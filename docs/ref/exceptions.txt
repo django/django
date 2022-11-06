@@ -42,6 +42,17 @@ Django core exception classes are defined in ``django.core.exceptions``.
     return any results. Most Django projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
 
+``FullResultSet``
+-----------------
+
+.. exception:: FullResultSet
+
+.. versionadded:: 4.2
+
+    ``FullResultSet`` may be raised during query generation if a query will
+    match everything. Most Django projects won't encounter this exception, but
+    it might be useful for implementing custom lookups and expressions.
+
 ``FieldDoesNotExist``
 ---------------------
 

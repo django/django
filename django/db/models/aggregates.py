@@ -1,7 +1,7 @@
 """
 Classes to represent the definitions of aggregate functions.
 """
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, FullResultSet
 from django.db.models.expressions import Case, Func, Star, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions.comparison import Coalesce
@@ -104,8 +104,11 @@ class Aggregate(Func):
         extra_context["distinct"] = "DISTINCT " if self.distinct else ""
         if self.filter:
             if connection.features.supports_aggregate_filter_clause:
-                filter_sql, filter_params = self.filter.as_sql(compiler, connection)
-                if filter_sql:
+                try:
+                    filter_sql, filter_params = self.filter.as_sql(compiler, connection)
+                except FullResultSet:
+                    pass
+                else:
                     template = self.filter_template % extra_context.get(
                         "template", self.template
                     )
