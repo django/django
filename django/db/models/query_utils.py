@@ -90,6 +90,7 @@ class Q(tree.Node):
             allow_joins=allow_joins,
             split_subq=False,
             check_filterable=False,
+            summarize=summarize,
         )
         query.promote_joins(joins)
         return clause
@@ -358,9 +359,9 @@ def refs_expression(lookup_parts, annotations):
     """
     for n in range(1, len(lookup_parts) + 1):
         level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
-        if level_n_lookup in annotations and annotations[level_n_lookup]:
-            return annotations[level_n_lookup], lookup_parts[n:]
-    return False, ()
+        if annotations.get(level_n_lookup):
+            return level_n_lookup, lookup_parts[n:]
+    return None, ()
 
 
 def check_rel_lookup_compatibility(model, target_opts, field):
