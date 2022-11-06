@@ -24,7 +24,15 @@ from django.db.models import (
     When,
 )
 from django.db.models.expressions import RawSQL
-from django.db.models.functions import Coalesce, ExtractYear, Floor, Length, Lower, Trim
+from django.db.models.functions import (
+    Cast,
+    Coalesce,
+    ExtractYear,
+    Floor,
+    Length,
+    Lower,
+    Trim,
+)
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -282,6 +290,13 @@ class NonAggregateAnnotationTestCase(TestCase):
         self.assertEqual(len(books), Book.objects.count())
         self.assertTrue(all(book.selected for book in books))
 
+    def test_full_expression_wrapped_annotation(self):
+        books = Book.objects.annotate(
+            selected=Coalesce(~Q(pk__in=[]), True),
+        )
+        self.assertEqual(len(books), Book.objects.count())
+        self.assertTrue(all(book.selected for book in books))
+
     def test_full_expression_annotation_with_aggregation(self):
         qs = Book.objects.filter(isbn="159059725").annotate(
             selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
@@ -292,7 +307,7 @@ class NonAggregateAnnotationTestCase(TestCase):
     def test_aggregate_over_full_expression_annotation(self):
         qs = Book.objects.annotate(
             selected=ExpressionWrapper(~Q(pk__in=[]), output_field=BooleanField()),
-        ).aggregate(Sum("selected"))
+        ).aggregate(selected__sum=Sum(Cast("selected", IntegerField())))
         self.assertEqual(qs["selected__sum"], Book.objects.count())
 
     def test_empty_queryset_annotation(self):

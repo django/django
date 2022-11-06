@@ -1,4 +1,4 @@
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, FullResultSet
 from django.db.models.expressions import Col
 from django.db.models.sql import compiler
 
@@ -40,12 +40,16 @@ class SQLDeleteCompiler(compiler.SQLDeleteCompiler, SQLCompiler):
             "DELETE %s FROM"
             % self.quote_name_unless_alias(self.query.get_initial_alias())
         ]
-        from_sql, from_params = self.get_from_clause()
+        from_sql, params = self.get_from_clause()
         result.extend(from_sql)
-        where_sql, where_params = self.compile(where)
-        if where_sql:
+        try:
+            where_sql, where_params = self.compile(where)
+        except FullResultSet:
+            pass
+        else:
             result.append("WHERE %s" % where_sql)
-        return " ".join(result), tuple(from_params) + tuple(where_params)
+            params.extend(where_params)
+        return " ".join(result), tuple(params)
 
 
 class SQLUpdateCompiler(compiler.SQLUpdateCompiler, SQLCompiler):
