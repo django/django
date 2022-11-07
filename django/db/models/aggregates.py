@@ -105,17 +105,18 @@ class Aggregate(Func):
         if self.filter:
             if connection.features.supports_aggregate_filter_clause:
                 filter_sql, filter_params = self.filter.as_sql(compiler, connection)
-                template = self.filter_template % extra_context.get(
-                    "template", self.template
-                )
-                sql, params = super().as_sql(
-                    compiler,
-                    connection,
-                    template=template,
-                    filter=filter_sql,
-                    **extra_context,
-                )
-                return sql, (*params, *filter_params)
+                if filter_sql:
+                    template = self.filter_template % extra_context.get(
+                        "template", self.template
+                    )
+                    sql, params = super().as_sql(
+                        compiler,
+                        connection,
+                        template=template,
+                        filter=filter_sql,
+                        **extra_context,
+                    )
+                    return sql, (*params, *filter_params)
             else:
                 copy = self.copy()
                 copy.filter = None
