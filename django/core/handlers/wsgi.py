@@ -91,6 +91,7 @@ class WSGIRequest(HttpRequest):
         self._stream = LimitedStream(self.environ["wsgi.input"], content_length)
         self._read_started = False
         self.resolver_match = None
+        self.environ.setdefault("wsgiorg.routing_args", ((), {}))
 
     def __getstate__(self):
         state = super().__getstate__()
@@ -116,6 +117,28 @@ class WSGIRequest(HttpRequest):
     def _set_post(self, post):
         self._post = post
 
+    def _get_positional_args(self):
+        routing_args = self.environ["wsgiorg.routing_args"]
+        positional_args = routing_args[0]
+        return positional_args
+
+    def _set_positional_args(self, new_positional_args):
+        routing_args = self.environ["wsgiorg.routing_args"]
+        named_args = routing_args[1]
+        new_routing_args = (new_positional_args, named_args)
+        self.environ["wsgiorg.routing_args"] = new_routing_args
+
+    def _get_named_args(self):
+        routing_args = self.environ["wsgiorg.routing_args"]
+        named_args = routing_args[1]
+        return named_args
+
+    def _set_named_args(self, new_named_args):
+        routing_args = self.environ["wsgiorg.routing_args"]
+        positional_args = routing_args[0]
+        new_routing_args = (positional_args, new_named_args)
+        self.environ["wsgiorg.routing_args"] = new_routing_args
+
     @cached_property
     def COOKIES(self):
         raw_cookie = get_str_from_wsgi(self.environ, "HTTP_COOKIE", "")
@@ -128,6 +151,8 @@ class WSGIRequest(HttpRequest):
         return self._files
 
     POST = property(_get_post, _set_post)
+    POSITIONAL_PATH_ARGS = property(_get_positional_args, _set_positional_args)
+    NAMED_PATH_ARGS = property(_get_named_args, _set_named_args)
 
 
 class WSGIHandler(base.BaseHandler):

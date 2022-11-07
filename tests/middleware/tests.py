@@ -8,6 +8,7 @@ from urllib.parse import quote
 from django.conf import settings
 from django.core import mail
 from django.core.exceptions import PermissionDenied
+from django.core.handlers.wsgi import WSGIRequest
 from django.http import (
     FileResponse,
     HttpRequest,
@@ -21,9 +22,14 @@ from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.middleware.common import BrokenLinkEmailsMiddleware, CommonMiddleware
 from django.middleware.gzip import GZipMiddleware
 from django.middleware.http import ConditionalGetMiddleware
+from django.middleware.routing_args import RoutingArgsMiddleware
 from django.test import RequestFactory, SimpleTestCase, override_settings
 
 int2byte = struct.Struct(">B").pack
+
+
+def _FAKE_VIEW():
+    return None
 
 
 def get_response_empty(request):
@@ -36,7 +42,6 @@ def get_response_404(request):
 
 @override_settings(ROOT_URLCONF="middleware.urls")
 class CommonMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     @override_settings(APPEND_SLASH=True)
@@ -389,7 +394,6 @@ class CommonMiddlewareTest(SimpleTestCase):
     MANAGERS=[("PHD", "PHB@dilbert.com")],
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     def setUp(self):
@@ -710,6 +714,58 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
         request = self.request_factory.head("/")
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(request)
         self.assertNotIn("ETag", conditional_get_response)
+
+
+class TestRoutingArgs(SimpleTestCase):
+    def setUp(self):
+        super(TestRoutingArgs, self).setUp()
+
+        environ = {"REQUEST_METHOD": "GET", "wsgi.input": BytesIO(b"")}
+        self.request = WSGIRequest(environ)
+
+        self.mw = RoutingArgsMiddleware(self.request)
+
+    def test_arguments_are_stored(self):
+        """The positional and named arguments should be stored in to environ"""
+        args = ("foo", "bar")
+        kwargs = {"arg": "value"}
+        self.mw.process_view(self.request, _FAKE_VIEW, args, kwargs)
+
+        self.assertEqual(self.request.POSITIONAL_PATH_ARGS, args)
+        self.assertEqual(
+            self.request.environ["wsgiorg.routing_args"][1],
+            kwargs,
+        )
+
+        self.assertTrue("wsgiorg.routing_args" in self.request.environ)
+        self.assertEqual(len(self.request.environ["wsgiorg.routing_args"]), 2)
+        self.assertEqual(self.request.environ["wsgiorg.routing_args"][0], args)
+        self.assertEqual(
+            self.request.environ["wsgiorg.routing_args"][1],
+            kwargs,
+        )
+
+    def test_named_arguments_are_copied(self):
+        """
+        The named arguments must be copied, not passed by reference.
+
+        Because Django will pass them on without inspecting the arguments for
+        the view.
+
+        """
+        kwargs = {"arg": "value"}
+        self.mw.process_view(self.request, _FAKE_VIEW, ("foo", "bar"), kwargs)
+        self.request.environ["wsgiorg.routing_args"][1]["new_arg"] = "new_value"
+        # The original dictionary must have not been modified:
+        self.assertEqual(len(kwargs), 1)
+        self.assertTrue("arg" in kwargs)
+
+    def test_response(self):
+        """A response should never be returned."""
+        args = ("foo", "bar")
+        kwargs = {"arg": "value"}
+        result = self.mw.process_view(self.request, _FAKE_VIEW, args, kwargs)
+        self.assertTrue(result is None)
 
 
 class XFrameOptionsMiddlewareTest(SimpleTestCase):

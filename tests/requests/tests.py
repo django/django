@@ -87,6 +87,7 @@ class RequestsTests(SimpleTestCase):
                 "SCRIPT_NAME",
                 "CONTENT_TYPE",
                 "wsgi.input",
+                "wsgiorg.routing_args",
             },
         )
         self.assertEqual(request.META["PATH_INFO"], "bogus")
