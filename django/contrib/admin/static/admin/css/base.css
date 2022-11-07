@@ -108,7 +108,7 @@ body {
 
 a:link,
 a:visited {
-    color: var(--link-fg);
+    color: var(--link-hover-color);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
 }
@@ -664,7 +664,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 0.8125rem;
     text-align: left;
-    background: var(--primary);
+    background: var(--header-bg);
     color: var(--header-link-color);
 }
 
@@ -863,7 +863,7 @@ a.deletelink:hover {
     float: left;
     padding: 3px 12px;
     background: var(--object-tools-bg);
-    color: var(--object-tools-fg);
+    color: var(--primary-fg);
     font-weight: 400;
     font-size: 0.6875rem;
     text-transform: uppercase;

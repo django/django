@@ -12,7 +12,8 @@
     flex: 1 0 auto;
 }
 
-.selector-available, .selector-chosen {
+.selector-available,
+.selector-chosen {
     width: 380px;
     text-align: center;
     margin-bottom: 5px;
@@ -20,7 +21,8 @@
     flex-direction: column;
 }
 
-.selector-available h2, .selector-chosen h2 {
+.selector-available h2,
+.selector-chosen h2 {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
 }
@@ -36,12 +38,13 @@
     color: var(--header-link-color);
     cursor: pointer;
 }
+
 .selector-chosen .list-footer-display__clear {
     color: var(--breadcrumbs-fg);
 }
 
 .selector-chosen h2 {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--header-link-color);
 }
 
@@ -98,6 +101,7 @@
     margin: 0 0 10px;
     border-radius: 0 0 4px 4px;
 }
+
 .selector .selector-chosen--with-filtered select {
     margin: 0;
     border-radius: 0;
@@ -108,7 +112,8 @@
     display: none;
 }
 
-.selector-add, .selector-remove {
+.selector-add,
+.selector-remove {
     width: 16px;
     height: 16px;
     display: block;
@@ -118,11 +123,13 @@
     opacity: 0.55;
 }
 
-.active.selector-add, .active.selector-remove {
+.active.selector-add,
+.active.selector-remove {
     opacity: 1;
 }
 
-.active.selector-add:hover, .active.selector-remove:hover {
+.active.selector-add:hover,
+.active.selector-remove:hover {
     cursor: pointer;
 }
 
@@ -130,7 +137,8 @@
     background: url(../img/selector-icons.svg) 0 -96px no-repeat;
 }
 
-.active.selector-add:focus, .active.selector-add:hover {
+.active.selector-add:focus,
+.active.selector-add:hover {
     background-position: 0 -112px;
 }
 
@@ -138,11 +146,13 @@
     background: url(../img/selector-icons.svg) 0 -64px no-repeat;
 }
 
-.active.selector-remove:focus, .active.selector-remove:hover {
+.active.selector-remove:focus,
+.active.selector-remove:hover {
     background-position: 0 -80px;
 }
 
-a.selector-chooseall, a.selector-clearall {
+a.selector-chooseall,
+a.selector-clearall {
     display: inline-block;
     height: 16px;
     text-align: left;
@@ -155,16 +165,20 @@ a.selector-chooseall, a.selector-clearall {
     opacity: 0.55;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-clearall:focus,
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+a.active.selector-chooseall:focus,
+a.active.selector-clearall:focus,
+a.active.selector-chooseall:hover,
+a.active.selector-clearall:hover {
     color: var(--link-fg);
 }
 
-a.active.selector-chooseall, a.active.selector-clearall {
+a.active.selector-chooseall,
+a.active.selector-clearall {
     opacity: 1;
 }
 
-a.active.selector-chooseall:hover, a.active.selector-clearall:hover {
+a.active.selector-chooseall:hover,
+a.active.selector-clearall:hover {
     cursor: pointer;
 }
 
@@ -174,7 +188,8 @@ a.selector-chooseall {
     cursor: default;
 }
 
-a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+a.active.selector-chooseall:focus,
+a.active.selector-chooseall:hover {
     background-position: 100% -176px;
 }
 
@@ -184,7 +199,8 @@ a.selector-clearall {
     cursor: default;
 }
 
-a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+a.active.selector-clearall:focus,
+a.active.selector-clearall:hover {
     background-position: 0 -144px;
 }
 
@@ -201,7 +217,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     height: 10.1em;
 }
 
-.stacked .selector-available, .stacked .selector-chosen {
+.stacked .selector-available,
+.stacked .selector-chosen {
     width: 480px;
 }
 
@@ -227,7 +244,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     padding: 3px 3px 3px 5px;
 }
 
-.stacked .selector-chooseall, .stacked .selector-clearall {
+.stacked .selector-chooseall,
+.stacked .selector-clearall {
     display: none;
 }
 
@@ -241,7 +259,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     cursor: pointer;
 }
 
-.stacked .active.selector-add:focus, .stacked .active.selector-add:hover {
+.stacked .active.selector-add:focus,
+.stacked .active.selector-add:hover {
     background-position: 0 -48px;
     cursor: pointer;
 }
@@ -256,7 +275,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     cursor: pointer;
 }
 
-.stacked .active.selector-remove:focus, .stacked .active.selector-remove:hover {
+.stacked .active.selector-remove:focus,
+.stacked .active.selector-remove:hover {
     background-position: 0 -16px;
     cursor: pointer;
 }
@@ -298,7 +318,9 @@ p.datetime {
     color: var(--body-quiet-color);
 }
 
-.datetime input, .form-row .datetime input.vDateField, .form-row .datetime input.vTimeField {
+.datetime input,
+.form-row .datetime input.vDateField,
+.form-row .datetime input.vTimeField {
     margin-left: 5px;
     margin-bottom: 4px;
 }
@@ -309,7 +331,8 @@ table p.datetime {
     padding-left: 0;
 }
 
-.datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
+.datetimeshortcuts .clock-icon,
+.datetimeshortcuts .date-icon {
     position: relative;
     display: inline-block;
     vertical-align: middle;
@@ -389,7 +412,8 @@ span.clearable-file-input label {
 
 /* CALENDARS & CLOCKS */
 
-.calendarbox, .clockbox {
+.calendarbox,
+.clockbox {
     margin: 5px auto;
     font-size: 0.75rem;
     width: 19em;
@@ -420,7 +444,8 @@ span.clearable-file-input label {
     width: 100%;
 }
 
-.calendar caption, .calendarbox h2 {
+.calendar caption,
+.calendarbox h2 {
     margin: 0;
     text-align: center;
     border-top: none;
@@ -462,7 +487,8 @@ span.clearable-file-input label {
     font-weight: 700;
 }
 
-.calendar td a, .timelist a {
+.calendar td a,
+.timelist a {
     display: block;
     font-weight: 400;
     padding: 6px;
@@ -470,13 +496,16 @@ span.clearable-file-input label {
     color: var(--body-quiet-color);
 }
 
-.calendar td a:focus, .timelist a:focus,
-.calendar td a:hover, .timelist a:hover {
+.calendar td a:focus,
+.timelist a:focus,
+.calendar td a:hover,
+.timelist a:hover {
     background: var(--primary);
     color: white;
 }
 
-.calendar td a:active, .timelist a:active {
+.calendar td a:active,
+.timelist a:active {
     background: var(--header-bg);
     color: white;
 }
@@ -489,8 +518,10 @@ span.clearable-file-input label {
     padding: 1px 3px;
 }
 
-.calendarnav a:link, #calendarnav a:visited,
-#calendarnav a:focus, #calendarnav a:hover {
+.calendarnav a:link,
+#calendarnav a:visited,
+#calendarnav a:focus,
+#calendarnav a:hover {
     color: var(--body-quiet-color);
 }
 
@@ -503,7 +534,8 @@ span.clearable-file-input label {
     padding: 8px 0;
 }
 
-.calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
+.calendarbox .calendarnav-previous,
+.calendarbox .calendarnav-next {
     display: block;
     position: absolute;
     top: 8px;
@@ -542,7 +574,8 @@ span.clearable-file-input label {
     color: var(--body-fg);
 }
 
-.calendar-cancel:focus, .calendar-cancel:hover {
+.calendar-cancel:focus,
+.calendar-cancel:hover {
     background: #ddd;
 }
 
@@ -551,7 +584,8 @@ span.clearable-file-input label {
     display: block;
 }
 
-ul.timelist, .timelist li {
+ul.timelist,
+.timelist li {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -572,14 +606,17 @@ ul.timelist, .timelist li {
     border: 0px none;
 }
 
-.inline-deletelink:focus, .inline-deletelink:hover {
+.inline-deletelink:focus,
+.inline-deletelink:hover {
     cursor: pointer;
 }
 
 /* RELATED WIDGET WRAPPER */
 .related-widget-wrapper {
-    float: left;       /* display properly in form rows with multiple fields */
-    overflow: hidden;  /* clear floated contents */
+    float: left;
+    /* display properly in form rows with multiple fields */
+    overflow: hidden;
+    /* clear floated contents */
 }
 
 .related-widget-wrapper-link {
@@ -595,8 +632,8 @@ ul.timelist, .timelist li {
     opacity: 1;
 }
 
-select + .related-widget-wrapper-link,
-.related-widget-wrapper-link + .related-widget-wrapper-link {
+select+.related-widget-wrapper-link,
+.related-widget-wrapper-link+.related-widget-wrapper-link {
     margin-left: 7px;
 }
 
