@@ -785,12 +785,12 @@ div.breadcrumbs {
     background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
-    color: var(--breadcrumbs-fg);
+    color: var(--body-fg);
     text-align: left;
 }
 
 div.breadcrumbs a {
-    color: var(--breadcrumbs-link-fg);
+    color: var(--body-loud-color);
 }
 
 div.breadcrumbs a:focus,
