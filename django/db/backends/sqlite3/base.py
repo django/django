@@ -371,11 +371,11 @@ class SQLiteCursorWrapper(Database.Cursor):
 
     def execute(self, query, params=None):
         if params is None:
-            return Database.Cursor.execute(self, query)
+            return super().execute(query)
         # Extract names if params is a mapping, i.e. "pyformat" style is used.
         param_names = list(params) if isinstance(params, Mapping) else None
         query = self.convert_query(query, param_names=param_names)
-        return Database.Cursor.execute(self, query, params)
+        return super().execute(query, params)
 
     def executemany(self, query, param_list):
         # Extract names if params is a mapping, i.e. "pyformat" style is used.
@@ -386,7 +386,7 @@ class SQLiteCursorWrapper(Database.Cursor):
         else:
             param_names = None
         query = self.convert_query(query, param_names=param_names)
-        return Database.Cursor.executemany(self, query, param_list)
+        return super().executemany(query, param_list)
 
     def convert_query(self, query, *, param_names=None):
         if param_names is None:
