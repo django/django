@@ -424,20 +424,19 @@ class SQLCompiler:
                 src = resolved.expression
                 expr_src = expr.expression
                 for sel_expr, _, col_alias in self.select:
-                    if col_alias and not (
-                        isinstance(expr_src, F) and col_alias == expr_src.name
+                    if (
+                        isinstance(expr_src, F)
+                        and expr_src.name == col_alias
+                        or src == sel_expr
                     ):
-                        continue
-                    if src == sel_expr:
-                        resolved.set_source_expressions(
-                            [Ref(col_alias if col_alias else src.target.column, src)]
-                        )
+                        resolved.set_source_expressions([Ref(col_alias, src)])
                         break
                 else:
-                    if col_alias:
-                        raise DatabaseError(
-                            "ORDER BY term does not match any column in the result set."
-                        )
+                    # Not sure how to detect this condition if we're using aliases
+                    # if col_alias:
+                    #     raise DatabaseError(
+                    #         "ORDER BY term does not match any column in the result set."
+                    #     )
                     # Add column used in ORDER BY clause to the selected
                     # columns and to each combined query.
                     order_by_idx = len(self.query.select) + 1
@@ -540,7 +539,7 @@ class SQLCompiler:
                             *self.query.annotation_select,
                         )
                     )
-                part_sql, part_args = compiler.as_sql()
+                part_sql, part_args = compiler.as_sql(with_col_aliases=True)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
@@ -686,6 +685,9 @@ class SQLCompiler:
         If 'with_limits' is False, any limit/offset information is not included
         in the query.
         """
+        if self.query.combinator:
+            with_col_aliases = True
+
         refcounts_before = self.query.alias_refcount.copy()
         try:
             extra_select, order_by, group_by = self.pre_sql_setup(

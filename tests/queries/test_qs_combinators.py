@@ -5,7 +5,15 @@ from django.db.models import Exists, F, IntegerField, OuterRef, Subquery, Value
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
-from .models import Author, Celebrity, ExtraInfo, Number, ReservedName
+from .models import (
+    Author,
+    Celebrity,
+    ExtraInfo,
+    NamedCategory,
+    Number,
+    ReservedName,
+    Tag,
+)
 
 
 @skipUnlessDBFeature("supports_select_union")
@@ -103,6 +111,19 @@ class QuerySetSetOperationTests(TestCase):
                 F("other_num").asc(nulls_last=True),
             ).values_list("other_num", flat=True),
             [1, 2, 3, 4, 6, 7, 8, 9, 10, None],
+        )
+
+    def test_union_with_select_related_and_order(self):
+        category = NamedCategory.objects.create(name="category")
+        Tag.objects.create(name="tag-1", category=category)
+        Tag.objects.create(name="tag-2", category=category)
+        base_qs = Tag.objects.all().select_related("category").order_by()
+        qs1 = base_qs.filter(name="tag-1")
+        qs2 = base_qs.filter(name="tag-2")
+        self.assertQuerySetEqual(
+            qs1.union(qs2).order_by("name"),
+            ["tag-1", "tag-2"],
+            lambda t: t.name,
         )
 
     @skipUnlessDBFeature("supports_select_intersection")
@@ -249,6 +270,7 @@ class QuerySetSetOperationTests(TestCase):
         qs2 = Number.objects.filter(num=9)
         self.assertCountEqual(qs1.union(qs2).values_list("num", flat=True), [1, 9])
 
+    # xxx
     def test_union_with_values_list_and_order(self):
         ReservedName.objects.bulk_create(
             [
