@@ -1103,6 +1103,14 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/get_view/", {"var": "val"})
         self.assertContains(response, "This is a test. val is the value.")
 
+    async def test_post_data(self):
+        response = await self.async_client.post("/post_view/", {"value": 37})
+        self.assertContains(response, "Data received: 37 is the value.")
+
+    async def test_body_read_on_get_data(self):
+        response = await self.async_client.get("/post_view/")
+        self.assertContains(response, "Viewing GET page.")
+
 
 @override_settings(ROOT_URLCONF="test_client.urls")
 class AsyncRequestFactoryTest(SimpleTestCase):
@@ -1146,6 +1154,16 @@ class AsyncRequestFactoryTest(SimpleTestCase):
         response = await async_generic_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content, b'{"example": "data"}')
+
+    async def test_request_limited_read(self):
+        tests = ["GET", "POST"]
+        for method in tests:
+            with self.subTest(method=method):
+                request = self.request_factory.generic(
+                    method,
+                    "/somewhere",
+                )
+                self.assertEqual(request.read(200), b"")
 
     def test_request_factory_sets_headers(self):
         request = self.request_factory.get(
