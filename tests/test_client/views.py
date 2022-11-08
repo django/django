@@ -90,6 +90,8 @@ def post_view(request):
             c = Context()
     else:
         t = Template("Viewing GET page.", name="Empty GET Template")
+        # Used by test_body_read_on_get_data.
+        request.read(200)
         c = Context()
     return HttpResponse(t.render(c))
 
