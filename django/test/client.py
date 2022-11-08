@@ -14,7 +14,7 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import WSGIRequest
+from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import got_request_exception, request_finished, request_started
 from django.db import close_old_connections
@@ -198,7 +198,8 @@ class AsyncClientHandler(BaseHandler):
             sender=self.__class__, scope=scope
         )
         request_started.connect(close_old_connections)
-        request = ASGIRequest(scope, body_file)
+        # Wrap FakePayload body_file to allow large read() in test environment.
+        request = ASGIRequest(scope, LimitedStream(body_file, len(body_file)))
         # Sneaky little hack so that we can easily get round
         # CsrfViewMiddleware. This makes life easier, and is probably required
         # for backwards compatibility with external tests against admin views.
@@ -598,7 +599,10 @@ class AsyncRequestFactory(RequestFactory):
             body_file = request.pop("_body_file")
         else:
             body_file = FakePayload("")
-        return ASGIRequest(self._base_scope(**request), body_file)
+        # Wrap FakePayload body_file to allow large read() in test environment.
+        return ASGIRequest(
+            self._base_scope(**request), LimitedStream(body_file, len(body_file))
+        )
 
     def generic(
         self,
