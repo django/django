@@ -718,11 +718,9 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
 class TestRoutingArgs(SimpleTestCase):
     def setUp(self):
-        super(TestRoutingArgs, self).setUp()
-
+        super().setUp()
         environ = {"REQUEST_METHOD": "GET", "wsgi.input": BytesIO(b"")}
         self.request = WSGIRequest(environ)
-
         self.mw = RoutingArgsMiddleware(self.request)
 
     def test_arguments_are_stored(self):
