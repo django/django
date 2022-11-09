@@ -227,18 +227,18 @@ class FunctionTests(SimpleTestCase):
         #13704 - Check urlize handles IDN correctly
         """
         self.assertEqual(
-            urlize("http://c✶.ws"),
-            '<a href="http://xn--c-lgq.ws" rel="nofollow">http://c✶.ws</a>',
+            urlize("http://ça.ws"),
+            '<a href="http://xn--a-5fa.ws" rel="nofollow">http://ça.ws</a>',
         )
         self.assertEqual(
-            urlize("www.c✶.ws"),
-            '<a href="http://www.xn--c-lgq.ws" rel="nofollow">www.c✶.ws</a>',
+            urlize("www.ça.ws"),
+            '<a href="http://www.xn--a-5fa.ws" rel="nofollow">www.ça.ws</a>',
         )
         self.assertEqual(
-            urlize("c✶.org"), '<a href="http://xn--c-lgq.org" rel="nofollow">c✶.org</a>'
+            urlize("ça.org"), '<a href="http://xn--a-5fa.org" rel="nofollow">ça.org</a>'
         )
         self.assertEqual(
-            urlize("info@c✶.org"), '<a href="mailto:info@xn--c-lgq.org">info@c✶.org</a>'
+            urlize("info@ça.org"), '<a href="mailto:info@xn--a-5fa.org">info@ça.org</a>'
         )
 
     def test_malformed(self):

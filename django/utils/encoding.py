@@ -211,7 +211,19 @@ def escape_uri_path(path):
 
 def punycode(domain):
     """Return the Punycode of the given domain if it's non-ASCII."""
-    return domain.encode("idna").decode("ascii")
+    if not domain:
+        return domain
+    try:
+        # try importing idna package for IDNA 2008 compliance
+        import idna
+
+        # enable uts46 mapping for mapping: uppercase letters, normalization, etc.
+        return idna.encode(domain, uts46=True, transitional=False).decode("ascii")
+    except ImportError:
+        # will fall back to Python IDNA 2003
+        return domain.encode("idna").decode("ascii")
+    except idna.IDNAError as e:
+        raise UnicodeError(e) from e
 
 
 def repercent_broken_unicode(path):
