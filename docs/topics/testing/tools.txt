@@ -969,7 +969,7 @@ The code for this test may look as follows::
             super().tearDownClass()
 
         def test_login(self):
-            self.selenium.get('%s%s' % (self.live_server_url, '/login/'))
+            self.selenium.get(f'{self.live_server_url}/login/')
             username_input = self.selenium.find_element(By.NAME, "username")
             username_input.send_keys('myuser')
             password_input = self.selenium.find_element(By.NAME, "password")

@@ -473,7 +473,7 @@ login page::
 
     def my_view(request):
         if not request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect(f'{settings.LOGIN_URL}?next={request.path}')
         # ...
 
 ...or display an error message::

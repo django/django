@@ -14,7 +14,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
         address = models.CharField(max_length=80)
 
         def __str__(self):
-            return "%s the place" % self.name
+            return f"{self.name} the place"
 
     class Restaurant(models.Model):
         place = models.OneToOneField(

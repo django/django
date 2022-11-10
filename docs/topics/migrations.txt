@@ -561,7 +561,7 @@ the historical model and iterate over the rows::
         # version than this migration expects. We use the historical version.
         Person = apps.get_model('yourappname', 'Person')
         for person in Person.objects.all():
-            person.name = '%s %s' % (person.first_name, person.last_name)
+            person.name = f'{person.first_name} {person.last_name}'
             person.save()
 
     class Migration(migrations.Migration):
