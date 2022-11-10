@@ -354,7 +354,7 @@ class PasswordResetForm(forms.Form):
 
 class SetPasswordForm(forms.Form):
     """
-    A form that lets a user change set their password without entering the old
+    A form that lets a user set their password without entering the old
     password
     """
 
