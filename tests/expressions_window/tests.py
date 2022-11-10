@@ -42,6 +42,7 @@ from django.db.models.functions import (
 )
 from django.db.models.lookups import Exact
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import Classification, Detail, Employee, PastEmployeeDepartment
 
@@ -1157,16 +1158,21 @@ class WindowFunctionTests(TestCase):
         )
 
     def test_filter_count(self):
-        self.assertEqual(
-            Employee.objects.annotate(
-                department_salary_rank=Window(
-                    Rank(), partition_by="department", order_by="-salary"
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(
+                Employee.objects.annotate(
+                    department_salary_rank=Window(
+                        Rank(), partition_by="department", order_by="-salary"
+                    )
                 )
+                .filter(department_salary_rank=1)
+                .count(),
+                5,
             )
-            .filter(department_salary_rank=1)
-            .count(),
-            5,
-        )
+        self.assertEqual(len(ctx.captured_queries), 1)
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 3)
+        self.assertNotIn("group by", sql)
 
     @skipUnlessDBFeature("supports_frame_range_fixed_distance")
     def test_range_n_preceding_and_following(self):

@@ -447,13 +447,15 @@ class Query(BaseExpression):
             if alias not in added_aggregate_names
         }
         # Existing usage of aggregation can be determined by the presence of
-        # selected aggregate and window annotations but also by filters against
-        # aliased aggregate and windows via HAVING / QUALIFY.
-        has_existing_aggregation = any(
-            getattr(annotation, "contains_aggregate", True)
-            or getattr(annotation, "contains_over_clause", True)
-            for annotation in existing_annotations.values()
-        ) or any(self.where.split_having_qualify()[1:])
+        # selected aggregates but also by filters against aliased aggregates.
+        _, having, qualify = self.where.split_having_qualify()
+        has_existing_aggregation = (
+            any(
+                getattr(annotation, "contains_aggregate", True)
+                for annotation in existing_annotations.values()
+            )
+            or having
+        )
         # Decide if we need to use a subquery.
         #
         # Existing aggregations would cause incorrect results as
@@ -468,6 +470,7 @@ class Query(BaseExpression):
             isinstance(self.group_by, tuple)
             or self.is_sliced
             or has_existing_aggregation
+            or qualify
             or self.distinct
             or self.combinator
         ):
@@ -494,13 +497,16 @@ class Query(BaseExpression):
                         self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                     )
                 inner_query.default_cols = False
-                # Mask existing annotations that are not referenced by
-                # aggregates to be pushed to the outer query.
-                annotation_mask = set()
-                for name in added_aggregate_names:
-                    annotation_mask.add(name)
-                    annotation_mask |= inner_query.annotations[name].get_refs()
-                inner_query.set_annotation_mask(annotation_mask)
+                if not qualify:
+                    # Mask existing annotations that are not referenced by
+                    # aggregates to be pushed to the outer query unless
+                    # filtering against window functions is involved as it
+                    # requires complex realising.
+                    annotation_mask = set()
+                    for name in added_aggregate_names:
+                        annotation_mask.add(name)
+                        annotation_mask |= inner_query.annotations[name].get_refs()
+                    inner_query.set_annotation_mask(annotation_mask)
 
             relabels = {t: "subquery" for t in inner_query.alias_map}
             relabels[None] = "subquery"
