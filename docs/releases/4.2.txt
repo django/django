@@ -318,6 +318,10 @@ Models
   :meth:`~.RelatedManager.aclear`, :meth:`~.RelatedManager.aremove`, and
   :meth:`~.RelatedManager.aset`.
 
+* :attr:`CharField.max_length <django.db.models.CharField.max_length>` is no
+  longer required to be set on PostgreSQL, which supports unlimited ``VARCHAR``
+  columns.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 

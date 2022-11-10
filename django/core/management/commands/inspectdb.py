@@ -339,7 +339,8 @@ class Command(BaseCommand):
 
         # Add max_length for all CharFields.
         if field_type == "CharField" and row.display_size:
-            field_params["max_length"] = int(row.display_size)
+            if (size := int(row.display_size)) and size > 0:
+                field_params["max_length"] = size
 
         if field_type in {"CharField", "TextField"} and row.collation:
             field_params["db_collation"] = row.collation
