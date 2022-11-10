@@ -70,6 +70,8 @@ The following is a unit test using the request factory::
 AsyncRequestFactory
 -------------------
 
+.. class:: AsyncRequestFactory
+
 ``RequestFactory`` creates WSGI-like requests. If you want to create ASGI-like
 requests, including having a correct ASGI ``scope``, you can instead use
 ``django.test.AsyncRequestFactory``.
@@ -77,6 +79,9 @@ requests, including having a correct ASGI ``scope``, you can instead use
 This class is directly API-compatible with ``RequestFactory``, with the only
 difference being that it returns ``ASGIRequest`` instances rather than
 ``WSGIRequest`` instances. All of its methods are still synchronous callables.
+
+Arbitrary keyword arguments in ``defaults`` are added directly into the ASGI
+scope.
 
 Testing class-based views
 =========================

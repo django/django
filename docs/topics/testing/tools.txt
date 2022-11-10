@@ -1906,9 +1906,13 @@ If you are testing from an asynchronous function, you must also use the
 asynchronous test client. This is available as ``django.test.AsyncClient``,
 or as ``self.async_client`` on any test.
 
+.. class:: AsyncClient(enforce_csrf_checks=False, raise_request_exception=True, **defaults)
+
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
 test client, with two exceptions:
 
+* In the initialization, arbitrary keyword arguments in ``defaults`` are added
+  directly into the ASGI scope.
 * The ``follow`` parameter is not supported.
 * Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
   prefix required by the synchronous client (see :meth:`Client.get`). For
