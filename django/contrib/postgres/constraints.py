@@ -51,8 +51,6 @@ class ExclusionConstraint(BaseConstraint):
             raise ValueError("The expressions must be a list of 2-tuples.")
         if not isinstance(condition, (type(None), Q)):
             raise ValueError("ExclusionConstraint.condition must be a Q instance.")
-        if condition and deferrable:
-            raise ValueError("ExclusionConstraint with conditions cannot be deferred.")
         if not isinstance(deferrable, (type(None), Deferrable)):
             raise ValueError(
                 "ExclusionConstraint.deferrable must be a Deferrable instance."
