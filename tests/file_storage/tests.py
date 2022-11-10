@@ -956,7 +956,7 @@ class FieldCallableFileStorageTests(SimpleTestCase):
 
         msg = (
             "FileField.storage must be a subclass/instance of "
-            "django.core.files.storage.Storage"
+            "django.core.files.storage.base.Storage"
         )
         for invalid_type in (NotStorage, str, list, set, tuple):
             with self.subTest(invalid_type=invalid_type):
