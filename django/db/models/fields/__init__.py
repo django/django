@@ -817,9 +817,14 @@ class Field(RegisterLookupMixin):
         # exactly which wacky database column type you want to use.
         data = self.db_type_parameters(connection)
         try:
-            return connection.data_types[self.get_internal_type()] % data
+            column_type = connection.data_types[self.get_internal_type()]
         except KeyError:
             return None
+        else:
+            # column_type is either a single-parameter function or a string.
+            if callable(column_type):
+                return column_type(data)
+            return column_type % data
 
     def rel_db_type(self, connection):
         """
@@ -1130,13 +1135,18 @@ class BooleanField(Field):
 
 
 class CharField(Field):
-    description = _("String (up to %(max_length)s)")
-
     def __init__(self, *args, db_collation=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.db_collation = db_collation
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    @property
+    def description(self):
+        if self.max_length is not None:
+            return _("String (up to %(max_length)s)")
+        else:
+            return _("String (unlimited)")
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
@@ -1148,6 +1158,12 @@ class CharField(Field):
 
     def _check_max_length_attribute(self, **kwargs):
         if self.max_length is None:
+            if (
+                connection.features.supports_unlimited_charfield
+                or "supports_unlimited_charfield"
+                in self.model._meta.required_db_features
+            ):
+                return []
             return [
                 checks.Error(
                     "CharFields must define a 'max_length' attribute.",

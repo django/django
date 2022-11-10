@@ -112,16 +112,18 @@ class CharFieldTests(TestCase):
             field = models.CharField()
 
         field = Model._meta.get_field("field")
-        self.assertEqual(
-            field.check(),
-            [
+        expected = (
+            []
+            if connection.features.supports_unlimited_charfield
+            else [
                 Error(
                     "CharFields must define a 'max_length' attribute.",
                     obj=field,
                     id="fields.E120",
                 ),
-            ],
+            ]
         )
+        self.assertEqual(field.check(), expected)
 
     def test_negative_max_length(self):
         class Model(models.Model):

@@ -106,6 +106,13 @@ class TextFieldDbCollation(models.Model):
         required_db_features = {"supports_collation_on_textfield"}
 
 
+class CharFieldUnlimited(models.Model):
+    char_field = models.CharField(max_length=None)
+
+    class Meta:
+        required_db_features = {"supports_unlimited_charfield"}
+
+
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)

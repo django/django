@@ -184,6 +184,13 @@ class InspectDBTestCase(TestCase):
                 output,
             )
 
+    @skipUnlessDBFeature("supports_unlimited_charfield")
+    def test_char_field_unlimited(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_charfieldunlimited", stdout=out)
+        output = out.getvalue()
+        self.assertIn("char_field = models.CharField()", output)
+
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
         assertFieldType = self.make_field_type_asserter()

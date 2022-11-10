@@ -110,3 +110,4 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     has_bit_xor = property(operator.attrgetter("is_postgresql_14"))
     supports_covering_spgist_indexes = property(operator.attrgetter("is_postgresql_14"))
+    supports_unlimited_charfield = True

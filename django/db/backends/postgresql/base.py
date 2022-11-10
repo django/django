@@ -80,6 +80,12 @@ from .operations import DatabaseOperations  # NOQA isort:skip
 from .schema import DatabaseSchemaEditor  # NOQA isort:skip
 
 
+def _get_varchar_column(data):
+    if data["max_length"] is None:
+        return "varchar"
+    return "varchar(%(max_length)s)" % data
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
@@ -92,7 +98,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "BigAutoField": "bigint",
         "BinaryField": "bytea",
         "BooleanField": "boolean",
-        "CharField": "varchar(%(max_length)s)",
+        "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "timestamp with time zone",
         "DecimalField": "numeric(%(max_digits)s, %(decimal_places)s)",

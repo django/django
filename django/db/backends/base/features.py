@@ -345,6 +345,9 @@ class BaseDatabaseFeatures:
     # Set to (exception, message) if null characters in text are disallowed.
     prohibits_null_characters_in_text_exception = None
 
+    # Does the backend support unlimited character columns?
+    supports_unlimited_charfield = False
+
     # Collation names for use by the Django test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.
