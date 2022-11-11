@@ -13,9 +13,9 @@ creating HTML pages with templates, see :doc:`Tutorial 3 </intro/tutorial03>`.
 
 A Django project can be configured with one or several template engines (or
 even zero if you don't use templates). Django ships built-in backends for its
-own template system, creatively called the Django template language (DTL), and
+own template system creatively called the Django template language (DTL), and
 for the popular alternative Jinja2_. Backends for other template languages may
-be available from third-parties. You can also write your own custom backend,
+be available from third parties. You can also write your own custom backend,
 see :doc:`Custom template backend </howto/custom-template-backend>`
 
 Django defines a standard API for loading and rendering templates regardless
@@ -29,7 +29,7 @@ template system. Until Django 1.8 it was the only built-in option available.
 It's a good template library even though it's fairly opinionated and sports a
 few idiosyncrasies. If you don't have a pressing reason to choose another
 backend, you should use the DTL, especially if you're writing a pluggable
-application and you intend to distribute templates. Django's contrib apps that
+application and you intend to distribute templates. Django's contrib apps 
 include templates, like :doc:`django.contrib.admin </ref/contrib/admin/index>`,
 use the DTL.
 
@@ -59,7 +59,7 @@ Syntax
     This is an overview of the Django template language's syntax. For details
     see the :doc:`language syntax reference </ref/templates/language>`.
 
-A Django template is a text document or a Python string marked-up using the
+A Django template is a text document or a Python string marked up using the
 Django template language. Some constructs are recognized and interpreted by the
 template engine. The main ones are variables and tags.
 
@@ -72,7 +72,7 @@ The syntax of the Django template language involves four constructs.
 Variables
 ~~~~~~~~~
 
-A variable outputs a value from the context, which is a dict-like object
+A variable outputs a value from the context, which is a direct-like object
 mapping keys to values.
 
 Variables are surrounded by ``{{`` and ``}}`` like this::
@@ -84,7 +84,7 @@ renders to::
 
     My first name is John. My last name is Doe.
 
-Dictionary lookup, attribute lookup and list-index lookups are implemented with
+Dictionary lookup, attribute lookup, and list-index lookups are implemented with
 a dot notation::
 
     {{ my_dict.key }}
@@ -249,14 +249,14 @@ Since most engines load templates from files, the top-level configuration for
 each engine contains two common settings:
 
 * :setting:`DIRS <TEMPLATES-DIRS>` defines a list of directories where the
-  engine should look for template source files, in search order.
+  engine should look for template source files, in the search order.
 * :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` tells whether the engine should
   look for templates inside installed applications. Each backend defines a
-  conventional name for the subdirectory inside applications where its
+  the conventional name for the subdirectory inside applications where its
   templates should be stored.
 
 While uncommon, it's possible to configure several instances of the same
-backend with different options. In that case you should define a unique
+backend with different options. In that case, you should define a unique
 :setting:`NAME <TEMPLATES-NAME>` for each engine.
 
 :setting:`OPTIONS <TEMPLATES-OPTIONS>` contains backend-specific settings.
@@ -396,7 +396,7 @@ subdirectory for each Django app, with subdirectories within those
 subdirectories as needed.
 
 Do this for your own sanity. Storing all templates in the root level of a
-single directory gets messy.
+the single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
@@ -412,7 +412,7 @@ the following templates:
 .. currentmodule:: django.template.loader
 
 In addition, to cut down on the repetitive nature of loading and rendering
-templates, Django provides a shortcut function which automates the process.
+templates, Django provides a shortcut function that automates the process.
 
 .. function:: render_to_string(template_name, context=None, request=None, using=None)
 
@@ -434,7 +434,7 @@ templates, Django provides a shortcut function which automates the process.
 
     ``using``
         An optional template engine :setting:`NAME <TEMPLATES-NAME>`. The
-        search for the template will be restricted to that engine.
+        Search for the template will be restricted to that engine.
 
     Usage example::
 
@@ -474,12 +474,12 @@ template engine.
 
 When :setting:`APP_DIRS <TEMPLATES-APP_DIRS>` is ``True``, ``DjangoTemplates``
 engines look for templates in the ``templates`` subdirectory of installed
-applications. This generic name was kept for backwards-compatibility.
+applications. This generic name was kept for backward-compatibility.
 
 ``DjangoTemplates`` engines accept the following :setting:`OPTIONS
 <TEMPLATES-OPTIONS>`:
 
-* ``'autoescape'``: a boolean that controls whether HTML autoescaping is
+* ``'autoescape'``: a boolean that controls whether HTML auto escaping is
   enabled.
 
   It defaults to ``True``.
@@ -601,7 +601,7 @@ adds defaults that differ from Jinja2's for a few options:
 
       {{ function(request) }}
 
-    Some Django templates context processors return a fixed value. For Jinja2
+    Some Django template context processors return a fixed value. For Jinja2
     templates, this layer of indirection isn't necessary since you can add
     constants directly in ``jinja2.Environment``.
 
