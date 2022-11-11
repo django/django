@@ -4,9 +4,11 @@ from django.utils.module_loading import import_string
 
 from .base import Storage
 from .filesystem import FileSystemStorage
+from .memory import InMemoryStorage
 
 __all__ = (
     "FileSystemStorage",
+    "InMemoryStorage",
     "Storage",
     "DefaultStorage",
     "default_storage",

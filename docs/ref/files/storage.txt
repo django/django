@@ -74,6 +74,39 @@ The ``FileSystemStorage`` class
         time of the last metadata change, and on others (like Windows), it's
         the creation time of the file.
 
+The ``InMemoryStorage`` class
+=============================
+
+.. versionadded:: 4.2
+
+.. class:: InMemoryStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
+
+    The :class:`~django.core.files.storage.InMemoryStorage` class implements
+    a memory-based file storage. It has no persistence, but can be useful for
+    speeding up tests by avoiding disk access.
+
+    .. attribute:: location
+
+        Absolute path to the directory name assigned to files. Defaults to the
+        value of your :setting:`MEDIA_ROOT` setting.
+
+    .. attribute:: base_url
+
+        URL that serves the files stored at this location.
+        Defaults to the value of your :setting:`MEDIA_URL` setting.
+
+    .. attribute:: file_permissions_mode
+
+        The file system permissions assigned to files, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_PERMISSIONS`.
+
+    .. attribute:: directory_permissions_mode
+
+        The file system permissions assigned to directories, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
+
 The ``Storage`` class
 =====================
 
