@@ -12,10 +12,11 @@ from django.utils.encoding import filepath_to_uri
 from django.utils.functional import cached_property
 
 from .base import Storage
+from .mixins import StorageSettingsMixin
 
 
 @deconstructible(path="django.core.files.storage.FileSystemStorage")
-class FileSystemStorage(Storage):
+class FileSystemStorage(Storage, StorageSettingsMixin):
     """
     Standard filesystem storage
     """
@@ -36,21 +37,6 @@ class FileSystemStorage(Storage):
         self._file_permissions_mode = file_permissions_mode
         self._directory_permissions_mode = directory_permissions_mode
         setting_changed.connect(self._clear_cached_properties)
-
-    def _clear_cached_properties(self, setting, **kwargs):
-        """Reset setting based property values."""
-        if setting == "MEDIA_ROOT":
-            self.__dict__.pop("base_location", None)
-            self.__dict__.pop("location", None)
-        elif setting == "MEDIA_URL":
-            self.__dict__.pop("base_url", None)
-        elif setting == "FILE_UPLOAD_PERMISSIONS":
-            self.__dict__.pop("file_permissions_mode", None)
-        elif setting == "FILE_UPLOAD_DIRECTORY_PERMISSIONS":
-            self.__dict__.pop("directory_permissions_mode", None)
-
-    def _value_or_setting(self, value, setting):
-        return setting if value is None else value
 
     @cached_property
     def base_location(self):
