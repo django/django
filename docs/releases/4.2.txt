@@ -355,6 +355,16 @@ Dropped support for PostgreSQL 11
 Upstream support for PostgreSQL 11 ends in November 2023. Django 4.2 supports
 PostgreSQL 12 and higher.
 
+Setting ``update_fields`` in ``Model.save()`` may now be required
+-----------------------------------------------------------------
+
+In order to avoid updating unnecessary columns,
+:meth:`.QuerySet.update_or_create` now passes ``update_fields`` to the
+:meth:`Model.save() <django.db.models.Model.save>` calls. As a consequence, any
+fields modified in the custom ``save()`` methods should be added to the
+``update_fields`` keyword argument before calling ``super()``. See
+:ref:`overriding-model-methods` for more details.
+
 Miscellaneous
 -------------
 
