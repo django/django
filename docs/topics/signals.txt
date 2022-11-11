@@ -46,7 +46,7 @@ Listening to signals
 To receive a signal, register a *receiver* function using the
 :meth:`Signal.connect` method. The receiver function is called when the signal
 is sent. All of the signal's receiver functions are called one at a time, in
-the order they were registered.
+the order, they were registered.
 
 .. method:: Signal.connect(receiver, sender=None, weak=True, dispatch_uid=None)
 
@@ -80,12 +80,12 @@ function or method::
     def my_callback(sender, **kwargs):
         print("Request finished!")
 
-Notice that the function takes a ``sender`` argument, along with wildcard
+Notice that the function takes a ``sender`` argument, along with a wildcard
 keyword arguments (``**kwargs``); all signal handlers must take these arguments.
 
 We'll look at senders :ref:`a bit later <connecting-to-specific-signals>`, but
 right now look at the ``**kwargs`` argument. All signals send keyword
-arguments, and may change those keyword arguments at any time. In the case of
+arguments and may change those keyword arguments at any time. In the case of
 :data:`~django.core.signals.request_finished`, it's documented as sending no
 arguments, which means we might be tempted to write our signal handling as
 ``my_callback(sender)``.
@@ -100,7 +100,7 @@ Connecting receiver functions
 -----------------------------
 
 There are two ways you can connect a receiver to a signal. You can take the
-manual connect route::
+manual to connect route::
 
     from django.core.signals import request_finished
 
@@ -129,10 +129,10 @@ Now, our ``my_callback`` function will be called each time a request finishes.
 
     Strictly speaking, signal handling and registration code can live anywhere
     you like, although it's recommended to avoid the application's root module
-    and its ``models`` module to minimize side-effects of importing code.
+    and its ``models`` module to minimize the side effects of importing code.
 
     In practice, signal handlers are usually defined in a ``signals``
-    submodule of the application they relate to. Signal receivers are
+    a submodule of the application they relate to. Signal receivers are
     connected in the :meth:`~django.apps.AppConfig.ready` method of your
     application :ref:`configuration class <configuring-applications-ref>`. If
     you're using the :func:`receiver` decorator, import the ``signals``
@@ -197,10 +197,10 @@ Preventing duplicate signals
 
 In some circumstances, the code connecting receivers to signals may run
 multiple times. This can cause your receiver function to be registered more
-than once, and thus called as many times for a signal event. For example, the
+than once and thus called as many times for a signal event. For example, the
 :meth:`~django.apps.AppConfig.ready` method may be executed more than once
 during testing. More generally, this occurs everywhere your project imports the
-module where you define the signals, because signal registration runs as many
+module where you define the signals because signal registration runs as many
 times as it is imported.
 
 If this behavior is problematic (such as when using signals to
@@ -224,7 +224,7 @@ its own signals.
 
 .. admonition:: When to use custom signals
 
-    Signals are implicit function calls which make debugging harder. If the
+    Signals are implicit function calls that make debugging harder. If the
     sender and receiver of your custom signal are both within your project,
     you're better off using an explicit function call.
 
@@ -293,4 +293,4 @@ is passed as a lazy reference to ``<app label>.<model>``, this method always
 returns ``None``.
 
 The ``receiver`` argument indicates the registered receiver to disconnect. It
-may be ``None`` if ``dispatch_uid`` is used to identify the receiver.
+maybe ``None`` if ``dispatch_uid`` is used to identify the receiver.
