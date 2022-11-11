@@ -2271,6 +2271,11 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
     ``aupdate_or_create()`` method was added.
 
+.. versionchanged:: 4.2
+
+    In older versions, ``update_or_create()`` didn't specify ``update_fields``
+    when calling :meth:`Model.save() <django.db.models.Model.save>`.
+
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
