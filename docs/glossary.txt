@@ -26,7 +26,7 @@ Glossary
         See :doc:`/topics/db/models`.
 
     MTV
-        "Model-template-view"; a software pattern, similar in style to MVC, but
+        "Model-template-view"; is a software pattern, similar in style to MVC, but
         a better description of the way Django does things.
 
         See :ref:`the FAQ entry <faq-mtv>`.
@@ -40,7 +40,7 @@ Glossary
     project
         A Python package -- i.e. a directory of code -- that contains all the
         settings for an instance of Django. This would include database
-        configuration, Django-specific options and application-specific
+        configuration, Django-specific options, and application-specific
         settings.
 
     property
@@ -57,7 +57,7 @@ Glossary
 
     slug
         A short label for something, containing only letters, numbers,
-        underscores or hyphens. They're generally used in URLs. For
+        underscores, or hyphens. They're generally used in URLs. For
         example, in a typical blog entry URL:
 
         .. parsed-literal::
@@ -68,10 +68,10 @@ Glossary
 
     template
         A chunk of text that acts as formatting for representing data. A
-        template helps to abstract the presentation of data from the data
+        the template helps to abstract the presentation of data from the data
         itself.
 
         See :doc:`/topics/templates`.
 
-    view
-        A function responsible for rendering a page.
+    View
+        A function is responsible for rendering a page.
