@@ -58,12 +58,12 @@ will help you know where to look for certain things:
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
   fairly high level and provide useful background information and explanation.
 
-* :doc:`Reference guides </ref/index>` contain technical reference for APIs and
+* :doc:`Reference guides </ref/index>` contain technical references for APIs and
   other aspects of Django's machinery. They describe how it works and how to
   use it but assume that you have a basic understanding of key concepts.
 
 * :doc:`How-to guides </howto/index>` are recipes. They guide you through the
-  steps involved in addressing key problems and use-cases. They are more
+  steps involved in addressing key problems and use cases. They are more
   advanced than tutorials and assume some knowledge of how Django works.
 
 The model layer
@@ -242,7 +242,7 @@ Security
 ========
 
 Security is a topic of paramount importance in the development of web
-applications and Django provides multiple protection tools and mechanisms:
+applications and Django provide multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
 * :doc:`Disclosed security issues in Django <releases/security>`
