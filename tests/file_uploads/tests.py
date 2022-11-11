@@ -11,6 +11,7 @@ from urllib.parse import quote
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files import temp as tempfile
+from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.http.multipartparser import (
     FILE,
@@ -804,6 +805,9 @@ class DirectoryCreationTests(SimpleTestCase):
     @unittest.skipIf(
         sys.platform == "win32", "Python on Windows doesn't have working os.chmod()."
     )
+    @override_settings(
+        DEFAULT_FILE_STORAGE="django.core.files.storage.FileSystemStorage"
+    )
     def test_readonly_root(self):
         """Permission errors are not swallowed"""
         os.chmod(MEDIA_ROOT, 0o500)
@@ -814,9 +818,11 @@ class DirectoryCreationTests(SimpleTestCase):
             )
 
     def test_not_a_directory(self):
+        default_storage.delete(UPLOAD_TO)
         # Create a file with the upload directory name
-        open(UPLOAD_TO, "wb").close()
-        self.addCleanup(os.remove, UPLOAD_TO)
+        with SimpleUploadedFile(UPLOAD_TO, b"x") as file:
+            default_storage.save(UPLOAD_TO, file)
+        self.addCleanup(default_storage.delete, UPLOAD_TO)
         msg = "%s exists and is not a directory." % UPLOAD_TO
         with self.assertRaisesMessage(FileExistsError, msg):
             with SimpleUploadedFile("foo.txt", b"x") as file:

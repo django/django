@@ -366,3 +366,12 @@ Preserving the test database
 The :option:`test --keepdb` option preserves the test database between test
 runs. It skips the create and destroy actions which can greatly decrease the
 time to run tests.
+
+Avoiding disk access for media files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
+prevent disk access for media files. All data is kept in memory, then it gets
+discarded after tests run.

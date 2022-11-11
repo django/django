@@ -85,6 +85,12 @@ The Breach (HTB) paper`_.
 
 .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
 
+In-memory file storage
+----------------------
+
+The new ``django.core.files.storage.InMemoryStorage`` class provides a
+non-persistent storage useful for speeding up tests by avoiding disk access.
+
 Minor features
 --------------
 
