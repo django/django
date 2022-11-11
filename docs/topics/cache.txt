@@ -365,12 +365,12 @@ the user ``apache``.
 
 .. warning:: 
 
-    Filesystem caching can become slow if you cache a large number of files. If 
-    you run into this problem then you might want to consider another caching 
-    mechanism.  
+    Filesystem caching can become slow if you cache a large number of files. If
+    you run into this problem then you might want to consider another caching
+    mechanism.
 
-    If you do need to use filesystem caching for a large number of files then 
-    it is recommended that you subclass ``FileBasedCache`` and improve the 
+    If you do need to use filesystem caching for a large number of files then
+    it is recommended that you subclass ``FileBasedCache`` and improve the
     culling strategy.
 
 .. warning::
