@@ -22,7 +22,7 @@ You may also find signing useful for the following:
 * Ensuring data stored in hidden form fields has not been tampered with.
 
 * Generating one-time secret URLs for allowing temporary access to a
-  protected resource, for example a downloadable file that a user has
+  protected resource, for example, a downloadable file that a user has
   paid for.
 
 Protecting ``SECRET_KEY`` and ``SECRET_KEY_FALLBACKS``
