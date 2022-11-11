@@ -33,7 +33,7 @@ able to store certain characters in the database, and information will be lost.
 .. _section 2: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/choosing-character-set.html
 .. _section 11: https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/character-set-migration.html
 
-All of Django's database backends automatically convert strings into
+Django's database backends automatically convert strings into
 the appropriate encoding for talking to the database. They also automatically
 convert strings retrieved from the database into strings. You don't even need
 to tell Django what encoding your database uses: that is handled transparently.
@@ -44,7 +44,7 @@ General string handling
 =======================
 
 Whenever you use strings with Django -- e.g., in database lookups, template
-rendering or anywhere else -- you have two choices for encoding those strings.
+rendering, or anywhere else -- you have two choices for encoding those strings.
 You can use normal strings or bytestrings (starting with a 'b').
 
 .. warning::
@@ -218,7 +218,7 @@ Models
 ======
 
 Because all strings are returned from the database as ``str`` objects, model
-fields that are character based (CharField, TextField, URLField, etc.) will
+fields that are character-based (CharField, TextField, URLField, etc.) will
 contain Unicode values when Django retrieves data from the database. This
 is *always* the case, even if the data could fit into an ASCII bytestring.
 
@@ -247,7 +247,7 @@ above_. For example::
 
 This function returns a correctly encoded URL even if ``self.location`` is
 something like "Jack visited Paris & Orléans". (In fact, the ``iri_to_uri()``
-call isn't strictly necessary in the above example, because all the
+the call isn't strictly necessary in the above example, because all the
 non-ASCII characters would have been removed in quoting in the first line.)
 
 .. _above: `URI and IRI handling`_
@@ -289,7 +289,7 @@ Files
 =====
 
 If you intend to allow users to upload files, you must ensure that the
-environment used to run Django is configured to work with non-ASCII file names.
+the environment used to run Django is configured to work with non-ASCII file names.
 If your environment isn't configured correctly, you'll encounter
 ``UnicodeEncodeError`` exceptions when saving files with file names or content
 that contains non-ASCII characters.
