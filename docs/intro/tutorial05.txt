@@ -442,9 +442,8 @@ and then we must amend the ``get_queryset`` method like so:
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
-            :5
-        ]
+        now = timezone.now()
+        return Question.objects.filter(pub_date__lte=now).order_by("-pub_date")[:5]
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
