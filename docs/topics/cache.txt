@@ -895,7 +895,7 @@ Accessing the cache
 Basic usage
 -----------
 
-.. currentmodule:: django.core.caches
+.. currentmodule:: django.core.cache
 
 The basic interface is:
 

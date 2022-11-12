@@ -662,7 +662,7 @@ details on these changes.
   :func:`~django.template.loader.get_template` and
   :func:`~django.template.loader.select_template` won't accept a
   :class:`~django.template.Context` in their
-  :meth:`~django.template.backends.base.Template.render()` method anymore.
+  :meth:`~django.template.base.Template.render()` method anymore.
 
 * :doc:`Template response APIs </ref/template-response>` will enforce the use
   of :class:`dict` and backend-dependent template objects instead of

@@ -329,7 +329,7 @@ If loading a template fails, the following two exceptions, defined in
 ``Template`` objects returned by ``get_template()`` and ``select_template()``
 must provide a ``render()`` method with the following signature:
 
-.. currentmodule:: django.template.backends.base
+.. currentmodule:: django.template.base
 
 .. method:: Template.render(context=None, request=None)
 

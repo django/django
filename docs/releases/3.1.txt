@@ -259,7 +259,7 @@ Cache
   field names in the ``no-cache`` directive for the ``Cache-Control`` header,
   according to :rfc:`7234#section-5.2.2.2`.
 
-* :meth:`~django.core.caches.cache.delete` now returns ``True`` if the key was
+* :meth:`~django.core.cache.cache.delete` now returns ``True`` if the key was
   successfully deleted, ``False`` otherwise.
 
 CSRF

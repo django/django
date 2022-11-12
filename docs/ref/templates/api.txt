@@ -34,7 +34,7 @@ lower level APIs:
    return a ``django.template.backends.django.Template`` which wraps the
    actual :class:`django.template.Template`.
 3. The ``Template`` obtained in the previous step has a
-   :meth:`~django.template.backends.base.Template.render` method which
+   :meth:`~django.template.base.Template.render` method which
    marshals a context and possibly a request into a :class:`Context` and
    delegates the rendering to the underlying :class:`Template`.
 
