@@ -21,71 +21,71 @@ constants, variables, and even other expressions.
 Some examples
 =============
 
-.. code-block:: python
+.. code-block:: pycon
 
-    from django.db.models import Count, F, Value
-    from django.db.models.functions import Length, Upper
-    from django.db.models.lookups import GreaterThan
+    >>> from django.db.models import Count, F, Value
+    >>> from django.db.models.functions import Length, Upper
+    >>> from django.db.models.lookups import GreaterThan
 
     # Find companies that have more employees than chairs.
-    Company.objects.filter(num_employees__gt=F("num_chairs"))
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs"))
 
     # Find companies that have at least twice as many employees
     # as chairs. Both the querysets below are equivalent.
-    Company.objects.filter(num_employees__gt=F("num_chairs") * 2)
-    Company.objects.filter(num_employees__gt=F("num_chairs") + F("num_chairs"))
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs") * 2)
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs") + F("num_chairs"))
 
     # How many chairs are needed for each company to seat all employees?
-    company = (
-        Company.objects.filter(num_employees__gt=F("num_chairs"))
-        .annotate(chairs_needed=F("num_employees") - F("num_chairs"))
-        .first()
-    )
-    ## >>> company.num_employees
+    >>> company = (
+    ...     Company.objects.filter(num_employees__gt=F("num_chairs"))
+    ...     .annotate(chairs_needed=F("num_employees") - F("num_chairs"))
+    ...     .first()
+    ... )
+    >>> company.num_employees
     120
-    ## >>> company.num_chairs
+    >>> company.num_chairs
     50
-    ## >>> company.chairs_needed
+    >>> company.chairs_needed
     70
 
     # Create a new company using expressions.
-    company = Company.objects.create(name="Google", ticker=Upper(Value("goog")))
+    >>> company = Company.objects.create(name="Google", ticker=Upper(Value("goog")))
     # Be sure to refresh it if you need to access the field.
-    company.refresh_from_db()
-    company.ticker
+    >>> company.refresh_from_db()
+    >>> company.ticker
     "GOOG"
 
     # Annotate models with an aggregated value. Both forms
     # below are equivalent.
-    Company.objects.annotate(num_products=Count("products"))
-    Company.objects.annotate(num_products=Count(F("products")))
+    >>> Company.objects.annotate(num_products=Count("products"))
+    >>> Company.objects.annotate(num_products=Count(F("products")))
 
     # Aggregates can contain complex computations also
-    Company.objects.annotate(num_offerings=Count(F("products") + F("services")))
+    >>> Company.objects.annotate(num_offerings=Count(F("products") + F("services")))
 
     # Expressions can also be used in order_by(), either directly
-    Company.objects.order_by(Length("name").asc())
-    Company.objects.order_by(Length("name").desc())
+    >>> Company.objects.order_by(Length("name").asc())
+    >>> Company.objects.order_by(Length("name").desc())
     # or using the double underscore lookup syntax.
-    from django.db.models import CharField
-    from django.db.models.functions import Length
+    >>> from django.db.models import CharField
+    >>> from django.db.models.functions import Length
 
-    CharField.register_lookup(Length)
-    Company.objects.order_by("name__length")
+    >>> CharField.register_lookup(Length)
+    >>> Company.objects.order_by("name__length")
 
     # Boolean expression can be used directly in filters.
-    from django.db.models import Exists
+    >>> from django.db.models import Exists
 
-    Company.objects.filter(
-        Exists(Employee.objects.filter(company=OuterRef("pk"), salary__gt=10))
-    )
+    >>> Company.objects.filter(
+    ...     Exists(Employee.objects.filter(company=OuterRef("pk"), salary__gt=10))
+    ... )
 
     # Lookup expressions can also be used directly in filters
-    Company.objects.filter(GreaterThan(F("num_employees"), F("num_chairs")))
+    >>> Company.objects.filter(GreaterThan(F("num_employees"), F("num_chairs")))
     # or annotations.
-    Company.objects.annotate(
-        need_chairs=GreaterThan(F("num_employees"), F("num_chairs")),
-    )
+    >>> Company.objects.annotate(
+    ...     need_chairs=GreaterThan(F("num_employees"), F("num_chairs")),
+    ... )
 
 Built-in Expressions
 ====================
