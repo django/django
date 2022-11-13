@@ -659,16 +659,20 @@ Passing strings
 ~~~~~~~~~~~~~~~
 
 Typical usage is to pass the contents of the page, as a string, bytestring,
-or :class:`memoryview`, to the :class:`HttpResponse` constructor::
+or :class:`memoryview`, to the :class:`HttpResponse` constructor:
+
+.. code-block:: pycon
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
-    >>> response = HttpResponse(b'Bytestrings are also accepted.')
-    >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
+    >>> response = HttpResponse(b"Bytestrings are also accepted.")
+    >>> response = HttpResponse(memoryview(b"Memoryview as well."))
 
 But if you want to add content incrementally, you can use ``response`` as a
-file-like object::
+file-like object:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
     >>> response.write("<p>Here's the text of the web page.</p>")
@@ -691,17 +695,21 @@ Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
 To set or remove a header field in your response, use
-:attr:`HttpResponse.headers`::
+:attr:`HttpResponse.headers`:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
-    >>> response.headers['Age'] = 120
-    >>> del response.headers['Age']
+    >>> response.headers["Age"] = 120
+    >>> del response.headers["Age"]
 
-You can also manipulate headers by treating your response like a dictionary::
+You can also manipulate headers by treating your response like a dictionary:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
-    >>> response['Age'] = 120
-    >>> del response['Age']
+    >>> response["Age"] = 120
+    >>> del response["Age"]
 
 This proxies to ``HttpResponse.headers``, and is the original interface offered
 by ``HttpResponse``.
@@ -709,9 +717,11 @@ by ``HttpResponse``.
 When using this interface, unlike a dictionary, ``del`` doesn't raise
 ``KeyError`` if the header field doesn't exist.
 
-You can also set headers on instantiation::
+You can also set headers on instantiation:
 
-    >>> response = HttpResponse(headers={'Age': 120})
+.. code-block:: pycon
+
+    >>> response = HttpResponse(headers={"Age": 120})
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
@@ -728,12 +738,17 @@ Telling the browser to treat the response as a file attachment
 
 To tell the browser to treat the response as a file attachment, set the
 ``Content-Type`` and ``Content-Disposition`` headers. For example, this is how
-you might return a Microsoft Excel spreadsheet::
+you might return a Microsoft Excel spreadsheet:
 
-    >>> response = HttpResponse(my_data, headers={
-    ...     'Content-Type': 'application/vnd.ms-excel',
-    ...     'Content-Disposition': 'attachment; filename="foo.xls"',
-    ... })
+.. code-block:: pycon
+
+    >>> response = HttpResponse(
+    ...     my_data,
+    ...     headers={
+    ...         "Content-Type": "application/vnd.ms-excel",
+    ...         "Content-Disposition": 'attachment; filename="foo.xls"',
+    ...     },
+    ... )
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -1069,10 +1084,12 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
 Usage
 -----
 
-Typical usage could look like::
+Typical usage could look like:
+
+.. code-block:: pycon
 
     >>> from django.http import JsonResponse
-    >>> response = JsonResponse({'foo': 'bar'})
+    >>> response = JsonResponse({"foo": "bar"})
     >>> response.content
     b'{"foo": "bar"}'
 
@@ -1080,7 +1097,9 @@ Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to serialize objects other than ``dict`` you must set the ``safe``
-parameter to ``False``::
+parameter to ``False``:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse([1, 2, 3], safe=False)
 
@@ -1104,7 +1123,9 @@ Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you need to use a different JSON encoder class you can pass the ``encoder``
-parameter to the constructor method::
+parameter to the constructor method:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)
 
@@ -1206,10 +1227,12 @@ Attributes
     when they can be guessed from contents of ``open_file``.
 
 ``FileResponse`` accepts any file-like object with binary content, for example
-a file open in binary mode like so::
+a file open in binary mode like so:
+
+.. code-block:: pycon
 
     >>> from django.http import FileResponse
-    >>> response = FileResponse(open('myfile.png', 'rb'))
+    >>> response = FileResponse(open("myfile.png", "rb"))
 
 The file will be closed automatically, so don't open it with a context manager.
 

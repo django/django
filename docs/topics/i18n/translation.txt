@@ -518,12 +518,14 @@ Localized names of languages
 .. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
-languages::
+languages:
+
+.. code-block:: pycon
 
     >>> from django.utils.translation import activate, get_language_info
-    >>> activate('fr')
-    >>> li = get_language_info('de')
-    >>> print(li['name'], li['name_local'], li['name_translated'], li['bidi'])
+    >>> activate("fr")
+    >>> li = get_language_info("de")
+    >>> print(li["name"], li["name_local"], li["name_translated"], li["bidi"])
     German Deutsch Allemand False
 
 The ``name``, ``name_local``, and ``name_translated`` attributes of the
@@ -1342,30 +1344,34 @@ Example URL patterns::
 
 After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
-function. Example::
+function. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
 
-    >>> activate('en')
-    >>> reverse('sitemap-xml')
+    >>> activate("en")
+    >>> reverse("sitemap-xml")
     '/sitemap.xml'
-    >>> reverse('news:index')
+    >>> reverse("news:index")
     '/en/news/'
 
-    >>> activate('nl')
-    >>> reverse('news:detail', kwargs={'slug': 'news-slug'})
+    >>> activate("nl")
+    >>> reverse("news:detail", kwargs={"slug": "news-slug"})
     '/nl/news/news-slug/'
 
 With ``prefix_default_language=False`` and  ``LANGUAGE_CODE='en'``, the URLs
-will be::
+will be:
 
-    >>> activate('en')
-    >>> reverse('news:index')
+.. code-block:: pycon
+
+    >>> activate("en")
+    >>> reverse("news:index")
     '/news/'
 
-    >>> activate('nl')
-    >>> reverse('news:index')
+    >>> activate("nl")
+    >>> reverse("news:index")
     '/nl/news/'
 
 .. warning::
@@ -1411,17 +1417,19 @@ URL patterns can also be marked translatable using the
     )
 
 After you've created the translations, the :func:`~django.urls.reverse`
-function will return the URL in the active language. Example::
+function will return the URL in the active language. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
 
-    >>> activate('en')
-    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    >>> activate("en")
+    >>> reverse("news:category", kwargs={"slug": "recent"})
     '/en/news/category/recent/'
 
-    >>> activate('nl')
-    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    >>> activate("nl")
+    >>> reverse("news:category", kwargs={"slug": "recent"})
     '/nl/nieuws/categorie/recent/'
 
 .. warning::

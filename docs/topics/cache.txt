@@ -916,37 +916,45 @@ It's the number of seconds the value should be stored in the cache. Passing in
 ``None`` for ``timeout`` will cache the value forever. A ``timeout`` of ``0``
 won't cache the value.
 
-If the object doesn't exist in the cache, ``cache.get()`` returns ``None``::
+If the object doesn't exist in the cache, ``cache.get()`` returns ``None``:
+
+.. code-block:: pycon
 
     >>> # Wait 30 seconds for 'my_key' to expire...
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
 
 If you need to determine whether the object exists in the cache and you have
-stored a literal value ``None``, use a sentinel object as the default::
+stored a literal value ``None``, use a sentinel object as the default:
+
+.. code-block:: pycon
 
     >>> sentinel = object()
-    >>> cache.get('my_key', sentinel) is sentinel
+    >>> cache.get("my_key", sentinel) is sentinel
     False
     >>> # Wait 30 seconds for 'my_key' to expire...
-    >>> cache.get('my_key', sentinel) is sentinel
+    >>> cache.get("my_key", sentinel) is sentinel
     True
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
-return if the object doesn't exist in the cache::
+return if the object doesn't exist in the cache:
 
-    >>> cache.get('my_key', 'has expired')
+.. code-block:: pycon
+
+    >>> cache.get("my_key", "has expired")
     'has expired'
 
 .. method:: cache.add(key, value, timeout=DEFAULT_TIMEOUT, version=None)
 
 To add a key only if it doesn't already exist, use the ``add()`` method.
 It takes the same parameters as ``set()``, but it will not attempt to
-update the cache if the key specified is already present::
+update the cache if the key specified is already present:
 
-    >>> cache.set('add_key', 'Initial value')
-    >>> cache.add('add_key', 'New value')
-    >>> cache.get('add_key')
+.. code-block:: pycon
+
+    >>> cache.set("add_key", "Initial value")
+    >>> cache.add("add_key", "New value")
+    >>> cache.get("add_key")
     'Initial value'
 
 If you need to know whether ``add()`` stored a value in the cache, you can
@@ -958,37 +966,45 @@ check the return value. It will return ``True`` if the value was stored,
 If you want to get a key's value or set a value if the key isn't in the cache,
 there is the ``get_or_set()`` method. It takes the same parameters as ``get()``
 but the default is set as the new cache value for that key, rather than
-returned::
+returned:
 
-    >>> cache.get('my_new_key')  # returns None
-    >>> cache.get_or_set('my_new_key', 'my new value', 100)
+.. code-block:: pycon
+
+    >>> cache.get("my_new_key")  # returns None
+    >>> cache.get_or_set("my_new_key", "my new value", 100)
     'my new value'
 
-You can also pass any callable as a *default* value::
+You can also pass any callable as a *default* value:
+
+.. code-block:: pycon
 
     >>> import datetime
-    >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
+    >>> cache.get_or_set("some-timestamp-key", datetime.datetime.now)
     datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
 
 .. method:: cache.get_many(keys, version=None)
 
 There's also a ``get_many()`` interface that only hits the cache once.
 ``get_many()`` returns a dictionary with all the keys you asked for that
-actually exist in the cache (and haven't expired)::
+actually exist in the cache (and haven't expired):
 
-    >>> cache.set('a', 1)
-    >>> cache.set('b', 2)
-    >>> cache.set('c', 3)
-    >>> cache.get_many(['a', 'b', 'c'])
+.. code-block:: pycon
+
+    >>> cache.set("a", 1)
+    >>> cache.set("b", 2)
+    >>> cache.set("c", 3)
+    >>> cache.get_many(["a", "b", "c"])
     {'a': 1, 'b': 2, 'c': 3}
 
 .. method:: cache.set_many(dict, timeout)
 
 To set multiple values more efficiently, use ``set_many()`` to pass a dictionary
-of key-value pairs::
+of key-value pairs:
 
-    >>> cache.set_many({'a': 1, 'b': 2, 'c': 3})
-    >>> cache.get_many(['a', 'b', 'c'])
+.. code-block:: pycon
+
+    >>> cache.set_many({"a": 1, "b": 2, "c": 3})
+    >>> cache.get_many(["a", "b", "c"])
     {'a': 1, 'b': 2, 'c': 3}
 
 Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
@@ -999,9 +1015,11 @@ failed to be inserted.
 .. method:: cache.delete(key, version=None)
 
 You can delete keys explicitly with ``delete()`` to clear the cache for a
-particular object::
+particular object:
 
-    >>> cache.delete('a')
+.. code-block:: pycon
+
+    >>> cache.delete("a")
     True
 
 ``delete()`` returns ``True`` if the key was successfully deleted, ``False``
@@ -1010,24 +1028,30 @@ otherwise.
 .. method:: cache.delete_many(keys, version=None)
 
 If you want to clear a bunch of keys at once, ``delete_many()`` can take a list
-of keys to be cleared::
+of keys to be cleared:
 
-    >>> cache.delete_many(['a', 'b', 'c'])
+.. code-block:: pycon
+
+    >>> cache.delete_many(["a", "b", "c"])
 
 .. method:: cache.clear()
 
 Finally, if you want to delete all the keys in the cache, use
 ``cache.clear()``.  Be careful with this; ``clear()`` will remove *everything*
-from the cache, not just the keys set by your application. ::
+from the cache, not just the keys set by your application. :
+
+.. code-block:: pycon
 
     >>> cache.clear()
 
 .. method:: cache.touch(key, timeout=DEFAULT_TIMEOUT, version=None)
 
 ``cache.touch()`` sets a new expiration for a key. For example, to update a key
-to expire 10 seconds from now::
+to expire 10 seconds from now:
 
-    >>> cache.touch('a', 10)
+.. code-block:: pycon
+
+    >>> cache.touch("a", 10)
     True
 
 Like other methods, the ``timeout`` argument is optional and defaults to the
@@ -1044,16 +1068,18 @@ You can also increment or decrement a key that already exists using the
 value will be incremented or decremented by 1. Other increment/decrement values
 can be specified by providing an argument to the increment/decrement call. A
 ValueError will be raised if you attempt to increment or decrement a
-nonexistent cache key.::
+nonexistent cache key.:
 
-    >>> cache.set('num', 1)
-    >>> cache.incr('num')
+.. code-block:: pycon
+
+    >>> cache.set("num", 1)
+    >>> cache.incr("num")
     2
-    >>> cache.incr('num', 10)
+    >>> cache.incr("num", 10)
     12
-    >>> cache.decr('num')
+    >>> cache.decr("num")
     11
-    >>> cache.decr('num', 5)
+    >>> cache.decr("num", 5)
     6
 
 .. note::
@@ -1120,32 +1146,36 @@ prefix and the user-provided cache key to obtain the final cache key.
 By default, any key request will automatically include the site
 default cache key version. However, the primitive cache functions all
 include a ``version`` argument, so you can specify a particular cache
-key version to set or get. For example::
+key version to set or get. For example:
+
+.. code-block:: pycon
 
     >>> # Set version 2 of a cache key
-    >>> cache.set('my_key', 'hello world!', version=2)
+    >>> cache.set("my_key", "hello world!", version=2)
     >>> # Get the default version (assuming version=1)
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
     >>> # Get version 2 of the same key
-    >>> cache.get('my_key', version=2)
+    >>> cache.get("my_key", version=2)
     'hello world!'
 
 The version of a specific key can be incremented and decremented using
 the ``incr_version()`` and ``decr_version()`` methods. This
 enables specific keys to be bumped to a new version, leaving other
-keys unaffected. Continuing our previous example::
+keys unaffected. Continuing our previous example:
+
+.. code-block:: pycon
 
     >>> # Increment the version of 'my_key'
-    >>> cache.incr_version('my_key')
+    >>> cache.incr_version("my_key")
     >>> # The default version still isn't available
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
     # Version 2 isn't available, either
-    >>> cache.get('my_key', version=2)
+    >>> cache.get("my_key", version=2)
     None
     >>> # But version 3 *is* available
-    >>> cache.get('my_key', version=3)
+    >>> cache.get("my_key", version=3)
     'hello world!'
 
 .. _cache_key_transformation:
@@ -1218,10 +1248,12 @@ yet support asynchronous caching. It will be coming in a future release.
 ``django.core.cache.backends.base.BaseCache`` has async variants of :ref:`all
 base methods <cache-basic-interface>`. By convention, the asynchronous versions
 of all methods are prefixed with ``a``. By default, the arguments for both
-variants are the same::
+variants are the same:
 
-    >>> await cache.aset('num', 1)
-    >>> await cache.ahas_key('num')
+.. code-block:: pycon
+
+    >>> await cache.aset("num", 1)
+    >>> await cache.ahas_key("num")
     True
 
 .. _downstream-caches:

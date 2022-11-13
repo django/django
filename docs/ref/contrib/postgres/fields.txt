@@ -127,19 +127,21 @@ We will use the following example model::
 
 The :lookup:`contains` lookup is overridden on :class:`ArrayField`. The
 returned objects will be those where the values passed are a subset of the
-data. It uses the SQL operator ``@>``. For example::
+data. It uses the SQL operator ``@>``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__contains=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__contains=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contains=['django'])
+    >>> Post.objects.filter(tags__contains=["django"])
     <QuerySet [<Post: First post>, <Post: Third post>]>
 
-    >>> Post.objects.filter(tags__contains=['django', 'thoughts'])
+    >>> Post.objects.filter(tags__contains=["django", "thoughts"])
     <QuerySet [<Post: First post>]>
 
 .. fieldlookup:: arrayfield.contained_by
@@ -149,16 +151,18 @@ data. It uses the SQL operator ``@>``. For example::
 
 This is the inverse of the :lookup:`contains <arrayfield.contains>` lookup -
 the objects returned will be those where the data is a subset of the values
-passed. It uses the SQL operator ``<@``. For example::
+passed. It uses the SQL operator ``<@``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__contained_by=["thoughts", "django"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
+    >>> Post.objects.filter(tags__contained_by=["thoughts", "django", "tutorial"])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.overlap
@@ -167,16 +171,18 @@ passed. It uses the SQL operator ``<@``. For example::
 ~~~~~~~~~~~
 
 Returns objects where the data shares any results with the values passed. Uses
-the SQL operator ``&&``. For example::
+the SQL operator ``&&``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts', 'tutorial'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__overlap=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts", "tutorial"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__overlap=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
+    >>> Post.objects.filter(tags__overlap=["thoughts", "tutorial"])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
     >>> Post.objects.filter(tags__overlap=Post.objects.values_list('tags'))
@@ -193,10 +199,12 @@ the SQL operator ``&&``. For example::
 ~~~~~~~
 
 Returns the length of the array. The lookups available afterward are those
-available for :class:`~django.db.models.IntegerField`. For example::
+available for :class:`~django.db.models.IntegerField`. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+.. code-block:: pycon
+
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
 
     >>> Post.objects.filter(tags__len=1)
     <QuerySet [<Post: Second post>]>
@@ -209,18 +217,20 @@ Index transforms
 Index transforms index into the array. Any non-negative integer can be used.
 There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
 array. The lookups available after the transform are those from the
-:attr:`base_field <ArrayField.base_field>`. For example::
+:attr:`base_field <ArrayField.base_field>`. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__0='thoughts')
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+
+    >>> Post.objects.filter(tags__0="thoughts")
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__1__iexact='Django')
+    >>> Post.objects.filter(tags__1__iexact="Django")
     <QuerySet [<Post: First post>]>
 
-    >>> Post.objects.filter(tags__276='javascript')
+    >>> Post.objects.filter(tags__276="javascript")
     <QuerySet []>
 
 .. note::
@@ -236,16 +246,18 @@ Slice transforms
 
 Slice transforms take a slice of the array. Any two non-negative integers can
 be used, separated by a single underscore. The lookups available after the
-transform do not change. For example::
+transform do not change. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__0_1=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["django", "python", "thoughts"])
+
+    >>> Post.objects.filter(tags__0_1=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__0_2__contains=['thoughts'])
+    >>> Post.objects.filter(tags__0_2__contains=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
 .. note::
@@ -374,20 +386,26 @@ We will use the following example model::
 Key lookups
 ~~~~~~~~~~~
 
-To query based on a given key, you can use that key as the lookup name::
+To query based on a given key, you can use that key as the lookup name:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__breed='collie')
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie"})
+
+    >>> Dog.objects.filter(data__breed="collie")
     <QuerySet [<Dog: Meg>]>
 
-You can chain other lookups after key lookups::
+You can chain other lookups after key lookups:
 
-    >>> Dog.objects.filter(data__breed__contains='l')
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(data__breed__contains="l")
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
-or use ``F()`` expressions to annotate a key value. For example::
+or use ``F()`` expressions to annotate a key value. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F
     >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
@@ -419,16 +437,18 @@ need to use the :lookup:`hstorefield.contains` lookup instead.
 The :lookup:`contains` lookup is overridden on
 :class:`~django.contrib.postgres.fields.HStoreField`. The returned objects are
 those where the given ``dict`` of key-value pairs are all contained in the
-field. It uses the SQL operator ``@>``. For example::
+field. It uses the SQL operator ``@>``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__contains={'owner': 'Bob'})
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
-    >>> Dog.objects.filter(data__contains={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.contained_by
@@ -439,16 +459,18 @@ field. It uses the SQL operator ``@>``. For example::
 This is the inverse of the :lookup:`contains <hstorefield.contains>` lookup -
 the objects returned will be those where the key-value pairs on the object are
 a subset of those in the value passed. It uses the SQL operator ``<@``. For
-example::
+example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
 
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
 
 .. fieldlookup:: hstorefield.has_key
@@ -457,12 +479,14 @@ example::
 ~~~~~~~~~~~
 
 Returns objects where the given key is in the data. Uses the SQL operator
-``?``. For example::
+``?``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_key='owner')
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__has_key="owner")
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_any_keys
@@ -471,13 +495,15 @@ Returns objects where the given key is in the data. Uses the SQL operator
 ~~~~~~~~~~~~~~~~
 
 Returns objects where any of the given keys are in the data. Uses the SQL
-operator ``?|``. For example::
+operator ``?|``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_any_keys=['owner', 'breed'])
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__has_any_keys=["owner", "breed"])
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_keys
@@ -486,12 +512,14 @@ operator ``?|``. For example::
 ~~~~~~~~~~~~
 
 Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example::
+``?&``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_keys=['breed', 'owner'])
+    >>> Dog.objects.create(name="Rufus", data={})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__has_keys=["breed", "owner"])
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.keys
@@ -503,12 +531,14 @@ Returns objects where the array of keys is the given value. Note that the order
 is not guaranteed to be reliable, so this transform is mainly useful for using
 in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``akeys()``. For example::
+``akeys()``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'toy': 'bone'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__keys__overlap=['breed', 'toy'])
+    >>> Dog.objects.create(name="Rufus", data={"toy": "bone"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__keys__overlap=["breed", "toy"])
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.values
@@ -520,12 +550,14 @@ Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``avals()``. For example::
+``avals()``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__values__contains=['collie'])
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__values__contains=["collie"])
     <QuerySet [<Dog: Meg>]>
 
 .. _range-fields:
@@ -645,13 +677,17 @@ model::
         def __str__(self):
             return self.name
 
-We will also use the following example objects::
+We will also use the following example objects:
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> from django.utils import timezone
     >>> now = timezone.now()
-    >>> Event.objects.create(name='Soft play', ages=(0, 10), start=now)
-    >>> Event.objects.create(name='Pub trip', ages=(21, None), start=now - datetime.timedelta(days=1))
+    >>> Event.objects.create(name="Soft play", ages=(0, 10), start=now)
+    >>> Event.objects.create(
+    ...     name="Pub trip", ages=(21, None), start=now - datetime.timedelta(days=1)
+    ... )
 
 and ``NumericRange``:
 
@@ -688,7 +724,9 @@ The ``contained_by`` lookup is also available on the non-range field types:
 :class:`~django.db.models.BigIntegerField`,
 :class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
 :class:`~django.db.models.DateField`, and
-:class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DateTimeField`. For example:
+
+.. code-block:: pycon
 
     >>> from psycopg2.extras import DateTimeTZRange
     >>> Event.objects.filter(

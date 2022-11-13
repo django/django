@@ -9,10 +9,12 @@ and provides introspection. It also maintains a list of available :doc:`models
 </topics/db/models>`.
 
 This registry is called :attr:`~django.apps.apps` and it's available in
-:mod:`django.apps`::
+:mod:`django.apps`:
+
+.. code-block:: pycon
 
     >>> from django.apps import apps
-    >>> apps.get_app_config('admin').verbose_name
+    >>> apps.get_app_config("admin").verbose_name
     'Administration'
 
 Projects and applications

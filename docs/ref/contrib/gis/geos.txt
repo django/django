@@ -50,25 +50,37 @@ Creating a Geometry
 
 :class:`GEOSGeometry` objects may be created in a few ways.  The first is
 to simply instantiate the object on some spatial input -- the following
-are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON::
+are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> pnt = GEOSGeometry('POINT(5 23)') # WKT
-    >>> pnt = GEOSGeometry('010100000000000000000014400000000000003740') # HEX
-    >>> pnt = GEOSGeometry(memoryview(b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14@\x00\x00\x00\x00\x00\x007@')) # WKB
-    >>> pnt = GEOSGeometry('{ "type": "Point", "coordinates": [ 5.000000, 23.000000 ] }') # GeoJSON
+    >>> pnt = GEOSGeometry("POINT(5 23)")  # WKT
+    >>> pnt = GEOSGeometry("010100000000000000000014400000000000003740")  # HEX
+    >>> pnt = GEOSGeometry(
+    ...     memoryview(
+    ...         b"\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14@\x00\x00\x00\x00\x00\x007@"
+    ...     )
+    ... )  # WKB
+    >>> pnt = GEOSGeometry(
+    ...     '{ "type": "Point", "coordinates": [ 5.000000, 23.000000 ] }'
+    ... )  # GeoJSON
 
 Another option is to use the constructor for the specific geometry type
 that you wish to create.  For example, a :class:`Point` object may be
-created by passing in the X and Y coordinates into its constructor::
+created by passing in the X and Y coordinates into its constructor:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(5, 23)
 
-All these constructors take the keyword argument ``srid``. For example::
+All these constructors take the keyword argument ``srid``. For example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry, LineString, Point
-    >>> print(GEOSGeometry('POINT (0 0)', srid=4326))
+    >>> print(GEOSGeometry("POINT (0 0)", srid=4326))
     SRID=4326;POINT (0 0)
     >>> print(LineString((0, 0), (1, 1), srid=4326))
     SRID=4326;LINESTRING (0 0, 1 1)
@@ -76,11 +88,13 @@ All these constructors take the keyword argument ``srid``. For example::
     SRID=32140;POINT (0 0)
 
 Finally, there is the :func:`fromfile` factory method which returns a
-:class:`GEOSGeometry` object from a file::
+:class:`GEOSGeometry` object from a file:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import fromfile
-    >>> pnt = fromfile('/path/to/pnt.wkt')
-    >>> pnt = fromfile(open('/path/to/pnt.wkt'))
+    >>> pnt = fromfile("/path/to/pnt.wkt")
+    >>> pnt = fromfile(open("/path/to/pnt.wkt"))
 
 .. _geos-exceptions-in-logfile:
 
@@ -97,14 +111,18 @@ Geometries are Pythonic
 -----------------------
 :class:`GEOSGeometry` objects are 'Pythonic', in other words components may
 be accessed, modified, and iterated over using standard Python conventions.
-For example, you can iterate over the coordinates in a :class:`Point`::
+For example, you can iterate over the coordinates in a :class:`Point`:
+
+.. code-block:: pycon
 
     >>> pnt = Point(5, 23)
     >>> [coord for coord in pnt]
     [5.0, 23.0]
 
 With any geometry object, the :attr:`GEOSGeometry.coords` property
-may be used to get the geometry coordinates as a Python tuple::
+may be used to get the geometry coordinates as a Python tuple:
+
+.. code-block:: pycon
 
     >>> pnt.coords
     (5.0, 23.0)
@@ -112,7 +130,9 @@ may be used to get the geometry coordinates as a Python tuple::
 You can get/set geometry components using standard Python indexing
 techniques.  However, what is returned depends on the geometry type
 of the object.  For example, indexing on a :class:`LineString`
-returns a coordinate tuple::
+returns a coordinate tuple:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import LineString
     >>> line = LineString((0, 0), (0, 50), (50, 50), (50, 0), (0, 0))
@@ -122,17 +142,21 @@ returns a coordinate tuple::
     (50.0, 0.0)
 
 Whereas indexing on a :class:`Polygon` will return the ring
-(a :class:`LinearRing` object) corresponding to the index::
+(a :class:`LinearRing` object) corresponding to the index:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Polygon
-    >>> poly = Polygon( ((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)) )
+    >>> poly = Polygon(((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)))
     >>> poly[0]
     <LinearRing object at 0x1044395b0>
-    >>> poly[0][-2] # second-to-last coordinate of external ring
+    >>> poly[0][-2]  # second-to-last coordinate of external ring
     (50.0, 0.0)
 
 In addition, coordinates/components of the geometry may added or modified,
-just like a Python list::
+just like a Python list:
+
+.. code-block:: pycon
 
     >>> line[0] = (1.0, 1.0)
     >>> line.pop()
@@ -141,7 +165,9 @@ just like a Python list::
     >>> line.coords
     ((1.0, 1.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (1.0, 1.0))
 
-Geometries support set-like operators::
+Geometries support set-like operators:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import LineString
     >>> ls1 = LineString((0, 0), (2, 2))
@@ -191,14 +217,16 @@ given ``geo_input`` argument, and then assumes the proper geometry subclass
 
 The ``srid`` parameter, if given, is set as the SRID of the created geometry if
 ``geo_input`` doesn't have an SRID. If different SRIDs are provided through the
-``geo_input`` and ``srid`` parameters, ``ValueError`` is raised::
+``geo_input`` and ``srid`` parameters, ``ValueError`` is raised:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> GEOSGeometry('POINT EMPTY', srid=4326).ewkt
+    >>> GEOSGeometry("POINT EMPTY", srid=4326).ewkt
     'SRID=4326;POINT EMPTY'
-    >>> GEOSGeometry('SRID=4326;POINT EMPTY', srid=4326).ewkt
+    >>> GEOSGeometry("SRID=4326;POINT EMPTY", srid=4326).ewkt
     'SRID=4326;POINT EMPTY'
-    >>> GEOSGeometry('SRID=1;POINT EMPTY', srid=4326)
+    >>> GEOSGeometry("SRID=1;POINT EMPTY", srid=4326)
     Traceback (most recent call last):
     ...
     ValueError: Input geometry already has SRID: 1.
@@ -862,7 +890,9 @@ geometry can be orders of magnitude faster -- the more complex the geometry
 that is prepared, the larger the speedup in the operation.  For more information,
 please consult the `GEOS wiki page on prepared geometries <https://trac.osgeo.org/geos/wiki/PreparedGeometry>`_.
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Point, Polygon
     >>> poly = Polygon.from_bbox((0, 0, 5, 5))

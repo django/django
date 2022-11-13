@@ -249,12 +249,14 @@ the ``.name`` and ``.value`` properties on the members.
 
 If you don't need to have the human-readable names translated, you can have
 them inferred from the member name (replacing underscores with spaces and using
-title-case)::
+title-case):
+
+.. code-block:: pycon
 
     >>> class Vehicle(models.TextChoices):
-    ...     CAR = 'C'
-    ...     TRUCK = 'T'
-    ...     JET_SKI = 'J'
+    ...     CAR = "C"
+    ...     TRUCK = "T"
+    ...     JET_SKI = "J"
     ...
     >>> Vehicle.JET_SKI.label
     'Jet Ski'
@@ -274,12 +276,14 @@ Django provides an ``IntegerChoices`` class. For example::
 
 It is also possible to make use of the `Enum Functional API
 <https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
-that labels are automatically generated as highlighted above::
+that labels are automatically generated as highlighted above:
 
-    >>> MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+.. code-block:: pycon
+
+    >>> MedalType = models.TextChoices("MedalType", "GOLD SILVER BRONZE")
     >>> MedalType.choices
     [('GOLD', 'Gold'), ('SILVER', 'Silver'), ('BRONZE', 'Bronze')]
-    >>> Place = models.IntegerChoices('Place', 'FIRST SECOND THIRD')
+    >>> Place = models.IntegerChoices("Place", "FIRST SECOND THIRD")
     >>> Place.choices
     [(1, 'First'), (2, 'Second'), (3, 'Third')]
 
@@ -2005,12 +2009,14 @@ With the following example::
             related_name='supervisor_of',
         )
 
-your resulting ``User`` model will have the following attributes::
+your resulting ``User`` model will have the following attributes:
+
+.. code-block:: pycon
 
     >>> user = User.objects.get(pk=1)
-    >>> hasattr(user, 'myspecialuser')
+    >>> hasattr(user, "myspecialuser")
     True
-    >>> hasattr(user, 'supervisor_of')
+    >>> hasattr(user, "supervisor_of")
     True
 
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse

@@ -86,17 +86,19 @@ buttons.
 :class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
 choices displayed on the widget are inherited from the :class:`ChoiceField` and
 changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
-example::
+example:
+
+.. code-block:: pycon
 
     >>> from django import forms
-    >>> CHOICES = [('1', 'First'), ('2', 'Second')]
+    >>> CHOICES = [("1", "First"), ("2", "Second")]
     >>> choice_field = forms.ChoiceField(widget=forms.RadioSelect, choices=CHOICES)
     >>> choice_field.choices
     [('1', 'First'), ('2', 'Second')]
     >>> choice_field.widget.choices
     [('1', 'First'), ('2', 'Second')]
     >>> choice_field.widget.choices = []
-    >>> choice_field.choices = [('1', 'First and only')]
+    >>> choice_field.choices = [("1", "First and only")]
     >>> choice_field.widget.choices
     [('1', 'First and only')]
 
@@ -137,7 +139,9 @@ For example, take the following form::
 
 This form will include three default :class:`TextInput` widgets, with default
 rendering -- no CSS class, no extra attributes. This means that the input boxes
-provided for each widget will be rendered exactly the same::
+provided for each widget will be rendered exactly the same:
+
+.. code-block:: pycon
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()

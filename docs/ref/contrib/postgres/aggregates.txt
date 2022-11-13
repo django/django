@@ -337,21 +337,26 @@ We will use this example table::
     |   test |      3 |     13 |
 
 
-Here's some examples of some of the general-purpose aggregation functions::
+Here's some examples of some of the general-purpose aggregation functions:
 
-    >>> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
+.. code-block:: pycon
+
+    >>> TestModel.objects.aggregate(result=StringAgg("field1", delimiter=";"))
     {'result': 'foo;bar;test'}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field2'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field2"))
     {'result': [1, 2, 3]}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field1'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field1"))
     {'result': ['foo', 'bar', 'test']}
 
 The next example shows the usage of statistical aggregate functions. The
 underlying math will be not described (you can read about this, for example, at
-`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_)::
+`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_):
 
-    >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
+.. code-block:: pycon
+
+    >>> TestModel.objects.aggregate(count=RegrCount(y="field3", x="field2"))
     {'count': 2}
-    >>> TestModel.objects.aggregate(avgx=RegrAvgX(y='field3', x='field2'),
-    ...                             avgy=RegrAvgY(y='field3', x='field2'))
+    >>> TestModel.objects.aggregate(
+    ...     avgx=RegrAvgX(y="field3", x="field2"), avgy=RegrAvgY(y="field3", x="field2")
+    ... )
     {'avgx': 2, 'avgy': 13}

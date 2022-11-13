@@ -87,16 +87,16 @@ cached. For example, assuming the :ref:`example blog models
 .. code-block:: pycon
 
     >>> entry = Entry.objects.get(id=1)
-    >>> entry.blog   # Blog object is retrieved at this point
-    >>> entry.blog   # cached version, no DB access
+    >>> entry.blog  # Blog object is retrieved at this point
+    >>> entry.blog  # cached version, no DB access
 
 But in general, callable attributes cause DB lookups every time:
 
 .. code-block:: pycon
 
     >>> entry = Entry.objects.get(id=1)
-    >>> entry.authors.all()   # query performed
-    >>> entry.authors.all()   # query performed again
+    >>> entry.authors.all()  # query performed
+    >>> entry.authors.all()  # query performed again
 
 Be careful when reading template code - the template system does not allow use
 of parentheses, but will call callables automatically, hiding the above

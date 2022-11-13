@@ -432,10 +432,12 @@ OGR Geometries
 around OGR's internal geometry representation. Thus, they allow for more
 efficient access to data when using :class:`DataSource`. Unlike its GEOS
 counterpart, :class:`OGRGeometry` supports spatial reference systems and
-coordinate transformation::
+coordinate transformation:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import OGRGeometry
-    >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
+    >>> polygon = OGRGeometry("POLYGON((0 0, 5 0, 5 5, 0 5))")
 
 .. class:: OGRGeometry(geom_input, srs=None)
 
@@ -1068,12 +1070,15 @@ Coordinate System Objects
 Represents a coordinate system transform. It is initialized with two
 :class:`SpatialReference`, representing the source and target coordinate
 systems, respectively. These objects should be used when performing the same
-coordinate transformation repeatedly on different geometries::
+coordinate transformation repeatedly on different geometries:
 
-    >>> ct = CoordTransform(SpatialReference('WGS84'), SpatialReference('NAD83'))
+.. code-block:: pycon
+
+    >>> ct = CoordTransform(SpatialReference("WGS84"), SpatialReference("NAD83"))
     >>> for feat in layer:
-    ...     geom = feat.geom # getting clone of feature geometry
-    ...     geom.transform(ct) # transforming
+    ...     geom = feat.geom  # getting clone of feature geometry
+    ...     geom.transform(ct)  # transforming
+    ...
 
 .. _raster-data-source-objects:
 
@@ -1807,18 +1812,24 @@ dictionary representation and provide a ``name`` argument that starts with
 of the raster.
 
 Here's how to create a raster and return it as a file in an
-:class:`~django.http.HttpResponse`::
+:class:`~django.http.HttpResponse`:
+
+.. code-block:: pycon
 
     >>> from django.http import HttpResponse
-    >>> rst = GDALRaster({
-    ...     'name': '/vsimem/temporarymemfile',
-    ...     'driver': 'tif',
-    ...     'width': 6, 'height': 6, 'srid': 3086,
-    ...     'origin': [500000, 400000],
-    ...     'scale': [100, -100],
-    ...     'bands': [{'data': range(36), 'nodata_value': 99}]
-    ... })
-    >>> HttpResponse(rast.vsi_buffer, 'image/tiff')
+    >>> rst = GDALRaster(
+    ...     {
+    ...         "name": "/vsimem/temporarymemfile",
+    ...         "driver": "tif",
+    ...         "width": 6,
+    ...         "height": 6,
+    ...         "srid": 3086,
+    ...         "origin": [500000, 400000],
+    ...         "scale": [100, -100],
+    ...         "bands": [{"data": range(36), "nodata_value": 99}],
+    ...     }
+    ... )
+    >>> HttpResponse(rast.vsi_buffer, "image/tiff")
 
 Using other Virtual Filesystems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

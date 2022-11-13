@@ -16,45 +16,55 @@ Example
 
 :class:`Distance` objects may be instantiated using a keyword argument indicating the
 context of the units.  In the example below, two different distance objects are
-instantiated in units of kilometers (``km``) and miles (``mi``)::
+instantiated in units of kilometers (``km``) and miles (``mi``):
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.measure import D, Distance
     >>> d1 = Distance(km=5)
     >>> print(d1)
     5.0 km
-    >>> d2 = D(mi=5) # `D` is an alias for `Distance`
+    >>> d2 = D(mi=5)  # `D` is an alias for `Distance`
     >>> print(d2)
     5.0 mi
 
 For conversions, access the preferred unit attribute to get a converted
-distance quantity::
+distance quantity:
 
-    >>> print(d1.mi) # Converting 5 kilometers to miles
+.. code-block:: pycon
+
+    >>> print(d1.mi)  # Converting 5 kilometers to miles
     3.10685596119
-    >>> print(d2.km) # Converting 5 miles to kilometers
+    >>> print(d2.km)  # Converting 5 miles to kilometers
     8.04672
 
 Moreover, arithmetic operations may be performed between the distance
-objects::
+objects:
 
-    >>> print(d1 + d2) # Adding 5 miles to 5 kilometers
+.. code-block:: pycon
+
+    >>> print(d1 + d2)  # Adding 5 miles to 5 kilometers
     13.04672 km
-    >>> print(d2 - d1) # Subtracting 5 kilometers from 5 miles
+    >>> print(d2 - d1)  # Subtracting 5 kilometers from 5 miles
     1.89314403881 mi
 
 Two :class:`Distance` objects multiplied together will yield an :class:`Area`
-object, which uses squared units of measure::
+object, which uses squared units of measure:
 
-    >>> a = d1 * d2 # Returns an Area object.
+.. code-block:: pycon
+
+    >>> a = d1 * d2  # Returns an Area object.
     >>> print(a)
     40.2336 sq_km
 
 To determine what the attribute abbreviation of a unit is, the ``unit_attname``
-class method may be used::
+class method may be used:
 
-    >>> print(Distance.unit_attname('US Survey Foot'))
+.. code-block:: pycon
+
+    >>> print(Distance.unit_attname("US Survey Foot"))
     survey_ft
-    >>> print(Distance.unit_attname('centimeter'))
+    >>> print(Distance.unit_attname("centimeter"))
     cm
 
 .. _supported_units:

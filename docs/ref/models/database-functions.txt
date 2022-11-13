@@ -35,13 +35,15 @@ Comparison and conversion functions
 
 Forces the result type of ``expression`` to be the one from ``output_field``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cast
-    >>> Author.objects.create(age=25, name='Margaret Smith')
+    >>> Author.objects.create(age=25, name="Margaret Smith")
     >>> author = Author.objects.annotate(
-    ...    age_as_float=Cast('age', output_field=FloatField()),
+    ...     age_as_float=Cast("age", output_field=FloatField()),
     ... ).get()
     >>> print(author.age_as_float)
     25.0
@@ -56,29 +58,30 @@ first non-null value (note that an empty string is not considered a null
 value). Each argument must be of a similar type, so mixing text and numbers
 will result in a database error.
 
-Usage examples::
+Usage examples:
+
+.. code-block:: pycon
 
     >>> # Get a screen name from least to most public
     >>> from django.db.models import Sum
     >>> from django.db.models.functions import Coalesce
-    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
-    >>> author = Author.objects.annotate(
-    ...    screen_name=Coalesce('alias', 'goes_by', 'name')).get()
+    >>> Author.objects.create(name="Margaret Smith", goes_by="Maggie")
+    >>> author = Author.objects.annotate(screen_name=Coalesce("alias", "goes_by", "name")).get()
     >>> print(author.screen_name)
     Maggie
 
     >>> # Prevent an aggregate Sum() from returning None
     >>> # The aggregate default argument uses Coalesce() under the hood.
     >>> aggregated = Author.objects.aggregate(
-    ...    combined_age=Sum('age'),
-    ...    combined_age_default=Sum('age', default=0),
-    ...    combined_age_coalesce=Coalesce(Sum('age'), 0),
+    ...     combined_age=Sum("age"),
+    ...     combined_age_default=Sum("age", default=0),
+    ...     combined_age_coalesce=Coalesce(Sum("age"), 0),
     ... )
-    >>> print(aggregated['combined_age'])
+    >>> print(aggregated["combined_age"])
     None
-    >>> print(aggregated['combined_age_default'])
+    >>> print(aggregated["combined_age_default"])
     0
-    >>> print(aggregated['combined_age_coalesce'])
+    >>> print(aggregated["combined_age_coalesce"])
     0
 
 .. warning::
@@ -99,14 +102,18 @@ Usage examples::
 
 Takes an expression and a collation name to query against.
 
-For example, to filter case-insensitively in SQLite::
+For example, to filter case-insensitively in SQLite:
 
-    >>> Author.objects.filter(name=Collate(Value('john'), 'nocase'))
+.. code-block:: pycon
+
+    >>> Author.objects.filter(name=Collate(Value("john"), "nocase"))
     <QuerySet [<Author: John>, <Author: john>]>
 
-It can also be used when ordering, for example with PostgreSQL::
+It can also be used when ordering, for example with PostgreSQL:
 
-    >>> Author.objects.order_by(Collate('name', 'et-x-icu'))
+.. code-block:: pycon
+
+    >>> Author.objects.order_by(Collate("name", "et-x-icu"))
     <QuerySet [<Author: Ursula>, <Author: Veronika>, <Author: Ülle>]>
 
 ``Greatest``
@@ -159,16 +166,20 @@ and ``comment.modified``.
 Takes a list of key-value pairs and returns a JSON object containing those
 pairs.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F
     >>> from django.db.models.functions import JSONObject, Lower
-    >>> Author.objects.create(name='Margaret Smith', alias='msmith', age=25)
-    >>> author = Author.objects.annotate(json_object=JSONObject(
-    ...     name=Lower('name'),
-    ...     alias='alias',
-    ...     age=F('age') * 2,
-    ... )).get()
+    >>> Author.objects.create(name="Margaret Smith", alias="msmith", age=25)
+    >>> author = Author.objects.annotate(
+    ...     json_object=JSONObject(
+    ...         name=Lower("name"),
+    ...         alias="alias",
+    ...         age=F("age") * 2,
+    ...     )
+    ... ).get()
     >>> author.json_object
     {'name': 'margaret smith', 'alias': 'msmith', 'age': 50}
 
@@ -292,23 +303,25 @@ Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
 e.g. use ``ExtractYear(...)`` rather than ``Extract(..., lookup_name='year')``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime
     >>> from django.db.models.functions import Extract
     >>> start = datetime(2015, 6, 15)
     >>> end = datetime(2015, 7, 2)
     >>> Experiment.objects.create(
-    ...    start_datetime=start, start_date=start.date(),
-    ...    end_datetime=end, end_date=end.date())
+    ...     start_datetime=start, start_date=start.date(), end_datetime=end, end_date=end.date()
+    ... )
     >>> # Add the experiment start year as a field in the QuerySet.
     >>> experiment = Experiment.objects.annotate(
-    ...    start_year=Extract('start_datetime', 'year')).get()
+    ...     start_year=Extract("start_datetime", "year")
+    ... ).get()
     >>> experiment.start_year
     2015
     >>> # How many experiments completed in the same year in which they started?
-    >>> Experiment.objects.filter(
-    ...    start_datetime__year=Extract('end_datetime', 'year')).count()
+    >>> Experiment.objects.filter(start_datetime__year=Extract("end_datetime", "year")).count()
     1
 
 ``DateField`` extracts
@@ -356,31 +369,50 @@ class is also a ``Transform`` registered on ``DateField`` and ``DateTimeField``
 as ``__(lookup_name)``, e.g. ``__year``.
 
 Since ``DateField``\s don't have a time component, only ``Extract`` subclasses
-that deal with date-parts can be used with ``DateField``::
+that deal with date-parts can be used with ``DateField``:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime, timezone
     >>> from django.db.models.functions import (
-    ...     ExtractDay, ExtractMonth, ExtractQuarter, ExtractWeek,
-    ...     ExtractIsoWeekDay, ExtractWeekDay, ExtractIsoYear, ExtractYear,
+    ...     ExtractDay,
+    ...     ExtractMonth,
+    ...     ExtractQuarter,
+    ...     ExtractWeek,
+    ...     ExtractIsoWeekDay,
+    ...     ExtractWeekDay,
+    ...     ExtractIsoYear,
+    ...     ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
     >>> Experiment.objects.create(
-    ...    start_datetime=start_2015, start_date=start_2015.date(),
-    ...    end_datetime=end_2015, end_date=end_2015.date())
+    ...     start_datetime=start_2015,
+    ...     start_date=start_2015.date(),
+    ...     end_datetime=end_2015,
+    ...     end_date=end_2015.date(),
+    ... )
     >>> Experiment.objects.annotate(
-    ...     year=ExtractYear('start_date'),
-    ...     isoyear=ExtractIsoYear('start_date'),
-    ...     quarter=ExtractQuarter('start_date'),
-    ...     month=ExtractMonth('start_date'),
-    ...     week=ExtractWeek('start_date'),
-    ...     day=ExtractDay('start_date'),
-    ...     weekday=ExtractWeekDay('start_date'),
-    ...     isoweekday=ExtractIsoWeekDay('start_date'),
+    ...     year=ExtractYear("start_date"),
+    ...     isoyear=ExtractIsoYear("start_date"),
+    ...     quarter=ExtractQuarter("start_date"),
+    ...     month=ExtractMonth("start_date"),
+    ...     week=ExtractWeek("start_date"),
+    ...     day=ExtractDay("start_date"),
+    ...     weekday=ExtractWeekDay("start_date"),
+    ...     isoweekday=ExtractIsoWeekDay("start_date"),
     ... ).values(
-    ...     'year', 'isoyear', 'quarter', 'month', 'week', 'day', 'weekday',
-    ...     'isoweekday',
-    ... ).get(end_date__year=ExtractYear('start_date'))
+    ...     "year",
+    ...     "isoyear",
+    ...     "quarter",
+    ...     "month",
+    ...     "week",
+    ...     "day",
+    ...     "weekday",
+    ...     "isoweekday",
+    ... ).get(
+    ...     end_date__year=ExtractYear("start_date")
+    ... )
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
      'day': 15, 'weekday': 2, 'isoweekday': 1}
 
@@ -406,35 +438,58 @@ These are logically equivalent to ``Extract('datetime_field', lookup_name)``.
 Each class is also a ``Transform`` registered on ``DateTimeField`` as
 ``__(lookup_name)``, e.g. ``__minute``.
 
-``DateTimeField`` examples::
+``DateTimeField`` examples:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime, timezone
     >>> from django.db.models.functions import (
-    ...     ExtractDay, ExtractHour, ExtractMinute, ExtractMonth,
-    ...     ExtractQuarter, ExtractSecond, ExtractWeek, ExtractIsoWeekDay,
-    ...     ExtractWeekDay, ExtractIsoYear, ExtractYear,
+    ...     ExtractDay,
+    ...     ExtractHour,
+    ...     ExtractMinute,
+    ...     ExtractMonth,
+    ...     ExtractQuarter,
+    ...     ExtractSecond,
+    ...     ExtractWeek,
+    ...     ExtractIsoWeekDay,
+    ...     ExtractWeekDay,
+    ...     ExtractIsoYear,
+    ...     ExtractYear,
     ... )
     >>> start_2015 = datetime(2015, 6, 15, 23, 30, 1, tzinfo=timezone.utc)
     >>> end_2015 = datetime(2015, 6, 16, 13, 11, 27, tzinfo=timezone.utc)
     >>> Experiment.objects.create(
-    ...    start_datetime=start_2015, start_date=start_2015.date(),
-    ...    end_datetime=end_2015, end_date=end_2015.date())
+    ...     start_datetime=start_2015,
+    ...     start_date=start_2015.date(),
+    ...     end_datetime=end_2015,
+    ...     end_date=end_2015.date(),
+    ... )
     >>> Experiment.objects.annotate(
-    ...     year=ExtractYear('start_datetime'),
-    ...     isoyear=ExtractIsoYear('start_datetime'),
-    ...     quarter=ExtractQuarter('start_datetime'),
-    ...     month=ExtractMonth('start_datetime'),
-    ...     week=ExtractWeek('start_datetime'),
-    ...     day=ExtractDay('start_datetime'),
-    ...     weekday=ExtractWeekDay('start_datetime'),
-    ...     isoweekday=ExtractIsoWeekDay('start_datetime'),
-    ...     hour=ExtractHour('start_datetime'),
-    ...     minute=ExtractMinute('start_datetime'),
-    ...     second=ExtractSecond('start_datetime'),
+    ...     year=ExtractYear("start_datetime"),
+    ...     isoyear=ExtractIsoYear("start_datetime"),
+    ...     quarter=ExtractQuarter("start_datetime"),
+    ...     month=ExtractMonth("start_datetime"),
+    ...     week=ExtractWeek("start_datetime"),
+    ...     day=ExtractDay("start_datetime"),
+    ...     weekday=ExtractWeekDay("start_datetime"),
+    ...     isoweekday=ExtractIsoWeekDay("start_datetime"),
+    ...     hour=ExtractHour("start_datetime"),
+    ...     minute=ExtractMinute("start_datetime"),
+    ...     second=ExtractSecond("start_datetime"),
     ... ).values(
-    ...     'year', 'isoyear', 'month', 'week', 'day',
-    ...     'weekday', 'isoweekday', 'hour', 'minute', 'second',
-    ... ).get(end_datetime__year=ExtractYear('start_datetime'))
+    ...     "year",
+    ...     "isoyear",
+    ...     "month",
+    ...     "week",
+    ...     "day",
+    ...     "weekday",
+    ...     "isoweekday",
+    ...     "hour",
+    ...     "minute",
+    ...     "second",
+    ... ).get(
+    ...     end_datetime__year=ExtractYear("start_datetime")
+    ... )
     {'year': 2015, 'isoyear': 2015, 'quarter': 2, 'month': 6, 'week': 25,
      'day': 15, 'weekday': 2, 'isoweekday': 1, 'hour': 23, 'minute': 30,
      'second': 1}
@@ -443,34 +498,39 @@ When :setting:`USE_TZ` is ``True`` then datetimes are stored in the database
 in UTC. If a different timezone is active in Django, the datetime is converted
 to that timezone before the value is extracted. The example below converts to
 the Melbourne timezone (UTC +10:00), which changes the day, weekday, and hour
-values that are returned::
+values that are returned:
+
+.. code-block:: pycon
 
     >>> from django.utils import timezone
     >>> import zoneinfo
-    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')  # UTC+10:00
+    >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")  # UTC+10:00
     >>> with timezone.override(melb):
-    ...    Experiment.objects.annotate(
-    ...        day=ExtractDay('start_datetime'),
-    ...        weekday=ExtractWeekDay('start_datetime'),
-    ...        isoweekday=ExtractIsoWeekDay('start_datetime'),
-    ...        hour=ExtractHour('start_datetime'),
-    ...    ).values('day', 'weekday', 'isoweekday', 'hour').get(
-    ...        end_datetime__year=ExtractYear('start_datetime'),
-    ...    )
+    ...     Experiment.objects.annotate(
+    ...         day=ExtractDay("start_datetime"),
+    ...         weekday=ExtractWeekDay("start_datetime"),
+    ...         isoweekday=ExtractIsoWeekDay("start_datetime"),
+    ...         hour=ExtractHour("start_datetime"),
+    ...     ).values("day", "weekday", "isoweekday", "hour").get(
+    ...         end_datetime__year=ExtractYear("start_datetime"),
+    ...     )
+    ...
     {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
 Explicitly passing the timezone to the ``Extract`` function behaves in the same
-way, and takes priority over an active timezone::
+way, and takes priority over an active timezone:
+
+.. code-block:: pycon
 
     >>> import zoneinfo
-    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
+    >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")
     >>> Experiment.objects.annotate(
-    ...     day=ExtractDay('start_datetime', tzinfo=melb),
-    ...     weekday=ExtractWeekDay('start_datetime', tzinfo=melb),
-    ...     isoweekday=ExtractIsoWeekDay('start_datetime', tzinfo=melb),
-    ...     hour=ExtractHour('start_datetime', tzinfo=melb),
-    ... ).values('day', 'weekday', 'isoweekday', 'hour').get(
-    ...     end_datetime__year=ExtractYear('start_datetime'),
+    ...     day=ExtractDay("start_datetime", tzinfo=melb),
+    ...     weekday=ExtractWeekDay("start_datetime", tzinfo=melb),
+    ...     isoweekday=ExtractIsoWeekDay("start_datetime", tzinfo=melb),
+    ...     hour=ExtractHour("start_datetime", tzinfo=melb),
+    ... ).values("day", "weekday", "isoweekday", "hour").get(
+    ...     end_datetime__year=ExtractYear("start_datetime"),
     ... )
     {'day': 16, 'weekday': 3, 'isoweekday': 2, 'hour': 9}
 
@@ -482,7 +542,9 @@ way, and takes priority over an active timezone::
 Returns the database server's current date and time when the query is executed,
 typically using the SQL ``CURRENT_TIMESTAMP``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Now
     >>> Article.objects.filter(published__lte=Now())
@@ -566,7 +628,9 @@ The subclasses are all defined as transforms, but they aren't registered with
 any fields, because the lookup names are already reserved by the ``Extract``
 subclasses.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime
     >>> from django.db.models import Count, DateTimeField
@@ -574,16 +638,20 @@ Usage example::
     >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 30, 50, 321))
     >>> Experiment.objects.create(start_datetime=datetime(2015, 6, 15, 14, 40, 2, 123))
     >>> Experiment.objects.create(start_datetime=datetime(2015, 12, 25, 10, 5, 27, 999))
-    >>> experiments_per_day = Experiment.objects.annotate(
-    ...    start_day=Trunc('start_datetime', 'day', output_field=DateTimeField())
-    ... ).values('start_day').annotate(experiments=Count('id'))
+    >>> experiments_per_day = (
+    ...     Experiment.objects.annotate(
+    ...         start_day=Trunc("start_datetime", "day", output_field=DateTimeField())
+    ...     )
+    ...     .values("start_day")
+    ...     .annotate(experiments=Count("id"))
+    ... )
     >>> for exp in experiments_per_day:
-    ...     print(exp['start_day'], exp['experiments'])
+    ...     print(exp["start_day"], exp["experiments"])
     ...
     2015-06-15 00:00:00 2
     2015-12-25 00:00:00 1
     >>> experiments = Experiment.objects.annotate(
-    ...    start_day=Trunc('start_datetime', 'day', output_field=DateTimeField())
+    ...     start_day=Trunc("start_datetime", "day", output_field=DateTimeField())
     ... ).filter(start_day=datetime(2015, 6, 15))
     >>> for exp in experiments:
     ...     print(exp.start_datetime)
@@ -622,7 +690,9 @@ with less precision. ``expression`` can have an ``output_field`` of either
 ``DateField`` or ``DateTimeField``.
 
 Since ``DateField``\s don't have a time component, only ``Trunc`` subclasses
-that deal with date-parts can be used with ``DateField``::
+that deal with date-parts can be used with ``DateField``:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime, timezone
     >>> from django.db.models import Count
@@ -633,22 +703,26 @@ that deal with date-parts can be used with ``DateField``::
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
     >>> Experiment.objects.create(start_datetime=start2, start_date=start2.date())
     >>> Experiment.objects.create(start_datetime=start3, start_date=start3.date())
-    >>> experiments_per_year = Experiment.objects.annotate(
-    ...    year=TruncYear('start_date')).values('year').annotate(
-    ...    experiments=Count('id'))
+    >>> experiments_per_year = (
+    ...     Experiment.objects.annotate(year=TruncYear("start_date"))
+    ...     .values("year")
+    ...     .annotate(experiments=Count("id"))
+    ... )
     >>> for exp in experiments_per_year:
-    ...     print(exp['year'], exp['experiments'])
+    ...     print(exp["year"], exp["experiments"])
     ...
     2014-01-01 1
     2015-01-01 2
 
     >>> import zoneinfo
-    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
-    >>> experiments_per_month = Experiment.objects.annotate(
-    ...    month=TruncMonth('start_datetime', tzinfo=melb)).values('month').annotate(
-    ...    experiments=Count('id'))
+    >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+    >>> experiments_per_month = (
+    ...     Experiment.objects.annotate(month=TruncMonth("start_datetime", tzinfo=melb))
+    ...     .values("month")
+    ...     .annotate(experiments=Count("id"))
+    ... )
     >>> for exp in experiments_per_month:
-    ...     print(exp['month'], exp['experiments'])
+    ...     print(exp["month"], exp["experiments"])
     ...
     2015-06-01 00:00:00+10:00 1
     2016-01-01 00:00:00+11:00 1
@@ -700,24 +774,30 @@ truncate all parts of the date up to ``kind`` and allow grouping or filtering
 datetimes with less precision. ``expression`` must have an ``output_field`` of
 ``DateTimeField``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from datetime import date, datetime, timezone
     >>> from django.db.models import Count
     >>> from django.db.models.functions import (
-    ...     TruncDate, TruncDay, TruncHour, TruncMinute, TruncSecond,
+    ...     TruncDate,
+    ...     TruncDay,
+    ...     TruncHour,
+    ...     TruncMinute,
+    ...     TruncSecond,
     ... )
     >>> import zoneinfo
     >>> start1 = datetime(2014, 6, 15, 14, 30, 50, 321, tzinfo=timezone.utc)
     >>> Experiment.objects.create(start_datetime=start1, start_date=start1.date())
-    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
+    >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")
     >>> Experiment.objects.annotate(
-    ...     date=TruncDate('start_datetime'),
-    ...     day=TruncDay('start_datetime', tzinfo=melb),
-    ...     hour=TruncHour('start_datetime', tzinfo=melb),
-    ...     minute=TruncMinute('start_datetime'),
-    ...     second=TruncSecond('start_datetime'),
-    ... ).values('date', 'day', 'hour', 'minute', 'second').get()
+    ...     date=TruncDate("start_datetime"),
+    ...     day=TruncDay("start_datetime", tzinfo=melb),
+    ...     hour=TruncHour("start_datetime", tzinfo=melb),
+    ...     minute=TruncMinute("start_datetime"),
+    ...     second=TruncSecond("start_datetime"),
+    ... ).values("date", "day", "hour", "minute", "second").get()
     {'date': datetime.date(2014, 6, 15),
      'day': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
      'hour': datetime.datetime(2014, 6, 16, 0, 0, tzinfo=zoneinfo.ZoneInfo('Australia/Melbourne')),
@@ -753,7 +833,9 @@ with less precision. ``expression`` can have an ``output_field`` of either
 ``TimeField`` or ``DateTimeField``.
 
 Since ``TimeField``\s don't have a date component, only ``Trunc`` subclasses
-that deal with time-parts can be used with ``TimeField``::
+that deal with time-parts can be used with ``TimeField``:
+
+.. code-block:: pycon
 
     >>> from datetime import datetime, timezone
     >>> from django.db.models import Count, TimeField
@@ -764,22 +846,30 @@ that deal with time-parts can be used with ``TimeField``::
     >>> Experiment.objects.create(start_datetime=start1, start_time=start1.time())
     >>> Experiment.objects.create(start_datetime=start2, start_time=start2.time())
     >>> Experiment.objects.create(start_datetime=start3, start_time=start3.time())
-    >>> experiments_per_hour = Experiment.objects.annotate(
-    ...    hour=TruncHour('start_datetime', output_field=TimeField()),
-    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> experiments_per_hour = (
+    ...     Experiment.objects.annotate(
+    ...         hour=TruncHour("start_datetime", output_field=TimeField()),
+    ...     )
+    ...     .values("hour")
+    ...     .annotate(experiments=Count("id"))
+    ... )
     >>> for exp in experiments_per_hour:
-    ...     print(exp['hour'], exp['experiments'])
+    ...     print(exp["hour"], exp["experiments"])
     ...
     14:00:00 2
     17:00:00 1
 
     >>> import zoneinfo
-    >>> melb = zoneinfo.ZoneInfo('Australia/Melbourne')
-    >>> experiments_per_hour = Experiment.objects.annotate(
-    ...    hour=TruncHour('start_datetime', tzinfo=melb),
-    ... ).values('hour').annotate(experiments=Count('id'))
+    >>> melb = zoneinfo.ZoneInfo("Australia/Melbourne")
+    >>> experiments_per_hour = (
+    ...     Experiment.objects.annotate(
+    ...         hour=TruncHour("start_datetime", tzinfo=melb),
+    ...     )
+    ...     .values("hour")
+    ...     .annotate(experiments=Count("id"))
+    ... )
     >>> for exp in experiments_per_hour:
-    ...     print(exp['hour'], exp['experiments'])
+    ...     print(exp["hour"], exp["experiments"])
     ...
     2014-06-16 00:00:00+10:00 2
     2016-01-01 04:00:00+11:00 1
@@ -802,15 +892,19 @@ We'll be using the following model in math function examples::
 
 Returns the absolute value of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Abs
     >>> Vector.objects.create(x=-0.5, y=1.1)
-    >>> vector = Vector.objects.annotate(x_abs=Abs('x'), y_abs=Abs('y')).get()
+    >>> vector = Vector.objects.annotate(x_abs=Abs("x"), y_abs=Abs("y")).get()
     >>> vector.x_abs, vector.y_abs
     (0.5, 1.1)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Abs
@@ -826,15 +920,19 @@ It can also be registered as a transform. For example::
 Returns the arccosine of a numeric field or expression. The expression value
 must be within the range -1 to 1.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import ACos
     >>> Vector.objects.create(x=0.5, y=-0.9)
-    >>> vector = Vector.objects.annotate(x_acos=ACos('x'), y_acos=ACos('y')).get()
+    >>> vector = Vector.objects.annotate(x_acos=ACos("x"), y_acos=ACos("y")).get()
     >>> vector.x_acos, vector.y_acos
     (1.0471975511965979, 2.6905658417935308)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ACos
@@ -850,15 +948,19 @@ It can also be registered as a transform. For example::
 Returns the arcsine of a numeric field or expression. The expression value must
 be in the range -1 to 1.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import ASin
     >>> Vector.objects.create(x=0, y=1)
-    >>> vector = Vector.objects.annotate(x_asin=ASin('x'), y_asin=ASin('y')).get()
+    >>> vector = Vector.objects.annotate(x_asin=ASin("x"), y_asin=ASin("y")).get()
     >>> vector.x_asin, vector.y_asin
     (0.0, 1.5707963267948966)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ASin
@@ -873,15 +975,19 @@ It can also be registered as a transform. For example::
 
 Returns the arctangent of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import ATan
     >>> Vector.objects.create(x=3.12, y=6.987)
-    >>> vector = Vector.objects.annotate(x_atan=ATan('x'), y_atan=ATan('y')).get()
+    >>> vector = Vector.objects.annotate(x_atan=ATan("x"), y_atan=ATan("y")).get()
     >>> vector.x_atan, vector.y_atan
     (1.2606282660069106, 1.428638798133829)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import ATan
@@ -896,11 +1002,13 @@ It can also be registered as a transform. For example::
 
 Returns the arctangent of ``expression1 / expression2``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import ATan2
     >>> Vector.objects.create(x=2.5, y=1.9)
-    >>> vector = Vector.objects.annotate(atan2=ATan2('x', 'y')).get()
+    >>> vector = Vector.objects.annotate(atan2=ATan2("x", "y")).get()
     >>> vector.atan2
     0.9209258773829491
 
@@ -912,15 +1020,19 @@ Usage example::
 Returns the smallest integer greater than or equal to a numeric field or
 expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Ceil
     >>> Vector.objects.create(x=3.12, y=7.0)
-    >>> vector = Vector.objects.annotate(x_ceil=Ceil('x'), y_ceil=Ceil('y')).get()
+    >>> vector = Vector.objects.annotate(x_ceil=Ceil("x"), y_ceil=Ceil("y")).get()
     >>> vector.x_ceil, vector.y_ceil
     (4.0, 7.0)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ceil
@@ -935,15 +1047,19 @@ It can also be registered as a transform. For example::
 
 Returns the cosine  of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Cos
     >>> Vector.objects.create(x=-8.0, y=3.1415926)
-    >>> vector = Vector.objects.annotate(x_cos=Cos('x'), y_cos=Cos('y')).get()
+    >>> vector = Vector.objects.annotate(x_cos=Cos("x"), y_cos=Cos("y")).get()
     >>> vector.x_cos, vector.y_cos
     (-0.14550003380861354, -0.9999999999999986)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cos
@@ -958,15 +1074,19 @@ It can also be registered as a transform. For example::
 
 Returns the cotangent of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Cot
     >>> Vector.objects.create(x=12.0, y=1.0)
-    >>> vector = Vector.objects.annotate(x_cot=Cot('x'), y_cot=Cot('y')).get()
+    >>> vector = Vector.objects.annotate(x_cot=Cot("x"), y_cot=Cot("y")).get()
     >>> vector.x_cot, vector.y_cot
     (-1.5726734063976826, 0.642092615934331)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Cot
@@ -981,15 +1101,19 @@ It can also be registered as a transform. For example::
 
 Converts a numeric field or expression from radians to degrees.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Degrees
     >>> Vector.objects.create(x=-1.57, y=3.14)
-    >>> vector = Vector.objects.annotate(x_d=Degrees('x'), y_d=Degrees('y')).get()
+    >>> vector = Vector.objects.annotate(x_d=Degrees("x"), y_d=Degrees("y")).get()
     >>> vector.x_d, vector.y_d
     (-89.95437383553924, 179.9087476710785)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Degrees
@@ -1005,15 +1129,19 @@ It can also be registered as a transform. For example::
 Returns the value of ``e`` (the natural logarithm base) raised to the power of
 a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Exp
     >>> Vector.objects.create(x=5.4, y=-2.0)
-    >>> vector = Vector.objects.annotate(x_exp=Exp('x'), y_exp=Exp('y')).get()
+    >>> vector = Vector.objects.annotate(x_exp=Exp("x"), y_exp=Exp("y")).get()
     >>> vector.x_exp, vector.y_exp
     (221.40641620418717, 0.1353352832366127)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Exp
@@ -1029,15 +1157,19 @@ It can also be registered as a transform. For example::
 Returns the largest integer value not greater than a numeric field or
 expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Floor
     >>> Vector.objects.create(x=5.4, y=-2.3)
-    >>> vector = Vector.objects.annotate(x_floor=Floor('x'), y_floor=Floor('y')).get()
+    >>> vector = Vector.objects.annotate(x_floor=Floor("x"), y_floor=Floor("y")).get()
     >>> vector.x_floor, vector.y_floor
     (5.0, -3.0)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Floor
@@ -1052,15 +1184,19 @@ It can also be registered as a transform. For example::
 
 Returns the natural logarithm a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Ln
     >>> Vector.objects.create(x=5.4, y=233.0)
-    >>> vector = Vector.objects.annotate(x_ln=Ln('x'), y_ln=Ln('y')).get()
+    >>> vector = Vector.objects.annotate(x_ln=Ln("x"), y_ln=Ln("y")).get()
     >>> vector.x_ln, vector.y_ln
     (1.6863989535702288, 5.4510384535657)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Ln
@@ -1076,11 +1212,13 @@ It can also be registered as a transform. For example::
 Accepts two numeric fields or expressions and returns the logarithm of
 the first to base of the second.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Log
     >>> Vector.objects.create(x=2.0, y=4.0)
-    >>> vector = Vector.objects.annotate(log=Log('x', 'y')).get()
+    >>> vector = Vector.objects.annotate(log=Log("x", "y")).get()
     >>> vector.log
     2.0
 
@@ -1092,11 +1230,13 @@ Usage example::
 Accepts two numeric fields or expressions and returns the remainder of
 the first divided by the second (modulo operation).
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Mod
     >>> Vector.objects.create(x=5.4, y=2.3)
-    >>> vector = Vector.objects.annotate(mod=Mod('x', 'y')).get()
+    >>> vector = Vector.objects.annotate(mod=Mod("x", "y")).get()
     >>> vector.mod
     0.8
 
@@ -1115,11 +1255,13 @@ Returns the value of the mathematical constant ``π``.
 Accepts two numeric fields or expressions and returns the value of the first
 raised to the power of the second.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Power
     >>> Vector.objects.create(x=2, y=-2)
-    >>> vector = Vector.objects.annotate(power=Power('x', 'y')).get()
+    >>> vector = Vector.objects.annotate(power=Power("x", "y")).get()
     >>> vector.power
     0.25
 
@@ -1130,15 +1272,19 @@ Usage example::
 
 Converts a numeric field or expression from degrees to radians.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Radians
     >>> Vector.objects.create(x=-90, y=180)
-    >>> vector = Vector.objects.annotate(x_r=Radians('x'), y_r=Radians('y')).get()
+    >>> vector = Vector.objects.annotate(x_r=Radians("x"), y_r=Radians("y")).get()
     >>> vector.x_r, vector.y_r
     (-1.5707963267948966, 3.141592653589793)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Radians
@@ -1162,15 +1308,19 @@ Rounds a numeric field or expression to ``precision`` (must be an integer)
 decimal places. By default, it rounds to the nearest integer. Whether half
 values are rounded up or down depends on the database.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Round
     >>> Vector.objects.create(x=5.4, y=-2.37)
-    >>> vector = Vector.objects.annotate(x_r=Round('x'), y_r=Round('y', precision=1)).get()
+    >>> vector = Vector.objects.annotate(x_r=Round("x"), y_r=Round("y", precision=1)).get()
     >>> vector.x_r, vector.y_r
     (5.0, -2.4)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Round
@@ -1185,15 +1335,19 @@ It can also be registered as a transform. For example::
 
 Returns the sign (-1, 0, 1) of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Sign
     >>> Vector.objects.create(x=5.4, y=-2.3)
-    >>> vector = Vector.objects.annotate(x_sign=Sign('x'), y_sign=Sign('y')).get()
+    >>> vector = Vector.objects.annotate(x_sign=Sign("x"), y_sign=Sign("y")).get()
     >>> vector.x_sign, vector.y_sign
     (1, -1)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sign
@@ -1208,15 +1362,19 @@ It can also be registered as a transform. For example::
 
 Returns the sine of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Sin
     >>> Vector.objects.create(x=5.4, y=-2.3)
-    >>> vector = Vector.objects.annotate(x_sin=Sin('x'), y_sin=Sin('y')).get()
+    >>> vector = Vector.objects.annotate(x_sin=Sin("x"), y_sin=Sin("y")).get()
     >>> vector.x_sin, vector.y_sin
     (-0.7727644875559871, -0.7457052121767203)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sin
@@ -1231,15 +1389,19 @@ It can also be registered as a transform. For example::
 
 Returns the square root of a nonnegative numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Sqrt
     >>> Vector.objects.create(x=4.0, y=12.0)
-    >>> vector = Vector.objects.annotate(x_sqrt=Sqrt('x'), y_sqrt=Sqrt('y')).get()
+    >>> vector = Vector.objects.annotate(x_sqrt=Sqrt("x"), y_sqrt=Sqrt("y")).get()
     >>> vector.x_sqrt, vector.y_sqrt
     (2.0, 3.46410)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Sqrt
@@ -1254,15 +1416,19 @@ It can also be registered as a transform. For example::
 
 Returns the tangent of a numeric field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Tan
     >>> Vector.objects.create(x=0, y=12)
-    >>> vector = Vector.objects.annotate(x_tan=Tan('x'), y_tan=Tan('y')).get()
+    >>> vector = Vector.objects.annotate(x_tan=Tan("x"), y_tan=Tan("y")).get()
     >>> vector.x_tan, vector.y_tan
     (0.0, -0.6358599286615808)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import FloatField
     >>> from django.db.models.functions import Tan
@@ -1287,11 +1453,13 @@ function.
 Like :class:`Length`, it can be registered as a transform on ``IntegerField``.
 The default lookup name is ``chr``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Chr
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.filter(name__startswith=Chr(ord('M'))).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.filter(name__startswith=Chr(ord("M"))).get()
     >>> print(author.name)
     Margaret Smith
 
@@ -1311,17 +1479,16 @@ This function will never have a null result. On backends where a null argument
 results in the entire expression being null, Django will ensure that each null
 part is converted to an empty string first.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> # Get the display name as "name (goes_by)"
     >>> from django.db.models import CharField, Value as V
     >>> from django.db.models.functions import Concat
-    >>> Author.objects.create(name='Margaret Smith', goes_by='Maggie')
+    >>> Author.objects.create(name="Margaret Smith", goes_by="Maggie")
     >>> author = Author.objects.annotate(
-    ...     screen_name=Concat(
-    ...         'name', V(' ('), 'goes_by', V(')'),
-    ...         output_field=CharField()
-    ...     )
+    ...     screen_name=Concat("name", V(" ("), "goes_by", V(")"), output_field=CharField())
     ... ).get()
     >>> print(author.screen_name)
     Margaret Smith (Maggie)
@@ -1333,11 +1500,13 @@ Usage example::
 
 Returns the first ``length`` characters of the given text field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Left
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(first_initial=Left('name', 1)).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(first_initial=Left("name", 1)).get()
     >>> print(author.first_initial)
     M
 
@@ -1349,18 +1518,22 @@ Usage example::
 Accepts a single text field or expression and returns the number of characters
 the value has. If the expression is null, then the length will also be null.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> # Get the length of the name and goes_by fields
     >>> from django.db.models.functions import Length
-    >>> Author.objects.create(name='Margaret Smith')
+    >>> Author.objects.create(name="Margaret Smith")
     >>> author = Author.objects.annotate(
-    ...    name_length=Length('name'),
-    ...    goes_by_length=Length('goes_by')).get()
+    ...     name_length=Length("name"), goes_by_length=Length("goes_by")
+    ... ).get()
     >>> print(author.name_length, author.goes_by_length)
     (14, None)
 
-It can also be registered as a transform. For example::
+It can also be registered as a transform. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import CharField
     >>> from django.db.models.functions import Length
@@ -1378,11 +1551,13 @@ representation.
 
 It can also be registered as a transform as described in :class:`Length`.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Lower
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_lower=Lower('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(name_lower=Lower("name")).get()
     >>> print(author.name_lower)
     margaret smith
 
@@ -1395,14 +1570,16 @@ Returns the value of the given text field or expression padded on the left side
 with ``fill_text`` so that the resulting value is ``length`` characters long.
 The default ``fill_text`` is a space.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Value
     >>> from django.db.models.functions import LPad
-    >>> Author.objects.create(name='John', alias='j')
-    >>> Author.objects.update(name=LPad('name', 8, Value('abc')))
+    >>> Author.objects.create(name="John", alias="j")
+    >>> Author.objects.update(name=LPad("name", 8, Value("abc")))
     1
-    >>> print(Author.objects.get(alias='j').name)
+    >>> print(Author.objects.get(alias="j").name)
     abcaJohn
 
 ``LTrim``
@@ -1423,11 +1600,13 @@ string.
 
 It can also be registered as a transform as described in :class:`Length`.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import MD5
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_md5=MD5('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(name_md5=MD5("name")).get()
     >>> print(author.name_md5)
     749fb689816b2db85f5b169c2055b247
 
@@ -1444,11 +1623,13 @@ than one character long.
 It can also be registered as a transform as described in :class:`Length`.
 The default lookup name is ``ord``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Ord
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_code_point=Ord('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(name_code_point=Ord("name")).get()
     >>> print(author.name_code_point)
     77
 
@@ -1460,13 +1641,15 @@ Usage example::
 Returns the value of the given text field or expression repeated ``number``
 times.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Repeat
-    >>> Author.objects.create(name='John', alias='j')
-    >>> Author.objects.update(name=Repeat('name', 3))
+    >>> Author.objects.create(name="John", alias="j")
+    >>> Author.objects.update(name=Repeat("name", 3))
     1
-    >>> print(Author.objects.get(alias='j').name)
+    >>> print(Author.objects.get(alias="j").name)
     JohnJohnJohn
 
 ``Replace``
@@ -1478,15 +1661,17 @@ Replaces all occurrences of ``text`` with ``replacement`` in ``expression``.
 The default replacement text is the empty string. The arguments to the function
 are case-sensitive.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Value
     >>> from django.db.models.functions import Replace
-    >>> Author.objects.create(name='Margaret Johnson')
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> Author.objects.update(name=Replace('name', Value('Margaret'), Value('Margareth')))
+    >>> Author.objects.create(name="Margaret Johnson")
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> Author.objects.update(name=Replace("name", Value("Margaret"), Value("Margareth")))
     2
-    >>> Author.objects.values('name')
+    >>> Author.objects.values("name")
     <QuerySet [{'name': 'Margareth Johnson'}, {'name': 'Margareth Smith'}]>
 
 ``Reverse``
@@ -1500,11 +1685,13 @@ expression in reverse order.
 It can also be registered as a transform as described in :class:`Length`. The
 default lookup name is ``reverse``.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Reverse
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(backward=Reverse('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(backward=Reverse("name")).get()
     >>> print(author.backward)
     htimS teragraM
 
@@ -1515,11 +1702,13 @@ Usage example::
 
 Returns the last ``length`` characters of the given text field or expression.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Right
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(last_letter=Right('name', 1)).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(last_letter=Right("name", 1)).get()
     >>> print(author.last_letter)
     h
 
@@ -1553,11 +1742,13 @@ the string.
 
 They can also be registered as transforms as described in :class:`Length`.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import SHA1
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_sha1=SHA1('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(name_sha1=SHA1("name")).get()
     >>> print(author.name_sha1)
     b87efd8a6c991c390be5a68e8a7945a7851c7e5c
 
@@ -1581,20 +1772,22 @@ Returns a positive integer corresponding to the 1-indexed position of the first
 occurrence of ``substring`` inside ``string``, or 0 if ``substring`` is not
 found.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Value as V
     >>> from django.db.models.functions import StrIndex
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> Author.objects.create(name='Smith, Margaret')
-    >>> Author.objects.create(name='Margaret Jackson')
-    >>> Author.objects.filter(name='Margaret Jackson').annotate(
-    ...     smith_index=StrIndex('name', V('Smith'))
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> Author.objects.create(name="Smith, Margaret")
+    >>> Author.objects.create(name="Margaret Jackson")
+    >>> Author.objects.filter(name="Margaret Jackson").annotate(
+    ...     smith_index=StrIndex("name", V("Smith"))
     ... ).get().smith_index
     0
-    >>> authors = Author.objects.annotate(
-    ...    smith_index=StrIndex('name', V('Smith'))
-    ... ).filter(smith_index__gt=0)
+    >>> authors = Author.objects.annotate(smith_index=StrIndex("name", V("Smith"))).filter(
+    ...     smith_index__gt=0
+    ... )
     <QuerySet [<Author: Margaret Smith>, <Author: Smith, Margaret>]>
 
 .. warning::
@@ -1613,14 +1806,16 @@ Returns a substring of length ``length`` from the field or expression starting
 at position ``pos``. The position is 1-indexed, so the position must be greater
 than 0. If ``length`` is ``None``, then the rest of the string will be returned.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> # Set the alias to the first 5 characters of the name as lowercase
     >>> from django.db.models.functions import Lower, Substr
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> Author.objects.update(alias=Lower(Substr('name', 1, 5)))
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> Author.objects.update(alias=Lower(Substr("name", 1, 5)))
     1
-    >>> print(Author.objects.get(name='Margaret Smith').alias)
+    >>> print(Author.objects.get(name="Margaret Smith").alias)
     marga
 
 ``Trim``
@@ -1631,13 +1826,15 @@ Usage example::
 Returns the value of the given text field or expression with leading and
 trailing spaces removed.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Trim
-    >>> Author.objects.create(name='  John  ', alias='j')
-    >>> Author.objects.update(name=Trim('name'))
+    >>> Author.objects.create(name="  John  ", alias="j")
+    >>> Author.objects.update(name=Trim("name"))
     1
-    >>> print(Author.objects.get(alias='j').name)
+    >>> print(Author.objects.get(alias="j").name)
     John
 
 ``Upper``
@@ -1650,11 +1847,13 @@ representation.
 
 It can also be registered as a transform as described in :class:`Length`.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.functions import Upper
-    >>> Author.objects.create(name='Margaret Smith')
-    >>> author = Author.objects.annotate(name_upper=Upper('name')).get()
+    >>> Author.objects.create(name="Margaret Smith")
+    >>> author = Author.objects.annotate(name_upper=Upper("name")).get()
     >>> print(author.name_upper)
     MARGARET SMITH
 

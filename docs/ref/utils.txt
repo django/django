@@ -298,7 +298,9 @@ The functions defined in this module share the following properties:
 .. module:: django.utils.feedgenerator
    :synopsis: Syndication feed generation library -- used for generating RSS, etc.
 
-Sample usage::
+Sample usage:
+
+.. code-block:: pycon
 
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
@@ -312,8 +314,9 @@ Sample usage::
     ...     link="http://www.holovaty.com/test/",
     ...     description="Testing.",
     ... )
-    >>> with open('test.rss', 'w') as fp:
-    ...     feed.write(fp, 'utf-8')
+    >>> with open("test.rss", "w") as fp:
+    ...     feed.write(fp, "utf-8")
+    ...
 
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``

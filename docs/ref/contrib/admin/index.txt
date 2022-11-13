@@ -3250,11 +3250,13 @@ with an instance namespace corresponding to the name of the Site instance.
 
 So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
-call::
+call:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> c = Choice.objects.get(...)
-    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,))
+    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,))
 
 This will find the first registered instance of the admin application
 (whatever the instance name), and resolve to the view for changing
@@ -3263,9 +3265,11 @@ This will find the first registered instance of the admin application
 If you want to find a URL in a specific admin instance, provide the name of
 that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
-``custom``, you would need to call::
+``custom``, you would need to call:
 
-    >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
+.. code-block:: pycon
+
+    >>> change_url = reverse("admin:polls_choice_change", args=(c.id,), current_app="custom")
 
 For more details, see the documentation on :ref:`reversing namespaced URLs
 <topics-http-reversing-url-namespaces>`.

@@ -295,14 +295,15 @@ Django uses PostgreSQL's identity columns to store auto-incrementing primary
 keys. An identity column is populated with values from a `sequence`_ that keeps
 track of the next available value. Manually assigning a value to an
 auto-incrementing field doesn't update the field's sequence, which might later
-cause a conflict. For example::
+cause a conflict. For example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> User.objects.create(username='alice', pk=1)
+    >>> User.objects.create(username="alice", pk=1)
     <User: alice>
     >>> # The sequence hasn't been updated; its next value is 1.
-    >>> User.objects.create(username='bob')
-    ...
+    >>> User.objects.create(username="bob")
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 

@@ -18,10 +18,12 @@ Example
 
 Give :class:`~django.core.paginator.Paginator` a list of objects, plus the
 number of items you'd like to have on each page, and it gives you methods for
-accessing the items for each page::
+accessing the items for each page:
+
+.. code-block:: pycon
 
     >>> from django.core.paginator import Paginator
-    >>> objects = ['john', 'paul', 'george', 'ringo']
+    >>> objects = ["john", "paul", "george", "ringo"]
     >>> p = Paginator(objects, 2)
 
     >>> p.count
@@ -54,9 +56,9 @@ accessing the items for each page::
     EmptyPage: That page contains no results
     >>> page2.previous_page_number()
     1
-    >>> page2.start_index() # The 1-based index of the first item on this page
+    >>> page2.start_index()  # The 1-based index of the first item on this page
     3
-    >>> page2.end_index() # The 1-based index of the last item on this page
+    >>> page2.end_index()  # The 1-based index of the last item on this page
     4
 
     >>> p.page(0)

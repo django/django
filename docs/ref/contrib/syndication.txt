@@ -1004,7 +1004,9 @@ They share this interface:
 :meth:`.SyndicationFeed.writeString`
     Returns the feed as a string in the given encoding.
 
-For example, to create an Atom 1.0 feed and print it to standard output::
+For example, to create an Atom 1.0 feed and print it to standard output:
+
+.. code-block:: pycon
 
     >>> from django.utils import feedgenerator
     >>> from datetime import datetime
@@ -1014,12 +1016,15 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     ...     description="In which I write about what I ate today.",
     ...     language="en",
     ...     author_name="Myself",
-    ...     feed_url="https://example.com/atom.xml")
-    >>> f.add_item(title="Hot dog today",
+    ...     feed_url="https://example.com/atom.xml",
+    ... )
+    >>> f.add_item(
+    ...     title="Hot dog today",
     ...     link="https://www.example.com/entries/1/",
     ...     pubdate=datetime.now(),
-    ...     description="<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>")
-    >>> print(f.writeString('UTF-8'))
+    ...     description="<p>Today I had a Vienna Beef hot dog. It was pink, plump and perfect.</p>",
+    ... )
+    >>> print(f.writeString("UTF-8"))
     <?xml version="1.0" encoding="UTF-8"?>
     <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     ...

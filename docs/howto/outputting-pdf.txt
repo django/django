@@ -28,7 +28,9 @@ You can install ReportLab with ``pip``:
 
     $ python -m pip install reportlab
 
-Test your installation by importing it in the Python interactive interpreter::
+Test your installation by importing it in the Python interactive interpreter:
+
+.. code-block:: pycon
 
     >>> import reportlab
 

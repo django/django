@@ -225,7 +225,9 @@ decorator so that they no longer rejects requests. In every other respect
 
 If, for some reason, you *want* the test client to perform CSRF
 checks, you can create an instance of the test client that enforces
-CSRF checks::
+CSRF checks:
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> csrf_client = Client(enforce_csrf_checks=True)

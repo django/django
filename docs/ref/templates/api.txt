@@ -248,7 +248,9 @@ interpreted as a literal string and not using the value of the variable "bar",
 if one exists in the template context.
 
 The template system uses the first lookup type that works. It's short-circuit
-logic. Here are a few examples::
+logic. Here are a few examples:
+
+.. code-block:: pycon
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -256,7 +258,9 @@ logic. Here are a few examples::
     >>> t.render(Context(d))
     "My name is Joe."
 
-    >>> class PersonClass: pass
+    >>> class PersonClass:
+    ...     pass
+    ...
     >>> p = PersonClass()
     >>> p.first_name = "Ron"
     >>> p.last_name = "Nasty"
@@ -269,11 +273,14 @@ logic. Here are a few examples::
     "The first stooge in the list is Larry."
 
 If any part of the variable is callable, the template system will try calling
-it. Example::
+it. Example:
+
+.. code-block:: pycon
 
     >>> class PersonClass2:
     ...     def name(self):
     ...         return "Samantha"
+    ...
     >>> t = Template("My name is {{ person.name }}.")
     >>> t.render(Context({"person": PersonClass2}))
     "My name is Samantha."
@@ -287,32 +294,37 @@ straight lookups. Here are some things to keep in mind:
   *does* have a ``silent_variable_failure`` attribute whose value is
   ``True``, the variable will render as the value of the engine's
   ``string_if_invalid`` configuration option (an empty string, by default).
-  Example::
+  Example:
 
-    >>> t = Template("My name is {{ person.first_name }}.")
-    >>> class PersonClass3:
-    ...     def first_name(self):
-    ...         raise AssertionError("foo")
-    >>> p = PersonClass3()
-    >>> t.render(Context({"person": p}))
-    Traceback (most recent call last):
-    ...
-    AssertionError: foo
+.. code-block:: pycon
 
-    >>> class SilentAssertionError(Exception):
-    ...     silent_variable_failure = True
-    >>> class PersonClass4:
-    ...     def first_name(self):
-    ...         raise SilentAssertionError
-    >>> p = PersonClass4()
-    >>> t.render(Context({"person": p}))
-    "My name is ."
+  >>> t = Template("My name is {{ person.first_name }}.")
+  >>> class PersonClass3:
+  ...     def first_name(self):
+  ...         raise AssertionError("foo")
+  ...
+  >>> p = PersonClass3()
+  >>> t.render(Context({"person": p}))
+  Traceback (most recent call last):
+  ...
+  AssertionError: foo
 
-  Note that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
-  base class for all Django database API ``DoesNotExist`` exceptions, has
-  ``silent_variable_failure = True``. So if you're using Django templates
-  with Django model objects, any ``DoesNotExist`` exception will fail
-  silently.
+  >>> class SilentAssertionError(Exception):
+  ...     silent_variable_failure = True
+  ...
+  >>> class PersonClass4:
+  ...     def first_name(self):
+  ...         raise SilentAssertionError
+  ...
+  >>> p = PersonClass4()
+  >>> t.render(Context({"person": p}))
+  "My name is ."
+
+  te that :exc:`django.core.exceptions.ObjectDoesNotExist`, which is the
+  se class for all Django database API ``DoesNotExist`` exceptions, has
+  silent_variable_failure = True``. So if you're using Django templates
+  th Django model objects, any ``DoesNotExist`` exception will fail
+  lently.
 
 * A variable can only be called if it has no required arguments. Otherwise,
   the system will return the value of the engine's ``string_if_invalid``
@@ -422,19 +434,21 @@ Playing with ``Context`` objects
 Most of the time, you'll instantiate :class:`Context` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
-dictionary syntax::
+dictionary syntax:
+
+.. code-block:: pycon
 
     >>> from django.template import Context
     >>> c = Context({"foo": "bar"})
-    >>> c['foo']
+    >>> c["foo"]
     'bar'
-    >>> del c['foo']
-    >>> c['foo']
+    >>> del c["foo"]
+    >>> c["foo"]
     Traceback (most recent call last):
     ...
     KeyError: 'foo'
-    >>> c['newvariable'] = 'hello'
-    >>> c['newvariable']
+    >>> c["newvariable"] = "hello"
+    >>> c["newvariable"]
     'hello'
 
 .. method:: Context.get(key, otherwise=None)
@@ -453,21 +467,23 @@ dictionary syntax::
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.template.ContextPopException``::
+``django.template.ContextPopException``:
+
+.. code-block:: pycon
 
     >>> c = Context()
-    >>> c['foo'] = 'first level'
+    >>> c["foo"] = "first level"
     >>> c.push()
     {}
-    >>> c['foo'] = 'second level'
-    >>> c['foo']
+    >>> c["foo"] = "second level"
+    >>> c["foo"]
     'second level'
     >>> c.pop()
     {'foo': 'second level'}
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
-    >>> c['foo'] = 'overwritten'
-    >>> c['foo']
+    >>> c["foo"] = "overwritten"
+    >>> c["foo"]
     'overwritten'
     >>> c.pop()
     Traceback (most recent call last):

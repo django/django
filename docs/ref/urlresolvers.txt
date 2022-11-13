@@ -36,9 +36,11 @@ If the URL accepts arguments, you may pass them in ``args``. For example::
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
 
-You can also pass ``kwargs`` instead of ``args``. For example::
+You can also pass ``kwargs`` instead of ``args``. For example:
 
-    >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
+.. code-block:: pycon
+
+    >>> reverse("admin:app_list", kwargs={"app_label": "auth"})
     '/admin/auth/'
 
 ``args`` and ``kwargs`` cannot be passed to ``reverse()`` at the same time.

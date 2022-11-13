@@ -40,44 +40,59 @@ API facilities.
 
 .. highlight:: pycon
 
-Create a couple of Places::
+Create a couple of Places:
 
-    >>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
+.. code-block:: pycon
+
+    >>> p1 = Place(name="Demon Dogs", address="944 W. Fullerton")
     >>> p1.save()
-    >>> p2 = Place(name='Ace Hardware', address='1013 N. Ashland')
+    >>> p2 = Place(name="Ace Hardware", address="1013 N. Ashland")
     >>> p2.save()
 
-Create a Restaurant. Pass the "parent" object as this object's primary key::
+Create a Restaurant. Pass the "parent" object as this object's primary key:
+
+.. code-block:: pycon
 
     >>> r = Restaurant(place=p1, serves_hot_dogs=True, serves_pizza=False)
     >>> r.save()
 
-A Restaurant can access its place::
+A Restaurant can access its place:
+
+.. code-block:: pycon
 
     >>> r.place
     <Place: Demon Dogs the place>
 
-A Place can access its restaurant, if available::
+A Place can access its restaurant, if available:
+
+.. code-block:: pycon
 
     >>> p1.restaurant
     <Restaurant: Demon Dogs the restaurant>
 
-p2 doesn't have an associated restaurant::
+p2 doesn't have an associated restaurant:
+
+.. code-block:: pycon
 
     >>> from django.core.exceptions import ObjectDoesNotExist
     >>> try:
-    >>>     p2.restaurant
-    >>> except ObjectDoesNotExist:
-    >>>     print("There is no restaurant here.")
+    ...     p2.restaurant
+    ... except ObjectDoesNotExist:
+    ...     print("There is no restaurant here.")
+    ...
     There is no restaurant here.
 
-You can also use ``hasattr`` to avoid the need for exception catching::
+You can also use ``hasattr`` to avoid the need for exception catching:
 
-    >>> hasattr(p2, 'restaurant')
+.. code-block:: pycon
+
+    >>> hasattr(p2, "restaurant")
     False
 
 Set the place using assignment notation. Because place is the primary key on
-Restaurant, the save will create a new restaurant::
+Restaurant, the save will create a new restaurant:
+
+.. code-block:: pycon
 
     >>> r.place = p2
     >>> r.save()
@@ -86,7 +101,9 @@ Restaurant, the save will create a new restaurant::
     >>> r.place
     <Place: Ace Hardware the place>
 
-Set the place back again, using assignment in the reverse direction::
+Set the place back again, using assignment in the reverse direction:
+
+.. code-block:: pycon
 
     >>> p1.restaurant = r
     >>> p1.restaurant
@@ -94,9 +111,11 @@ Set the place back again, using assignment in the reverse direction::
 
 Note that you must save an object before it can be assigned to a one-to-one
 relationship. For example, creating a ``Restaurant`` with unsaved ``Place``
-raises ``ValueError``::
+raises ``ValueError``:
 
-    >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
+.. code-block:: pycon
+
+    >>> p3 = Place(name="Demon Dogs", address="944 W. Fullerton")
     >>> Restaurant.objects.create(place=p3, serves_hot_dogs=True, serves_pizza=False)
     Traceback (most recent call last):
     ...
@@ -104,18 +123,24 @@ raises ``ValueError``::
 
 Restaurant.objects.all() returns the Restaurants, not the Places. Note that
 there are two restaurants - Ace Hardware the Restaurant was created in the call
-to r.place = p2::
+to r.place = p2:
+
+.. code-block:: pycon
 
     >>> Restaurant.objects.all()
     <QuerySet [<Restaurant: Demon Dogs the restaurant>, <Restaurant: Ace Hardware the restaurant>]>
 
 Place.objects.all() returns all Places, regardless of whether they have
-Restaurants::
+Restaurants:
 
-    >>> Place.objects.order_by('name')
+.. code-block:: pycon
+
+    >>> Place.objects.order_by("name")
     <QuerySet [<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]>
 
-You can query the models using :ref:`lookups across relationships <lookups-that-span-relationships>`::
+You can query the models using :ref:`lookups across relationships <lookups-that-span-relationships>`:
+
+.. code-block:: pycon
 
     >>> Restaurant.objects.get(place=p1)
     <Restaurant: Demon Dogs the restaurant>
@@ -126,7 +151,9 @@ You can query the models using :ref:`lookups across relationships <lookups-that-
     >>> Restaurant.objects.exclude(place__address__contains="Ashland")
     <QuerySet [<Restaurant: Demon Dogs the restaurant>]>
 
-This also works in reverse::
+This also works in reverse:
+
+.. code-block:: pycon
 
     >>> Place.objects.get(pk=1)
     <Place: Demon Dogs the place>
@@ -137,13 +164,17 @@ This also works in reverse::
     >>> Place.objects.get(restaurant__place__name__startswith="Demon")
     <Place: Demon Dogs the place>
 
-Add a Waiter to the Restaurant::
+Add a Waiter to the Restaurant:
 
-    >>> w = r.waiter_set.create(name='Joe')
+.. code-block:: pycon
+
+    >>> w = r.waiter_set.create(name="Joe")
     >>> w
     <Waiter: Joe the waiter at Demon Dogs the restaurant>
 
-Query the waiters::
+Query the waiters:
+
+.. code-block:: pycon
 
     >>> Waiter.objects.filter(restaurant__place=p1)
     <QuerySet [<Waiter: Joe the waiter at Demon Dogs the restaurant>]>

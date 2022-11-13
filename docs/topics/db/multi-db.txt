@@ -405,20 +405,22 @@ catch-all nature of the PrimaryReplicaRouter implementation would mean
 that all models would be available on all databases.
 
 With this setup installed, and all databases migrated as per
-:ref:`synchronizing_multiple_databases`, lets run some Django code::
+:ref:`synchronizing_multiple_databases`, lets run some Django code:
+
+.. code-block:: pycon
 
     >>> # This retrieval will be performed on the 'auth_db' database
-    >>> fred = User.objects.get(username='fred')
-    >>> fred.first_name = 'Frederick'
+    >>> fred = User.objects.get(username="fred")
+    >>> fred.first_name = "Frederick"
 
     >>> # This save will also be directed to 'auth_db'
     >>> fred.save()
 
     >>> # These retrieval will be randomly allocated to a replica database
-    >>> dna = Person.objects.get(name='Douglas Adams')
+    >>> dna = Person.objects.get(name="Douglas Adams")
 
     >>> # A new object has no database allocation when created
-    >>> mh = Book(title='Mostly Harmless')
+    >>> mh = Book(title="Mostly Harmless")
 
     >>> # This assignment will consult the router, and set mh onto
     >>> # the same database as the author object
@@ -428,7 +430,7 @@ With this setup installed, and all databases migrated as per
     >>> mh.save()
 
     >>> # ... but if we re-retrieve the object, it will come back on a replica
-    >>> mh = Book.objects.get(title='Mostly Harmless')
+    >>> mh = Book.objects.get(title="Mostly Harmless")
 
 This example defined a router to handle interaction with models from the
 ``auth`` app, and other routers to handle interaction with all other apps. If
@@ -453,16 +455,18 @@ You can select the database for a ``QuerySet`` at any point in the
 ``QuerySet`` that uses the specified database.
 
 ``using()`` takes a single argument: the alias of the database on
-which you want to run the query. For example::
+which you want to run the query. For example:
+
+.. code-block:: pycon
 
     >>> # This will run on the 'default' database.
     >>> Author.objects.all()
 
     >>> # So will this.
-    >>> Author.objects.using('default')
+    >>> Author.objects.using("default")
 
     >>> # This will run on the 'other' database.
-    >>> Author.objects.using('other')
+    >>> Author.objects.using("other")
 
 Selecting a database for ``save()``
 -----------------------------------
@@ -471,9 +475,11 @@ Use the ``using`` keyword to ``Model.save()`` to specify to which
 database the data should be saved.
 
 For example, to save an object to the ``legacy_users`` database, you'd
-use this::
+use this:
 
-    >>> my_object.save(using='legacy_users')
+.. code-block:: pycon
+
+    >>> my_object.save(using="legacy_users")
 
 If you don't specify ``using``, the ``save()`` method will save into
 the default database allocated by the routers.
@@ -486,11 +492,13 @@ use ``save(using=...)`` as a way to migrate the instance to a new
 database. However, if you don't take appropriate steps, this could
 have some unexpected consequences.
 
-Consider the following example::
+Consider the following example:
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')  # (statement 1)
-    >>> p.save(using='second') # (statement 2)
+.. code-block:: pycon
+
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")  # (statement 1)
+    >>> p.save(using="second")  # (statement 2)
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
@@ -510,19 +518,23 @@ will be overridden when ``p`` is saved.
 You can avoid this in two ways. First, you can clear the primary key
 of the instance. If an object has no primary key, Django will treat it
 as a new object, avoiding any loss of data on the ``second``
-database::
+database:
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')
-    >>> p.pk = None # Clear the primary key.
-    >>> p.save(using='second') # Write a completely new object.
+.. code-block:: pycon
+
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")
+    >>> p.pk = None  # Clear the primary key.
+    >>> p.save(using="second")  # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
-to ensure that Django does an SQL ``INSERT``::
+to ensure that Django does an SQL ``INSERT``:
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')
-    >>> p.save(using='second', force_insert=True)
+.. code-block:: pycon
+
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")
+    >>> p.save(using="second", force_insert=True)
 
 This will ensure that the person named ``Fred`` will have the same
 primary key on both databases. If that primary key is already in use
@@ -534,20 +546,24 @@ Selecting a database to delete from
 
 By default, a call to delete an existing object will be executed on
 the same database that was used to retrieve the object in the first
-place::
+place:
 
-    >>> u = User.objects.using('legacy_users').get(username='fred')
-    >>> u.delete() # will delete from the `legacy_users` database
+.. code-block:: pycon
+
+    >>> u = User.objects.using("legacy_users").get(username="fred")
+    >>> u.delete()  # will delete from the `legacy_users` database
 
 To specify the database from which a model will be deleted, pass a
 ``using`` keyword argument to the ``Model.delete()`` method. This
 argument works just like the ``using`` keyword argument to ``save()``.
 
 For example, if you're migrating a user from the ``legacy_users``
-database to the ``new_users`` database, you might use these commands::
+database to the ``new_users`` database, you might use these commands:
 
-    >>> user_obj.save(using='new_users')
-    >>> user_obj.delete(using='legacy_users')
+.. code-block:: pycon
+
+    >>> user_obj.save(using="new_users")
+    >>> user_obj.delete(using="legacy_users")
 
 Using managers with multiple databases
 --------------------------------------

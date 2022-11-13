@@ -503,17 +503,19 @@ Using sessions out of views
       >>> from django.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
-An API is available to manipulate session data outside of a view::
+An API is available to manipulate session data outside of a view:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
-    >>> s['last_login'] = 1376587691
+    >>> s["last_login"] = 1376587691
     >>> s.create()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
-    >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
-    >>> s['last_login']
+    >>> s = SessionStore(session_key="2b1189a188b44ad18c35e113ac6ceead")
+    >>> s["last_login"]
     1376587691
 
 ``SessionStore.create()`` is designed to create a new session (i.e. one not
@@ -526,17 +528,21 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
 :source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
-access sessions using the normal Django database API::
+access sessions using the normal Django database API:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk="2b1189a188b44ad18c35e113ac6ceead")
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
 Note that you'll need to call
 :meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
-format::
+format:
+
+.. code-block:: pycon
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'

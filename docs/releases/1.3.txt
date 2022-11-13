@@ -476,14 +476,19 @@ passed empty dictionary. This was inconsistent with behavior in other parts of
 the framework. Starting with 1.3 if you pass in empty dictionary the
 ``FormSet`` will raise a ``ValidationError``.
 
-For example with a ``FormSet``::
+For example with a ``FormSet``:
+
+.. code-block:: pycon
 
     >>> class ArticleForm(Form):
     ...     title = CharField()
     ...     pub_date = DateField()
+    ...
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-the following code will raise a ``ValidationError``::
+the following code will raise a ``ValidationError``:
+
+.. code-block:: pycon
 
     >>> ArticleFormSet({})
     Traceback (most recent call last):
@@ -491,7 +496,9 @@ the following code will raise a ``ValidationError``::
     ValidationError: [u'ManagementForm data is missing or has been tampered with']
 
 if you need to instantiate an empty ``FormSet``, don't pass in the data or use
-``None``::
+``None``:
+
+.. code-block:: pycon
 
     >>> formset = ArticleFormSet()
     >>> formset = ArticleFormSet(data=None)
@@ -502,11 +509,13 @@ Callables in templates
 Previously, a callable in a template would only be called automatically as part
 of the variable resolution process if it was retrieved via attribute
 lookup. This was an inconsistency that could result in confusing and unhelpful
-behavior::
+behavior:
 
-    >>> Template("{{ user.get_full_name }}").render(Context({'user': user}))
+.. code-block:: pycon
+
+    >>> Template("{{ user.get_full_name }}").render(Context({"user": user}))
     u'Joe Bloggs'
-    >>> Template("{{ full_name }}").render(Context({'full_name': user.get_full_name}))
+    >>> Template("{{ full_name }}").render(Context({"full_name": user.get_full_name}))
     u'&lt;bound method User.get_full_name of &lt;...
 
 This has been resolved in Django 1.3 - the result in both cases will be ``u'Joe

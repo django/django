@@ -48,14 +48,16 @@ Overview and a quick example
 ----------------------------
 
 To use the test client, instantiate ``django.test.Client`` and retrieve
-web pages::
+web pages:
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> c = Client()
-    >>> response = c.post('/login/', {'username': 'john', 'password': 'smith'})
+    >>> response = c.post("/login/", {"username": "john", "password": "smith"})
     >>> response.status_code
     200
-    >>> response = c.get('/customer/details/')
+    >>> response = c.get("/customer/details/")
     >>> response.content
     b'<!DOCTYPE html...'
 
@@ -1962,14 +1964,12 @@ test client, with two exceptions:
 * The ``follow`` parameter is not supported.
 * Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
   prefix required by the synchronous client (see :meth:`Client.get`). For
-  example, here is how to set an HTTP ``Accept`` header::
+  example, here is how to set an HTTP ``Accept`` header:
+
+.. code-block:: pycon
 
     >>> c = AsyncClient()
-    >>> c.get(
-    ...     '/customers/details/',
-    ...     {'name': 'fred', 'age': 7},
-    ...     ACCEPT='application/json'
-    ... )
+    >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
 
 .. versionchanged:: 4.2
 

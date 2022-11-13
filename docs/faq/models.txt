@@ -8,7 +8,9 @@ How can I see the raw SQL queries Django is running?
 ====================================================
 
 Make sure your Django :setting:`DEBUG` setting is set to ``True``.
-Then do this::
+Then do this:
+
+.. code-block:: pycon
 
     >>> from django.db import connection
     >>> connection.queries
@@ -26,10 +28,12 @@ the following::
 SELECTs, etc. Each time your app hits the database, the query will be recorded.
 
 If you are using :doc:`multiple databases</topics/db/multi-db>`, you can use the
-same interface on each member of the ``connections`` dictionary::
+same interface on each member of the ``connections`` dictionary:
+
+.. code-block:: pycon
 
     >>> from django.db import connections
-    >>> connections['my_db_alias'].queries
+    >>> connections["my_db_alias"].queries
 
 If you need to clear the query list manually at any point in your functions,
 call ``reset_queries()``, like this::

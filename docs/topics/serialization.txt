@@ -487,10 +487,17 @@ Firstly, you need to add another method -- this time to the model itself::
 That method should always return a natural key tuple -- in this
 example, ``(first name, last name)``. Then, when you call
 ``serializers.serialize()``, you provide ``use_natural_foreign_keys=True``
-or ``use_natural_primary_keys=True`` arguments::
+or ``use_natural_primary_keys=True`` arguments:
 
-    >>> serializers.serialize('json', [book1, book2], indent=2,
-    ...      use_natural_foreign_keys=True, use_natural_primary_keys=True)
+.. code-block:: pycon
+
+    >>> serializers.serialize(
+    ...     "json",
+    ...     [book1, book2],
+    ...     indent=2,
+    ...     use_natural_foreign_keys=True,
+    ...     use_natural_primary_keys=True,
+    ... )
 
 When ``use_natural_foreign_keys=True`` is specified, Django will use the
 ``natural_key()`` method to serialize any foreign key reference to objects

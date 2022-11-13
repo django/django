@@ -713,7 +713,9 @@ Assigning unsaved objects to a :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.OneToOneField` now raises a :exc:`ValueError`.
 
 Previously, the assignment of an unsaved object would be silently ignored.
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> book = Book.objects.create(name="Django")
     >>> book.author = Author(name="John")
@@ -724,7 +726,9 @@ For example::
     >>> book.author
     >>>
 
-Now, an error will be raised to prevent data loss::
+Now, an error will be raised to prevent data loss:
+
+.. code-block:: pycon
 
     >>> book.author = Author(name="john")
     Traceback (most recent call last):
@@ -790,7 +794,9 @@ Querying for model lookups now checks if the object passed is of correct type
 and raises a :exc:`ValueError` if not. Previously, Django didn't care if the
 object was of correct type; it just used the object's related field attribute
 (e.g. ``id``) for the lookup. Now, an error is raised to prevent incorrect
-lookups::
+lookups:
+
+.. code-block:: pycon
 
     >>> book = Book.objects.create(name="Django")
     >>> book = Book.objects.filter(author=book)
@@ -802,16 +808,20 @@ lookups::
 --------------------------------------------
 
 ``select_related()`` now validates that the given fields actually exist.
-Previously, nonexistent fields were silently ignored. Now, an error is raised::
+Previously, nonexistent fields were silently ignored. Now, an error is raised:
 
-    >>> book = Book.objects.select_related('nonexistent_field')
+.. code-block:: pycon
+
+    >>> book = Book.objects.select_related("nonexistent_field")
     Traceback (most recent call last):
     ...
     FieldError: Invalid field name(s) given in select_related: 'nonexistent_field'
 
-The validation also makes sure that the given field is relational::
+The validation also makes sure that the given field is relational:
 
-    >>> book = Book.objects.select_related('name')
+.. code-block:: pycon
+
+    >>> book = Book.objects.select_related("name")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'name'
@@ -966,7 +976,9 @@ returns the relationship as ``django.db.models.fields.related.ManyToOneRel``
 is set to the target of the relationship instead of the source. The source
 model is accessible on the ``related_model`` attribute instead.
 
-Consider this example from the tutorial in Django 1.8::
+Consider this example from the tutorial in Django 1.8:
+
+.. code-block:: pycon
 
     >>> p = Poll.objects.get(pk=1)
     >>> p._meta.get_all_related_objects()
@@ -976,7 +988,9 @@ Consider this example from the tutorial in Django 1.8::
     >>> p._meta.get_all_related_objects()[0].related_model
     <class 'polls.models.Choice'>
 
-and compare it to the behavior on older versions::
+and compare it to the behavior on older versions:
+
+.. code-block:: pycon
 
     >>> p._meta.get_all_related_objects()
     [<RelatedObject: polls:choice related to poll>]
