@@ -109,24 +109,28 @@ pull them out of the database into Python memory.
 Instead, Django uses the ``F()`` object to generate an SQL expression that
 describes the required operation at the database level.
 
-Let's try this with an example. Normally, one might do something like this::
+Let's try this with an example. Normally, one might do something like this:
+
+.. code-block:: python
 
     # Tintin filed a news story!
-    reporter = Reporters.objects.get(name='Tintin')
+    reporter = Reporters.objects.get(name="Tintin")
     reporter.stories_filed += 1
     reporter.save()
 
 Here, we have pulled the value of ``reporter.stories_filed`` from the database
 into memory and manipulated it using familiar Python operators, and then saved
-the object back to the database. But instead we could also have done::
+the object back to the database. But instead we could also have done:
+
+.. code-block:: python
 
     from django.db.models import F
 
-    reporter = Reporters.objects.get(name='Tintin')
-    reporter.stories_filed = F('stories_filed') + 1
+    reporter = Reporters.objects.get(name="Tintin")
+    reporter.stories_filed = F("stories_filed") + 1
     reporter.save()
 
-Although ``reporter.stories_filed = F('stories_filed') + 1`` looks like a
+Although ``reporter.stories_filed = F("stories_filed") + 1`` looks like a
 normal Python assignment of value to an instance attribute, in fact it's an SQL
 construct describing an operation on the database.
 
@@ -140,7 +144,9 @@ know about it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
-To access the new value saved this way, the object must be reloaded::
+To access the new value saved this way, the object must be reloaded:
+
+.. code-block:: python
 
    reporter = Reporters.objects.get(pk=reporter.pk)
    # Or, more succinctly:
@@ -149,17 +155,21 @@ To access the new value saved this way, the object must be reloaded::
 As well as being used in operations on single instances as above, ``F()`` can
 be used on ``QuerySets`` of object instances, with ``update()``. This reduces
 the two queries we were using above - the ``get()`` and the
-:meth:`~Model.save()` - to just one::
+:meth:`~Model.save()` - to just one:
 
-    reporter = Reporters.objects.filter(name='Tintin')
-    reporter.update(stories_filed=F('stories_filed') + 1)
+.. code-block:: python
+
+    reporter = Reporters.objects.filter(name="Tintin")
+    reporter.update(stories_filed=F("stories_filed") + 1)
 
 We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
-the field value of each one, and saving each one back to the database::
+the field value of each one, and saving each one back to the database:
 
-    Reporter.objects.update(stories_filed=F('stories_filed') + 1)
+.. code-block:: python
+
+    Reporter.objects.update(stories_filed=F("stories_filed") + 1)
 
 ``F()`` therefore can offer performance advantages by:
 
@@ -188,13 +198,15 @@ than based on its value when the instance was retrieved.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``F()`` objects assigned to model fields persist after saving the model
-instance and will be applied on each :meth:`~Model.save()`. For example::
+instance and will be applied on each :meth:`~Model.save()`. For example:
 
-    reporter = Reporters.objects.get(name='Tintin')
-    reporter.stories_filed = F('stories_filed') + 1
+.. code-block:: python
+
+    reporter = Reporters.objects.get(name="Tintin")
+    reporter.stories_filed = F("stories_filed") + 1
     reporter.save()
 
-    reporter.name = 'Tintin Jr.'
+    reporter.name = "Tintin Jr."
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
@@ -218,26 +230,33 @@ Using ``F()`` with annotations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``F()`` can be used to create dynamic fields on your models by combining
-different fields with arithmetic::
+different fields with arithmetic:
 
-    company = Company.objects.annotate(
-        chairs_needed=F('num_employees') - F('num_chairs'))
+.. code-block:: python
+
+    company = Company.objects.annotate(chairs_needed=F("num_employees") - F("num_chairs"))
 
 If the fields that you're combining are of different types you'll need
 to tell Django what kind of field will be returned. Since ``F()`` does not
 directly support ``output_field`` you will need to wrap the expression with
-:class:`ExpressionWrapper`::
+:class:`ExpressionWrapper`:
+
+.. code-block:: python
 
     from django.db.models import DateTimeField, ExpressionWrapper, F
 
     Ticket.objects.annotate(
         expires=ExpressionWrapper(
-            F('active_at') + F('duration'), output_field=DateTimeField()))
+            F("active_at") + F("duration"), output_field=DateTimeField()
+        )
+    )
 
 When referencing relational fields such as ``ForeignKey``, ``F()`` returns the
-primary key value rather than a model instance::
+primary key value rather than a model instance:
 
-    >> car = Company.objects.annotate(built_by=F('manufacturer'))[0]
+.. code-block:: pycon
+
+    >> car = Company.objects.annotate(built_by=F("manufacturer"))[0]
     >> car.manufacturer
     <Manufacturer: Toyota>
     >> car.built_by
@@ -253,10 +272,13 @@ Use ``F()`` and the ``nulls_first`` or ``nulls_last`` keyword argument to
 a field's null values. By default, the ordering depends on your database.
 
 For example, to sort companies that haven't been contacted (``last_contacted``
-is null) after companies that have been contacted::
+is null) after companies that have been contacted:
+
+.. code-block:: python
 
     from django.db.models import F
-    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
+
+    Company.objects.order_by(F("last_contacted").desc(nulls_last=True))
 
 Using ``F()`` with logical operations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -265,11 +287,13 @@ Using ``F()`` with logical operations
 
 ``F()`` expressions that output ``BooleanField`` can be logically negated with
 the inversion operator ``~F()``. For example, to swap the activation status of
-companies::
+companies:
+
+.. code-block:: python
 
     from django.db.models import F
 
-    Company.objects.update(is_active=~F('is_active'))
+    Company.objects.update(is_active=~F("is_active"))
 
 .. _func-expressions:
 
@@ -278,18 +302,23 @@ companies::
 
 ``Func()`` expressions are the base type of all expressions that involve
 database functions like ``COALESCE`` and ``LOWER``, or aggregates like ``SUM``.
-They can be used directly::
+They can be used directly:
+
+.. code-block:: python
 
     from django.db.models import F, Func
 
-    queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
+    queryset.annotate(field_lower=Func(F("field"), function="LOWER"))
 
-or they can be used to build a library of database functions::
+or they can be used to build a library of database functions:
+
+.. code-block:: python
 
     class Lower(Func):
-        function = 'LOWER'
+        function = "LOWER"
 
-    queryset.annotate(field_lower=Lower('field'))
+
+    queryset.annotate(field_lower=Lower("field"))
 
 But both cases will result in a queryset where each model is annotated with an
 extra attribute ``field_lower`` produced, roughly, from the following SQL:
@@ -318,7 +347,7 @@ The ``Func`` API is as follows:
         generated for this function. Defaults to
         ``'%(function)s(%(expressions)s)'``.
 
-        If you're constructing SQL like ``strftime('%W', 'date')`` and need a
+        If you're constructing SQL like ``strftime("%W", "date")`` and need a
         literal ``%`` character in the query, quadruple it (``%%%%``) in the
         ``template`` attribute because the string is interpolated twice: once
         during the template interpolation in ``as_sql()`` and once in the SQL
@@ -397,12 +426,15 @@ is required. All of the :ref:`aggregate functions <aggregation-functions>`,
 like ``Sum()`` and ``Count()``, inherit from ``Aggregate()``.
 
 Since ``Aggregate``\s are expressions and wrap expressions, you can represent
-some complex computations::
+some complex computations:
+
+.. code-block:: python
 
     from django.db.models import Count
 
     Company.objects.annotate(
-        managers_required=(Count('num_employees') / 4) + Count('num_managers'))
+        managers_required=(Count("num_employees") / 4) + Count("num_managers")
+    )
 
 The ``Aggregate`` API is as follows:
 
@@ -475,22 +507,21 @@ Creating your own Aggregate Functions
 
 You can create your own aggregate functions, too. At a minimum, you need to
 define ``function``, but you can also completely customize the SQL that is
-generated. Here's a brief example::
+generated. Here's a brief example:
+
+.. code-block:: python
 
     from django.db.models import Aggregate
 
+
     class Sum(Aggregate):
         # Supports SUM(ALL field).
-        function = 'SUM'
-        template = '%(function)s(%(all_values)s%(expressions)s)'
+        function = "SUM"
+        template = "%(function)s(%(all_values)s%(expressions)s)"
         allow_distinct = False
 
         def __init__(self, expression, all_values=False, **extra):
-            super().__init__(
-                expression,
-                all_values='ALL ' if all_values else '',
-                **extra
-            )
+            super().__init__(expression, all_values="ALL " if all_values else "", **extra)
 
 ``Value()`` expressions
 -----------------------
@@ -504,11 +535,11 @@ boolean, or string within an expression, you can wrap that value within a
 ``Value()``.
 
 You will rarely need to use ``Value()`` directly. When you write the expression
-``F('field') + 1``, Django implicitly wraps the ``1`` in a ``Value()``,
+``F("field") + 1``, Django implicitly wraps the ``1`` in a ``Value()``,
 allowing simple values to be used in more complex expressions. You will need to
 use ``Value()`` when you want to pass a string to an expression. Most
 expressions interpret a string argument as the name of a field, like
-``Lower('name')``.
+``Lower("name")``.
 
 The ``value`` argument describes the value to be included in the expression,
 such as ``1``, ``True``, or ``None``. Django knows how to convert these Python
@@ -711,10 +742,10 @@ length is greater than the total length of all combined comments:
 
 The initial ``filter(...)`` limits the subquery to the relevant parameters.
 ``order_by()`` removes the default :attr:`~django.db.models.Options.ordering`
-(if any) on the ``Comment`` model. ``values('post')`` aggregates comments by
+(if any) on the ``Comment`` model. ``values("post")`` aggregates comments by
 ``Post``. Finally, ``annotate(...)`` performs the aggregation. The order in
 which these queryset methods are applied is important. In this case, since the
-subquery must be limited to a single column, ``values('total')`` is required.
+subquery must be limited to a single column, ``values("total")`` is required.
 
 This is the only way to perform an aggregation within a ``Subquery``, as
 using :meth:`~.QuerySet.aggregate` attempts to evaluate the queryset (and if
@@ -1047,9 +1078,11 @@ calling the appropriate methods on the wrapped expression.
 
     .. method:: get_source_expressions()
 
-        Returns an ordered list of inner expressions. For example::
+        Returns an ordered list of inner expressions. For example:
 
-          >>> Sum(F('foo')).get_source_expressions()
+        .. code-block:: pycon
+
+          >>> Sum(F("foo")).get_source_expressions()
           [F('foo')]
 
     .. method:: set_source_expressions(expressions)
@@ -1067,6 +1100,8 @@ calling the appropriate methods on the wrapped expression.
         ``change_map`` is a dictionary mapping old aliases to new aliases.
 
         Example::
+
+        .. code-block:: python
 
           def relabeled_clone(self, change_map):
               clone = copy.copy(self)
@@ -1147,22 +1182,25 @@ The ``COALESCE`` SQL function is defined as taking a list of columns or
 values. It will return the first column or value that isn't ``NULL``.
 
 We'll start by defining the template to be used for SQL generation and
-an ``__init__()`` method to set some attributes::
+an ``__init__()`` method to set some attributes:
+
+.. code-block:: python
 
   import copy
   from django.db.models import Expression
 
+
   class Coalesce(Expression):
-      template = 'COALESCE( %(expressions)s )'
+      template = "COALESCE( %(expressions)s )"
 
       def __init__(self, expressions, output_field):
-        super().__init__(output_field=output_field)
-        if len(expressions) < 2:
-            raise ValueError('expressions must have at least 2 elements')
-        for expression in expressions:
-            if not hasattr(expression, 'resolve_expression'):
-                raise TypeError('%r is not an Expression' % expression)
-        self.expressions = expressions
+          super().__init__(output_field=output_field)
+          if len(expressions) < 2:
+              raise ValueError("expressions must have at least 2 elements")
+          for expression in expressions:
+              if not hasattr(expression, "resolve_expression"):
+                  raise TypeError("%r is not an Expression" % expression)
+          self.expressions = expressions
 
 We do some basic validation on the parameters, including requiring at least
 2 columns or values, and ensuring they are expressions. We are requiring
@@ -1171,16 +1209,24 @@ the eventual result to.
 
 Now we implement the preprocessing and validation. Since we do not have
 any of our own validation at this point, we delegate to the nested
-expressions::
+expressions:
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+.. code-block:: python
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         for pos, expression in enumerate(self.expressions):
-            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+            c.expressions[pos] = expression.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save
+            )
         return c
 
-Next, we write the method responsible for generating the SQL::
+Next, we write the method responsible for generating the SQL:
+
+.. code-block:: python
 
     def as_sql(self, compiler, connection, template=None):
         sql_expressions, sql_params = [], []
@@ -1189,15 +1235,16 @@ Next, we write the method responsible for generating the SQL::
             sql_expressions.append(sql)
             sql_params.extend(params)
         template = template or self.template
-        data = {'expressions': ','.join(sql_expressions)}
+        data = {"expressions": ",".join(sql_expressions)}
         return template % data, sql_params
+
 
     def as_oracle(self, compiler, connection):
         """
         Example of vendor specific handling (Oracle in this case).
         Let's make the function name lowercase.
         """
-        return self.as_sql(compiler, connection, template='coalesce( %(expressions)s )')
+        return self.as_sql(compiler, connection, template="coalesce( %(expressions)s )")
 
 ``as_sql()`` methods can support custom keyword arguments, allowing
 ``as_vendorname()`` methods to override data used to generate the SQL string.
@@ -1217,10 +1264,13 @@ backend. The ``as_oracle()`` function will be called instead of ``as_sql()``
 if the Oracle backend is in use.
 
 Finally, we implement the rest of the methods that allow our query expression
-to play nice with other query expressions::
+to play nice with other query expressions:
+
+.. code-block:: python
 
     def get_source_expressions(self):
         return self.expressions
+
 
     def set_source_expressions(self, expressions):
         self.expressions = expressions
@@ -1255,12 +1305,15 @@ than passed as query parameters (where the database driver would escape them),
 they must not contain untrusted user input.
 
 For example, if ``substring`` is user-provided, this function is vulnerable to
-SQL injection::
+SQL injection:
+
+.. code-block:: python
 
     from django.db.models import Func
 
+
     class Position(Func):
-        function = 'POSITION'
+        function = "POSITION"
         template = "%(function)s('%(substring)s' in %(expressions)s)"
 
         def __init__(self, expression, substring):
@@ -1271,11 +1324,13 @@ This function generates an SQL string without any parameters. Since
 ``substring`` is passed to ``super().__init__()`` as a keyword argument, it's
 interpolated into the SQL string before the query is sent to the database.
 
-Here's a corrected rewrite::
+Here's a corrected rewrite:
+
+.. code-block:: python
 
     class Position(Func):
-        function = 'POSITION'
-        arg_joiner = ' IN '
+        function = "POSITION"
+        arg_joiner = " IN "
 
         def __init__(self, expression, substring):
             super().__init__(substring, expression)
@@ -1293,12 +1348,16 @@ onto the function's class.
 Let's say we're writing a backend for Microsoft's SQL Server which uses the SQL
 ``LEN`` instead of ``LENGTH`` for the :class:`~functions.Length` function.
 We'll monkey patch a new method called ``as_sqlserver()`` onto the ``Length``
-class::
+class:
+
+.. code-block:: python
 
     from django.db.models.functions import Length
 
+
     def sqlserver_length(self, compiler, connection):
-        return self.as_sql(compiler, connection, function='LEN')
+        return self.as_sql(compiler, connection, function="LEN")
+
 
     Length.as_sqlserver = sqlserver_length
 

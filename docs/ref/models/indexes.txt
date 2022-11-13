@@ -33,16 +33,20 @@ options`_.
 Positional argument ``*expressions`` allows creating functional indexes on
 expressions and database functions.
 
-For example::
+For example:
 
-    Index(Lower('title').desc(), 'pub_date', name='lower_title_date_idx')
+.. code-block:: python
+
+    Index(Lower("title").desc(), "pub_date", name="lower_title_date_idx")
 
 creates an index on the lowercased value of the ``title`` field in descending
 order and the ``pub_date`` field in the default ascending order.
 
-Another example::
+Another example:
 
-    Index(F('height') * F('weight'), Round('weight'), name='calc_idx')
+.. code-block:: python
+
+    Index(F("height") * F("weight"), Round("weight"), name="calc_idx")
 
 creates an index on the result of multiplying fields ``height`` and ``weight``
 and the ``weight`` rounded to the nearest integer.
@@ -195,9 +199,11 @@ as non-key columns. This allows index-only scans to be used for queries that
 select only included fields (:attr:`~Index.include`) and filter only by indexed
 fields (:attr:`~Index.fields`).
 
-For example::
+For example:
 
-    Index(name='covering_index', fields=['headline'], include=['pub_date'])
+.. code-block:: python
+
+    Index(name="covering_index", fields=["headline"], include=["pub_date"])
 
 will allow filtering on ``headline``, also selecting ``pub_date``, while
 fetching data only from the index.

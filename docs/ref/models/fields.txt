@@ -93,33 +93,38 @@ default form widget will be a select box with these choices instead of the
 standard text field.
 
 The first element in each tuple is the actual value to be set on the model,
-and the second element is the human-readable name. For example::
+and the second element is the human-readable name. For example:
+
+.. code-block:: python
 
     YEAR_IN_SCHOOL_CHOICES = [
-        ('FR', 'Freshman'),
-        ('SO', 'Sophomore'),
-        ('JR', 'Junior'),
-        ('SR', 'Senior'),
-        ('GR', 'Graduate'),
+        ("FR", "Freshman"),
+        ("SO", "Sophomore"),
+        ("JR", "Junior"),
+        ("SR", "Senior"),
+        ("GR", "Graduate"),
     ]
 
 Generally, it's best to define choices inside a model class, and to
-define a suitably-named constant for each value::
+define a suitably-named constant for each value:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class Student(models.Model):
-        FRESHMAN = 'FR'
-        SOPHOMORE = 'SO'
-        JUNIOR = 'JR'
-        SENIOR = 'SR'
-        GRADUATE = 'GR'
+        FRESHMAN = "FR"
+        SOPHOMORE = "SO"
+        JUNIOR = "JR"
+        SENIOR = "SR"
+        GRADUATE = "GR"
         YEAR_IN_SCHOOL_CHOICES = [
-            (FRESHMAN, 'Freshman'),
-            (SOPHOMORE, 'Sophomore'),
-            (JUNIOR, 'Junior'),
-            (SENIOR, 'Senior'),
-            (GRADUATE, 'Graduate'),
+            (FRESHMAN, "Freshman"),
+            (SOPHOMORE, "Sophomore"),
+            (JUNIOR, "Junior"),
+            (SENIOR, "Senior"),
+            (GRADUATE, "Graduate"),
         ]
         year_in_school = models.CharField(
             max_length=2,
@@ -139,20 +144,26 @@ will work anywhere that the ``Student`` model has been imported).
 .. _field-choices-named-groups:
 
 You can also collect your available choices into named groups that can
-be used for organizational purposes::
+be used for organizational purposes:
+
+.. code-block:: python
 
     MEDIA_CHOICES = [
-        ('Audio', (
-                ('vinyl', 'Vinyl'),
-                ('cd', 'CD'),
-            )
+        (
+            "Audio",
+            (
+                ("vinyl", "Vinyl"),
+                ("cd", "CD"),
+            ),
         ),
-        ('Video', (
-                ('vhs', 'VHS Tape'),
-                ('dvd', 'DVD'),
-            )
+        (
+            "Video",
+            (
+                ("vhs", "VHS Tape"),
+                ("dvd", "DVD"),
+            ),
         ),
-        ('unknown', 'Unknown'),
+        ("unknown", "Unknown"),
     ]
 
 The first element in each tuple is the name to apply to the group. The
@@ -180,7 +191,7 @@ meant for static data that doesn't change much, if ever.
 Unless :attr:`blank=False<Field.blank>` is set on the field along with a
 :attr:`~Field.default` then a label containing ``"---------"`` will be rendered
 with the select box. To override this behavior, add a tuple to ``choices``
-containing ``None``; e.g. ``(None, 'Your String For Display')``.
+containing ``None``; e.g. ``(None, "Your String For Display")``.
 Alternatively, you can use an empty string instead of ``None`` where this makes
 sense - such as on a :class:`~django.db.models.CharField`.
 
@@ -190,18 +201,20 @@ Enumeration types
 ~~~~~~~~~~~~~~~~~
 
 In addition, Django provides enumeration types that you can subclass to define
-choices in a concise way::
+choices in a concise way:
+
+.. code-block:: python
 
     from django.utils.translation import gettext_lazy as _
 
-    class Student(models.Model):
 
+    class Student(models.Model):
         class YearInSchool(models.TextChoices):
-            FRESHMAN = 'FR', _('Freshman')
-            SOPHOMORE = 'SO', _('Sophomore')
-            JUNIOR = 'JR', _('Junior')
-            SENIOR = 'SR', _('Senior')
-            GRADUATE = 'GR', _('Graduate')
+            FRESHMAN = "FR", _("Freshman")
+            SOPHOMORE = "SO", _("Sophomore")
+            JUNIOR = "JR", _("Junior")
+            SENIOR = "SR", _("Senior")
+            GRADUATE = "GR", _("Graduate")
 
         year_in_school = models.CharField(
             max_length=2,
@@ -242,7 +255,7 @@ modifications:
   field.
 
 Note that using ``YearInSchool.SENIOR``, ``YearInSchool['SENIOR']``, or
-``YearInSchool('SR')`` to access or lookup enum members work as expected, as do
+``YearInSchool("SR")`` to access or lookup enum members work as expected, as do
 the ``.name`` and ``.value`` properties on the members.
 
 .. _field-choices-enum-auto-label:
@@ -308,13 +321,15 @@ There are some additional caveats to be aware of:
 - Because an enumeration with a concrete data type requires all values to match
   the type, overriding the :ref:`blank label <field-choices-blank-label>`
   cannot be achieved by creating a member with a value of ``None``. Instead,
-  set the ``__empty__`` attribute on the class::
+  set the ``__empty__`` attribute on the class:
+
+.. code-block:: python
 
     class Answer(models.IntegerChoices):
-        NO = 0, _('No')
-        YES = 1, _('Yes')
+        NO = 0, _("No")
+        YES = 1, _("Yes")
 
-        __empty__ = _('(Unknown)')
+        __empty__ = _("(Unknown)")
 
 ``db_column``
 -------------
@@ -787,14 +802,16 @@ Has the following optional arguments:
     If you specify a string value or a :class:`~pathlib.Path`, it may contain
     :func:`~time.strftime` formatting, which will be replaced by the date/time
     of the file upload (so that uploaded files don't fill up the given
-    directory). For example::
+    directory). For example:
+
+    .. code-block:: python
 
         class MyModel(models.Model):
             # file will be uploaded to MEDIA_ROOT/uploads
-            upload = models.FileField(upload_to='uploads/')
+            upload = models.FileField(upload_to="uploads/")
             # or...
             # file will be saved to MEDIA_ROOT/uploads/2015/01/30
-            upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
+            upload = models.FileField(upload_to="uploads/%Y/%m/%d/")
 
     If you are using the default
     :class:`~django.core.files.storage.FileSystemStorage`, the string value
@@ -957,7 +974,7 @@ A read-only property to access the file's relative URL by calling the
 :meth:`~django.core.files.storage.Storage.url` method of the underlying
 :class:`~django.core.files.storage.Storage` class.
 
-.. method:: FieldFile.open(mode='rb')
+.. method:: FieldFile.open(mode="rb")
 
 Opens or reopens the file associated with this instance in the specified
 ``mode``. Unlike the standard Python ``open()`` method, it doesn't return a
@@ -989,11 +1006,14 @@ saved after the file associated with this field has been altered. Defaults to
 Note that the ``content`` argument should be an instance of
 :class:`django.core.files.File`, not Python's built-in file object.
 You can construct a :class:`~django.core.files.File` from an existing
-Python file object like this::
+Python file object like this:
+
+.. code-block:: python
 
     from django.core.files import File
+
     # Open an existing file using Python's built-in open()
-    f = open('/path/to/hello.world')
+    f = open("/path/to/hello.world")
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
@@ -1035,14 +1055,18 @@ directory on the filesystem. Has some special arguments, of which the first is
     :class:`FilePathField` should get its choices. Example: ``"/home/images"``.
 
     ``path`` may also be a callable, such as a function to dynamically set the
-    path at runtime. Example::
+    path at runtime. Example:
+    
+    .. code-block:: python
 
         import os
         from django.conf import settings
         from django.db import models
 
+
         def images_path():
-            return os.path.join(settings.LOCAL_FILE_DIR, 'images')
+            return os.path.join(settings.LOCAL_FILE_DIR, "images")
+
 
         class MyModel(models.Model):
             file = models.FilePathField(path=images_path)
@@ -1581,10 +1605,12 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     ``Artist`` can be deleted even if that implies deleting an ``Album``
     which is referenced by a ``Song``, because ``Song`` also references
-    ``Artist`` itself through a cascading relationship. For example::
+    ``Artist`` itself through a cascading relationship. For example:
+    
+    .. code-block:: pycon
 
-        >>> artist_one = Artist.objects.create(name='artist one')
-        >>> artist_two = Artist.objects.create(name='artist two')
+        >>> artist_one = Artist.objects.create(name="artist one")
+        >>> artist_two = Artist.objects.create(name="artist two")
         >>> album_one = Album.objects.create(artist=artist_one)
         >>> album_two = Album.objects.create(artist=artist_two)
         >>> song_one = Song.objects.create(artist=artist_one, album=album_one)
@@ -1612,14 +1638,18 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     :func:`~django.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
     necessary to avoid executing queries at the time your ``models.py`` is
-    imported::
+    imported:
+    
+    .. code-block:: python
 
         from django.conf import settings
         from django.contrib.auth import get_user_model
         from django.db import models
 
+
         def get_sentinel_user():
-            return get_user_model().objects.get_or_create(username='deleted')[0]
+            return get_user_model().objects.get_or_create(username="deleted")[0]
+
 
         class MyModel(models.Model):
             user = models.ForeignKey(
@@ -1885,20 +1915,25 @@ that control how the relationship functions.
     Only used when a custom intermediary model is specified. Django will
     normally determine which fields of the intermediary model to use in order
     to establish a many-to-many relationship automatically. However,
-    consider the following models::
+    consider the following models:
+    
+    .. code-block:: python
 
         from django.db import models
 
+
         class Person(models.Model):
             name = models.CharField(max_length=50)
+
 
         class Group(models.Model):
             name = models.CharField(max_length=128)
             members = models.ManyToManyField(
                 Person,
-                through='Membership',
-                through_fields=('group', 'person'),
+                through="Membership",
+                through_fields=("group", "person"),
             )
+
 
         class Membership(models.Model):
             group = models.ForeignKey(Group, on_delete=models.CASCADE)

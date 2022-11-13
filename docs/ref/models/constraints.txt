@@ -110,7 +110,7 @@ This method must be implemented by a subclass.
 A :class:`Q` object or boolean :class:`~django.db.models.Expression` that
 specifies the check you want the constraint to enforce.
 
-For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
+For example, ``CheckConstraint(check=Q(age__gte=18), name="age_gte_18")``
 ensures the age field is never less than 18.
 
 .. admonition:: Oracle
@@ -118,9 +118,11 @@ ensures the age field is never less than 18.
     Checks with nullable fields on Oracle must include a condition allowing for
     ``NULL`` values in order for :meth:`validate() <BaseConstraint.validate>`
     to behave the same as check constraints validation. For example, if ``age``
-    is a nullable field::
+    is a nullable field:
+    
+    .. code-block:: python
 
-        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name='age_gte_18')
+        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name="age_gte_18")
 
 .. versionchanged:: 4.1
 
@@ -141,9 +143,11 @@ ensures the age field is never less than 18.
 Positional argument ``*expressions`` allows creating functional unique
 constraints on expressions and database functions.
 
-For example::
+For example:
 
-    UniqueConstraint(Lower('name').desc(), 'category', name='unique_lower_name_category')
+.. code-block:: python
+
+    UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
 
 creates a unique constraint on the lowercased value of the ``name`` field in
 descending order and the ``category`` field in the default ascending order.
@@ -171,9 +175,11 @@ date.
 A :class:`Q` object that specifies the condition you want the constraint to
 enforce.
 
-For example::
+For example:
 
-    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+.. code-block:: python
+
+    UniqueConstraint(fields=["user"], condition=Q(status="DRAFT"), name="unique_draft_user")
 
 ensures that each user only has one draft.
 

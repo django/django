@@ -124,10 +124,12 @@ described here.
 .. admonition:: Restrictions on ``QuerySet.values_list()``
 
     If you recreate :meth:`QuerySet.values_list` using the pickled ``query``
-    attribute, it will be converted to :meth:`QuerySet.values`::
+    attribute, it will be converted to :meth:`QuerySet.values`:
+    
+    .. code-block:: pycon
 
         >>> import pickle
-        >>> qs = Blog.objects.values_list('id', 'name')
+        >>> qs = Blog.objects.values_list("id", "name")
         >>> qs
         <QuerySet [(1, 'Beatles Blog')]>
         >>> reloaded_qs = Blog.objects.all()
@@ -225,9 +227,11 @@ The lookup parameters (``**kwargs``) should be in the format described in
 underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
 
 This example excludes all entries whose ``pub_date`` is later than 2005-1-3
-AND whose ``headline`` is "Hello"::
+AND whose ``headline`` is "Hello":
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
+.. code-block:: python
+
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline="Hello")
 
 In SQL terms, that evaluates to:
 
@@ -237,9 +241,11 @@ In SQL terms, that evaluates to:
     WHERE NOT (pub_date > '2005-1-3' AND headline = 'Hello')
 
 This example excludes all entries whose ``pub_date`` is later than 2005-1-3
-OR whose headline is "Hello"::
+OR whose headline is "Hello":
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
+.. code-block:: python
+
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline="Hello")
 
 In SQL terms, that evaluates to:
 
@@ -329,11 +335,13 @@ interested in the exact number of entries, you could do this:
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
 :meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
 with other methods (e.g. :meth:`aggregate`), you must promote it to an
-annotation::
+annotation:
 
-    Blog.objects.alias(entries=Count('entry')).annotate(
-        entries=F('entries'),
-    ).aggregate(Sum('entries'))
+.. code-block:: python
+
+    Blog.objects.alias(entries=Count("entry")).annotate(
+        entries=F("entries"),
+    ).aggregate(Sum("entries"))
 
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
@@ -351,16 +359,20 @@ By default, results returned by a ``QuerySet`` are ordered by the ordering
 tuple given by the ``ordering`` option in the model's ``Meta``. You can
 override this on a per-``QuerySet`` basis by using the ``order_by`` method.
 
-Example::
+Example:
 
-    Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
+.. code-block:: python
+
+    Entry.objects.filter(pub_date__year=2005).order_by("-pub_date", "headline")
 
 The result above will be ordered by ``pub_date`` descending, then by
 ``headline`` ascending. The negative sign in front of ``"-pub_date"`` indicates
 *descending* order. Ascending order is implied. To order randomly, use ``"?"``,
-like so::
+like so:
 
-    Entry.objects.order_by('?')
+.. code-block:: python
+
+    Entry.objects.order_by("?")
 
 Note: ``order_by('?')`` queries may be expensive and slow, depending on the
 database backend you're using.
@@ -368,32 +380,42 @@ database backend you're using.
 To order by a field in a different model, use the same syntax as when you are
 querying across model relations. That is, the name of the field, followed by a
 double underscore (``__``), followed by the name of the field in the new model,
-and so on for as many models as you want to join. For example::
+and so on for as many models as you want to join. For example:
 
-    Entry.objects.order_by('blog__name', 'headline')
+.. code-block:: python
+
+    Entry.objects.order_by("blog__name", "headline")
 
 If you try to order by a field that is a relation to another model, Django will
 use the default ordering on the related model, or order by the related model's
 primary key if there is no :attr:`Meta.ordering
 <django.db.models.Options.ordering>` specified. For example, since the ``Blog``
-model has no default ordering specified::
+model has no default ordering specified:
 
-    Entry.objects.order_by('blog')
+.. code-block:: python
 
-...is identical to::
+    Entry.objects.order_by("blog")
 
-    Entry.objects.order_by('blog__id')
+...is identical to:
+
+.. code-block:: python
+
+    Entry.objects.order_by("blog__id")
 
 If ``Blog`` had ``ordering = ['name']``, then the first queryset would be
-identical to::
+identical to:
 
-    Entry.objects.order_by('blog__name')
+.. code-block:: python
+
+    Entry.objects.order_by("blog__name")
 
 You can also order by :doc:`query expressions </ref/models/expressions>` by
 calling :meth:`~.Expression.asc` or :meth:`~.Expression.desc` on the
-expression::
+expression:
 
-    Entry.objects.order_by(Coalesce('summary', 'headline').desc())
+.. code-block:: python
+
+    Entry.objects.order_by(Coalesce("summary", "headline").desc())
 
 :meth:`~.Expression.asc` and :meth:`~.Expression.desc` have arguments
 (``nulls_first`` and ``nulls_last``) that control how null values are sorted.
@@ -407,17 +429,20 @@ related model ordering can change the expected results.
     (for example, a :class:`~django.db.models.ManyToManyField` field, or the
     reverse relation of a :class:`~django.db.models.ForeignKey` field).
 
-    Consider this case::
+    Consider this case:
+    
+    .. code-block:: python
 
          class Event(Model):
-            parent = models.ForeignKey(
-                'self',
-                on_delete=models.CASCADE,
-                related_name='children',
-            )
-            date = models.DateField()
+             parent = models.ForeignKey(
+                 "self",
+                 on_delete=models.CASCADE,
+                 related_name="children",
+             )
+             date = models.DateField()
 
-         Event.objects.order_by('children__date')
+
+         Event.objects.order_by("children__date")
 
     Here, there could potentially be multiple ordering data for each ``Event``;
     each ``Event`` with multiple ``children`` will be returned multiple times
@@ -437,9 +462,11 @@ backend normally orders them.
 
 You can order by a field converted to lowercase with
 :class:`~django.db.models.functions.Lower` which will achieve case-consistent
-ordering::
+ordering:
 
-    Entry.objects.order_by(Lower('headline').desc())
+.. code-block:: python
+
+    Entry.objects.order_by(Lower("headline").desc())
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call :meth:`order_by()` with no parameters.
@@ -449,9 +476,11 @@ You can tell if a query is ordered or not by checking the
 ``QuerySet`` has been ordered in any way.
 
 Each ``order_by()`` call will clear any previous ordering. For example, this
-query will be ordered by ``pub_date`` and not ``headline``::
+query will be ordered by ``pub_date`` and not ``headline``:
 
-    Entry.objects.order_by('headline').order_by('pub_date')
+.. code-block:: python
+
+    Entry.objects.order_by("headline").order_by("pub_date")
 
 .. warning::
 
@@ -568,9 +597,11 @@ Examples (those after the first will only work on PostgreSQL):
     ``_id`` or referenced field to make sure the ``DISTINCT ON`` expressions
     match those at the beginning of the ``ORDER BY`` clause. For example, if
     the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
-    ``name``::
+    ``name``:
+    
+    .. code-block:: python
 
-        Entry.objects.order_by('blog').distinct('blog')
+        Entry.objects.order_by("blog").distinct("blog")
 
     ...wouldn't work because the query would be ordered by ``blog__name`` thus
     mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
@@ -589,14 +620,16 @@ Each of those dictionaries represents an object, with the keys corresponding to
 the attribute names of model objects.
 
 This example compares the dictionaries of ``values()`` with the normal model
-objects::
+objects:
+
+.. code-block:: pycon
 
     # This list contains a Blog object.
-    >>> Blog.objects.filter(name__startswith='Beatles')
+    >>> Blog.objects.filter(name__startswith="Beatles")
     <QuerySet [<Blog: Beatles Blog>]>
 
     # This list contains a dictionary.
-    >>> Blog.objects.filter(name__startswith='Beatles').values()
+    >>> Blog.objects.filter(name__startswith="Beatles").values()
     <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
 
 The ``values()`` method takes optional positional arguments, ``*fields``, which
@@ -709,7 +742,9 @@ of the available fields and you won't need the functionality of a model
 instance object. It's more efficient to select only the fields you need to use.
 
 Finally, note that you can call ``filter()``, ``order_by()``, etc. after the
-``values()`` call, that means that these two calls are identical::
+``values()`` call, that means that these two calls are identical:
+
+.. code-block:: pycon
 
     Blog.objects.values().order_by('id')
     Blog.objects.order_by('id').values()
@@ -837,7 +872,7 @@ not having any author:
 ``dates()``
 ~~~~~~~~~~~
 
-.. method:: dates(field, kind, order='ASC')
+.. method:: dates(field, kind, order="ASC")
 
 Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.date`
 objects representing all available dates of a particular kind within the
@@ -1041,10 +1076,12 @@ The following examples illustrate the difference between plain lookups and
     # Hits the database again to get the related Blog object.
     b = e.blog
 
-And here's ``select_related`` lookup::
+And here's ``select_related`` lookup:
+
+.. code-block:: python
 
     # Hits the database.
-    e = Entry.objects.select_related('blog').get(id=5)
+    e = Entry.objects.select_related("blog").get(id=5)
 
     # Doesn't hit the database, because e.blog has been prepopulated
     # in the previous query.
@@ -1052,30 +1089,38 @@ And here's ``select_related`` lookup::
 
 You can use ``select_related()`` with any queryset of objects::
 
+.. code-block:: python
+
     from django.utils import timezone
 
     # Find all the blogs with entries scheduled to be published in the future.
     blogs = set()
 
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog'):
+    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog"):
         # Without select_related(), this would make a database query for each
         # loop iteration in order to fetch the related blog for each entry.
         blogs.add(e.blog)
 
 The order of ``filter()`` and ``select_related()`` chaining isn't important.
-These querysets are equivalent::
+These querysets are equivalent:
 
-    Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog')
-    Entry.objects.select_related('blog').filter(pub_date__gt=timezone.now())
+.. code-block:: python
+
+    Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog")
+    Entry.objects.select_related("blog").filter(pub_date__gt=timezone.now())
 
 You can follow foreign keys in a similar way to querying them. If you have the
-following models::
+following models:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class City(models.Model):
         # ...
         pass
+
 
     class Person(models.Model):
         # ...
@@ -1086,22 +1131,25 @@ following models::
             null=True,
         )
 
+
     class Book(models.Model):
         # ...
         author = models.ForeignKey(Person, on_delete=models.CASCADE)
 
-... then a call to ``Book.objects.select_related('author__hometown').get(id=4)``
-will cache the related ``Person`` *and* the related ``City``::
+... then a call to ``Book.objects.select_related("author__hometown").get(id=4)``
+will cache the related ``Person`` *and* the related ``City``:
+
+.. code-block:: python
 
     # Hits the database with joins to the author and hometown tables.
-    b = Book.objects.select_related('author__hometown').get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Doesn't hit the database.
+    b = Book.objects.select_related("author__hometown").get(id=4)
+    p = b.author  # Doesn't hit the database.
+    c = p.hometown  # Doesn't hit the database.
 
     # Without select_related()...
     b = Book.objects.get(id=4)  # Hits the database.
-    p = b.author         # Hits the database.
-    c = p.hometown       # Hits the database.
+    p = b.author  # Hits the database.
+    c = p.hometown  # Hits the database.
 
 You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
@@ -1191,7 +1239,9 @@ item in the Pizza ``QuerySet``.
 
 We can reduce to just two queries using ``prefetch_related``:
 
-    >>> Pizza.objects.prefetch_related('toppings')
+.. code-block:: pycon
+
+    >>> Pizza.objects.prefetch_related("toppings")
 
 This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
 ``self.toppings.all()`` is called, instead of having to go to the database for
@@ -1222,7 +1272,9 @@ database.
     results, and retrieve data using a fresh database query. So, if you write
     the following:
 
-        >>> pizzas = Pizza.objects.prefetch_related('toppings')
+    .. code-block:: pycon
+
+        >>> pizzas = Pizza.objects.prefetch_related("toppings")
         >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
 
     ...then the fact that ``pizza.toppings.all()`` has been prefetched will not
@@ -1241,21 +1293,29 @@ database.
     any prefetched cache for the relation will be cleared.
 
 You can also use the normal join syntax to do related fields of related
-fields. Suppose we have an additional model to the example above::
+fields. Suppose we have an additional model to the example above:
+
+.. code-block:: python
 
     class Restaurant(models.Model):
-        pizzas = models.ManyToManyField(Pizza, related_name='restaurants')
-        best_pizza = models.ForeignKey(Pizza, related_name='championed_by', on_delete=models.CASCADE)
+        pizzas = models.ManyToManyField(Pizza, related_name="restaurants")
+        best_pizza = models.ForeignKey(
+            Pizza, related_name="championed_by", on_delete=models.CASCADE
+        )
 
 The following are all legal:
 
-    >>> Restaurant.objects.prefetch_related('pizzas__toppings')
+.. code-block:: pycon
+
+    >>> Restaurant.objects.prefetch_related("pizzas__toppings")
 
 This will prefetch all pizzas belonging to restaurants, and all toppings
 belonging to those pizzas. This will result in a total of 3 database queries -
 one for the restaurants, one for the pizzas, and one for the toppings.
 
-    >>> Restaurant.objects.prefetch_related('best_pizza__toppings')
+.. code-block:: pycon
+
+    >>> Restaurant.objects.prefetch_related("best_pizza__toppings")
 
 This will fetch the best pizza and all the toppings for the best pizza for each
 restaurant. This will be done in 3 database queries - one for the restaurants,
@@ -1309,20 +1369,28 @@ the prefetch operation.
 In its simplest form ``Prefetch`` is equivalent to the traditional string based
 lookups:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+    >>> Restaurant.objects.prefetch_related(Prefetch("pizzas__toppings"))
 
 You can provide a custom queryset with the optional ``queryset`` argument.
 This can be used to change the default ordering of the queryset:
 
+.. code-block:: pycon
+
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+    ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.order_by("name"))
+    ... )
 
 Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
 applicable to reduce the number of queries even further:
 
+.. code-block:: pycon
+
     >>> Pizza.objects.prefetch_related(
-    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+    ...     Prefetch("restaurants", queryset=Restaurant.objects.select_related("best_pizza"))
+    ... )
 
 You can also assign the prefetched result to a custom attribute with the optional
 ``to_attr`` argument. The result will be stored directly in a list.
@@ -1330,32 +1398,40 @@ You can also assign the prefetched result to a custom attribute with the optiona
 This allows prefetching the same relation multiple times with a different
 ``QuerySet``; for instance:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', to_attr='menu'),
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
+    ...     Prefetch("pizzas", to_attr="menu"),
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ... )
 
 Lookups created with custom ``to_attr`` can still be traversed as usual by other
 lookups:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
-    ...     'vegetarian_menu__toppings')
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ...     "vegetarian_menu__toppings",
+    ... )
 
 Using ``to_attr`` is recommended when filtering down the prefetch result as it is
 less ambiguous than storing a filtered result in the related manager's cache:
+
+.. code-block:: pycon
 
     >>> queryset = Pizza.objects.filter(vegetarian=True)
     >>>
     >>> # Recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
+    ...     Prefetch("pizzas", queryset=queryset, to_attr="vegetarian_pizzas")
+    ... )
     >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
     >>>
     >>> # Not recommended:
-    >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset))
+    >>> restaurants = Restaurant.objects.prefetch_related(Prefetch("pizzas", queryset=queryset))
     >>> vegetarian_pizzas = restaurants[0].pizzas.all()
 
 Custom prefetching also works with single related relations like
@@ -1371,10 +1447,13 @@ where prefetching with a custom ``QuerySet`` is useful:
 * You want to use performance optimization techniques like
   :meth:`deferred fields <defer()>`:
 
-    >>> queryset = Pizza.objects.only('name')
+  .. code-block:: pycon
+
+    >>> queryset = Pizza.objects.only("name")
     >>>
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('best_pizza', queryset=queryset))
+    ...     Prefetch("best_pizza", queryset=queryset)
+    ... )
 
 When using multiple databases, ``Prefetch`` will respect your choice of
 database. If the inner query does not specify a database, it will use the
@@ -1404,7 +1483,9 @@ database selected by the outer query. All of the following are valid:
 
     Take the following examples:
 
-       >>> prefetch_related('pizzas__toppings', 'pizzas')
+    .. code-block:: pycon
+
+       >>> prefetch_related("pizzas__toppings", "pizzas")
 
     This works even though it's unordered because ``'pizzas__toppings'``
     already contains all the needed information, therefore the second argument
@@ -1417,7 +1498,9 @@ database selected by the outer query. All of the following are valid:
     created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
     lookup.
 
-        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+    .. code-block:: pycon
+
+        >>> prefetch_related("pizza_list__toppings", Prefetch("pizzas", to_attr="pizza_list"))
 
     This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
     when ``'pizza_list__toppings'`` is being processed.
@@ -1448,14 +1531,18 @@ generated by a ``QuerySet``.
     that we can enhance the QuerySet API to allow removing ``extra()``. We are
     no longer improving or fixing bugs for this method.
 
-    For example, this use of ``extra()``::
+    For example, this use of ``extra()``:
+    
+    .. code-block:: pycon
 
         >>> qs.extra(
-        ...     select={'val': "select col from sometable where othercol = %s"},
+        ...     select={"val": "select col from sometable where othercol = %s"},
         ...     select_params=(someparam,),
         ... )
 
-    is equivalent to::
+    is equivalent to:
+    
+    .. code-block:: pycon
 
         >>> qs.annotate(val=RawSQL("select col from sometable where othercol = %s", (someparam,)))
 
@@ -1540,11 +1627,13 @@ of the arguments is required, but you should use at least one of them.
   fragments in ``extra(select=...)``. For this purpose, use the
   ``select_params`` parameter.
 
-  This will work, for example::
+  This will work, for example:
+  
+  .. code-block:: python
 
       Blog.objects.extra(
-          select={'a': '%s', 'b': '%s'},
-          select_params=('one', 'two'),
+          select={"a": "%s", "b": "%s"},
+          select_params=("one", "two"),
       )
 
   If you need to use a literal ``%s`` inside your select string, use
@@ -1722,25 +1811,29 @@ one, doing so will result in an error.
     reader, is slightly faster and consumes a little less memory in the Python
     process.
 
-    For example, both of these models use the same underlying database table::
+    For example, both of these models use the same underlying database table:
+    
+    .. code-block:: python
 
         class CommonlyUsedModel(models.Model):
             f1 = models.CharField(max_length=10)
 
             class Meta:
                 managed = False
-                db_table = 'app_largetable'
+                db_table = "app_largetable"
+
 
         class ManagedModel(models.Model):
             f1 = models.CharField(max_length=10)
             f2 = models.CharField(max_length=10)
 
             class Meta:
-                db_table = 'app_largetable'
+                db_table = "app_largetable"
+
 
         # Two equivalent QuerySets:
         CommonlyUsedModel.objects.all()
-        ManagedModel.objects.defer('f2')
+        ManagedModel.objects.defer("f2")
 
     If many fields need to be duplicated in the unmanaged model, it may be best
     to create an abstract model with the shared fields and then have the
@@ -1818,11 +1911,13 @@ this method takes is the alias of a database, as defined in
 
 For example::
 
+.. code-block:: pycon
+
     # queries the database with the 'default' alias.
     >>> Entry.objects.all()
 
     # queries the database with the 'backup' alias
-    >>> Entry.objects.using('backup')
+    >>> Entry.objects.using("backup")
 
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1832,7 +1927,9 @@ For example::
 Returns a queryset that will lock rows until the end of the transaction,
 generating a ``SELECT ... FOR UPDATE`` SQL statement on supported databases.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import transaction
 
@@ -1868,9 +1965,11 @@ to refer to the queryset's model.
 
     If you want to lock parents models when using :ref:`multi-table inheritance
     <multi-table-inheritance>`, you must specify parent link fields (by default
-    ``<parent_model_name>_ptr``) in the ``of`` argument. For example::
+    ``<parent_model_name>_ptr``) in the ``of`` argument. For example:
+    
+    .. code-block:: python
 
-        Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
+        Restaurant.objects.select_for_update(of=("self", "place_ptr"))
 
 .. admonition:: Using ``select_for_update(of=(...))`` with specified fields
 
@@ -1967,11 +2066,14 @@ AND (``&``)
 
 Combines two ``QuerySet``\s using the SQL ``AND`` operator.
 
-The following are equivalent::
+The following are equivalent:
+
+.. code-block:: python
 
     Model.objects.filter(x=1) & Model.objects.filter(y=2)
     Model.objects.filter(x=1, y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) & Q(y=2))
 
 SQL equivalent:
@@ -1985,10 +2087,13 @@ OR (``|``)
 
 Combines two ``QuerySet``\s using the SQL ``OR`` operator.
 
-The following are equivalent::
+The following are equivalent:
+
+.. code-block:: python
 
     Model.objects.filter(x=1) | Model.objects.filter(y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) | Q(y=2))
 
 SQL equivalent:
@@ -2007,10 +2112,13 @@ XOR (``^``)
 
 Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
 
-The following are equivalent::
+The following are equivalent:
+
+.. code-block:: python
 
     Model.objects.filter(x=1) ^ Model.objects.filter(y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) ^ Q(y=2))
 
 SQL equivalent:
@@ -2066,32 +2174,42 @@ nature, but any differences are noted below next to each method.
 Returns the object matching the given lookup parameters, which should be in
 the format described in `Field lookups`_. You should use lookups that are
 guaranteed unique, such as the primary key or fields in a unique constraint.
-For example::
+For example:
+
+.. code-block:: python
 
     Entry.objects.get(id=1)
     Entry.objects.get(Q(blog=blog) & Q(entry_number=1))
 
 If you expect a queryset to already return one row, you can use ``get()``
-without any arguments to return the object for that row::
+without any arguments to return the object for that row:
+
+.. code-block:: python
 
     Entry.objects.filter(pk=1).get()
 
 If ``get()`` doesn't find any object, it raises a :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception::
+<django.db.models.Model.DoesNotExist>` exception:
 
-    Entry.objects.get(id=-999) # raises Entry.DoesNotExist
+.. code-block:: python
+
+    Entry.objects.get(id=-999)  # raises Entry.DoesNotExist
 
 If ``get()`` finds more than one object, it raises a
 :exc:`Model.MultipleObjectsReturned
-<django.db.models.Model.MultipleObjectsReturned>` exception::
+<django.db.models.Model.MultipleObjectsReturned>` exception:
 
-    Entry.objects.get(name='A Duplicated Name') # raises Entry.MultipleObjectsReturned
+.. code-block:: python
+
+    Entry.objects.get(name="A Duplicated Name")  # raises Entry.MultipleObjectsReturned
 
 Both these exception classes are attributes of the model class, and specific to
 that model. If you want to handle such exceptions from several ``get()`` calls
 for different models, you can use their generic base classes. For example, you
 can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
-:exc:`~django.db.models.Model.DoesNotExist` exceptions from multiple models::
+:exc:`~django.db.models.Model.DoesNotExist` exceptions from multiple models:
+
+.. code-block:: python
 
     from django.core.exceptions import ObjectDoesNotExist
 
@@ -2113,11 +2231,15 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
 
 *Asynchronous version*: ``acreate()``
 
-A convenience method for creating an object and saving it all in one step.  Thus::
+A convenience method for creating an object and saving it all in one step.  Thus:
+
+.. code-block:: python
 
     p = Person.objects.create(first_name="Bruce", last_name="Springsteen")
 
-and::
+and:
+
+.. code-block:: python
 
     p = Person(first_name="Bruce", last_name="Springsteen")
     p.save(force_insert=True)
@@ -2152,22 +2274,26 @@ created object and ``created`` is a boolean specifying whether a new object was
 created.
 
 This is meant to prevent duplicate objects from being created when requests are
-made in parallel, and as a shortcut to boilerplatish code. For example::
+made in parallel, and as a shortcut to boilerplatish code. For example:
+
+.. code-block:: python
 
     try:
-        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        obj = Person.objects.get(first_name="John", last_name="Lennon")
     except Person.DoesNotExist:
-        obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+        obj = Person(first_name="John", last_name="Lennon", birthday=date(1940, 10, 9))
         obj.save()
 
 Here, with concurrent requests, multiple attempts to save a ``Person`` with
 the same parameters may be made. To avoid this race condition, the above
-example can be rewritten using ``get_or_create()`` like so::
+example can be rewritten using ``get_or_create()`` like so:
+
+.. code-block:: python
 
     obj, created = Person.objects.get_or_create(
-        first_name='John',
-        last_name='Lennon',
-        defaults={'birthday': date(1940, 10, 9)},
+        first_name="John",
+        last_name="Lennon",
+        defaults={"birthday": date(1940, 10, 9)},
     )
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
@@ -2186,21 +2312,25 @@ found, ``get_or_create()`` returns a tuple of that object and ``False``.
 You can specify more complex conditions for the retrieved object by chaining
 ``get_or_create()`` with ``filter()`` and using :class:`Q objects
 <django.db.models.Q>`. For example, to retrieve Robert or Bob Marley if either
-exists, and create the latter otherwise::
+exists, and create the latter otherwise:
+
+.. code-block:: python
 
     from django.db.models import Q
 
     obj, created = Person.objects.filter(
-        Q(first_name='Bob') | Q(first_name='Robert'),
-    ).get_or_create(last_name='Marley', defaults={'first_name': 'Bob'})
+        Q(first_name="Bob") | Q(first_name="Robert"),
+    ).get_or_create(last_name="Marley", defaults={"first_name": "Bob"})
 
 If multiple objects are found, ``get_or_create()`` raises
 :exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
 found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
-according to this algorithm::
+according to this algorithm:
 
-    params = {k: v for k, v in kwargs.items() if '__' not in k}
+.. code-block:: python
+
+    params = {k: v for k, v in kwargs.items() if "__" not in k}
     params.update({k: v() if callable(v) else v for k, v in defaults.items()})
     obj = self.model(**params)
     obj.save()
@@ -2215,9 +2345,11 @@ details. The internal implementation has some more error-checking than this and
 handles some extra edge-conditions; if you're interested, read the code.
 
 If you have a field named ``defaults`` and want to use it as an exact lookup in
-``get_or_create()``, use ``'defaults__exact'``, like so::
+``get_or_create()``, use ``'defaults__exact'``, like so:
 
-    Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
+.. code-block:: python
+
+    Foo.objects.get_or_create(defaults__exact="bar", defaults={"defaults": "baz"})
 
 The ``get_or_create()`` method has similar error behavior to :meth:`create()`
 when you're using manually specified primary keys. If an object needs to be
@@ -2237,17 +2369,22 @@ whenever a request to a page has a side effect on your data. For more, see
   inside the context of that relation. That could lead you to some integrity
   problems if you don't use it consistently.
 
-  Being the following models::
+  Being the following models:
+  
+  .. code-block:: python
 
       class Chapter(models.Model):
           title = models.CharField(max_length=255, unique=True)
+
 
       class Book(models.Model):
           title = models.CharField(max_length=256)
           chapters = models.ManyToManyField(Chapter)
 
   You can use ``get_or_create()`` through Book's chapters field, but it only
-  fetches inside the context of that book::
+  fetches inside the context of that book:
+  
+  .. code-block:: pycon
 
       >>> book = Book.objects.create(title="Ulysses")
       >>> book.chapters.get_or_create(title="Telemachus")
@@ -2288,26 +2425,31 @@ The ``update_or_create`` method tries to fetch an object from database based on
 the given ``kwargs``. If a match is found, it updates the fields passed in the
 ``defaults`` dictionary.
 
-This is meant as a shortcut to boilerplatish code. For example::
+This is meant as a shortcut to boilerplatish code. For example:
 
-    defaults = {'first_name': 'Bob'}
+.. code-block:: python
+
+    defaults = {"first_name": "Bob"}
     try:
-        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        obj = Person.objects.get(first_name="John", last_name="Lennon")
         for key, value in defaults.items():
             setattr(obj, key, value)
         obj.save()
     except Person.DoesNotExist:
-        new_values = {'first_name': 'John', 'last_name': 'Lennon'}
+        new_values = {"first_name": "John", "last_name": "Lennon"}
         new_values.update(defaults)
         obj = Person(**new_values)
         obj.save()
 
 This pattern gets quite unwieldy as the number of fields in a model goes up.
-The above example can be rewritten using ``update_or_create()`` like so::
+The above example can be rewritten using ``update_or_create()`` like so:
+
+.. code-block:: python
 
     obj, created = Person.objects.update_or_create(
-        first_name='John', last_name='Lennon',
-        defaults={'first_name': 'Bob'},
+        first_name="John",
+        last_name="Lennon",
+        defaults={"first_name": "Bob"},
     )
 
 For a detailed description of how names passed in ``kwargs`` are resolved, see
@@ -2365,12 +2507,14 @@ This has a number of caveats though:
   generator. The cast allows inspecting all objects so that any objects with a
   manually set primary key can be inserted first. If you want to insert objects
   in batches without evaluating the entire generator at once, you can use this
-  technique as long as the objects don't have any manually set primary keys::
+  technique as long as the objects don't have any manually set primary keys:
+  
+  .. code-block:: python
 
     from itertools import islice
 
     batch_size = 100
-    objs = (Entry(headline='Test %s' % i) for i in range(1000))
+    objs = (Entry(headline="Test %s" % i) for i in range(1000))
     while True:
         batch = list(islice(objs, batch_size))
         if not batch:
@@ -2478,11 +2622,13 @@ the ``QuerySet``.
 
 Example::
 
+.. code-block:: python
+
     # Returns the total number of entries in the database.
     Entry.objects.count()
 
     # Returns the number of entries whose headline contains 'Lennon'
-    Entry.objects.filter(headline__contains='Lennon').count()
+    Entry.objects.filter(headline__contains="Lennon").count()
 
 A ``count()`` call performs a ``SELECT COUNT(*)`` behind the scenes, so you
 should always use ``count()`` rather than loading all of the record into Python
@@ -2659,15 +2805,19 @@ value for ``chunk_size`` will result in Django using an implicit default of
 Returns the latest object in the table based on the given field(s).
 
 This example returns the latest ``Entry`` in the table, according to the
-``pub_date`` field::
+``pub_date`` field:
 
-    Entry.objects.latest('pub_date')
+.. code-block:: python
+
+    Entry.objects.latest("pub_date")
 
 You can also choose the latest based on several fields. For example, to select
 the ``Entry`` with the earliest ``expire_date`` when two entries have the same
-``pub_date``::
+``pub_date``:
 
-    Entry.objects.latest('pub_date', '-expire_date')
+.. code-block:: python
+
+    Entry.objects.latest("pub_date", "-expire_date")
 
 The negative sign in ``'-expire_date'`` means to sort ``expire_date`` in
 *descending* order. Since ``latest()`` gets the last result, the ``Entry`` with
@@ -2692,9 +2842,11 @@ readability.
     example, PostgreSQL and MySQL sort null values as if they are higher than
     non-null values, while SQLite does the opposite.
 
-    You may want to filter out null values::
+    You may want to filter out null values:
+    
+    .. code-block:: python
 
-        Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
+        Entry.objects.filter(pub_date__isnull=False).latest("pub_date")
 
 .. versionchanged:: 4.1
 
@@ -2728,15 +2880,19 @@ is no matching object. If the ``QuerySet`` has no ordering defined, then the
 queryset is automatically ordered by the primary key. This can affect
 aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
-Example::
+Example:
 
-    p = Article.objects.order_by('title', 'pub_date').first()
+.. code-block:: python
+
+    p = Article.objects.order_by("title", "pub_date").first()
 
 Note that ``first()`` is a convenience method, the following code sample is
-equivalent to the above example::
+equivalent to the above example:
+
+.. code-block:: python
 
     try:
-        p = Article.objects.order_by('title', 'pub_date')[0]
+        p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
 
@@ -2822,12 +2978,16 @@ possible, but it *does* execute nearly the same query as a normal
 any objects in a :class:`.QuerySet`, particularly in the context of a large
 :class:`.QuerySet`.
 
-To find whether a queryset contains any items::
+To find whether a queryset contains any items:
+
+.. code-block:: python
 
     if some_queryset.exists():
         print("There is at least one object in some_queryset")
 
-Which will be faster than::
+Which will be faster than:
+
+.. code-block:: python
 
     if some_queryset:
         print("There is at least one object in some_queryset")
@@ -2859,16 +3019,20 @@ not. This tries to perform the query in the simplest and fastest way possible.
 :meth:`contains` is useful for checking an object membership in a
 :class:`.QuerySet`, particularly in the context of a large :class:`.QuerySet`.
 
-To check whether a queryset contains a specific item::
+To check whether a queryset contains a specific item:
+
+.. code-block:: python
 
     if some_queryset.contains(obj):
-        print('Entry contained in queryset')
+        print("Entry contained in queryset")
 
 This will be faster than the following which requires evaluating and iterating
-through the entire queryset::
+through the entire queryset:
+
+.. code-block:: python
 
     if obj in some_queryset:
-        print('Entry contained in queryset')
+        print("Entry contained in queryset")
 
 Like :meth:`exists`, if ``some_queryset`` has not yet been evaluated, but you
 know that it will be at some point, then using ``some_queryset.contains(obj)``
@@ -2941,13 +3105,17 @@ The ``update()`` method returns the number of affected rows:
 
 If you're just updating a record and don't need to do anything with the model
 object, the most efficient approach is to call ``update()``, rather than
-loading the model object into memory. For example, instead of doing this::
+loading the model object into memory. For example, instead of doing this:
+
+.. code-block:: python
 
     e = Entry.objects.get(id=10)
     e.comments_on = False
     e.save()
 
-...do this::
+...do this:
+
+.. code-block:: python
 
     Entry.objects.filter(id=10).update(comments_on=False)
 
@@ -2962,7 +3130,9 @@ does not call any ``save()`` methods on your models, nor does it emit the
 calling :meth:`Model.save() <django.db.models.Model.save>`). If you want to
 update a bunch of records for a model that has a custom
 :meth:`~django.db.models.Model.save()` method, loop over them and call
-:meth:`~django.db.models.Model.save()`, like this::
+:meth:`~django.db.models.Model.save()`, like this:
+
+.. code-block:: python
 
     for e in Entry.objects.filter(pub_date__year=2010):
         e.comments_on = False
@@ -2977,9 +3147,11 @@ Ordered queryset
 
 Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
 MySQL, and is ignored for different databases. This is useful for updating a
-unique field in the order that is specified without conflicts. For example::
+unique field in the order that is specified without conflicts. For example:
 
-    Entry.objects.order_by('-number').update(number=F('number') + 1)
+.. code-block:: python
+
+    Entry.objects.order_by("-number").update(number=F("number") + 1)
 
 .. note::
 
@@ -3143,7 +3315,9 @@ As a convenience when no lookup type is provided (like in
 Exact match. If the value provided for comparison is ``None``, it will be
 interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more details).
 
-Examples::
+Examples:
+
+.. code-block:: python
 
     Entry.objects.get(id__exact=14)
     Entry.objects.get(id__exact=None)
@@ -3173,9 +3347,11 @@ Case-insensitive exact match. If the value provided for comparison is ``None``,
 it will be interpreted as an SQL ``NULL`` (see :lookup:`isnull` for more
 details).
 
-Example::
+Example:
 
-    Blog.objects.get(name__iexact='beatles blog')
+.. code-block:: python
+
+    Blog.objects.get(name__iexact="beatles blog")
     Blog.objects.get(name__iexact=None)
 
 SQL equivalents:
@@ -3201,9 +3377,11 @@ Note the first query will match ``'Beatles Blog'``, ``'beatles blog'``,
 
 Case-sensitive containment test.
 
-Example::
+Example:
 
-    Entry.objects.get(headline__contains='Lennon')
+.. code-block:: python
+
+    Entry.objects.get(headline__contains="Lennon")
 
 SQL equivalent:
 
@@ -3228,9 +3406,11 @@ honored today'``.
 
 Case-insensitive containment test.
 
-Example::
+Example:
 
-    Entry.objects.get(headline__icontains='Lennon')
+.. code-block:: python
+
+    Entry.objects.get(headline__icontains="Lennon")
 
 SQL equivalent:
 
@@ -3251,10 +3431,12 @@ SQL equivalent:
 In a given iterable; often a list, tuple, or queryset. It's not a common use
 case, but strings (being iterables) are accepted.
 
-Examples::
+Examples:
+
+.. code-block:: python
 
     Entry.objects.filter(id__in=[1, 3, 4])
-    Entry.objects.filter(headline__in='abc')
+    Entry.objects.filter(headline__in="abc")
 
 SQL equivalents:
 
@@ -3264,9 +3446,11 @@ SQL equivalents:
     SELECT ... WHERE headline IN ('a', 'b', 'c');
 
 You can also use a queryset to dynamically evaluate the list of values
-instead of providing a list of literal values::
+instead of providing a list of literal values:
 
-    inner_qs = Blog.objects.filter(name__contains='Cheddar')
+.. code-block:: python
+
+    inner_qs = Blog.objects.filter(name__contains="Cheddar")
     entries = Entry.objects.filter(blog__in=inner_qs)
 
 This queryset will be evaluated as subselect statement:
@@ -3278,16 +3462,20 @@ This queryset will be evaluated as subselect statement:
 If you pass in a ``QuerySet`` resulting from ``values()`` or ``values_list()``
 as the value to an ``__in`` lookup, you need to ensure you are only extracting
 one field in the result. For example, this will work (filtering on the blog
-names)::
+names):
 
-    inner_qs = Blog.objects.filter(name__contains='Ch').values('name')
+.. code-block:: python
+
+    inner_qs = Blog.objects.filter(name__contains="Ch").values("name")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
 This example will raise an exception, since the inner query is trying to
-extract two field values, where only one is expected::
+extract two field values, where only one is expected:
+
+.. code-block:: python
 
     # Bad code! Will raise a TypeError.
-    inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
+    inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
 .. _nested-queries-performance:
@@ -3299,10 +3487,11 @@ extract two field values, where only one is expected::
     database backends, most notably MySQL, don't optimize nested queries very
     well. It is more efficient, in those cases, to extract a list of values
     and then pass that into the second query. That is, execute two queries
-    instead of one::
+    instead of one:
+    
+    .. code-block:: python
 
-        values = Blog.objects.filter(
-                name__contains='Cheddar').values_list('pk', flat=True)
+        values = Blog.objects.filter(name__contains="Cheddar").values_list("pk", flat=True)
         entries = Entry.objects.filter(blog__in=list(values))
 
     Note the ``list()`` call around the Blog ``QuerySet`` to force execution of
@@ -3354,9 +3543,11 @@ Less than or equal to.
 
 Case-sensitive starts-with.
 
-Example::
+Example:
 
-    Entry.objects.filter(headline__startswith='Lennon')
+.. code-block:: python
+
+    Entry.objects.filter(headline__startswith="Lennon")
 
 SQL equivalent:
 
@@ -3374,9 +3565,11 @@ like ``istartswith`` for SQLite.
 
 Case-insensitive starts-with.
 
-Example::
+Example:
 
-    Entry.objects.filter(headline__istartswith='Lennon')
+.. code-block:: python
+
+    Entry.objects.filter(headline__istartswith="Lennon")
 
 SQL equivalent:
 
@@ -3396,9 +3589,11 @@ SQL equivalent:
 
 Case-sensitive ends-with.
 
-Example::
+Example:
 
-    Entry.objects.filter(headline__endswith='Lennon')
+.. code-block:: python
+
+    Entry.objects.filter(headline__endswith="Lennon")
 
 SQL equivalent:
 
@@ -3419,9 +3614,11 @@ SQL equivalent:
 
 Case-insensitive ends-with.
 
-Example::
+Example:
 
-    Entry.objects.filter(headline__iendswith='Lennon')
+.. code-block:: python
+
+    Entry.objects.filter(headline__iendswith="Lennon")
 
 SQL equivalent:
 
@@ -3478,7 +3675,9 @@ numbers and even characters.
 For datetime fields, casts the value as date. Allows chaining additional field
 lookups. Takes a date value.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__date=datetime.date(2005, 1, 1))
     Entry.objects.filter(pub_date__date__gt=datetime.date(2005, 1, 1))
@@ -3498,7 +3697,9 @@ database <database-time-zone-definitions>`.
 For date and datetime fields, an exact year match. Allows chaining additional
 field lookups. Takes an integer year.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__year=2005)
     Entry.objects.filter(pub_date__year__gte=2005)
@@ -3543,7 +3744,9 @@ in the database <database-time-zone-definitions>`.
 For date and datetime fields, an exact month match. Allows chaining additional
 field lookups. Takes an integer 1 (January) through 12 (December).
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__month=12)
     Entry.objects.filter(pub_date__month__gte=6)
@@ -3622,7 +3825,9 @@ additional field lookups.
 Takes an integer value representing the day of week from 1 (Sunday) to 7
 (Saturday).
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__week_day=2)
     Entry.objects.filter(pub_date__week_day__gte=2)
@@ -3649,7 +3854,9 @@ chaining additional field lookups.
 Takes an integer value representing the day of the week from 1 (Monday) to 7
 (Sunday).
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__iso_week_day=1)
     Entry.objects.filter(pub_date__iso_week_day__gte=1)
@@ -3674,7 +3881,9 @@ For date and datetime fields, a 'quarter of the year' match. Allows chaining
 additional field lookups. Takes an integer value between 1 and 4 representing
 the quarter of the year.
 
-Example to retrieve entries in the second quarter (April 1 to June 30)::
+Example to retrieve entries in the second quarter (April 1 to June 30):
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__quarter=2)
 
@@ -3693,7 +3902,9 @@ in the database <database-time-zone-definitions>`.
 For datetime fields, casts the value as time. Allows chaining additional field
 lookups. Takes a :class:`datetime.time` value.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Entry.objects.filter(pub_date__time=datetime.time(14, 30))
     Entry.objects.filter(pub_date__time__range=(datetime.time(8), datetime.time(17)))
@@ -3713,7 +3924,9 @@ database <database-time-zone-definitions>`.
 For datetime and time fields, an exact hour match. Allows chaining additional
 field lookups. Takes an integer between 0 and 23.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Event.objects.filter(timestamp__hour=23)
     Event.objects.filter(time__hour=5)
@@ -3741,7 +3954,9 @@ in the database <database-time-zone-definitions>`.
 For datetime and time fields, an exact minute match. Allows chaining additional
 field lookups. Takes an integer between 0 and 59.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Event.objects.filter(timestamp__minute=29)
     Event.objects.filter(time__minute=46)
@@ -3769,7 +3984,9 @@ in the database <database-time-zone-definitions>`.
 For datetime and time fields, an exact second match. Allows chaining additional
 field lookups. Takes an integer between 0 and 59.
 
-Example::
+Example:
+
+.. code-block:: python
 
     Event.objects.filter(timestamp__second=31)
     Event.objects.filter(time__second=2)
@@ -3819,9 +4036,11 @@ In the case of SQLite, which has no built in regular expression support,
 this feature is provided by a (Python) user-defined REGEXP function, and
 the regular expression syntax is therefore that of Python's ``re`` module.
 
-Example::
+Example:
 
-    Entry.objects.get(title__regex=r'^(An?|The) +')
+.. code-block:: python
+
+    Entry.objects.get(title__regex=r"^(An?|The) +")
 
 SQL equivalents:
 
@@ -3845,9 +4064,11 @@ regular expression syntax is recommended.
 
 Case-insensitive regular expression match.
 
-Example::
+Example:
 
-    Entry.objects.get(title__iregex=r'^(an?|the) +')
+.. code-block:: python
+
+    Entry.objects.get(title__iregex=r"^(an?|the) +")
 
 SQL equivalents:
 
@@ -4078,12 +4299,14 @@ The ``lookup`` argument describes the relations to follow and works the same
 as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
+    >>> Question.objects.prefetch_related(Prefetch("choice_set")).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
-    >>> Question.objects.prefetch_related(Prefetch('choice_set'))
+    >>> Question.objects.prefetch_related(Prefetch("choice_set"))
     <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
@@ -4091,17 +4314,21 @@ This is useful to further filter down the prefetch operation, or to call
 :meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
 relation, hence reducing the number of queries even further:
 
+.. code-block:: pycon
+
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
     >>> voted_choices
     <QuerySet [<Choice: The sky>]>
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices)
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: The sky>]>
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
 attribute:
 
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
+.. code-block:: pycon
+
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
     [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()

@@ -137,13 +137,15 @@ Django quotes column and table names behind the scenes.
     :meth:`~django.db.models.query.QuerySet.latest` and
     :meth:`~django.db.models.query.QuerySet.earliest` methods.
 
-    Example::
+    Example:
+    
+    .. code-block:: python
 
         # Latest by ascending order_date.
         get_latest_by = "order_date"
 
         # Latest by priority descending, order_date ascending.
-        get_latest_by = ['-priority', 'order_date']
+        get_latest_by = ["-priority", "order_date"]
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
@@ -196,40 +198,50 @@ Django quotes column and table names behind the scenes.
     ``ForeignKey``. This can be used to make related objects orderable with
     respect to a parent object. For example, if an ``Answer`` relates to a
     ``Question`` object, and a question has more than one answer, and the order
-    of answers matters, you'd do this::
+    of answers matters, you'd do this:
+    
+    .. code-block:: python
 
         from django.db import models
+
 
         class Question(models.Model):
             text = models.TextField()
             # ...
+
 
         class Answer(models.Model):
             question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
-                order_with_respect_to = 'question'
+                order_with_respect_to = "question"
 
     When ``order_with_respect_to`` is set, two additional methods are provided to
     retrieve and to set the order of the related objects: ``get_RELATED_order()``
     and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
     example, assuming that a ``Question`` object has multiple related ``Answer``
     objects, the list returned contains the primary keys of the related ``Answer``
-    objects::
+    objects:
+    
+    .. code-block:: pycon
 
         >>> question = Question.objects.get(id=1)
         >>> question.get_answer_order()
         [1, 2, 3]
 
     The order of a ``Question`` object's related ``Answer`` objects can be set by
-    passing in a list of ``Answer`` primary keys::
+    passing in a list of ``Answer`` primary keys:
+    
+    .. code-block:: pycon
 
         >>> question.set_answer_order([3, 1, 2])
 
     The related objects also get two methods, ``get_next_in_order()`` and
     ``get_previous_in_order()``, which can be used to access those objects in their
-    proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+    proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+    
+    .. code-block:: pycon
 
         >>> answer = Answer.objects.get(id=2)
         >>> answer.get_next_in_order()
@@ -257,33 +269,43 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.ordering
 
-    The default ordering for the object, for use when obtaining lists of objects::
+    The default ordering for the object, for use when obtaining lists of objects:
+    
+    .. code-block:: python
 
-        ordering = ['-order_date']
+        ordering = ["-order_date"]
 
     This is a tuple or list of strings and/or query expressions. Each string is
     a field name with an optional "-" prefix, which indicates descending order.
     Fields without a leading "-" will be ordered ascending. Use the string "?"
     to order randomly.
 
-    For example, to order by a ``pub_date`` field ascending, use this::
+    For example, to order by a ``pub_date`` field ascending, use this:
+    
+    .. code-block:: python
 
-        ordering = ['pub_date']
+        ordering = ["pub_date"]
 
-    To order by ``pub_date`` descending, use this::
+    To order by ``pub_date`` descending, use this:
+    
+    .. code-block:: python
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
-    To order by ``pub_date`` descending, then by ``author`` ascending, use this::
+    To order by ``pub_date`` descending, then by ``author`` ascending, use this:
+    
+    .. code-block:: python
 
-        ordering = ['-pub_date', 'author']
+        ordering = ["-pub_date", "author"]
 
     You can also use :doc:`query expressions </ref/models/expressions>`. To
-    order by ``author`` ascending and make null values sort last, use this::
+    order by ``author`` ascending and make null values sort last, use this:
+    
+    .. code-block:: python
 
         from django.db.models import F
 
-        ordering = [F('author').asc(nulls_last=True)]
+        ordering = [F("author").asc(nulls_last=True)]
 
 .. warning::
 
@@ -304,9 +326,11 @@ Django quotes column and table names behind the scenes.
 
     Extra permissions to enter into the permissions table when creating this object.
     Add, change, delete, and view permissions are automatically created for each
-    model. This example specifies an extra permission, ``can_deliver_pizzas``::
+    model. This example specifies an extra permission, ``can_deliver_pizzas``:
+    
+    .. code-block:: python
 
-        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+        permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -378,9 +402,12 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.indexes
 
     A list of :doc:`indexes </ref/models/indexes>` that you want to define on
-    the model::
+    the model:
+    
+    .. code-block:: python
 
         from django.db import models
+
 
         class Customer(models.Model):
             first_name = models.CharField(max_length=100)
@@ -388,8 +415,8 @@ Django quotes column and table names behind the scenes.
 
             class Meta:
                 indexes = [
-                    models.Index(fields=['last_name', 'first_name']),
-                    models.Index(fields=['first_name'], name='first_name_idx'),
+                    models.Index(fields=["last_name", "first_name"]),
+                    models.Index(fields=["first_name"], name="first_name_idx"),
                 ]
 
 ``unique_together``
@@ -431,7 +458,9 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.index_together
 
-    Sets of field names that, taken together, are indexed::
+    Sets of field names that, taken together, are indexed:
+    
+    .. code-block:: python
 
         index_together = [
             ["pub_date", "deadline"],
@@ -441,7 +470,9 @@ Django quotes column and table names behind the scenes.
     ``CREATE INDEX`` statement will be issued.)
 
     For convenience, ``index_together`` can be a single list when dealing with a single
-    set of fields::
+    set of fields:
+    
+    .. code-block:: python
 
         index_together = ["pub_date", "deadline"]
 
@@ -455,16 +486,19 @@ Django quotes column and table names behind the scenes.
 .. attribute:: Options.constraints
 
     A list of :doc:`constraints </ref/models/constraints>` that you want to
-    define on the model::
+    define on the model:
+    
+    .. code-block:: python
 
         from django.db import models
+
 
         class Customer(models.Model):
             age = models.IntegerField()
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+                    models.CheckConstraint(check=models.Q(age__gte=18), name="age_gte_18"),
                 ]
 
 ``verbose_name``
@@ -472,7 +506,9 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.verbose_name
 
-    A human-readable name for the object, singular::
+    A human-readable name for the object, singular:
+    
+    .. code-block:: python
 
         verbose_name = "pizza"
 
@@ -484,7 +520,9 @@ Django quotes column and table names behind the scenes.
 
 .. attribute:: Options.verbose_name_plural
 
-    The plural name for the object::
+    The plural name for the object:
+    
+    .. code-block:: python
 
         verbose_name_plural = "stories"
 

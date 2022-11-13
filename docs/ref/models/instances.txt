@@ -32,9 +32,12 @@ need to :meth:`~Model.save()`.
     signature as any change may prevent the model instance from being saved.
     Rather than overriding ``__init__``, try using one of these approaches:
 
-    #. Add a classmethod on the model class::
+    #. Add a classmethod on the model class:
+    
+    .. code-block:: python
 
         from django.db import models
+
 
         class Book(models.Model):
             title = models.CharField(max_length=100)
@@ -45,9 +48,12 @@ need to :meth:`~Model.save()`.
                 # do something with the book
                 return book
 
+
         book = Book.create("Pride and Prejudice")
 
-    #. Add a method on a custom manager (usually preferred)::
+    #. Add a method on a custom manager (usually preferred):
+    
+    .. code-block:: python
 
         class BookManager(models.Manager):
             def create_book(self, title):
@@ -55,10 +61,12 @@ need to :meth:`~Model.save()`.
                 # do something with the book
                 return book
 
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
             objects = BookManager()
+
 
         book = Book.objects.create_book("Pride and Prejudice")
 
@@ -84,9 +92,12 @@ In addition to creating the new model, the ``from_db()`` method must set the
 ``adding`` and ``db`` flags in the new instance's :attr:`~Model._state` attribute.
 
 Below is an example showing how to record the initial values of fields that
-are loaded from the database::
+are loaded from the database:
+
+.. code-block:: python
 
     from django.db.models import DEFERRED
+
 
     @classmethod
     def from_db(cls, db, field_names, values):
@@ -108,12 +119,14 @@ are loaded from the database::
         )
         return instance
 
+
     def save(self, *args, **kwargs):
         # Check how the current values differ from ._loaded_values. For example,
         # prevent changing the creator_id of the model. (This example doesn't
         # support cases where 'creator_id' is deferred).
         if not self._state.adding and (
-                self.creator_id != self._loaded_values['creator_id']):
+            self.creator_id != self._loaded_values["creator_id"]
+        ):
             raise ValueError("Updating the value of creator isn't allowed")
         super().save(*args, **kwargs)
 
@@ -159,11 +172,13 @@ It is possible to force the set of fields to be loaded by using the ``fields``
 argument.
 
 For example, to test that an ``update()`` call resulted in the expected
-update, you could write a test similar to this::
+update, you could write a test similar to this:
+
+.. code-block:: python
 
     def test_update_result(self):
         obj = MyModel.objects.create(val=1)
-        MyModel.objects.filter(pk=obj.pk).update(val=F('val') + 1)
+        MyModel.objects.filter(pk=obj.pk).update(val=F("val") + 1)
         # At this point obj.val is still 1, but the value in the database
         # was updated to 2. The object's updated value needs to be reloaded
         # from the database.
@@ -173,7 +188,9 @@ update, you could write a test similar to this::
 Note that when deferred fields are accessed, the loading of the deferred
 field's value happens through this method. Thus it is possible to customize
 the way deferred loading happens. The example below shows how one can reload
-all of the instance's fields when a deferred field is reloaded::
+all of the instance's fields when a deferred field is reloaded:
+
+.. code-block:: python
 
     class ExampleModel(models.Model):
         def refresh_from_db(self, using=None, fields=None, **kwargs):
@@ -253,9 +270,12 @@ not be corrected by the user.
 Note that ``full_clean()`` will *not* be called automatically when you call
 your model's :meth:`~Model.save()` method. You'll need to call it manually
 when you want to run one-step model validation for your own manually created
-models. For example::
+models. For example:
+
+.. code-block:: python
 
     from django.core.exceptions import ValidationError
+
     try:
         article.full_clean()
     except ValidationError as e:
@@ -288,21 +308,25 @@ This method should be overridden to perform custom validation on your model.
 This method should be used to provide custom model validation, and to modify
 attributes on your model if desired. For instance, you could use it to
 automatically provide a value for a field, or to do validation that requires
-access to more than a single field::
+access to more than a single field:
+
+.. code-block:: python
 
     import datetime
     from django.core.exceptions import ValidationError
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class Article(models.Model):
         ...
+
         def clean(self):
             # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError(_('Draft entries may not have a publication date.'))
+            if self.status == "draft" and self.pub_date is not None:
+                raise ValidationError(_("Draft entries may not have a publication date."))
             # Set the pub_date for published items if it hasn't been set already.
-            if self.status == 'published' and self.pub_date is None:
+            if self.status == "published" and self.pub_date is None:
                 self.pub_date = datetime.date.today()
 
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
@@ -312,9 +336,12 @@ In the above example, the :exc:`~django.core.exceptions.ValidationError`
 exception raised by ``Model.clean()`` was instantiated with a string, so it
 will be stored in a special error dictionary key,
 :data:`~django.core.exceptions.NON_FIELD_ERRORS`. This key is used for errors
-that are tied to the entire model instead of to a specific field::
+that are tied to the entire model instead of to a specific field:
+
+.. code-block:: python
 
     from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+
     try:
         article.full_clean()
     except ValidationError as e:
@@ -323,23 +350,32 @@ that are tied to the entire model instead of to a specific field::
 To assign exceptions to a specific field, instantiate the
 :exc:`~django.core.exceptions.ValidationError` with a dictionary, where the
 keys are the field names. We could update the previous example to assign the
-error to the ``pub_date`` field::
+error to the ``pub_date`` field:
+
+.. code-block:: python
 
     class Article(models.Model):
         ...
+
         def clean(self):
             # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
+            if self.status == "draft" and self.pub_date is not None:
+                raise ValidationError(
+                    {"pub_date": _("Draft entries may not have a publication date.")}
+                )
             ...
 
 If you detect errors in multiple fields during ``Model.clean()``, you can also
-pass a dictionary mapping field names to errors::
+pass a dictionary mapping field names to errors:
 
-    raise ValidationError({
-        'title': ValidationError(_('Missing title.'), code='required'),
-        'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
-    })
+.. code-block:: python
+
+    raise ValidationError(
+        {
+            "title": ValidationError(_("Missing title."), code="required"),
+            "pub_date": ValidationError(_("Invalid date."), code="invalid"),
+        }
+    )
 
 Then, ``full_clean()`` will check unique constraints on your model.
 
@@ -353,24 +389,28 @@ Then, ``full_clean()`` will check unique constraints on your model.
 
     To work around this dilemma, instead override :meth:`Model.clean_fields()
     <django.db.models.Model.clean_fields>` as it receives the list of fields
-    that are excluded from validation. For example::
+    that are excluded from validation. For example:
+    
+    .. code-block:: python
 
         class Article(models.Model):
             ...
+
             def clean_fields(self, exclude=None):
                 super().clean_fields(exclude=exclude)
-                if self.status == 'draft' and self.pub_date is not None:
-                    if exclude and 'status' in exclude:
+                if self.status == "draft" and self.pub_date is not None:
+                    if exclude and "status" in exclude:
                         raise ValidationError(
-                            _('Draft entries may not have a publication date.')
+                            _("Draft entries may not have a publication date.")
                         )
                     else:
-                        raise ValidationError({
-                            'status': _(
-                                'Set status to draft if there is not a '
-                                'publication date.'
-                             ),
-                        })
+                        raise ValidationError(
+                            {
+                                "status": _(
+                                    "Set status to draft if there is not a " "publication date."
+                                ),
+                            }
+                        )
 
 .. method:: Model.validate_unique(exclude=None)
 
@@ -486,9 +526,11 @@ primary-key value that already exists in the database, Django will assume you're
 changing the existing record rather than creating a new one.
 
 Given the above ``'Cheddar Talk'`` blog example, this example would override the
-previous record in the database::
+previous record in the database:
 
-    b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
+.. code-block:: python
+
+    b4 = Blog(id=3, name="Not Cheddar", tagline="Anything but cheese.")
     b4.save()  # Overrides the previous blog with ID=3!
 
 See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
@@ -751,19 +793,25 @@ instances with a primary key value of ``None`` aren't equal to anything except
 themselves. For proxy models, concrete class is defined as the model's first
 non-proxy parent; for all other models it's simply the model's class.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
+
 
     class MyProxyModel(MyModel):
         class Meta:
             proxy = True
 
+
     class MultitableInherited(MyModel):
         pass
+
 
     # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
@@ -799,7 +847,9 @@ Define a ``get_absolute_url()`` method to tell Django how to calculate the
 canonical URL for an object. To callers, this method should appear to return a
 string that can be used to refer to the object over HTTP.
 
-For example::
+For example:
+
+.. code-block:: python
 
     def get_absolute_url(self):
         return "/people/%i/" % self.id
@@ -808,11 +858,14 @@ While this code is correct and simple, it may not be the most portable way to
 to write this kind of method. The :func:`~django.urls.reverse` function is
 usually the best approach.
 
-For example::
+For example:
+
+.. code-block:: python
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('people-detail', kwargs={'pk' : self.pk})
+
+        return reverse("people-detail", kwargs={"pk": self.pk})
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -827,10 +880,12 @@ URL, you should define ``get_absolute_url()``.
 .. warning::
 
     You should avoid building the URL from unvalidated user input, in order to
-    reduce possibilities of link or redirect poisoning::
+    reduce possibilities of link or redirect poisoning:
+    
+    .. code-block:: python
 
         def get_absolute_url(self):
-            return '/%s/' % self.name
+            return "/%s/" % self.name
 
     If ``self.name`` is ``'/example.com'`` this returns ``'//example.com/'``
     which, in turn, is a valid schema relative URL but not the expected
@@ -878,15 +933,18 @@ For every field that has :attr:`~django.db.models.Field.choices` set, the
 object will have a ``get_FOO_display()`` method, where ``FOO`` is the name of
 the field. This method returns the "human-readable" value of the field.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class Person(models.Model):
         SHIRT_SIZES = [
-            ('S', 'Small'),
-            ('M', 'Medium'),
-            ('L', 'Large'),
+            ("S", "Small"),
+            ("M", "Medium"),
+            ("L", "Large"),
         ]
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)

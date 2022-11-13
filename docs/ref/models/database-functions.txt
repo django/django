@@ -125,21 +125,25 @@ Accepts a list of at least two field names or expressions and returns the
 greatest value. Each argument must be of a similar type, so mixing text and
 numbers will result in a database error.
 
-Usage example::
+Usage example:
 
-    class Blog(models.Model):
-        body = models.TextField()
-        modified = models.DateTimeField(auto_now=True)
+.. code-block:: pycon
 
-    class Comment(models.Model):
-        body = models.TextField()
-        modified = models.DateTimeField(auto_now=True)
-        blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    >>> class Blog(models.Model):
+    ...     body = models.TextField()
+    ...     modified = models.DateTimeField(auto_now=True)
+    ...
+
+    >>> class Comment(models.Model):
+    ...     body = models.TextField()
+    ...     modified = models.DateTimeField(auto_now=True)
+    ...     blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    ...
 
     >>> from django.db.models.functions import Greatest
-    >>> blog = Blog.objects.create(body='Greatest is the best.')
-    >>> comment = Comment.objects.create(body='No, Least is better.', blog=blog)
-    >>> comments = Comment.objects.annotate(last_updated=Greatest('modified', 'blog__modified'))
+    >>> blog = Blog.objects.create(body="Greatest is the best.")
+    >>> comment = Comment.objects.create(body="No, Least is better.", blog=blog)
+    >>> comments = Comment.objects.annotate(last_updated=Greatest("modified", "blog__modified"))
     >>> annotated_comment = comments.get()
 
 ``annotated_comment.last_updated`` will be the most recent of ``blog.modified``
@@ -301,7 +305,7 @@ returned when this timezone is active will be the same as above except for:
 
 Each ``lookup_name`` above has a corresponding ``Extract`` subclass (listed
 below) that should typically be used instead of the more verbose equivalent,
-e.g. use ``ExtractYear(...)`` rather than ``Extract(..., lookup_name='year')``.
+e.g. use ``ExtractYear(...)`` rather than ``Extract(..., lookup_name="year")``.
 
 Usage example:
 
