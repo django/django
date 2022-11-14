@@ -514,14 +514,13 @@ class Query(BaseExpression):
             # and move them to the outer AggregateQuery.
             col_cnt = 0
             for alias, expression in list(inner_query.annotation_select.items()):
+                if not expression.is_summary:
+                    continue
                 annotation_select_mask = inner_query.annotation_select_mask
-                if expression.is_summary:
-                    expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
-                    outer_query.annotations[alias] = expression.relabeled_clone(
-                        relabels
-                    )
-                    del inner_query.annotations[alias]
-                    annotation_select_mask.remove(alias)
+                expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
+                outer_query.annotations[alias] = expression.relabeled_clone(relabels)
+                del inner_query.annotations[alias]
+                annotation_select_mask.remove(alias)
                 # Make sure the annotation_select wont use cached results.
                 inner_query.set_annotation_mask(inner_query.annotation_select_mask)
             if (
