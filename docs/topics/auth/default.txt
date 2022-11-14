@@ -565,8 +565,8 @@ The ``login_required`` decorator
 
 .. currentmodule:: django.contrib.auth.mixins
 
-The ``LoginRequired`` mixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``LoginRequiredMixin`` mixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using :doc:`class-based views </topics/class-based-views/index>`, you can
 achieve the same behavior as with ``login_required`` by using the
