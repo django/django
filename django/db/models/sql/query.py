@@ -443,7 +443,7 @@ class Query(BaseExpression):
             return {}
         existing_annotations = {
             alias: annotation
-            for alias, annotation in self.annotation_select.items()
+            for alias, annotation in self.annotations.items()
             if alias not in added_aggregate_names
         }
         # Existing usage of aggregation can be determined by the presence of
