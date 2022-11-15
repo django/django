@@ -441,11 +441,11 @@ class SQLCompiler:
                     # Add column used in ORDER BY clause to the selected
                     # columns and to each combined query.
                     order_by_idx = len(self.query.select) + 1
-                    col_name = f"__orderbycol{order_by_idx}"
+                    col_alias = f"__orderbycol{order_by_idx}"
                     for q in self.query.combined_queries:
-                        q.add_annotation(expr_src, col_name)
-                    self.query.add_select_col(resolved, col_name)
-                    resolved.set_source_expressions([RawSQL(f"{order_by_idx}", ())])
+                        q.add_annotation(expr_src, col_alias)
+                    self.query.add_select_col(resolved, col_alias)
+                    resolved.set_source_expressions([Ref(col_alias, src)])
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
