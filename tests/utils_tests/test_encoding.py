@@ -14,6 +14,7 @@ from django.utils.encoding import (
     force_str,
     get_system_encoding,
     iri_to_uri,
+    punycode,
     repercent_broken_unicode,
     smart_bytes,
     smart_str,
@@ -21,6 +22,12 @@ from django.utils.encoding import (
 )
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy
+
+try:
+    # try importing idna package for IDNA 2008 compliance
+    import idna
+except ImportError:
+    idna = None
 
 
 class TestEncodingUtils(SimpleTestCase):
@@ -218,3 +225,32 @@ class TestRFC3987IEncodingUtils(unittest.TestCase):
         for uri, expected in cases:
             with self.subTest(uri):
                 self.assertEqual(escape_uri_path(uri), expected)
+
+
+class TestPunycodeEncoding(unittest.TestCase):
+    def test_valid_punycode(self):
+        self.assertIsNone(punycode(None))
+        self.assertEqual(punycode(""), "")
+
+        cases = [
+            ("xn----f38am99bqvcd5liy1cxsg.test", "xn----f38am99bqvcd5liy1cxsg.test"),
+            ("test.xn--rhqv96g", "test.xn--rhqv96g"),
+            ("test.شبك", "test.xn--ngbx0c"),
+            ("普遍接受-测试.top", "xn----f38am99bqvcd5liy1cxsg.top"),
+            ("मेल.डाटामेल.भारत", "xn--r2bi6d.xn--c2bd4bq1db8d.xn--h2brj9c"),
+            ("fußball.de", "xn--fuball-cta.de" if idna else "fussball.de"),
+        ]
+
+        for ulabel, alabel in cases:
+            with self.subTest(ulabel):
+                self.assertEqual(punycode(ulabel), alabel)
+
+    def test_invalid_punycode(self):
+        cases = [".test.top"]
+        if idna:
+            cases += ["in--valid", "\\u0557w.test"]
+
+        for label in cases:
+            with self.subTest(label):
+                with self.assertRaises(UnicodeError):
+                    punycode(label)
