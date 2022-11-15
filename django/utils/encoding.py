@@ -6,6 +6,12 @@ from urllib.parse import quote
 
 from django.utils.functional import Promise
 
+try:
+    # try importing idna package for IDNA 2008 compliance
+    import idna
+except ImportError:
+    idna = None
+
 
 class DjangoUnicodeDecodeError(UnicodeDecodeError):
     def __init__(self, obj, *args):
@@ -213,17 +219,15 @@ def punycode(domain):
     """Return the Punycode of the given domain if it's non-ASCII."""
     if not domain:
         return domain
-    try:
-        # try importing idna package for IDNA 2008 compliance
-        import idna
+    if idna:
+        try:
+            # enable uts46 mapping for mapping: uppercase letters, normalization, etc.
+            return idna.encode(domain, uts46=True, transitional=False).decode("ascii")
+        except idna.IDNAError as e:
+            raise UnicodeError(e) from e
 
-        # enable uts46 mapping for mapping: uppercase letters, normalization, etc.
-        return idna.encode(domain, uts46=True, transitional=False).decode("ascii")
-    except ImportError:
-        # will fall back to Python IDNA 2003
-        return domain.encode("idna").decode("ascii")
-    except idna.IDNAError as e:
-        raise UnicodeError(e) from e
+    # will fall back to Python IDNA 2003
+    return domain.encode("idna").decode("ascii")
 
 
 def repercent_broken_unicode(path):
