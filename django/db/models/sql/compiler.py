@@ -424,25 +424,34 @@ class SQLCompiler:
                 src = resolved.expression
                 expr_src = expr.expression
                 for sel_expr, _, col_alias in self.select:
-                    if col_alias and not (
-                        isinstance(expr_src, F) and col_alias == expr_src.name
-                    ):
-                        continue
                     if src == sel_expr:
+                        # When values() is used the exact alias must be used to
+                        # reference annotations.
+                        if (
+                            self.query.has_select_fields
+                            and col_alias in self.query.annotation_select
+                            and not (
+                                isinstance(expr_src, F) and col_alias == expr_src.name
+                            )
+                        ):
+                            continue
                         resolved.set_source_expressions(
                             [Ref(col_alias if col_alias else src.target.column, src)]
                         )
                         break
                 else:
-                    if col_alias:
-                        raise DatabaseError(
-                            "ORDER BY term does not match any column in the result set."
-                        )
                     # Add column used in ORDER BY clause to the selected
                     # columns and to each combined query.
                     order_by_idx = len(self.query.select) + 1
                     col_alias = f"__orderbycol{order_by_idx}"
                     for q in self.query.combined_queries:
+                        # If fields were explicitly selected through values()
+                        # combined queries cannot be augmented.
+                        if q.has_select_fields:
+                            raise DatabaseError(
+                                "ORDER BY term does not match any column in "
+                                "the result set."
+                            )
                         q.add_annotation(expr_src, col_alias)
                     self.query.add_select_col(resolved, col_alias)
                     resolved.set_source_expressions([Ref(col_alias, src)])
@@ -540,7 +549,7 @@ class SQLCompiler:
                             *self.query.annotation_select,
                         )
                     )
-                part_sql, part_args = compiler.as_sql()
+                part_sql, part_args = compiler.as_sql(with_col_aliases=True)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
@@ -688,8 +697,9 @@ class SQLCompiler:
         """
         refcounts_before = self.query.alias_refcount.copy()
         try:
+            combinator = self.query.combinator
             extra_select, order_by, group_by = self.pre_sql_setup(
-                with_col_aliases=with_col_aliases,
+                with_col_aliases=with_col_aliases or bool(combinator),
             )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
