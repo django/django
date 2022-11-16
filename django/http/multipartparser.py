@@ -666,7 +666,7 @@ def parse_boundary_stream(stream, max_header_size):
     # well as throwing away the CRLFCRLF bytes from above.
     stream.unget(chunk[header_end + 4 :])
 
-    TYPE = RAW
+    item_type = RAW
     outdict = {}
 
     # Eliminate blank lines
@@ -681,16 +681,16 @@ def parse_boundary_stream(stream, max_header_size):
             continue
 
         if name == "content-disposition":
-            TYPE = FIELD
+            item_type = FIELD
             if params.get("filename"):
-                TYPE = FILE
+                item_type = FILE
 
         outdict[name] = value, params
 
-    if TYPE == RAW:
+    if item_type == RAW:
         stream.unget(chunk)
 
-    return (TYPE, outdict, stream)
+    return (item_type, outdict, stream)
 
 
 class Parser:
