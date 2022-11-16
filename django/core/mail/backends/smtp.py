@@ -7,6 +7,7 @@ from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import sanitize_address
 from django.core.mail.utils import DNS_NAME
+from django.utils.functional import cached_property
 
 
 class EmailBackend(BaseEmailBackend):
@@ -54,6 +55,13 @@ class EmailBackend(BaseEmailBackend):
     def connection_class(self):
         return smtplib.SMTP_SSL if self.use_ssl else smtplib.SMTP
 
+    @cached_property
+    def ssl_context(self):
+        ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_CLIENT)
+        if self.ssl_certfile or self.ssl_keyfile:
+            ssl_context.load_cert_chain(self.ssl_certfile, self.ssl_keyfile)
+        return ssl_context
+
     def open(self):
         """
         Ensure an open connection to the email server. Return whether or not a
@@ -70,12 +78,7 @@ class EmailBackend(BaseEmailBackend):
         if self.timeout is not None:
             connection_params["timeout"] = self.timeout
         if self.use_ssl:
-            connection_params.update(
-                {
-                    "keyfile": self.ssl_keyfile,
-                    "certfile": self.ssl_certfile,
-                }
-            )
+            connection_params["context"] = self.ssl_context
         try:
             self.connection = self.connection_class(
                 self.host, self.port, **connection_params
@@ -84,9 +87,7 @@ class EmailBackend(BaseEmailBackend):
             # TLS/SSL are mutually exclusive, so only attempt TLS over
             # non-secure connections.
             if not self.use_ssl and self.use_tls:
-                self.connection.starttls(
-                    keyfile=self.ssl_keyfile, certfile=self.ssl_certfile
-                )
+                self.connection.starttls(context=self.ssl_context)
             if self.username and self.password:
                 self.connection.login(self.username, self.password)
             return True
