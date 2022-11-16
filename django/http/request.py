@@ -198,8 +198,7 @@ class HttpRequest:
         except KeyError:
             if default is not RAISE_ERROR:
                 return default
-            else:
-                raise
+            raise
         try:
             value = signing.get_cookie_signer(salt=key + salt).unsign(
                 cookie_value, max_age=max_age
@@ -207,8 +206,7 @@ class HttpRequest:
         except signing.BadSignature:
             if default is not RAISE_ERROR:
                 return default
-            else:
-                raise
+            raise
         return value
 
     def build_absolute_uri(self, location=None):
