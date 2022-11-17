@@ -414,22 +414,15 @@ class TestQuerying(PostgreSQLTestCase):
             [obj_1, obj_2],
         )
 
-    def test_overlap_values_array_field(self):
-        # issue 26056
-        post1 = CharArrayModel(field=["django"])
-        post2 = CharArrayModel(field=["thoughts"])
-        post3 = CharArrayModel(field=["tutorial"])
-        CharArrayModel.objects.bulk_create([post1, post2, post3])
-        qs = CharArrayModel.objects.filter(
-            field__overlap=CharArrayModel.objects.values_list("field", flat=True)
+    def test_overlap_values_list(self):
+        values = NullableIntegerArrayModel.objects.filter(order__lt=3).values_list(
+            "field"
         )
-        self.assertSequenceEqual(
-            qs.values_list("field", flat=True),
-            [
-                (["django"]),
-                (["thoughts"]),
-                (["tutorial"]),
-            ],
+        self.assertCountEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__overlap=values,
+            ),
+            self.objs[:3],
         )
 
     def test_lookups_autofield_array(self):

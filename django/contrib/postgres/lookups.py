@@ -1,6 +1,6 @@
 from django.db.models import Transform
 from django.db.models.lookups import PostgresOperatorLookup
-from django.db.models.sql.compiler import Query
+from django.db.models.sql.query import Query
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
@@ -19,13 +19,12 @@ class Overlap(PostgresOperatorLookup):
     lookup_name = "overlap"
     postgres_operator = "&&"
 
-    def process_rhs(self, qn, connection):
-        if isinstance(self.rhs, Query):
-            from .expressions import ArraySubquery
+    def get_prep_lookup(self):
+        from .expressions import ArraySubquery
 
+        if isinstance(self.rhs, Query):
             self.rhs = ArraySubquery(self.rhs)
-        rhs, params = super().process_rhs(qn, connection)
-        return rhs, params
+        return super().get_prep_lookup()
 
 
 class HasKey(PostgresOperatorLookup):

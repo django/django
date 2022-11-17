@@ -170,13 +170,16 @@ Returns objects where the data shares any results with the values passed. Uses
 the SQL operator ``&&``. For example::
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+    >>> Post.objects.create(name='Second post', tags=['thoughts', 'tutorial'])
     >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
 
     >>> Post.objects.filter(tags__overlap=['thoughts'])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
     >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
+    <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
+
+    >>> Post.objects.filter(tags__overlap=Post.objects.values_list('tags'))
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.len
