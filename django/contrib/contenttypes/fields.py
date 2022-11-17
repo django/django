@@ -461,7 +461,7 @@ class GenericRelation(ForeignObject):
                 to_opts=opts,
                 target_fields=(opts.pk,),
                 join_field=self,
-                m2m=not self.unique,
+                m2m=False,
                 direct=False,
                 filtered_relation=filtered_relation,
             )
