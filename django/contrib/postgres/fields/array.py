@@ -195,7 +195,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def slice_expression(self, expression, start, length):
         # If length is not provided, don't specify an end to slice to the end
         # of the array.
-        end = None if length is None else start + length - 1
+        end = "" if length is None else start + length - 1
         return SliceTransform(start, end, expression)
 
     def validate(self, value, model_instance):
@@ -356,11 +356,10 @@ class SliceTransform(Transform):
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
         # self.start is set to 1 if slice start is not provided
-        # breakpoint()
-        if self.end is None:
+        if self.end:
             return f"{lhs}[%s:%s]", params + [self.start, self.end]
         else:
-            return f"{lhs}[%s:%s]", params + [self.start, self.end]
+            return f"{lhs}[%s:]", params + [self.start]
 
 
 class SliceTransformFactory:
