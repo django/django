@@ -111,6 +111,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        else:
+            skips.update(
+                {
+                    "Only connections to in-memory SQLite databases are passed to the "
+                    "server thread.": {
+                        "servers.tests.LiveServerInMemoryDatabaseLockTest."
+                        "test_in_memory_database_lock",
+                    },
+                }
+            )
         return skips
 
     @cached_property
