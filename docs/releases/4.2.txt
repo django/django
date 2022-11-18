@@ -247,6 +247,11 @@ Models
   set of related objects, using an ``a`` prefix: :meth:`~.RelatedManager.aadd`,
   :meth:`~.RelatedManager.aclear`, :meth:`~.RelatedManager.aremove`, and
   :meth:`~.RelatedManager.aset`.
+* :class:`F() <django.db.models.F>` and
+  :class:`OuterRef() <django.db.models.OuterRef>` expressions now support
+  :ref:`slicing <slicing-using-f>` for ``CharField``, ``EmailField``,
+  ``SlugField``, ``URLField``, ``TextField``, and
+  ``django.contrib.postgres.fields.ArrayField``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~

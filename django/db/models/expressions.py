@@ -816,6 +816,9 @@ class F(Combinable):
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.name)
 
+    def __getitem__(self, subscript):
+        return SliceableF(self, subscript)
+
     def resolve_expression(
         self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
     ):
@@ -882,6 +885,66 @@ class OuterRef(F):
 
     def relabeled_clone(self, relabels):
         return self
+
+
+class SliceableF(F):
+    """
+    An object that contains a slice of an F expression.
+    Object resolves the column on which the slicing is applied, and then
+    applies the slicing if possible.
+    """
+
+    def __init__(self, obj, subscript):
+        self.name = obj.name
+        self.c = obj
+        if hasattr(obj, "relabeled_clone"):
+            self.is_outerref = True
+        else:
+            self.is_outerref = False
+        if isinstance(subscript, int):
+            if subscript < 0:
+                raise ValueError("Negative indexing is not supported.")
+            self.start = subscript + 1
+            self.length = 1
+        elif isinstance(subscript, slice):
+            if (subscript.start is not None and subscript.start < 0) or (
+                subscript.stop is not None and subscript.stop < 0
+            ):
+                raise ValueError("Negative indexing is not supported.")
+            if subscript.step is not None:
+                raise ValueError("Step argument is not supported.")
+            if subscript.stop and subscript.start and subscript.stop < subscript.start:
+                raise ValueError("Slice stop must be greater than slice start.")
+            self.start = 1 if subscript.start is None else subscript.start + 1
+            if subscript.stop is None:
+                self.length = None
+            else:
+                self.length = subscript.stop - (subscript.start or 0)
+        else:
+            raise TypeError("Argument to slice must be either int or slice instance.")
+
+    def __repr__(self):
+        start = self.start - 1
+        stop = None if self.length is None else start + self.length
+        subscript = slice(start, stop)
+        return f"{self.__class__.__qualname__}({self.name!r}, {subscript!r})"
+
+    def resolve_expression(
+        self,
+        query=None,
+        allow_joins=True,
+        reuse=None,
+        summarize=False,
+        for_save=False,
+    ):
+        if self.is_outerref:
+            resolved = query.resolve_ref(self.name, allow_joins, reuse, summarize)
+            return resolved.output_field.slice_expression(
+                self.c, self.start, self.length
+            )
+
+        resolved = query.resolve_ref(self.name, allow_joins, reuse, summarize)
+        return resolved.output_field.slice_expression(resolved, self.start, self.length)
 
 
 @deconstructible(path="django.db.models.Func")

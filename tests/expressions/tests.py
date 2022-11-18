@@ -84,6 +84,7 @@ from .models import (
     RemoteEmployee,
     Result,
     SimulationRun,
+    Text,
     Time,
 )
 
@@ -204,6 +205,109 @@ class BasicExpressionsTests(TestCase):
                 {"num_chairs": 32, "name": "Test GmbH", "num_employees": 32},
             ],
         )
+
+    def _test_slicing_of_f_expressions(self, model):
+        tests = [
+            (F("name")[:], "Example Inc.", "Example Inc."),
+            (F("name")[:7], "Example Inc.", "Example"),
+            (F("name")[0], "Example", "E"),
+            (F("name")[5], "E", ""),
+            (F("name")[7:], "Foobar Ltd.", "Ltd."),
+            (F("name")[0:10], "Ltd.", "Ltd."),
+            (F("name")[2:7], "Test GmbH", "st Gm"),
+            (F("name")[2:2], "st Gm", ""),
+        ]
+        for expression, name, expected in tests:
+            with self.subTest(expression=expression, name=name, expected=expected):
+                obj = model.objects.get(name=name)
+                obj.name = expression
+                obj.save()
+                obj.refresh_from_db()
+                self.assertEqual(obj.name, expected)
+
+    def test_slicing_of_f_expressions_charfield(self):
+        self._test_slicing_of_f_expressions(Company)
+
+    def test_slicing_of_f_expressions_textfield(self):
+        Text.objects.bulk_create(
+            [Text(name=company.name) for company in Company.objects.all()]
+        )
+        self._test_slicing_of_f_expressions(Text)
+
+    def test_slicing_of_f_expressions_with_annotate(self):
+        qs = Company.objects.annotate(
+            first_three=F("name")[:3],
+            after_three=F("name")[3:],
+            random_four=F("name")[2:5],
+            first_letter_slice=F("name")[:1],
+            first_letter_index=F("name")[0],
+        )
+        tests = [
+            ("first_three", ["Exa", "Foo", "Tes"]),
+            ("after_three", ["mple Inc.", "bar Ltd.", "t GmbH"]),
+            ("random_four", ["amp", "oba", "st "]),
+            ("first_letter_slice", ["E", "F", "T"]),
+            ("first_letter_index", ["E", "F", "T"]),
+        ]
+        for annotation, expected in tests:
+            with self.subTest(annotation):
+                self.assertCountEqual(qs.values_list(annotation, flat=True), expected)
+
+    def test_slicing_of_f_expression_with_annotated_expression(self):
+        qs = Company.objects.annotate(
+            new_name=Case(
+                When(based_in_eu=True, then=Concat(Value("EU:"), F("name"))),
+                default=F("name"),
+            ),
+            first_two=F("new_name")[:3],
+        )
+        self.assertCountEqual(
+            qs.values_list("first_two", flat=True),
+            ["Exa", "EU:", "Tes"],
+        )
+
+    def test_slicing_of_f_expressions_with_negative_index(self):
+        msg = "Negative indexing is not supported."
+        indexes = [slice(0, -4), slice(-4, 0), slice(-4), -5]
+        for i in indexes:
+            with self.subTest(i=i), self.assertRaisesMessage(ValueError, msg):
+                F("name")[i]
+
+    def test_slicing_of_f_expressions_with_slice_stop_less_than_slice_start(self):
+        msg = "Slice stop must be greater than slice start."
+        with self.assertRaisesMessage(ValueError, msg):
+            F("name")[4:2]
+
+    def test_slicing_of_f_expressions_with_invalid_type(self):
+        msg = "Argument to slice must be either int or slice instance."
+        with self.assertRaisesMessage(TypeError, msg):
+            F("name")["error"]
+
+    def test_slicing_of_f_expressions_with_step(self):
+        msg = "Step argument is not supported."
+        with self.assertRaisesMessage(ValueError, msg):
+            F("name")[::4]
+
+    def test_slicing_of_f_unsupported_field(self):
+        msg = "This field does not support slicing."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            Company.objects.update(num_chairs=F("num_chairs")[:4])
+
+    def test_slicing_of_outerref(self):
+        test_object = Company.objects.create(
+            name="Stark Systems",
+            num_employees=39,
+            num_chairs=5,
+            ceo=Employee.objects.create(firstname="Jason", lastname="Smith", salary=10),
+        )
+        qs = Company.objects.filter(
+            Exists(
+                Company.objects.annotate(seventh_letter=F("name")[6]).filter(
+                    seventh_letter=OuterRef("name")[0],
+                )
+            )
+        )
+        self.assertSequenceEqual(qs, [test_object])
 
     def test_arithmetic(self):
         # We can perform arithmetic operations in expressions
@@ -2302,6 +2406,9 @@ class ReprTests(SimpleTestCase):
         self.assertEqual(
             repr(Func("published", function="TO_CHAR")),
             "Func(F(published), function=TO_CHAR)",
+        )
+        self.assertEqual(
+            repr(F("published")[0:2]), "SliceableF('published', slice(0, 2, None))"
         )
         self.assertEqual(repr(OrderBy(Value(1))), "OrderBy(Value(1), descending=False)")
         self.assertEqual(repr(RawSQL("table.col", [])), "RawSQL(table.col, [])")

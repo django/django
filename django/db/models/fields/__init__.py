@@ -15,6 +15,7 @@ from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
+from django.db.utils import NotSupportedError
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
@@ -1057,6 +1058,10 @@ class Field(RegisterLookupMixin):
         """Return the value of this field in the given model instance."""
         return getattr(obj, self.attname)
 
+    def slice_expression(self, expression, start, length):
+        """Return a slice of this field."""
+        raise NotSupportedError("This field does not support slicing.")
+
 
 class BooleanField(Field):
     empty_strings_allowed = False
@@ -1205,6 +1210,11 @@ class CharField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class CommaSeparatedIntegerField(CharField):
@@ -2394,6 +2404,11 @@ class TextField(Field):
         if self.db_collation:
             kwargs["db_collation"] = self.db_collation
         return name, path, args, kwargs
+
+    def slice_expression(self, expression, start, length):
+        from django.db.models.functions import Substr
+
+        return Substr(expression, start, length)
 
 
 class TimeField(DateTimeCheckMixin, Field):
