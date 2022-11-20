@@ -40,6 +40,16 @@ in the future.
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg library: https://pypi.org/project/psycopg/
 
+Mitigation for the BREACH attack
+--------------------------------
+
+:class:`~django.middleware.gzip.GZipMiddleware` now includes a mitigation for
+the BREACH attack. It will add up to 100 random bytes to gzip responses to make
+BREACH attacks harder. Read more about the mitigation technique in the `Heal
+The Breach (HTB) paper`_.
+
+.. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
+
 Minor features
 --------------
 
