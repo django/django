@@ -13,6 +13,8 @@ class GZipMiddleware(MiddlewareMixin):
     on the Accept-Encoding header.
     """
 
+    max_random_bytes = 100
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if not response.streaming and len(response.content) < 200:
@@ -31,11 +33,17 @@ class GZipMiddleware(MiddlewareMixin):
         if response.streaming:
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
-            response.streaming_content = compress_sequence(response.streaming_content)
+            response.streaming_content = compress_sequence(
+                response.streaming_content,
+                max_random_bytes=self.max_random_bytes,
+            )
             del response.headers["Content-Length"]
         else:
             # Return the compressed content only if it's actually shorter.
-            compressed_content = compress_string(response.content)
+            compressed_content = compress_string(
+                response.content,
+                max_random_bytes=self.max_random_bytes,
+            )
             if len(compressed_content) >= len(response.content):
                 return response
             response.content = compressed_content
