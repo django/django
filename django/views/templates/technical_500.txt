@@ -34,7 +34,7 @@ Traceback (most recent call last):
 {% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}
 {% endfor %}
 {% if exception_type %}Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
-{% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% endif %}{% endif %}
+{% if exception_value %}Exception Value: {{ exception_value }}{% endif %}{% if exception_notes %}{{ exception_notes }}{% endif %}{% endif %}{% endif %}
 {% if raising_view_name %}Raised during: {{ raising_view_name }}{% endif %}
 {% if request %}Request information:
 {% if user_str %}USER: {{ user_str }}{% endif %}

@@ -7,7 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf
+from unittest import mock, skipIf, skipUnless
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -22,6 +22,7 @@ from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
+from django.utils.version import PY311
 from django.views.debug import (
     CallableSettingWrapper,
     ExceptionCycleWarning,
@@ -656,6 +657,40 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(
             "During handling of the above exception (My context), another "
             "exception occurred",
+            text,
+        )
+
+    @skipUnless(PY311, "Exception notes were added in Python 3.11.")
+    def test_exception_with_notes(self):
+        request = self.rf.get("/test_view/")
+        try:
+            try:
+                raise RuntimeError("Oops")
+            except Exception as err:
+                err.add_note("First Note")
+                err.add_note("Second Note")
+                err.add_note(mark_safe("<script>alert(1);</script>"))
+                raise err
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn(
+            '<pre class="exception_value">Oops\nFirst Note\nSecond Note\n'
+            "&lt;script&gt;alert(1);&lt;/script&gt;</pre>",
+            html,
+        )
+        self.assertIn(
+            "Exception Value: Oops\nFirst Note\nSecond Note\n"
+            "&lt;script&gt;alert(1);&lt;/script&gt;",
+            html,
+        )
+
+        text = reporter.get_traceback_text()
+        self.assertIn(
+            "Exception Value: Oops\nFirst Note\nSecond Note\n"
+            "<script>alert(1);</script>",
             text,
         )
 

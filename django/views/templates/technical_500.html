@@ -100,7 +100,7 @@
 <div id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
       {% if request %} at {{ request.path_info }}{% endif %}</h1>
-  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
+  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
     <tr>
@@ -330,7 +330,7 @@ During handling of the above exception ({{ frame.exc_cause|force_escape }}), ano
 {% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}{% endfor %}
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
-Exception Value: {{ exception_value|force_escape }}
+Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}
 </textarea>
   <br><br>
   <input type="submit" value="Share this traceback on a public website">
