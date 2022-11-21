@@ -1,3 +1,4 @@
+{
 Thanks for downloading Django.
 
 To install it, make sure you have Python 3.8 or greater installed. Then run
@@ -6,3 +7,4 @@ this command from the command prompt:
     python -m pip install .
 
 For more detailed instructions, see docs/intro/install.txt.
+}
