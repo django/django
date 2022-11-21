@@ -10,8 +10,7 @@ class SuccessMessageMixin:
 
     def form_valid(self, form):
         response = super().form_valid(form)
-        success_message = self.get_success_message(form.cleaned_data)
-        if success_message:
+        if success_message := self.get_success_message(form.cleaned_data):
             messages.success(self.request, success_message)
         return response
 

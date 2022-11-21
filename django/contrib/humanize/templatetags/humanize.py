@@ -77,10 +77,7 @@ def intcomma(value, use_l10n=True):
             return number_format(value, use_l10n=True, force_grouping=True)
     orig = str(value)
     new = re.sub(r"^(-?\d+)(\d{3})", r"\g<1>,\g<2>", orig)
-    if orig == new:
-        return new
-    else:
-        return intcomma(new, use_l10n)
+    return new if orig == new else intcomma(new, use_l10n)
 
 
 # A tuple of standard large number to their converters
@@ -152,19 +149,21 @@ def apnumber(value):
         value = int(value)
     except (TypeError, ValueError):
         return value
-    if not 0 < value < 10:
-        return value
     return (
-        _("one"),
-        _("two"),
-        _("three"),
-        _("four"),
-        _("five"),
-        _("six"),
-        _("seven"),
-        _("eight"),
-        _("nine"),
-    )[value - 1]
+        (
+            _("one"),
+            _("two"),
+            _("three"),
+            _("four"),
+            _("five"),
+            _("six"),
+            _("seven"),
+            _("eight"),
+            _("nine"),
+        )[value - 1]
+        if 0 < value < 10
+        else value
+    )
 
 
 # Perform the comparison in the default time zone when USE_TZ = True

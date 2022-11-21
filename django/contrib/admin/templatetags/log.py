@@ -57,11 +57,10 @@ def get_admin_log(parser, token):
         raise template.TemplateSyntaxError(
             "Second argument to 'get_admin_log' must be 'as'"
         )
-    if len(tokens) > 4:
-        if tokens[4] != "for_user":
-            raise template.TemplateSyntaxError(
-                "Fourth argument to 'get_admin_log' must be 'for_user'"
-            )
+    if len(tokens) > 4 and tokens[4] != "for_user":
+        raise template.TemplateSyntaxError(
+            "Fourth argument to 'get_admin_log' must be 'for_user'"
+        )
     return AdminLogNode(
         limit=tokens[1],
         varname=tokens[3],

@@ -127,7 +127,7 @@ class Command(BaseCommand):
             for k, v in options.items()
             if k in get_func_args(_ogrinspect) and v is not None
         }
-        output = [s for s in _ogrinspect(ds, model_name, **ogr_options)]
+        output = list(_ogrinspect(ds, model_name, **ogr_options))
 
         if options["mapping"]:
             # Constructing the keyword arguments for `mapping`, and
@@ -145,11 +145,11 @@ class Command(BaseCommand):
                 [
                     "",
                     "",
-                    "# Auto-generated `LayerMapping` dictionary for %s model"
-                    % model_name,
+                    f"# Auto-generated `LayerMapping` dictionary for {model_name} model",
                     "%s_mapping = {" % model_name.lower(),
                 ]
             )
+
             output.extend(
                 "    '%s': '%s'," % (rev_mapping[ogr_fld], ogr_fld)
                 for ogr_fld in ds[options["layer_key"]].fields

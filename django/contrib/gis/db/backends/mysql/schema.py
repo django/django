@@ -73,7 +73,7 @@ class MySQLGISSchemaEditor(DatabaseSchemaEditor):
         super().remove_field(model, field)
 
     def _create_spatial_index_name(self, model, field):
-        return "%s_%s_id" % (model._meta.db_table, field.column)
+        return f"{model._meta.db_table}_{field.column}_id"
 
     def create_spatial_indexes(self):
         for sql in self.geometry_sql:

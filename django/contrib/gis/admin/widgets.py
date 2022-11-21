@@ -66,7 +66,7 @@ class OpenLayersWidget(Textarea):
         # note: we must switch out dashes for underscores since js
         # functions are created using the module variable
         js_safe_name = self.params["name"].replace("-", "_")
-        self.params["module"] = "geodjango_%s" % js_safe_name
+        self.params["module"] = f"geodjango_{js_safe_name}"
 
         if value:
             # Transforming the geometry to the projection used on the
@@ -99,7 +99,7 @@ class OpenLayersWidget(Textarea):
         """Build the map options hash for the OpenLayers template."""
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
-            return "new OpenLayers.Bounds(%s)" % extent
+            return f"new OpenLayers.Bounds({extent})"
 
         def ol_projection(srid):
             return 'new OpenLayers.Projection("EPSG:%s")' % srid

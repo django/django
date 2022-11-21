@@ -104,9 +104,9 @@ class AutocompleteJsonView(BaseListView):
         # Validate suitability of objects.
         if not model_admin.get_search_fields(request):
             raise Http404(
-                "%s must have search_fields for the autocomplete_view."
-                % type(model_admin).__qualname__
+                f"{type(model_admin).__qualname__} must have search_fields for the autocomplete_view."
             )
+
 
         to_field_name = getattr(
             source_field.remote_field, "field_name", remote_model._meta.pk.attname

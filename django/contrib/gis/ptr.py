@@ -19,7 +19,7 @@ class CPointerBase:
         if self._ptr:
             return self._ptr
         raise self.null_ptr_exception_class(
-            "NULL %s pointer encountered." % self.__class__.__name__
+            f"NULL {self.__class__.__name__} pointer encountered."
         )
 
     @ptr.setter
@@ -27,7 +27,7 @@ class CPointerBase:
         # Only allow the pointer to be set with pointers of the compatible
         # type or None (NULL).
         if not (ptr is None or isinstance(ptr, self.ptr_type)):
-            raise TypeError("Incompatible pointer type: %s." % type(ptr))
+            raise TypeError(f"Incompatible pointer type: {type(ptr)}.")
         self._ptr = ptr
 
     def __del__(self):

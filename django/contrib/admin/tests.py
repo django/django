@@ -136,7 +136,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         """
         from selenium.webdriver.common.by import By
 
-        self.selenium.get("%s%s" % (self.live_server_url, login_url))
+        self.selenium.get(f"{self.live_server_url}{login_url}")
         username_input = self.selenium.find_element(By.NAME, "username")
         username_input.send_keys(username)
         password_input = self.selenium.find_element(By.NAME, "password")
@@ -187,9 +187,7 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
 
         if values:
             options = self.selenium.find_elements(By.CSS_SELECTOR, options_selector)
-            actual_values = []
-            for option in options:
-                actual_values.append(option.get_attribute("value"))
+            actual_values = [option.get_attribute("value") for option in options]
             self.assertEqual(values, actual_values)
         else:
             # Prevent the `find_elements(By.CSS_SELECTOR, …)` call from blocking
@@ -207,14 +205,14 @@ class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
         Assert that the <SELECT> widget identified by `selector` has the
         options with the given `values`.
         """
-        self._assertOptionsValues("%s > option" % selector, values)
+        self._assertOptionsValues(f"{selector} > option", values)
 
     def assertSelectedOptions(self, selector, values):
         """
         Assert that the <SELECT> widget identified by `selector` has the
         selected options with the given `values`.
         """
-        self._assertOptionsValues("%s > option:checked" % selector, values)
+        self._assertOptionsValues(f"{selector} > option:checked", values)
 
     def has_css_class(self, selector, klass):
         """

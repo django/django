@@ -41,8 +41,9 @@ class Feature(GDALBase):
             i = index
         else:
             raise IndexError(
-                "Index out of range when accessing field in a feature: %s." % index
+                f"Index out of range when accessing field in a feature: {index}."
             )
+
         return Field(self, i)
 
     def __len__(self):
@@ -116,5 +117,5 @@ class Feature(GDALBase):
         "Return the index of the given field name."
         i = capi.get_field_index(self.ptr, force_bytes(field_name))
         if i < 0:
-            raise IndexError("Invalid OFT field name given: %s." % field_name)
+            raise IndexError(f"Invalid OFT field name given: {field_name}.")
         return i

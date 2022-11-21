@@ -27,10 +27,7 @@ class Point(GEOSGeometry):
             coords = x
         elif isinstance(x, (float, int)) and isinstance(y, (float, int)):
             # Here X, Y, and (optionally) Z were passed in individually, as parameters.
-            if isinstance(z, (float, int)):
-                coords = [x, y, z]
-            else:
-                coords = [x, y]
+            coords = [x, y, z] if isinstance(z, (float, int)) else [x, y]
         else:
             raise TypeError("Invalid parameters given for Point initialization.")
 
@@ -64,7 +61,7 @@ class Point(GEOSGeometry):
             return capi.create_point(None)
 
         if ndim < 2 or ndim > 3:
-            raise TypeError("Invalid point dimension: %s" % ndim)
+            raise TypeError(f"Invalid point dimension: {ndim}")
 
         cs = capi.create_cs(c_uint(1), c_uint(ndim))
         i = iter(coords)
@@ -76,8 +73,7 @@ class Point(GEOSGeometry):
         return capi.create_point(cs)
 
     def _set_list(self, length, items):
-        ptr = self._create_point(length, items)
-        if ptr:
+        if ptr := self._create_point(length, items):
             srid = self.srid
             capi.destroy_geom(self.ptr)
             self._ptr = ptr
@@ -100,10 +96,7 @@ class Point(GEOSGeometry):
         "Return the number of dimensions for this Point (either 0, 2 or 3)."
         if self.empty:
             return 0
-        if self.hasz:
-            return 3
-        else:
-            return 2
+        return 3 if self.hasz else 2
 
     def _get_single_external(self, index):
         if index == 0:

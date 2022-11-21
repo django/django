@@ -18,7 +18,7 @@ class CIText:
         super().__init__(*args, **kwargs)
 
     def get_internal_type(self):
-        return "CI" + super().get_internal_type()
+        return f"CI{super().get_internal_type()}"
 
     def db_type(self, connection):
         return "citext"

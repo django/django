@@ -76,13 +76,9 @@ class GeoFuncMixin:
             field = source_fields[pos]
             if not isinstance(field, GeometryField):
                 raise TypeError(
-                    "%s function requires a GeometryField in position %s, got %s."
-                    % (
-                        self.name,
-                        pos + 1,
-                        type(field).__name__,
-                    )
+                    f"{self.name} function requires a GeometryField in position {pos + 1}, got {type(field).__name__}."
                 )
+
 
         base_srid = res.geo_field.srid
         for pos in self.geom_param_pos[1:]:
@@ -96,12 +92,15 @@ class GeoFuncMixin:
         return res
 
     def _handle_param(self, value, param_name="", check_types=None):
-        if not hasattr(value, "resolve_expression"):
-            if check_types and not isinstance(value, check_types):
-                raise TypeError(
-                    "The %s parameter has the wrong type: should be %s."
-                    % (param_name, check_types)
-                )
+        if (
+            not hasattr(value, "resolve_expression")
+            and check_types
+            and not isinstance(value, check_types)
+        ):
+            raise TypeError(
+                f"The {param_name} parameter has the wrong type: should be {check_types}."
+            )
+
         return value
 
 
@@ -459,14 +458,12 @@ class Perimeter(DistanceResultMixin, OracleToleranceMixin, GeoFunc):
     arity = 1
 
     def as_postgresql(self, compiler, connection, **extra_context):
-        function = None
         if self.geo_field.geodetic(connection) and not self.source_is_geography():
             raise NotSupportedError(
                 "ST_Perimeter cannot use a non-projected non-geography field."
             )
         dim = min(f.dim for f in self.get_source_fields())
-        if dim > 2:
-            function = connection.ops.perimeter3d
+        function = connection.ops.perimeter3d if dim > 2 else None
         return super().as_sql(compiler, connection, function=function, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
@@ -499,7 +496,7 @@ class SnapToGrid(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
     def __init__(self, expression, *args, **extra):
         nargs = len(args)
         expressions = [expression]
-        if nargs in (1, 2):
+        if nargs in {1, 2}:
             expressions.extend(
                 [self._handle_param(arg, "", NUMERIC_TYPES) for arg in args]
             )
@@ -507,8 +504,9 @@ class SnapToGrid(SQLiteDecimalToFloatMixin, GeomOutputGeoFunc):
             # Reverse origin and size param ordering
             expressions += [
                 *(self._handle_param(arg, "", NUMERIC_TYPES) for arg in args[2:]),
-                *(self._handle_param(arg, "", NUMERIC_TYPES) for arg in args[0:2]),
+                *(self._handle_param(arg, "", NUMERIC_TYPES) for arg in args[:2]),
             ]
+
         else:
             raise ValueError("Must provide 1, 2, or 4 arguments to `SnapToGrid`.")
         super().__init__(*expressions, **extra)

@@ -117,13 +117,13 @@ class AdminSite:
         for model in model_or_iterable:
             if model._meta.abstract:
                 raise ImproperlyConfigured(
-                    "The model %s is abstract, so it cannot be registered with admin."
-                    % model.__name__
+                    f"The model {model.__name__} is abstract, so it cannot be registered with admin."
                 )
+
 
             if model in self._registry:
                 registered_admin = str(self._registry[model])
-                msg = "The model %s is already registered " % model.__name__
+                msg = f"The model {model.__name__} is already registered "
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
                     msg += "in app %r." % re.sub(r"\.ModelAdmin$", "", registered_admin)
@@ -141,9 +141,7 @@ class AdminSite:
                     # the created class appears to "live" in the wrong place,
                     # which causes issues later on.
                     options["__module__"] = __name__
-                    admin_class = type(
-                        "%sAdmin" % model.__name__, (admin_class,), options
-                    )
+                    admin_class = type(f"{model.__name__}Admin", (admin_class,), options)
 
                 # Instantiate the admin class to save in the registry
                 self._registry[model] = admin_class(model, self)
@@ -158,7 +156,7 @@ class AdminSite:
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
             if model not in self._registry:
-                raise NotRegistered("The model %s is not registered" % model.__name__)
+                raise NotRegistered(f"The model {model.__name__} is not registered")
             del self._registry[model]
 
     def is_registered(self, model):
@@ -293,10 +291,11 @@ class AdminSite:
         for model, model_admin in self._registry.items():
             urlpatterns += [
                 path(
-                    "%s/%s/" % (model._meta.app_label, model._meta.model_name),
+                    f"{model._meta.app_label}/{model._meta.model_name}/",
                     include(model_admin.urls),
-                ),
+                )
             ]
+
             if model._meta.app_label not in valid_app_labels:
                 valid_app_labels.append(model._meta.app_label)
 
@@ -430,7 +429,7 @@ class AdminSite:
             and REDIRECT_FIELD_NAME not in request.POST
         ):
             context[REDIRECT_FIELD_NAME] = reverse("admin:index", current_app=self.name)
-        context.update(extra_context or {})
+        context |= (extra_context or {})
 
         defaults = {
             "extra_context": context,
@@ -448,12 +447,12 @@ class AdminSite:
         if settings.APPEND_SLASH and not url.endswith("/"):
             urlconf = getattr(request, "urlconf", None)
             try:
-                match = resolve("%s/" % request.path_info, urlconf)
+                match = resolve(f"{request.path_info}/", urlconf)
             except Resolver404:
                 pass
             else:
                 if getattr(match.func, "should_append_slash", True):
-                    return HttpResponsePermanentRedirect("%s/" % request.path)
+                    return HttpResponsePermanentRedirect(f"{request.path}/")
         raise Http404
 
     def _build_app_dict(self, request, label=None):
@@ -585,7 +584,7 @@ class AdminSite:
         return TemplateResponse(
             request,
             self.app_index_template
-            or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
+            or [f"admin/{app_label}/app_index.html", "admin/app_index.html"],
             context,
         )
 

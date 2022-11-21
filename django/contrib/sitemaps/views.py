@@ -72,19 +72,20 @@ def index(
             site = site()
         protocol = req_protocol if site.protocol is None else site.protocol
         sitemap_url = reverse(sitemap_url_name, kwargs={"section": section})
-        absolute_url = "%s://%s%s" % (protocol, req_site.domain, sitemap_url)
+        absolute_url = f"{protocol}://{req_site.domain}{sitemap_url}"
         site_lastmod = site.get_latest_lastmod()
         if all_indexes_lastmod:
-            if site_lastmod is not None:
-                latest_lastmod = _get_latest_lastmod(latest_lastmod, site_lastmod)
-            else:
+            if site_lastmod is None:
                 all_indexes_lastmod = False
+            else:
+                latest_lastmod = _get_latest_lastmod(latest_lastmod, site_lastmod)
         sites.append(SitemapIndexItem(absolute_url, site_lastmod))
         # Add links to all pages of the sitemap.
-        for page in range(2, site.paginator.num_pages + 1):
-            sites.append(
-                SitemapIndexItem("%s?p=%s" % (absolute_url, page), site_lastmod)
-            )
+        sites.extend(
+            SitemapIndexItem(f"{absolute_url}?p={page}", site_lastmod)
+            for page in range(2, site.paginator.num_pages + 1)
+        )
+
     # If lastmod is defined for all sites, set header so as
     # ConditionalGetMiddleware is able to send 304 NOT MODIFIED
     if all_indexes_lastmod and latest_lastmod:
@@ -112,12 +113,12 @@ def sitemap(
     req_protocol = request.scheme
     req_site = get_current_site(request)
 
-    if section is not None:
-        if section not in sitemaps:
-            raise Http404("No sitemap available for section: %r" % section)
-        maps = [sitemaps[section]]
-    else:
+    if section is None:
         maps = sitemaps.values()
+    elif section not in sitemaps:
+        raise Http404("No sitemap available for section: %r" % section)
+    else:
+        maps = [sitemaps[section]]
     page = request.GET.get("p", 1)
 
     lastmod = None
@@ -135,7 +136,7 @@ def sitemap(
                 else:
                     all_sites_lastmod = False
         except EmptyPage:
-            raise Http404("Page %s empty" % page)
+            raise Http404(f"Page {page} empty")
         except PageNotAnInteger:
             raise Http404("No page '%s'" % page)
     # If lastmod is defined for all sites, set header so as

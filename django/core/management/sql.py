@@ -27,8 +27,9 @@ def emit_pre_migrate_signal(verbosity, interactive, db, **kwargs):
         if verbosity >= 2:
             stdout = kwargs.get("stdout", sys.stdout)
             stdout.write(
-                "Running pre-migrate handlers for application %s" % app_config.label
+                f"Running pre-migrate handlers for application {app_config.label}"
             )
+
         models.signals.pre_migrate.send(
             sender=app_config,
             app_config=app_config,
@@ -47,8 +48,9 @@ def emit_post_migrate_signal(verbosity, interactive, db, **kwargs):
         if verbosity >= 2:
             stdout = kwargs.get("stdout", sys.stdout)
             stdout.write(
-                "Running post-migrate handlers for application %s" % app_config.label
+                f"Running post-migrate handlers for application {app_config.label}"
             )
+
         models.signals.post_migrate.send(
             sender=app_config,
             app_config=app_config,

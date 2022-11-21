@@ -43,8 +43,7 @@ def delete_selected(modeladmin, request, queryset):
     if request.POST.get("post") and not protected:
         if perms_needed:
             raise PermissionDenied
-        n = queryset.count()
-        if n:
+        if n := queryset.count():
             for obj in queryset:
                 obj_display = str(obj)
                 modeladmin.log_deletion(request, obj, obj_display)
@@ -87,9 +86,8 @@ def delete_selected(modeladmin, request, queryset):
         request,
         modeladmin.delete_selected_confirmation_template
         or [
-            "admin/%s/%s/delete_selected_confirmation.html"
-            % (app_label, opts.model_name),
-            "admin/%s/delete_selected_confirmation.html" % app_label,
+            f"admin/{app_label}/{opts.model_name}/delete_selected_confirmation.html",
+            f"admin/{app_label}/delete_selected_confirmation.html",
             "admin/delete_selected_confirmation.html",
         ],
         context,

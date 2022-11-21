@@ -130,7 +130,7 @@ def result_headers(cl):
         if is_sorted:
             order_type = ordering_field_columns.get(i).lower()
             sort_priority = list(ordering_field_columns).index(i) + 1
-            th_classes.append("sorted %sending" % order_type)
+            th_classes.append(f"sorted {order_type}ending")
             new_order_type = {"asc": "desc", "desc": "asc"}[order_type]
 
         # build new ordering param
@@ -186,7 +186,7 @@ def _coerce_field_name(field_name, field_index):
     """
     if callable(field_name):
         if field_name.__name__ == "<lambda>":
-            return "lambda" + str(field_index)
+            return f"lambda{str(field_index)}"
         else:
             return field_name.__name__
     return field_name
@@ -208,7 +208,7 @@ def items_for_result(cl, result, form):
     pk = cl.lookup_opts.pk.attname
     for field_index, field_name in enumerate(cl.list_display):
         empty_value_display = cl.model_admin.get_empty_value_display()
-        row_classes = ["field-%s" % _coerce_field_name(field_name, field_index)]
+        row_classes = [f"field-{_coerce_field_name(field_name, field_index)}"]
         try:
             f, attr, value = lookup_field(field_name, result, cl.model_admin)
         except ObjectDoesNotExist:
@@ -227,10 +227,7 @@ def items_for_result(cl, result, form):
             else:
                 if isinstance(f.remote_field, models.ManyToOneRel):
                     field_val = getattr(result, f.name)
-                    if field_val is None:
-                        result_repr = empty_value_display
-                    else:
-                        result_repr = field_val
+                    result_repr = empty_value_display if field_val is None else field_val
                 else:
                     result_repr = display_for_field(value, f, empty_value_display)
                 if isinstance(
@@ -255,10 +252,7 @@ def items_for_result(cl, result, form):
                 )
                 # Convert the pk to something that can be used in JavaScript.
                 # Problem cases are non-ASCII strings.
-                if cl.to_field:
-                    attr = str(cl.to_field)
-                else:
-                    attr = pk
+                attr = str(cl.to_field) if cl.to_field else pk
                 value = result.serializable_value(attr)
                 link_or_text = format_html(
                     '<a href="{}"{}>{}</a>',
@@ -324,10 +318,7 @@ def result_list(cl):
     Display the headers and data list together.
     """
     headers = list(result_headers(cl))
-    num_sorted_fields = 0
-    for h in headers:
-        if h["sortable"] and h["sorted"]:
-            num_sorted_fields += 1
+    num_sorted_fields = sum(1 for h in headers if h["sortable"] and h["sorted"])
     return {
         "cl": cl,
         "result_hidden_fields": list(result_hidden_fields(cl)),
@@ -352,112 +343,113 @@ def date_hierarchy(cl):
     """
     Display the date hierarchy for date drill-down functionality.
     """
-    if cl.date_hierarchy:
-        field_name = cl.date_hierarchy
-        field = get_fields_from_path(cl.model, field_name)[-1]
-        if isinstance(field, models.DateTimeField):
-            dates_or_datetimes = "datetimes"
-            qs_kwargs = {"is_dst": True} if settings.USE_DEPRECATED_PYTZ else {}
-        else:
-            dates_or_datetimes = "dates"
-            qs_kwargs = {}
-        year_field = "%s__year" % field_name
-        month_field = "%s__month" % field_name
-        day_field = "%s__day" % field_name
-        field_generic = "%s__" % field_name
-        year_lookup = cl.params.get(year_field)
-        month_lookup = cl.params.get(month_field)
-        day_lookup = cl.params.get(day_field)
+    if not cl.date_hierarchy:
+        return
+    field_name = cl.date_hierarchy
+    field = get_fields_from_path(cl.model, field_name)[-1]
+    if isinstance(field, models.DateTimeField):
+        dates_or_datetimes = "datetimes"
+        qs_kwargs = {"is_dst": True} if settings.USE_DEPRECATED_PYTZ else {}
+    else:
+        dates_or_datetimes = "dates"
+        qs_kwargs = {}
+    year_field = f"{field_name}__year"
+    month_field = f"{field_name}__month"
+    day_field = f"{field_name}__day"
+    field_generic = f"{field_name}__"
+    year_lookup = cl.params.get(year_field)
+    month_lookup = cl.params.get(month_field)
+    day_lookup = cl.params.get(day_field)
 
-        def link(filters):
-            return cl.get_query_string(filters, [field_generic])
+    def link(filters):
+        return cl.get_query_string(filters, [field_generic])
 
-        if not (year_lookup or month_lookup or day_lookup):
-            # select appropriate start level
-            date_range = cl.queryset.aggregate(
-                first=models.Min(field_name), last=models.Max(field_name)
-            )
-            if date_range["first"] and date_range["last"]:
-                if dates_or_datetimes == "datetimes":
-                    date_range = {
-                        k: timezone.localtime(v) if timezone.is_aware(v) else v
-                        for k, v in date_range.items()
-                    }
-                if date_range["first"].year == date_range["last"].year:
-                    year_lookup = date_range["first"].year
-                    if date_range["first"].month == date_range["last"].month:
-                        month_lookup = date_range["first"].month
+    if not (year_lookup or month_lookup or day_lookup):
+        # select appropriate start level
+        date_range = cl.queryset.aggregate(
+            first=models.Min(field_name), last=models.Max(field_name)
+        )
+        if date_range["first"] and date_range["last"]:
+            if dates_or_datetimes == "datetimes":
+                date_range = {
+                    k: timezone.localtime(v) if timezone.is_aware(v) else v
+                    for k, v in date_range.items()
+                }
+            if date_range["first"].year == date_range["last"].year:
+                year_lookup = date_range["first"].year
+                if date_range["first"].month == date_range["last"].month:
+                    month_lookup = date_range["first"].month
 
-        if year_lookup and month_lookup and day_lookup:
-            day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
-            return {
-                "show": True,
-                "back": {
-                    "link": link({year_field: year_lookup, month_field: month_lookup}),
-                    "title": capfirst(formats.date_format(day, "YEAR_MONTH_FORMAT")),
-                },
-                "choices": [
-                    {"title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT"))}
-                ],
-            }
-        elif year_lookup and month_lookup:
-            days = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "day", **qs_kwargs
-            )
-            return {
-                "show": True,
-                "back": {
-                    "link": link({year_field: year_lookup}),
-                    "title": str(year_lookup),
-                },
-                "choices": [
-                    {
-                        "link": link(
-                            {
-                                year_field: year_lookup,
-                                month_field: month_lookup,
-                                day_field: day.day,
-                            }
-                        ),
-                        "title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT")),
-                    }
-                    for day in days
-                ],
-            }
-        elif year_lookup:
-            months = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "month", **qs_kwargs
-            )
-            return {
-                "show": True,
-                "back": {"link": link({}), "title": _("All dates")},
-                "choices": [
-                    {
-                        "link": link(
-                            {year_field: year_lookup, month_field: month.month}
-                        ),
-                        "title": capfirst(
-                            formats.date_format(month, "YEAR_MONTH_FORMAT")
-                        ),
-                    }
-                    for month in months
-                ],
-            }
-        else:
-            years = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "year", **qs_kwargs
-            )
-            return {
-                "show": True,
-                "back": None,
-                "choices": [
-                    {
-                        "link": link({year_field: str(year.year)}),
-                        "title": str(year.year),
-                    }
-                    for year in years
-                ],
-            }
+    if year_lookup and month_lookup and day_lookup:
+        day = datetime.date(int(year_lookup), int(month_lookup), int(day_lookup))
+        return {
+            "show": True,
+            "back": {
+                "link": link({year_field: year_lookup, month_field: month_lookup}),
+                "title": capfirst(formats.date_format(day, "YEAR_MONTH_FORMAT")),
+            },
+            "choices": [
+                {"title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT"))}
+            ],
+        }
+    elif year_lookup and month_lookup:
+        days = getattr(cl.queryset, dates_or_datetimes)(
+            field_name, "day", **qs_kwargs
+        )
+        return {
+            "show": True,
+            "back": {
+                "link": link({year_field: year_lookup}),
+                "title": str(year_lookup),
+            },
+            "choices": [
+                {
+                    "link": link(
+                        {
+                            year_field: year_lookup,
+                            month_field: month_lookup,
+                            day_field: day.day,
+                        }
+                    ),
+                    "title": capfirst(formats.date_format(day, "MONTH_DAY_FORMAT")),
+                }
+                for day in days
+            ],
+        }
+    elif year_lookup:
+        months = getattr(cl.queryset, dates_or_datetimes)(
+            field_name, "month", **qs_kwargs
+        )
+        return {
+            "show": True,
+            "back": {"link": link({}), "title": _("All dates")},
+            "choices": [
+                {
+                    "link": link(
+                        {year_field: year_lookup, month_field: month.month}
+                    ),
+                    "title": capfirst(
+                        formats.date_format(month, "YEAR_MONTH_FORMAT")
+                    ),
+                }
+                for month in months
+            ],
+        }
+    else:
+        years = getattr(cl.queryset, dates_or_datetimes)(
+            field_name, "year", **qs_kwargs
+        )
+        return {
+            "show": True,
+            "back": None,
+            "choices": [
+                {
+                    "link": link({year_field: str(year.year)}),
+                    "title": str(year.year),
+                }
+                for year in years
+            ],
+        }
 
 
 @register.tag(name="date_hierarchy")

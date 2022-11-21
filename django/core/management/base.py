@@ -69,7 +69,7 @@ class CommandParser(ArgumentParser):
         if self.called_from_command_line:
             super().error(message)
         else:
-            raise CommandError("Error: %s" % message)
+            raise CommandError(f"Error: {message}")
 
 
 def handle_default_options(options):
@@ -288,12 +288,15 @@ class BaseCommand:
         """
         kwargs.setdefault("formatter_class", DjangoHelpFormatter)
         parser = CommandParser(
-            prog="%s %s" % (os.path.basename(prog_name), subcommand),
+            prog=f"{os.path.basename(prog_name)} {subcommand}",
             description=self.help or None,
             missing_args_message=getattr(self, "missing_args_message", None),
-            called_from_command_line=getattr(self, "_called_from_command_line", None),
+            called_from_command_line=getattr(
+                self, "_called_from_command_line", None
+            ),
             **kwargs,
         )
+
         self.add_base_argument(
             parser,
             "--version",
@@ -408,7 +411,7 @@ class BaseCommand:
             if isinstance(e, SystemCheckError):
                 self.stderr.write(str(e), lambda x: x)
             else:
-                self.stderr.write("%s: %s" % (e.__class__.__name__, e))
+                self.stderr.write(f"{e.__class__.__name__}: {e}")
             sys.exit(e.returncode)
         finally:
             try:
@@ -537,12 +540,13 @@ class BaseCommand:
                 if visible_issue_count == 0
                 else "1 issue"
                 if visible_issue_count == 1
-                else "%s issues" % visible_issue_count,
+                else f"{visible_issue_count} issues",
                 len(all_issues) - visible_issue_count,
             )
 
+
         if any(e.is_serious(fail_level) and not e.is_silenced() for e in all_issues):
-            msg = self.style.ERROR("SystemCheckError: %s" % header) + body + footer
+            msg = self.style.ERROR(f"SystemCheckError: {header}") + body + footer
             raise SystemCheckError(msg)
         else:
             msg = header + body + footer
@@ -566,8 +570,7 @@ class BaseCommand:
             # No databases are configured (or the dummy one)
             return
 
-        plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-        if plan:
+        if plan := executor.migration_plan(executor.loader.graph.leaf_nodes()):
             apps_waiting_migration = sorted(
                 {migration.app_label for migration, backwards in plan}
             )
@@ -622,12 +625,12 @@ class AppCommand(BaseCommand):
             app_configs = [apps.get_app_config(app_label) for app_label in app_labels]
         except (LookupError, ImportError) as e:
             raise CommandError(
-                "%s. Are you sure your INSTALLED_APPS setting is correct?" % e
+                f"{e}. Are you sure your INSTALLED_APPS setting is correct?"
             )
+
         output = []
         for app_config in app_configs:
-            app_output = self.handle_app_config(app_config, **options)
-            if app_output:
+            if app_output := self.handle_app_config(app_config, **options):
                 output.append(app_output)
         return "\n".join(output)
 
@@ -663,8 +666,7 @@ class LabelCommand(BaseCommand):
     def handle(self, *labels, **options):
         output = []
         for label in labels:
-            label_output = self.handle_label(label, **options)
-            if label_output:
+            if label_output := self.handle_label(label, **options):
                 output.append(label_output)
         return "\n".join(output)
 

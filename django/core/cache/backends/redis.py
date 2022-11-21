@@ -16,9 +16,7 @@ class RedisSerializer:
     def dumps(self, obj):
         # Only skip pickling for integers, a int subclasses as bool should be
         # pickled.
-        if type(obj) is int:
-            return obj
-        return pickle.dumps(obj, self.protocol)
+        return obj if type(obj) is int else pickle.dumps(obj, self.protocol)
 
     def loads(self, data):
         try:
@@ -87,12 +85,11 @@ class RedisCacheClient:
         client = self.get_client(key, write=True)
         value = self._serializer.dumps(value)
 
-        if timeout == 0:
-            if ret := bool(client.set(key, value, nx=True)):
-                client.delete(key)
-            return ret
-        else:
+        if timeout != 0:
             return bool(client.set(key, value, ex=timeout, nx=True))
+        if ret := bool(client.set(key, value, nx=True)):
+            client.delete(key)
+        return ret
 
     def get(self, key, default):
         client = self.get_client(key)
@@ -159,11 +156,7 @@ class RedisCacheClient:
 class RedisCache(BaseCache):
     def __init__(self, server, params):
         super().__init__(params)
-        if isinstance(server, str):
-            self._servers = re.split("[;,]", server)
-        else:
-            self._servers = server
-
+        self._servers = re.split("[;,]", server) if isinstance(server, str) else server
         self._class = RedisCacheClient
         self._options = params.get("OPTIONS", {})
 

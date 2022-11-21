@@ -10,14 +10,18 @@ def i18n_patterns(*urls, prefix_default_language=True):
     Add the language code prefix to every URL pattern within this function.
     This may only be used in the root URLconf, not in an included URLconf.
     """
-    if not settings.USE_I18N:
-        return list(urls)
-    return [
-        URLResolver(
-            LocalePrefixPattern(prefix_default_language=prefix_default_language),
-            list(urls),
-        )
-    ]
+    return (
+        [
+            URLResolver(
+                LocalePrefixPattern(
+                    prefix_default_language=prefix_default_language
+                ),
+                list(urls),
+            )
+        ]
+        if settings.USE_I18N
+        else list(urls)
+    )
 
 
 @functools.lru_cache(maxsize=None)
@@ -28,10 +32,14 @@ def is_language_prefix_patterns_used(urlconf):
         `True` if the default language should be prefixed
     )
     """
-    for url_pattern in get_resolver(urlconf).url_patterns:
-        if isinstance(url_pattern.pattern, LocalePrefixPattern):
-            return True, url_pattern.pattern.prefix_default_language
-    return False, False
+    return next(
+        (
+            (True, url_pattern.pattern.prefix_default_language)
+            for url_pattern in get_resolver(urlconf).url_patterns
+            if isinstance(url_pattern.pattern, LocalePrefixPattern)
+        ),
+        (False, False),
+    )
 
 
 urlpatterns = [

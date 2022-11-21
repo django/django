@@ -152,10 +152,7 @@ class BaseSpatialField(Field):
         returned.
         """
         srid = obj.srid  # SRID of given geometry.
-        if srid is None or self.srid == -1 or (srid == -1 and self.srid != -1):
-            return self.srid
-        else:
-            return srid
+        return self.srid if srid is None or self.srid == -1 or srid == -1 else srid
 
     def get_db_prep_value(self, value, connection, *args, **kwargs):
         if value is None:
@@ -194,17 +191,12 @@ class BaseSpatialField(Field):
             return None
         # When the input is not a geometry or raster, attempt to construct one
         # from the given string input.
-        if isinstance(obj, GEOSGeometry):
-            pass
-        else:
+        if not isinstance(obj, GEOSGeometry):
             # Check if input is a candidate for conversion to raster or geometry.
             is_candidate = isinstance(obj, (bytes, str)) or hasattr(
                 obj, "__geo_interface__"
             )
-            # Try to convert the input to raster.
-            raster = self.get_raster_prep_value(obj, is_candidate)
-
-            if raster:
+            if raster := self.get_raster_prep_value(obj, is_candidate):
                 obj = raster
             elif is_candidate:
                 try:
@@ -215,9 +207,9 @@ class BaseSpatialField(Field):
                     )
             else:
                 raise ValueError(
-                    "Cannot use object with type %s for a spatial lookup parameter."
-                    % type(obj).__name__
+                    f"Cannot use object with type {type(obj).__name__} for a spatial lookup parameter."
                 )
+
 
         # Assigning the SRID value.
         obj.srid = self.get_srid(obj)
@@ -319,9 +311,11 @@ class GeometryField(BaseSpatialField):
         of the spatial backend. For example, Oracle and MySQL require custom
         selection formats in order to retrieve geometries in OGC WKB.
         """
-        if not compiler.query.subquery:
-            return compiler.connection.ops.select % sql, params
-        return sql, params
+        return (
+            (sql, params)
+            if compiler.query.subquery
+            else (compiler.connection.ops.select % sql, params)
+        )
 
 
 # The OpenGIS Geometry Type Fields

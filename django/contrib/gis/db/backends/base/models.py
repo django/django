@@ -12,30 +12,28 @@ class SpatialRefSysMixin:
         """
         Return a GDAL SpatialReference object.
         """
-        # TODO: Is caching really necessary here?  Is complexity worth it?
         if hasattr(self, "_srs"):
             # Returning a clone of the cached SpatialReference object.
             return self._srs.clone()
-        else:
-            # Attempting to cache a SpatialReference object.
+        # Attempting to cache a SpatialReference object.
 
-            # Trying to get from WKT first.
-            try:
-                self._srs = gdal.SpatialReference(self.wkt)
-                return self.srs
-            except Exception as e:
-                msg = e
+        # Trying to get from WKT first.
+        try:
+            self._srs = gdal.SpatialReference(self.wkt)
+            return self.srs
+        except Exception as e:
+            msg = e
 
-            try:
-                self._srs = gdal.SpatialReference(self.proj4text)
-                return self.srs
-            except Exception as e:
-                msg = e
+        try:
+            self._srs = gdal.SpatialReference(self.proj4text)
+            return self.srs
+        except Exception as e:
+            msg = e
 
-            raise Exception(
-                "Could not get OSR SpatialReference from WKT: %s\nError:\n%s"
-                % (self.wkt, msg)
-            )
+        raise Exception(
+            "Could not get OSR SpatialReference from WKT: %s\nError:\n%s"
+            % (self.wkt, msg)
+        )
 
     @property
     def ellipsoid(self):
@@ -125,13 +123,14 @@ class SpatialRefSysMixin:
 
         if not string:
             return sphere_name, sphere_params
-        else:
             # `string` parameter used to place in format acceptable by PostGIS
-            if len(sphere_params) == 3:
-                radius, flattening = sphere_params[0], sphere_params[2]
-            else:
-                radius, flattening = sphere_params
-            return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
+        radius, flattening = (
+            (sphere_params[0], sphere_params[2])
+            if len(sphere_params) == 3
+            else sphere_params
+        )
+
+        return 'SPHEROID["%s",%s,%s]' % (sphere_name, radius, flattening)
 
     def __str__(self):
         """

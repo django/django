@@ -48,10 +48,8 @@ class ASGIRequest(HttpRequest):
         # The Django path is different from ASGI scope path args, it should
         # combine with script name.
         if self.script_name:
-            self.path = "%s/%s" % (
-                self.script_name.rstrip("/"),
-                self.path_info.replace("/", "", 1),
-            )
+            self.path = f'{self.script_name.rstrip("/")}/{self.path_info.replace("/", "", 1)}'
+
         else:
             self.path = scope["path"]
         # HTTP basics.
@@ -87,12 +85,12 @@ class ASGIRequest(HttpRequest):
             elif name == "content-type":
                 corrected_name = "CONTENT_TYPE"
             else:
-                corrected_name = "HTTP_%s" % name.upper().replace("-", "_")
+                corrected_name = f'HTTP_{name.upper().replace("-", "_")}'
             # HTTP/2 say only ASCII chars are allowed in headers, but decode
             # latin1 just in case.
             value = value.decode("latin1")
             if corrected_name in self.META:
-                value = self.META[corrected_name] + "," + value
+                value = f"{self.META[corrected_name]},{value}"
             self.META[corrected_name] = value
         # Pull out request encoding, if provided.
         self._set_content_type_params(self.META)
@@ -152,8 +150,9 @@ class ASGIHandler(base.BaseHandler):
         # FIXME: Allow to override this.
         if scope["type"] != "http":
             raise ValueError(
-                "Django can only handle ASGI/HTTP connections, not %s." % scope["type"]
+                f'Django can only handle ASGI/HTTP connections, not {scope["type"]}.'
             )
+
 
         async with ThreadSensitiveContext():
             await self.handle(scope, receive, send)
@@ -249,10 +248,11 @@ class ASGIHandler(base.BaseHandler):
             if isinstance(value, str):
                 value = value.encode("latin1")
             response_headers.append((bytes(header), bytes(value)))
-        for c in response.cookies.values():
-            response_headers.append(
-                (b"Set-Cookie", c.output(header="").encode("ascii").strip())
-            )
+        response_headers.extend(
+            (b"Set-Cookie", c.output(header="").encode("ascii").strip())
+            for c in response.cookies.values()
+        )
+
         # Initial response message.
         await send(
             {
@@ -312,6 +312,4 @@ class ASGIHandler(base.BaseHandler):
         """
         Return the script prefix to use from either the scope or a setting.
         """
-        if settings.FORCE_SCRIPT_NAME:
-            return settings.FORCE_SCRIPT_NAME
-        return scope.get("root_path", "") or ""
+        return settings.FORCE_SCRIPT_NAME or scope.get("root_path", "") or ""

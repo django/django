@@ -120,21 +120,20 @@ class TemplateCommand(BaseCommand):
         for file in options["files"]:
             extra_files.extend(map(lambda x: x.strip(), file.split(",")))
         if exclude := options.get("exclude"):
-            for directory in exclude:
-                excluded_directories.append(directory.strip())
+            excluded_directories.extend(directory.strip() for directory in exclude)
         if self.verbosity >= 2:
             self.stdout.write(
-                "Rendering %s template files with extensions: %s"
-                % (app_or_project, ", ".join(extensions))
+                f'Rendering {app_or_project} template files with extensions: {", ".join(extensions)}'
             )
+
             self.stdout.write(
-                "Rendering %s template files with filenames: %s"
-                % (app_or_project, ", ".join(extra_files))
+                f'Rendering {app_or_project} template files with filenames: {", ".join(extra_files)}'
             )
-        base_name = "%s_name" % app_or_project
-        base_subdir = "%s_template" % app_or_project
-        base_directory = "%s_directory" % app_or_project
-        camel_case_name = "camel_case_%s_name" % app_or_project
+
+        base_name = f"{app_or_project}_name"
+        base_subdir = f"{app_or_project}_template"
+        base_directory = f"{app_or_project}_directory"
+        camel_case_name = f"camel_case_{app_or_project}_name"
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
         context = Context(
@@ -209,7 +208,7 @@ class TemplateCommand(BaseCommand):
                     shutil.copyfile(old_path, new_path)
 
                 if self.verbosity >= 2:
-                    self.stdout.write("Creating %s" % new_path)
+                    self.stdout.write(f"Creating {new_path}")
                 try:
                     self.apply_umask(old_path, new_path)
                     self.make_writeable(new_path)
@@ -240,20 +239,20 @@ class TemplateCommand(BaseCommand):
         """
         if template is None:
             return os.path.join(django.__path__[0], "conf", subdir)
-        else:
-            if template.startswith("file://"):
-                template = template[7:]
-            expanded_template = os.path.expanduser(template)
-            expanded_template = os.path.normpath(expanded_template)
-            if os.path.isdir(expanded_template):
-                return expanded_template
-            if self.is_url(template):
-                # downloads the file and returns the path
-                absolute_path = self.download(template)
-            else:
-                absolute_path = os.path.abspath(expanded_template)
-            if os.path.exists(absolute_path):
-                return self.extract(absolute_path)
+        if template.startswith("file://"):
+            template = template[7:]
+        expanded_template = os.path.expanduser(template)
+        expanded_template = os.path.normpath(expanded_template)
+        if os.path.isdir(expanded_template):
+            return expanded_template
+        absolute_path = (
+            self.download(template)
+            if self.is_url(template)
+            else os.path.abspath(expanded_template)
+        )
+
+        if os.path.exists(absolute_path):
+            return self.extract(absolute_path)
 
         raise CommandError(
             "couldn't handle %s template %s." % (self.app_or_project, template)
@@ -302,19 +301,16 @@ class TemplateCommand(BaseCommand):
         def cleanup_url(url):
             tmp = url.rstrip("/")
             filename = tmp.split("/")[-1]
-            if url.endswith("/"):
-                display_url = tmp + "/"
-            else:
-                display_url = url
+            display_url = f"{tmp}/" if url.endswith("/") else url
             return filename, display_url
 
-        prefix = "django_%s_template_" % self.app_or_project
+        prefix = f"django_{self.app_or_project}_template_"
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_download")
         self.paths_to_remove.append(tempdir)
         filename, display_url = cleanup_url(url)
 
         if self.verbosity >= 2:
-            self.stdout.write("Downloading %s" % display_url)
+            self.stdout.write(f"Downloading {display_url}")
 
         the_path = os.path.join(tempdir, filename)
         opener = build_opener()
@@ -371,11 +367,11 @@ class TemplateCommand(BaseCommand):
         Extract the given file to a temporary directory and return
         the path of the directory with the extracted content.
         """
-        prefix = "django_%s_template_" % self.app_or_project
+        prefix = f"django_{self.app_or_project}_template_"
         tempdir = tempfile.mkdtemp(prefix=prefix, suffix="_extract")
         self.paths_to_remove.append(tempdir)
         if self.verbosity >= 2:
-            self.stdout.write("Extracting %s" % filename)
+            self.stdout.write(f"Extracting {filename}")
         try:
             archive.extract(filename, tempdir)
             return tempdir

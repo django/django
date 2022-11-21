@@ -116,15 +116,13 @@ class Paginator:
         ordered = getattr(self.object_list, "ordered", None)
         if ordered is not None and not ordered:
             obj_list_repr = (
-                "{} {}".format(
-                    self.object_list.model, self.object_list.__class__.__name__
-                )
+                f"{self.object_list.model} {self.object_list.__class__.__name__}"
                 if hasattr(self.object_list, "model")
                 else "{!r}".format(self.object_list)
             )
+
             warnings.warn(
-                "Pagination may yield inconsistent results with an unordered "
-                "object_list: {}.".format(obj_list_repr),
+                f"Pagination may yield inconsistent results with an unordered object_list: {obj_list_repr}.",
                 UnorderedObjectListWarning,
                 stacklevel=3,
             )
@@ -168,7 +166,7 @@ class Page(collections.abc.Sequence):
         self.paginator = paginator
 
     def __repr__(self):
-        return "<Page %s of %s>" % (self.number, self.paginator.num_pages)
+        return f"<Page {self.number} of {self.paginator.num_pages}>"
 
     def __len__(self):
         return len(self.object_list)
@@ -176,9 +174,9 @@ class Page(collections.abc.Sequence):
     def __getitem__(self, index):
         if not isinstance(index, (int, slice)):
             raise TypeError(
-                "Page indices must be integers or slices, not %s."
-                % type(index).__name__
+                f"Page indices must be integers or slices, not {type(index).__name__}."
             )
+
         # The object_list is converted to a list so that if it was a QuerySet
         # it won't be a database hit per __getitem__.
         if not isinstance(self.object_list, list):

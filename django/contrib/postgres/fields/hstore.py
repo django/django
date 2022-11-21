@@ -22,8 +22,7 @@ class HStoreField(CheckFieldDefaultMixin, Field):
         return "hstore"
 
     def get_transform(self, name):
-        transform = super().get_transform(name)
-        if transform:
+        if transform := super().get_transform(name):
             return transform
         return KeyTransformFactory(name)
 

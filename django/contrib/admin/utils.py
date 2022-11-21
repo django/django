@@ -19,7 +19,7 @@ from django.utils.translation import override as translation_override
 
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
-UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
+UNQUOTE_RE = _lazy_re_compile(f'_(?:{"|".join([x[1:] for x in UNQUOTE_MAP])})')
 
 
 class FieldIsAForeignKeyColumnName(Exception):
@@ -126,18 +126,18 @@ def get_deleted_objects(objs, request, admin_site):
         has_admin = model in admin_site._registry
         opts = obj._meta
 
-        no_edit_link = "%s: %s" % (capfirst(opts.verbose_name), obj)
+        no_edit_link = f"{capfirst(opts.verbose_name)}: {obj}"
 
         if has_admin:
             if not admin_site._registry[model].has_delete_permission(request, obj):
                 perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse(
-                    "%s:%s_%s_change"
-                    % (admin_site.name, opts.app_label, opts.model_name),
+                    f"{admin_site.name}:{opts.app_label}_{opts.model_name}_change",
                     None,
                     (quote(obj.pk),),
                 )
+
             except NoReverseMatch:
                 # Change url doesn't exist -- don't display link to edit
                 return no_edit_link
@@ -203,10 +203,7 @@ class NestedObjects(Collector):
         children = []
         for child in self.edges.get(obj, ()):
             children.extend(self._nested(child, seen, format_callback))
-        if format_callback:
-            ret = [format_callback(obj)]
-        else:
-            ret = [obj]
+        ret = [format_callback(obj)] if format_callback else [obj]
         if children:
             ret.append(children)
         return ret
@@ -281,10 +278,7 @@ def lookup_field(name, obj, model_admin=None):
             value = attr(obj)
         else:
             attr = getattr(obj, name)
-            if callable(attr):
-                value = attr()
-            else:
-                value = attr
+            value = attr() if callable(attr) else attr
         f = None
     else:
         attr = None
@@ -356,9 +350,9 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
                     model._meta.object_name,
                 )
                 if model_admin:
-                    message += " or %s" % model_admin.__class__.__name__
+                    message += f" or {model_admin.__class__.__name__}"
                 if form:
-                    message += " or %s" % form.__class__.__name__
+                    message += f" or {form.__class__.__name__}"
                 raise AttributeError(message)
 
             if hasattr(attr, "short_description"):
@@ -370,20 +364,14 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             ):
                 label = attr.fget.short_description
             elif callable(attr):
-                if attr.__name__ == "<lambda>":
-                    label = "--"
-                else:
-                    label = pretty_name(attr.__name__)
+                label = "--" if attr.__name__ == "<lambda>" else pretty_name(attr.__name__)
             else:
                 label = pretty_name(name)
     except FieldIsAForeignKeyColumnName:
         label = pretty_name(name)
         attr = name
 
-    if return_attr:
-        return (label, attr)
-    else:
-        return label
+    return (label, attr) if return_attr else label
 
 
 def help_text_for_field(name, model):
@@ -488,7 +476,7 @@ def reverse_field_path(model, path):
                 break
 
         # Field should point to another model
-        if field.is_relation and not (field.auto_created and not field.concrete):
+        if field.is_relation and (not field.auto_created or field.concrete):
             related_name = field.related_query_name()
             parent = field.remote_field.model
         else:
@@ -510,10 +498,7 @@ def get_fields_from_path(model, path):
     pieces = path.split(LOOKUP_SEP)
     fields = []
     for piece in pieces:
-        if fields:
-            parent = get_model_from_relation(fields[-1])
-        else:
-            parent = model
+        parent = get_model_from_relation(fields[-1]) if fields else model
         fields.append(parent._meta.get_field(piece))
     return fields
 
@@ -542,36 +527,39 @@ def construct_change_message(form, formsets, add):
     if formsets:
         with translation_override(None):
             for formset in formsets:
-                for added_object in formset.new_objects:
-                    change_message.append(
-                        {
-                            "added": {
-                                "name": str(added_object._meta.verbose_name),
-                                "object": str(added_object),
-                            }
+                change_message.extend(
+                    {
+                        "added": {
+                            "name": str(added_object._meta.verbose_name),
+                            "object": str(added_object),
                         }
-                    )
-                for changed_object, changed_fields in formset.changed_objects:
-                    change_message.append(
-                        {
-                            "changed": {
-                                "name": str(changed_object._meta.verbose_name),
-                                "object": str(changed_object),
-                                "fields": _get_changed_field_labels_from_form(
-                                    formset.forms[0], changed_fields
-                                ),
-                            }
+                    }
+                    for added_object in formset.new_objects
+                )
+
+                change_message.extend(
+                    {
+                        "changed": {
+                            "name": str(changed_object._meta.verbose_name),
+                            "object": str(changed_object),
+                            "fields": _get_changed_field_labels_from_form(
+                                formset.forms[0], changed_fields
+                            ),
                         }
-                    )
-                for deleted_object in formset.deleted_objects:
-                    change_message.append(
-                        {
-                            "deleted": {
-                                "name": str(deleted_object._meta.verbose_name),
-                                "object": str(deleted_object),
-                            }
+                    }
+                    for changed_object, changed_fields in formset.changed_objects
+                )
+
+                change_message.extend(
+                    {
+                        "deleted": {
+                            "name": str(deleted_object._meta.verbose_name),
+                            "object": str(deleted_object),
                         }
-                    )
+                    }
+                    for deleted_object in formset.deleted_objects
+                )
+
     return change_message
 
 

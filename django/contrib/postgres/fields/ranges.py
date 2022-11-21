@@ -79,7 +79,7 @@ class RangeField(models.Field):
         return isinstance(value, (list, tuple)) or super()._choices_is_value(value)
 
     def get_placeholder(self, value, compiler, connection):
-        return "%s::{}".format(self.db_type(connection))
+        return f"%s::{self.db_type(connection)}"
 
     def get_prep_value(self, value):
         if value is None:
@@ -239,8 +239,8 @@ class DateTimeRangeContains(PostgresOperatorLookup):
             )
         ):
             cast_internal_type = self.lhs.output_field.base_field.get_internal_type()
-            cast_sql = "::{}".format(connection.data_types.get(cast_internal_type))
-        return "%s%s" % (sql, cast_sql), params
+            cast_sql = f"::{connection.data_types.get(cast_internal_type)}"
+        return f"{sql}{cast_sql}", params
 
 
 DateRangeField.register_lookup(DateTimeRangeContains)
@@ -265,14 +265,14 @@ class RangeContainedBy(PostgresOperatorLookup):
         # Ignore precision for DecimalFields.
         db_type = self.lhs.output_field.cast_db_type(connection).split("(")[0]
         cast_type = self.type_mapping[db_type]
-        return "%s::%s" % (rhs, cast_type), rhs_params
+        return f"{rhs}::{cast_type}", rhs_params
 
     def process_lhs(self, compiler, connection):
         lhs, lhs_params = super().process_lhs(compiler, connection)
         if isinstance(self.lhs.output_field, models.FloatField):
-            lhs = "%s::numeric" % lhs
+            lhs = f"{lhs}::numeric"
         elif isinstance(self.lhs.output_field, models.SmallIntegerField):
-            lhs = "%s::integer" % lhs
+            lhs = f"{lhs}::integer"
         return lhs, lhs_params
 
     def get_prep_lookup(self):

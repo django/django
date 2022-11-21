@@ -33,9 +33,9 @@ class CheckMessage:
             obj = self.obj._meta.label
         else:
             obj = str(self.obj)
-        id = "(%s) " % self.id if self.id else ""
+        id = f"({self.id}) " if self.id else ""
         hint = "\n\tHINT: %s" % self.hint if self.hint else ""
-        return "%s: %s%s%s" % (obj, id, self.msg, hint)
+        return f"{obj}: {id}{self.msg}{hint}"
 
     def __repr__(self):
         return "<%s: level=%r, msg=%r, hint=%r, obj=%r, id=%r>" % (

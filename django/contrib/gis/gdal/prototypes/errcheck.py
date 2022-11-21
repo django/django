@@ -45,10 +45,7 @@ def check_string(result, func, cargs, offset=-1, str_result=False):
     if str_result:
         # For routines that return a string.
         ptr = result
-        if not ptr:
-            s = None
-        else:
-            s = string_at(result)
+        s = string_at(result) if ptr else None
     else:
         # Error-code return specified.
         check_err(result)

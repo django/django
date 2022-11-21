@@ -56,9 +56,7 @@ class FileProxyMixin:
     def readable(self):
         if self.closed:
             return False
-        if hasattr(self.file, "readable"):
-            return self.file.readable()
-        return True
+        return self.file.readable() if hasattr(self.file, "readable") else True
 
     def writable(self):
         if self.closed:
@@ -70,9 +68,7 @@ class FileProxyMixin:
     def seekable(self):
         if self.closed:
             return False
-        if hasattr(self.file, "seekable"):
-            return self.file.seekable()
-        return True
+        return self.file.seekable() if hasattr(self.file, "seekable") else True
 
     def __iter__(self):
         return iter(self.file)

@@ -24,11 +24,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
          ls = LineString(Point(1, 1), Point(2, 2))
         """
         # If only one argument provided, set the coords array appropriately
-        if len(args) == 1:
-            coords = args[0]
-        else:
-            coords = args
-
+        coords = args[0] if len(args) == 1 else args
         if not (
             isinstance(coords, (tuple, list))
             or numpy
@@ -80,7 +76,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using its methods.
-        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=bool(ndim == 3))
+        cs = GEOSCoordSeq(capi.create_cs(ncoords, ndim), z=ndim == 3)
         point_setter = cs._set_point_3d if ndim == 3 else cs._set_point_2d
 
         for i in range(ncoords):
@@ -120,8 +116,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         for i, c in enumerate(items):
             cs[i] = c
 
-        ptr = self._init_func(cs.ptr)
-        if ptr:
+        if ptr := self._init_func(cs.ptr):
             capi.destroy_geom(self.ptr)
             self.ptr = ptr
             if srid is not None:
@@ -152,10 +147,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         Return a numpy array if possible.
         """
         lst = [func(i) for i in range(len(self))]
-        if numpy:
-            return numpy.array(lst)  # ARRRR!
-        else:
-            return lst
+        return numpy.array(lst) if numpy else lst
 
     @property
     def array(self):
@@ -175,10 +167,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
     @property
     def z(self):
         "Return a list or numpy array of the Z variable."
-        if not self.hasz:
-            return None
-        else:
-            return self._listarr(self._cs.getZ)
+        return self._listarr(self._cs.getZ) if self.hasz else None
 
 
 # LinearRings are LineStrings used within Polygons.

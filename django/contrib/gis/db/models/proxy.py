@@ -69,14 +69,11 @@ class SpatialProxy(DeferredAttribute):
             if value.srid is None:
                 # Assigning the field SRID if the geometry has no SRID.
                 value.srid = self.field.srid
-        elif value is None or isinstance(value, (str, memoryview)):
-            # Set geometries with None, WKT, HEX, or WKB
-            pass
-        else:
+        elif value is not None and not isinstance(value, (str, memoryview)):
             raise TypeError(
-                "Cannot set %s SpatialProxy (%s) with value of type: %s"
-                % (instance.__class__.__name__, gtype, type(value))
+                f"Cannot set {instance.__class__.__name__} SpatialProxy ({gtype}) with value of type: {type(value)}"
             )
+
 
         # Setting the objects dictionary with the value, and returning.
         instance.__dict__[self.field.attname] = value

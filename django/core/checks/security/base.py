@@ -126,18 +126,18 @@ W022 = Warning(
 
 E023 = Error(
     "You have set the SECURE_REFERRER_POLICY setting to an invalid value.",
-    hint="Valid values are: {}.".format(", ".join(sorted(REFERRER_POLICY_VALUES))),
+    hint=f'Valid values are: {", ".join(sorted(REFERRER_POLICY_VALUES))}.',
     id="security.E023",
 )
+
 
 E024 = Error(
     "You have set the SECURE_CROSS_ORIGIN_OPENER_POLICY setting to an invalid "
     "value.",
-    hint="Valid values are: {}.".format(
-        ", ".join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES)),
-    ),
+    hint=f'Valid values are: {", ".join(sorted(CROSS_ORIGIN_OPENER_POLICY_VALUES))}.',
     id="security.E024",
 )
+
 
 W025 = Warning(SECRET_KEY_WARNING_MSG, id="security.W025")
 
@@ -231,11 +231,12 @@ def check_secret_key_fallbacks(app_configs, **kwargs):
     except (ImproperlyConfigured, AttributeError):
         warnings.append(Warning(W025.msg % "SECRET_KEY_FALLBACKS", id=W025.id))
     else:
-        for index, key in enumerate(fallbacks):
-            if not _check_secret_key(key):
-                warnings.append(
-                    Warning(W025.msg % f"SECRET_KEY_FALLBACKS[{index}]", id=W025.id)
-                )
+        warnings.extend(
+            Warning(W025.msg % f"SECRET_KEY_FALLBACKS[{index}]", id=W025.id)
+            for index, key in enumerate(fallbacks)
+            if not _check_secret_key(key)
+        )
+
     return warnings
 
 

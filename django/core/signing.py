@@ -193,18 +193,15 @@ class Signer:
                 "Unsafe Signer separator: %r (cannot be empty or consist of "
                 "only A-z0-9-_=)" % sep,
             )
-        self.salt = salt or "%s.%s" % (
-            self.__class__.__module__,
-            self.__class__.__name__,
-        )
+        self.salt = salt or f"{self.__class__.__module__}.{self.__class__.__name__}"
         self.algorithm = algorithm or "sha256"
 
     def signature(self, value, key=None):
         key = key or self.key
-        return base64_hmac(self.salt + "signer", value, key, algorithm=self.algorithm)
+        return base64_hmac(f"{self.salt}signer", value, key, algorithm=self.algorithm)
 
     def sign(self, value):
-        return "%s%s%s" % (value, self.sep, self.signature(value))
+        return f"{value}{self.sep}{self.signature(value)}"
 
     def unsign(self, signed_value):
         if self.sep not in signed_value:
@@ -237,7 +234,7 @@ class Signer:
                 is_compressed = True
         base64d = b64_encode(data).decode()
         if is_compressed:
-            base64d = "." + base64d
+            base64d = f".{base64d}"
         return self.sign(base64d)
 
     def unsign_object(self, signed_obj, serializer=JSONSerializer, **kwargs):
@@ -259,7 +256,7 @@ class TimestampSigner(Signer):
         return b62_encode(int(time.time()))
 
     def sign(self, value):
-        value = "%s%s%s" % (value, self.sep, self.timestamp())
+        value = f"{value}{self.sep}{self.timestamp()}"
         return super().sign(value)
 
     def unsign(self, value, max_age=None):
@@ -276,5 +273,5 @@ class TimestampSigner(Signer):
             # Check timestamp is not older than max_age
             age = time.time() - timestamp
             if age > max_age:
-                raise SignatureExpired("Signature age %s > %s seconds" % (age, max_age))
+                raise SignatureExpired(f"Signature age {age} > {max_age} seconds")
         return value

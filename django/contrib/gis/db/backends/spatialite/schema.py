@@ -179,13 +179,15 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
                 )
             if getattr(field, "spatial_index", False):
                 self.execute(
-                    self.sql_rename_table
-                    % {
-                        "old_table": self.quote_name(
-                            "idx_%s_%s" % (old_db_table, field.column)
-                        ),
-                        "new_table": self.quote_name(
-                            "idx_%s_%s" % (new_db_table, field.column)
-                        ),
-                    }
+                    (
+                        self.sql_rename_table
+                        % {
+                            "old_table": self.quote_name(
+                                f"idx_{old_db_table}_{field.column}"
+                            ),
+                            "new_table": self.quote_name(
+                                f"idx_{new_db_table}_{field.column}"
+                            ),
+                        }
+                    )
                 )

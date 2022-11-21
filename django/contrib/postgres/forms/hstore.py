@@ -19,9 +19,7 @@ class HStoreField(forms.CharField):
     }
 
     def prepare_value(self, value):
-        if isinstance(value, dict):
-            return json.dumps(value)
-        return value
+        return json.dumps(value) if isinstance(value, dict) else value
 
     def to_python(self, value):
         if not value:

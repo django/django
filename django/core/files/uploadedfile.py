@@ -43,7 +43,7 @@ class UploadedFile(File):
         self.content_type_extra = content_type_extra
 
     def __repr__(self):
-        return "<%s: %s (%s)>" % (self.__class__.__name__, self.name, self.content_type)
+        return f"<{self.__class__.__name__}: {self.name} ({self.content_type})>"
 
     def _get_name(self):
         return self._name
@@ -75,8 +75,9 @@ class TemporaryUploadedFile(UploadedFile):
     def __init__(self, name, content_type, size, charset, content_type_extra=None):
         _, ext = os.path.splitext(name)
         file = tempfile.NamedTemporaryFile(
-            suffix=".upload" + ext, dir=settings.FILE_UPLOAD_TEMP_DIR
+            suffix=f".upload{ext}", dir=settings.FILE_UPLOAD_TEMP_DIR
         )
+
         super().__init__(file, name, content_type, size, charset, content_type_extra)
 
     def temporary_file_path(self):

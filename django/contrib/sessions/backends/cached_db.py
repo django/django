@@ -33,8 +33,7 @@ class SessionStore(DBStore):
             data = None
 
         if data is None:
-            s = self._get_session_from_db()
-            if s:
+            if s := self._get_session_from_db():
                 data = self.decode(s.session_data)
                 self._cache.set(
                     self.cache_key, data, self.get_expiry_age(expiry=s.expire_date)

@@ -49,19 +49,19 @@ class DistanceField(models.FloatField):
         self.geo_field = geo_field
 
     def get_prep_value(self, value):
-        if isinstance(value, Distance):
-            return value
-        return super().get_prep_value(value)
+        return value if isinstance(value, Distance) else super().get_prep_value(value)
 
     def get_db_prep_value(self, value, connection, prepared=False):
         if not isinstance(value, Distance):
             return value
-        distance_att = connection.ops.get_distance_att_for_field(self.geo_field)
-        if not distance_att:
+        if distance_att := connection.ops.get_distance_att_for_field(
+            self.geo_field
+        ):
+            return getattr(value, distance_att)
+        else:
             raise ValueError(
                 "Distance measure is supplied, but units are unknown for result."
             )
-        return getattr(value, distance_att)
 
     def from_db_value(self, value, expression, connection):
         if value is None:

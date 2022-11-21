@@ -7,4 +7,4 @@ class RangeSerializer(BaseSerializer):
         # Ranges are implemented in psycopg2._range but the public import
         # location is psycopg2.extras.
         module = "psycopg2.extras" if module == "psycopg2._range" else module
-        return "%s.%r" % (module, self.value), {"import %s" % module}
+        return "%s.%r" % (module, self.value), {f"import {module}"}

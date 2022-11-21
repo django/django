@@ -41,8 +41,9 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
         placemarks = []
         if connection.features.has_Transform_function:
             qs = klass._default_manager.using(using).annotate(
-                **{"%s_4326" % field_name: Transform(field_name, 4326)}
+                **{f"{field_name}_4326": Transform(field_name, 4326)}
             )
+
             field_name += "_4326"
         else:
             qs = klass._default_manager.using(using).all()
@@ -51,10 +52,7 @@ def kml(request, label, model, field_name=None, compress=False, using=DEFAULT_DB
             placemarks.append(mod)
 
     # Getting the render function and rendering to the correct.
-    if compress:
-        render = render_to_kmz
-    else:
-        render = render_to_kml
+    render = render_to_kmz if compress else render_to_kml
     return render("gis/kml/placemarks.kml", {"places": placemarks})
 
 

@@ -233,13 +233,7 @@ def sort_dependencies(app_list, allow_cycles=False):
             else:
                 skipped.append((model, deps))
         if not changed:
-            if allow_cycles:
-                # If cycles are allowed, add the last skipped model and ignore
-                # its dependencies. This could be improved by some graph
-                # analysis to ignore as few dependencies as possible.
-                model, _ = skipped.pop()
-                model_list.append(model)
-            else:
+            if not allow_cycles:
                 raise RuntimeError(
                     "Can't resolve dependencies for %s in serialized app list."
                     % ", ".join(
@@ -249,6 +243,11 @@ def sort_dependencies(app_list, allow_cycles=False):
                         )
                     ),
                 )
+            # If cycles are allowed, add the last skipped model and ignore
+            # its dependencies. This could be improved by some graph
+            # analysis to ignore as few dependencies as possible.
+            model, _ = skipped.pop()
+            model_list.append(model)
         model_dependencies = skipped
 
     return model_list

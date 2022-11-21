@@ -153,16 +153,16 @@ class ContentType(models.Model):
     @property
     def name(self):
         model = self.model_class()
-        if not model:
-            return self.model
-        return str(model._meta.verbose_name)
+        return str(model._meta.verbose_name) if model else self.model
 
     @property
     def app_labeled_name(self):
         model = self.model_class()
-        if not model:
-            return self.model
-        return "%s | %s" % (model._meta.app_label, model._meta.verbose_name)
+        return (
+            f"{model._meta.app_label} | {model._meta.verbose_name}"
+            if model
+            else self.model
+        )
 
     def model_class(self):
         """Return the model class for this type of content."""

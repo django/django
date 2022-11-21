@@ -52,8 +52,8 @@ def check_user_model(app_configs=None, **kwargs):
         )
 
     # Check that the username field is unique
-    if not cls._meta.get_field(cls.USERNAME_FIELD).unique and not any(
-        constraint.fields == (cls.USERNAME_FIELD,)
+    if not cls._meta.get_field(cls.USERNAME_FIELD).unique and all(
+        constraint.fields != (cls.USERNAME_FIELD,)
         for constraint in cls._meta.total_unique_constraints
     ):
         if settings.AUTHENTICATION_BACKENDS == [
@@ -141,11 +141,10 @@ def check_models_permissions(app_configs=None, **kwargs):
                 )
             )
         # Check builtin permission codename length.
-        max_builtin_permission_codename_length = (
-            max(len(codename) for codename in builtin_permissions.keys())
-            if builtin_permissions
-            else 0
+        max_builtin_permission_codename_length = max(
+            (len(codename) for codename in builtin_permissions), default=0
         )
+
         if max_builtin_permission_codename_length > permission_codename_max_length:
             model_name_max_length = permission_codename_max_length - (
                 max_builtin_permission_codename_length - len(opts.model_name)

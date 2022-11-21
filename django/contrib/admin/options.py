@@ -383,9 +383,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         Hook for specifying fieldsets.
         """
-        if self.fieldsets:
-            return self.fieldsets
-        return [(None, {"fields": self.get_fields(request, obj)})]
+        return self.fieldsets or [(None, {"fields": self.get_fields(request, obj)})]
 
     def get_inlines(self, request, obj):
         """Hook for specifying custom inlines."""
@@ -415,9 +413,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         admin site. This is used by changelist_view.
         """
         qs = self.model._default_manager.get_queryset()
-        # TODO: this should be handled by some parameter to the ChangeList.
-        ordering = self.get_ordering(request)
-        if ordering:
+        if ordering := self.get_ordering(request):
             qs = qs.order_by(*ordering)
         return qs
 
@@ -542,7 +538,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("add", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_change_permission(self, request, obj=None):
         """
@@ -557,7 +553,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("change", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_delete_permission(self, request, obj=None):
         """
@@ -572,7 +568,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         """
         opts = self.opts
         codename = get_permission_codename("delete", opts)
-        return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+        return request.user.has_perm(f"{opts.app_label}.{codename}")
 
     def has_view_permission(self, request, obj=None):
         """
@@ -589,8 +585,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         codename_view = get_permission_codename("view", opts)
         codename_change = get_permission_codename("change", opts)
         return request.user.has_perm(
-            "%s.%s" % (opts.app_label, codename_view)
-        ) or request.user.has_perm("%s.%s" % (opts.app_label, codename_change))
+            f"{opts.app_label}.{codename_view}"
+        ) or request.user.has_perm(f"{opts.app_label}.{codename_change}")
 
     def has_view_or_change_permission(self, request, obj=None):
         return self.has_view_permission(request, obj) or self.has_change_permission(
@@ -655,7 +651,7 @@ class ModelAdmin(BaseModelAdmin):
         super().__init__()
 
     def __str__(self):
-        return "%s.%s" % (self.opts.app_label, self.__class__.__name__)
+        return f"{self.opts.app_label}.{self.__class__.__name__}"
 
     def __repr__(self):
         return (
@@ -730,16 +726,17 @@ class ModelAdmin(BaseModelAdmin):
     def media(self):
         extra = "" if settings.DEBUG else ".min"
         js = [
-            "vendor/jquery/jquery%s.js" % extra,
+            f"vendor/jquery/jquery{extra}.js",
             "jquery.init.js",
             "core.js",
             "admin/RelatedObjectLookups.js",
             "actions.js",
             "urlify.js",
             "prepopulate.js",
-            "vendor/xregexp/xregexp%s.js" % extra,
+            f"vendor/xregexp/xregexp{extra}.js",
         ]
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+
+        return forms.Media(js=[f"admin/js/{url}" for url in js])
 
     def get_model_perms(self, request):
         """
@@ -809,8 +806,7 @@ class ModelAdmin(BaseModelAdmin):
             return modelform_factory(self.model, **defaults)
         except FieldError as e:
             raise FieldError(
-                "%s. Check fields/fieldsets/exclude attributes of class %s."
-                % (e, self.__class__.__name__)
+                f"{e}. Check fields/fieldsets/exclude attributes of class {self.__class__.__name__}."
             )
 
     def get_changelist(self, request, **kwargs):
@@ -1000,9 +996,10 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
                 continue
             permission_checks = (
-                getattr(self, "has_%s_permission" % permission)
+                getattr(self, f"has_{permission}_permission")
                 for permission in callable.allowed_permissions
             )
+
             if any(has_permission(request) for has_permission in permission_checks):
                 filtered_actions.append(action)
         return filtered_actions
@@ -1109,11 +1106,11 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name[1:]
+                return f"{field_name[1:]}__istartswith"
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name[1:]
+                return f"{field_name[1:]}__iexact"
             elif field_name.startswith("@"):
-                return "%s__search" % field_name[1:]
+                return f"{field_name[1:]}__search"
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)
@@ -1134,7 +1131,7 @@ class ModelAdmin(BaseModelAdmin):
                         # Update opts to follow the relation.
                         opts = field.path_infos[-1].to_opts
             # Otherwise, use the field with icontains.
-            return "%s__icontains" % field_name
+            return f"{field_name}__icontains"
 
         may_have_duplicates = False
         search_fields = self.get_search_fields(request)
@@ -1164,11 +1161,11 @@ class ModelAdmin(BaseModelAdmin):
         """
         match = request.resolver_match
         if self.preserve_filters and match:
-            current_url = "%s:%s" % (match.app_name, match.url_name)
-            changelist_url = "admin:%s_%s_changelist" % (
-                self.opts.app_label,
-                self.opts.model_name,
+            current_url = f"{match.app_name}:{match.url_name}"
+            changelist_url = (
+                f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist"
             )
+
             if current_url == changelist_url:
                 preserved_filters = request.GET.urlencode()
             else:
@@ -1202,11 +1199,11 @@ class ModelAdmin(BaseModelAdmin):
                 level = getattr(messages.constants, level.upper())
             except AttributeError:
                 levels = messages.constants.DEFAULT_TAGS.values()
-                levels_repr = ", ".join("`%s`" % level for level in levels)
+                levels_repr = ", ".join(f"`{level}`" for level in levels)
                 raise ValueError(
-                    "Bad message level string: `%s`. Possible values are: %s"
-                    % (level, levels_repr)
+                    f"Bad message level string: `{level}`. Possible values are: {levels_repr}"
                 )
+
 
         messages.add_message(
             request, level, message, extra_tags=extra_tags, fail_silently=fail_silently
@@ -1262,15 +1259,15 @@ class ModelAdmin(BaseModelAdmin):
             {"preserved_filters": preserved_filters, "opts": self.opts}, form_url
         )
         view_on_site_url = self.get_view_on_site_url(obj)
-        has_editable_inline_admin_formsets = False
-        for inline in context["inline_admin_formsets"]:
-            if (
+        has_editable_inline_admin_formsets = any(
+            (
                 inline.has_add_permission
                 or inline.has_change_permission
                 or inline.has_delete_permission
-            ):
-                has_editable_inline_admin_formsets = True
-                break
+            )
+            for inline in context["inline_admin_formsets"]
+        )
+
         context.update(
             {
                 "add": add,
@@ -1310,8 +1307,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             form_template
             or [
-                "admin/%s/%s/change_form.html" % (app_label, self.opts.model_name),
-                "admin/%s/change_form.html" % app_label,
+                f"admin/{app_label}/{self.opts.model_name}/change_form.html",
+                f"admin/{app_label}/change_form.html",
                 "admin/change_form.html",
             ],
             context,
@@ -1324,10 +1321,11 @@ class ModelAdmin(BaseModelAdmin):
         opts = obj._meta
         preserved_filters = self.get_preserved_filters(request)
         obj_url = reverse(
-            "admin:%s_%s_change" % (opts.app_label, opts.model_name),
+            f"admin:{opts.app_label}_{opts.model_name}_change",
             args=(quote(obj.pk),),
             current_app=self.admin_site.name,
         )
+
         # Add a link to the object's change form if the user can edit the obj.
         if self.has_change_permission(request, obj):
             obj_repr = format_html('<a href="{}">{}</a>', urlquote(obj_url), obj)
@@ -1341,8 +1339,7 @@ class ModelAdmin(BaseModelAdmin):
         # the presence of keys in request.POST.
 
         if IS_POPUP_VAR in request.POST:
-            to_field = request.POST.get(TO_FIELD_VAR)
-            if to_field:
+            if to_field := request.POST.get(TO_FIELD_VAR):
                 attr = str(to_field)
             else:
                 attr = obj._meta.pk.attname
@@ -1357,15 +1354,15 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (opts.app_label, opts.model_name),
-                    "admin/%s/popup_response.html" % opts.app_label,
+                    f"admin/{opts.app_label}/{opts.model_name}/popup_response.html",
+                    f"admin/{opts.app_label}/popup_response.html",
                     "admin/popup_response.html",
                 ],
                 {
                     "popup_response_data": popup_response_data,
                 },
             )
+
 
         elif "_continue" in request.POST or (
             # Redirecting after "Save as new".
@@ -1430,15 +1427,15 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (opts.app_label, opts.model_name),
-                    "admin/%s/popup_response.html" % opts.app_label,
+                    f"admin/{opts.app_label}/{opts.model_name}/popup_response.html",
+                    f"admin/{opts.app_label}/popup_response.html",
                     "admin/popup_response.html",
                 ],
                 {
                     "popup_response_data": popup_response_data,
                 },
             )
+
 
         opts = self.opts
         preserved_filters = self.get_preserved_filters(request)
@@ -1472,10 +1469,11 @@ class ModelAdmin(BaseModelAdmin):
             )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse(
-                "admin:%s_%s_change" % (opts.app_label, opts.model_name),
+                f"admin:{opts.app_label}_{opts.model_name}_change",
                 args=(obj.pk,),
                 current_app=self.admin_site.name,
             )
+
             redirect_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
             )
@@ -1491,9 +1489,10 @@ class ModelAdmin(BaseModelAdmin):
             )
             self.message_user(request, msg, messages.SUCCESS)
             redirect_url = reverse(
-                "admin:%s_%s_add" % (opts.app_label, opts.model_name),
+                f"admin:{opts.app_label}_{opts.model_name}_add",
                 current_app=self.admin_site.name,
             )
+
             redirect_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": opts}, redirect_url
             )
@@ -1509,9 +1508,10 @@ class ModelAdmin(BaseModelAdmin):
     def _response_post_save(self, request, obj):
         if self.has_view_or_change_permission(request):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist",
                 current_app=self.admin_site.name,
             )
+
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
@@ -1618,15 +1618,15 @@ class ModelAdmin(BaseModelAdmin):
                 request,
                 self.popup_response_template
                 or [
-                    "admin/%s/%s/popup_response.html"
-                    % (self.opts.app_label, self.opts.model_name),
-                    "admin/%s/popup_response.html" % self.opts.app_label,
+                    f"admin/{self.opts.app_label}/{self.opts.model_name}/popup_response.html",
+                    f"admin/{self.opts.app_label}/popup_response.html",
                     "admin/popup_response.html",
                 ],
                 {
                     "popup_response_data": popup_response_data,
                 },
             )
+
 
         self.message_user(
             request,
@@ -1640,9 +1640,10 @@ class ModelAdmin(BaseModelAdmin):
 
         if self.has_change_permission(request, None):
             post_url = reverse(
-                "admin:%s_%s_changelist" % (self.opts.app_label, self.opts.model_name),
+                f"admin:{self.opts.app_label}_{self.opts.model_name}_changelist",
                 current_app=self.admin_site.name,
             )
+
             preserved_filters = self.get_preserved_filters(request)
             post_url = add_preserved_filters(
                 {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
@@ -1665,10 +1666,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.delete_confirmation_template
             or [
-                "admin/{}/{}/delete_confirmation.html".format(
-                    app_label, self.opts.model_name
-                ),
-                "admin/{}/delete_confirmation.html".format(app_label),
+                f"admin/{app_label}/{self.opts.model_name}/delete_confirmation.html",
+                f"admin/{app_label}/delete_confirmation.html",
                 "admin/delete_confirmation.html",
             ],
             context,
@@ -1749,8 +1748,9 @@ class ModelAdmin(BaseModelAdmin):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field %s cannot be referenced." % to_field
+                f"The field {to_field} cannot be referenced."
             )
+
 
         if request.method == "POST" and "_saveasnew" in request.POST:
             object_id = None
@@ -1765,13 +1765,13 @@ class ModelAdmin(BaseModelAdmin):
         else:
             obj = self.get_object(request, unquote(object_id), to_field)
 
-            if request.method == "POST":
-                if not self.has_change_permission(request, obj):
-                    raise PermissionDenied
-            else:
-                if not self.has_view_or_change_permission(request, obj):
-                    raise PermissionDenied
-
+            if (
+                request.method == "POST"
+                and not self.has_change_permission(request, obj)
+                or request.method != "POST"
+                and not self.has_view_or_change_permission(request, obj)
+            ):
+                raise PermissionDenied
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(
                     request, self.opts, object_id
@@ -1789,10 +1789,12 @@ class ModelAdmin(BaseModelAdmin):
                 change=not add,
             )
             form_validated = form.is_valid()
-            if form_validated:
-                new_object = self.save_form(request, form, change=not add)
-            else:
-                new_object = form.instance
+            new_object = (
+                self.save_form(request, form, change=not add)
+                if form_validated
+                else form.instance
+            )
+
             if all_valid(formsets) and form_validated:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
@@ -1807,18 +1809,17 @@ class ModelAdmin(BaseModelAdmin):
                     return self.response_change(request, new_object)
             else:
                 form_validated = False
+        elif add:
+            initial = self.get_changeform_initial_data(request)
+            form = ModelForm(initial=initial)
+            formsets, inline_instances = self._create_formsets(
+                request, form.instance, change=False
+            )
         else:
-            if add:
-                initial = self.get_changeform_initial_data(request)
-                form = ModelForm(initial=initial)
-                formsets, inline_instances = self._create_formsets(
-                    request, form.instance, change=False
-                )
-            else:
-                form = ModelForm(instance=obj)
-                formsets, inline_instances = self._create_formsets(
-                    request, obj, change=True
-                )
+            form = ModelForm(instance=obj)
+            formsets, inline_instances = self._create_formsets(
+                request, obj, change=True
+            )
 
         if not add and not self.has_change_permission(request, obj):
             readonly_fields = flatten_fieldsets(fieldsets)
@@ -1875,7 +1876,7 @@ class ModelAdmin(BaseModelAdmin):
             # Use the change template instead of the add template.
             add = False
 
-        context.update(extra_context or {})
+        context |= (extra_context or {})
 
         return self.render_change_form(
             request, context, add=add, change=not add, obj=obj, form_url=form_url
@@ -1889,9 +1890,7 @@ class ModelAdmin(BaseModelAdmin):
 
     def _get_edited_object_pks(self, request, prefix):
         """Return POST data values of list_editable primary keys."""
-        pk_pattern = re.compile(
-            r"{}-\d+-{}$".format(re.escape(prefix), self.opts.pk.name)
-        )
+        pk_pattern = re.compile(f"{re.escape(prefix)}-\d+-{self.opts.pk.name}$")
         return [value for key, value in request.POST.items() if pk_pattern.match(key)]
 
     def _get_list_editable_queryset(self, request, prefix):
@@ -1937,7 +1936,7 @@ class ModelAdmin(BaseModelAdmin):
                         "title": _("Database error"),
                     },
                 )
-            return HttpResponseRedirect(request.path + "?" + ERROR_FLAG + "=1")
+            return HttpResponseRedirect(f"{request.path}?{ERROR_FLAG}=1")
 
         # If the request was POSTed, this might be a bulk action or a bulk
         # edit. Try to look up an action or confirmation first, but if this
@@ -1955,10 +1954,9 @@ class ModelAdmin(BaseModelAdmin):
             and "_save" not in request.POST
         ):
             if selected:
-                response = self.response_action(
+                if response := self.response_action(
                     request, queryset=cl.get_queryset(request)
-                )
-                if response:
+                ):
                     return response
                 else:
                     action_failed = True
@@ -1977,15 +1975,13 @@ class ModelAdmin(BaseModelAdmin):
             and helpers.ACTION_CHECKBOX_NAME in request.POST
             and "index" not in request.POST
             and "_save" not in request.POST
-        ):
-            if selected:
-                response = self.response_action(
-                    request, queryset=cl.get_queryset(request)
-                )
-                if response:
-                    return response
-                else:
-                    action_failed = True
+        ) and selected:
+            if response := self.response_action(
+                request, queryset=cl.get_queryset(request)
+            ):
+                return response
+            else:
+                action_failed = True
 
         if action_failed:
             # Redirect back to the changelist page to avoid resubmitting the
@@ -2041,11 +2037,7 @@ class ModelAdmin(BaseModelAdmin):
             formset = cl.formset = FormSet(queryset=cl.result_list)
 
         # Build the list of media to be used by the formset.
-        if formset:
-            media = self.media + formset.media
-        else:
-            media = self.media
-
+        media = self.media + formset.media if formset else self.media
         # Build the action form and populate it with available actions.
         if actions:
             action_form = self.action_form(auto_id=None)
@@ -2085,8 +2077,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.change_list_template
             or [
-                "admin/%s/%s/change_list.html" % (app_label, self.opts.model_name),
-                "admin/%s/change_list.html" % app_label,
+                f"admin/{app_label}/{self.opts.model_name}/change_list.html",
+                f"admin/{app_label}/change_list.html",
                 "admin/change_list.html",
             ],
             context,
@@ -2111,8 +2103,9 @@ class ModelAdmin(BaseModelAdmin):
         to_field = request.POST.get(TO_FIELD_VAR, request.GET.get(TO_FIELD_VAR))
         if to_field and not self.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field %s cannot be referenced." % to_field
+                f"The field {to_field} cannot be referenced."
             )
+
 
         obj = self.get_object(request, unquote(object_id), to_field)
 
@@ -2222,8 +2215,8 @@ class ModelAdmin(BaseModelAdmin):
             request,
             self.object_history_template
             or [
-                "admin/%s/%s/object_history.html" % (app_label, self.opts.model_name),
-                "admin/%s/object_history.html" % app_label,
+                f"admin/{app_label}/{self.opts.model_name}/object_history.html",
+                f"admin/{app_label}/object_history.html",
                 "admin/object_history.html",
             ],
             context,
@@ -2236,13 +2229,12 @@ class ModelAdmin(BaseModelAdmin):
             "queryset": inline.get_queryset(request),
         }
         if request.method == "POST":
-            formset_params.update(
-                {
-                    "data": request.POST.copy(),
-                    "files": request.FILES,
-                    "save_as_new": "_saveasnew" in request.POST,
-                }
-            )
+            formset_params |= {
+                "data": request.POST.copy(),
+                "files": request.FILES,
+                "save_as_new": "_saveasnew" in request.POST,
+            }
+
         return formset_params
 
     def _create_formsets(self, request, obj, change):
@@ -2257,7 +2249,7 @@ class ModelAdmin(BaseModelAdmin):
             prefix = FormSet.get_default_prefix()
             prefixes[prefix] = prefixes.get(prefix, 0) + 1
             if prefixes[prefix] != 1 or not prefix:
-                prefix = "%s-%s" % (prefix, prefixes[prefix])
+                prefix = f"{prefix}-{prefixes[prefix]}"
             formset_params = self.get_formset_kwargs(request, obj, inline, prefix)
             formset = FormSet(**formset_params)
 
@@ -2321,12 +2313,12 @@ class InlineModelAdmin(BaseModelAdmin):
     @property
     def media(self):
         extra = "" if settings.DEBUG else ".min"
-        js = ["vendor/jquery/jquery%s.js" % extra, "jquery.init.js", "inlines.js"]
+        js = [f"vendor/jquery/jquery{extra}.js", "jquery.init.js", "inlines.js"]
         if self.filter_vertical or self.filter_horizontal:
             js.extend(["SelectBox.js", "SelectFilter2.js"])
         if self.classes and "collapse" in self.classes:
             js.append("collapse.js")
-        return forms.Media(js=["admin/js/%s" % url for url in js])
+        return forms.Media(js=[f"admin/js/{url}" for url in js])
 
     def get_extra(self, request, obj=None, **kwargs):
         """Hook for customizing the number of extra inline forms."""
@@ -2375,6 +2367,8 @@ class InlineModelAdmin(BaseModelAdmin):
         can_change = self.has_change_permission(request, obj) if request else True
         can_add = self.has_add_permission(request, obj) if request else True
 
+
+
         class DeleteProtectedModelForm(base_model_form):
             def hand_clean_DELETE(self):
                 """
@@ -2382,35 +2376,33 @@ class InlineModelAdmin(BaseModelAdmin):
                 templates it's not rendered using the field information, but
                 just using a generic "deletion_field" of the InlineModelAdmin.
                 """
-                if self.cleaned_data.get(DELETION_FIELD_NAME, False):
-                    using = router.db_for_write(self._meta.model)
-                    collector = NestedObjects(using=using)
-                    if self.instance._state.adding:
-                        return
-                    collector.collect([self.instance])
-                    if collector.protected:
-                        objs = []
-                        for p in collector.protected:
-                            objs.append(
-                                # Translators: Model verbose name and instance
-                                # representation, suitable to be an item in a
-                                # list.
-                                _("%(class_name)s %(instance)s")
-                                % {"class_name": p._meta.verbose_name, "instance": p}
-                            )
-                        params = {
-                            "class_name": self._meta.model._meta.verbose_name,
-                            "instance": self.instance,
-                            "related_objects": get_text_list(objs, _("and")),
-                        }
-                        msg = _(
-                            "Deleting %(class_name)s %(instance)s would require "
-                            "deleting the following protected related objects: "
-                            "%(related_objects)s"
-                        )
-                        raise ValidationError(
-                            msg, code="deleting_protected", params=params
-                        )
+                if not self.cleaned_data.get(DELETION_FIELD_NAME, False):
+                    return
+                using = router.db_for_write(self._meta.model)
+                collector = NestedObjects(using=using)
+                if self.instance._state.adding:
+                    return
+                collector.collect([self.instance])
+                if collector.protected:
+                    objs = [
+                        _("%(class_name)s %(instance)s")
+                        % {"class_name": p._meta.verbose_name, "instance": p}
+                        for p in collector.protected
+                    ]
+
+                    params = {
+                        "class_name": self._meta.model._meta.verbose_name,
+                        "instance": self.instance,
+                        "related_objects": get_text_list(objs, _("and")),
+                    }
+                    msg = _(
+                        "Deleting %(class_name)s %(instance)s would require "
+                        "deleting the following protected related objects: "
+                        "%(related_objects)s"
+                    )
+                    raise ValidationError(
+                        msg, code="deleting_protected", params=params
+                    )
 
             def is_valid(self):
                 result = super().is_valid()
@@ -2424,6 +2416,7 @@ class InlineModelAdmin(BaseModelAdmin):
                 if not can_add and self.instance._state.adding:
                     return False
                 return super().has_changed()
+
 
         defaults["form"] = DeleteProtectedModelForm
 
@@ -2450,15 +2443,19 @@ class InlineModelAdmin(BaseModelAdmin):
         Return True if the user has any of the given permissions ('add',
         'change', etc.) for the model that points to the through model.
         """
-        opts = self.opts
-        # Find the target model of an auto-created many-to-many relationship.
-        for field in opts.fields:
-            if field.remote_field and field.remote_field.model != self.parent_model:
-                opts = field.remote_field.model._meta
-                break
+        opts = next(
+            (
+                field.remote_field.model._meta
+                for field in opts.fields
+                if field.remote_field
+                and field.remote_field.model != self.parent_model
+            ),
+            self.opts,
+        )
+
         return any(
             request.user.has_perm(
-                "%s.%s" % (opts.app_label, get_permission_codename(perm, opts))
+                f"{opts.app_label}.{get_permission_codename(perm, opts)}"
             )
             for perm in perms
         )

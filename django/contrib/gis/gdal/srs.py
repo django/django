@@ -68,7 +68,7 @@ class SpatialReference(GDALBase):
             if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
                 capi.set_axis_strategy(self.ptr, self.axis_order)
             elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
-                raise ValueError("%s is not supported in GDAL < 3.0." % self.axis_order)
+                raise ValueError(f"{self.axis_order} is not supported in GDAL < 3.0.")
             return
         elif isinstance(srs_input, str):
             try:
@@ -97,16 +97,14 @@ class SpatialReference(GDALBase):
 
         # If the pointer is NULL, throw an exception.
         if not srs:
-            raise SRSException(
-                "Could not create spatial reference from: %s" % srs_input
-            )
+            raise SRSException(f"Could not create spatial reference from: {srs_input}")
         else:
             self.ptr = srs
 
         if self.axis_order == AxisOrder.TRADITIONAL and GDAL_VERSION >= (3, 0):
             capi.set_axis_strategy(self.ptr, self.axis_order)
         elif self.axis_order != AxisOrder.TRADITIONAL and GDAL_VERSION < (3, 0):
-            raise ValueError("%s is not supported in GDAL < 3.0." % self.axis_order)
+            raise ValueError(f"{self.axis_order} is not supported in GDAL < 3.0.")
         # Importing from either the user input string or an integer SRID.
         if srs_type == "user":
             self.import_user_input(srs_input)

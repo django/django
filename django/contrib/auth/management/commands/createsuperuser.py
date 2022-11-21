@@ -36,9 +36,10 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            "--%s" % self.UserModel.USERNAME_FIELD,
+            f"--{self.UserModel.USERNAME_FIELD}",
             help="Specifies the login for the superuser.",
         )
+
         parser.add_argument(
             "--noinput",
             "--no-input",
@@ -70,17 +71,18 @@ class Command(BaseCommand):
                     )
                 else:
                     parser.add_argument(
-                        "--%s" % field_name,
+                        f"--{field_name}",
                         action="append",
                         help=(
                             "Specifies the %s for the superuser. Can be used "
                             "multiple times." % field_name,
                         ),
                     )
+
             else:
                 parser.add_argument(
-                    "--%s" % field_name,
-                    help="Specifies the %s for the superuser." % field_name,
+                    f"--{field_name}",
+                    help=f"Specifies the {field_name} for the superuser.",
                 )
 
     def execute(self, *args, **options):
@@ -101,23 +103,17 @@ class Command(BaseCommand):
             user_data[PASSWORD_FIELD] = None
         try:
             if options["interactive"]:
-                # Same as user_data but without many to many fields and with
-                # foreign keys as fake model instances instead of raw IDs.
-                fake_user_data = {}
                 if hasattr(self.stdin, "isatty") and not self.stdin.isatty():
                     raise NotRunningInTTYException
                 default_username = get_default_username(database=database)
                 if username:
-                    error_msg = self._validate_username(
+                    if error_msg := self._validate_username(
                         username, verbose_field_name, database
-                    )
-                    if error_msg:
+                    ):
                         self.stderr.write(error_msg)
                         username = None
                 elif username == "":
-                    raise CommandError(
-                        "%s cannot be blank." % capfirst(verbose_field_name)
-                    )
+                    raise CommandError(f"{capfirst(verbose_field_name)} cannot be blank.")
                 # Prompt for username.
                 while username is None:
                     message = self._get_input_message(
@@ -127,19 +123,21 @@ class Command(BaseCommand):
                         self.username_field, message, default_username
                     )
                     if username:
-                        error_msg = self._validate_username(
+                        if error_msg := self._validate_username(
                             username, verbose_field_name, database
-                        )
-                        if error_msg:
+                        ):
                             self.stderr.write(error_msg)
                             username = None
                             continue
                 user_data[self.UserModel.USERNAME_FIELD] = username
-                fake_user_data[self.UserModel.USERNAME_FIELD] = (
-                    self.username_field.remote_field.model(username)
+                fake_user_data = {
+                    self.UserModel.USERNAME_FIELD: self.username_field.remote_field.model(
+                        username
+                    )
                     if self.username_field.remote_field
                     else username
-                )
+                }
+
                 # Prompt for required fields.
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     field = self.UserModel._meta.get_field(field_name)
@@ -201,28 +199,25 @@ class Command(BaseCommand):
                 # options.
                 if username is None:
                     username = os.environ.get(
-                        "DJANGO_SUPERUSER_" + self.UserModel.USERNAME_FIELD.upper()
+                        f"DJANGO_SUPERUSER_{self.UserModel.USERNAME_FIELD.upper()}"
                     )
+
                 if username is None:
                     raise CommandError(
-                        "You must use --%s with --noinput."
-                        % self.UserModel.USERNAME_FIELD
+                        f"You must use --{self.UserModel.USERNAME_FIELD} with --noinput."
                     )
-                else:
-                    error_msg = self._validate_username(
-                        username, verbose_field_name, database
-                    )
-                    if error_msg:
-                        raise CommandError(error_msg)
+
+                if error_msg := self._validate_username(
+                    username, verbose_field_name, database
+                ):
+                    raise CommandError(error_msg)
 
                 user_data[self.UserModel.USERNAME_FIELD] = username
                 for field_name in self.UserModel.REQUIRED_FIELDS:
-                    env_var = "DJANGO_SUPERUSER_" + field_name.upper()
+                    env_var = f"DJANGO_SUPERUSER_{field_name.upper()}"
                     value = options[field_name] or os.environ.get(env_var)
                     if not value:
-                        raise CommandError(
-                            "You must use --%s with --noinput." % field_name
-                        )
+                        raise CommandError(f"You must use --{field_name} with --noinput.")
                     field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
                     if field.many_to_many and isinstance(user_data[field_name], str):
@@ -258,7 +253,7 @@ class Command(BaseCommand):
         try:
             val = field.clean(raw_value, None)
         except exceptions.ValidationError as e:
-            self.stderr.write("Error: %s" % "; ".join(e.messages))
+            self.stderr.write(f'Error: {"; ".join(e.messages)}')
             val = None
 
         return val
@@ -298,9 +293,9 @@ class Command(BaseCommand):
             except self.UserModel.DoesNotExist:
                 pass
             else:
-                return "Error: That %s is already taken." % verbose_field_name
+                return f"Error: That {verbose_field_name} is already taken."
         if not username:
-            return "%s cannot be blank." % capfirst(verbose_field_name)
+            return f"{capfirst(verbose_field_name)} cannot be blank."
         try:
             self.username_field.clean(username, None)
         except exceptions.ValidationError as e:

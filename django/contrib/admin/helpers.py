@@ -247,10 +247,8 @@ class AdminReadonlyField:
         )
 
     def get_admin_url(self, remote_field, remote_obj):
-        url_name = "admin:%s_%s_change" % (
-            remote_field.model._meta.app_label,
-            remote_field.model._meta.model_name,
-        )
+        url_name = f"admin:{remote_field.model._meta.app_label}_{remote_field.model._meta.model_name}_change"
+
         try:
             url = reverse(
                 url_name,
@@ -284,10 +282,7 @@ class AdminReadonlyField:
                 if getattr(attr, "boolean", False):
                     result_repr = _boolean_icon(value)
                 else:
-                    if hasattr(value, "__html__"):
-                        result_repr = value
-                    else:
-                        result_repr = linebreaksbr(value)
+                    result_repr = value if hasattr(value, "__html__") else linebreaksbr(value)
             else:
                 if isinstance(f.remote_field, ManyToManyRel) and value is not None:
                     result_repr = ", ".join(map(str, value.all()))
@@ -425,7 +420,7 @@ class InlineAdminFormSet:
         verbose_name = self.opts.verbose_name
         return json.dumps(
             {
-                "name": "#%s" % self.formset.prefix,
+                "name": f"#{self.formset.prefix}",
                 "options": {
                     "prefix": self.formset.prefix,
                     "addText": gettext("Add another %(verbose_name)s")
@@ -515,8 +510,7 @@ class InlineAdminForm(AdminForm):
         return AdminField(self.form, self.formset._pk_field.name, False)
 
     def fk_field(self):
-        fk = getattr(self.formset, "fk", None)
-        if fk:
+        if fk := getattr(self.formset, "fk", None):
             return AdminField(self.form, fk.name, False)
         else:
             return ""

@@ -181,7 +181,7 @@ class Command(BaseCommand):
                 error_text = ERRORS[e.errno]
             except KeyError:
                 error_text = e
-            self.stderr.write("Error: %s" % error_text)
+            self.stderr.write(f"Error: {error_text}")
             # Need to use an OS exit because sys.exit doesn't work in a thread
             os._exit(1)
         except KeyboardInterrupt:

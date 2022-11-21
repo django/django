@@ -20,10 +20,7 @@ def last_arg_byref(args):
 def check_dbl(result, func, cargs):
     "Check the status code and returns the double value passed in by reference."
     # Checking the status code
-    if result != 1:
-        return None
-    # Double passed in by reference, return its value.
-    return last_arg_byref(cargs)
+    return None if result != 1 else last_arg_byref(cargs)
 
 
 def check_geom(result, func, cargs):

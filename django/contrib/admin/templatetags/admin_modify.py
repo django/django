@@ -22,22 +22,24 @@ def prepopulated_fields_js(context):
                 if inline_admin_form.original is None:
                     prepopulated_fields.extend(inline_admin_form.prepopulated_fields)
 
-    prepopulated_fields_json = []
-    for field in prepopulated_fields:
-        prepopulated_fields_json.append(
-            {
-                "id": "#%s" % field["field"].auto_id,
-                "name": field["field"].name,
-                "dependency_ids": [
-                    "#%s" % dependency.auto_id for dependency in field["dependencies"]
-                ],
-                "dependency_list": [
-                    dependency.name for dependency in field["dependencies"]
-                ],
-                "maxLength": field["field"].field.max_length or 50,
-                "allowUnicode": getattr(field["field"].field, "allow_unicode", False),
-            }
-        )
+    prepopulated_fields_json = [
+        {
+            "id": f'#{field["field"].auto_id}',
+            "name": field["field"].name,
+            "dependency_ids": [
+                f"#{dependency.auto_id}"
+                for dependency in field["dependencies"]
+            ],
+            "dependency_list": [
+                dependency.name for dependency in field["dependencies"]
+            ],
+            "maxLength": field["field"].field.max_length or 50,
+            "allowUnicode": getattr(
+                field["field"].field, "allow_unicode", False
+            ),
+        }
+        for field in prepopulated_fields
+    ]
 
     context.update(
         {

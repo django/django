@@ -103,29 +103,23 @@ class Command(BaseCommand):
                         # Give it a nice title if it's a squashed one
                         title = plan_node[1]
                         if graph.nodes[plan_node].replaces:
-                            title += " (%s squashed migrations)" % len(
-                                graph.nodes[plan_node].replaces
-                            )
-                        applied_migration = loader.applied_migrations.get(plan_node)
-                        # Mark it as applied/unapplied
-                        if applied_migration:
+                            title += f" ({len(graph.nodes[plan_node].replaces)} squashed migrations)"
+                        if applied_migration := loader.applied_migrations.get(
+                            plan_node
+                        ):
                             if plan_node in recorded_migrations:
-                                output = " [X] %s" % title
+                                output = f" [X] {title}"
                             else:
                                 title += " Run 'manage.py migrate' to finish recording."
-                                output = " [-] %s" % title
+                                output = f" [-] {title}"
                             if self.verbosity >= 2 and hasattr(
                                 applied_migration, "applied"
                             ):
-                                output += (
-                                    " (applied at %s)"
-                                    % applied_migration.applied.strftime(
-                                        "%Y-%m-%d %H:%M:%S"
-                                    )
-                                )
+                                output += f' (applied at {applied_migration.applied.strftime("%Y-%m-%d %H:%M:%S")})'
+
                             self.stdout.write(output)
                         else:
-                            self.stdout.write(" [ ] %s" % title)
+                            self.stdout.write(f" [ ] {title}")
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
             if not shown:
@@ -160,17 +154,15 @@ class Command(BaseCommand):
             out = []
             for parent in sorted(node.parents):
                 out.append("%s.%s" % parent.key)
-            if out:
-                return " ... (%s)" % ", ".join(out)
-            return ""
+            return f' ... ({", ".join(out)})' if out else ""
 
         for node in plan:
             deps = ""
             if self.verbosity >= 2:
                 deps = print_deps(node)
             if node.key in loader.applied_migrations:
-                self.stdout.write("[X]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.stdout.write(f"[X]  {node.key[0]}.{node.key[1]}{deps}")
             else:
-                self.stdout.write("[ ]  %s.%s%s" % (node.key[0], node.key[1], deps))
+                self.stdout.write(f"[ ]  {node.key[0]}.{node.key[1]}{deps}")
         if not plan:
             self.stdout.write("(no migrations)", self.style.ERROR)
