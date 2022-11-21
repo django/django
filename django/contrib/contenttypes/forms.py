@@ -19,17 +19,10 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         queryset=None,
         **kwargs,
     ):
-        opts = self.model._meta
         self.instance = instance
-        self.rel_name = (
-            opts.app_label
-            + "-"
-            + opts.model_name
-            + "-"
-            + self.ct_field.name
-            + "-"
-            + self.ct_fk_field.name
-        )
+        opts = self.model._meta
+        self.rel_name = f"{opts.app_label}-{opts.model_name}-{self.ct_field.name}-{self.ct_fk_field.name}"
+
         self.save_as_new = save_as_new
         if self.instance is None or self.instance.pk is None:
             qs = self.model._default_manager.none()
@@ -47,9 +40,7 @@ class BaseGenericInlineFormSet(BaseModelFormSet):
         super().__init__(queryset=qs, data=data, files=files, prefix=prefix, **kwargs)
 
     def initial_form_count(self):
-        if self.save_as_new:
-            return 0
-        return super().initial_form_count()
+        return 0 if self.save_as_new else super().initial_form_count()
 
     @classmethod
     def get_default_prefix(cls):

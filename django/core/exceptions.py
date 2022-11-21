@@ -201,17 +201,17 @@ class ValidationError(Exception):
                 yield str(message)
 
     def __str__(self):
-        if hasattr(self, "error_dict"):
-            return repr(dict(self))
-        return repr(list(self))
+        return repr(dict(self)) if hasattr(self, "error_dict") else repr(list(self))
 
     def __repr__(self):
-        return "ValidationError(%s)" % self
+        return f"ValidationError({self})"
 
     def __eq__(self, other):
-        if not isinstance(other, ValidationError):
-            return NotImplemented
-        return hash(self) == hash(other)
+        return (
+            hash(self) == hash(other)
+            if isinstance(other, ValidationError)
+            else NotImplemented
+        )
 
     def __hash__(self):
         if hasattr(self, "message"):

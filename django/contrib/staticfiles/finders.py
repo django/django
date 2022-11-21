@@ -121,8 +121,7 @@ class FileSystemFinder(BaseFinder):
         for prefix, root in self.locations:
             if root not in searched_locations:
                 searched_locations.append(root)
-            matched_path = self.find_location(root, path, prefix)
-            if matched_path:
+            if matched_path := self.find_location(root, path, prefix):
                 if not all:
                     return matched_path
                 matches.append(matched_path)
@@ -134,7 +133,7 @@ class FileSystemFinder(BaseFinder):
         absolute path (or ``None`` if no match).
         """
         if prefix:
-            prefix = "%s%s" % (prefix, os.sep)
+            prefix = f"{prefix}{os.sep}"
             if not path.startswith(prefix):
                 return None
             path = path[len(prefix) :]
@@ -200,8 +199,7 @@ class AppDirectoriesFinder(BaseFinder):
             app_location = self.storages[app].location
             if app_location not in searched_locations:
                 searched_locations.append(app_location)
-            match = self.find_in_app(app, path)
-            if match:
+            if match := self.find_in_app(app, path):
                 if not all:
                     return match
                 matches.append(match)
@@ -214,8 +212,7 @@ class AppDirectoriesFinder(BaseFinder):
         storage = self.storages.get(app)
         # Only try to find a file if the source dir actually exists.
         if storage and storage.exists(path):
-            matched_path = storage.path(path)
-            if matched_path:
+            if matched_path := storage.path(path):
                 return matched_path
 
 

@@ -138,9 +138,9 @@ class BaseSpatialOperations:
     def check_expression_support(self, expression):
         if isinstance(expression, self.disallowed_aggregates):
             raise NotSupportedError(
-                "%s spatial aggregation is not supported by this database backend."
-                % expression.name
+                f"{expression.name} spatial aggregation is not supported by this database backend."
             )
+
         super().check_expression_support(expression)
 
     def spatial_aggregate_name(self, agg_name):
@@ -186,21 +186,18 @@ class BaseSpatialOperations:
         if field.geodetic(self.connection):
             if self.connection.features.supports_area_geodetic:
                 return "sq_m"
-            raise NotImplementedError(
-                "Area on geodetic coordinate systems not supported."
-            )
-        else:
-            units_name = field.units_name(self.connection)
-            if units_name:
-                return AreaMeasure.unit_attname(units_name)
+            else:
+                raise NotImplementedError(
+                    "Area on geodetic coordinate systems not supported."
+                )
+        elif units_name := field.units_name(self.connection):
+            return AreaMeasure.unit_attname(units_name)
 
     def get_distance_att_for_field(self, field):
         dist_att = None
         if field.geodetic(self.connection):
             if self.connection.features.supports_distance_geodetic:
                 dist_att = "m"
-        else:
-            units = field.units_name(self.connection)
-            if units:
-                dist_att = DistanceMeasure.unit_attname(units)
+        elif units := field.units_name(self.connection):
+            dist_att = DistanceMeasure.unit_attname(units)
         return dist_att

@@ -29,10 +29,10 @@ class BaseHandler:
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
-        self._view_middleware = []
         self._template_response_middleware = []
         self._exception_middleware = []
 
+        self._view_middleware = []
         get_response = self._get_response_async if is_async else self._get_response
         handler = convert_exception_to_response(get_response)
         handler_is_async = is_async
@@ -42,9 +42,9 @@ class BaseHandler:
             middleware_can_async = getattr(middleware, "async_capable", False)
             if not middleware_can_sync and not middleware_can_async:
                 raise RuntimeError(
-                    "Middleware %s must have at least one of "
-                    "sync_capable/async_capable set to True." % middleware_path
+                    f"Middleware {middleware_path} must have at least one of sync_capable/async_capable set to True."
                 )
+
             elif not handler_is_async and middleware_can_sync:
                 middleware_is_async = False
             else:
@@ -56,8 +56,9 @@ class BaseHandler:
                     handler,
                     handler_is_async,
                     debug=settings.DEBUG,
-                    name="middleware %s" % middleware_path,
+                    name=f"middleware {middleware_path}",
                 )
+
                 mw_instance = middleware(adapted_handler)
             except MiddlewareNotUsed as exc:
                 if settings.DEBUG:
@@ -71,8 +72,9 @@ class BaseHandler:
 
             if mw_instance is None:
                 raise ImproperlyConfigured(
-                    "Middleware factory %s returned None." % middleware_path
+                    f"Middleware factory {middleware_path} returned None."
                 )
+
 
             if hasattr(mw_instance, "process_view"):
                 self._view_middleware.insert(
@@ -121,7 +123,7 @@ class BaseHandler:
         if method_is_async is None:
             method_is_async = asyncio.iscoroutinefunction(method)
         if debug and not name:
-            name = name or "method %s()" % method.__qualname__
+            name = name or f"method {method.__qualname__}()"
         if is_async:
             if not method_is_async:
                 if debug:
@@ -213,9 +215,9 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name=f"{middleware_method.__self__.__class__.__name__}.process_template_response",
                 )
+
             try:
                 response = response.render()
             except Exception as e:
@@ -274,9 +276,9 @@ class BaseHandler:
                 self.check_response(
                     response,
                     middleware_method,
-                    name="%s.process_template_response"
-                    % (middleware_method.__self__.__class__.__name__,),
+                    name=f"{middleware_method.__self__.__class__.__name__}.process_template_response",
                 )
+
             try:
                 if asyncio.iscoroutinefunction(response.render):
                     response = await response.render()
@@ -322,12 +324,9 @@ class BaseHandler:
             return
         if not name:
             if isinstance(callback, types.FunctionType):  # FBV
-                name = "The view %s.%s" % (callback.__module__, callback.__name__)
+                name = f"The view {callback.__module__}.{callback.__name__}"
             else:  # CBV
-                name = "The view %s.%s.__call__" % (
-                    callback.__module__,
-                    callback.__class__.__name__,
-                )
+                name = f"The view {callback.__module__}.{callback.__class__.__name__}.__call__"
         if response is None:
             raise ValueError(
                 "%s didn't return an HttpResponse object. It returned None "
@@ -359,8 +358,7 @@ class BaseHandler:
         return a response for this exception, return None.
         """
         for middleware_method in self._exception_middleware:
-            response = middleware_method(request, exception)
-            if response:
+            if response := middleware_method(request, exception):
                 return response
         return None
 

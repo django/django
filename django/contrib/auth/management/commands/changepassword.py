@@ -15,10 +15,10 @@ class Command(BaseCommand):
     requires_system_checks = []
 
     def _get_pass(self, prompt="Password: "):
-        p = getpass.getpass(prompt=prompt)
-        if not p:
+        if p := getpass.getpass(prompt=prompt):
+            return p
+        else:
             raise CommandError("aborted")
-        return p
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -36,11 +36,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        if options["username"]:
-            username = options["username"]
-        else:
-            username = getpass.getuser()
-
+        username = options["username"] or getpass.getuser()
         try:
             u = UserModel._default_manager.using(options["database"]).get(
                 **{UserModel.USERNAME_FIELD: username}

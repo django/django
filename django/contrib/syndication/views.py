@@ -16,9 +16,9 @@ def add_domain(domain, url, secure=False):
     protocol = "https" if secure else "http"
     if url.startswith("//"):
         # Support network-path reference (see #16753) - RSS requires a protocol
-        url = "%s:%s" % (protocol, url)
+        url = f"{protocol}:{url}"
     elif not url.startswith(("http://", "https://", "mailto:")):
-        url = iri_to_uri("%s://%s%s" % (protocol, domain, url))
+        url = iri_to_uri(f"{protocol}://{domain}{url}")
     return url
 
 
@@ -65,8 +65,7 @@ class Feed:
             )
 
     def item_enclosures(self, item):
-        enc_url = self._get_dynamic_attr("item_enclosure_url", item)
-        if enc_url:
+        if enc_url := self._get_dynamic_attr("item_enclosure_url", item):
             enc = feedgenerator.Enclosure(
                 url=str(enc_url),
                 length=str(self._get_dynamic_attr("item_enclosure_length", item)),
@@ -99,10 +98,7 @@ class Feed:
                     f"Feed method {attname!r} decorated by {func.__name__!r} needs to "
                     f"use @functools.wraps."
                 )
-            if code.co_argcount == 2:  # one argument is 'self'
-                return attr(obj)
-            else:
-                return attr()
+            return attr(obj) if code.co_argcount == 2 else attr()
         return attr
 
     def feed_extra_kwargs(self, obj):

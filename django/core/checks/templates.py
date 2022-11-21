@@ -49,7 +49,6 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
 
 @register(Tags.templates)
 def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
-    errors = []
     libraries = defaultdict(set)
 
     for conf in settings.TEMPLATES:
@@ -60,16 +59,14 @@ def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
     for module_name, module_path in get_template_tag_modules():
         libraries[module_name].add(module_path)
 
-    for library_name, items in libraries.items():
-        if len(items) > 1:
-            errors.append(
-                Warning(
-                    W003.msg.format(
-                        repr(library_name),
-                        ", ".join(repr(item) for item in sorted(items)),
-                    ),
-                    id=W003.id,
-                )
-            )
-
-    return errors
+    return [
+        Warning(
+            W003.msg.format(
+                repr(library_name),
+                ", ".join(repr(item) for item in sorted(items)),
+            ),
+            id=W003.id,
+        )
+        for library_name, items in libraries.items()
+        if len(items) > 1
+    ]

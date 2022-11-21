@@ -22,9 +22,7 @@ class RangeWidget(MultiWidget):
         super().__init__(widgets, attrs)
 
     def decompress(self, value):
-        if value:
-            return (value.lower, value.upper)
-        return (None, None)
+        return (value.lower, value.upper) if value else (None, None)
 
 
 class HiddenRangeWidget(RangeWidget):

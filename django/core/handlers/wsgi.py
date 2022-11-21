@@ -52,10 +52,7 @@ class LimitedStream:
                 break
             self.buffer += chunk
         sio = BytesIO(self.buffer)
-        if size:
-            line = sio.readline(size)
-        else:
-            line = sio.readline()
+        line = sio.readline(size) if size else sio.readline()
         self.buffer = sio.read()
         return line
 
@@ -77,7 +74,7 @@ class WSGIRequest(HttpRequest):
         # be careful to only replace the first slash in the path because of
         # http://test/something and http://test//something being different as
         # stated in RFC 3986.
-        self.path = "%s/%s" % (script_name.rstrip("/"), path_info.replace("/", "", 1))
+        self.path = f'{script_name.rstrip("/")}/{path_info.replace("/", "", 1)}'
         self.META = environ
         self.META["PATH_INFO"] = path_info
         self.META["SCRIPT_NAME"] = script_name
@@ -182,16 +179,9 @@ def get_script_name(environ):
     if settings.FORCE_SCRIPT_NAME is not None:
         return settings.FORCE_SCRIPT_NAME
 
-    # If Apache's mod_rewrite had a whack at the URL, Apache set either
-    # SCRIPT_URL or REDIRECT_URL to the full resource URL before applying any
-    # rewrites. Unfortunately not every web server (lighttpd!) passes this
-    # information through all the time, so FORCE_SCRIPT_NAME, above, is still
-    # needed.
-    script_url = get_bytes_from_wsgi(environ, "SCRIPT_URL", "") or get_bytes_from_wsgi(
-        environ, "REDIRECT_URL", ""
-    )
-
-    if script_url:
+    if script_url := get_bytes_from_wsgi(
+        environ, "SCRIPT_URL", ""
+    ) or get_bytes_from_wsgi(environ, "REDIRECT_URL", ""):
         if b"//" in script_url:
             # mod_wsgi squashes multiple successive slashes in PATH_INFO,
             # do the same with script_url before manipulating paths (#17133).

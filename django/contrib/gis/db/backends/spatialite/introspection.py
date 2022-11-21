@@ -71,7 +71,7 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
             (table_name,),
         )
         for row in cursor.fetchall():
-            constraints["%s__spatial__index" % row[0]] = {
+            constraints[f"{row[0]}__spatial__index"] = {
                 "columns": [row[0]],
                 "primary_key": False,
                 "unique": False,
@@ -79,4 +79,5 @@ class SpatiaLiteIntrospection(DatabaseIntrospection):
                 "check": False,
                 "index": True,
             }
+
         return constraints

@@ -63,10 +63,9 @@ class CheckRegistry:
 
         if callable(check):
             return inner(check)
-        else:
-            if check:
-                tags += (check,)
-            return inner
+        if check:
+            tags += (check,)
+        return inner
 
     def run_checks(
         self,

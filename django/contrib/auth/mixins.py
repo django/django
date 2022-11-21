@@ -22,14 +22,14 @@ class AccessMixin:
         """
         Override this method to override the login_url attribute.
         """
-        login_url = self.login_url or settings.LOGIN_URL
-        if not login_url:
+        if login_url := self.login_url or settings.LOGIN_URL:
+            return str(login_url)
+        else:
             raise ImproperlyConfigured(
                 f"{self.__class__.__name__} is missing the login_url attribute. Define "
                 f"{self.__class__.__name__}.login_url, settings.LOGIN_URL, or override "
                 f"{self.__class__.__name__}.get_login_url()."
             )
-        return str(login_url)
 
     def get_permission_denied_message(self):
         """
@@ -68,9 +68,11 @@ class LoginRequiredMixin(AccessMixin):
     """Verify that the current user is authenticated."""
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+        return (
+            super().dispatch(request, *args, **kwargs)
+            if request.user.is_authenticated
+            else self.handle_no_permission()
+        )
 
 
 class PermissionRequiredMixin(AccessMixin):
@@ -90,11 +92,11 @@ class PermissionRequiredMixin(AccessMixin):
                 f"{self.__class__.__name__}.permission_required, or override "
                 f"{self.__class__.__name__}.get_permission_required()."
             )
-        if isinstance(self.permission_required, str):
-            perms = (self.permission_required,)
-        else:
-            perms = self.permission_required
-        return perms
+        return (
+            (self.permission_required,)
+            if isinstance(self.permission_required, str)
+            else self.permission_required
+        )
 
     def has_permission(self):
         """
@@ -104,9 +106,11 @@ class PermissionRequiredMixin(AccessMixin):
         return self.request.user.has_perms(perms)
 
     def dispatch(self, request, *args, **kwargs):
-        if not self.has_permission():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+        return (
+            super().dispatch(request, *args, **kwargs)
+            if self.has_permission()
+            else self.handle_no_permission()
+        )
 
 
 class UserPassesTestMixin(AccessMixin):
@@ -117,9 +121,7 @@ class UserPassesTestMixin(AccessMixin):
 
     def test_func(self):
         raise NotImplementedError(
-            "{} is missing the implementation of the test_func() method.".format(
-                self.__class__.__name__
-            )
+            f"{self.__class__.__name__} is missing the implementation of the test_func() method."
         )
 
     def get_test_func(self):
@@ -130,6 +132,8 @@ class UserPassesTestMixin(AccessMixin):
 
     def dispatch(self, request, *args, **kwargs):
         user_test_result = self.get_test_func()()
-        if not user_test_result:
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)
+        return (
+            super().dispatch(request, *args, **kwargs)
+            if user_test_result
+            else self.handle_no_permission()
+        )

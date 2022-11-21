@@ -25,10 +25,7 @@ def action(function=None, *, permissions=None, description=None):
             func.short_description = description
         return func
 
-    if function is None:
-        return decorator
-    else:
-        return decorator(function)
+    return decorator if function is None else decorator(function)
 
 
 def display(
@@ -71,10 +68,7 @@ def display(
             func.empty_value_display = empty_value
         return func
 
-    if function is None:
-        return decorator
-    else:
-        return decorator(function)
+    return decorator if function is None else decorator(function)
 
 
 def register(*models, site=None):

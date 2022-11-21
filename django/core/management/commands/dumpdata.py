@@ -112,11 +112,7 @@ class Command(BaseCommand):
         use_base_manager = options["use_base_manager"]
         pks = options["primary_keys"]
 
-        if pks:
-            primary_keys = [pk.strip() for pk in pks.split(",")]
-        else:
-            primary_keys = []
-
+        primary_keys = [pk.strip() for pk in pks.split(",")] if pks else []
         excluded_models, excluded_apps = parse_apps_and_model_labels(excludes)
 
         if not app_labels:
@@ -144,9 +140,7 @@ class Command(BaseCommand):
                     try:
                         model = app_config.get_model(model_label)
                     except LookupError:
-                        raise CommandError(
-                            "Unknown model: %s.%s" % (app_label, model_label)
-                        )
+                        raise CommandError(f"Unknown model: {app_label}.{model_label}")
 
                     app_list_value = app_list.setdefault(app_config, [])
 
@@ -178,7 +172,7 @@ class Command(BaseCommand):
             except serializers.SerializerDoesNotExist:
                 pass
 
-            raise CommandError("Unknown serialization format: %s" % format)
+            raise CommandError(f"Unknown serialization format: {format}")
 
         def get_objects(count_only=False):
             """
@@ -208,11 +202,7 @@ class Command(BaseCommand):
                         category=ProxyModelWarning,
                     )
                 if not model._meta.proxy and router.allow_migrate_model(using, model):
-                    if use_base_manager:
-                        objects = model._base_manager
-                    else:
-                        objects = model._default_manager
-
+                    objects = model._base_manager if use_base_manager else model._default_manager
                     queryset = objects.using(using).order_by(model._meta.pk.name)
                     if primary_keys:
                         queryset = queryset.filter(pk__in=primary_keys)
@@ -278,4 +268,4 @@ class Command(BaseCommand):
         except Exception as e:
             if show_traceback:
                 raise
-            raise CommandError("Unable to serialize database: %s" % e)
+            raise CommandError(f"Unable to serialize database: {e}")

@@ -128,8 +128,7 @@ class Command(BaseCommand):
 
     def reset_sequences(self, connection, models):
         """Reset database sequences for the given connection and models."""
-        sequence_sql = connection.ops.sequence_reset_sql(no_style(), models)
-        if sequence_sql:
+        if sequence_sql := connection.ops.sequence_reset_sql(no_style(), models):
             if self.verbosity >= 2:
                 self.stdout.write("Resetting sequences")
             with connection.cursor() as cursor:
@@ -170,7 +169,7 @@ class Command(BaseCommand):
         try:
             connection.check_constraints(table_names=table_names)
         except Exception as e:
-            e.args = ("Problem installing fixtures: %s" % e,)
+            e.args = (f"Problem installing fixtures: {e}", )
             raise
 
         # If we found even one object in a fixture, we need to reset the
@@ -293,23 +292,17 @@ class Command(BaseCommand):
         cmp_fmts = self.compression_formats if cmp_fmt is None else [cmp_fmt]
         ser_fmts = self.serialization_formats if ser_fmt is None else [ser_fmt]
         return {
-            "%s.%s"
-            % (
-                fixture_name,
-                ".".join([ext for ext in combo if ext]),
-            )
+            f'{fixture_name}.{".".join([ext for ext in combo if ext])}'
             for combo in product(databases, ser_fmts, cmp_fmts)
         }
 
     def find_fixture_files_in_dir(self, fixture_dir, fixture_name, targets):
-        fixture_files_in_dir = []
         path = os.path.join(fixture_dir, fixture_name)
-        for candidate in glob.iglob(glob.escape(path) + "*"):
-            if os.path.basename(candidate) in targets:
-                # Save the fixture_dir and fixture_name for future error
-                # messages.
-                fixture_files_in_dir.append((candidate, fixture_dir, fixture_name))
-        return fixture_files_in_dir
+        return [
+            (candidate, fixture_dir, fixture_name)
+            for candidate in glob.iglob(f"{glob.escape(path)}*")
+            if os.path.basename(candidate) in targets
+        ]
 
     @functools.lru_cache(maxsize=None)
     def find_fixtures(self, fixture_label):
@@ -326,7 +319,7 @@ class Command(BaseCommand):
         fixture_files = []
         for fixture_dir in fixture_dirs:
             if self.verbosity >= 2:
-                self.stdout.write("Checking %s for fixtures..." % humanize(fixture_dir))
+                self.stdout.write(f"Checking {humanize(fixture_dir)} for fixtures...")
             fixture_files_in_dir = self.find_fixture_files_in_dir(
                 fixture_dir,
                 fixture_name,
@@ -402,14 +395,13 @@ class Command(BaseCommand):
             cmp_fmt = None
 
         if len(parts) > 1:
-            if parts[-1] in self.serialization_formats:
-                ser_fmt = parts[-1]
-                parts = parts[:-1]
-            else:
+            if parts[-1] not in self.serialization_formats:
                 raise CommandError(
                     "Problem installing fixture '%s': %s is not a known "
                     "serialization format." % (".".join(parts[:-1]), parts[-1])
                 )
+            ser_fmt = parts[-1]
+            parts = parts[:-1]
         else:
             ser_fmt = None
 

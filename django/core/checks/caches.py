@@ -14,9 +14,7 @@ E001 = Error(
 
 @register(Tags.caches)
 def check_default_cache_is_configured(app_configs, **kwargs):
-    if DEFAULT_CACHE_ALIAS not in settings.CACHES:
-        return [E001]
-    return []
+    return [E001] if DEFAULT_CACHE_ALIAS not in settings.CACHES else []
 
 
 @register(Tags.caches, deploy=True)
@@ -39,7 +37,7 @@ def check_cache_location_not_exposed(app_configs, **kwargs):
             if not isinstance(cache, FileBasedCache):
                 continue
             cache_path = pathlib.Path(cache._dir).resolve()
-            if any(path == cache_path for path in paths):
+            if cache_path in paths:
                 relation = "matches"
             elif any(path in cache_path.parents for path in paths):
                 relation = "is inside"

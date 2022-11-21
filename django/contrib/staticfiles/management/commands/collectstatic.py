@@ -116,11 +116,7 @@ class Command(BaseCommand):
         if self.clear:
             self.clear_dir("")
 
-        if self.symlink:
-            handler = self.link_file
-        else:
-            handler = self.copy_file
-
+        handler = self.link_file if self.symlink else self.copy_file
         found_files = {}
         for finder in get_finders():
             for path, storage in finder.list(self.ignore_patterns):
@@ -215,24 +211,22 @@ class Command(BaseCommand):
             return (
                 "\n%(modified_count)s %(identifier)s %(action)s"
                 "%(destination)s%(unmodified)s%(post_processed)s."
-            ) % {
-                "modified_count": modified_count,
-                "identifier": "static file" + ("" if modified_count == 1 else "s"),
-                "action": "symlinked" if self.symlink else "copied",
-                "destination": (
-                    " to '%s'" % destination_path if destination_path else ""
-                ),
-                "unmodified": (
-                    ", %s unmodified" % unmodified_count
+                % {
+                    "modified_count": modified_count,
+                    "identifier": "static file"
+                    + ("" if modified_count == 1 else "s"),
+                    "action": "symlinked" if self.symlink else "copied",
+                    "destination": " to '%s'" % destination_path
+                    if destination_path
+                    else "",
+                    "unmodified": f", {unmodified_count} unmodified"
                     if collected["unmodified"]
-                    else ""
-                ),
-                "post_processed": (
-                    collected["post_processed"]
-                    and ", %s post-processed" % post_processed_count
-                    or ""
-                ),
-            }
+                    else "",
+                    "post_processed": collected["post_processed"]
+                    and f", {post_processed_count} post-processed"
+                    or "",
+                }
+            )
 
     def log(self, msg, level=2):
         """

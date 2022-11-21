@@ -119,7 +119,7 @@ class ExclusionConstraint(BaseConstraint):
             expressions=Expressions(
                 table, expressions, compiler, schema_editor.quote_value
             ),
-            where=" WHERE (%s)" % condition if condition else "",
+            where=f" WHERE ({condition})" if condition else "",
             include=schema_editor._index_include_sql(model, include),
             deferrable=schema_editor._deferrable_constraint_sql(self.deferrable),
         )
@@ -180,16 +180,7 @@ class ExclusionConstraint(BaseConstraint):
         return super().__eq__(other)
 
     def __repr__(self):
-        return "<%s: index_type=%s expressions=%s name=%s%s%s%s%s>" % (
-            self.__class__.__qualname__,
-            repr(self.index_type),
-            repr(self.expressions),
-            repr(self.name),
-            "" if self.condition is None else " condition=%s" % self.condition,
-            "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
-            "" if not self.include else " include=%s" % repr(self.include),
-            "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
-        )
+        return f'<{self.__class__.__qualname__}: index_type={repr(self.index_type)} expressions={repr(self.expressions)} name={repr(self.name)}{"" if self.condition is None else f" condition={self.condition}"}{"" if self.deferrable is None else " deferrable=%r" % self.deferrable}{f" include={repr(self.include)}" if self.include else ""}{f" opclasses={repr(self.opclasses)}" if self.opclasses else ""}>'
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
         queryset = model._default_manager.using(using)
@@ -223,11 +214,11 @@ class ExclusionConstraint(BaseConstraint):
         model_class_pk = instance._get_pk_val(model._meta)
         if not instance._state.adding and model_class_pk is not None:
             queryset = queryset.exclude(pk=model_class_pk)
-        if not self.condition:
-            if queryset.exists():
-                raise ValidationError(self.get_violation_error_message())
-        else:
+        if self.condition:
             if (self.condition & Exists(queryset.filter(self.condition))).check(
                 replacement_map, using=using
             ):
                 raise ValidationError(self.get_violation_error_message())
+
+        elif queryset.exists():
+            raise ValidationError(self.get_violation_error_message())

@@ -42,16 +42,13 @@ def check_url_namespaces_unique(app_configs, **kwargs):
     all_namespaces = _load_all_namespaces(resolver)
     counter = Counter(all_namespaces)
     non_unique_namespaces = [n for n, count in counter.items() if count > 1]
-    errors = []
-    for namespace in non_unique_namespaces:
-        errors.append(
-            Warning(
-                "URL namespace '{}' isn't unique. You may not be able to reverse "
-                "all URLs in this namespace".format(namespace),
-                id="urls.W005",
-            )
+    return [
+        Warning(
+            f"URL namespace '{namespace}' isn't unique. You may not be able to reverse all URLs in this namespace",
+            id="urls.W005",
         )
-    return errors
+        for namespace in non_unique_namespaces
+    ]
 
 
 def _load_all_namespaces(resolver, parents=()):
@@ -81,10 +78,8 @@ def get_warning_for_invalid_pattern(pattern):
     urlpattern having regex or name attributes.
     """
     if isinstance(pattern, str):
-        hint = (
-            "Try removing the string '{}'. The list of urlpatterns should not "
-            "have a prefix string as the first element.".format(pattern)
-        )
+        hint = f"Try removing the string '{pattern}'. The list of urlpatterns should not have a prefix string as the first element."
+
     elif isinstance(pattern, tuple):
         hint = "Try using path() instead of a tuple."
     else:
@@ -111,7 +106,4 @@ def check_url_settings(app_configs, **kwargs):
 
 
 def E006(name):
-    return Error(
-        "The {} setting must end with a slash.".format(name),
-        id="urls.E006",
-    )
+    return Error(f"The {name} setting must end with a slash.", id="urls.E006")

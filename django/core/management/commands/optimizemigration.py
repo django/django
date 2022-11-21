@@ -99,7 +99,7 @@ class Command(BaseCommand):
                     "replaces": [(migration.app_label, migration.name)],
                 },
             )
-            optimized_migration_name = "%s_optimized" % migration.name
+            optimized_migration_name = f"{migration.name}_optimized"
             optimized_migration = subclass(optimized_migration_name, app_label)
             writer = MigrationWriter(optimized_migration)
             migration_file_string = writer.as_string()

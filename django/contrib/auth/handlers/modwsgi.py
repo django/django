@@ -19,9 +19,7 @@ def check_password(environ, username, password):
             user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return None
-        if not user.is_active:
-            return None
-        return user.check_password(password)
+        return user.check_password(password) if user.is_active else None
     finally:
         db.close_old_connections()
 
@@ -36,8 +34,11 @@ def groups_for_user(environ, username):
             user = UserModel._default_manager.get_by_natural_key(username)
         except UserModel.DoesNotExist:
             return []
-        if not user.is_active:
-            return []
-        return [group.name.encode() for group in user.groups.all()]
+        return (
+            [group.name.encode() for group in user.groups.all()]
+            if user.is_active
+            else []
+        )
+
     finally:
         db.close_old_connections()

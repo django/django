@@ -86,8 +86,9 @@ class ProgressBar:
         self.prev_done = done
         cr = "" if self.total_count == 1 else "\r"
         self.output.write(
-            cr + "[" + "." * done + " " * (self.progress_width - done) + "]"
+            f"{cr}[" + "." * done + " " * (self.progress_width - done) + "]"
         )
+
         if done == self.progress_width:
             self.output.write("\n")
         self.output.flush()
@@ -152,19 +153,19 @@ class Serializer:
                             or field.attname in self.selected_fields
                         ):
                             self.handle_field(obj, field)
-                    else:
-                        if (
+                    elif (
                             self.selected_fields is None
                             or field.attname[:-3] in self.selected_fields
                         ):
-                            self.handle_fk_field(obj, field)
+                        self.handle_fk_field(obj, field)
             for field in concrete_model._meta.local_many_to_many:
-                if field.serialize:
-                    if (
+                if field.serialize and (
+                    (
                         self.selected_fields is None
                         or field.attname in self.selected_fields
-                    ):
-                        self.handle_m2m_field(obj, field)
+                    )
+                ):
+                    self.handle_m2m_field(obj, field)
             self.end_object(obj)
             progress_bar.update(count)
             self.first = self.first and False
@@ -275,11 +276,7 @@ class DeserializedObject:
         self.deferred_fields = deferred_fields
 
     def __repr__(self):
-        return "<%s: %s(pk=%s)>" % (
-            self.__class__.__name__,
-            self.object._meta.label,
-            self.object.pk,
-        )
+        return f"<{self.__class__.__name__}: {self.object._meta.label}(pk={self.object.pk})>"
 
     def save(self, save_m2m=True, using=None, **kwargs):
         # Call save on the Model baseclass directly. This bypasses any
@@ -298,7 +295,7 @@ class DeserializedObject:
         self.m2m_data = {}
         for field, field_value in self.deferred_fields.items():
             opts = self.object._meta
-            label = opts.app_label + "." + opts.model_name
+            label = f"{opts.app_label}.{opts.model_name}"
             if isinstance(field.remote_field, models.ManyToManyRel):
                 try:
                     values = deserialize_m2m_values(

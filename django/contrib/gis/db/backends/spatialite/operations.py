@@ -18,7 +18,7 @@ from django.utils.version import get_version_tuple
 class SpatialiteNullCheckOperator(SpatialOperator):
     def as_sql(self, connection, lookup, template_params, sql_params):
         sql, params = super().as_sql(connection, lookup, template_params, sql_params)
-        return "%s > 0" % sql, params
+        return f"{sql} > 0", params
 
 
 class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
@@ -148,7 +148,7 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
         """
         cursor = self.connection._cursor()
         try:
-            cursor.execute("SELECT %s" % func)
+            cursor.execute(f"SELECT {func}")
             row = cursor.fetchone()
         finally:
             cursor.close()

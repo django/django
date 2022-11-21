@@ -291,11 +291,11 @@ class EmailMessage:
 
     def send(self, fail_silently=False):
         """Send the email message."""
-        if not self.recipients():
-            # Don't bother creating the network connection if there's nobody to
-            # send to.
-            return 0
-        return self.get_connection(fail_silently).send_messages([self])
+        return (
+            self.get_connection(fail_silently).send_messages([self])
+            if self.recipients()
+            else 0
+        )
 
     def attach(self, filename=None, content=None, mimetype=None):
         """
@@ -326,14 +326,13 @@ class EmailMessage:
             )
             basetype, subtype = mimetype.split("/", 1)
 
-            if basetype == "text":
-                if isinstance(content, bytes):
-                    try:
-                        content = content.decode()
-                    except UnicodeDecodeError:
-                        # If mimetype suggests the file is text but it's
-                        # actually binary, read() raises a UnicodeDecodeError.
-                        mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
+            if basetype == "text" and isinstance(content, bytes):
+                try:
+                    content = content.decode()
+                except UnicodeDecodeError:
+                    # If mimetype suggests the file is text but it's
+                    # actually binary, read() raises a UnicodeDecodeError.
+                    mimetype = DEFAULT_ATTACHMENT_MIME_TYPE
 
             self.attachments.append((filename, content, mimetype))
 

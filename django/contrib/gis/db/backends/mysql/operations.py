@@ -25,11 +25,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def select(self):
-        return self.geom_func_prefix + "AsBinary(%s)"
+        return f"{self.geom_func_prefix}AsBinary(%s)"
 
     @cached_property
     def from_text(self):
-        return self.geom_func_prefix + "GeomFromText"
+        return f"{self.geom_func_prefix}GeomFromText"
 
     @cached_property
     def gis_operators(self):

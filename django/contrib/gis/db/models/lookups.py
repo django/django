@@ -30,7 +30,7 @@ class GISLookup(Lookup):
             if len(self.rhs_params) == (2 if self.lookup_name == "relate" else 1):
                 self.process_band_indices()
             elif len(self.rhs_params) > 1:
-                raise ValueError("Tuple too long for lookup %s." % self.lookup_name)
+                raise ValueError(f"Tuple too long for lookup {self.lookup_name}.")
         elif isinstance(self.lhs, RasterBandTransform):
             self.process_band_indices(only_lhs=True)
 

@@ -44,15 +44,14 @@ class GeoFeedMixin:
                         box_coords = geom
                     else:
                         raise ValueError("Only should be two sets of coordinates.")
+                elif len(geom) == 2:
+                    # Point: (X, Y)
+                    self.add_georss_point(handler, geom, w3c_geo=w3c_geo)
+                elif len(geom) == 4:
+                    # Box: (X0, Y0, X1, Y1)
+                    box_coords = (geom[:2], geom[2:])
                 else:
-                    if len(geom) == 2:
-                        # Point: (X, Y)
-                        self.add_georss_point(handler, geom, w3c_geo=w3c_geo)
-                    elif len(geom) == 4:
-                        # Box: (X0, Y0, X1, Y1)
-                        box_coords = (geom[:2], geom[2:])
-                    else:
-                        raise ValueError("Only should be 2 or 4 numeric elements.")
+                    raise ValueError("Only should be 2 or 4 numeric elements.")
                 # If a GeoRSS box was given via tuple.
                 if box_coords is not None:
                     if w3c_geo:
@@ -72,11 +71,11 @@ class GeoFeedMixin:
                         raise ValueError("W3C Geo only supports Point geometries.")
                     # For formatting consistent w/the GeoRSS simple standard:
                     # http://georss.org/1.0#simple
-                    if gtype in ("linestring", "linearring"):
+                    if gtype in {"linestring", "linearring"}:
                         handler.addQuickElement(
                             "georss:line", self.georss_coords(geom.coords)
                         )
-                    elif gtype in ("polygon",):
+                    elif gtype in {"polygon"}:
                         # Only support the exterior ring.
                         handler.addQuickElement(
                             "georss:polygon", self.georss_coords(geom[0].coords)

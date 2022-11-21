@@ -60,10 +60,7 @@ def shortcut(request, content_type_id, object_id):
                     # The current site's domain matches a site attached to the
                     # object.
                     break
-                # Caveat: In the case of multiple related Sites, this just
-                # selects the *first* one, which is arbitrary.
-                site = site_qs.first()
-                if site:
+                if site := site_qs.first():
                     object_domain = site.domain
                     break
         else:
@@ -79,10 +76,7 @@ def shortcut(request, content_type_id, object_id):
                         object_domain = site.domain
                         break
 
-    # If all that malarkey found an object domain, use it. Otherwise, fall back
-    # to whatever get_absolute_url() returned.
-    if object_domain is not None:
-        protocol = request.scheme
-        return HttpResponseRedirect("%s://%s%s" % (protocol, object_domain, absurl))
-    else:
+    if object_domain is None:
         return HttpResponseRedirect(absurl)
+    protocol = request.scheme
+    return HttpResponseRedirect(f"{protocol}://{object_domain}{absurl}")

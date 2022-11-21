@@ -51,8 +51,11 @@ class ReadOnlyPasswordHashWidget(forms.Widget):
                     }
                 )
             else:
-                for key, value_ in hasher.safe_summary(value).items():
-                    summary.append({"label": gettext(key), "value": value_})
+                summary.extend(
+                    {"label": gettext(key), "value": value_}
+                    for key, value_ in hasher.safe_summary(value).items()
+                )
+
         context["summary"] = summary
         return context
 
@@ -127,10 +130,7 @@ class UserCreationForm(forms.ModelForm):
 
     def _post_clean(self):
         super()._post_clean()
-        # Validate the password after self.instance is updated with form data
-        # by super().
-        password = self.cleaned_data.get("password2")
-        if password:
+        if password := self.cleaned_data.get("password2"):
             try:
                 password_validation.validate_password(password, self.instance)
             except ValidationError as error:
@@ -161,13 +161,11 @@ class UserChangeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        password = self.fields.get("password")
-        if password:
+        if password := self.fields.get("password"):
             password.help_text = password.help_text.format(
                 f"../../{self.instance.pk}/password/"
             )
-        user_permissions = self.fields.get("user_permissions")
-        if user_permissions:
+        if user_permissions := self.fields.get("user_permissions"):
             user_permissions.queryset = user_permissions.queryset.select_related(
                 "content_type"
             )
@@ -294,11 +292,9 @@ class PasswordResetForm(forms.Form):
         """
         email_field_name = UserModel.get_email_field_name()
         active_users = UserModel._default_manager.filter(
-            **{
-                "%s__iexact" % email_field_name: email,
-                "is_active": True,
-            }
+            **{f"{email_field_name}__iexact": email, "is_active": True}
         )
+
         return (
             u
             for u in active_users
@@ -481,7 +477,4 @@ class AdminPasswordChangeForm(forms.Form):
     @property
     def changed_data(self):
         data = super().changed_data
-        for name in self.fields:
-            if name not in data:
-                return []
-        return ["password"]
+        return next(([] for name in self.fields if name not in data), ["password"])

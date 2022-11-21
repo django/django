@@ -59,10 +59,7 @@ class PostGISOperator(SpatialOperator):
                     "Band indices are not allowed for this operator, it works on bbox "
                     "only."
                 )
-            template_params["lhs"] = "%s, %s" % (
-                template_params["lhs"],
-                lookup.band_lhs,
-            )
+            template_params["lhs"] = f'{template_params["lhs"]}, {lookup.band_lhs}'
 
         if lookup.band_rhs is not None and rhs_is_raster:
             if not self.func:
@@ -70,25 +67,22 @@ class PostGISOperator(SpatialOperator):
                     "Band indices are not allowed for this operator, it works on bbox "
                     "only."
                 )
-            template_params["rhs"] = "%s, %s" % (
-                template_params["rhs"],
-                lookup.band_rhs,
-            )
+            template_params["rhs"] = f'{template_params["rhs"]}, {lookup.band_rhs}'
 
         # Convert rasters to polygons if necessary.
         if not self.raster or spheroid:
             # Operators without raster support.
             if lhs_is_raster:
-                template_params["lhs"] = "ST_Polygon(%s)" % template_params["lhs"]
+                template_params["lhs"] = f'ST_Polygon({template_params["lhs"]})'
             if rhs_is_raster:
-                template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
+                template_params["rhs"] = f'ST_Polygon({template_params["rhs"]})'
         elif self.raster == BILATERAL:
             # Operators with raster support but don't support mixed (rast-geom)
             # lookups.
             if lhs_is_raster and not rhs_is_raster:
-                template_params["lhs"] = "ST_Polygon(%s)" % template_params["lhs"]
+                template_params["lhs"] = f'ST_Polygon({template_params["lhs"]})'
             elif rhs_is_raster and not lhs_is_raster:
-                template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
+                template_params["rhs"] = f'ST_Polygon({template_params["rhs"]})'
 
         return template_params
 
@@ -166,43 +160,34 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     @cached_property
     def function_names(self):
-        function_names = {
+        return {
             "AsWKB": "ST_AsBinary",
             "AsWKT": "ST_AsText",
             "BoundingCircle": "ST_MinimumBoundingCircle",
             "NumPoints": "ST_NPoints",
         }
-        return function_names
 
     @cached_property
     def spatial_version(self):
         """Determine the version of the PostGIS library."""
-        # Trying to get the PostGIS version because the function
-        # signatures will depend on the version used.  The cost
-        # here is a database query to determine the version, which
-        # can be mitigated by setting `POSTGIS_VERSION` with a 3-tuple
-        # comprising user-supplied values for the major, minor, and
-        # subminor revision of PostGIS.
         if hasattr(settings, "POSTGIS_VERSION"):
-            version = settings.POSTGIS_VERSION
-        else:
-            # Run a basic query to check the status of the connection so we're
-            # sure we only raise the error below if the problem comes from
-            # PostGIS and not from PostgreSQL itself (see #24862).
-            self._get_postgis_func("version")
+            return settings.POSTGIS_VERSION
+        # Run a basic query to check the status of the connection so we're
+        # sure we only raise the error below if the problem comes from
+        # PostGIS and not from PostgreSQL itself (see #24862).
+        self._get_postgis_func("version")
 
-            try:
-                vtup = self.postgis_version_tuple()
-            except ProgrammingError:
-                raise ImproperlyConfigured(
-                    'Cannot determine PostGIS version for database "%s" '
-                    'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 2.5. "
-                    "Was the database created from a spatial database "
-                    "template?" % self.connection.settings_dict["NAME"]
-                )
-            version = vtup[1:]
-        return version
+        try:
+            vtup = self.postgis_version_tuple()
+        except ProgrammingError:
+            raise ImproperlyConfigured(
+                'Cannot determine PostGIS version for database "%s" '
+                'using command "SELECT postgis_lib_version()". '
+                "GeoDjango requires at least PostGIS version 2.5. "
+                "Was the database created from a spatial database "
+                "template?" % self.connection.settings_dict["NAME"]
+            )
+        return vtup[1:]
 
     def convert_extent(self, box):
         """
@@ -239,19 +224,15 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
         # Type-based geometries.
         # TODO: Support 'M' extension.
-        if f.dim == 3:
-            geom_type = f.geom_type + "Z"
-        else:
-            geom_type = f.geom_type
-        if f.geography:
-            if f.srid != 4326:
-                raise NotSupportedError(
-                    "PostGIS only supports geography columns with an SRID of 4326."
-                )
-
-            return "geography(%s,%d)" % (geom_type, f.srid)
-        else:
+        geom_type = f"{f.geom_type}Z" if f.dim == 3 else f.geom_type
+        if not f.geography:
             return "geometry(%s,%d)" % (geom_type, f.srid)
+        if f.srid != 4326:
+            raise NotSupportedError(
+                "PostGIS only supports geography columns with an SRID of 4326."
+            )
+
+        return "geography(%s,%d)" % (geom_type, f.srid)
 
     def get_distance(self, f, dist_val, lookup_type):
         """
@@ -268,17 +249,15 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
         # Shorthand boolean flags.
         geodetic = f.geodetic(self.connection)
-        geography = f.geography
-
         if isinstance(value, Distance):
-            if geography:
-                dist_param = value.m
-            elif geodetic:
-                if lookup_type == "dwithin":
-                    raise ValueError(
-                        "Only numeric values of degree units are "
-                        "allowed on geographic DWithin queries."
-                    )
+            geography = f.geography
+
+            if not geography and geodetic and lookup_type == "dwithin":
+                raise ValueError(
+                    "Only numeric values of degree units are "
+                    "allowed on geographic DWithin queries."
+                )
+            elif not geography and geodetic or geography:
                 dist_param = value.m
             else:
                 dist_param = getattr(
@@ -298,26 +277,19 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         transform_func = self.spatial_function_name("Transform")
         if hasattr(value, "as_sql"):
-            if value.field.srid == f.srid:
-                placeholder = "%s"
-            else:
-                placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
-            return placeholder
+            return (
+                "%s"
+                if value.field.srid == f.srid
+                else "%s(%%s, %s)" % (transform_func, f.srid)
+            )
 
         # Get the srid for this object
-        if value is None:
-            value_srid = None
-        else:
-            value_srid = value.srid
-
-        # Adding Transform() to the SQL placeholder if the value srid
-        # is not equal to the field srid.
-        if value_srid is None or value_srid == f.srid:
-            placeholder = "%s"
-        else:
-            placeholder = "%s(%%s, %s)" % (transform_func, f.srid)
-
-        return placeholder
+        value_srid = None if value is None else value.srid
+        return (
+            "%s"
+            if value_srid is None or value_srid == f.srid
+            else "%s(%%s, %s)" % (transform_func, f.srid)
+        )
 
     def _get_postgis_func(self, func):
         """
@@ -325,7 +297,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         # Close out the connection.  See #9437.
         with self.connection.temporary_connection() as cursor:
-            cursor.execute("SELECT %s()" % func)
+            cursor.execute(f"SELECT {func}()")
             return cursor.fetchone()[0]
 
     def postgis_geos_version(self):
@@ -363,8 +335,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         """
         proj_regex = re.compile(r"(\d+)\.(\d+)\.(\d+)")
         proj_ver_str = self.postgis_proj_version()
-        m = proj_regex.search(proj_ver_str)
-        if m:
+        if m := proj_regex.search(proj_ver_str):
             return tuple(map(int, m.groups()))
         else:
             raise Exception("Could not determine PROJ version from PostGIS.")

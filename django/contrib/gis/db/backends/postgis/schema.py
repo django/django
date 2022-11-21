@@ -45,7 +45,7 @@ class PostGISSchemaEditor(DatabaseSchemaEditor):
             model,
             fields=fields,
             name=name,
-            using=" USING %s" % self.geom_index_type,
+            using=f" USING {self.geom_index_type}",
             opclasses=opclasses,
             expressions=expressions,
         )

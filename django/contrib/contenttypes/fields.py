@@ -77,7 +77,7 @@ class GenericForeignKey(FieldCacheMixin):
 
     def __str__(self):
         model = self.model
-        return "%s.%s" % (model._meta.label, self.name)
+        return f"{model._meta.label}.{self.name}"
 
     def check(self, **kwargs):
         return [
@@ -205,14 +205,13 @@ class GenericForeignKey(FieldCacheMixin):
             ct_id = getattr(obj, ct_attname)
             if ct_id is None:
                 return None
-            else:
-                model = self.get_content_type(
-                    id=ct_id, using=obj._state.db
-                ).model_class()
-                return (
-                    model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
-                    model,
-                )
+            model = self.get_content_type(
+                id=ct_id, using=obj._state.db
+            ).model_class()
+            return (
+                model._meta.pk.get_prep_value(getattr(obj, self.fk_field)),
+                model,
+            )
 
         return (
             ret_val,
@@ -365,22 +364,24 @@ class GenericRelation(ForeignObject):
 
     def _check_generic_foreign_key_existence(self):
         target = self.remote_field.model
-        if isinstance(target, ModelBase):
-            fields = target._meta.private_fields
-            if any(self._is_matching_generic_foreign_key(field) for field in fields):
-                return []
-            else:
-                return [
-                    checks.Error(
-                        "The GenericRelation defines a relation with the model "
-                        "'%s', but that model does not have a GenericForeignKey."
-                        % target._meta.label,
-                        obj=self,
-                        id="contenttypes.E004",
-                    )
-                ]
-        else:
+        if not isinstance(target, ModelBase):
             return []
+        fields = target._meta.private_fields
+        return (
+            []
+            if any(
+                self._is_matching_generic_foreign_key(field) for field in fields
+            )
+            else [
+                checks.Error(
+                    "The GenericRelation defines a relation with the model "
+                    "'%s', but that model does not have a GenericForeignKey."
+                    % target._meta.label,
+                    obj=self,
+                    id="contenttypes.E004",
+                )
+            ]
+        )
 
     def resolve_related_fields(self):
         self.to_fields = [self.model._meta.pk.name]
@@ -397,18 +398,10 @@ class GenericRelation(ForeignObject):
         The idea is that if you have a GFK defined on a parent model then we
         need to join the parent model first, then the child model.
         """
-        # With an inheritance chain ChildTag -> Tag and Tag defines the
-        # GenericForeignKey, and a TaggedItem model has a GenericRelation to
-        # ChildTag, then we need to generate a join from TaggedItem to Tag
-        # (as Tag.object_id == TaggedItem.pk), and another join from Tag to
-        # ChildTag (as that is where the relation is to). Do this by first
-        # generating a join to the parent model, then generating joins to the
-        # child models.
-        path = []
         opts = self.remote_field.model._meta.concrete_model._meta
         parent_opts = opts.get_field(self.object_id_field_name).model._meta
         target = parent_opts.pk
-        path.append(
+        path = [
             PathInfo(
                 from_opts=self.model._meta,
                 to_opts=parent_opts,
@@ -418,7 +411,8 @@ class GenericRelation(ForeignObject):
                 direct=False,
                 filtered_relation=filtered_relation,
             )
-        )
+        ]
+
         # Collect joins needed for the parent -> child chain. This is easiest
         # to do if we collect joins for the child -> parent chain and then
         # reverse the direction (call to reverse() and use of
@@ -438,19 +432,18 @@ class GenericRelation(ForeignObject):
         object_id_field = opts.get_field(self.object_id_field_name)
         if object_id_field.model != opts.model:
             return self._get_path_info_with_parent(filtered_relation)
-        else:
-            target = opts.pk
-            return [
-                PathInfo(
-                    from_opts=self.model._meta,
-                    to_opts=opts,
-                    target_fields=(target,),
-                    join_field=self.remote_field,
-                    m2m=True,
-                    direct=False,
-                    filtered_relation=filtered_relation,
-                )
-            ]
+        target = opts.pk
+        return [
+            PathInfo(
+                from_opts=self.model._meta,
+                to_opts=opts,
+                target_fields=(target,),
+                join_field=self.remote_field,
+                m2m=True,
+                direct=False,
+                filtered_relation=filtered_relation,
+            )
+        ]
 
     def get_reverse_path_info(self, filtered_relation=None):
         opts = self.model._meta
@@ -526,11 +519,14 @@ class GenericRelation(ForeignObject):
         """
         return self.remote_field.model._base_manager.db_manager(using).filter(
             **{
-                "%s__pk"
-                % self.content_type_field_name: ContentType.objects.db_manager(using)
-                .get_for_model(self.model, for_concrete_model=self.for_concrete_model)
+                f"{self.content_type_field_name}__pk": ContentType.objects.db_manager(
+                    using
+                )
+                .get_for_model(
+                    self.model, for_concrete_model=self.for_concrete_model
+                )
                 .pk,
-                "%s__in" % self.object_id_field_name: [obj.pk for obj in objs],
+                f"{self.object_id_field_name}__in": [obj.pk for obj in objs],
             }
         )
 
@@ -563,6 +559,8 @@ def create_generic_related_manager(superclass, rel):
     specific to generic relations.
     """
 
+
+
     class GenericRelatedObjectManager(superclass, AltersData):
         def __init__(self, instance=None):
             super().__init__()
@@ -581,9 +579,10 @@ def create_generic_related_manager(superclass, rel):
             self.pk_val = instance.pk
 
             self.core_filters = {
-                "%s__pk" % self.content_type_field_name: self.content_type.id,
+                f"{self.content_type_field_name}__pk": self.content_type.id,
                 self.object_id_field_name: self.pk_val,
             }
+
 
         def __call__(self, *, manager):
             manager = getattr(self.model, manager)
@@ -638,7 +637,7 @@ def create_generic_related_manager(superclass, rel):
             # We (possibly) need to convert object IDs to the type of the
             # instances' PK in order to match up instances:
             object_id_converter = instances[0]._meta.pk.to_python
-            content_type_id_field_name = "%s_id" % self.content_type_field_name
+            content_type_id_field_name = f"{self.content_type_field_name}_id"
             return (
                 queryset.filter(query),
                 lambda relobj: (
@@ -799,5 +798,6 @@ def create_generic_related_manager(superclass, rel):
             return await sync_to_async(self.update_or_create)(**kwargs)
 
         aupdate_or_create.alters_data = True
+
 
     return GenericRelatedObjectManager

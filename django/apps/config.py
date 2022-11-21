@@ -56,7 +56,7 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self.label)
+        return f"<{self.__class__.__name__}: {self.label}>"
 
     @cached_property
     def default_auto_field(self):
@@ -76,12 +76,7 @@ class AppConfig:
         paths = list(getattr(module, "__path__", []))
         if len(paths) != 1:
             filename = getattr(module, "__file__", None)
-            if filename is not None:
-                paths = [os.path.dirname(filename)]
-            else:
-                # For unknown reasons, sometimes the list returned by __path__
-                # contains duplicates that must be removed (#25246).
-                paths = list(set(paths))
+            paths = list(set(paths)) if filename is None else [os.path.dirname(filename)]
         if len(paths) > 1:
             raise ImproperlyConfigured(
                 "The app module %r has multiple filesystem locations (%r); "
@@ -119,7 +114,7 @@ class AppConfig:
             # If the apps module defines more than one AppConfig subclass,
             # the default one can declare default = True.
             if module_has_submodule(app_module, APPS_MODULE_NAME):
-                mod_path = "%s.%s" % (entry, APPS_MODULE_NAME)
+                mod_path = f"{entry}.{APPS_MODULE_NAME}"
                 mod = import_module(mod_path)
                 # Check if there's exactly one AppConfig candidate,
                 # excluding those that explicitly define default = False.
@@ -186,7 +181,7 @@ class AppConfig:
                     cls_name,
                 )
                 if candidates:
-                    msg += " Choices are: %s." % ", ".join(candidates)
+                    msg += f' Choices are: {", ".join(candidates)}.'
                 raise ImportError(msg)
             else:
                 # Re-trigger the module import exception.
@@ -265,7 +260,7 @@ class AppConfig:
         self.models = self.apps.all_models[self.label]
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
-            models_module_name = "%s.%s" % (self.name, MODELS_MODULE_NAME)
+            models_module_name = f"{self.name}.{MODELS_MODULE_NAME}"
             self.models_module = import_module(models_module_name)
 
     def ready(self):

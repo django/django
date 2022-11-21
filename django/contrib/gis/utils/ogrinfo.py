@@ -17,36 +17,30 @@ def ogrinfo(data_source, num_features=10):
     # Checking the parameters.
     if isinstance(data_source, str):
         data_source = DataSource(data_source)
-    elif isinstance(data_source, DataSource):
-        pass
-    else:
+    elif not isinstance(data_source, DataSource):
         raise Exception(
             "Data source parameter must be a string or a DataSource object."
         )
 
     for i, layer in enumerate(data_source):
-        print("data source : %s" % data_source.name)
-        print("==== layer %s" % i)
-        print("  shape type: %s" % GEO_CLASSES[layer.geom_type.num].__name__)
-        print("  # features: %s" % len(layer))
-        print("         srs: %s" % layer.srs)
+        print(f"data source : {data_source.name}")
+        print(f"==== layer {i}")
+        print(f"  shape type: {GEO_CLASSES[layer.geom_type.num].__name__}")
+        print(f"  # features: {len(layer)}")
+        print(f"         srs: {layer.srs}")
         extent_tup = layer.extent.tuple
-        print("      extent: %s - %s" % (extent_tup[0:2], extent_tup[2:4]))
-        print("Displaying the first %s features ====" % num_features)
+        print(f"      extent: {extent_tup[:2]} - {extent_tup[2:4]}")
+        print(f"Displaying the first {num_features} features ====")
 
         width = max(*map(len, layer.fields))
         fmt = " %%%ss: %%s" % width
         for j, feature in enumerate(layer[:num_features]):
-            print("=== Feature %s" % j)
+            print(f"=== Feature {j}")
             for fld_name in layer.fields:
                 type_name = feature[fld_name].type_name
                 output = fmt % (fld_name, type_name)
-                val = feature.get(fld_name)
-                if val:
-                    if isinstance(val, str):
-                        val_fmt = ' ("%s")'
-                    else:
-                        val_fmt = " (%s)"
+                if val := feature.get(fld_name):
+                    val_fmt = ' ("%s")' if isinstance(val, str) else " (%s)"
                     output += val_fmt % val
                 else:
                     output += " (None)"

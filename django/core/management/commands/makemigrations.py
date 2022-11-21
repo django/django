@@ -175,8 +175,9 @@ class Command(BaseCommand):
 
         if conflicts and not self.merge:
             name_str = "; ".join(
-                "%s in %s" % (", ".join(names), app) for app, names in conflicts.items()
+                f'{", ".join(names)} in {app}' for app, names in conflicts.items()
             )
+
             raise CommandError(
                 "Conflicting migrations detected; multiple leaf nodes in the "
                 "migration graph: (%s).\nTo fix them run "
@@ -190,7 +191,7 @@ class Command(BaseCommand):
 
         # If they want to merge and there is something to merge, then
         # divert into the merge code
-        if self.merge and conflicts:
+        if self.merge:
             return self.handle_merge(loader, conflicts)
 
         if self.interactive:
@@ -229,34 +230,30 @@ class Command(BaseCommand):
             self.write_migration_files(changes)
             return
 
-        # Detect changes
-        changes = autodetector.changes(
+        if changes := autodetector.changes(
             graph=loader.graph,
             trim_to_apps=app_labels or None,
             convert_apps=app_labels or None,
             migration_name=self.migration_name,
-        )
-
-        if not changes:
-            # No changes? Tell them.
-            if self.verbosity >= 1:
-                if app_labels:
-                    if len(app_labels) == 1:
-                        self.log("No changes detected in app '%s'" % app_labels.pop())
-                    else:
-                        self.log(
-                            "No changes detected in apps '%s'"
-                            % ("', '".join(app_labels))
-                        )
-                else:
-                    self.log("No changes detected")
-        else:
+        ):
             if check_changes:
                 sys.exit(1)
             if self.update:
                 self.write_to_last_migration_files(changes)
             else:
                 self.write_migration_files(changes)
+
+        elif self.verbosity >= 1:
+            if app_labels:
+                if len(app_labels) == 1:
+                    self.log("No changes detected in app '%s'" % app_labels.pop())
+                else:
+                    self.log(
+                        "No changes detected in apps '%s'"
+                        % ("', '".join(app_labels))
+                    )
+            else:
+                self.log("No changes detected")
 
     def write_to_last_migration_files(self, changes):
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
@@ -282,12 +279,11 @@ class Command(BaseCommand):
                 raise CommandError(
                     f"Cannot update applied migration '{leaf_migration}'."
                 )
-            depending_migrations = [
+            if depending_migrations := [
                 migration
                 for migration in loader.disk_migrations.values()
                 if leaf_migration_node in migration.dependencies
-            ]
-            if depending_migrations:
+            ]:
                 formatted_migrations = ", ".join(
                     [f"'{migration}'" for migration in depending_migrations]
                 )
@@ -300,14 +296,17 @@ class Command(BaseCommand):
                 leaf_migration.operations.extend(migration.operations)
 
                 for dependency in migration.dependencies:
-                    if isinstance(dependency, SwappableTuple):
-                        if settings.AUTH_USER_MODEL == dependency.setting:
-                            leaf_migration.dependencies.append(
-                                ("__setting__", "AUTH_USER_MODEL")
-                            )
-                        else:
-                            leaf_migration.dependencies.append(dependency)
-                    elif dependency[0] != migration.app_label:
+                    if (
+                        isinstance(dependency, SwappableTuple)
+                        and settings.AUTH_USER_MODEL == dependency.setting
+                    ):
+                        leaf_migration.dependencies.append(
+                            ("__setting__", "AUTH_USER_MODEL")
+                        )
+                    elif (
+                        isinstance(dependency, SwappableTuple)
+                        or dependency[0] != migration.app_label
+                    ):
                         leaf_migration.dependencies.append(dependency)
             # Optimize migration.
             optimizer = MigrationOptimizer()
@@ -316,11 +315,9 @@ class Command(BaseCommand):
             )
             # Update name.
             previous_migration_path = MigrationWriter(leaf_migration).path
-            suggested_name = (
-                leaf_migration.name[:4] + "_" + leaf_migration.suggest_name()
-            )
+            suggested_name = f"{leaf_migration.name[:4]}_{leaf_migration.suggest_name()}"
             if leaf_migration.name == suggested_name:
-                new_name = leaf_migration.name + "_updated"
+                new_name = f"{leaf_migration.name}_updated"
             else:
                 new_name = suggested_name
             leaf_migration.name = new_name
@@ -347,7 +344,7 @@ class Command(BaseCommand):
                     migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.log("    - %s" % operation.describe())
+                        self.log(f"    - {operation.describe()}")
                     if self.scriptable:
                         self.stdout.write(migration_string)
                 if not self.dry_run:
@@ -436,9 +433,7 @@ class Command(BaseCommand):
                 )
             )
             if not common_ancestor_count:
-                raise ValueError(
-                    "Could not find common ancestor of %s" % migration_names
-                )
+                raise ValueError(f"Could not find common ancestor of {migration_names}")
             # Now work out the operations along each divergent branch
             for migration in merge_migrations:
                 migration.branch = migration.ancestry[common_ancestor_count:]
@@ -451,11 +446,11 @@ class Command(BaseCommand):
             # (can_optimize_through) to automatically see if they're
             # mergeable. For now, we always just prompt the user.
             if self.verbosity > 0:
-                self.log(self.style.MIGRATE_HEADING("Merging %s" % app_label))
+                self.log(self.style.MIGRATE_HEADING(f"Merging {app_label}"))
                 for migration in merge_migrations:
-                    self.log(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
+                    self.log(self.style.MIGRATE_LABEL(f"  Branch {migration.name}"))
                     for operation in migration.merged_operations:
-                        self.log("    - %s" % operation.describe())
+                        self.log(f"    - {operation.describe()}")
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.

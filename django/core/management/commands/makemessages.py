@@ -52,10 +52,7 @@ class TranslatableFile:
         self.locale_dir = locale_dir
 
     def __repr__(self):
-        return "<%s: %s>" % (
-            self.__class__.__name__,
-            os.sep.join([self.dirpath, self.file]),
-        )
+        return f"<{self.__class__.__name__}: {os.sep.join([self.dirpath, self.file])}>"
 
     def __eq__(self, other):
         return self.path == other.path
@@ -103,7 +100,7 @@ class BuildFile:
             "djangojs": "c",
             "django": "py",
         }.get(self.domain)
-        filename = "%s.%s" % (self.translatable.file, extension)
+        filename = f"{self.translatable.file}.{extension}"
         return os.path.join(self.translatable.dirpath, filename)
 
     def preprocess(self):
@@ -145,7 +142,7 @@ class BuildFile:
             new_path = self.path[2:]
 
         return re.sub(
-            r"^(#: .*)(" + re.escape(old_path) + r")",
+            f"^(#: .*)({re.escape(old_path)})",
             lambda match: match[0].replace(old_path, new_path),
             msgs,
             flags=re.MULTILINE,
@@ -155,12 +152,8 @@ class BuildFile:
         """
         Remove a preprocessed copy of a translatable file (if any).
         """
-        if self.is_templatized:
-            # This check is needed for the case of a symlinked file and its
-            # source being processed inside a single group (locale dir);
-            # removing either of those two removes both.
-            if os.path.exists(self.work_path):
-                os.unlink(self.work_path)
+        if self.is_templatized and os.path.exists(self.work_path):
+            os.unlink(self.work_path)
 
 
 def normalize_eols(raw_contents):
@@ -191,10 +184,9 @@ def write_pot_file(potfile, msgs):
         lines = []
         found, header_read = False, False
         for line in pot_lines:
-            if not found and not header_read:
-                if "charset=CHARSET" in line:
-                    found = True
-                    line = line.replace("charset=CHARSET", "charset=UTF-8")
+            if not found and not header_read and "charset=CHARSET" in line:
+                found = True
+                line = line.replace("charset=CHARSET", "charset=UTF-8")
             if not line and not found:
                 header_read = True
             lines.append(line)
@@ -351,10 +343,10 @@ class Command(BaseCommand):
         if options["add_location"]:
             if self.gettext_version < (0, 19):
                 raise CommandError(
-                    "The --add-location option requires gettext 0.19 or later. "
-                    "You have %s." % ".".join(str(x) for x in self.gettext_version)
+                    f'The --add-location option requires gettext 0.19 or later. You have {".".join(str(x) for x in self.gettext_version)}.'
                 )
-            arg_add_location = "--add-location=%s" % options["add_location"]
+
+            arg_add_location = f'--add-location={options["add_location"]}'
             self.msgmerge_options = self.msgmerge_options[:] + [arg_add_location]
             self.msguniq_options = self.msguniq_options[:] + [arg_add_location]
             self.msgattrib_options = self.msgattrib_options[:] + [arg_add_location]
@@ -382,13 +374,13 @@ class Command(BaseCommand):
 
         if self.verbosity > 1:
             self.stdout.write(
-                "examining files with the extensions: %s"
-                % get_text_list(list(self.extensions), "and")
+                f'examining files with the extensions: {get_text_list(list(self.extensions), "and")}'
             )
 
-        self.invoked_for_django = False
+
         self.locale_paths = []
         self.default_locale_path = None
+        self.invoked_for_django = False
         if os.path.isdir(os.path.join("conf", "locale")):
             self.locale_paths = [os.path.abspath(os.path.join("conf", "locale"))]
             self.default_locale_path = self.locale_paths[0]
@@ -405,9 +397,7 @@ class Command(BaseCommand):
 
         # Build locale list
         looks_like_locale = re.compile(r"[a-z]{2}")
-        locale_dirs = filter(
-            os.path.isdir, glob.glob("%s/*" % self.default_locale_path)
-        )
+        locale_dirs = filter(os.path.isdir, glob.glob(f"{self.default_locale_path}/*"))
         all_locales = [
             lang_code
             for lang_code in map(os.path.basename, locale_dirs)
@@ -432,17 +422,12 @@ class Command(BaseCommand):
             # Build po files for each selected locale
             for locale in locales:
                 if not is_valid_locale(locale):
-                    # Try to guess what valid locale it could be
-                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
-
-                    # Search for characters followed by a non character (i.e. separator)
-                    match = re.match(
+                    if match := re.match(
                         r"^(?P<language>[a-zA-Z]+)"
                         r"(?P<separator>[^a-zA-Z])"
                         r"(?P<territory>.+)$",
                         locale,
-                    )
-                    if match:
+                    ):
                         locale_parts = match.groupdict()
                         language = locale_parts["language"].lower()
                         territory = (
@@ -456,19 +441,13 @@ class Command(BaseCommand):
 
                     # Recheck if the proposed locale is valid
                     if is_valid_locale(proposed_locale):
-                        self.stdout.write(
-                            "invalid locale %s, did you mean %s?"
-                            % (
-                                locale,
-                                proposed_locale,
-                            ),
-                        )
+                        self.stdout.write(f"invalid locale {locale}, did you mean {proposed_locale}?")
                     else:
-                        self.stdout.write("invalid locale %s" % locale)
+                        self.stdout.write(f"invalid locale {locale}")
 
                     continue
                 if self.verbosity > 0:
-                    self.stdout.write("processing locale %s" % locale)
+                    self.stdout.write(f"processing locale {locale}")
                 for potfile in potfiles:
                     self.write_po_file(potfile, locale)
         finally:
@@ -483,8 +462,7 @@ class Command(BaseCommand):
             ["xgettext", "--version"],
             stdout_encoding=DEFAULT_LOCALE_ENCODING,
         )
-        m = re.search(r"(\d+)\.(\d+)\.?(\d+)?", out)
-        if m:
+        if m := re.search(r"(\d+)\.(\d+)\.?(\d+)?", out):
             return tuple(int(d) for d in m.groups() if d is not None)
         else:
             raise CommandError("Unable to get gettext version. Is it installed?")
@@ -508,7 +486,7 @@ class Command(BaseCommand):
         self.process_files(file_list)
         potfiles = []
         for path in self.locale_paths:
-            potfile = os.path.join(path, "%s.pot" % self.domain)
+            potfile = os.path.join(path, f"{self.domain}.pot")
             if not os.path.exists(potfile):
                 continue
             args = ["msguniq"] + self.msguniq_options + [potfile]
@@ -528,7 +506,7 @@ class Command(BaseCommand):
 
     def remove_potfiles(self):
         for path in self.locale_paths:
-            pot_path = os.path.join(path, "%s.pot" % self.domain)
+            pot_path = os.path.join(path, f"{self.domain}.pot")
             if os.path.exists(pot_path):
                 os.unlink(pot_path)
 
@@ -558,7 +536,7 @@ class Command(BaseCommand):
                 ):
                     dirnames.remove(dirname)
                     if self.verbosity > 1:
-                        self.stdout.write("ignoring directory %s" % dirname)
+                        self.stdout.write(f"ignoring directory {dirname}")
                 elif dirname == "locale":
                     dirnames.remove(dirname)
                     self.locale_paths.insert(
@@ -571,15 +549,19 @@ class Command(BaseCommand):
                     file_path, self.ignore_patterns
                 ):
                     if self.verbosity > 1:
-                        self.stdout.write(
-                            "ignoring file %s in %s" % (filename, dirpath)
-                        )
+                        self.stdout.write(f"ignoring file {filename} in {dirpath}")
                 else:
-                    locale_dir = None
-                    for path in self.locale_paths:
-                        if os.path.abspath(dirpath).startswith(os.path.dirname(path)):
-                            locale_dir = path
-                            break
+                    locale_dir = next(
+                        (
+                            path
+                            for path in self.locale_paths
+                            if os.path.abspath(dirpath).startswith(
+                                os.path.dirname(path)
+                            )
+                        ),
+                        None,
+                    )
+
                     locale_dir = locale_dir or self.default_locale_path or NO_LOCALE_DIR
                     all_files.append(
                         self.translatable_file_class(dirpath, filename, locale_dir)
@@ -609,9 +591,9 @@ class Command(BaseCommand):
         for translatable in files:
             if self.verbosity > 1:
                 self.stdout.write(
-                    "processing file %s in %s"
-                    % (translatable.file, translatable.dirpath)
+                    f"processing file {translatable.file} in {translatable.dirpath}"
                 )
+
             if self.domain not in ("djangojs", "django"):
                 continue
             build_file = self.build_file_class(self, self.domain, translatable)
@@ -619,13 +601,9 @@ class Command(BaseCommand):
                 build_file.preprocess()
             except UnicodeDecodeError as e:
                 self.stdout.write(
-                    "UnicodeDecodeError: skipped file %s in %s (reason: %s)"
-                    % (
-                        translatable.file,
-                        translatable.dirpath,
-                        e,
-                    )
+                    f"UnicodeDecodeError: skipped file {translatable.file} in {translatable.dirpath} (reason: {e})"
                 )
+
                 continue
             except BaseException:
                 # Cleanup before exit.
@@ -634,21 +612,7 @@ class Command(BaseCommand):
                 raise
             build_files.append(build_file)
 
-        if self.domain == "djangojs":
-            is_templatized = build_file.is_templatized
-            args = [
-                "xgettext",
-                "-d",
-                self.domain,
-                "--language=%s" % ("C" if is_templatized else "JavaScript",),
-                "--keyword=gettext_noop",
-                "--keyword=gettext_lazy",
-                "--keyword=ngettext_lazy:1,2",
-                "--keyword=pgettext:1c,2",
-                "--keyword=npgettext:1c,2,3",
-                "--output=-",
-            ]
-        elif self.domain == "django":
+        if self.domain == "django":
             args = [
                 "xgettext",
                 "-d",
@@ -663,6 +627,21 @@ class Command(BaseCommand):
                 "--keyword=npgettext_lazy:1c,2,3",
                 "--output=-",
             ]
+        elif self.domain == "djangojs":
+            is_templatized = build_file.is_templatized
+            args = [
+                "xgettext",
+                "-d",
+                self.domain,
+                f'--language={"C" if is_templatized else "JavaScript"}',
+                "--keyword=gettext_noop",
+                "--keyword=gettext_lazy",
+                "--keyword=ngettext_lazy:1,2",
+                "--keyword=pgettext:1c,2",
+                "--keyword=npgettext:1c,2,3",
+                "--output=-",
+            ]
+
         else:
             return
 
@@ -698,7 +677,7 @@ class Command(BaseCommand):
                 )
             for build_file in build_files:
                 msgs = build_file.postprocess_messages(msgs)
-            potfile = os.path.join(locale_dir, "%s.pot" % self.domain)
+            potfile = os.path.join(locale_dir, f"{self.domain}.pot")
             write_pot_file(potfile, msgs)
 
         for build_file in build_files:
@@ -713,7 +692,7 @@ class Command(BaseCommand):
         """
         basedir = os.path.join(os.path.dirname(potfile), locale, "LC_MESSAGES")
         os.makedirs(basedir, exist_ok=True)
-        pofile = os.path.join(basedir, "%s.po" % self.domain)
+        pofile = os.path.join(basedir, f"{self.domain}.po")
 
         if os.path.exists(pofile):
             args = ["msgmerge"] + self.msgmerge_options + [pofile, potfile]
@@ -756,21 +735,19 @@ class Command(BaseCommand):
         contents of a newly created .po file.
         """
         django_dir = os.path.normpath(os.path.join(os.path.dirname(django.__file__)))
-        if self.domain == "djangojs":
-            domains = ("djangojs", "django")
-        else:
-            domains = ("django",)
+        domains = ("djangojs", "django") if self.domain == "djangojs" else ("django", )
         for domain in domains:
             django_po = os.path.join(
-                django_dir, "conf", "locale", locale, "LC_MESSAGES", "%s.po" % domain
+                django_dir, "conf", "locale", locale, "LC_MESSAGES", f"{domain}.po"
             )
+
             if os.path.exists(django_po):
                 with open(django_po, encoding="utf-8") as fp:
                     m = plural_forms_re.search(fp.read())
                 if m:
                     plural_form_line = m["value"]
                     if self.verbosity > 1:
-                        self.stdout.write("copying plural forms: %s" % plural_form_line)
+                        self.stdout.write(f"copying plural forms: {plural_form_line}")
                     lines = []
                     found = False
                     for line in msgs.splitlines():

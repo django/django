@@ -54,7 +54,7 @@ class Envelope:
                 else:
                     self._from_sequence(args[0])
             else:
-                raise TypeError("Incorrect type of argument: %s" % type(args[0]))
+                raise TypeError(f"Incorrect type of argument: {type(args[0])}")
         elif len(args) == 4:
             # Individual parameters passed in.
             #  Thanks to ww for the help
@@ -140,7 +140,7 @@ class Envelope:
                         "Incorrect number of tuple elements (%d)." % len(args[0])
                     )
             else:
-                raise TypeError("Incorrect type of argument: %s" % type(args[0]))
+                raise TypeError(f"Incorrect type of argument: {type(args[0])}")
         elif len(args) == 2:
             # An x and an y parameter were passed in
             return self.expand_to_include((args[0], args[1], args[0], args[1]))
@@ -189,15 +189,4 @@ class Envelope:
     def wkt(self):
         "Return WKT representing a Polygon for this envelope."
         # TODO: Fix significant figures.
-        return "POLYGON((%s %s,%s %s,%s %s,%s %s,%s %s))" % (
-            self.min_x,
-            self.min_y,
-            self.min_x,
-            self.max_y,
-            self.max_x,
-            self.max_y,
-            self.max_x,
-            self.min_y,
-            self.min_x,
-            self.min_y,
-        )
+        return f"POLYGON(({self.min_x} {self.min_y},{self.min_x} {self.max_y},{self.max_x} {self.max_y},{self.max_x} {self.min_y},{self.min_x} {self.min_y}))"

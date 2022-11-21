@@ -88,7 +88,7 @@ class GEOSGeometryBase(GEOSBase):
 
     def __repr__(self):
         "Short-hand representation because WKT may be very large."
-        return "<%s object at %s>" % (self.geom_type, hex(addressof(self.ptr)))
+        return f"<{self.geom_type} object at {hex(addressof(self.ptr))}>"
 
     # Pickling support
     def _to_pickle_wkb(self):
@@ -123,10 +123,10 @@ class GEOSGeometryBase(GEOSBase):
         parts = ewkt.split(b";", 1)
         if len(parts) == 2:
             srid_part, wkt = parts
-            match = re.match(rb"SRID=(?P<srid>\-?\d+)", srid_part)
-            if not match:
+            if match := re.match(rb"SRID=(?P<srid>\-?\d+)", srid_part):
+                srid = int(match["srid"])
+            else:
                 raise ValueError("EWKT has invalid SRID part.")
-            srid = int(match["srid"])
         else:
             wkt = ewkt
         if not wkt:
@@ -360,10 +360,7 @@ class GEOSGeometryBase(GEOSBase):
     def srid(self):
         "Get the SRID for the geometry. Return None if no SRID is set."
         s = capi.geos_get_srid(self.ptr)
-        if s == 0:
-            return None
-        else:
-            return s
+        return None if s == 0 else s
 
     @srid.setter
     def srid(self, srid):
@@ -377,7 +374,7 @@ class GEOSGeometryBase(GEOSBase):
         Return the EWKT (SRID + WKT) of the Geometry.
         """
         srid = self.srid
-        return "SRID=%s;%s" % (srid, self.wkt) if srid else self.wkt
+        return f"SRID={srid};{self.wkt}" if srid else self.wkt
 
     @property
     def wkt(self):
@@ -435,7 +432,7 @@ class GEOSGeometryBase(GEOSBase):
     def kml(self):
         "Return the KML representation of this Geometry."
         gtype = self.geom_type
-        return "<%s>%s</%s>" % (gtype, self.coord_seq.kml, gtype)
+        return f"<{gtype}>{self.coord_seq.kml}</{gtype}>"
 
     @property
     def prepared(self):
@@ -731,8 +728,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         if isinstance(geo_input, bytes):
             geo_input = force_str(geo_input)
         if isinstance(geo_input, str):
-            wkt_m = wkt_regex.match(geo_input)
-            if wkt_m:
+            if wkt_m := wkt_regex.match(geo_input):
                 # Handle WKT input.
                 if wkt_m["srid"]:
                     input_srid = int(wkt_m["srid"])
@@ -756,7 +752,7 @@ class GEOSGeometry(GEOSGeometryBase, ListMixin):
         elif isinstance(geo_input, GEOSGeometry):
             g = capi.geom_clone(geo_input.ptr)
         else:
-            raise TypeError("Improper geometry input type: %s" % type(geo_input))
+            raise TypeError(f"Improper geometry input type: {type(geo_input)}")
 
         if not g:
             raise GEOSException("Could not initialize GEOS Geometry with given input.")

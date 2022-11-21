@@ -47,9 +47,7 @@ class GEOSCoordSeq(GEOSBase):
         # Checking the input value
         if isinstance(value, (list, tuple)):
             pass
-        elif numpy and isinstance(value, numpy.ndarray):
-            pass
-        else:
+        elif not numpy or not isinstance(value, numpy.ndarray):
             raise TypeError(
                 "Must set coordinate with a sequence (list, tuple, or numpy array)."
             )
@@ -69,7 +67,7 @@ class GEOSCoordSeq(GEOSBase):
     def _checkindex(self, index):
         "Check the given index."
         if not (0 <= index < self.size):
-            raise IndexError("invalid GEOS Geometry index: %s" % index)
+            raise IndexError(f"invalid GEOS Geometry index: {index}")
 
     def _checkdim(self, dim):
         "Check the given dimension."
@@ -181,23 +179,15 @@ class GEOSCoordSeq(GEOSBase):
         "Return the KML representation for the coordinates."
         # Getting the substitution string depending on whether the coordinates have
         #  a Z dimension.
-        if self.hasz:
-            substr = "%s,%s,%s "
-        else:
-            substr = "%s,%s,0 "
-        return (
-            "<coordinates>%s</coordinates>"
-            % "".join(substr % self[i] for i in range(len(self))).strip()
-        )
+        substr = "%s,%s,%s " if self.hasz else "%s,%s,0 "
+        return f'<coordinates>{"".join(substr % self[i] for i in range(len(self))).strip()}</coordinates>'
 
     @property
     def tuple(self):
         "Return a tuple version of this coordinate sequence."
         n = self.size
         get_point = self._point_getter
-        if n == 1:
-            return get_point(0)
-        return tuple(get_point(i) for i in range(n))
+        return get_point(0) if n == 1 else tuple(get_point(i) for i in range(n))
 
     @property
     def is_counterclockwise(self):

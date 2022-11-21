@@ -96,11 +96,7 @@ def srs_output(func, argtypes):
 
 def const_string_output(func, argtypes, offset=None, decoding=None, cpl=False):
     func.argtypes = argtypes
-    if offset:
-        func.restype = c_int
-    else:
-        func.restype = c_char_p
-
+    func.restype = c_int if offset else c_char_p
     def _check_const(result, func, cargs):
         res = check_const_string(result, func, cargs, offset=offset, cpl=cpl)
         if res and decoding:
@@ -121,14 +117,7 @@ def string_output(func, argtypes, offset=-1, str_result=False, decoding=None):
     only when `str_result` is True.
     """
     func.argtypes = argtypes
-    if str_result:
-        # Use subclass of c_char_p so the error checking routine
-        # can free the memory at the pointer's address.
-        func.restype = gdal_char_p
-    else:
-        # Error code is returned
-        func.restype = c_int
-
+    func.restype = gdal_char_p if str_result else c_int
     # Dynamically defining our error-checking function with the
     # given offset.
     def _check_str(result, func, cargs):

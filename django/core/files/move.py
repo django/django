@@ -46,9 +46,9 @@ def file_move_safe(
     try:
         if not allow_overwrite and os.access(new_file_name, os.F_OK):
             raise FileExistsError(
-                "Destination file %s exists and allow_overwrite is False."
-                % new_file_name
+                f"Destination file {new_file_name} exists and allow_overwrite is False."
             )
+
 
         os.rename(old_file_name, new_file_name)
         return
@@ -66,9 +66,10 @@ def file_move_safe(
                 os.O_WRONLY
                 | os.O_CREAT
                 | getattr(os, "O_BINARY", 0)
-                | (os.O_EXCL if not allow_overwrite else 0)
+                | (0 if allow_overwrite else os.O_EXCL)
             ),
         )
+
         try:
             locks.lock(fd, locks.LOCK_EX)
             current_chunk = None

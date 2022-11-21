@@ -34,7 +34,7 @@ class SessionStore(SessionBase):
             )
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
-                logger = logging.getLogger("django.security.%s" % e.__class__.__name__)
+                logger = logging.getLogger(f"django.security.{e.__class__.__name__}")
                 logger.warning(str(e))
             self._session_key = None
 

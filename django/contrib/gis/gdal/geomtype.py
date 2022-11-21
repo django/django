@@ -84,7 +84,7 @@ class OGRGeomType:
             s = "Geometry"
         elif s == "PointZ":
             s = "Point"
-        return s + "Field"
+        return f"{s}Field"
 
     def to_multi(self):
         """

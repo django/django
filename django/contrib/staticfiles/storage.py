@@ -125,8 +125,8 @@ class HashedFilesMixin:
                 content.close()
         path, filename = os.path.split(clean_name)
         root, ext = os.path.splitext(filename)
-        file_hash = (".%s" % file_hash) if file_hash else ""
-        hashed_name = os.path.join(path, "%s%s%s" % (root, file_hash, ext))
+        file_hash = f".{file_hash}" if file_hash else ""
+        hashed_name = os.path.join(path, f"{root}{file_hash}{ext}")
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
@@ -279,7 +279,7 @@ class HashedFilesMixin:
         paths = {path: paths[path] for path in adjustable_paths}
         substitutions = False
 
-        for i in range(self.max_post_process_passes):
+        for _ in range(self.max_post_process_passes):
             substitutions = False
             for name, hashed_name, processed, subst in self._post_process(
                 paths, adjustable_paths, hashed_files
@@ -361,13 +361,10 @@ class HashedFilesMixin:
                         substitutions = False
                     processed = True
 
-                if not processed:
-                    # or handle the case in which neither processing nor
-                    # a change to the original file happened
-                    if not hashed_file_exists:
-                        processed = True
-                        saved_name = self._save(hashed_name, original_file)
-                        hashed_name = self.clean_name(saved_name)
+                if not processed and not hashed_file_exists:
+                    processed = True
+                    saved_name = self._save(hashed_name, original_file)
+                    hashed_name = self.clean_name(saved_name)
 
                 # and then set the cache accordingly
                 hashed_files[hash_key] = hashed_name
@@ -395,12 +392,11 @@ class HashedFilesMixin:
     def stored_name(self, name):
         cleaned_name = self.clean_name(name)
         hash_key = self.hash_key(cleaned_name)
-        cache_name = self.hashed_files.get(hash_key)
-        if cache_name:
+        if cache_name := self.hashed_files.get(hash_key):
             return cache_name
         # No cached name found, recalculate it from the files.
         intermediate_name = name
-        for i in range(self.max_post_process_passes + 1):
+        for _ in range(self.max_post_process_passes + 1):
             cache_name = self.clean_name(
                 self.hashed_name(name, content=None, filename=intermediate_name)
             )

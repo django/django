@@ -65,11 +65,10 @@ class FileBasedCache(BaseCache):
                     locks.lock(f, locks.LOCK_EX)
                     if self._is_expired(f):
                         return False
-                    else:
-                        previous_value = pickle.loads(zlib.decompress(f.read()))
-                        f.seek(0)
-                        self._write_content(f, timeout, previous_value)
-                        return True
+                    previous_value = pickle.loads(zlib.decompress(f.read()))
+                    f.seek(0)
+                    self._write_content(f, timeout, previous_value)
+                    return True
                 finally:
                     locks.unlock(f)
         except FileNotFoundError:
@@ -165,5 +164,5 @@ class FileBasedCache(BaseCache):
         """
         return [
             os.path.join(self._dir, fname)
-            for fname in glob.glob1(self._dir, "*%s" % self.cache_suffix)
+            for fname in glob.glob1(self._dir, f"*{self.cache_suffix}")
         ]

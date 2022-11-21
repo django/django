@@ -13,18 +13,16 @@ def fromfile(file_h):
     else:
         buf = file_h.read()
 
-    # If we get WKB need to wrap in memoryview(), so run through regexes.
-    if isinstance(buf, bytes):
-        try:
-            decoded = buf.decode()
-        except UnicodeDecodeError:
-            pass
-        else:
-            if wkt_regex.match(decoded) or hex_regex.match(decoded):
-                return GEOSGeometry(decoded)
-    else:
+    if not isinstance(buf, bytes):
         return GEOSGeometry(buf)
 
+    try:
+        decoded = buf.decode()
+    except UnicodeDecodeError:
+        pass
+    else:
+        if wkt_regex.match(decoded) or hex_regex.match(decoded):
+            return GEOSGeometry(decoded)
     return GEOSGeometry(memoryview(buf))
 
 

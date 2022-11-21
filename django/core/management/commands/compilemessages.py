@@ -112,7 +112,7 @@ class Command(BaseCommand):
         # Build locale list
         all_locales = []
         for basedir in basedirs:
-            locale_dirs = filter(os.path.isdir, glob.glob("%s/*" % basedir))
+            locale_dirs = filter(os.path.isdir, glob.glob(f"{basedir}/*"))
             all_locales.extend(map(os.path.basename, locale_dirs))
 
         # Account for excluded locales
@@ -151,15 +151,12 @@ class Command(BaseCommand):
                 try:
                     if mo_path.stat().st_mtime >= po_path.stat().st_mtime:
                         if self.verbosity > 0:
-                            self.stdout.write(
-                                "File “%s” is already compiled and up to date."
-                                % po_path
-                            )
+                            self.stdout.write(f"File “{po_path}” is already compiled and up to date.")
                         continue
                 except FileNotFoundError:
                     pass
                 if self.verbosity > 0:
-                    self.stdout.write("processing file %s in %s" % (f, dirpath))
+                    self.stdout.write(f"processing file {f} in {dirpath}")
 
                 if has_bom(po_path):
                     self.stderr.write(
@@ -187,9 +184,7 @@ class Command(BaseCommand):
                 if status:
                     if self.verbosity > 0:
                         if errors:
-                            self.stderr.write(
-                                "Execution of %s failed: %s" % (self.program, errors)
-                            )
+                            self.stderr.write(f"Execution of {self.program} failed: {errors}")
                         else:
-                            self.stderr.write("Execution of %s failed" % self.program)
+                            self.stderr.write(f"Execution of {self.program} failed")
                     self.has_errors = True

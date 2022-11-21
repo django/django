@@ -32,9 +32,7 @@ def mapping(data_source, geom_name="geom", layer_key=0, multi_geom=False):
     if isinstance(data_source, str):
         # Instantiating the DataSource from the string.
         data_source = DataSource(data_source)
-    elif isinstance(data_source, DataSource):
-        pass
-    else:
+    elif not isinstance(data_source, DataSource):
         raise TypeError(
             "Data source parameter must be a string or a DataSource object."
         )
@@ -179,10 +177,7 @@ def _ogrinspect(
             kwlist.append("null=True")
         if field_name.lower() in blank_fields:
             kwlist.append("blank=True")
-        if kwlist:
-            return ", " + ", ".join(kwlist)
-        else:
-            return ""
+        return ", " + ", ".join(kwlist) if kwlist else ""
 
     # For those wishing to disable the imports.
     if imports:
@@ -191,7 +186,7 @@ def _ogrinspect(
         yield ""
         yield ""
 
-    yield "class %s(models.Model):" % model_name
+    yield f"class {model_name}(models.Model):"
 
     for field_name, width, precision, field_type in zip(
         ogr_fields, layer.field_widths, layer.field_precisions, layer.field_types
@@ -218,25 +213,21 @@ def _ogrinspect(
                     kwargs_str,
                 )
             else:
-                yield "    %s = models.FloatField(%s)" % (mfield, kwargs_str[2:])
+                yield f"    {mfield} = models.FloatField({kwargs_str[2:]})"
         elif field_type is OFTInteger:
-            yield "    %s = models.IntegerField(%s)" % (mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.IntegerField({kwargs_str[2:]})"
         elif field_type is OFTInteger64:
-            yield "    %s = models.BigIntegerField(%s)" % (mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.BigIntegerField({kwargs_str[2:]})"
         elif field_type is OFTString:
-            yield "    %s = models.CharField(max_length=%s%s)" % (
-                mfield,
-                width,
-                kwargs_str,
-            )
+            yield f"    {mfield} = models.CharField(max_length={width}{kwargs_str})"
         elif field_type is OFTDate:
-            yield "    %s = models.DateField(%s)" % (mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.DateField({kwargs_str[2:]})"
         elif field_type is OFTDateTime:
-            yield "    %s = models.DateTimeField(%s)" % (mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.DateTimeField({kwargs_str[2:]})"
         elif field_type is OFTTime:
-            yield "    %s = models.TimeField(%s)" % (mfield, kwargs_str[2:])
+            yield f"    {mfield} = models.TimeField({kwargs_str[2:]})"
         else:
-            raise TypeError("Unknown field type %s in %s" % (field_type, mfield))
+            raise TypeError(f"Unknown field type {field_type} in {mfield}")
 
     # TODO: Autodetection of multigeometry types (see #7218).
     gtype = layer.geom_type
@@ -256,12 +247,12 @@ def _ogrinspect(
                 # WGS84 is already the default.
                 srid_str = ""
             else:
-                srid_str = "srid=%s" % srid
+                srid_str = f"srid={srid}"
     else:
-        srid_str = "srid=%s" % srid
+        srid_str = f"srid={srid}"
 
-    yield "    %s = models.%s(%s)" % (geom_name, geom_field, srid_str)
+    yield f"    {geom_name} = models.{geom_field}({srid_str})"
 
     if name_field:
         yield ""
-        yield "    def __str__(self): return self.%s" % name_field
+        yield f"    def __str__(self): return self.{name_field}"

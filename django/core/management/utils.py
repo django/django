@@ -21,7 +21,7 @@ def popen_wrapper(args, stdout_encoding="utf-8"):
     try:
         p = run(args, capture_output=True, close_fds=os.name != "nt")
     except OSError as err:
-        raise CommandError("Error executing %s" % args[0]) from err
+        raise CommandError(f"Error executing {args[0]}") from err
     return (
         p.stdout.decode(stdout_encoding),
         p.stderr.decode(DEFAULT_LOCALE_ENCODING, errors="replace"),
@@ -47,7 +47,7 @@ def handle_extensions(extensions):
         ext_list.extend(ext.replace(" ", "").split(","))
     for i, ext in enumerate(ext_list):
         if not ext.startswith("."):
-            ext_list[i] = ".%s" % ext_list[i]
+            ext_list[i] = f".{ext_list[i]}"
     return set(ext_list)
 
 
@@ -99,7 +99,7 @@ def parse_apps_and_model_labels(labels):
             try:
                 model = installed_apps.get_model(label)
             except LookupError:
-                raise CommandError("Unknown model: %s" % label)
+                raise CommandError(f"Unknown model: {label}")
             models.add(model)
         else:
             try:
@@ -130,7 +130,7 @@ def get_command_line_option(argv, option):
 def normalize_path_patterns(patterns):
     """Normalize an iterable of glob style patterns based on OS."""
     patterns = [os.path.normcase(p) for p in patterns]
-    dir_suffixes = {"%s*" % path_sep for path_sep in {"/", os.sep}}
+    dir_suffixes = {f"{path_sep}*" for path_sep in {"/", os.sep}}
     norm_patterns = []
     for pattern in patterns:
         for dir_suffix in dir_suffixes:

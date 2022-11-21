@@ -20,7 +20,7 @@ class File(FileProxyMixin):
         return self.name or ""
 
     def __repr__(self):
-        return "<%s: %s>" % (self.__class__.__name__, self or "None")
+        return f'<{self.__class__.__name__}: {self or "None"}>'
 
     def __bool__(self):
         return bool(self.name)
@@ -57,10 +57,10 @@ class File(FileProxyMixin):
             pass
 
         while True:
-            data = self.read(chunk_size)
-            if not data:
+            if data := self.read(chunk_size):
+                yield data
+            else:
                 break
-            yield data
 
     def multiple_chunks(self, chunk_size=None):
         """

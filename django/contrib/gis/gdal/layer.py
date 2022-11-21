@@ -61,7 +61,7 @@ class Layer(GDALBase):
         "Iterate over each Feature in the Layer."
         # ResetReading() must be called before iteration is to begin.
         capi.reset_reading(self._ptr)
-        for i in range(self.num_feat):
+        for _ in range(self.num_feat):
             yield Feature(capi.get_next_feature(self._ptr), self)
 
     def __len__(self):
@@ -92,7 +92,7 @@ class Layer(GDALBase):
                 if feat.fid == feat_id:
                     return feat
         # Should have returned a Feature, raise an IndexError.
-        raise IndexError("Invalid feature id: %s." % feat_id)
+        raise IndexError(f"Invalid feature id: {feat_id}.")
 
     # #### Layer properties ####
     @property
@@ -185,7 +185,7 @@ class Layer(GDALBase):
         if isinstance(filter, OGRGeometry):
             capi.set_spatial_filter(self.ptr, filter.ptr)
         elif isinstance(filter, (tuple, list)):
-            if not len(filter) == 4:
+            if len(filter) != 4:
                 raise ValueError("Spatial filter list/tuple must have 4 elements.")
             # Map c_double onto params -- if a bad type is passed in it
             # will be caught here.
@@ -208,7 +208,7 @@ class Layer(GDALBase):
         in the Layer.
         """
         if field_name not in self.fields:
-            raise GDALException("invalid field name: %s" % field_name)
+            raise GDALException(f"invalid field name: {field_name}")
         return [feat.get(field_name) for feat in self]
 
     def get_geoms(self, geos=False):

@@ -293,17 +293,16 @@ class PasswordResetConfirmView(PasswordContextMixin, FormView):
                     # If the token is valid, display the password reset form.
                     self.validlink = True
                     return super().dispatch(*args, **kwargs)
-            else:
-                if self.token_generator.check_token(self.user, token):
-                    # Store the token in the session and redirect to the
-                    # password reset form at a URL without the token. That
-                    # avoids the possibility of leaking the token in the
-                    # HTTP Referer header.
-                    self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
-                    redirect_url = self.request.path.replace(
-                        token, self.reset_url_token
-                    )
-                    return HttpResponseRedirect(redirect_url)
+            elif self.token_generator.check_token(self.user, token):
+                # Store the token in the session and redirect to the
+                # password reset form at a URL without the token. That
+                # avoids the possibility of leaking the token in the
+                # HTTP Referer header.
+                self.request.session[INTERNAL_RESET_SESSION_TOKEN] = token
+                redirect_url = self.request.path.replace(
+                    token, self.reset_url_token
+                )
+                return HttpResponseRedirect(redirect_url)
 
         # Display the "Password reset unsuccessful" page.
         return self.render_to_response(self.get_context_data())

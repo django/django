@@ -106,8 +106,9 @@ class ChangeList:
         to_field = request.GET.get(TO_FIELD_VAR)
         if to_field and not model_admin.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
-                "The field %s cannot be referenced." % to_field
+                f"The field {to_field} cannot be referenced."
             )
+
         self.to_field = to_field
         self.params = dict(request.GET.items())
         if PAGE_VAR in self.params:
@@ -115,10 +116,7 @@ class ChangeList:
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
 
-        if self.is_popup:
-            self.list_editable = ()
-        else:
-            self.list_editable = list_editable
+        self.list_editable = () if self.is_popup else list_editable
         self.queryset = self.get_queryset(request)
         self.get_results(request)
         if self.is_popup:
@@ -131,11 +129,7 @@ class ChangeList:
         self.pk_attname = self.lookup_opts.pk.attname
 
     def __repr__(self):
-        return "<%s: model=%s model_admin=%s>" % (
-            self.__class__.__qualname__,
-            self.model.__qualname__,
-            self.model_admin.__class__.__qualname__,
-        )
+        return f"<{self.__class__.__qualname__}: model={self.model.__qualname__} model_admin={self.model_admin.__class__.__qualname__}>"
 
     def get_filters_params(self, params=None):
         """
@@ -157,7 +151,7 @@ class ChangeList:
 
         for key, value in lookup_params.items():
             if not self.model_admin.lookup_allowed(key, value):
-                raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
+                raise DisallowedModelAdminLookup(f"Filtering by {key} not allowed")
 
         filter_specs = []
         for list_filter in self.list_filter:
@@ -203,10 +197,10 @@ class ChangeList:
         if self.date_hierarchy:
             # Create bounded lookup parameters so that the query is more
             # efficient.
-            year = lookup_params.pop("%s__year" % self.date_hierarchy, None)
+            year = lookup_params.pop(f"{self.date_hierarchy}__year", None)
             if year is not None:
-                month = lookup_params.pop("%s__month" % self.date_hierarchy, None)
-                day = lookup_params.pop("%s__day" % self.date_hierarchy, None)
+                month = lookup_params.pop(f"{self.date_hierarchy}__month", None)
+                day = lookup_params.pop(f"{self.date_hierarchy}__day", None)
                 try:
                     from_date = datetime(
                         int(year),
@@ -228,10 +222,11 @@ class ChangeList:
                     to_date = make_aware(to_date)
                 lookup_params.update(
                     {
-                        "%s__gte" % self.date_hierarchy: from_date,
-                        "%s__lt" % self.date_hierarchy: to_date,
+                        f"{self.date_hierarchy}__gte": from_date,
+                        f"{self.date_hierarchy}__lt": to_date,
                     }
                 )
+
 
         # At this point, all the parameters used by the various ListFilters
         # have been removed from lookup_params, which now only contains other
@@ -269,7 +264,7 @@ class ChangeList:
                     del p[k]
             else:
                 p[k] = v
-        return "?%s" % urlencode(sorted(p.items()))
+        return f"?{urlencode(sorted(p.items()))}"
 
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(
@@ -468,11 +463,10 @@ class ChangeList:
                 if isinstance(field, (Combinable, OrderBy)):
                     if not isinstance(field, OrderBy):
                         field = field.asc()
-                    if isinstance(field.expression, F):
-                        order_type = "desc" if field.descending else "asc"
-                        field = field.expression.name
-                    else:
+                    if not isinstance(field.expression, F):
                         continue
+                    order_type = "desc" if field.descending else "asc"
+                    field = field.expression.name
                 elif field.startswith("-"):
                     field = field[1:]
                     order_type = "desc"
@@ -555,9 +549,11 @@ class ChangeList:
         if self.list_select_related is True:
             return qs.select_related()
 
-        if self.list_select_related is False:
-            if self.has_related_field_in_list_display():
-                return qs.select_related()
+        if (
+            self.list_select_related is False
+            and self.has_related_field_in_list_display()
+        ):
+            return qs.select_related()
 
         if self.list_select_related:
             return qs.select_related(*self.list_select_related)
@@ -570,16 +566,17 @@ class ChangeList:
             except FieldDoesNotExist:
                 pass
             else:
-                if isinstance(field.remote_field, ManyToOneRel):
-                    # <FK>_id field names don't require a join.
-                    if field_name != field.get_attname():
-                        return True
+                if (
+                    isinstance(field.remote_field, ManyToOneRel)
+                    and field_name != field.get_attname()
+                ):
+                    return True
         return False
 
     def url_for_result(self, result):
         pk = getattr(result, self.pk_attname)
         return reverse(
-            "admin:%s_%s_change" % (self.opts.app_label, self.opts.model_name),
+            f"admin:{self.opts.app_label}_{self.opts.model_name}_change",
             args=(quote(pk),),
             current_app=self.model_admin.admin_site.name,
         )
