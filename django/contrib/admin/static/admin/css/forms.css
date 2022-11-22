@@ -83,7 +83,7 @@ form ul.inline li {
     content: '';
     display: inline-block;
     vertical-align: middle;
-    height: 26px;
+    height: 1.625rem;
 }
 
 .aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
@@ -277,8 +277,8 @@ body.popup .submit-row {
 }
 
 .submit-row input {
-    height: 35px;
-    line-height: 15px;
+    height: 2.1875rem;
+    line-height: 0.9375rem;
 }
 
 .submit-row input, .submit-row a {
@@ -297,9 +297,9 @@ body.popup .submit-row {
     display: block;
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
-    height: 15px;
-    line-height: 15px;
+    padding: 0.625rem 0.9375rem;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     color: var(--button-fg);
 }
 
@@ -308,8 +308,8 @@ body.popup .submit-row {
     background: var(--close-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
-    height: 15px;
-    line-height: 15px;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     color: var(--button-fg);
 }
 
@@ -524,8 +524,8 @@ body.popup .submit-row {
 }
 
 .related-lookup {
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
     background-image: url(../img/search.svg);
 }
 

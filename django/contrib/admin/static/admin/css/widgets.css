@@ -277,8 +277,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 18px;
-    width: 18px;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -498,7 +498,7 @@ span.clearable-file-input label {
     background: var(--body-bg);
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
-    line-height: 11px;
+    line-height: 0.6875rem;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
 }
