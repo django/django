@@ -97,6 +97,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                         return True
         return False
 
+    def get_referencing_models_list(self, table_name, app_label):
+        referencingModelsList = []
+        with self.connection.cursor() as cursor:
+            for other_table in self.connection.introspection.get_table_list(cursor):
+                relations = self.connection.introspection.get_relations(
+                    cursor, other_table.name
+                )
+                for constraint_column, constraint_table in relations.values():
+                    if constraint_table == table_name:
+                        model_name = other_table.name.replace(app_label, "")[1:]
+                        referencingModelsList.append(model_name)
+            return referencingModelsList
+
     def alter_db_table(
         self, model, old_db_table, new_db_table, disable_constraints=True
     ):
@@ -213,6 +226,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
+        custom_pk_field = None
         alter_fields = alter_fields or []
         if getattr(create_field, "primary_key", False) or any(
             getattr(new_field, "primary_key", False) for _, new_field in alter_fields
@@ -232,6 +246,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Add in any created fields
         if create_field:
             body[create_field.name] = create_field
+            if create_field.primary_key or (
+                create_field.remote_field and create_field.remote_field.parent_link
+            ):
+                custom_pk_field = create_field
             # Choose a default and insert it into the copy map
             if not create_field.many_to_many and create_field.concrete:
                 mapping[create_field.column] = self.prepare_default(
@@ -359,6 +377,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # Fix any PK-removed field
         if restore_pk_field:
             restore_pk_field.primary_key = True
+
+        if custom_pk_field and self._is_referenced_by_fk_constraint(
+            custom_pk_field.model._meta.db_table
+        ):
+            app_label = model._meta.app_label
+            model_table = custom_pk_field.model._meta.db_table
+            referencing_models = self.get_referencing_models_list(
+                model_table, app_label
+            )
+            for m in referencing_models:
+                r_model = model._meta.apps.get_model(app_label, m)
+                self._remake_table(r_model)
 
     def delete_model(self, model, handle_autom2m=True):
         if handle_autom2m:

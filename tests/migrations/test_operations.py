@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.exceptions import FieldDoesNotExist
 from django.db import IntegrityError, connection, migrations, models, transaction
 from django.db.migrations.migration import Migration
@@ -1424,6 +1426,83 @@ class OperationTests(OperationTestBase):
         self.assertEqual(bytes(pony.empty), b"")
         self.assertEqual(bytes(pony.digits), b"42")
         self.assertEqual(bytes(pony.quotes), b'"\'"')
+
+    @skipUnlessDBFeature("supports_foreign_keys")
+    def test_add_pk_to_referenced_model(self):
+        app_label = "test_adflpkrdfk"
+        project_state = self.set_up_test_model(app_label)
+        project_state = self.apply_operations(
+            app_label,
+            project_state,
+            [
+                migrations.CreateModel(
+                    "Stable",
+                    fields=[
+                        ("ponies", models.ManyToManyField("Pony")),
+                    ],
+                ),
+                migrations.AddField(
+                    "Pony",
+                    "stables",
+                    models.ManyToManyField("Stable"),
+                ),
+            ],
+        )
+        self.assertIsInstance(
+            project_state.models[app_label, "pony"].fields["id"],
+            models.AutoField,
+        )
+        new_project_state = project_state.clone()
+        # Add a new uuid pk
+        operations = [
+            migrations.RemoveField("Pony", "id"),
+            migrations.AddField(
+                model_name="Pony",
+                name="uid",
+                field=models.UUIDField(
+                    default=uuid.uuid4,
+                    editable=False,
+                    primary_key=True,
+                    serialize=False,
+                    unique=True,
+                ),
+            ),
+        ]
+        new_state = self.apply_operations(
+            app_label, project_state, operations=operations
+        )
+        self.assertIsInstance(
+            new_state.models[app_label, "pony"].fields["uid"],
+            models.UUIDField,
+        )
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                "test_adflpkrdfk_pony_stables",
+                ["pony_id"],
+                ("test_adflpkrdfk_pony", "uid"),
+            )
+            self.assertFKExists(
+                "test_adflpkrdfk_stable_ponies",
+                ["pony_id"],
+                ("test_adflpkrdfk_pony", "uid"),
+            )
+        # And test reversal
+        self.unapply_operations(app_label, new_project_state, operations=operations)
+        self.assertIsInstance(
+            new_project_state.models[app_label, "pony"].fields["id"],
+            models.AutoField,
+        )
+        if connection.features.supports_foreign_keys:
+            self.assertFKExists(
+                "test_adflpkrdfk_pony_stables",
+                ["pony_id"],
+                ("test_adflpkrdfk_pony", "id"),
+            )
+            self.assertFKExists(
+                "test_adflpkrdfk_stable_ponies",
+                ["pony_id"],
+                ("test_adflpkrdfk_pony", "id"),
+            )
 
     def test_column_name_quoting(self):
         """
