@@ -598,6 +598,39 @@ class BulkCreateTests(TestCase):
     @skipUnlessDBFeature(
         "supports_update_conflicts", "supports_update_conflicts_with_target"
     )
+    def test_update_conflicts_unique_fields_pk(self):
+        TwoFields.objects.bulk_create(
+            [
+                TwoFields(f1=1, f2=1, name="a"),
+                TwoFields(f1=2, f2=2, name="b"),
+            ]
+        )
+        self.assertEqual(TwoFields.objects.count(), 2)
+
+        obj1 = TwoFields.objects.get(f1=1)
+        obj2 = TwoFields.objects.get(f1=2)
+        conflicting_objects = [
+            TwoFields(pk=obj1.pk, f1=3, f2=3, name="c"),
+            TwoFields(pk=obj2.pk, f1=4, f2=4, name="d"),
+        ]
+        TwoFields.objects.bulk_create(
+            conflicting_objects,
+            update_conflicts=True,
+            unique_fields=["pk"],
+            update_fields=["name"],
+        )
+        self.assertEqual(TwoFields.objects.count(), 2)
+        self.assertCountEqual(
+            TwoFields.objects.values("f1", "f2", "name"),
+            [
+                {"f1": 1, "f2": 1, "name": "c"},
+                {"f1": 2, "f2": 2, "name": "d"},
+            ],
+        )
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts", "supports_update_conflicts_with_target"
+    )
     def test_update_conflicts_two_fields_unique_fields_both(self):
         with self.assertRaises((OperationalError, ProgrammingError)):
             self._test_update_conflicts_two_fields(["f1", "f2"])
