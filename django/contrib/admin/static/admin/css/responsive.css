@@ -104,13 +104,13 @@ input[type="submit"], button {
     }
 
     #changelist-search label {
-        line-height: 22px;
+        line-height: 1.375rem;
     }
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
-        height: 22px;
+        height: 1.375rem;
         margin: 0 10px 0 6px;
     }
 
@@ -186,12 +186,12 @@ input[type="submit"], button {
         box-sizing: border-box;
         margin: 0;
         padding: 6px 8px;
-        min-height: 36px;
+        min-height: 2.25rem;
         font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 36px;
+        height: 2.25rem;
     }
 
     .form-row select[multiple] {
@@ -957,7 +957,7 @@ input[type="submit"], button {
     .calendar-shortcuts {
         padding: 10px 0;
         font-size: 0.75rem;
-        line-height: 12px;
+        line-height: 0.75rem;
     }
 
     .calendar-shortcuts a {
