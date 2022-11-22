@@ -1725,8 +1725,8 @@ class SQLInsertCompiler(SQLCompiler):
         on_conflict_suffix_sql = self.connection.ops.on_conflict_suffix_sql(
             fields,
             self.query.on_conflict,
-            self.query.update_fields,
-            self.query.unique_fields,
+            (f.column for f in self.query.update_fields),
+            (f.column for f in self.query.unique_fields),
         )
         if (
             self.returning_fields
