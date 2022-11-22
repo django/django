@@ -732,11 +732,8 @@ class QuerySet(AltersData):
                     "update_fields."
                 )
             if unique_fields:
-                # Primary key is allowed in unique_fields.
                 unique_fields = [
-                    self.model._meta.get_field(name)
-                    for name in unique_fields
-                    if name != "pk"
+                    self.model._meta.get_field(name) for name in unique_fields
                 ]
                 if any(not f.concrete or f.many_to_many for f in unique_fields):
                     raise ValueError(
@@ -785,6 +782,12 @@ class QuerySet(AltersData):
                 raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:
             return objs
+        opts = self.model._meta
+        if unique_fields:
+            # Primary key is allowed in unique_fields.
+            unique_fields = [
+                opts.pk.name if name == "pk" else name for name in unique_fields
+            ]
         on_conflict = self._check_bulk_create_options(
             ignore_conflicts,
             update_conflicts,
@@ -792,7 +795,6 @@ class QuerySet(AltersData):
             unique_fields,
         )
         self._for_write = True
-        opts = self.model._meta
         fields = opts.concrete_fields
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
