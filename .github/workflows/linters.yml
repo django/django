@@ -30,8 +30,8 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install flake8
       - name: flake8
-        # Pinned to v1.0.2.
-        uses: liskin/gh-problem-matcher-wrap@e7d110d699a16b3dead9ef8b1f9470f93765ae95
+        # Pinned to v2.0.0.
+        uses: liskin/gh-problem-matcher-wrap@d8afa2cfb66dd3f982b1950429e652bc14d0d7d2
         with:
           linters: flake8
           run: flake8
@@ -47,8 +47,8 @@ jobs:
           python-version: '3.11'
       - run: python -m pip install isort
       - name: isort
-        # Pinned to v1.0.2.
-        uses: liskin/gh-problem-matcher-wrap@e7d110d699a16b3dead9ef8b1f9470f93765ae95
+        # Pinned to v2.0.0.
+        uses: liskin/gh-problem-matcher-wrap@d8afa2cfb66dd3f982b1950429e652bc14d0d7d2
         with:
           linters: isort
           run: isort --check --diff django tests scripts
