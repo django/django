@@ -391,7 +391,7 @@ Argument        Value
 .. data:: django.db.models.signals.class_prepared
    :module:
 
-Sent whenever a model class has been "prepared" -- that is, once model has
+Sent whenever a model class has been "prepared" -- that is, once a model has
 been defined and registered with Django's model system. Django uses this
 signal internally; it's not generally used in third-party applications.
 
