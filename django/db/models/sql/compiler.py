@@ -128,7 +128,7 @@ class SQLCompiler:
             # If the group by is set to a list (by .values() call most likely),
             # then we need to add everything in it to the GROUP BY clause.
             # Backwards compatibility hack for setting query.group_by. Remove
-            # when  we have public API way of forcing the GROUP BY clause.
+            # when we have public API way of forcing the GROUP BY clause.
             # Converts string references to expressions.
             for expr in self.query.group_by:
                 if not hasattr(expr, "as_sql"):
@@ -148,9 +148,7 @@ class SQLCompiler:
                 continue
             if alias:
                 aliased_exprs[expr] = alias
-            cols = expr.get_group_by_cols()
-            for col in cols:
-                expressions.append(col)
+            expressions.extend(expr.get_group_by_cols())
         if not self._meta_ordering:
             for expr, (sql, params, is_ref) in order_by:
                 # Skip references to the SELECT clause, as all expressions in
