@@ -395,6 +395,9 @@ Miscellaneous
 * The undocumented ``negated`` parameter of the
   :class:`~django.db.models.Exists` expression is removed.
 
+* The ``is_summary`` argument of the undocumented ``Query.add_annotation()``
+  method is removed.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
