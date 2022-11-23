@@ -771,16 +771,19 @@ object in the Django admin site and as the value inserted into a template when
 it displays an object. Thus, you should always return a nice, human-readable
 representation of the model from the ``__str__()`` method.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            return f'{self.first_name} {self.last_name}'
+            return f"{self.first_name} {self.last_name}"
 
 ``__eq__()``
 ------------

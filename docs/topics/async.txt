@@ -62,7 +62,9 @@ run code concurrently rather than serially. This is especially handy when
 dealing with external APIs or data stores.
 
 If you want to call a part of Django that is still synchronous, you will need
-to wrap it in a :func:`sync_to_async` call. For example::
+to wrap it in a :func:`sync_to_async` call. For example:
+
+.. code-block:: python
 
     from asgiref.sync import sync_to_async
 
@@ -191,7 +193,9 @@ code from an async context, then you can disable the warning by setting the
     async-unsafe parts of Django, you may suffer data loss or corruption. Be
     very careful and do not use this in production environments.
 
-If you need to do this from within Python, do that with ``os.environ``::
+If you need to do this from within Python, do that with ``os.environ``:
+
+.. code-block:: python
 
     import os
 
@@ -221,7 +225,9 @@ dependency when you install Django with ``pip``.
 .. function:: async_to_sync(async_function, force_new_loop=False)
 
 Takes an async function and returns a sync function that wraps it. Can be used
-as either a direct wrapper or a decorator::
+as either a direct wrapper or a decorator:
+
+.. code-block:: pycon
 
     from asgiref.sync import async_to_sync
 
@@ -254,7 +260,9 @@ as ensuring threadlocals work, it also enables the ``thread_sensitive`` mode of
 .. function:: sync_to_async(sync_function, thread_sensitive=True)
 
 Takes a sync function and returns an async function that wraps it. Can be used
-as either a direct wrapper or a decorator::
+as either a direct wrapper or a decorator:
+
+.. code-block:: pycon
 
     from asgiref.sync import sync_to_async
 

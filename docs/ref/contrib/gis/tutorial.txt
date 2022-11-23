@@ -193,22 +193,25 @@ Defining a Geographic Model
 ---------------------------
 
 Now that you've examined your dataset using ``ogrinfo``, create a GeoDjango
-model to represent this data::
+model to represent this data:
+
+.. code-block:: python
 
     from django.contrib.gis.db import models
+
 
     class WorldBorder(models.Model):
         # Regular Django fields corresponding to the attributes in the
         # world borders shapefile.
         name = models.CharField(max_length=50)
         area = models.IntegerField()
-        pop2005 = models.IntegerField('Population 2005')
-        fips = models.CharField('FIPS Code', max_length=2, null=True)
-        iso2 = models.CharField('2 Digit ISO', max_length=2)
-        iso3 = models.CharField('3 Digit ISO', max_length=3)
-        un = models.IntegerField('United Nations Code')
-        region = models.IntegerField('Region Code')
-        subregion = models.IntegerField('Sub-Region Code')
+        pop2005 = models.IntegerField("Population 2005")
+        fips = models.CharField("FIPS Code", max_length=2, null=True)
+        iso2 = models.CharField("2 Digit ISO", max_length=2)
+        iso3 = models.CharField("3 Digit ISO", max_length=3)
+        un = models.IntegerField("United Nations Code")
+        region = models.IntegerField("Region Code")
+        subregion = models.IntegerField("Sub-Region Code")
         lon = models.FloatField()
         lat = models.FloatField()
 
@@ -453,28 +456,31 @@ Boundary geometries may be exported as WKT and GeoJSON:
 
 To import the data, use a ``LayerMapping`` in a Python script.
 Create a file called ``load.py`` inside the ``world`` application,
-with the following code::
+with the following code:
+
+.. code-block:: python
 
     from pathlib import Path
     from django.contrib.gis.utils import LayerMapping
     from .models import WorldBorder
 
     world_mapping = {
-        'fips' : 'FIPS',
-        'iso2' : 'ISO2',
-        'iso3' : 'ISO3',
-        'un' : 'UN',
-        'name' : 'NAME',
-        'area' : 'AREA',
-        'pop2005' : 'POP2005',
-        'region' : 'REGION',
-        'subregion' : 'SUBREGION',
-        'lon' : 'LON',
-        'lat' : 'LAT',
-        'mpoly' : 'MULTIPOLYGON',
+        "fips": "FIPS",
+        "iso2": "ISO2",
+        "iso3": "ISO3",
+        "un": "UN",
+        "name": "NAME",
+        "area": "AREA",
+        "pop2005": "POP2005",
+        "region": "REGION",
+        "subregion": "SUBREGION",
+        "lon": "LON",
+        "lat": "LAT",
+        "mpoly": "MULTIPOLYGON",
     }
 
-    world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
+    world_shp = Path(__file__).resolve().parent / "data" / "TM_WORLD_BORDERS-0.3.shp"
+
 
     def run(verbose=True):
         lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
@@ -548,10 +554,13 @@ A few notes about the command-line options given above:
   :class:`~django.contrib.gis.db.models.PolygonField`.
 
 The command produces the following output, which may be copied
-directly into the ``models.py`` of a GeoDjango application::
+directly into the ``models.py`` of a GeoDjango application:
+
+.. code-block:: python
 
     # This is an auto-generated Django model module created by ogrinspect.
     from django.contrib.gis.db import models
+
 
     class WorldBorder(models.Model):
         fips = models.CharField(max_length=2)
@@ -567,20 +576,21 @@ directly into the ``models.py`` of a GeoDjango application::
         lat = models.FloatField()
         geom = models.MultiPolygonField(srid=4326)
 
+
     # Auto-generated `LayerMapping` dictionary for WorldBorder model
     worldborders_mapping = {
-        'fips' : 'FIPS',
-        'iso2' : 'ISO2',
-        'iso3' : 'ISO3',
-        'un' : 'UN',
-        'name' : 'NAME',
-        'area' : 'AREA',
-        'pop2005' : 'POP2005',
-        'region' : 'REGION',
-        'subregion' : 'SUBREGION',
-        'lon' : 'LON',
-        'lat' : 'LAT',
-        'geom' : 'MULTIPOLYGON',
+        "fips": "FIPS",
+        "iso2": "ISO2",
+        "iso3": "ISO3",
+        "un": "UN",
+        "name": "NAME",
+        "area": "AREA",
+        "pop2005": "POP2005",
+        "region": "REGION",
+        "subregion": "SUBREGION",
+        "lon": "LON",
+        "lat": "LAT",
+        "geom": "MULTIPOLYGON",
     }
 
 Spatial Queries
@@ -678,14 +688,20 @@ __ https://spatialreference.org/ref/epsg/32140/
 .. admonition:: Raw queries
 
     When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
-    fields so that the field value can be recognized by GEOS::
+    fields so that the field value can be recognized by GEOS:
+
+    .. code-block:: python
 
         from django.db import connection
+
         # or if you're querying a non-default database:
         from django.db import connections
-        connection = connections['your_gis_db_alias']
 
-        City.objects.raw('SELECT id, name, %s as point from myapp_city' % (connection.ops.select % 'point'))
+        connection = connections["your_gis_db_alias"]
+
+        City.objects.raw(
+            "SELECT id, name, %s as point from myapp_city" % (connection.ops.select % "point")
+        )
 
     You should only use raw queries when you know exactly what you're doing.
 
@@ -743,20 +759,24 @@ The Django admin allows users to create and modify geometries on a JavaScript
 slippy map (powered by `OpenLayers`_).
 
 Let's dive right in. Create a file called ``admin.py`` inside the ``world``
-application with the following code::
+application with the following code:
+
+.. code-block:: python
 
     from django.contrib.gis import admin
     from .models import WorldBorder
 
     admin.site.register(WorldBorder, admin.ModelAdmin)
 
-Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
+Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows:
+
+.. code-block:: python
 
     from django.contrib import admin
     from django.urls import include, path
 
     urlpatterns = [
-        path('admin/', admin.site.urls),
+        path("admin/", admin.site.urls),
     ]
 
 Create an admin user:

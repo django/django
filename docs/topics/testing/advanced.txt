@@ -39,23 +39,27 @@ restricted subset of the test client API:
 Example
 -------
 
-The following is a unit test using the request factory::
+The following is a unit test using the request factory:
+
+.. code-block:: python
 
     from django.contrib.auth.models import AnonymousUser, User
     from django.test import RequestFactory, TestCase
 
     from .views import MyView, my_view
 
+
     class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
             self.user = User.objects.create_user(
-                username='jacob', email='jacob@…', password='top_secret')
+                username="jacob", email="jacob@…", password="top_secret"
+            )
 
         def test_details(self):
             # Create an instance of a GET request.
-            request = self.factory.get('/customer/details')
+            request = self.factory.get("/customer/details")
 
             # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
@@ -146,13 +150,18 @@ the request's host and use custom host names in tests must include those hosts
 in :setting:`ALLOWED_HOSTS`.
 
 The first option to do so is to add the hosts to your settings file. For
-example, the test suite for docs.djangoproject.com includes the following::
+example, the test suite for docs.djangoproject.com includes the following:
+
+.. code-block:: python
 
     from django.test import TestCase
 
+
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
-            response = self.client.get('/en/dev/search/', HTTP_HOST='docs.djangoproject.dev:8000')
+            response = self.client.get(
+                "/en/dev/search/", HTTP_HOST="docs.djangoproject.dev:8000"
+            )
             self.assertEqual(response.status_code, 200)
 
 and the settings file includes a list of the domains supported by the project::
@@ -169,14 +178,17 @@ Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
 preferable in standalone apps that can't package their own settings file or
 for projects where the list of domains is not static (e.g., subdomains for
 multitenancy). For example, you could write a test for the domain
-``http://otherserver/`` as follows::
+``http://otherserver/`` as follows:
+
+.. code-block:: python
 
     from django.test import TestCase, override_settings
 
+
     class MultiDomainTestCase(TestCase):
-        @override_settings(ALLOWED_HOSTS=['otherserver'])
+        @override_settings(ALLOWED_HOSTS=["otherserver"])
         def test_other_domain(self):
-            response = self.client.get('http://otherserver/foo/bar/')
+            response = self.client.get("http://otherserver/foo/bar/")
 
 Disabling :setting:`ALLOWED_HOSTS` checking (``ALLOWED_HOSTS = ['*']``) when
 running tests prevents the test client from raising a helpful error message if
@@ -349,7 +361,9 @@ Advanced features of ``TransactionTestCase``
 .. attribute:: TransactionTestCase.reset_sequences
 
     Setting ``reset_sequences = True`` on a ``TransactionTestCase`` will make
-    sure sequences are always reset before the test run::
+    sure sequences are always reset before the test run:
+
+    .. code-block:: python
 
         class TestsThatDependsOnPrimaryKeySequences(TransactionTestCase):
             reset_sequences = True
@@ -375,24 +389,29 @@ share a common resource), you can use ``django.test.testcases.SerializeMixin``
 to run them sequentially. This mixin uses a filesystem ``lockfile``.
 
 For example, you can use ``__file__`` to determine that all test classes in the
-same file that inherit from ``SerializeMixin`` will run sequentially::
+same file that inherit from ``SerializeMixin`` will run sequentially:
+
+.. code-block:: python
 
     import os
 
     from django.test import TestCase
     from django.test.testcases import SerializeMixin
 
+
     class ImageTestCaseMixin(SerializeMixin):
         lockfile = __file__
 
         def setUp(self):
-            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.filename = os.path.join(temp_storage_dir, "my_file.png")
             self.file = create_file(self.filename)
+
 
     class RemoveImageTests(ImageTestCaseMixin, TestCase):
         def test_remove_image(self):
             os.remove(self.filename)
             self.assertFalse(os.path.exists(self.filename))
+
 
     class ResizeImageTests(ImageTestCaseMixin, TestCase):
         def test_resize_image(self):

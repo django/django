@@ -51,9 +51,12 @@ Attributes
     Django will add an attribute ``objects`` containing default
     :class:`~django.db.models.Manager` instance. If you add your own
     :class:`~django.db.models.Manager` instance attribute, the default one does
-    not appear. Consider the following example::
+    not appear. Consider the following example:
+
+    .. code-block:: python
 
         from django.db import models
+
 
         class Person(models.Model):
             # Add manager with another name

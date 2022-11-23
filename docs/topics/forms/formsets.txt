@@ -862,7 +862,7 @@ For example, in the default case, you might see:
     <label for="id_form-0-title">Title:</label>
     <input type="text" name="form-0-title" id="id_form-0-title">
 
-But with ``ArticleFormset(prefix='article')`` that becomes:
+But with ``ArticleFormset(prefix="article")`` that becomes:
 
 .. code-block:: html
 
@@ -967,22 +967,25 @@ Formsets have the following attributes and methods associated with rendering:
 
 Using a formset inside a view is not very different from using a regular
 ``Form`` class. The only thing you will want to be aware of is making sure to
-use the management form inside the template. Let's look at a sample view::
+use the management form inside the template. Let's look at a sample view:
+
+.. code-block:: python
 
     from django.forms import formset_factory
     from django.shortcuts import render
     from myapp.forms import ArticleForm
 
+
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
-        if request.method == 'POST':
+        if request.method == "POST":
             formset = ArticleFormSet(request.POST, request.FILES)
             if formset.is_valid():
                 # do something with the formset.cleaned_data
                 pass
         else:
             formset = ArticleFormSet()
-        return render(request, 'manage_articles.html', {'formset': formset})
+        return render(request, "manage_articles.html", {"formset": formset})
 
 The ``manage_articles.html`` template might look like this:
 
@@ -1052,28 +1055,35 @@ You are able to use more than one formset in a view if you like. Formsets
 borrow much of its behavior from forms. With that said you are able to use
 ``prefix`` to prefix formset form field names with a given value to allow
 more than one formset to be sent to a view without name clashing. Let's take
-a look at how this might be accomplished::
+a look at how this might be accomplished:
+
+.. code-block:: python
 
     from django.forms import formset_factory
     from django.shortcuts import render
     from myapp.forms import ArticleForm, BookForm
 
+
     def manage_articles(request):
         ArticleFormSet = formset_factory(ArticleForm)
         BookFormSet = formset_factory(BookForm)
-        if request.method == 'POST':
-            article_formset = ArticleFormSet(request.POST, request.FILES, prefix='articles')
-            book_formset = BookFormSet(request.POST, request.FILES, prefix='books')
+        if request.method == "POST":
+            article_formset = ArticleFormSet(request.POST, request.FILES, prefix="articles")
+            book_formset = BookFormSet(request.POST, request.FILES, prefix="books")
             if article_formset.is_valid() and book_formset.is_valid():
                 # do something with the cleaned_data on the formsets.
                 pass
         else:
-            article_formset = ArticleFormSet(prefix='articles')
-            book_formset = BookFormSet(prefix='books')
-        return render(request, 'manage_articles.html', {
-            'article_formset': article_formset,
-            'book_formset': book_formset,
-        })
+            article_formset = ArticleFormSet(prefix="articles")
+            book_formset = BookFormSet(prefix="books")
+        return render(
+            request,
+            "manage_articles.html",
+            {
+                "article_formset": article_formset,
+                "book_formset": book_formset,
+            },
+        )
 
 You would then render the formsets as normal. It is important to point out
 that you need to pass ``prefix`` on both the POST and non-POST cases so that

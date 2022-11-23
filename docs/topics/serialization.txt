@@ -15,9 +15,12 @@ serializer to handle any format (text-based or not).
 Serializing data
 ================
 
-At the highest level, you can serialize data like this::
+At the highest level, you can serialize data like this:
+
+.. code-block:: python
 
     from django.core import serializers
+
     data = serializers.serialize("xml", SomeModel.objects.all())
 
 The arguments to the ``serialize`` function are the format to serialize the data
@@ -36,7 +39,9 @@ You can also use a serializer object directly::
     data = xml_serializer.getvalue()
 
 This is useful if you want to serialize data directly to a file-like object
-(which includes an :class:`~django.http.HttpResponse`)::
+(which includes an :class:`~django.http.HttpResponse`):
+
+.. code-block:: python
 
     with open("file.xml", "w") as out:
         xml_serializer.serialize(SomeModel.objects.all(), stream=out)
@@ -53,10 +58,13 @@ Subset of fields
 ----------------
 
 If you only want a subset of fields to be serialized, you can
-specify a ``fields`` argument to the serializer::
+specify a ``fields`` argument to the serializer:
+
+.. code-block:: python
 
     from django.core import serializers
-    data = serializers.serialize('xml', SomeModel.objects.all(), fields=['name','size'])
+
+    data = serializers.serialize("xml", SomeModel.objects.all(), fields=["name", "size"])
 
 In this example, only the ``name`` and ``size`` attributes of each model will
 be serialized. The primary key is always serialized as the ``pk`` element in the
@@ -81,10 +89,13 @@ object.
 However, if you have a model that uses :ref:`multi-table inheritance
 <multi-table-inheritance>`, you also need to serialize all of the base classes
 for the model. This is because only the fields that are locally defined on the
-model will be serialized. For example, consider the following models::
+model will be serialized. For example, consider the following models:
+
+.. code-block:: python
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
+
 
     class Restaurant(Place):
         serves_hot_dogs = models.BooleanField(default=False)
@@ -257,9 +268,12 @@ represented as a list of PKs.
 Be aware that not all Django output can be passed unmodified to :mod:`json`.
 For example, if you have some custom type in an object to be serialized, you'll
 have to write a custom :mod:`json` encoder for it. Something like this will
-work::
+work:
+
+.. code-block:: python
 
     from django.core.serializers.json import DjangoJSONEncoder
+
 
     class LazyEncoder(DjangoJSONEncoder):
         def default(self, obj):
@@ -268,11 +282,13 @@ work::
             return super().default(obj)
 
 You can then pass ``cls=LazyEncoder`` to the ``serializers.serialize()``
-function::
+function:
+
+.. code-block:: python
 
     from django.core.serializers import serialize
 
-    serialize('json', SomeModel.objects.all(), cls=LazyEncoder)
+    serialize("json", SomeModel.objects.all(), cls=LazyEncoder)
 
 Also note that GeoDjango provides a :doc:`customized GeoJSON serializer
 </ref/contrib/gis/serializers>`.
@@ -376,9 +392,12 @@ object instance without using the primary key value.
 Deserialization of natural keys
 -------------------------------
 
-Consider the following two models::
+Consider the following two models:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=100)
@@ -387,7 +406,8 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            unique_together = [["first_name", "last_name"]]
+
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -415,13 +435,17 @@ However, if we add natural key handling to Person, the fixture becomes
 much more humane. To add natural key handling, you define a default
 Manager for Person with a ``get_by_natural_key()`` method. In the case
 of a Person, a good natural key might be the pair of first and last
-name::
+name:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class PersonManager(models.Manager):
         def get_by_natural_key(self, first_name, last_name):
             return self.get(first_name=first_name, last_name=last_name)
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=100)
@@ -431,7 +455,7 @@ name::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            unique_together = [["first_name", "last_name"]]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -469,7 +493,9 @@ Serialization of natural keys
 -----------------------------
 
 So how do you get Django to emit a natural key when serializing an object?
-Firstly, you need to add another method -- this time to the model itself::
+Firstly, you need to add another method -- this time to the model itself:
+
+.. code-block:: python
 
     class Person(models.Model):
         first_name = models.CharField(max_length=100)
@@ -479,7 +505,7 @@ Firstly, you need to add another method -- this time to the model itself::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            unique_together = [["first_name", "last_name"]]
 
         def natural_key(self):
             return (self.first_name, self.last_name)
@@ -611,7 +637,9 @@ To control this ordering, you can define dependencies on your
 attribute on the ``natural_key()`` method itself.
 
 For example, let's add a natural key to the ``Book`` model from the
-example above::
+example above:
+
+.. code-block:: python
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -622,11 +650,15 @@ example above::
 
 The natural key for a ``Book`` is a combination of its name and its
 author. This means that ``Person`` must be serialized before ``Book``.
-To define this dependency, we add one extra line::
+To define this dependency, we add one extra line:
+
+    .. code-block:: python
 
         def natural_key(self):
             return (self.name,) + self.author.natural_key()
-        natural_key.dependencies = ['example_app.person']
+
+
+        natural_key.dependencies = ["example_app.person"]
 
 This definition ensures that all ``Person`` objects are serialized before
 any ``Book`` objects. In turn, any object referencing ``Book`` will be

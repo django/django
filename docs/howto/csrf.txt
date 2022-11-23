@@ -200,10 +200,13 @@ However, if you use cache decorators on individual views, the CSRF middleware
 will not yet have been able to set the Vary header or the CSRF cookie, and the
 response will be cached without either one. In this case, on any views that
 will require a CSRF token to be inserted you should use the
-:func:`django.views.decorators.csrf.csrf_protect` decorator first::
+:func:`django.views.decorators.csrf.csrf_protect` decorator first:
+
+.. code-block:: python
 
   from django.views.decorators.cache import cache_page
   from django.views.decorators.csrf import csrf_protect
+
 
   @cache_page(60 * 15)
   @csrf_protect
@@ -276,21 +279,23 @@ it for the rest of the time.
 
 Solution: use :func:`~django.views.decorators.csrf.csrf_exempt` for the whole
 view function, and :func:`~django.views.decorators.csrf.csrf_protect` for the
-path within it that needs protection. Example::
+path within it that needs protection. Example:
+
+.. code-block:: python
 
     from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+
     @csrf_exempt
     def my_view(request):
-
         @csrf_protect
         def protected_path(request):
             do_something()
 
         if some_condition():
-           return protected_path(request)
+            return protected_path(request)
         else:
-           do_something_else()
+            do_something_else()
 
 Protecting a page that uses AJAX without an HTML form
 -----------------------------------------------------

@@ -13,7 +13,7 @@ A lookup example
 ================
 
 Let's start with a small custom lookup. We will write a custom lookup ``ne``
-which works opposite to ``exact``. ``Author.objects.filter(name__ne='Jack')``
+which works opposite to ``exact``. ``Author.objects.filter(name__ne="Jack")``
 will translate to the SQL:
 
 .. code-block:: sql
@@ -24,34 +24,43 @@ This SQL is backend independent, so we don't need to worry about different
 databases.
 
 There are two steps to making this work. Firstly we need to implement the
-lookup, then we need to tell Django about it::
+lookup, then we need to tell Django about it:
+
+.. code-block:: python
 
   from django.db.models import Lookup
 
+
   class NotEqual(Lookup):
-      lookup_name = 'ne'
+      lookup_name = "ne"
 
       def as_sql(self, compiler, connection):
           lhs, lhs_params = self.process_lhs(compiler, connection)
           rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params
-          return '%s <> %s' % (lhs, rhs), params
+          return "%s <> %s" % (lhs, rhs), params
 
 To register the ``NotEqual`` lookup we will need to call ``register_lookup`` on
 the field class we want the lookup to be available for. In this case, the lookup
 makes sense on all ``Field`` subclasses, so we register it with ``Field``
-directly::
+directly:
+
+.. code-block:: python
 
   from django.db.models import Field
+
   Field.register_lookup(NotEqual)
 
-Lookup registration can also be done using a decorator pattern::
+Lookup registration can also be done using a decorator pattern:
+
+.. code-block:: python
 
     from django.db.models import Field
 
+
     @Field.register_lookup
     class NotEqualLookup(Lookup):
-        # ...
+        ...
 
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You
@@ -76,7 +85,7 @@ A ``Lookup`` works against two values, ``lhs`` and ``rhs``, standing for
 left-hand side and right-hand side. The left-hand side is usually a field
 reference, but it can be anything implementing the :ref:`query expression API
 <query-expression>`. The right-hand is the value given by the user. In the
-example ``Author.objects.filter(name__ne='Jack')``, the left-hand side is a
+example ``Author.objects.filter(name__ne="Jack")``, the left-hand side is a
 reference to the ``name`` field of the ``Author`` model, and ``'Jack'`` is the
 right-hand side.
 
@@ -111,17 +120,23 @@ or where it did not exceed a certain amount
     and without duplicating functionality already in Django.
 
 We will start by writing an ``AbsoluteValue`` transformer. This will use the SQL
-function ``ABS()`` to transform the value before comparison::
+function ``ABS()`` to transform the value before comparison:
+
+.. code-block:: python
 
   from django.db.models import Transform
 
-  class AbsoluteValue(Transform):
-      lookup_name = 'abs'
-      function = 'ABS'
 
-Next, let's register it for ``IntegerField``::
+  class AbsoluteValue(Transform):
+      lookup_name = "abs"
+      function = "ABS"
+
+Next, let's register it for ``IntegerField``:
+
+.. code-block:: python
 
   from django.db.models import IntegerField
+
   IntegerField.register_lookup(AbsoluteValue)
 
 We can now run the queries we had before.
@@ -144,14 +159,14 @@ Note that in case there is no other lookup specified, Django interprets
 ``change__abs=27`` as ``change__abs__exact=27``.
 
 This also allows the result to be used in ``ORDER BY`` and ``DISTINCT ON``
-clauses. For example ``Experiment.objects.order_by('change__abs')`` generates:
+clauses. For example ``Experiment.objects.order_by("change__abs")`` generates:
 
 .. code-block:: sql
 
     SELECT ... ORDER BY ABS("experiments"."change") ASC
 
 And on databases that support distinct on fields (such as PostgreSQL),
-``Experiment.objects.distinct('change__abs')`` generates:
+``Experiment.objects.distinct("change__abs")`` generates:
 
 .. code-block:: sql
 
@@ -163,13 +178,16 @@ this here as it didn't change, but supposing we were applying ``AbsoluteValue``
 to some field which represents a more complex type (for example a point
 relative to an origin, or a complex number) then we may have wanted to specify
 that the transform returns a ``FloatField`` type for further lookups. This can
-be done by adding an ``output_field`` attribute to the transform::
+be done by adding an ``output_field`` attribute to the transform:
+
+.. code-block:: python
 
     from django.db.models import FloatField, Transform
 
+
     class AbsoluteValue(Transform):
-        lookup_name = 'abs'
-        function = 'ABS'
+        lookup_name = "abs"
+        function = "ABS"
 
         @property
         def output_field(self):
@@ -193,18 +211,22 @@ the following SQL:
 
     SELECT .. WHERE "experiments"."change" < 27 AND "experiments"."change" > -27
 
-The implementation is::
+The implementation is:
+
+.. code-block:: python
 
   from django.db.models import Lookup
 
+
   class AbsoluteValueLessThan(Lookup):
-      lookup_name = 'lt'
+      lookup_name = "lt"
 
       def as_sql(self, compiler, connection):
           lhs, lhs_params = compiler.compile(self.lhs.lhs)
           rhs, rhs_params = self.process_rhs(compiler, connection)
           params = lhs_params + rhs_params + lhs_params + rhs_params
-          return '%s < %s AND %s > -%s' % (lhs, rhs, lhs, rhs), params
+          return "%s < %s AND %s > -%s" % (lhs, rhs, lhs, rhs), params
+
 
   AbsoluteValue.register_lookup(AbsoluteValueLessThan)
 
@@ -248,18 +270,24 @@ transformations in a database-agnostic way.
 We define an ``UpperCase`` transformer which uses the SQL function ``UPPER()`` to
 transform the values before comparison. We define
 :attr:`bilateral = True <django.db.models.Transform.bilateral>` to indicate that
-this transformation should apply to both ``lhs`` and ``rhs``::
+this transformation should apply to both ``lhs`` and ``rhs``:
+
+.. code-block:: python
 
   from django.db.models import Transform
 
+
   class UpperCase(Transform):
-      lookup_name = 'upper'
-      function = 'UPPER'
+      lookup_name = "upper"
+      function = "UPPER"
       bilateral = True
 
-Next, let's register it::
+Next, let's register it:
+
+.. code-block:: python
 
   from django.db.models import CharField, TextField
+
   CharField.register_lookup(UpperCase)
   TextField.register_lookup(UpperCase)
 
@@ -306,11 +334,13 @@ In some cases you may wish to dynamically change which ``Transform`` or
 an example, you could have a field which stores coordinates or an arbitrary
 dimension, and wish to allow a syntax like ``.filter(coords__x7=4)`` to return
 the objects where the 7th coordinate has value 4. In order to do this, you
-would override ``get_lookup`` with something like::
+would override ``get_lookup`` with something like:
+
+.. code-block:: python
 
     class CoordinatesField(Field):
         def get_lookup(self, lookup_name):
-            if lookup_name.startswith('x'):
+            if lookup_name.startswith("x"):
                 try:
                     dimension = int(lookup_name[1:])
                 except ValueError:
@@ -333,11 +363,11 @@ will look for a ``Lookup``. If there are multiple names, it will look for a
 is not found, we look for a ``Transform`` and then the ``exact`` lookup on that
 ``Transform``. All call sequences always end with a ``Lookup``. To clarify:
 
-- ``.filter(myfield__mylookup)`` will call ``myfield.get_lookup('mylookup')``.
+- ``.filter(myfield__mylookup)`` will call ``myfield.get_lookup("mylookup")``.
 - ``.filter(myfield__mytransform__mylookup)`` will call
-  ``myfield.get_transform('mytransform')``, and then
-  ``mytransform.get_lookup('mylookup')``.
+  ``myfield.get_transform("mytransform")``, and then
+  ``mytransform.get_lookup("mylookup")``.
 - ``.filter(myfield__mytransform)`` will first call
-  ``myfield.get_lookup('mytransform')``, which will fail, so it will fall back
-  to calling ``myfield.get_transform('mytransform')`` and then
-  ``mytransform.get_lookup('exact')``.
+  ``myfield.get_lookup("mytransform")``, which will fail, so it will fall back
+  to calling ``myfield.get_transform("mytransform")`` and then
+  ``mytransform.get_lookup("exact")``.

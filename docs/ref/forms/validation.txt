@@ -117,49 +117,57 @@ Raising ``ValidationError``
 In order to make error messages flexible and easy to override, consider the
 following guidelines:
 
-* Provide a descriptive error ``code`` to the constructor::
+* Provide a descriptive error ``code`` to the constructor:
+
+.. code-block:: python
 
       # Good
-      ValidationError(_('Invalid value'), code='invalid')
+      ValidationError(_("Invalid value"), code="invalid")
 
       # Bad
-      ValidationError(_('Invalid value'))
+      ValidationError(_("Invalid value"))
 
 * Don't coerce variables into the message; use placeholders and the ``params``
-  argument of the constructor::
+  argument of the constructor:
+
+.. code-block:: python
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
-          params={'value': '42'},
+          _("Invalid value: %(value)s"),
+          params={"value": "42"},
       )
 
       # Bad
-      ValidationError(_('Invalid value: %s') % value)
+      ValidationError(_("Invalid value: %s") % value)
 
 * Use mapping keys instead of positional formatting. This enables putting
   the variables in any order or omitting them altogether when rewriting the
-  message::
+  message:
+
+.. code-block:: python
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
-          params={'value': '42'},
+          _("Invalid value: %(value)s"),
+          params={"value": "42"},
       )
 
       # Bad
       ValidationError(
-          _('Invalid value: %s'),
-          params=('42',),
+          _("Invalid value: %s"),
+          params=("42",),
       )
 
-* Wrap the message with ``gettext`` to enable translation::
+* Wrap the message with ``gettext`` to enable translation:
+
+.. code-block:: python
 
       # Good
-      ValidationError(_('Invalid value'))
+      ValidationError(_("Invalid value"))
 
       # Bad
-      ValidationError('Invalid value')
+      ValidationError("Invalid value")
 
 Putting it all together::
 
@@ -191,19 +199,25 @@ of them to the form submitter, it is possible to pass a list of errors to the
 ``ValidationError`` constructor.
 
 As above, it is recommended to pass a list of ``ValidationError`` instances
-with ``code``\s and ``params`` but a list of strings will also work::
+with ``code``\s and ``params`` but a list of strings will also work:
+
+.. code-block:: python
 
     # Good
-    raise ValidationError([
-        ValidationError(_('Error 1'), code='error1'),
-        ValidationError(_('Error 2'), code='error2'),
-    ])
+    raise ValidationError(
+        [
+            ValidationError(_("Error 1"), code="error1"),
+            ValidationError(_("Error 2"), code="error2"),
+        ]
+    )
 
     # Bad
-    raise ValidationError([
-        _('Error 1'),
-        _('Error 2'),
-    ])
+    raise ValidationError(
+        [
+            _("Error 1"),
+            _("Error 2"),
+        ]
+    )
 
 Using validation in practice
 ============================
@@ -227,10 +241,13 @@ field's constructor, via the field's ``validators`` argument, or defined on the
 attribute.
 
 Validators can be used to validate values inside the field, let's have a look
-at Django's ``SlugField``::
+at Django's ``SlugField``:
+
+.. code-block:: python
 
     from django.core import validators
     from django.forms import CharField
+
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
@@ -257,10 +274,13 @@ Form field default cleaning
 ---------------------------
 
 Let's first create a custom form field that validates its input is a string
-containing comma-separated email addresses. The full class looks like this::
+containing comma-separated email addresses. The full class looks like this:
+
+.. code-block:: python
 
     from django import forms
     from django.core.validators import validate_email
+
 
     class MultiEmailField(forms.Field):
         def to_python(self, value):
@@ -268,7 +288,7 @@ containing comma-separated email addresses. The full class looks like this::
             # Return an empty list if no input was given.
             if not value:
                 return []
-            return value.split(',')
+            return value.split(",")
 
         def validate(self, value):
             """Check if value consists only of valid emails."""
@@ -281,7 +301,9 @@ Every form that uses this field will have these methods run before anything
 else can be done with the field's data. This is cleaning that is specific to
 this type of field, regardless of how it is subsequently used.
 
-Let's create a ``ContactForm`` to demonstrate how you'd use this field::
+Let's create a ``ContactForm`` to demonstrate how you'd use this field:
+
+.. code-block:: python
 
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -302,17 +324,20 @@ Continuing on from the previous example, suppose that in our ``ContactForm``,
 we want to make sure that the ``recipients`` field always contains the address
 ``"fred@example.com"``. This is validation that is specific to our form, so we
 don't want to put it into the general ``MultiEmailField`` class. Instead, we
-write a cleaning method that operates on the ``recipients`` field, like so::
+write a cleaning method that operates on the ``recipients`` field, like so:
+
+.. code-block:: python
 
     from django import forms
     from django.core.exceptions import ValidationError
+
 
     class ContactForm(forms.Form):
         # Everything as before.
         ...
 
         def clean_recipients(self):
-            data = self.cleaned_data['recipients']
+            data = self.cleaned_data["recipients"]
             if "fred@example.com" not in data:
                 raise ValidationError("You have forgotten about Fred!")
 
@@ -344,10 +369,13 @@ checks.
 There are two ways to report any errors from this step. Probably the most
 common method is to display the error at the top of the form. To create such
 an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
-example::
+example:
+
+.. code-block:: python
 
     from django import forms
     from django.core.exceptions import ValidationError
+
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -362,8 +390,7 @@ example::
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
                     raise ValidationError(
-                        "Did not send for 'help' in the subject despite "
-                        "CC'ing yourself."
+                        "Did not send for 'help' in the subject despite " "CC'ing yourself."
                     )
 
 In this code, if the validation error is raised, the form will display an
@@ -375,7 +402,9 @@ The call to ``super().clean()`` in the example code ensures that any validation
 logic in parent classes is maintained. If your form inherits another that
 doesn't return a ``cleaned_data`` dictionary in its ``clean()`` method (doing
 so is optional), then don't assign ``cleaned_data`` to the result of the
-``super()`` call and use ``self.cleaned_data`` instead::
+``super()`` call and use ``self.cleaned_data`` instead:
+
+.. code-block:: python
 
     def clean(self):
         super().clean()
@@ -388,9 +417,12 @@ to both the "subject" and "cc_myself" rows in the form display. Be careful when
 doing this in practice, since it can lead to confusing form output. We're
 showing what is possible here and leaving it up to you and your designers to
 work out what works effectively in your particular situation. Our new code
-(replacing the previous sample) looks like this::
+(replacing the previous sample) looks like this:
+
+.. code-block:: python
 
     from django import forms
+
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -403,8 +435,8 @@ work out what works effectively in your particular situation. Our new code
 
             if cc_myself and subject and "help" not in subject:
                 msg = "Must put 'help' in subject when cc'ing yourself."
-                self.add_error('cc_myself', msg)
-                self.add_error('subject', msg)
+                self.add_error("cc_myself", msg)
+                self.add_error("subject", msg)
 
 The second argument of ``add_error()`` can be a string, or preferably an
 instance of ``ValidationError``. See :ref:`raising-validation-error` for more

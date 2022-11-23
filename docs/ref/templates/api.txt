@@ -184,7 +184,9 @@ the first one will be used.
 .. class:: Template
 
     This class lives at ``django.template.Template``. The constructor takes
-    one argument — the raw template code::
+    one argument — the raw template code:
+
+    .. code-block:: python
 
         from django.template import Template
 
@@ -216,7 +218,9 @@ different contexts.
 .. method:: Template.render(context)
 
     Call the :class:`Template` object's ``render()`` method with a
-    :class:`Context` to "fill" the template::
+    :class:`Context` to "fill" the template:
+
+    .. code-block:: pycon
 
         >>> from django.template import Context, Template
         >>> template = Template("My name is {{ my_name }}.")
@@ -347,10 +351,14 @@ straight lookups. Here are some things to keep in mind:
   ``string_if_invalid``, unconditionally.  The
   dynamically-generated :meth:`~django.db.models.Model.delete` and
   :meth:`~django.db.models.Model.save` methods on Django model objects get
-  ``alters_data=True`` automatically. Example::
+  ``alters_data=True`` automatically. Example:
+
+.. code-block:: python
 
     def sensitive_function(self):
         self.database_record.delete()
+
+
     sensitive_function.alters_data = True
 
 * Occasionally you may want to turn off this feature for other reasons,
@@ -569,18 +577,23 @@ A ``flatten()`` method is also internally used to make ``Context`` objects compa
     True
 
 Result from ``flatten()`` can be useful in unit tests to compare ``Context``
-against ``dict``::
+against ``dict``:
+
+.. code-block:: python
 
     class ContextTest(unittest.TestCase):
         def test_against_dictionary(self):
             c1 = Context()
-            c1['update'] = 'value'
-            self.assertEqual(c1.flatten(), {
-                'True': True,
-                'None': None,
-                'False': False,
-                'update': 'value',
-            })
+            c1["update"] = "value"
+            self.assertEqual(
+                c1.flatten(),
+                {
+                    "True": True,
+                    "None": None,
+                    "False": False,
+                    "update": "value",
+                },
+            )
 
 .. _subclassing-context-requestcontext:
 
@@ -635,7 +648,9 @@ below.
     processors.
 
     If you want context data to take priority over context processors, use the
-    following pattern::
+    following pattern:
+
+    .. code-block:: python
 
         from django.template import RequestContext
 
@@ -648,19 +663,27 @@ below.
 
 Also, you can give :class:`RequestContext` a list of additional processors,
 using the optional, third positional argument, ``processors``. In this
-example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
+example, the :class:`RequestContext` instance gets an ``ip_address`` variable:
+
+.. code-block:: python
 
     from django.http import HttpResponse
     from django.template import RequestContext, Template
 
+
     def ip_address_processor(request):
-        return {'ip_address': request.META['REMOTE_ADDR']}
+        return {"ip_address": request.META["REMOTE_ADDR"]}
+
 
     def client_ip_view(request):
-        template = Template('{{ title }}: {{ ip_address }}')
-        context = RequestContext(request, {
-            'title': 'Your IP Address',
-        }, [ip_address_processor])
+        template = Template("{{ title }}: {{ ip_address }}")
+        context = RequestContext(
+            request,
+            {
+                "title": "Your IP Address",
+            },
+            [ip_address_processor],
+        )
         return HttpResponse(template.render(context))
 
 .. _context-processors:
@@ -779,9 +802,12 @@ one argument, an :class:`~django.http.HttpRequest` object, and returns a
 dictionary that gets added to the template context.
 
 For example, to add the :setting:`DEFAULT_FROM_EMAIL` setting to every
-context::
+context:
+
+.. code-block:: python
 
     from django.conf import settings
+
 
     def from_email(request):
         return {

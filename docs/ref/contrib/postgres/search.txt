@@ -94,13 +94,17 @@ Examples:
 
 .. _Full Text Search docs: https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
 
+.. code-block:: pycon
+
     >>> from django.contrib.postgres.search import SearchQuery
-    >>> SearchQuery('red tomato')  # two keywords
-    >>> SearchQuery('tomato red')  # same results as above
-    >>> SearchQuery('red tomato', search_type='phrase')  # a phrase
-    >>> SearchQuery('tomato red', search_type='phrase')  # a different phrase
-    >>> SearchQuery("'tomato' & ('red' | 'green')", search_type='raw')  # boolean operators
-    >>> SearchQuery("'tomato' ('red' OR 'green')", search_type='websearch')  # websearch operators
+    >>> SearchQuery("red tomato")  # two keywords
+    >>> SearchQuery("tomato red")  # same results as above
+    >>> SearchQuery("red tomato", search_type="phrase")  # a phrase
+    >>> SearchQuery("tomato red", search_type="phrase")  # a different phrase
+    >>> SearchQuery("'tomato' & ('red' | 'green')", search_type="raw")  # boolean operators
+    >>> SearchQuery(
+    ...     "'tomato' ('red' OR 'green')", search_type="websearch"
+    ... )  # websearch operators
 
 ``SearchQuery`` terms can be combined logically to provide more flexibility:
 

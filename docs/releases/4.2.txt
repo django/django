@@ -411,7 +411,9 @@ option is deprecated in favor of the :attr:`~django.db.models.Options.indexes`
 option.
 
 Migrating existing ``index_together`` should be handled as a migration. For
-example::
+example:
+
+.. code-block:: python
 
     class Author(models.Model):
         rank = models.IntegerField()
@@ -420,7 +422,9 @@ example::
         class Meta:
             index_together = [["rank", "name"]]
 
-Should become::
+Should become:
+
+.. code-block:: python
 
     class Author(models.Model):
         rank = models.IntegerField()

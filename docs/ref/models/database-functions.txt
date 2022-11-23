@@ -11,7 +11,9 @@ Functions are also :doc:`expressions <expressions>`, so they can be used and
 combined with other expressions like :ref:`aggregate functions
 <aggregation-functions>`.
 
-We'll be using the following model in examples of each function::
+We'll be using the following model in examples of each function:
+
+.. code-block:: python
 
     class Author(models.Model):
         name = models.CharField(max_length=50)
@@ -231,7 +233,9 @@ returns ``expression1``.
 Date functions
 ==============
 
-We'll be using the following model in examples of each function::
+We'll be using the following model in examples of each function:
+
+.. code-block:: python
 
     class Experiment(models.Model):
         start_datetime = models.DateTimeField()
@@ -287,7 +291,9 @@ returned when this timezone is active will be the same as above except for:
     databases and from Python's standard functions. This function will return
     ``1`` for Sunday, ``2`` for Monday, through ``7`` for Saturday.
 
-    The equivalent calculation in Python is::
+    The equivalent calculation in Python is:
+
+    .. code-block:: pycon
 
         >>> from datetime import datetime
         >>> dt = datetime(2015, 6, 15)
@@ -883,7 +889,9 @@ that deal with time-parts can be used with ``TimeField``:
 Math Functions
 ==============
 
-We'll be using the following model in math function examples::
+We'll be using the following model in math function examples:
+
+.. code-block:: python
 
     class Vector(models.Model):
         x = models.FloatField()

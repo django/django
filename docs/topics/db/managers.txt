@@ -23,12 +23,15 @@ By default, Django adds a ``Manager`` with the name ``objects`` to every Django
 model class. However, if you want to use ``objects`` as a field name, or if you
 want to use a name other than ``objects`` for the ``Manager``, you can rename
 it on a per-model basis. To rename the ``Manager`` for a given class, define a
-class attribute of type ``models.Manager()`` on that model. For example::
+class attribute of type ``models.Manager()`` on that model. For example:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class Person(models.Model):
-        #...
+        # ...
         people = models.Manager()
 
 Using this example model, ``Person.objects`` will generate an
@@ -55,20 +58,23 @@ functionality to your models. (For "row-level" functionality -- i.e., functions
 that act on a single instance of a model object -- use :ref:`Model methods
 <model-methods>`, not custom ``Manager`` methods.)
 
-For example, this custom ``Manager`` adds a method ``with_counts()``::
+For example, this custom ``Manager`` adds a method ``with_counts()``:
+
+.. code-block:: python
 
     from django.db import models
     from django.db.models.functions import Coalesce
 
+
     class PollManager(models.Manager):
         def with_counts(self):
-            return self.annotate(
-                num_responses=Coalesce(models.Count("response"), 0)
-            )
+            return self.annotate(num_responses=Coalesce(models.Count("response"), 0))
+
 
     class OpinionPoll(models.Model):
         question = models.CharField(max_length=200)
         objects = PollManager()
+
 
     class Response(models.Model):
         poll = models.ForeignKey(OpinionPoll, on_delete=models.CASCADE)
@@ -88,9 +94,12 @@ Modifying a manager's initial ``QuerySet``
 ------------------------------------------
 
 A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
-example, using this model::
+example, using this model:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
@@ -103,20 +112,23 @@ You can override a ``Manager``’s base ``QuerySet`` by overriding the
 ``QuerySet`` with the properties you require.
 
 For example, the following model has *two* ``Manager``\s -- one that returns
-all objects, and one that returns only the books by Roald Dahl::
+all objects, and one that returns only the books by Roald Dahl:
+
+.. code-block:: python
 
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(author='Roald Dahl')
+            return super().get_queryset().filter(author="Roald Dahl")
+
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
 
-        objects = models.Manager() # The default manager.
-        dahl_objects = DahlBookManager() # The Dahl-specific manager.
+        objects = models.Manager()  # The default manager.
+        dahl_objects = DahlBookManager()  # The Dahl-specific manager.
 
 With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
@@ -124,10 +136,12 @@ Roald Dahl.
 
 Because ``get_queryset()`` returns a ``QuerySet`` object, you can use
 ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it. So
-these statements are all legal::
+these statements are all legal:
+
+.. code-block:: python
 
     Book.dahl_objects.all()
-    Book.dahl_objects.filter(title='Matilda')
+    Book.dahl_objects.filter(title="Matilda")
     Book.dahl_objects.count()
 
 This example also pointed out another interesting technique: using multiple
@@ -135,20 +149,26 @@ managers on the same model. You can attach as many ``Manager()`` instances to
 a model as you'd like. This is a non-repetitive way to define common "filters"
 for your models.
 
-For example::
+For example:
+
+.. code-block:: python
 
     class AuthorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='A')
+            return super().get_queryset().filter(role="A")
+
 
     class EditorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='E')
+            return super().get_queryset().filter(role="E")
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -206,7 +226,7 @@ Base managers aren't used when querying on related models, or when
 <backwards-related-objects>`. For example, if the ``Question`` model
 :ref:`from the tutorial <creating-models>` had a ``deleted`` field and a base
 manager that filters out instances with ``deleted=True``, a queryset like
-``Choice.objects.filter(question__name__startswith='What')`` would include
+``Choice.objects.filter(question__name__startswith="What")`` would include
 choices related to deleted questions.
 
 Don't filter away any results in this type of manager subclass
@@ -227,14 +247,17 @@ Calling custom ``QuerySet`` methods from the manager
 
 While most methods from the standard ``QuerySet`` are accessible directly from
 the ``Manager``, this is only the case for the extra methods defined on a
-custom ``QuerySet`` if you also implement them on the ``Manager``::
+custom ``QuerySet`` if you also implement them on the ``Manager``:
+
+.. code-block:: python
 
     class PersonQuerySet(models.QuerySet):
         def authors(self):
-            return self.filter(role='A')
+            return self.filter(role="A")
 
         def editors(self):
-            return self.filter(role='E')
+            return self.filter(role="E")
+
 
     class PersonManager(models.Manager):
         def get_queryset(self):
@@ -246,10 +269,13 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
         def editors(self):
             return self.get_queryset().editors()
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from
@@ -263,7 +289,9 @@ Creating a manager with ``QuerySet`` methods
 In lieu of the above approach which requires duplicating methods on both the
 ``QuerySet`` and the ``Manager``, :meth:`QuerySet.as_manager()
 <django.db.models.query.QuerySet.as_manager>` can be used to create an instance
-of ``Manager`` with a copy of a custom ``QuerySet``’s methods::
+of ``Manager`` with a copy of a custom ``QuerySet``’s methods:
+
+.. code-block:: python
 
     class Person(models.Model):
         ...
@@ -285,7 +313,9 @@ Methods are copied according to the following rules:
 - Methods with a ``queryset_only`` attribute set to ``False`` are always copied.
 - Methods with a ``queryset_only`` attribute set to ``True`` are never copied.
 
-For example::
+For example:
+
+.. code-block:: python
 
     class CustomQuerySet(models.QuerySet):
         # Available on both Manager and QuerySet.
@@ -299,11 +329,13 @@ For example::
         # Available only on QuerySet.
         def opted_out_public_method(self):
             return
+
         opted_out_public_method.queryset_only = True
 
         # Available on both Manager and QuerySet.
         def _opted_in_private_method(self):
             return
+
         _opted_in_private_method.queryset_only = False
 
 ``from_queryset()``
@@ -314,15 +346,19 @@ For example::
 For advanced usage you might want both a custom ``Manager`` and a custom
 ``QuerySet``. You can do that by calling ``Manager.from_queryset()`` which
 returns a *subclass* of your base ``Manager`` with a copy of the custom
-``QuerySet`` methods::
+``QuerySet`` methods:
+
+.. code-block:: python
 
     class CustomManager(models.Manager):
         def manager_only_method(self):
             return
 
+
     class CustomQuerySet(models.QuerySet):
         def manager_and_queryset_method(self):
             return
+
 
     class MyModel(models.Model):
         objects = CustomManager.from_queryset(CustomQuerySet)()
@@ -358,7 +394,9 @@ Here's how Django handles custom managers and :ref:`model inheritance
 These rules provide the necessary flexibility if you want to install a
 collection of custom managers on a group of models, via an abstract base
 class, but still customize the default manager. For example, suppose you have
-this base class::
+this base class:
+
+.. code-block:: python
 
     class AbstractBase(models.Model):
         # ...
@@ -368,7 +406,9 @@ this base class::
             abstract = True
 
 If you use this directly in a subclass, ``objects`` will be the default
-manager if you declare no managers in the base class::
+manager if you declare no managers in the base class:
+
+.. code-block:: python
 
     class ChildA(AbstractBase):
         # ...
@@ -376,7 +416,9 @@ manager if you declare no managers in the base class::
         pass
 
 If you want to inherit from ``AbstractBase``, but provide a different default
-manager, you can provide the default manager on the child class::
+manager, you can provide the default manager on the child class:
+
+.. code-block:: python
 
     class ChildB(AbstractBase):
         # ...
@@ -391,13 +433,16 @@ class, but still use the default from ``AbstractBase``. You can't add the new
 manager directly in the child class, as that would override the default and you would
 have to also explicitly include all the managers from the abstract base class.
 The solution is to put the extra managers in another base class and introduce
-it into the inheritance hierarchy *after* the defaults::
+it into the inheritance hierarchy *after* the defaults:
+
+.. code-block:: python
 
     class ExtraManager(models.Model):
         extra_manager = OtherManager()
 
         class Meta:
             abstract = True
+
 
     class ChildC(AbstractBase, ExtraManager):
         # ...
@@ -406,9 +451,11 @@ it into the inheritance hierarchy *after* the defaults::
         pass
 
 Note that while you can *define* a custom manager on the abstract model, you
-can't *invoke* any methods using the abstract model. That is::
+can't *invoke* any methods using the abstract model. That is:
 
-    ClassA.objects.do_something()
+.. code-block:: python
+
+    classA.objects.do_something()
 
 is legal, but::
 

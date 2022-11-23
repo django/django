@@ -1133,10 +1133,12 @@ is using a supported spatial database backend.
     differs across spatial databases, the ``SpatialRefSys`` and
     ``GeometryColumns`` models can no longer be associated with
     the ``gis`` application name.  Thus, no models will be returned
-    when using the ``get_models`` method in the following example::
+    when using the ``get_models`` method in the following example:
+
+    .. code-block:: pycon
 
         >>> from django.db.models import get_app, get_models
-        >>> get_models(get_app('gis'))
+        >>> get_models(get_app("gis"))
         []
 
 To get the correct ``SpatialRefSys`` and ``GeometryColumns``

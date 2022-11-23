@@ -66,7 +66,10 @@ Applying ASGI middleware
 ========================
 
 To apply ASGI middleware, or to embed Django in another ASGI application, you
-can wrap Django's ``application`` object in the ``asgi.py`` file. For example::
+can wrap Django's ``application`` object in the ``asgi.py`` file. For example:
+
+.. code-block:: python
 
     from some_asgi_library import AmazingMiddleware
+
     application = AmazingMiddleware(application)

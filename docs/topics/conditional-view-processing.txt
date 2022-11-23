@@ -66,13 +66,17 @@ if they are not already set by the view and if the request's method is safe
 (``GET`` or ``HEAD``).
 
 Using this feature usefully is probably best explained with an example.
-Suppose you have this pair of models, representing a small blog system::
+Suppose you have this pair of models, representing a small blog system:
+
+.. code-block:: python
 
     import datetime
     from django.db import models
 
+
     class Blog(models.Model):
         ...
+
 
     class Entry(models.Model):
         blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
@@ -82,15 +86,20 @@ Suppose you have this pair of models, representing a small blog system::
 If the front page, displaying the latest blog entries, only changes when you
 add a new blog entry, you can compute the last modified time very quickly. You
 need the latest ``published`` date for every entry associated with that blog.
-One way to do this would be::
+One way to do this would be:
+
+.. code-block:: python
 
     def latest_entry(request, blog_id):
         return Entry.objects.filter(blog=blog_id).latest("published").published
 
 You can then use this function to provide early detection of an unchanged page
-for your front page view::
+for your front page view:
+
+.. code-block:: python
 
     from django.views.decorators.http import condition
+
 
     @condition(last_modified_func=latest_entry)
     def front_page(request, blog_id):
@@ -125,16 +134,22 @@ type of functions as the ``condition`` decorator. Their signatures are::
     last_modified(last_modified_func)
 
 We could write the earlier example, which only uses a last-modified function,
-using one of these decorators::
+using one of these decorators:
+
+.. code-block:: python
 
     @last_modified(latest_entry)
     def front_page(request, blog_id):
         ...
 
-...or::
+...or:
+
+.. code-block:: python
 
     def front_page(request, blog_id):
         ...
+
+
     front_page = last_modified(latest_entry)(front_page)
 
 Use ``condition`` when testing both conditions
@@ -144,13 +159,16 @@ It might look nicer to some people to try and chain the ``etag`` and
 ``last_modified`` decorators if you want to test both preconditions. However,
 this would lead to incorrect behavior.
 
-::
+:
+
+.. code-block:: python
 
     # Bad code. Don't do this!
     @etag(etag_func)
     @last_modified(last_modified_func)
     def my_view(request):
-        # ...
+        ...
+
 
     # End of bad code.
 

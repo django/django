@@ -7,13 +7,17 @@ GeoDjango Model API
 
 This document explores the details of the GeoDjango Model API.  Throughout this
 section, we'll be using the following geographic model of a `ZIP code`__ and
-of a `Digital Elevation Model`__ as our examples::
+of a `Digital Elevation Model`__ as our examples:
+
+.. code-block:: python
 
     from django.contrib.gis.db import models
+
 
     class Zipcode(models.Model):
         code = models.CharField(max_length=5)
         poly = models.PolygonField()
+
 
     class Elevation(models.Model):
         name = models.CharField(max_length=100)
@@ -249,14 +253,16 @@ available for geography columns:
 If you need to use a spatial lookup or aggregate that doesn't support the
 geography type as input, you can use the
 :class:`~django.db.models.functions.Cast` database function to convert the
-geography column to a geometry type in the query::
+geography column to a geometry type in the query:
+
+.. code-block:: python
 
     from django.contrib.gis.db.models import PointField
     from django.db.models.functions import Cast
 
-    Zipcode.objects.annotate(
-        geom=Cast('geography_field', PointField())
-    ).filter(geom__within=poly)
+    Zipcode.objects.annotate(geom=Cast("geography_field", PointField())).filter(
+        geom__within=poly
+    )
 
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type

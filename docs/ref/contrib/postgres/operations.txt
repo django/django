@@ -18,17 +18,17 @@ Set up the hstore extension in PostgreSQL before the first ``CreateModel``
 or ``AddField`` operation that involves
 :class:`~django.contrib.postgres.fields.HStoreField` by adding a migration with
 the :class:`~django.contrib.postgres.operations.HStoreExtension` operation.
-For example::
+For example:
+
+.. code-block:: python
 
     from django.contrib.postgres.operations import HStoreExtension
+
 
     class Migration(migrations.Migration):
         ...
 
-        operations = [
-            HStoreExtension(),
-            ...
-        ]
+        operations = [HStoreExtension(), ...]
 
 The operation skips adding the extension if it already exists.
 
@@ -120,20 +120,23 @@ your database using a migration file. These collations can then be used with
 the ``db_collation`` parameter on :class:`~django.db.models.CharField`,
 :class:`~django.db.models.TextField`, and their subclasses.
 
-For example, to create a collation for German phone book ordering::
+For example, to create a collation for German phone book ordering:
+
+.. code-block:: python
 
     from django.contrib.postgres.operations import CreateCollation
+
 
     class Migration(migrations.Migration):
         ...
 
         operations = [
             CreateCollation(
-                'german_phonebook',
-                provider='icu',
-                locale='und-u-ks-level2',
+                "german_phonebook",
+                provider="icu",
+                locale="und-u-ks-level2",
             ),
-            ...
+            ...,
         ]
 
 .. class:: CreateCollation(name, locale, *, provider='libc', deterministic=True)

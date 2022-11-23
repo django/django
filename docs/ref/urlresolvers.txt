@@ -13,28 +13,36 @@ your code, Django provides the following function:
 .. function:: reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None)
 
 ``viewname`` can be a :ref:`URL pattern name <naming-url-patterns>` or the
-callable view object. For example, given the following ``url``::
+callable view object. For example, given the following ``url``:
+
+.. code-block:: python
 
     from news import views
 
-    path('archive/', views.archive, name='news-archive')
+    path("archive/", views.archive, name="news-archive")
 
-you can use any of the following to reverse the URL::
+you can use any of the following to reverse the URL:
+
+.. code-block:: python
 
     # using the named URL
-    reverse('news-archive')
+    reverse("news-archive")
 
     # passing a callable object
     # (This is discouraged because you can't reverse namespaced views this way.)
     from news import views
+
     reverse(views.archive)
 
-If the URL accepts arguments, you may pass them in ``args``. For example::
+If the URL accepts arguments, you may pass them in ``args``. For example:
+
+.. code-block:: python
 
     from django.urls import reverse
 
+
     def myview(request):
-        return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
+        return HttpResponseRedirect(reverse("arch-summary", args=[1945]))
 
 You can also pass ``kwargs`` instead of ``args``. For example:
 
@@ -67,9 +75,11 @@ use for reversing. By default, the root URLconf for the current thread is used.
 .. note::
 
     The string returned by ``reverse()`` is already
-    :ref:`urlquoted <uri-and-iri-handling>`. For example::
+    :ref:`urlquoted <uri-and-iri-handling>`. For example:
 
-        >>> reverse('cities', args=['Orléans'])
+    .. code-block:: pycon
+
+        >>> reverse("cities", args=["Orléans"])
         '.../Orl%C3%A9ans/'
 
     Applying further encoding (such as :func:`urllib.parse.quote`) to the output
@@ -189,37 +199,44 @@ If the URL does not resolve, the function raises a
         there is one.
 
 A :class:`ResolverMatch` object can then be interrogated to provide
-information about the URL pattern that matches a URL::
+information about the URL pattern that matches a URL:
+
+.. code-block:: python
 
     # Resolve a URL
-    match = resolve('/some/path/')
+    match = resolve("/some/path/")
     # Print the URL pattern that matches the URL
     print(match.url_name)
 
-A :class:`ResolverMatch` object can also be assigned to a triple::
+A :class:`ResolverMatch` object can also be assigned to a triple:
 
-    func, args, kwargs = resolve('/some/path/')
+.. code-block:: python
+
+    func, args, kwargs = resolve("/some/path/")
 
 One possible use of :func:`~django.urls.resolve` would be to test whether a
-view would raise a ``Http404`` error before redirecting to it::
+view would raise a ``Http404`` error before redirecting to it:
+
+.. code-block:: python
 
     from urllib.parse import urlparse
     from django.urls import resolve
     from django.http import Http404, HttpResponseRedirect
 
+
     def myview(request):
-        next = request.META.get('HTTP_REFERER', None) or '/'
+        next = request.META.get("HTTP_REFERER", None) or "/"
         response = HttpResponseRedirect(next)
 
         # modify the request and response as required, e.g. change locale
         # and set corresponding locale cookie
 
         view, args, kwargs = resolve(urlparse(next)[2])
-        kwargs['request'] = request
+        kwargs["request"] = request
         try:
             view(*args, **kwargs)
         except Http404:
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect("/")
         return response
 
 ``get_script_prefix()``

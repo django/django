@@ -44,11 +44,13 @@ locales when guessing the format used by the user when inputting data on forms.
     or ``%p`` (AM/PM).
 
 To enable a form field to localize input and output data use its ``localize``
-argument::
+argument:
+
+.. code-block:: python
 
     class CashRegisterForm(forms.Form):
-       product = forms.CharField()
-       revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
+        product = forms.CharField()
+        revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
 
 .. _topic-l10n-templates:
 

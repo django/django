@@ -75,11 +75,13 @@ On the server (``mod_wsgi``)
 ----------------------------
 
 In your live server environment, you'll need to tell your WSGI
-application what settings file to use. Do that with ``os.environ``::
+application what settings file to use. Do that with ``os.environ``:
+
+.. code-block:: python
 
     import os
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
 Read the :doc:`Django mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common
@@ -113,15 +115,20 @@ Using settings in Python code
 =============================
 
 In your Django apps, use settings by importing the object
-``django.conf.settings``. Example::
+``django.conf.settings``. Example:
+
+.. code-block:: python
 
     from django.conf import settings
 
     if settings.DEBUG:
         # Do something
+        ...
 
 Note that ``django.conf.settings`` isn't a module -- it's an object. So
-importing individual settings is not possible::
+importing individual settings is not possible:
+
+.. code-block:: python
 
     from django.conf.settings import DEBUG  # This won't work.
 
@@ -135,11 +142,13 @@ Altering settings at runtime
 ============================
 
 You shouldn't alter settings in your applications at runtime. For example,
-don't do this in a view::
+don't do this in a view:
+
+.. code-block:: python
 
     from django.conf import settings
 
-    settings.DEBUG = True   # Don't do this!
+    settings.DEBUG = True  # Don't do this!
 
 The only place you should assign to settings is in a settings file.
 
@@ -183,7 +192,9 @@ calling:
 
 .. function:: django.conf.settings.configure(default_settings, **settings)
 
-Example::
+Example:
+
+.. code-block:: python
 
     from django.conf import settings
 
@@ -215,7 +226,9 @@ first positional argument) in the call to ``configure()``.
 
 In this example, default settings are taken from ``myapp_defaults``, and the
 :setting:`DEBUG` setting is set to ``True``, regardless of its value in
-``myapp_defaults``::
+``myapp_defaults``:
+
+.. code-block:: python
 
     from django.conf import settings
     from myapp import myapp_defaults
@@ -252,9 +265,12 @@ purpose:
 
 .. attribute:: django.conf.settings.configured
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.conf import settings
+
     if not settings.configured:
         settings.configure(myapp_defaults, DEBUG=True)
 
@@ -274,7 +290,9 @@ configuring settings.
 
 After you've either set :envvar:`DJANGO_SETTINGS_MODULE` or called
 ``configure()``, you'll need to call :func:`django.setup()` to load your
-settings and populate Django's application registry. For example::
+settings and populate Django's application registry. For example:
+
+.. code-block:: python
 
     import django
     from django.conf import settings

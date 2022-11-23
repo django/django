@@ -52,10 +52,13 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
-        ``ArrayField`` as the ``base_field``. For example::
+        ``ArrayField`` as the ``base_field``. For example:
+
+        .. code-block:: python
 
             from django.contrib.postgres.fields import ArrayField
             from django.db import models
+
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -81,25 +84,33 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 .. note::
 
     When nesting ``ArrayField``, whether you use the ``size`` parameter or not,
-    PostgreSQL requires that the arrays are rectangular::
+    PostgreSQL requires that the arrays are rectangular:
+
+    .. code-block:: python
 
         from django.contrib.postgres.fields import ArrayField
         from django.db import models
 
+
         class Board(models.Model):
             pieces = ArrayField(ArrayField(models.IntegerField()))
 
+
         # Valid
-        Board(pieces=[
-            [2, 3],
-            [2, 1],
-        ])
+        Board(
+            pieces=[
+                [2, 3],
+                [2, 1],
+            ]
+        )
 
         # Not valid
-        Board(pieces=[
-            [2, 3],
-            [2],
-        ])
+        Board(
+            pieces=[
+                [2, 3],
+                [2],
+            ]
+        )
 
     If irregular shapes are required, then the underlying field should be made
     nullable and the values padded with ``None``.
@@ -108,10 +119,13 @@ Querying ``ArrayField``
 -----------------------
 
 There are a number of custom lookups and transforms for :class:`ArrayField`.
-We will use the following example model::
+We will use the following example model:
+
+.. code-block:: python
 
     from django.contrib.postgres.fields import ArrayField
     from django.db import models
+
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -185,7 +199,7 @@ the SQL operator ``&&``. For example:
     >>> Post.objects.filter(tags__overlap=["thoughts", "tutorial"])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
-    >>> Post.objects.filter(tags__overlap=Post.objects.values_list('tags'))
+    >>> Post.objects.filter(tags__overlap=Post.objects.values_list("tags"))
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. versionchanged:: 4.2
@@ -369,10 +383,13 @@ Querying ``HStoreField``
 In addition to the ability to query by key, there are a number of custom
 lookups available for ``HStoreField``.
 
-We will use the following example model::
+We will use the following example model:
+
+.. code-block:: python
 
     from django.contrib.postgres.fields import HStoreField
     from django.db import models
+
 
     class Dog(models.Model):
         name = models.CharField(max_length=200)
@@ -664,10 +681,13 @@ Querying Range Fields
 
 There are a number of custom lookups and transforms for range fields. They are
 available on all the above fields, but we will use the following example
-model::
+model:
+
+.. code-block:: python
 
     from django.contrib.postgres.fields import IntegerRangeField
     from django.db import models
+
 
     class Event(models.Model):
         name = models.CharField(max_length=200)

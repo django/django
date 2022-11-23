@@ -20,9 +20,12 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 .. function:: require_http_methods(request_method_list)
 
     Decorator to require that a view only accepts particular request
-    methods. Usage::
+    methods. Usage:
+
+    .. code-block:: python
 
         from django.views.decorators.http import require_http_methods
+
 
         @require_http_methods(["GET", "POST"])
         def my_view(request):

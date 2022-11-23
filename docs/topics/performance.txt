@@ -109,7 +109,9 @@ higher levels. At higher levels the system has to deal with objects through
 multiple levels of abstraction and layers of machinery.
 
 That is, the database can typically do things faster than Python can, which can
-do them faster than the template language can::
+do them faster than the template language can:
+
+.. code-block:: python
 
     # QuerySet operation on the database
     # fast, because that's what databases are good at
@@ -123,7 +125,7 @@ do them faster than the template language can::
     # Django template filter
     # slower still, because it will have to count them in Python anyway,
     # and because of template language overheads
-    {{ my_bicycles|length }}
+    {{my_bicycles | length}}
 
 Generally speaking, the most appropriate level for the job is the lowest-level
 one that it is comfortable to code for.

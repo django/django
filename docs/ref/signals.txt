@@ -307,23 +307,30 @@ Arguments sent with this signal:
     The database alias being used.
 
 For example, if a ``Pizza`` can have multiple ``Topping`` objects, modeled
-like this::
+like this:
+
+.. code-block:: python
 
     class Topping(models.Model):
         # ...
         pass
 
+
     class Pizza(models.Model):
         # ...
         toppings = models.ManyToManyField(Topping)
 
-If we connected a handler like this::
+If we connected a handler like this:
+
+.. code-block:: python
 
     from django.db.models.signals import m2m_changed
+
 
     def toppings_changed(sender, **kwargs):
         # Do something
         pass
+
 
     m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
 
@@ -526,14 +533,18 @@ Arguments sent with this signal:
     want to perform operations on.
 
 For example, you could register a callback in an
-:class:`~django.apps.AppConfig` like this::
+:class:`~django.apps.AppConfig` like this:
+
+.. code-block:: python
 
     from django.apps import AppConfig
     from django.db.models.signals import post_migrate
 
+
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
+
 
     class MyAppConfig(AppConfig):
         ...

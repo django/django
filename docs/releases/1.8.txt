@@ -696,7 +696,9 @@ Assigning unsaved objects to relations raises an error
 .. note::
 
     To more easily allow in-memory usage of models, this change was reverted in
-    Django 1.8.4 and replaced with a check during ``model.save()``. For example::
+    Django 1.8.4 and replaced with a check during ``model.save()``. For example:
+
+    .. code-block:: pycon
 
         >>> book = Book.objects.create(name="Django")
         >>> book.author = Author(name="John")

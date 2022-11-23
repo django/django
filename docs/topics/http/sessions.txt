@@ -203,11 +203,11 @@ You can edit it multiple times.
 
     .. method:: get(key, default=None)
 
-      Example: ``fav_color = request.session.get('fav_color', 'red')``
+      Example: ``fav_color = request.session.get("fav_color", "red")``
 
     .. method:: pop(key, default=__not_given)
 
-      Example: ``fav_color = request.session.pop('fav_color', 'blue')``
+      Example: ``fav_color = request.session.pop("fav_color", "blue")``
 
     .. method:: keys()
 
@@ -357,14 +357,16 @@ Bundled serializers
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
-    keys in ``request.session`` won't work as expected::
+    keys in ``request.session`` won't work as expected:
+
+    .. code-block:: pycon
 
         >>> # initial assignment
-        >>> request.session[0] = 'bar'
+        >>> request.session[0] = "bar"
         >>> # subsequent requests following serialization & deserialization
         >>> # of session data
         >>> request.session[0]  # KeyError
-        >>> request.session['0']
+        >>> request.session["0"]
         'bar'
 
     Similarly, data that can't be encoded in JSON, such as non-UTF8 bytes like
@@ -422,31 +424,37 @@ Examples
 --------
 
 This simplistic view sets a ``has_commented`` variable to ``True`` after a user
-posts a comment. It doesn't let a user post a comment more than once::
+posts a comment. It doesn't let a user post a comment more than once:
+
+.. code-block:: python
 
     def post_comment(request, new_comment):
-        if request.session.get('has_commented', False):
+        if request.session.get("has_commented", False):
             return HttpResponse("You've already commented.")
         c = comments.Comment(comment=new_comment)
         c.save()
-        request.session['has_commented'] = True
-        return HttpResponse('Thanks for your comment!')
+        request.session["has_commented"] = True
+        return HttpResponse("Thanks for your comment!")
 
-This simplistic view logs in a "member" of the site::
+This simplistic view logs in a "member" of the site:
+
+.. code-block:: python
 
     def login(request):
-        m = Member.objects.get(username=request.POST['username'])
-        if m.check_password(request.POST['password']):
-            request.session['member_id'] = m.id
+        m = Member.objects.get(username=request.POST["username"])
+        if m.check_password(request.POST["password"]):
+            request.session["member_id"] = m.id
             return HttpResponse("You're logged in.")
         else:
             return HttpResponse("Your username and password didn't match.")
 
-...And this one logs a member out, according to ``login()`` above::
+...And this one logs a member out, according to ``login()`` above:
+
+.. code-block:: python
 
     def logout(request):
         try:
-            del request.session['member_id']
+            del request.session["member_id"]
         except KeyError:
             pass
         return HttpResponse("You're logged out.")
@@ -474,20 +482,23 @@ It's good practice to use
 :meth:`~backends.base.SessionBase.delete_test_cookie()` to clean up after
 yourself. Do this after you've verified that the test cookie worked.
 
-Here's a typical usage example::
+Here's a typical usage example:
+
+.. code-block:: python
 
     from django.http import HttpResponse
     from django.shortcuts import render
 
+
     def login(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render(request, 'foo/login_form.html')
+        return render(request, "foo/login_form.html")
 
 Using sessions out of views
 ===========================
@@ -554,20 +565,22 @@ When sessions are saved
 
 By default, Django only saves to the session database when the session has been
 modified -- that is if any of its dictionary values have been assigned or
-deleted::
+deleted:
+
+.. code-block:: python
 
     # Session is modified.
-    request.session['foo'] = 'bar'
+    request.session["foo"] = "bar"
 
     # Session is modified.
-    del request.session['foo']
+    del request.session["foo"]
 
     # Session is modified.
-    request.session['foo'] = {}
+    request.session["foo"] = {}
 
     # Gotcha: Session is NOT modified, because this alters
     # request.session['foo'] instead of request.session.
-    request.session['foo']['bar'] = 'baz'
+    request.session["foo"]["bar"] = "baz"
 
 In the last case of the above example, we can tell the session object
 explicitly that it has been modified by setting the ``modified`` attribute on
@@ -819,11 +832,14 @@ Example
 
 The example below shows a custom database-backed session engine that includes
 an additional database column to store an account ID (thus providing an option
-to query the database for all active sessions for an account)::
+to query the database for all active sessions for an account):
+
+.. code-block:: python
 
     from django.contrib.sessions.backends.db import SessionStore as DBStore
     from django.contrib.sessions.base_session import AbstractBaseSession
     from django.db import models
+
 
     class CustomSession(AbstractBaseSession):
         account_id = models.IntegerField(null=True, db_index=True)
@@ -831,6 +847,7 @@ to query the database for all active sessions for an account)::
         @classmethod
         def get_session_store_class(cls):
             return SessionStore
+
 
     class SessionStore(DBStore):
         @classmethod
@@ -840,7 +857,7 @@ to query the database for all active sessions for an account)::
         def create_model_instance(self, data):
             obj = super().create_model_instance(data)
             try:
-                account_id = int(data.get('_auth_user_id'))
+                account_id = int(data.get("_auth_user_id"))
             except (ValueError, TypeError):
                 account_id = None
             obj.account_id = account_id
@@ -848,10 +865,12 @@ to query the database for all active sessions for an account)::
 
 If you are migrating from the Django's built-in ``cached_db`` session store to
 a custom one based on ``cached_db``, you should override the cache key prefix
-in order to prevent a namespace clash::
+in order to prevent a namespace clash:
+
+.. code-block:: python
 
     class SessionStore(CachedDBStore):
-        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+        cache_key_prefix = "mysessions.custom_cached_db_backend"
 
         # ...
 

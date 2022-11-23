@@ -63,9 +63,12 @@ Adds a few conveniences for perfectionists:
 
   If necessary, individual views may be excluded from the ``APPEND_SLASH``
   behavior using the :func:`~django.views.decorators.common.no_append_slash`
-  decorator::
+  decorator:
+
+.. code-block:: python
 
     from django.views.decorators.common import no_append_slash
+
 
     @no_append_slash
     def sensitive_fbv(request, *args, **kwargs):

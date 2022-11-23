@@ -15,15 +15,17 @@ The code lives in the ``django.core.mail`` module.
 Quick example
 =============
 
-In two lines::
+In two lines:
+
+.. code-block:: python
 
     from django.core.mail import send_mail
 
     send_mail(
-        'Subject here',
-        'Here is the message.',
-        'from@example.com',
-        ['to@example.com'],
+        "Subject here",
+        "Here is the message.",
+        "from@example.com",
+        ["to@example.com"],
         fail_silently=False,
     )
 
@@ -189,25 +191,28 @@ be printed as the first bit of the email message.
 
 Here's an example view that takes a ``subject``, ``message`` and ``from_email``
 from the request's POST data, sends that to admin@example.com and redirects to
-"/contact/thanks/" when it's done::
+"/contact/thanks/" when it's done:
+
+.. code-block:: python
 
     from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
+
     def send_email(request):
-        subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
-        from_email = request.POST.get('from_email', '')
+        subject = request.POST.get("subject", "")
+        message = request.POST.get("message", "")
+        from_email = request.POST.get("from_email", "")
         if subject and message and from_email:
             try:
-                send_mail(subject, message, from_email, ['admin@example.com'])
+                send_mail(subject, message, from_email, ["admin@example.com"])
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
-            return HttpResponseRedirect('/contact/thanks/')
+                return HttpResponse("Invalid header found.")
+            return HttpResponseRedirect("/contact/thanks/")
         else:
             # In reality we'd use a form class
             # to get proper validation errors.
-            return HttpResponse('Make sure all fields are entered and valid.')
+            return HttpResponse("Make sure all fields are entered and valid.")
 
 .. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
@@ -285,18 +290,20 @@ All parameters are optional and can be set at any time prior to calling the
 * ``reply_to``: A list or tuple of recipient addresses used in the "Reply-To"
   header when sending the email.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.core.mail import EmailMessage
 
     email = EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com', 'to2@example.com'],
-        ['bcc@example.com'],
-        reply_to=['another@example.com'],
-        headers={'Message-ID': 'foo'},
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com", "to2@example.com"],
+        ["bcc@example.com"],
+        reply_to=["another@example.com"],
+        headers={"Message-ID": "foo"},
     )
 
 The class has the following methods:
@@ -338,9 +345,11 @@ The class has the following methods:
     omit ``mimetype``, the MIME content type will be guessed from the
     filename of the attachment.
 
-    For example::
+    For example:
+    
+    .. code-block:: python
 
-       message.attach('design.png', img_data, 'image/png')
+       message.attach("design.png", img_data, "image/png")
 
     If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
     accept :class:`django.core.mail.EmailMessage` and
@@ -361,9 +370,11 @@ The class has the following methods:
 * ``attach_file()`` creates a new attachment using a file from your
   filesystem. Call it with the path of the file to attach and, optionally,
   the MIME type to use for the attachment. If the MIME type is omitted, it
-  will be guessed from the filename. You can use it like this::
+  will be guessed from the filename. You can use it like this:
+  
+  .. code-block:: python
 
-    message.attach_file('/images/weather_map.png')
+    message.attach_file("/images/weather_map.png")
 
   For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
@@ -379,13 +390,15 @@ class. This subclass of :class:`~django.core.mail.EmailMessage` has an
 body in the email. All the other methods (including the class initialization)
 are inherited directly from :class:`~django.core.mail.EmailMessage`.
 
-To send a text and HTML combination, you could write::
+To send a text and HTML combination, you could write:
+
+.. code-block:: python
 
     from django.core.mail import EmailMultiAlternatives
 
-    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
-    text_content = 'This is an important message.'
-    html_content = '<p>This is an <strong>important</strong> message.</p>'
+    subject, from_email, to = "hello", "from@example.com", "to@example.com"
+    text_content = "This is an important message."
+    html_content = "<p>This is an <strong>important</strong> message.</p>"
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
@@ -424,17 +437,25 @@ The email backend class has the following methods:
   left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
-``open()`` and ``close()`` as needed::
+``open()`` and ``close()`` as needed:
+
+.. code-block:: python
 
     from django.core import mail
 
     with mail.get_connection() as connection:
         mail.EmailMessage(
-            subject1, body1, from1, [to1],
+            subject1,
+            body1,
+            from1,
+            [to1],
             connection=connection,
         ).send()
         mail.EmailMessage(
-            subject2, body2, from2, [to2],
+            subject2,
+            body2,
+            from2,
+            [to2],
             connection=connection,
         ).send()
 
@@ -601,10 +622,13 @@ and sends them all using a single connection.
 For example, if you have a function called ``get_notification_email()`` that
 returns a list of :class:`~django.core.mail.EmailMessage` objects representing
 some periodic email you wish to send out, you could send these emails using
-a single call to send_messages::
+a single call to send_messages:
+
+.. code-block:: python
 
     from django.core import mail
-    connection = mail.get_connection()   # Use default email connection
+
+    connection = mail.get_connection()  # Use default email connection
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -614,9 +638,12 @@ backend, sends the list of messages, and then closes the connection again.
 The second approach is to use the ``open()`` and ``close()`` methods on the
 email backend to manually control the connection. ``send_messages()`` will not
 manually open or close the connection if it is already open, so if you
-manually open the connection, you can control when it is closed. For example::
+manually open the connection, you can control when it is closed. For example:
+
+.. code-block:: python
 
     from django.core import mail
+
     connection = mail.get_connection()
 
     # Manually open the connection
@@ -624,26 +651,26 @@ manually open the connection, you can control when it is closed. For example::
 
     # Construct an email message that uses the connection
     email1 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com"],
         connection=connection,
     )
-    email1.send() # Send the email
+    email1.send()  # Send the email
 
     # Construct two more messages
     email2 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to2@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to2@example.com"],
     )
     email3 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to3@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to3@example.com"],
     )
 
     # Send the two emails in a single call -

@@ -71,14 +71,17 @@ from :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`. If you would like different
 permissions for these files and/or directories, you can subclass either of the
 :ref:`static files storage classes <staticfiles-storages>` and specify the
 ``file_permissions_mode`` and/or ``directory_permissions_mode`` parameters,
-respectively. For example::
+respectively. For example:
+
+.. code-block:: python
 
     from django.contrib.staticfiles import storage
 
+
     class MyStaticFilesStorage(storage.StaticFilesStorage):
         def __init__(self, *args, **kwargs):
-            kwargs['file_permissions_mode'] = 0o640
-            kwargs['directory_permissions_mode'] = 0o760
+            kwargs["file_permissions_mode"] = 0o640
+            kwargs["directory_permissions_mode"] = 0o760
             super().__init__(*args, **kwargs)
 
 Then set the :setting:`STATICFILES_STORAGE` setting to
@@ -135,9 +138,12 @@ a more persistent way than providing the ``--ignore`` command option at each
 ``collectstatic`` invocation. Provide a custom :class:`~django.apps.AppConfig`
 class, override the ``ignore_patterns`` attribute of this class and replace
 ``'django.contrib.staticfiles'`` with that class path in your
-:setting:`INSTALLED_APPS` setting::
+:setting:`INSTALLED_APPS` setting:
+
+.. code-block:: python
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
+
 
     class MyStaticFilesConfig(StaticFilesConfig):
         ignore_patterns = [...]  # your custom ignore list
@@ -313,12 +319,16 @@ For example, the ``'css/styles.css'`` file with this content:
 
 You can change the location of the manifest file by using a custom
 ``ManifestStaticFilesStorage`` subclass that sets the ``manifest_storage``
-argument. For example::
+argument. For example:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.contrib.staticfiles.storage import (
-        ManifestStaticFilesStorage, StaticFilesStorage,
+        ManifestStaticFilesStorage,
+        StaticFilesStorage,
     )
+
 
     class MyManifestStaticFilesStorage(ManifestStaticFilesStorage):
         def __init__(self, *args, **kwargs):
@@ -395,11 +405,13 @@ Finders Module
 ==============
 
 ``staticfiles`` finders has a ``searched_locations`` attribute which is a list
-of directory paths in which the finders searched. Example usage::
+of directory paths in which the finders searched. Example usage:
+
+.. code-block:: python
 
     from django.contrib.staticfiles import finders
 
-    result = finders.find('css/base.css')
+    result = finders.find("css/base.css")
     searched_locations = finders.searched_locations
 
 Other Helpers
@@ -465,7 +477,9 @@ This view function serves static files in development.
 This view is automatically enabled by :djadmin:`runserver` (with a
 :setting:`DEBUG` setting set to ``True``). To use the view with a different
 local development server, add the following snippet to the end of your
-primary URL configuration::
+primary URL configuration:
+
+.. code-block:: python
 
    from django.conf import settings
    from django.contrib.staticfiles import views
@@ -473,7 +487,7 @@ primary URL configuration::
 
    if settings.DEBUG:
        urlpatterns += [
-           re_path(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r"^static/(?P<path>.*)$", views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your
@@ -485,7 +499,9 @@ you:
 .. function:: urls.staticfiles_urlpatterns()
 
 This will return the proper URL pattern for serving static files to your
-already defined pattern list. Use it like this::
+already defined pattern list. Use it like this:
+
+.. code-block:: python
 
    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 

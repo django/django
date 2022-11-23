@@ -49,22 +49,30 @@ committing it to source control. This reduces the number of vectors from which
 an attacker may acquire the key.
 
 Instead of hardcoding the secret key in your settings module, consider loading
-it from an environment variable::
+it from an environment variable:
+
+.. code-block:: python
 
     import os
-    SECRET_KEY = os.environ['SECRET_KEY']
 
-or from a file::
+    SECRET_KEY = os.environ["SECRET_KEY"]
 
-    with open('/etc/secret_key.txt') as f:
+or from a file:
+
+.. code-block:: python
+
+    with open("/etc/secret_key.txt") as f:
         SECRET_KEY = f.read().strip()
 
-If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
+If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`:
+
+.. code-block:: python
 
     import os
-    SECRET_KEY = os.environ['CURRENT_SECRET_KEY']
+
+    SECRET_KEY = os.environ["CURRENT_SECRET_KEY"]
     SECRET_KEY_FALLBACKS = [
-        os.environ['OLD_SECRET_KEY'],
+        os.environ["OLD_SECRET_KEY"],
     ]
 
 Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a

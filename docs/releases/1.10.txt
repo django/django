@@ -943,7 +943,9 @@ Instead of assigning related objects using direct assignment:
     >>> e.related_set = new_list
 
 Use the :meth:`~django.db.models.fields.related.RelatedManager.set` method
-added in Django 1.9::
+added in Django 1.9:
+
+    .. code-block:: pycon
 
         >>> e.related_set.set([obj1, obj2, obj3])
 

@@ -144,23 +144,29 @@ class-based views<decorating-class-based-views>`.
 .. function:: csrf_exempt(view)
 
     This decorator marks a view as being exempt from the protection ensured by
-    the middleware. Example::
+    the middleware. Example:
+
+    .. code-block:: python
 
         from django.http import HttpResponse
         from django.views.decorators.csrf import csrf_exempt
 
+
         @csrf_exempt
         def my_view(request):
-            return HttpResponse('Hello world')
+            return HttpResponse("Hello world")
 
 .. function:: csrf_protect(view)
 
     Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.
 
-    Usage::
+    Usage:
+
+    .. code-block:: python
 
         from django.shortcuts import render
         from django.views.decorators.csrf import csrf_protect
+
 
         @csrf_protect
         def my_view(request):
@@ -176,10 +182,13 @@ class-based views<decorating-class-based-views>`.
     ensure the template tag does work. This decorator works similarly to
     ``csrf_protect``, but never rejects an incoming request.
 
-    Example::
+    Example:
+
+    .. code-block:: python
 
         from django.shortcuts import render
         from django.views.decorators.csrf import requires_csrf_token
+
 
         @requires_csrf_token
         def my_view(request):

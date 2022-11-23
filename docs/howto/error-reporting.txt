@@ -78,25 +78,31 @@ behavior is from broken web bots too.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
-regular expression objects. For example::
+regular expression objects. For example:
+
+.. code-block:: python
 
     import re
+
     IGNORABLE_404_URLS = [
-        re.compile(r'\.(php|cgi)$'),
-        re.compile(r'^/phpmyadmin/'),
+        re.compile(r"\.(php|cgi)$"),
+        re.compile(r"^/phpmyadmin/"),
     ]
 
 In this example, a 404 to any URL ending with ``.php`` or ``.cgi`` will *not* be
 reported. Neither will any URL starting with ``/phpmyadmin/``.
 
 The following example shows how to exclude some conventional URLs that browsers and
-crawlers often request::
+crawlers often request:
+
+.. code-block:: python
 
     import re
+
     IGNORABLE_404_URLS = [
-        re.compile(r'^/apple-touch-icon.*\.png$'),
-        re.compile(r'^/favicon\.ico$'),
-        re.compile(r'^/robots\.txt$'),
+        re.compile(r"^/apple-touch-icon.*\.png$"),
+        re.compile(r"^/favicon\.ico$"),
+        re.compile(r"^/robots\.txt$"),
     ]
 
 (Note that these are regular expressions, so we put a backslash in front of
@@ -154,11 +160,14 @@ filtered out of error reports in a production environment (that is, where
     If a function (either a view or any regular callback) in your code uses
     local variables susceptible to contain sensitive information, you may
     prevent the values of those variables from being included in error reports
-    using the ``sensitive_variables`` decorator::
+    using the ``sensitive_variables`` decorator:
+
+    .. code-block:: python
 
         from django.views.decorators.debug import sensitive_variables
 
-        @sensitive_variables('user', 'pw', 'cc')
+
+        @sensitive_variables("user", "pw", "cc")
         def process_info(user):
             pw = user.pass_word
             cc = user.credit_card_number
@@ -183,9 +192,11 @@ filtered out of error reports in a production environment (that is, where
         '``user``’ in the following example), and if the decorated function has
         multiple decorators, then make sure to place ``@sensitive_variables``
         at the top of the decorator chain. This way it will also hide the
-        function argument as it gets passed through the other decorators::
+        function argument as it gets passed through the other decorators:
 
-            @sensitive_variables('user', 'pw', 'cc')
+        .. code-block:: python
+
+            @sensitive_variables("user", "pw", "cc")
             @some_decorator
             @another_decorator
             def process_info(user):
@@ -197,17 +208,20 @@ filtered out of error reports in a production environment (that is, where
     with :attr:`POST parameters<django.http.HttpRequest.POST>` susceptible to
     contain sensitive information, you may prevent the values of those
     parameters from being included in the error reports using the
-    ``sensitive_post_parameters`` decorator::
+    ``sensitive_post_parameters`` decorator:
+
+    .. code-block:: python
 
         from django.views.decorators.debug import sensitive_post_parameters
 
-        @sensitive_post_parameters('pass_word', 'credit_card_number')
+
+        @sensitive_post_parameters("pass_word", "credit_card_number")
         def record_user_profile(request):
             UserProfile.create(
                 user=request.user,
-                password=request.POST['pass_word'],
-                credit_card=request.POST['credit_card_number'],
-                name=request.POST['name'],
+                password=request.POST["pass_word"],
+                credit_card=request.POST["credit_card_number"],
+                name=request.POST["name"],
             )
             ...
 
@@ -252,7 +266,9 @@ define your own filter class and tell Django to use it via the
 
 You may also control in a more granular way which filter to use within any
 given view by setting the ``HttpRequest``’s ``exception_reporter_filter``
-attribute::
+attribute:
+
+.. code-block:: python
 
     def my_view(request):
         if request.user.is_authenticated:
@@ -281,7 +297,7 @@ following attributes and methods:
 
             import re
 
-            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE', flags=re.IGNORECASE)
+            re.compile(r"API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
 
         .. versionchanged:: 4.2
 
@@ -341,7 +357,9 @@ Your custom reporter class needs to inherit from
         Return a dictionary containing traceback information.
 
         This is the main extension point for customizing exception reports, for
-        example::
+        example:
+
+        .. code-block:: python
 
             from django.views.debug import ExceptionReporter
 
@@ -367,7 +385,9 @@ Your custom reporter class needs to inherit from
 
 As with the filter class, you may control which exception reporter class to use
 within any given view by setting the ``HttpRequest``’s
-``exception_reporter_class`` attribute::
+``exception_reporter_class`` attribute:
+
+.. code-block:: python
 
     def my_view(request):
         if request.user.is_authenticated:

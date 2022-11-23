@@ -50,11 +50,13 @@ See :attr:`.BaseConstraint.name`.
 An iterable of 2-tuples. The first element is an expression or string. The
 second element is an SQL operator represented as a string. To avoid typos, you
 may use :class:`~django.contrib.postgres.fields.RangeOperators` which maps the
-operators with strings. For example::
+operators with strings. For example:
 
-    expressions=[
-        ('timespan', RangeOperators.ADJACENT_TO),
-        (F('room'), RangeOperators.EQUAL),
+.. code-block:: python
+
+    expressions = [
+        ("timespan", RangeOperators.ADJACENT_TO),
+        (F("room"), RangeOperators.EQUAL),
     ]
 
 .. admonition:: Restrictions on operators.
@@ -63,10 +65,12 @@ operators with strings. For example::
 
 The :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression can
 be used to specify a custom `operator class`_ for the constraint expressions.
-For example::
+For example:
 
-    expressions=[
-        (OpClass('circle', name='circle_ops'), RangeOperators.OVERLAPS),
+.. code-block:: python
+
+    expressions = [
+        (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
     ]
 
 creates an exclusion constraint on ``circle`` using ``circle_ops``.
@@ -104,7 +108,9 @@ These conditions have the same database restrictions as
 .. attribute:: ExclusionConstraint.deferrable
 
 Set this parameter to create a deferrable exclusion constraint. Accepted values
-are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example:
+
+.. code-block:: python
 
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import RangeOperators
@@ -112,9 +118,9 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
 
     ExclusionConstraint(
-        name='exclude_overlapping_deferred',
+        name="exclude_overlapping_deferred",
         expressions=[
-            ('timespan', RangeOperators.OVERLAPS),
+            ("timespan", RangeOperators.OVERLAPS),
         ],
         deferrable=Deferrable.DEFERRED,
     )
@@ -186,29 +192,32 @@ Examples
 --------
 
 The following example restricts overlapping reservations in the same room, not
-taking canceled reservations into account::
+taking canceled reservations into account:
+
+.. code-block:: python
 
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import DateTimeRangeField, RangeOperators
     from django.db import models
     from django.db.models import Q
 
+
     class Room(models.Model):
         number = models.IntegerField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         timespan = DateTimeRangeField()
         cancelled = models.BooleanField(default=False)
 
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
+                    name="exclude_overlapping_reservations",
                     expressions=[
-                        ('timespan', RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
+                        ("timespan", RangeOperators.OVERLAPS),
+                        ("room", RangeOperators.EQUAL),
                     ],
                     condition=Q(cancelled=False),
                 ),
@@ -221,7 +230,9 @@ often, the delimiters will be ``'[)'``, meaning that the lower bound is
 inclusive and the upper bound is exclusive. You may use the
 :class:`~django.contrib.postgres.fields.RangeBoundary` that provides an
 expression mapping for the `range boundaries <https://www.postgresql.org/docs/
-current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
+current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example:
+
+.. code-block:: python
 
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
@@ -234,12 +245,12 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
 
 
     class TsTzRange(Func):
-        function = 'TSTZRANGE'
+        function = "TSTZRANGE"
         output_field = DateTimeRangeField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         start = models.DateTimeField()
         end = models.DateTimeField()
         cancelled = models.BooleanField(default=False)
@@ -247,10 +258,13 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
+                    name="exclude_overlapping_reservations",
                     expressions=[
-                        (TsTzRange('start', 'end', RangeBoundary()), RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
+                        (
+                            TsTzRange("start", "end", RangeBoundary()),
+                            RangeOperators.OVERLAPS,
+                        ),
+                        ("room", RangeOperators.EQUAL),
                     ],
                     condition=Q(cancelled=False),
                 ),

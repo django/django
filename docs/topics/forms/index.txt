@@ -540,20 +540,24 @@ Then you can configure the :setting:`FORM_RENDERER` setting:
 
     FORM_RENDERER = "project.settings.CustomFormRenderer"
 
-… or for a single form::
+… or for a single form:
+
+.. code-block:: python
 
     class MyForm(forms.Form):
         template_name = "form_snippet.html"
         ...
 
 … or for a single render of a form instance, passing in the template name to
-the :meth:`.Form.render`. Here's an example of this being used in a view::
+the :meth:`.Form.render`. Here's an example of this being used in a view:
+
+.. code-block:: python
 
     def index(request):
         form = MyForm()
         rendered_form = form.render("form_snippet.html")
-        context = {'form': rendered_form}
-        return render(request, 'index.html', context)
+        context = {"form": rendered_form}
+        return render(request, "index.html", context)
 
 See :ref:`ref-forms-api-outputting-html` for more details.
 

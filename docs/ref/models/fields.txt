@@ -275,10 +275,11 @@ title-case):
     'Jet Ski'
 
 Since the case where the enum values need to be integers is extremely common,
-Django provides an ``IntegerChoices`` class. For example::
+Django provides an ``IntegerChoices`` class. For example:
+
+.. code-block:: python
 
     class Card(models.Model):
-
         class Suit(models.IntegerChoices):
             DIAMOND = 1
             SPADE = 2
@@ -304,15 +305,17 @@ that labels are automatically generated as highlighted above:
 
 If you require support for a concrete data type other than ``int`` or ``str``,
 you can subclass ``Choices`` and the required concrete data type, e.g.
-:class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
+:class:`~datetime.date` for use with :class:`~django.db.models.DateField`:
+
+.. code-block:: python
 
     class MoonLandings(datetime.date, models.Choices):
-        APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
-        APOLLO_12 = 1969, 11, 19, 'Apollo 12 (Intrepid)'
-        APOLLO_14 = 1971, 2, 5, 'Apollo 14 (Antares)'
-        APOLLO_15 = 1971, 7, 30, 'Apollo 15 (Falcon)'
-        APOLLO_16 = 1972, 4, 21, 'Apollo 16 (Orion)'
-        APOLLO_17 = 1972, 12, 11, 'Apollo 17 (Challenger)'
+        APOLLO_11 = 1969, 7, 20, "Apollo 11 (Eagle)"
+        APOLLO_12 = 1969, 11, 19, "Apollo 12 (Intrepid)"
+        APOLLO_14 = 1971, 2, 5, "Apollo 14 (Antares)"
+        APOLLO_15 = 1971, 7, 30, "Apollo 15 (Falcon)"
+        APOLLO_16 = 1972, 4, 21, "Apollo 16 (Orion)"
+        APOLLO_17 = 1972, 12, 11, "Apollo 17 (Challenger)"
 
 There are some additional caveats to be aware of:
 
@@ -374,10 +377,13 @@ The default can't be a mutable object (model instance, ``list``, ``set``, etc.),
 as a reference to the same instance of that object would be used as the default
 value in all new model instances. Instead, wrap the desired default in a
 callable. For example, if you want to specify a default ``dict`` for
-:class:`~django.db.models.JSONField`, use a function::
+:class:`~django.db.models.JSONField`, use a function:
+
+.. code-block:: python
 
     def contact_default():
         return {"email": "to1@example.com"}
+
 
     contact_info = JSONField("ContactInfo", default=contact_default)
 
@@ -843,11 +849,14 @@ Has the following optional arguments:
                             when determining the final destination path.
     ======================  ===============================================
 
-    For example::
+    For example:
+
+    .. code-block:: python
 
         def user_directory_path(instance, filename):
             # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-            return 'user_{0}/{1}'.format(instance.user.id, filename)
+            return "user_{0}/{1}".format(instance.user.id, filename)
+
 
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
@@ -1016,9 +1025,12 @@ Python file object like this:
     f = open("/path/to/hello.world")
     myfile = File(f)
 
-Or you can construct one from a Python string like this::
+Or you can construct one from a Python string like this:
+
+.. code-block:: python
 
     from django.core.files.base import ContentFile
+
     myfile = ContentFile("hello world")
 
 For more information, see :doc:`/topics/files`.
@@ -1411,10 +1423,13 @@ A field for storing universally unique identifiers. Uses Python's
 
 Universally unique identifiers are a good alternative to :class:`AutoField` for
 :attr:`~Field.primary_key`. The database will not generate the UUID for you, so
-it is recommended to use :attr:`~Field.default`::
+it is recommended to use :attr:`~Field.default`:
+
+.. code-block:: python
 
     import uuid
     from django.db import models
+
 
     class MyUUIDModel(models.Model):
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1459,16 +1474,20 @@ on_delete=models.CASCADE)``.
 .. _lazy-relationships:
 
 If you need to create a relationship on a model that has not yet been defined,
-you can use the name of the model, rather than the model object itself::
+you can use the name of the model, rather than the model object itself:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class Car(models.Model):
         manufacturer = models.ForeignKey(
-            'Manufacturer',
+            "Manufacturer",
             on_delete=models.CASCADE,
         )
         # ...
+
 
     class Manufacturer(models.Model):
         # ...
@@ -1510,11 +1529,13 @@ concrete model and are not relative to the abstract model's ``app_label``:
 To refer to models defined in another application, you can explicitly specify
 a model with the full application label. For example, if the ``Manufacturer``
 model above is defined in another application called ``production``, you'd
-need to use::
+need to use:
+
+.. code-block:: python
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(
-            'production.Manufacturer',
+            "production.Manufacturer",
             on_delete=models.CASCADE,
         )
 
@@ -1591,13 +1612,17 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     that is being deleted in the same operation, but via a :attr:`CASCADE`
     relationship.
 
-    Consider this set of models::
+    Consider this set of models:
+
+    .. code-block:: python
 
         class Artist(models.Model):
             name = models.CharField(max_length=10)
 
+
         class Album(models.Model):
             artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
 
         class Song(models.Model):
             artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
@@ -1684,10 +1709,13 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     The callable form can be helpful, for instance, when used in conjunction
     with the Python ``datetime`` module to limit selections by date range. For
-    example::
+    example:
+
+    .. code-block:: python
 
         def limit_pub_date_choices():
-            return {'pub_date__lte': datetime.date.today()}
+            return {"pub_date__lte": datetime.date.today()}
+
 
         limit_choices_to = limit_pub_date_choices
 
@@ -1838,9 +1866,12 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.symmetrical
 
     Only used in the definition of ManyToManyFields on self. Consider the
-    following model::
+    following model:
+
+    .. code-block:: python
 
         from django.db import models
+
 
         class Person(models.Model):
             friends = models.ManyToManyField("self")
@@ -2028,10 +2059,13 @@ If you do not specify the :attr:`~ForeignKey.related_name` argument for the
 ``OneToOneField``, Django will use the lowercase name of the current model as
 default value.
 
-With the following example::
+With the following example:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.db import models
+
 
     class MySpecialUser(models.Model):
         user = models.OneToOneField(
@@ -2041,7 +2075,7 @@ With the following example::
         supervisor = models.OneToOneField(
             settings.AUTH_USER_MODEL,
             on_delete=models.CASCADE,
-            related_name='supervisor_of',
+            related_name="supervisor_of",
         )
 
 your resulting ``User`` model will have the following attributes:

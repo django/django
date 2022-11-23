@@ -414,12 +414,14 @@ variable.
 The :ref:`simple_tag<howto-custom-template-tags-simple-tags>`,
 :ref:`inclusion_tag <howto-custom-template-tags-inclusion-tags>` and newly
 introduced ``assignment_tag`` template helper functions may now accept any
-number of positional or keyword arguments. For example::
+number of positional or keyword arguments. For example:
+
+.. code-block:: python
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
+        warning = kwargs["warning"]
+        profile = kwargs["profile"]
         ...
         return ...
 
@@ -1276,17 +1278,23 @@ path is needed due to use in existing ``manage.py`` files.
 
 Two flags, ``is_safe`` and ``needs_autoescape``, define how each template filter
 interacts with Django's auto-escaping behavior. They used to be attributes of
-the filter function::
+the filter function:
+
+.. code-block:: python
 
     @register.filter
     def noop(value):
         return value
+
+
     noop.is_safe = True
 
 However, this technique caused some problems in combination with decorators,
 especially :func:`@stringfilter <django.template.defaultfilters.stringfilter>`.
 Now, the flags are keyword arguments of :meth:`@register.filter
-<django.template.Library.filter>`::
+<django.template.Library.filter>`:
+
+.. code-block:: python
 
     @register.filter(is_safe=True)
     def noop(value):

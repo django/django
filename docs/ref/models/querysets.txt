@@ -1068,7 +1068,9 @@ performance booster which results in a single more complex query but means
 later use of foreign-key relationships won't require database queries.
 
 The following examples illustrate the difference between plain lookups and
-``select_related()`` lookups. Here's standard lookup::
+``select_related()`` lookups. Here's standard lookup:
+
+.. code-block:: python
 
     # Hits the database.
     e = Entry.objects.get(id=5)
@@ -1170,7 +1172,9 @@ specified. This is not recommended in most cases as it is likely to make the
 underlying query more complex, and return more data, than is actually needed.
 
 If you need to clear the list of related fields added by past calls of
-``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter::
+``select_related`` on a ``QuerySet``, you can pass ``None`` as a parameter:
+
+.. code-block:: pycon
 
    >>> without_relations = queryset.select_related(None)
 
@@ -1208,12 +1212,16 @@ must be restricted to a homogeneous set of results. For example, prefetching
 objects referenced by a ``GenericForeignKey`` is only supported if the query
 is restricted to one ``ContentType``.
 
-For example, suppose you have these models::
+For example, suppose you have these models:
+
+.. code-block:: python
 
     from django.db import models
 
+
     class Topping(models.Model):
         name = models.CharField(max_length=30)
+
 
     class Pizza(models.Model):
         name = models.CharField(max_length=50)
@@ -1763,7 +1771,9 @@ deferred field will be retrieved from the database if you access that field
     ``defer()``.
 
 You can make multiple calls to ``defer()``. Each call adds new fields to the
-deferred set::
+deferred set:
+
+.. code-block:: python
 
     # Defers both the body and headline fields.
     Entry.objects.defer("body").filter(rating=5).defer("headline")
@@ -1779,7 +1789,9 @@ notation to separate related fields::
     Blog.objects.select_related().defer("entry__headline", "entry__body")
 
 If you want to clear the set of deferred fields, pass ``None`` as a parameter
-to ``defer()``::
+to ``defer()``:
+
+.. code-block:: python
 
     # Load all fields immediately.
     my_queryset.defer(None)
@@ -1865,14 +1877,18 @@ following two querysets are the same, in terms of deferred fields::
 Whenever you call ``only()`` it *replaces* the set of fields to load
 immediately. The method's name is mnemonic: **only** those fields are loaded
 immediately; the remainder are deferred. Thus, successive calls to ``only()``
-result in only the final fields being considered::
+result in only the final fields being considered:
+
+.. code-block:: python
 
     # This will defer all fields except the headline.
     Entry.objects.only("body", "rating").only("headline")
 
 Since ``defer()`` acts incrementally (adding fields to the deferred list), you
 can combine calls to ``only()`` and ``defer()`` and things will behave
-logically::
+logically:
+
+.. code-block:: python
 
     # Final result is that everything except "headline" is deferred.
     Entry.objects.only("headline", "body").defer("body")
@@ -3638,9 +3654,12 @@ SQL equivalent:
 
 Range test (inclusive).
 
-Example::
+Example:
+
+.. code-block:: python
 
     import datetime
+
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))

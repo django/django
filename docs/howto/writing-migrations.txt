@@ -17,14 +17,18 @@ run a migration against a particular database. For example, you may want to
 
 In order to do that you can check the database connection's alias inside a
 ``RunPython`` operation by looking at the ``schema_editor.connection.alias``
-attribute::
+attribute:
+
+.. code-block:: python
 
     from django.db import migrations
 
+
     def forwards(apps, schema_editor):
-        if schema_editor.connection.alias != 'default':
+        if schema_editor.connection.alias != "default":
             return
         # Your migration code goes here
+
 
     class Migration(migrations.Migration):
 
@@ -48,13 +52,17 @@ method of database routers as ``**hints``:
                 return db == hints["target_db"]
             return True
 
-Then, to leverage this in your migrations, do the following::
+Then, to leverage this in your migrations, do the following:
+
+.. code-block:: python
 
     from django.db import migrations
+
 
     def forwards(apps, schema_editor):
         # Your migration code goes here
         ...
+
 
     class Migration(migrations.Migration):
 
@@ -63,7 +71,7 @@ Then, to leverage this in your migrations, do the following::
         ]
 
         operations = [
-            migrations.RunPython(forwards, hints={'target_db': 'default'}),
+            migrations.RunPython(forwards, hints={"target_db": "default"}),
         ]
 
 If your ``RunPython`` or ``RunSQL`` operation only affects one model, it's good
@@ -188,9 +196,12 @@ Non-atomic migrations
 On databases that support DDL transactions (SQLite and PostgreSQL), migrations
 will run inside a transaction by default. For use cases such as performing data
 migrations on large tables, you may want to prevent a migration from running in
-a transaction by setting the ``atomic`` attribute to ``False``::
+a transaction by setting the ``atomic`` attribute to ``False``:
+
+.. code-block:: python
 
     from django.db import migrations
+
 
     class Migration(migrations.Migration):
         atomic = False
@@ -201,19 +212,23 @@ possible to execute parts of the migration inside a transaction using
 ``RunPython``.
 
 Here's an example of a non-atomic data migration that updates a large table in
-smaller batches::
+smaller batches:
+
+.. code-block:: python
 
     import uuid
 
     from django.db import migrations, transaction
 
+
     def gen_uuid(apps, schema_editor):
-        MyModel = apps.get_model('myapp', 'MyModel')
+        MyModel = apps.get_model("myapp", "MyModel")
         while MyModel.objects.filter(uuid__isnull=True).exists():
             with transaction.atomic():
                 for row in MyModel.objects.filter(uuid__isnull=True)[:1000]:
                     row.uuid = uuid.uuid4()
                     row.save()
+
 
     class Migration(migrations.Migration):
         atomic = False
@@ -239,14 +254,17 @@ If you've used the :djadmin:`makemigrations` command you've probably
 already seen ``dependencies`` in action because auto-created
 migrations have this defined as part of their creation process.
 
-The ``dependencies`` property is declared like this::
+The ``dependencies`` property is declared like this:
+
+.. code-block:: python
 
     from django.db import migrations
+
 
     class Migration(migrations.Migration):
 
         dependencies = [
-            ('myapp', '0123_the_previous_migration'),
+            ("myapp", "0123_the_previous_migration"),
         ]
 
 Usually this will be enough, but from time to time you may need to
@@ -255,13 +273,15 @@ useful, for example, to make third-party apps' migrations run *after*
 your :setting:`AUTH_USER_MODEL` replacement.
 
 To achieve this, place all migrations that should depend on yours in
-the ``run_before`` attribute on your ``Migration`` class::
+the ``run_before`` attribute on your ``Migration`` class:
+
+.. code-block:: python
 
     class Migration(migrations.Migration):
         ...
 
         run_before = [
-            ('third_party_app', '0001_do_awesome'),
+            ("third_party_app", "0001_do_awesome"),
         ]
 
 Prefer using ``dependencies`` over ``run_before`` when possible. You should
@@ -341,7 +361,9 @@ it needs any extra fields, they should be added in operations after
 
 For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
 ``Author``, we could add a through model ``AuthorBook`` with a new field
-``is_primary``, like so::
+``is_primary``, like so:
+
+.. code-block:: python
 
     from django.db import migrations, models
     import django.db.models.deletion
@@ -349,7 +371,7 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
 
     class Migration(migrations.Migration):
         dependencies = [
-            ('core', '0001_initial'),
+            ("core", "0001_initial"),
         ]
 
         operations = [
@@ -358,52 +380,52 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
                     # Old table name from checking with sqlmigrate, new table
                     # name from AuthorBook._meta.db_table.
                     migrations.RunSQL(
-                        sql='ALTER TABLE core_book_authors RENAME TO core_authorbook',
-                        reverse_sql='ALTER TABLE core_authorbook RENAME TO core_book_authors',
+                        sql="ALTER TABLE core_book_authors RENAME TO core_authorbook",
+                        reverse_sql="ALTER TABLE core_authorbook RENAME TO core_book_authors",
                     ),
                 ],
                 state_operations=[
                     migrations.CreateModel(
-                        name='AuthorBook',
+                        name="AuthorBook",
                         fields=[
                             (
-                                'id',
+                                "id",
                                 models.AutoField(
                                     auto_created=True,
                                     primary_key=True,
                                     serialize=False,
-                                    verbose_name='ID',
+                                    verbose_name="ID",
                                 ),
                             ),
                             (
-                                'author',
+                                "author",
                                 models.ForeignKey(
                                     on_delete=django.db.models.deletion.DO_NOTHING,
-                                    to='core.Author',
+                                    to="core.Author",
                                 ),
                             ),
                             (
-                                'book',
+                                "book",
                                 models.ForeignKey(
                                     on_delete=django.db.models.deletion.DO_NOTHING,
-                                    to='core.Book',
+                                    to="core.Book",
                                 ),
                             ),
                         ],
                     ),
                     migrations.AlterField(
-                        model_name='book',
-                        name='authors',
+                        model_name="book",
+                        name="authors",
                         field=models.ManyToManyField(
-                            to='core.Author',
-                            through='core.AuthorBook',
+                            to="core.Author",
+                            through="core.AuthorBook",
                         ),
                     ),
                 ],
             ),
             migrations.AddField(
-                model_name='authorbook',
-                name='is_primary',
+                model_name="authorbook",
+                name="is_primary",
                 field=models.BooleanField(default=False),
             ),
         ]

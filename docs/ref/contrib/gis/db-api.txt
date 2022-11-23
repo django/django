@@ -284,9 +284,12 @@ to be in the units of the field.
 
 For example, let's say we have a ``SouthTexasCity`` model (from the
 :source:`GeoDjango distance tests <tests/gis_tests/distapp/models.py>` ) on a
-*projected* coordinate system valid for cities in southern Texas::
+*projected* coordinate system valid for cities in southern Texas:
+
+.. code-block:: python
 
     from django.contrib.gis.db import models
+
 
     class SouthTexasCity(models.Model):
         name = models.CharField(max_length=30)

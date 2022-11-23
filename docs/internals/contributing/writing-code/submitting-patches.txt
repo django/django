@@ -181,32 +181,41 @@ Next you can silence warnings in tests that actually test the deprecated
 behavior by using the ``ignore_warnings`` decorator, either at the test or class
 level:
 
-#) In a particular test::
+#) In a particular test:
+
+.. code-block:: python
 
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
+
 
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     def test_foo(self):
         ...
 
-#) For an entire test case::
+#) For an entire test case:
+
+.. code-block:: python
 
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
+
 
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-You can also add a test for the deprecation warning::
+You can also add a test for the deprecation warning:
+
+.. code-block:: python
 
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     def test_foo_deprecation_warning(self):
-        msg = 'Expected deprecation message'
+        msg = "Expected deprecation message"
         with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
-            # invoke deprecated behavior
+            ...  # invoke deprecated behavior
 
 Finally, there are a couple of updates to Django's documentation to make:
 

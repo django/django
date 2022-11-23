@@ -79,33 +79,43 @@ any :data:`~django.db.models.signals.pre_save` or
 ``raw=True`` since the instance only contains attributes that are local to the
 model. You may, for example, want to disable handlers that access
 related fields that aren't present during fixture loading and would otherwise
-raise an exception::
+raise an exception:
+
+.. code-block:: python
 
     from django.db.models.signals import post_save
     from .models import MyModel
 
+
     def my_handler(**kwargs):
         # disable the handler during fixture loading
-        if kwargs['raw']:
+        if kwargs["raw"]:
             return
         ...
 
+
     post_save.connect(my_handler, sender=MyModel)
 
-You could also write a decorator to encapsulate this logic::
+You could also write a decorator to encapsulate this logic:
+
+.. code-block:: python
 
     from functools import wraps
+
 
     def disable_for_loaddata(signal_handler):
         """
         Decorator that turns off signal handlers when loading fixture data.
         """
+
         @wraps(signal_handler)
         def wrapper(*args, **kwargs):
-            if kwargs['raw']:
+            if kwargs["raw"]:
                 return
             signal_handler(*args, **kwargs)
+
         return wrapper
+
 
     @disable_for_loaddata
     def my_handler(**kwargs):

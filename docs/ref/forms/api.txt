@@ -790,13 +790,16 @@ highlight errors in red.
 The :class:`Form` class has a couple of hooks you can use to add ``class``
 attributes to required rows or to rows with errors: set the
 :attr:`Form.error_css_class` and/or :attr:`Form.required_css_class`
-attributes::
+attributes:
+
+.. code-block:: python
 
     from django import forms
 
+
     class ContactForm(forms.Form):
-        error_css_class = 'error'
-        required_css_class = 'required'
+        error_css_class = "error"
+        required_css_class = "required"
 
         # ... and the rest of your fields here
 
@@ -972,9 +975,12 @@ Specifies the :doc:`renderer <renderers>` to use for the form. Defaults to
 :setting:`FORM_RENDERER` setting.
 
 You can set this as a class attribute when declaring your form or use the
-``renderer`` argument to ``Form.__init__()``. For example::
+``renderer`` argument to ``Form.__init__()``. For example:
+
+.. code-block:: python
 
     from django import forms
+
 
     class MyForm(forms.Form):
         default_renderer = MyRenderer()
@@ -1190,33 +1196,37 @@ Attributes of ``BoundField``
 
     This property returns the data for this :class:`~django.forms.BoundField`
     extracted by the widget's :meth:`~django.forms.Widget.value_from_datadict`
-    method, or ``None`` if it wasn't given::
+    method, or ``None`` if it wasn't given:
+
+    .. code-block:: pycon
 
         >>> unbound_form = ContactForm()
-        >>> print(unbound_form['subject'].data)
+        >>> print(unbound_form["subject"].data)
         None
-        >>> bound_form = ContactForm(data={'subject': 'My Subject'})
-        >>> print(bound_form['subject'].data)
+        >>> bound_form = ContactForm(data={"subject": "My Subject"})
+        >>> print(bound_form["subject"].data)
         My Subject
 
 .. attribute:: BoundField.errors
 
     A :ref:`list-like object <ref-forms-error-list-format>` that is displayed
-    as an HTML ``<ul class="errorlist">`` when printed::
+    as an HTML ``<ul class="errorlist">`` when printed:
 
-        >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+    .. code-block:: pycon
+
+        >>> data = {"subject": "hi", "message": "", "sender": "", "cc_myself": ""}
         >>> f = ContactForm(data, auto_id=False)
-        >>> print(f['message'])
+        >>> print(f["message"])
         <input type="text" name="message" required>
-        >>> f['message'].errors
+        >>> f["message"].errors
         ['This field is required.']
-        >>> print(f['message'].errors)
+        >>> print(f["message"].errors)
         <ul class="errorlist"><li>This field is required.</li></ul>
-        >>> f['subject'].errors
+        >>> f["subject"].errors
         []
-        >>> print(f['subject'].errors)
+        >>> print(f["subject"].errors)
 
-        >>> str(f['subject'].errors)
+        >>> str(f["subject"].errors)
         ''
 
 .. attribute:: BoundField.field
@@ -1271,15 +1281,18 @@ Attributes of ``BoundField``
 
     :attr:`BoundField.initial` caches its return value, which is useful
     especially when dealing with callables whose return values can change (e.g.
-    ``datetime.now`` or ``uuid.uuid4``)::
+    ``datetime.now`` or ``uuid.uuid4``):
+
+    .. code-block:: pycon
 
         >>> from datetime import datetime
         >>> class DatedCommentForm(CommentForm):
         ...     created = forms.DateTimeField(initial=datetime.now)
+        ...
         >>> f = DatedCommentForm()
-        >>> f['created'].initial
+        >>> f["created"].initial
         datetime.datetime(2021, 7, 27, 9, 5, 54)
-        >>> f['created'].initial
+        >>> f["created"].initial
         datetime.datetime(2021, 7, 27, 9, 5, 54)
 
     Using :attr:`BoundField.initial` is recommended over
@@ -1297,12 +1310,14 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.name
 
-    The name of this field in the form::
+    The name of this field in the form:
+
+    .. code-block:: pycon
 
         >>> f = ContactForm()
-        >>> print(f['subject'].name)
+        >>> print(f["subject"].name)
         subject
-        >>> print(f['message'].name)
+        >>> print(f["message"].name)
         message
 
 .. attribute:: BoundField.use_fieldset
@@ -1351,18 +1366,22 @@ Methods of ``BoundField``
     When you use Django's rendering shortcuts, CSS classes are used to
     indicate required form fields or fields that contain errors. If you're
     manually rendering a form, you can access these CSS classes using the
-    ``css_classes`` method::
+    ``css_classes`` method:
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> f['message'].css_classes()
+    .. code-block:: pycon
+
+        >>> f = ContactForm(data={"message": ""})
+        >>> f["message"].css_classes()
         'required'
 
     If you want to provide some additional classes in addition to the
     error and required classes that may be required, you can provide
-    those classes as an argument::
+    those classes as an argument:
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> f['message'].css_classes('foo bar')
+    .. code-block:: pycon
+
+        >>> f = ContactForm(data={"message": ""})
+        >>> f["message"].css_classes("foo bar")
         'foo bar required'
 
 .. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None, tag=None)
@@ -1392,10 +1411,12 @@ Methods of ``BoundField``
         the field you declare, e.g. ``forms.CharField``.
 
     To separately render the label tag of a form field, you can call its
-    ``label_tag()`` method::
+    ``label_tag()`` method:
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> print(f['message'].label_tag())
+    .. code-block:: pycon
+
+        >>> f = ContactForm(data={"message": ""})
+        >>> print(f["message"].label_tag())
         <label for="id_message">Message:</label>
 
     If you'd like to customize the rendering this can be achieved by overriding
@@ -1419,14 +1440,16 @@ Methods of ``BoundField``
 .. method:: BoundField.value()
 
     Use this method to render the raw value of this field as it would be rendered
-    by a ``Widget``::
+    by a ``Widget``:
 
-        >>> initial = {'subject': 'welcome'}
+    .. code-block:: pycon
+
+        >>> initial = {"subject": "welcome"}
         >>> unbound_form = ContactForm(initial=initial)
-        >>> bound_form = ContactForm(data={'subject': 'hi'}, initial=initial)
-        >>> print(unbound_form['subject'].value())
+        >>> bound_form = ContactForm(data={"subject": "hi"}, initial=initial)
+        >>> print(unbound_form["subject"].value())
         welcome
-        >>> print(bound_form['subject'].value())
+        >>> print(bound_form["subject"].value())
         hi
 
 Customizing ``BoundField``
@@ -1447,7 +1470,9 @@ A custom form field can override ``get_bound_field()``:
 
 If you have a ``GPSCoordinatesField``, for example, and want to be able to
 access additional information about the coordinates in a template, this could
-be implemented as follows::
+be implemented as follows:
+
+.. code-block:: python
 
     class GPSCoordinatesBoundField(BoundField):
         @property
@@ -1461,6 +1486,7 @@ be implemented as follows::
                 return get_country_from_coordinates(value)
             else:
                 return None
+
 
     class GPSCoordinatesField(Field):
         def get_bound_field(self, form, field_name):
@@ -1488,26 +1514,34 @@ data is handled separately to normal form data, so when your form
 contains a ``FileField`` and ``ImageField``, you will need to specify
 a second argument when you bind your form. So if we extend our
 ContactForm to include an ``ImageField`` called ``mugshot``, we
-need to bind the file data containing the mugshot image::
+need to bind the file data containing the mugshot image:
+
+.. code-block:: pycon
 
     # Bound form with an image field
     >>> from django.core.files.uploadedfile import SimpleUploadedFile
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
-    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
+    >>> file_data = {"mugshot": SimpleUploadedFile("face.jpg", b"binary content")}
     >>> f = ContactFormWithMugshot(data, file_data)
 
 In practice, you will usually specify ``request.FILES`` as the source
 of file data (just like you use ``request.POST`` as the source of
-form data)::
+form data):
+
+.. code-block:: pycon
 
     # Bound form with an image field, data from the request
     >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
 Constructing an unbound form is the same as always -- omit both form data *and*
-file data::
+file data:
+
+.. code-block:: pycon
 
     # Unbound form with an image field
     >>> f = ContactFormWithMugshot()

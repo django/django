@@ -27,9 +27,12 @@ Writing your own checks
 
 The framework is flexible and allows you to write functions that perform
 any other kind of check you may require. The following is an example stub
-check function::
+check function:
+
+.. code-block:: python
 
     from django.core.checks import Error, register
+
 
     @register()
     def example_check(app_configs, **kwargs):
@@ -38,10 +41,10 @@ check function::
         if check_failed:
             errors.append(
                 Error(
-                    'an error',
-                    hint='A hint.',
+                    "an error",
+                    hint="A hint.",
                     obj=checked_object,
-                    id='myapp.E001',
+                    id="myapp.E001",
                 )
             )
         return errors
@@ -98,9 +101,12 @@ application is loaded; for example, in the :meth:`AppConfig.ready()
 You can pass as many tags to ``register`` as you want in order to label your
 check. Tagging checks is useful since it allows you to run only a certain
 group of checks. For example, to register a compatibility check, you would
-make the following call::
+make the following call:
+
+.. code-block:: python
 
     from django.core.checks import register, Tags
+
 
     @register(Tags.compatibility)
     def my_check(app_configs, **kwargs):
@@ -108,7 +114,9 @@ make the following call::
         return errors
 
 You can register "deployment checks" that are only relevant to a production
-settings file like this::
+settings file like this:
+
+.. code-block:: python
 
     @register(Tags.security, deploy=True)
     def my_check(app_configs, **kwargs):
@@ -120,10 +128,14 @@ You can also use ``register`` as a function rather than a decorator by
 passing a callable object (usually a function) as the first argument
 to ``register``.
 
-The code below is equivalent to the code above::
+The code below is equivalent to the code above:
+
+.. code-block:: python
 
     def my_check(app_configs, **kwargs):
         ...
+
+
     register(my_check, Tags.security, deploy=True)
 
 .. _field-checking:
@@ -145,10 +157,13 @@ Consider an example where you are implementing a custom field named
 ``RangedIntegerField``. This field adds ``min`` and ``max`` arguments to the
 constructor of ``IntegerField``. You may want to add a check to ensure that users
 provide a min value that is less than or equal to the max value. The following
-code snippet shows how you can implement this check::
+code snippet shows how you can implement this check:
+
+.. code-block:: python
 
     from django.core import checks
     from django.db import models
+
 
     class RangedIntegerField(models.IntegerField):
         def __init__(self, min=None, max=None, **kwargs):
@@ -167,15 +182,13 @@ code snippet shows how you can implement this check::
             return errors
 
         def _check_min_max_values(self, **kwargs):
-            if (self.min is not None and
-                    self.max is not None and
-                    self.min > self.max):
+            if self.min is not None and self.max is not None and self.min > self.max:
                 return [
                     checks.Error(
-                        'min greater than max.',
-                        hint='Decrease min or increase max.',
+                        "min greater than max.",
+                        hint="Decrease min or increase max.",
                         obj=self,
-                        id='myapp.E001',
+                        id="myapp.E001",
                     )
                 ]
             # When no error, return an empty list
@@ -185,7 +198,9 @@ If you wanted to add checks to a model manager, you would take the same
 approach on your subclass of :class:`~django.db.models.Manager`.
 
 If you want to add a check to a model class, the approach is *almost* the same:
-the only difference is that the check is a classmethod, not an instance method::
+the only difference is that the check is a classmethod, not an instance method:
+
+.. code-block:: python
 
     class MyModel(models.Model):
         @classmethod
@@ -197,16 +212,19 @@ the only difference is that the check is a classmethod, not an instance method::
 Writing tests
 -------------
 
-Messages are comparable. That allows you to easily write tests::
+Messages are comparable. That allows you to easily write tests:
+
+.. code-block:: python
 
     from django.core.checks import Error
+
     errors = checked_object.check()
     expected_errors = [
         Error(
-            'an error',
-            hint='A hint.',
+            "an error",
+            hint="A hint.",
             obj=checked_object,
-            id='myapp.E001',
+            id="myapp.E001",
         )
     ]
     self.assertEqual(errors, expected_errors)

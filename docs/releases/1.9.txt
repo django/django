@@ -943,11 +943,13 @@ the output will be escaped when it is used as a variable in the template.
 
 For the intended use cases of :class:`~django.template.Library.simple_tag`,
 however, it is very easy to end up with incorrect HTML and possibly an XSS
-exploit. For example::
+exploit. For example:
+
+.. code-block:: python
 
     @register.simple_tag(takes_context=True)
     def greeting(context):
-        return "Hello {0}!".format(context['request'].user.first_name)
+        return "Hello {0}!".format(context["request"].user.first_name)
 
 In older versions of Django, this will be an XSS issue because
 ``user.first_name`` is not escaped.

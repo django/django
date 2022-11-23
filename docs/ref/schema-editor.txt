@@ -17,7 +17,9 @@ system, or have more advanced needs, it's a lot nicer than writing SQL.
 
 Each database backend in Django supplies its own version of ``SchemaEditor``,
 and it's always accessible via the ``connection.schema_editor()`` context
-manager::
+manager:
+
+.. code-block:: python
 
     with connection.schema_editor() as schema_editor:
         schema_editor.delete_model(MyModel)

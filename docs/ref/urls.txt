@@ -12,17 +12,19 @@
 
 .. function:: path(route, view, kwargs=None, name=None)
 
-Returns an element for inclusion in ``urlpatterns``. For example::
+Returns an element for inclusion in ``urlpatterns``. For example:
+
+.. code-block:: python
 
     from django.urls import include, path
 
     urlpatterns = [
-        path('index/', views.index, name='main-view'),
-        path('bio/<username>/', views.bio, name='bio'),
-        path('articles/<slug:title>/', views.article, name='article-detail'),
-        path('articles/<slug:title>/<int:section>/', views.section, name='article-section'),
-        path('blog/', include('blog.urls')),
-        ...
+        path("index/", views.index, name="main-view"),
+        path("bio/<username>/", views.bio, name="bio"),
+        path("articles/<slug:title>/", views.article, name="article-detail"),
+        path("articles/<slug:title>/<int:section>/", views.section, name="article-section"),
+        path("blog/", include("blog.urls")),
+        ...,
     ]
 
 The ``route`` argument should be a string or
@@ -51,15 +53,17 @@ argument is useful.
 
 .. function:: re_path(route, view, kwargs=None, name=None)
 
-Returns an element for inclusion in ``urlpatterns``. For example::
+Returns an element for inclusion in ``urlpatterns``. For example:
+
+.. code-block:: python
 
     from django.urls import include, re_path
 
     urlpatterns = [
-        re_path(r'^index/$', views.index, name='index'),
-        re_path(r'^bio/(?P<username>\w+)/$', views.bio, name='bio'),
-        re_path(r'^blog/', include('blog.urls')),
-        ...
+        re_path(r"^index/$", views.index, name="index"),
+        re_path(r"^bio/(?P<username>\w+)/$", views.bio, name="bio"),
+        re_path(r"^blog/", include("blog.urls")),
+        ...,
     ]
 
 The ``route`` argument should be a string or
@@ -136,7 +140,9 @@ converter name to use in path patterns. See
 
 .. function:: static.static(prefix, view=django.views.static.serve, **kwargs)
 
-Helper function to return a URL pattern for serving files in debug mode::
+Helper function to return a URL pattern for serving files in debug mode:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.conf.urls.static import static

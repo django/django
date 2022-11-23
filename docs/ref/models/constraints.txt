@@ -192,13 +192,15 @@ These conditions have the same database restrictions as
 .. attribute:: UniqueConstraint.deferrable
 
 Set this parameter to create a deferrable unique constraint. Accepted values
-are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
+are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example:
+
+.. code-block:: python
 
     from django.db.models import Deferrable, UniqueConstraint
 
     UniqueConstraint(
-        name='unique_order',
-        fields=['order'],
+        name="unique_order",
+        fields=["order"],
         deferrable=Deferrable.DEFERRED,
     )
 

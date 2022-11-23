@@ -72,22 +72,28 @@ Django now includes :class:`.models.JSONField` and
 supported database backends. Both fields support the use of custom JSON
 encoders and decoders. The model field supports the introspection,
 :ref:`lookups, and transforms <querying-jsonfield>` that were previously
-PostgreSQL-only::
+PostgreSQL-only:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class ContactInfo(models.Model):
         data = models.JSONField()
 
-    ContactInfo.objects.create(data={
-        'name': 'John',
-        'cities': ['London', 'Cambridge'],
-        'pets': {'dogs': ['Rufus', 'Meg']},
-    })
+
+    ContactInfo.objects.create(
+        data={
+            "name": "John",
+            "cities": ["London", "Cambridge"],
+            "pets": {"dogs": ["Rufus", "Meg"]},
+        }
+    )
     ContactInfo.objects.filter(
-        data__name='John',
-        data__pets__has_key='dogs',
-        data__cities__contains='London',
+        data__name="John",
+        data__pets__has_key="dogs",
+        data__cities__contains="London",
     ).delete()
 
 If your project uses ``django.contrib.postgres.fields.JSONField``, plus the
@@ -586,22 +592,29 @@ If you have a custom user model inheriting from ``AbstractUser``, you'll need
 to generate and apply a database migration for your user model.
 
 If you want to preserve the 30 character limit for first names, use a custom
-form::
+form:
+
+.. code-block:: python
 
     from django import forms
     from django.contrib.auth.forms import UserChangeForm
+
 
     class MyUserChangeForm(UserChangeForm):
         first_name = forms.CharField(max_length=30, required=False)
 
 If you wish to keep this restriction in the admin when editing users, set
-``UserAdmin.form`` to use this form::
+``UserAdmin.form`` to use this form:
+
+.. code-block:: python
 
     from django.contrib.auth.admin import UserAdmin
     from django.contrib.auth.models import User
 
+
     class MyUserAdmin(UserAdmin):
         form = MyUserChangeForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)

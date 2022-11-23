@@ -85,14 +85,17 @@ For application authors
 -----------------------
 
 If you're creating a pluggable app called "Rock ’n’ roll", here's how you
-would provide a proper name for the admin::
+would provide a proper name for the admin:
+
+.. code-block:: python
 
     # rock_n_roll/apps.py
 
     from django.apps import AppConfig
 
+
     class RockNRollConfig(AppConfig):
-        name = 'rock_n_roll'
+        name = "rock_n_roll"
         verbose_name = "Rock ’n’ roll"
 
 ``RockNRollConfig`` will be loaded automatically when :setting:`INSTALLED_APPS`
@@ -119,7 +122,9 @@ than the path to a configuration class.
     If your code imports the application registry in an application's
     ``__init__.py``, the name ``apps`` will clash with the ``apps`` submodule.
     The best practice is to move that code to a submodule and import it. A
-    workaround is to import the registry under a different name::
+    workaround is to import the registry under a different name:
+
+    .. code-block:: python
 
         from django.apps import apps as django_apps
 
@@ -128,19 +133,23 @@ For application users
 
 If you're using "Rock ’n’ roll" in a project called ``anthology``, but you
 want it to show up as "Jazz Manouche" instead, you can provide your own
-configuration::
+configuration:
+
+.. code-block:: python
 
     # anthology/apps.py
 
     from rock_n_roll.apps import RockNRollConfig
 
+
     class JazzManoucheConfig(RockNRollConfig):
         verbose_name = "Jazz Manouche"
+
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.JazzManoucheConfig',
+        "anthology.apps.JazzManoucheConfig",
         # ...
     ]
 
@@ -277,7 +286,9 @@ Methods
     can refer to the sender by its string label instead of using the model
     class itself.
 
-    Example::
+    Example:
+
+    .. code-block:: python
 
         from django.apps import AppConfig
         from django.db.models.signals import pre_save
@@ -289,10 +300,11 @@ Methods
             def ready(self):
                 # importing model classes
                 from .models import MyModel  # or...
-                MyModel = self.get_model('MyModel')
+
+                MyModel = self.get_model("MyModel")
 
                 # registering signals with the model's string label
-                pre_save.connect(receiver, sender='app_label.MyModel')
+                pre_save.connect(receiver, sender="app_label.MyModel")
 
     .. warning::
 

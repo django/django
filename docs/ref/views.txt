@@ -23,7 +23,9 @@ using a real front-end web server).
 The most likely example is user-uploaded content in :setting:`MEDIA_ROOT`.
 ``django.contrib.staticfiles`` is intended for static assets and has no
 built-in handling for user-uploaded files, but you can have Django serve your
-:setting:`MEDIA_ROOT` by appending something like this to your URLconf::
+:setting:`MEDIA_ROOT` by appending something like this to your URLconf:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.urls import re_path
@@ -33,9 +35,13 @@ built-in handling for user-uploaded files, but you can have Django serve your
 
     if settings.DEBUG:
         urlpatterns += [
-            re_path(r'^media/(?P<path>.*)$', serve, {
-                'document_root': settings.MEDIA_ROOT,
-            }),
+            re_path(
+                r"^media/(?P<path>.*)$",
+                serve,
+                {
+                    "document_root": settings.MEDIA_ROOT,
+                },
+            ),
         ]
 
 Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
@@ -127,9 +133,12 @@ string representation of the exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a
 :exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
-view you can use code like this::
+view you can use code like this:
+
+.. code-block:: python
 
     from django.core.exceptions import PermissionDenied
+
 
     def edit(request, pk):
         if not request.user.is_staff:

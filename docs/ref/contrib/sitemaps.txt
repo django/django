@@ -50,12 +50,18 @@ Initialization
 .. function:: views.sitemap(request, sitemaps, section=None, template_name='sitemap.xml', content_type='application/xml')
 
 To activate sitemap generation on your Django site, add this line to your
-:doc:`URLconf </topics/http/urls>`::
+:doc:`URLconf </topics/http/urls>`:
+
+.. code-block:: python
 
     from django.contrib.sitemaps.views import sitemap
 
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.views.sitemap')
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -95,10 +101,13 @@ An example
 
 Let's assume you have a blog system, with an ``Entry`` model, and you want your
 sitemap to include all the links to your individual blog entries. Here's how
-your sitemap class might look::
+your sitemap class might look:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import Sitemap
     from blog.models import Entry
+
 
     class BlogSitemap(Sitemap):
         changefreq = "never"
@@ -335,7 +344,9 @@ Example
 -------
 
 Here's an example of a :doc:`URLconf </topics/http/urls>` using
-:class:`GenericSitemap`::
+:class:`GenericSitemap`:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import GenericSitemap
     from django.contrib.sitemaps.views import sitemap
@@ -343,18 +354,20 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
     from blog.models import Entry
 
     info_dict = {
-        'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
+        "queryset": Entry.objects.all(),
+        "date_field": "pub_date",
     }
 
     urlpatterns = [
         # some generic view using info_dict
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-             {'sitemaps': {'blog': GenericSitemap(info_dict, priority=0.6)}},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"blog": GenericSitemap(info_dict, priority=0.6)}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -365,21 +378,25 @@ Sitemap for static views
 Often you want the search engine crawlers to index views which are neither
 object detail pages nor flatpages. The solution is to explicitly list URL
 names for these views in ``items`` and call :func:`~django.urls.reverse` in
-the ``location`` method of the sitemap. For example::
+the ``location`` method of the sitemap. For example:
+
+.. code-block:: python
 
     # sitemaps.py
     from django.contrib import sitemaps
     from django.urls import reverse
 
+
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
-        changefreq = 'daily'
+        changefreq = "daily"
 
         def items(self):
-            return ['main', 'about', 'license']
+            return ["main", "about", "license"]
 
         def location(self, item):
             return reverse(item)
+
 
     # urls.py
     from django.contrib.sitemaps.views import sitemap
@@ -389,16 +406,20 @@ the ``location`` method of the sitemap. For example::
     from . import views
 
     sitemaps = {
-        'static': StaticViewSitemap,
+        "static": StaticViewSitemap,
     }
 
     urlpatterns = [
-        path('', views.main, name='main'),
-        path('about/', views.about, name='about'),
-        path('license/', views.license, name='license'),
+        path("", views.main, name="main"),
+        path("about/", views.about, name="about"),
+        path("license/", views.license, name="license"),
         # ...
-        path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap')
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -416,15 +437,25 @@ references individual sitemap files, one per each section defined in your
 * The :func:`django.contrib.sitemaps.views.sitemap` view should take a
   ``section`` keyword argument.
 
-Here's what the relevant URLconf lines would look like for the example above::
+Here's what the relevant URLconf lines would look like for the example above:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('sitemap.xml', views.index, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.index'),
-        path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
@@ -442,18 +473,25 @@ index will reflect that.
 
 If you're not using the vanilla sitemap view -- for example, if it's wrapped
 with a caching decorator -- you must name your sitemap view and pass
-``sitemap_url_name`` to the index view::
+``sitemap_url_name`` to the index view:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import views as sitemaps_views
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        path('sitemap.xml',
-             cache_page(86400)(sitemaps_views.index),
-             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
-        path('sitemap-<section>.xml',
-             cache_page(86400)(sitemaps_views.sitemap),
-             {'sitemaps': sitemaps}, name='sitemaps'),
+        path(
+            "sitemap.xml",
+            cache_page(86400)(sitemaps_views.index),
+            {"sitemaps": sitemaps, "sitemap_url_name": "sitemaps"},
+        ),
+        path(
+            "sitemap-<section>.xml",
+            cache_page(86400)(sitemaps_views.sitemap),
+            {"sitemaps": sitemaps},
+            name="sitemaps",
+        ),
     ]
 
 .. versionchanged:: 4.1
@@ -465,19 +503,25 @@ Template customization
 
 If you wish to use a different template for each sitemap or sitemap index
 available on your site, you may specify it by passing a ``template_name``
-parameter to the ``sitemap`` and ``index`` views via the URLconf::
+parameter to the ``sitemap`` and ``index`` views via the URLconf:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('custom-sitemap.xml', views.index, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.index'),
-        path('custom-sitemap-<section>.xml', views.sitemap, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "custom-sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "custom-sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -599,9 +643,12 @@ that: :func:`django.contrib.sitemaps.ping_google()`.
 .. _`Google Search Console`: https://search.google.com/search-console/welcome
 
 One useful way to call :func:`ping_google` is from a model's ``save()``
-method::
+method:
+
+.. code-block:: python
 
     from django.contrib.sitemaps import ping_google
+
 
     class Entry(models.Model):
         # ...

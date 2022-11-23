@@ -13,10 +13,13 @@ Simple mixins
 
         A dictionary to include in the context. This is a convenient way of
         specifying some context in
-        :meth:`~django.views.generic.base.View.as_view`. Example usage::
+        :meth:`~django.views.generic.base.View.as_view`. Example usage:
+
+        .. code-block:: python
 
             from django.views.generic import TemplateView
-            TemplateView.as_view(extra_context={'title': 'Custom Title'})
+
+            TemplateView.as_view(extra_context={"title": "Custom Title"})
 
     **Methods**
 

@@ -179,24 +179,26 @@ All attributes should be considered read-only, unless stated otherwise.
     the request.
 
     The name of each header is stylized with title-casing (e.g. ``User-Agent``)
-    when it's displayed. You can access headers case-insensitively::
+    when it's displayed. You can access headers case-insensitively:
+
+    .. code-block:: pycon
 
         >>> request.headers
         {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
 
-        >>> 'User-Agent' in request.headers
+        >>> "User-Agent" in request.headers
         True
-        >>> 'user-agent' in request.headers
+        >>> "user-agent" in request.headers
         True
 
-        >>> request.headers['User-Agent']
+        >>> request.headers["User-Agent"]
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
-        >>> request.headers['user-agent']
+        >>> request.headers["user-agent"]
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
-        >>> request.headers.get('User-Agent')
+        >>> request.headers.get("User-Agent")
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
-        >>> request.headers.get('user-agent')
+        >>> request.headers.get("user-agent")
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
     For use in, for example, Django templates, headers can also be looked up
@@ -296,13 +298,15 @@ Methods
 
     .. note:: The :meth:`~HttpRequest.get_host()` method fails when the host is
         behind multiple proxies. One solution is to use middleware to rewrite
-        the proxy headers, as in the following example::
+        the proxy headers, as in the following example:
+
+        .. code-block:: python
 
             class MultipleProxyMiddleware:
                 FORWARDED_FOR_FIELDS = [
-                    'HTTP_X_FORWARDED_FOR',
-                    'HTTP_X_FORWARDED_HOST',
-                    'HTTP_X_FORWARDED_SERVER',
+                    "HTTP_X_FORWARDED_FOR",
+                    "HTTP_X_FORWARDED_HOST",
+                    "HTTP_X_FORWARDED_SERVER",
                 ]
 
                 def __init__(self, get_response):
@@ -315,8 +319,8 @@ Methods
                     """
                     for field in self.FORWARDED_FOR_FIELDS:
                         if field in request.META:
-                            if ',' in request.META[field]:
-                                parts = request.META[field].split(',')
+                            if "," in request.META[field]:
+                                parts = request.META[field].split(",")
                                 request.META[field] = parts[-1].strip()
                     return self.get_response(request)
 
@@ -381,24 +385,23 @@ Methods
     attached to the cookie value to ensure the cookie is not older than
     ``max_age`` seconds.
 
-    For example::
+    For example:
 
-        >>> request.get_signed_cookie('name')
+    .. code-block:: pycon
+
+        >>> request.get_signed_cookie("name")
         'Tony'
-        >>> request.get_signed_cookie('name', salt='name-salt')
+        >>> request.get_signed_cookie("name", salt="name-salt")
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('nonexistent-cookie')
-        ...
+        >>> request.get_signed_cookie("nonexistent-cookie")
         KeyError: 'nonexistent-cookie'
-        >>> request.get_signed_cookie('nonexistent-cookie', False)
+        >>> request.get_signed_cookie("nonexistent-cookie", False)
         False
-        >>> request.get_signed_cookie('cookie-that-was-tampered-with')
-        ...
+        >>> request.get_signed_cookie("cookie-that-was-tampered-with")
         BadSignature: ...
-        >>> request.get_signed_cookie('name', max_age=60)
-        ...
+        >>> request.get_signed_cookie("name", max_age=60)
         SignatureExpired: Signature age 1677.3839159 > 60 seconds
-        >>> request.get_signed_cookie('name', False, max_age=60)
+        >>> request.get_signed_cookie("name", False, max_age=60)
         False
 
     See :doc:`cryptographic signing </topics/signing>` for more information.
@@ -411,9 +414,11 @@ Methods
 .. method:: HttpRequest.accepts(mime_type)
 
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument::
+    argument:
 
-        >>> request.accepts('text/html')
+    .. code-block:: pycon
+
+        >>> request.accepts("text/html")
         True
 
     Most browsers send ``Accept: */*`` by default, so this would return
@@ -492,9 +497,11 @@ a subclass of dictionary. Exceptions are outlined here:
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
-    equal to ``value``. For example::
+    equal to ``value``. For example:
 
-        >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
+    .. code-block:: pycon
+
+        >>> QueryDict.fromkeys(["a", "a", "b"], value="val")
         <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
 
 .. method:: QueryDict.__getitem__(key)
@@ -530,22 +537,26 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Takes either a ``QueryDict`` or a dictionary. Like :meth:`dict.update`,
     except it *appends* to the current dictionary items rather than replacing
-    them. For example::
+    them. For example:
 
-        >>> q = QueryDict('a=1', mutable=True)
-        >>> q.update({'a': '2'})
-        >>> q.getlist('a')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1", mutable=True)
+        >>> q.update({"a": "2"})
+        >>> q.getlist("a")
         ['1', '2']
-        >>> q['a'] # returns the last
+        >>> q["a"]  # returns the last
         '2'
 
 .. method:: QueryDict.items()
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator object instead of a view object.
-    For example::
+    For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> list(q.items())
         [('a', '3')]
 
@@ -553,9 +564,11 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Like :meth:`dict.values`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator instead of a view object. For
-    example::
+    example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> list(q.values())
         ['3']
 
@@ -588,19 +601,23 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.lists()
 
     Like :meth:`items()`, except it includes all values, as a list, for each
-    member of the dictionary. For example::
+    member of the dictionary. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> q.lists()
         [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
     Returns a list of values for the given key and removes them from the
-    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+    dictionary. Raises ``KeyError`` if the key does not exist. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
-        >>> q.pop('a')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
+        >>> q.pop("a")
         ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
@@ -608,9 +625,11 @@ In addition, ``QueryDict`` has the following methods:
     Removes an arbitrary member of the dictionary (since there's no concept
     of ordering), and returns a two value tuple containing the key and a list
     of all values for the key. Raises ``KeyError`` when called on an empty
-    dictionary. For example::
+    dictionary. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
         >>> q.popitem()
         ('a', ['1', '2', '3'])
 
@@ -618,26 +637,32 @@ In addition, ``QueryDict`` has the following methods:
 
     Returns a ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
-    element of the list, using the same logic as :meth:`QueryDict.__getitem__`::
+    element of the list, using the same logic as :meth:`QueryDict.__getitem__`:
 
-        >>> q = QueryDict('a=1&a=3&a=5')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=3&a=5")
         >>> q.dict()
         {'a': '5'}
 
 .. method:: QueryDict.urlencode(safe=None)
 
-    Returns a string of the data in query string format. For example::
+    Returns a string of the data in query string format. For example:
 
-        >>> q = QueryDict('a=2&b=3&b=5')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=2&b=3&b=5")
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
     Use the ``safe`` parameter to pass characters which don't require encoding.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict(mutable=True)
-        >>> q['next'] = '/a&b/'
-        >>> q.urlencode(safe='/')
+        >>> q["next"] = "/a&b/"
+        >>> q.urlencode(safe="/")
         'next=/a%26b/'
 
 ``HttpResponse`` objects
@@ -1045,10 +1070,13 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example::
+can create it with the help of :py:class:`http.HTTPStatus`. For example:
+
+.. code-block:: python
 
     from http import HTTPStatus
     from django.http import HttpResponse
+
 
     class HttpResponseNoContent(HttpResponse):
         status_code = HTTPStatus.NO_CONTENT

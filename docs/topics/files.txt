@@ -25,15 +25,18 @@ When you use a :class:`~django.db.models.FileField` or
 to deal with that file.
 
 Consider the following model, using an :class:`~django.db.models.ImageField` to
-store a photo::
+store a photo:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Car(models.Model):
         name = models.CharField(max_length=255)
         price = models.DecimalField(max_digits=5, decimal_places=2)
-        photo = models.ImageField(upload_to='cars')
-        specs = models.FileField(upload_to='specs')
+        photo = models.ImageField(upload_to="cars")
+        specs = models.FileField(upload_to="specs")
 
 Any ``Car`` instance will have a ``photo`` attribute that you can use to get at
 the details of the attached photo:
@@ -96,10 +99,12 @@ To save an existing file on disk to a :class:`~django.db.models.FileField`:
     While :class:`~django.db.models.ImageField` non-image data attributes, such
     as ``height``, ``width``, and ``size`` are available on the instance, the
     underlying image data cannot be used without reopening the image. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> from PIL import Image
-        >>> car = Car.objects.get(name='57 Chevy')
+        >>> car = Car.objects.get(name="57 Chevy")
         >>> car.photo.width
         191
         >>> car.photo.height
@@ -212,12 +217,15 @@ Django ships with a :class:`django.core.files.storage.FileSystemStorage` class
 which implements basic local filesystem file storage.
 
 For example, the following code will store uploaded files under
-``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is::
+``/media/photos`` regardless of what your :setting:`MEDIA_ROOT` setting is:
+
+.. code-block:: python
 
     from django.core.files.storage import FileSystemStorage
     from django.db import models
 
-    fs = FileSystemStorage(location='/media/photos')
+    fs = FileSystemStorage(location="/media/photos")
+
 
     class Car(models.Model):
         ...
@@ -239,7 +247,9 @@ for example.
 Your callable will be evaluated when your models classes are loaded, and must
 return an instance of :class:`~django.core.files.storage.Storage`.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.db import models

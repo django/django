@@ -523,17 +523,21 @@ Isolating model registration
 To avoid polluting the global :attr:`~django.apps.apps` registry and prevent
 unnecessary table creation, models defined in a test method should be bound to
 a temporary ``Apps`` instance. To do this, use the
-:func:`~django.test.utils.isolate_apps` decorator::
+:func:`~django.test.utils.isolate_apps` decorator:
+
+.. code-block:: python
 
     from django.db import models
     from django.test import SimpleTestCase
     from django.test.utils import isolate_apps
 
+
     class TestModelDefinition(SimpleTestCase):
-        @isolate_apps('app_label')
+        @isolate_apps("app_label")
         def test_model_definition(self):
             class TestModel(models.Model):
                 pass
+
             ...
 
 .. admonition:: Setting ``app_label``

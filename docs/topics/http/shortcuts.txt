@@ -60,26 +60,37 @@ Example
 -------
 
 The following example renders the template ``myapp/index.html`` with the
-MIME type :mimetype:`application/xhtml+xml`::
+MIME type :mimetype:`application/xhtml+xml`:
+
+.. code-block:: python
 
     from django.shortcuts import render
 
+
     def my_view(request):
         # View code here...
-        return render(request, 'myapp/index.html', {
-            'foo': 'bar',
-        }, content_type='application/xhtml+xml')
+        return render(
+            request,
+            "myapp/index.html",
+            {
+                "foo": "bar",
+            },
+            content_type="application/xhtml+xml",
+        )
 
-This example is equivalent to::
+This example is equivalent to:
+
+.. code-block:: python
 
     from django.http import HttpResponse
     from django.template import loader
 
+
     def my_view(request):
         # View code here...
-        t = loader.get_template('myapp/index.html')
-        c = {'foo': 'bar'}
-        return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
+        t = loader.get_template("myapp/index.html")
+        c = {"foo": "bar"}
+        return HttpResponse(t.render(c, request), content_type="application/xhtml+xml")
 
 ``redirect()``
 ==============
@@ -110,9 +121,12 @@ You can use the :func:`redirect` function in a number of ways.
 
 #. By passing some object; that object's
    :meth:`~django.db.models.Model.get_absolute_url` method will be called
-   to figure out the redirect URL::
+   to figure out the redirect URL:
+
+    .. code-block:: python
 
         from django.shortcuts import redirect
+
 
         def my_view(request):
             ...
@@ -121,27 +135,35 @@ You can use the :func:`redirect` function in a number of ways.
 
 #. By passing the name of a view and optionally some positional or
    keyword arguments; the URL will be reverse resolved using the
-   :func:`~django.urls.reverse` method::
+   :func:`~django.urls.reverse` method:
+
+    .. code-block:: python
 
         def my_view(request):
             ...
-            return redirect('some-view-name', foo='bar')
+            return redirect("some-view-name", foo="bar")
 
-#. By passing a hardcoded URL to redirect to::
+#. By passing a hardcoded URL to redirect to:
 
-        def my_view(request):
-            ...
-            return redirect('/some/url/')
-
-   This also works with full URLs::
+    .. code-block:: python
 
         def my_view(request):
             ...
-            return redirect('https://example.com/')
+            return redirect("/some/url/")
+
+   This also works with full URLs:
+
+    .. code-block:: python
+
+        def my_view(request):
+            ...
+            return redirect("https://example.com/")
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
-will be returned::
+will be returned:
+
+.. code-block:: python
 
     def my_view(request):
         ...
@@ -177,16 +199,22 @@ Example
 -------
 
 The following example gets the object with the primary key of 1 from
-``MyModel``::
+``MyModel``:
+
+.. code-block:: python
 
     from django.shortcuts import get_object_or_404
+
 
     def my_view(request):
         obj = get_object_or_404(MyModel, pk=1)
 
-This example is equivalent to::
+This example is equivalent to:
+
+.. code-block:: python
 
     from django.http import Http404
+
 
     def my_view(request):
         try:
@@ -196,29 +224,37 @@ This example is equivalent to::
 
 The most common use case is to pass a :class:`~django.db.models.Model`, as
 shown above. However, you can also pass a
-:class:`~django.db.models.query.QuerySet` instance::
+:class:`~django.db.models.query.QuerySet` instance:
 
-    queryset = Book.objects.filter(title__startswith='M')
+.. code-block:: python
+
+    queryset = Book.objects.filter(title__startswith="M")
     get_object_or_404(queryset, pk=1)
 
-The above example is a bit contrived since it's equivalent to doing::
+The above example is a bit contrived since it's equivalent to doing:
 
-    get_object_or_404(Book, title__startswith='M', pk=1)
+.. code-block:: python
+
+    get_object_or_404(Book, title__startswith="M", pk=1)
 
 but it can be useful if you are passed the ``queryset`` variable from somewhere
 else.
 
 Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
 for example if you have a
-:ref:`custom manager<custom-managers>`::
+:ref:`custom manager<custom-managers>`:
 
-    get_object_or_404(Book.dahl_objects, title='Matilda')
+.. code-block:: python
+
+    get_object_or_404(Book.dahl_objects, title="Matilda")
 
 You can also use
-:class:`related managers<django.db.models.fields.related.RelatedManager>`::
+:class:`related managers<django.db.models.fields.related.RelatedManager>`:
 
-    author = Author.objects.get(name='Roald Dahl')
-    get_object_or_404(author.book_set, title='Matilda')
+.. code-block:: python
+
+    author = Author.objects.get(name="Roald Dahl")
+    get_object_or_404(author.book_set, title="Matilda")
 
 Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
@@ -251,16 +287,22 @@ Arguments
 Example
 -------
 
-The following example gets all published objects from ``MyModel``::
+The following example gets all published objects from ``MyModel``:
+
+.. code-block:: python
 
     from django.shortcuts import get_list_or_404
+
 
     def my_view(request):
         my_objects = get_list_or_404(MyModel, published=True)
 
-This example is equivalent to::
+This example is equivalent to:
+
+.. code-block:: python
 
     from django.http import Http404
+
 
     def my_view(request):
         my_objects = list(MyModel.objects.filter(published=True))

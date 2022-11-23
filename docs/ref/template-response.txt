@@ -218,17 +218,19 @@ subsequent rendering calls do not change the response content.
 However, when ``response.content`` is explicitly assigned, the
 change is always applied. If you want to force the content to be
 re-rendered, you can reevaluate the rendered content, and assign
-the content of the response manually::
+the content of the response manually:
+
+.. code-block:: pycon
 
     # Set up a rendered TemplateResponse
     >>> from django.template.response import TemplateResponse
-    >>> t = TemplateResponse(request, 'original.html', {})
+    >>> t = TemplateResponse(request, "original.html", {})
     >>> t.render()
     >>> print(t.content)
     Original content
 
     # Re-rendering doesn't change content
-    >>> t.template_name = 'new.html'
+    >>> t.template_name = "new.html"
     >>> t.render()
     >>> print(t.content)
     Original content
@@ -261,17 +263,21 @@ rendered content will be available.
 
 To define a post-render callback, define a function that takes
 a single argument -- response -- and register that function with
-the template response::
+the template response:
+
+.. code-block:: python
 
     from django.template.response import TemplateResponse
+
 
     def my_render_callback(response):
         # Do content-sensitive processing
         do_post_processing()
 
+
     def my_view(request):
         # Create a response
-        response = TemplateResponse(request, 'mytemplate.html', {})
+        response = TemplateResponse(request, "mytemplate.html", {})
         # Register the callback
         response.add_post_render_callback(my_render_callback)
         # Return the response
@@ -292,9 +298,14 @@ A :class:`TemplateResponse` object can be used anywhere that a normal
 alternative to calling :func:`~django.shortcuts.render()`.
 
 For example, the following view returns a :class:`TemplateResponse` with a
-template and a context containing a queryset::
+template and a context containing a queryset:
+
+.. code-block:: python
 
     from django.template.response import TemplateResponse
 
+
     def blog_index(request):
-        return TemplateResponse(request, 'entry_list.html', {'entries': Entry.objects.all()})
+        return TemplateResponse(
+            request, "entry_list.html", {"entries": Entry.objects.all()}
+        )

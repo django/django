@@ -39,10 +39,12 @@ To install the flatpages app, follow these steps:
 
 Then either:
 
-3. Add an entry in your URLconf. For example::
+3. Add an entry in your URLconf. For example:
+
+.. code-block:: python
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 or:
@@ -66,20 +68,24 @@ Using the URLconf
 -----------------
 
 There are several ways to include the flat pages in your URLconf. You can
-dedicate a particular path to flat pages::
+dedicate a particular path to flat pages:
+
+.. code-block:: python
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 You can also set it up as a "catchall" pattern. In this case, it is important
-to place the pattern at the end of the other urlpatterns::
+to place the pattern at the end of the other urlpatterns:
+
+.. code-block:: python
 
     from django.contrib.flatpages import views
 
     # Your other patterns here
     urlpatterns += [
-        re_path(r'^(?P<url>.*/)$', views.flatpage),
+        re_path(r"^(?P<url>.*/)$", views.flatpage),
     ]
 
 .. warning::
@@ -90,13 +96,15 @@ to place the pattern at the end of the other urlpatterns::
 
 Another common setup is to use flat pages for a limited set of known pages and
 to hard code the urls, so you can reference them with the :ttag:`url` template
-tag::
+tag:
+
+.. code-block:: python
 
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
-        path('license/', views.flatpage, {'url': '/license/'}, name='license'),
+        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
     ]
 
 Using the middleware
@@ -176,7 +184,9 @@ other object in the system.
 The ``FlatPage`` model has an ``enable_comments`` field that isn't used by
 ``contrib.flatpages``, but that could be useful for your project or third-party
 apps. It doesn't appear in the admin interface, but you can add it by
-registering a custom ``ModelAdmin`` for ``FlatPage``::
+registering a custom ``ModelAdmin`` for ``FlatPage``:
+
+.. code-block:: python
 
     from django.contrib import admin
     from django.contrib.flatpages.admin import FlatPageAdmin
@@ -186,16 +196,20 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
     # Define a new FlatPageAdmin
     class FlatPageAdmin(FlatPageAdmin):
         fieldsets = [
-            (None, {'fields': ['url', 'title', 'content', 'sites']}),
-            (_('Advanced options'), {
-                'classes': ['collapse'],
-                'fields': [
-                    'enable_comments',
-                    'registration_required',
-                    'template_name',
-                ],
-            }),
+            (None, {"fields": ["url", "title", "content", "sites"]}),
+            (
+                _("Advanced options"),
+                {
+                    "classes": ["collapse"],
+                    "fields": [
+                        "enable_comments",
+                        "registration_required",
+                        "template_name",
+                    ],
+                },
+            ),
         ]
+
 
     # Re-register FlatPageAdmin
     admin.site.unregister(FlatPage)
@@ -336,7 +350,9 @@ Integrating with :mod:`django.contrib.sitemaps`
 Example
 -------
 
-Here's an example of a URLconf using :class:`FlatPageSitemap`::
+Here's an example of a URLconf using :class:`FlatPageSitemap`:
+
+.. code-block:: python
 
     from django.contrib.flatpages.sitemaps import FlatPageSitemap
     from django.contrib.sitemaps.views import sitemap
@@ -344,9 +360,11 @@ Here's an example of a URLconf using :class:`FlatPageSitemap`::
 
     urlpatterns = [
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-            {'sitemaps': {'flatpages': FlatPageSitemap}},
-            name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"flatpages": FlatPageSitemap}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]

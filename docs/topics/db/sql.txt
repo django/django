@@ -49,7 +49,9 @@ This method takes a raw SQL query, executes it, and returns a
 can be iterated over like a normal :class:`~django.db.models.query.QuerySet` to
 provide object instances.
 
-This is best illustrated with an example. Suppose you have the following model::
+This is best illustrated with an example. Suppose you have the following model:
+
+.. code-block:: python
 
     class Person(models.Model):
         first_name = models.CharField(...)
@@ -241,13 +243,17 @@ replaced with parameters from the ``params`` argument.
     **Do not use string formatting on raw queries or quote placeholders in your
     SQL strings!**
 
-    It's tempting to write the above query as::
+    It's tempting to write the above query as:
 
-        >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
+    .. code-block:: pycon
+
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = %s" % lname
         >>> Person.objects.raw(query)
 
     You might also think you should write your query like this (with quotes
-    around ``%s``)::
+    around ``%s``):
+
+    .. code-block:: pycon
 
         >>> query = "SELECT * FROM myapp_person WHERE last_name = '%s'"
 
@@ -279,9 +285,12 @@ get a cursor object. Then, call ``cursor.execute(sql, [params])`` to execute
 the SQL and ``cursor.fetchone()`` or ``cursor.fetchall()`` to return the
 resulting rows.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import connection
+
 
     def my_custom_sql(self):
         with connection.cursor() as cursor:
@@ -304,36 +313,42 @@ If you are using :doc:`more than one database </topics/db/multi-db>`, you can
 use ``django.db.connections`` to obtain the connection (and cursor) for a
 specific database. ``django.db.connections`` is a dictionary-like
 object that allows you to retrieve a specific connection using its
-alias::
+alias:
+
+.. code-block:: python
 
     from django.db import connections
-    with connections['my_db_alias'].cursor() as cursor:
-        # Your code here...
+
+    with connections["my_db_alias"].cursor() as cursor:
+        # Your code here
+        ...
 
 By default, the Python DB API will return results without their field names,
 which means you end up with a ``list`` of values, rather than a ``dict``. At a
 small performance and memory cost, you can return results as a ``dict`` by
-using something like this::
+using something like this:
+
+.. code-block:: python
 
     def dictfetchall(cursor):
         "Return all rows from a cursor as a dict"
         columns = [col[0] for col in cursor.description]
-        return [
-            dict(zip(columns, row))
-            for row in cursor.fetchall()
-        ]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 Another option is to use :func:`collections.namedtuple` from the Python
 standard library. A ``namedtuple`` is a tuple-like object that has fields
 accessible by attribute lookup; it's also indexable and iterable. Results are
-immutable and accessible by field names or indices, which might be useful::
+immutable and accessible by field names or indices, which might be useful:
+
+.. code-block:: python
 
     from collections import namedtuple
+
 
     def namedtuplefetchall(cursor):
         "Return all rows from a cursor as a namedtuple"
         desc = cursor.description
-        nt_result = namedtuple('Result', [col[0] for col in desc])
+        nt_result = namedtuple("Result", [col[0] for col in desc])
         return [nt_result(*row) for row in cursor.fetchall()]
 
 Here is an example of the difference between the three:
@@ -373,7 +388,9 @@ Also note that Django expects the ``"%s"`` placeholder, *not* the ``"?"``
 placeholder, which is used by the SQLite Python bindings. This is for the sake
 of consistency and sanity.
 
-Using a cursor as a context manager::
+Using a cursor as a context manager:
+
+.. code-block:: python
 
     with connection.cursor() as c:
         c.execute(...)

@@ -22,10 +22,13 @@ module defines tests using a class-based approach.
 
 Here is an example which subclasses from :class:`django.test.TestCase`,
 which is a subclass of :class:`unittest.TestCase` that runs each test inside a
-transaction to provide isolation::
+transaction to provide isolation:
+
+.. code-block:: python
 
     from django.test import TestCase
     from myapp.models import Animal
+
 
     class AnimalTestCase(TestCase):
         def setUp(self):
@@ -85,7 +88,9 @@ any file named ``test*.py`` under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
-path to a package, module, ``TestCase`` subclass, or test method. For instance::
+path to a package, module, ``TestCase`` subclass, or test method. For instance:
+
+.. code-block:: pycon
 
     # Run all the tests in the animals.tests module
     $ ./manage.py test animals.tests

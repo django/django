@@ -66,29 +66,31 @@ Python style
 
   Final judgments of readability are left to the Merger's discretion. As a
   guide, f-strings should use only plain variable and property access, with
-  prior local variable assignment for more complex cases::
+  prior local variable assignment for more complex cases:
 
-    # Allowed
-    f'hello {user}'
-    f'hello {user.name}'
-    f'hello {self.user.name}'
+.. code-block:: pycon
 
-    # Disallowed
-    f'hello {get_user()}'
-    f'you are {user.age * 365.25} days old'
+  # Allowed
+  f'hello {user}'
+  f'hello {user.name}'
+  f'hello {self.user.name}'
 
-    # Allowed with local variable assignment
-    user = get_user()
-    f'hello {user}'
-    user_days_old = user.age * 365.25
-    f'you are {user_days_old} days old'
+  # Disallowed
+  f'hello {get_user()}'
+  f'you are {user.age * 365.25} days old'
 
-  f-strings should not be used for any string that may require translation,
-  including error and logging messages. In general ``format()`` is more
-  verbose, so the other formatting methods are preferred.
+  # Allowed with local variable assignment
+  user = get_user()
+  f'hello {user}'
+  user_days_old = user.age * 365.25
+  f'you are {user_days_old} days old'
 
-  Don't waste time doing unrelated refactoring of existing code to adjust the
-  formatting method.
+  strings should not be used for any string that may require translation,
+  cluding error and logging messages. In general ``format()`` is more
+  rbose, so the other formatting methods are preferred.
+
+  n't waste time doing unrelated refactoring of existing code to adjust the
+  rmatting method.
 
 * Avoid use of "we" in comments, e.g. "Loop over" rather than "We loop over".
 
@@ -119,7 +121,9 @@ Python style
 
   Reserve ticket references for obscure issues where the ticket has additional
   details that can't be easily described in docstrings or comments. Include the
-  ticket number at the end of a sentence like this::
+  ticket number at the end of a sentence like this:
+
+.. code-block:: python
 
     def test_foo():
         """
@@ -306,14 +310,16 @@ Model style
 
 * If ``choices`` is defined for a given model field, define each choice as a
   list of tuples, with an all-uppercase name as a class attribute on the model.
-  Example::
+  Example:
+
+.. code-block:: python
 
     class MyModel(models.Model):
-        DIRECTION_UP = 'U'
-        DIRECTION_DOWN = 'D'
+        DIRECTION_UP = "U"
+        DIRECTION_DOWN = "D"
         DIRECTION_CHOICES = [
-            (DIRECTION_UP, 'Up'),
-            (DIRECTION_DOWN, 'Down'),
+            (DIRECTION_UP, "Up"),
+            (DIRECTION_DOWN, "Down"),
         ]
 
 Use of ``django.conf.settings``
@@ -325,18 +331,22 @@ for this is as follows:
 
 Manual configuration of settings (i.e. not relying on the
 :envvar:`DJANGO_SETTINGS_MODULE` environment variable) is allowed and possible
-as follows::
+as follows:
+
+.. code-block:: python
 
     from django.conf import settings
 
-    settings.configure({}, SOME_SETTING='foo')
+    settings.configure({}, SOME_SETTING="foo")
 
 However, if any setting is accessed before the ``settings.configure`` line,
 this will not work. (Internally, ``settings`` is a ``LazyObject`` which
 configures itself automatically when the settings are accessed if it has not
 already been configured).
 
-So, if there is a module containing some code as follows::
+So, if there is a module containing some code as follows:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.urls import get_callable

@@ -51,14 +51,17 @@ the Python package that holds your app. Then add the app to your
 
 By default, :djadmin:`inspectdb` creates unmanaged models. That is,
 ``managed = False`` in the model's ``Meta`` class tells Django not to manage
-each table's creation, modification, and deletion::
+each table's creation, modification, and deletion:
+
+.. code-block:: python
 
     class Person(models.Model):
         id = models.IntegerField(primary_key=True)
         first_name = models.CharField(max_length=70)
+
         class Meta:
-           managed = False
-           db_table = 'CENSUS_PERSONS'
+            managed = False
+            db_table = "CENSUS_PERSONS"
 
 If you do want to allow Django to manage the table's lifecycle, you'll need to
 change the :attr:`~django.db.models.Options.managed` option above to ``True``

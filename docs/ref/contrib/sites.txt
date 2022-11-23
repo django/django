@@ -60,10 +60,13 @@ multiple copies of the same story in the database.
 A better solution removes the content duplication: Both sites use the same
 article database, and an article is associated with one or more sites. In
 Django model terminology, that's represented by a
-:class:`~django.db.models.ManyToManyField` in the ``Article`` model::
+:class:`~django.db.models.ManyToManyField` in the ``Article`` model:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
     from django.db import models
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -103,10 +106,13 @@ model in a many-to-one relationship, using
 :class:`~django.db.models.ForeignKey`.
 
 For example, if an article is only allowed on a single site, you'd use a model
-like this::
+like this:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
     from django.db import models
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=200)
@@ -122,9 +128,12 @@ Hooking into the current site from views
 
 You can use the sites framework in your Django views to do
 particular things based on the site in which the view is being called.
-For example::
+For example:
+
+.. code-block:: python
 
     from django.conf import settings
+
 
     def my_view(request):
         if settings.SITE_ID == 3:
@@ -136,13 +145,16 @@ For example::
 
 It's fragile to hard-code the site IDs like that, in case they change. The
 cleaner way of accomplishing the same thing is to check the current site's
-domain::
+domain:
+
+.. code-block:: python
 
     from django.contrib.sites.shortcuts import get_current_site
 
+
     def my_view(request):
         current_site = get_current_site(request)
-        if current_site.domain == 'foo.com':
+        if current_site.domain == "foo.com":
             # Do something
             pass
         else:
@@ -156,13 +168,16 @@ it is not.
 If you don't have access to the request object, you can use the
 ``get_current()`` method of the :class:`~django.contrib.sites.models.Site`
 model's manager. You should then ensure that your settings file does contain
-the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
+the :setting:`SITE_ID` setting. This example is equivalent to the previous one:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
 
+
     def my_function_without_request():
         current_site = Site.objects.get_current()
-        if current_site.domain == 'foo.com':
+        if current_site.domain == "foo.com":
             # Do something
             pass
         else:
@@ -185,10 +200,13 @@ objects, we can abstract the "thank you" notice to use the values of the
 current site's :attr:`~django.contrib.sites.models.Site.name` and
 :attr:`~django.contrib.sites.models.Site.domain`.
 
-Here's an example of what the form-handling view looks like::
+Here's an example of what the form-handling view looks like:
+
+.. code-block:: python
 
     from django.contrib.sites.shortcuts import get_current_site
     from django.core.mail import send_mail
+
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
@@ -196,11 +214,10 @@ Here's an example of what the form-handling view looks like::
 
         current_site = get_current_site(request)
         send_mail(
-            'Thanks for subscribing to %s alerts' % current_site.name,
-            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % (
-                current_site.name,
-            ),
-            'editor@%s' % current_site.domain,
+            "Thanks for subscribing to %s alerts" % current_site.name,
+            "Thanks for your subscription. We appreciate it.\n\n-The %s team."
+            % (current_site.name,),
+            "editor@%s" % current_site.domain,
             [user.email],
         )
 
@@ -213,18 +230,21 @@ subscribing to LJWorld.com alerts." Same goes for the email's message body.
 Note that an even more flexible (but more heavyweight) way of doing this would
 be to use Django's template system. Assuming Lawrence.com and LJWorld.com have
 different template directories (:setting:`DIRS <TEMPLATES-DIRS>`), you could
-farm out to the template system like so::
+farm out to the template system like so:
+
+.. code-block:: python
 
     from django.core.mail import send_mail
     from django.template import loader
+
 
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render({})
-        message = loader.get_template('alerts/message.txt').render({})
-        send_mail(subject, message, 'editor@ljworld.com', [user.email])
+        subject = loader.get_template("alerts/subject.txt").render({})
+        message = loader.get_template("alerts/message.txt").render({})
+        send_mail(subject, message, "editor@ljworld.com", [user.email])
 
         # ...
 
@@ -290,7 +310,9 @@ little cleverer than that: on the first request, the current site is cached, and
 any subsequent call returns the cached data instead of hitting the database.
 
 If for any reason you want to force a database query, you can tell Django to
-clear the cache using ``Site.objects.clear_cache()``::
+clear the cache using ``Site.objects.clear_cache()``:
+
+.. code-block:: python
 
     # First call; current site fetched from database.
     current_site = Site.objects.get_current()
@@ -322,14 +344,17 @@ with the current :class:`~django.contrib.sites.models.Site`.
     setting is defined in your settings.
 
 Use :class:`~django.contrib.sites.managers.CurrentSiteManager` by adding it to
-your model explicitly. For example::
+your model explicitly. For example:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
     from django.contrib.sites.managers import CurrentSiteManager
     from django.db import models
 
+
     class Photo(models.Model):
-        photo = models.FileField(upload_to='photos')
+        photo = models.FileField(upload_to="photos")
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         site = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -359,19 +384,22 @@ related to, then you need to explicitly pass the custom field name as
 a parameter to
 :class:`~django.contrib.sites.managers.CurrentSiteManager` on your
 model. The following model, which has a field called ``publish_on``,
-demonstrates this::
+demonstrates this:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
     from django.contrib.sites.managers import CurrentSiteManager
     from django.db import models
 
+
     class Photo(models.Model):
-        photo = models.FileField(upload_to='photos')
+        photo = models.FileField(upload_to="photos")
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         publish_on = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
-        on_site = CurrentSiteManager('publish_on')
+        on_site = CurrentSiteManager("publish_on")
 
 If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
 and pass a field name that doesn't exist, Django will raise a ``ValueError``.
@@ -393,9 +421,12 @@ define :class:`~django.contrib.sites.managers.CurrentSiteManager`.
 Site middleware
 ===============
 
-If you often use this pattern::
+If you often use this pattern:
+
+.. code-block:: python
 
     from django.contrib.sites.models import Site
+
 
     def my_view(request):
         site = Site.objects.get_current()

@@ -77,12 +77,15 @@ regardless of ``AUTHENTICATION_BACKENDS``.
 
 If your authentication mechanism uses a custom HTTP header and not
 ``REMOTE_USER``, you can subclass ``RemoteUserMiddleware`` and set the
-``header`` attribute to the desired ``request.META`` key.  For example::
+``header`` attribute to the desired ``request.META`` key.  For example:
+
+.. code-block:: python
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
+
     class CustomHeaderMiddleware(RemoteUserMiddleware):
-        header = 'HTTP_AUTHUSER'
+        header = "HTTP_AUTHUSER"
 
 .. warning::
 

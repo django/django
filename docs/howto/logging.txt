@@ -28,7 +28,9 @@ First, import the Python logging library, and then obtain a logger instance
 with :py:func:`logging.getLogger`. Provide the ``getLogger()`` method with a
 name to identify it and the records it emits. A good option is to use
 ``__name__`` (see :ref:`naming-loggers` below for more on this) which will
-provide the name of the current Python module as a dotted path::
+provide the name of the current Python module as a dotted path:
+
+.. code-block:: python
 
     import logging
 
@@ -36,12 +38,14 @@ provide the name of the current Python module as a dotted path::
 
 It's a good convention to perform this declaration at module level.
 
-And then in a function, for example in a view, send a record to the logger::
+And then in a function, for example in a view, send a record to the logger:
+
+.. code-block:: python
 
     def some_view(request):
         ...
         if some_risky_state:
-            logger.warning('Platform is running at risk')
+            logger.warning("Platform is running at risk")
 
 When this code is executed, a :py:class:`~logging.LogRecord` containing that
 message will be sent to the logger. If you're using Django's default logging
@@ -49,9 +53,11 @@ configuration, the message will appear in the console.
 
 The ``WARNING`` level used in the example above is one of several
 :ref:`logging severity levels <topic-logging-parts-loggers>`: ``DEBUG``,
-``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. So, another example might be::
+``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. So, another example might be:
 
-    logger.critical('Payment system is not responding')
+.. code-block:: python
+
+    logger.critical("Payment system is not responding")
 
 .. important::
 
@@ -176,9 +182,11 @@ It will forward messages of levels ``DEBUG`` and higher to the handler named
 Note that a logger can forward messages to multiple handlers, so the relation
 between loggers and handlers is many-to-many.
 
-If you execute::
+If you execute:
 
-    logger.debug('Attempting to connect to API')
+.. code-block:: python
+
+    logger.debug("Attempting to connect to API")
 
 in your code, you will find that message in the file ``general.log`` in the
 root of the project.
@@ -276,9 +284,11 @@ from loggers anywhere within the ``my_app`` namespace (including
         },
     }
 
-You can also define logger namespacing explicitly::
+You can also define logger namespacing explicitly:
 
-    logger = logging.getLogger('project.payment')
+.. code-block:: python
+
+    logger = logging.getLogger("project.payment")
 
 and set up logger mappings accordingly.
 
@@ -330,9 +340,11 @@ environment.
 
 For example, you could set an environment variable ``DJANGO_LOG_LEVEL``
 appropriately in your development and staging environments, and make use of it
-in a logger mapping thus::
+in a logger mapping thus:
 
-    'level': os.getenv('DJANGO_LOG_LEVEL', 'WARNING')
+.. code-block:: python
+
+    "level": os.getenv("DJANGO_LOG_LEVEL", "WARNING")
 
 \- so that unless the environment specifies a lower log level, this
 configuration will only forward records of severity ``WARNING`` and above to

@@ -294,23 +294,29 @@ backends.
 Admin actions are no longer collected from base ``ModelAdmin`` classes
 ----------------------------------------------------------------------
 
-For example, in older versions of Django::
+For example, in older versions of Django:
+
+.. code-block:: python
 
     from django.contrib import admin
 
+
     class BaseAdmin(admin.ModelAdmin):
-        actions = ['a']
+        actions = ["a"]
+
 
     class SubAdmin(BaseAdmin):
-        actions = ['b']
+        actions = ["b"]
 
 ``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
 Now ``actions`` follows standard Python inheritance. To get the same result as
-before::
+before:
+
+.. code-block:: python
 
     class SubAdmin(BaseAdmin):
-        actions = BaseAdmin.actions + ['b']
+        actions = BaseAdmin.actions + ["b"]
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -338,12 +344,14 @@ automatically installed along with Django.
 ``cached_property`` aliases
 ---------------------------
 
-In usage like::
+In usage like:
+
+.. code-block:: python
 
     from django.utils.functional import cached_property
 
-    class A:
 
+    class A:
         @cached_property
         def base(self):
             return ...
@@ -354,15 +362,18 @@ In usage like::
 later), such usage now raises ``TypeError: Cannot assign the same
 cached_property to two different names ('base' and 'alias').``
 
-Use this instead::
+Use this instead:
+
+.. code-block:: python
 
     import operator
+
 
     class A:
 
         ...
 
-        alias = property(operator.attrgetter('base'))
+        alias = property(operator.attrgetter("base"))
 
 Permissions for proxy models
 ----------------------------

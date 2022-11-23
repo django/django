@@ -80,15 +80,18 @@ application :doc:`that is created by django-admin startproject
 
 Finally, edit your WSGI script ``mysite.wsgi`` to tie Apache's authentication
 to your site's authentication mechanisms by importing the ``check_password``
-function::
+function:
+
+.. code-block:: python
 
     import os
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
     from django.contrib.auth.handlers.modwsgi import check_password
 
     from django.core.handlers.wsgi import WSGIHandler
+
     application = WSGIHandler()
 
 

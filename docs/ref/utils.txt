@@ -461,12 +461,14 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     Here, ``friends()`` will be called twice. Since the instance ``person`` in
     the view and the template are the same, decorating the ``friends()`` method
-    with ``@cached_property`` can avoid that::
+    with ``@cached_property`` can avoid that:
+
+    .. code-block:: python
 
         from django.utils.functional import cached_property
 
-        class Person(models.Model):
 
+        class Person(models.Model):
             @cached_property
             def friends(self):
                 ...
@@ -541,7 +543,9 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     translation as one of its arguments, the function evaluation is delayed
     until it needs to be converted to a string.
 
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
@@ -571,7 +575,9 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
     If you have a function that returns text and you want to be able to take
     lazy arguments while delaying their evaluation, you can use this
-    decorator::
+    decorator:
+
+    .. code-block:: pycon
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
@@ -762,12 +768,17 @@ Functions for working with Python modules.
 
     Imports a dotted module path and returns the attribute/class designated by
     the last name in the path. Raises ``ImportError`` if the import failed. For
-    example::
+    example:
+
+    .. code-block:: python
 
         from django.utils.module_loading import import_string
-        ValidationError = import_string('django.core.exceptions.ValidationError')
 
-    is equivalent to::
+        ValidationError = import_string("django.core.exceptions.ValidationError")
+
+    is equivalent to:
+
+    .. code-block:: python
 
         from django.core.exceptions import ValidationError
 
@@ -800,9 +811,11 @@ appropriate entities.
     For building up fragments of HTML, you should normally be using
     :func:`django.utils.html.format_html` instead.
 
-    String marked safe will become unsafe again if modified. For example::
+    String marked safe will become unsafe again if modified. For example:
 
-        >>> mystr = '<b>Hello World</b>   '
+    .. code-block:: pycon
+
+        >>> mystr = "<b>Hello World</b>   "
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
         <class 'django.utils.safestring.SafeString'>
@@ -821,14 +834,18 @@ appropriate entities.
 
     A version of :meth:`str.format` for when ``format_string``, ``args``,
     and/or ``kwargs`` contain lazy objects. The first argument is the string to
-    be formatted. For example::
+    be formatted. For example:
+
+    .. code-block:: python
 
         from django.utils.text import format_lazy
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
-                 PersonDetailView.as_view()),
+            path(
+                format_lazy("{person}/<int:pk>/", person=pgettext_lazy("URL", "person")),
+                PersonDetailView.as_view(),
+            ),
         ]
 
     This example allows translators to translate part of the URL. If "person"
@@ -846,15 +863,19 @@ appropriate entities.
     #. Replacing any whitespace or repeated dashes with single dashes.
     #. Removing leading and trailing whitespace, dashes, and underscores.
 
-    For example::
+    For example:
 
-        >>> slugify(' Joel is a slug ')
+    .. code-block:: pycon
+
+        >>> slugify(" Joel is a slug ")
         'joel-is-a-slug'
 
     If you want to allow Unicode characters, pass ``allow_unicode=True``. For
-    example::
+    example:
 
-        >>> slugify('你好 World', allow_unicode=True)
+    .. code-block:: pycon
+
+        >>> slugify("你好 World", allow_unicode=True)
         '你好-world'
 
 .. _time-zone-selection-functions:

@@ -35,14 +35,14 @@ The :ref:`fields <subset-of-fields>` option can be used to limit fields that
 will be present in the ``properties`` key, as it works with all other
 serializers.
 
-Example::
+Example:
+
+.. code-block:: python
 
     from django.core.serializers import serialize
     from my_app.models import City
 
-    serialize('geojson', City.objects.all(),
-              geometry_field='point',
-              fields=['name'])
+    serialize("geojson", City.objects.all(), geometry_field="point", fields=["name"])
 
 Would output::
 

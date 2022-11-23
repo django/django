@@ -55,18 +55,22 @@ system along with all the fields, properties, and methods available on it.
 Relationships to other models appear as hyperlinks. Descriptions are pulled
 from ``help_text`` attributes on fields or from docstrings on model methods.
 
-A model with useful documentation might look like this::
+A model with useful documentation might look like this:
+
+.. code-block:: python
 
     class BlogEntry(models.Model):
         """
         Stores a single blog entry, related to :model:`blog.Blog` and
         :model:`auth.User`.
         """
+
         slug = models.SlugField(help_text="A short label, generally used in URLs.")
         author = models.ForeignKey(
             User,
             models.SET_NULL,
-            blank=True, null=True,
+            blank=True,
+            null=True,
         )
         blog = models.ForeignKey(Blog, models.CASCADE)
         ...
@@ -86,11 +90,14 @@ you can document in your view function docstrings include:
 * The **context**, or a list of variables available in the view's template.
 * The name of the template or templates that are used for that view.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.shortcuts import render
 
     from myapp.models import MyModel
+
 
     def my_view(request, slug):
         """
@@ -105,8 +112,8 @@ For example::
 
         :template:`myapp/my_template.html`
         """
-        context = {'mymodel': MyModel.objects.get(slug=slug)}
-        return render(request, 'myapp/my_template.html', context)
+        context = {"mymodel": MyModel.objects.get(slug=slug)}
+        return render(request, "myapp/my_template.html", context)
 
 Template tags and filters reference
 ===================================

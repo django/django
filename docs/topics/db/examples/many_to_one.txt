@@ -5,9 +5,12 @@ Many-to-one relationships
 To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
 
 In this example, a ``Reporter`` can be associated with many ``Article``
-objects, but an ``Article`` can only have one ``Reporter`` object::
+objects, but an ``Article`` can only have one ``Reporter`` object:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Reporter(models.Model):
         first_name = models.CharField(max_length=30)
@@ -16,6 +19,7 @@ objects, but an ``Article`` can only have one ``Reporter`` object::
 
         def __str__(self):
             return f"{self.first_name} {self.last_name}"
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
@@ -26,7 +30,7 @@ objects, but an ``Article`` can only have one ``Reporter`` object::
             return self.headline
 
         class Meta:
-            ordering = ['headline']
+            ordering = ["headline"]
 
 What follows are examples of operations that can be performed using the Python
 API facilities.

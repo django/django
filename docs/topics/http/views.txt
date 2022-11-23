@@ -15,10 +15,13 @@ application directory.
 A simple view
 =============
 
-Here's a view that returns the current date and time, as an HTML document::
+Here's a view that returns the current date and time, as an HTML document:
+
+.. code-block:: python
 
     from django.http import HttpResponse
     import datetime
+
 
     def current_datetime(request):
         now = datetime.datetime.now()
@@ -66,24 +69,30 @@ other than 200 (which means *"OK"*). You can find the full list of available
 subclasses in the :ref:`request/response <ref-httpresponse-subclasses>`
 documentation. Return an instance of one of those subclasses instead of a
 normal :class:`~django.http.HttpResponse` in order to signify an error. For
-example::
+example:
+
+.. code-block:: python
 
     from django.http import HttpResponse, HttpResponseNotFound
+
 
     def my_view(request):
         # ...
         if foo:
-            return HttpResponseNotFound('<h1>Page not found</h1>')
+            return HttpResponseNotFound("<h1>Page not found</h1>")
         else:
-            return HttpResponse('<h1>Page was found</h1>')
+            return HttpResponse("<h1>Page was found</h1>")
 
 There isn't a specialized subclass for every possible HTTP response code,
 since many of them aren't going to be that common. However, as documented in
 the :class:`~django.http.HttpResponse` documentation, you can also pass the
 HTTP status code into the constructor for :class:`~django.http.HttpResponse`
-to create a return class for any status code you like. For example::
+to create a return class for any status code you like. For example:
+
+.. code-block:: python
 
     from django.http import HttpResponse
+
 
     def my_view(request):
         # ...
@@ -100,27 +109,32 @@ The ``Http404`` exception
 .. class:: django.http.Http404()
 
 When you return an error such as :class:`~django.http.HttpResponseNotFound`,
-you're responsible for defining the HTML of the resulting error page::
+you're responsible for defining the HTML of the resulting error page:
 
-    return HttpResponseNotFound('<h1>Page not found</h1>')
+.. code-block:: python
+
+    return HttpResponseNotFound("<h1>Page not found</h1>")
 
 For convenience, and because it's a good idea to have a consistent 404 error page
 across your site, Django provides an ``Http404`` exception. If you raise
 ``Http404`` at any point in a view function, Django will catch it and return the
 standard error page for your application, along with an HTTP error code 404.
 
-Example usage::
+Example usage:
+
+.. code-block:: python
 
     from django.http import Http404
     from django.shortcuts import render
     from polls.models import Poll
+
 
     def detail(request, poll_id):
         try:
             p = Poll.objects.get(pk=poll_id)
         except Poll.DoesNotExist:
             raise Http404("Poll does not exist")
-        return render(request, 'polls/detail.html', {'poll': p})
+        return render(request, "polls/detail.html", {"poll": p})
 
 In order to show customized HTML when Django returns a 404, you can create an
 HTML template named ``404.html`` and place it in the top level of your
@@ -171,7 +185,9 @@ Testing custom error views
 --------------------------
 
 To test the response of a custom error handler, raise the appropriate exception
-in a test view. For example::
+in a test view. For example:
+
+.. code-block:: python
 
     from django.core.exceptions import PermissionDenied
     from django.http import HttpResponse
@@ -180,7 +196,7 @@ in a test view. For example::
 
 
     def response_error_handler(request, exception=None):
-        return HttpResponse('Error handler content', status=403)
+        return HttpResponse("Error handler content", status=403)
 
 
     def permission_denied_view(request):
@@ -188,7 +204,7 @@ in a test view. For example::
 
 
     urlpatterns = [
-        path('403/', permission_denied_view),
+        path("403/", permission_denied_view),
     ]
 
     handler403 = response_error_handler
@@ -197,11 +213,10 @@ in a test view. For example::
     # ROOT_URLCONF must specify the module that contains handler403 = ...
     @override_settings(ROOT_URLCONF=__name__)
     class CustomErrorHandlerTests(SimpleTestCase):
-
         def test_handler_renders_template_response(self):
-            response = self.client.get('/403/')
+            response = self.client.get("/403/")
             # Make assertions on the response here. For example:
-            self.assertContains(response, 'Error handler content', status_code=403)
+            self.assertContains(response, "Error handler content", status_code=403)
 
 .. _async-views:
 
@@ -214,14 +229,17 @@ Django will automatically detect these and run them in an async context.
 However, you will need to use an async server based on ASGI to get their
 performance benefits.
 
-Here's an example of an async view::
+Here's an example of an async view:
+
+.. code-block:: python
 
     import datetime
     from django.http import HttpResponse
 
+
     async def current_datetime(request):
         now = datetime.datetime.now()
-        html = '<html><body>It is now %s.</body></html>' % now
+        html = "<html><body>It is now %s.</body></html>" % now
         return HttpResponse(html)
 
 You can read more about Django's async support, and how to best use async

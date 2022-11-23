@@ -169,27 +169,29 @@ URLconf improvements
 
 You can now use any callable as the callback in URLconfs (previously, only
 strings that referred to callables were allowed). This allows a much more
-natural use of URLconfs. For example, this URLconf::
+natural use of URLconfs. For example, this URLconf:
+
+.. code-block:: python
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('',
-        ('^myview/$', 'mysite.myapp.views.myview')
-    )
+    urlpatterns = patterns("", ("^myview/$", "mysite.myapp.views.myview"))
 
-can now be rewritten as::
+can now be rewritten as:
+
+.. code-block:: python
 
     from django.conf.urls.defaults import *
     from mysite.myapp.views import myview
 
-    urlpatterns = patterns('',
-        ('^myview/$', myview)
-    )
+    urlpatterns = patterns("", ("^myview/$", myview))
 
 One useful application of this can be seen when using decorators; this
 change allows you to apply decorators to views *in your
 URLconf*. Thus, you can make a generic view require login very
-easily::
+easily:
+
+.. code-block:: python
 
     from django.conf.urls.defaults import *
     from django.contrib.auth.decorators import login_required
@@ -197,12 +199,10 @@ easily::
     from mysite.myapp.models import MyModel
 
     info = {
-        "queryset" : MyModel.objects.all(),
+        "queryset": MyModel.objects.all(),
     }
 
-    urlpatterns = patterns('',
-        ('^myview/$', login_required(object_list), info)
-    )
+    urlpatterns = patterns("", ("^myview/$", login_required(object_list), info))
 
 Note that both syntaxes (strings and callables) are valid, and will continue to
 be valid for the foreseeable future.

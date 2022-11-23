@@ -306,21 +306,24 @@ databases::
 Now we'll need to handle routing. First we want a router that knows to
 send queries for the ``auth`` and ``contenttypes`` apps to ``auth_db``
 (``auth`` models are linked to ``ContentType``, so they must be stored in the
-same database)::
+same database):
+
+.. code-block:: python
 
     class AuthRouter:
         """
         A router to control all database operations on models in the
         auth and contenttypes applications.
         """
-        route_app_labels = {'auth', 'contenttypes'}
+
+        route_app_labels = {"auth", "contenttypes"}
 
         def db_for_read(self, model, **hints):
             """
             Attempts to read auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'auth_db'
+                return "auth_db"
             return None
 
         def db_for_write(self, model, **hints):
@@ -328,7 +331,7 @@ same database)::
             Attempts to write auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'auth_db'
+                return "auth_db"
             return None
 
         def allow_relation(self, obj1, obj2, **hints):
@@ -337,10 +340,10 @@ same database)::
             involved.
             """
             if (
-                obj1._meta.app_label in self.route_app_labels or
-                obj2._meta.app_label in self.route_app_labels
+                obj1._meta.app_label in self.route_app_labels
+                or obj2._meta.app_label in self.route_app_labels
             ):
-               return True
+                return True
             return None
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
@@ -349,34 +352,37 @@ same database)::
             'auth_db' database.
             """
             if app_label in self.route_app_labels:
-                return db == 'auth_db'
+                return db == "auth_db"
             return None
 
 And we also want a router that sends all other apps to the
 primary/replica configuration, and randomly chooses a replica to read
-from::
+from:
+
+.. code-block:: python
 
     import random
+
 
     class PrimaryReplicaRouter:
         def db_for_read(self, model, **hints):
             """
             Reads go to a randomly-chosen replica.
             """
-            return random.choice(['replica1', 'replica2'])
+            return random.choice(["replica1", "replica2"])
 
         def db_for_write(self, model, **hints):
             """
             Writes always go to primary.
             """
-            return 'primary'
+            return "primary"
 
         def allow_relation(self, obj1, obj2, **hints):
             """
             Relations between objects are allowed if both objects are
             in the primary/replica pool.
             """
-            db_set = {'primary', 'replica1', 'replica2'}
+            db_set = {"primary", "replica1", "replica2"}
             if obj1._state.db in db_set and obj2._state.db in db_set:
                 return True
             return None
@@ -574,12 +580,12 @@ a non-default database.
 For example, say you have a custom manager method that touches the
 database -- ``User.objects.create_user()``. Because ``create_user()``
 is a manager method, not a ``QuerySet`` method, you can't do
-``User.objects.using('new_users').create_user()``. (The
+``User.objects.using("new_users").create_user()``. (The
 ``create_user()`` method is only available on ``User.objects``, the
 manager, not on ``QuerySet`` objects derived from the manager.) The
 solution is to use ``db_manager()``, like this::
 
-    User.objects.db_manager('new_users').create_user(...)
+    User.objects.db_manager("new_users").create_user(...)
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
@@ -592,7 +598,9 @@ appropriate handling of the ``_db`` attribute on the manager (a string
 containing the name of the database to use).
 
 For example, if you want to return a custom ``QuerySet`` class from
-the ``get_queryset`` method, you could do this::
+the ``get_queryset`` method, you could do this:
+
+.. code-block:: python
 
     class MyManager(models.Manager):
         def get_queryset(self):
@@ -611,11 +619,13 @@ need to write custom :class:`~django.contrib.admin.ModelAdmin` classes
 that will direct the admin to use a specific database for content.
 
 ``ModelAdmin`` objects have the following methods that require customization
-for multiple-database support::
+for multiple-database support:
+
+.. code-block:: python
 
     class MultiDBModelAdmin(admin.ModelAdmin):
         # A handy constant for the name of the alternate database.
-        using = 'other'
+        using = "other"
 
         def save_model(self, request, obj, form, change):
             # Tell Django to save objects to the 'other' database.
@@ -632,12 +642,16 @@ for multiple-database support::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(
+                db_field, request, using=self.using, **kwargs
+            )
 
         def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(
+                db_field, request, using=self.using, **kwargs
+            )
 
 The implementation provided here implements a multi-database strategy
 where all objects of a given type are stored on a specific database
@@ -646,10 +660,12 @@ usage of multiple databases is more complex, your ``ModelAdmin`` will
 need to reflect that strategy.
 
 :class:`~django.contrib.admin.InlineModelAdmin` objects can be handled in a
-similar fashion. They require three customized methods::
+similar fashion. They require three customized methods:
+
+.. code-block:: python
 
     class MultiDBTabularInline(admin.TabularInline):
-        using = 'other'
+        using = "other"
 
         def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
@@ -658,15 +674,21 @@ similar fashion. They require three customized methods::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(
+                db_field, request, using=self.using, **kwargs
+            )
 
         def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(
+                db_field, request, using=self.using, **kwargs
+            )
 
 Once you've written your model admin definitions, they can be
-registered with any ``Admin`` instance::
+registered with any ``Admin`` instance:
+
+.. code-block:: python
 
     from django.contrib import admin
 
@@ -674,13 +696,15 @@ registered with any ``Admin`` instance::
     class BookInline(MultiDBTabularInline):
         model = Book
 
+
     class PublisherAdmin(MultiDBModelAdmin):
         inlines = [BookInline]
+
 
     admin.site.register(Author, MultiDBModelAdmin)
     admin.site.register(Publisher, PublisherAdmin)
 
-    othersite = admin.AdminSite('othersite')
+    othersite = admin.AdminSite("othersite")
     othersite.register(Publisher, MultiDBModelAdmin)
 
 This example sets up two admin sites. On the first site, the
@@ -696,10 +720,13 @@ If you are using more than one database you can use
 ``django.db.connections`` to obtain the connection (and cursor) for a
 specific database. ``django.db.connections`` is a dictionary-like
 object that allows you to retrieve a specific connection using its
-alias::
+alias:
+
+.. code-block:: python
 
     from django.db import connections
-    with connections['my_db_alias'].cursor() as cursor:
+
+    with connections["my_db_alias"].cursor() as cursor:
         ...
 
 Limitations of multiple databases

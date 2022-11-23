@@ -70,10 +70,12 @@ described in :ref:`binding-uploaded-files`. This would look something like:
 Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
 into the form's constructor; this is how file data gets bound into a form.
 
-Here's a common way you might handle an uploaded file::
+Here's a common way you might handle an uploaded file:
+
+.. code-block:: python
 
     def handle_uploaded_file(f):
-        with open('some/file/name.txt', 'wb+') as destination:
+        with open("some/file/name.txt", "wb+") as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
 
@@ -91,53 +93,62 @@ If you're saving a file on a :class:`~django.db.models.Model` with a
 makes this process much easier. The file object will be saved to the location
 specified by the :attr:`~django.db.models.FileField.upload_to` argument of the
 corresponding :class:`~django.db.models.FileField` when calling
-``form.save()``::
+``form.save()``:
+
+.. code-block:: python
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
     from .forms import ModelFormWithFileField
 
+
     def upload_file(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = ModelFormWithFileField(request.POST, request.FILES)
             if form.is_valid():
                 # file is saved
                 form.save()
-                return HttpResponseRedirect('/success/url/')
+                return HttpResponseRedirect("/success/url/")
         else:
             form = ModelFormWithFileField()
-        return render(request, 'upload.html', {'form': form})
+        return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually, you can assign the file object from
 :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
-model::
+model:
+
+.. code-block:: python
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
     from .forms import UploadFileForm
     from .models import ModelWithFileField
 
+
     def upload_file(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = UploadFileForm(request.POST, request.FILES)
             if form.is_valid():
-                instance = ModelWithFileField(file_field=request.FILES['file'])
+                instance = ModelWithFileField(file_field=request.FILES["file"])
                 instance.save()
-                return HttpResponseRedirect('/success/url/')
+                return HttpResponseRedirect("/success/url/")
         else:
             form = UploadFileForm()
-        return render(request, 'upload.html', {'form': form})
+        return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually outside of a request, you can assign
 a :class:`~django.core.files.File` like object to the
-:class:`~django.db.models.FileField`::
+:class:`~django.db.models.FileField`:
+
+.. code-block:: python
 
     from django.core.management.base import BaseCommand
     from django.core.files.base import ContentFile
 
+
     class MyCommand(BaseCommand):
         def handle(self, *args, **options):
-            content_file = ContentFile(b'Hello world!', name='hello-world.txt')
+            content_file = ContentFile(b"Hello world!", name="hello-world.txt")
             instance = ModelWithFileField(file_field=content_file)
             instance.save()
 
@@ -278,36 +289,42 @@ list::
     :func:`~django.views.decorators.csrf.csrf_protect` on the function that
     actually processes the request.  Note that this means that the handlers may
     start receiving the file upload before the CSRF checks have been done.
-    Example code::
+    Example code:
+
+    .. code-block:: python
 
         from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
 
         @csrf_exempt
         def upload_file_view(request):
             request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
             return _upload_file_view(request)
 
+
         @csrf_protect
         def _upload_file_view(request):
-            ... # Process request
+            ...  # Process request
 
     If you are using a class-based view, you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on its
     :meth:`~django.views.generic.base.View.dispatch` method and
     :func:`~django.views.decorators.csrf.csrf_protect` on the method that
-    actually processes the request. Example code::
+    actually processes the request. Example code:
+
+    .. code-block:: python
 
         from django.utils.decorators import method_decorator
         from django.views import View
         from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
-        @method_decorator(csrf_exempt, name='dispatch')
-        class UploadFileView(View):
 
+        @method_decorator(csrf_exempt, name="dispatch")
+        class UploadFileView(View):
             def setup(self, request, *args, **kwargs):
                 request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
                 super().setup(request, *args, **kwargs)
 
             @method_decorator(csrf_protect)
             def post(self, request, *args, **kwargs):
-                ... # Process request
+                ...  # Process request

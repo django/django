@@ -127,14 +127,18 @@ Measurement API
     To initialize a distance object, pass in a keyword corresponding to the
     desired :ref:`unit attribute name <supported_units>` set with desired
     value. For example, the following creates a distance object representing 5
-    miles::
+    miles:
+
+    .. code-block:: pycon
 
         >>> dist = Distance(mi=5)
 
     .. method:: __getattr__(unit_att)
 
     Returns the distance value in units corresponding to the given unit
-    attribute. For example::
+    attribute. For example:
+
+    .. code-block:: pycon
 
         >>> print(dist.km)
         8.04672
@@ -142,9 +146,11 @@ Measurement API
     .. classmethod:: unit_attname(unit_name)
 
     Returns the distance unit attribute name for the given full unit name. For
-    example::
+    example:
 
-        >>> Distance.unit_attname('Mile')
+    .. code-block:: pycon
+
+        >>> Distance.unit_attname("Mile")
         'mi'
 
 .. class:: D
@@ -159,14 +165,18 @@ Measurement API
     To initialize an area object, pass in a keyword corresponding to the
     desired :ref:`unit attribute name <supported_units>` set with desired
     value. For example, the following creates an area object representing 5
-    square miles::
+    square miles:
+
+    .. code-block:: pycon
 
         >>> a = Area(sq_mi=5)
 
     .. method:: __getattr__(unit_att)
 
     Returns the area value in units corresponding to the given unit attribute.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> print(a.sq_km)
         12.949940551680001
@@ -174,9 +184,11 @@ Measurement API
     .. classmethod:: unit_attname(unit_name)
 
     Returns the area unit attribute name for the given full unit name. For
-    example::
+    example:
 
-        >>> Area.unit_attname('Kilometer')
+    .. code-block:: pycon
+
+        >>> Area.unit_attname("Kilometer")
         'sq_km'
 
 .. class:: A

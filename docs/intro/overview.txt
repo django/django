@@ -68,7 +68,9 @@ Enjoy the free API
 
 With that, you've got a free, and rich, :doc:`Python API </topics/db/queries>`
 to access your data. The API is created on the fly, no code generation
-necessary::
+necessary:
+
+.. code-block:: pycon
 
     # Import the models we created from our "news" app
     >>> from news.models import Article, Reporter
@@ -78,7 +80,7 @@ necessary::
     <QuerySet []>
 
     # Create a new Reporter.
-    >>> r = Reporter(full_name='John Smith')
+    >>> r = Reporter(full_name="John Smith")
 
     # Save the object into the database. You have to call save() explicitly.
     >>> r.save()
@@ -98,9 +100,9 @@ necessary::
     # Django provides a rich database lookup API.
     >>> Reporter.objects.get(id=1)
     <Reporter: John Smith>
-    >>> Reporter.objects.get(full_name__startswith='John')
+    >>> Reporter.objects.get(full_name__startswith="John")
     <Reporter: John Smith>
-    >>> Reporter.objects.get(full_name__contains='mith')
+    >>> Reporter.objects.get(full_name__contains="mith")
     <Reporter: John Smith>
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
@@ -109,8 +111,9 @@ necessary::
 
     # Create an article.
     >>> from datetime import date
-    >>> a = Article(pub_date=date.today(), headline='Django is cool',
-    ...     content='Yeah.', reporter=r)
+    >>> a = Article(
+    ...     pub_date=date.today(), headline="Django is cool", content="Yeah.", reporter=r
+    ... )
     >>> a.save()
 
     # Now the article is in the database.
@@ -129,11 +132,11 @@ necessary::
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
-    >>> Article.objects.filter(reporter__full_name__startswith='John')
+    >>> Article.objects.filter(reporter__full_name__startswith="John")
     <QuerySet [<Article: Django is cool>]>
 
     # Change an object by altering its attributes and calling save().
-    >>> r.full_name = 'Billy Goat'
+    >>> r.full_name = "Billy Goat"
     >>> r.save()
 
     # Delete an object with delete().

@@ -93,7 +93,9 @@ Keep in mind that each of these values can be an expression.
     Since the ``then`` keyword argument is reserved for the result of the
     ``When()``, there is a potential conflict if a
     :class:`~django.db.models.Model` has a field named ``then``. This can be
-    resolved in two ways::
+    resolved in two ways:
+
+    .. code-block:: pycon
 
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)

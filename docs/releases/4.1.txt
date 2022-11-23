@@ -30,11 +30,14 @@ What's new in Django 4.1
 Asynchronous handlers for class-based views
 -------------------------------------------
 
-View subclasses may now define async HTTP method handlers::
+View subclasses may now define async HTTP method handlers:
+
+.. code-block:: python
 
     import asyncio
     from django.http import HttpResponse
     from django.views import View
+
 
     class AsyncView(View):
         async def get(self, request, *args, **kwargs):
@@ -651,7 +654,9 @@ Miscellaneous
   operation can be used to only update the migration state without running any
   SQL. Move the generated operations into the ``state_operations`` argument of
   :class:`~django.db.migrations.operations.SeparateDatabaseAndState`. For
-  example::
+  example:
+
+.. code-block:: python
 
     class Migration(migrations.Migration):
         ...
@@ -660,12 +665,8 @@ Miscellaneous
             migrations.SeparateDatabaseAndState(
                 database_operations=[],
                 state_operations=[
-                    migrations.RemoveConstraint(
-                        ...
-                    ),
-                    migrations.AddConstraint(
-                        ...
-                    ),
+                    migrations.RemoveConstraint(...),
+                    migrations.AddConstraint(...),
                 ],
             ),
         ]

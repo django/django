@@ -29,9 +29,12 @@ API Reference
     In addition to methods provided by the
     :class:`django.contrib.syndication.views.Feed` base class, GeoDjango's
     ``Feed`` class provides the following overrides. Note that these overrides
-    may be done in multiple ways::
+    may be done in multiple ways:
+
+    .. code-block:: python
 
         from django.contrib.gis.feeds import Feed
+
 
         class MyFeed(Feed):
 
@@ -57,22 +60,24 @@ API Reference
 
     Takes the object returned by ``get_object()`` and returns the *feed's*
     geometry. Typically this is a ``GEOSGeometry`` instance, or can be a tuple
-    to represent a point or a box. For example::
+    to represent a point or a box. For example:
+
+    .. code-block:: python
 
         class ZipcodeFeed(Feed):
-
             def geometry(self, obj):
                 # Can also return: `obj.poly`, and `obj.poly.centroid`.
-                return obj.poly.extent # tuple like: (X0, Y0, X1, Y1).
+                return obj.poly.extent  # tuple like: (X0, Y0, X1, Y1).
 
     .. method:: item_geometry(item)
 
     Set this to return the geometry for each *item* in the feed. This can be a
     ``GEOSGeometry`` instance, or a tuple that represents a point coordinate or
-    bounding box. For example::
+    bounding box. For example:
+
+    .. code-block:: python
 
         class ZipcodeFeed(Feed):
-
             def item_geometry(self, obj):
                 # Returns the polygon.
                 return obj.poly

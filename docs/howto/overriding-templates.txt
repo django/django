@@ -25,23 +25,25 @@ your project's templates directory.
 
 Let's say you're trying to override the templates for a third-party application
 called ``blog``, which provides the templates ``blog/post.html`` and
-``blog/list.html``. The relevant settings for your project would look like::
+``blog/list.html``. The relevant settings for your project would look like:
+
+.. code-block:: pycon
 
     from pathlib import Path
 
     BASE_DIR = Path(__file__).resolve().parent.parent
 
     INSTALLED_APPS = [
-        ...,
-        'blog',
-        ...,
+        ...
+        "blog",
+        ...
     ]
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
             ...
         },
     ]
@@ -73,7 +75,9 @@ apps, it's more common to use the first method and put template overrides in a
 project's templates folder. If you prefer, however, it's also possible to put
 the overrides in an app's template directory.
 
-First, make sure your template settings are checking inside app directories::
+First, make sure your template settings are checking inside app directories:
+
+.. code-block:: pycon
 
     TEMPLATES = [
         {

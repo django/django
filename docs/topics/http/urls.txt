@@ -68,17 +68,19 @@ algorithm the system follows to determine which Python code to execute:
 Example
 =======
 
-Here's a sample URLconf::
+Here's a sample URLconf:
+
+.. code-block:: python
 
     from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        path('articles/<int:year>/', views.year_archive),
-        path('articles/<int:year>/<int:month>/', views.month_archive),
-        path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail),
+        path("articles/2003/", views.special_case_2003),
+        path("articles/<int:year>/", views.year_archive),
+        path("articles/<int:year>/<int:month>/", views.month_archive),
+        path("articles/<int:year>/<int:month>/<slug:slug>/", views.article_detail),
     ]
 
 Notes:
@@ -157,30 +159,34 @@ A converter is a class that includes the following:
   and as a consequence :func:`~django.urls.reverse` will raise
   :class:`~django.urls.NoReverseMatch` unless another URL pattern matches.
 
-For example::
+For example:
+
+.. code-block:: python
 
     class FourDigitYearConverter:
-        regex = '[0-9]{4}'
+        regex = "[0-9]{4}"
 
         def to_python(self, value):
             return int(value)
 
         def to_url(self, value):
-            return '%04d' % value
+            return "%04d" % value
 
 Register custom converter classes in your URLconf using
-:func:`~django.urls.register_converter`::
+:func:`~django.urls.register_converter`:
+
+.. code-block:: python
 
     from django.urls import path, register_converter
 
     from . import converters, views
 
-    register_converter(converters.FourDigitYearConverter, 'yyyy')
+    register_converter(converters.FourDigitYearConverter, "yyyy")
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        path('articles/<yyyy:year>/', views.year_archive),
-        ...
+        path("articles/2003/", views.special_case_2003),
+        path("articles/<yyyy:year>/", views.year_archive),
+        ...,
     ]
 
 Using regular expressions
@@ -194,17 +200,22 @@ In Python regular expressions, the syntax for named regular expression groups
 is ``(?P<name>pattern)``, where ``name`` is the name of the group and
 ``pattern`` is some pattern to match.
 
-Here's the example URLconf from earlier, rewritten using regular expressions::
+Here's the example URLconf from earlier, rewritten using regular expressions:
+
+.. code-block:: python
 
     from django.urls import path, re_path
 
     from . import views
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
-        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
-        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$', views.article_detail),
+        path("articles/2003/", views.special_case_2003),
+        re_path(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
+        re_path(r"^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$", views.month_archive),
+        re_path(
+            r"^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$",
+            views.article_detail,
+        ),
     ]
 
 This accomplishes roughly the same thing as the previous example, except:
@@ -241,13 +252,15 @@ Nested arguments
 Regular expressions allow nested arguments, and Django will resolve them and
 pass them to the view. When reversing, Django will try to fill in all outer
 captured arguments, ignoring any nested captured arguments. Consider the
-following URL patterns which optionally take a page argument::
+following URL patterns which optionally take a page argument:
+
+.. code-block:: python
 
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'^blog/(page-([0-9]+)/)?$', blog_articles),                  # bad
-        re_path(r'^comments/(?:page-(?P<page_number>[0-9]+)/)?$', comments),  # good
+        re_path(r"^blog/(page-([0-9]+)/)?$", blog_articles),  # bad
+        re_path(r"^comments/(?:page-(?P<page_number>[0-9]+)/)?$", comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,
@@ -291,7 +304,9 @@ Specifying defaults for view arguments
 ======================================
 
 A convenient trick is to specify default parameters for your views' arguments.
-Here's an example URLconf and view::
+Here's an example URLconf and view:
+
+.. code-block:: python
 
     # URLconf
     from django.urls import path
@@ -299,8 +314,8 @@ Here's an example URLconf and view::
     from . import views
 
     urlpatterns = [
-        path('blog/', views.page),
-        path('blog/page<int:num>/', views.page),
+        path("blog/", views.page),
+        path("blog/page<int:num>/", views.page),
     ]
 
     # View (in blog/views.py)
@@ -362,14 +377,16 @@ At any point, your ``urlpatterns`` can "include" other URLconf modules. This
 essentially "roots" a set of URLs below other ones.
 
 For example, here's an excerpt of the URLconf for the `Django website`_
-itself. It includes a number of other URLconfs::
+itself. It includes a number of other URLconfs:
+
+.. code-block:: python
 
     from django.urls import include, path
 
     urlpatterns = [
         # ... snip ...
-        path('community/', include('aggregator.urls')),
-        path('contact/', include('contact.urls')),
+        path("community/", include("aggregator.urls")),
+        path("contact/", include("contact.urls")),
         # ... snip ...
     ]
 
@@ -378,7 +395,9 @@ whatever part of the URL matched up to that point and sends the remaining
 string to the included URLconf for further processing.
 
 Another possibility is to include additional URL patterns by using a list of
-:func:`~django.urls.path` instances. For example, consider this URLconf::
+:func:`~django.urls.path` instances. For example, consider this URLconf:
+
+.. code-block:: python
 
     from django.urls import include, path
 
@@ -386,46 +405,55 @@ Another possibility is to include additional URL patterns by using a list of
     from credit import views as credit_views
 
     extra_patterns = [
-        path('reports/', credit_views.report),
-        path('reports/<int:id>/', credit_views.report),
-        path('charge/', credit_views.charge),
+        path("reports/", credit_views.report),
+        path("reports/<int:id>/", credit_views.report),
+        path("charge/", credit_views.charge),
     ]
 
     urlpatterns = [
-        path('', main_views.homepage),
-        path('help/', include('apps.help.urls')),
-        path('credit/', include(extra_patterns)),
+        path("", main_views.homepage),
+        path("help/", include("apps.help.urls")),
+        path("credit/", include(extra_patterns)),
     ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
 ``credit_views.report()`` Django view.
 
 This can be used to remove redundancy from URLconfs where a single pattern
-prefix is used repeatedly. For example, consider this URLconf::
+prefix is used repeatedly. For example, consider this URLconf:
+
+.. code-block:: python
 
     from django.urls import path
     from . import views
 
     urlpatterns = [
-        path('<page_slug>-<page_id>/history/', views.history),
-        path('<page_slug>-<page_id>/edit/', views.edit),
-        path('<page_slug>-<page_id>/discuss/', views.discuss),
-        path('<page_slug>-<page_id>/permissions/', views.permissions),
+        path("<page_slug>-<page_id>/history/", views.history),
+        path("<page_slug>-<page_id>/edit/", views.edit),
+        path("<page_slug>-<page_id>/discuss/", views.discuss),
+        path("<page_slug>-<page_id>/permissions/", views.permissions),
     ]
 
 We can improve this by stating the common path prefix only once and grouping
-the suffixes that differ::
+the suffixes that differ:
+
+.. code-block:: python
 
     from django.urls import include, path
     from . import views
 
     urlpatterns = [
-        path('<page_slug>-<page_id>/', include([
-            path('history/', views.history),
-            path('edit/', views.edit),
-            path('discuss/', views.discuss),
-            path('permissions/', views.permissions),
-        ])),
+        path(
+            "<page_slug>-<page_id>/",
+            include(
+                [
+                    path("history/", views.history),
+                    path("edit/", views.edit),
+                    path("discuss/", views.discuss),
+                    path("permissions/", views.permissions),
+                ]
+            ),
+        ),
     ]
 
 .. _`Django website`: https://www.djangoproject.com/
@@ -434,13 +462,15 @@ Captured parameters
 -------------------
 
 An included URLconf receives any captured parameters from parent URLconfs, so
-the following example is valid::
+the following example is valid:
+
+.. code-block:: python
 
     # In settings/urls/main.py
     from django.urls import include, path
 
     urlpatterns = [
-        path('<username>/blog/', include('foo.urls.blog')),
+        path("<username>/blog/", include("foo.urls.blog")),
     ]
 
     # In foo/urls/blog.py
@@ -448,8 +478,8 @@ the following example is valid::
     from . import views
 
     urlpatterns = [
-        path('', views.blog.index),
-        path('archive/', views.blog.archive),
+        path("", views.blog.index),
+        path("archive/", views.blog.archive),
     ]
 
 In the above example, the captured ``"username"`` variable is passed to the
@@ -467,17 +497,19 @@ The :func:`~django.urls.path` function can take an optional third argument
 which should be a dictionary of extra keyword arguments to pass to the view
 function.
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.urls import path
     from . import views
 
     urlpatterns = [
-        path('blog/<int:year>/', views.year_archive, {'foo': 'bar'}),
+        path("blog/<int:year>/", views.year_archive, {"foo": "bar"}),
     ]
 
 In this example, for a request to ``/blog/2005/``, Django will call
-``views.year_archive(request, year=2005, foo='bar')``.
+``views.year_archive(request, year=2005, foo="bar")``.
 
 This technique is used in the
 :doc:`syndication framework </ref/contrib/syndication>` to pass metadata and
@@ -498,13 +530,15 @@ each line in the included URLconf will be passed the extra options.
 
 For example, these two URLconf sets are functionally identical:
 
-Set one::
+Set one:
+
+.. code-block:: python
 
     # main.py
     from django.urls import include, path
 
     urlpatterns = [
-        path('blog/', include('inner'), {'blog_id': 3}),
+        path("blog/", include("inner"), {"blog_id": 3}),
     ]
 
     # inner.py
@@ -512,26 +546,28 @@ Set one::
     from mysite import views
 
     urlpatterns = [
-        path('archive/', views.archive),
-        path('about/', views.about),
+        path("archive/", views.archive),
+        path("about/", views.about),
     ]
 
-Set two::
+Set two:
+
+.. code-block:: python
 
     # main.py
     from django.urls import include, path
     from mysite import views
 
     urlpatterns = [
-        path('blog/', include('inner')),
+        path("blog/", include("inner")),
     ]
 
     # inner.py
     from django.urls import path
 
     urlpatterns = [
-        path('archive/', views.archive, {'blog_id': 3}),
-        path('about/', views.about, {'blog_id': 3}),
+        path("archive/", views.archive, {"blog_id": 3}),
+        path("about/", views.about, {"blog_id": 3}),
     ]
 
 Note that extra options will *always* be passed to *every* line in the included
@@ -589,16 +625,18 @@ layers where URLs are needed:
 Examples
 --------
 
-Consider again this URLconf entry::
+Consider again this URLconf entry:
+
+.. code-block:: python
 
     from django.urls import path
 
     from . import views
 
     urlpatterns = [
-        #...
-        path('articles/<int:year>/', views.year_archive, name='news-year-archive'),
-        #...
+        # ...
+        path("articles/<int:year>/", views.year_archive, name="news-year-archive"),
+        # ...
     ]
 
 According to this design, the URL for the archive corresponding to year *nnnn*
@@ -616,16 +654,19 @@ You can obtain these in template code by using:
     {% endfor %}
     </ul>
 
-Or in Python code::
+Or in Python code:
+
+.. code-block:: python
 
     from django.http import HttpResponseRedirect
     from django.urls import reverse
+
 
     def redirect_to_year(request):
         # ...
         year = 2006
         # ...
-        return HttpResponseRedirect(reverse('news-year-archive', args=(year,)))
+        return HttpResponseRedirect(reverse("news-year-archive", args=(year,)))
 
 If, for some reason, it was decided that the URLs where content for yearly
 article archives are published at should be changed then you would only need to
@@ -869,19 +910,24 @@ will be added to the global namespace. However, you can also ``include()`` a
 
     (<list of path()/re_path() instances>, <application namespace>)
 
-For example::
+For example:
+
+.. code-block:: python
 
     from django.urls import include, path
 
     from . import views
 
-    polls_patterns = ([
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-    ], 'polls')
+    polls_patterns = (
+        [
+            path("", views.IndexView.as_view(), name="index"),
+            path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ],
+        "polls",
+    )
 
     urlpatterns = [
-        path('polls/', include(polls_patterns)),
+        path("polls/", include(polls_patterns)),
     ]
 
 This will include the nominated URL patterns into the given application

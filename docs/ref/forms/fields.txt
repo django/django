@@ -20,13 +20,15 @@ you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
 a single argument and either raises a
 ``django.core.exceptions.ValidationError`` exception or returns the clean
-value::
+value:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> f = forms.EmailField()
-    >>> f.clean('foo@example.com')
+    >>> f.clean("foo@example.com")
     'foo@example.com'
-    >>> f.clean('invalid email address')
+    >>> f.clean("invalid email address")
     Traceback (most recent call last):
     ...
     ValidationError: ['Enter a valid email address.']
@@ -47,13 +49,15 @@ should *always* be accepted:
 
 By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
-``clean()`` will raise a ``ValidationError`` exception::
+``clean()`` will raise a ``ValidationError`` exception:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> f = forms.CharField()
-    >>> f.clean('foo')
+    >>> f.clean("foo")
     'foo'
-    >>> f.clean('')
+    >>> f.clean("")
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
@@ -61,7 +65,7 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
-    >>> f.clean(' ')
+    >>> f.clean(" ")
     ' '
     >>> f.clean(0)
     '0'
@@ -71,12 +75,14 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     'False'
 
 To specify that a field is *not* required, pass ``required=False`` to the
-``Field`` constructor::
+``Field`` constructor:
+
+.. code-block:: pycon
 
     >>> f = forms.CharField(required=False)
-    >>> f.clean('foo')
+    >>> f.clean("foo")
     'foo'
-    >>> f.clean('')
+    >>> f.clean("")
     ''
     >>> f.clean(None)
     ''
@@ -112,13 +118,16 @@ spaces and upper-casing the first letter. Specify ``label`` if that default
 behavior doesn't result in an adequate label.
 
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
-We've specified ``auto_id=False`` to simplify the output::
+We've specified ``auto_id=False`` to simplify the output:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(label='Your name')
-    ...     url = forms.URLField(label='Your website', required=False)
+    ...     name = forms.CharField(label="Your name")
+    ...     url = forms.URLField(label="Your website", required=False)
     ...     comment = forms.CharField()
+    ...
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Your name:</th><td><input type="text" name="name" required></td></tr>
@@ -131,13 +140,16 @@ We've specified ``auto_id=False`` to simplify the output::
 .. attribute:: Field.label_suffix
 
 The ``label_suffix`` argument lets you override the form's
-:attr:`~django.forms.Form.label_suffix` on a per-field basis::
+:attr:`~django.forms.Form.label_suffix` on a per-field basis:
+
+.. code-block:: pycon
 
     >>> class ContactForm(forms.Form):
     ...     age = forms.IntegerField()
     ...     nationality = forms.CharField()
-    ...     captcha_answer = forms.IntegerField(label='2 + 2', label_suffix=' =')
-    >>> f = ContactForm(label_suffix='?')
+    ...     captcha_answer = forms.IntegerField(label="2 + 2", label_suffix=" =")
+    ...
+    >>> f = ContactForm(label_suffix="?")
     >>> print(f.as_p())
     <p><label for="id_age">Age?</label> <input id="id_age" name="age" type="number" required></p>
     <p><label for="id_nationality">Nationality?</label> <input id="id_nationality" name="nationality" type="text" required></p>
@@ -154,13 +166,16 @@ rendering this ``Field`` in an unbound ``Form``.
 To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 
 The use-case for this is when you want to display an "empty" form in which a
-field is initialized to a particular value. For example::
+field is initialized to a particular value. For example:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='Your name')
-    ...     url = forms.URLField(initial='http://')
+    ...     name = forms.CharField(initial="Your name")
+    ...     url = forms.URLField(initial="http://")
     ...     comment = forms.CharField()
+    ...
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" required></td></tr>
@@ -169,13 +184,16 @@ field is initialized to a particular value. For example::
 
 You may be thinking, why not just pass a dictionary of the initial values as
 data when displaying the form? Well, if you do that, you'll trigger validation,
-and the HTML output will include any validation errors::
+and the HTML output will include any validation errors:
+
+.. code-block:: pycon
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField()
     ...     url = forms.URLField()
     ...     comment = forms.CharField()
-    >>> default_data = {'name': 'Your name', 'url': 'http://'}
+    ...
+    >>> default_data = {"name": "Your name", "url": "http://"}
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
     <tr><th>Name:</th><td><input type="text" name="name" value="Your name" required></td></tr>
@@ -187,13 +205,16 @@ forms, the HTML output will use the bound data.
 
 Also note that ``initial`` values are *not* used as "fallback" data in
 validation if a particular field's value is not given. ``initial`` values are
-*only* intended for initial form display::
+*only* intended for initial form display:
+
+.. code-block:: pycon
 
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='Your name')
-    ...     url = forms.URLField(initial='http://')
+    ...     name = forms.CharField(initial="Your name")
+    ...     url = forms.URLField(initial="http://")
     ...     comment = forms.CharField()
-    >>> data = {'name': '', 'url': '', 'comment': 'Foo'}
+    ...
+    >>> data = {"name": "", "url": "", "comment": "Foo"}
     >>> f = CommentForm(data)
     >>> f.is_valid()
     False
@@ -201,11 +222,14 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f.errors
     {'url': ['This field is required.'], 'name': ['This field is required.']}
 
-Instead of a constant, you can also pass any callable::
+Instead of a constant, you can also pass any callable:
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> class DateForm(forms.Form):
     ...     day = forms.DateField(initial=datetime.date.today)
+    ...
     >>> print(DateForm())
     <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" required><td></tr>
 
@@ -233,21 +257,24 @@ Like the model field's :attr:`~django.db.models.Field.help_text`, this value
 isn't HTML-escaped in automatically-generated forms.
 
 Here's a full example ``Form`` that implements ``help_text`` for two of its
-fields. We've specified ``auto_id=False`` to simplify the output::
+fields. We've specified ``auto_id=False`` to simplify the output:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
-    ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    ...     subject = forms.CharField(max_length=100, help_text="100 characters max.")
     ...     message = forms.CharField()
-    ...     sender = forms.EmailField(help_text='A valid email address, please.')
+    ...     sender = forms.EmailField(help_text="A valid email address, please.")
     ...     cc_myself = forms.BooleanField(required=False)
+    ...
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" required><br><span class="helptext">100 characters max.</span></td></tr>
     <tr><th>Message:</th><td><input type="text" name="message" required></td></tr>
     <tr><th>Sender:</th><td><input type="email" name="sender" required><br>A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself"></td></tr>
-    >>> print(f.as_ul()))
+    >>> print(f.as_ul())
     <li>Subject: <input type="text" name="subject" maxlength="100" required> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" required></li>
     <li>Sender: <input type="email" name="sender" required> A valid email address, please.</li>
@@ -265,19 +292,23 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 
 The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
-want to override. For example, here is the default error message::
+want to override. For example, here is the default error message:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> generic = forms.CharField()
-    >>> generic.clean('')
+    >>> generic.clean("")
     Traceback (most recent call last):
       ...
     ValidationError: ['This field is required.']
 
-And here is a custom error message::
+And here is a custom error message:
 
-    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
-    >>> name.clean('')
+.. code-block:: pycon
+
+    >>> name = forms.CharField(error_messages={"required": "Please enter your name"})
+    >>> name.clean("")
     Traceback (most recent call last):
       ...
     ValidationError: ['Please enter your name']
@@ -731,19 +762,22 @@ For each field, we describe the default widget used if you don't specify
     non-image data attributes, such as ``format``, ``height``, and ``width``,
     are available, methods that access the underlying image data, such as
     ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> from PIL import Image
         >>> from django import forms
         >>> from django.core.files.uploadedfile import SimpleUploadedFile
         >>> class ImageForm(forms.Form):
         ...     img = forms.ImageField()
-        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        ...
+        >>> file_data = {"img": SimpleUploadedFile("test.png", b"file content")}
         >>> form = ImageForm({}, file_data)
         # Pillow closes the underlying file descriptor.
         >>> form.is_valid()
         True
-        >>> image_field = form.cleaned_data['img']
+        >>> image_field = form.cleaned_data["img"]
         >>> image_field.image
         <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=191x287 at 0x7F5985045C18>
         >>> image_field.image.width
@@ -1132,36 +1166,41 @@ Slightly complex built-in ``Field`` classes
 
         A default ``incomplete`` error message can be defined on the
         :class:`MultiValueField` subclass, or different messages can be defined
-        on each individual field. For example::
+        on each individual field. For example:
+
+        .. code-block:: python
 
             from django.core.validators import RegexValidator
+
 
             class PhoneField(MultiValueField):
                 def __init__(self, **kwargs):
                     # Define one message for all fields.
                     error_messages = {
-                        'incomplete': 'Enter a country calling code and a phone number.',
+                        "incomplete": "Enter a country calling code and a phone number.",
                     }
                     # Or define a different message for each field.
                     fields = (
                         CharField(
-                            error_messages={'incomplete': 'Enter a country calling code.'},
+                            error_messages={"incomplete": "Enter a country calling code."},
                             validators=[
-                                RegexValidator(r'^[0-9]+$', 'Enter a valid country calling code.'),
+                                RegexValidator(r"^[0-9]+$", "Enter a valid country calling code."),
                             ],
                         ),
                         CharField(
-                            error_messages={'incomplete': 'Enter a phone number.'},
-                            validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')],
+                            error_messages={"incomplete": "Enter a phone number."},
+                            validators=[RegexValidator(r"^[0-9]+$", "Enter a valid phone number.")],
                         ),
                         CharField(
-                            validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid extension.')],
+                            validators=[RegexValidator(r"^[0-9]+$", "Enter a valid extension.")],
                             required=False,
                         ),
                     )
                     super().__init__(
-                        error_messages=error_messages, fields=fields,
-                        require_all_fields=False, **kwargs
+                        error_messages=error_messages,
+                        fields=fields,
+                        require_all_fields=False,
+                        **kwargs
                     )
 
     .. attribute:: MultiValueField.widget
@@ -1226,14 +1265,16 @@ objects (in the case of ``ModelMultipleChoiceField``) into the
 
 For more complex uses, you can specify ``queryset=None`` when declaring the
 form field and then populate the ``queryset`` in the form's ``__init__()``
-method::
+method:
+
+.. code-block:: python
 
     class FooMultipleChoiceForm(forms.Form):
         foo_select = forms.ModelMultipleChoiceField(queryset=None)
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.fields['foo_select'].queryset = ...
+            self.fields["foo_select"].queryset = ...
 
 Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
 attribute which specifies the class used to iterate over the queryset when
@@ -1342,9 +1383,12 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
     representations of the objects for use in the field's choices. To provide
     customized representations, subclass ``ModelChoiceField`` and override
     ``label_from_instance``. This method will receive a model object and should
-    return a string suitable for representing it. For example::
+    return a string suitable for representing it. For example:
+
+    .. code-block:: python
 
         from django.forms import ModelChoiceField
+
 
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):
@@ -1407,9 +1451,12 @@ widget implementations, for example, to add `data-* attributes`_ to
 
 .. _`data-* attributes`: https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*
 
-For example, consider the following models::
+For example, consider the following models:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Topping(models.Model):
         name = models.CharField(max_length=100)
@@ -1418,27 +1465,36 @@ For example, consider the following models::
         def __str__(self):
             return self.name
 
+
     class Pizza(models.Model):
         topping = models.ForeignKey(Topping, on_delete=models.CASCADE)
 
 You can use a :class:`~django.forms.Select` widget subclass to include
 the value of ``Topping.price`` as the HTML attribute ``data-price`` for each
-``<option>`` element::
+``<option>`` element:
+
+.. code-block:: python
 
     from django import forms
 
+
     class ToppingSelect(forms.Select):
-        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        def create_option(
+            self, name, value, label, selected, index, subindex=None, attrs=None
+        ):
+            option = super().create_option(
+                name, value, label, selected, index, subindex, attrs
+            )
             if value:
-                option['attrs']['data-price'] = value.instance.price
+                option["attrs"]["data-price"] = value.instance.price
             return option
+
 
     class PizzaForm(forms.ModelForm):
         class Meta:
             model = Pizza
-            fields = ['topping']
-            widgets = {'topping': ToppingSelect}
+            fields = ["topping"]
+            widgets = {"topping": ToppingSelect}
 
 This will render the ``Pizza.topping`` select as:
 

@@ -361,7 +361,7 @@ Here's an example of the search algorithm. For this example the
         },
     ]
 
-If you call ``get_template('story_detail.html')``, here are the files Django
+If you call ``get_template("story_detail.html")``, here are the files Django
 will look for, in order:
 
 * ``/home/html/example.com/story_detail.html`` (``'django'`` engine)
@@ -400,7 +400,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
-    get_template('news/story_detail.html')
+    get_template("news/story_detail.html")
 
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
@@ -436,10 +436,13 @@ templates, Django provides a shortcut function which automates the process.
         An optional template engine :setting:`NAME <TEMPLATES-NAME>`. The
         search for the template will be restricted to that engine.
 
-    Usage example::
+    Usage example:
+
+    .. code-block:: python
 
         from django.template.loader import render_to_string
-        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
+        rendered = render_to_string("my_template.html", {"foo": "bar"})
 
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
@@ -449,11 +452,13 @@ Finally, you can use configured engines directly:
 
 .. data:: engines
 
-    Template engines are available in ``django.template.engines``::
+    Template engines are available in ``django.template.engines``:
+
+    .. code-block:: python
 
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
         template = django_engine.from_string("Hello {{ name }}!")
 
     The lookup key — ``'django'`` in this example — is the engine's
@@ -622,7 +627,9 @@ Django-flavored environment. It doesn't know about Django filters and tags.
 In order to use Django-specific APIs, you must configure them into the
 environment.
 
-For example, you can create ``myproject/jinja2.py`` with this content::
+For example, you can create ``myproject/jinja2.py`` with this content:
+
+.. code-block:: python
 
     from django.templatetags.static import static
     from django.urls import reverse
@@ -632,10 +639,12 @@ For example, you can create ``myproject/jinja2.py`` with this content::
 
     def environment(**options):
         env = Environment(**options)
-        env.globals.update({
-            'static': static,
-            'url': reverse,
-        })
+        env.globals.update(
+            {
+                "static": static,
+                "url": reverse,
+            }
+        )
         return env
 
 and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.

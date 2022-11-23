@@ -23,7 +23,9 @@ A middleware factory is a callable that takes a ``get_response`` callable and
 returns a middleware. A middleware is a callable that takes a request and
 returns a response, just like a view.
 
-A middleware can be written as a function that looks like this::
+A middleware can be written as a function that looks like this:
+
+.. code-block:: python
 
     def simple_middleware(get_response):
         # One-time configuration and initialization.
@@ -41,7 +43,9 @@ A middleware can be written as a function that looks like this::
 
         return middleware
 
-Or it can be written as a class whose instances are callable, like this::
+Or it can be written as a class whose instances are callable, like this:
+
+.. code-block:: python
 
     class SimpleMiddleware:
         def __init__(self, get_response):
@@ -261,7 +265,9 @@ must test for streaming responses and adjust their behavior accordingly::
 
     ``streaming_content`` should be assumed to be too large to hold in memory.
     Response middleware may wrap it in a new generator, but must not consume
-    it. Wrapping is typically implemented as follows::
+    it. Wrapping is typically implemented as follows:
+
+    .. code-block:: python
 
         def wrap_streaming_content(content):
             for chunk in content:
@@ -329,21 +335,26 @@ methods, if they are provided, should also be adapted to match the sync/async
 mode. However, Django will individually adapt them as required if you do not,
 at an additional performance penalty.
 
-Here's an example of how to create a middleware function that supports both::
+Here's an example of how to create a middleware function that supports both:
+
+.. code-block:: python
 
     import asyncio
     from django.utils.decorators import sync_and_async_middleware
+
 
     @sync_and_async_middleware
     def simple_middleware(get_response):
         # One-time configuration and initialization goes here.
         if asyncio.iscoroutinefunction(get_response):
+
             async def middleware(request):
                 # Do something here!
                 response = await get_response(request)
                 return response
 
         else:
+
             def middleware(request):
                 # Do something here!
                 response = get_response(request)

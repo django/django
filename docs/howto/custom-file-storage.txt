@@ -9,18 +9,24 @@ on some remote system -- you can do so by defining a custom storage class.
 You'll need to follow these steps:
 
 #. Your custom storage system must be a subclass of
-   ``django.core.files.storage.Storage``::
+   ``django.core.files.storage.Storage``:
+
+    .. code-block:: python
 
         from django.core.files.storage import Storage
+
 
         class MyStorage(Storage):
             ...
 
 #. Django must be able to instantiate your storage system without any arguments.
-   This means that any settings should be taken from ``django.conf.settings``::
+   This means that any settings should be taken from ``django.conf.settings``:
+
+    .. code-block:: python
 
         from django.conf import settings
         from django.core.files.storage import Storage
+
 
         class MyStorage(Storage):
             def __init__(self, option=None):

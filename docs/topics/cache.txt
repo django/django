@@ -297,27 +297,29 @@ for routing purposes.
 For example, the following router would direct all cache read
 operations to ``cache_replica``, and all write operations to
 ``cache_primary``. The cache table will only be synchronized onto
-``cache_primary``::
+``cache_primary``:
+
+.. code-block:: python
 
     class CacheRouter:
         """A router to control all database cache operations"""
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label == 'django_cache':
-                return 'cache_replica'
+            if model._meta.app_label == "django_cache":
+                return "cache_replica"
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label == 'django_cache':
-                return 'cache_primary'
+            if model._meta.app_label == "django_cache":
+                return "cache_primary"
             return None
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if app_label == 'django_cache':
-                return db == 'cache_primary'
+            if app_label == "django_cache":
+                return db == "cache_primary"
             return None
 
 If you don't specify routing directions for the database cache model,
@@ -658,9 +660,12 @@ The per-view cache
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``
-decorator that will automatically cache the view's response for you::
+decorator that will automatically cache the view's response for you:
+
+.. code-block:: python
 
     from django.views.decorators.cache import cache_page
+
 
     @cache_page(60 * 15)
     def my_view(request):
@@ -691,7 +696,9 @@ requested, subsequent requests to that URL will use the cache.
 which directs the decorator to use a specific cache (from your
 :setting:`CACHES` setting) when caching view results. By default, the
 ``default`` cache will be used, but you can specify any cache you
-want::
+want:
+
+.. code-block:: python
 
     @cache_page(60 * 15, cache="special_cache")
     def my_view(request):
@@ -700,7 +707,9 @@ want::
 You can also override the cache prefix on a per-view basis. ``cache_page``
 takes an optional keyword argument, ``key_prefix``,
 which works in the same way as the :setting:`CACHE_MIDDLEWARE_KEY_PREFIX`
-setting for the middleware.  It can be used like this::
+setting for the middleware.  It can be used like this:
+
+.. code-block:: python
 
     @cache_page(60 * 15, key_prefix="site1")
     def my_view(request):
@@ -733,12 +742,14 @@ to it in the URLconf. Here's the old URLconf from earlier::
         path('foo/<int:code>/', my_view),
     ]
 
-Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
+Here's the same thing, with ``my_view`` wrapped in ``cache_page``:
+
+.. code-block:: python
 
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
+        path("foo/<int:code>/", cache_page(60 * 15)(my_view)),
     ]
 
 .. templatetag:: cache
@@ -884,7 +895,9 @@ Accessing the cache
 .. data:: django.core.cache.cache
 
     As a shortcut, the default cache is available as
-    ``django.core.cache.cache``::
+    ``django.core.cache.cache``:
+
+    .. code-block:: pycon
 
         >>> from django.core.cache import cache
 
@@ -905,7 +918,9 @@ The basic interface is:
 
 .. method:: cache.get(key, default=None, version=None)
 
-    >>> cache.get('my_key')
+.. code-block:: pycon
+
+    >>> cache.get("my_key")
     'hello, world!'
 
 ``key`` should be a ``str``, and ``value`` can be any picklable Python object.
@@ -1186,10 +1201,12 @@ Cache key transformation
 As described in the previous two sections, the cache key provided by a
 user is not used verbatim -- it is combined with the cache prefix and
 key version to provide a final cache key. By default, the three parts
-are joined using colons to produce a final string::
+are joined using colons to produce a final string:
+
+.. code-block:: python
 
     def make_key(key, key_prefix, version):
-        return '%s:%s:%s' % (key_prefix, version, key)
+        return "%s:%s:%s" % (key_prefix, version, key)
 
 If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key
@@ -1225,9 +1242,12 @@ this code in the ``management`` module of one of your
 If you want to instead provide custom key validation logic for one of the
 built-in backends, you can subclass it, override just the ``validate_key``
 method, and follow the instructions for `using a custom cache backend`_. For
-instance, to do this for the ``locmem`` backend, put this code in a module::
+instance, to do this for the ``locmem`` backend, put this code in a module:
+
+.. code-block:: python
 
     from django.core.cache.backends.locmem import LocMemCache
+
 
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
@@ -1322,11 +1342,14 @@ as a cookie, or a language, or a user-agent -- you'll need to use the ``Vary``
 header to tell caching mechanisms that the page output depends on those things.
 
 To do this in Django, use the convenient
-:func:`django.views.decorators.vary.vary_on_headers` view decorator, like so::
+:func:`django.views.decorators.vary.vary_on_headers` view decorator, like so:
+
+.. code-block:: python
 
     from django.views.decorators.vary import vary_on_headers
 
-    @vary_on_headers('User-Agent')
+
+    @vary_on_headers("User-Agent")
     def my_view(request):
         ...
 
@@ -1339,9 +1362,11 @@ setting the ``Vary`` header (using something like ``response.headers['Vary'] =
 already exist), rather than setting it from scratch and potentially overriding
 anything that was already in there.
 
-You can pass multiple headers to ``vary_on_headers()``::
+You can pass multiple headers to ``vary_on_headers()``:
 
-    @vary_on_headers('User-Agent', 'Cookie')
+.. code-block:: python
+
+    @vary_on_headers("User-Agent", "Cookie")
     def my_view(request):
         ...
 
@@ -1353,13 +1378,16 @@ different from a request with the user-agent ``Mozilla`` and the cookie value
 
 Because varying on cookie is so common, there's a
 :func:`django.views.decorators.vary.vary_on_cookie` decorator. These two views
-are equivalent::
+are equivalent:
+
+.. code-block:: python
 
     @vary_on_cookie
     def my_view(request):
         ...
 
-    @vary_on_headers('Cookie')
+
+    @vary_on_headers("Cookie")
     def my_view(request):
         ...
 
@@ -1367,15 +1395,18 @@ The headers you pass to ``vary_on_headers`` are not case sensitive;
 ``"User-Agent"`` is the same thing as ``"user-agent"``.
 
 You can also use a helper function, :func:`django.utils.cache.patch_vary_headers`,
-directly. This function sets, or adds to, the ``Vary header``. For example::
+directly. This function sets, or adds to, the ``Vary header``. For example:
+
+.. code-block:: python
 
     from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
+
     def my_view(request):
         ...
-        response = render(request, 'template_name', context)
-        patch_vary_headers(response, ['Cookie'])
+        response = render(request, "template_name", context)
+        patch_vary_headers(response, ["Cookie"])
         return response
 
 ``patch_vary_headers`` takes an :class:`~django.http.HttpResponse` instance as
@@ -1400,9 +1431,12 @@ private and which is public.
 
 The solution is to indicate a page's cache should be "private." To do this in
 Django, use the :func:`~django.views.decorators.cache.cache_control` view
-decorator. Example::
+decorator. Example:
+
+.. code-block:: python
 
     from django.views.decorators.cache import cache_control
+
 
     @cache_control(private=True)
     def my_view(request):
@@ -1418,10 +1452,13 @@ would be a blog site that offers both private and public entries. Public
 entries may be cached on any shared cache. The following code uses
 :func:`~django.utils.cache.patch_cache_control`, the manual way to modify the
 cache control header (it is internally called by the
-:func:`~django.views.decorators.cache.cache_control` decorator)::
+:func:`~django.views.decorators.cache.cache_control` decorator):
+
+.. code-block:: python
 
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie
+
 
     @vary_on_cookie
     def list_blog_entries_view(request):
@@ -1438,9 +1475,12 @@ You can control downstream caches in other ways as well (see :rfc:`9111` for
 details on HTTP caching). For example, even if you don't use Django's
 server-side cache framework, you can still tell clients to cache a view for a
 certain amount of time with the :rfc:`max-age <9111#section-5.2.2.1>`
-directive::
+directive:
+
+.. code-block:: python
 
     from django.views.decorators.cache import cache_control
+
 
     @cache_control(max_age=3600)
     def my_view(request):
@@ -1468,9 +1508,12 @@ The full list of known directives can be found in the `IANA registry`_
 If you want to use headers to disable caching altogether,
 :func:`~django.views.decorators.cache.never_cache` is a view decorator that
 adds headers to ensure the response won't be cached by browsers or other
-caches. Example::
+caches. Example:
+
+.. code-block:: python
 
     from django.views.decorators.cache import never_cache
+
 
     @never_cache
     def myview(request):

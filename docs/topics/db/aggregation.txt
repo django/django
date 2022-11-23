@@ -48,30 +48,33 @@ Cheat sheet
 ===========
 
 In a hurry? Here's how to do common aggregate queries, assuming the models
-above::
+above:
+
+.. code-block:: pycon
 
     # Total number of books.
     >>> Book.objects.count()
     2452
 
     # Total number of books with publisher=BaloneyPress
-    >>> Book.objects.filter(publisher__name='BaloneyPress').count()
+    >>> Book.objects.filter(publisher__name="BaloneyPress").count()
     73
 
     # Average price across all books.
     >>> from django.db.models import Avg
-    >>> Book.objects.aggregate(Avg('price'))
+    >>> Book.objects.aggregate(Avg("price"))
     {'price__avg': 34.35}
 
     # Max price across all books.
     >>> from django.db.models import Max
-    >>> Book.objects.aggregate(Max('price'))
+    >>> Book.objects.aggregate(Max("price"))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
     >>> from django.db.models import FloatField
     >>> Book.objects.aggregate(
-    ...     price_diff=Max('price', output_field=FloatField()) - Avg('price'))
+    ...     price_diff=Max("price", output_field=FloatField()) - Avg("price")
+    ... )
     {'price_diff': 46.85}
 
     # All the following queries involve traversing the Book<->Publisher
@@ -79,7 +82,7 @@ above::
 
     # Each publisher, each with a count of books as a "num_books" attribute.
     >>> from django.db.models import Count
-    >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
+    >>> pubs = Publisher.objects.annotate(num_books=Count("book"))
     >>> pubs
     <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
     >>> pubs[0].num_books
@@ -87,8 +90,8 @@ above::
 
     # Each publisher, with a separate count of books with a rating above and below 5
     >>> from django.db.models import Q
-    >>> above_5 = Count('book', filter=Q(book__rating__gt=5))
-    >>> below_5 = Count('book', filter=Q(book__rating__lte=5))
+    >>> above_5 = Count("book", filter=Q(book__rating__gt=5))
+    >>> below_5 = Count("book", filter=Q(book__rating__lte=5))
     >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
     >>> pubs[0].above_5
     23
@@ -96,7 +99,7 @@ above::
     12
 
     # The top 5 publishers, in order by number of books.
-    >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
+    >>> pubs = Publisher.objects.annotate(num_books=Count("book")).order_by("-num_books")[:5]
     >>> pubs[0].num_books
     1323
 
@@ -173,11 +176,13 @@ specified values.
 The syntax for these annotations is identical to that used for the
 :meth:`~.QuerySet.aggregate` clause. Each argument to ``annotate()`` describes
 an aggregate that is to be calculated. For example, to annotate books with the
-number of authors::
+number of authors:
+
+.. code-block:: pycon
 
     # Build an annotated queryset
     >>> from django.db.models import Count
-    >>> q = Book.objects.annotate(Count('authors'))
+    >>> q = Book.objects.annotate(Count("authors"))
     # Interrogate the first object in the queryset
     >>> q[0]
     <Book: The Definitive Guide to Django>
@@ -215,12 +220,14 @@ Combining multiple aggregations
 Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
 wrong results <10060>` because joins are used instead of subqueries:
 
+.. code-block:: pycon
+
     >>> book = Book.objects.first()
     >>> book.authors.count()
     2
     >>> book.store_set.count()
     3
-    >>> q = Book.objects.annotate(Count('authors'), Count('store'))
+    >>> q = Book.objects.annotate(Count("authors"), Count("store"))
     >>> q[0].authors__count
     6
     >>> q[0].store__count
@@ -230,7 +237,11 @@ For most aggregates, there is no way to avoid this problem, however, the
 :class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
-    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
+.. code-block:: pycon
+
+    >>> q = Book.objects.annotate(
+    ...     Count("authors", distinct=True), Count("store", distinct=True)
+    ... )
     >>> q[0].authors__count
     2
     >>> q[0].store__count
@@ -507,7 +518,9 @@ the annotation is computed over all members of the group.
 For example, consider an author query that attempts to find out the average
 rating of books written by each author:
 
-    >>> Author.objects.annotate(average_rating=Avg('book__rating'))
+.. code-block:: pycon
+
+    >>> Author.objects.annotate(average_rating=Avg("book__rating"))
 
 This will return one result for each author in the database, annotated with
 their average book rating.
@@ -570,28 +583,35 @@ when selecting the output data, even if they are not otherwise specified in the
 and they can make otherwise identical result rows appear to be separate. This
 shows up, particularly, when counting things.
 
-By way of example, suppose you have a model like this::
+By way of example, suppose you have a model like this:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Item(models.Model):
         name = models.CharField(max_length=10)
         data = models.IntegerField()
 
 If you want to count how many times each distinct ``data`` value appears in an
-ordered queryset, you might try this::
+ordered queryset, you might try this:
 
-    items = Item.objects.order_by('name')
+.. code-block:: python
+
+    items = Item.objects.order_by("name")
     # Warning: not quite correct!
-    items.values('data').annotate(Count('id'))
+    items.values("data").annotate(Count("id"))
 
 ...which will group the ``Item`` objects by their common ``data`` values and
 then count the number of ``id`` values in each group. Except that it won't
 quite work. The ordering by ``name`` will also play a part in the grouping, so
 this query will group by distinct ``(data, name)`` pairs, which isn't what you
-want. Instead, you should construct this queryset::
+want. Instead, you should construct this queryset:
 
-    items.values('data').annotate(Count('id')).order_by()
+.. code-block:: python
+
+    items.values("data").annotate(Count("id")).order_by()
 
 ...clearing any ordering in the query. You could also order by, say, ``data``
 without any harmful effects, since that is already playing a role in the

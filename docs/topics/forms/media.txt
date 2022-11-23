@@ -49,16 +49,19 @@ The easiest way to define assets is as a static definition. Using this
 method, the declaration is an inner ``Media`` class. The properties of the
 inner class define the requirements.
 
-Here's an example::
+Here's an example:
+
+.. code-block:: python
 
     from django import forms
+
 
     class CalendarWidget(forms.TextInput):
         class Media:
             css = {
-                'all': ['pretty.css'],
+                "all": ["pretty.css"],
             }
-            js = ['animations.js', 'actions.js']
+            js = ["animations.js", "actions.js"]
 
 This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
 Every time the CalendarWidget is used on a form, that form will be directed
@@ -94,24 +97,28 @@ types accepted by CSS files in media declarations: 'all', 'aural', 'braille',
 'embossed', 'handheld', 'print', 'projection', 'screen', 'tty' and 'tv'. If
 you need to have different stylesheets for different media types, provide
 a list of CSS files for each output medium. The following example would
-provide two CSS options -- one for the screen, and one for print::
+provide two CSS options -- one for the screen, and one for print:
+
+.. code-block:: python
 
     class Media:
         css = {
-            'screen': ['pretty.css'],
-            'print': ['newspaper.css'],
+            "screen": ["pretty.css"],
+            "print": ["newspaper.css"],
         }
 
 If a group of CSS files are appropriate for multiple output media types,
 the dictionary key can be a comma separated list of output media types.
 In the following example, TV's and projectors will have the same media
-requirements::
+requirements:
+
+.. code-block:: python
 
     class Media:
         css = {
-            'screen': ['pretty.css'],
-            'tv,projector': ['lo_res.css'],
-            'print': ['newspaper.css],
+            "screen": ["pretty.css"],
+            "tv,projector": ["lo_res.css"],
+            "print": ["newspaper.css"],
         }
 
 If this last CSS definition were to be rendered, it would become the following HTML::
@@ -198,13 +205,16 @@ and ``js`` keyword arguments in the same format as that used in a
 static media definition.
 
 For example, the static definition for our Calendar Widget could also
-be defined in a dynamic fashion::
+be defined in a dynamic fashion:
+
+.. code-block:: python
 
     class CalendarWidget(forms.TextInput):
         @property
         def media(self):
-            return forms.Media(css={'all': ['pretty.css']},
-                               js=['animations.js', 'actions.js'])
+            return forms.Media(
+                css={"all": ["pretty.css"]}, js=["animations.js", "actions.js"]
+            )
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.

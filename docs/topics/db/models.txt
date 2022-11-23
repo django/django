@@ -23,9 +23,12 @@ Quick example
 =============
 
 This example model defines a ``Person``, which has a ``first_name`` and
-``last_name``::
+``last_name``:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=30)
@@ -89,14 +92,18 @@ attributes. Be careful not to choose field names that conflict with the
 :doc:`models API </ref/models/instances>` like ``clean``, ``save``, or
 ``delete``.
 
-Example::
+Example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Musician(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         instrument = models.CharField(max_length=100)
+
 
     class Album(models.Model):
         artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
@@ -158,14 +165,16 @@ ones:
     is given, the default form widget will be a select box instead of the
     standard text field and will limit choices to the choices given.
 
-    A choices list looks like this::
+    A choices list looks like this:
+    
+    .. code-block:: python
 
         YEAR_IN_SCHOOL_CHOICES = [
-            ('FR', 'Freshman'),
-            ('SO', 'Sophomore'),
-            ('JR', 'Junior'),
-            ('SR', 'Senior'),
-            ('GR', 'Graduate'),
+            ("FR", "Freshman"),
+            ("SO", "Sophomore"),
+            ("JR", "Junior"),
+            ("SR", "Senior"),
+            ("GR", "Graduate"),
         ]
 
     .. note::
@@ -176,20 +185,25 @@ ones:
 
     Given a model instance, the display value for a field with ``choices`` can
     be accessed using the :meth:`~django.db.models.Model.get_FOO_display`
-    method. For example::
+    method. For example:
+
+    .. code-block:: python
 
         from django.db import models
 
+
         class Person(models.Model):
             SHIRT_SIZES = [
-                ('S', 'Small'),
-                ('M', 'Medium'),
-                ('L', 'Large'),
+                ("S", "Small"),
+                ("M", "Medium"),
+                ("L", "Large"),
             ]
             name = models.CharField(max_length=60)
             shirt_size = models.CharField(max_length=1, choices=SHIRT_SIZES)
 
-    ::
+    :
+
+    .. code-block:: pycon
 
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
@@ -199,12 +213,15 @@ ones:
         'Large'
 
     You can also use enumeration classes to define ``choices`` in a concise
-    way::
+    way:
+
+    .. code-block:: python
 
         from django.db import models
 
+
         class Runner(models.Model):
-            MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+            MedalType = models.TextChoices("MedalType", "GOLD SILVER BRONZE")
             name = models.CharField(max_length=60)
             medal = models.CharField(blank=True, choices=MedalType.choices, max_length=10)
 
@@ -232,9 +249,12 @@ ones:
 
     The primary key field is read-only. If you change the value of the primary
     key on an existing object and then save it, a new object will be created
-    alongside the old one. For example::
+    alongside the old one. For example:
+
+    .. code-block:: python
 
         from django.db import models
+
 
         class Fruit(models.Model):
             name = models.CharField(max_length=100, primary_key=True)
@@ -334,13 +354,17 @@ to which the model is related.
 
 For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
 ``Manufacturer`` makes multiple cars but each ``Car`` only has one
-``Manufacturer`` -- use the following definitions::
+``Manufacturer`` -- use the following definitions:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Manufacturer(models.Model):
         # ...
         pass
+
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
@@ -354,7 +378,9 @@ reference <ref-foreignkey>` for details.
 It's suggested, but not required, that the name of a
 :class:`~django.db.models.ForeignKey` field (``manufacturer`` in the example
 above) be the name of the model, lowercase. You can call the field whatever you
-want. For example::
+want. For example:
+
+.. code-block:: python
 
     class Car(models.Model):
         company_that_makes_it = models.ForeignKey(
@@ -390,13 +416,17 @@ class to which the model is related.
 
 For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 ``Topping`` can be on multiple pizzas and each ``Pizza`` has multiple toppings
--- here's how you'd represent that::
+-- here's how you'd represent that:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Topping(models.Model):
         # ...
         pass
+
 
     class Pizza(models.Model):
         # ...
@@ -455,9 +485,12 @@ intermediate model. The intermediate model is associated with the
 :class:`~django.db.models.ManyToManyField` using the
 :attr:`through <ManyToManyField.through>` argument to point to the model
 that will act as an intermediary. For our musician example, the code would look
-something like this::
+something like this:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         name = models.CharField(max_length=128)
@@ -465,12 +498,14 @@ something like this::
         def __str__(self):
             return self.name
 
+
     class Group(models.Model):
         name = models.CharField(max_length=128)
-        members = models.ManyToManyField(Person, through='Membership')
+        members = models.ManyToManyField(Person, through="Membership")
 
         def __str__(self):
             return self.name
+
 
     class Membership(models.Model):
         person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -581,18 +616,22 @@ method can be used to remove all many-to-many relationships for an instance:
 
 Once you have established the many-to-many relationships, you can issue
 queries. Just as with normal many-to-many relationships, you can query using
-the attributes of the many-to-many-related model::
+the attributes of the many-to-many-related model:
+
+.. code-block:: pycon
 
     # Find all the groups with a member whose name starts with 'Paul'
-    >>> Group.objects.filter(members__name__startswith='Paul')
+    >>> Group.objects.filter(members__name__startswith="Paul")
     <QuerySet [<Group: The Beatles>]>
 
-As you are using an intermediate model, you can also query on its attributes::
+As you are using an intermediate model, you can also query on its attributes:
+
+.. code-block:: pycon
 
     # Find all the members of the Beatles that joined after 1 Jan 1961
     >>> Person.objects.filter(
-    ...     group__name='The Beatles',
-    ...     membership__date_joined__gt=date(1961,1,1))
+    ...     group__name="The Beatles", membership__date_joined__gt=date(1961, 1, 1)
+    ... )
     <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
@@ -664,10 +703,13 @@ Models across files
 
 It's perfectly OK to relate a model to one from another app. To do this, import
 the related model at the top of the file where your model is defined. Then,
-refer to the other model class wherever needed. For example::
+refer to the other model class wherever needed. For example:
+
+.. code-block:: python
 
     from django.db import models
     from geography.models import ZipCode
+
 
     class Restaurant(models.Model):
         # ...
@@ -719,9 +761,12 @@ provided in :doc:`/howto/custom-model-fields`.
 ``Meta`` options
 ================
 
-Give your model metadata by using an inner ``class Meta``, like so::
+Give your model metadata by using an inner ``class Meta``, like so:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Ox(models.Model):
         horn_length = models.IntegerField()
@@ -765,9 +810,12 @@ objects. Whereas :class:`~django.db.models.Manager` methods are intended to do
 This is a valuable technique for keeping business logic in one place -- the
 model.
 
-For example, this model has a few custom methods::
+For example, this model has a few custom methods:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
@@ -777,6 +825,7 @@ For example, this model has a few custom methods::
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
             import datetime
+
             if self.birth_date < datetime.date(1945, 8, 1):
                 return "Pre-boomer"
             elif self.birth_date < datetime.date(1965, 1, 1):
@@ -787,7 +836,7 @@ For example, this model has a few custom methods::
         @property
         def full_name(self):
             "Returns the person's full name."
-            return f'{self.first_name} {self.last_name}'
+            return f"{self.first_name} {self.last_name}"
 
 The last method in this example is a :term:`property`.
 
@@ -829,9 +878,12 @@ behavior.
 
 A classic use-case for overriding the built-in methods is if you want something
 to happen whenever you save an object. For example (see
-:meth:`~Model.save` for documentation of the parameters it accepts)::
+:meth:`~Model.save` for documentation of the parameters it accepts):
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -842,9 +894,12 @@ to happen whenever you save an object. For example (see
             super().save(*args, **kwargs)  # Call the "real" save() method.
             do_something_else()
 
-You can also prevent saving::
+You can also prevent saving:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -852,7 +907,7 @@ You can also prevent saving::
 
         def save(self, *args, **kwargs):
             if self.name == "Yoko Ono's blog":
-                return # Yoko shall never have her own blog!
+                return  # Yoko shall never have her own blog!
             else:
                 super().save(*args, **kwargs)  # Call the "real" save() method.
 
@@ -872,10 +927,13 @@ code will automatically support those arguments when they are added.
 If you wish to update a field value in the :meth:`~Model.save` method, you may
 also want to have this field added to the ``update_fields`` keyword argument.
 This will ensure the field is saved when ``update_fields`` is specified. For
-example::
+example:
+
+.. code-block:: python
 
     from django.db import models
     from django.utils.text import slugify
+
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -960,9 +1018,12 @@ class. This model will then not be used to create any database
 table. Instead, when it is used as a base class for other models, its
 fields will be added to those of the child class.
 
-An example::
+An example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
@@ -970,6 +1031,7 @@ An example::
 
         class Meta:
             abstract = True
+
 
     class Student(CommonInfo):
         home_group = models.CharField(max_length=5)
@@ -993,20 +1055,24 @@ When an abstract base class is created, Django makes any :ref:`Meta <meta-option
 inner class you declared in the base class available as an
 attribute. If a child class does not declare its own :ref:`Meta <meta-options>`
 class, it will inherit the parent's :ref:`Meta <meta-options>`. If the child wants to
-extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example::
+extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class CommonInfo(models.Model):
         # ...
         class Meta:
             abstract = True
-            ordering = ['name']
+            ordering = ["name"]
+
 
     class Student(CommonInfo):
         # ...
         class Meta(CommonInfo.Meta):
-            db_table = 'student_info'
+            db_table = "student_info"
 
 Django does make one adjustment to the :ref:`Meta <meta-options>` class of an
 abstract base class: before installing the :ref:`Meta <meta-options>`
@@ -1024,9 +1090,12 @@ Due to the way Python inheritance works, if a child class inherits from
 multiple abstract base classes, only the :ref:`Meta <meta-options>` options
 from the first listed class will be inherited by default. To inherit :ref:`Meta
 <meta-options>` options from multiple abstract base classes, you must
-explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
+explicitly declare the :ref:`Meta <meta-options>` inheritance. For example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
@@ -1034,12 +1103,14 @@ explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
 
         class Meta:
             abstract = True
-            ordering = ['name']
+            ordering = ["name"]
+
 
     class Unmanaged(models.Model):
         class Meta:
             abstract = True
             managed = False
+
 
     class Student(CommonInfo, Unmanaged):
         home_group = models.CharField(max_length=5)
@@ -1074,9 +1145,12 @@ class (only), part of the value should contain ``'%(app_label)s'`` and
   the model class names within each app must also be unique, therefore the
   resulting name will end up being different.
 
-For example, given an app ``common/models.py``::
+For example, given an app ``common/models.py``:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Base(models.Model):
         m2m = models.ManyToManyField(
@@ -1088,15 +1162,20 @@ For example, given an app ``common/models.py``::
         class Meta:
             abstract = True
 
+
     class ChildA(Base):
         pass
+
 
     class ChildB(Base):
         pass
 
-Along with another app ``rare/models.py``::
+Along with another app ``rare/models.py``:
+
+.. code-block:: python
 
     from common.models import Base
+
 
     class ChildB(Base):
         pass
@@ -1131,13 +1210,17 @@ the hierarchy is a model all by itself. Each model corresponds to its own
 database table and can be queried and created individually. The inheritance
 relationship introduces links between the child model and each of its parents
 (via an automatically-created :class:`~django.db.models.OneToOneField`).
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
+
 
     class Restaurant(Place):
         serves_hot_dogs = models.BooleanField(default=False)
@@ -1201,7 +1284,9 @@ inherits behavior from the parent: if the child does not specify an
 these from its parent.
 
 If the parent has an ordering and you don't want the child to have any natural
-ordering, you can explicitly disable it::
+ordering, you can explicitly disable it:
+
+.. code-block:: python
 
     class ChildModel(ParentModel):
         # ...
@@ -1225,7 +1310,9 @@ attribute on each such field. If you forget, Django will raise a validation
 error.
 
 For example, using the above ``Place`` class again, let's create another
-subclass with a :class:`~django.db.models.ManyToManyField`::
+subclass with a :class:`~django.db.models.ManyToManyField`:
+
+.. code-block:: python
 
     class Supplier(Place):
         customers = models.ManyToManyField(Place)
@@ -1239,7 +1326,7 @@ This results in the error::
     'Supplier.customers' or 'Supplier.place_ptr'.
 
 Adding ``related_name`` to the ``customers`` field as follows would resolve the
-error: ``models.ManyToManyField(Place, related_name='provider')``.
+error: ``models.ManyToManyField(Place, related_name="provider")``.
 
 Specifying the parent link field
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1275,13 +1362,17 @@ Proxy models are declared like normal models. You tell Django that it's a
 proxy model by setting the :attr:`~django.db.models.Options.proxy` attribute of
 the ``Meta`` class to ``True``.
 
-For example, suppose you want to add a method to the ``Person`` model. You can do it like this::
+For example, suppose you want to add a method to the ``Person`` model. You can do it like this:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
+
 
     class MyPerson(Person):
         class Meta:
@@ -1303,7 +1394,9 @@ accessible through ``MyPerson``, and vice-versa:
 
 You could also use a proxy model to define a different default ordering on
 a model. You might not always want to order the ``Person`` model, but regularly
-order by the ``last_name`` attribute when you use the proxy::
+order by the ``last_name`` attribute when you use the proxy:
+
+.. code-block:: python
 
     class OrderedPerson(Person):
         class Meta:
@@ -1346,13 +1439,17 @@ it will become the default, although any managers defined on the parent
 classes will still be available.
 
 Continuing our example from above, you could change the default manager used
-when you query the ``Person`` model like this::
+when you query the ``Person`` model like this:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class NewManager(models.Manager):
         # ...
         pass
+
 
     class MyPerson(Person):
         objects = NewManager()
@@ -1363,7 +1460,9 @@ when you query the ``Person`` model like this::
 If you wanted to add a new manager to the Proxy, without replacing the
 existing default, you can use the techniques described in the :ref:`custom
 manager <custom-managers-and-inheritance>` documentation: create a base class
-containing the new managers and inherit that after the primary base class::
+containing the new managers and inherit that after the primary base class:
+
+.. code-block:: python
 
     # Create an abstract class for the new manager.
     class ExtraManagers(models.Model):
@@ -1371,6 +1470,7 @@ containing the new managers and inherit that after the primary base class::
 
         class Meta:
             abstract = True
+
 
     class MyPerson(Person, ExtraManagers):
         class Meta:
@@ -1430,15 +1530,19 @@ coming from.
 
 Note that inheriting from multiple models that have a common ``id`` primary
 key field will raise an error. To properly use multiple inheritance, you can
-use an explicit :class:`~django.db.models.AutoField` in the base models::
+use an explicit :class:`~django.db.models.AutoField` in the base models:
+
+.. code-block:: python
 
     class Article(models.Model):
         article_id = models.AutoField(primary_key=True)
         ...
 
+
     class Book(models.Model):
         book_id = models.AutoField(primary_key=True)
         ...
+
 
     class BookReview(Book, Article):
         pass
@@ -1446,18 +1550,25 @@ use an explicit :class:`~django.db.models.AutoField` in the base models::
 Or use a common ancestor to hold the :class:`~django.db.models.AutoField`. This
 requires using an explicit :class:`~django.db.models.OneToOneField` from each
 parent model to the common ancestor to avoid a clash between the fields that
-are automatically generated and inherited by the child::
+are automatically generated and inherited by the child:
+
+.. code-block:: python
 
     class Piece(models.Model):
         pass
 
+
     class Article(Piece):
-        article_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
+        article_piece = models.OneToOneField(
+            Piece, on_delete=models.CASCADE, parent_link=True
+        )
         ...
+
 
     class Book(Piece):
         book_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
+
 
     class BookReview(Book, Article):
         pass

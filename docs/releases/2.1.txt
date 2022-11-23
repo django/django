@@ -276,11 +276,14 @@ If you used bcrypt with Django 1.4 or 1.5 (before ``BCryptSHA256PasswordHasher``
 was added in Django 1.6), you might have some passwords that use the
 ``BCryptPasswordHasher`` hasher.
 
-You can check if that's the case like this::
+You can check if that's the case like this:
+
+.. code-block:: python
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    User.objects.filter(password__startswith='bcrypt$$')
+    User.objects.filter(password__startswith="bcrypt$$")
 
 If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
@@ -317,7 +320,9 @@ With the new "view" permission, existing custom admin forms may raise errors
 when a user doesn't have the change permission because the form might access
 nonexistent fields. Fix this by overriding :meth:`.ModelAdmin.get_form` and
 checking if the user has the "change" permissions and returning the default
-form if not::
+form if not:
+
+.. code-block:: python
 
     class MyAdmin(admin.ModelAdmin):
         def get_form(self, request, obj=None, **kwargs):

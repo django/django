@@ -236,20 +236,24 @@ Content negotiation example
 ===========================
 
 Here is an example showing how you might go about implementing a form that
-works with an API-based workflow as well as 'normal' form POSTs::
+works with an API-based workflow as well as 'normal' form POSTs:
+
+.. code-block:: python
 
     from django.http import JsonResponse
     from django.views.generic.edit import CreateView
     from myapp.models import Author
+
 
     class JsonableResponseMixin:
         """
         Mixin to add JSON support to a form.
         Must be used with an object-based FormView (e.g. CreateView)
         """
+
         def form_invalid(self, form):
             response = super().form_invalid(form)
-            if self.request.accepts('text/html'):
+            if self.request.accepts("text/html"):
                 return response
             else:
                 return JsonResponse(form.errors, status=400)
@@ -259,14 +263,15 @@ works with an API-based workflow as well as 'normal' form POSTs::
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
             response = super().form_valid(form)
-            if self.request.accepts('text/html'):
+            if self.request.accepts("text/html"):
                 return response
             else:
                 data = {
-                    'pk': self.object.pk,
+                    "pk": self.object.pk,
                 }
                 return JsonResponse(data)
 
+
     class AuthorCreateView(JsonableResponseMixin, CreateView):
         model = Author
-        fields = ['name']
+        fields = ["name"]

@@ -88,11 +88,14 @@ Paginating a ``ListView``
 :class:`django.views.generic.list.ListView` provides a builtin way to paginate
 the displayed list. You can do this by adding a
 :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` attribute to
-your view class, for example::
+your view class, for example:
+
+.. code-block:: python
 
     from django.views.generic import ListView
 
     from myapp.models import Contact
+
 
     class ContactListView(ListView):
         paginate_by = 2
@@ -134,20 +137,23 @@ Using ``Paginator`` in a view function
 ======================================
 
 Here's an example using :class:`~django.core.paginator.Paginator` in a view
-function to paginate a queryset::
+function to paginate a queryset:
+
+.. code-block:: python
 
     from django.core.paginator import Paginator
     from django.shortcuts import render
 
     from myapp.models import Contact
 
+
     def listing(request):
         contact_list = Contact.objects.all()
-        paginator = Paginator(contact_list, 25) # Show 25 contacts per page.
+        paginator = Paginator(contact_list, 25)  # Show 25 contacts per page.
 
-        page_number = request.GET.get('page')
+        page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
-        return render(request, 'list.html', {'page_obj': page_obj})
+        return render(request, "list.html", {"page_obj": page_obj})
 
 In the template :file:`list.html`, you can include navigation between pages in
 the same way as in the template for the ``ListView`` above.

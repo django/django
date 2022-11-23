@@ -52,16 +52,19 @@ Example
         PRIMEM["Greenwich",0],
         UNIT["Degree",0.017453292519943295]]
 
-#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`)::
+#. Now we define our corresponding Django model (make sure to use :djadmin:`migrate`):
+
+.. code-block:: python
 
     from django.contrib.gis.db import models
 
+
     class TestGeo(models.Model):
-        name = models.CharField(max_length=25) # corresponds to the 'str' field
-        poly = models.PolygonField(srid=4269) # we want our model in a different SRID
+        name = models.CharField(max_length=25)  # corresponds to the 'str' field
+        poly = models.PolygonField(srid=4269)  # we want our model in a different SRID
 
         def __str__(self):
-            return 'Name: %s' % self.name
+            return "Name: %s" % self.name
 
 #. Use :class:`LayerMapping` to extract all the features and place them in the
    database:

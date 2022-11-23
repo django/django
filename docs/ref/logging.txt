@@ -61,54 +61,56 @@ Default logging definition
 
 Django's default logging configuration inherits Python's defaults. It's
 available as ``django.utils.log.DEFAULT_LOGGING`` and defined in
-:source:`django/utils/log.py`::
+:source:`django/utils/log.py`:
+
+.. code-block:: python
 
     {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
             },
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
             },
         },
-        'formatters': {
-            'django.server': {
-                '()': 'django.utils.log.ServerFormatter',
-                'format': '[{server_time}] {message}',
-                'style': '{',
+        "formatters": {
+            "django.server": {
+                "()": "django.utils.log.ServerFormatter",
+                "format": "[{server_time}] {message}",
+                "style": "{",
             }
         },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
+        "handlers": {
+            "console": {
+                "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
             },
-            'django.server': {
-                'level': 'INFO',
-                'class': 'logging.StreamHandler',
-                'formatter': 'django.server',
+            "django.server": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",
+                "formatter": "django.server",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            }
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
+        "loggers": {
+            "django": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
             },
-            'django.server': {
-                'handlers': ['django.server'],
-                'level': 'INFO',
-                'propagate': False,
+            "django.server": {
+                "handlers": ["django.server"],
+                "level": "INFO",
+                "propagate": False,
             },
-        }
+        },
     }
 
 See :ref:`configuring-logging` on how to complement or replace this default
@@ -226,19 +228,25 @@ to a ``SuspiciousOperation`` will not be logged to the ``django.request``
 logger, but only to the ``django.security`` logger.
 
 To silence a particular type of ``SuspiciousOperation``, you can override that
-specific logger following this example::
+specific logger following this example:
 
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
+.. code-block:: python
+
+    {
+        # ...
+        "handlers": {
+            "null": {
+                "class": "logging.NullHandler",
+            },
         },
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
+        "loggers": {
+            "django.security.DisallowedHost": {
+                "handlers": ["null"],
+                "propagate": False,
+            },
         },
-    },
+        # ...
+    }
 
 Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
 
@@ -278,30 +286,42 @@ Python logging module <python:logging.handlers>`.
     containing the full content of the debug web page that would have been
     produced if :setting:`DEBUG` were ``True``. To set this value in your
     configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
+    ``django.utils.log.AdminEmailHandler``, like this:
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
+    .. code-block:: python
+
+        {
+            # ...
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "include_html": True,
+                },
             },
-        },
+            # ...
+        }
 
     Be aware of the :ref:`security implications of logging
     <logging-security-implications>` when using the ``AdminEmailHandler``.
 
     By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
     :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this::
+    handler can be overridden, like this:
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+    .. code-block:: python
+
+        {
+            # ...
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "email_backend": "django.core.mail.backends.filebased.EmailBackend",
+                },
             },
-        },
+            # ...
+        }
 
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
@@ -309,16 +329,22 @@ Python logging module <python:logging.handlers>`.
     The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
     an ``django.views.debug.ExceptionReporter`` subclass to customize the
     traceback text sent in the email body. You provide a string import path to
-    the class you wish to use, like this::
+    the class you wish to use, like this:
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-                'reporter_class': 'somepackage.error_reporter.CustomErrorReporter',
+    .. code-block:: python
+
+        {
+            # ...
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "include_html": True,
+                    "reporter_class": "somepackage.error_reporter.CustomErrorReporter",
+                },
             },
-        },
+            # ...
+        }
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 
@@ -341,9 +367,12 @@ logging module.
 
     For instance, to filter out :exc:`~django.http.UnreadablePostError`
     (raised when a user cancels an upload) from the admin emails, you would
-    create a filter function::
+    create a filter function:
+
+    .. code-block:: python
 
         from django.http import UnreadablePostError
+
 
         def skip_unreadable_post(record):
             if record.exc_info:
@@ -352,21 +381,27 @@ logging module.
                     return False
             return True
 
-    and then add it to your logging config::
+    and then add it to your logging config:
 
-        'filters': {
-            'skip_unreadable_posts': {
-                '()': 'django.utils.log.CallbackFilter',
-                'callback': skip_unreadable_post,
+    .. code-block:: python
+
+        {
+            # ...
+            "filters": {
+                "skip_unreadable_posts": {
+                    "()": "django.utils.log.CallbackFilter",
+                    "callback": skip_unreadable_post,
+                },
             },
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['skip_unreadable_posts'],
-                'class': 'django.utils.log.AdminEmailHandler',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "filters": ["skip_unreadable_posts"],
+                    "class": "django.utils.log.AdminEmailHandler",
+                },
             },
-        },
+            # ...
+        }
 
 .. class:: RequireDebugFalse()
 
@@ -374,20 +409,26 @@ logging module.
 
     This filter is used as follows in the default :setting:`LOGGING`
     configuration to ensure that the :class:`AdminEmailHandler` only sends
-    error emails to admins when :setting:`DEBUG` is ``False``::
+    error emails to admins when :setting:`DEBUG` is ``False``:
 
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+    .. code-block:: python
+
+        {
+            # ...
+            "filters": {
+                "require_debug_false": {
+                    "()": "django.utils.log.RequireDebugFalse",
+                },
             },
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "filters": ["require_debug_false"],
+                    "class": "django.utils.log.AdminEmailHandler",
+                },
             },
-        },
+            # ...
+        }
 
 .. class:: RequireDebugTrue()
 

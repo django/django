@@ -246,17 +246,20 @@ to go one step further and use
 :class:`~django.contrib.contenttypes.models.ContentType` to enable truly
 generic (sometimes called "polymorphic") relationships between models.
 
-For example, it could be used for a tagging system like so::
+For example, it could be used for a tagging system like so:
+
+.. code-block:: python
 
     from django.contrib.contenttypes.fields import GenericForeignKey
     from django.contrib.contenttypes.models import ContentType
     from django.db import models
 
+
     class TaggedItem(models.Model):
         tag = models.SlugField()
         content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
         object_id = models.PositiveIntegerField()
-        content_object = GenericForeignKey('content_type', 'object_id')
+        content_object = GenericForeignKey("content_type", "object_id")
 
         def __str__(self):
             return self.tag
@@ -370,7 +373,9 @@ Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` isn't a
-normal field object, these examples will *not* work::
+normal field object, these examples will *not* work:
+
+.. code-block:: pycon
 
     # This will fail
     >>> TaggedItem.objects.filter(content_object=guido)
@@ -393,10 +398,13 @@ Reverse generic relations
         from the related object.
 
 If you know which models you'll be using most often, you can also add
-a "reverse" generic relationship to enable an additional API. For example::
+a "reverse" generic relationship to enable an additional API. For example:
+
+.. code-block:: python
 
     from django.contrib.contenttypes.fields import GenericRelation
     from django.db import models
+
 
     class Bookmark(models.Model):
         url = models.URLField()
@@ -453,9 +461,11 @@ instance:
     <QuerySet []>
 
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
-``related_query_name`` set allows querying from the related object::
+``related_query_name`` set allows querying from the related object:
 
-    tags = GenericRelation(TaggedItem, related_query_name='bookmark')
+.. code-block:: python
+
+    tags = GenericRelation(TaggedItem, related_query_name="bookmark")
 
 This enables filtering, ordering, and other query operations on ``Bookmark``
 from ``TaggedItem``:

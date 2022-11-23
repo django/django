@@ -144,12 +144,15 @@ Level Constant  Tag
 To change the default tags for a message level (either built-in or custom),
 set the :setting:`MESSAGE_TAGS` setting to a dictionary containing the levels
 you wish to change. As this extends the default tags, you only need to provide
-tags for the levels you wish to override::
+tags for the levels you wish to override:
+
+.. code-block:: python
 
     from django.contrib.messages import constants as messages
+
     MESSAGE_TAGS = {
-        messages.INFO: '',
-        50: 'critical',
+        messages.INFO: "",
+        50: "critical",
     }
 
 Using messages in views and templates
@@ -160,19 +163,24 @@ Using messages in views and templates
 Adding a message
 ----------------
 
-To add a message, call::
+To add a message, call:
+
+.. code-block:: python
 
     from django.contrib import messages
-    messages.add_message(request, messages.INFO, 'Hello world.')
+
+    messages.add_message(request, messages.INFO, "Hello world.")
 
 Some shortcut methods provide a standard way to add messages with commonly
-used tags (which are usually represented as HTML classes for the message)::
+used tags (which are usually represented as HTML classes for the message):
 
-    messages.debug(request, '%s SQL statements were executed.' % count)
-    messages.info(request, 'Three credits remain in your account.')
-    messages.success(request, 'Profile details updated.')
-    messages.warning(request, 'Your account expires in three days.')
-    messages.error(request, 'Document deleted.')
+.. code-block:: python
+
+    messages.debug(request, "%s SQL statements were executed." % count)
+    messages.info(request, "Three credits remain in your account.")
+    messages.success(request, "Profile details updated.")
+    messages.warning(request, "Your account expires in three days.")
+    messages.error(request, "Document deleted.")
 
 .. _message-displaying:
 
@@ -213,7 +221,9 @@ is a mapping of the message level names to their numeric value::
     {% endif %}
 
 **Outside of templates**, you can use
-:func:`~django.contrib.messages.get_messages`::
+:func:`~django.contrib.messages.get_messages`:
+
+.. code-block:: python
 
     from django.contrib.messages import get_messages
 
@@ -256,12 +266,15 @@ Creating custom message levels
 ------------------------------
 
 Messages levels are nothing more than integers, so you can define your own
-level constants and use them to create more customized user feedback, e.g.::
+level constants and use them to create more customized user feedback, e.g.:
+
+.. code-block:: python
 
     CRITICAL = 50
 
+
     def my_view(request):
-        messages.add_message(request, CRITICAL, 'A serious error occurred.')
+        messages.add_message(request, CRITICAL, "A serious error occurred.")
 
 When creating custom message levels you should be careful to avoid overloading
 existing levels. The values for the built-in levels are:
@@ -289,25 +302,30 @@ Changing the minimum recorded level per-request
 -----------------------------------------------
 
 The minimum recorded level can be set per request via the ``set_level``
-method::
+method:
+
+.. code-block:: python
 
     from django.contrib import messages
 
     # Change the messages level to ensure the debug message is added.
     messages.set_level(request, messages.DEBUG)
-    messages.debug(request, 'Test message...')
+    messages.debug(request, "Test message...")
 
     # In another request, record only messages with a level of WARNING and higher
     messages.set_level(request, messages.WARNING)
-    messages.success(request, 'Your profile was updated.') # ignored
-    messages.warning(request, 'Your account is about to expire.') # recorded
+    messages.success(request, "Your profile was updated.")  # ignored
+    messages.warning(request, "Your account is about to expire.")  # recorded
 
     # Set the messages level back to default.
     messages.set_level(request, None)
 
-Similarly, the current effective level can be retrieved with ``get_level``::
+Similarly, the current effective level can be retrieved with ``get_level``:
+
+.. code-block:: python
 
     from django.contrib import messages
+
     current_level = messages.get_level(request)
 
 For more information on how the minimum recorded level functions, see
@@ -317,10 +335,12 @@ Adding extra message tags
 -------------------------
 
 For more direct control over message tags, you can optionally provide a string
-containing extra tags to any of the add methods::
+containing extra tags to any of the add methods:
 
-    messages.add_message(request, messages.INFO, 'Over 9000!', extra_tags='dragonball')
-    messages.error(request, 'Email box full', extra_tags='email')
+.. code-block:: python
+
+    messages.add_message(request, messages.INFO, "Over 9000!", extra_tags="dragonball")
+    messages.error(request, "Email box full", extra_tags="email")
 
 Extra tags are added before the default tag for that level and are space
 separated.
@@ -359,15 +379,18 @@ Adding messages in class-based views
         ``cleaned_data`` is the cleaned data from the form which is used for
         string formatting
 
-**Example views.py**::
+**Example views.py**:
+
+.. code-block:: python
 
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
+
     class AuthorCreateView(SuccessMessageMixin, CreateView):
         model = Author
-        success_url = '/success/'
+        success_url = "/success/"
         success_message = "%(name)s was created successfully"
 
 The cleaned data from the ``form`` is available for string interpolation using
@@ -376,15 +399,18 @@ from the saved ``object`` override the
 :meth:`~django.contrib.messages.views.SuccessMessageMixin.get_success_message`
 method.
 
-**Example views.py for ModelForms**::
+**Example views.py for ModelForms**:
+
+.. code-block:: python
 
     from django.contrib.messages.views import SuccessMessageMixin
     from django.views.generic.edit import CreateView
     from myapp.models import ComplicatedModel
 
+
     class ComplicatedCreateView(SuccessMessageMixin, CreateView):
         model = ComplicatedModel
-        success_url = '/success/'
+        success_url = "/success/"
         success_message = "%(calculated_field)s was created successfully"
 
         def get_success_message(self, cleaned_data):

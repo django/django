@@ -63,7 +63,9 @@ aware or naive.
 
 When time zone support is disabled, Django uses naive datetime objects in local
 time. This is sufficient for many use cases. In this mode, to obtain the
-current time, you would write::
+current time, you would write:
+
+.. code-block:: python
 
     import datetime
 
@@ -71,7 +73,9 @@ current time, you would write::
 
 When time zone support is enabled (:setting:`USE_TZ=True <USE_TZ>`), Django uses
 time-zone-aware datetime objects. If your code creates datetime objects, they
-should be aware too. In this mode, the example above becomes::
+should be aware too. In this mode, the example above becomes:
+
+.. code-block:: python
 
     from django.utils import timezone
 
@@ -166,41 +170,47 @@ you can use to build a map from likely locations to time zones.
 Here's an example that stores the current timezone in the session. (It skips
 error handling entirely for the sake of simplicity.)
 
-Add the following middleware to :setting:`MIDDLEWARE`::
+Add the following middleware to :setting:`MIDDLEWARE`:
+
+.. code-block:: python
 
     import zoneinfo
 
     from django.utils import timezone
+
 
     class TimezoneMiddleware:
         def __init__(self, get_response):
             self.get_response = get_response
 
         def __call__(self, request):
-            tzname = request.session.get('django_timezone')
+            tzname = request.session.get("django_timezone")
             if tzname:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             else:
                 timezone.deactivate()
             return self.get_response(request)
 
-Create a view that can set the current timezone::
+Create a view that can set the current timezone:
+
+.. code-block:: python
 
     from django.shortcuts import redirect, render
 
     # Prepare a map of common locations to timezone choices you wish to offer.
     common_timezones = {
-        'London': 'Europe/London',
-        'Paris': 'Europe/Paris',
-        'New York': 'America/New_York',
+        "London": "Europe/London",
+        "Paris": "Europe/Paris",
+        "New York": "America/New_York",
     }
 
+
     def set_timezone(request):
-        if request.method == 'POST':
-            request.session['django_timezone'] = request.POST['timezone']
-            return redirect('/')
+        if request.method == "POST":
+            request.session["django_timezone"] = request.POST["timezone"]
+            return redirect("/")
         else:
-            return render(request, 'template.html', {'timezones': common_timezones})
+            return render(request, "template.html", {"timezones": common_timezones})
 
 Include a form in ``template.html`` that will ``POST`` to this view:
 
@@ -433,12 +443,17 @@ a warning when you attempt to save a naive datetime to the database::
     datetime (2012-01-01 00:00:00) while time zone support is active.
 
 During development, you can turn such warnings into exceptions and get a
-traceback by adding the following to your settings file::
+traceback by adding the following to your settings file:
+
+.. code-block:: python
 
     import warnings
+
     warnings.filterwarnings(
-        'error', r"DateTimeField .* received a naive datetime",
-        RuntimeWarning, r'django\.db\.models\.fields',
+        "error",
+        r"DateTimeField .* received a naive datetime",
+        RuntimeWarning,
+        r"django\.db\.models\.fields",
     )
 
 Fixtures
@@ -582,23 +597,25 @@ Troubleshooting
    method. You also consider that a :class:`~datetime.date` is a lot like a
    :class:`~datetime.datetime`, except that it's less accurate.
 
-   None of this is true in a time zone aware environment::
+   None of this is true in a time zone aware environment:
 
-       >>> import datetime
-       >>> import zoneinfo
-       >>> paris_tz = zoneinfo.ZoneInfo("Europe/Paris")
-       >>> new_york_tz = zoneinfo.ZoneInfo("America/New_York")
-       >>> paris = datetime.datetime(2012, 3, 3, 1, 30, tzinfo=paris_tz)
-       # This is the correct way to convert between time zones.
-       >>> new_york = paris.astimezone(new_york_tz)
-       >>> paris == new_york, paris.date() == new_york.date()
-       (True, False)
-       >>> paris - new_york, paris.date() - new_york.date()
-       (datetime.timedelta(0), datetime.timedelta(1))
-       >>> paris
-       datetime.datetime(2012, 3, 3, 1, 30, tzinfo=zoneinfo.ZoneInfo(key='Europe/Paris'))
-       >>> new_york
-       datetime.datetime(2012, 3, 2, 19, 30, tzinfo=zoneinfo.ZoneInfo(key='America/New_York'))
+   .. code-block:: pycon
+
+        >>> import datetime
+        >>> import zoneinfo
+        >>> paris_tz = zoneinfo.ZoneInfo("Europe/Paris")
+        >>> new_york_tz = zoneinfo.ZoneInfo("America/New_York")
+        >>> paris = datetime.datetime(2012, 3, 3, 1, 30, tzinfo=paris_tz)
+        # This is the correct way to convert between time zones.
+        >>> new_york = paris.astimezone(new_york_tz)
+        >>> paris == new_york, paris.date() == new_york.date()
+        (True, False)
+        >>> paris - new_york, paris.date() - new_york.date()
+        (datetime.timedelta(0), datetime.timedelta(1))
+        >>> paris
+        datetime.datetime(2012, 3, 3, 1, 30, tzinfo=zoneinfo.ZoneInfo(key='Europe/Paris'))
+        >>> new_york
+        datetime.datetime(2012, 3, 2, 19, 30, tzinfo=zoneinfo.ZoneInfo(key='America/New_York'))
 
    As this example shows, the same datetime has a different date, depending on
    the time zone in which it is represented. But the real problem is more

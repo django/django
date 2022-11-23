@@ -409,11 +409,13 @@ The intersection pattern matrix may only use the following characters:
 ``1``, ``2``, ``T``, ``F``, or ``*``.  This lookup type allows users to "fine tune"
 a specific geometric relationship consistent with the DE-9IM model. [#fnde9im]_
 
-Geometry example::
+Geometry example:
+
+.. code-block:: python
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, "T*T***FF*"))
 
 PostGIS and MariaDB SQL equivalent:
 
@@ -451,7 +453,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, "anyinteract"))
 
 Oracle SQL equivalent:
 

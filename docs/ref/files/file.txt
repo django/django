@@ -95,7 +95,9 @@ The ``ContentFile`` class
 
     The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
     but unlike :class:`~django.core.files.File` it operates on string content
-    (bytes also supported), rather than an actual file. For example::
+    (bytes also supported), rather than an actual file. For example:
+
+    .. code-block:: python
 
         from django.core.files.base import ContentFile
 
@@ -135,14 +137,18 @@ below) will also have a couple of extra methods:
     Saves a new file with the file name and contents provided. This will not
     replace the existing file, but will create a new file and update the object
     to point to it. If ``save`` is ``True``, the model's ``save()`` method will
-    be called once the file is saved. That is, these two lines::
+    be called once the file is saved. That is, these two lines:
 
-        >>> car.photo.save('myphoto.jpg', content, save=False)
+    .. code-block:: pycon
+
+        >>> car.photo.save("myphoto.jpg", content, save=False)
         >>> car.save()
 
-    are equivalent to::
+    are equivalent to:
 
-        >>> car.photo.save('myphoto.jpg', content, save=True)
+    .. code-block:: pycon
+
+        >>> car.photo.save("myphoto.jpg", content, save=True)
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as

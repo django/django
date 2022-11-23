@@ -2000,29 +2000,33 @@ To call a management command from code use ``call_command``.
   correct type. For example, ``call_command('flush', verbosity=0)`` (zero must
   be an integer rather than a string).
 
-Examples::
+Examples:
 
-      from django.core import management
-      from django.core.management.commands import loaddata
+.. code-block:: python
 
-      management.call_command('flush', verbosity=0, interactive=False)
-      management.call_command('loaddata', 'test_data', verbosity=0)
-      management.call_command(loaddata.Command(), 'test_data', verbosity=0)
+    from django.core import management
+    from django.core.management.commands import loaddata
+
+    management.call_command("flush", verbosity=0, interactive=False)
+    management.call_command("loaddata", "test_data", verbosity=0)
+    management.call_command(loaddata.Command(), "test_data", verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
 with ``True`` or ``False``, as you can see with the ``interactive`` option above.
 
-Named arguments can be passed by using either one of the following syntaxes::
+Named arguments can be passed by using either one of the following syntaxes:
 
-      # Similar to the command line
-      management.call_command('dumpdata', '--natural-foreign')
+.. code-block:: python
 
-      # Named argument similar to the command line minus the initial dashes and
-      # with internal dashes replaced by underscores
-      management.call_command('dumpdata', natural_foreign=True)
+    # Similar to the command line
+    management.call_command("dumpdata", "--natural-foreign")
 
-      # `use_natural_foreign_keys` is the option destination variable
-      management.call_command('dumpdata', use_natural_foreign_keys=True)
+    # Named argument similar to the command line minus the initial dashes and
+    # with internal dashes replaced by underscores
+    management.call_command("dumpdata", natural_foreign=True)
+
+    # `use_natural_foreign_keys` is the option destination variable
+    management.call_command("dumpdata", use_natural_foreign_keys=True)
 
 Some command options have different names when using ``call_command()`` instead
 of ``django-admin`` or ``manage.py``. For example, ``django-admin
@@ -2042,7 +2046,9 @@ Output redirection
 ==================
 
 Note that you can redirect standard output and error streams as all commands
-support the ``stdout`` and ``stderr`` options. For example, you could write::
+support the ``stdout`` and ``stderr`` options. For example, you could write:
 
-    with open('/path/to/command_output', 'w') as f:
-        management.call_command('dumpdata', stdout=f)
+.. code-block:: python
+
+    with open("/path/to/command_output", "w") as f:
+        management.call_command("dumpdata", stdout=f)

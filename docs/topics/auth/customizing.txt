@@ -98,18 +98,24 @@ database ID or whatever, but has to be the primary key of your user object --
 and returns a user object or ``None``.
 
 The ``authenticate`` method takes a ``request`` argument and credentials as
-keyword arguments. Most of the time, it'll look like this::
+keyword arguments. Most of the time, it'll look like this:
+
+.. code-block:: python
 
     from django.contrib.auth.backends import BaseBackend
+
 
     class MyBackend(BaseBackend):
         def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a user.
             ...
 
-But it could also authenticate a token, like so::
+But it could also authenticate a token, like so:
+
+.. code-block:: python
 
     from django.contrib.auth.backends import BaseBackend
+
 
     class MyBackend(BaseBackend):
         def authenticate(self, request, token=None):
@@ -133,12 +139,15 @@ user logs in.
 
 Here's an example backend that authenticates against a username and password
 variable defined in your ``settings.py`` file and creates a Django ``User``
-object the first time a user authenticates::
+object the first time a user authenticates:
+
+.. code-block:: python
 
     from django.conf import settings
     from django.contrib.auth.backends import BaseBackend
     from django.contrib.auth.hashers import check_password
     from django.contrib.auth.models import User
+
 
     class SettingsBackend(BaseBackend):
         """
@@ -151,7 +160,7 @@ object the first time a user authenticates::
         """
 
         def authenticate(self, request, username=None, password=None):
-            login_valid = (settings.ADMIN_LOGIN == username)
+            login_valid = settings.ADMIN_LOGIN == username
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
             if login_valid and pwd_valid:
                 try:
@@ -197,9 +206,12 @@ exception in :meth:`~django.contrib.auth.models.User.has_perm()` or
 :meth:`~django.contrib.auth.models.User.has_module_perms()`, the authorization
 will immediately fail and Django won't check the backends that follow.
 
-A backend could implement permissions for the magic admin like this::
+A backend could implement permissions for the magic admin like this:
+
+.. code-block:: python
 
     from django.contrib.auth.backends import BaseBackend
+
 
     class MagicAdminBackend(BaseBackend):
         def has_perm(self, user_obj, perm, obj=None):
@@ -276,10 +288,13 @@ To create custom permissions for a given model object, use the ``permissions``
 :ref:`model Meta attribute <meta-options>`.
 
 This example ``Task`` model creates two custom permissions, i.e., actions users
-can or cannot do with ``Task`` instances, specific to your application::
+can or cannot do with ``Task`` instances, specific to your application:
+
+.. code-block:: python
 
     class Task(models.Model):
         ...
+
         class Meta:
             permissions = [
                 ("change_task_status", "Can change the status of tasks"),
@@ -292,9 +307,11 @@ is connected to the :data:`~django.db.models.signals.post_migrate` signal).
 Your code is in charge of checking the value of these permissions when a user
 is trying to access the functionality provided by the application (changing the
 status of tasks or closing tasks.) Continuing the above example, the following
-checks if a user may close tasks::
+checks if a user may close tasks:
 
-    user.has_perm('app.close_task')
+.. code-block:: python
+
+    user.has_perm("app.close_task")
 
 .. _extending-user:
 
@@ -313,9 +330,12 @@ If you wish to store information related to ``User``, you can use a
 :class:`~django.db.models.OneToOneField` to a model containing the fields for
 additional information. This one-to-one model is often called a profile model,
 as it might store non-auth related information about a site user. For example
-you might create an Employee model::
+you might create an Employee model:
+
+.. code-block:: python
 
     from django.contrib.auth.models import User
+
 
     class Employee(models.Model):
         user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -334,7 +354,9 @@ To add a profile model's fields to the user page in the admin, define an
 :class:`~django.contrib.admin.InlineModelAdmin` (for this example, we'll use a
 :class:`~django.contrib.admin.StackedInline`) in your app's ``admin.py`` and
 add it to a ``UserAdmin`` class which is registered with the
-:class:`~django.contrib.auth.models.User` class::
+:class:`~django.contrib.auth.models.User` class:
+
+.. code-block:: python
 
     from django.contrib import admin
     from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -347,11 +369,13 @@ add it to a ``UserAdmin`` class which is registered with the
     class EmployeeInline(admin.StackedInline):
         model = Employee
         can_delete = False
-        verbose_name_plural = 'employee'
+        verbose_name_plural = "employee"
+
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
         inlines = [EmployeeInline]
+
 
     # Re-register UserAdmin
     admin.site.unregister(User)
@@ -394,9 +418,12 @@ Using a custom user model when starting a project
 If you're starting a new project, it's highly recommended to set up a custom
 user model, even if the default :class:`~django.contrib.auth.models.User` model
 is sufficient for you. This model behaves identically to the default user
-model, but you'll be able to customize it in the future if the need arises::
+model, but you'll be able to customize it in the future if the need arises:
+
+.. code-block:: python
 
     from django.contrib.auth.models import AbstractUser
+
 
     class User(AbstractUser):
         pass
@@ -404,7 +431,9 @@ model, but you'll be able to customize it in the future if the need arises::
 Don't forget to point :setting:`AUTH_USER_MODEL` to it. Do this before creating
 any migrations or running ``manage.py migrate`` for the first time.
 
-Also, register the model in the app's ``admin.py``::
+Also, register the model in the app's ``admin.py``:
+
+.. code-block:: python
 
     from django.contrib import admin
     from django.contrib.auth.admin import UserAdmin
@@ -466,10 +495,13 @@ different user model.
 
     When you define a foreign key or many-to-many relations to the user model,
     you should specify the custom model using the :setting:`AUTH_USER_MODEL`
-    setting. For example::
+    setting. For example:
+
+    .. code-block:: python
 
         from django.conf import settings
         from django.db import models
+
 
         class Article(models.Model):
             author = models.ForeignKey(
@@ -478,13 +510,17 @@ different user model.
             )
 
     When connecting to signals sent by the user model, you should specify
-    the custom model using the :setting:`AUTH_USER_MODEL` setting. For example::
+    the custom model using the :setting:`AUTH_USER_MODEL` setting. For example:
+
+    .. code-block:: python
 
         from django.conf import settings
         from django.db.models.signals import post_save
 
+
         def post_save_receiver(sender, instance, created, **kwargs):
             pass
+
 
         post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
@@ -498,18 +534,22 @@ different user model.
     ``@override_settings(AUTH_USER_MODEL=...)`` for example, and you cache the
     result of ``get_user_model()`` in a module-level variable, you may need to
     listen to the  :data:`~django.test.signals.setting_changed` signal to clear
-    the cache. For example::
+    the cache. For example:
+
+    .. code-block:: python
 
         from django.apps import apps
         from django.contrib.auth import get_user_model
         from django.core.signals import setting_changed
         from django.dispatch import receiver
 
+
         @receiver(setting_changed)
         def user_model_swapped(*, setting, **kwargs):
-            if setting == 'AUTH_USER_MODEL':
+            if setting == "AUTH_USER_MODEL":
                 apps.clear_cache()
                 from myapp import some_module
+
                 some_module.UserModel = get_user_model()
 
 .. _specifying-custom-user-model:
@@ -555,12 +595,14 @@ password resets. You must then provide some key implementation details:
         can support non-unique usernames.
 
         In the following example, the field ``identifier`` is used
-        as the identifying field::
+        as the identifying field:
+
+        .. code-block:: python
 
             class MyUser(AbstractBaseUser):
                 identifier = models.CharField(max_length=40, unique=True)
                 ...
-                USERNAME_FIELD = 'identifier'
+                USERNAME_FIELD = "identifier"
 
     .. attribute:: EMAIL_FIELD
 
@@ -580,14 +622,16 @@ password resets. You must then provide some key implementation details:
         creating a user in the admin.
 
         For example, here is the partial definition for a user model that
-        defines two required fields - a date of birth and height::
+        defines two required fields - a date of birth and height:
+
+        .. code-block:: python
 
             class MyUser(AbstractBaseUser):
                 ...
                 date_of_birth = models.DateField()
                 height = models.FloatField()
                 ...
-                REQUIRED_FIELDS = ['date_of_birth', 'height']
+                REQUIRED_FIELDS = ["date_of_birth", "height"]
 
         .. note::
 
@@ -831,16 +875,18 @@ to work with a custom user model:
 * :class:`~django.contrib.auth.forms.UserChangeForm`
 
 If your custom user model is a subclass of ``AbstractUser``, then you can
-extend these forms in this manner::
+extend these forms in this manner:
+
+.. code-block:: python
 
     from django.contrib.auth.forms import UserCreationForm
     from myapp.models import CustomUser
 
-    class CustomUserCreationForm(UserCreationForm):
 
+    class CustomUserCreationForm(UserCreationForm):
         class Meta(UserCreationForm.Meta):
             model = CustomUser
-            fields = UserCreationForm.Meta.fields + ('custom_field',)
+            fields = UserCreationForm.Meta.fields + ("custom_field",)
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
@@ -888,18 +934,17 @@ custom user class.
     ``django.contrib.auth.admin.UserAdmin``, then you need to add your custom
     fields to ``fieldsets`` (for fields to be used in editing users) and to
     ``add_fieldsets`` (for fields to be used when creating a user). For
-    example::
+    example:
+
+    .. code-block:: python
 
         from django.contrib.auth.admin import UserAdmin
 
+
         class CustomUserAdmin(UserAdmin):
             ...
-            fieldsets = UserAdmin.fieldsets + (
-                (None, {'fields': ['custom_field']}),
-            )
-            add_fieldsets = UserAdmin.add_fieldsets + (
-                (None, {'fields': ['custom_field']}),
-            )
+            fieldsets = UserAdmin.fieldsets + ((None, {"fields": ["custom_field"]}),)
+            add_fieldsets = UserAdmin.add_fieldsets + ((None, {"fields": ["custom_field"]}),)
 
     See :ref:`a full example <custom-users-admin-full-example>` for more
     details.
@@ -1010,12 +1055,12 @@ components work together, but is not intended to be copied directly into
 projects for production use.
 
 This code would all live in a ``models.py`` file for a custom
-authentication app::
+authentication app:
+
+.. code-block:: python
 
     from django.db import models
-    from django.contrib.auth.models import (
-        BaseUserManager, AbstractBaseUser
-    )
+    from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
     class MyUserManager(BaseUserManager):
@@ -1025,7 +1070,7 @@ authentication app::
             birth and password.
             """
             if not email:
-                raise ValueError('Users must have an email address')
+                raise ValueError("Users must have an email address")
 
             user = self.model(
                 email=self.normalize_email(email),
@@ -1053,7 +1098,7 @@ authentication app::
 
     class MyUser(AbstractBaseUser):
         email = models.EmailField(
-            verbose_name='email address',
+            verbose_name="email address",
             max_length=255,
             unique=True,
         )
@@ -1063,8 +1108,8 @@ authentication app::
 
         objects = MyUserManager()
 
-        USERNAME_FIELD = 'email'
-        REQUIRED_FIELDS = ['date_of_birth']
+        USERNAME_FIELD = "email"
+        REQUIRED_FIELDS = ["date_of_birth"]
 
         def __str__(self):
             return self.email
@@ -1086,7 +1131,9 @@ authentication app::
             return self.is_admin
 
 Then, to register this custom user model with Django's admin, the following
-code would be required in the app's ``admin.py`` file::
+code would be required in the app's ``admin.py`` file:
+
+.. code-block:: python
 
     from django import forms
     from django.contrib import admin
@@ -1101,12 +1148,15 @@ code would be required in the app's ``admin.py`` file::
     class UserCreationForm(forms.ModelForm):
         """A form for creating new users. Includes all the required
         fields, plus a repeated password."""
-        password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-        password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+        password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+        password2 = forms.CharField(
+            label="Password confirmation", widget=forms.PasswordInput
+        )
 
         class Meta:
             model = MyUser
-            fields = ['email', 'date_of_birth']
+            fields = ["email", "date_of_birth"]
 
         def clean_password2(self):
             # Check that the two password entries match
@@ -1130,11 +1180,12 @@ code would be required in the app's ``admin.py`` file::
         the user, but replaces the password field with admin's
         disabled password hash display field.
         """
+
         password = ReadOnlyPasswordHashField()
 
         class Meta:
             model = MyUser
-            fields = ['email', 'password', 'date_of_birth', 'is_active', 'is_admin']
+            fields = ["email", "password", "date_of_birth", "is_active", "is_admin"]
 
 
     class UserAdmin(BaseUserAdmin):
@@ -1145,23 +1196,26 @@ code would be required in the app's ``admin.py`` file::
         # The fields to be used in displaying the User model.
         # These override the definitions on the base UserAdmin
         # that reference specific fields on auth.User.
-        list_display = ['email', 'date_of_birth', 'is_admin']
-        list_filter = ['is_admin']
+        list_display = ["email", "date_of_birth", "is_admin"]
+        list_filter = ["is_admin"]
         fieldsets = [
-            (None, {'fields': ['email', 'password']}),
-            ('Personal info', {'fields': ['date_of_birth']}),
-            ('Permissions', {'fields': ['is_admin']}),
+            (None, {"fields": ["email", "password"]}),
+            ("Personal info", {"fields": ["date_of_birth"]}),
+            ("Permissions", {"fields": ["is_admin"]}),
         ]
         # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
         # overrides get_fieldsets to use this attribute when creating a user.
         add_fieldsets = [
-            (None, {
-                'classes': ['wide'],
-                'fields': ['email', 'date_of_birth', 'password1', 'password2'],
-            }),
+            (
+                None,
+                {
+                    "classes": ["wide"],
+                    "fields": ["email", "date_of_birth", "password1", "password2"],
+                },
+            ),
         ]
-        search_fields = ['email']
-        ordering = ['email']
+        search_fields = ["email"]
+        ordering = ["email"]
         filter_horizontal = []
 
 

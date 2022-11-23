@@ -74,15 +74,19 @@ still possible to prevent views from running in a transaction.
 .. function:: non_atomic_requests(using=None)
 
     This decorator will negate the effect of :setting:`ATOMIC_REQUESTS
-    <DATABASE-ATOMIC_REQUESTS>` for a given view::
+    <DATABASE-ATOMIC_REQUESTS>` for a given view:
+
+    .. code-block:: python
 
         from django.db import transaction
+
 
         @transaction.non_atomic_requests
         def my_view(request):
             do_stuff()
 
-        @transaction.non_atomic_requests(using='other')
+
+        @transaction.non_atomic_requests(using="other")
         def my_other_view(request):
             do_stuff_on_the_other_database()
 
@@ -111,18 +115,24 @@ Django provides a single API to control database transactions.
     durability and can be achieved by setting ``durable=True``. If the
     ``atomic`` block is nested within another it raises a ``RuntimeError``.
 
-    ``atomic`` is usable both as a :py:term:`decorator`::
+    ``atomic`` is usable both as a :py:term:`decorator`:
+
+    .. code-block:: python
 
         from django.db import transaction
+
 
         @transaction.atomic
         def viewfunc(request):
             # This code executes inside a transaction.
             do_stuff()
 
-    and as a :py:term:`context manager`::
+    and as a :py:term:`context manager`:
+
+    .. code-block:: python
 
         from django.db import transaction
+
 
         def viewfunc(request):
             # This code executes in autocommit mode (Django's default).
@@ -133,9 +143,12 @@ Django provides a single API to control database transactions.
                 do_more_stuff()
 
     Wrapping ``atomic`` in a try/except block allows for natural handling of
-    integrity errors::
+    integrity errors:
+
+    .. code-block:: python
 
         from django.db import IntegrityError, transaction
+
 
         @transaction.atomic
         def viewfunc(request):
@@ -190,7 +203,9 @@ Django provides a single API to control database transactions.
 
         For example, given ``MyModel`` with an ``active`` field, this snippet
         ensures that the ``if obj.active`` check at the end uses the correct
-        value if updating ``active`` to ``True`` fails in the transaction::
+        value if updating ``active`` to ``True`` fails in the transaction:
+
+        .. code-block:: python
 
             from django.db import DatabaseError, transaction
 
@@ -297,24 +312,28 @@ the open transaction is successfully committed:
 
 .. function:: on_commit(func, using=None, robust=False)
 
-Pass a function, or any callable, to :func:`on_commit`::
+Pass a function, or any callable, to :func:`on_commit`:
+
+.. code-block:: python
 
     from django.db import transaction
+
 
     def send_welcome_email():
         ...
 
+
     transaction.on_commit(send_welcome_email)
 
 Callbacks will not be passed any arguments, but you can bind them with
-:func:`functools.partial`::
+:func:`functools.partial`:
+
+.. code-block:: python
 
     from functools import partial
 
     for user in users:
-        transaction.on_commit(
-            partial(send_invite_email, user=user)
-        )
+        transaction.on_commit(partial(send_invite_email, user=user))
 
 Callbacks are called after the open transaction is successfully committed. If
 the transaction is instead rolled back (typically when an unhandled exception
@@ -343,7 +362,9 @@ Savepoints (i.e. nested :func:`atomic` blocks) are handled correctly. That is,
 an :func:`on_commit` callable registered after a savepoint (in a nested
 :func:`atomic` block) will be called after the outer transaction is committed,
 but not if a rollback to that savepoint or any previous savepoint occurred
-during the transaction::
+during the transaction:
+
+.. code-block:: python
 
     with transaction.atomic():  # Outer atomic, start a new transaction
         transaction.on_commit(foo)
@@ -354,7 +375,9 @@ during the transaction::
     # foo() and then bar() will be called when leaving the outermost block
 
 On the other hand, when a savepoint is rolled back (due to an exception being
-raised), the inner callable will not be called::
+raised), the inner callable will not be called:
+
+.. code-block:: python
 
     with transaction.atomic():  # Outer atomic, start a new transaction
         transaction.on_commit(foo)
@@ -568,7 +591,9 @@ In addition, there's a utility function:
 
     Resets the counter used to generate unique savepoint IDs.
 
-The following example demonstrates the use of savepoints::
+The following example demonstrates the use of savepoints:
+
+.. code-block:: python
 
     from django.db import transaction
 

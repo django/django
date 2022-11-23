@@ -34,9 +34,12 @@ which widget is used on which field, see the documentation about
 :ref:`built-in-fields`.
 
 However, if you want to use a different widget for a field, you can
-use the :attr:`~Field.widget` argument on the field definition. For example::
+use the :attr:`~Field.widget` argument on the field definition. For example:
+
+.. code-block:: python
 
     from django import forms
+
 
     class CommentForm(forms.Form):
         name = forms.CharField()
@@ -52,19 +55,24 @@ Setting arguments for widgets
 Many widgets have optional extra arguments; they can be set when defining the
 widget on the field. In the following example, the
 :attr:`~django.forms.SelectDateWidget.years` attribute is set for a
-:class:`~django.forms.SelectDateWidget`::
+:class:`~django.forms.SelectDateWidget`:
+
+.. code-block:: python
 
     from django import forms
 
-    BIRTH_YEAR_CHOICES = ['1980', '1981', '1982']
+    BIRTH_YEAR_CHOICES = ["1980", "1981", "1982"]
     FAVORITE_COLORS_CHOICES = [
-        ('blue', 'Blue'),
-        ('green', 'Green'),
-        ('black', 'Black'),
+        ("blue", "Blue"),
+        ("green", "Green"),
+        ("black", "Black"),
     ]
 
+
     class SimpleForm(forms.Form):
-        birth_year = forms.DateField(widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES))
+        birth_year = forms.DateField(
+            widget=forms.SelectDateWidget(years=BIRTH_YEAR_CHOICES)
+        )
         favorite_colors = forms.MultipleChoiceField(
             required=False,
             widget=forms.CheckboxSelectMultiple,
@@ -128,9 +136,12 @@ need to specify additional attributes at the time when the widget object is
 instantiated and assigned to a form field (and perhaps add some rules to your
 CSS files).
 
-For example, take the following form::
+For example, take the following form:
+
+.. code-block:: python
 
     from django import forms
+
 
     class CommentForm(forms.Form):
         name = forms.CharField()
@@ -153,31 +164,37 @@ On a real web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. It is also possible to specify
 the 'type' attribute to take advantage of the new HTML5 input types.  To do
-this, you use the :attr:`Widget.attrs` argument when creating the widget::
+this, you use the :attr:`Widget.attrs` argument when creating the widget:
+
+.. code-block:: python
 
     class CommentForm(forms.Form):
-        name = forms.CharField(widget=forms.TextInput(attrs={'class': 'special'}))
+        name = forms.CharField(widget=forms.TextInput(attrs={"class": "special"}))
         url = forms.URLField()
-        comment = forms.CharField(widget=forms.TextInput(attrs={'size': '40'}))
+        comment = forms.CharField(widget=forms.TextInput(attrs={"size": "40"}))
 
-You can also modify a widget in the form definition::
+You can also modify a widget in the form definition:
+
+.. code-block:: python
 
     class CommentForm(forms.Form):
         name = forms.CharField()
         url = forms.URLField()
         comment = forms.CharField()
 
-        name.widget.attrs.update({'class': 'special'})
-        comment.widget.attrs.update(size='40')
+        name.widget.attrs.update({"class": "special"})
+        comment.widget.attrs.update(size="40")
 
 Or if the field isn't declared directly on the form (such as model form fields),
-you can use the :attr:`Form.fields` attribute::
+you can use the :attr:`Form.fields` attribute:
+
+.. code-block:: python
 
     class CommentForm(forms.ModelForm):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.fields['name'].widget.attrs.update({'class': 'special'})
-            self.fields['comment'].widget.attrs.update(size='40')
+            self.fields["name"].widget.attrs.update({"class": "special"})
+            self.fields["comment"].widget.attrs.update(size="40")
 
 Django will then include the extra attributes in the rendered output:
 
@@ -236,14 +253,16 @@ foundation for custom widgets.
             '<input title="Your name" type="text" name="name" value="A name" size="10">'
 
         If you assign a value of ``True`` or ``False`` to an attribute,
-        it will be rendered as an HTML5 boolean attribute::
+        it will be rendered as an HTML5 boolean attribute:
 
-            >>> name = forms.TextInput(attrs={'required': True})
-            >>> name.render('name', 'A name')
+        .. code-block:: pycon
+
+            >>> name = forms.TextInput(attrs={"required": True})
+            >>> name.render("name", "A name")
             '<input name="name" type="text" value="A name" required>'
             >>>
-            >>> name = forms.TextInput(attrs={'required': False})
-            >>> name.render('name', 'A name')
+            >>> name = forms.TextInput(attrs={"required": False})
+            >>> name.render("name", "A name")
             '<input name="name" type="text" value="A name">'
 
     .. attribute:: Widget.supports_microseconds
@@ -367,11 +386,13 @@ foundation for custom widgets.
 
     .. attribute:: MultiWidget.widgets
 
-        An iterable containing the widgets needed. For example::
+        An iterable containing the widgets needed. For example:
+
+        .. code-block:: pycon
 
             >>> from django.forms import MultiWidget, TextInput
             >>> widget = MultiWidget(widgets=[TextInput, TextInput])
-            >>> widget.render('name', ['john', 'paul'])
+            >>> widget.render("name", ["john", "paul"])
             '<input type="text" name="name_0" value="john"><input type="text" name="name_1" value="paul">'
 
         You may provide a dictionary in order to specify custom suffixes for
@@ -379,10 +400,12 @@ foundation for custom widgets.
         ``(key, widget)`` pair, the key will be appended to the ``name`` of the
         widget in order to generate the attribute value. You may provide the
         empty string (``''``) for a single key, in order to suppress the suffix
-        for one widget. For example::
+        for one widget. For example:
 
-            >>> widget = MultiWidget(widgets={'': TextInput, 'last': TextInput})
-            >>> widget.render('name', ['john', 'paul'])
+        .. code-block:: pycon
+
+            >>> widget = MultiWidget(widgets={"": TextInput, "last": TextInput})
+            >>> widget.render("name", ["john", "paul"])
             '<input type="text" name="name" value="john"><input type="text" name="name_last" value="paul">'
 
     And one required method:
@@ -401,9 +424,12 @@ foundation for custom widgets.
 
         An example of this is how :class:`SplitDateTimeWidget` turns a
         :class:`~datetime.datetime` value into a list with date and time split
-        into two separate values::
+        into two separate values:
+
+        .. code-block:: python
 
             from django.forms import MultiWidget
+
 
             class SplitDateTimeWidget(MultiWidget):
 
@@ -441,10 +467,13 @@ foundation for custom widgets.
     a date with the day, month, and year in different select boxes. This widget
     is intended to be used with a :class:`~django.forms.DateField` rather than
     a :class:`~django.forms.MultiValueField`, thus we have implemented
-    :meth:`~Widget.value_from_datadict`::
+    :meth:`~Widget.value_from_datadict`:
+
+    .. code-block:: python
 
         from datetime import date
         from django import forms
+
 
         class DateSelectorWidget(forms.MultiWidget):
             def __init__(self, attrs=None):
@@ -462,14 +491,14 @@ foundation for custom widgets.
                 if isinstance(value, date):
                     return [value.day, value.month, value.year]
                 elif isinstance(value, str):
-                    year, month, day = value.split('-')
+                    year, month, day = value.split("-")
                     return [day, month, year]
                 return [None, None, None]
 
             def value_from_datadict(self, data, files, name):
                 day, month, year = super().value_from_datadict(data, files, name)
                 # DateField expects a single string that it can parse into a date.
-                return '{}-{}-{}'.format(year, month, day)
+                return "{}-{}-{}".format(year, month, day)
 
     The constructor creates several :class:`Select` widgets in a list. The
     ``super()`` method uses this list to set up the widget.
@@ -945,12 +974,23 @@ Composite widgets
         An optional dict of months to use in the "months" select box.
 
         The keys of the dict correspond to the month number (1-indexed) and
-        the values are the displayed months::
+        the values are the displayed months:
+
+        .. code-block:: python
 
             MONTHS = {
-                1:_('jan'), 2:_('feb'), 3:_('mar'), 4:_('apr'),
-                5:_('may'), 6:_('jun'), 7:_('jul'), 8:_('aug'),
-                9:_('sep'), 10:_('oct'), 11:_('nov'), 12:_('dec')
+                1: _("jan"),
+                2: _("feb"),
+                3: _("mar"),
+                4: _("apr"),
+                5: _("may"),
+                6: _("jun"),
+                7: _("jul"),
+                8: _("aug"),
+                9: _("sep"),
+                10: _("oct"),
+                11: _("nov"),
+                12: _("dec"),
             }
 
     .. attribute:: SelectDateWidget.empty_label

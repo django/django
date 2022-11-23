@@ -430,21 +430,28 @@ If you have a custom user model inheriting from ``AbstractUser``, you'll need
 to generate and apply a database migration for your user model.
 
 If you want to preserve the 30 character limit for last names, use a custom
-form::
+form:
+
+.. code-block:: python
 
     from django.contrib.auth.forms import UserChangeForm
+
 
     class MyUserChangeForm(UserChangeForm):
         last_name = forms.CharField(max_length=30, required=False)
 
 If you wish to keep this restriction in the admin when editing users, set
-``UserAdmin.form`` to use this form::
+``UserAdmin.form`` to use this form:
+
+.. code-block:: python
 
     from django.contrib.auth.admin import UserAdmin
     from django.contrib.auth.models import User
 
+
     class MyUserAdmin(UserAdmin):
         form = MyUserChangeForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
@@ -483,10 +490,12 @@ raises an exception and should be replaced with::
 called defines all of the options passed to ``call_command()``.
 
 For custom management commands that use options not created using
-``parser.add_argument()``, add a ``stealth_options`` attribute on the command::
+``parser.add_argument()``, add a ``stealth_options`` attribute on the command:
+
+.. code-block:: python
 
     class MyCommand(BaseCommand):
-        stealth_options = ('option_name', ...)
+        stealth_options = ("option_name", ...)
 
 Indexes no longer accept positional arguments
 ---------------------------------------------
@@ -509,7 +518,9 @@ instance that's violating a foreign key constraint.
 Foreign keys are now created with ``DEFERRABLE INITIALLY DEFERRED`` instead of
 ``DEFERRABLE IMMEDIATE``. Thus, tables may need to be rebuilt to recreate
 foreign keys with the new definition, particularly if you're using a pattern
-like this::
+like this:
+
+.. code-block:: python
 
     from django.db import transaction
 
@@ -521,7 +532,9 @@ If you don't recreate the foreign key as ``DEFERRED``, the first ``create()``
 would fail now that foreign key constraints are enforced.
 
 Backup your database first! After upgrading to Django 2.0, you can then
-rebuild tables using a script similar to this::
+rebuild tables using a script similar to this:
+
+.. code-block:: python
 
     from django.apps import apps
     from django.db import connection
@@ -530,7 +543,7 @@ rebuild tables using a script similar to this::
         for model in app.get_models(include_auto_created=True):
             if model._meta.managed and not (model._meta.proxy or model._meta.swapped):
                 for base in model.__bases__:
-                    if hasattr(base, '_meta'):
+                    if hasattr(base, "_meta"):
                         base._meta.local_many_to_many = []
                 model._meta.local_many_to_many = []
                 with connection.schema_editor() as editor:

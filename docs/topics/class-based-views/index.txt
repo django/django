@@ -36,13 +36,15 @@ Usage in your URLconf
 The most direct way to use generic views is to create them directly in your
 URLconf. If you're only changing a few attributes on a class-based view, you
 can pass them into the :meth:`~django.views.generic.base.View.as_view` method
-call itself::
+call itself:
+
+.. code-block:: python
 
     from django.urls import path
     from django.views.generic import TemplateView
 
     urlpatterns = [
-        path('about/', TemplateView.as_view(template_name="about.html")),
+        path("about/", TemplateView.as_view(template_name="about.html")),
     ]
 
 Any arguments passed to :meth:`~django.views.generic.base.View.as_view` will
@@ -60,10 +62,13 @@ methods (such as ``get_context_data``) in your subclass to provide new values
 or methods. Consider, for example, a view that just displays one template,
 ``about.html``. Django has a generic view to do this -
 :class:`~django.views.generic.base.TemplateView` - so we can subclass it, and
-override the template name::
+override the template name:
+
+.. code-block:: python
 
     # some_app/views.py
     from django.views.generic import TemplateView
+
 
     class AboutView(TemplateView):
         template_name = "about.html"
@@ -71,14 +76,16 @@ override the template name::
 Then we need to add this new view into our URLconf.
 :class:`~django.views.generic.base.TemplateView` is a class, not a function, so
 we point the URL to the :meth:`~django.views.generic.base.View.as_view` class
-method instead, which provides a function-like entry to class-based views::
+method instead, which provides a function-like entry to class-based views:
+
+.. code-block:: python
 
     # urls.py
     from django.urls import path
     from some_app.views import AboutView
 
     urlpatterns = [
-        path('about/', AboutView.as_view()),
+        path("about/", AboutView.as_view()),
     ]
 
 
@@ -97,29 +104,38 @@ since then, it is a waste of CPU time and bandwidth to fetch the books from the
 database, render a full response and send it to the client. It might be
 preferable to ask the API when the most recent book was published.
 
-We map the URL to book list view in the URLconf::
+We map the URL to book list view in the URLconf:
+
+.. code-block:: python
 
     from django.urls import path
     from books.views import BookListView
 
     urlpatterns = [
-        path('books/', BookListView.as_view()),
+        path("books/", BookListView.as_view()),
     ]
 
-And the view::
+And the view:
+
+.. code-block:: python
 
     from django.http import HttpResponse
     from django.views.generic import ListView
     from books.models import Book
 
+
     class BookListView(ListView):
         model = Book
 
         def head(self, *args, **kwargs):
-            last_book = self.get_queryset().latest('publication_date')
+            last_book = self.get_queryset().latest("publication_date")
             response = HttpResponse(
                 # RFC 1123 date format.
-                headers={'Last-Modified': last_book.publication_date.strftime('%a, %d %b %Y %H:%M:%S GMT')},
+                headers={
+                    "Last-Modified": last_book.publication_date.strftime(
+                        "%a, %d %b %Y %H:%M:%S GMT"
+                    )
+                },
             )
             return response
 
@@ -138,11 +154,14 @@ Asynchronous class-based views
 
 As well as the synchronous (``def``) method handlers already shown, ``View``
 subclasses may define asynchronous (``async def``) method handlers to leverage
-asynchronous code using ``await``::
+asynchronous code using ``await``:
+
+.. code-block:: python
 
     import asyncio
     from django.http import HttpResponse
     from django.views import View
+
 
     class AsyncView(View):
         async def get(self, request, *args, **kwargs):

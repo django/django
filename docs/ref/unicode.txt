@@ -240,13 +240,16 @@ handles this for you automatically.
 If you're constructing a URL manually (i.e., *not* using the ``reverse()``
 function), you'll need to take care of the encoding yourself. In this case,
 use the ``iri_to_uri()`` and ``quote()`` functions that were documented
-above_. For example::
+above_. For example:
+
+.. code-block:: python
 
     from urllib.parse import quote
     from django.utils.encoding import iri_to_uri
 
+
     def get_absolute_url(self):
-        url = '/person/%s/?x=0&y=0' % quote(self.location)
+        url = "/person/%s/?x=0&y=0" % quote(self.location)
         return iri_to_uri(url)
 
 This function returns a correctly encoded URL even if ``self.location`` is
@@ -259,10 +262,13 @@ non-ASCII characters would have been removed in quoting in the first line.)
 Templates
 =========
 
-Use strings when creating templates manually::
+Use strings when creating templates manually:
+
+.. code-block:: python
 
     from django.template import Template
-    t2 = Template('This is a string template.')
+
+    t2 = Template("This is a string template.")
 
 But the common case is to read templates from the filesystem. If your template
 files are not stored with a UTF-8 encoding, adjust the :setting:`TEMPLATES`
@@ -300,9 +306,12 @@ that contains non-ASCII characters.
 
 Filesystem support for UTF-8 file names varies and might depend on the
 environment. Check your current configuration in an interactive Python shell by
-running::
+running:
+
+.. code-block:: python
 
     import sys
+
     sys.getfilesystemencoding()
 
 This should output "UTF-8".
@@ -334,11 +343,13 @@ client.
 
 By default, the :setting:`DEFAULT_CHARSET` setting is used as the assumed encoding
 for form data. If you need to change this for a particular form, you can set
-the ``encoding`` attribute on an ``HttpRequest`` instance. For example::
+the ``encoding`` attribute on an ``HttpRequest`` instance. For example:
+
+.. code-block:: python
 
     def some_view(request):
         # We know that the data must be encoded as KOI8-R (for some reason).
-        request.encoding = 'koi8-r'
+        request.encoding = "koi8-r"
         ...
 
 You can even change the encoding after having accessed ``request.GET`` or

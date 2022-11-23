@@ -12,9 +12,11 @@ module. They are described in more detail in the `PostgreSQL docs
 .. note::
 
     All functions come without default aliases, so you must explicitly provide
-    one. For example::
+    one. For example:
 
-        >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
+    .. code-block:: pycon
+
+        >>> SomeModel.objects.aggregate(arr=ArrayAgg("somefield"))
         {'arr': [0, 1, 2]}
 
 .. admonition:: Common aggregate options
@@ -93,7 +95,9 @@ General-purpose aggregation functions
     Returns ``True``, if all input values are true, ``default`` if all values
     are null or if there are no values, otherwise ``False``.
 
-    Usage example::
+    Usage example:
+
+    .. code-block:: pycon
 
         class Comment(models.Model):
             body = models.TextField()
@@ -102,7 +106,7 @@ General-purpose aggregation functions
 
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolAnd
-        >>> Comment.objects.aggregate(booland=BoolAnd('published'))
+        >>> Comment.objects.aggregate(booland=BoolAnd("published"))
         {'booland': False}
         >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
         {'booland': True}
@@ -115,7 +119,9 @@ General-purpose aggregation functions
     Returns ``True`` if at least one input value is true, ``default`` if all
     values are null or if there are no values, otherwise ``False``.
 
-    Usage example::
+    Usage example:
+
+    .. code-block:: pycon
 
         class Comment(models.Model):
             body = models.TextField()
@@ -124,7 +130,7 @@ General-purpose aggregation functions
 
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolOr
-        >>> Comment.objects.aggregate(boolor=BoolOr('published'))
+        >>> Comment.objects.aggregate(boolor=BoolOr("published"))
         {'boolor': True}
         >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))
         {'boolor': False}
@@ -152,7 +158,9 @@ General-purpose aggregation functions
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
 
-    Usage example::
+    Usage example:
+
+    .. code-block:: pycon
 
         class Room(models.Model):
             number = models.IntegerField(unique=True)
@@ -166,10 +174,10 @@ General-purpose aggregation functions
         >>> from django.contrib.postgres.aggregates import JSONBAgg
         >>> Room.objects.annotate(
         ...     requirements=JSONBAgg(
-        ...         'hotelreservation__requirements',
-        ...         ordering='-hotelreservation__start',
+        ...         "hotelreservation__requirements",
+        ...         ordering="-hotelreservation__start",
         ...     )
-        ... ).filter(requirements__0__sea_view=True).values('number', 'requirements')
+        ... ).filter(requirements__0__sea_view=True).values("number", "requirements")
         <QuerySet [{'number': 102, 'requirements': [
             {'parking': False, 'sea_view': True, 'double_bed': False},
             {'parking': True, 'double_bed': True}

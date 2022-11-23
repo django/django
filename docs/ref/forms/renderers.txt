@@ -171,10 +171,13 @@ Using this renderer along with the built-in templates requires either:
   with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
 * Adding the built-in templates directory in :setting:`DIRS <TEMPLATES-DIRS>`
-  of one of your template engines. To generate that path::
+  of one of your template engines. To generate that path:
+
+.. code-block:: python
 
     import django
-    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
+
+    django.__path__[0] + "/forms/templates"  # or '/forms/jinja2'
 
 Using this renderer requires you to make sure the form templates your project
 needs can be located.

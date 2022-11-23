@@ -78,17 +78,23 @@ To avoid unwanted migrations in the future, either explicitly set
 
     DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-or configure it on a per-app basis::
+or configure it on a per-app basis:
+
+.. code-block:: python
 
     from django.apps import AppConfig
 
-    class MyAppConfig(AppConfig):
-        default_auto_field = 'django.db.models.AutoField'
-        name = 'my_app'
 
-or on a per-model basis::
+    class MyAppConfig(AppConfig):
+        default_auto_field = "django.db.models.AutoField"
+        name = "my_app"
+
+or on a per-model basis:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
@@ -108,7 +114,9 @@ Functional indexes
 
 The new :attr:`*expressions <django.db.models.Index.expressions>` positional
 argument of :class:`Index() <django.db.models.Index>` enables creating
-functional indexes on expressions and database functions. For example::
+functional indexes on expressions and database functions. For example:
+
+.. code-block:: python
 
     from django.db import models
     from django.db.models import F, Index, Value
@@ -124,13 +132,13 @@ functional indexes on expressions and database functions. For example::
         class Meta:
             indexes = [
                 Index(
-                    Lower('first_name'),
-                    Upper('last_name').desc(),
-                    name='first_last_name_idx',
+                    Lower("first_name"),
+                    Upper("last_name").desc(),
+                    name="first_last_name_idx",
                 ),
                 Index(
-                    F('height') / (F('weight') + Value(5)),
-                    name='calc_idx',
+                    F("height") / (F("weight") + Value(5)),
+                    name="calc_idx",
                 ),
             ]
 

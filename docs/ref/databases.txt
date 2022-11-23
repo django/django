@@ -197,14 +197,16 @@ Isolation level
 Like PostgreSQL itself, Django defaults to the ``READ COMMITTED`` `isolation
 level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
 ``SERIALIZABLE``, set it in the :setting:`OPTIONS` part of your database
-configuration in :setting:`DATABASES`::
+configuration in :setting:`DATABASES`:
+
+.. code-block:: python
 
     import psycopg2.extensions
 
     DATABASES = {
         # ...
-        'OPTIONS': {
-            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+        "OPTIONS": {
+            "isolation_level": psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
         },
     }
 
@@ -509,14 +511,16 @@ In other words, if you set the name of the database in :setting:`OPTIONS`,
 this will take precedence over :setting:`NAME`, which would override
 anything in a `MySQL option file`_.
 
-Here's a sample configuration which uses a MySQL option file::
+Here's a sample configuration which uses a MySQL option file:
+
+.. code-block:: python
 
     # settings.py
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': '/path/to/my.cnf',
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "OPTIONS": {
+                "read_default_file": "/path/to/my.cnf",
             },
         }
     }
@@ -527,7 +531,7 @@ Here's a sample configuration which uses a MySQL option file::
     database = NAME
     user = USER
     password = PASSWORD
-    default-character-set = utf8
+    default - character - set = utf8
 
 Several other `MySQLdb connection options`_ may be useful, such as ``ssl``,
 ``init_command``, and ``sql_mode``.
@@ -1006,11 +1010,14 @@ Additionally, the backend turns database identifiers to all-uppercase.
 
 To prevent these transformations (this is usually required only when dealing
 with legacy databases or accessing tables which belong to other users), use
-a quoted name as the value for ``db_table``::
+a quoted name as the value for ``db_table``:
+
+.. code-block:: python
 
     class LegacyModel(models.Model):
         class Meta:
             db_table = '"name_left_in_lowercase"'
+
 
     class ForeignModel(models.Model):
         class Meta:

@@ -110,16 +110,18 @@ New (1.0) ``models.py``::
         def __unicode__(self):
             return u'%s %s' % (self.first_name, self.last_name)
 
-New (1.0) ``admin.py``::
+New (1.0) ``admin.py``:
+
+.. code-block:: python
 
     from django.contrib import admin
     from models import Author
 
+
     class AuthorAdmin(admin.ModelAdmin):
-        list_display = ['first_name', 'last_name']
-        prepopulated_fields = {
-            'slug': ('first_name', 'last_name')
-        }
+        list_display = ["first_name", "last_name"]
+        prepopulated_fields = {"slug": ("first_name", "last_name")}
+
 
     admin.site.register(Author, AuthorAdmin)
 
@@ -223,27 +225,32 @@ Update your root ``urls.py``
 
 If you're using the admin site, you need to update your root ``urls.py``.
 
-Old (0.96) ``urls.py``::
+Old (0.96) ``urls.py``:
+
+.. code-block:: python
 
     from django.conf.urls.defaults import *
 
-    urlpatterns = patterns('',
-        (r'^admin/', include('django.contrib.admin.urls')),
-
+    urlpatterns = patterns(
+        "",
+        (r"^admin/", include("django.contrib.admin.urls")),
         # ... the rest of your URLs here ...
     )
 
-New (1.0) ``urls.py``::
+New (1.0) ``urls.py``:
+
+.. code-block:: python
 
     from django.conf.urls.defaults import *
 
     # The next two lines enable the admin and load each admin.py file:
     from django.contrib import admin
+
     admin.autodiscover()
 
-    urlpatterns = patterns('',
-        (r'^admin/(.*)', admin.site.root),
-
+    urlpatterns = patterns(
+        "",
+        (r"^admin/(.*)", admin.site.root),
         # ... the rest of your URLs here ...
     )
 
@@ -261,11 +268,15 @@ If you're already using the ``newforms`` library, and you used our recommended
 ``import`` statement syntax, all you have to do is change your import
 statements.
 
-Old::
+Old:
+
+.. code-block:: python
 
     from django import newforms as forms
 
-New::
+New:
+
+.. code-block:: python
 
     from django import forms
 
@@ -601,7 +612,9 @@ every module.
 
 If you were previously relying on ``_()`` always being present, you should now
 explicitly import ``ugettext`` or ``ugettext_lazy``, if appropriate, and alias
-it to ``_`` yourself::
+it to ``_`` yourself:
+
+.. code-block:: python
 
     from django.utils.translation import ugettext as _
 
@@ -646,11 +659,14 @@ Testing
 :meth:`django.test.Client.login` has changed
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Old (0.96)::
+Old (0.96):
+
+.. code-block:: python
 
     from django.test import Client
+
     c = Client()
-    c.login('/path/to/login','myuser','mypassword')
+    c.login("/path/to/login", "myuser", "mypassword")
 
 New (1.0)::
 

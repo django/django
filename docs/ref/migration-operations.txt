@@ -364,19 +364,25 @@ be removed (elided) when :ref:`squashing migrations <migration-squashing>`.
 
 You are advised to write the code as a separate function above the ``Migration``
 class in the migration file, and pass it to ``RunPython``. Here's an example of
-using ``RunPython`` to create some initial objects on a ``Country`` model::
+using ``RunPython`` to create some initial objects on a ``Country`` model:
+
+.. code-block:: python
 
     from django.db import migrations
+
 
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.using(db_alias).bulk_create([
-            Country(name="USA", code="us"),
-            Country(name="France", code="fr"),
-        ])
+        Country.objects.using(db_alias).bulk_create(
+            [
+                Country(name="USA", code="us"),
+                Country(name="France", code="fr"),
+            ]
+        )
+
 
     def reverse_func(apps, schema_editor):
         # forwards_func() creates two Country instances,
@@ -385,6 +391,7 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
         db_alias = schema_editor.connection.alias
         Country.objects.using(db_alias).filter(name="USA", code="us").delete()
         Country.objects.using(db_alias).filter(name="France", code="fr").delete()
+
 
     class Migration(migrations.Migration):
 
@@ -471,9 +478,12 @@ Writing your own
 
 Operations have a relatively simple API, and they're designed so that you can
 easily write your own to supplement the built-in Django ones. The basic
-structure of an ``Operation`` looks like this::
+structure of an ``Operation`` looks like this:
+
+.. code-block:: python
 
     from django.db.migrations.operations.base import Operation
+
 
     class MyCustomOperation(Operation):
 
@@ -534,7 +544,9 @@ Some things to note:
 * If you want to work with model classes or model instances from the
   ``from_state`` argument in ``database_forwards()`` or
   ``database_backwards()``, you must render model states using the
-  ``clear_delayed_apps_cache()`` method to make related models available::
+  ``clear_delayed_apps_cache()`` method to make related models available:
+
+.. code-block:: python
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         # This operation should have access to all models. Ensure that all models are
@@ -561,9 +573,12 @@ Some things to note:
 
 As an example, let's make an operation that loads PostgreSQL extensions (which
 contain some of PostgreSQL's more exciting features). Since there's no model
-state changes, all it does is run one command::
+state changes, all it does is run one command:
+
+.. code-block:: python
 
     from django.db.migrations.operations.base import Operation
+
 
     class LoadExtension(Operation):
 

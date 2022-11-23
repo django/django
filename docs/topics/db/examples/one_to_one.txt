@@ -5,9 +5,12 @@ One-to-one relationships
 To define a one-to-one relationship, use
 :class:`~django.db.models.OneToOneField`.
 
-In this example, a ``Place`` optionally can be a ``Restaurant``::
+In this example, a ``Place`` optionally can be a ``Restaurant``:
+
+.. code-block:: python
 
     from django.db import models
+
 
     class Place(models.Model):
         name = models.CharField(max_length=50)
@@ -15,6 +18,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
 
         def __str__(self):
             return f"{self.name} the place"
+
 
     class Restaurant(models.Model):
         place = models.OneToOneField(
@@ -27,6 +31,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
 
         def __str__(self):
             return "%s the restaurant" % self.place.name
+
 
     class Waiter(models.Model):
         restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)

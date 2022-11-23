@@ -30,11 +30,13 @@ Default: ``{}`` (Empty dictionary)
 
 A dictionary mapping ``"app_label.model_name"`` strings to functions that take
 a model object and return its URL. This is a way of inserting or overriding
-``get_absolute_url()`` methods on a per-installation basis. Example::
+``get_absolute_url()`` methods on a per-installation basis. Example:
+
+.. code-block:: python
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.blog': lambda o: "/blogs/%s/" % o.slug,
-        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        "blogs.blog": lambda o: "/blogs/%s/" % o.slug,
+        "news.story": lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
 The model name used in this setting should be all lowercase, regardless of the
@@ -52,9 +54,11 @@ A list of all the people who get code error notifications. When
 is configured in :setting:`LOGGING` (done by default), Django emails these
 people the details of exceptions raised in the request/response cycle.
 
-Each item in the list should be a tuple of (Full name, email address). Example::
+Each item in the list should be a tuple of (Full name, email address). Example:
 
-    [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+.. code-block:: python
+
+    [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
 .. setting:: ALLOWED_HOSTS
 
@@ -120,11 +124,13 @@ The :setting:`APPEND_SLASH` setting is only used if
 ``CACHES``
 ----------
 
-Default::
+Default:
+
+.. code-block:: python
 
     {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
 
@@ -166,10 +172,12 @@ backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
 
 A string containing a dotted path to a function (or any callable) that defines how to
 compose a prefix, version and key into a final cache key. The default
-implementation is equivalent to the function::
+implementation is equivalent to the function:
+
+.. code-block:: python
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), key])
+        return ":".join([key_prefix, str(version), key])
 
 You may use any key function you want, as long as it has the same
 argument signature.
@@ -436,7 +444,9 @@ Default: ``'django.views.csrf.csrf_failure'``
 
 A dotted path to the view function to be used when an incoming request is
 rejected by the :doc:`CSRF protection </ref/csrf>`. The function should have
-this signature::
+this signature:
+
+.. code-block:: python
 
     def csrf_failure(request, reason=""):
         ...
@@ -1968,7 +1978,7 @@ see the current list of translated languages by looking in
 
 The list is a list of two-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
-``('ja', 'Japanese')``.
+``("ja", "Japanese")``.
 This specifies which languages are available for language selection. See
 :doc:`/topics/i18n/index`.
 
@@ -1979,13 +1989,15 @@ If you define a custom :setting:`LANGUAGES` setting, you can mark the
 language names as translation strings using the
 :func:`~django.utils.translation.gettext_lazy` function.
 
-Here's a sample settings file::
+Here's a sample settings file:
+
+.. code-block:: python
 
     from django.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
-        ('de', _('German')),
-        ('en', _('English')),
+        ("de", _("German")),
+        ("en", _("English")),
     ]
 
 .. setting:: LANGUAGES_BIDI
@@ -2424,9 +2436,11 @@ Django whether the request came in via HTTPS, and set
 ``SECURE_PROXY_SSL_HEADER`` so that Django knows what header to look for.
 
 Set a tuple with two elements -- the name of the header to look for and the
-required value. For example::
+required value. For example:
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+.. code-block:: python
+
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
 proxy and that the request is guaranteed to be secure (i.e., it originally came
@@ -3172,14 +3186,16 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 ``MESSAGE_TAGS``
 ----------------
 
-Default::
+Default:
+
+.. code-block:: python
 
     {
-        messages.DEBUG: 'debug',
-        messages.INFO: 'info',
-        messages.SUCCESS: 'success',
-        messages.WARNING: 'warning',
-        messages.ERROR: 'error',
+        messages.DEBUG: "debug",
+        messages.INFO: "info",
+        messages.SUCCESS: "success",
+        messages.WARNING: "warning",
+        messages.ERROR: "error",
     }
 
 This sets the mapping of message level to message tag, which is typically

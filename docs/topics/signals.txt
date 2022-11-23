@@ -12,13 +12,17 @@ taken place. They're especially useful when many pieces of code may be
 interested in the same events.
 
 For example, a third-party app can register to be notified of settings
-changes::
+changes:
+
+.. code-block:: python
 
     from django.apps import AppConfig
     from django.core.signals import setting_changed
 
+
     def my_callback(sender, **kwargs):
         print("Setting changed!")
+
 
     class MyAppConfig(AppConfig):
         ...
@@ -75,7 +79,9 @@ Receiver functions
 ------------------
 
 First, we need to define a receiver function. A receiver can be any Python
-function or method::
+function or method:
+
+.. code-block:: python
 
     def my_callback(sender, **kwargs):
         print("Request finished!")
@@ -100,7 +106,9 @@ Connecting receiver functions
 -----------------------------
 
 There are two ways you can connect a receiver to a signal. You can take the
-manual connect route::
+manual connect route:
+
+.. code-block:: python
 
     from django.core.signals import request_finished
 
@@ -114,10 +122,13 @@ Alternatively, you can use a :func:`receiver` decorator:
     :param kwargs: Wildcard keyword arguments to pass to a
         :ref:`function <receiver-functions>`.
 
-Here's how you connect with the decorator::
+Here's how you connect with the decorator:
+
+.. code-block:: python
 
     from django.core.signals import request_finished
     from django.dispatch import receiver
+
 
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
@@ -137,10 +148,13 @@ Now, our ``my_callback`` function will be called each time a request finishes.
     application :ref:`configuration class <configuring-applications-ref>`. If
     you're using the :func:`receiver` decorator, import the ``signals``
     submodule inside :meth:`~django.apps.AppConfig.ready`, this will implicitly
-    connect signal handlers::
+    connect signal handlers:
+
+    .. code-block:: python
 
         from django.apps import AppConfig
         from django.core.signals import request_finished
+
 
         class MyAppConfig(AppConfig):
             ...
@@ -148,6 +162,7 @@ Now, our ``my_callback`` function will be called each time a request finishes.
             def ready(self):
                 # Implicitly connect signal handlers decorated with @receiver.
                 from . import signals
+
                 # Explicitly connect a signal handler.
                 request_finished.connect(signals.my_callback)
 
@@ -172,7 +187,9 @@ when one *specific* model is saved.
 In these cases, you can register to receive signals sent only by particular
 senders. In the case of :data:`django.db.models.signals.pre_save`, the sender
 will be the model class being saved, so you can indicate that you only want
-signals sent by some model::
+signals sent by some model:
+
+.. code-block:: python
 
     from django.db.models.signals import pre_save
     from django.dispatch import receiver
@@ -208,7 +225,9 @@ send an email whenever a model is saved), pass a unique identifier as
 the ``dispatch_uid`` argument to identify your receiver function. This
 identifier will usually be a string, although any hashable object will
 suffice. The end result is that your receiver function will only be
-bound to the signal once for each unique ``dispatch_uid`` value::
+bound to the signal once for each unique ``dispatch_uid`` value:
+
+.. code-block:: python
 
     from django.core.signals import request_finished
 
@@ -235,7 +254,9 @@ Defining signals
 
 All signals are :class:`django.dispatch.Signal` instances.
 
-For example::
+For example:
+
+.. code-block:: python
 
     import django.dispatch
 
@@ -256,7 +277,9 @@ this) or :meth:`Signal.send_robust`. You must provide the ``sender`` argument
 (which is a class most of the time) and may provide as many other keyword
 arguments as you like.
 
-For example, here's how sending our ``pizza_done`` signal might look::
+For example, here's how sending our ``pizza_done`` signal might look:
+
+.. code-block:: python
 
     class PizzaStore:
         ...

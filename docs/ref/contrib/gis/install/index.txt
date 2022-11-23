@@ -159,7 +159,9 @@ new line in ``ld.so.conf``.  This is *one* example of how to do so::
 For OpenSolaris users, the system library path may be modified using the
 ``crle`` utility.  Run ``crle`` with no options to see the current configuration
 and use ``crle -l`` to set with the new library path.  Be *very* careful when
-modifying the system library path::
+modifying the system library path:
+
+.. code-block:: python
 
     # crle -l $OLD_PATH:/usr/local/lib
 

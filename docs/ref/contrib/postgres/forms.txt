@@ -23,21 +23,24 @@ Fields
 
         It specifies the underlying form field for the array. This is not used
         to render any HTML, but it is used to process the submitted data and
-        validate it. For example::
+        validate it. For example:
+
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
+            ...
 
-            >>> form = NumberListForm({'numbers': '1,2,3'})
+            >>> form = NumberListForm({"numbers": "1,2,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data
             {'numbers': [1, 2, 3]}
 
-            >>> form = NumberListForm({'numbers': '1,2,a'})
+            >>> form = NumberListForm({"numbers": "1,2,a"})
             >>> form.is_valid()
             False
 
@@ -45,15 +48,18 @@ Fields
 
         This is an optional argument which defaults to a comma: ``,``. This
         value is used to split the submitted data. It allows you to chain
-        ``SimpleArrayField`` for multidimensional data::
+        ``SimpleArrayField`` for multidimensional data:
+
+        .. code-block:: pycon
 
             >>> from django import forms
             >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class GridForm(forms.Form):
-            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')
+            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter="|")
+            ...
 
-            >>> form = GridForm({'places': '1,2|2,1|4,3'})
+            >>> form = GridForm({"places": "1,2|2,1|4,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data

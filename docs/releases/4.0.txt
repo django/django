@@ -75,7 +75,9 @@ The new :attr:`*expressions <django.db.models.UniqueConstraint.expressions>`
 positional argument of
 :class:`UniqueConstraint() <django.db.models.UniqueConstraint>` enables
 creating functional unique constraints on expressions and database functions.
-For example::
+For example:
+
+.. code-block:: python
 
     from django.db import models
     from django.db.models import UniqueConstraint
@@ -89,9 +91,9 @@ For example::
         class Meta:
             constraints = [
                 UniqueConstraint(
-                    Lower('first_name'),
-                    Lower('last_name').desc(),
-                    name='first_last_name_unique',
+                    Lower("first_name"),
+                    Lower("last_name").desc(),
+                    name="first_last_name_unique",
                 ),
             ]
 

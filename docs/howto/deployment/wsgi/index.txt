@@ -73,9 +73,12 @@ Applying WSGI middleware
 To apply :pep:`WSGI middleware
 <3333#middleware-components-that-play-both-sides>` you can wrap the application
 object. For instance you could add these lines at the bottom of
-:file:`wsgi.py`::
+:file:`wsgi.py`:
+
+.. code-block:: python
 
     from helloworld.wsgi import HelloWorldApplication
+
     application = HelloWorldApplication(application)
 
 You could also replace the Django WSGI application with a custom WSGI

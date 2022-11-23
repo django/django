@@ -19,16 +19,19 @@ editing content:
 .. note::
 
     Some of the examples on this page assume that an ``Author`` model has been
-    defined as follows in ``myapp/models.py``::
+    defined as follows in ``myapp/models.py``:
+
+    .. code-block:: python
 
         from django.db import models
         from django.urls import reverse
+
 
         class Author(models.Model):
             name = models.CharField(max_length=200)
 
             def get_absolute_url(self):
-                return reverse('author-detail', kwargs={'pk': self.pk})
+                return reverse("author-detail", kwargs={"pk": self.pk})
 
 ``FormView``
 ============
@@ -48,9 +51,12 @@ editing content:
     * :class:`django.views.generic.edit.ProcessFormView`
     * :class:`django.views.generic.base.View`
 
-    **Example myapp/forms.py**::
+    **Example myapp/forms.py**:
+
+    .. code-block:: python
 
         from django import forms
+
 
         class ContactForm(forms.Form):
             name = forms.CharField()
@@ -60,15 +66,18 @@ editing content:
                 # send email using the self.cleaned_data dictionary
                 pass
 
-    **Example myapp/views.py**::
+    **Example myapp/views.py**:
+
+    .. code-block:: python
 
         from myapp.forms import ContactForm
         from django.views.generic.edit import FormView
 
+
         class ContactFormView(FormView):
-            template_name = 'contact.html'
+            template_name = "contact.html"
             form_class = ContactForm
-            success_url = '/thanks/'
+            success_url = "/thanks/"
 
             def form_valid(self, form):
                 # This method is called when valid form data has been POSTed.
@@ -136,14 +145,17 @@ editing content:
         the object being created. If the object hasn't been created yet, the
         value will be ``None``.
 
-    **Example myapp/views.py**::
+    **Example myapp/views.py**:
+
+    .. code-block:: python
 
         from django.views.generic.edit import CreateView
         from myapp.models import Author
 
+
         class AuthorCreateView(CreateView):
             model = Author
-            fields = ['name']
+            fields = ["name"]
 
     **Example myapp/author_form.html**:
 
@@ -215,15 +227,18 @@ editing content:
         When using ``UpdateView`` you have access to ``self.object``, which is
         the object being updated.
 
-    **Example myapp/views.py**::
+    **Example myapp/views.py**:
+
+    .. code-block:: python
 
         from django.views.generic.edit import UpdateView
         from myapp.models import Author
 
+
         class AuthorUpdateView(UpdateView):
             model = Author
-            fields = ['name']
-            template_name_suffix = '_update_form'
+            fields = ["name"]
+            template_name_suffix = "_update_form"
 
     **Example myapp/author_update_form.html**:
 
@@ -301,15 +316,18 @@ editing content:
         deleting objects for the example ``Author`` model would cause the
         default ``template_name`` to be ``'myapp/author_check_delete.html'``.
 
-    **Example myapp/views.py**::
+    **Example myapp/views.py**:
+
+    .. code-block:: python
 
         from django.urls import reverse_lazy
         from django.views.generic.edit import DeleteView
         from myapp.models import Author
 
+
         class AuthorDeleteView(DeleteView):
             model = Author
-            success_url = reverse_lazy('author-list')
+            success_url = reverse_lazy("author-list")
 
     **Example myapp/author_confirm_delete.html**:
 

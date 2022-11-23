@@ -318,7 +318,9 @@ In order to resolve this ticket, we'll add a ``make_toast()`` function to the
 use the function and check that its output looks correct.
 
 Navigate to Django's ``tests/shortcuts/`` folder and create a new file
-``test_make_toast.py``. Add the following code::
+``test_make_toast.py``. Add the following code:
+
+.. code-block:: python
 
     from django.shortcuts import make_toast
     from django.test import SimpleTestCase
@@ -326,7 +328,7 @@ Navigate to Django's ``tests/shortcuts/`` folder and create a new file
 
     class MakeToastTests(SimpleTestCase):
         def test_make_toast(self):
-            self.assertEqual(make_toast(), 'toast')
+            self.assertEqual(make_toast(), "toast")
 
 This test checks that the ``make_toast()`` returns ``'toast'``.
 
@@ -357,9 +359,11 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
     $ ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error::
+method we added, with this error:
 
-    ImportError: cannot import name 'make_toast' from 'django.shortcuts'
+.. code-block:: pycon
+
+    importError: cannot import name 'make_toast' from 'django.shortcuts'
 
 If all of the tests passed, then you'll want to make sure that you added the
 new test shown above to the appropriate folder and file name.
@@ -370,10 +374,12 @@ Writing the code for your ticket
 Next we'll be adding the ``make_toast()`` function.
 
 Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
-bottom, add::
+bottom, add:
+
+.. code-block:: python
 
     def make_toast():
-        return 'toast'
+        return "toast"
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django

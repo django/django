@@ -361,17 +361,23 @@ Create in bulk
 
 When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
-number of SQL queries. For example::
+number of SQL queries. For example:
 
-    Entry.objects.bulk_create([
-        Entry(headline='This is a test'),
-        Entry(headline='This is only a test'),
-    ])
+.. code-block:: python
 
-...is preferable to::
+    Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
 
-    Entry.objects.create(headline='This is a test')
-    Entry.objects.create(headline='This is only a test')
+...is preferable to:
+
+.. code-block:: python
+
+    Entry.objects.create(headline="This is a test")
+    Entry.objects.create(headline="This is only a test")
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
@@ -382,24 +388,32 @@ Update in bulk
 
 When updating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
-number of SQL queries. Given a list or queryset of objects::
+number of SQL queries. Given a list or queryset of objects:
 
-    entries = Entry.objects.bulk_create([
-        Entry(headline='This is a test'),
-        Entry(headline='This is only a test'),
-    ])
+.. code-block:: python
 
-The following example::
+    entries = Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
 
-    entries[0].headline = 'This is not a test'
-    entries[1].headline = 'This is no longer a test'
-    Entry.objects.bulk_update(entries, ['headline'])
+The following example:
 
-...is preferable to::
+.. code-block:: python
 
-    entries[0].headline = 'This is not a test'
+    entries[0].headline = "This is not a test"
+    entries[1].headline = "This is no longer a test"
+    Entry.objects.bulk_update(entries, ["headline"])
+
+...is preferable to:
+
+.. code-block:: python
+
+    entries[0].headline = "This is not a test"
     entries[0].save()
-    entries[1].headline = 'This is no longer a test'
+    entries[1].headline = "This is no longer a test"
     entries[1].save()
 
 Note that there are a number of :meth:`caveats to this method
@@ -468,14 +482,17 @@ When removing different pairs of objects from :class:`ManyToManyFields
 :meth:`~django.db.models.query.QuerySet.delete` on a
 :class:`~django.db.models.Q` expression with multiple
 :attr:`~django.db.models.ManyToManyField.through`  model instances to reduce
-the number of SQL queries. For example::
+the number of SQL queries. For example:
+
+.. code-block:: python
 
     from django.db.models import Q
+
     PizzaToppingRelationship = Pizza.toppings.through
     PizzaToppingRelationship.objects.filter(
-        Q(pizza=my_pizza, topping=pepperoni) |
-        Q(pizza=your_pizza, topping=pepperoni) |
-        Q(pizza=your_pizza, topping=mushroom)
+        Q(pizza=my_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=mushroom)
     ).delete()
 
 ...is preferable to::
