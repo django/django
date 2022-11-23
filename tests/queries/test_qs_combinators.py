@@ -424,6 +424,12 @@ class QuerySetSetOperationTests(TestCase):
         qs = Number.objects.filter(pk__in=[])
         self.assertEqual(qs.union(qs).count(), 0)
 
+    def test_count_union_with_select_related(self):
+        e1 = ExtraInfo.objects.create(value=1, info="e1")
+        Author.objects.create(name="a1", num=1, extra=e1)
+        qs = Author.objects.select_related("extra").order_by()
+        self.assertEqual(qs.union(qs).count(), 1)
+
     @skipUnlessDBFeature("supports_select_difference")
     def test_count_difference(self):
         qs1 = Number.objects.filter(num__lt=10)
