@@ -381,24 +381,28 @@ class Query(BaseExpression):
             alias = None
         return target.get_col(alias, field)
 
-    def get_aggregation(self, using, added_aggregate_names):
+    def get_aggregation(self, using, aggregate_exprs):
         """
         Return the dictionary with the values of the existing aggregations.
         """
-        if not self.annotation_select:
+        if not aggregate_exprs:
             return {}
-        existing_annotations = {
-            alias: annotation
-            for alias, annotation in self.annotations.items()
-            if alias not in added_aggregate_names
-        }
+        aggregates = {}
+        for alias, aggregate_expr in aggregate_exprs.items():
+            self.check_alias(alias)
+            aggregate = aggregate_expr.resolve_expression(
+                self, allow_joins=True, reuse=None, summarize=True
+            )
+            if not aggregate.contains_aggregate:
+                raise TypeError("%s is not an aggregate expression" % alias)
+            aggregates[alias] = aggregate
         # Existing usage of aggregation can be determined by the presence of
         # selected aggregates but also by filters against aliased aggregates.
         _, having, qualify = self.where.split_having_qualify()
         has_existing_aggregation = (
             any(
                 getattr(annotation, "contains_aggregate", True)
-                for annotation in existing_annotations.values()
+                for annotation in self.annotations.values()
             )
             or having
         )
@@ -449,25 +453,19 @@ class Query(BaseExpression):
                     # filtering against window functions is involved as it
                     # requires complex realising.
                     annotation_mask = set()
-                    for name in added_aggregate_names:
-                        annotation_mask.add(name)
-                        annotation_mask |= inner_query.annotations[name].get_refs()
+                    for aggregate in aggregates.values():
+                        annotation_mask |= aggregate.get_refs()
                     inner_query.set_annotation_mask(annotation_mask)
 
-            # Remove any aggregates marked for reduction from the subquery and
-            # move them to the outer AggregateQuery. This requires making sure
-            # all columns referenced by the aggregates are selected in the
-            # subquery. It is achieved by retrieving all column references from
-            # the aggregates, explicitly selecting them if they are not
-            # already, and making sure the aggregates are repointed to
-            # referenced to them.
+            # Add aggregates to the outer AggregateQuery. This requires making
+            # sure all columns referenced by the aggregates are selected in the
+            # inner query. It is achieved by retrieving all column references
+            # by the aggregates, explicitly selecting them in the inner query,
+            # and making sure the aggregates are repointed to them.
             col_refs = {}
-            for alias, expression in list(inner_query.annotation_select.items()):
-                if not expression.is_summary:
-                    continue
-                annotation_select_mask = inner_query.annotation_select_mask
+            for alias, aggregate in aggregates.items():
                 replacements = {}
-                for col in self._gen_cols([expression], resolve_refs=False):
+                for col in self._gen_cols([aggregate], resolve_refs=False):
                     if not (col_ref := col_refs.get(col)):
                         index = len(col_refs) + 1
                         col_alias = f"__col{index}"
@@ -476,13 +474,9 @@ class Query(BaseExpression):
                         inner_query.annotations[col_alias] = col
                         inner_query.append_annotation_mask([col_alias])
                     replacements[col] = col_ref
-                outer_query.annotations[alias] = expression.replace_expressions(
+                outer_query.annotations[alias] = aggregate.replace_expressions(
                     replacements
                 )
-                del inner_query.annotations[alias]
-                annotation_select_mask.remove(alias)
-                # Make sure the annotation_select wont use cached results.
-                inner_query.set_annotation_mask(inner_query.annotation_select_mask)
             if (
                 inner_query.select == ()
                 and not inner_query.default_cols
@@ -499,19 +493,21 @@ class Query(BaseExpression):
             self.select = ()
             self.default_cols = False
             self.extra = {}
-            if existing_annotations:
+            if self.annotations:
                 # Inline reference to existing annotations and mask them as
                 # they are unnecessary given only the summarized aggregations
                 # are requested.
                 replacements = {
                     Ref(alias, annotation): annotation
-                    for alias, annotation in existing_annotations.items()
+                    for alias, annotation in self.annotations.items()
                 }
-                for name in added_aggregate_names:
-                    self.annotations[name] = self.annotations[name].replace_expressions(
-                        replacements
-                    )
-                self.set_annotation_mask(added_aggregate_names)
+                self.annotations = {
+                    alias: aggregate.replace_expressions(replacements)
+                    for alias, aggregate in aggregates.items()
+                }
+            else:
+                self.annotations = aggregates
+            self.set_annotation_mask(aggregates)
 
         empty_set_result = [
             expression.empty_result_set_value
@@ -537,8 +533,7 @@ class Query(BaseExpression):
         Perform a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        obj.add_annotation(Count("*"), alias="__count", is_summary=True)
-        return obj.get_aggregation(using, ["__count"])["__count"]
+        return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
 
     def has_filters(self):
         return self.where
@@ -1085,12 +1080,10 @@ class Query(BaseExpression):
                 "semicolons, or SQL comments."
             )
 
-    def add_annotation(self, annotation, alias, is_summary=False, select=True):
+    def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
-        annotation = annotation.resolve_expression(
-            self, allow_joins=True, reuse=None, summarize=is_summary
-        )
+        annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
         else:

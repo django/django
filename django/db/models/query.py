@@ -23,7 +23,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Ref, Value, When
+from django.db.models.expressions import Case, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
@@ -589,24 +589,7 @@ class QuerySet(AltersData):
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        query = self.query.chain()
-        for (alias, aggregate_expr) in kwargs.items():
-            query.add_annotation(aggregate_expr, alias, is_summary=True)
-            annotation = query.annotations[alias]
-            if not annotation.contains_aggregate:
-                raise TypeError("%s is not an aggregate expression" % alias)
-            for expr in annotation.get_source_expressions():
-                if (
-                    expr.contains_aggregate
-                    and isinstance(expr, Ref)
-                    and expr.refs in kwargs
-                ):
-                    name = expr.refs
-                    raise exceptions.FieldError(
-                        "Cannot compute %s('%s'): '%s' is an aggregate"
-                        % (annotation.name, name, name)
-                    )
-        return query.get_aggregation(self.db, kwargs)
+        return self.query.chain().get_aggregation(self.db, kwargs)
 
     async def aaggregate(self, *args, **kwargs):
         return await sync_to_async(self.aggregate)(*args, **kwargs)
@@ -1655,7 +1638,6 @@ class QuerySet(AltersData):
                 clone.query.add_annotation(
                     annotation,
                     alias,
-                    is_summary=False,
                     select=select,
                 )
         for alias, annotation in clone.query.annotations.items():
