@@ -756,6 +756,9 @@ argument - the index of the form in the formset. The index is ``None`` for the
     ...         kwargs['custom_kwarg'] = index
     ...         return kwargs
 
+    >>> ArticleFormSet = formset_factory(MyArticleForm, formset=BaseArticleFormSet)
+    >>> formset = ArticleFormSet()
+
 .. _formset-prefix:
 
 Customizing a formset's prefix
