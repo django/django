@@ -82,6 +82,11 @@ JoinInfo = namedtuple(
 class RawQuery:
     """A single raw SQL query."""
 
+    has_select_fields = True
+    contains_aggregate = []
+    contains_over_clause = False
+    subquery = False
+
     def __init__(self, sql, using, params=()):
         self.params = params
         self.sql = sql
@@ -98,7 +103,9 @@ class RawQuery:
         return self.clone(using)
 
     def clone(self, using):
-        return RawQuery(self.sql, using, params=self.params)
+        query = RawQuery(self.sql, using, params=self.params)
+        query.subquery = self.subquery
+        return query
 
     def get_columns(self):
         if self.cursor is None:
@@ -150,6 +157,17 @@ class RawQuery:
 
         self.cursor = connection.cursor()
         self.cursor.execute(self.sql, params)
+
+    def as_sql(self, compiler, connection):
+        sql = self.sql
+        if self.subquery:
+            sql = "(%s)" % sql
+        return sql, self.params
+
+    def resolve_expression(self, query, *args, **kwargs):
+        clone = self.clone(self.using)
+        clone.subquery = True
+        return clone
 
 
 ExplainInfo = namedtuple("ExplainInfo", ("format", "options"))
@@ -1243,7 +1261,7 @@ class Query(BaseExpression):
                 )
             elif hasattr(value, "_meta"):
                 self.check_query_object_type(value, opts, field)
-            elif hasattr(value, "__iter__"):
+            elif hasattr(value, "__iter__") and not getattr(value, "subquery", False):
                 for v in value:
                     self.check_query_object_type(v, opts, field)
 

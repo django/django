@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models.query import RawQuerySet
+from django.db.models.sql.query import RawQuery
 from django.test import TestCase, skipUnlessDBFeature
 
 from .models import (
@@ -61,6 +62,12 @@ class RawQueryTests(TestCase):
             author=cls.a3,
             paperback=True,
             opening_line="It was the day my grandmother exploded.",
+        )
+        cls.b5 = Book.objects.create(
+            title="Some other awesome book",
+            author=cls.a4,
+            paperback=True,
+            opening_line="Story of the book that was left behind",
         )
         cls.c1 = Coffee.objects.create(brand="dunkin doughnuts")
         cls.c2 = Coffee.objects.create(brand="starbucks")
@@ -308,7 +315,7 @@ class RawQueryTests(TestCase):
             ("book_count", 3),
             ("book_count", 0),
             ("book_count", 1),
-            ("book_count", 0),
+            ("book_count", 1),
         )
         authors = Author.objects.order_by("pk")
         self.assertSuccessfulRawQuery(Author, query, authors, expected_annotations)
@@ -413,7 +420,18 @@ class RawQueryTests(TestCase):
         )
 
     def test_len(self):
-        self.assertEqual(len(Book.objects.raw("SELECT * FROM raw_query_book")), 4)
+        self.assertEqual(len(Book.objects.raw("SELECT * FROM raw_query_book")), 5)
         self.assertEqual(
             len(Book.objects.raw("SELECT * FROM raw_query_book WHERE id = 0")), 0
         )
+
+    def test_as_subquery(self):
+        author_id_sub_query = RawQuery(
+            "SELECT id FROM raw_query_author WHERE last_name LIKE %s",
+            using="default",
+            params=["Smith"],
+        )
+        with self.assertNumQueries(1):
+            self.assertEqual(
+                len(Book.objects.filter(author_id__in=author_id_sub_query)), 4
+            )

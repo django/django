@@ -355,6 +355,9 @@ Miscellaneous
 * The undocumented ``negated`` parameter of the
   :class:`~django.db.models.Exists` expression is removed.
 
+* Add functionality so :class:`~django.db.models.sql.RawQuery`
+  can be used as a subquery.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2

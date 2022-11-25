@@ -2048,6 +2048,9 @@ class RawQuerySet:
         model_init_names = [f.attname for f in model_init_fields]
         return model_init_names, model_init_order, annotation_fields
 
+    def resolve_expression(self, *args, **kwargs):
+        return self.query.resolve_expression(self, *args, **kwargs)
+
     def prefetch_related(self, *lookups):
         """Same as QuerySet.prefetch_related()"""
         clone = self._clone()
