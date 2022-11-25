@@ -283,9 +283,7 @@ class TimestampSigner(Signer):
 
     def unsign_object(self, signed_obj, max_age=None, **kwargs):
         if self.expiration_key is None:
-            return super(TimestampSigner, self).unsign_object(
-                signed_obj, max_age=max_age, **kwargs
-            )
+            return super().unsign_object(signed_obj, max_age=max_age, **kwargs)
 
         # If using expiration key use it's value when present
         value = super().unsign_object(signed_obj, **kwargs, max_age=None)
