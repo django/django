@@ -630,6 +630,52 @@ the software to accomplish this should be accompanied by a test, whether you
 write the test first and then make the code pass the test, or work out the
 logic in your code first and then write a test to prove it.
 
+Testing user interaction
+------------------------
+
+But tests can do more that check our querysets. We can also use tests to ensure
+that the user can interact with the site in the same way.
+
+As an example, we'll test submitting a form. For this, you'll need to install
+`django.webtest`_:
+
+.. console::
+
+    $ pip install django-webtest
+
+.. code-block:: python
+    :caption: ``polls/tests.py``
+
+    from django_webtest import WebTest
+
+    class PollWebTests(WebTest):
+        def test_vote_form(self):
+            """
+            We should be able to fill out the vote form, and store our vote.
+            """
+            question = create_question(question_text="What's up?")
+            choice = Choice.objects.create(question=question, choice_text="The sky")
+            self.assertEqual(choice.votes, 0)
+
+            response = self.app.get(reverse("polls:vote", args=(question.id,)))
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, question.question_text)
+
+            # Play around with Webtest's form API
+            form = response.form
+            field = form["choice"]
+            self.assertEqual(field.options, [(str(choice.pk), False, None)])
+            self.assertEqual(field.value, None)
+
+            # Select and submit
+            form["choice"] = choice.pk
+            post_submit_page = form.submit().follow()
+            self.assertEqual(post_submit_page.request.path, reverse("polls:results"))
+            self.assertEqual(choice.votes, 1)
+
+.. _django.webtest: https://github.com/django-webtest/django-webtest
+
+
 At a certain point you are bound to look at your tests and wonder whether your
 code is suffering from test bloat, which brings us to:
 
