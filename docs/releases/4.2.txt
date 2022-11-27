@@ -65,6 +65,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   390,000 to 480,000.
 
+* :class:`~django.contrib.auth.forms.UserCreationForm` now saves many-to-many
+  form fields for a custom user model.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

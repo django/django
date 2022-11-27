@@ -1665,6 +1665,11 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
 
+    .. versionchanged:: 4.2
+
+        In older versions, :class:`UserCreationForm` didn't save many-to-many
+        form fields for a custom user model.
+
 .. currentmodule:: django.contrib.auth
 
 Authentication data in templates
