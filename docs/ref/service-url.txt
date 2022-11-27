@@ -1,0 +1,77 @@
+===============
+Connection URLs
+===============
+
+The following helpers within ``django.conf.service_url`` are meant to
+simplify connection configuration to databases and caches via URLs,
+for example Heroku's usage of the ``DATABASE_URL`` environment variable
+to provide connection details for hosted databases.
+
+
+.. currentmodule:: django.conf.service_url
+
+Database URLs
+=============
+
+.. function: configure_db(value)
+
+Provide a database URL and receive a configuration dictionary meant for
+the DATABASES Django setting.
+
+For example::
+
+    import os
+    from django.conf.service_url import configure_db
+
+    DATABASES = {
+       "default": configure_db(os.environ['DATABASE_URL'], max_conn_age=)
+    }
+
+
+The backend that is used will depend on the protocol within the URL. For
+example ``postgres://localhost:5432`` will map to the ``django.db.backends.postgresl``
+backend.
+
+The database protocol mappings that come with Django are the following:
+
+- ``mysql://`` -> ``django.db.backends.mysql``
+- ``oracle://`` -> ``django.db.backends.oracle``
+- ``postgres://`` -> ``django.db.backends.postgresql``
+- ``sqlite://`` -> ``django.db.backends.sqlite3``
+- ``mysql+gis://`` -> ``django.contrib.gis.db.backends.mysql``
+- ``oracle+gis://`` -> ``django.contrib.gis.db.backends.oracle``
+- ``postgis://`` -> ``django.contrib.gis.db.backends.postgis``
+- ``spatialite://`` -> ``django.contrib.gis.db.backends.spatialite``
+
+.. function: register_db_backend(scheme, path)
+
+Register a custom protocol to an associated database backend.
+
+Cache URLs
+==========
+
+.. function: configure_cache(value)
+
+Provide a database URL and receive a configuration dictionary meant for
+the CACHES Django setting.
+
+    import os
+    from django.conf.service_url import configure_cache
+
+    CACHES = {
+       "default": configure_cache("memcached+pymemcache://localhost:11211")
+    }
+
+The backend use depends on the protocol specified in the URL. The following protocol mappings
+are defined by Django:
+
+- ``file://`` -> ``django.core.cache.backends.filebased.FileBasedCache``
+- ``memory://`` -> ``django.core.cache.backends.locmem.LocMemCache``
+- ``db://`` -> ``django.core.cache.backends.db.DatabaseCache``
+- ``dummy://`` -> ``django.core.cache.backends.dummy.DummyCache``
+- ``memcached+pymemcache://`` -> ``django.core.cache.backends.memcached.PyMemcacheCache``
+- ``memcached+pylibmccache://`` -> ``django.core.cache.backends.memcached.PyLibMCCache``
+
+.. function: register_cache_backend(scheme, path)
+
+Register a custom protocol to an associated cache backend.

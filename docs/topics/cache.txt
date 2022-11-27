@@ -113,6 +113,7 @@ In this example, Memcached is available through a local Unix socket file
         }
     }
 
+
 One excellent feature of Memcached is its ability to share a cache over
 multiple servers. This means you can run Memcached daemons on multiple
 machines, and the program will treat the group of machines as a *single*
@@ -443,6 +444,25 @@ as reference implementations. You'll find the code in the
 Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
 been well-tested and are well-documented.
+
+
+.. _connection_url_support:
+
+Connection URL Support
+----------------------
+
+Cache connection URLs can be used to configure cache backends by calling
+:func:`~django.conf.service_url.configure_cache`::
+
+    import os
+    from django.conf.service_url import configure_cache
+
+    CACHES = {
+       "default": configure_cache("memcached+pymemcache://localhost:11211")
+    }
+
+More information can be found in the documentation for :func:`django.conf.service_url.configure_cache`
+
 
 .. _cache_arguments:
 

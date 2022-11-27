@@ -25,6 +25,23 @@ reference manuals.
 General notes
 =============
 
+.. _database-url-support:
+
+Database URL Support
+--------------------
+
+Database connection URLs can be used to configure database backends by calling
+:func:`django.conf.service_url.configure_db`::
+
+    import os
+    from django.conf.service_url import configure_db
+
+    DATABASES = {
+       "default": configure_db(os.environ['DATABASE_URL'])
+    }
+
+more information can be found in the documentation for :func:`~django.conf.service_url.configure_db`
+
 .. _persistent-database-connections:
 
 Persistent connections

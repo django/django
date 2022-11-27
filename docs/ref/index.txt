@@ -24,6 +24,7 @@ API Reference
    request-response
    schema-editor
    settings
+   service-url
    signals
    templates/index
    template-response

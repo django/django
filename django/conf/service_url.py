@@ -91,14 +91,27 @@ def _get_config(backend_type, value):
 
 
 def configure_db(value):
+    """
+    Generate a configuration dictionary for a database based on a URL.
+    """
     return _get_config("db", value)
 
 
 def configure_cache(value):
+    """
+    Generate a configuration dictionary for a cache based on a URL.
+    """
     return _get_config("cache", value)
 
 
 def register_db_backend(scheme, path):
+    """
+    Register a custom protocol scheme for database URL connection configuration. path should
+    be the name of the custom backend.
+
+    Custom backends requiring custom URL parsing should override the backend's config_from_url
+    method.
+    """
     if not path.endswith(".base.DatabaseWrapper"):
         path += ".base.DatabaseWrapper"
 
@@ -106,6 +119,13 @@ def register_db_backend(scheme, path):
 
 
 def register_cache_backend(scheme, path):
+    """
+    Register a custom protocol scheme for cache URL connection configuration. path should be
+    the name of the custom backend.
+
+    Custom backends requiring custom URL parsing should override the backend's config_from_url
+    method.
+    """
     _register_backend("cache", scheme, path)
 
 
