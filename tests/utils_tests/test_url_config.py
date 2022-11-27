@@ -236,23 +236,23 @@ class TestCaches(unittest.TestCase):
         self.assertEqual(result["LOCATION"], "abc")
 
     def test_memcached_with_ip(self):
-        result = configure_cache("memcached://1.2.3.4:1567")
+        result = configure_cache("memcached+pymemcache://1.2.3.4:1567")
         self.assertEqual(
-            result["BACKEND"], "django.core.cache.backends.memcached.MemcachedCache"
+            result["BACKEND"], "django.core.cache.backends.memcached.PyMemcacheCache"
         )
         self.assertEqual(result["LOCATION"], "1.2.3.4:1567")
 
     def test_memcached_without_port(self):
-        result = configure_cache("memcached://1.2.3.4")
+        result = configure_cache("memcached+pylibmccache://1.2.3.4")
         self.assertEqual(
-            result["BACKEND"], "django.core.cache.backends.memcached.MemcachedCache"
+            result["BACKEND"], "django.core.cache.backends.memcached.PyLibMCCache"
         )
         self.assertEqual(result["LOCATION"], "1.2.3.4")
 
     def test_memcached_socket_path(self):
-        result = configure_cache("memcached:///tmp/memcached.sock")
+        result = configure_cache("memcached+pymemcache:///tmp/memcached.sock")
         self.assertEqual(
-            result["BACKEND"], "django.core.cache.backends.memcached.MemcachedCache"
+            result["BACKEND"], "django.core.cache.backends.memcached.PyMemcacheCache"
         )
         self.assertEqual(result["LOCATION"], "/tmp/memcached.sock")
 

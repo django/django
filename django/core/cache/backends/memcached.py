@@ -3,14 +3,13 @@
 import re
 import time
 
+from django.conf.service_url import parse_url
 from django.core.cache.backends.base import (
     DEFAULT_TIMEOUT,
     BaseCache,
     InvalidCacheKey,
     memcache_key_warnings,
 )
-from django.conf.service_url import parse_url
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.utils.functional import cached_property
 
 
@@ -184,11 +183,12 @@ class PyLibMCCache(BaseMemcachedCache):
     @classmethod
     def config_from_url(cls, engine, scheme, url):
         parsed = parse_url(url)
-        # We are dealing with a URI like memcached://unix:/abc
-        # Set the hostname to be the unix path
-        parsed["hostname"] = "{0}:/{1}".format(parsed["hostname"], parsed["path"])
-        parsed["hostname_with_port"] = parsed["hostname"]
-        parsed["path"] = None
+        if parsed["path"]:
+            # We are dealing with a URI like memcached://unix:/abc
+            # Set the hostname to be the unix path
+            parsed["hostname"] = "{0}:/{1}".format(parsed["hostname"], parsed["path"])
+            parsed["hostname_with_port"] = parsed["hostname"]
+            parsed["path"] = None
         return super().config_from_url(engine, scheme, parsed)
 
 

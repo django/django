@@ -123,7 +123,7 @@ register_cache_backend("memory", "django.core.cache.backends.locmem.LocMemCache"
 register_cache_backend("db", "django.core.cache.backends.db.DatabaseCache")
 register_cache_backend("dummy", "django.core.cache.backends.dummy.DummyCache")
 register_cache_backend(
-    "memcached", "django.core.cache.backends.memcached.MemcachedCache"
+    "memcached+pymemcache", "django.core.cache.backends.memcached.PyMemcacheCache"
 )
 register_cache_backend(
     "memcached+pylibmccache", "django.core.cache.backends.memcached.PyLibMCCache"

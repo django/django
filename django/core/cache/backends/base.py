@@ -1,9 +1,9 @@
 "Base Cache class."
 import time
 import warnings
+from urllib import parse
 
 from asgiref.sync import sync_to_async
-from urllib import parse
 
 from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
