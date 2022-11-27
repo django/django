@@ -11,7 +11,6 @@ from contextlib import contextmanager
 from urllib import parse
 
 from django.conf import settings
-from django.conf.service_url import parse_url
 from django.core.exceptions import ImproperlyConfigured
 from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
@@ -20,7 +19,7 @@ from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrappe
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
-from django.utils.url_config import parse_url
+from django.conf.service_url import parse_url
 from django.utils.version import get_version_tuple
 
 try:
