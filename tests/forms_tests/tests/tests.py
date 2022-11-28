@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models
 from django.forms import CharField, FileField, Form, ModelForm
 from django.forms.models import ModelFormMetaclass
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
 from ..models import (
     BoundaryModel,
@@ -203,6 +203,7 @@ class ModelFormCallableModelDefault(TestCase):
             """,
         )
 
+    @skipUnlessDBFeature("supports_json_field")
     def test_callable_default_hidden_widget_value_not_overridden(self):
         class FieldWithCallableDefaultsModel(models.Model):
             int_field = models.IntegerField(default=lambda: 1)
