@@ -124,6 +124,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                         "servers.tests.LiveServerInMemoryDatabaseLockTest."
                         "test_in_memory_database_lock",
                     },
+                    "multiprocessing's start method is checked only for in-memory "
+                    "SQLite databases": {
+                        "backends.sqlite.test_creation.TestDbSignatureTests."
+                        "test_get_test_db_clone_settings_not_supported",
+                    },
                 }
             )
         return skips
