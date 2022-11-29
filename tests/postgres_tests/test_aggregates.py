@@ -125,6 +125,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (BoolAnd("boolean_field", default=False), False),
             (BoolOr("boolean_field", default=False), False),
             (JSONBAgg("integer_field", default=Value('["<empty>"]')), ["<empty>"]),
+            (StringAgg("char_field", delimiter=";", default="<empty>"), "<empty>"),
             (
                 StringAgg("char_field", delimiter=";", default=Value("<empty>")),
                 "<empty>",
