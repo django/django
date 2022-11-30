@@ -590,6 +590,12 @@ Miscellaneous
 * The minimum supported version of ``asgiref`` is increased from 3.4.1 to
   3.5.2.
 
+* Combined expressions no longer use the error-prone behavior of guessing
+  ``output_field`` when argument types match. As a consequence, resolving an
+  ``output_field`` for database functions and combined expressions may now
+  crash with mixed types. You will need to explicitly set the ``output_field``
+  in such cases.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
