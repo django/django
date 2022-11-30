@@ -42,8 +42,9 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx_copybutton",
 ]
-
+copybutton_prompt_text = "$ "
 # AutosectionLabel settings.
 # Uses a <page>:<label> schema which doesn't work for duplicate sub-section
 # labels, so set max depth.
