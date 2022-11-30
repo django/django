@@ -321,6 +321,9 @@ Utilities
   documented functions for handling URL redirects. The Django functions were
   not affected.
 
+* The new :func:`django.utils.http.content_disposition_header` function returns
+  a ``Content-Disposition`` HTTP header value as specified by :rfc:`6266`.
+
 Validators
 ~~~~~~~~~~
 

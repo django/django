@@ -8,7 +8,7 @@ import sys
 import time
 from email.header import Header
 from http.client import responses
-from urllib.parse import quote, urlparse
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core import signals, signing
@@ -18,7 +18,7 @@ from django.http.cookie import SimpleCookie
 from django.utils import timezone
 from django.utils.datastructures import CaseInsensitiveMapping
 from django.utils.encoding import iri_to_uri
-from django.utils.http import http_date
+from django.utils.http import content_disposition_header, http_date
 from django.utils.regex_helper import _lazy_re_compile
 
 _charset_from_content_type_re = _lazy_re_compile(
@@ -569,20 +569,10 @@ class FileResponse(StreamingHttpResponse):
             else:
                 self.headers["Content-Type"] = "application/octet-stream"
 
-        if filename:
-            disposition = "attachment" if self.as_attachment else "inline"
-            try:
-                filename.encode("ascii")
-                file_expr = 'filename="{}"'.format(
-                    filename.replace("\\", "\\\\").replace('"', r"\"")
-                )
-            except UnicodeEncodeError:
-                file_expr = "filename*=utf-8''{}".format(quote(filename))
-            self.headers["Content-Disposition"] = "{}; {}".format(
-                disposition, file_expr
-            )
-        elif self.as_attachment:
-            self.headers["Content-Disposition"] = "attachment"
+        if content_disposition := content_disposition_header(
+            self.as_attachment, filename
+        ):
+            self.headers["Content-Disposition"] = content_disposition
 
 
 class HttpResponseRedirectBase(HttpResponse):

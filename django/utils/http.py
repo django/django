@@ -10,6 +10,7 @@ from urllib.parse import (
     _coerce_args,
     _splitnetloc,
     _splitparams,
+    quote,
     scheme_chars,
     unquote,
 )
@@ -425,3 +426,24 @@ def parse_header_parameters(line):
                 value = unquote(value, encoding=encoding)
             pdict[name] = value
     return key, pdict
+
+
+def content_disposition_header(as_attachment, filename):
+    """
+    Construct a Content-Disposition HTTP header value from the given filename
+    as specified by RFC 6266.
+    """
+    if filename:
+        disposition = "attachment" if as_attachment else "inline"
+        try:
+            filename.encode("ascii")
+            file_expr = 'filename="{}"'.format(
+                filename.replace("\\", "\\\\").replace('"', r"\"")
+            )
+        except UnicodeEncodeError:
+            file_expr = "filename*=utf-8''{}".format(quote(filename))
+        return f"{disposition}; {file_expr}"
+    elif as_attachment:
+        return "attachment"
+    else:
+        return None
