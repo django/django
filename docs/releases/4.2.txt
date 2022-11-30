@@ -540,3 +540,6 @@ Miscellaneous
 
 * ``TransactionTestCase.assertQuerysetEqual()`` is deprecated in favor of
   ``assertQuerySetEqual()``.
+
+* Passing positional arguments to ``Signer`` and ``TimestampSigner`` is
+  deprecated in favor of keyword-only arguments.
