@@ -729,6 +729,15 @@ escaping HTML.
 
     Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
 
+.. function:: content_disposition_header(as_attachment, filename)
+
+    .. versionadded:: 4.2
+
+    Constructs a ``Content-Disposition`` HTTP header value from the given
+    ``filename`` as specified by :rfc:`6266`. Returns ``None`` if
+    ``as_attachment`` is ``False`` and ``filename`` is ``None``, otherwise
+    returns a string suitable for the ``Content-Disposition`` HTTP header.
+
 .. function:: base36_to_int(s)
 
     Converts a base 36 string to an integer.
