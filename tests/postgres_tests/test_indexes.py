@@ -15,7 +15,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import CharField, F, Index, Q
 from django.db.models.functions import Cast, Collate, Length, Lower
 from django.test import skipUnlessDBFeature
-from django.test.utils import modify_settings, register_lookup
+from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .fields import SearchVector, SearchVectorField
@@ -235,7 +235,6 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         )
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
         SELECT opcname, c.relname FROM pg_opclass AS oc

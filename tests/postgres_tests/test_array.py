@@ -12,12 +12,7 @@ from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
-from django.test import (
-    TransactionTestCase,
-    modify_settings,
-    override_settings,
-    skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
@@ -1259,8 +1254,6 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
-    # To locate the widget's template.
-    @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)
