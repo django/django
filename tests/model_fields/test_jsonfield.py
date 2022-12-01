@@ -1007,7 +1007,7 @@ class TestQuerying(TestCase):
                 False,
             )
         self.assertIn(
-            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"'""",
             queries[0]["sql"],
         )
 

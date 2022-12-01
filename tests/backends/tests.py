@@ -454,7 +454,7 @@ class BackendTestCase(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
-        # accessing closed cursor (psycopg2 has InterfaceError, rest seem
+        # accessing closed cursor (psycopg has InterfaceError, rest seem
         # to use ProgrammingError).
         with self.assertRaises(connection.features.closed_cursor_error_class):
             # cursor should be closed, so no queries should be possible.
@@ -462,12 +462,12 @@ class BackendTestCase(TransactionTestCase):
 
     @unittest.skipUnless(
         connection.vendor == "postgresql",
-        "Psycopg2 specific cursor.closed attribute needed",
+        "Psycopg specific cursor.closed attribute needed",
     )
     def test_cursor_contextmanager_closing(self):
         # There isn't a generic way to test that cursors are closed, but
-        # psycopg2 offers us a way to check that by closed attribute.
-        # So, run only on psycopg2 for that reason.
+        # psycopg offers us a way to check that by closed attribute.
+        # So, run only on psycopg for that reason.
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)

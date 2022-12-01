@@ -2019,6 +2019,10 @@ class IntegerField(Field):
                 "Field '%s' expected a number but got %r." % (self.name, value),
             ) from e
 
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super().get_db_prep_value(value, connection, prepared)
+        return connection.ops.adapt_integerfield_value(value, self.get_internal_type())
+
     def get_internal_type(self):
         return "IntegerField"
 

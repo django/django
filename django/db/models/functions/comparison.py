@@ -1,6 +1,7 @@
 """Database functions that do comparisons or type conversions."""
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
+from django.db.models.fields import TextField
 from django.db.models.fields.json import JSONField
 from django.utils.regex_helper import _lazy_re_compile
 
@@ -158,7 +159,14 @@ class JSONObject(Func):
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_postgresql(self, compiler, connection, **extra_context):
-        return self.as_sql(
+        copy = self.copy()
+        copy.set_source_expressions(
+            [
+                Cast(expression, TextField()) if index % 2 == 0 else expression
+                for index, expression in enumerate(copy.get_source_expressions())
+            ]
+        )
+        return super(JSONObject, copy).as_sql(
             compiler,
             connection,
             function="JSONB_BUILD_OBJECT",

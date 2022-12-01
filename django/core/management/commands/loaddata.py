@@ -207,7 +207,7 @@ class Command(BaseCommand):
             self.models.add(obj.object.__class__)
             try:
                 obj.save(using=self.using)
-            # psycopg2 raises ValueError if data contains NUL chars.
+            # psycopg raises ValueError if data contains NUL chars.
             except (DatabaseError, IntegrityError, ValueError) as e:
                 e.args = (
                     "Could not load %(object_label)s(pk=%(pk)s): %(error_msg)s"

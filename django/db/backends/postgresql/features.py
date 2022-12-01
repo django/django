@@ -1,7 +1,8 @@
 import operator
 
-from django.db import InterfaceError
+from django.db import DataError, InterfaceError
 from django.db.backends.base.features import BaseDatabaseFeatures
+from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.utils.functional import cached_property
 
 
@@ -26,6 +27,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     can_introspect_materialized_views = True
     can_distinct_on_fields = True
     can_rollback_ddl = True
+    schema_editor_uses_clientside_param_binding = True
     supports_combined_alters = True
     nulls_order_largest = True
     closed_cursor_error_class = InterfaceError
@@ -80,6 +82,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "test_create_index_ignores_opclasses",
         },
     }
+
+    @cached_property
+    def prohibits_null_characters_in_text_exception(self):
+        if is_psycopg3:
+            return DataError, "PostgreSQL text fields cannot contain NUL (0x00) bytes"
+        else:
+            return ValueError, "A string literal cannot contain NUL (0x00) characters."
 
     @cached_property
     def introspected_field_types(self):

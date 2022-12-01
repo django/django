@@ -429,14 +429,14 @@ Install Django and set up database
 recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
-psycopg2
-~~~~~~~~
+psycopg
+~~~~~~~
 
-The ``psycopg2`` Python module provides the interface between Python and the
-PostgreSQL database. ``psycopg2`` can be installed via pip within your Python
+The ``psycopg`` Python module provides the interface between Python and the
+PostgreSQL database. ``psycopg`` can be installed via pip within your Python
 virtual environment::
 
-    ...\> py -m pip install psycopg2
+    ...\> py -m pip install psycopg
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from

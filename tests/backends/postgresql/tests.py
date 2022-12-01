@@ -14,6 +14,11 @@ from django.db import (
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import TestCase, override_settings
 
+try:
+    from django.db.backends.postgresql.psycopg_any import is_psycopg3
+except ImportError:
+    is_psycopg3 = False
+
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL tests")
 class Tests(TestCase):
@@ -228,7 +233,7 @@ class Tests(TestCase):
         # Since this is a django.test.TestCase, a transaction is in progress
         # and the isolation level isn't reported as 0. This test assumes that
         # PostgreSQL is configured with the default isolation level.
-        # Check the level on the psycopg2 connection, not the Django wrapper.
+        # Check the level on the psycopg connection, not the Django wrapper.
         self.assertIsNone(connection.connection.isolation_level)
 
         new_connection = connection.copy()
@@ -238,7 +243,7 @@ class Tests(TestCase):
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
-            # Check the level on the psycopg2 connection, not the Django wrapper.
+            # Check the level on the psycopg connection, not the Django wrapper.
             self.assertEqual(
                 new_connection.connection.isolation_level,
                 IsolationLevel.SERIALIZABLE,
@@ -252,7 +257,7 @@ class Tests(TestCase):
         new_connection.settings_dict["OPTIONS"]["isolation_level"] = -1
         msg = (
             "Invalid transaction isolation level -1 specified. Use one of the "
-            "IsolationLevel values."
+            "psycopg.IsolationLevel values."
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.ensure_connection()
@@ -268,7 +273,7 @@ class Tests(TestCase):
 
     def _select(self, val):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT %s", (val,))
+            cursor.execute("SELECT %s::text[]", (val,))
             return cursor.fetchone()[0]
 
     def test_select_ascii_array(self):
@@ -308,17 +313,18 @@ class Tests(TestCase):
                     )
 
     def test_correct_extraction_psycopg_version(self):
-        from django.db.backends.postgresql.base import Database, psycopg2_version
+        from django.db.backends.postgresql.base import Database, psycopg_version
 
         with mock.patch.object(Database, "__version__", "4.2.1 (dt dec pq3 ext lo64)"):
-            self.assertEqual(psycopg2_version(), (4, 2, 1))
+            self.assertEqual(psycopg_version(), (4, 2, 1))
         with mock.patch.object(
             Database, "__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"
         ):
-            self.assertEqual(psycopg2_version(), (4, 2))
+            self.assertEqual(psycopg_version(), (4, 2))
 
     @override_settings(DEBUG=True)
-    def test_copy_cursors(self):
+    @unittest.skipIf(is_psycopg3, "psycopg2 specific test")
+    def test_copy_to_expert_cursors(self):
         out = StringIO()
         copy_expert_sql = "COPY django_session TO STDOUT (FORMAT CSV, HEADER)"
         with connection.cursor() as cursor:
@@ -328,6 +334,16 @@ class Tests(TestCase):
             [q["sql"] for q in connection.queries],
             [copy_expert_sql, "COPY django_session TO STDOUT"],
         )
+
+    @override_settings(DEBUG=True)
+    @unittest.skipUnless(is_psycopg3, "psycopg3 specific test")
+    def test_copy_cursors(self):
+        copy_sql = "COPY django_session TO STDOUT (FORMAT CSV, HEADER)"
+        with connection.cursor() as cursor:
+            with cursor.copy(copy_sql) as copy:
+                for row in copy:
+                    pass
+        self.assertEqual([q["sql"] for q in connection.queries], [copy_sql])
 
     def test_get_database_version(self):
         new_connection = connection.copy()

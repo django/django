@@ -538,8 +538,8 @@ PostgreSQL. These fields are used to store a range of values; for example the
 start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
-All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
+All of the range fields translate to :ref:`psycopg Range objects
+<psycopg:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
 excluded, that is ``[)`` (see the PostgreSQL documentation for details about
 `different bounds`_). The default bounds can be changed for non-discrete range
@@ -553,8 +553,8 @@ the ``default_bounds`` argument.
 
     Stores a range of integers. Based on an
     :class:`~django.db.models.IntegerField`. Represented by an ``int4range`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
@@ -567,8 +567,8 @@ the ``default_bounds`` argument.
 
     Stores a range of large integers. Based on a
     :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
-    in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    in the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
@@ -581,8 +581,8 @@ the ``default_bounds`` argument.
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
 
     .. attribute:: DecimalRangeField.default_bounds
 
@@ -592,7 +592,7 @@ the ``default_bounds`` argument.
         default is lower bound included, upper bound excluded, that is ``[)``
         (see the PostgreSQL documentation for details about
         `different bounds`_). ``default_bounds`` is not used for
-        :class:`~psycopg2:psycopg2.extras.NumericRange` inputs.
+        ``django.db.backends.postgresql.psycopg_any.NumericRange`` inputs.
 
 ``DateTimeRangeField``
 ----------------------
@@ -601,8 +601,8 @@ the ``default_bounds`` argument.
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange`` in Python.
 
     .. attribute:: DateTimeRangeField.default_bounds
 
@@ -612,7 +612,7 @@ the ``default_bounds`` argument.
         default is lower bound included, upper bound excluded, that is ``[)``
         (see the PostgreSQL documentation for details about
         `different bounds`_). ``default_bounds`` is not used for
-        :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` inputs.
+        ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange`` inputs.
 
 ``DateRangeField``
 ------------------
@@ -621,7 +621,8 @@ the ``default_bounds`` argument.
 
     Stores a range of dates. Based on a
     :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
-    database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
+    database and a ``django.db.backends.postgresql.psycopg_any.DateRange`` in
+    Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
@@ -655,7 +656,7 @@ We will also use the following example objects::
 
 and ``NumericRange``:
 
-    >>> from psycopg2.extras import NumericRange
+    >>> from django.db.backends.postgresql.psycopg_any import NumericRange
 
 Containment functions
 ~~~~~~~~~~~~~~~~~~~~~
@@ -690,7 +691,7 @@ The ``contained_by`` lookup is also available on the non-range field types:
 :class:`~django.db.models.DateField`, and
 :class:`~django.db.models.DateTimeField`. For example::
 
-    >>> from psycopg2.extras import DateTimeTZRange
+    >>> from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
     >>> Event.objects.filter(
     ...     start__contained_by=DateTimeTZRange(
     ...         timezone.now() - datetime.timedelta(hours=1),
@@ -864,9 +865,9 @@ Defining your own range types
 -----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
-field implementations use base classes below, and psycopg2 provides a
-:func:`~psycopg2:psycopg2.extras.register_range` to allow use of custom range
-types.
+field implementations use base classes below, and ``psycopg`` provides a
+:func:`~psycopg:psycopg.types.range.register_range` to allow use of custom
+range types.
 
 .. class:: RangeField(**options)
 
@@ -878,7 +879,7 @@ types.
 
     .. attribute:: range_type
 
-        The psycopg2 range type to use.
+        The range type to use.
 
     .. attribute:: form_field
 
@@ -895,7 +896,7 @@ types.
 
     .. attribute:: range_type
 
-        The psycopg2 range type to use.
+        The range type to use.
 
 Range operators
 ---------------
