@@ -237,7 +237,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
 class ArrayRHSMixin:
     def __init__(self, lhs, rhs):
-        # Don't wrap arrays that contains only None values, psycopg2 doesn't
+        # Don't wrap arrays that contains only None values, psycopg doesn't
         # allow this.
         if isinstance(rhs, (tuple, list)) and any(self._rhs_not_none_values(rhs)):
             expressions = []

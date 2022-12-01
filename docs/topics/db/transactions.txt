@@ -397,8 +397,8 @@ tasks, etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
 `two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
-<psycopg2:tpc>` and the :pep:`optional Two-Phase Commit Extensions in the
-Python DB-API specification <249#optional-two-phase-commit-extensions>`.
+<psycopg:two-phase-commit>` and the :pep:`optional Two-Phase Commit Extensions
+in the Python DB-API specification <249#optional-two-phase-commit-extensions>`.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an
