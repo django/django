@@ -1,11 +1,10 @@
-import unittest
 from decimal import Decimal
 
-from django.db import connection
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
-from django.test import TestCase
 from django.test.utils import modify_settings
+
+from . import PostgreSQLTestCase
 
 try:
     from psycopg2.extras import DateRange, DateTimeRange, DateTimeTZRange, NumericRange
@@ -20,8 +19,7 @@ except ImportError:
     pass
 
 
-@unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
-class PostgresConfigTests(TestCase):
+class PostgresConfigTests(PostgreSQLTestCase):
     def test_register_type_handlers_connection(self):
         from django.contrib.postgres.signals import register_type_handlers
 

@@ -16,7 +16,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
-from django.test import ignore_warnings, skipUnlessDBFeature
+from django.test import ignore_warnings, modify_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
@@ -37,6 +37,7 @@ except ImportError:
     pass
 
 
+@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
         SELECT opcname, c.relname FROM pg_opclass AS oc
@@ -254,6 +255,7 @@ class SchemaTests(PostgreSQLTestCase):
         Scene.objects.create(scene="ScEnE 10", setting="Sir Bedemir's Castle")
 
 
+@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class ExclusionConstraintTests(PostgreSQLTestCase):
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""
@@ -1196,6 +1198,7 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
 
 
+@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class ExclusionConstraintOpclassesDepracationTests(PostgreSQLTestCase):
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""

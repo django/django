@@ -1,10 +1,12 @@
 from io import StringIO
 
 from django.core.management import call_command
+from django.test.utils import modify_settings
 
 from . import PostgreSQLTestCase
 
 
+@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class InspectDBTests(PostgreSQLTestCase):
     def assertFieldsInModel(self, model, field_outputs):
         out = StringIO()
