@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import (
     CharField,
     F,
@@ -147,7 +147,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
                 # Empty result when query must be executed.
-                with self.assertNumQueries(1):
+                with transaction.atomic(), self.assertNumQueries(1):
                     values = AggregateTestModel.objects.aggregate(
                         aggregation=aggregation,
                     )
