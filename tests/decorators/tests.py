@@ -520,6 +520,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             vary_on_headers,
             vary_on_cookie,
             user_passes_test,
+            login_required,
         )
 
         for decorator in decorators:
@@ -1440,6 +1441,62 @@ class AuthDecoratorTests(SimpleTestCase):
 
         request = HttpRequest()
         request.user = self.DummyUser()
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = await an_async_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
+
+    def test_login_required_decorator_pass(self):
+        @login_required
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.is_authenticated = True
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    async def test_login_required_decorator_pass_with_async_view(self):
+        @login_required
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.is_authenticated = True
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_required_decorator_fail(self):
+        @login_required(login_url="/test-login")
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.is_authenticated = False
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = a_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
+
+    async def test_login_required_decorator_fail_with_async_view(self):
+        @login_required(login_url="/test-login")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.is_authenticated = False
         request.path = "/test-next-page"
         request.build_absolute_uri = self.dummy_build_absolute_uri
         response = await an_async_view(request)

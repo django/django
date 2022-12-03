@@ -54,6 +54,7 @@ def user_passes_test(
     return decorator
 
 
+@sync_and_async_middleware
 def login_required(
     function=None, redirect_field_name=REDIRECT_FIELD_NAME, login_url=None
 ):
