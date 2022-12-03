@@ -1575,7 +1575,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    path('my_view/', self.my_view),
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
@@ -1609,35 +1609,14 @@ templates used by the :class:`ModelAdmin` views:
         ``/admin/myapp/mymodel/my_view/`` (assuming the admin URLs are included
         at ``/admin/``.)
 
-    However, the ``self.my_view`` function registered above suffers from two
-    problems:
+    Notice how the ``self.my_view`` function is wrapped in
+    ``self.admin_site.admin_view``. This is generally what you want, since it
+    ensures two things:
 
-    * It will *not* perform any permission checks, so it will be accessible
-      to the general public.
-    * It will *not* provide any header details to prevent caching. This means
-      if the page retrieves data from the database, and caching middleware is
-      active, the page could show outdated information.
-
-    Since this is usually not what you want, Django provides a convenience
-    wrapper to check permissions and mark the view as non-cacheable. This
-    wrapper is ``AdminSite.admin_view()`` (i.e. ``self.admin_site.admin_view``
-    inside a ``ModelAdmin`` instance); use it like so::
-
-        class MyModelAdmin(admin.ModelAdmin):
-            def get_urls(self):
-                urls = super().get_urls()
-                my_urls = [
-                    path('my_view/', self.admin_site.admin_view(self.my_view))
-                ]
-                return my_urls + urls
-
-    Notice the wrapped view in the fifth line above::
-
-        path('my_view/', self.admin_site.admin_view(self.my_view))
-
-    This wrapping will protect ``self.my_view`` from unauthorized access and
-    will apply the :func:`django.views.decorators.cache.never_cache` decorator to
-    make sure it is not cached if the cache middleware is active.
+    1. Permission checks are run, ensuring only active staff users can access the view
+    2. The :func:`django.views.decorators.cache.never_cache` decorator is
+       applied to prevent caching, ensuring the returned information is
+       up-to-date
 
     If the page is cacheable, but you still want the permission check to be
     performed, you can pass a ``cacheable=True`` argument to
