@@ -519,6 +519,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             last_modified,
             vary_on_headers,
             vary_on_cookie,
+            user_passes_test,
         )
 
         for decorator in decorators:
@@ -1376,3 +1377,73 @@ class HttpDecoratorTests(SimpleTestCase):
             response.headers["Last-Modified"],
             "Wed, 01 Jan 2020 00:00:00 GMT",
         )
+
+
+class AuthDecoratorTests(SimpleTestCase):
+    class DummyUser:
+        pass
+
+    def always_pass(self, user):
+        return True
+
+    def always_fail(self, user):
+        return False
+
+    def dummy_build_absolute_uri(request):
+        """
+        This is required to bypass the normal login URL resolver methods, so we can
+        easily specify one for the test.
+        """
+        pass
+
+    def test_user_passes_test_decorator_pass(self):
+        @user_passes_test(self.always_pass)
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    async def test_user_passes_test_decorator_pass_with_async_view(self):
+        @user_passes_test(self.always_pass)
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_passes_test_decorator_fail(self):
+        @user_passes_test(self.always_fail, login_url="/test-login")
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = a_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
+
+    async def test_user_passes_test_decorator_fail_with_async_view(self):
+        @user_passes_test(self.always_fail, login_url="/test-login")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = await an_async_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
