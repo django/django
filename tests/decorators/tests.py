@@ -521,6 +521,7 @@ class SyncAndAsyncDecoratorTests(TestCase):
             vary_on_cookie,
             user_passes_test,
             login_required,
+            permission_required,
         )
 
         for decorator in decorators:
@@ -1397,6 +1398,12 @@ class AuthDecoratorTests(SimpleTestCase):
         """
         pass
 
+    def user_has_all_perms(self, perms):
+        return True
+
+    def user_has_no_perms(self, perms):
+        return False
+
     def test_user_passes_test_decorator_pass(self):
         @user_passes_test(self.always_pass)
         def a_view(request):
@@ -1497,6 +1504,62 @@ class AuthDecoratorTests(SimpleTestCase):
         request = HttpRequest()
         request.user = self.DummyUser()
         request.user.is_authenticated = False
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = await an_async_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
+
+    def test_permission_required_decorator_pass(self):
+        @permission_required("test_perm")
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.has_perms = self.user_has_all_perms
+        response = a_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    async def test_permission_required_decorator_pass_with_async_view(self):
+        @permission_required("test_perm")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.has_perms = self.user_has_all_perms
+        response = await an_async_view(request)
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_permission_required_decorator_fail(self):
+        @permission_required("test_perm", login_url="/test-login")
+        def a_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.has_perms = self.user_has_no_perms
+        request.path = "/test-next-page"
+        request.build_absolute_uri = self.dummy_build_absolute_uri
+        response = a_view(request)
+
+        # Assert we get redirected to the login page
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/test-login?next=/test-next-page")
+
+    async def test_permission_required_decorator_fail_with_async_view(self):
+        @permission_required("test_perm", login_url="/test-login")
+        async def an_async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        request.user = self.DummyUser()
+        request.user.has_perms = self.user_has_no_perms
         request.path = "/test-next-page"
         request.build_absolute_uri = self.dummy_build_absolute_uri
         response = await an_async_view(request)

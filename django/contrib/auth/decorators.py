@@ -72,6 +72,7 @@ def login_required(
     return actual_decorator
 
 
+@sync_and_async_middleware
 def permission_required(perm, login_url=None, raise_exception=False):
     """
     Decorator for views that checks whether a user has a particular permission
