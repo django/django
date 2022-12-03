@@ -10,6 +10,8 @@ urlpatterns = [
     path("streaming/", views.streaming),
     path("in_transaction/", views.in_transaction),
     path("not_in_transaction/", views.not_in_transaction),
+    path("not_in_transaction_using_none/", views.not_in_transaction_using_none),
+    path("not_in_transaction_using_text/", views.not_in_transaction_using_text),
     path("bad_request/", views.bad_request),
     path("suspicious/", views.suspicious),
     path("malformed_post/", views.malformed_post),
