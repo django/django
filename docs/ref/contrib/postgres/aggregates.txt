@@ -157,7 +157,7 @@ General-purpose aggregation functions
         class Room(models.Model):
             number = models.IntegerField(unique=True)
 
-        class HotelReservation(model.Model):
+        class HotelReservation(models.Model):
             room = models.ForeignKey('Room', on_delete=models.CASCADE)
             start = models.DateTimeField()
             end = models.DateTimeField()
