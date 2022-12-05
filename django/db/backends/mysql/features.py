@@ -16,7 +16,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
     supports_temporal_subtraction = True
