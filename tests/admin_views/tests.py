@@ -3371,8 +3371,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         cls.ssh1 = SuperSecretHideout.objects.create(
             location="super floating castle!", supervillain=cls.sv1
         )
-        cls.cy1 = CyclicOne.objects.create(name="I am recursive", two_id=1)
-        cls.cy2 = CyclicTwo.objects.create(name="I am recursive too", one_id=1)
+        cls.cy1 = CyclicOne.objects.create(pk=1, name="I am recursive", two_id=1)
+        cls.cy2 = CyclicTwo.objects.create(pk=1, name="I am recursive too", one_id=1)
 
     def setUp(self):
         self.client.force_login(self.superuser)
