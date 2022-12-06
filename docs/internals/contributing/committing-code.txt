@@ -138,7 +138,7 @@ Django's Git repository:
   Credit the contributors in the commit message: "Thanks A for the report and B
   for review." Use git's `Co-Authored-By`_ as appropriate.
 
-  .. _Co-Authored-By: https://docs.github.com/en/github/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
+  .. _Co-Authored-By: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 
 * For commits to a branch, prefix the commit message with the branch name.
   For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."

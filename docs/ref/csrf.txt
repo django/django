@@ -115,7 +115,7 @@ vulnerability allows and much worse).
     alternatives like ``<a rel="noreferrer" ...>"`` for links to third-party
     sites.
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 .. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
