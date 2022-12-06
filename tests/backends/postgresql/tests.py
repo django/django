@@ -15,7 +15,7 @@ from django.db.backends.base.base import BaseDatabaseWrapper
 from django.test import TestCase, override_settings
 
 try:
-    from django.db.backends.postgresql.psycopg_any import is_psycopg3
+    from django.db.backends.postgresql.psycopg_any import errors, is_psycopg3
 except ImportError:
     is_psycopg3 = False
 
@@ -261,6 +261,21 @@ class Tests(TestCase):
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             new_connection.ensure_connection()
+
+    def test_connect_role(self):
+        """
+        The session role can be configured with DATABASES
+        ["OPTIONS"]["assume_role"].
+        """
+        try:
+            custom_role = "django_nonexistent_role"
+            new_connection = connection.copy()
+            new_connection.settings_dict["OPTIONS"]["assume_role"] = custom_role
+            msg = f'role "{custom_role}" does not exist'
+            with self.assertRaisesMessage(errors.InvalidParameterValue, msg):
+                new_connection.connect()
+        finally:
+            new_connection.close()
 
     def test_connect_no_is_usable_checks(self):
         new_connection = connection.copy()
