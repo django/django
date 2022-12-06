@@ -10,7 +10,7 @@ display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
 .. _OpenLayers: https://openlayers.org/
-.. _NASA: https://earthdata.nasa.gov/
+.. _NASA: https://www.earthdata.nasa.gov/
 
 Field arguments
 ===============
