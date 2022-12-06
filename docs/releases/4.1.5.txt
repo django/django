@@ -1,0 +1,12 @@
+==========================
+Django 4.1.5 release notes
+==========================
+
+*Expected January 2, 2023*
+
+Django 4.1.5 fixes several bugs in 4.1.4.
+
+Bugfixes
+========
+
+* ...
