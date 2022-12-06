@@ -164,7 +164,7 @@ class Tests(TestCase):
         settings["NAME"] = None
         settings["OPTIONS"] = {"service": "django_test"}
         params = DatabaseWrapper(settings).get_connection_params()
-        self.assertEqual(params["database"], "postgres")
+        self.assertEqual(params["dbname"], "postgres")
         self.assertNotIn("service", params)
 
     def test_connect_and_rollback(self):
