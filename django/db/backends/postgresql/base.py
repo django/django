@@ -186,16 +186,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {}
+        conn_params = {"client_encoding": "UTF8"}
         if settings_dict["NAME"]:
             conn_params = {
-                "database": settings_dict["NAME"],
+                "dbname": settings_dict["NAME"],
                 **settings_dict["OPTIONS"],
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
             settings_dict.get("OPTIONS", {}).pop("service", None)
-            conn_params = {"database": "postgres", **settings_dict["OPTIONS"]}
+            conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
 
@@ -239,7 +239,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def ensure_timezone(self):
         if self.connection is None:
             return False
-        conn_timezone_name = self.connection.get_parameter_status("TimeZone")
+        conn_timezone_name = self.connection.info.parameter_status("TimeZone")
         timezone_name = self.timezone_name
         if timezone_name and conn_timezone_name != timezone_name:
             with self.connection.cursor() as cursor:
@@ -249,7 +249,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def init_connection_state(self):
         super().init_connection_state()
-        self.connection.set_client_encoding("UTF8")
 
         timezone_changed = self.ensure_timezone()
         if timezone_changed:
@@ -365,7 +364,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def pg_version(self):
         with self.temporary_connection():
-            return self.connection.server_version
+            return self.connection.info.server_version
 
     def make_debug_cursor(self, cursor):
         return CursorDebugWrapper(cursor, self)
