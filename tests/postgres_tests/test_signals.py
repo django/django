@@ -9,7 +9,7 @@ try:
         register_type_handlers,
     )
 except ImportError:
-    pass  # pyscogp2 isn't installed.
+    pass  # psycopg isn't installed.
 
 
 class OIDTests(PostgreSQLTestCase):
