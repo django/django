@@ -224,6 +224,12 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* The new ``"assume_role"`` option is now supported in :setting:`OPTIONS` on
+  PostgreSQL to allow specifying the :ref:`session role <database-role>`.
+
 Decorators
 ~~~~~~~~~~
 

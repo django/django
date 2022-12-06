@@ -230,6 +230,27 @@ configuration in :setting:`DATABASES`::
 
     ``IsolationLevel`` was added.
 
+.. _database-role:
+
+Role
+----
+
+.. versionadded:: 4.2
+
+If you need to use a different role for database connections than the role use
+to establish the connection, set it in the :setting:`OPTIONS` part of your
+database configuration in :setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "assume_role": "my_application_role",
+            },
+        },
+    }
+
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
 

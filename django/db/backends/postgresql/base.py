@@ -221,6 +221,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         else:
             conn_params = {**settings_dict["OPTIONS"]}
 
+        conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
@@ -288,14 +289,28 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
         return False
 
+    def ensure_role(self):
+        if self.connection is None:
+            return False
+        if new_role := self.settings_dict.get("OPTIONS", {}).get("assume_role"):
+            with self.connection.cursor() as cursor:
+                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
+                cursor.execute(sql)
+            return True
+        return False
+
     def init_connection_state(self):
         super().init_connection_state()
 
-        timezone_changed = self.ensure_timezone()
-        if timezone_changed:
-            # Commit after setting the time zone (see #17062)
-            if not self.get_autocommit():
-                self.connection.commit()
+        # Commit after setting the time zone.
+        commit_tz = self.ensure_timezone()
+        # Set the role on the connection. This is useful if the credential used
+        # to login is not the same as the role that owns database resources. As
+        # can be the case when using temporary or ephemeral credentials.
+        commit_role = self.ensure_role()
+
+        if (commit_role or commit_tz) and not self.get_autocommit():
+            self.connection.commit()
 
     @async_unsafe
     def create_cursor(self, name=None):
