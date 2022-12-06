@@ -103,8 +103,8 @@ GZip middleware
     should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
     paper (PDF)`_ and `breachattack.com`_.
 
-    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: http://breachattack.com
+    .. _the BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
 
 The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
