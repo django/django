@@ -1565,7 +1565,8 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
-    them as documented in :doc:`/topics/http/urls`::
+    them as documented in :doc:`/topics/http/urls`, using the
+    ``AdminSite.admin_view()`` wrapper on your views::
 
         from django.contrib import admin
         from django.template.response import TemplateResponse
@@ -1575,7 +1576,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    path('my_view/', self.my_view),
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
@@ -1600,6 +1601,18 @@ templates used by the :class:`ModelAdmin` views:
 
     .. note::
 
+        Notice how the ``self.my_view`` function is wrapped in
+        ``self.admin_site.admin_view``. This is important, since it ensures two
+        things:
+
+        #. Permission checks are run, ensuring only active staff users can
+           access the view.
+        #. The :func:`django.views.decorators.cache.never_cache` decorator is
+           applied to prevent caching, ensuring the returned information is
+           up-to-date.
+
+    .. note::
+
         Notice that the custom patterns are included *before* the regular admin
         URLs: the admin URL patterns are very permissive and will match nearly
         anything, so you'll usually want to prepend your custom URLs to the
@@ -1608,36 +1621,6 @@ templates used by the :class:`ModelAdmin` views:
         In this example, ``my_view`` will be accessed at
         ``/admin/myapp/mymodel/my_view/`` (assuming the admin URLs are included
         at ``/admin/``.)
-
-    However, the ``self.my_view`` function registered above suffers from two
-    problems:
-
-    * It will *not* perform any permission checks, so it will be accessible
-      to the general public.
-    * It will *not* provide any header details to prevent caching. This means
-      if the page retrieves data from the database, and caching middleware is
-      active, the page could show outdated information.
-
-    Since this is usually not what you want, Django provides a convenience
-    wrapper to check permissions and mark the view as non-cacheable. This
-    wrapper is ``AdminSite.admin_view()`` (i.e. ``self.admin_site.admin_view``
-    inside a ``ModelAdmin`` instance); use it like so::
-
-        class MyModelAdmin(admin.ModelAdmin):
-            def get_urls(self):
-                urls = super().get_urls()
-                my_urls = [
-                    path('my_view/', self.admin_site.admin_view(self.my_view))
-                ]
-                return my_urls + urls
-
-    Notice the wrapped view in the fifth line above::
-
-        path('my_view/', self.admin_site.admin_view(self.my_view))
-
-    This wrapping will protect ``self.my_view`` from unauthorized access and
-    will apply the :func:`django.views.decorators.cache.never_cache` decorator to
-    make sure it is not cached if the cache middleware is active.
 
     If the page is cacheable, but you still want the permission check to be
     performed, you can pass a ``cacheable=True`` argument to
