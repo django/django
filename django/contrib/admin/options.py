@@ -1024,10 +1024,10 @@ class ModelAdmin(BaseModelAdmin):
         Return a list of choices for use in a form object.  Each choice is a
         tuple (name, description).
         """
-        choices = [] + default_choices
-        for func, name, description in self.get_actions(request).values():
-            choice = (name, description % model_format_dict(self.opts))
-            choices.append(choice)
+        choices = default_choices + [
+            (name, description % model_format_dict(self.opts))
+            for func, name, description in self.get_actions(request).values()
+        ]
         return choices
 
     def get_action(self, action):
