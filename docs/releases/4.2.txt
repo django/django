@@ -131,7 +131,9 @@ Minor features
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
+  replaces paths to JavaScript modules in ``import`` and ``export`` statements
+  with their hashed counterparts.
 
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
