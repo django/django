@@ -342,23 +342,23 @@ attribute::
     >>> f.fields['name']
     <django.forms.fields.CharField object at 0x7ffaac6324d0>
 
-You can alter the field of :class:`Form` instance to change the way it is
-presented in the form::
+You can alter the field and :class:`.BoundField` of :class:`Form` instance to
+change the way it is presented in the form::
 
-    >>> f.as_table().split('\n')[0]
-    '<tr><th>Name:</th><td><input name="name" type="text" value="instance" required></td></tr>'
-    >>> f.fields['name'].label = "Username"
-    >>> f.as_table().split('\n')[0]
-    '<tr><th>Username:</th><td><input name="name" type="text" value="instance" required></td></tr>'
+    >>> f.as_div().split("</div>")[0]
+    '<div><label for="id_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_subject">'
+    >>> f["subject"].label = "Topic"
+    >>> f.as_div().split("</div>")[0]
+    '<div><label for="id_subject">Topic:</label><input type="text" name="subject" maxlength="100" required id="id_subject">'
 
 Beware not to alter the ``base_fields`` attribute because this modification
 will influence all subsequent ``ContactForm`` instances within the same Python
 process::
 
-    >>> f.base_fields['name'].label = "Username"
+    >>> f.base_fields["subject"].label_suffix = "?"
     >>> another_f = CommentForm(auto_id=False)
-    >>> another_f.as_table().split('\n')[0]
-    '<tr><th>Username:</th><td><input name="name" type="text" value="class" required></td></tr>'
+    >>> f.as_div().split("</div>")[0]
+    '<div><label for="id_subject">Subject?</label><input type="text" name="subject" maxlength="100" required id="id_subject">'
 
 Accessing "clean" data
 ======================
@@ -790,42 +790,22 @@ If ``auto_id`` is ``False``, then the form output will not include ``<label>``
 tags nor ``id`` attributes::
 
     >>> f = ContactForm(auto_id=False)
-    >>> print(f.as_table())
-    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" required></td></tr>
-    <tr><th>Message:</th><td><input type="text" name="message" required></td></tr>
-    <tr><th>Sender:</th><td><input type="email" name="sender" required></td></tr>
-    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself"></td></tr>
-    >>> print(f.as_ul())
-    <li>Subject: <input type="text" name="subject" maxlength="100" required></li>
-    <li>Message: <input type="text" name="message" required></li>
-    <li>Sender: <input type="email" name="sender" required></li>
-    <li>Cc myself: <input type="checkbox" name="cc_myself"></li>
-    >>> print(f.as_p())
-    <p>Subject: <input type="text" name="subject" maxlength="100" required></p>
-    <p>Message: <input type="text" name="message" required></p>
-    <p>Sender: <input type="email" name="sender" required></p>
-    <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
+    >>> print(f.as_div())
+    <div>Subject:<input type="text" name="subject" maxlength="100" required></div>
+    <div>Message:<textarea name="message" cols="40" rows="10" required></textarea></div>
+    <div>Sender:<input type="email" name="sender" required></div>
+    <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
 If ``auto_id`` is set to ``True``, then the form output *will* include
 ``<label>`` tags and will use the field name as its ``id`` for each form
 field::
 
     >>> f = ContactForm(auto_id=True)
-    >>> print(f.as_table())
-    <tr><th><label for="subject">Subject:</label></th><td><input id="subject" type="text" name="subject" maxlength="100" required></td></tr>
-    <tr><th><label for="message">Message:</label></th><td><input type="text" name="message" id="message" required></td></tr>
-    <tr><th><label for="sender">Sender:</label></th><td><input type="email" name="sender" id="sender" required></td></tr>
-    <tr><th><label for="cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="cc_myself"></td></tr>
-    >>> print(f.as_ul())
-    <li><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" required></li>
-    <li><label for="message">Message:</label> <input type="text" name="message" id="message" required></li>
-    <li><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" required></li>
-    <li><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself"></li>
-    >>> print(f.as_p())
-    <p><label for="subject">Subject:</label> <input id="subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="message">Message:</label> <input type="text" name="message" id="message" required></p>
-    <p><label for="sender">Sender:</label> <input type="email" name="sender" id="sender" required></p>
-    <p><label for="cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="cc_myself"></p>
+    >>> print(f.as_div())
+    <div><label for="subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="subject"></div>
+    <div><label for="message">Message:</label><textarea name="message" cols="40" rows="10" required id="message"></textarea></div>
+    <div><label for="sender">Sender:</label><input type="email" name="sender" required id="sender"></div>
+    <div><label for="cc_myself">Cc myself:</label><input type="checkbox" name="cc_myself" id="cc_myself"></div>
 
 If ``auto_id`` is set to a string containing the format character ``'%s'``,
 then the form output will include ``<label>`` tags, and will generate ``id``
@@ -834,21 +814,11 @@ attributes based on the format string. For example, for a format string
 ``'field_subject'``. Continuing our example::
 
     >>> f = ContactForm(auto_id='id_for_%s')
-    >>> print(f.as_table())
-    <tr><th><label for="id_for_subject">Subject:</label></th><td><input id="id_for_subject" type="text" name="subject" maxlength="100" required></td></tr>
-    <tr><th><label for="id_for_message">Message:</label></th><td><input type="text" name="message" id="id_for_message" required></td></tr>
-    <tr><th><label for="id_for_sender">Sender:</label></th><td><input type="email" name="sender" id="id_for_sender" required></td></tr>
-    <tr><th><label for="id_for_cc_myself">Cc myself:</label></th><td><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></td></tr>
-    >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required></li>
-    <li><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" required></li>
-    <li><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" required></li>
-    <li><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself"></li>
-    >>> print(f.as_p())
-    <p><label for="id_for_subject">Subject:</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="id_for_message">Message:</label> <input type="text" name="message" id="id_for_message" required></p>
-    <p><label for="id_for_sender">Sender:</label> <input type="email" name="sender" id="id_for_sender" required></p>
-    <p><label for="id_for_cc_myself">Cc myself:</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself"></p>
+    >>> print(f.as_div())
+    <div><label for="id_for_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
+    <div><label for="id_for_message">Message:</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
+    <div><label for="id_for_sender">Sender:</label><input type="email" name="sender" required id="id_for_sender"></div>
+    <div><label for="id_for_cc_myself">Cc myself:</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>
 
 If ``auto_id`` is set to any other true value -- such as a string that doesn't
 include ``%s`` -- then the library will act as if ``auto_id`` is ``True``.
@@ -864,17 +834,17 @@ It's possible to customize that character, or omit it entirely, using the
 ``label_suffix`` parameter::
 
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
-    >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject</label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required></li>
-    <li><label for="id_for_message">Message</label> <input type="text" name="message" id="id_for_message" required></li>
-    <li><label for="id_for_sender">Sender</label> <input type="email" name="sender" id="id_for_sender" required></li>
-    <li><label for="id_for_cc_myself">Cc myself</label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself"></li>
+    >>> print(f.as_div())
+    <div><label for="id_for_subject">Subject</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
+    <div><label for="id_for_message">Message</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
+    <div><label for="id_for_sender">Sender</label><input type="email" name="sender" required id="id_for_sender"></div>
+    <div><label for="id_for_cc_myself">Cc myself</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
-    >>> print(f.as_ul())
-    <li><label for="id_for_subject">Subject -></label> <input id="id_for_subject" type="text" name="subject" maxlength="100" required></li>
-    <li><label for="id_for_message">Message -></label> <input type="text" name="message" id="id_for_message" required></li>
-    <li><label for="id_for_sender">Sender -></label> <input type="email" name="sender" id="id_for_sender" required></li>
-    <li><label for="id_for_cc_myself">Cc myself -></label> <input type="checkbox" name="cc_myself" id="id_for_cc_myself"></li>
+    >>> print(f.as_div())
+    <div><label for="id_for_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
+    <div><label for="id_for_message">Message -&gt;</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
+    <div><label for="id_for_sender">Sender -&gt;</label><input type="email" name="sender" required id="id_for_sender"></div>
+    <div><label for="id_for_cc_myself">Cc myself -&gt;</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>
 
 Note that the label suffix is added only if the last character of the
 label isn't a punctuation character (in English, those are ``.``, ``!``, ``?``
@@ -961,20 +931,25 @@ method you're using::
     ...         'sender': 'invalid email address',
     ...         'cc_myself': True}
     >>> f = ContactForm(data, auto_id=False)
+    >>> print(f.as_div())
+    <div>Subject:<ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" required></div>
+    <div>Message:<textarea name="message" cols="40" rows="10" required>Hi there</textarea></div>
+    <div>Sender:<ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="email" name="sender" value="invalid email address" required></div>
+    <div>Cc myself:<input type="checkbox" name="cc_myself" checked></div>
     >>> print(f.as_table())
     <tr><th>Subject:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" required></td></tr>
-    <tr><th>Message:</th><td><input type="text" name="message" value="Hi there" required></td></tr>
+    <tr><th>Message:</th><td><textarea name="message" cols="40" rows="10" required></textarea></td></tr>
     <tr><th>Sender:</th><td><ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="email" name="sender" value="invalid email address" required></td></tr>
     <tr><th>Cc myself:</th><td><input checked type="checkbox" name="cc_myself"></td></tr>
     >>> print(f.as_ul())
     <li><ul class="errorlist"><li>This field is required.</li></ul>Subject: <input type="text" name="subject" maxlength="100" required></li>
-    <li>Message: <input type="text" name="message" value="Hi there" required></li>
+    <li>Message: <textarea name="message" cols="40" rows="10" required></textarea></li>
     <li><ul class="errorlist"><li>Enter a valid email address.</li></ul>Sender: <input type="email" name="sender" value="invalid email address" required></li>
     <li>Cc myself: <input checked type="checkbox" name="cc_myself"></li>
     >>> print(f.as_p())
     <p><ul class="errorlist"><li>This field is required.</li></ul></p>
     <p>Subject: <input type="text" name="subject" maxlength="100" required></p>
-    <p>Message: <input type="text" name="message" value="Hi there" required></p>
+    <p>Message: <textarea name="message" cols="40" rows="10" required></textarea></p>
     <p><ul class="errorlist"><li>Enter a valid email address.</li></ul></p>
     <p>Sender: <input type="email" name="sender" value="invalid email address" required></p>
     <p>Cc myself: <input checked type="checkbox" name="cc_myself"></p>
@@ -1494,12 +1469,12 @@ fields are ordered first::
     >>> class ContactFormWithPriority(ContactForm):
     ...     priority = forms.CharField()
     >>> f = ContactFormWithPriority(auto_id=False)
-    >>> print(f.as_ul())
-    <li>Subject: <input type="text" name="subject" maxlength="100" required></li>
-    <li>Message: <input type="text" name="message" required></li>
-    <li>Sender: <input type="email" name="sender" required></li>
-    <li>Cc myself: <input type="checkbox" name="cc_myself"></li>
-    <li>Priority: <input type="text" name="priority" required></li>
+    >>> print(f.as_div())
+    <div>Subject:<input type="text" name="subject" maxlength="100" required></div>
+    <div>Message:<textarea name="message" cols="40" rows="10" required></textarea></div>
+    <div>Sender:<input type="email" name="sender" required></div>
+    <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
+    <div>Priority:<input type="text" name="priority" required></div>
 
 It's possible to subclass multiple forms, treating forms as mixins. In this
 example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
@@ -1515,11 +1490,11 @@ classes::
     >>> class BeatleForm(InstrumentForm, PersonForm):
     ...     haircut_type = forms.CharField()
     >>> b = BeatleForm(auto_id=False)
-    >>> print(b.as_ul())
-    <li>First name: <input type="text" name="first_name" required></li>
-    <li>Last name: <input type="text" name="last_name" required></li>
-    <li>Instrument: <input type="text" name="instrument" required></li>
-    <li>Haircut type: <input type="text" name="haircut_type" required></li>
+    >>> print(b.as_div())
+    <div>First name:<input type="text" name="first_name" required></div>
+    <div>Last name:<input type="text" name="last_name" required></div>
+    <div>Instrument:<input type="text" name="instrument" required></div>
+    <div>Haircut type:<input type="text" name="haircut_type" required></div>
 
 It's possible to declaratively remove a ``Field`` inherited from a parent class
 by setting the name of the field to ``None`` on the subclass. For example::
@@ -1548,12 +1523,12 @@ You can put several Django forms inside one ``<form>`` tag. To give each
 
     >>> mother = PersonForm(prefix="mother")
     >>> father = PersonForm(prefix="father")
-    >>> print(mother.as_ul())
-    <li><label for="id_mother-first_name">First name:</label> <input type="text" name="mother-first_name" id="id_mother-first_name" required></li>
-    <li><label for="id_mother-last_name">Last name:</label> <input type="text" name="mother-last_name" id="id_mother-last_name" required></li>
-    >>> print(father.as_ul())
-    <li><label for="id_father-first_name">First name:</label> <input type="text" name="father-first_name" id="id_father-first_name" required></li>
-    <li><label for="id_father-last_name">Last name:</label> <input type="text" name="father-last_name" id="id_father-last_name" required></li>
+    >>> print(mother.as_div())
+    <div><label for="id_mother-first_name">First name:</label><input type="text" name="mother-first_name" required id="id_mother-first_name"></div>
+    <div><label for="id_mother-last_name">Last name:</label><input type="text" name="mother-last_name" required id="id_mother-last_name"></div>
+    >>> print(father.as_div())
+    <div><label for="id_father-first_name">First name:</label><input type="text" name="father-first_name" required id="id_father-first_name"></div>
+    <div><label for="id_father-last_name">Last name:</label><input type="text" name="father-last_name" required id="id_father-last_name"></div>
 
 The prefix can also be specified on the form class::
 
