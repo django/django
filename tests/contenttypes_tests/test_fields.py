@@ -33,6 +33,7 @@ class GenericForeignKeyTests(TestCase):
     def test_get_object_cache_respects_deleted_objects(self):
         question = Question.objects.create(text="Who?")
         post = Post.objects.create(title="Answer", parent=question)
+        self.addCleanup(post.delete)
 
         question_pk = question.pk
         Question.objects.all().delete()

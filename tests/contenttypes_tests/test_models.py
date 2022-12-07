@@ -319,6 +319,9 @@ class ContentTypesMultidbTests(TestCase):
         When using multiple databases, ContentType.objects.get_for_model() uses
         db_for_read().
         """
+        ContentType.objects.using("other").get_or_create(
+            app_label="contenttypes_tests", model="author"
+        )
         ContentType.objects.clear_cache()
         with self.assertNumQueries(0, using="default"), self.assertNumQueries(
             1, using="other"
