@@ -113,7 +113,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FieldInfo(
                 line.name,
                 line.type_code,
-                line.display_size,
+                # display_size is always None on psycopg2.
+                line.internal_size if line.display_size is None else line.display_size,
                 line.internal_size,
                 line.precision,
                 line.scale,

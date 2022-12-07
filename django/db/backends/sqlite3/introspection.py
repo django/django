@@ -119,8 +119,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FieldInfo(
                 name,
                 data_type,
-                None,
                 get_field_size(data_type),
+                None,
                 None,
                 None,
                 not notnull,

@@ -409,6 +409,10 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.9.0 to 3.21.0.
 
+* :djadmin:`inspectdb` now uses ``display_size`` from
+  ``DatabaseIntrospection.get_table_description()`` rather than
+  ``internal_size`` for ``CharField``.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
