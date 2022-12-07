@@ -975,8 +975,11 @@ class ModelAdmin(BaseModelAdmin):
 
     def _get_base_actions(self):
         """Return the list of actions, prior to any request-based filtering."""
-        actions = []
-        base_actions = (self.get_action(action) for action in self.actions or [])
+        base_actions = [
+            get_action
+            for action in self.actions or []
+            if (get_action := self.get_action(action))
+        ]
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
         base_action_names = {name for _, name, _ in base_actions}
