@@ -1565,7 +1565,8 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
-    them as documented in :doc:`/topics/http/urls`::
+    them as documented in :doc:`/topics/http/urls`, using the
+    ``AdminSite.admin_view()`` wrapper on your views::
 
         from django.contrib import admin
         from django.template.response import TemplateResponse
@@ -1600,6 +1601,18 @@ templates used by the :class:`ModelAdmin` views:
 
     .. note::
 
+        Notice how the ``self.my_view`` function is wrapped in
+        ``self.admin_site.admin_view``. This is important, since
+        it ensures two things:
+
+        1. Permission checks are run, ensuring only active staff users can
+           access the view
+        2. The :func:`django.views.decorators.cache.never_cache` decorator is
+           applied to prevent caching, ensuring the returned information is
+           up-to-date
+
+    .. note::
+
         Notice that the custom patterns are included *before* the regular admin
         URLs: the admin URL patterns are very permissive and will match nearly
         anything, so you'll usually want to prepend your custom URLs to the
@@ -1608,15 +1621,6 @@ templates used by the :class:`ModelAdmin` views:
         In this example, ``my_view`` will be accessed at
         ``/admin/myapp/mymodel/my_view/`` (assuming the admin URLs are included
         at ``/admin/``.)
-
-    Notice how the ``self.my_view`` function is wrapped in
-    ``self.admin_site.admin_view``. This is generally what you want, since it
-    ensures two things:
-
-    1. Permission checks are run, ensuring only active staff users can access the view
-    2. The :func:`django.views.decorators.cache.never_cache` decorator is
-       applied to prevent caching, ensuring the returned information is
-       up-to-date
 
     If the page is cacheable, but you still want the permission check to be
     performed, you can pass a ``cacheable=True`` argument to
