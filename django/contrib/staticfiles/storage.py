@@ -72,6 +72,28 @@ class HashedFilesMixin:
                     r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
                 ),
+                (
+                    (
+                        r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                        r"""\s*from\s*['"](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """import%(import)s from "%(url)s";""",
+                ),
+                (
+                    (
+                        r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
+                        r"""\s*from\s*["'](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """export%(exports)s from "%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\s*['"](?P<url>[\.\/].*?)["']\s*;)""",
+                    """import"%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
+                    """import("%(url)s")""",
+                ),
             ),
         ),
     )
