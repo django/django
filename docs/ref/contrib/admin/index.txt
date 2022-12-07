@@ -1602,14 +1602,14 @@ templates used by the :class:`ModelAdmin` views:
     .. note::
 
         Notice how the ``self.my_view`` function is wrapped in
-        ``self.admin_site.admin_view``. This is important, since
-        it ensures two things:
+        ``self.admin_site.admin_view``. This is important, since it ensures two
+        things:
 
-        1. Permission checks are run, ensuring only active staff users can
-           access the view
-        2. The :func:`django.views.decorators.cache.never_cache` decorator is
+        #. Permission checks are run, ensuring only active staff users can
+           access the view.
+        #. The :func:`django.views.decorators.cache.never_cache` decorator is
            applied to prevent caching, ensuring the returned information is
-           up-to-date
+           up-to-date.
 
     .. note::
 
