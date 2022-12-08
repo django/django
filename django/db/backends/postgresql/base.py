@@ -35,9 +35,9 @@ def psycopg2_version():
 
 PSYCOPG2_VERSION = psycopg2_version()
 
-if PSYCOPG2_VERSION < (2, 8, 4):
+if PSYCOPG2_VERSION < (2, 9, 5):
     raise ImproperlyConfigured(
-        "psycopg2 version 2.8.4 or newer is required; you have %s"
+        "psycopg2 version 2.9.5 or newer is required; you have %s"
         % psycopg2.__version__
     )
 

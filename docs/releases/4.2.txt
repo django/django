@@ -368,6 +368,9 @@ Dropped support for PostgreSQL 11
 Upstream support for PostgreSQL 11 ends in November 2023. Django 4.2 supports
 PostgreSQL 12 and higher.
 
+Also, the minimum supported version of ``psycopg2`` is increased from 2.8.4 to
+2.9.5, as ``psycopg2`` 2.9.5 is the first release to support Python 3.11.
+
 Setting ``update_fields`` in ``Model.save()`` may now be required
 -----------------------------------------------------------------
 
