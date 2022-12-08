@@ -407,6 +407,8 @@ Miscellaneous
 * The ``is_summary`` argument of the undocumented ``Query.add_annotation()``
   method is removed.
 
+* The minimum supported version of SQLite is increased from 3.9.0 to 3.21.0.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
