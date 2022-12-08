@@ -291,12 +291,14 @@ class Tests(TestCase):
                         "::citext", do.lookup_cast(lookup, internal_type=field_type)
                     )
 
-    def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql.base import psycopg2_version
+    def test_correct_extraction_psycopg_version(self):
+        from django.db.backends.postgresql.base import Database, psycopg2_version
 
-        with mock.patch("psycopg2.__version__", "4.2.1 (dt dec pq3 ext lo64)"):
+        with mock.patch.object(Database, "__version__", "4.2.1 (dt dec pq3 ext lo64)"):
             self.assertEqual(psycopg2_version(), (4, 2, 1))
-        with mock.patch("psycopg2.__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"):
+        with mock.patch.object(
+            Database, "__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"
+        ):
             self.assertEqual(psycopg2_version(), (4, 2))
 
     @override_settings(DEBUG=True)
