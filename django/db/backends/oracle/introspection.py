@@ -116,7 +116,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN user_tab_cols.char_used IS NULL
                     THEN user_tab_cols.data_length
                     ELSE user_tab_cols.char_length
-                END as internal_size,
+                END as display_size,
                 CASE
                     WHEN user_tab_cols.identity_column = 'YES' THEN 1
                     ELSE 0
@@ -141,7 +141,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         )
         field_map = {
             column: (
-                internal_size,
+                display_size,
                 default if default != "NULL" else None,
                 collation,
                 is_autofield,
@@ -151,7 +151,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 column,
                 default,
                 collation,
-                internal_size,
+                display_size,
                 is_autofield,
                 is_json,
             ) in cursor.fetchall()
@@ -165,13 +165,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = desc[0]
-            internal_size, default, collation, is_autofield, is_json = field_map[name]
+            display_size, default, collation, is_autofield, is_json = field_map[name]
             name %= {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),
-                    *desc[1:3],
-                    internal_size,
+                    desc[1],
+                    display_size,
+                    desc[3],
                     desc[4] or 0,
                     desc[5] or 0,
                     *desc[6:],
