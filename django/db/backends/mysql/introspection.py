@@ -148,7 +148,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             info = field_info[line[0]]
             fields.append(
                 FieldInfo(
-                    *line[:3],
+                    *line[:2],
+                    to_int(info.max_len) or line[2],
                     to_int(info.max_len) or line[3],
                     to_int(info.num_prec) or line[4],
                     to_int(info.num_scale) or line[5],
