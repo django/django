@@ -1492,6 +1492,24 @@ class TestVerboseNameInlineForms(TestDataMixin, TestCase):
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
 class SeleniumTests(AdminSeleniumTestCase):
+    
+    # This is a decorator that wraps any test and runs aXe on the final window state left by the test
+    def run_axe(func):
+        
+        def inner(*args):
+            # args[0] is self
+            func(args[0])
+            from axe_selenium_python import Axe
+            axe = Axe(args[0].selenium)
+            axe.inject()
+            # We run aXe on default settings for this draft, but I think we should add constraints on what standards we should test
+            results = axe.run()
+            # Write results to a file (we can use this as artifacts on GHA)
+            axe.write_results(results, 'a11y.json')
+            # Printing violations for debug purpose
+            print(results['violations'])
+            
+        return inner
 
     available_apps = ["admin_inlines"] + AdminSeleniumTestCase.available_apps
 
@@ -1500,6 +1518,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             username="super", password="secret", email="super@example.com"
         )
 
+    @run_axe
     def test_add_stackeds(self):
         """
         The "Add another XXX" link correctly adds items to the stacked formset.
