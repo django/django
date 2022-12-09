@@ -9,10 +9,10 @@ repos:
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
-    rev: 5.0.4
+    rev: 6.0.0
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.24.0
+    rev: v8.29.0
     hooks:
       - id: eslint
