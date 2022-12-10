@@ -265,7 +265,7 @@ class ArrayLenTransform(Transform):
         return (
             "CASE WHEN %(lhs)s IS NULL THEN NULL ELSE "
             "coalesce(array_length(%(lhs)s, 1), 0) END"
-        ) % {"lhs": lhs}, params
+        ) % {"lhs": lhs}, params * 2
 
 
 @ArrayField.register_lookup
