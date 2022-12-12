@@ -1,5 +1,3 @@
-import psycopg2
-
 from django.db.models import (
     CharField,
     Expression,
@@ -309,14 +307,9 @@ class SearchHeadline(Func):
         options_sql = ""
         options_params = []
         if self.options:
-            # getquoted() returns a quoted bytestring of the adapted value.
             options_params.append(
                 ", ".join(
-                    "%s=%s"
-                    % (
-                        option,
-                        psycopg2.extensions.adapt(value).getquoted().decode(),
-                    )
+                    connection.ops.compose_sql(f"{option}=%s", [value])
                     for option, value in self.options.items()
                 )
             )
