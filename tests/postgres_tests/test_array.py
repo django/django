@@ -31,8 +31,6 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import NumericRange
-
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.expressions import ArraySubquery
     from django.contrib.postgres.fields import ArrayField
@@ -42,6 +40,7 @@ try:
         SplitArrayField,
         SplitArrayWidget,
     )
+    from django.db.backends.postgresql.psycopg_any import NumericRange
 except ImportError:
     pass
 

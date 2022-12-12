@@ -9,12 +9,10 @@ from django.db.backends.base.creation import BaseDatabaseCreation
 from django.test import SimpleTestCase
 
 try:
-    import psycopg2  # NOQA
+    from django.db.backends.postgresql.psycopg_any import errors
 except ImportError:
     pass
 else:
-    from psycopg2 import errors
-
     from django.db.backends.postgresql.creation import DatabaseCreation
 
 

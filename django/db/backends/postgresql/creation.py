@@ -1,9 +1,8 @@
 import sys
 
-from psycopg2 import errors
-
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.creation import BaseDatabaseCreation
+from django.db.backends.postgresql.psycopg_any import errors
 from django.db.backends.utils import strip_quotes
 
 

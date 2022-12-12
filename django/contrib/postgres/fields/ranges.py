@@ -1,10 +1,14 @@
 import datetime
 import json
 
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
-
 from django.contrib.postgres import forms, lookups
 from django.db import models
+from django.db.backends.postgresql.psycopg_any import (
+    DateRange,
+    DateTimeTZRange,
+    NumericRange,
+    Range,
+)
 from django.db.models.lookups import PostgresOperatorLookup
 
 from .utils import AttributeSetter
