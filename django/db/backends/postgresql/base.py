@@ -48,6 +48,7 @@ from .creation import DatabaseCreation  # NOQA
 from .features import DatabaseFeatures  # NOQA
 from .introspection import DatabaseIntrospection  # NOQA
 from .operations import DatabaseOperations  # NOQA
+from .psycopg_any import IsolationLevel  # NOQA
 from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
@@ -212,22 +213,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
-        connection = Database.connect(**conn_params)
-
         # self.isolation_level must be set:
         # - after connecting to the database in order to obtain the database's
         #   default when no value is explicitly specified in options.
         # - before calling _set_autocommit() because if autocommit is on, that
         #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT.
         options = self.settings_dict["OPTIONS"]
+        set_isolation_level = False
         try:
-            self.isolation_level = options["isolation_level"]
+            isolation_level_value = options["isolation_level"]
         except KeyError:
-            self.isolation_level = connection.isolation_level
+            self.isolation_level = IsolationLevel.READ_COMMITTED
         else:
             # Set the isolation level to the value from OPTIONS.
-            if self.isolation_level != connection.isolation_level:
-                connection.set_session(isolation_level=self.isolation_level)
+            try:
+                self.isolation_level = IsolationLevel(isolation_level_value)
+                set_isolation_level = True
+            except ValueError:
+                raise ImproperlyConfigured(
+                    f"Invalid transaction isolation level {isolation_level_value} "
+                    f"specified. Use one of the IsolationLevel values."
+                )
+        connection = Database.connect(**conn_params)
+        if set_isolation_level:
+            connection.isolation_level = self.isolation_level
         # Register dummy loads() to avoid a round trip from psycopg2's decode
         # to json.dumps() to json.loads(), when using a custom decoder in
         # JSONField.
