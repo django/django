@@ -50,7 +50,7 @@ class AdminScriptTestCase(SimpleTestCase):
         self.addCleanup(tmpdir.cleanup)
         # os.path.realpath() is required for temporary directories on macOS,
         # where `/var` is a symlink to `/private/var`.
-        self.test_dir = os.path.realpath(os.path.join(tmpdir.name, "test_project"))
+        self.test_dir = os.path.realpath(os.path.join(tmpdir.name, "config"))
         os.mkdir(self.test_dir)
 
     def write_settings(self, filename, apps=None, is_dir=False, sdict=None, extra=None):
@@ -268,7 +268,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         default: django-admin builtin commands succeed if settings are provided
         as argument.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -279,7 +279,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         in the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -319,7 +319,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         default: django-admin can execute user commands if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -330,7 +330,7 @@ class DjangoAdminDefaultSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -368,7 +368,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         fulldefault: django-admin builtin commands succeed if a settings file
         is provided.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -379,7 +379,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         contains settings.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -419,7 +419,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         fulldefault: django-admin can execute user commands if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -430,7 +430,7 @@ class DjangoAdminFullPathDefaultSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -462,7 +462,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         minimal: django-admin builtin commands fail if settings are provided as
         argument.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
@@ -473,7 +473,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
@@ -510,7 +510,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         minimal: django-admin can't execute user commands, even if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -521,7 +521,7 @@ class DjangoAdminMinimalSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
@@ -551,7 +551,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         alternate: django-admin builtin commands succeed if settings are
         provided as argument.
         """
-        args = ["check", "--settings=test_project.alternate_settings", "admin_scripts"]
+        args = ["check", "--settings=config.alternate_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -562,7 +562,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.alternate_settings")
+        out, err = self.run_django_admin(args, "config.alternate_settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -602,7 +602,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         alternate: django-admin can execute user commands if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.alternate_settings"]
+        args = ["noargs_command", "--settings=config.alternate_settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -613,7 +613,7 @@ class DjangoAdminAlternateSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_django_admin(args, "test_project.alternate_settings")
+        out, err = self.run_django_admin(args, "config.alternate_settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -648,7 +648,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         alternate: django-admin builtin commands succeed if settings are
         provided as argument.
         """
-        args = ["check", "--settings=test_project.alternate_settings", "admin_scripts"]
+        args = ["check", "--settings=config.alternate_settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -659,7 +659,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.alternate_settings")
+        out, err = self.run_django_admin(args, "config.alternate_settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -698,7 +698,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         alternate: django-admin can execute user commands if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.alternate_settings"]
+        args = ["noargs_command", "--settings=config.alternate_settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -709,7 +709,7 @@ class DjangoAdminMultipleSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_django_admin(args, "test_project.alternate_settings")
+        out, err = self.run_django_admin(args, "config.alternate_settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -728,7 +728,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         "directory: startapp creates the correct directory"
         args = ["startapp", "settings_test"]
         app_path = os.path.join(self.test_dir, "settings_test")
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, "apps.py")) as f:
@@ -744,7 +744,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         template_path = os.path.join(custom_templates_dir, "app_template")
         args = ["startapp", "--template", template_path, "custom_settings_test"]
         app_path = os.path.join(self.test_dir, "custom_settings_test")
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         self.assertTrue(os.path.exists(os.path.join(app_path, "api.py")))
@@ -753,7 +753,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         """startapp creates the correct directory with Unicode characters."""
         args = ["startapp", "こんにちは"]
         app_path = os.path.join(self.test_dir, "こんにちは")
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertTrue(os.path.exists(app_path))
         with open(os.path.join(app_path, "apps.py"), encoding="utf8") as f:
@@ -806,7 +806,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         directory: django-admin builtin commands succeed if settings are
         provided as argument.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -817,7 +817,7 @@ class DjangoAdminSettingsDirectory(AdminScriptTestCase):
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_django_admin(args, "test_project.settings")
+        out, err = self.run_django_admin(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -852,9 +852,7 @@ class ManageNoSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
-        )
+        self.assertOutput(err, r"No module named '?(config\.)?settings'?", regex=True)
 
     def test_builtin_with_bad_settings(self):
         """
@@ -901,7 +899,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         default: manage.py builtin commands succeed if settings are provided as
         argument.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -912,7 +910,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -951,7 +949,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         default: manage.py can execute user commands when settings are provided
         as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -962,7 +960,7 @@ class ManageDefaultSettings(AdminScriptTestCase):
         in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -994,7 +992,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         fulldefault: manage.py builtin commands succeed if settings are
         provided as argument.
         """
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
@@ -1005,7 +1003,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         provided in the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, SYSTEM_CHECK_MSG)
 
@@ -1044,7 +1042,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         fulldefault: manage.py can execute user commands when settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_manage(args)
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
@@ -1055,7 +1053,7 @@ class ManageFullPathDefaultSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(err)
         self.assertOutput(out, "EXECUTE: noargs_command")
 
@@ -1083,7 +1081,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
 
     def test_builtin_with_settings(self):
         "minimal: manage.py builtin commands fail if settings are provided as argument"
-        args = ["check", "--settings=test_project.settings", "admin_scripts"]
+        args = ["check", "--settings=config.settings", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
@@ -1094,7 +1092,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         the environment.
         """
         args = ["check", "admin_scripts"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(out)
         self.assertOutput(err, "No installed app with label 'admin_scripts'.")
 
@@ -1130,7 +1128,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         minimal: manage.py can't execute user commands, even if settings are
         provided as argument.
         """
-        args = ["noargs_command", "--settings=test_project.settings"]
+        args = ["noargs_command", "--settings=config.settings"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
@@ -1141,7 +1139,7 @@ class ManageMinimalSettings(AdminScriptTestCase):
         provided in environment.
         """
         args = ["noargs_command"]
-        out, err = self.run_manage(args, "test_project.settings")
+        out, err = self.run_manage(args, "config.settings")
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'noargs_command'")
 
@@ -1163,9 +1161,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ["check", "admin_scripts"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
-        )
+        self.assertOutput(err, r"No module named '?(config\.)?settings'?", regex=True)
 
     def test_builtin_with_settings(self):
         "alternate: manage.py builtin commands work with settings provided as argument"
@@ -1209,9 +1205,7 @@ class ManageAlternateSettings(AdminScriptTestCase):
         args = ["noargs_command"]
         out, err = self.run_manage(args)
         self.assertNoOutput(out)
-        self.assertOutput(
-            err, r"No module named '?(test_project\.)?settings'?", regex=True
-        )
+        self.assertOutput(err, r"No module named '?(config\.)?settings'?", regex=True)
 
     def test_custom_command_with_settings(self):
         """
@@ -2820,8 +2814,8 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertIs(os.path.isdir(testproject_dir), True)
         tests = [
             (["manage.py"], 0o700),
-            (["testproject"], 0o700),
-            (["testproject", "settings.py"], 0o600),
+            (["config"], 0o700),
+            (["config", "settings.py"], 0o600),
         ]
         for paths, expected_mode in tests:
             file_path = os.path.join(testproject_dir, *paths)
@@ -3054,13 +3048,13 @@ class DjangoAdminSuggestions(AdminScriptTestCase):
         self.write_settings("settings.py")
 
     def test_suggestions(self):
-        args = ["rnserver", "--settings=test_project.settings"]
+        args = ["rnserver", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertOutput(err, "Unknown command: 'rnserver'. Did you mean runserver?")
 
     def test_no_suggestions(self):
-        args = ["abcdef", "--settings=test_project.settings"]
+        args = ["abcdef", "--settings=config.settings"]
         out, err = self.run_django_admin(args)
         self.assertNoOutput(out)
         self.assertNotInOutput(err, "Did you mean")
