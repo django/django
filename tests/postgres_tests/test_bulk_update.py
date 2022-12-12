@@ -11,9 +11,9 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import DateRange, NumericRange
+    from django.db.backends.postgresql.psycopg_any import DateRange, NumericRange
 except ImportError:
-    pass  # psycopg2 isn't installed.
+    pass  # psycopg isn't installed.
 
 
 class BulkSaveTests(PostgreSQLTestCase):

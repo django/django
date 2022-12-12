@@ -8,13 +8,17 @@ from django.test import TestCase
 from django.test.utils import modify_settings
 
 try:
-    from psycopg2.extras import DateRange, DateTimeRange, DateTimeTZRange, NumericRange
-
     from django.contrib.postgres.fields import (
         DateRangeField,
         DateTimeRangeField,
         DecimalRangeField,
         IntegerRangeField,
+    )
+    from django.db.backends.postgresql.psycopg_any import (
+        DateRange,
+        DateTimeRange,
+        DateTimeTZRange,
+        NumericRange,
     )
 except ImportError:
     pass

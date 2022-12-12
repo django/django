@@ -1,11 +1,9 @@
 import json
 from functools import lru_cache, partial
 
-from psycopg2.extras import Inet
-from psycopg2.extras import Json as Jsonb
-
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.postgresql.psycopg_any import Inet, Jsonb
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
 
