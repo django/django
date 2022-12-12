@@ -3,7 +3,7 @@ from functools import lru_cache, partial
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
-from django.db.backends.postgresql.psycopg_any import Inet, Jsonb
+from django.db.backends.postgresql.psycopg_any import Inet, Jsonb, mogrify
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
 
@@ -173,6 +173,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if name.startswith('"') and name.endswith('"'):
             return name  # Quoting once is enough.
         return '"%s"' % name
+
+    def compose_sql(self, sql, params):
+        return mogrify(sql, params, self.connection)
 
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
