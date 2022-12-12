@@ -1,11 +1,11 @@
 """
  This object provides quoting for GEOS geometries into PostgreSQL/PostGIS.
 """
-from psycopg2 import extensions
 from psycopg2.extensions import ISQLQuote
 
 from django.contrib.gis.db.backends.postgis.pgraster import to_pgraster
 from django.contrib.gis.geos import GEOSGeometry
+from django.db.backends.postgresql.psycopg_any import sql
 
 
 class PostGISAdapter:
@@ -47,13 +47,6 @@ class PostGISAdapter:
     def _fix_polygon(cls, poly):
         return poly
 
-    def _quote(self, value):
-        adapted = extensions.adapt(value)
-        if hasattr(adapted, "encoding"):
-            adapted.encoding = "utf8"
-        # getquoted() returns a quoted bytestring of the adapted value.
-        return adapted.getquoted().decode()
-
     def getquoted(self):
         """
         Return a properly quoted string for use in PostgreSQL/PostGIS.
@@ -62,7 +55,7 @@ class PostGISAdapter:
             # Psycopg will figure out whether to use E'\\000' or '\000'.
             return b"%s(%s)" % (
                 b"ST_GeogFromWKB" if self.geography else b"ST_GeomFromEWKB",
-                self._quote(self.ewkb).encode(),
+                sql.quote(self.ewkb).encode(),
             )
         else:
             # For rasters, add explicit type cast to WKB string.
