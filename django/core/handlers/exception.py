@@ -13,6 +13,7 @@ from django.core.exceptions import (
     RequestDataTooBig,
     SuspiciousOperation,
     TooManyFieldsSent,
+    TooManyFilesSent,
 )
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
@@ -111,7 +112,7 @@ def response_for_exception(request, exc):
             exc_info=sys.exc_info(),
         )
     elif isinstance(exc, SuspiciousOperation):
-        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
+        if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent)):
             # POST data can't be accessed again, otherwise the original
             # exception would be raised.
             request._mark_post_parse_error()
