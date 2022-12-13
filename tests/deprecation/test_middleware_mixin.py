@@ -1,7 +1,6 @@
-import asyncio
 import threading
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, iscoroutinefunction
 
 from django.contrib.admindocs.middleware import XViewMiddleware
 from django.contrib.auth.middleware import (
@@ -101,11 +100,11 @@ class MiddlewareMixinTests(SimpleTestCase):
                 # Middleware appears as coroutine if get_function is
                 # a coroutine.
                 middleware_instance = middleware(async_get_response)
-                self.assertIs(asyncio.iscoroutinefunction(middleware_instance), True)
+                self.assertIs(iscoroutinefunction(middleware_instance), True)
                 # Middleware doesn't appear as coroutine if get_function is not
                 # a coroutine.
                 middleware_instance = middleware(sync_get_response)
-                self.assertIs(asyncio.iscoroutinefunction(middleware_instance), False)
+                self.assertIs(iscoroutinefunction(middleware_instance), False)
 
     def test_sync_to_async_uses_base_thread_and_connection(self):
         """
