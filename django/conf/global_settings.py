@@ -313,6 +313,10 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 # SuspiciousOperation (TooManyFieldsSent) is raised.
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
+# Maximum number of files encoded in a multipart upload that will be read
+# before a SuspiciousOperation (TooManyFilesSent) is raised.
+DATA_UPLOAD_MAX_NUMBER_FILES = 100
+
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
 # (i.e. "/tmp" on *nix systems).
