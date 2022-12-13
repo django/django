@@ -6,9 +6,12 @@ import os
 import re
 import sys
 import time
+import warnings
 from email.header import Header
 from http.client import responses
 from urllib.parse import urlparse
+
+from asgiref.sync import async_to_sync, sync_to_async
 
 from django.conf import settings
 from django.core import signals, signing
@@ -476,7 +479,18 @@ class StreamingHttpResponse(HttpResponseBase):
 
     @property
     def streaming_content(self):
-        return map(self.make_bytes, self._iterator)
+        if self.is_async:
+            # pull to lexical scope to capture fixed reference in case
+            # streaming_content is set again later.
+            _iterator = self._iterator
+
+            async def awrapper():
+                async for part in _iterator:
+                    yield self.make_bytes(part)
+
+            return awrapper()
+        else:
+            return map(self.make_bytes, self._iterator)
 
     @streaming_content.setter
     def streaming_content(self, value):
@@ -484,12 +498,48 @@ class StreamingHttpResponse(HttpResponseBase):
 
     def _set_streaming_content(self, value):
         # Ensure we can never iterate on "value" more than once.
-        self._iterator = iter(value)
+        try:
+            self._iterator = iter(value)
+            self.is_async = False
+        except TypeError:
+            self._iterator = value.__aiter__()
+            self.is_async = True
         if hasattr(value, "close"):
             self._resource_closers.append(value.close)
 
     def __iter__(self):
-        return self.streaming_content
+        try:
+            return iter(self.streaming_content)
+        except TypeError:
+            warnings.warn(
+                "StreamingHttpResponse must consume asynchronous iterators in order to "
+                "serve them synchronously. Use a synchronous iterator instead.",
+                Warning,
+            )
+
+            # async iterator. Consume in async_to_sync and map back.
+            async def to_list(_iterator):
+                as_list = []
+                async for chunk in _iterator:
+                    as_list.append(chunk)
+                return as_list
+
+            return map(self.make_bytes, iter(async_to_sync(to_list)(self._iterator)))
+
+    async def __aiter__(self):
+        try:
+            async for part in self.streaming_content:
+                yield part
+        except TypeError:
+            warnings.warn(
+                "StreamingHttpResponse must consume synchronous iterators in order to "
+                "serve them asynchronously. Use an asynchronous iterator instead.",
+                Warning,
+            )
+            # sync iterator. Consume via sync_to_async and yield via async
+            # generator.
+            for part in await sync_to_async(list)(self.streaming_content):
+                yield part
 
     def getvalue(self):
         return b"".join(self.streaming_content)

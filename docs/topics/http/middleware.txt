@@ -267,6 +267,16 @@ must test for streaming responses and adjust their behavior accordingly::
             for chunk in content:
                 yield alter_content(chunk)
 
+:class:`~django.http.StreamingHttpResponse` allows both synchronous and
+asynchronous iterators. The wrapping function must match. Check
+:attr:`StreamingHttpResponse.is_async
+<django.http.StreamingHttpResponse.is_async>` if your middleware needs to
+support both types of iterator.
+
+..  versionchanged:: 4.2
+
+    Support for streaming responses with asynchronous iterators was added.
+
 Exception handling
 ==================
 
