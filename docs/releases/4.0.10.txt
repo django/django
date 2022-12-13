@@ -6,4 +6,12 @@ Django 4.0.10 release notes
 
 Django 4.0.10 fixes a security issue with severity "moderate" in 4.0.9.
 
-...
+CVE-2023-24580: Potential denial-of-service vulnerability in file uploads
+=========================================================================
+
+Passing certain inputs to multipart forms could result in too many open files
+or memory exhaustion, and provided a potential vector for a denial-of-service
+attack.
+
+The number of files parts parsed is now limited via the new
+:setting:`DATA_UPLOAD_MAX_NUMBER_FILES` setting.
