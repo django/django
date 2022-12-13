@@ -58,6 +58,15 @@ class TooManyFieldsSent(SuspiciousOperation):
     pass
 
 
+class TooManyFilesSent(SuspiciousOperation):
+    """
+    The number of fields in a GET or POST request exceeded
+    settings.DATA_UPLOAD_MAX_NUMBER_FILES.
+    """
+
+    pass
+
+
 class RequestDataTooBig(SuspiciousOperation):
     """
     The size of the request (excluding any file uploads) exceeded

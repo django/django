@@ -1063,6 +1063,28 @@ could be used as a denial-of-service attack vector if left unchecked. Since web
 servers don't typically perform deep request inspection, it's not possible to
 perform a similar check at that level.
 
+.. setting:: DATA_UPLOAD_MAX_NUMBER_FILES
+
+``DATA_UPLOAD_MAX_NUMBER_FILES``
+--------------------------------
+
+.. versionadded:: 3.2.18
+
+Default: ``100``
+
+The maximum number of files that may be received via POST in a
+``multipart/form-data`` encoded request before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFiles``) is
+raised. You can set this to ``None`` to disable the check. Applications that
+are expected to receive an unusually large number of file fields should tune
+this setting.
+
+The number of accepted files is correlated to the amount of time and memory
+needed to process the request. Large requests could be used as a
+denial-of-service attack vector if left unchecked. Since web servers don't
+typically perform deep request inspection, it's not possible to perform a
+similar check at that level.
+
 .. setting:: DATABASE_ROUTERS
 
 ``DATABASE_ROUTERS``
@@ -3671,6 +3693,7 @@ HTTP
 ----
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FILES`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`

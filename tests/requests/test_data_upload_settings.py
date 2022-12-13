@@ -1,11 +1,14 @@
 from io import BytesIO
 
-from django.core.exceptions import RequestDataTooBig, TooManyFieldsSent
+from django.core.exceptions import (
+    RequestDataTooBig, TooManyFieldsSent, TooManyFilesSent,
+)
 from django.core.handlers.wsgi import WSGIRequest
 from django.test import SimpleTestCase
 from django.test.client import FakePayload
 
 TOO_MANY_FIELDS_MSG = 'The number of GET/POST parameters exceeded settings.DATA_UPLOAD_MAX_NUMBER_FIELDS.'
+TOO_MANY_FILES_MSG = 'The number of files exceeded settings.DATA_UPLOAD_MAX_NUMBER_FILES.'
 TOO_MUCH_DATA_MSG = 'Request body exceeded settings.DATA_UPLOAD_MAX_MEMORY_SIZE.'
 
 
@@ -163,6 +166,52 @@ class DataUploadMaxNumberOfFieldsMultipartPost(SimpleTestCase):
 
     def test_no_limit(self):
         with self.settings(DATA_UPLOAD_MAX_NUMBER_FIELDS=None):
+            self.request._load_post_and_files()
+
+
+class DataUploadMaxNumberOfFilesMultipartPost(SimpleTestCase):
+    def setUp(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    (
+                        'Content-Disposition: form-data; name="name1"; '
+                        'filename="name1.txt"'
+                    ),
+                    "",
+                    "value1",
+                    "--boundary",
+                    (
+                        'Content-Disposition: form-data; name="name2"; '
+                        'filename="name2.txt"'
+                    ),
+                    "",
+                    "value2",
+                    "--boundary--",
+                ]
+            )
+        )
+        self.request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+
+    def test_number_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FILES=1):
+            with self.assertRaisesMessage(TooManyFilesSent, TOO_MANY_FILES_MSG):
+                self.request._load_post_and_files()
+
+    def test_number_not_exceeded(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FILES=2):
+            self.request._load_post_and_files()
+
+    def test_no_limit(self):
+        with self.settings(DATA_UPLOAD_MAX_NUMBER_FILES=None):
             self.request._load_post_and_files()
 
 
