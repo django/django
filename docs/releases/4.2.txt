@@ -286,7 +286,8 @@ Models
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :class:`~django.http.StreamingHttpResponse` now supports async iterators
+  when Django is served via ASGI.
 
 Security
 ~~~~~~~~
