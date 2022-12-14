@@ -430,12 +430,16 @@ class SimpleLazyObject(LazyObject):
 
     def __await__(self):
         async def _():
+            # when passing a wrapped coroutine: await on it.
+            # when passing a wrapped function: run it in a different thread
+            # using 'sync_to_async', to prevent event loop blocking.
             if iscoroutinefunction(self._wrapped):
                 self._wrapped = await self._wrapped()
             elif callable(self._wrapped):
                 self._wrapped = await sync_to_async(self._wrapped)()
             return self._wrapped
 
+        # Initialize _wrapped attribute if uninitialized.
         if not hasattr(self, "_wrapped") or self._wrapped is empty:
             self._wrapped = self._setupfunc
 
