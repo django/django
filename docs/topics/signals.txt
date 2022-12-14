@@ -11,38 +11,34 @@ allow certain *senders* to notify a set of *receivers* that some action has
 taken place. They're especially useful when many pieces of code may be
 interested in the same events.
 
-Django provides a :doc:`set of built-in signals </ref/signals>` that let user
-code get notified by Django itself of certain actions. These include some useful
-notifications:
+For example, a third-party app can register to be notified of settings
+changes::
 
-* :data:`django.db.models.signals.pre_save` &
-  :data:`django.db.models.signals.post_save`
+    from django.apps import AppConfig
+    from django.core.signals import setting_changed
 
-  Sent before or after a model's :meth:`~django.db.models.Model.save` method
-  is called.
+    def my_callback(sender, **kwargs):
+        print("Setting changed!")
 
-* :data:`django.db.models.signals.pre_delete` &
-  :data:`django.db.models.signals.post_delete`
+    class MyAppConfig(AppConfig):
+        ...
 
-  Sent before or after a model's :meth:`~django.db.models.Model.delete`
-  method or queryset's :meth:`~django.db.models.query.QuerySet.delete`
-  method is called.
+        def ready(self):
+            setting_changed.connect(my_callback)
 
-* :data:`django.db.models.signals.m2m_changed`
+Django's :doc:`built-in signals </ref/signals>` let user code get notified of
+certain actions.
 
-  Sent when a :class:`~django.db.models.ManyToManyField` on a model is changed.
+You can also define and send your own custom signals. See
+:ref:`defining-and-sending-signals` below.
 
-* :data:`django.core.signals.request_started` &
-  :data:`django.core.signals.request_finished`
+.. warning::
 
-  Sent when Django starts or finishes an HTTP request.
+    Signals give the appearance of loose coupling, but they can quickly lead to
+    code that is hard to understand, adjust and debug.
 
-See the :doc:`built-in signal documentation </ref/signals>` for a complete list,
-and a complete explanation of each signal.
-
-You can also `define and send your own custom signals`_; see below.
-
-.. _define and send your own custom signals: `defining and sending signals`_
+    Where possible you should opt for directly calling the handling code,
+    rather than dispatching via a signal.
 
 Listening to signals
 ====================
@@ -217,6 +213,8 @@ bound to the signal once for each unique ``dispatch_uid`` value::
     from django.core.signals import request_finished
 
     request_finished.connect(my_callback, dispatch_uid="my_unique_identifier")
+
+.. _defining-and-sending-signals:
 
 Defining and sending signals
 ============================

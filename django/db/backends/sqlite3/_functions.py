@@ -134,7 +134,7 @@ def _sqlite_date_trunc(lookup_type, dt, tzname, conn_tzname):
     elif lookup_type == "month":
         return f"{dt.year:04d}-{dt.month:02d}-01"
     elif lookup_type == "week":
-        dt = dt - timedelta(days=dt.weekday())
+        dt -= timedelta(days=dt.weekday())
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
     elif lookup_type == "day":
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d}"
@@ -205,7 +205,7 @@ def _sqlite_datetime_trunc(lookup_type, dt, tzname, conn_tzname):
     elif lookup_type == "month":
         return f"{dt.year:04d}-{dt.month:02d}-01 00:00:00"
     elif lookup_type == "week":
-        dt = dt - timedelta(days=dt.weekday())
+        dt -= timedelta(days=dt.weekday())
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"
     elif lookup_type == "day":
         return f"{dt.year:04d}-{dt.month:02d}-{dt.day:02d} 00:00:00"

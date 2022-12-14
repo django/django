@@ -6,7 +6,7 @@ from django.utils.functional import cached_property
 
 class DatabaseFeatures(BaseDatabaseFeatures):
     empty_fetchmany_value = ()
-    allows_group_by_pk = True
+    allows_group_by_selected_pks = True
     related_fields_match_type = True
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
@@ -16,12 +16,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_date_lookup_using_string = False
     supports_timezones = False
     requires_explicit_null_ordering_when_grouping = True
-    can_release_savepoints = True
     atomic_transactions = False
     can_clone_databases = True
     supports_temporal_subtraction = True
-    supports_select_intersection = False
-    supports_select_difference = False
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
     supports_update_conflicts = True
@@ -111,18 +108,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
             },
         }
-        if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
-            skips.update(
-                {
-                    "GROUP BY optimization does not work properly when "
-                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #31331.": {
-                        "aggregation.tests.AggregateTestCase."
-                        "test_aggregation_subquery_annotation_multivalued",
-                        "annotations.tests.NonAggregateAnnotationTestCase."
-                        "test_annotation_aggregate_with_m2o",
-                    },
-                }
-            )
         if self.connection.mysql_is_mariadb and (
             10,
             4,
@@ -321,6 +306,15 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             and self._mysql_storage_engine != "MyISAM"
             and self.connection.mysql_version >= (8, 0, 13)
         )
+
+    @cached_property
+    def supports_select_intersection(self):
+        is_mariadb = self.connection.mysql_is_mariadb
+        return is_mariadb or self.connection.mysql_version >= (8, 0, 31)
+
+    supports_select_difference = property(
+        operator.attrgetter("supports_select_intersection")
+    )
 
     @cached_property
     def can_rename_index(self):

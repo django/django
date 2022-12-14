@@ -1908,11 +1908,9 @@ class SeleniumTests(AdminSeleniumTestCase):
             "border-top-%s",
         ]
         for prop in border_properties:
-            prop = prop % "width"
-            self.assertEqual(element.value_of_css_property(prop), width)
+            self.assertEqual(element.value_of_css_property(prop % "width"), width)
         for prop in border_properties:
-            prop = prop % "style"
-            self.assertEqual(element.value_of_css_property(prop), style)
+            self.assertEqual(element.value_of_css_property(prop % "style"), style)
         # Convert hex color to rgb.
         self.assertRegex(color, "#[0-9a-f]{6}")
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:], 16)
@@ -1923,8 +1921,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             "rgba(%d, %d, %d, 1)" % (r, g, b),
         ]
         for prop in border_properties:
-            prop = prop % "color"
-            self.assertIn(element.value_of_css_property(prop), colors)
+            self.assertIn(element.value_of_css_property(prop % "color"), colors)
 
     def test_inline_formset_error_input_border(self):
         from selenium.webdriver.common.by import By

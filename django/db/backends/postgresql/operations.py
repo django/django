@@ -1,9 +1,18 @@
-from psycopg2.extras import Inet
+import json
+from functools import lru_cache, partial
 
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.postgresql.psycopg_any import Inet, Jsonb, mogrify
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
+
+
+@lru_cache
+def get_json_dumps(encoder):
+    if encoder is None:
+        return json.dumps
+    return partial(json.dumps, cls=encoder)
 
 
 class DatabaseOperations(BaseDatabaseOperations):
@@ -165,6 +174,9 @@ class DatabaseOperations(BaseDatabaseOperations):
             return name  # Quoting once is enough.
         return '"%s"' % name
 
+    def compose_sql(self, sql, params):
+        return mogrify(sql, params, self.connection)
+
     def set_time_zone_sql(self):
         return "SET TIME ZONE %s"
 
@@ -307,6 +319,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         if value:
             return Inet(value)
         return None
+
+    def adapt_json_value(self, value, encoder):
+        return Jsonb(value, dumps=get_json_dumps(encoder))
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         if internal_type == "DateField":

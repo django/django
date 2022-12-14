@@ -10,10 +10,11 @@ from django.core.files.utils import validate_file_name
 from django.db.models import signals
 from django.db.models.fields import Field
 from django.db.models.query_utils import DeferredAttribute
+from django.db.models.utils import AltersData
 from django.utils.translation import gettext_lazy as _
 
 
-class FieldFile(File):
+class FieldFile(File, AltersData):
     def __init__(self, instance, field, name):
         super().__init__(None, name)
         self.instance = instance

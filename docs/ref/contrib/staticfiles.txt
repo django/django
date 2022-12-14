@@ -295,6 +295,8 @@ method). The regular expressions used to find those paths
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
+* The `modules import`_ in JavaScript.
+* The `modules aggregation`_ in JavaScript.
 
 For example, the ``'css/styles.css'`` file with this content:
 
@@ -328,6 +330,11 @@ argument. For example::
 .. versionchanged:: 4.1
 
     Support for finding paths in CSS source map comments was added.
+
+.. versionchanged:: 4.2
+
+    Support for finding paths to JavaScript modules in ``import`` and
+    ``export`` statements was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
@@ -382,6 +389,8 @@ hashing algorithm.
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 .. _`source map`: https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map
+.. _`modules import`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#importing_features_into_your_script
+.. _`modules aggregation`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#aggregating_modules
 
 ``ManifestFilesMixin``
 ----------------------

@@ -24,7 +24,7 @@ html[data-theme="light"],
     --breadcrumbs-link-fg: var(--body-bg);
     --breadcrumbs-bg: var(--primary);
 
-    --link-fg: #447e9b;
+    --link-fg: #417893;
     --link-hover-color: #036;
     --link-selected-fg: #5b80b2;
 
@@ -194,7 +194,7 @@ li ul {
 
 li, dt, dd {
     font-size: 0.8125rem;
-    line-height: 20px;
+    line-height: 1.25rem;
 }
 
 dt {
@@ -308,7 +308,7 @@ table {
 
 td, th {
     font-size: 0.8125rem;
-    line-height: 16px;
+    line-height: 1rem;
     border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
@@ -501,7 +501,7 @@ textarea:focus, select:focus, .vTextField:focus {
 }
 
 select {
-    height: 30px;
+    height: 1.875rem;
 }
 
 select[multiple] {
@@ -761,7 +761,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     margin-left: 5px;
-    height: 16px;
+    height: 1rem;
 }
 
 .object-tools a {
@@ -936,7 +936,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 #branding h1 {
     padding: 0;
-    margin: 0 20px 0 0;
+    margin: 0;
+    margin-inline-end: 20px;
     font-weight: 300;
     font-size: 1.5rem;
     color: var(--header-branding-color);
@@ -1058,8 +1059,8 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 15px;
-    line-height: 15px;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     border-radius: 4px;
     padding: 10px 15px;
     color: var(--button-fg);

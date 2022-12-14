@@ -1659,8 +1659,8 @@ one, doing so will result in an error.
     have measured that the difference between returning the fields you need and
     the full set of fields for the model will be significant.
 
-    Even if you think you are in the advanced use-case situation, **only use
-    ``defer()`` when you cannot, at queryset load time, determine if you will
+    Even if you think you are in the advanced use-case situation, **only use**
+    ``defer()`` **when you cannot, at queryset load time, determine if you will
     need the extra fields or not**. If you are frequently loading and using a
     particular subset of your data, the best choice you can make is to
     normalize your models and put the non-loaded data into a separate model
@@ -1707,9 +1707,11 @@ one, doing so will result in an error.
 
 .. method:: only(*fields)
 
-The ``only()`` method is more or less the opposite of :meth:`defer()`. You call
-it with the fields that should *not* be deferred when retrieving a model.  If
-you have a model where almost all the fields need to be deferred, using
+The ``only()`` method is essentially the opposite of :meth:`defer`. Only the
+fields passed into this method and that are *not* already specified as deferred
+are loaded immediately when the queryset is evaluated.
+
+If you have a model where almost all the fields need to be deferred, using
 ``only()`` to specify the complementary set of fields can result in simpler
 code.
 
@@ -1734,8 +1736,7 @@ logically::
     # Final result is that everything except "headline" is deferred.
     Entry.objects.only("headline", "body").defer("body")
 
-    # Final result loads headline and body immediately (only() replaces any
-    # existing set of fields).
+    # Final result loads headline immediately.
     Entry.objects.defer("body").only("headline", "body")
 
 All of the cautions in the note for the :meth:`defer` documentation apply to
@@ -1755,6 +1756,11 @@ are in your ``only()`` call.
     When calling :meth:`~django.db.models.Model.save()` for instances with
     deferred fields, only the loaded fields will be saved. See
     :meth:`~django.db.models.Model.save()` for more details.
+
+.. note::
+
+    When using :meth:`defer` after ``only()`` the fields in :meth:`defer` will
+    override ``only()`` for fields that are listed in both.
 
 ``using()``
 ~~~~~~~~~~~
@@ -2174,7 +2180,7 @@ Finally, a word on using ``get_or_create()`` in Django views. Please make sure
 to use it only in ``POST`` requests unless you have a good reason not to.
 ``GET`` requests shouldn't have any effect on data. Instead, use ``POST``
 whenever a request to a page has a side effect on your data. For more, see
-:rfc:`Safe methods <7231#section-4.2.1>` in the HTTP spec.
+:rfc:`Safe methods <9110#section-9.2.1>` in the HTTP spec.
 
 .. warning::
 
@@ -2270,6 +2276,11 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 .. versionchanged:: 4.1
 
     ``aupdate_or_create()`` method was added.
+
+.. versionchanged:: 4.2
+
+    In older versions, ``update_or_create()`` didn't specify ``update_fields``
+    when calling :meth:`Model.save() <django.db.models.Model.save>`.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~

@@ -48,6 +48,7 @@ from .creation import DatabaseCreation  # NOQA
 from .features import DatabaseFeatures  # NOQA
 from .introspection import DatabaseIntrospection  # NOQA
 from .operations import DatabaseOperations  # NOQA
+from .psycopg_any import IsolationLevel  # NOQA
 from .schema import DatabaseSchemaEditor  # NOQA
 
 psycopg2.extensions.register_adapter(SafeString, psycopg2.extensions.QuotedString)
@@ -186,16 +187,16 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {}
+        conn_params = {"client_encoding": "UTF8"}
         if settings_dict["NAME"]:
             conn_params = {
-                "database": settings_dict["NAME"],
+                "dbname": settings_dict["NAME"],
                 **settings_dict["OPTIONS"],
             }
         elif settings_dict["NAME"] is None:
             # Connect to the default 'postgres' db.
             settings_dict.get("OPTIONS", {}).pop("service", None)
-            conn_params = {"database": "postgres", **settings_dict["OPTIONS"]}
+            conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
 
@@ -212,22 +213,30 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def get_new_connection(self, conn_params):
-        connection = Database.connect(**conn_params)
-
         # self.isolation_level must be set:
         # - after connecting to the database in order to obtain the database's
         #   default when no value is explicitly specified in options.
         # - before calling _set_autocommit() because if autocommit is on, that
         #   will set connection.isolation_level to ISOLATION_LEVEL_AUTOCOMMIT.
         options = self.settings_dict["OPTIONS"]
+        set_isolation_level = False
         try:
-            self.isolation_level = options["isolation_level"]
+            isolation_level_value = options["isolation_level"]
         except KeyError:
-            self.isolation_level = connection.isolation_level
+            self.isolation_level = IsolationLevel.READ_COMMITTED
         else:
             # Set the isolation level to the value from OPTIONS.
-            if self.isolation_level != connection.isolation_level:
-                connection.set_session(isolation_level=self.isolation_level)
+            try:
+                self.isolation_level = IsolationLevel(isolation_level_value)
+                set_isolation_level = True
+            except ValueError:
+                raise ImproperlyConfigured(
+                    f"Invalid transaction isolation level {isolation_level_value} "
+                    f"specified. Use one of the IsolationLevel values."
+                )
+        connection = Database.connect(**conn_params)
+        if set_isolation_level:
+            connection.isolation_level = self.isolation_level
         # Register dummy loads() to avoid a round trip from psycopg2's decode
         # to json.dumps() to json.loads(), when using a custom decoder in
         # JSONField.
@@ -239,7 +248,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     def ensure_timezone(self):
         if self.connection is None:
             return False
-        conn_timezone_name = self.connection.get_parameter_status("TimeZone")
+        conn_timezone_name = self.connection.info.parameter_status("TimeZone")
         timezone_name = self.timezone_name
         if timezone_name and conn_timezone_name != timezone_name:
             with self.connection.cursor() as cursor:
@@ -249,7 +258,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def init_connection_state(self):
         super().init_connection_state()
-        self.connection.set_client_encoding("UTF8")
 
         timezone_changed = self.ensure_timezone()
         if timezone_changed:
@@ -365,7 +373,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     @cached_property
     def pg_version(self):
         with self.temporary_connection():
-            return self.connection.server_version
+            return self.connection.info.server_version
 
     def make_debug_cursor(self, cursor):
         return CursorDebugWrapper(cursor, self)

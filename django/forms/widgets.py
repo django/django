@@ -207,7 +207,7 @@ def media_property(cls):
                 else:
                     m = Media()
                     for medium in extend:
-                        m = m + base[medium]
+                        m += base[medium]
                 return m + Media(definition)
             return Media(definition)
         return base
@@ -945,7 +945,7 @@ class MultiWidget(Widget):
         """
         media = Media()
         for w in self.widgets:
-            media = media + w.media
+            media += w.media
         return media
 
     media = property(_get_media)

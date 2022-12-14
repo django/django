@@ -473,7 +473,7 @@ login page::
 
     def my_view(request):
         if not request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect(f'{settings.LOGIN_URL}?next={request.path}')
         # ...
 
 ...or display an error message::
@@ -565,8 +565,8 @@ The ``login_required`` decorator
 
 .. currentmodule:: django.contrib.auth.mixins
 
-The ``LoginRequired`` mixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``LoginRequiredMixin`` mixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using :doc:`class-based views </topics/class-based-views/index>`, you can
 achieve the same behavior as with ``login_required`` by using the
@@ -1664,6 +1664,11 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
+
+    .. versionchanged:: 4.2
+
+        In older versions, :class:`UserCreationForm` didn't save many-to-many
+        form fields for a custom user model.
 
 .. currentmodule:: django.contrib.auth
 

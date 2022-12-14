@@ -22,6 +22,11 @@ form .form-row p {
     padding-left: 0;
 }
 
+.form-row > div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
 /* FORM LABELS */
 
 label {
@@ -69,7 +74,6 @@ form ul.inline li {
 .aligned label {
     display: block;
     padding: 4px 10px 0 0;
-    float: left;
     width: 160px;
     word-wrap: break-word;
     line-height: 1;
@@ -79,15 +83,20 @@ form ul.inline li {
     content: '';
     display: inline-block;
     vertical-align: middle;
-    height: 26px;
+    height: 1.625rem;
 }
 
-.aligned label + p, .aligned label + div.help, .aligned label + div.readonly {
+.aligned label + p, .aligned .checkbox-row + div.help, .aligned label + div.readonly {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
     margin-left: 170px;
     overflow-wrap: break-word;
+}
+
+.aligned label + div.readonly,
+.aligned label + .datetime {
+    margin-left: 0;
 }
 
 .aligned ul label {
@@ -117,7 +126,6 @@ form .aligned div.radiolist {
 
 form .aligned p.help,
 form .aligned div.help {
-    clear: left;
     margin-top: 0;
     margin-left: 160px;
     padding-left: 10px;
@@ -129,8 +137,7 @@ form .aligned p.datetime div.help.timezonewarning {
     font-weight: normal;
 }
 
-form .aligned label + p.help,
-form .aligned label + div.help {
+form .aligned .checkbox-row + .help {
     margin-left: 0;
     padding-left: 0;
 }
@@ -270,8 +277,8 @@ body.popup .submit-row {
 }
 
 .submit-row input {
-    height: 35px;
-    line-height: 15px;
+    height: 2.1875rem;
+    line-height: 0.9375rem;
 }
 
 .submit-row input, .submit-row a {
@@ -290,9 +297,9 @@ body.popup .submit-row {
     display: block;
     background: var(--delete-button-bg);
     border-radius: 4px;
-    padding: 10px 15px;
-    height: 15px;
-    line-height: 15px;
+    padding: 0.625rem 0.9375rem;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     color: var(--button-fg);
 }
 
@@ -301,8 +308,8 @@ body.popup .submit-row {
     background: var(--close-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
-    height: 15px;
-    line-height: 15px;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     color: var(--button-fg);
 }
 
@@ -517,8 +524,8 @@ body.popup .submit-row {
 }
 
 .related-lookup {
-    width: 16px;
-    height: 16px;
+    width: 1rem;
+    height: 1rem;
     background-image: url(../img/search.svg);
 }
 

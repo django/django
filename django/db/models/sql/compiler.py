@@ -4,7 +4,7 @@ import re
 from functools import partial
 from itertools import chain
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.expressions import F, OrderBy, RawSQL, Ref, Value
@@ -169,7 +169,7 @@ class SQLCompiler:
                 expr = Ref(alias, expr)
             try:
                 sql, params = self.compile(expr)
-            except EmptyResultSet:
+            except (EmptyResultSet, FullResultSet):
                 continue
             sql, params = expr.select_format(self, sql, params)
             params_hash = make_hashable(params)
@@ -179,41 +179,10 @@ class SQLCompiler:
         return result
 
     def collapse_group_by(self, expressions, having):
-        # If the DB can group by primary key, then group by the primary key of
-        # query's main model. Note that for PostgreSQL the GROUP BY clause must
-        # include the primary key of every table, but for MySQL it is enough to
-        # have the main table's primary key.
-        if self.connection.features.allows_group_by_pk:
-            # Determine if the main model's primary key is in the query.
-            pk = None
-            for expr in expressions:
-                # Is this a reference to query's base table primary key? If the
-                # expression isn't a Col-like, then skip the expression.
-                if (
-                    getattr(expr, "target", None) == self.query.model._meta.pk
-                    and getattr(expr, "alias", None) == self.query.base_table
-                ):
-                    pk = expr
-                    break
-            # If the main model's primary key is in the query, group by that
-            # field, HAVING expressions, and expressions associated with tables
-            # that don't have a primary key included in the grouped columns.
-            if pk:
-                pk_aliases = {
-                    expr.alias
-                    for expr in expressions
-                    if hasattr(expr, "target") and expr.target.primary_key
-                }
-                expressions = [pk] + [
-                    expr
-                    for expr in expressions
-                    if expr in having
-                    or (
-                        getattr(expr, "alias", None) is not None
-                        and expr.alias not in pk_aliases
-                    )
-                ]
-        elif self.connection.features.allows_group_by_selected_pks:
+        # If the database supports group by functional dependence reduction,
+        # then the expressions can be reduced to the set of selected table
+        # primary keys as all other columns are functionally dependent on them.
+        if self.connection.features.allows_group_by_selected_pks:
             # Filter out all expressions associated with a table's primary key
             # present in the grouped columns. This is done by identifying all
             # tables that have their primary key included in the grouped
@@ -235,7 +204,9 @@ class SQLCompiler:
             expressions = [
                 expr
                 for expr in expressions
-                if expr in pks or getattr(expr, "alias", None) not in aliases
+                if expr in pks
+                or expr in having
+                or getattr(expr, "alias", None) not in aliases
             ]
         return expressions
 
@@ -316,6 +287,8 @@ class SQLCompiler:
                     sql, params = "0", ()
                 else:
                     sql, params = self.compile(Value(empty_result_set_value))
+            except FullResultSet:
+                sql, params = self.compile(Value(True))
             else:
                 sql, params = col.select_format(self, sql, params)
             if alias is None and with_col_aliases:
@@ -451,28 +424,37 @@ class SQLCompiler:
                 src = resolved.expression
                 expr_src = expr.expression
                 for sel_expr, _, col_alias in self.select:
-                    if col_alias and not (
-                        isinstance(expr_src, F) and col_alias == expr_src.name
-                    ):
-                        continue
                     if src == sel_expr:
+                        # When values() is used the exact alias must be used to
+                        # reference annotations.
+                        if (
+                            self.query.has_select_fields
+                            and col_alias in self.query.annotation_select
+                            and not (
+                                isinstance(expr_src, F) and col_alias == expr_src.name
+                            )
+                        ):
+                            continue
                         resolved.set_source_expressions(
                             [Ref(col_alias if col_alias else src.target.column, src)]
                         )
                         break
                 else:
-                    if col_alias:
-                        raise DatabaseError(
-                            "ORDER BY term does not match any column in the result set."
-                        )
                     # Add column used in ORDER BY clause to the selected
                     # columns and to each combined query.
                     order_by_idx = len(self.query.select) + 1
-                    col_name = f"__orderbycol{order_by_idx}"
+                    col_alias = f"__orderbycol{order_by_idx}"
                     for q in self.query.combined_queries:
-                        q.add_annotation(expr_src, col_name)
-                    self.query.add_select_col(resolved, col_name)
-                    resolved.set_source_expressions([RawSQL(f"{order_by_idx}", ())])
+                        # If fields were explicitly selected through values()
+                        # combined queries cannot be augmented.
+                        if q.has_select_fields:
+                            raise DatabaseError(
+                                "ORDER BY term does not match any column in "
+                                "the result set."
+                            )
+                        q.add_annotation(expr_src, col_alias)
+                    self.query.add_select_col(resolved, col_alias)
+                    resolved.set_source_expressions([Ref(col_alias, src)])
             sql, params = self.compile(resolved)
             # Don't add the same column twice, but the order direction is
             # not taken into account so we strip it. When this entire method
@@ -531,7 +513,6 @@ class SQLCompiler:
         compilers = [
             query.get_compiler(self.using, self.connection, self.elide_empty)
             for query in self.query.combined_queries
-            if not query.is_empty()
         ]
         if not features.supports_slicing_ordering_in_compound:
             for compiler in compilers:
@@ -546,6 +527,11 @@ class SQLCompiler:
         elif self.query.is_sliced and combinator == "union":
             limit = (self.query.low_mark, self.query.high_mark)
             for compiler in compilers:
+                # A sliced union cannot have its parts elided as some of them
+                # might be sliced as well and in the event where only a single
+                # part produces a non-empty resultset it might be impossible to
+                # generate valid SQL.
+                compiler.elide_empty = False
                 if not compiler.query.is_sliced:
                     compiler.query.set_limits(*limit)
         parts = ()
@@ -563,7 +549,7 @@ class SQLCompiler:
                             *self.query.annotation_select,
                         )
                     )
-                part_sql, part_args = compiler.as_sql()
+                part_sql, part_args = compiler.as_sql(with_col_aliases=True)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
                     # supported.
@@ -711,14 +697,13 @@ class SQLCompiler:
         """
         refcounts_before = self.query.alias_refcount.copy()
         try:
+            combinator = self.query.combinator
             extra_select, order_by, group_by = self.pre_sql_setup(
-                with_col_aliases=with_col_aliases,
+                with_col_aliases=with_col_aliases or bool(combinator),
             )
             for_update_part = None
             # Is a LIMIT/OFFSET clause needed?
-            with_limit_offset = with_limits and (
-                self.query.high_mark is not None or self.query.low_mark
-            )
+            with_limit_offset = with_limits and self.query.is_sliced
             combinator = self.query.combinator
             features = self.connection.features
             if combinator:
@@ -748,9 +733,16 @@ class SQLCompiler:
                         raise
                     # Use a predicate that's always False.
                     where, w_params = "0 = 1", []
-                having, h_params = (
-                    self.compile(self.having) if self.having is not None else ("", [])
-                )
+                except FullResultSet:
+                    where, w_params = "", []
+                try:
+                    having, h_params = (
+                        self.compile(self.having)
+                        if self.having is not None
+                        else ("", [])
+                    )
+                except FullResultSet:
+                    having, h_params = "", []
                 result = ["SELECT"]
                 params = []
 
@@ -1645,9 +1637,7 @@ class SQLInsertCompiler(SQLCompiler):
                     "Window expressions are not allowed in this query (%s=%r)."
                     % (field.name, value)
                 )
-        else:
-            value = field.get_db_prep_save(value, connection=self.connection)
-        return value
+        return field.get_db_prep_save(value, connection=self.connection)
 
     def pre_save_val(self, field, obj):
         """
@@ -1733,8 +1723,8 @@ class SQLInsertCompiler(SQLCompiler):
         on_conflict_suffix_sql = self.connection.ops.on_conflict_suffix_sql(
             fields,
             self.query.on_conflict,
-            self.query.update_fields,
-            self.query.unique_fields,
+            (f.column for f in self.query.update_fields),
+            (f.column for f in self.query.unique_fields),
         )
         if (
             self.returning_fields
@@ -1844,11 +1834,12 @@ class SQLDeleteCompiler(SQLCompiler):
         )
 
     def _as_sql(self, query):
-        result = ["DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)]
-        where, params = self.compile(query.where)
-        if where:
-            result.append("WHERE %s" % where)
-        return " ".join(result), tuple(params)
+        delete = "DELETE FROM %s" % self.quote_name_unless_alias(query.base_table)
+        try:
+            where, params = self.compile(query.where)
+        except FullResultSet:
+            return delete, ()
+        return f"{delete} WHERE {where}", tuple(params)
 
     def as_sql(self):
         """
@@ -1900,18 +1891,14 @@ class SQLUpdateCompiler(SQLCompiler):
                     )
             elif hasattr(val, "prepare_database_save"):
                 if field.remote_field:
-                    val = field.get_db_prep_save(
-                        val.prepare_database_save(field),
-                        connection=self.connection,
-                    )
+                    val = val.prepare_database_save(field)
                 else:
                     raise TypeError(
                         "Tried to update field %s with a model instance, %r. "
                         "Use a value compatible with %s."
                         % (field, val, field.__class__.__name__)
                     )
-            else:
-                val = field.get_db_prep_save(val, connection=self.connection)
+            val = field.get_db_prep_save(val, connection=self.connection)
 
             # Getting the placeholder for the field.
             if hasattr(field, "get_placeholder"):
@@ -1933,8 +1920,11 @@ class SQLUpdateCompiler(SQLCompiler):
             "UPDATE %s SET" % qn(table),
             ", ".join(values),
         ]
-        where, params = self.compile(self.query.where)
-        if where:
+        try:
+            where, params = self.compile(self.query.where)
+        except FullResultSet:
+            params = []
+        else:
             result.append("WHERE %s" % where)
         return " ".join(result), tuple(update_params + params)
 
@@ -2044,7 +2034,7 @@ class SQLAggregateCompiler(SQLCompiler):
             elide_empty=self.elide_empty,
         ).as_sql(with_col_aliases=True)
         sql = "SELECT %s FROM (%s) subquery" % (sql, inner_query_sql)
-        params = params + inner_query_params
+        params += inner_query_params
         return sql, params
 
 

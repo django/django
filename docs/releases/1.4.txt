@@ -900,8 +900,8 @@ object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
 
 As part of this change, all underlying SQLite connections are now enabled for
 potential thread-sharing (by passing the ``check_same_thread=False`` attribute
-to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
-disabling thread-sharing by default, so this does not affect any existing
+to ``pysqlite``). ``DatabaseWrapper`` however preserves the previous behavior
+by disabling thread-sharing by default, so this does not affect any existing
 code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
 
 Finally, while it's now possible to pass connections between threads, Django

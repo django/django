@@ -328,8 +328,8 @@ class Command(BaseCommand):
             field_notes.append("This field type is a guess.")
 
         # Add max_length for all CharFields.
-        if field_type == "CharField" and row.internal_size:
-            field_params["max_length"] = int(row.internal_size)
+        if field_type == "CharField" and row.display_size:
+            field_params["max_length"] = int(row.display_size)
 
         if field_type in {"CharField", "TextField"} and row.collation:
             field_params["db_collation"] = row.collation

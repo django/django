@@ -13,8 +13,8 @@ When it's enabled, two users accessing the same content may see dates, times and
 numbers formatted in different ways, depending on the formats for their current
 locale.
 
-The formatting system is disabled by default. To enable it, it's
-necessary to set :setting:`USE_L10N = True <USE_L10N>` in your settings file.
+The formatting system is enabled by default. To disable it, it's
+necessary to set :setting:`USE_L10N = False <USE_L10N>` in your settings file.
 
 .. note::
 

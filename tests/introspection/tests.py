@@ -132,7 +132,7 @@ class IntrospectionTests(TransactionTestCase):
             )
         self.assertEqual(
             [
-                r[3]
+                r[2]
                 for r in desc
                 if connection.introspection.get_field_type(r[1], r) == "CharField"
             ],

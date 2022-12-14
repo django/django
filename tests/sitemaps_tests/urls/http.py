@@ -114,6 +114,16 @@ class CallableLastmodFullSitemap(Sitemap):
         return obj.lastmod
 
 
+class CallableLastmodNoItemsSitemap(Sitemap):
+    location = "/location/"
+
+    def items(self):
+        return []
+
+    def lastmod(self, obj):
+        return obj.lastmod
+
+
 class GetLatestLastmodNoneSiteMap(Sitemap):
     changefreq = "never"
     priority = 0.5
@@ -231,6 +241,10 @@ callable_lastmod_partial_sitemap = {
 
 callable_lastmod_full_sitemap = {
     "callable-lastmod": CallableLastmodFullSitemap,
+}
+
+callable_lastmod_no_items_sitemap = {
+    "callable-lastmod": CallableLastmodNoItemsSitemap,
 }
 
 urlpatterns = [
@@ -416,6 +430,11 @@ urlpatterns = [
         "callable-lastmod-full/sitemap.xml",
         views.sitemap,
         {"sitemaps": callable_lastmod_full_sitemap},
+    ),
+    path(
+        "callable-lastmod-no-items/index.xml",
+        views.index,
+        {"sitemaps": callable_lastmod_no_items_sitemap},
     ),
     path(
         "generic-lastmod/index.xml",

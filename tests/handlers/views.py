@@ -33,6 +33,16 @@ def not_in_transaction(request):
     return HttpResponse(str(connection.in_atomic_block))
 
 
+@transaction.non_atomic_requests(using=None)
+def not_in_transaction_using_none(request):
+    return HttpResponse(str(connection.in_atomic_block))
+
+
+@transaction.non_atomic_requests(using="incorrect")
+def not_in_transaction_using_text(request):
+    return HttpResponse(str(connection.in_atomic_block))
+
+
 def bad_request(request):
     raise BadRequest()
 

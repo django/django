@@ -4,7 +4,7 @@ Code to manage the creation and SQL rendering of 'where' constraints.
 import operator
 from functools import reduce
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import Case, When
 from django.db.models.lookups import Exact
 from django.utils import tree
@@ -145,6 +145,8 @@ class WhereNode(tree.Node):
                 sql, params = compiler.compile(child)
             except EmptyResultSet:
                 empty_needed -= 1
+            except FullResultSet:
+                full_needed -= 1
             else:
                 if sql:
                     result.append(sql)
@@ -158,24 +160,25 @@ class WhereNode(tree.Node):
             # counts.
             if empty_needed == 0:
                 if self.negated:
-                    return "", []
+                    raise FullResultSet
                 else:
                     raise EmptyResultSet
             if full_needed == 0:
                 if self.negated:
                     raise EmptyResultSet
                 else:
-                    return "", []
+                    raise FullResultSet
         conn = " %s " % self.connector
         sql_string = conn.join(result)
-        if sql_string:
-            if self.negated:
-                # Some backends (Oracle at least) need parentheses
-                # around the inner SQL in the negated case, even if the
-                # inner SQL contains just a single expression.
-                sql_string = "NOT (%s)" % sql_string
-            elif len(result) > 1 or self.resolved:
-                sql_string = "(%s)" % sql_string
+        if not sql_string:
+            raise FullResultSet
+        if self.negated:
+            # Some backends (Oracle at least) need parentheses around the inner
+            # SQL in the negated case, even if the inner SQL contains just a
+            # single expression.
+            sql_string = "NOT (%s)" % sql_string
+        elif len(result) > 1 or self.resolved:
+            sql_string = "(%s)" % sql_string
         return sql_string, result_params
 
     def get_group_by_cols(self):
@@ -223,6 +226,12 @@ class WhereNode(tree.Node):
         for child in self.children:
             clone.children.append(child.replace_expressions(replacements))
         return clone
+
+    def get_refs(self):
+        refs = set()
+        for child in self.children:
+            refs |= child.get_refs()
+        return refs
 
     @classmethod
     def _contains_aggregate(cls, obj):

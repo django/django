@@ -12,12 +12,7 @@ from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
-from django.test import (
-    TransactionTestCase,
-    modify_settings,
-    override_settings,
-    skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
@@ -36,8 +31,6 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import NumericRange
-
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.expressions import ArraySubquery
     from django.contrib.postgres.fields import ArrayField
@@ -47,6 +40,7 @@ try:
         SplitArrayField,
         SplitArrayWidget,
     )
+    from django.db.backends.postgresql.psycopg_any import NumericRange
 except ImportError:
     pass
 
@@ -241,6 +235,36 @@ class TestQuerying(PostgreSQLTestCase):
             NullableIntegerArrayModel.objects.filter(field__exact=[1]), self.objs[:1]
         )
 
+    def test_exact_null_only_array(self):
+        obj = NullableIntegerArrayModel.objects.create(
+            field=[None], field_nested=[None, None]
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field__exact=[None]), [obj]
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(field_nested__exact=[None, None]),
+            [obj],
+        )
+
+    def test_exact_null_only_nested_array(self):
+        obj1 = NullableIntegerArrayModel.objects.create(field_nested=[[None, None]])
+        obj2 = NullableIntegerArrayModel.objects.create(
+            field_nested=[[None, None], [None, None]],
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field_nested__exact=[[None, None]],
+            ),
+            [obj1],
+        )
+        self.assertSequenceEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field_nested__exact=[[None, None], [None, None]],
+            ),
+            [obj2],
+        )
+
     def test_exact_with_expression(self):
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__exact=[Value(1)]),
@@ -382,6 +406,21 @@ class TestQuerying(PostgreSQLTestCase):
                 ]
             ),
             [obj_1, obj_2],
+        )
+
+    def test_overlap_values(self):
+        qs = NullableIntegerArrayModel.objects.filter(order__lt=3)
+        self.assertCountEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__overlap=qs.values_list("field"),
+            ),
+            self.objs[:3],
+        )
+        self.assertCountEqual(
+            NullableIntegerArrayModel.objects.filter(
+                field__overlap=qs.values("field"),
+            ),
+            self.objs[:3],
         )
 
     def test_lookups_autofield_array(self):
@@ -1214,8 +1253,6 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
-    # To locate the widget's template.
-    @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)

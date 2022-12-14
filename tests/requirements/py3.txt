@@ -5,10 +5,10 @@ backports.zoneinfo; python_version < '3.9'
 bcrypt
 black
 docutils
-geoip2
+geoip2; python_version < '3.12'
 jinja2 >= 2.9.2
-numpy
-Pillow >= 6.2.0
+numpy; python_version < '3.12'
+Pillow >= 6.2.0; sys.platform != 'win32' or python_version < '3.12'
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys.platform != 'win32'
 pymemcache >= 3.4.0
@@ -17,7 +17,7 @@ pywatchman; sys.platform != 'win32'
 PyYAML
 redis >= 3.0.0
 selenium
-sqlparse >= 0.2.2
+sqlparse >= 0.2.3
 tblib >= 1.5.0
 tzdata
 colorama; sys.platform == 'win32'

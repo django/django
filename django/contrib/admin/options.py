@@ -561,7 +561,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
     def has_delete_permission(self, request, obj=None):
         """
-        Return True if the given request has permission to change the given
+        Return True if the given request has permission to delete the given
         Django model instance, the default implementation doesn't examine the
         `obj` parameter.
 
@@ -1840,7 +1840,7 @@ class ModelAdmin(BaseModelAdmin):
             request, formsets, inline_instances, obj
         )
         for inline_formset in inline_formsets:
-            media = media + inline_formset.media
+            media += inline_formset.media
 
         if add:
             title = _("Add %s")

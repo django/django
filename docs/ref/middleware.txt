@@ -103,8 +103,8 @@ GZip middleware
     should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
     paper (PDF)`_ and `breachattack.com`_.
 
-    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: http://breachattack.com
+    .. _the BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
 
 The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
@@ -122,7 +122,7 @@ It will NOT compress content if any of the following are true:
   containing ``gzip``.
 
 If the response has an ``ETag`` header, the ETag is made weak to comply with
-:rfc:`7232#section-2.1`.
+:rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.

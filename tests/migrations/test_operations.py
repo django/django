@@ -1796,6 +1796,43 @@ class OperationTests(OperationTestBase):
         self.assertTableExists(original_m2m_table)
         self.assertTableNotExists(new_m2m_table)
 
+    def test_alter_model_table_m2m_field(self):
+        app_label = "test_talm2mfl"
+        project_state = self.set_up_test_model(app_label, second_model=True)
+        # Add the M2M field.
+        project_state = self.apply_operations(
+            app_label,
+            project_state,
+            operations=[
+                migrations.AddField(
+                    "Pony",
+                    "stables",
+                    models.ManyToManyField("Stable"),
+                )
+            ],
+        )
+        m2m_table = f"{app_label}_pony_stables"
+        self.assertColumnExists(m2m_table, "pony_id")
+        self.assertColumnExists(m2m_table, "stable_id")
+        # Point the M2M field to self.
+        with_field_state = project_state.clone()
+        operations = [
+            migrations.AlterField(
+                model_name="Pony",
+                name="stables",
+                field=models.ManyToManyField("self"),
+            )
+        ]
+        project_state = self.apply_operations(
+            app_label, project_state, operations=operations
+        )
+        self.assertColumnExists(m2m_table, "from_pony_id")
+        self.assertColumnExists(m2m_table, "to_pony_id")
+        # Reversal.
+        self.unapply_operations(app_label, with_field_state, operations=operations)
+        self.assertColumnExists(m2m_table, "pony_id")
+        self.assertColumnExists(m2m_table, "stable_id")
+
     def test_alter_field(self):
         """
         Tests the AlterField operation.

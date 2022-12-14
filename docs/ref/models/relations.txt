@@ -37,6 +37,9 @@ Related objects reference
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
     .. method:: add(*objs, bulk=True, through_defaults=None)
+    .. method:: aadd(*objs, bulk=True, through_defaults=None)
+
+        *Asynchronous version*: ``aadd``
 
         Adds the specified model objects to the related object set.
 
@@ -75,7 +78,14 @@ Related objects reference
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
 
+        .. versionchanged:: 4.2
+
+            ``aadd()`` method was added.
+
     .. method:: create(through_defaults=None, **kwargs)
+    .. method:: acreate(through_defaults=None, **kwargs)
+
+        *Asynchronous version*: ``acreate``
 
         Creates a new object, saves it and puts it in the related object set.
         Returns the newly created object::
@@ -110,7 +120,14 @@ Related objects reference
         needed. You can use callables as values in the ``through_defaults``
         dictionary.
 
+        .. versionchanged:: 4.1
+
+            ``acreate()`` method was added.
+
     .. method:: remove(*objs, bulk=True)
+    .. method:: aremove(*objs, bulk=True)
+
+        *Asynchronous version*: ``aremove``
 
         Removes the specified model objects from the related object set::
 
@@ -150,7 +167,14 @@ Related objects reference
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
 
+        .. versionchanged:: 4.2
+
+            ``aremove()`` method was added.
+
     .. method:: clear(bulk=True)
+    .. method:: aclear(bulk=True)
+
+        *Asynchronous version*: ``aclear``
 
         Removes all objects from the related object set::
 
@@ -167,7 +191,14 @@ Related objects reference
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
 
+        .. versionchanged:: 4.2
+
+            ``aclear()`` method was added.
+
     .. method:: set(objs, bulk=True, clear=False, through_defaults=None)
+    .. method:: aset(objs, bulk=True, clear=False, through_defaults=None)
+
+        *Asynchronous version*: ``aset``
 
         Replace the set of related objects::
 
@@ -200,13 +231,19 @@ Related objects reference
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
 
+        .. versionchanged:: 4.2
+
+            ``aset()`` method was added.
+
     .. note::
 
-       Note that ``add()``, ``create()``, ``remove()``, ``clear()``, and
-       ``set()`` all apply database changes immediately for all types of
-       related fields. In other words, there is no need to call ``save()``
-       on either end of the relationship.
+       Note that ``add()``, ``aadd()``, ``create()``, ``acreate()``,
+       ``remove()``, ``aremove()``, ``clear()``, ``aclear()``, ``set()``, and
+       ``aset()`` all apply database changes immediately for all types of
+       related fields. In other words, there is no need to call
+       ``save()``/``asave()`` on either end of the relationship.
 
        If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
-       the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
-       the prefetched cache.
+       the ``add()``, ``aadd()``, ``remove()``, ``aremove()``, ``clear()``,
+       ``aclear()``, ``set()``, and ``aset()`` methods clear the prefetched
+       cache.

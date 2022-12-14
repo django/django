@@ -164,7 +164,7 @@ class Tests(TestCase):
         settings["NAME"] = None
         settings["OPTIONS"] = {"service": "django_test"}
         params = DatabaseWrapper(settings).get_connection_params()
-        self.assertEqual(params["database"], "postgres")
+        self.assertEqual(params["dbname"], "postgres")
         self.assertNotIn("service", params)
 
     def test_connect_and_rollback(self):
@@ -223,7 +223,7 @@ class Tests(TestCase):
         The transaction level can be configured with
         DATABASES ['OPTIONS']['isolation_level'].
         """
-        from psycopg2.extensions import ISOLATION_LEVEL_SERIALIZABLE as serializable
+        from django.db.backends.postgresql.psycopg_any import IsolationLevel
 
         # Since this is a django.test.TestCase, a transaction is in progress
         # and the isolation level isn't reported as 0. This test assumes that
@@ -232,14 +232,30 @@ class Tests(TestCase):
         self.assertIsNone(connection.connection.isolation_level)
 
         new_connection = connection.copy()
-        new_connection.settings_dict["OPTIONS"]["isolation_level"] = serializable
+        new_connection.settings_dict["OPTIONS"][
+            "isolation_level"
+        ] = IsolationLevel.SERIALIZABLE
         try:
             # Start a transaction so the isolation level isn't reported as 0.
             new_connection.set_autocommit(False)
             # Check the level on the psycopg2 connection, not the Django wrapper.
-            self.assertEqual(new_connection.connection.isolation_level, serializable)
+            self.assertEqual(
+                new_connection.connection.isolation_level,
+                IsolationLevel.SERIALIZABLE,
+            )
         finally:
             new_connection.close()
+
+    def test_connect_invalid_isolation_level(self):
+        self.assertIsNone(connection.connection.isolation_level)
+        new_connection = connection.copy()
+        new_connection.settings_dict["OPTIONS"]["isolation_level"] = -1
+        msg = (
+            "Invalid transaction isolation level -1 specified. Use one of the "
+            "IsolationLevel values."
+        )
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            new_connection.ensure_connection()
 
     def test_connect_no_is_usable_checks(self):
         new_connection = connection.copy()
@@ -291,12 +307,14 @@ class Tests(TestCase):
                         "::citext", do.lookup_cast(lookup, internal_type=field_type)
                     )
 
-    def test_correct_extraction_psycopg2_version(self):
-        from django.db.backends.postgresql.base import psycopg2_version
+    def test_correct_extraction_psycopg_version(self):
+        from django.db.backends.postgresql.base import Database, psycopg2_version
 
-        with mock.patch("psycopg2.__version__", "4.2.1 (dt dec pq3 ext lo64)"):
+        with mock.patch.object(Database, "__version__", "4.2.1 (dt dec pq3 ext lo64)"):
             self.assertEqual(psycopg2_version(), (4, 2, 1))
-        with mock.patch("psycopg2.__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"):
+        with mock.patch.object(
+            Database, "__version__", "4.2b0.dev1 (dt dec pq3 ext lo64)"
+        ):
             self.assertEqual(psycopg2_version(), (4, 2))
 
     @override_settings(DEBUG=True)

@@ -100,7 +100,7 @@
 <div id="summary">
   <h1>{% if exception_type %}{{ exception_type }}{% else %}Report{% endif %}
       {% if request %} at {{ request.path_info }}{% endif %}</h1>
-  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% else %}No exception message supplied{% endif %}</pre>
+  <pre class="exception_value">{% if exception_value %}{{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}{% else %}No exception message supplied{% endif %}</pre>
   <table class="meta">
 {% if request %}
     <tr>
@@ -242,7 +242,7 @@
                 </ol>
               {% endif %}
               <ol start="{{ frame.lineno }}" class="context-line">
-                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}</pre>{% if not is_email %} <span>…</span>{% endif %}</li>
+                <li onclick="toggle('pre{{ frame.id }}', 'post{{ frame.id }}')"><pre>{{ frame.context_line }}{{ frame.colno }}</pre>{% if not is_email %} <span>…</span>{% endif %}</li>
               </ol>
               {% if frame.post_context and not is_email  %}
                 <ol start='{{ frame.lineno|add:"1" }}' class="post-context" id="post{{ frame.id }}">
@@ -327,10 +327,10 @@ The above exception ({{ frame.exc_cause|force_escape }}) was the direct cause of
 {% else %}
 During handling of the above exception ({{ frame.exc_cause|force_escape }}), another exception occurred:
 {% endif %}{% endif %}{% endifchanged %}  {% if frame.tb %}File "{{ frame.filename }}"{% if frame.context_line %}, line {{ frame.lineno }}{% endif %}, in {{ frame.function }}
-{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}{% endfor %}
+{% if frame.context_line %}    {% spaceless %}{{ frame.context_line }}{% endspaceless %}{{ frame.tb_area_colno }}{% endif %}{% elif forloop.first %}None{% else %}Traceback: None{% endif %}{% endfor %}
 
 Exception Type: {{ exception_type }}{% if request %} at {{ request.path_info }}{% endif %}
-Exception Value: {{ exception_value|force_escape }}
+Exception Value: {{ exception_value|force_escape }}{% if exception_notes %}{{ exception_notes }}{% endif %}
 </textarea>
   <br><br>
   <input type="submit" value="Share this traceback on a public website">

@@ -1,4 +1,5 @@
 import functools
+import itertools
 import re
 import sys
 import types
@@ -15,7 +16,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import get_docs_version
+from django.utils.version import PY311, get_docs_version
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
@@ -110,7 +111,7 @@ class SafeExceptionReporterFilter:
 
     cleansed_substitute = "********************"
     hidden_settings = _lazy_re_compile(
-        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE", flags=re.I
+        "API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.I
     )
 
     def cleanse_setting(self, key, value):
@@ -118,10 +119,13 @@ class SafeExceptionReporterFilter:
         Cleanse an individual setting key/value of sensitive content. If the
         value is a dictionary, recursively cleanse the keys in that dictionary.
         """
-        try:
-            is_sensitive = self.hidden_settings.search(key)
-        except TypeError:
-            is_sensitive = False
+        if key == settings.SESSION_COOKIE_NAME:
+            is_sensitive = True
+        else:
+            try:
+                is_sensitive = self.hidden_settings.search(key)
+            except TypeError:
+                is_sensitive = False
 
         if is_sensitive:
             cleansed = self.cleansed_substitute
@@ -157,6 +161,14 @@ class SafeExceptionReporterFilter:
         if not hasattr(request, "META"):
             return {}
         return {k: self.cleanse_setting(k, v) for k, v in request.META.items()}
+
+    def get_safe_cookies(self, request):
+        """
+        Return a dictionary of request.COOKIES with sensitive values redacted.
+        """
+        if not hasattr(request, "COOKIES"):
+            return {}
+        return {k: self.cleanse_setting(k, v) for k, v in request.COOKIES.items()}
 
     def is_active(self, request):
         """
@@ -359,6 +371,7 @@ class ExceptionReporter:
             "frames": frames,
             "request": self.request,
             "request_meta": self.filter.get_safe_request_meta(self.request),
+            "request_COOKIES_items": self.filter.get_safe_cookies(self.request).items(),
             "user_str": user_str,
             "filtered_POST_items": list(
                 self.filter.get_post_parameters(self.request).items()
@@ -376,7 +389,6 @@ class ExceptionReporter:
         if self.request is not None:
             c["request_GET_items"] = self.request.GET.items()
             c["request_FILES_items"] = self.request.FILES.items()
-            c["request_COOKIES_items"] = self.request.COOKIES.items()
             c["request_insecure_uri"] = self._get_raw_insecure_uri()
             c["raising_view_name"] = get_caller(self.request)
 
@@ -385,6 +397,8 @@ class ExceptionReporter:
             c["exception_type"] = self.exc_type.__name__
         if self.exc_value:
             c["exception_value"] = str(self.exc_value)
+            if exc_notes := getattr(self.exc_value, "__notes__", None):
+                c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:
             c["lastframe"] = frames[-1]
         return c
@@ -533,6 +547,24 @@ class ExceptionReporter:
                 pre_context = []
                 context_line = "<source code not available>"
                 post_context = []
+
+            colno = tb_area_colno = ""
+            if PY311:
+                _, _, start_column, end_column = next(
+                    itertools.islice(
+                        tb.tb_frame.f_code.co_positions(), tb.tb_lasti // 2, None
+                    )
+                )
+                if start_column and end_column:
+                    underline = "^" * (end_column - start_column)
+                    spaces = " " * (start_column + len(str(lineno + 1)) + 2)
+                    colno = f"\n{spaces}{underline}"
+                    tb_area_spaces = " " * (
+                        4
+                        + start_column
+                        - (len(context_line) - len(context_line.lstrip()))
+                    )
+                    tb_area_colno = f"\n{tb_area_spaces}{underline}"
             yield {
                 "exc_cause": exc_cause,
                 "exc_cause_explicit": exc_cause_explicit,
@@ -549,6 +581,8 @@ class ExceptionReporter:
                 "context_line": context_line,
                 "post_context": post_context,
                 "pre_context_lineno": pre_context_lineno + 1,
+                "colno": colno,
+                "tb_area_colno": tb_area_colno,
             }
             tb = tb.tb_next
 

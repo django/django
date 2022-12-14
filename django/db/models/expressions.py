@@ -7,7 +7,7 @@ from collections import defaultdict
 from decimal import Decimal
 from uuid import UUID
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
@@ -161,6 +161,9 @@ class Combinable:
         raise NotImplementedError(
             "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
+
+    def __invert__(self):
+        return NegatedExpression(self)
 
 
 class BaseExpression:
@@ -401,6 +404,12 @@ class BaseExpression:
             ]
         )
         return clone
+
+    def get_refs(self):
+        refs = set()
+        for expr in self.get_source_expressions():
+            refs |= expr.get_refs()
+        return refs
 
     def copy(self):
         return copy.copy(self)
@@ -827,6 +836,9 @@ class F(Combinable):
     def __hash__(self):
         return hash(self.name)
 
+    def copy(self):
+        return copy.copy(self)
+
 
 class ResolvedOuterRef(F):
     """
@@ -949,6 +961,8 @@ class Func(SQLiteNumericMixin, Expression):
                 if empty_result_set_value is NotImplemented:
                     raise
                 arg_sql, arg_params = compiler.compile(Value(empty_result_set_value))
+            except FullResultSet:
+                arg_sql, arg_params = compiler.compile(Value(True))
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
@@ -1159,6 +1173,9 @@ class Ref(Expression):
         # just a reference to the name of `source`.
         return self
 
+    def get_refs(self):
+        return {self.refs}
+
     def relabeled_clone(self, relabels):
         return self
 
@@ -1252,6 +1269,57 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
         return "{}({})".format(self.__class__.__name__, self.expression)
 
 
+class NegatedExpression(ExpressionWrapper):
+    """The logical negation of a conditional expression."""
+
+    def __init__(self, expression):
+        super().__init__(expression, output_field=fields.BooleanField())
+
+    def __invert__(self):
+        return self.expression.copy()
+
+    def as_sql(self, compiler, connection):
+        try:
+            sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            features = compiler.connection.features
+            if not features.supports_boolean_expr_in_select_clause:
+                return "1=1", ()
+            return compiler.compile(Value(True))
+        ops = compiler.connection.ops
+        # Some database backends (e.g. Oracle) don't allow EXISTS() and filters
+        # to be compared to another expression unless they're wrapped in a CASE
+        # WHEN.
+        if not ops.conditional_expression_supported_in_where_clause(self.expression):
+            return f"CASE WHEN {sql} = 0 THEN 1 ELSE 0 END", params
+        return f"NOT {sql}", params
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        resolved = super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
+        if not getattr(resolved.expression, "conditional", False):
+            raise TypeError("Cannot negate non-conditional expressions.")
+        return resolved
+
+    def select_format(self, compiler, sql, params):
+        # Wrap boolean expressions with a CASE WHEN expression if a database
+        # backend (e.g. Oracle) doesn't support boolean expression in SELECT or
+        # GROUP BY list.
+        expression_supported_in_where_clause = (
+            compiler.connection.ops.conditional_expression_supported_in_where_clause
+        )
+        if (
+            not compiler.connection.features.supports_boolean_expr_in_select_clause
+            # Avoid double wrapping.
+            and expression_supported_in_where_clause(self.expression)
+        ):
+            sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
+        return sql, params
+
+
 @deconstructible(path="django.db.models.When")
 class When(Expression):
     template = "WHEN %(condition)s THEN %(result)s"
@@ -1310,14 +1378,6 @@ class When(Expression):
         template_params = extra_context
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
-        # Filters that match everything are handled as empty strings in the
-        # WHERE clause, but in a CASE WHEN expression they must use a predicate
-        # that's always True.
-        if condition_sql == "":
-            if connection.features.supports_boolean_expr_in_select_clause:
-                condition_sql, condition_params = compiler.compile(Value(True))
-            else:
-                condition_sql, condition_params = "1=1", ()
         template_params["condition"] = condition_sql
         result_sql, result_params = compiler.compile(self.result)
         template_params["result"] = result_sql
@@ -1404,14 +1464,17 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
+        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
             except EmptyResultSet:
                 continue
+            except FullResultSet:
+                default_sql, default_params = compiler.compile(case.result)
+                break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
-        default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner
@@ -1486,33 +1549,9 @@ class Exists(Subquery):
     template = "EXISTS(%(subquery)s)"
     output_field = fields.BooleanField()
 
-    def __init__(self, queryset, negated=False, **kwargs):
-        self.negated = negated
+    def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)
         self.query = self.query.exists()
-
-    def __invert__(self):
-        clone = self.copy()
-        clone.negated = not self.negated
-        return clone
-
-    def as_sql(self, compiler, connection, **extra_context):
-        try:
-            sql, params = super().as_sql(
-                compiler,
-                connection,
-                **extra_context,
-            )
-        except EmptyResultSet:
-            if self.negated:
-                features = compiler.connection.features
-                if not features.supports_boolean_expr_in_select_clause:
-                    return "1=1", ()
-                return compiler.compile(Value(True))
-            raise
-        if self.negated:
-            sql = "NOT {}".format(sql)
-        return sql, params
 
     def select_format(self, compiler, sql, params):
         # Wrap EXISTS() with a CASE WHEN expression if a database backend

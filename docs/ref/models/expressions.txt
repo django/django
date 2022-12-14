@@ -255,6 +255,19 @@ is null) after companies that have been contacted::
     from django.db.models import F
     Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
 
+Using ``F()`` with logical operations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+``F()`` expressions that output ``BooleanField`` can be logically negated with
+the inversion operator ``~F()``. For example, to swap the activation status of
+companies::
+
+    from django.db.models import F
+
+    Company.objects.update(is_active=~F('is_active'))
+
 .. _func-expressions:
 
 ``Func()`` expressions

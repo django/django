@@ -112,16 +112,15 @@ def iri_to_uri(iri):
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of RFC 3987, slightly simplified
-    since the input is assumed to be a string rather than an arbitrary byte
-    stream.
+    This is the algorithm from RFC 3987 Section 3.1, slightly simplified since
+    the input is assumed to be a string rather than an arbitrary byte stream.
 
     Take an IRI (string or UTF-8 bytes, e.g. '/I ♥ Django/' or
     b'/I \xe2\x99\xa5 Django/') and return a string containing the encoded
     result with ASCII chars only (e.g. '/I%20%E2%99%A5%20Django/').
     """
     # The list of safe characters here is constructed from the "reserved" and
-    # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
+    # "unreserved" characters specified in RFC 3986 Sections 2.2 and 2.3:
     #     reserved    = gen-delims / sub-delims
     #     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
     #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
@@ -130,7 +129,7 @@ def iri_to_uri(iri):
     # Of the unreserved characters, urllib.parse.quote() already considers all
     # but the ~ safe.
     # The % character is also added to the list of safe characters here, as the
-    # end of section 3.1 of RFC 3987 specifically mentions that % must not be
+    # end of RFC 3987 Section 3.1 specifically mentions that % must not be
     # converted.
     if iri is None:
         return iri
@@ -161,7 +160,7 @@ def uri_to_iri(uri):
     Convert a Uniform Resource Identifier(URI) into an Internationalized
     Resource Identifier(IRI).
 
-    This is the algorithm from section 3.2 of RFC 3987, excluding step 4.
+    This is the algorithm from RFC 3987 Section 3.2, excluding step 4.
 
     Take an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and return
     a string containing the encoded result (e.g. '/I%20♥%20Django/').
@@ -197,13 +196,13 @@ def escape_uri_path(path):
     Escape the unsafe characters from the path portion of a Uniform Resource
     Identifier (URI).
     """
-    # These are the "reserved" and "unreserved" characters specified in
-    # sections 2.2 and 2.3 of RFC 2396:
+    # These are the "reserved" and "unreserved" characters specified in RFC
+    # 3986 Sections 2.2 and 2.3:
     #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
     #   unreserved  = alphanum | mark
     #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
     # The list of safe characters here is constructed subtracting ";", "=",
-    # and "?" according to section 3.3 of RFC 2396.
+    # and "?" according to RFC 3986 Section 3.3.
     # The reason for not subtracting and escaping "/" is that we are escaping
     # the entire path, not a path segment.
     return quote(path, safe="/:@&+$,-_.!~*'()")
@@ -216,7 +215,7 @@ def punycode(domain):
 
 def repercent_broken_unicode(path):
     """
-    As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
+    As per RFC 3987 Section 3.2, step three of converting a URI into an IRI,
     repercent-encode any octet produced that is not part of a strictly legal
     UTF-8 octet sequence.
     """

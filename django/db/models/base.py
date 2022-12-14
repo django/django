@@ -4,6 +4,8 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
+from asgiref.sync import sync_to_async
+
 import django
 from django.apps import apps
 from django.conf import settings
@@ -46,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -454,7 +456,7 @@ class ModelState:
     fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__
@@ -735,7 +737,15 @@ class Model(metaclass=ModelBase):
             if field.is_cached(self):
                 field.delete_cached_value(self)
 
+        # Clear cached private relations.
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
+
+    async def arefresh_from_db(self, using=None, fields=None):
+        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
 
     def serializable_value(self, field_name):
         """
@@ -809,6 +819,18 @@ class Model(metaclass=ModelBase):
         )
 
     save.alters_data = True
+
+    async def asave(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        return await sync_to_async(self.save)(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
+
+    asave.alters_data = True
 
     def save_base(
         self,
@@ -1110,6 +1132,14 @@ class Model(metaclass=ModelBase):
         return collector.delete()
 
     delete.alters_data = True
+
+    async def adelete(self, using=None, keep_parents=False):
+        return await sync_to_async(self.delete)(
+            using=using,
+            keep_parents=keep_parents,
+        )
+
+    adelete.alters_data = True
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)

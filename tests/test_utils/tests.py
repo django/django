@@ -235,10 +235,6 @@ class AssertNumQueriesTests(TestCase):
         self.assertNumQueries(2, test_func)
 
 
-@unittest.skipUnless(
-    connection.vendor != "sqlite" or not connection.is_in_memory_db(),
-    "For SQLite in-memory tests, closing the connection destroys the database.",
-)
 class AssertNumQueriesUponConnectionTests(TransactionTestCase):
     available_apps = []
 

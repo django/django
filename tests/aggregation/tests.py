@@ -34,6 +34,7 @@ from django.db.models.functions import (
     Cast,
     Coalesce,
     Greatest,
+    Lower,
     Now,
     Pi,
     TruncDate,
@@ -1257,11 +1258,11 @@ class AggregateTestCase(TestCase):
         self.assertEqual(author.sum_age, other_author.sum_age)
 
     def test_aggregate_over_aggregate(self):
-        msg = "Cannot compute Avg('age'): 'age' is an aggregate"
+        msg = "Cannot resolve keyword 'age_agg' into field."
         with self.assertRaisesMessage(FieldError, msg):
-            Author.objects.annotate(age_alias=F("age"),).aggregate(
-                age=Sum(F("age")),
-                avg_age=Avg(F("age")),
+            Author.objects.aggregate(
+                age_agg=Sum(F("age")),
+                avg_age=Avg(F("age_agg")),
             )
 
     def test_annotated_aggregate_over_annotated_aggregate(self):
@@ -2084,3 +2085,78 @@ class AggregateTestCase(TestCase):
             exists=Exists(Author.objects.extra(where=["1=0"])),
         )
         self.assertEqual(len(qs), 6)
+
+    def test_aggregation_over_annotation_shared_alias(self):
+        self.assertEqual(
+            Publisher.objects.annotate(agg=Count("book__authors"),).aggregate(
+                agg=Count("agg"),
+            ),
+            {"agg": 5},
+        )
+
+
+class AggregateAnnotationPruningTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a1 = Author.objects.create(age=1)
+        cls.a2 = Author.objects.create(age=2)
+        cls.p1 = Publisher.objects.create(num_awards=1)
+        cls.p2 = Publisher.objects.create(num_awards=0)
+        cls.b1 = Book.objects.create(
+            name="b1",
+            publisher=cls.p1,
+            pages=100,
+            rating=4.5,
+            price=10,
+            contact=cls.a1,
+            pubdate=datetime.date.today(),
+        )
+        cls.b1.authors.add(cls.a1)
+        cls.b2 = Book.objects.create(
+            name="b2",
+            publisher=cls.p2,
+            pages=1000,
+            rating=3.2,
+            price=50,
+            contact=cls.a2,
+            pubdate=datetime.date.today(),
+        )
+        cls.b2.authors.add(cls.a1, cls.a2)
+
+    def test_unused_aliased_aggregate_pruned(self):
+        with CaptureQueriesContext(connection) as ctx:
+            cnt = Book.objects.alias(
+                authors_count=Count("authors"),
+            ).count()
+        self.assertEqual(cnt, 2)
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
+        self.assertNotIn("authors_count", sql)
+
+    def test_non_aggregate_annotation_pruned(self):
+        with CaptureQueriesContext(connection) as ctx:
+            Book.objects.annotate(
+                name_lower=Lower("name"),
+            ).count()
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 1, "No subquery wrapping required")
+        self.assertNotIn("name_lower", sql)
+
+    def test_unreferenced_aggregate_annotation_pruned(self):
+        with CaptureQueriesContext(connection) as ctx:
+            cnt = Book.objects.annotate(
+                authors_count=Count("authors"),
+            ).count()
+        self.assertEqual(cnt, 2)
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
+        self.assertNotIn("authors_count", sql)
+
+    def test_referenced_aggregate_annotation_kept(self):
+        with CaptureQueriesContext(connection) as ctx:
+            Book.objects.annotate(
+                authors_count=Count("authors"),
+            ).aggregate(Avg("authors_count"))
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
+        self.assertEqual(sql.count("authors_count"), 2)

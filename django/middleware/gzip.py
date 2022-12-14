@@ -42,7 +42,7 @@ class GZipMiddleware(MiddlewareMixin):
             response.headers["Content-Length"] = str(len(response.content))
 
         # If there is a strong ETag, make it weak to fulfill the requirements
-        # of RFC 7232 section-2.1 while also allowing conditional request
+        # of RFC 9110 Section 8.8.1 while also allowing conditional request
         # matches on ETags.
         etag = response.get("ETag")
         if etag and etag.startswith('"'):
