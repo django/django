@@ -122,8 +122,8 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the ``SECRET_KEY`` or ``SECRET_KEY_FALLBACKS`` are not kept secret and
-    you are using the**
+    **If the** ``SECRET_KEY`` **or** ``SECRET_KEY_FALLBACKS`` **are not kept
+    secret and you are using the**
     ``django.contrib.sessions.serializers.PickleSerializer``, **this can lead
     to arbitrary remote code execution.**
 
