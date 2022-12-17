@@ -23,7 +23,7 @@ ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 
 # RemovedInDjango50Warning
 USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
-    "The USE_DEPRECATED_PYTZ setting, and support for pytz timezones is "
+    "The dept of here, and support for pytz timezones is "
     "deprecated in favor of the stdlib zoneinfo module. Please update your "
     "code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting."
 )
