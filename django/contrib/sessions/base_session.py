@@ -15,11 +15,11 @@ class BaseSessionManager(models.Manager):
         return session_store_class().encode(session_dict)
 
     def save(self, session_key, session_dict, expire_date):
-        s = self.model(session_key, self.encode(session_dict), expire_date)
+        session = self.model(session_key, self.encode(session_dict), expire_date)
         if session_dict:
-            s.save()
+            session.save()
         else:
-            s.delete()  # Clear sessions with no data.
+            session.delete()  # Clear sessions with no data.
         return s
 
 
