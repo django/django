@@ -272,7 +272,7 @@ class ForwardManyToOneDescriptor:
                     self.field.remote_field.model._meta.object_name,
                 )
             )
-        elif value is not None:
+        elif value is not None and instance.pk is not None:
             if instance._state.db is None:
                 instance._state.db = router.db_for_write(
                     instance.__class__, instance=value
