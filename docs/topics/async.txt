@@ -85,7 +85,7 @@ With some exceptions, Django can run ORM queries asynchronously as well::
 
 Detailed notes can be found in :ref:`async-queries`, but in short:
 
-* All ``QuerySet`` methods that cause a SQL query to occur have an
+* All ``QuerySet`` methods that cause an SQL query to occur have an
   ``a``-prefixed asynchronous variant.
 
 * ``async for`` is supported on all QuerySets (including the output of
