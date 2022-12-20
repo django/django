@@ -438,6 +438,9 @@ Miscellaneous
   ``DatabaseIntrospection.get_table_description()`` rather than
   ``internal_size`` for ``CharField``.
 
+* The minimum supported version of ``asgiref`` is increased from 3.5.2 to
+  3.6.0.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
