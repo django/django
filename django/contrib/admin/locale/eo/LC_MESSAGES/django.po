@@ -7,15 +7,16 @@
 # Dinu Gherman <gherman@darwin.in-berlin.de>, 2011
 # kristjan <kristjan.schmidt@googlemail.com>, 2012
 # Matthieu Desplantes <matmututu@gmail.com>, 2021
-# Nikolay Korotkiy <sikmir@gmail.com>, 2017
+# Meiyer <interdist+translations@gmail.com>, 2022
+# Nikolay Korotkiy <sikmir@disroot.org>, 2017
 # Adamo Mesha <adam.raizen@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-13 08:23+0000\n"
-"Last-Translator: Matthieu Desplantes <matmututu@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -86,8 +87,8 @@ msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
 "that both fields may be case-sensitive."
 msgstr ""
-"Bonvolu eniri la ĝustan %(username)s-n kaj pasvorton por personara konto. "
-"Notu, ke ambaŭ kampoj povas esti usklecodistinga."
+"Bonvolu enigi la ĝustajn %(username)sn kaj pasvorton por personara konto. "
+"Notu, ke ambaŭ kampoj povas esti uskleco-distingaj."
 
 msgid "Action:"
 msgstr "Ago:"
@@ -97,7 +98,7 @@ msgid "Add another %(verbose_name)s"
 msgstr "Aldoni alian %(verbose_name)sn"
 
 msgid "Remove"
-msgstr "Forigu"
+msgstr "Forigi"
 
 msgid "Addition"
 msgstr "Aldono"
@@ -139,22 +140,22 @@ msgstr "protokoleroj"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "Aldonis “%(object)s”"
+msgstr "Aldono de “%(object)s”"
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
-msgstr ""
+msgstr "Ŝanĝo de “%(object)s” — %(changes)s"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Forigo de “%(object)s”"
 
 msgid "LogEntry Object"
 msgstr "Protokolera objekto"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "Aldonita(j) {name} “{object}”."
 
 msgid "Added."
 msgstr "Aldonita."
@@ -164,15 +165,15 @@ msgstr "kaj"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
-msgstr ""
+msgstr "Ŝanĝita(j) {fields} por {name} “{object}”."
 
 #, python-brace-format
 msgid "Changed {fields}."
-msgstr "Ŝanĝita {fields}."
+msgstr "Ŝanĝita(j) {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "Forigita(j) {name} “{object}”."
 
 msgid "No fields changed."
 msgstr "Neniu kampo ŝanĝita."
@@ -185,7 +186,7 @@ msgstr ""
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr ""
+msgstr "La {name} “{obj}” estis sukcese aldonita(j)."
 
 msgid "You may edit it again below."
 msgstr "Eblas redakti ĝin sube."
@@ -218,15 +219,14 @@ msgid ""
 "Items must be selected in order to perform actions on them. No items have "
 "been changed."
 msgstr ""
-"Elementoj devas esti elektitaj por elfari agojn sur ilin. Neniu elemento "
-"estis ŝanĝita."
+"Elementoj devas esti elektitaj por agi je ili. Neniu elemento estis ŝanĝita."
 
 msgid "No action selected."
 msgstr "Neniu ago elektita."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr ""
+msgstr "La %(name)s “%(obj)s” estis sukcese forigita(j)."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
@@ -267,8 +267,9 @@ msgstr "0 el %(cnt)s elektita"
 msgid "Change history: %s"
 msgstr "Ŝanĝa historio: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -282,10 +283,10 @@ msgstr ""
 "protektitajn rilatajn objektojn: %(related_objects)s"
 
 msgid "Django site admin"
-msgstr "Djanga reteja administrado"
+msgstr "Dĵanga reteja administrado"
 
 msgid "Django administration"
-msgstr "Djanga administrado"
+msgstr "Dĵanga administrado"
 
 msgid "Site administration"
 msgstr "Reteja administrado"
@@ -295,7 +296,7 @@ msgstr "Ensaluti"
 
 #, python-format
 msgid "%(app)s administration"
-msgstr "%(app)s administrado"
+msgstr "Administrado de %(app)s"
 
 msgid "Page not found"
 msgstr "Paĝo ne trovita"
@@ -321,7 +322,7 @@ msgid ""
 msgstr ""
 
 msgid "Run the selected action"
-msgstr "Lanĉi la elektita agon"
+msgstr "Lanĉi la elektitan agon"
 
 msgid "Go"
 msgstr "Ek"
@@ -338,7 +339,7 @@ msgstr "Viŝi elekton"
 
 #, python-format
 msgid "Models in the %(name)s application"
-msgstr "Modeloj en la %(name)s aplikaĵo"
+msgstr "Modeloj en la aplikaĵo “%(name)s”"
 
 msgid "Add"
 msgstr "Aldoni"
@@ -511,10 +512,16 @@ msgstr ""
 "paĝon. Ĉu vi ŝatus ensaluti per alia konto?"
 
 msgid "Forgotten your password or username?"
-msgstr "Ĉu vi forgesis vian pasvorton aŭ salutnomo?"
+msgstr "Ĉu vi forgesis vian pasvorton aŭ vian salutnomon?"
 
 msgid "Toggle navigation"
 msgstr "Ŝalti navigadon"
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
 
 msgid "Date/time"
 msgstr "Dato/horo"
@@ -524,6 +531,12 @@ msgstr "Uzanto"
 
 msgid "Action"
 msgstr "Ago"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -581,8 +594,12 @@ msgstr "Aldoni alian %(model)sn"
 msgid "Delete selected %(model)s"
 msgstr "Forigi elektitan %(model)sn"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Dankon pro pasigo de kvalita tempon kun la retejo hodiaŭ."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Ensaluti denove"
@@ -607,7 +624,7 @@ msgid "Password reset"
 msgstr "Pasvorta rekomencigo"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Via pasvorto estis ŝanĝita. Vi povas iri antaŭen kaj ensaluti nun."
+msgstr "Via pasvorto estis ŝanĝita. Vi povas ensaluti nun."
 
 msgid "Password reset confirmation"
 msgstr "Konfirmo de restarigo de pasvorto"
@@ -643,7 +660,7 @@ msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Se vi ne ricevas retmesaĝon, bonvolu certiĝi, ke vi entajpis la adreson, per "
+"Se vi ne ricevas retmesaĝon, bonvole certiĝu ke vi entajpis la adreson per "
 "kiu vi registriĝis, kaj kontrolu en via spamujo."
 
 #, python-format
