@@ -6,7 +6,7 @@
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Carlos Leite <caduado@gmail.com>, 2019
 # Carlos Leite <caduado@gmail.com>, 2019
-# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
@@ -19,6 +19,7 @@
 # João Paulo Andrade <joaopaulo.a.p@gmail.com>, 2018
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marssal Jr. <marssaljr@gmail.com>, 2022
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Marco Rougeth <marco@rougeth.com>, 2015
 # Otávio Reis <otaviocha@gmail.com>, 2018
@@ -34,8 +35,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Tomaz Marcelino Cunha Neto <tomazmcn@gmail.com>\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Marssal Jr. <marssaljr@gmail.com>, 2022\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -280,12 +281,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificado com sucesso."
 msgstr[1] "%(count)s %(name)s modificados com sucesso."
+msgstr[2] "%(count)s %(name)s modificados com sucesso."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selecionado"
 msgstr[1] "Todos %(total_count)s selecionados"
+msgstr[2] "Todos %(total_count)s selecionados"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -569,10 +572,10 @@ msgid "Action"
 msgstr "Ação"
 
 msgid "entry"
-msgstr ""
+msgstr "registro"
 
 msgid "entries"
-msgstr ""
+msgstr "registros"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -598,6 +601,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -632,7 +636,7 @@ msgstr "Excluir %(model)s selecionado"
 
 #, python-format
 msgid "View selected %(model)s"
-msgstr ""
+msgstr "Visualizar %(model)s selecionados"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Obrigado por passar algum tempo de qualidade com o site hoje."

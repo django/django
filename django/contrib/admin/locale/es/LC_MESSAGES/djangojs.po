@@ -6,15 +6,15 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Uriel Medina <urimeba511@gmail.com>, 2020-2022
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-02-11 05:37+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2022\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -80,6 +80,7 @@ msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s de %(cnt)s seleccionado"
 msgstr[1] "%(sel)s de  %(cnt)s seleccionados"
+msgstr[2] "%(sel)s de  %(cnt)s seleccionados"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -126,12 +127,14 @@ msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Nota: Usted esta a %s horas por delante de la hora del servidor."
 msgstr[1] "Nota: Usted va %s horas por delante de la hora del servidor."
+msgstr[2] "Nota: Usted va %s horas por delante de la hora del servidor."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Nota: Usted esta a %s hora de retraso de tiempo de servidor."
 msgstr[1] "Nota: Usted va %s horas por detrás de la hora del servidor."
+msgstr[2] "Nota: Usted va %s horas por detrás de la hora del servidor."
 
 msgid "Choose a Time"
 msgstr "Elija una Hora"
@@ -265,6 +268,12 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Ya ha enviado este formulario. ¿Está seguro de querer enviarlo de nuevo?"
 
 msgid "Show"
 msgstr "Mostrar"

@@ -23,8 +23,10 @@
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # José Luis <alagunajs@gmail.com>, 2016
+# José Luis <alagunajs@gmail.com>, 2016
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011,2013
+# Luigy, 2019
 # Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
@@ -33,16 +35,19 @@
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # ntrrgc <ntrrgc@gmail.com>, 2013
 # Pablo, 2015
+# Pablo, 2015
+# Sebastián Magrí, 2013
 # Sebastián Magrí, 2013
 # Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Veronicabh <vero.blazher@gmail.com>, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: mpachas <miguel.pachas.garcia@gmail.com>\n"
+"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"Last-Translator: mpachas <miguel.pachas.garcia@gmail.com>, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -437,6 +442,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este valor tenga al menos %(limit_value)d carácter(es) "
 "(tiene%(show_value)d)."
+msgstr[2] ""
+"Asegúrese de que este valor tenga al menos %(limit_value)d carácter(es) "
+"(tiene%(show_value)d)."
 
 #, python-format
 msgid ""
@@ -451,6 +459,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
 "%(show_value)d)."
+msgstr[2] ""
+"Asegúrese de que este valor tenga menos de %(limit_value)d caracteres (tiene "
+"%(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Introduzca un número."
@@ -460,12 +471,14 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Asegúrese de que no hay más de %(max)s dígito en total."
 msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos en total."
+msgstr[2] "Asegúrese de que no haya más de %(max)s dígitos en total."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Asegúrese de que no haya más de %(max)s dígito decimal."
 msgstr[1] "Asegúrese de que no haya más de %(max)s dígitos decimales."
+msgstr[2] "Asegúrese de que no haya más de %(max)s dígitos decimales."
 
 #, python-format
 msgid ""
@@ -475,6 +488,8 @@ msgid_plural ""
 msgstr[0] ""
 "Asegúrese de que no haya más de %(max)s dígito antes del punto decimal"
 msgstr[1] ""
+"Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
+msgstr[2] ""
 "Asegúrese de que no haya más de %(max)s dígitos antes del punto decimal."
 
 #, python-format
@@ -768,6 +783,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Asegúrese de que este nombre de archivo tenga como máximo %(max)d "
 "carácter(es) (tiene %(length)d)."
+msgstr[2] ""
+"Asegúrese de que este nombre de archivo tenga como máximo %(max)d "
+"carácter(es) (tiene %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -819,12 +837,14 @@ msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
 msgstr[0] "Por favor, envíe %(num)d formulario como máximo."
 msgstr[1] "Por favor, envíe %(num)d formularios como máximo."
+msgstr[2] "Por favor, envíe %(num)d formularios como máximo."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
 msgstr[0] "Por favor, envíe %(num)d formulario como mínimo."
 msgstr[1] "Por favor, envíe %(num)d formularios como mínimo."
+msgstr[2] "Por favor, envíe %(num)d formularios como mínimo."
 
 msgid "Order"
 msgstr "Orden"
@@ -897,6 +917,7 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
+msgstr[2] "%(size)d bytes"
 
 #, python-format
 msgid "%s KB"
@@ -1166,36 +1187,42 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d años"
 msgstr[1] "%(num)d años"
+msgstr[2] "%(num)d años"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mes"
 msgstr[1] "%(num)d meses"
+msgstr[2] "%(num)d meses"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d semana"
 msgstr[1] "%(num)d semanas"
+msgstr[2] "%(num)d semanas"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d día"
 msgstr[1] "%(num)d días"
+msgstr[2] "%(num)d días"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d hora"
 msgstr[1] "%(num)d horas"
+msgstr[2] "%(num)d horas"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minutos"
 msgstr[1] "%(num)d minutes"
+msgstr[2] "%(num)d minutes"
 
 msgid "Forbidden"
 msgstr "Prohibido"
@@ -1219,23 +1246,23 @@ msgid ""
 "enable them, at least for this site, or for HTTPS connections, or for “same-"
 "origin” requests."
 msgstr ""
-"Si ha configurado su navegador para deshabilitar los encabezados \"Referer"
-"\", vuelva a habilitarlos, al menos para este sitio, o para conexiones "
-"HTTPS, o para solicitudes del \"mismo origen\"."
+"Si ha configurado su navegador para deshabilitar los encabezados "
+"\"Referer\", vuelva a habilitarlos, al menos para este sitio, o para "
+"conexiones HTTPS, o para solicitudes del \"mismo origen\"."
 
 msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Si esta utilizando la etiqueta <meta name=\"referrer\" content=\"no-referrer"
-"\"> o incluyendo el encabezado \"Referrer-Policy: no-referrer\", elimínelos. "
-"La protección CSRF requiere que el encabezado \"Referer\" realice una "
-"comprobación estricta del referente. Si le preocupa la privacidad, utilice "
-"alternativas como <a rel=\"noreferrer\" …> para los enlaces a sitios de "
-"terceros."
+"Si esta utilizando la etiqueta <meta name=\"referrer\" content=\"no-"
+"referrer\"> o incluyendo el encabezado \"Referrer-Policy: no-referrer\", "
+"elimínelos. La protección CSRF requiere que el encabezado \"Referer\" "
+"realice una comprobación estricta del referente. Si le preocupa la "
+"privacidad, utilice alternativas como <a rel=\"noreferrer\" …> para los "
+"enlaces a sitios de terceros."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1251,8 +1278,8 @@ msgid ""
 "them, at least for this site, or for “same-origin” requests."
 msgstr ""
 "Si ha configurado su navegador para deshabilitar las cookies, vuelva a "
-"habilitarlas, al menos para este sitio o para solicitudes del \"mismo origen"
-"\"."
+"habilitarlas, al menos para este sitio o para solicitudes del \"mismo "
+"origen\"."
 
 msgid "More information is available with DEBUG=True."
 msgstr "Más información disponible si se establece DEBUG=True."
@@ -1329,14 +1356,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Estás viendo esta página porque <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> está en su archivo de configuración y no ha configurado "
-"ninguna URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> está en su archivo de configuración y no ha "
+"configurado ninguna URL."
 
 msgid "Django Documentation"
 msgstr "Documentación de Django"
