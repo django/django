@@ -125,9 +125,10 @@ How we make decisions
 =====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on |django-developers| about a feature. In these votes we
-follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
+have informal votes on |django-developers| or the Django Forum about a feature.
+In these votes we follow the voting style invented by Apache and used on Python
+itself, where votes are given as +1, +0, -0, or -1.
+Roughly translated, these votes mean:
 
 * +1: "I love the idea and I'm strongly committed to it."
 
@@ -138,29 +139,28 @@ votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
 * -1: "I strongly disagree and would be very unhappy to see the idea turn
   into reality."
 
-Although these votes on |django-developers| are informal, they'll be taken very
-seriously. After a suitable voting period, if an obvious consensus arises we'll
-follow the votes.
+Although these votes are informal, they'll be taken very seriously. After a
+suitable voting period, if an obvious consensus arises we'll follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
 if the discussion toward a consensus fizzles out without a concrete decision,
-the decision may be deferred to the :ref:`technical board <technical-board>`.
+the decision may be deferred to the :ref:`steering council <steering-council>`.
 
-Internally, the technical board will use the same voting mechanism. A
+Internally, the steering council will use the same voting mechanism. A
 proposition will be considered carried if:
 
-* There are at least three "+1" votes from members of the technical board.
+* There are at least three "+1" votes from members of the steering council.
 
-* There is no "-1" vote from any member of the technical board.
+* There is no "-1" vote from any member of the steering council.
 
 Votes should be submitted within a week.
 
-Since this process allows any technical board member to veto a proposal, a
+Since this process allows any steering council member to veto a proposal, a
 "-1" vote should be accompanied by an explanation of what it would take to
 convert that "-1" into at least a "+0".
 
 Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list.
+|django-developers| mailing list or on the Django Forum.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
