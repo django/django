@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-01-14 11:26+0000\n"
-"Last-Translator: arneatec <arneatec@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"Last-Translator: arneatec <arneatec@gmail.com>, 2022\n"
 "Language-Team: Bulgarian (http://www.transifex.com/django/django/language/"
 "bg/)\n"
 "MIME-Version: 1.0\n"
@@ -393,6 +393,10 @@ msgstr ""
 "Уверете се, че тази стойност е по-голяма или равна на %(limit_value)s ."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Уверете се, че стойността е кратна на стъпката %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -466,6 +470,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s с този %(field_labels)s вече съществува."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Ограничението “%(name)s” е нарушено."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Стойността %(value)r не е валиден избор."
 
@@ -479,8 +487,8 @@ msgstr "Това поле не може да е празно."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s с този %(field_label)s вече съществува."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -776,16 +784,16 @@ msgstr ""
 "проблем продължава."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Моля изпратете не повече от %d формуляр."
-msgstr[1] "Моля изпратете не повече от %d формуляри."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Моля изпратете не повече от %(num)d формуляр."
+msgstr[1] "Моля изпратете не повече от %(num)d формуляра."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Моля изпратете поне %d формуляр."
-msgstr[1] "Моля изпратете поне %d формуляра."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Моля изпратете поне %(num)d формуляр."
+msgstr[1] "Моля изпратете поне %(num)d формуляра."
 
 msgid "Order"
 msgstr "Ред"
@@ -1189,8 +1197,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Ако използвате <meta name=\"referrer\" content=\"no-referrer\"> таг или "
 "включвате “Referrer-Policy: no-referrer” header, моля премахнете ги. CSRF "
@@ -1292,14 +1300,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Вие виждате тази страница, защото <a href=\"https://docs.djangoproject.com/"
-"en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> е във вашия файл с настройки и не сте конфигурирали "
-"никакви URL-и."
+"en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> е във вашия файл с настройки и не сте "
+"конфигурирали никакви URL-и."
 
 msgid "Django Documentation"
 msgstr "Django документация"
