@@ -1,4 +1,3 @@
-import asyncio
 import collections
 import logging
 import os
@@ -13,6 +12,8 @@ from itertools import chain
 from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
+
+from asgiref.sync import iscoroutinefunction
 
 from django.apps import apps
 from django.apps.registry import Apps
@@ -440,7 +441,7 @@ class TestContextDecorator:
         raise TypeError("Can only decorate subclasses of unittest.TestCase")
 
     def decorate_callable(self, func):
-        if asyncio.iscoroutinefunction(func):
+        if iscoroutinefunction(func):
             # If the inner function is an async function, we must execute async
             # as well so that the `with` statement executes at the right time.
             @wraps(func)
