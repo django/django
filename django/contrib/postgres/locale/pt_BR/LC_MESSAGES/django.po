@@ -2,7 +2,7 @@
 #
 # Translators:
 # Andre Machado <csantos.machado@gmail.com>, 2016
-# Carlos C. Leite <caduado@gmail.com>, 2016,2019
+# Carlos Leite <caduado@gmail.com>, 2016,2019
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Lucas Infante <maccinza@gmail.com>, 2015
@@ -14,8 +14,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2022-01-19 09:22+0000\n"
+"Last-Translator: Carlos Leite <caduado@gmail.com>, 2016,2019\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -78,6 +78,9 @@ msgstr[0] ""
 msgstr[1] ""
 "A lista contém itens %(show_value)d, não deveria conter mais que "
 "%(limit_value)d."
+msgstr[2] ""
+"A lista contém itens %(show_value)d, não deveria conter mais que "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -90,6 +93,9 @@ msgstr[0] ""
 "A lista contém um item %(show_value)d, deveria conter não menos que "
 "%(limit_value)d."
 msgstr[1] ""
+"A lista contém %(show_value)d itens, deveria conter não menos que "
+"%(limit_value)d."
+msgstr[2] ""
 "A lista contém %(show_value)d itens, deveria conter não menos que "
 "%(limit_value)d."
 

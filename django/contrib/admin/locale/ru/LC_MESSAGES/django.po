@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Alex Ibragimov, 2021
 # Ivan Ivaschenko <defuz.net@gmail.com>, 2013
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
@@ -9,25 +10,29 @@
 # Sergey <inoks@mail.ru>, 2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2012-2015
+# Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022
 # Дмитрий <nerosketch@gmail.com>, 2019
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2018
+# Bobsans <mr.bobsans@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-21 09:32+0000\n"
-"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012-2015,2022\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Удалить выбранные %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -39,10 +44,6 @@ msgstr "Не удается удалить %(name)s"
 
 msgid "Are you sure?"
 msgstr "Вы уверены?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Удалить выбранные %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Администрирование"
@@ -282,8 +283,9 @@ msgstr "Выбрано 0 объектов из %(cnt)s "
 msgid "Change history: %s"
 msgstr "История изменений: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -539,6 +541,12 @@ msgstr "Забыли свой пароль или имя пользовател�
 msgid "Toggle navigation"
 msgstr "Переключить навигацию"
 
+msgid "Start typing to filter…"
+msgstr "Начните печатать для фильтрации..."
+
+msgid "Filter navigation items"
+msgstr "Фильтр элементов навигации"
+
 msgid "Date/time"
 msgstr "Дата и время"
 
@@ -547,6 +555,12 @@ msgstr "Пользователь"
 
 msgid "Action"
 msgstr "Действие"
+
+msgid "entry"
+msgstr "запись"
+
+msgid "entries"
+msgstr "записи"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -606,7 +620,11 @@ msgstr "Добавить ещё один объект типа \"%(model)s\""
 msgid "Delete selected %(model)s"
 msgstr "Удалить выбранный объект типа \"%(model)s\""
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Просмотреть выбранный объект типа \"%(model)s\""
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Благодарим вас за время, проведенное на этом сайте."
 
 msgid "Log in again"

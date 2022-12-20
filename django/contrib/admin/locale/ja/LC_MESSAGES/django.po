@@ -4,6 +4,7 @@
 # akiyoko <ayokose@gmail.com>, 2020
 # Claude Paroz <claude@2xlibre.net>, 2016
 # Goto Hayato <habita.gh@gmail.com>, 2019
+# Hiroki Sawano, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
 # Shinya Okano <tokibito@gmail.com>, 2012-2018,2021
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-10-13 11:41+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Hiroki Sawano, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -269,8 +270,9 @@ msgstr "%(cnt)s個の内ひとつも選択されていません"
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -540,6 +542,12 @@ msgstr "ユーザー"
 msgid "Action"
 msgstr "操作"
 
+msgid "entry"
+msgstr "エントリ"
+
+msgid "entries"
+msgstr "エントリ"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
@@ -594,6 +602,10 @@ msgstr "%(model)s の追加"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "選択された %(model)s を削除"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "ご利用ありがとうございました。"
