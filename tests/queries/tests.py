@@ -3322,9 +3322,7 @@ class ExcludeTests(TestCase):
         )
         self.assertCountEqual(
             Job.objects.annotate(
-                responsibility=subquery.filter(job=OuterRef("name"),).values(
-                    "id"
-                )[:1]
+                responsibility=subquery.filter(job=OuterRef("name")).values("id")[:1]
             ),
             [self.j1, self.j2],
         )

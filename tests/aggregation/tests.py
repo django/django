@@ -2088,7 +2088,7 @@ class AggregateTestCase(TestCase):
 
     def test_aggregation_over_annotation_shared_alias(self):
         self.assertEqual(
-            Publisher.objects.annotate(agg=Count("book__authors"),).aggregate(
+            Publisher.objects.annotate(agg=Count("book__authors")).aggregate(
                 agg=Count("agg"),
             ),
             {"agg": 5},
