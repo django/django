@@ -687,6 +687,13 @@ or by including the ``Accept-Language`` HTTP header in the request::
 
 More details are in :ref:`how-django-discovers-language-preference`.
 
+When setting the language for a test client request by either creating a cookie or by including the Accept-Language HTTP header, the Django active language will switch for all other subsequent tests. 
+
+Fortunately, the default language can be set in the tearDown method::
+
+	def tearDown(self):
+		translation.activate(settings.LANGUAGE_CODE)
+
 If the middleware isn't enabled, the active language may be set using
 :func:`.translation.override`::
 
