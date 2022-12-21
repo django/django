@@ -638,6 +638,14 @@ or by including the ``Accept-Language`` HTTP header in the request::
         response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='fr')
         self.assertEqual(response.content, b"Bienvenue sur mon site.")
 
+.. note::
+
+    When using these methods, ensure to reset the active language at the end of
+    each test::
+
+        def tearDown(self):
+            translation.activate(settings.LANGUAGE_CODE)
+
 More details are in :ref:`how-django-discovers-language-preference`.
 
 If the middleware isn't enabled, the active language may be set using
