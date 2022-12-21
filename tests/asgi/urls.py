@@ -1,4 +1,5 @@
 import threading
+import time
 
 from django.http import FileResponse, HttpResponse
 from django.urls import path
@@ -8,6 +9,12 @@ from django.views.decorators.csrf import csrf_exempt
 def hello(request):
     name = request.GET.get("name") or "World"
     return HttpResponse("Hello %s!" % name)
+
+
+def hello_with_delay(request):
+    name = request.GET.get("name") or "World"
+    time.sleep(1)
+    return HttpResponse(f"Hello {name}!")
 
 
 def hello_meta(request):
@@ -46,4 +53,5 @@ urlpatterns = [
     path("meta/", hello_meta),
     path("post/", post_echo),
     path("wait/", sync_waiter),
+    path("delayed_hello/", hello_with_delay),
 ]

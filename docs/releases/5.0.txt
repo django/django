@@ -192,6 +192,13 @@ Minor features
 
 * ...
 
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* Under ASGI, ``http.disconnect`` events are now handled. This allows views to
+  perform any necessary cleanup if a client disconnects before the response is
+  generated. See :ref:`async-handling-disconnect` for more details.
+
 Cache
 ~~~~~
 

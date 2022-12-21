@@ -136,6 +136,26 @@ a purely synchronous codebase under ASGI because the request-handling code is
 still all running asynchronously. In general you will only want to enable ASGI
 mode if you have asynchronous code in your project.
 
+.. _async-handling-disconnect:
+
+Handling disconnects
+--------------------
+
+.. versionadded:: 5.0
+
+For long-lived requests, a client may disconnect before the view returns a
+response. In this case, an ``asyncio.CancelledError`` will be raised in the
+view. You can catch this error and handle it if you need to perform any
+cleanup::
+
+    async def my_view(request):
+        try:
+            # Do some work
+            ...
+        except asyncio.CancelledError:
+            # Handle disconnect
+            raise
+
 .. _async-safety:
 
 Async safety
