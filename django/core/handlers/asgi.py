@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 import tempfile
@@ -187,7 +188,30 @@ class ASGIHandler(base.BaseHandler):
         if isinstance(response, FileResponse):
             response.block_size = self.chunk_size
         # Send the response.
-        await self.send_response(response, send)
+        try:
+            tasks = [
+                asyncio.ensure_future(coro)
+                for coro in (
+                    self.send_response(response, send),
+                    self.listen_for_disconnect(receive),
+                )
+            ]
+            await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
+            for task in tasks:
+                if task.done():
+                    exception = task.exception()
+                    if exception:
+                        break
+        except RequestAborted:
+            raise RequestAborted()
+        except asyncio.CancelledError:
+            pass
+
+    async def listen_for_disconnect(self, res):
+        while True:
+            message = await res()
+            if message["type"] == "http.disconnect":
+                raise RequestAborted()
 
     async def read_body(self, receive):
         """Reads an HTTP body from an ASGI connection."""
@@ -205,7 +229,7 @@ class ASGIHandler(base.BaseHandler):
             if "body" in message:
                 body_file.write(message["body"])
             # Quit out if that's the end.
-            if not message.get("more_body", False):
+            if not message.get("more_body", None):
                 break
         body_file.seek(0)
         return body_file
@@ -243,6 +267,7 @@ class ASGIHandler(base.BaseHandler):
         """Encode and send a response out over ASGI."""
         # Collect cookies into headers. Have to preserve header case as there
         # are some non-RFC compliant clients that require e.g. Content-Type.
+        # await asyncio.sleep(0.05)
         response_headers = []
         for header, value in response.items():
             if isinstance(header, str):
