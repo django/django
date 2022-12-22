@@ -140,7 +140,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     return sequence["name"]
         return None
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         # Drop indexes on varchar/text/citext columns that are changing to a
         # different type.
         old_db_params = old_field.db_parameters(connection=self.connection)
@@ -155,7 +157,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             self.execute(self._delete_index_sql(model, index_name))
 
-        self.sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
+        self.sql_alter_column_type = (
+            "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
+        )
         # Cast when data type changed.
         if using_sql := self._using_sql(new_field, old_field):
             self.sql_alter_column_type += using_sql
@@ -178,6 +182,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     % {
                         "column": self.quote_name(column),
                         "type": new_type,
+                        "collation": "",
                     },
                     [],
                 ),
@@ -204,7 +209,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             column = strip_quotes(new_field.column)
             fragment, _ = super()._alter_column_type_sql(
-                model, old_field, new_field, new_type
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
             # Drop the sequence if exists (Django 4.1+ identity columns don't
             # have it).
@@ -222,7 +227,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             return fragment, other_actions
         elif new_is_auto and old_is_auto and old_internal_type != new_internal_type:
             fragment, _ = super()._alter_column_type_sql(
-                model, old_field, new_field, new_type
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
             column = strip_quotes(new_field.column)
             db_types = {
@@ -246,7 +251,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 ]
             return fragment, other_actions
         else:
-            return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+            return super()._alter_column_type_sql(
+                model, old_field, new_field, new_type, old_collation, new_collation
+            )
 
     def _alter_column_collation_sql(
         self, model, new_field, new_type, new_collation, old_field

@@ -9,8 +9,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
-    sql_alter_column_type = "MODIFY %(column)s %(type)s"
-    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s"
     sql_alter_column_no_default_null = "ALTER COLUMN %(column)s SET DEFAULT NULL"
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
@@ -218,9 +217,13 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_type += " NOT NULL"
         return new_type
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(
+            model, old_field, new_field, new_type, old_collation, new_collation
+        )
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)

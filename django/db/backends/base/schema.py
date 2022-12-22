@@ -87,13 +87,12 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_column = "ALTER TABLE %(table)s ADD COLUMN %(column)s %(definition)s"
     sql_alter_column = "ALTER TABLE %(table)s %(changes)s"
-    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
+    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
     sql_alter_column_null = "ALTER COLUMN %(column)s DROP NOT NULL"
     sql_alter_column_not_null = "ALTER COLUMN %(column)s SET NOT NULL"
     sql_alter_column_default = "ALTER COLUMN %(column)s SET DEFAULT %(default)s"
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_alter_column_collate = "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
     sql_rename_column = (
         "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
@@ -950,17 +949,14 @@ class BaseDatabaseSchemaEditor:
         # Type suffix change? (e.g. auto increment).
         old_type_suffix = old_field.db_type_suffix(connection=self.connection)
         new_type_suffix = new_field.db_type_suffix(connection=self.connection)
-        # Collation change?
-        if old_collation != new_collation:
-            # Collation change handles also a type change.
-            fragment = self._alter_column_collation_sql(
-                model, new_field, new_type, new_collation, old_field
-            )
-            actions.append(fragment)
-        # Type change?
-        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
+        # Type or collation change?
+        if (
+            old_type != new_type
+            or old_type_suffix != new_type_suffix
+            or old_collation != new_collation
+        ):
             fragment, other_actions = self._alter_column_type_sql(
-                model, old_field, new_field, new_type
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
@@ -1076,20 +1072,14 @@ class BaseDatabaseSchemaEditor:
             rel_collation = rel_db_params.get("collation")
             old_rel_db_params = old_rel.field.db_parameters(connection=self.connection)
             old_rel_collation = old_rel_db_params.get("collation")
-            if old_rel_collation != rel_collation:
-                # Collation change handles also a type change.
-                fragment = self._alter_column_collation_sql(
-                    new_rel.related_model,
-                    new_rel.field,
-                    rel_type,
-                    rel_collation,
-                    old_rel.field,
-                )
-                other_actions = []
-            else:
-                fragment, other_actions = self._alter_column_type_sql(
-                    new_rel.related_model, old_rel.field, new_rel.field, rel_type
-                )
+            fragment, other_actions = self._alter_column_type_sql(
+                new_rel.related_model,
+                old_rel.field,
+                new_rel.field,
+                rel_type,
+                old_rel_collation,
+                rel_collation,
+            )
             self.execute(
                 self.sql_alter_column
                 % {
@@ -1209,7 +1199,9 @@ class BaseDatabaseSchemaEditor:
             params,
         )
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         """
         Hook to specialize column type alteration for different backends,
         for cases when a creation type is different to an alteration type
@@ -1219,30 +1211,22 @@ class BaseDatabaseSchemaEditor:
         an ALTER TABLE statement and a list of extra (sql, params) tuples to
         run once the field is altered.
         """
+        if collate_sql := self._collate_sql(
+            new_collation, old_collation, model._meta.db_table
+        ):
+            collate_sql = f" {collate_sql}"
+        else:
+            collate_sql = ""
         return (
             (
                 self.sql_alter_column_type
                 % {
                     "column": self.quote_name(new_field.column),
                     "type": new_type,
+                    "collation": collate_sql,
                 },
                 [],
             ),
-            [],
-        )
-
-    def _alter_column_collation_sql(
-        self, model, new_field, new_type, new_collation, old_field
-    ):
-        return (
-            self.sql_alter_column_collate
-            % {
-                "column": self.quote_name(new_field.column),
-                "type": new_type,
-                "collation": " " + self._collate_sql(new_collation)
-                if new_collation
-                else "",
-            },
             [],
         )
 
@@ -1745,8 +1729,8 @@ class BaseDatabaseSchemaEditor:
     def _delete_primary_key_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_pk, model, name)
 
-    def _collate_sql(self, collation):
-        return "COLLATE " + self.quote_name(collation)
+    def _collate_sql(self, collation, old_collation=None, table_name=None):
+        return "COLLATE " + self.quote_name(collation) if collation else ""
 
     def remove_procedure(self, procedure_name, param_types=()):
         sql = self.sql_delete_procedure % {
