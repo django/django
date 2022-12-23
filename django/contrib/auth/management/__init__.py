@@ -95,11 +95,16 @@ def create_permissions(
         .values_list("content_type", "codename")
     )
 
-    perms = [
-        Permission(codename=codename, name=name, content_type=ct)
-        for ct, (codename, name) in searched_perms
-        if (ct.pk, codename) not in all_perms
-    ]
+    perms = []
+    for ct, (codename, name) in searched_perms:
+        if (ct.pk, codename) not in all_perms:
+            permission = Permission()
+            permission._state.db = using
+            permission.codename = codename
+            permission.name = name
+            permission.content_type = ct
+            perms.append(permission)
+
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
