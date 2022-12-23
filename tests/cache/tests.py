@@ -2004,7 +2004,7 @@ class CacheUtils(SimpleTestCase):
 
     host = "www.example.com"
     path = "/cache/test/"
-    factory = RequestFactory(HTTP_HOST=host)
+    factory = RequestFactory(headers={"host": host})
 
     def tearDown(self):
         cache.clear()
@@ -2095,9 +2095,9 @@ class CacheUtils(SimpleTestCase):
         """
         get_cache_key keys differ by fully-qualified URL instead of path
         """
-        request1 = self.factory.get(self.path, HTTP_HOST="sub-1.example.com")
+        request1 = self.factory.get(self.path, headers={"host": "sub-1.example.com"})
         learn_cache_key(request1, HttpResponse())
-        request2 = self.factory.get(self.path, HTTP_HOST="sub-2.example.com")
+        request2 = self.factory.get(self.path, headers={"host": "sub-2.example.com"})
         learn_cache_key(request2, HttpResponse())
         self.assertNotEqual(get_cache_key(request1), get_cache_key(request2))
 

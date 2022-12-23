@@ -214,7 +214,7 @@ class PasswordResetTest(AuthViewsTestCase):
             response = self.client.post(
                 "/password_reset/",
                 {"email": "staffmember@example.com"},
-                HTTP_HOST="www.example:dr.frankenstein@evil.tld",
+                headers={"host": "www.example:dr.frankenstein@evil.tld"},
             )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(len(mail.outbox), 0)
@@ -227,7 +227,7 @@ class PasswordResetTest(AuthViewsTestCase):
             response = self.client.post(
                 "/admin_password_reset/",
                 {"email": "staffmember@example.com"},
-                HTTP_HOST="www.example:dr.frankenstein@evil.tld",
+                headers={"host": "www.example:dr.frankenstein@evil.tld"},
             )
         self.assertEqual(response.status_code, 400)
         self.assertEqual(len(mail.outbox), 0)

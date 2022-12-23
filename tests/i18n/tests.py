@@ -1778,7 +1778,7 @@ class MiscTests(SimpleTestCase):
         ]
         for header, expected in tests:
             with self.subTest(header=header):
-                request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE=header)
+                request = self.rf.get("/", headers={"accept-language": header})
                 self.assertEqual(get_language_from_request(request), expected)
 
     @override_settings(
@@ -1799,10 +1799,10 @@ class MiscTests(SimpleTestCase):
         refs #18419 -- this is explicitly for browser compatibility
         """
         g = get_language_from_request
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="zh-cn,en")
+        request = self.rf.get("/", headers={"accept-language": "zh-cn,en"})
         self.assertEqual(g(request), "zh-hans")
 
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="zh-tw,en")
+        request = self.rf.get("/", headers={"accept-language": "zh-tw,en"})
         self.assertEqual(g(request), "zh-hant")
 
     def test_special_fallback_language(self):
@@ -1810,7 +1810,7 @@ class MiscTests(SimpleTestCase):
         Some languages may have special fallbacks that don't follow the simple
         'fr-ca' -> 'fr' logic (notably Chinese codes).
         """
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="zh-my,en")
+        request = self.rf.get("/", headers={"accept-language": "zh-my,en"})
         self.assertEqual(get_language_from_request(request), "zh-hans")
 
     def test_subsequent_code_fallback_language(self):
@@ -1828,7 +1828,7 @@ class MiscTests(SimpleTestCase):
         ]
         for value, expected in tests:
             with self.subTest(value=value):
-                request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE=f"{value},en")
+                request = self.rf.get("/", headers={"accept-language": f"{value},en"})
                 self.assertEqual(get_language_from_request(request), expected)
 
     def test_parse_language_cookie(self):
@@ -1840,7 +1840,7 @@ class MiscTests(SimpleTestCase):
         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "pt"
         self.assertEqual("pt", g(request))
 
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="de")
+        request = self.rf.get("/", headers={"accept-language": "de"})
         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "es"
         self.assertEqual("es", g(request))
 
@@ -1854,7 +1854,7 @@ class MiscTests(SimpleTestCase):
         # translation to variation (zh-hans) the user sets zh-hans as the
         # preferred language, it should be selected without falling back nor
         # ignoring it.
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="de")
+        request = self.rf.get("/", headers={"accept-language": "de"})
         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "zh-hans"
         self.assertEqual(g(request), "zh-hans")
 
@@ -1957,7 +1957,7 @@ class MiscTests(SimpleTestCase):
         previously valid should not be used (#14170).
         """
         g = get_language_from_request
-        request = self.rf.get("/", HTTP_ACCEPT_LANGUAGE="pt-br")
+        request = self.rf.get("/", headers={"accept-language": "pt-br"})
         self.assertEqual("pt-br", g(request))
         with self.settings(LANGUAGES=[("en", "English")]):
             self.assertNotEqual("pt-br", g(request))
@@ -2215,13 +2215,13 @@ class CountrySpecificLanguageTests(SimpleTestCase):
     def test_get_language_from_request(self):
         # issue 19919
         request = self.rf.get(
-            "/", HTTP_ACCEPT_LANGUAGE="en-US,en;q=0.8,bg;q=0.6,ru;q=0.4"
+            "/", headers={"accept-language": "en-US,en;q=0.8,bg;q=0.6,ru;q=0.4"}
         )
         lang = get_language_from_request(request)
         self.assertEqual("en-us", lang)
 
         request = self.rf.get(
-            "/", HTTP_ACCEPT_LANGUAGE="bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4"
+            "/", headers={"accept-language": "bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
         )
         lang = get_language_from_request(request)
         self.assertEqual("bg", lang)
@@ -2233,13 +2233,13 @@ class CountrySpecificLanguageTests(SimpleTestCase):
     def test_specific_language_codes(self):
         # issue 11915
         request = self.rf.get(
-            "/", HTTP_ACCEPT_LANGUAGE="pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"
+            "/", headers={"accept-language": "pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
         )
         lang = get_language_from_request(request)
         self.assertEqual("pt-br", lang)
 
         request = self.rf.get(
-            "/", HTTP_ACCEPT_LANGUAGE="pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"
+            "/", headers={"accept-language": "pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
         )
         lang = get_language_from_request(request)
         self.assertEqual("pt-br", lang)

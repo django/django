@@ -690,7 +690,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
         response = ConditionalGetMiddleware(self.get_response)(self.req)
         etag = response.headers["ETag"]
-        put_request = self.request_factory.put("/", HTTP_IF_MATCH=etag)
+        put_request = self.request_factory.put("/", headers={"if-match": etag})
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(
             put_request
         )
@@ -1061,7 +1061,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = '"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1075,7 +1075,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = 'W/"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1090,11 +1090,12 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         def get_cond_response(req):
             return ConditionalGetMiddleware(get_response)(req)
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         response = GZipMiddleware(get_cond_response)(request)
         gzip_etag = response.headers["ETag"]
         next_request = self.rf.get(
-            "/", HTTP_ACCEPT_ENCODING="gzip, deflate", HTTP_IF_NONE_MATCH=gzip_etag
+            "/",
+            headers={"accept-encoding": "gzip, deflate", "if-none-match": gzip_etag},
         )
         next_response = ConditionalGetMiddleware(get_response)(next_request)
         self.assertEqual(next_response.status_code, 304)

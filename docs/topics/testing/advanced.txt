@@ -152,7 +152,10 @@ example, the test suite for docs.djangoproject.com includes the following::
 
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
-            response = self.client.get('/en/dev/search/', HTTP_HOST='docs.djangoproject.dev:8000')
+            response = self.client.get(
+                "/en/dev/search/",
+                headers={"host": "docs.djangoproject.dev:8000"},
+            )
             self.assertEqual(response.status_code, 200)
 
 and the settings file includes a list of the domains supported by the project::

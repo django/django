@@ -63,7 +63,7 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         response = self.client.get(
             "/%s/%s" % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE="Thu, 1 Jan 1970 00:00:00 GMT",
+            headers={"if-modified-since": "Thu, 1 Jan 1970 00:00:00 GMT"},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
@@ -73,9 +73,11 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         response = self.client.get(
             "/%s/%s" % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE="Mon, 18 Jan 2038 05:14:07 GMT"
-            # This is 24h before max Unix time. Remember to fix Django and
-            # update this test well before 2038 :)
+            headers={
+                # This is 24h before max Unix time. Remember to fix Django and
+                # update this test well before 2038 :)
+                "if-modified-since": "Mon, 18 Jan 2038 05:14:07 GMT"
+            },
         )
         self.assertIsInstance(response, HttpResponseNotModified)
 
@@ -88,7 +90,8 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         invalid_date = "Mon, 28 May 999999999999 28:25:26 GMT"
         response = self.client.get(
-            "/%s/%s" % (self.prefix, file_name), HTTP_IF_MODIFIED_SINCE=invalid_date
+            "/%s/%s" % (self.prefix, file_name),
+            headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
@@ -104,7 +107,8 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         invalid_date = ": 1291108438, Wed, 20 Oct 2010 14:05:00 GMT"
         response = self.client.get(
-            "/%s/%s" % (self.prefix, file_name), HTTP_IF_MODIFIED_SINCE=invalid_date
+            "/%s/%s" % (self.prefix, file_name),
+            headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
