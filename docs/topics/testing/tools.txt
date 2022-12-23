@@ -682,7 +682,7 @@ a name of :setting:`LANGUAGE_COOKIE_NAME` and a value of the language code::
 or by including the ``Accept-Language`` HTTP header in the request::
 
     def test_language_using_header(self):
-        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='fr')
+        response = self.client.get("/", headers={"accept-language": "fr"})
         self.assertEqual(response.content, b"Bienvenue sur mon site.")
 
 More details are in :ref:`how-django-discovers-language-preference`.

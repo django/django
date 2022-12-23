@@ -237,7 +237,7 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/raises500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(
             response,
             "Raised during: view_tests.views.raises500",
@@ -254,7 +254,9 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/classbased500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get(
+                "/classbased500/", headers={"accept": "text/plain"}
+            )
         self.assertContains(
             response,
             "Raised during: view_tests.views.Raises500View",
@@ -432,7 +434,7 @@ class DebugViewTests(SimpleTestCase):
         )
 
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/raises500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
 
@@ -1116,7 +1118,7 @@ class ExceptionReporterTests(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS="example.com")
     def test_disallowed_host(self):
         "An exception report can be generated even for a disallowed host."
-        request = self.rf.get("/", HTTP_HOST="evil.com")
+        request = self.rf.get("/", headers={"host": "evil.com"})
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
         self.assertIn("http://evil.com/", html)
@@ -1201,7 +1203,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS=["example.com"])
     def test_get_raw_insecure_uri(self):
-        factory = RequestFactory(HTTP_HOST="evil.com")
+        factory = RequestFactory(headers={"host": "evil.com"})
         tests = [
             ("////absolute-uri", "http://evil.com//absolute-uri"),
             ("/?foo=bar", "http://evil.com/?foo=bar"),
@@ -1326,7 +1328,7 @@ class PlainTextReportTests(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS="example.com")
     def test_disallowed_host(self):
         "An exception report can be generated even for a disallowed host."
-        request = self.rf.get("/", HTTP_HOST="evil.com")
+        request = self.rf.get("/", headers={"host": "evil.com"})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
         self.assertIn("http://evil.com/", text)
@@ -1787,7 +1789,7 @@ class ExceptionReporterFilterTests(
         )
 
     def test_request_meta_filtering(self):
-        request = self.rf.get("/", HTTP_SECRET_HEADER="super_secret")
+        request = self.rf.get("/", headers={"secret-header": "super_secret"})
         reporter_filter = SafeExceptionReporterFilter()
         self.assertEqual(
             reporter_filter.get_safe_request_meta(request)["HTTP_SECRET_HEADER"],
@@ -1795,12 +1797,13 @@ class ExceptionReporterFilterTests(
         )
 
     def test_exception_report_uses_meta_filtering(self):
-        response = self.client.get("/raises500/", HTTP_SECRET_HEADER="super_secret")
+        response = self.client.get(
+            "/raises500/", headers={"secret-header": "super_secret"}
+        )
         self.assertNotIn(b"super_secret", response.content)
         response = self.client.get(
             "/raises500/",
-            HTTP_SECRET_HEADER="super_secret",
-            HTTP_ACCEPT="application/json",
+            headers={"secret-header": "super_secret", "accept": "application/json"},
         )
         self.assertNotIn(b"super_secret", response.content)
 
@@ -1863,7 +1866,7 @@ class NonHTMLResponseExceptionReporterFilter(
     Refs #14614.
     """
 
-    rf = RequestFactory(HTTP_ACCEPT="application/json")
+    rf = RequestFactory(headers={"accept": "application/json"})
 
     def test_non_sensitive_request(self):
         """
@@ -1915,7 +1918,9 @@ class NonHTMLResponseExceptionReporterFilter(
 
     @override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
     def test_non_html_response_encoding(self):
-        response = self.client.get("/raises500/", HTTP_ACCEPT="application/json")
+        response = self.client.get(
+            "/raises500/", headers={"accept": "application/json"}
+        )
         self.assertEqual(response.headers["Content-Type"], "text/plain; charset=utf-8")
 
 
