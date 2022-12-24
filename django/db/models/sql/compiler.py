@@ -1214,14 +1214,18 @@ class SQLCompiler:
                 for o in opts.related_objects
                 if o.field.unique and not o.many_to_many
             ]
-            for f, model in related_fields:
-                related_select_mask = select_mask.get(f) or {}
+            for related_field, model in related_fields:
+                related_select_mask = select_mask.get(related_field) or {}
                 if not select_related_descend(
-                    f, restricted, requested, related_select_mask, reverse=True
+                    related_field,
+                    restricted,
+                    requested,
+                    related_select_mask,
+                    reverse=True,
                 ):
                     continue
 
-                related_field_name = f.related_query_name()
+                related_field_name = related_field.related_query_name()
                 fields_found.add(related_field_name)
 
                 join_info = self.query.setup_joins(
@@ -1231,10 +1235,10 @@ class SQLCompiler:
                 from_parent = issubclass(model, opts.model) and model is not opts.model
                 klass_info = {
                     "model": model,
-                    "field": f,
+                    "field": related_field,
                     "reverse": True,
-                    "local_setter": f.remote_field.set_cached_value,
-                    "remote_setter": f.set_cached_value,
+                    "local_setter": related_field.remote_field.set_cached_value,
+                    "remote_setter": related_field.set_cached_value,
                     "from_parent": from_parent,
                 }
                 related_klass_infos.append(klass_info)
@@ -1249,7 +1253,7 @@ class SQLCompiler:
                     select_fields.append(len(select))
                     select.append((col, None))
                 klass_info["select_fields"] = select_fields
-                next = requested.get(f.related_query_name(), {})
+                next = requested.get(related_field.related_query_name(), {})
                 next_klass_infos = self.get_related_selections(
                     select,
                     related_select_mask,
@@ -1264,7 +1268,7 @@ class SQLCompiler:
             def local_setter(obj, from_obj):
                 # Set a reverse fk object when relation is non-empty.
                 if from_obj:
-                    f.remote_field.set_cached_value(from_obj, obj)
+                    final_field.remote_field.set_cached_value(from_obj, obj)
 
             def remote_setter(name, obj, from_obj):
                 setattr(from_obj, name, obj)
@@ -1275,7 +1279,7 @@ class SQLCompiler:
                     break
                 if name in self.query._filtered_relations:
                     fields_found.add(name)
-                    f, _, join_opts, joins, _, _ = self.query.setup_joins(
+                    final_field, _, join_opts, joins, _, _ = self.query.setup_joins(
                         [name], opts, root_alias
                     )
                     model = join_opts.model
@@ -1285,7 +1289,7 @@ class SQLCompiler:
                     )
                     klass_info = {
                         "model": model,
-                        "field": f,
+                        "field": final_field,
                         "reverse": True,
                         "local_setter": local_setter,
                         "remote_setter": partial(remote_setter, name),
@@ -1293,7 +1297,7 @@ class SQLCompiler:
                     }
                     related_klass_infos.append(klass_info)
                     select_fields = []
-                    field_select_mask = select_mask.get((name, f)) or {}
+                    field_select_mask = select_mask.get((name, final_field)) or {}
                     columns = self.get_default_columns(
                         field_select_mask,
                         start_alias=alias,
