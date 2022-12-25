@@ -3630,7 +3630,6 @@ class OperationTests(OperationTestBase):
             Book.objects.create(read=70, unread=10)
         Book.objects.create(read=70, unread=30)
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_remove_constraint(self):
         project_state = self.set_up_test_model(
             "test_removeconstraint",
@@ -3673,7 +3672,10 @@ class OperationTests(OperationTestBase):
                 "test_removeconstraint", editor, project_state, new_state
             )
         Pony.objects.create(pink=1, weight=1.0).delete()
-        with self.assertRaises(IntegrityError), transaction.atomic():
+        if connection.features.supports_table_check_constraints:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=100, weight=1.0)
+        else:
             Pony.objects.create(pink=100, weight=1.0)
         # Remove the other one.
         lt_operation = migrations.RemoveConstraint(
@@ -3698,7 +3700,10 @@ class OperationTests(OperationTestBase):
             gt_operation.database_backwards(
                 "test_removeconstraint", editor, new_state, project_state
             )
-        with self.assertRaises(IntegrityError), transaction.atomic():
+        if connection.features.supports_table_check_constraints:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=1.0)
+        else:
             Pony.objects.create(pink=1, weight=1.0)
         # Test deconstruction
         definition = gt_operation.deconstruct()
