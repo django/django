@@ -50,5 +50,7 @@ Supporting the Development of Django
 ====================================
 
 Django's development depends on your contributions. 
-
+swamy is added some lines of code to the main branch
+swamy is new to django is learning deeply git and github
+swamy is make chages in the mainbranch
 If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/
