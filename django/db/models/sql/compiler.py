@@ -1265,7 +1265,7 @@ class SQLCompiler:
                 )
                 get_related_klass_infos(klass_info, next_klass_infos)
 
-            def local_setter(obj, from_obj):
+            def local_setter(final_field, obj, from_obj):
                 # Set a reverse fk object when relation is non-empty.
                 if from_obj:
                     final_field.remote_field.set_cached_value(from_obj, obj)
@@ -1291,7 +1291,7 @@ class SQLCompiler:
                         "model": model,
                         "field": final_field,
                         "reverse": True,
-                        "local_setter": local_setter,
+                        "local_setter": partial(local_setter, final_field),
                         "remote_setter": partial(remote_setter, name),
                         "from_parent": from_parent,
                     }
