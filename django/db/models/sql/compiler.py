@@ -1274,6 +1274,9 @@ class SQLCompiler:
                 if from_obj:
                     final_field.remote_field.set_cached_value(from_obj, obj)
 
+            def local_setter_noop(obj, from_obj):
+                pass
+
             def remote_setter(name, obj, from_obj):
                 setattr(from_obj, name, obj)
 
@@ -1295,7 +1298,11 @@ class SQLCompiler:
                         "model": model,
                         "field": final_field,
                         "reverse": True,
-                        "local_setter": partial(local_setter, final_field),
+                        "local_setter": (
+                            partial(local_setter, final_field)
+                            if len(joins) <= 2
+                            else local_setter_noop
+                        ),
                         "remote_setter": partial(remote_setter, name),
                         "from_parent": from_parent,
                     }
