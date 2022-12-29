@@ -26,7 +26,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max, Value
+from django.db.models import NOT_PROVIDED, Manager, ExpressionWrapper, IntegerField, DateTimeField, Max, Value
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
@@ -40,7 +40,7 @@ from django.db.models.fields.related import (
 from django.db.models.functions import Coalesce
 from django.db.models.manager import Manager
 from django.db.models.options import Options
-from django.db.models.query import F, Q
+from django.db.models.query import F, Q, QuerySet
 from django.db.models.signals import (
     class_prepared,
     post_init,
@@ -51,6 +51,7 @@ from django.db.models.signals import (
 from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
+from django.utils.timezone import now
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext_lazy as _
 
@@ -2472,6 +2473,68 @@ class Model(AltersData, metaclass=ModelBase):
                     )
             errors.extend(cls._check_local_fields(fields, "constraints"))
         return errors
+
+
+# Begin Soft-Delete
+class SoftDeleteQuerySet(QuerySet):
+    def delete(self, sure=False):
+        """You have to specify exactly which delete-method you want to commit
+        (to avoid mess)."""
+        if sure:
+            return super().delete()
+        else:
+            return 'SOFT or HARD'
+    
+    def soft_delete(self):
+        return self.update(soft_delete_dt=now())
+    
+    def hard_delete(self):
+        return super().delete()
+    
+    def restore(self):
+        return self.update(soft_delete_dt=None)
+
+
+class SoftDeleteManager(Manager):
+    def get_queryset(self):
+        """All the actions that you had in the normal Model,
+        now the Soft-Delete mechanism is applied to them."""
+        return SoftDeleteQuerySet(self.model, using=self._db).all().filter(soft_delete_dt=None)
+    
+    def ALL(self):
+        """Returns all the rows, whether they are Soft-Deleted or not."""
+        return super().get_queryset()
+    
+    def deleted(self):
+        """Returns all Soft-Deleted rows."""
+        return super().get_queryset().exclude(soft_delete_dt=None)
+
+
+class SoftDeleteModel(Model):
+    """Soft-Delete Model (Just Model + Soft-Delete mechanism)."""
+    
+    soft_delete_dt = DateTimeField(null=True, default=None, blank=True)
+    objects = SoftDeleteManager()
+    
+    def delete(self, sure=False):
+        """You have to specify exactly which delete-method you want to commit
+        (to avoid mess)."""
+        if sure:
+            return super().delete()
+        else:
+            return 'SOFT or HARD'
+    
+    def soft_delete(self):
+        self.soft_delete_dt = now()
+        return self.save()
+    
+    def hard_delete(self):
+        return super().delete()
+    
+    def restore(self):
+        self.soft_delete_dt = None
+        return self.save()
+# End Soft-Delete
 
 
 ############################################
