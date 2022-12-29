@@ -73,6 +73,10 @@ source_suffix = '.txt'
 # The root toctree document.
 root_doc = "contents"
 
+# Disable auto-created table of contents entries for all domain objects (e.g.
+# functions, classes, attributes, etc.) in Sphinx 5.2+.
+toc_object_entries = False
+
 # General substitutions.
 project = 'Django'
 copyright = 'Django Software Foundation and contributors'
