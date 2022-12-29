@@ -149,6 +149,9 @@ Minor features
   removes the former ``map_css`` block) to better comply with a strict Content
   Security Policy.
 
+* :class:`~django.contrib.gis.forms.widgets.OpenLayersWidget` is now based on
+  OpenLayers 7.2.2 (previously 4.6.5).
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
