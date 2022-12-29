@@ -336,6 +336,14 @@ argument. For example::
     Support for finding paths to JavaScript modules in ``import`` and
     ``export`` statements was added.
 
+.. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
+
+.. versionadded:: 4.2
+
+This attribute provides a single hash that changes whenever a file in the
+manifest changes. This can be useful to communicate to SPAs that the assets on
+the server have changed (due to a new deployment).
+
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
 Since static files might reference other static files that need to have their
