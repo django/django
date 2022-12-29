@@ -436,7 +436,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # The in-memory version of the manifest matches the one on disk
         # since a properly created manifest should cover all filenames.
         if hashed_files:
-            manifest = storage.staticfiles_storage.load_manifest()
+            manifest, _ = storage.staticfiles_storage.load_manifest()
             self.assertEqual(hashed_files, manifest)
 
     def test_manifest_exists(self):
@@ -463,7 +463,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
     def test_parse_cache(self):
         hashed_files = storage.staticfiles_storage.hashed_files
-        manifest = storage.staticfiles_storage.load_manifest()
+        manifest, _ = storage.staticfiles_storage.load_manifest()
         self.assertEqual(hashed_files, manifest)
 
     def test_clear_empties_manifest(self):
@@ -476,7 +476,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         hashed_files = storage.staticfiles_storage.hashed_files
         self.assertIn(cleared_file_name, hashed_files)
 
-        manifest_content = storage.staticfiles_storage.load_manifest()
+        manifest_content, _ = storage.staticfiles_storage.load_manifest()
         self.assertIn(cleared_file_name, manifest_content)
 
         original_path = storage.staticfiles_storage.path(cleared_file_name)
@@ -491,7 +491,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         hashed_files = storage.staticfiles_storage.hashed_files
         self.assertNotIn(cleared_file_name, hashed_files)
 
-        manifest_content = storage.staticfiles_storage.load_manifest()
+        manifest_content, _ = storage.staticfiles_storage.load_manifest()
         self.assertNotIn(cleared_file_name, manifest_content)
 
     def test_missing_entry(self):
@@ -534,6 +534,29 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             ),
             2,
         )
+
+    def test_manifest_hash(self):
+        # Collect the additional file.
+        self.run_collectstatic()
+
+        _, manifest_hash_orig = storage.staticfiles_storage.load_manifest()
+        self.assertNotEqual(manifest_hash_orig, "")
+        self.assertEqual(storage.staticfiles_storage.manifest_hash, manifest_hash_orig)
+        # Saving doesn't change the hash.
+        storage.staticfiles_storage.save_manifest()
+        self.assertEqual(storage.staticfiles_storage.manifest_hash, manifest_hash_orig)
+        # Delete the original file from the app, collect with clear.
+        os.unlink(self._clear_filename)
+        self.run_collectstatic(clear=True)
+        # Hash is changed.
+        _, manifest_hash = storage.staticfiles_storage.load_manifest()
+        self.assertNotEqual(manifest_hash, manifest_hash_orig)
+
+    def test_manifest_hash_v1(self):
+        storage.staticfiles_storage.manifest_name = "staticfiles_v1.json"
+        manifest_content, manifest_hash = storage.staticfiles_storage.load_manifest()
+        self.assertEqual(manifest_hash, "")
+        self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
 
 
 @override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.NoneHashStorage")

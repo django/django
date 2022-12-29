@@ -201,6 +201,10 @@ Minor features
   replaces paths to JavaScript modules in ``import`` and ``export`` statements
   with their hashed counterparts.
 
+* The new :attr:`.ManifestStaticFilesStorage.manifest_hash` attribute provides
+  a hash over all files in the manifest and changes whenever one of the files
+  changes.
+
 :mod:`django.contrib.syndication`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
