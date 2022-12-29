@@ -1,5 +1,3 @@
-import os
-
 from django.template import Context, Engine, TemplateSyntaxError
 from django.template.base import Node
 from django.template.library import InvalidTemplateLibrary
@@ -530,7 +528,7 @@ class InclusionTagTests(TagTestCase):
 class TemplateTagLoadingTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.egg_dir = os.path.join(ROOT, "eggs")
+        cls.egg_dir = ROOT / "eggs"
         super().setUpClass()
 
     def test_load_error(self):
@@ -543,7 +541,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
             Engine(libraries={"broken_tag": "template_tests.broken_tag"})
 
     def test_load_error_egg(self):
-        egg_name = "%s/tagsegg.egg" % self.egg_dir
+        egg_name = self.egg_dir / "tagsegg.egg"
         msg = (
             "Invalid template library specified. ImportError raised when "
             "trying to load 'tagsegg.templatetags.broken_egg': cannot "
@@ -555,7 +553,7 @@ class TemplateTagLoadingTests(SimpleTestCase):
 
     def test_load_working_egg(self):
         ttext = "{% load working_egg %}"
-        egg_name = "%s/tagsegg.egg" % self.egg_dir
+        egg_name = self.egg_dir / "tagsegg.egg"
         with extend_sys_path(egg_name):
             engine = Engine(
                 libraries={

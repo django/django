@@ -1,5 +1,6 @@
 import hashlib
 import os
+from pathlib import Path
 
 from django.core.files.uploadedfile import UploadedFile
 from django.core.files.uploadhandler import TemporaryFileUploadHandler
@@ -26,7 +27,7 @@ def file_upload_view(request):
     ):
         # If a file is posted, the dummy client should only post the file name,
         # not the full path.
-        if os.path.dirname(form_data["file_field"].name) != "":
+        if Path(form_data["file_field"].name).parent != Path("."):
             return HttpResponseServerError()
         return HttpResponse()
     else:

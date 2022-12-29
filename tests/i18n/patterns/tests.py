@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -19,7 +19,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=[
-        os.path.join(os.path.dirname(__file__), "locale"),
+        Path(__file__).parent / "locale",
     ],
     LANGUAGE_CODE="en-us",
     LANGUAGES=[
@@ -35,7 +35,7 @@ class PermanentRedirectLocaleMiddleWare(LocaleMiddleware):
     TEMPLATES=[
         {
             "BACKEND": "django.template.backends.django.DjangoTemplates",
-            "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+            "DIRS": [Path(__file__).parent / "templates"],
             "OPTIONS": {
                 "context_processors": [
                     "django.template.context_processors.i18n",

@@ -1,7 +1,7 @@
-import os
 import sys
 import unittest
 from importlib import import_module
+from pathlib import Path
 from zipimport import zipimporter
 
 from django.test import SimpleTestCase, modify_settings
@@ -73,7 +73,7 @@ class DefaultLoader(unittest.TestCase):
 
 class EggLoader(unittest.TestCase):
     def setUp(self):
-        self.egg_dir = "%s/eggs" % os.path.dirname(__file__)
+        self.egg_dir = Path(__file__).parent / "eggs"
 
     def tearDown(self):
         sys.path_importer_cache.clear()
@@ -88,7 +88,7 @@ class EggLoader(unittest.TestCase):
 
     def test_shallow_loader(self):
         "Module existence can be tested inside eggs"
-        egg_name = "%s/test_egg.egg" % self.egg_dir
+        egg_name = self.egg_dir / "test_egg.egg"
         with extend_sys_path(egg_name):
             egg_module = import_module("egg_module")
 
@@ -109,7 +109,7 @@ class EggLoader(unittest.TestCase):
 
     def test_deep_loader(self):
         "Modules deep inside an egg can still be tested for existence"
-        egg_name = "%s/test_egg.egg" % self.egg_dir
+        egg_name = self.egg_dir / "test_egg.egg"
         with extend_sys_path(egg_name):
             egg_module = import_module("egg_module.sub1.sub2")
 

@@ -779,7 +779,7 @@ requires_tz_support = skipUnless(
 def extend_sys_path(*paths):
     """Context manager to temporarily add paths to sys.path."""
     _orig_sys_path = sys.path[:]
-    sys.path.extend(paths)
+    sys.path.extend(str(p) for p in paths)
     try:
         yield
     finally:

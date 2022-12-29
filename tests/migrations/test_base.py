@@ -1,8 +1,8 @@
-import os
 import shutil
 import tempfile
 from contextlib import contextmanager
 from importlib import import_module
+from pathlib import Path
 
 from django.apps import apps
 from django.db import connection, connections, migrations, models
@@ -185,10 +185,9 @@ class MigrationTestBase(TransactionTestCase):
         Returns the filesystem path to the temporary migrations module.
         """
         with tempfile.TemporaryDirectory() as temp_dir:
-            target_dir = tempfile.mkdtemp(dir=temp_dir)
-            with open(os.path.join(target_dir, "__init__.py"), "w"):
-                pass
-            target_migrations_dir = os.path.join(target_dir, "migrations")
+            target_dir = Path(tempfile.mkdtemp(dir=temp_dir))
+            target_dir.joinpath("__init__.py").touch()
+            target_migrations_dir = target_dir / "migrations"
 
             if module is None:
                 module = apps.get_app_config(app_label).name + ".migrations"
@@ -201,7 +200,7 @@ class MigrationTestBase(TransactionTestCase):
                 shutil.copytree(source_migrations_dir, target_migrations_dir)
 
             with extend_sys_path(temp_dir):
-                new_module = os.path.basename(target_dir) + ".migrations"
+                new_module = target_dir.name + ".migrations"
                 with self.settings(MIGRATION_MODULES={app_label: new_module}):
                     yield target_migrations_dir
 

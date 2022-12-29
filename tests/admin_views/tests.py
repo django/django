@@ -1,7 +1,7 @@
 import datetime
-import os
 import re
 import unittest
+from pathlib import Path
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
@@ -1495,8 +1495,8 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             # Put this app's and the shared tests templates dirs in DIRS to
             # take precedence over the admin's templates dir.
             "DIRS": [
-                os.path.join(os.path.dirname(__file__), "templates"),
-                os.path.join(os.path.dirname(os.path.dirname(__file__)), "templates"),
+                Path(__file__).parent / "templates",
+                Path(__file__).parent.parent / "templates",
             ],
             "APP_DIRS": True,
             "OPTIONS": {

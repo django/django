@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
@@ -8,7 +8,7 @@ from django.utils import translation
 @override_settings(
     USE_I18N=True,
     LOCALE_PATHS=[
-        os.path.join(os.path.dirname(__file__), "locale"),
+        Path(__file__).parent / "locale",
     ],
     LANGUAGE_CODE="en",
     LANGUAGES=[

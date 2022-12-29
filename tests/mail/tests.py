@@ -666,9 +666,7 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
                 )
                 self.assertEqual(mimetypes.guess_type(basename)[0], real_mimetype)
                 self.assertEqual(email.attachments, [])
-                file_path = os.path.join(
-                    os.path.dirname(__file__), "attachments", basename
-                )
+                file_path = Path(__file__).parent / "attachments" / basename
                 email.attach_file(file_path, mimetype=mimetype)
                 self.assertEqual(len(email.attachments), 1)
                 self.assertIn(basename, email.attachments[0])
@@ -1569,6 +1567,8 @@ class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
         super().tearDown()
 
     def mkdtemp(self):
+        # Using a path as str on purpose, FileBackendPathLibTests is testing the
+        # same with a pathlib.Path instance.
         return tempfile.mkdtemp()
 
     def flush_mailbox(self):

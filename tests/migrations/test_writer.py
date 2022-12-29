@@ -885,16 +885,16 @@ class WriterTests(SimpleTestCase):
             "migrations.migrations_test_apps.without_init_file",
         ]
 
-        base_dir = os.path.dirname(os.path.dirname(__file__))
+        base_dir = pathlib.Path(__file__).parent.parent
 
         for app in test_apps:
             with self.modify_settings(INSTALLED_APPS={"append": app}):
                 migration = migrations.Migration("0001_initial", app.split(".")[-1])
-                expected_path = os.path.join(
-                    base_dir, *(app.split(".") + ["migrations", "0001_initial.py"])
+                expected_path = base_dir.joinpath(
+                    *app.split("."), "migrations", "0001_initial.py"
                 )
                 writer = MigrationWriter(migration)
-                self.assertEqual(writer.path, expected_path)
+                self.assertEqual(writer.path, str(expected_path))
 
     def test_custom_operation(self):
         migration = type(

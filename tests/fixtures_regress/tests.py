@@ -55,7 +55,7 @@ from .models import (
     Widget,
 )
 
-_cur_dir = os.path.dirname(os.path.abspath(__file__))
+_cur_dir = Path(__file__).parent
 
 
 class TestFixtures(TestCase):
@@ -169,9 +169,7 @@ class TestFixtures(TestCase):
         we need to make sure we don't discover the absolute path in every
         fixture directory.
         """
-        load_absolute_path = os.path.join(
-            os.path.dirname(__file__), "fixtures", "absolute.json"
-        )
+        load_absolute_path = _cur_dir / "fixtures" / "absolute.json"
         management.call_command(
             "loaddata",
             load_absolute_path,
@@ -180,8 +178,8 @@ class TestFixtures(TestCase):
         self.assertEqual(Absolute.objects.count(), 1)
 
     def test_relative_path(self, path=["fixtures", "absolute.json"]):
-        relative_path = os.path.join(*path)
-        cwd = os.getcwd()
+        relative_path = Path().joinpath(*path)
+        cwd = Path.cwd()
         try:
             os.chdir(_cur_dir)
             management.call_command(
@@ -193,7 +191,7 @@ class TestFixtures(TestCase):
             os.chdir(cwd)
         self.assertEqual(Absolute.objects.count(), 1)
 
-    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, "fixtures_1")])
+    @override_settings(FIXTURE_DIRS=[_cur_dir / "fixtures_1"])
     def test_relative_path_in_fixture_dirs(self):
         self.test_relative_path(path=["inner", "absolute.json"])
 
@@ -471,12 +469,7 @@ class TestFixtures(TestCase):
             )
 
     @skipUnlessDBFeature("supports_forward_references")
-    @override_settings(
-        FIXTURE_DIRS=[
-            os.path.join(_cur_dir, "fixtures_1"),
-            os.path.join(_cur_dir, "fixtures_2"),
-        ]
-    )
+    @override_settings(FIXTURE_DIRS=[_cur_dir / "fixtures_1", _cur_dir / "fixtures_2"])
     def test_loaddata_forward_refs_split_fixtures(self):
         """
         Regression for #17530 - should be able to cope with forward references
@@ -539,12 +532,7 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
-    @override_settings(
-        FIXTURE_DIRS=[
-            os.path.join(_cur_dir, "fixtures_1"),
-            os.path.join(_cur_dir, "fixtures_1"),
-        ]
-    )
+    @override_settings(FIXTURE_DIRS=[_cur_dir / "fixtures_1", _cur_dir / "fixtures_1"])
     def test_fixture_dirs_with_duplicates(self):
         """
         settings.FIXTURE_DIRS cannot contain duplicates in order to avoid
@@ -555,7 +543,7 @@ class TestFixtures(TestCase):
         ):
             management.call_command("loaddata", "absolute.json", verbosity=0)
 
-    @override_settings(FIXTURE_DIRS=[os.path.join(_cur_dir, "fixtures")])
+    @override_settings(FIXTURE_DIRS=[_cur_dir / "fixtures"])
     def test_fixture_dirs_with_default_fixture_path(self):
         """
         settings.FIXTURE_DIRS cannot contain a default fixtures directory
@@ -564,7 +552,7 @@ class TestFixtures(TestCase):
         msg = (
             "'%s' is a default fixture directory for the '%s' app "
             "and cannot be listed in settings.FIXTURE_DIRS."
-            % (os.path.join(_cur_dir, "fixtures"), "fixtures_regress")
+            % (_cur_dir / "fixtures", "fixtures_regress")
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             management.call_command("loaddata", "absolute.json", verbosity=0)
@@ -583,12 +571,7 @@ class TestFixtures(TestCase):
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             management.call_command("loaddata", "absolute.json", verbosity=0)
 
-    @override_settings(
-        FIXTURE_DIRS=[
-            os.path.join(_cur_dir, "fixtures_1"),
-            os.path.join(_cur_dir, "fixtures_2"),
-        ]
-    )
+    @override_settings(FIXTURE_DIRS=[_cur_dir / "fixtures_1", _cur_dir / "fixtures_2"])
     def test_loaddata_with_valid_fixture_dirs(self):
         management.call_command(
             "loaddata",
@@ -596,8 +579,8 @@ class TestFixtures(TestCase):
             verbosity=0,
         )
 
-    @override_settings(FIXTURE_DIRS=[Path(_cur_dir) / "fixtures_1"])
-    def test_fixtures_dir_pathlib(self):
+    @override_settings(FIXTURE_DIRS=[str(_cur_dir / "fixtures_1")])
+    def test_fixtures_dir_as_str(self):
         management.call_command("loaddata", "inner/absolute.json", verbosity=0)
         self.assertQuerySetEqual(Absolute.objects.all(), [1], transform=lambda o: o.pk)
 
@@ -958,12 +941,11 @@ class TestLoadFixtureFromOtherAppDirectory(TestCase):
     paths on Windows.
     """
 
-    current_dir = os.path.abspath(os.path.dirname(__file__))
     # relative_prefix is something like tests/fixtures_regress or
     # fixtures_regress depending on how runtests.py is invoked.
     # All path separators must be / in order to be a proper regression test on
     # Windows, so replace as appropriate.
-    relative_prefix = os.path.relpath(current_dir, os.getcwd()).replace("\\", "/")
+    relative_prefix = os.path.relpath(_cur_dir, os.getcwd()).replace("\\", "/")
     fixtures = [relative_prefix + "/fixtures/absolute.json"]
 
     def test_fixtures_loaded(self):

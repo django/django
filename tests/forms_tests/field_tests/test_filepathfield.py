@@ -1,16 +1,16 @@
-import os.path
+from pathlib import Path
 
 from django.core.exceptions import ValidationError
 from django.forms import FilePathField
 from django.test import SimpleTestCase
 
-PATH = os.path.dirname(os.path.abspath(__file__))
+PATH = Path(__file__).parent
 
 
 def fix_os_paths(x):
     if isinstance(x, str):
-        if x.startswith(PATH):
-            x = x[len(PATH) :]
+        if x.startswith(str(PATH)):
+            x = x[len(str(PATH)) :]
         return x.replace("\\", "/")
     elif isinstance(x, tuple):
         return tuple(fix_os_paths(list(x)))
@@ -34,7 +34,7 @@ class FilePathFieldTest(SimpleTestCase):
         ("/filepathfield_test_dir/h/__init__.py", "__init__.py"),
         ("/filepathfield_test_dir/j/__init__.py", "__init__.py"),
     ]
-    path = os.path.join(PATH, "filepathfield_test_dir") + "/"
+    path = str(PATH / "filepathfield_test_dir") + "/"
 
     def assertChoices(self, field, expected_choices):
         self.assertEqual(fix_os_paths(field.choices), expected_choices)

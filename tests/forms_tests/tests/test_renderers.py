@@ -1,5 +1,5 @@
-import os
 import unittest
+from pathlib import Path
 
 from django.forms.renderers import (
     BaseRenderer,
@@ -23,14 +23,10 @@ class SharedTests:
         renderer = self.renderer()
         # Found because forms_tests is .
         tpl = renderer.get_template("forms_tests/custom_widget.html")
-        expected_path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                self.expected_widget_dir + "/forms_tests/custom_widget.html",
-            )
+        expected_path = Path(__file__).parent.parent.joinpath(
+            self.expected_widget_dir, "forms_tests", "custom_widget.html"
         )
-        self.assertEqual(tpl.origin.name, expected_path)
+        self.assertEqual(tpl.origin.name, str(expected_path))
 
 
 class BaseTemplateRendererTests(SimpleTestCase):

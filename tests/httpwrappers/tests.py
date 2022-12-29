@@ -1,9 +1,9 @@
 import copy
 import json
-import os
 import pickle
 import unittest
 import uuid
+from pathlib import Path
 
 from django.core.exceptions import DisallowedRedirect
 from django.core.serializers.json import DjangoJSONEncoder
@@ -767,7 +767,7 @@ class FileCloseTests(SimpleTestCase):
         request_finished.connect(close_old_connections)
 
     def test_response(self):
-        filename = os.path.join(os.path.dirname(__file__), "abc.txt")
+        filename = Path(__file__).parent / "abc.txt"
 
         # file isn't closed until we close the response.
         file1 = open(filename)
@@ -785,7 +785,7 @@ class FileCloseTests(SimpleTestCase):
         self.assertTrue(file2.closed)
 
     def test_streaming_response(self):
-        filename = os.path.join(os.path.dirname(__file__), "abc.txt")
+        filename = Path(__file__).parent / "abc.txt"
 
         # file isn't closed until we close the response.
         file1 = open(filename)

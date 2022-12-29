@@ -99,13 +99,13 @@ class FileStorageTests(SimpleTestCase):
     storage_class = FileSystemStorage
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
+        self.temp_dir = Path(tempfile.mkdtemp())
         self.storage = self.storage_class(
             location=self.temp_dir, base_url="/test_media_url/"
         )
         # Set up a second temporary directory which is ensured to have a mixed
         # case name.
-        self.temp_dir2 = tempfile.mkdtemp(suffix="aBc")
+        self.temp_dir2 = Path(tempfile.mkdtemp(suffix="aBc"))
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
@@ -295,7 +295,7 @@ class FileStorageTests(SimpleTestCase):
 
         self.assertEqual(storage_f_name, f.name)
 
-        self.assertTrue(os.path.exists(os.path.join(self.temp_dir, f.name)))
+        self.assertTrue(self.temp_dir.joinpath(f.name).exists())
 
         self.storage.delete(storage_f_name)
 
@@ -310,16 +310,14 @@ class FileStorageTests(SimpleTestCase):
         with self.storage.open("path/to/test.file") as f:
             self.assertEqual(f.read(), b"file saved with path")
 
-        self.assertTrue(
-            os.path.exists(os.path.join(self.temp_dir, "path", "to", "test.file"))
-        )
+        self.assertTrue(self.temp_dir.joinpath("path", "to", "test.file").exists())
 
         self.storage.delete("path/to/test.file")
 
     def test_file_save_abs_path(self):
         test_name = "path/to/test.file"
         f = ContentFile("file saved with path")
-        f_name = self.storage.save(os.path.join(self.temp_dir, test_name), f)
+        f_name = self.storage.save(self.temp_dir / test_name, f)
         self.assertEqual(f_name, test_name)
 
     @unittest.skipUnless(
@@ -327,12 +325,12 @@ class FileStorageTests(SimpleTestCase):
     )
     def test_file_save_broken_symlink(self):
         """A new path is created on save when a broken symlink is supplied."""
-        nonexistent_file_path = os.path.join(self.temp_dir, "nonexistent.txt")
-        broken_symlink_path = os.path.join(self.temp_dir, "symlink.txt")
+        nonexistent_file_path = self.temp_dir / "nonexistent.txt"
+        broken_symlink_path = self.temp_dir / "symlink.txt"
         os.symlink(nonexistent_file_path, broken_symlink_path)
         f = ContentFile("some content")
         f_name = self.storage.save(broken_symlink_path, f)
-        self.assertIs(os.path.exists(os.path.join(self.temp_dir, f_name)), True)
+        self.assertIs(self.temp_dir.joinpath(f_name).exists(), True)
 
     def test_save_doesnt_close(self):
         with TemporaryUploadedFile("test", "text/plain", 1, "utf8") as file:
@@ -418,7 +416,7 @@ class FileStorageTests(SimpleTestCase):
 
         self.storage.save("storage_test_1", ContentFile("custom content"))
         self.storage.save("storage_test_2", ContentFile("custom content"))
-        os.mkdir(os.path.join(self.temp_dir, "storage_dir_1"))
+        self.temp_dir.joinpath("storage_dir_1").mkdir()
 
         self.addCleanup(self.storage.delete, "storage_test_1")
         self.addCleanup(self.storage.delete, "storage_test_2")
@@ -669,13 +667,13 @@ class OverwritingStorageTests(FileStorageTests):
         try:
             self.assertEqual(stored_name_1, name)
             self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            self.assertTrue(self.temp_dir.joinpath(name).exists())
             with self.storage.open(name) as fp:
                 self.assertEqual(fp.read(), content_1)
             stored_name_2 = self.storage.save(name, f_2)
             self.assertEqual(stored_name_2, name)
             self.assertTrue(self.storage.exists(name))
-            self.assertTrue(os.path.exists(os.path.join(self.temp_dir, name)))
+            self.assertTrue(self.temp_dir.joinpath(name).exists())
             with self.storage.open(name) as fp:
                 self.assertEqual(fp.read(), content_2)
         finally:
@@ -1078,7 +1076,7 @@ class FileStoragePermissions(unittest.TestCase):
 
 class FileStoragePathParsing(SimpleTestCase):
     def setUp(self):
-        self.storage_dir = tempfile.mkdtemp()
+        self.storage_dir = Path(tempfile.mkdtemp())
         self.storage = FileSystemStorage(self.storage_dir)
 
     def tearDown(self):
@@ -1094,10 +1092,10 @@ class FileStoragePathParsing(SimpleTestCase):
         self.storage.save("dotted.path/test", ContentFile("1"))
         self.storage.save("dotted.path/test", ContentFile("2"))
 
-        files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
-        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
-        self.assertEqual(files[0], "test")
-        self.assertRegex(files[1], "test_%s" % FILE_SUFFIX_REGEX)
+        files = sorted(self.storage_dir.joinpath("dotted.path").iterdir())
+        self.assertFalse(self.storage_dir.joinpath("dotted_.path").exists())
+        self.assertEqual(files[0].name, "test")
+        self.assertRegex(files[1].name, "test_%s" % FILE_SUFFIX_REGEX)
 
     def test_first_character_dot(self):
         """
@@ -1107,10 +1105,10 @@ class FileStoragePathParsing(SimpleTestCase):
         self.storage.save("dotted.path/.test", ContentFile("1"))
         self.storage.save("dotted.path/.test", ContentFile("2"))
 
-        files = sorted(os.listdir(os.path.join(self.storage_dir, "dotted.path")))
-        self.assertFalse(os.path.exists(os.path.join(self.storage_dir, "dotted_.path")))
-        self.assertEqual(files[0], ".test")
-        self.assertRegex(files[1], ".test_%s" % FILE_SUFFIX_REGEX)
+        files = sorted(self.storage_dir.joinpath("dotted.path").iterdir())
+        self.assertFalse(self.storage_dir.joinpath("dotted_.path").exists())
+        self.assertEqual(files[0].name, ".test")
+        self.assertRegex(files[1].name, ".test_%s" % FILE_SUFFIX_REGEX)
 
 
 class ContentFileStorageTestCase(unittest.TestCase):

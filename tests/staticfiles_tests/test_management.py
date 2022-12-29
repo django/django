@@ -267,9 +267,8 @@ class TestCollectionClear(CollectionTestCase):
     """
 
     def run_collectstatic(self, **kwargs):
-        clear_filepath = os.path.join(settings.STATIC_ROOT, "cleared.txt")
-        with open(clear_filepath, "w") as f:
-            f.write("should be cleared")
+        clear_filepath = Path(settings.STATIC_ROOT) / "cleared.txt"
+        clear_filepath.write_text("should be cleared")
         super().run_collectstatic(clear=True)
 
     def test_cleared_not_found(self):
@@ -411,30 +410,26 @@ class TestCollectionFilesOverride(CollectionTestCase):
     """
 
     def setUp(self):
-        self.temp_dir = tempfile.mkdtemp()
+        self.temp_dir = Path(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.temp_dir)
 
         # get modification and access times for no_label/static/file2.txt
-        self.orig_path = os.path.join(
-            TEST_ROOT, "apps", "no_label", "static", "file2.txt"
-        )
-        self.orig_mtime = os.path.getmtime(self.orig_path)
-        self.orig_atime = os.path.getatime(self.orig_path)
+        self.orig_path = TEST_ROOT / "apps" / "no_label" / "static" / "file2.txt"
+        self.orig_mtime = self.orig_path.stat().st_mtime
+        self.orig_atime = self.orig_path.stat().st_atime
 
         # prepare duplicate of file2.txt from a temporary app
         # this file will have modification time older than no_label/static/file2.txt
         # anyway it should be taken to STATIC_ROOT because the temporary app is before
         # 'no_label' app in installed apps
-        self.temp_app_path = os.path.join(self.temp_dir, "staticfiles_test_app")
-        self.testfile_path = os.path.join(self.temp_app_path, "static", "file2.txt")
+        self.temp_app_path = self.temp_dir / "staticfiles_test_app"
+        self.testfile_path = self.temp_app_path / "static" / "file2.txt"
 
-        os.makedirs(self.temp_app_path)
-        with open(os.path.join(self.temp_app_path, "__init__.py"), "w+"):
-            pass
+        self.temp_app_path.mkdir()
+        self.temp_app_path.joinpath("__init__.py").touch()
 
-        os.makedirs(os.path.dirname(self.testfile_path))
-        with open(self.testfile_path, "w+") as f:
-            f.write("duplicate of file2.txt")
+        self.testfile_path.parent.mkdir()
+        self.testfile_path.write_text("duplicate of file2.txt")
 
         os.utime(self.testfile_path, (self.orig_atime - 1, self.orig_mtime - 1))
 
@@ -501,16 +496,15 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
         There is a warning when there are duplicate destinations.
         """
         with tempfile.TemporaryDirectory() as static_dir:
-            duplicate = os.path.join(static_dir, "test", "file.txt")
-            os.mkdir(os.path.dirname(duplicate))
-            with open(duplicate, "w+") as f:
-                f.write("duplicate of file.txt")
+            duplicate = Path(static_dir) / "test" / "file.txt"
+            duplicate.parent.mkdir()
+            duplicate.write_text("duplicate of file.txt")
 
             with self.settings(STATICFILES_DIRS=[static_dir]):
                 output = self._collectstatic_output(clear=True)
             self.assertIn(self.warning_string, output)
 
-            os.remove(duplicate)
+            duplicate.unlink()
 
             # Make sure the warning went away again.
             with self.settings(STATICFILES_DIRS=[static_dir]):
@@ -573,28 +567,28 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
         """
         With ``--link``, symbolic links are created.
         """
-        self.assertTrue(os.path.islink(os.path.join(settings.STATIC_ROOT, "test.txt")))
+        self.assertTrue(Path(settings.STATIC_ROOT).joinpath("test.txt").is_symlink())
 
     def test_broken_symlink(self):
         """
         Test broken symlink gets deleted.
         """
-        path = os.path.join(settings.STATIC_ROOT, "test.txt")
-        os.unlink(path)
+        path = Path(settings.STATIC_ROOT) / "test.txt"
+        path.unlink()
         self.run_collectstatic()
-        self.assertTrue(os.path.islink(path))
+        self.assertTrue(path.is_symlink())
 
     def test_symlinks_and_files_replaced(self):
         """
         Running collectstatic in non-symlink mode replaces symlinks with files,
         while symlink mode replaces files with symlinks.
         """
-        path = os.path.join(settings.STATIC_ROOT, "test.txt")
-        self.assertTrue(os.path.islink(path))
+        path = Path(settings.STATIC_ROOT) / "test.txt"
+        self.assertTrue(path.is_symlink())
         self.run_collectstatic(link=False)
-        self.assertFalse(os.path.islink(path))
+        self.assertFalse(path.is_symlink())
         self.run_collectstatic(link=True)
-        self.assertTrue(os.path.islink(path))
+        self.assertTrue(path.is_symlink())
 
     def test_clear_broken_symlink(self):
         """

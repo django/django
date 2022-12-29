@@ -1,5 +1,5 @@
-import os
 from datetime import date
+from pathlib import Path
 
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
@@ -61,7 +61,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         TEMPLATES=[
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+                "DIRS": [Path(__file__).parent / "templates"],
             }
         ]
     )
@@ -133,7 +133,7 @@ class HTTPSitemapTests(SitemapTestsBase):
         TEMPLATES=[
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+                "DIRS": [Path(__file__).parent / "templates"],
             }
         ]
     )
@@ -590,7 +590,7 @@ class DeprecatedTests(SitemapTestsBase):
         TEMPLATES=[
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+                "DIRS": [Path(__file__).parent / "templates"],
             }
         ]
     )
@@ -607,7 +607,7 @@ class DeprecatedTests(SitemapTestsBase):
         TEMPLATES=[
             {
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
+                "DIRS": [Path(__file__).parent / "templates"],
             }
         ]
     )

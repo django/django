@@ -1,6 +1,6 @@
 import datetime
-import os
 from decimal import Decimal
+from pathlib import Path
 from unittest import mock, skipUnless
 
 from django import forms
@@ -2627,9 +2627,7 @@ class FileAndImageFieldTests(TestCase):
                 fields = "__all__"
 
         # Grab an image for testing.
-        filename = os.path.join(os.path.dirname(__file__), "test.png")
-        with open(filename, "rb") as fp:
-            img = fp.read()
+        img = Path(__file__).parent.joinpath("test.png").read_bytes()
 
         # Fake a POST QueryDict and FILES MultiValueDict.
         data = {"title": "Testing"}
@@ -2665,10 +2663,8 @@ class FileAndImageFieldTests(TestCase):
         # it comes to validation. This specifically tests that #6302 is fixed for
         # both file fields and image fields.
 
-        with open(os.path.join(os.path.dirname(__file__), "test.png"), "rb") as fp:
-            image_data = fp.read()
-        with open(os.path.join(os.path.dirname(__file__), "test2.png"), "rb") as fp:
-            image_data2 = fp.read()
+        image_data = Path(__file__).parent.joinpath("test.png").read_bytes()
+        image_data2 = Path(__file__).parent.joinpath("test2.png").read_bytes()
 
         f = ImageFileForm(
             data={"description": "An image"},

@@ -5,6 +5,7 @@ import unittest.loader
 from argparse import ArgumentParser
 from contextlib import contextmanager
 from importlib import import_module
+from pathlib import Path
 from unittest import TestSuite, TextTestRunner, defaultTestLoader, mock
 
 from django.db import connections
@@ -20,9 +21,9 @@ from django.test.utils import (
 
 @contextmanager
 def change_cwd(directory):
-    current_dir = os.path.abspath(os.path.dirname(__file__))
-    new_dir = os.path.join(current_dir, directory)
-    old_cwd = os.getcwd()
+    current_dir = Path(__file__).parent
+    new_dir = current_dir / directory
+    old_cwd = Path.cwd()
     os.chdir(new_dir)
     try:
         yield

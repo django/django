@@ -1,13 +1,13 @@
-import os
+from pathlib import Path
 
 from django.conf import settings
 from django.test import SimpleTestCase
 from django.utils.translation import activate, get_language
 
-here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-pdir = os.path.split(os.path.split(os.path.abspath(here))[0])[0]
+here = Path(__file__).parent.parent
+tests_dir = here.parent.parent
 extended_locale_paths = settings.LOCALE_PATHS + [
-    os.path.join(pdir, "i18n", "other", "locale"),
+    tests_dir / "i18n" / "other" / "locale",
 ]
 
 

@@ -1,5 +1,5 @@
-import os
 from functools import partial
+from pathlib import Path
 
 from django.conf.urls.i18n import i18n_patterns
 from django.urls import include, path, re_path
@@ -8,9 +8,9 @@ from django.views import defaults, i18n, static
 
 from . import views
 
-base_dir = os.path.dirname(os.path.abspath(__file__))
-media_dir = os.path.join(base_dir, "media")
-locale_dir = os.path.join(base_dir, "locale")
+base_dir = Path(__file__).parent
+media_dir = base_dir / "media"
+locale_dir = base_dir / "locale"
 
 urlpatterns = [
     path("", views.index_page),

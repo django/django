@@ -2,11 +2,11 @@
 Tests for django.core.servers.
 """
 import errno
-import os
 import socket
 import threading
 import unittest
 from http.client import HTTPConnection
+from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import urlopen
@@ -19,12 +19,12 @@ from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
 from .models import Person
 
-TEST_ROOT = os.path.dirname(__file__)
+TEST_ROOT = Path(__file__).parent
 TEST_SETTINGS = {
     "MEDIA_URL": "media/",
-    "MEDIA_ROOT": os.path.join(TEST_ROOT, "media"),
+    "MEDIA_ROOT": TEST_ROOT / "media",
     "STATIC_URL": "static/",
-    "STATIC_ROOT": os.path.join(TEST_ROOT, "static"),
+    "STATIC_ROOT": TEST_ROOT / "static",
 }
 
 
