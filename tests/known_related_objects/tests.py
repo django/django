@@ -164,3 +164,23 @@ class ExistingRelatedInstancesTests(TestCase):
             )
             self.assertIs(ps[0], ps[0].pool_1.poolstyle)
             self.assertIs(ps[0], ps[0].pool_2.another_style)
+
+    def test_multilevel_reverse_fk_cyclic_select_related(self):
+        with self.assertNumQueries(3):
+            p = list(
+                PoolStyle.objects.annotate(
+                    tournament_pool=FilteredRelation("pool__tournament__pool"),
+                ).select_related("tournament_pool", "tournament_pool__tournament")
+            )
+            self.assertEqual(p[0].tournament_pool.tournament, p[0].pool.tournament)
+
+    def test_multilevel_reverse_fk_select_related(self):
+        with self.assertNumQueries(2):
+            p = list(
+                Tournament.objects.filter(id=self.t2.id)
+                .annotate(
+                    style=FilteredRelation("pool__another_style"),
+                )
+                .select_related("style")
+            )
+            self.assertEqual(p[0].style.another_pool, self.p3)
