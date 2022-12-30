@@ -6,7 +6,7 @@ from django.core.files.uploadhandler import TemporaryFileUploadHandler
 from django.http import HttpResponse, HttpResponseServerError, JsonResponse
 
 from .models import FileModel
-from .tests import UNICODE_FILENAME, UPLOAD_TO
+from .tests import UNICODE_FILENAME, UPLOAD_FOLDER
 from .uploadhandler import (
     ErroringUploadHandler,
     QuotaUploadHandler,
@@ -68,9 +68,13 @@ def file_upload_unicode_name(request):
     # Check to make sure the exotic characters are preserved even
     # through file save.
     uni_named_file = request.FILES["file_unicode"]
-    FileModel.objects.create(testfile=uni_named_file)
-    full_name = "%s/%s" % (UPLOAD_TO, uni_named_file.name)
-    return HttpResponse() if os.path.exists(full_name) else HttpResponseServerError()
+    file_model = FileModel.objects.create(testfile=uni_named_file)
+    full_name = f"{UPLOAD_FOLDER}/{uni_named_file.name}"
+    return (
+        HttpResponse()
+        if file_model.testfile.storage.exists(full_name)
+        else HttpResponseServerError()
+    )
 
 
 def file_upload_echo(request):
