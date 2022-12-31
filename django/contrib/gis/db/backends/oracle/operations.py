@@ -122,6 +122,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "ForcePolygonCW",
         "GeoHash",
         "GeometryDistance",
+        "IsEmpty",
         "LineLocatePoint",
         "MakeValid",
         "MemSize",

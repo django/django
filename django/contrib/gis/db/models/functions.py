@@ -382,6 +382,12 @@ class Intersection(OracleToleranceMixin, GeomOutputGeoFunc):
 
 
 @BaseSpatialField.register_lookup
+class IsEmpty(GeoFuncMixin, Transform):
+    lookup_name = "isempty"
+    output_field = BooleanField()
+
+
+@BaseSpatialField.register_lookup
 class IsValid(OracleToleranceMixin, GeoFuncMixin, Transform):
     lookup_name = "isvalid"
     output_field = BooleanField()

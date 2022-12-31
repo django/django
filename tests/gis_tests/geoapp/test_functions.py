@@ -371,6 +371,18 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             else:
                 self.assertIs(c.inter.empty, True)
 
+    @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
+    def test_isempty(self):
+        empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
+        City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
+        self.assertSequenceEqual(
+            City.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=True
+            ),
+            [empty],
+        )
+        self.assertSequenceEqual(City.objects.filter(point__isempty=True), [empty])
+
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):
         valid_geom = fromstr("POLYGON((0 0, 0 1, 1 1, 1 0, 0 0))")
