@@ -72,6 +72,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "BoundingCircle",
             "ForcePolygonCW",
             "GeometryDistance",
+            "IsEmpty",
             "LineLocatePoint",
             "MakeValid",
             "MemSize",
