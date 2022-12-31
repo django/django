@@ -31,7 +31,7 @@
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
 &rsaquo; <a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
-&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+&rsaquo; <a href="#" aria-current="page">{{ cl.opts.verbose_name_plural|capfirst }}</a>
 </div>
 {% endblock %}
 {% endif %}

@@ -19,7 +19,9 @@ class AdminBreadcrumbsTests(TestCase):
     def test_breadcrumbs_absent(self):
         response = self.client.get(reverse("admin:index"))
         self.assertNotContains(response, '<nav aria-label="Breadcrumbs">')
+        self.assertNotContains(response, '<a href="#" aria-current="page">')
 
     def test_breadcrumbs_present(self):
         response = self.client.get(reverse("admin:auth_user_add"))
         self.assertContains(response, '<nav aria-label="Breadcrumbs">')
+        self.assertContains(response, '<a href="#" aria-current="page">')

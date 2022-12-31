@@ -74,7 +74,7 @@
         {% block breadcrumbs %}
           <div class="breadcrumbs">
             <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
-            {% if title %} &rsaquo; {{ title }}{% endif %}
+            {% if title %} &rsaquo; <a href="#" aria-current="page">{{ title }}</a>{% endif %}
           </div>
         {% endblock %}
       </nav>

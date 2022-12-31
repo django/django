@@ -93,7 +93,7 @@ class AdminSidebarTests(TestCase):
         )
         # Does not include aria-current attribute.
         self.assertContains(response, '<a href="%s">Users</a>' % url)
-        self.assertNotContains(response, "aria-current")
+        self.assertNotContains(response, '<a href="%s" aria-current="page">Users</a>' % url)
 
     @override_settings(DEBUG=True)
     def test_included_app_list_template_context_fully_set(self):

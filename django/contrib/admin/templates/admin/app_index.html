@@ -8,9 +8,11 @@
 <div class="breadcrumbs">
 <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
 &rsaquo;
+<a href="#" aria-current="page">
 {% for app in app_list %}
 {{ app.name }}
 {% endfor %}
+</a>
 </div>
 {% endblock %}
 {% endif %}
