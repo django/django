@@ -219,7 +219,9 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             }
             if self.choices:
                 warnings.warn(
-                    "Choices should be defined in base field.", RemovedInDjango51Warning
+                    "Choices should be defined in base field.",
+                    RemovedInDjango51Warning,
+                    stacklevel=2,
                 )
         return obj.formfield(**{**defaults, **kwargs})
 

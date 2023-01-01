@@ -3,7 +3,6 @@ import enum
 import json
 import unittest
 import uuid
-import warnings
 
 from django import forms
 from django.core import checks, exceptions, serializers, validators
@@ -1139,12 +1138,9 @@ class TestChoiceFormField(PostgreSQLTestCase):
         model_field = ArrayField(
             models.CharField(max_length=27), choices=(("a1", "A1"), ("b1", "B1"))
         )
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")
+        msg = "Choices should be defined in base field."
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
             model_field.formfield()
-            assert len(w) == 1
-            assert issubclass(w[-1].category, RemovedInDjango51Warning)
-            assert "Choices should be defined in base field." in str(w[-1].message)
 
 
 class TestSplitFormField(PostgreSQLSimpleTestCase):
