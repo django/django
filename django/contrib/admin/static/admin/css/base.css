@@ -51,7 +51,7 @@ html[data-theme="light"],
     --delete-button-bg: #ba2121;
     --delete-button-hover-bg: #a41515;
 
-    --object-tools-fg: var(--button-fg);
+    --object-tools-fg: var(--primary-fg);
     --object-tools-bg: var(--close-button-bg);
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
@@ -774,7 +774,7 @@ a.deletelink:focus, a.deletelink:hover {
     float: left;
     padding: 3px 12px;
     background: var(--object-tools-bg);
-    color: var(--primary-fg);
+    color: var(--object-tools-fg);
     font-weight: 400;
     font-size: 0.6875rem;
     text-transform: uppercase;
