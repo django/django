@@ -235,6 +235,7 @@ class Widget(metaclass=MediaDefiningClass):
     is_required = False
     supports_microseconds = True
     use_fieldset = False
+    autocomplete = False
 
     def __init__(self, attrs=None):
         self.attrs = {} if attrs is None else attrs.copy()
