@@ -939,8 +939,8 @@ class TypedChoiceField(ChoiceField):
 
 
 class MultipleChoiceField(ChoiceField):
-    hidden_widget = MultipleHiddenInput
-    widget = SelectMultiple
+    hidden_widget = MultipleHiddenInput(attrs={'autocomplete': 'off'})
+    widget = SelectMultiple(attrs={'autocomplete': 'off'})
     default_error_messages = {
         "invalid_choice": _(
             "Select a valid choice. %(value)s is not one of the available choices."
