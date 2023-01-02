@@ -44,7 +44,7 @@ html[data-theme="light"],
     --button-fg: #fff;
     --button-bg: var(--primary);
     --button-hover-bg: #609ab6;
-    --default-button-bg: var(--secondary);
+    --default-button-bg: var(--button-fg);
     --default-button-hover-bg: #205067;
     --close-button-bg: #747474;
     --close-button-hover-bg: #333;
@@ -540,7 +540,7 @@ a.button {
 .button.default, input[type=submit].default, .submit-row input.default {
     border: none;
     font-weight: 400;
-    color: var(--button-fg);
+    background: var(--default-button-bg);
 }
 
 .button.default:active, input[type=submit].default:active,
