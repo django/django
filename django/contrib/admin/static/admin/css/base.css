@@ -21,7 +21,7 @@ html[data-theme="light"],
     --header-link-color: var(--primary-fg);
 
     --breadcrumbs-fg: #c4dce8;
-    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-link-fg: var(--body-loud-color);
     --breadcrumbs-bg: var(--primary);
 
     --link-fg: #417893;
@@ -709,7 +709,7 @@ div.breadcrumbs {
 }
 
 div.breadcrumbs a {
-    color: var(--body-loud-color);
+    color: var(--breadcrumbs-link-fg);
 }
 
 div.breadcrumbs a:focus, div.breadcrumbs a:hover {
