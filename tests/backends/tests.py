@@ -142,6 +142,23 @@ class LastExecutedQueryTest(TestCase):
                 sql % params,
             )
 
+    def test_last_executed_query_with_duplicate_params(self):
+        square_opts = Square._meta
+        table = connection.introspection.identifier_converter(square_opts.db_table)
+        id_column = connection.ops.quote_name(square_opts.get_field("id").column)
+        root_column = connection.ops.quote_name(square_opts.get_field("root").column)
+        sql = f"UPDATE {table} SET {root_column} = %s + %s WHERE {id_column} = %s"
+        with connection.cursor() as cursor:
+            params = [42, 42, 1]
+            cursor.execute(sql, params)
+            last_executed_query = connection.ops.last_executed_query(
+                cursor, sql, params
+            )
+            self.assertEqual(
+                last_executed_query,
+                f"UPDATE {table} SET {root_column} = 42 + 42 WHERE {id_column} = 1",
+            )
+
 
 class ParameterHandlingTest(TestCase):
     def test_bad_parameter_count(self):
@@ -437,7 +454,7 @@ class BackendTestCase(TransactionTestCase):
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         # Both InterfaceError and ProgrammingError seem to be used when
-        # accessing closed cursor (psycopg2 has InterfaceError, rest seem
+        # accessing closed cursor (psycopg has InterfaceError, rest seem
         # to use ProgrammingError).
         with self.assertRaises(connection.features.closed_cursor_error_class):
             # cursor should be closed, so no queries should be possible.
@@ -445,12 +462,12 @@ class BackendTestCase(TransactionTestCase):
 
     @unittest.skipUnless(
         connection.vendor == "postgresql",
-        "Psycopg2 specific cursor.closed attribute needed",
+        "Psycopg specific cursor.closed attribute needed",
     )
     def test_cursor_contextmanager_closing(self):
         # There isn't a generic way to test that cursors are closed, but
-        # psycopg2 offers us a way to check that by closed attribute.
-        # So, run only on psycopg2 for that reason.
+        # psycopg offers us a way to check that by closed attribute.
+        # So, run only on psycopg for that reason.
         with connection.cursor() as cursor:
             self.assertIsInstance(cursor, CursorWrapper)
         self.assertTrue(cursor.closed)

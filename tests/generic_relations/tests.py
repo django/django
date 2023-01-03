@@ -45,6 +45,10 @@ class GenericRelationsTests(TestCase):
         # Original list of tags:
         return obj.tag, obj.content_type.model_class(), obj.object_id
 
+    async def test_generic_async_acreate(self):
+        await self.bacon.tags.acreate(tag="orange")
+        self.assertEqual(await self.bacon.tags.acount(), 3)
+
     def test_generic_update_or_create_when_created(self):
         """
         Should be able to use update_or_create from the generic related manager
@@ -69,6 +73,18 @@ class GenericRelationsTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(count + 1, self.bacon.tags.count())
         self.assertEqual(tag.tag, "juicy")
+
+    async def test_generic_async_aupdate_or_create(self):
+        tag, created = await self.bacon.tags.aupdate_or_create(
+            id=self.fatty.id, defaults={"tag": "orange"}
+        )
+        self.assertIs(created, False)
+        self.assertEqual(tag.tag, "orange")
+        self.assertEqual(await self.bacon.tags.acount(), 2)
+        tag, created = await self.bacon.tags.aupdate_or_create(tag="pink")
+        self.assertIs(created, True)
+        self.assertEqual(await self.bacon.tags.acount(), 3)
+        self.assertEqual(tag.tag, "pink")
 
     def test_generic_get_or_create_when_created(self):
         """
@@ -95,6 +111,18 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(count + 1, self.bacon.tags.count())
         # shouldn't had changed the tag
         self.assertEqual(tag.tag, "stinky")
+
+    async def test_generic_async_aget_or_create(self):
+        tag, created = await self.bacon.tags.aget_or_create(
+            id=self.fatty.id, defaults={"tag": "orange"}
+        )
+        self.assertIs(created, False)
+        self.assertEqual(tag.tag, "fatty")
+        self.assertEqual(await self.bacon.tags.acount(), 2)
+        tag, created = await self.bacon.tags.aget_or_create(tag="orange")
+        self.assertIs(created, True)
+        self.assertEqual(await self.bacon.tags.acount(), 3)
+        self.assertEqual(tag.tag, "orange")
 
     def test_generic_relations_m2m_mimic(self):
         """
@@ -296,6 +324,13 @@ class GenericRelationsTests(TestCase):
         with self.assertRaisesMessage(TypeError, msg):
             self.bacon.tags.add(self.lion)
 
+    async def test_aadd(self):
+        bacon = await Vegetable.objects.acreate(name="Bacon", is_yucky=False)
+        t1 = await TaggedItem.objects.acreate(content_object=self.quartz, tag="shiny")
+        t2 = await TaggedItem.objects.acreate(content_object=self.quartz, tag="fatty")
+        await bacon.tags.aadd(t1, t2, bulk=False)
+        self.assertEqual(await bacon.tags.acount(), 2)
+
     def test_set(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
         fatty = bacon.tags.create(tag="fatty")
@@ -318,6 +353,16 @@ class GenericRelationsTests(TestCase):
 
         bacon.tags.set([], clear=True)
         self.assertSequenceEqual(bacon.tags.all(), [])
+
+    async def test_aset(self):
+        bacon = await Vegetable.objects.acreate(name="Bacon", is_yucky=False)
+        fatty = await bacon.tags.acreate(tag="fatty")
+        await bacon.tags.aset([fatty])
+        self.assertEqual(await bacon.tags.acount(), 1)
+        await bacon.tags.aset([])
+        self.assertEqual(await bacon.tags.acount(), 0)
+        await bacon.tags.aset([fatty], bulk=False, clear=True)
+        self.assertEqual(await bacon.tags.acount(), 1)
 
     def test_assign(self):
         bacon = Vegetable.objects.create(name="Bacon", is_yucky=False)
@@ -360,6 +405,10 @@ class GenericRelationsTests(TestCase):
             [self.hairy, self.yellow],
         )
 
+    async def test_aclear(self):
+        await self.bacon.tags.aclear()
+        self.assertEqual(await self.bacon.tags.acount(), 0)
+
     def test_remove(self):
         self.assertSequenceEqual(
             TaggedItem.objects.order_by("tag"),
@@ -371,6 +420,12 @@ class GenericRelationsTests(TestCase):
             TaggedItem.objects.order_by("tag"),
             [self.hairy, self.salty, self.yellow],
         )
+
+    async def test_aremove(self):
+        await self.bacon.tags.aremove(self.fatty)
+        self.assertEqual(await self.bacon.tags.acount(), 1)
+        await self.bacon.tags.aremove(self.salty)
+        self.assertEqual(await self.bacon.tags.acount(), 0)
 
     def test_generic_relation_related_name_default(self):
         # GenericRelation isn't usable from the reverse side by default.

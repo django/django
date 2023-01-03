@@ -1351,7 +1351,7 @@ its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
 For more on Vary headers, see the :rfc:`official Vary spec
-<7231#section-7.1.4>`.
+<9110#section-12.5.5>`.
 
 Controlling cache: Using other headers
 ======================================
@@ -1402,10 +1402,10 @@ cache control header (it is internally called by the
 
         return response
 
-You can control downstream caches in other ways as well (see :rfc:`7234` for
+You can control downstream caches in other ways as well (see :rfc:`9111` for
 details on HTTP caching). For example, even if you don't use Django's
 server-side cache framework, you can still tell clients to cache a view for a
-certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
+certain amount of time with the :rfc:`max-age <9111#section-5.2.2.1>`
 directive::
 
     from django.views.decorators.cache import cache_control

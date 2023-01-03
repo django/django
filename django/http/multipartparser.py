@@ -43,7 +43,7 @@ FIELD = "field"
 
 class MultiPartParser:
     """
-    A rfc2388 multipart/form-data parser.
+    An RFC 7578 multipart/form-data parser.
 
     ``MultiValueDict.parse()`` reads the input stream in ``chunk_size`` chunks
     and returns a tuple of ``(MultiValueDict(POST), MultiValueDict(FILES))``.

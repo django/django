@@ -5,9 +5,14 @@ from urllib.parse import urlencode
 
 from django.core.exceptions import DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
-from django.http import HttpRequest, RawPostDataException, UnreadablePostError
+from django.http import (
+    HttpHeaders,
+    HttpRequest,
+    RawPostDataException,
+    UnreadablePostError,
+)
 from django.http.multipartparser import MultiPartParserError
-from django.http.request import HttpHeaders, split_domain_port
+from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import FakePayload
 
@@ -425,10 +430,8 @@ class RequestsTests(SimpleTestCase):
         Multipart POST requests with Content-Length >= 0 are valid and need to
         be handled.
         """
-        # According to:
-        # https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.13
-        # Every request.POST with Content-Length >= 0 is a valid request,
-        # this test ensures that we handle Content-Length == 0.
+        # According to RFC 9110 Section 8.6 every POST with Content-Length >= 0
+        # is a valid request, so ensure that we handle Content-Length == 0.
         payload = FakePayload(
             "\r\n".join(
                 [

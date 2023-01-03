@@ -1,4 +1,3 @@
-import asyncio
 import difflib
 import inspect
 import json
@@ -26,7 +25,7 @@ from urllib.parse import (
 )
 from urllib.request import url2pathname
 
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, iscoroutinefunction
 
 from django.apps import apps
 from django.conf import settings
@@ -401,7 +400,7 @@ class SimpleTestCase(unittest.TestCase):
         )
 
         # Convert async test methods.
-        if asyncio.iscoroutinefunction(testMethod):
+        if iscoroutinefunction(testMethod):
             setattr(self, self._testMethodName, async_to_sync(testMethod))
 
         if not skipped:
@@ -1778,7 +1777,9 @@ class LiveServerThread(threading.Thread):
         try:
             # Create the handler for serving static and media files
             handler = self.static_handler(_MediaFilesHandler(WSGIHandler()))
-            self.httpd = self._create_server()
+            self.httpd = self._create_server(
+                connections_override=self.connections_override,
+            )
             # If binding to port zero, assign the port allocated by the OS.
             if self.port == 0:
                 self.port = self.httpd.server_address[1]

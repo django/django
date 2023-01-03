@@ -23,11 +23,11 @@ Function's summary:
 =========================  ========================  ======================  =======================  ==================  =====================
 Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
 =========================  ========================  ======================  =======================  ==================  =====================
-:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
-:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
-:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsEmpty`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`IsValid`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`MemSize`
+:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`      :class:`NumPoints`
 ..                         :class:`PointOnSurface`                           :class:`Transform`       :class:`AsWKT`
 ..                                                                           :class:`Translate`       :class:`GeoHash`
 =========================  ========================  ======================  =======================  ==================  =====================
@@ -367,6 +367,18 @@ it provides index-assisted nearest-neighbor result sets.
 
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
+
+``IsEmpty``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: IsEmpty(expr)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Accepts a geographic field or expression and tests if the value is an empty
+geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
 
 ``IsValid``
 ===========

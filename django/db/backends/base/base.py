@@ -8,6 +8,8 @@ import warnings
 from collections import deque
 from contextlib import contextmanager
 
+from django.db.backends.utils import debug_transaction
+
 try:
     import zoneinfo
 except ImportError:
@@ -307,12 +309,12 @@ class BaseDatabaseWrapper:
 
     def _commit(self):
         if self.connection is not None:
-            with self.wrap_database_errors:
+            with debug_transaction(self, "COMMIT"), self.wrap_database_errors:
                 return self.connection.commit()
 
     def _rollback(self):
         if self.connection is not None:
-            with self.wrap_database_errors:
+            with debug_transaction(self, "ROLLBACK"), self.wrap_database_errors:
                 return self.connection.rollback()
 
     def _close(self):
@@ -488,9 +490,11 @@ class BaseDatabaseWrapper:
 
         if start_transaction_under_autocommit:
             self._start_transaction_under_autocommit()
-        else:
+        elif autocommit:
             self._set_autocommit(autocommit)
-
+        else:
+            with debug_transaction(self, "BEGIN"):
+                self._set_autocommit(autocommit)
         self.autocommit = autocommit
 
         if autocommit and self.run_commit_hooks_on_set_autocommit_on:

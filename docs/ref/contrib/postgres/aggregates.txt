@@ -157,7 +157,7 @@ General-purpose aggregation functions
         class Room(models.Model):
             number = models.IntegerField(unique=True)
 
-        class HotelReservation(model.Model):
+        class HotelReservation(models.Model):
             room = models.ForeignKey('Room', on_delete=models.CASCADE)
             start = models.DateTimeField()
             end = models.DateTimeField()
@@ -207,6 +207,32 @@ General-purpose aggregation functions
         elements in the result string.
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
+
+    Usage example::
+
+        class Publication(models.Model):
+            title = models.CharField(max_length=30)
+
+        class Article(models.Model):
+            headline = models.CharField(max_length=100)
+            publications = models.ManyToManyField(Publication)
+
+        >>> article = Article.objects.create(headline="NASA uses Python")
+        >>> article.publications.create(title="The Python Journal")
+        <Publication: Publication object (1)>
+        >>> article.publications.create(title="Science News")
+        <Publication: Publication object (2)>
+        >>> from django.contrib.postgres.aggregates import StringAgg
+        >>> Article.objects.annotate(
+        ...     publication_names=StringAgg(
+        ...         "publications__title",
+        ...         delimiter=", ",
+        ...         ordering="publications__title",
+        ...     )
+        ... ).values("headline", "publication_names")
+        <QuerySet [{
+            'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
+        }]>
 
     .. deprecated:: 4.0
 

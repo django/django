@@ -2139,7 +2139,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
 
     def test_unprefixed_language_with_accept_language(self):
         """'Accept-Language' is respected."""
-        response = self.client.get("/simple/", HTTP_ACCEPT_LANGUAGE="fr")
+        response = self.client.get("/simple/", headers={"accept-language": "fr"})
         self.assertRedirects(response, "/fr/simple/")
 
     def test_unprefixed_language_with_cookie_language(self):
@@ -2149,7 +2149,7 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         self.assertRedirects(response, "/fr/simple/")
 
     def test_unprefixed_language_with_non_valid_language(self):
-        response = self.client.get("/simple/", HTTP_ACCEPT_LANGUAGE="fi")
+        response = self.client.get("/simple/", headers={"accept-language": "fi"})
         self.assertEqual(response.content, b"Yes")
         self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "fi"})
         response = self.client.get("/simple/")

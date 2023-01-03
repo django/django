@@ -1,8 +1,9 @@
+import json
 import warnings
 
 from django.contrib.postgres.fields import ArrayField
 from django.db.models import Aggregate, BooleanField, JSONField, TextField, Value
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 
 from .mixins import OrderableAggMixin
 
@@ -31,6 +32,14 @@ class DeprecatedConvertValueMixin:
             self._default_provided = True
         super().__init__(*expressions, default=default, **extra)
 
+    def resolve_expression(self, *args, **kwargs):
+        resolved = super().resolve_expression(*args, **kwargs)
+        if not self._default_provided:
+            resolved.empty_result_set_value = getattr(
+                self, "deprecation_empty_result_set_value", self.deprecation_value
+            )
+        return resolved
+
     def convert_value(self, value, expression, connection):
         if value is None and not self._default_provided:
             warnings.warn(self.deprecation_msg, category=RemovedInDjango50Warning)
@@ -48,8 +57,7 @@ class ArrayAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
     deprecation_msg = (
         "In Django 5.0, ArrayAgg() will return None instead of an empty list "
         "if there are no rows. Pass default=None to opt into the new behavior "
-        "and silence this warning or default=Value([]) to keep the previous "
-        "behavior."
+        "and silence this warning or default=[] to keep the previous behavior."
     )
 
     @property
@@ -87,12 +95,45 @@ class JSONBAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
 
     # RemovedInDjango50Warning
     deprecation_value = "[]"
+    deprecation_empty_result_set_value = property(lambda self: [])
     deprecation_msg = (
         "In Django 5.0, JSONBAgg() will return None instead of an empty list "
         "if there are no rows. Pass default=None to opt into the new behavior "
-        "and silence this warning or default=Value('[]') to keep the previous "
+        "and silence this warning or default=[] to keep the previous "
         "behavior."
     )
+
+    # RemovedInDjango51Warning: When the deprecation ends, remove __init__().
+    #
+    # RemovedInDjango50Warning: When the deprecation ends, replace with:
+    # def __init__(self, *expressions, default=None, **extra):
+    def __init__(self, *expressions, default=NOT_PROVIDED, **extra):
+        super().__init__(*expressions, default=default, **extra)
+        if (
+            isinstance(default, Value)
+            and isinstance(default.value, str)
+            and not isinstance(default.output_field, JSONField)
+        ):
+            value = default.value
+            try:
+                decoded = json.loads(value)
+            except json.JSONDecodeError:
+                warnings.warn(
+                    "Passing a Value() with an output_field that isn't a JSONField as "
+                    "JSONBAgg(default) is deprecated. Pass default="
+                    f"Value({value!r}, output_field=JSONField()) instead.",
+                    stacklevel=2,
+                    category=RemovedInDjango51Warning,
+                )
+                self.default.output_field = self.output_field
+            else:
+                self.default = Value(decoded, self.output_field)
+                warnings.warn(
+                    "Passing an encoded JSON string as JSONBAgg(default) is "
+                    f"deprecated. Pass default={decoded!r} instead.",
+                    stacklevel=2,
+                    category=RemovedInDjango51Warning,
+                )
 
 
 class StringAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
@@ -106,8 +147,7 @@ class StringAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
     deprecation_msg = (
         "In Django 5.0, StringAgg() will return None instead of an empty "
         "string if there are no rows. Pass default=None to opt into the new "
-        "behavior and silence this warning or default=Value('') to keep the "
-        "previous behavior."
+        'behavior and silence this warning or default="" to keep the previous behavior.'
     )
 
     def __init__(self, expression, delimiter, **extra):

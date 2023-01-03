@@ -20,13 +20,16 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
-
     from django.contrib.postgres import fields as pg_fields
     from django.contrib.postgres import forms as pg_forms
     from django.contrib.postgres.validators import (
         RangeMaxValueValidator,
         RangeMinValueValidator,
+    )
+    from django.db.backends.postgresql.psycopg_any import (
+        DateRange,
+        DateTimeTZRange,
+        NumericRange,
     )
 except ImportError:
     pass

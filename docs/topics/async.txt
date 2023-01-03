@@ -28,10 +28,10 @@ class-based view, this means declaring the HTTP method handlers, such as
 
 .. note::
 
-    Django uses ``asyncio.iscoroutinefunction`` to test if your view is
+    Django uses ``asgiref.sync.iscoroutinefunction`` to test if your view is
     asynchronous or not. If you implement your own method of returning a
-    coroutine, ensure you set the ``_is_coroutine`` attribute of the view
-    to ``asyncio.coroutines._is_coroutine`` so this function returns ``True``.
+    coroutine, ensure you use ``asgiref.sync.markcoroutinefunction`` so this
+    function returns ``True``.
 
 Under a WSGI server, async views will run in their own, one-off event loop.
 This means you can use async features, like concurrent async HTTP requests,
@@ -85,7 +85,7 @@ With some exceptions, Django can run ORM queries asynchronously as well::
 
 Detailed notes can be found in :ref:`async-queries`, but in short:
 
-* All ``QuerySet`` methods that cause a SQL query to occur have an
+* All ``QuerySet`` methods that cause an SQL query to occur have an
   ``a``-prefixed asynchronous variant.
 
 * ``async for`` is supported on all QuerySets (including the output of
@@ -97,13 +97,17 @@ Django also supports some asynchronous model methods that use the database::
         book = Book(...)
         await book.asave(using="secondary")
 
+    async def make_book_with_tags(tags, ...):
+        book = await Book.objects.acreate(...)
+        await book.tags.aset(tags)
+
 Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
 .. versionchanged:: 4.2
 
-    Asynchronous model interface was added.
+    Asynchronous model and related manager interfaces were added.
 
 Performance
 -----------

@@ -39,6 +39,12 @@ details on these changes.
 
 * The ``TransactionTestCase.assertQuerysetEqual()`` method will be removed.
 
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions will be removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` will be removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0

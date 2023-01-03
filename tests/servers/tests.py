@@ -5,6 +5,7 @@ import errno
 import os
 import socket
 import threading
+import unittest
 from http.client import HTTPConnection
 from urllib.error import HTTPError
 from urllib.parse import urlencode
@@ -12,7 +13,7 @@ from urllib.request import urlopen
 
 from django.conf import settings
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIServer
-from django.db import DEFAULT_DB_ALIAS, connections
+from django.db import DEFAULT_DB_ALIAS, connection, connections
 from django.test import LiveServerTestCase, override_settings
 from django.test.testcases import LiveServerThread, QuietWSGIRequestHandler
 
@@ -107,8 +108,33 @@ class LiveServerTestCloseConnectionTest(LiveServerBase):
         self.assertIsNone(conn.connection)
 
 
+@unittest.skipUnless(connection.vendor == "sqlite", "SQLite specific test.")
+class LiveServerInMemoryDatabaseLockTest(LiveServerBase):
+    def test_in_memory_database_lock(self):
+        """
+        With a threaded LiveServer and an in-memory database, an error can
+        occur when 2 requests reach the server and try to lock the database
+        at the same time, if the requests do not share the same database
+        connection.
+        """
+        conn = self.server_thread.connections_override[DEFAULT_DB_ALIAS]
+        # Open a connection to the database.
+        conn.connect()
+        # Create a transaction to lock the database.
+        cursor = conn.cursor()
+        cursor.execute("BEGIN IMMEDIATE TRANSACTION")
+        try:
+            with self.urlopen("/create_model_instance/") as f:
+                self.assertEqual(f.status, 200)
+        except HTTPError:
+            self.fail("Unexpected error due to a database lock.")
+        finally:
+            # Release the transaction.
+            cursor.execute("ROLLBACK")
+
+
 class FailingLiveServerThread(LiveServerThread):
-    def _create_server(self):
+    def _create_server(self, connections_override=None):
         raise RuntimeError("Error creating server.")
 
 
@@ -150,7 +176,7 @@ class LiveServerAddress(LiveServerBase):
 
 
 class LiveServerSingleThread(LiveServerThread):
-    def _create_server(self):
+    def _create_server(self, connections_override=None):
         return WSGIServer(
             (self.host, self.port), QuietWSGIRequestHandler, allow_reuse_address=False
         )

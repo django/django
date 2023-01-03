@@ -290,45 +290,47 @@ Performing actions after commit
 
 Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
-include a `Celery`_ task, an email notification, or a cache invalidation.
+include a background task, an email notification, or a cache invalidation.
 
-.. _Celery: https://pypi.org/project/celery/
-
-Django provides the :func:`on_commit` function to register callback functions
-that should be executed after a transaction is successfully committed:
+:func:`on_commit` allows you to register callbacks that will be executed after
+the open transaction is successfully committed:
 
 .. function:: on_commit(func, using=None, robust=False)
 
-Pass any function (that takes no arguments) to :func:`on_commit`::
+Pass a function, or any callable, to :func:`on_commit`::
 
     from django.db import transaction
 
-    def do_something():
-        pass  # send a mail, invalidate a cache, fire off a Celery task, etc.
+    def send_welcome_email():
+        ...
 
-    transaction.on_commit(do_something)
+    transaction.on_commit(send_welcome_email)
 
-You can also bind arguments to your function using :func:`functools.partial`::
+Callbacks will not be passed any arguments, but you can bind them with
+:func:`functools.partial`::
 
     from functools import partial
 
-    transaction.on_commit(partial(some_celery_task.delay, 'arg1'))
+    for user in users:
+        transaction.on_commit(
+            partial(send_invite_email, user=user)
+        )
 
-The function you pass in will be called immediately after a hypothetical
-database write made where ``on_commit()`` is called would be successfully
-committed.
+Callbacks are called after the open transaction is successfully committed. If
+the transaction is instead rolled back (typically when an unhandled exception
+is raised in an :func:`atomic` block), the callback will be discarded, and
+never called.
 
-If you call ``on_commit()`` while there isn't an active transaction, the
-callback will be executed immediately.
+If you call ``on_commit()`` while there isn't an open transaction,
+the callback will be executed immediately.
 
-If that hypothetical database write is instead rolled back (typically when an
-unhandled exception is raised in an :func:`atomic` block), your function will
-be discarded and never called.
+It's sometimes useful to register callbacks that can fail. Passing
+``robust=True`` allows the next callbacks to be executed even if the current
+one throws an exception. All errors derived from Python's ``Exception`` class
+are caught and logged to the ``django.db.backends.base`` logger.
 
-It's sometimes useful to register callback functions that can fail. Passing
-``robust=True`` allows the next functions to be executed even if the current
-function throws an exception. All errors derived from Python's ``Exception``
-class are caught and logged to the ``django.db.backends.base`` logger.
+You can use :meth:`.TestCase.captureOnCommitCallbacks` to test callbacks
+registered with :func:`on_commit`.
 
 .. versionchanged:: 4.2
 
@@ -390,13 +392,13 @@ Timing of execution
 Your callbacks are executed *after* a successful commit, so a failure in a
 callback will not cause the transaction to roll back. They are executed
 conditionally upon the success of the transaction, but they are not *part* of
-the transaction. For the intended use cases (mail notifications, Celery tasks,
-etc.), this should be fine. If it's not (if your follow-up action is so
+the transaction. For the intended use cases (mail notifications, background
+tasks, etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
 `two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
-<psycopg2:tpc>` and the :pep:`optional Two-Phase Commit Extensions in the
-Python DB-API specification <249#optional-two-phase-commit-extensions>`.
+<psycopg:two-phase-commit>` and the :pep:`optional Two-Phase Commit Extensions
+in the Python DB-API specification <249#optional-two-phase-commit-extensions>`.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an

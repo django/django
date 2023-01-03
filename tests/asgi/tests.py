@@ -12,6 +12,7 @@ from django.db import close_old_connections
 from django.test import (
     AsyncRequestFactory,
     SimpleTestCase,
+    ignore_warnings,
     modify_settings,
     override_settings,
 )
@@ -58,6 +59,13 @@ class ASGITest(SimpleTestCase):
         # Allow response.close() to finish.
         await communicator.wait()
 
+    # Python's file API is not async compatible. A third-party library such
+    # as https://github.com/Tinche/aiofiles allows passing the file to
+    # FileResponse as an async interator. With a sync iterator
+    # StreamingHTTPResponse triggers a warning when iterating the file.
+    # assertWarnsMessage is not async compatible, so ignore_warnings for the
+    # test.
+    @ignore_warnings(module="django.http.response")
     async def test_file_response(self):
         """
         Makes sure that FileResponse works over ASGI.
@@ -91,6 +99,8 @@ class ASGITest(SimpleTestCase):
                     self.assertEqual(value, b"text/plain")
                 else:
                     raise
+
+        # Warning ignored here.
         response_body = await communicator.receive_output()
         self.assertEqual(response_body["type"], "http.response.body")
         self.assertEqual(response_body["body"], test_file_contents)
@@ -106,6 +116,7 @@ class ASGITest(SimpleTestCase):
             "django.contrib.staticfiles.finders.FileSystemFinder",
         ],
     )
+    @ignore_warnings(module="django.http.response")
     async def test_static_file_response(self):
         application = ASGIStaticFilesHandler(get_asgi_application())
         # Construct HTTP request.

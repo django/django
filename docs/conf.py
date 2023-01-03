@@ -97,6 +97,10 @@ source_suffix = ".txt"
 # The root toctree document.
 root_doc = "contents"
 
+# Disable auto-created table of contents entries for all domain objects (e.g.
+# functions, classes, attributes, etc.) in Sphinx 5.2+.
+toc_object_entries = False
+
 # General substitutions.
 project = "Django"
 copyright = "Django Software Foundation and contributors"
@@ -174,7 +178,7 @@ pygments_style = "trac"
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "psycopg2": ("https://www.psycopg.org/docs/", None),
+    "psycopg": ("https://www.psycopg.org/psycopg3/docs/", None),
 }
 
 # Python's docs don't change every week.

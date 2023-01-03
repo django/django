@@ -90,10 +90,11 @@ class FileBasedCache(BaseCache):
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)
-        if os.path.exists(fname):
+        try:
             with open(fname, "rb") as f:
                 return not self._is_expired(f)
-        return False
+        except FileNotFoundError:
+            return False
 
     def _cull(self):
         """

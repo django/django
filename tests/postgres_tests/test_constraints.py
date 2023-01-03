@@ -16,7 +16,7 @@ from django.db.models import (
 )
 from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Cast, Left, Lower
-from django.test import ignore_warnings, modify_settings, skipUnlessDBFeature
+from django.test import ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
 from django.utils.deprecation import RemovedInDjango50Warning
@@ -25,19 +25,17 @@ from . import PostgreSQLTestCase
 from .models import HotelReservation, IntegerArrayModel, RangesModel, Room, Scene
 
 try:
-    from psycopg2.extras import DateRange, NumericRange
-
     from django.contrib.postgres.constraints import ExclusionConstraint
     from django.contrib.postgres.fields import (
         DateTimeRangeField,
         RangeBoundary,
         RangeOperators,
     )
+    from django.db.backends.postgresql.psycopg_any import DateRange, NumericRange
 except ImportError:
     pass
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
         SELECT opcname, c.relname FROM pg_opclass AS oc
@@ -71,6 +69,16 @@ class SchemaTests(PostgreSQLTestCase):
         constraint = CheckConstraint(
             check=Q(field__contains=[1]),
             name="array_contains",
+        )
+        msg = f"Constraint “{constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint.validate(IntegerArrayModel, IntegerArrayModel())
+        constraint.validate(IntegerArrayModel, IntegerArrayModel(field=[1]))
+
+    def test_check_constraint_array_length(self):
+        constraint = CheckConstraint(
+            check=Q(field__len=1),
+            name="array_length",
         )
         msg = f"Constraint “{constraint.name}” is violated."
         with self.assertRaisesMessage(ValidationError, msg):
@@ -255,7 +263,6 @@ class SchemaTests(PostgreSQLTestCase):
         Scene.objects.create(scene="ScEnE 10", setting="Sir Bedemir's Castle")
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class ExclusionConstraintTests(PostgreSQLTestCase):
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""
@@ -310,16 +317,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
                 name="exclude_invalid_deferrable",
                 expressions=[(F("datespan"), RangeOperators.OVERLAPS)],
                 deferrable="invalid",
-            )
-
-    def test_deferrable_with_condition(self):
-        msg = "ExclusionConstraint with conditions cannot be deferred."
-        with self.assertRaisesMessage(ValueError, msg):
-            ExclusionConstraint(
-                name="exclude_invalid_condition",
-                expressions=[(F("datespan"), RangeOperators.OVERLAPS)],
-                condition=Q(cancelled=False),
-                deferrable=Deferrable.DEFERRED,
             )
 
     def test_invalid_include_type(self):
@@ -912,6 +909,39 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         RangesModel.objects.create(ints=(10, 19))
         RangesModel.objects.create(ints=(51, 60))
 
+    def test_range_adjacent_initially_deferred_with_condition(self):
+        constraint_name = "ints_adjacent_deferred_with_condition"
+        self.assertNotIn(
+            constraint_name, self.get_constraints(RangesModel._meta.db_table)
+        )
+        constraint = ExclusionConstraint(
+            name=constraint_name,
+            expressions=[("ints", RangeOperators.ADJACENT_TO)],
+            condition=Q(ints__lt=(100, 200)),
+            deferrable=Deferrable.DEFERRED,
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(RangesModel, constraint)
+        self.assertIn(constraint_name, self.get_constraints(RangesModel._meta.db_table))
+        RangesModel.objects.create(ints=(20, 50))
+        adjacent_range = RangesModel.objects.create(ints=(10, 20))
+        # Constraint behavior can be changed with SET CONSTRAINTS.
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic(), connection.cursor() as cursor:
+                quoted_name = connection.ops.quote_name(constraint_name)
+                cursor.execute(f"SET CONSTRAINTS {quoted_name} IMMEDIATE")
+        # Remove adjacent range before the end of transaction.
+        adjacent_range.delete()
+        RangesModel.objects.create(ints=(10, 19))
+        RangesModel.objects.create(ints=(51, 60))
+        # Add adjacent range that doesn't match the condition.
+        RangesModel.objects.create(ints=(200, 500))
+        adjacent_range = RangesModel.objects.create(ints=(100, 200))
+        # Constraint behavior can be changed with SET CONSTRAINTS.
+        with transaction.atomic(), connection.cursor() as cursor:
+            quoted_name = connection.ops.quote_name(constraint_name)
+            cursor.execute(f"SET CONSTRAINTS {quoted_name} IMMEDIATE")
+
     def test_range_adjacent_gist_include(self):
         constraint_name = "ints_adjacent_gist_include"
         self.assertNotIn(
@@ -1175,7 +1205,6 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
         )
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class ExclusionConstraintOpclassesDepracationTests(PostgreSQLTestCase):
     def get_constraints(self, table):
         """Get the constraints on the table using a new cursor."""

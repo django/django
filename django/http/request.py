@@ -461,6 +461,31 @@ class HttpHeaders(CaseInsensitiveMapping):
             return None
         return header.replace("_", "-").title()
 
+    @classmethod
+    def to_wsgi_name(cls, header):
+        header = header.replace("-", "_").upper()
+        if header in cls.UNPREFIXED_HEADERS:
+            return header
+        return f"{cls.HTTP_PREFIX}{header}"
+
+    @classmethod
+    def to_asgi_name(cls, header):
+        return header.replace("-", "_").upper()
+
+    @classmethod
+    def to_wsgi_names(cls, headers):
+        return {
+            cls.to_wsgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
+    @classmethod
+    def to_asgi_names(cls, headers):
+        return {
+            cls.to_asgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
 
 class QueryDict(MultiValueDict):
     """

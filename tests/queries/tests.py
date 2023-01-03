@@ -5,7 +5,7 @@ import unittest
 from operator import attrgetter
 from threading import Lock
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DEFAULT_DB_ALIAS, connection
 from django.db.models import CharField, Count, Exists, F, Max, OuterRef, Q
 from django.db.models.expressions import RawSQL
@@ -3322,9 +3322,7 @@ class ExcludeTests(TestCase):
         )
         self.assertCountEqual(
             Job.objects.annotate(
-                responsibility=subquery.filter(job=OuterRef("name"),).values(
-                    "id"
-                )[:1]
+                responsibility=subquery.filter(job=OuterRef("name")).values("id")[:1]
             ),
             [self.j1, self.j2],
         )
@@ -3588,7 +3586,8 @@ class WhereNodeTest(SimpleTestCase):
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()])
         self.assertEqual(w.as_sql(compiler, connection), ("(dummy AND dummy)", []))
         w.negate()
@@ -3597,7 +3596,8 @@ class WhereNodeTest(SimpleTestCase):
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
 
     def test_empty_full_handling_disjunction(self):
         compiler = WhereNodeTest.MockCompiler()
@@ -3605,7 +3605,8 @@ class WhereNodeTest(SimpleTestCase):
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
         w = WhereNode(children=[self.DummyNode(), self.DummyNode()], connector=OR)
         self.assertEqual(w.as_sql(compiler, connection), ("(dummy OR dummy)", []))
         w.negate()
@@ -3619,7 +3620,8 @@ class WhereNodeTest(SimpleTestCase):
         compiler = WhereNodeTest.MockCompiler()
         empty_w = WhereNode()
         w = WhereNode(children=[empty_w, empty_w])
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
         w.negate()
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
@@ -3627,9 +3629,11 @@ class WhereNodeTest(SimpleTestCase):
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)
         w.negate()
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
         w = WhereNode(children=[empty_w, NothingNode()], connector=OR)
-        self.assertEqual(w.as_sql(compiler, connection), ("", []))
+        with self.assertRaises(FullResultSet):
+            w.as_sql(compiler, connection)
         w = WhereNode(children=[empty_w, NothingNode()], connector=AND)
         with self.assertRaises(EmptyResultSet):
             w.as_sql(compiler, connection)

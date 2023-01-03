@@ -304,6 +304,34 @@ class QuerySetSetOperationTests(TestCase):
             operator.itemgetter("num"),
         )
 
+    def test_union_with_select_related_and_order(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e1")
+        a1 = Author.objects.create(name="a1", num=1, extra=e1)
+        a2 = Author.objects.create(name="a2", num=3, extra=e1)
+        Author.objects.create(name="a3", num=2, extra=e1)
+        base_qs = Author.objects.select_related("extra").order_by()
+        qs1 = base_qs.filter(name="a1")
+        qs2 = base_qs.filter(name="a2")
+        self.assertSequenceEqual(qs1.union(qs2).order_by("pk"), [a1, a2])
+
+    @skipUnlessDBFeature("supports_slicing_ordering_in_compound")
+    def test_union_with_select_related_and_first(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e1")
+        a1 = Author.objects.create(name="a1", num=1, extra=e1)
+        Author.objects.create(name="a2", num=3, extra=e1)
+        base_qs = Author.objects.select_related("extra")
+        qs1 = base_qs.filter(name="a1")
+        qs2 = base_qs.filter(name="a2")
+        self.assertEqual(qs1.union(qs2).first(), a1)
+
+    def test_union_with_first(self):
+        e1 = ExtraInfo.objects.create(value=7, info="e1")
+        a1 = Author.objects.create(name="a1", num=1, extra=e1)
+        base_qs = Author.objects.order_by()
+        qs1 = base_qs.filter(name="a1")
+        qs2 = base_qs.filter(name="a2")
+        self.assertEqual(qs1.union(qs2).first(), a1)
+
     def test_union_multiple_models_with_values_list_and_order(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
         qs1 = Celebrity.objects.all()
@@ -395,6 +423,12 @@ class QuerySetSetOperationTests(TestCase):
     def test_count_union_empty_result(self):
         qs = Number.objects.filter(pk__in=[])
         self.assertEqual(qs.union(qs).count(), 0)
+
+    def test_count_union_with_select_related(self):
+        e1 = ExtraInfo.objects.create(value=1, info="e1")
+        Author.objects.create(name="a1", num=1, extra=e1)
+        qs = Author.objects.select_related("extra").order_by()
+        self.assertEqual(qs.union(qs).count(), 1)
 
     @skipUnlessDBFeature("supports_select_difference")
     def test_count_difference(self):

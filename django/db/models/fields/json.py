@@ -1,12 +1,18 @@
 import json
+import warnings
 
 from django import forms
 from django.core import checks, exceptions
 from django.db import NotSupportedError, connections, router
-from django.db.models import lookups
+from django.db.models import expressions, lookups
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.fields import TextField
-from django.db.models.lookups import PostgresOperatorLookup, Transform
+from django.db.models.lookups import (
+    FieldGetDbPrepValueMixin,
+    PostgresOperatorLookup,
+    Transform,
+)
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.translation import gettext_lazy as _
 
 from . import Field
@@ -92,10 +98,40 @@ class JSONField(CheckFieldDefaultMixin, Field):
     def get_internal_type(self):
         return "JSONField"
 
-    def get_prep_value(self, value):
+    def get_db_prep_value(self, value, connection, prepared=False):
+        # RemovedInDjango51Warning: When the deprecation ends, replace with:
+        # if (
+        #     isinstance(value, expressions.Value)
+        #     and isinstance(value.output_field, JSONField)
+        # ):
+        #     value = value.value
+        # elif hasattr(value, "as_sql"): ...
+        if isinstance(value, expressions.Value):
+            if isinstance(value.value, str) and not isinstance(
+                value.output_field, JSONField
+            ):
+                try:
+                    value = json.loads(value.value, cls=self.decoder)
+                except json.JSONDecodeError:
+                    value = value.value
+                else:
+                    warnings.warn(
+                        "Providing an encoded JSON string via Value() is deprecated. "
+                        f"Use Value({value!r}, output_field=JSONField()) instead.",
+                        category=RemovedInDjango51Warning,
+                    )
+            elif isinstance(value.output_field, JSONField):
+                value = value.value
+            else:
+                return value
+        elif hasattr(value, "as_sql"):
+            return value
+        return connection.ops.adapt_json_value(value, self.encoder)
+
+    def get_db_prep_save(self, value, connection):
         if value is None:
             return value
-        return json.dumps(value, cls=self.encoder)
+        return self.get_db_prep_value(value, connection)
 
     def get_transform(self, name):
         transform = super().get_transform(name)
@@ -141,7 +177,7 @@ def compile_json_path(key_transforms, include_root=True):
     return "".join(path)
 
 
-class DataContains(PostgresOperatorLookup):
+class DataContains(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contains"
     postgres_operator = "@>"
 
@@ -156,7 +192,7 @@ class DataContains(PostgresOperatorLookup):
         return "JSON_CONTAINS(%s, %s)" % (lhs, rhs), params
 
 
-class ContainedBy(PostgresOperatorLookup):
+class ContainedBy(FieldGetDbPrepValueMixin, PostgresOperatorLookup):
     lookup_name = "contained_by"
     postgres_operator = "<@"
 

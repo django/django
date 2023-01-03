@@ -102,3 +102,11 @@ class UniqueConstraintConditionModel(models.Model):
                 condition=models.Q(color__isnull=True),
             ),
         ]
+
+
+class DbCommentModel(models.Model):
+    name = models.CharField(max_length=15, db_comment="'Name' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

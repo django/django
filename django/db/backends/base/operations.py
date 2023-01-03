@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import json
 from importlib import import_module
 
 import sqlparse
@@ -524,6 +525,9 @@ class BaseDatabaseOperations:
         else:
             return value
 
+    def adapt_integerfield_value(self, value, internal_type):
+        return value
+
     def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected
@@ -574,6 +578,9 @@ class BaseDatabaseOperations:
         type for the backend driver.
         """
         return value or None
+
+    def adapt_json_value(self, value, encoder):
+        return json.dumps(value, cls=encoder)
 
     def year_lookup_bounds_for_date_field(self, value, iso_year=False):
         """

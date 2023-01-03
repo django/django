@@ -143,7 +143,7 @@ class ConditionalGet(SimpleTestCase):
         self.assertEqual(response.status_code, 412)
 
     def test_both_headers(self):
-        # see https://tools.ietf.org/html/rfc7232#section-6
+        # See RFC 9110 Section 13.2.2.
         self.client.defaults["HTTP_IF_MODIFIED_SINCE"] = LAST_MODIFIED_STR
         self.client.defaults["HTTP_IF_NONE_MATCH"] = ETAG
         response = self.client.get("/condition/")

@@ -10,6 +10,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
+from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -329,7 +330,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         return new_class
 
 
-class BaseModelForm(BaseForm):
+class BaseModelForm(BaseForm, AltersData):
     def __init__(
         self,
         data=None,
@@ -644,7 +645,7 @@ def modelform_factory(
 # ModelFormSets ##############################################################
 
 
-class BaseModelFormSet(BaseFormSet):
+class BaseModelFormSet(BaseFormSet, AltersData):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """

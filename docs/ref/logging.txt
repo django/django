@@ -196,9 +196,13 @@ For performance reasons, SQL logging is only enabled when
 level or handlers that are installed.
 
 This logging does not include framework-level initialization (e.g.
-``SET TIMEZONE``) or transaction management queries (e.g. ``BEGIN``,
-``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
-wish to view all database queries.
+``SET TIMEZONE``). Turn on query logging in your database if you wish to view
+all database queries.
+
+.. versionchanged:: 4.2
+
+    Support for logging transaction management queries (``BEGIN``, ``COMMIT``,
+    and ``ROLLBACK``) was added.
 
 .. _django-security-logger:
 

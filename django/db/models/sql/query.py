@@ -399,77 +399,36 @@ class Query(BaseExpression):
             alias = None
         return target.get_col(alias, field)
 
-    def rewrite_cols(self, annotation, col_cnt):
-        # We must make sure the inner query has the referred columns in it.
-        # If we are aggregating over an annotation, then Django uses Ref()
-        # instances to note this. However, if we are annotating over a column
-        # of a related model, then it might be that column isn't part of the
-        # SELECT clause of the inner query, and we must manually make sure
-        # the column is selected. An example case is:
-        #    .aggregate(Sum('author__awards'))
-        # Resolving this expression results in a join to author, but there
-        # is no guarantee the awards column of author is in the select clause
-        # of the query. Thus we must manually add the column to the inner
-        # query.
-        orig_exprs = annotation.get_source_expressions()
-        new_exprs = []
-        for expr in orig_exprs:
-            # FIXME: These conditions are fairly arbitrary. Identify a better
-            # method of having expressions decide which code path they should
-            # take.
-            if isinstance(expr, Ref):
-                # Its already a Ref to subquery (see resolve_ref() for
-                # details)
-                new_exprs.append(expr)
-            elif isinstance(expr, (WhereNode, Lookup)):
-                # Decompose the subexpressions further. The code here is
-                # copied from the else clause, but this condition must appear
-                # before the contains_aggregate/is_summary condition below.
-                new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
-                new_exprs.append(new_expr)
-            else:
-                # Reuse aliases of expressions already selected in subquery.
-                for col_alias, selected_annotation in self.annotation_select.items():
-                    if selected_annotation is expr:
-                        new_expr = Ref(col_alias, expr)
-                        break
-                else:
-                    # An expression that is not selected the subquery.
-                    if isinstance(expr, Col) or (
-                        expr.contains_aggregate and not expr.is_summary
-                    ):
-                        # Reference column or another aggregate. Select it
-                        # under a non-conflicting alias.
-                        col_cnt += 1
-                        col_alias = "__col%d" % col_cnt
-                        self.annotations[col_alias] = expr
-                        self.append_annotation_mask([col_alias])
-                        new_expr = Ref(col_alias, expr)
-                    else:
-                        # Some other expression not referencing database values
-                        # directly. Its subexpression might contain Cols.
-                        new_expr, col_cnt = self.rewrite_cols(expr, col_cnt)
-                new_exprs.append(new_expr)
-        annotation.set_source_expressions(new_exprs)
-        return annotation, col_cnt
-
-    def get_aggregation(self, using, added_aggregate_names):
+    def get_aggregation(self, using, aggregate_exprs):
         """
         Return the dictionary with the values of the existing aggregations.
         """
-        if not self.annotation_select:
+        if not aggregate_exprs:
             return {}
-        existing_annotations = [
-            annotation
-            for alias, annotation in self.annotations.items()
-            if alias not in added_aggregate_names
-        ]
+        aggregates = {}
+        for alias, aggregate_expr in aggregate_exprs.items():
+            self.check_alias(alias)
+            aggregate = aggregate_expr.resolve_expression(
+                self, allow_joins=True, reuse=None, summarize=True
+            )
+            if not aggregate.contains_aggregate:
+                raise TypeError("%s is not an aggregate expression" % alias)
+            aggregates[alias] = aggregate
+        # Existing usage of aggregation can be determined by the presence of
+        # selected aggregates but also by filters against aliased aggregates.
+        _, having, qualify = self.where.split_having_qualify()
+        has_existing_aggregation = (
+            any(
+                getattr(annotation, "contains_aggregate", True)
+                for annotation in self.annotations.values()
+            )
+            or having
+        )
         # Decide if we need to use a subquery.
         #
-        # Existing annotations would cause incorrect results as get_aggregation()
-        # must produce just one result and thus must not use GROUP BY. But we
-        # aren't smart enough to remove the existing annotations from the
-        # query, so those would force us to use GROUP BY.
+        # Existing aggregations would cause incorrect results as
+        # get_aggregation() must produce just one result and thus must not use
+        # GROUP BY.
         #
         # If the query has limit or distinct, or uses set operations, then
         # those operations must be done in a subquery so that the query
@@ -478,7 +437,8 @@ class Query(BaseExpression):
         if (
             isinstance(self.group_by, tuple)
             or self.is_sliced
-            or existing_annotations
+            or has_existing_aggregation
+            or qualify
             or self.distinct
             or self.combinator
         ):
@@ -500,33 +460,41 @@ class Query(BaseExpression):
                 # query is grouped by the main model's primary key. However,
                 # clearing the select clause can alter results if distinct is
                 # used.
-                has_existing_aggregate_annotations = any(
-                    annotation
-                    for annotation in existing_annotations
-                    if getattr(annotation, "contains_aggregate", True)
-                )
-                if inner_query.default_cols and has_existing_aggregate_annotations:
+                if inner_query.default_cols and has_existing_aggregation:
                     inner_query.group_by = (
                         self.model._meta.pk.get_col(inner_query.get_initial_alias()),
                     )
                 inner_query.default_cols = False
+                if not qualify:
+                    # Mask existing annotations that are not referenced by
+                    # aggregates to be pushed to the outer query unless
+                    # filtering against window functions is involved as it
+                    # requires complex realising.
+                    annotation_mask = set()
+                    for aggregate in aggregates.values():
+                        annotation_mask |= aggregate.get_refs()
+                    inner_query.set_annotation_mask(annotation_mask)
 
-            relabels = {t: "subquery" for t in inner_query.alias_map}
-            relabels[None] = "subquery"
-            # Remove any aggregates marked for reduction from the subquery
-            # and move them to the outer AggregateQuery.
-            col_cnt = 0
-            for alias, expression in list(inner_query.annotation_select.items()):
-                annotation_select_mask = inner_query.annotation_select_mask
-                if expression.is_summary:
-                    expression, col_cnt = inner_query.rewrite_cols(expression, col_cnt)
-                    outer_query.annotations[alias] = expression.relabeled_clone(
-                        relabels
-                    )
-                    del inner_query.annotations[alias]
-                    annotation_select_mask.remove(alias)
-                # Make sure the annotation_select wont use cached results.
-                inner_query.set_annotation_mask(inner_query.annotation_select_mask)
+            # Add aggregates to the outer AggregateQuery. This requires making
+            # sure all columns referenced by the aggregates are selected in the
+            # inner query. It is achieved by retrieving all column references
+            # by the aggregates, explicitly selecting them in the inner query,
+            # and making sure the aggregates are repointed to them.
+            col_refs = {}
+            for alias, aggregate in aggregates.items():
+                replacements = {}
+                for col in self._gen_cols([aggregate], resolve_refs=False):
+                    if not (col_ref := col_refs.get(col)):
+                        index = len(col_refs) + 1
+                        col_alias = f"__col{index}"
+                        col_ref = Ref(col_alias, col)
+                        col_refs[col] = col_ref
+                        inner_query.annotations[col_alias] = col
+                        inner_query.append_annotation_mask([col_alias])
+                    replacements[col] = col_ref
+                outer_query.annotations[alias] = aggregate.replace_expressions(
+                    replacements
+                )
             if (
                 inner_query.select == ()
                 and not inner_query.default_cols
@@ -543,6 +511,21 @@ class Query(BaseExpression):
             self.select = ()
             self.default_cols = False
             self.extra = {}
+            if self.annotations:
+                # Inline reference to existing annotations and mask them as
+                # they are unnecessary given only the summarized aggregations
+                # are requested.
+                replacements = {
+                    Ref(alias, annotation): annotation
+                    for alias, annotation in self.annotations.items()
+                }
+                self.annotations = {
+                    alias: aggregate.replace_expressions(replacements)
+                    for alias, aggregate in aggregates.items()
+                }
+            else:
+                self.annotations = aggregates
+            self.set_annotation_mask(aggregates)
 
         empty_set_result = [
             expression.empty_result_set_value
@@ -557,9 +540,9 @@ class Query(BaseExpression):
         result = compiler.execute_sql(SINGLE)
         if result is None:
             result = empty_set_result
-
-        converters = compiler.get_converters(outer_query.annotation_select.values())
-        result = next(compiler.apply_converters((result,), converters))
+        else:
+            converters = compiler.get_converters(outer_query.annotation_select.values())
+            result = next(compiler.apply_converters((result,), converters))
 
         return dict(zip(outer_query.annotation_select, result))
 
@@ -568,8 +551,7 @@ class Query(BaseExpression):
         Perform a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        obj.add_annotation(Count("*"), alias="__count", is_summary=True)
-        return obj.get_aggregation(using, ["__count"])["__count"]
+        return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
 
     def has_filters(self):
         return self.where
@@ -1116,12 +1098,10 @@ class Query(BaseExpression):
                 "semicolons, or SQL comments."
             )
 
-    def add_annotation(self, annotation, alias, is_summary=False, select=True):
+    def add_annotation(self, annotation, alias, select=True):
         """Add a single annotation expression to the Query."""
         self.check_alias(alias)
-        annotation = annotation.resolve_expression(
-            self, allow_joins=True, reuse=None, summarize=is_summary
-        )
+        annotation = annotation.resolve_expression(self, allow_joins=True, reuse=None)
         if select:
             self.append_annotation_mask([alias])
         else:
@@ -1210,16 +1190,19 @@ class Query(BaseExpression):
             return type_(values)
         return value
 
-    def solve_lookup_type(self, lookup):
+    def solve_lookup_type(self, lookup, summarize=False):
         """
         Solve the lookup type from the lookup (e.g.: 'foobar__id__icontains').
         """
         lookup_splitted = lookup.split(LOOKUP_SEP)
         if self.annotations:
-            expression, expression_lookups = refs_expression(
+            annotation, expression_lookups = refs_expression(
                 lookup_splitted, self.annotations
             )
-            if expression:
+            if annotation:
+                expression = self.annotations[annotation]
+                if summarize:
+                    expression = Ref(annotation, expression)
                 return expression_lookups, (), expression
         _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
         field_parts = lookup_splitted[0 : len(lookup_splitted) - len(lookup_parts)]
@@ -1356,6 +1339,7 @@ class Query(BaseExpression):
         split_subq=True,
         reuse_with_filtered_relation=False,
         check_filterable=True,
+        summarize=False,
     ):
         """
         Build a WhereNode for a single filter clause but don't add it
@@ -1396,18 +1380,21 @@ class Query(BaseExpression):
                 allow_joins=allow_joins,
                 split_subq=split_subq,
                 check_filterable=check_filterable,
+                summarize=summarize,
             )
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
                 raise TypeError("Cannot filter against a non-conditional expression.")
-            condition = filter_expr.resolve_expression(self, allow_joins=allow_joins)
+            condition = filter_expr.resolve_expression(
+                self, allow_joins=allow_joins, summarize=summarize
+            )
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
             return WhereNode([condition], connector=AND), []
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
-        lookups, parts, reffed_expression = self.solve_lookup_type(arg)
+        lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
 
         if check_filterable:
             self.check_filterable(reffed_expression)
@@ -1546,6 +1533,7 @@ class Query(BaseExpression):
         allow_joins=True,
         split_subq=True,
         check_filterable=True,
+        summarize=False,
     ):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
@@ -1564,6 +1552,7 @@ class Query(BaseExpression):
                 allow_joins=allow_joins,
                 split_subq=split_subq,
                 check_filterable=check_filterable,
+                summarize=summarize,
             )
             joinpromoter.add_votes(needed_inner)
             if child_clause:
@@ -1905,7 +1894,7 @@ class Query(BaseExpression):
         return targets, joins[-1], joins
 
     @classmethod
-    def _gen_cols(cls, exprs, include_external=False):
+    def _gen_cols(cls, exprs, include_external=False, resolve_refs=True):
         for expr in exprs:
             if isinstance(expr, Col):
                 yield expr
@@ -1914,9 +1903,12 @@ class Query(BaseExpression):
             ):
                 yield from expr.get_external_cols()
             elif hasattr(expr, "get_source_expressions"):
+                if not resolve_refs and isinstance(expr, Ref):
+                    continue
                 yield from cls._gen_cols(
                     expr.get_source_expressions(),
                     include_external=include_external,
+                    resolve_refs=resolve_refs,
                 )
 
     @classmethod

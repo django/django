@@ -237,7 +237,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
 class ArrayRHSMixin:
     def __init__(self, lhs, rhs):
-        # Don't wrap arrays that contains only None values, psycopg2 doesn't
+        # Don't wrap arrays that contains only None values, psycopg doesn't
         # allow this.
         if isinstance(rhs, (tuple, list)) and any(self._rhs_not_none_values(rhs)):
             expressions = []
@@ -297,7 +297,7 @@ class ArrayLenTransform(Transform):
         return (
             "CASE WHEN %(lhs)s IS NULL THEN NULL ELSE "
             "coalesce(array_length(%(lhs)s, 1), 0) END"
-        ) % {"lhs": lhs}, params
+        ) % {"lhs": lhs}, params * 2
 
 
 @ArrayField.register_lookup

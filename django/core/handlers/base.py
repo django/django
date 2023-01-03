@@ -2,7 +2,7 @@ import asyncio
 import logging
 import types
 
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, MiddlewareNotUsed
@@ -119,7 +119,7 @@ class BaseHandler:
           - Asynchronous methods are left alone
         """
         if method_is_async is None:
-            method_is_async = asyncio.iscoroutinefunction(method)
+            method_is_async = iscoroutinefunction(method)
         if debug and not name:
             name = name or "method %s()" % method.__qualname__
         if is_async:
@@ -191,7 +191,7 @@ class BaseHandler:
         if response is None:
             wrapped_callback = self.make_view_atomic(callback)
             # If it is an asynchronous view, run it in a subthread.
-            if asyncio.iscoroutinefunction(wrapped_callback):
+            if iscoroutinefunction(wrapped_callback):
                 wrapped_callback = async_to_sync(wrapped_callback)
             try:
                 response = wrapped_callback(request, *callback_args, **callback_kwargs)
@@ -245,7 +245,7 @@ class BaseHandler:
         if response is None:
             wrapped_callback = self.make_view_atomic(callback)
             # If it is a synchronous view, run it in a subthread
-            if not asyncio.iscoroutinefunction(wrapped_callback):
+            if not iscoroutinefunction(wrapped_callback):
                 wrapped_callback = sync_to_async(
                     wrapped_callback, thread_sensitive=True
                 )
@@ -278,7 +278,7 @@ class BaseHandler:
                     % (middleware_method.__self__.__class__.__name__,),
                 )
             try:
-                if asyncio.iscoroutinefunction(response.render):
+                if iscoroutinefunction(response.render):
                     response = await response.render()
                 else:
                     response = await sync_to_async(
@@ -346,7 +346,7 @@ class BaseHandler:
         non_atomic_requests = getattr(view, "_non_atomic_requests", set())
         for alias, settings_dict in connections.settings.items():
             if settings_dict["ATOMIC_REQUESTS"] and alias not in non_atomic_requests:
-                if asyncio.iscoroutinefunction(view):
+                if iscoroutinefunction(view):
                     raise RuntimeError(
                         "You cannot use ATOMIC_REQUESTS with async views."
                     )

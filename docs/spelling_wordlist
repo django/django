@@ -136,6 +136,7 @@ dimensioned
 discoverable
 Disqus
 distro
+django
 djangoproject
 dm
 docstring
@@ -246,7 +247,6 @@ kilometre
 Koziarski
 kwarg
 kwargs
-Kyngesburye
 Kyrgyz
 latin
 lawrence
@@ -387,7 +387,6 @@ psycopg
 Punycode
 Puthraya
 pyformat
-pysqlite
 pythonic
 qs
 queryset

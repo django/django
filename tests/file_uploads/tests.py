@@ -25,7 +25,8 @@ from .models import FileModel
 
 UNICODE_FILENAME = "test-0123456789_中文_Orléans.jpg"
 MEDIA_ROOT = sys_tempfile.mkdtemp()
-UPLOAD_TO = os.path.join(MEDIA_ROOT, "test_upload")
+UPLOAD_FOLDER = "test_upload"
+UPLOAD_TO = os.path.join(MEDIA_ROOT, UPLOAD_FOLDER)
 
 CANDIDATE_TRAVERSAL_FILE_NAMES = [
     "/tmp/hax0rd.txt",  # Absolute path, *nix-style.
@@ -189,8 +190,7 @@ class FileUploadTests(TestCase):
 
     def test_unicode_file_name_rfc2231(self):
         """
-        Test receiving file upload when filename is encoded with RFC2231
-        (#22971).
+        Receiving file upload when filename is encoded with RFC 2231.
         """
         payload = client.FakePayload()
         payload.write(
@@ -219,8 +219,7 @@ class FileUploadTests(TestCase):
 
     def test_unicode_name_rfc2231(self):
         """
-        Test receiving file upload when filename is encoded with RFC2231
-        (#22971).
+        Receiving file upload when filename is encoded with RFC 2231.
         """
         payload = client.FakePayload()
         payload.write(

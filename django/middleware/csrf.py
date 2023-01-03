@@ -11,8 +11,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.exceptions import DisallowedHost, ImproperlyConfigured
-from django.http import UnreadablePostError
-from django.http.request import HttpHeaders
+from django.http import HttpHeaders, UnreadablePostError
 from django.urls import get_callable
 from django.utils.cache import patch_vary_headers
 from django.utils.crypto import constant_time_compare, get_random_string
@@ -426,7 +425,7 @@ class CsrfViewMiddleware(MiddlewareMixin):
         if getattr(callback, "csrf_exempt", False):
             return None
 
-        # Assume that anything not defined as 'safe' by RFC7231 needs protection
+        # Assume that anything not defined as 'safe' by RFC 9110 needs protection
         if request.method in ("GET", "HEAD", "OPTIONS", "TRACE"):
             return self._accept(request)
 

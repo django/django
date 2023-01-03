@@ -91,6 +91,24 @@ Django quotes column and table names behind the scenes.
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
 
+``db_table_comment``
+--------------------
+
+.. versionadded:: 4.2
+
+.. attribute:: Options.db_table_comment
+
+The comment on the database table to use for this model. It is useful for
+documenting database tables for individuals with direct database access who may
+not be looking at your Django code. For example::
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE)
+        answer = models.TextField()
+
+        class Meta:
+            db_table_comment = "Question answers"
+
 ``db_tablespace``
 -----------------
 

@@ -48,6 +48,7 @@ class BaseSpatialOperations:
         "GeoHash",
         "GeometryDistance",
         "Intersection",
+        "IsEmpty",
         "IsValid",
         "Length",
         "LineLocatePoint",

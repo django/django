@@ -7,7 +7,7 @@ from collections import defaultdict
 from decimal import Decimal
 from uuid import UUID
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
@@ -404,6 +404,12 @@ class BaseExpression:
             ]
         )
         return clone
+
+    def get_refs(self):
+        refs = set()
+        for expr in self.get_source_expressions():
+            refs |= expr.get_refs()
+        return refs
 
     def copy(self):
         return copy.copy(self)
@@ -955,6 +961,8 @@ class Func(SQLiteNumericMixin, Expression):
                 if empty_result_set_value is NotImplemented:
                     raise
                 arg_sql, arg_params = compiler.compile(Value(empty_result_set_value))
+            except FullResultSet:
+                arg_sql, arg_params = compiler.compile(Value(True))
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
@@ -1165,6 +1173,9 @@ class Ref(Expression):
         # just a reference to the name of `source`.
         return self
 
+    def get_refs(self):
+        return {self.refs}
+
     def relabeled_clone(self, relabels):
         return self
 
@@ -1367,14 +1378,6 @@ class When(Expression):
         template_params = extra_context
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
-        # Filters that match everything are handled as empty strings in the
-        # WHERE clause, but in a CASE WHEN expression they must use a predicate
-        # that's always True.
-        if condition_sql == "":
-            if connection.features.supports_boolean_expr_in_select_clause:
-                condition_sql, condition_params = compiler.compile(Value(True))
-            else:
-                condition_sql, condition_params = "1=1", ()
         template_params["condition"] = condition_sql
         result_sql, result_params = compiler.compile(self.result)
         template_params["result"] = result_sql
@@ -1461,14 +1464,17 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
+        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
             except EmptyResultSet:
                 continue
+            except FullResultSet:
+                default_sql, default_params = compiler.compile(case.result)
+                break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
-        default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner

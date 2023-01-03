@@ -1,10 +1,15 @@
 import datetime
 import json
 
-from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange, Range
-
 from django.contrib.postgres import forms, lookups
 from django.db import models
+from django.db.backends.postgresql.psycopg_any import (
+    DateRange,
+    DateTimeTZRange,
+    NumericRange,
+    Range,
+)
+from django.db.models.functions import Cast
 from django.db.models.lookups import PostgresOperatorLookup
 
 from .utils import AttributeSetter
@@ -204,7 +209,14 @@ class DateRangeField(RangeField):
         return "daterange"
 
 
-RangeField.register_lookup(lookups.DataContains)
+class RangeContains(lookups.DataContains):
+    def get_prep_lookup(self):
+        if not isinstance(self.rhs, (list, tuple, Range)):
+            return Cast(self.rhs, self.lhs.field.base_field)
+        return super().get_prep_lookup()
+
+
+RangeField.register_lookup(RangeContains)
 RangeField.register_lookup(lookups.ContainedBy)
 RangeField.register_lookup(lookups.Overlap)
 

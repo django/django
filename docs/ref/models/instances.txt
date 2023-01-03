@@ -728,7 +728,7 @@ For example::
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            return '%s %s' % (self.first_name, self.last_name)
+            return f'{self.first_name} {self.last_name}'
 
 ``__eq__()``
 ------------
@@ -848,7 +848,7 @@ track down every place that the URL might be created. Specify it once, in
 
 .. note::
     The string you return from ``get_absolute_url()`` **must** contain only
-    ASCII characters (required by the URI specification, :rfc:`2396#section-2`)
+    ASCII characters (required by the URI specification, :rfc:`3986#section-2`)
     and be URL-encoded, if necessary.
 
     Code and templates calling ``get_absolute_url()`` should be able to use the

@@ -177,6 +177,52 @@ class TestHashedFiles:
             self.assertIn(b"https://", relfile.read())
         self.assertPostCondition()
 
+    def test_module_import(self):
+        relpath = self.hashed_file_path("cached/module.js")
+        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        tests = [
+            # Relative imports.
+            b'import testConst from "./module_test.477bbebe77f0.js";',
+            b'import relativeModule from "../nested/js/nested.866475c46bb4.js";',
+            b'import { firstConst, secondConst } from "./module_test.477bbebe77f0.js";',
+            # Absolute import.
+            b'import rootConst from "/static/absolute_root.5586327fe78c.js";',
+            # Dynamic import.
+            b'const dynamicModule = import("./module_test.477bbebe77f0.js");',
+            # Creating a module object.
+            b'import * as NewModule from "./module_test.477bbebe77f0.js";',
+            # Aliases.
+            b'import { testConst as alias } from "./module_test.477bbebe77f0.js";',
+            b"import {\n"
+            b"    firstVar1 as firstVarAlias,\n"
+            b"    $second_var_2 as secondVarAlias\n"
+            b'} from "./module_test.477bbebe77f0.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
+        self.assertPostCondition()
+
+    def test_aggregating_modules(self):
+        relpath = self.hashed_file_path("cached/module.js")
+        self.assertEqual(relpath, "cached/module.55fd6938fbc5.js")
+        tests = [
+            b'export * from "./module_test.477bbebe77f0.js";',
+            b'export { testConst } from "./module_test.477bbebe77f0.js";',
+            b"export {\n"
+            b"    firstVar as firstVarAlias,\n"
+            b"    secondVar as secondVarAlias\n"
+            b'} from "./module_test.477bbebe77f0.js";',
+        ]
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            for module_import in tests:
+                with self.subTest(module_import=module_import):
+                    self.assertIn(module_import, content)
+        self.assertPostCondition()
+
     @override_settings(
         STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "loop")],
         STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
@@ -390,7 +436,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         # The in-memory version of the manifest matches the one on disk
         # since a properly created manifest should cover all filenames.
         if hashed_files:
-            manifest = storage.staticfiles_storage.load_manifest()
+            manifest, _ = storage.staticfiles_storage.load_manifest()
             self.assertEqual(hashed_files, manifest)
 
     def test_manifest_exists(self):
@@ -417,7 +463,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
     def test_parse_cache(self):
         hashed_files = storage.staticfiles_storage.hashed_files
-        manifest = storage.staticfiles_storage.load_manifest()
+        manifest, _ = storage.staticfiles_storage.load_manifest()
         self.assertEqual(hashed_files, manifest)
 
     def test_clear_empties_manifest(self):
@@ -430,7 +476,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         hashed_files = storage.staticfiles_storage.hashed_files
         self.assertIn(cleared_file_name, hashed_files)
 
-        manifest_content = storage.staticfiles_storage.load_manifest()
+        manifest_content, _ = storage.staticfiles_storage.load_manifest()
         self.assertIn(cleared_file_name, manifest_content)
 
         original_path = storage.staticfiles_storage.path(cleared_file_name)
@@ -445,7 +491,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
         hashed_files = storage.staticfiles_storage.hashed_files
         self.assertNotIn(cleared_file_name, hashed_files)
 
-        manifest_content = storage.staticfiles_storage.load_manifest()
+        manifest_content, _ = storage.staticfiles_storage.load_manifest()
         self.assertNotIn(cleared_file_name, manifest_content)
 
     def test_missing_entry(self):
@@ -488,6 +534,29 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
             ),
             2,
         )
+
+    def test_manifest_hash(self):
+        # Collect the additional file.
+        self.run_collectstatic()
+
+        _, manifest_hash_orig = storage.staticfiles_storage.load_manifest()
+        self.assertNotEqual(manifest_hash_orig, "")
+        self.assertEqual(storage.staticfiles_storage.manifest_hash, manifest_hash_orig)
+        # Saving doesn't change the hash.
+        storage.staticfiles_storage.save_manifest()
+        self.assertEqual(storage.staticfiles_storage.manifest_hash, manifest_hash_orig)
+        # Delete the original file from the app, collect with clear.
+        os.unlink(self._clear_filename)
+        self.run_collectstatic(clear=True)
+        # Hash is changed.
+        _, manifest_hash = storage.staticfiles_storage.load_manifest()
+        self.assertNotEqual(manifest_hash, manifest_hash_orig)
+
+    def test_manifest_hash_v1(self):
+        storage.staticfiles_storage.manifest_name = "staticfiles_v1.json"
+        manifest_content, manifest_hash = storage.staticfiles_storage.load_manifest()
+        self.assertEqual(manifest_hash, "")
+        self.assertEqual(manifest_content, {"dummy.txt": "dummy.txt"})
 
 
 @override_settings(STATICFILES_STORAGE="staticfiles_tests.storage.NoneHashStorage")

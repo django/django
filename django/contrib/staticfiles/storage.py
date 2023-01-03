@@ -72,6 +72,28 @@ class HashedFilesMixin:
                     r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
                 ),
+                (
+                    (
+                        r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                        r"""\s*from\s*['"](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """import%(import)s from "%(url)s";""",
+                ),
+                (
+                    (
+                        r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
+                        r"""\s*from\s*["'](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """export%(exports)s from "%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\s*['"](?P<url>[\.\/].*?)["']\s*;)""",
+                    """import"%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
+                    """import("%(url)s")""",
+                ),
             ),
         ),
     )
@@ -417,7 +439,7 @@ class HashedFilesMixin:
 
 
 class ManifestFilesMixin(HashedFilesMixin):
-    manifest_version = "1.0"  # the manifest format standard
+    manifest_version = "1.1"  # the manifest format standard
     manifest_name = "staticfiles.json"
     manifest_strict = True
     keep_intermediate_files = False
@@ -427,7 +449,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         if manifest_storage is None:
             manifest_storage = self
         self.manifest_storage = manifest_storage
-        self.hashed_files = self.load_manifest()
+        self.hashed_files, self.manifest_hash = self.load_manifest()
 
     def read_manifest(self):
         try:
@@ -439,15 +461,15 @@ class ManifestFilesMixin(HashedFilesMixin):
     def load_manifest(self):
         content = self.read_manifest()
         if content is None:
-            return {}
+            return {}, ""
         try:
             stored = json.loads(content)
         except json.JSONDecodeError:
             pass
         else:
             version = stored.get("version")
-            if version == "1.0":
-                return stored.get("paths", {})
+            if version in ("1.0", "1.1"):
+                return stored.get("paths", {}), stored.get("hash", "")
         raise ValueError(
             "Couldn't load manifest '%s' (version %s)"
             % (self.manifest_name, self.manifest_version)
@@ -460,7 +482,14 @@ class ManifestFilesMixin(HashedFilesMixin):
             self.save_manifest()
 
     def save_manifest(self):
-        payload = {"paths": self.hashed_files, "version": self.manifest_version}
+        self.manifest_hash = self.file_hash(
+            None, ContentFile(json.dumps(sorted(self.hashed_files.items())).encode())
+        )
+        payload = {
+            "paths": self.hashed_files,
+            "version": self.manifest_version,
+            "hash": self.manifest_hash,
+        }
         if self.manifest_storage.exists(self.manifest_name):
             self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()

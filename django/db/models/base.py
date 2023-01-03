@@ -48,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -456,7 +456,7 @@ class ModelState:
     fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__
@@ -735,6 +735,11 @@ class Model(metaclass=ModelBase):
         # Clear cached relations.
         for field in self._meta.related_objects:
             if field.is_cached(self):
+                field.delete_cached_value(self)
+
+        # Clear cached private relations.
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
                 field.delete_cached_value(self)
 
         self._state.db = db_instance._state.db
@@ -1551,6 +1556,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
+                *cls._check_db_table_comment(databases),
             ]
 
         return errors
@@ -1586,6 +1592,29 @@ class Model(metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_db_table_comment(cls, databases):
+        if not cls._meta.db_table_comment:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in cls._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"tables (db_table_comment).",
+                        obj=cls,
+                        id="models.W046",
+                    )
+                )
+        return errors
 
     @classmethod
     def _check_swappable(cls):

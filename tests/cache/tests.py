@@ -1762,6 +1762,12 @@ class FileBasedCacheTests(BaseCacheTests, TestCase):
         with open(cache_file, "rb") as fh:
             self.assertIs(cache._is_expired(fh), True)
 
+    def test_has_key_race_handling(self):
+        self.assertIs(cache.add("key", "value"), True)
+        with mock.patch("builtins.open", side_effect=FileNotFoundError) as mocked_open:
+            self.assertIs(cache.has_key("key"), False)
+            mocked_open.assert_called_once()
+
 
 @unittest.skipUnless(RedisCache_params, "Redis backend not configured")
 @override_settings(
@@ -1780,6 +1786,14 @@ class RedisCacheTests(BaseCacheTests, TestCase):
     @property
     def incr_decr_type_error(self):
         return self.lib.ResponseError
+
+    def test_incr_write_connection(self):
+        cache.set("number", 42)
+        with mock.patch(
+            "django.core.cache.backends.redis.RedisCacheClient.get_client"
+        ) as mocked_get_client:
+            cache.incr("number")
+            self.assertEqual(mocked_get_client.call_args.kwargs, {"write": True})
 
     def test_cache_client_class(self):
         self.assertIs(cache._class, RedisCacheClient)

@@ -1,0 +1,16 @@
+==========================
+Django 4.1.5 release notes
+==========================
+
+*January 2, 2023*
+
+Django 4.1.5 fixes a bug in 4.1.4. Also, the latest string translations from
+Transifex are incorporated.
+
+Bugfixes
+========
+
+* Fixed a long standing bug in the ``__len`` lookup for ``ArrayField`` that
+  caused a crash of model validation on
+  :attr:`Meta.constraints <django.db.models.Options.constraints>`
+  (:ticket:`34205`).

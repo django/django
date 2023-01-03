@@ -127,6 +127,15 @@ value.
 
 Renames the model's table from ``old_db_table`` to ``new_db_table``.
 
+``alter_db_table_comment()``
+----------------------------
+
+.. versionadded:: 4.2
+
+.. method:: BaseDatabaseSchemaEditor.alter_db_table_comment(model, old_db_table_comment, new_db_table_comment)
+
+Change the ``model``’s table comment to ``new_db_table_comment``.
+
 ``alter_db_tablespace()``
 -------------------------
 

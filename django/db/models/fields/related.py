@@ -1060,22 +1060,6 @@ class ForeignKey(ForeignObject):
     def target_field(self):
         return self.foreign_related_fields[0]
 
-    def get_reverse_path_info(self, filtered_relation=None):
-        """Get path from the related model to this field's model."""
-        opts = self.model._meta
-        from_opts = self.remote_field.model._meta
-        return [
-            PathInfo(
-                from_opts=from_opts,
-                to_opts=opts,
-                target_fields=(opts.pk,),
-                join_field=self.remote_field,
-                m2m=not self.unique,
-                direct=False,
-                filtered_relation=filtered_relation,
-            )
-        ]
-
     def validate(self, value, model_instance):
         if self.remote_field.parent_link:
             return
@@ -1442,6 +1426,14 @@ class ManyToManyField(RelatedField):
                     'with a symmetrical relationship, e.g. to "self".',
                     obj=self,
                     id="fields.W345",
+                )
+            )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
                 )
             )
 

@@ -11,6 +11,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
+from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.db.models import Func, Value
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
@@ -161,7 +162,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     unsupported_functions = set()
 
-    select = "%s::bytea"
+    select = "%s" if is_psycopg3 else "%s::bytea"
+
     select_extent = None
 
     @cached_property
@@ -407,6 +409,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
+            if isinstance(value, str):  # Coming from hex strings.
+                value = value.encode("ascii")
             return None if value is None else GEOSGeometryBase(read(value), geom_class)
 
         return converter
