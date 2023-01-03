@@ -1,9 +1,12 @@
 ======
-Django
+Django 
 ======
 
-Django is a high-level Python web framework that encourages rapid development
-and clean, pragmatic design. Thanks for checking it out.
+You're welcome! Django is a popular web framework for good reason.
+It's fast, flexible, and secure, and it has a large and active community of developers. 
+Some of the features that make Django popular include its automatic admin interface, its support for multiple databases, and its ability to handle high levels of traffic.
+If you're new to Django, I'd recommend starting with the official Django tutorial to get a feel for the framework and how it works. 
+Do you have any specific questions about Django that I can help with?
 
 All documentation is in the "``docs``" directory and online at
 https://docs.djangoproject.com/en/stable/. If you're just getting started,
