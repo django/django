@@ -78,3 +78,8 @@ Bugfixes
 
 * Fixed a migration crash on Oracle and SQLite when adding a check constraint
   with ``condition`` contains ``|`` (``OR``) operator (:ticket:`30412`).
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
