@@ -95,6 +95,45 @@ class TestUtilsText(SimpleTestCase):
             text.Truncator(lazystr("The quick brown fox")).chars(10), "The quick…"
         )
 
+    def test_truncate_chars_html(self):
+        truncator = text.Truncator(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>"
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>",
+            truncator.chars(80, html=True),
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>",
+            truncator.chars(46, html=True),
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick brown fox jumped over the lazy dog.</em>'
+            "</strong></p>",
+            truncator.chars(45, html=True),
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick…</em></strong></p>',
+            truncator.chars(10, html=True),
+        )
+        self.assertEqual(
+            "…",
+            truncator.chars(1, html=True),
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The qu....</em></strong></p>',
+            truncator.chars(10, "....", html=True),
+        )
+        self.assertEqual(
+            '<p id="par"><strong><em>The quick </em></strong></p>',
+            truncator.chars(10, "", html=True),
+        )
+        truncator = text.Truncator("foo</p>")
+        self.assertEqual("foo</p>", truncator.chars(5, html=True))
+
     @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
     def test_truncate_chars_html_size_limit(self):
         max_len = text.Truncator.MAX_LENGTH_HTML
@@ -113,6 +152,47 @@ class TestUtilsText(SimpleTestCase):
                 self.assertEqual(
                     expected if expected else value, truncator.chars(10, html=True)
                 )
+
+    def test_truncate_chars_html_with_newline_inside_tag(self):
+        truncator = text.Truncator(
+            '<p>The quick <a href="xyz.html"\n id="mylink">brown fox</a> jumped over '
+            "the lazy dog.</p>"
+        )
+        self.assertEqual(
+            '<p>The quick <a href="xyz.html"\n id="mylink">brow…</a></p>',
+            truncator.chars(15, html=True),
+        )
+        self.assertEqual(
+            "<p>Th…</p>",
+            truncator.chars(3, html=True),
+        )
+
+    def test_truncate_chars_html_with_void_elements(self):
+        truncator = text.Truncator(
+            "<br/>The <hr />quick brown fox jumped over the lazy dog."
+        )
+        self.assertEqual("<br/>The <hr />quick brown…", truncator.chars(16, html=True))
+        truncator = text.Truncator(
+            "<br>The <hr/>quick <em>brown fox</em> jumped over the lazy dog."
+        )
+        self.assertEqual(
+            "<br>The <hr/>quick <em>brown…</em>", truncator.chars(16, html=True)
+        )
+        self.assertEqual("<br>The <hr/>q…", truncator.chars(6, html=True))
+        self.assertEqual("<br>The …", truncator.chars(5, html=True))
+        self.assertEqual("<br>The…", truncator.chars(4, html=True))
+        self.assertEqual("<br>Th…", truncator.chars(3, html=True))
+
+    def test_truncate_chars_html_with_html_entities(self):
+        truncator = text.Truncator(
+            "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>"
+        )
+        self.assertEqual(
+            "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo…</i>",
+            truncator.chars(40, html=True),
+        )
+        truncator = text.Truncator("<p>I &lt;3 python, what about you?</p>")
+        self.assertEqual("<p>I &lt;3 python,…</p>", truncator.chars(16, html=True))
 
     def test_truncate_words(self):
         truncator = text.Truncator("The quick brown fox jumped over the lazy dog.")
@@ -142,12 +222,24 @@ class TestUtilsText(SimpleTestCase):
             truncator.words(4, html=True),
         )
         self.assertEqual(
+            "",
+            truncator.words(0, html=True),
+        )
+        self.assertEqual(
             '<p id="par"><strong><em>The quick brown fox....</em></strong></p>',
             truncator.words(4, "....", html=True),
         )
         self.assertEqual(
             '<p id="par"><strong><em>The quick brown fox</em></strong></p>',
             truncator.words(4, "", html=True),
+        )
+
+        truncator = text.Truncator(
+            "<p>The  quick \t brown fox jumped over the lazy dog.</p>"
+        )
+        self.assertEqual(
+            "<p>The  quick \t brown fox…</p>",
+            truncator.words(4, html=True),
         )
 
         # Test with new line inside tag
@@ -158,6 +250,10 @@ class TestUtilsText(SimpleTestCase):
         self.assertEqual(
             '<p>The quick <a href="xyz.html"\n id="mylink">brown…</a></p>',
             truncator.words(3, html=True),
+        )
+        self.assertEqual(
+            "<p>The…</p>",
+            truncator.words(1, html=True),
         )
 
         # Test self-closing tags
@@ -182,6 +278,9 @@ class TestUtilsText(SimpleTestCase):
         )
         truncator = text.Truncator("<p>I &lt;3 python, what about you?</p>")
         self.assertEqual("<p>I &lt;3 python,…</p>", truncator.words(3, html=True))
+
+        truncator = text.Truncator("foo</p>")
+        self.assertEqual("foo</p>", truncator.words(3, html=True))
 
     @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
     def test_truncate_words_html_size_limit(self):
