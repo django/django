@@ -368,6 +368,11 @@ Miscellaneous
   :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
   ``msg_prefix``. This is consistent with the behavior of other assertions.
 
+* ``django.utils.text.Truncator`` used by :tfilter:`truncatechars_html` and
+  :tfilter:`truncatewords_html` template filters now uses
+  :py:class:`html.parser.HTMLParser` subclasses. This results in a more robust
+  and faster operation, but there may be small differences in the output.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
