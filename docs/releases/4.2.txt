@@ -251,7 +251,8 @@ Error Reporting
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.FileSystemStorage.chmod` method allows to change
+  permissions mode on the selected file/directory.
 
 File Uploads
 ~~~~~~~~~~~~

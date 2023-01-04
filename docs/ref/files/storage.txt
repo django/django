@@ -74,6 +74,12 @@ The ``FileSystemStorage`` class
         time of the last metadata change, and on others (like Windows), it's
         the creation time of the file.
 
+    .. method:: chmod(name, mode)
+
+        .. versionadded:: 4.2
+
+        Change the permission mode on the specified file/directory.
+
 The ``Storage`` class
 =====================
 

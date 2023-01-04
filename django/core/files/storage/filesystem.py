@@ -127,7 +127,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
                 break
 
         if self.file_permissions_mode is not None:
-            os.chmod(full_path, self.file_permissions_mode)
+            self.chmod(name, self.file_permissions_mode)
 
         # Ensure the saved path is always relative to the storage root.
         name = os.path.relpath(full_path, self.location)
@@ -205,3 +205,7 @@ class FileSystemStorage(Storage, StorageSettingsMixin):
 
     def get_modified_time(self, name):
         return self._datetime_from_timestamp(os.path.getmtime(self.path(name)))
+
+    def chmod(self, name, mode):
+        full_path = self.path(name)
+        os.chmod(full_path, mode)
