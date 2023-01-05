@@ -1,14 +1,16 @@
-import asyncio
 import logging
 import sys
 from functools import wraps
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import iscoroutinefunction, sync_to_async
 
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import (
-    BadRequest, PermissionDenied, RequestDataTooBig, SuspiciousOperation,
+    BadRequest,
+    PermissionDenied,
+    RequestDataTooBig,
+    SuspiciousOperation,
     TooManyFieldsSent,
 )
 from django.http import Http404
@@ -31,16 +33,21 @@ def convert_exception_to_response(get_response):
     no middleware leaks an exception and that the next middleware in the stack
     can rely on getting a response instead of an exception.
     """
-    if asyncio.iscoroutinefunction(get_response):
+    if iscoroutinefunction(get_response):
+
         @wraps(get_response)
         async def inner(request):
             try:
                 response = await get_response(request)
             except Exception as exc:
-                response = await sync_to_async(response_for_exception, thread_sensitive=False)(request, exc)
+                response = await sync_to_async(
+                    response_for_exception, thread_sensitive=False
+                )(request, exc)
             return response
+
         return inner
     else:
+
         @wraps(get_response)
         def inner(request):
             try:
@@ -48,6 +55,7 @@ def convert_exception_to_response(get_response):
             except Exception as exc:
                 response = response_for_exception(request, exc)
             return response
+
         return inner
 
 
@@ -56,36 +64,50 @@ def response_for_exception(request, exc):
         if settings.DEBUG:
             response = debug.technical_404_response(request, exc)
         else:
-            response = get_exception_response(request, get_resolver(get_urlconf()), 404, exc)
+            response = get_exception_response(
+                request, get_resolver(get_urlconf()), 404, exc
+            )
 
     elif isinstance(exc, PermissionDenied):
-        response = get_exception_response(request, get_resolver(get_urlconf()), 403, exc)
+        response = get_exception_response(
+            request, get_resolver(get_urlconf()), 403, exc
+        )
         log_response(
-            'Forbidden (Permission denied): %s', request.path,
+            "Forbidden (Permission denied): %s",
+            request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     elif isinstance(exc, MultiPartParserError):
-        response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
+        response = get_exception_response(
+            request, get_resolver(get_urlconf()), 400, exc
+        )
         log_response(
-            'Bad request (Unable to parse request body): %s', request.path,
+            "Bad request (Unable to parse request body): %s",
+            request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     elif isinstance(exc, BadRequest):
         if settings.DEBUG:
-            response = debug.technical_500_response(request, *sys.exc_info(), status_code=400)
+            response = debug.technical_500_response(
+                request, *sys.exc_info(), status_code=400
+            )
         else:
-            response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
+            response = get_exception_response(
+                request, get_resolver(get_urlconf()), 400, exc
+            )
         log_response(
-            '%s: %s', str(exc), request.path,
+            "%s: %s",
+            str(exc),
+            request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
     elif isinstance(exc, SuspiciousOperation):
         if isinstance(exc, (RequestDataTooBig, TooManyFieldsSent)):
@@ -95,28 +117,41 @@ def response_for_exception(request, exc):
 
         # The request logger receives events for any problematic request
         # The security logger receives events for all SuspiciousOperations
-        security_logger = logging.getLogger('django.security.%s' % exc.__class__.__name__)
+        security_logger = logging.getLogger(
+            "django.security.%s" % exc.__class__.__name__
+        )
         security_logger.error(
             str(exc),
-            extra={'status_code': 400, 'request': request},
+            exc_info=exc,
+            extra={"status_code": 400, "request": request},
         )
         if settings.DEBUG:
-            response = debug.technical_500_response(request, *sys.exc_info(), status_code=400)
+            response = debug.technical_500_response(
+                request, *sys.exc_info(), status_code=400
+            )
         else:
-            response = get_exception_response(request, get_resolver(get_urlconf()), 400, exc)
+            response = get_exception_response(
+                request, get_resolver(get_urlconf()), 400, exc
+            )
 
     else:
         signals.got_request_exception.send(sender=None, request=request)
-        response = handle_uncaught_exception(request, get_resolver(get_urlconf()), sys.exc_info())
+        response = handle_uncaught_exception(
+            request, get_resolver(get_urlconf()), sys.exc_info()
+        )
         log_response(
-            '%s: %s', response.reason_phrase, request.path,
+            "%s: %s",
+            response.reason_phrase,
+            request.path,
             response=response,
             request=request,
-            exc_info=sys.exc_info(),
+            exception=exc,
         )
 
     # Force a TemplateResponse to be rendered.
-    if not getattr(response, 'is_rendered', True) and callable(getattr(response, 'render', None)):
+    if not getattr(response, "is_rendered", True) and callable(
+        getattr(response, "render", None)
+    ):
         response = response.render()
 
     return response

@@ -1,6 +1,6 @@
-===============
-Error reporting
-===============
+=============================
+How to manage error reporting
+=============================
 
 When you're running a public site you should always turn off the
 :setting:`DEBUG` setting. That will make your server run much faster, and will
@@ -64,9 +64,9 @@ not found" errors). Django sends emails about 404 errors when:
 If those conditions are met, Django will email the users listed in the
 :setting:`MANAGERS` setting whenever your code raises a 404 and the request has
 a referer. It doesn't bother to email for 404s that don't have a referer --
-those are usually people typing in broken URLs or broken Web bots. It also
+those are usually people typing in broken URLs or broken web bots. It also
 ignores 404s when the referer is equal to the requested URL, since this
-behavior is from broken Web bots too.
+behavior is from broken web bots too.
 
 .. note::
 
@@ -74,7 +74,7 @@ behavior is from broken Web bots too.
     before other middleware that intercepts 404 errors, such as
     :class:`~django.middleware.locale.LocaleMiddleware` or
     :class:`~django.contrib.flatpages.middleware.FlatpageFallbackMiddleware`.
-    Put it towards the top of your :setting:`MIDDLEWARE` setting.
+    Put it toward the top of your :setting:`MIDDLEWARE` setting.
 
 You can tell Django to stop reporting particular 404s by tweaking the
 :setting:`IGNORABLE_404_URLS` setting. It should be a list of compiled
@@ -123,7 +123,7 @@ Filtering error reports
     Filtering sensitive data is a hard problem, and it's nearly impossible to
     guarantee that sensitive data won't leak into an error report. Therefore,
     error reports should only be available to trusted team members and you
-    should avoid transmitting error reports unencrypted over the Internet
+    should avoid transmitting error reports unencrypted over the internet
     (such as through email).
 
 Filtering sensitive information
@@ -281,7 +281,11 @@ following attributes and methods:
 
             import re
 
-            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE', flags=re.IGNORECASE)
+            re.compile(r'API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE', flags=re.IGNORECASE)
+
+        .. versionchanged:: 4.2
+
+            ``HTTP_COOKIE`` was added.
 
     .. method:: is_active(request)
 
@@ -321,15 +325,11 @@ Your custom reporter class needs to inherit from
 
     .. attribute:: html_template_path
 
-        .. versionadded:: 3.2
-
         Property that returns a :class:`pathlib.Path` representing the absolute
         filesystem path to a template for rendering the HTML representation of
         the exception. Defaults to the Django provided template.
 
     .. attribute:: text_template_path
-
-        .. versionadded:: 3.2
 
         Property that returns a :class:`pathlib.Path` representing the absolute
         filesystem path to a template for rendering the plain-text

@@ -21,4 +21,4 @@ class Fields3D(models.Model):
     poly = models.PolygonField(dim=3)
 
     class Meta:
-        required_db_features = {'supports_3d_storage'}
+        required_db_features = {"supports_3d_storage"}

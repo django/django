@@ -2,21 +2,20 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017-2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017-2018,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # krikulis <kristaps.kulis@gmail.com>, 2014
 # Māris Nartišs <maris.gis@gmail.com>, 2016
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
 # Mārtiņš Šulcs <shulcsm@gmail.com>, 2018
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018-2021
 # peterisb <pb@sungis.lv>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-25 23:29+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -153,7 +152,7 @@ msgid "Armenian"
 msgstr "Armēņu"
 
 msgid "Interlingua"
-msgstr "modernā latīņu valoda"
+msgstr "modernā latīņu"
 
 msgid "Indonesian"
 msgstr "indonēziešu"
@@ -171,10 +170,10 @@ msgid "Italian"
 msgstr "itāļu"
 
 msgid "Japanese"
-msgstr "Japāņu"
+msgstr "japāņu"
 
 msgid "Georgian"
-msgstr "vācu"
+msgstr "gruzīnu"
 
 msgid "Kabyle"
 msgstr "kabiliešu"
@@ -214,6 +213,9 @@ msgstr "mongoļu"
 
 msgid "Marathi"
 msgstr "maratiešu"
+
+msgid "Malay"
+msgstr "malajiešu"
 
 msgid "Burmese"
 msgstr "birmiešu"
@@ -356,15 +358,15 @@ msgstr "Ievadiet korektu e-pasta adresi"
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Ievadiet korektu \"vienkāršotā teksta\" vērtību, kas satur tikai burtus, "
+"Ievadiet korektu \"identifikatora\" vērtību, kas satur tikai burtus, "
 "ciparus, apakšsvītras vai defises."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Ievadiet korektu \"vienkāršotā teksta\" vērtību, kas satur tikai Unikoda "
-"burtus, ciparus, apakšsvītras vai defises."
+"Ievadiet korektu \"identifikatora\" vērtību, kas satur tikai Unikoda burtus, "
+"ciparus, apakšsvītras vai defises."
 
 msgid "Enter a valid IPv4 address."
 msgstr "Ievadiet korektu IPv4 adresi."
@@ -389,6 +391,10 @@ msgstr "Šai vērtībai jabūt mazākai vai vienādai ar %(limit_value)s."
 #, python-format
 msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Vērtībai jābūt lielākai vai vienādai ar %(limit_value)s."
+
+#, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Vērtībai jābūt reizinājumam no %(limit_value)s."
 
 #, python-format
 msgid ""
@@ -469,6 +475,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s ar šādu lauka %(field_labels)s vērtību jau eksistē."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Konstante “%(name)s” ir pārkāpta."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vērtība %(value)r ir nederīga izvēle."
 
@@ -482,8 +492,8 @@ msgstr "Šis lauks nevar būt tukšs"
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s ar šādu lauka %(field_label)s vērtību jau eksistē."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -778,18 +788,18 @@ msgstr ""
 "%(field_names)s. Paziņojiet par kļūdu, ja problēma atkārtojas."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Lūdzu iesniedziet ne vairāk kā %d formu."
-msgstr[1] "Lūdzu iesniedziet ne vairāk kā %d formu."
-msgstr[2] "Lūdzu iesniedziet ne vairāk kā %d formas."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
+msgstr[1] "Lūdzu iesniedziet ne vairāk par %(num)d formu."
+msgstr[2] "Lūdzu iesniedziet ne vairāk par %(num)d formām."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Lūdzu iesniedziet vismaz %d formu."
-msgstr[1] "Lūdzu iesniedziet vismaz %d formu."
-msgstr[2] "Lūdzu iesniedziet vismaz %d formas."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Lūdzu iesniedziet vismaz %(num)d formas."
+msgstr[1] "Lūdzu iesniedziet vismaz %(num)d formu."
+msgstr[2] "Lūdzu iesniedziet vismaz %(num)d formas."
 
 msgid "Order"
 msgstr "Sakārtojums"
@@ -1118,7 +1128,7 @@ msgstr "Šī nav derīga IPv6 adrese."
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr "%(truncated_text)s..."
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "vai"
@@ -1128,46 +1138,46 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d gadi"
-msgstr[1] "%d gads"
-msgstr[2] "%d gadi"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d gadi"
+msgstr[1] "%(num)d gads"
+msgstr[2] "%(num)d gadi"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d mēneši"
-msgstr[1] "%d mēnesis"
-msgstr[2] "%d mēneši"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d mēneši"
+msgstr[1] "%(num)d mēnesis"
+msgstr[2] "%(num)d mēneši"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d nedēļas"
-msgstr[1] "%d nedēļa"
-msgstr[2] "%d nedēļas"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d nedēļas"
+msgstr[1] "%(num)d nedēļa"
+msgstr[2] "%(num)d nedēļas"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dienas"
-msgstr[1] "%d diena"
-msgstr[2] "%d dienas"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d dienas"
+msgstr[1] "%(num)d diena"
+msgstr[2] "%(num)d dienas"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d stundas"
-msgstr[1] "%d stunda"
-msgstr[2] "%d stundas"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d stundas"
+msgstr[1] "%(num)d stunda"
+msgstr[2] "%(num)d stubdas"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minūtes"
-msgstr[1] "%d minūte"
-msgstr[2] "%d minūtes"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minūtes"
+msgstr[1] "%(num)d minūte"
+msgstr[2] "%(num)d minūtes"
 
 msgid "Forbidden"
 msgstr "Aizliegts"
@@ -1177,14 +1187,14 @@ msgstr "CSRF pārbaude neizdevās. Pieprasījums pārtrauks."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Jūs redzat šo ziņojumu, jo šai HTTPS vietnei nepieciešams “Referer header”, "
-"kuru bija paredzēts, ka nosūtīs jūsu tīmekļa pārlūkprogramma, bet tas netika "
-"nosūtīts. Šis headeris ir vajadzīgs drošības apsvērumu dēļ, lai "
-"pārliecinātos, ka trešās puses nepārņems kontroli pār jūsu pārlūkprogrammu."
+"Jūs redzat šo paziņojumu, jo jūsu pārlūkprogrammai ir jānosūta “Referer "
+"header” šai HTTPS vietnei, taču tā netika nosūtīta. Šī galvene ir "
+"nepieciešama drošības apsvērumu dēļ, lai pārliecinātos, ka jūsu "
+"pārlūkprogrammas komunikācijas datus nepārtver trešās puses."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

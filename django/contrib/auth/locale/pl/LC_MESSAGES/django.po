@@ -6,10 +6,10 @@
 # Janusz Harkot <jh@trilab.pl>, 2015
 # Karol <kfuks2@o2.pl>, 2012
 # m_aciek <maciej.olko@gmail.com>, 2014
-# m_aciek <maciej.olko@gmail.com>, 2016-2017,2019
+# m_aciek <maciej.olko@gmail.com>, 2016-2017,2019,2021
 # m_aciek <maciej.olko@gmail.com>, 2014-2015
 # muszalski <m.muszalski@gmail.com>, 2016
-# p <inactive+poczciwiec@transifex.com>, 2014
+# c10516f0462e552b4c3672569f0745a7_cc5cca2 <841826256cd8f47d0e443806a8e56601_19204>, 2014
 # Mattia Procopio <promat85@gmail.com>, 2014
 # Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-06 20:03+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 11:17+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -50,7 +50,7 @@ msgid "Change password: %s"
 msgstr "Zmień hasło: %s"
 
 msgid "Authentication and Authorization"
-msgstr "Uwierzytelnianie i autoryzacja"
+msgstr "Uwierzytelnienie i autoryzacja"
 
 msgid "password"
 msgstr "hasło"
@@ -59,7 +59,7 @@ msgid "last login"
 msgstr "ostatnie logowanie"
 
 msgid "No password set."
-msgstr "Hasło nie zostało ustawione."
+msgstr "Nie ustawiono hasła."
 
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
@@ -83,7 +83,7 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Nie przechowujemy surowych haseł, więc nie da się zobaczyć hasła tego "
-"użytkownika. Możesz jednak zmienić to hasło używając <a href=\"{}\">tego "
+"użytkownika. Możesz jednak je zmienić używając <a href=\"{}\">tego "
 "formularza</a>."
 
 #, python-format
@@ -98,7 +98,7 @@ msgid "This account is inactive."
 msgstr "To konto jest nieaktywne."
 
 msgid "Email"
-msgstr "Adres email"
+msgstr "Adres e-mail"
 
 msgid "New password"
 msgstr "Nowe hasło"
@@ -148,6 +148,9 @@ msgstr "work factor"
 msgid "checksum"
 msgstr "suma kontrolna"
 
+msgid "block size"
+msgstr "rozmiar bloku"
+
 msgid "name"
 msgstr "nazwa"
 
@@ -193,7 +196,7 @@ msgid "Specific permissions for this user."
 msgstr "Szczególne uprawnienia dla tego użytkownika."
 
 msgid "username"
-msgstr "użytkownik"
+msgstr "nazwa użytkownika"
 
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr "Wymagana. 150 lub mniej znaków. Jedynie litery, cyfry i @/./+/-/_."
@@ -208,7 +211,7 @@ msgid "last name"
 msgstr "nazwisko"
 
 msgid "email address"
-msgstr "adres email"
+msgstr "adres e-mail"
 
 msgid "staff status"
 msgstr "w zespole"
@@ -298,7 +301,7 @@ msgstr ""
 "cyfry i znaki @/./+/-/_."
 
 msgid "Logged out"
-msgstr "Wylogowany"
+msgstr "Wylogowany(-na)"
 
 msgid "Password reset"
 msgstr "Zresetowanie hasła"
@@ -310,10 +313,10 @@ msgid "Enter new password"
 msgstr "Wprowadź nowe haslo"
 
 msgid "Password reset unsuccessful"
-msgstr "Zresetowanie hasła nie powiodło się"
+msgstr "Resetowanie hasła nie powiodło się"
 
 msgid "Password reset complete"
-msgstr "Zresetowanie hasła powiodło się"
+msgstr "Resetowanie hasła zakończone"
 
 msgid "Password change"
 msgstr "Zmiana hasła"

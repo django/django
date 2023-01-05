@@ -3,7 +3,7 @@ Writing your first Django app, part 3
 =====================================
 
 This tutorial begins where :doc:`Tutorial 2 </intro/tutorial02>` left off. We're
-continuing the Web-poll application and will focus on creating the public
+continuing the web-poll application and will focus on creating the public
 interface -- "views."
 
 .. admonition:: Where to get help:
@@ -14,7 +14,7 @@ interface -- "views."
 Overview
 ========
 
-A view is a "type" of Web page in your Django application that generally serves
+A view is a "type" of web page in your Django application that generally serves
 a specific function and has a specific template. For example, in a blog
 application, you might have the following views:
 
@@ -70,7 +70,7 @@ Now let's add a few more views to ``polls/views.py``. These views are
 slightly different, because they take an argument:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     def detail(request, question_id):
         return HttpResponse("You're looking at question %s." % question_id)
@@ -86,7 +86,7 @@ Wire these new views into the ``polls.urls`` module by adding the following
 :func:`~django.urls.path` calls:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -121,9 +121,10 @@ like so::
 
 The ``question_id=34`` part comes from ``<int:question_id>``. Using angle
 brackets "captures" part of the URL and sends it as a keyword argument to the
-view function. The ``:question_id>`` part of the string defines the name that
-will be used to identify the matched pattern, and the ``<int:`` part is a
+view function. The ``question_id`` part of the string defines the name that
+will be used to identify the matched pattern, and the ``int`` part is a
 converter that determines what patterns should match this part of the URL path.
+The colon (``:``) separates the converter and pattern name.
 
 Write views that actually do something
 ======================================
@@ -146,7 +147,7 @@ view, which displays the latest 5 poll questions in the system, separated by
 commas, according to publication date:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse
 
@@ -195,7 +196,7 @@ Django as ``polls/index.html``.
 Put the following code in that template:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/index.html
+    :caption: ``polls/templates/polls/index.html``
 
     {% if latest_question_list %}
         <ul>
@@ -217,7 +218,7 @@ __ https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Gett
 Now let's update our ``index`` view in ``polls/views.py`` to use the template:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse
     from django.template import loader
@@ -250,7 +251,7 @@ template. Django provides a shortcut. Here's the full ``index()`` view,
 rewritten:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.shortcuts import render
 
@@ -279,7 +280,7 @@ Now, let's tackle the question detail view -- the page that displays the questio
 for a given poll. Here's the view:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import Http404
     from django.shortcuts import render
@@ -301,7 +302,7 @@ later, but if you'd like to quickly get the above example working, a file
 containing just:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/detail.html
+    :caption: ``polls/templates/polls/detail.html``
 
     {{ question }}
 
@@ -315,7 +316,7 @@ and raise :exc:`~django.http.Http404` if the object doesn't exist. Django
 provides a shortcut. Here's the ``detail()`` view, rewritten:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.shortcuts import get_object_or_404, render
 
@@ -357,7 +358,7 @@ variable ``question``, here's what the ``polls/detail.html`` template might look
 like:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/detail.html
+    :caption: ``polls/templates/polls/detail.html``
 
     <h1>{{ question.question_text }}</h1>
     <ul>
@@ -431,7 +432,7 @@ The answer is to add namespaces to your  URLconf. In the ``polls/urls.py``
 file, go ahead and add an ``app_name`` to set the application namespace:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -448,14 +449,14 @@ file, go ahead and add an ``app_name`` to set the application namespace:
 Now change your ``polls/index.html`` template from:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/index.html
+    :caption: ``polls/templates/polls/index.html``
 
     <li><a href="{% url 'detail' question.id %}">{{ question.question_text }}</a></li>
 
 to point at the namespaced detail view:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/index.html
+    :caption: ``polls/templates/polls/index.html``
 
     <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
 

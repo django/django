@@ -1,45 +1,44 @@
 /* global ol */
 'use strict';
-function GeometryTypeControl(opt_options) {
+class GeometryTypeControl extends ol.control.Control {
     // Map control to switch type when geometry type is unknown
-    const options = opt_options || {};
+    constructor(opt_options) {
+        const options = opt_options || {};
 
-    const element = document.createElement('div');
-    element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
-    if (options.active) {
-        element.classList.add("type-active");
-    }
-
-    const self = this;
-    const switchType = function(e) {
-        e.preventDefault();
-        if (options.widget.currentGeometryType !== self) {
-            options.widget.map.removeInteraction(options.widget.interactions.draw);
-            options.widget.interactions.draw = new ol.interaction.Draw({
-                features: options.widget.featureCollection,
-                type: options.type
-            });
-            options.widget.map.addInteraction(options.widget.interactions.draw);
-            options.widget.currentGeometryType.element.classList.remove('type-active');
-            options.widget.currentGeometryType = self;
+        const element = document.createElement('div');
+        element.className = 'switch-type type-' + options.type + ' ol-control ol-unselectable';
+        if (options.active) {
             element.classList.add("type-active");
         }
-    };
 
-    element.addEventListener('click', switchType, false);
-    element.addEventListener('touchstart', switchType, false);
+        super({
+            element: element,
+            target: options.target
+        });
+        const self = this;
+        const switchType = function(e) {
+            e.preventDefault();
+            if (options.widget.currentGeometryType !== self) {
+                options.widget.map.removeInteraction(options.widget.interactions.draw);
+                options.widget.interactions.draw = new ol.interaction.Draw({
+                    features: options.widget.featureCollection,
+                    type: options.type
+                });
+                options.widget.map.addInteraction(options.widget.interactions.draw);
+                options.widget.currentGeometryType.element.classList.remove('type-active');
+                options.widget.currentGeometryType = self;
+                element.classList.add("type-active");
+            }
+        };
 
-    ol.control.Control.call(this, {
-        element: element
-    });
-};
-ol.inherits(GeometryTypeControl, ol.control.Control);
+        element.addEventListener('click', switchType, false);
+        element.addEventListener('touchstart', switchType, false);
+    }
+}
 
 // TODO: allow deleting individual features (#8972)
-{
-    const jsonFormat = new ol.format.GeoJSON();
-
-    function MapWidget(options) {
+class MapWidget {
+    constructor(options) {
         this.map = null;
         this.interactions = {draw: null, modify: null};
         this.typeChoices = false;
@@ -63,6 +62,11 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
             this.options.base_layer = new ol.layer.Tile({source: new ol.source.OSM()});
         }
 
+        // RemovedInDjango51Warning: when the deprecation ends, remove setting
+        // width/height (3 lines below).
+        const mapContainer = document.getElementById(this.options.map_id);
+        mapContainer.style.width = `${mapContainer.dataset.width}px`;
+        mapContainer.style.height = `${mapContainer.dataset.height}px`;
         this.map = this.createMap();
         this.featureCollection = new ol.Collection();
         this.featureOverlay = new ol.layer.Vector({
@@ -92,6 +96,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
         const initial_value = document.getElementById(this.options.id).value;
         if (initial_value) {
+            const jsonFormat = new ol.format.GeoJSON();
             const features = jsonFormat.readFeatures('{"type": "Feature", "geometry": ' + initial_value + '}');
             const extent = ol.extent.createEmpty();
             features.forEach(function(feature) {
@@ -99,7 +104,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 ol.extent.extend(extent, feature.getGeometry().getExtent());
             }, this);
             // Center/zoom the map
-            this.map.getView().fit(extent, {maxZoom: this.options.default_zoom});
+            this.map.getView().fit(extent, {minResolution: 1});
         } else {
             this.map.getView().setCenter(this.defaultCenter());
         }
@@ -107,21 +112,27 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
         if (initial_value && !this.options.is_collection) {
             this.disableDrawing();
         }
+        const clearNode = document.getElementById(this.map.getTarget()).nextElementSibling;
+        if (clearNode.classList.contains('clear_features')) {
+            clearNode.querySelector('a').addEventListener('click', (ev) => {
+                ev.preventDefault();
+                self.clearFeatures();
+            });
+        }
         this.ready = true;
     }
 
-    MapWidget.prototype.createMap = function() {
-        const map = new ol.Map({
+    createMap() {
+        return new ol.Map({
             target: this.options.map_id,
             layers: [this.options.base_layer],
             view: new ol.View({
                 zoom: this.options.default_zoom
             })
         });
-        return map;
-    };
+    }
 
-    MapWidget.prototype.createInteractions = function() {
+    createInteractions() {
         // Initialize the modify interaction
         this.interactions.modify = new ol.interaction.Modify({
             features: this.featureCollection,
@@ -149,17 +160,17 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
 
         this.map.addInteraction(this.interactions.draw);
         this.map.addInteraction(this.interactions.modify);
-    };
+    }
 
-    MapWidget.prototype.defaultCenter = function() {
+    defaultCenter() {
         const center = [this.options.default_lon, this.options.default_lat];
         if (this.options.map_srid) {
             return ol.proj.transform(center, 'EPSG:4326', this.map.getView().getProjection());
         }
         return center;
-    };
+    }
 
-    MapWidget.prototype.enableDrawing = function() {
+    enableDrawing() {
         this.interactions.draw.setActive(true);
         if (this.typeChoices) {
             // Show geometry type icons
@@ -168,9 +179,9 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 divs[i].style.visibility = "visible";
             }
         }
-    };
+    }
 
-    MapWidget.prototype.disableDrawing = function() {
+    disableDrawing() {
         if (this.interactions.draw) {
             this.interactions.draw.setActive(false);
             if (this.typeChoices) {
@@ -181,16 +192,16 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 }
             }
         }
-    };
+    }
 
-    MapWidget.prototype.clearFeatures = function() {
+    clearFeatures() {
         this.featureCollection.clear();
         // Empty textarea widget
         document.getElementById(this.options.id).value = '';
         this.enableDrawing();
-    };
+    }
 
-    MapWidget.prototype.serializeFeatures = function() {
+    serializeFeatures() {
         // Three use cases: GeometryCollection, multigeometries, and single geometry
         let geometry = null;
         const features = this.featureOverlay.getSource().getFeatures();
@@ -221,8 +232,7 @@ ol.inherits(GeometryTypeControl, ol.control.Control);
                 geometry = features[0].getGeometry();
             }
         }
+        const jsonFormat = new ol.format.GeoJSON();
         document.getElementById(this.options.id).value = jsonFormat.writeGeometry(geometry);
-    };
-
-    window.MapWidget = MapWidget;
+    }
 }

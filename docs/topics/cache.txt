@@ -3,13 +3,13 @@ Django's cache framework
 ========================
 
 A fundamental trade-off in dynamic websites is, well, they're dynamic. Each
-time a user requests a page, the Web server makes all sorts of calculations --
+time a user requests a page, the web server makes all sorts of calculations --
 from database queries to template rendering to business logic -- to create the
 page that your site's visitor sees. This is a lot more expensive, from a
 processing-overhead perspective, than your standard
 read-a-file-off-the-filesystem server arrangement.
 
-For most Web applications, this overhead isn't a big deal. Most Web
+For most web applications, this overhead isn't a big deal. Most web
 applications aren't ``washingtonpost.com`` or ``slashdot.org``; they're small-
 to medium-sized sites with so-so traffic. But for medium- to high-traffic
 sites, it's essential to cut as much overhead as possible.
@@ -18,7 +18,7 @@ That's where caching comes in.
 
 To cache something is to save the result of an expensive calculation so that
 you don't have to perform the calculation next time. Here's some pseudocode
-explaining how this would work for a dynamically generated Web page::
+explaining how this would work for a dynamically generated web page::
 
     given a URL, try finding that page in the cache
     if the page is in the cache:
@@ -62,7 +62,6 @@ settings file. Here's an explanation of all available values for
 Memcached
 ---------
 
-The fastest, most efficient type of cache supported natively by Django,
 Memcached__ is an entirely memory-based cache server, originally developed
 to handle high loads at LiveJournal.com and subsequently open-sourced by
 Danga Interactive. It is used by sites such as Facebook and Wikipedia to
@@ -150,6 +149,15 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
         }
     }
 
+By default, the ``PyMemcacheCache`` backend sets the following options (you can
+override them in your :setting:`OPTIONS <CACHES-OPTIONS>`)::
+
+    'OPTIONS': {
+        'allow_unicode_keys': True,
+        'default_noreply': False,
+        'serde': pymemcache.serde.pickle_serde,
+    }
+
 A final point about Memcached is that memory-based caching has a
 disadvantage: because the cached data is stored in memory, the data will be
 lost if your server crashes. Clearly, memory isn't intended for permanent data
@@ -159,15 +167,68 @@ permanent storage -- they're all intended to be solutions for caching, not
 storage -- but we point this out here because memory-based caching is
 particularly temporary.
 
-.. versionchanged:: 3.2
+.. _redis:
 
-    The ``PyMemcacheCache`` backend was added.
+Redis
+-----
 
-.. deprecated:: 3.2
+Redis__ is an in-memory database that can be used for caching. To begin you'll
+need a Redis server running either locally or on a remote machine.
 
-    The ``MemcachedCache`` backend is deprecated as ``python-memcached`` has
-    some problems and seems to be unmaintained. Use ``PyMemcacheCache`` or
-    ``PyLibMCCache`` instead.
+__ https://redis.io/
+
+After setting up the Redis server, you'll need to install Python bindings for
+Redis. `redis-py`_ is the binding supported natively by Django. Installing the
+additional `hiredis-py`_ package is also recommended.
+
+.. _`redis-py`: https://pypi.org/project/redis/
+.. _`hiredis-py`: https://pypi.org/project/hiredis/
+
+To use Redis as your cache backend with Django:
+
+* Set :setting:`BACKEND <CACHES-BACKEND>` to
+  ``django.core.cache.backends.redis.RedisCache``.
+
+* Set :setting:`LOCATION <CACHES-LOCATION>` to the URL pointing to your Redis
+  instance, using the appropriate scheme. See the ``redis-py`` docs for
+  `details on the available schemes
+  <https://redis-py.readthedocs.io/en/stable/connections.html#redis.connection.ConnectionPool.from_url>`_.
+
+For example, if Redis is running on localhost (127.0.0.1) port 6379::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379',
+        }
+    }
+
+Often Redis servers are protected with authentication. In order to supply a
+username and password, add them in the ``LOCATION`` along with the URL::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://username:password@127.0.0.1:6379',
+        }
+    }
+
+If you have multiple Redis servers set up in the replication mode, you can
+specify the servers either as a semicolon or comma delimited string, or as a
+list. While using multiple servers, write operations are performed on the first
+server (leader). Read operations are performed on the other servers (replicas)
+chosen at random::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': [
+                'redis://127.0.0.1:6379', # leader
+                'redis://127.0.0.1:6378', # read-replica 1
+                'redis://127.0.0.1:6377', # read-replica 2
+            ],
+        }
+    }
 
 .. _database-caching:
 
@@ -297,7 +358,7 @@ setting.
 
 Make sure the directory pointed-to by this setting either exists and is
 readable and writable, or that it can be created by the system user under which
-your Web server runs. Continuing the above example, if your server runs as the
+your web server runs. Continuing the above example, if your server runs as the
 user ``apache``, make sure the directory ``/var/tmp/django_cache`` exists and
 is readable and writable by the user ``apache``, or that it can be created by
 the user ``apache``.
@@ -377,7 +438,7 @@ cache backend with Django, use the Python import path as the
 
 If you're building your own backend, you can use the standard cache backends
 as reference implementations. You'll find the code in the
-``django/core/cache/backends/`` directory of the Django source.
+:source:`django/core/cache/backends/` directory of the Django source.
 
 Note: Without a really compelling reason, such as a host that doesn't support
 them, you should stick to the cache backends included with Django. They've
@@ -422,9 +483,9 @@ behavior. These arguments are provided as additional keys in the
     On some backends (``database`` in particular) this makes culling *much*
     faster at the expense of more cache misses.
 
-  Memcached backends pass the contents of :setting:`OPTIONS <CACHES-OPTIONS>`
-  as keyword arguments to the client constructors, allowing for more advanced
-  control of client behavior. For example usage, see below.
+  The Memcached and Redis backends pass the contents of :setting:`OPTIONS
+  <CACHES-OPTIONS>` as keyword arguments to the client constructors, allowing
+  for more advanced control of client behavior. For example usage, see below.
 
 * :setting:`KEY_PREFIX <CACHES-KEY_PREFIX>`: A string that will be
   automatically included (prepended by default) to all cache keys
@@ -495,6 +556,27 @@ flag on the connection's socket::
             }
         }
     }
+
+Here's an example configuration for a ``redis`` based backend that selects
+database ``10`` (by default Redis ships with 16 logical databases), specifies a
+`parser class`_ (``redis.connection.HiredisParser`` will be used by default if
+the ``hiredis-py`` package is installed), and sets a custom `connection pool
+class`_ (``redis.ConnectionPool`` is used by default)::
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': 'redis://127.0.0.1:6379',
+            'OPTIONS': {
+                'db': '10',
+                'parser_class': 'redis.connection.PythonParser',
+                'pool_class': 'redis.BlockingConnectionPool',
+            }
+        }
+    }
+
+.. _`parser class`: https://github.com/redis/redis-py#parsers
+.. _`connection pool class`: https://github.com/redis/redis-py#connection-pools
 
 .. _the-per-site-cache:
 
@@ -572,7 +654,7 @@ __ `Controlling cache: Using other headers`_
 The per-view cache
 ==================
 
-.. function:: django.views.decorators.cache.cache_page
+.. function:: django.views.decorators.cache.cache_page(timeout, *, cache=None, key_prefix=None)
 
 A more granular way to use the caching framework is by caching the output of
 individual views. ``django.views.decorators.cache`` defines a ``cache_page``
@@ -808,6 +890,8 @@ Accessing the cache
 
     This object is equivalent to ``caches['default']``.
 
+.. _cache-basic-interface:
+
 Basic usage
 -----------
 
@@ -847,12 +931,6 @@ stored a literal value ``None``, use a sentinel object as the default::
     >>> # Wait 30 seconds for 'my_key' to expire...
     >>> cache.get('my_key', sentinel) is sentinel
     True
-
-.. admonition:: ``MemcachedCache``
-
-    Due to a ``python-memcached`` limitation, it's not possible to distinguish
-    between stored ``None`` value and a cache miss signified by a return value
-    of ``None`` on the deprecated ``MemcachedCache`` backend.
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
 return if the object doesn't exist in the cache::
@@ -997,6 +1075,12 @@ the cache backend.
 
     For caches that don't implement ``close`` methods it is a no-op.
 
+.. note::
+
+    The async variants of base methods are prefixed with ``a``, e.g.
+    ``cache.aadd()`` or ``cache.adelete_many()``. See `Asynchronous support`_
+    for more details.
+
 .. _cache_key_prefixing:
 
 Cache key prefixing
@@ -1123,13 +1207,30 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 ...and use the dotted Python path to this class in the
 :setting:`BACKEND <CACHES-BACKEND>` portion of your :setting:`CACHES` setting.
 
+.. _asynchronous_support:
+
+Asynchronous support
+====================
+
+Django has developing support for asynchronous cache backends, but does not
+yet support asynchronous caching. It will be coming in a future release.
+
+``django.core.cache.backends.base.BaseCache`` has async variants of :ref:`all
+base methods <cache-basic-interface>`. By convention, the asynchronous versions
+of all methods are prefixed with ``a``. By default, the arguments for both
+variants are the same::
+
+    >>> await cache.aset('num', 1)
+    >>> await cache.ahas_key('num')
+    True
+
 .. _downstream-caches:
 
 Downstream caches
 =================
 
 So far, this document has focused on caching your *own* data. But another type
-of caching is relevant to Web development, too: caching performed by
+of caching is relevant to web development, too: caching performed by
 "downstream" caches. These are systems that cache pages for users even before
 the request reaches your website.
 
@@ -1139,7 +1240,7 @@ Here are a few examples of downstream caches:
   certain pages, so if you requested a page from ``http://example.com/``, your
   ISP would send you the page without having to access example.com directly.
   The maintainers of example.com have no knowledge of this caching; the ISP
-  sits between example.com and your Web browser, handling all of the caching
+  sits between example.com and your web browser, handling all of the caching
   transparently. Such caching is not possible under HTTPS as it would
   constitute a man-in-the-middle attack.
 
@@ -1148,17 +1249,17 @@ Here are a few examples of downstream caches:
   performance. In this case, each request first would be handled by the
   proxy, and it would be passed to your application only if needed.
 
-* Your Web browser caches pages, too. If a Web page sends out the
+* Your web browser caches pages, too. If a web page sends out the
   appropriate headers, your browser will use the local cached copy for
-  subsequent requests to that page, without even contacting the Web page
+  subsequent requests to that page, without even contacting the web page
   again to see whether it has changed.
 
 Downstream caching is a nice efficiency boost, but there's a danger to it:
-Many Web pages' contents differ based on authentication and a host of other
+Many web pages' contents differ based on authentication and a host of other
 variables, and cache systems that blindly save pages based purely on URLs could
 expose incorrect or sensitive data to subsequent visitors to those pages.
 
-For example, if you operate a Web email system, then the contents of the
+For example, if you operate a web email system, then the contents of the
 "inbox" page depend on which user is logged in. If an ISP blindly cached your
 site, then the first user who logged in through that ISP would have their
 user-specific inbox page cached for subsequent visitors to the site.  That's
@@ -1176,7 +1277,7 @@ Using ``Vary`` headers
 
 The ``Vary`` header defines which request headers a cache
 mechanism should take into account when building its cache key. For example, if
-the contents of a Web page depend on a user's language preference, the page is
+the contents of a web page depend on a user's language preference, the page is
 said to "vary on language."
 
 By default, Django's cache system creates its cache keys using the requested
@@ -1250,7 +1351,7 @@ its first argument and a list/tuple of case-insensitive header names as its
 second argument.
 
 For more on Vary headers, see the :rfc:`official Vary spec
-<7231#section-7.1.4>`.
+<9110#section-12.5.5>`.
 
 Controlling cache: Using other headers
 ======================================
@@ -1262,7 +1363,7 @@ A user usually faces two kinds of caches: their own browser cache (a private
 cache) and their provider's cache (a public cache). A public cache is used by
 multiple users and controlled by someone else. This poses problems with
 sensitive data--you don't want, say, your bank account number stored in a
-public cache. So Web applications need a way to tell caches which data is
+public cache. So web applications need a way to tell caches which data is
 private and which is public.
 
 The solution is to indicate a page's cache should be "private." To do this in
@@ -1301,10 +1402,10 @@ cache control header (it is internally called by the
 
         return response
 
-You can control downstream caches in other ways as well (see :rfc:`7234` for
+You can control downstream caches in other ways as well (see :rfc:`9111` for
 details on HTTP caching). For example, even if you don't use Django's
 server-side cache framework, you can still tell clients to cache a view for a
-certain amount of time with the :rfc:`max-age <7234#section-5.2.2.8>`
+certain amount of time with the :rfc:`max-age <9111#section-5.2.2.1>`
 directive::
 
     from django.views.decorators.cache import cache_control

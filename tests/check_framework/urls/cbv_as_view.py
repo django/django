@@ -13,7 +13,7 @@ class EmptyCallableView:
 
 
 urlpatterns = [
-    path('missing_as_view', EmptyCBV),
-    path('has_as_view', EmptyCBV.as_view()),
-    path('callable_class', EmptyCallableView()),
+    path("missing_as_view", EmptyCBV),
+    path("has_as_view", EmptyCBV.as_view()),
+    path("callable_class", EmptyCallableView()),
 ]

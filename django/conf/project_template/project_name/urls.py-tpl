@@ -1,4 +1,5 @@
-"""{{ project_name }} URL Configuration
+"""
+URL configuration for {{ project_name }} project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/{{ docs_version }}/topics/http/urls/

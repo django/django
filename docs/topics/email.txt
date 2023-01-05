@@ -209,7 +209,7 @@ from the request's POST data, sends that to admin@example.com and redirects to
             # to get proper validation errors.
             return HttpResponse('Make sure all fields are entered and valid.')
 
-.. _Header injection: http://nyphp.org/phundamentals/8_Preventing-Email-Header-Injection
+.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
 .. _emailmessage-and-smtpconnection:
 
@@ -420,7 +420,7 @@ The email backend class has the following methods:
 * ``send_messages(email_messages)`` sends a list of
   :class:`~django.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
-  connection afterwards. If the connection is already open, it will be
+  connection afterward. If the connection is already open, it will be
   left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
@@ -664,7 +664,7 @@ and that those emails will contain the correct content.
 
 The easiest way to configure email for local development is to use the
 :ref:`console <topic-email-console-backend>` email backend. This backend
-redirects all email to stdout, allowing you to inspect the content of mail.
+redirects all email to ``stdout``, allowing you to inspect the content of mail.
 
 The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection
@@ -672,15 +672,19 @@ to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
-anything. Python has a built-in way to accomplish this with a single command::
+anything. The `aiosmtpd`_ package provides a way to accomplish this::
 
-    python -m smtpd -n -c DebuggingServer localhost:1025
+    python -m pip install aiosmtpd
 
-This command will start a minimal SMTP server listening on port 1025 of
+    python -m aiosmtpd -n -l localhost:8025
+
+This command will start a minimal SMTP server listening on port 8025 of
 localhost. This server prints to standard output all email headers and the
 email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
-server options, see the Python documentation for the :mod:`smtpd` module.
+server options, see the documentation of the `aiosmtpd`_ module.
+
+.. _aiosmtpd: https://aiosmtpd.readthedocs.io/en/latest/
 
 For information about unit-testing the sending of emails in your application,
 see the :ref:`topics-testing-email` section of the testing documentation.

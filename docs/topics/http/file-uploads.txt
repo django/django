@@ -22,7 +22,7 @@ Basic file uploads
 Consider a form containing a :class:`~django.forms.FileField`:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -46,7 +46,7 @@ Most of the time, you'll pass the file data from ``request`` into the form as
 described in :ref:`binding-uploaded-files`. This would look something like:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
@@ -126,6 +126,19 @@ model::
             form = UploadFileForm()
         return render(request, 'upload.html', {'form': form})
 
+If you are constructing an object manually outside of a request, you can assign
+a :class:`~django.core.files.File` like object to the
+:class:`~django.db.models.FileField`::
+
+    from django.core.management.base import BaseCommand
+    from django.core.files.base import ContentFile
+
+    class MyCommand(BaseCommand):
+        def handle(self, *args, **options):
+            content_file = ContentFile(b'Hello world!', name='hello-world.txt')
+            instance = ModelWithFileField(file_field=content_file)
+            instance.save()
+
 Uploading multiple files
 ------------------------
 
@@ -133,7 +146,7 @@ If you want to upload multiple files using one form field, set the ``multiple``
 HTML attribute of field's widget:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
@@ -145,7 +158,7 @@ Then override the ``post`` method of your
 uploads:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.views.generic.edit import FormView
     from .forms import FileFieldForm
@@ -271,3 +284,24 @@ list::
         @csrf_protect
         def _upload_file_view(request):
             ... # Process request
+
+    If you are using a class-based view, you will need to use
+    :func:`~django.views.decorators.csrf.csrf_exempt` on its
+    :meth:`~django.views.generic.base.View.dispatch` method and
+    :func:`~django.views.decorators.csrf.csrf_protect` on the method that
+    actually processes the request. Example code::
+
+        from django.utils.decorators import method_decorator
+        from django.views import View
+        from django.views.decorators.csrf import csrf_exempt, csrf_protect
+
+        @method_decorator(csrf_exempt, name='dispatch')
+        class UploadFileView(View):
+
+            def setup(self, request, *args, **kwargs):
+                request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
+                super().setup(request, *args, **kwargs)
+
+            @method_decorator(csrf_protect)
+            def post(self, request, *args, **kwargs):
+                ... # Process request

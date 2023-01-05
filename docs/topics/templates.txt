@@ -261,10 +261,10 @@ backend with different options. In that case you should define a unique
 
 :setting:`OPTIONS <TEMPLATES-OPTIONS>` contains backend-specific settings.
 
+.. _template-loading:
+
 Usage
 -----
-
-.. _template-loading:
 
 .. module:: django.template.loader
 

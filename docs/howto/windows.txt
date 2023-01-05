@@ -65,7 +65,7 @@ following::
     ...\> py -m venv project-name
 
 This will create a folder called 'project-name' if it does not already exist
-and setup the virtual environment. To activate the environment, run::
+and set up the virtual environment. To activate the environment, run::
 
     ...\> project-name\Scripts\activate.bat
 
@@ -93,8 +93,6 @@ with Django.
 
 Colored terminal output
 =======================
-
-.. versionadded:: 3.2
 
 A quality-of-life feature adds colored (rather than monochrome) output to the
 terminal. In modern terminals this should work for both CMD and PowerShell. If

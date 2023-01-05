@@ -4,25 +4,27 @@ from io import StringIO
 from django.db import connection
 from django.test import TestCase
 from django.test.runner import DiscoverRunner
+from django.utils.version import PY311
 
 from .models import Person
 
 
-@unittest.skipUnless(connection.vendor == 'sqlite', 'Only run on sqlite so we can check output SQL.')
+@unittest.skipUnless(
+    connection.vendor == "sqlite", "Only run on sqlite so we can check output SQL."
+)
 class TestDebugSQL(unittest.TestCase):
-
     class PassingTest(TestCase):
         def runTest(self):
-            Person.objects.filter(first_name='pass').count()
+            Person.objects.filter(first_name="pass").count()
 
     class FailingTest(TestCase):
         def runTest(self):
-            Person.objects.filter(first_name='fail').count()
+            Person.objects.filter(first_name="fail").count()
             self.fail()
 
     class ErrorTest(TestCase):
         def runTest(self):
-            Person.objects.filter(first_name='error').count()
+            Person.objects.filter(first_name="error").count()
             raise Exception
 
     class ErrorSetUpTestDataTest(TestCase):
@@ -36,18 +38,18 @@ class TestDebugSQL(unittest.TestCase):
     class PassingSubTest(TestCase):
         def runTest(self):
             with self.subTest():
-                Person.objects.filter(first_name='subtest-pass').count()
+                Person.objects.filter(first_name="subtest-pass").count()
 
     class FailingSubTest(TestCase):
         def runTest(self):
             with self.subTest():
-                Person.objects.filter(first_name='subtest-fail').count()
+                Person.objects.filter(first_name="subtest-fail").count()
                 self.fail()
 
     class ErrorSubTest(TestCase):
         def runTest(self):
             with self.subTest():
-                Person.objects.filter(first_name='subtest-error').count()
+                Person.objects.filter(first_name="subtest-error").count()
                 raise Exception
 
     def _test_output(self, verbosity):
@@ -86,34 +88,49 @@ class TestDebugSQL(unittest.TestCase):
             self.assertIn(output, full_output)
 
     expected_outputs = [
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'error';'''),
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'fail';'''),
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'subtest-error';'''),
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'subtest-fail';'''),
+        (
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'error';"""
+        ),
+        (
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'fail';"""
+        ),
+        (
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-error';"""
+        ),
+        (
+            """SELECT COUNT(*) AS "__count"\n"""
+            """FROM "test_runner_person"\n"""
+            """WHERE "test_runner_person"."first_name" = 'subtest-fail';"""
+        ),
     ]
 
+    # Python 3.11 uses fully qualified test name in the output.
+    method_name = ".runTest" if PY311 else ""
+    test_class_path = "test_runner.test_debug_sql.TestDebugSQL"
     verbose_expected_outputs = [
-        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingTest) ... FAIL',
-        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorTest) ... ERROR',
-        'runTest (test_runner.test_debug_sql.TestDebugSQL.PassingTest) ... ok',
+        f"runTest ({test_class_path}.FailingTest{method_name}) ... FAIL",
+        f"runTest ({test_class_path}.ErrorTest{method_name}) ... ERROR",
+        f"runTest ({test_class_path}.PassingTest{method_name}) ... ok",
         # If there are errors/failures in subtests but not in test itself,
         # the status is not written. That behavior comes from Python.
-        'runTest (test_runner.test_debug_sql.TestDebugSQL.FailingSubTest) ...',
-        'runTest (test_runner.test_debug_sql.TestDebugSQL.ErrorSubTest) ...',
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'pass';'''),
-        ('''SELECT COUNT(*) AS "__count" '''
-            '''FROM "test_runner_person" WHERE '''
-            '''"test_runner_person"."first_name" = 'subtest-pass';'''),
+        f"runTest ({test_class_path}.FailingSubTest{method_name}) ...",
+        f"runTest ({test_class_path}.ErrorSubTest{method_name}) ...",
+        (
+            """SELECT COUNT(*) AS "__count" """
+            """FROM "test_runner_person" WHERE """
+            """"test_runner_person"."first_name" = 'pass';"""
+        ),
+        (
+            """SELECT COUNT(*) AS "__count" """
+            """FROM "test_runner_person" WHERE """
+            """"test_runner_person"."first_name" = 'subtest-pass';"""
+        ),
     ]
 
     def test_setupclass_exception(self):
@@ -130,7 +147,7 @@ class TestDebugSQL(unittest.TestCase):
         runner.teardown_databases(old_config)
         output = stream.getvalue()
         self.assertIn(
-            'ERROR: setUpClass '
-            '(test_runner.test_debug_sql.TestDebugSQL.ErrorSetUpTestDataTest)',
+            "ERROR: setUpClass "
+            "(test_runner.test_debug_sql.TestDebugSQL.ErrorSetUpTestDataTest)",
             output,
         )

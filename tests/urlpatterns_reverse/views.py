@@ -44,12 +44,14 @@ view_class_instance = ViewClass()
 
 
 class LazyRedirectView(RedirectView):
-    url = reverse_lazy('named-lazy-url-redirected-to')
+    url = reverse_lazy("named-lazy-url-redirected-to")
 
 
-@user_passes_test(lambda u: u.is_authenticated, login_url=reverse_lazy('some-login-page'))
+@user_passes_test(
+    lambda u: u.is_authenticated, login_url=reverse_lazy("some-login-page")
+)
 def login_required_view(request):
-    return HttpResponse('Hello you')
+    return HttpResponse("Hello you")
 
 
 def bad_view(request, *args, **kwargs):
@@ -57,7 +59,10 @@ def bad_view(request, *args, **kwargs):
 
 
 empty_view_partial = partial(empty_view, template_name="template.html")
-empty_view_nested_partial = partial(empty_view_partial, template_name="nested_partial.html")
+empty_view_nested_partial = partial(
+    empty_view_partial, template_name="nested_partial.html"
+)
 empty_view_wrapped = update_wrapper(
-    partial(empty_view, template_name="template.html"), empty_view,
+    partial(empty_view, template_name="template.html"),
+    empty_view,
 )

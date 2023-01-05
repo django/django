@@ -34,11 +34,11 @@ class Message:
 
     @property
     def tags(self):
-        return ' '.join(tag for tag in [self.extra_tags, self.level_tag] if tag)
+        return " ".join(tag for tag in [self.extra_tags, self.level_tag] if tag)
 
     @property
     def level_tag(self):
-        return LEVEL_TAGS.get(self.level, '')
+        return LEVEL_TAGS.get(self.level, "")
 
 
 class BaseStorage:
@@ -70,7 +70,7 @@ class BaseStorage:
         return item in self._loaded_messages or item in self._queued_messages
 
     def __repr__(self):
-        return f'<{self.__class__.__qualname__}: request={self.request!r}>'
+        return f"<{self.__class__.__qualname__}: request={self.request!r}>"
 
     @property
     def _loaded_messages(self):
@@ -78,7 +78,7 @@ class BaseStorage:
         Return a list of loaded messages, retrieving them first if they have
         not been loaded yet.
         """
-        if not hasattr(self, '_loaded_data'):
+        if not hasattr(self, "_loaded_data"):
             messages, all_retrieved = self._get()
             self._loaded_data = messages or []
         return self._loaded_data
@@ -96,7 +96,9 @@ class BaseStorage:
         just containing no messages) then ``None`` should be returned in
         place of ``messages``.
         """
-        raise NotImplementedError('subclasses of BaseStorage must provide a _get() method')
+        raise NotImplementedError(
+            "subclasses of BaseStorage must provide a _get() method"
+        )
 
     def _store(self, messages, response, *args, **kwargs):
         """
@@ -107,7 +109,9 @@ class BaseStorage:
 
         **This method must be implemented by a subclass.**
         """
-        raise NotImplementedError('subclasses of BaseStorage must provide a _store() method')
+        raise NotImplementedError(
+            "subclasses of BaseStorage must provide a _store() method"
+        )
 
     def _prepare_messages(self, messages):
         """
@@ -130,7 +134,7 @@ class BaseStorage:
             messages = self._loaded_messages + self._queued_messages
             return self._store(messages, response)
 
-    def add(self, level, message, extra_tags=''):
+    def add(self, level, message, extra_tags=""):
         """
         Queue a message to be stored.
 
@@ -155,8 +159,8 @@ class BaseStorage:
         The default level is the ``MESSAGE_LEVEL`` setting. If this is
         not found, the ``INFO`` level is used.
         """
-        if not hasattr(self, '_level'):
-            self._level = getattr(settings, 'MESSAGE_LEVEL', constants.INFO)
+        if not hasattr(self, "_level"):
+            self._level = getattr(settings, "MESSAGE_LEVEL", constants.INFO)
         return self._level
 
     def _set_level(self, value=None):
@@ -166,7 +170,7 @@ class BaseStorage:
         If set to ``None``, the default level will be used (see the
         ``_get_level`` method).
         """
-        if value is None and hasattr(self, '_level'):
+        if value is None and hasattr(self, "_level"):
             del self._level
         else:
             self._level = int(value)

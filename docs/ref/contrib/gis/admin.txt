@@ -5,6 +5,22 @@ GeoDjango's admin site
 .. module:: django.contrib.gis.admin
     :synopsis: GeoDjango's extensions to the admin site.
 
+``GISModelAdmin``
+=================
+
+.. class:: GISModelAdmin
+
+    .. attribute:: gis_widget
+
+        The widget class to be used for
+        :class:`~django.contrib.gis.db.models.GeometryField`. Defaults to
+        :class:`~django.contrib.gis.forms.widgets.OSMWidget`.
+
+    .. attribute:: gis_widget_kwargs
+
+        The keyword arguments that would be passed to the :attr:`gis_widget`.
+        Defaults to an empty dictionary.
+
 ``GeoModelAdmin``
 =================
 
@@ -57,6 +73,11 @@ GeoDjango's admin site
         ``modifiable=False``, actually displays the geometry in a map,
         but disables the ability to edit its vertices.
 
+    .. deprecated:: 4.0
+
+        This class is deprecated. Use :class:`~django.contrib.admin.ModelAdmin`
+        instead.
+
 ``OSMGeoAdmin``
 ===============
 
@@ -64,5 +85,7 @@ GeoDjango's admin site
 
     A subclass of :class:`GeoModelAdmin` that uses a Spherical Mercator projection
     with `OpenStreetMap <https://www.openstreetmap.org/>`_ street data tiles.
-    See the :ref:`OSMGeoAdmin introduction <osmgeoadmin-intro>`
-    in the tutorial for a usage example.
+
+    .. deprecated:: 4.0
+
+        This class is deprecated. Use :class:`GISModelAdmin` instead.

@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -8,7 +6,7 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-    friends = models.ManyToManyField('self', blank=True)
+    friends = models.ManyToManyField("self", blank=True)
 
 
 class Publisher(models.Model):
@@ -20,7 +18,7 @@ class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
 
 class Book(models.Model):
@@ -30,13 +28,13 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
     tags = GenericRelation(ItemTag)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
 
 class Store(models.Model):
@@ -47,14 +45,16 @@ class Store(models.Model):
 
 
 class Entries(models.Model):
-    EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
+    EntryID = models.AutoField(primary_key=True, db_column="Entry ID")
     Entry = models.CharField(unique=True, max_length=50)
     Exclude = models.BooleanField(default=False)
 
 
 class Clues(models.Model):
     ID = models.AutoField(primary_key=True)
-    EntryID = models.ForeignKey(Entries, models.CASCADE, verbose_name='Entry', db_column='Entry ID')
+    EntryID = models.ForeignKey(
+        Entries, models.CASCADE, verbose_name="Entry", db_column="Entry ID"
+    )
     Clue = models.CharField(max_length=150)
 
 
@@ -86,4 +86,6 @@ class Charlie(models.Model):
 
 class SelfRefFK(models.Model):
     name = models.CharField(max_length=50)
-    parent = models.ForeignKey('self', models.SET_NULL, null=True, blank=True, related_name='children')
+    parent = models.ForeignKey(
+        "self", models.SET_NULL, null=True, blank=True, related_name="children"
+    )

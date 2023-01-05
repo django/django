@@ -13,10 +13,10 @@ from django.test import modify_settings, override_settings
 
 TEST_ROOT = os.path.dirname(__file__)
 TEST_SETTINGS = {
-    'MEDIA_URL': 'media/',
-    'STATIC_URL': 'static/',
-    'MEDIA_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'media'),
-    'STATIC_ROOT': os.path.join(TEST_ROOT, 'project', 'site_media', 'static'),
+    "MEDIA_URL": "media/",
+    "STATIC_URL": "static/",
+    "MEDIA_ROOT": os.path.join(TEST_ROOT, "project", "site_media", "media"),
+    "STATIC_ROOT": os.path.join(TEST_ROOT, "project", "site_media", "static"),
 }
 
 
@@ -29,36 +29,21 @@ class LiveServerBase(StaticLiveServerTestCase):
         # Override settings
         cls.settings_override = override_settings(**TEST_SETTINGS)
         cls.settings_override.enable()
-        try:
-            super().setUpClass()
-        except Exception:
-            # Clean up since tearDownClass() isn't called on errors.
-            cls._tearDownLiveServerBase()
-            raise
-
-    @classmethod
-    def _tearDownLiveServerBase(cls):
-        # Restore original settings
-        cls.settings_override.disable()
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls._tearDownLiveServerBase()
+        cls.addClassCleanup(cls.settings_override.disable)
+        super().setUpClass()
 
 
 class StaticLiveServerChecks(LiveServerBase):
-
     @classmethod
     def setUpClass(cls):
         # If contrib.staticfiles isn't configured properly, the exception
         # should bubble up to the main thread.
-        old_STATIC_URL = TEST_SETTINGS['STATIC_URL']
-        TEST_SETTINGS['STATIC_URL'] = None
+        old_STATIC_URL = TEST_SETTINGS["STATIC_URL"]
+        TEST_SETTINGS["STATIC_URL"] = None
         try:
             cls.raises_exception()
         finally:
-            TEST_SETTINGS['STATIC_URL'] = old_STATIC_URL
+            TEST_SETTINGS["STATIC_URL"] = old_STATIC_URL
 
     @classmethod
     def tearDownClass(cls):
@@ -74,9 +59,7 @@ class StaticLiveServerChecks(LiveServerBase):
             # app without having set the required STATIC_URL setting.")
             pass
         else:
-            # super().setUpClass() cleans up after itself on a failure.
-            super().tearDownClass()
-            raise Exception('setUpClass() should have raised an exception.')
+            raise Exception("setUpClass() should have raised an exception.")
 
     def test_test_test(self):
         # Intentionally empty method so that the test is picked up by the
@@ -85,16 +68,15 @@ class StaticLiveServerChecks(LiveServerBase):
 
 
 class StaticLiveServerView(LiveServerBase):
-
     def urlopen(self, url):
         return urlopen(self.live_server_url + url)
 
     # The test is going to access a static file stored in this application.
-    @modify_settings(INSTALLED_APPS={'append': 'staticfiles_tests.apps.test'})
+    @modify_settings(INSTALLED_APPS={"append": "staticfiles_tests.apps.test"})
     def test_collectstatic_emulation(self):
         """
         StaticLiveServerTestCase use of staticfiles' serve() allows it
         to discover app's static assets without having to collectstatic first.
         """
-        with self.urlopen('/static/test/file.txt') as f:
-            self.assertEqual(f.read().rstrip(b'\r\n'), b'In static directory.')
+        with self.urlopen("/static/test/file.txt") as f:
+            self.assertEqual(f.read().rstrip(b"\r\n"), b"In static directory.")

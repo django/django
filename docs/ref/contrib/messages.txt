@@ -69,10 +69,6 @@ Django provides three built-in storage classes in
     to prevent manipulation) to persist notifications across requests. Old
     messages are dropped if the cookie data size would exceed 2048 bytes.
 
-    .. versionchanged:: 3.2
-
-        Messages format was changed to the :rfc:`6265` compliant format.
-
 .. class:: storage.fallback.FallbackStorage
 
     This class first uses ``CookieStorage``, and falls back to using

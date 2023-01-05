@@ -6,6 +6,7 @@ class GDALRasterBase(GDALBase):
     """
     Attributes that exist on both GDALRaster and GDALBand.
     """
+
     @property
     def metadata(self):
         """
@@ -15,7 +16,7 @@ class GDALRasterBase(GDALBase):
         """
         # The initial metadata domain list contains the default domain.
         # The default is returned if domain name is None.
-        domain_list = ['DEFAULT']
+        domain_list = ["DEFAULT"]
 
         # Get additional metadata domains from the raster.
         meta_list = capi.get_ds_metadata_domain_list(self._ptr)
@@ -38,7 +39,7 @@ class GDALRasterBase(GDALBase):
             # Get metadata for this domain.
             data = capi.get_ds_metadata(
                 self._ptr,
-                (None if domain == 'DEFAULT' else domain.encode()),
+                (None if domain == "DEFAULT" else domain.encode()),
             )
             if not data:
                 continue
@@ -48,12 +49,12 @@ class GDALRasterBase(GDALBase):
             counter = 0
             item = data[counter]
             while item:
-                key, val = item.decode().split('=')
+                key, val = item.decode().split("=")
                 domain_meta[key] = val
                 counter += 1
                 item = data[counter]
             # The default domain values are returned if domain is None.
-            result[domain or 'DEFAULT'] = domain_meta
+            result[domain or "DEFAULT"] = domain_meta
         return result
 
     @metadata.setter
@@ -65,11 +66,12 @@ class GDALRasterBase(GDALBase):
         # Loop through domains.
         for domain, metadata in value.items():
             # Set the domain to None for the default, otherwise encode.
-            domain = None if domain == 'DEFAULT' else domain.encode()
+            domain = None if domain == "DEFAULT" else domain.encode()
             # Set each metadata entry separately.
             for meta_name, meta_value in metadata.items():
                 capi.set_ds_metadata_item(
-                    self._ptr, meta_name.encode(),
+                    self._ptr,
+                    meta_name.encode(),
                     meta_value.encode() if meta_value else None,
                     domain,
                 )

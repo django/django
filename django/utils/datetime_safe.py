@@ -9,13 +9,14 @@
 
 import time
 import warnings
-from datetime import date as real_date, datetime as real_datetime
+from datetime import date as real_date
+from datetime import datetime as real_datetime
 
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.regex_helper import _lazy_re_compile
 
 warnings.warn(
-    'The django.utils.datetime_safe module is deprecated.',
+    "The django.utils.datetime_safe module is deprecated.",
     category=RemovedInDjango50Warning,
     stacklevel=2,
 )
@@ -32,9 +33,16 @@ class datetime(real_datetime):
 
     @classmethod
     def combine(cls, date, time):
-        return cls(date.year, date.month, date.day,
-                   time.hour, time.minute, time.second,
-                   time.microsecond, time.tzinfo)
+        return cls(
+            date.year,
+            date.month,
+            date.day,
+            time.hour,
+            time.minute,
+            time.second,
+            time.microsecond,
+            time.tzinfo,
+        )
 
     def date(self):
         return date(self.year, self.month, self.day)
@@ -78,17 +86,19 @@ def strftime(dt, fmt):
         return super(type(dt), dt).strftime(fmt)
     illegal_formatting = _illegal_formatting.search(fmt)
     if illegal_formatting:
-        raise TypeError('strftime of dates before 1000 does not handle ' + illegal_formatting[0])
+        raise TypeError(
+            "strftime of dates before 1000 does not handle " + illegal_formatting[0]
+        )
 
     year = dt.year
     # For every non-leap year century, advance by
     # 6 years to get into the 28-year repeat cycle
     delta = 2000 - year
     off = 6 * (delta // 100 + delta // 400)
-    year = year + off
+    year += off
 
     # Move to around the year 2000
-    year = year + ((2000 - year) // 28) * 28
+    year += ((2000 - year) // 28) * 28
     timetuple = dt.timetuple()
     s1 = time.strftime(fmt, (year,) + timetuple[1:])
     sites1 = _findall(s1, str(year))
@@ -104,5 +114,5 @@ def strftime(dt, fmt):
     s = s1
     syear = "%04d" % dt.year
     for site in sites:
-        s = s[:site] + syear + s[site + 4:]
+        s = s[:site] + syear + s[site + 4 :]
     return s

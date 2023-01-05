@@ -37,7 +37,7 @@ command. For example:
 uWSGI model
 -----------
 
-uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
+uWSGI operates on a client-server model. Your web server (e.g., nginx, Apache)
 communicates with a ``django-uwsgi`` "worker" process to serve dynamic content.
 
 Configuring and starting the uWSGI server for Django

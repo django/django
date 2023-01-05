@@ -1,6 +1,6 @@
-===========================
-Writing custom model fields
-===========================
+=================================
+How to create custom model fields
+=================================
 
 .. currentmodule:: django.db.models
 
@@ -98,7 +98,7 @@ Normally, you're either writing a Django field to match a particular database
 column type, or you will need a way to convert your data to, say, a string.
 
 For our ``Hand`` example, we could convert the card data to a string of 104
-characters by concatenating all the cards together in a pre-determined order --
+characters by concatenating all the cards together in a predetermined order --
 say, all the *north* cards first, then the *east*, *south* and *west* cards. So
 ``Hand`` objects can be saved to text or character columns in the database.
 
@@ -234,7 +234,7 @@ The counterpoint to writing your ``__init__()`` method is writing the
 :meth:`~.Field.deconstruct` method. It's used during :doc:`model migrations
 </topics/migrations>` to tell Django how to take an instance of your new field
 and reduce it to a serialized form - in particular, what arguments to pass to
-``__init__()`` to re-create it.
+``__init__()`` to recreate it.
 
 If you haven't added any extra options on top of the field you inherited from,
 then there's no need to write a new ``deconstruct()`` method. If, however,
@@ -313,6 +313,26 @@ reconstructing the field::
     name, path, args, kwargs = my_field_instance.deconstruct()
     new_instance = MyField(*args, **kwargs)
     self.assertEqual(my_field_instance.some_attribute, new_instance.some_attribute)
+
+.. _custom-field-non_db_attrs:
+
+Field attributes not affecting database column definition
+---------------------------------------------------------
+
+.. versionadded:: 4.1
+
+You can override ``Field.non_db_attrs`` to customize attributes of a field that
+don't affect a column definition. It's used during model migrations to detect
+no-op ``AlterField`` operations.
+
+For example::
+
+    class CommaSepField(models.Field):
+
+        @property
+        def non_db_attrs(self):
+            return super().non_db_attrs + ("separator",)
+
 
 Changing a custom field's base class
 ------------------------------------
@@ -394,13 +414,14 @@ If you aim to build a database-agnostic application, you should account for
 differences in database column types. For example, the date/time column type
 in PostgreSQL is called ``timestamp``, while the same column in MySQL is called
 ``datetime``. You can handle this in a :meth:`~Field.db_type` method by
-checking the ``connection.settings_dict['ENGINE']`` attribute.
+checking the ``connection.vendor`` attribute. Current built-in vendor names
+are: ``sqlite``, ``postgresql``, ``mysql``, and ``oracle``.
 
 For example::
 
     class MyDateField(models.Field):
         def db_type(self, connection):
-            if connection.settings_dict['ENGINE'] == 'django.db.backends.mysql':
+            if connection.vendor == 'mysql':
                 return 'datetime'
             else:
                 return 'timestamp'
@@ -492,8 +513,8 @@ following arguments:
 
 * ``None`` (if the field allows ``null=True``)
 
-In our ``HandField`` class, we're storing the data as a VARCHAR field in the
-database, so we need to be able to process strings and ``None`` in the
+In our ``HandField`` class, we're storing the data as a ``VARCHAR`` field in
+the database, so we need to be able to process strings and ``None`` in the
 ``from_db_value()``. In ``to_python()``, we need to also handle ``Hand``
 instances::
 
@@ -703,7 +724,7 @@ serialization formats. Here are a couple of tips to make things go more
 smoothly:
 
 #. Look at the existing Django fields (in
-   :file:`django/db/models/fields/__init__.py`) for inspiration. Try to find
+   :source:`django/db/models/fields/__init__.py`) for inspiration. Try to find
    a field that's similar to what you want and extend it a little bit,
    instead of creating an entirely new field from scratch.
 
@@ -740,7 +761,7 @@ In addition to the above details, there are a few guidelines which can greatly
 improve the efficiency and readability of the field's code.
 
 #. The source for Django's own ``ImageField`` (in
-   ``django/db/models/fields/files.py``) is a great example of how to
+   :source:`django/db/models/fields/files.py`) is a great example of how to
    subclass ``FileField`` to support a particular type of file, as it
    incorporates all of the techniques described above.
 

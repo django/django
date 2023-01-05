@@ -2,7 +2,7 @@
 Committing code
 ===============
 
-This section is addressed to the committers and to anyone interested in knowing
+This section is addressed to the mergers and to anyone interested in knowing
 how code gets committed into Django. If you're a community member who wants to
 contribute code to Django, look at :doc:`writing-code/working-with-git` instead.
 
@@ -16,15 +16,15 @@ requests.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
-best pull requests possible. In practice however, committers - who will likely
-be more familiar with the commit guidelines - may decide to bring a commit up
-to standard themselves.
+best pull requests possible. In practice mergers - who will likely be more 
+familiar with the commit guidelines - may decide to bring a commit up to
+standard themselves.
 
-You may want to have Jenkins test the pull request with one of the pull request
-builders that doesn't run automatically, such as Oracle or Selenium. See the
-`Jenkins wiki page`_ for instructions.
+You may want to have Jenkins or GitHub actions test the pull request with one
+of the pull request builders that doesn't run automatically, such as Oracle or
+Selenium. See the `CI wiki page`_ for instructions.
 
-.. _Jenkins wiki page: https://code.djangoproject.com/wiki/Jenkins
+.. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
 If you find yourself checking out pull requests locally more often, this git
 alias will be helpful::
@@ -90,7 +90,7 @@ Django's commit history as usable as possible:
 * Trivial and small patches usually are best done in one commit. Medium to
   large work may be split into multiple commits if it makes sense.
 
-Practicality beats purity, so it is up to each committer to decide how much
+Practicality beats purity, so it is up to each merger to decide how much
 history mangling to do for a pull request. The main points are engaging the
 community, getting work done, and having a usable commit history.
 
@@ -138,7 +138,7 @@ Django's Git repository:
   Credit the contributors in the commit message: "Thanks A for the report and B
   for review." Use git's `Co-Authored-By`_ as appropriate.
 
-  .. _Co-Authored-By: https://docs.github.com/en/github/committing-changes-to-your-project/creating-a-commit-with-multiple-authors
+  .. _Co-Authored-By: https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors
 
 * For commits to a branch, prefix the commit message with the branch name.
   For example: "[1.4.x] Fixed #xxxxx -- Added support for mind reading."
@@ -166,7 +166,7 @@ Django's Git repository:
     Note that the Trac integration doesn't know anything about pull requests.
     So if you try to close a pull request with the phrase "closes #400" in your
     commit message, GitHub will close the pull request, but the Trac plugin
-    will also close the same numbered ticket in Trac.
+    will not close the same numbered ticket in Trac.
 
 .. _Trac plugin: https://github.com/trac-hacks/trac-github
 
@@ -192,8 +192,8 @@ Django's Git repository:
     Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from main.
 
   There's a `script on the wiki
-  <https://code.djangoproject.com/wiki/CommitterTips#AutomatingBackports>`_
-  to automate this.
+  <https://code.djangoproject.com/wiki/MergerTips#AutomatingBackports>`_ to
+  automate this.
 
   If the commit fixes a regression, include this in the commit message:
 
@@ -211,7 +211,7 @@ Nobody's perfect; mistakes will be committed.
 But try very hard to ensure that mistakes don't happen. Just because we have a
 reversion policy doesn't relax your responsibility to aim for the highest
 quality possible. Really: double-check your work, or have it checked by
-another committer, **before** you commit it in the first place!
+another merger **before** you commit it in the first place!
 
 When a mistaken commit is discovered, please follow these guidelines:
 
@@ -231,10 +231,9 @@ When a mistaken commit is discovered, please follow these guidelines:
 * If the problem is small (a feature commit after feature freeze,
   say), wait it out.
 
-* If there's a disagreement between the committer and the
-  reverter-to-be then try to work it out on the |django-developers|
-  mailing list. If an agreement can't be reached then it should
-  be put to a vote.
+* If there's a disagreement between the merger and the reverter-to-be then try
+  to work it out on the |django-developers| mailing list. If an agreement can't
+  be reached then it should be put to a vote.
 
 * If the commit introduced a confirmed, disclosed security
   vulnerability then the commit may be reverted immediately without

@@ -67,11 +67,11 @@ work, see :ref:`troubleshooting-django-admin`.
 .. admonition:: Where should this code live?
 
     If your background is in plain old PHP (with no use of modern frameworks),
-    you're probably used to putting code under the Web server's document root
+    you're probably used to putting code under the web server's document root
     (in a place such as ``/var/www``). With Django, you don't do that. It's
-    not a good idea to put any of this Python code within your Web server's
+    not a good idea to put any of this Python code within your web server's
     document root, because it risks the possibility that people may be able
-    to view your code over the Web. That's not good for security.
+    to view your code over the web. That's not good for security.
 
     Put your code in some directory **outside** of the document root, such as
     :file:`/home/mycode`.
@@ -148,16 +148,16 @@ You'll see the following output on the command line:
     Ignore the warning about unapplied database migrations for now; we'll deal
     with the database shortly.
 
-You've started the Django development server, a lightweight Web server written
+You've started the Django development server, a lightweight web server written
 purely in Python. We've included this with Django so you can develop things
 rapidly, without having to deal with configuring a production server -- such as
 Apache -- until you're ready for production.
 
 Now's a good time to note: **don't** use this server in anything resembling a
 production environment. It's intended only for use while developing. (We're in
-the business of making Web frameworks, not Web servers.)
+the business of making web frameworks, not web servers.)
 
-Now that the server's running, visit http://127.0.0.1:8000/ with your Web
+Now that the server's running, visit http://127.0.0.1:8000/ with your web
 browser. You'll see a "Congratulations!" page, with a rocket taking off.
 It worked!
 
@@ -181,10 +181,10 @@ It worked!
 
     .. console::
 
-        $ python manage.py runserver 0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
-    **0** is a shortcut for **0.0.0.0**. Full docs for the development server
-    can be found in the :djadmin:`runserver` reference.
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
@@ -206,8 +206,8 @@ rather than creating directories.
 
 .. admonition:: Projects vs. apps
 
-    What's the difference between a project and an app? An app is a Web
-    application that does something -- e.g., a Weblog system, a database of
+    What's the difference between a project and an app? An app is a web
+    application that does something -- e.g., a blog system, a database of
     public records or a small poll app. A project is a collection of
     configuration and apps for a particular website. A project can contain
     multiple apps. An app can be in multiple projects.
@@ -245,7 +245,7 @@ Let's write the first view. Open the file ``polls/views.py``
 and put the following Python code in it:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse
 
@@ -273,7 +273,7 @@ Your app directory should now look like::
 In the ``polls/urls.py`` file include the following code:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
@@ -288,7 +288,7 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
 :func:`~django.urls.include` in the ``urlpatterns`` list, so you have:
 
 .. code-block:: python
-    :caption: mysite/urls.py
+    :caption: ``mysite/urls.py``
 
     from django.contrib import admin
     from django.urls import include, path

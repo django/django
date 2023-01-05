@@ -47,14 +47,14 @@ Create a few ``Publications``::
 
 Create an ``Article``::
 
-    >>> a1 = Article(headline='Django lets you build Web apps easily')
+    >>> a1 = Article(headline='Django lets you build web apps easily')
 
 You can't associate it with a ``Publication`` until it's been saved::
 
     >>> a1.publications.add(p1)
     Traceback (most recent call last):
     ...
-    ValueError: "<Article: Django lets you build Web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
+    ValueError: "<Article: Django lets you build web apps easily>" needs to have a value for field "id" before this many-to-many relationship can be used.
 
 Save it!
 ::
@@ -100,7 +100,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
     >>> p2.article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
     >>> p1.article_set.all()
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Publication.objects.get(id=4).article_set.all()
     <QuerySet [<Article: NASA uses Python>]>
 
@@ -108,13 +108,13 @@ Many-to-many relationships can be queried using :ref:`lookups across
 relationships <lookups-that-span-relationships>`::
 
     >>> Article.objects.filter(publications__id=1)
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications__pk=1)
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications=1)
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications=p1)
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
 
     >>> Article.objects.filter(publications__title__startswith="Science")
     <QuerySet [<Article: NASA uses Python>, <Article: NASA uses Python>]>
@@ -132,9 +132,9 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     1
 
     >>> Article.objects.filter(publications__in=[1,2]).distinct()
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
     >>> Article.objects.filter(publications__in=[p1,p2]).distinct()
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA uses Python>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
 
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
 a :class:`~django.db.models.ManyToManyField`)::
@@ -165,7 +165,7 @@ Excluding a related item works as you would expect, too (although the SQL
 involved is a little complex)::
 
     >>> Article.objects.exclude(publications=p2)
-    <QuerySet [<Article: Django lets you build Web apps easily>]>
+    <QuerySet [<Article: Django lets you build web apps easily>]>
 
 If we delete a ``Publication``, its ``Articles`` won't be able to access it::
 
@@ -180,7 +180,7 @@ If we delete an ``Article``, its ``Publications`` won't be able to access it::
 
     >>> a2.delete()
     >>> Article.objects.all()
-    <QuerySet [<Article: Django lets you build Web apps easily>]>
+    <QuerySet [<Article: Django lets you build web apps easily>]>
     >>> p2.article_set.all()
     <QuerySet []>
 
@@ -261,7 +261,7 @@ go::
     >>> Publication.objects.all()
     <QuerySet [<Publication: Highlights for Children>, <Publication: The Python Journal>]>
     >>> Article.objects.all()
-    <QuerySet [<Article: Django lets you build Web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]>
+    <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA finds intelligent life on Earth>, <Article: NASA uses Python>, <Article: Oxygen-free diet works wonders>]>
     >>> a2.publications.all()
     <QuerySet [<Publication: The Python Journal>]>
 
@@ -269,7 +269,7 @@ Bulk delete some articles - references to deleted objects should go::
 
     >>> q = Article.objects.filter(headline__startswith='Django')
     >>> print(q)
-    <QuerySet [<Article: Django lets you build Web apps easily>]>
+    <QuerySet [<Article: Django lets you build web apps easily>]>
     >>> q.delete()
 
 After the :meth:`~django.db.models.query.QuerySet.delete`, the

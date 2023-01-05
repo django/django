@@ -1,14 +1,15 @@
 import datetime
 import decimal
 import functools
-import hashlib
 import logging
 import time
 from contextlib import contextmanager
 
 from django.db import NotSupportedError
+from django.utils.crypto import md5
+from django.utils.dateparse import parse_time
 
-logger = logging.getLogger('django.db.backends')
+logger = logging.getLogger("django.db.backends")
 
 
 class CursorWrapper:
@@ -16,7 +17,7 @@ class CursorWrapper:
         self.cursor = cursor
         self.db = db
 
-    WRAP_ERROR_ATTRS = frozenset(['fetchone', 'fetchmany', 'fetchall', 'nextset'])
+    WRAP_ERROR_ATTRS = frozenset(["fetchone", "fetchmany", "fetchall", "nextset"])
 
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
@@ -49,8 +50,8 @@ class CursorWrapper:
         # database driver may support them (e.g. cx_Oracle).
         if kparams is not None and not self.db.features.supports_callproc_kwargs:
             raise NotSupportedError(
-                'Keyword parameters for callproc are not supported on this '
-                'database backend.'
+                "Keyword parameters for callproc are not supported on this "
+                "database backend."
             )
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
@@ -63,13 +64,17 @@ class CursorWrapper:
                 return self.cursor.callproc(procname, params, kparams)
 
     def execute(self, sql, params=None):
-        return self._execute_with_wrappers(sql, params, many=False, executor=self._execute)
+        return self._execute_with_wrappers(
+            sql, params, many=False, executor=self._execute
+        )
 
     def executemany(self, sql, param_list):
-        return self._execute_with_wrappers(sql, param_list, many=True, executor=self._executemany)
+        return self._execute_with_wrappers(
+            sql, param_list, many=True, executor=self._executemany
+        )
 
     def _execute_with_wrappers(self, sql, params, many, executor):
-        context = {'connection': self.db, 'cursor': self}
+        context = {"connection": self.db, "cursor": self}
         for wrapper in reversed(self.db.execute_wrappers):
             executor = functools.partial(wrapper, executor)
         return executor(sql, params, many, context)
@@ -102,7 +107,9 @@ class CursorDebugWrapper(CursorWrapper):
             return super().executemany(sql, param_list)
 
     @contextmanager
-    def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=False):
+    def debug_sql(
+        self, sql=None, params=None, use_last_executed_query=False, many=False
+    ):
         start = time.monotonic()
         try:
             yield
@@ -112,41 +119,94 @@ class CursorDebugWrapper(CursorWrapper):
             if use_last_executed_query:
                 sql = self.db.ops.last_executed_query(self.cursor, sql, params)
             try:
-                times = len(params) if many else ''
+                times = len(params) if many else ""
             except TypeError:
                 # params could be an iterator.
-                times = '?'
-            self.db.queries_log.append({
-                'sql': '%s times: %s' % (times, sql) if many else sql,
-                'time': '%.3f' % duration,
-            })
+                times = "?"
+            self.db.queries_log.append(
+                {
+                    "sql": "%s times: %s" % (times, sql) if many else sql,
+                    "time": "%.3f" % duration,
+                }
+            )
             logger.debug(
-                '(%.3f) %s; args=%s; alias=%s',
+                "(%.3f) %s; args=%s; alias=%s",
                 duration,
                 sql,
                 params,
                 self.db.alias,
-                extra={'duration': duration, 'sql': sql, 'params': params, 'alias': self.db.alias},
+                extra={
+                    "duration": duration,
+                    "sql": sql,
+                    "params": params,
+                    "alias": self.db.alias,
+                },
             )
+
+
+@contextmanager
+def debug_transaction(connection, sql):
+    start = time.monotonic()
+    try:
+        yield
+    finally:
+        if connection.queries_logged:
+            stop = time.monotonic()
+            duration = stop - start
+            connection.queries_log.append(
+                {
+                    "sql": "%s" % sql,
+                    "time": "%.3f" % duration,
+                }
+            )
+            logger.debug(
+                "(%.3f) %s; args=%s; alias=%s",
+                duration,
+                sql,
+                None,
+                connection.alias,
+                extra={
+                    "duration": duration,
+                    "sql": sql,
+                    "alias": connection.alias,
+                },
+            )
+
+
+def split_tzname_delta(tzname):
+    """
+    Split a time zone name into a 3-tuple of (name, sign, offset).
+    """
+    for sign in ["+", "-"]:
+        if sign in tzname:
+            name, offset = tzname.rsplit(sign, 1)
+            if offset and parse_time(offset):
+                return name, sign, offset
+    return tzname, None, None
 
 
 ###############################################
 # Converters from database (string) to Python #
 ###############################################
 
+
 def typecast_date(s):
-    return datetime.date(*map(int, s.split('-'))) if s else None  # return None if s is null
+    return (
+        datetime.date(*map(int, s.split("-"))) if s else None
+    )  # return None if s is null
 
 
 def typecast_time(s):  # does NOT store time zone information
     if not s:
         return None
-    hour, minutes, seconds = s.split(':')
-    if '.' in seconds:  # check whether seconds have a fractional part
-        seconds, microseconds = seconds.split('.')
+    hour, minutes, seconds = s.split(":")
+    if "." in seconds:  # check whether seconds have a fractional part
+        seconds, microseconds = seconds.split(".")
     else:
-        microseconds = '0'
-    return datetime.time(int(hour), int(minutes), int(seconds), int((microseconds + '000000')[:6]))
+        microseconds = "0"
+    return datetime.time(
+        int(hour), int(minutes), int(seconds), int((microseconds + "000000")[:6])
+    )
 
 
 def typecast_timestamp(s):  # does NOT store time zone information
@@ -154,31 +214,36 @@ def typecast_timestamp(s):  # does NOT store time zone information
     # "2005-07-29 09:56:00-05"
     if not s:
         return None
-    if ' ' not in s:
+    if " " not in s:
         return typecast_date(s)
     d, t = s.split()
     # Remove timezone information.
-    if '-' in t:
-        t, _ = t.split('-', 1)
-    elif '+' in t:
-        t, _ = t.split('+', 1)
-    dates = d.split('-')
-    times = t.split(':')
+    if "-" in t:
+        t, _ = t.split("-", 1)
+    elif "+" in t:
+        t, _ = t.split("+", 1)
+    dates = d.split("-")
+    times = t.split(":")
     seconds = times[2]
-    if '.' in seconds:  # check whether seconds have a fractional part
-        seconds, microseconds = seconds.split('.')
+    if "." in seconds:  # check whether seconds have a fractional part
+        seconds, microseconds = seconds.split(".")
     else:
-        microseconds = '0'
+        microseconds = "0"
     return datetime.datetime(
-        int(dates[0]), int(dates[1]), int(dates[2]),
-        int(times[0]), int(times[1]), int(seconds),
-        int((microseconds + '000000')[:6])
+        int(dates[0]),
+        int(dates[1]),
+        int(dates[2]),
+        int(times[0]),
+        int(times[1]),
+        int(seconds),
+        int((microseconds + "000000")[:6]),
     )
 
 
 ###############################################
 # Converters from Python to database (string) #
 ###############################################
+
 
 def split_identifier(identifier):
     """
@@ -190,7 +255,7 @@ def split_identifier(identifier):
     try:
         namespace, name = identifier.split('"."')
     except ValueError:
-        namespace, name = '', identifier
+        namespace, name = "", identifier
     return namespace.strip('"'), name.strip('"')
 
 
@@ -208,7 +273,11 @@ def truncate_name(identifier, length=None, hash_len=4):
         return identifier
 
     digest = names_digest(name, length=hash_len)
-    return '%s%s%s' % ('%s"."' % namespace if namespace else '', name[:length - hash_len], digest)
+    return "%s%s%s" % (
+        '%s"."' % namespace if namespace else "",
+        name[: length - hash_len],
+        digest,
+    )
 
 
 def names_digest(*args, length):
@@ -216,7 +285,7 @@ def names_digest(*args, length):
     Generate a 32-bit digest of a set of arguments that can be used to shorten
     identifying names.
     """
-    h = hashlib.md5()
+    h = md5(usedforsecurity=False)
     for arg in args:
         h.update(arg.encode())
     return h.hexdigest()[:length]
@@ -233,7 +302,9 @@ def format_number(value, max_digits, decimal_places):
     if max_digits is not None:
         context.prec = max_digits
     if decimal_places is not None:
-        value = value.quantize(decimal.Decimal(1).scaleb(-decimal_places), context=context)
+        value = value.quantize(
+            decimal.Decimal(1).scaleb(-decimal_places), context=context
+        )
     else:
         context.traps[decimal.Rounded] = 1
         value = context.create_decimal(value)

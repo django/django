@@ -130,7 +130,7 @@ for each test.
 
 * The class method
   :meth:`TestCase.setUpTestData() <django.test.TestCase.setUpTestData>` adds
-  the ability to setup test data at the class level. Using this technique can
+  the ability to set up test data at the class level. Using this technique can
   speed up the tests as compared to using ``setUp()``.
 
 * Fixture loading within ``TestCase`` is now performed once for the whole

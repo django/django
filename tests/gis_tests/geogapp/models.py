@@ -15,7 +15,7 @@ class City(NamedModel):
     point = models.PointField(geography=True)
 
     class Meta:
-        app_label = 'geogapp'
+        app_label = "geogapp"
 
 
 class Zipcode(NamedModel):
@@ -28,7 +28,7 @@ class County(NamedModel):
     mpoly = models.MultiPolygonField(geography=True)
 
     class Meta:
-        app_label = 'geogapp'
+        app_label = "geogapp"
 
     def __str__(self):
-        return ' County, '.join([self.name, self.state])
+        return " County, ".join([self.name, self.state])

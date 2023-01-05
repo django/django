@@ -9,6 +9,11 @@ PAPER         ?=
 BUILDDIR      ?= _build
 LANGUAGE      ?=
 
+# Set the default language.
+ifndef LANGUAGE
+override LANGUAGE = en
+endif
+
 # Convert something like "en_US" to "en", because Sphinx does not recognize
 # underscores. Country codes should be passed using a dash, e.g. "pt-BR".
 LANGUAGEOPT = $(firstword $(subst _, ,$(LANGUAGE)))

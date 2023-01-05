@@ -11,6 +11,7 @@ you quickly accomplish common tasks.
    :maxdepth: 1
 
    auth-remote-user
+   csrf
    custom-management-commands
    custom-model-fields
    custom-lookups
@@ -22,6 +23,7 @@ you quickly accomplish common tasks.
    error-reporting
    initial-data
    legacy-databases
+   logging
    outputting-csv
    outputting-pdf
    overriding-templates

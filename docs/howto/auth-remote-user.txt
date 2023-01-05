@@ -1,9 +1,9 @@
-====================================
-Authentication using ``REMOTE_USER``
-====================================
+=========================================
+How to authenticate using ``REMOTE_USER``
+=========================================
 
 This document describes how to make use of external authentication sources
-(where the Web server sets the ``REMOTE_USER`` environment variable) in your
+(where the web server sets the ``REMOTE_USER`` environment variable) in your
 Django applications.  This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
@@ -15,7 +15,7 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 .. _WebAuth: https://uit.stanford.edu/service/authentication
 .. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
-When the Web server takes care of authentication it typically sets the
+When the web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute.  Django can be configured to make

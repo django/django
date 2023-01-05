@@ -88,7 +88,12 @@
             if (options.added) {
                 options.added(row);
             }
-            $(document).trigger('formset:added', [row, options.prefix]);
+            row.get(0).dispatchEvent(new CustomEvent("formset:added", {
+                bubbles: true,
+                detail: {
+                    formsetName: options.prefix
+                }
+            }));
         };
 
         /**
@@ -130,7 +135,11 @@
             if (options.removed) {
                 options.removed(row);
             }
-            $(document).trigger('formset:removed', [row, options.prefix]);
+            document.dispatchEvent(new CustomEvent("formset:removed", {
+                detail: {
+                    formsetName: options.prefix
+                }
+            }));
             // Update the TOTAL_FORMS form count.
             const forms = $("." + options.formCssClass);
             $("#id_" + options.prefix + "-TOTAL_FORMS").val(forms.length);
@@ -296,7 +305,13 @@
                     dependency_list = input.data('dependency_list') || [],
                     dependencies = [];
                 $.each(dependency_list, function(i, field_name) {
-                    dependencies.push('#' + row.find('.form-row .field-' + field_name).find('input, select, textarea').attr('id'));
+                    // Dependency in a fieldset.
+                    let field_element = row.find('.form-row .field-' + field_name);
+                    // Dependency without a fieldset.
+                    if (!field_element.length) {
+                        field_element = row.find('.form-row.field-' + field_name);
+                    }
+                    dependencies.push('#' + field_element.find('input, select, textarea').attr('id'));
                 });
                 if (dependencies.length) {
                     input.prepopulate(dependencies, input.attr('maxlength'));

@@ -68,6 +68,13 @@ Some examples::
     ...     account_type=OuterRef('account_type'),
     ... ).exclude(pk=OuterRef('pk')).values('pk')
     >>> When(Exists(non_unique_account_type), then=Value('non unique'))
+    >>> # Condition can be created using lookup expressions.
+    >>> from django.db.models.lookups import GreaterThan, LessThan
+    >>> When(
+    ...     GreaterThan(F('registered_on'), date(2014, 1, 1)) &
+    ...     LessThan(F('registered_on'), date(2015, 1, 1)),
+    ...     then='account_type',
+    ... )
 
 Keep in mind that each of these values can be an expression.
 
@@ -80,10 +87,6 @@ Keep in mind that each of these values can be an expression.
 
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
-
-.. versionchanged:: 3.2
-
-    Support for using the ``condition`` argument with ``lookups`` was added.
 
 ``Case``
 --------

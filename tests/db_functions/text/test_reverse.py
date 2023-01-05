@@ -10,22 +10,27 @@ from ..models import Author
 class ReverseTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.john = Author.objects.create(name='John Smith', alias='smithj')
-        cls.elena = Author.objects.create(name='Élena Jordan', alias='elena')
-        cls.python = Author.objects.create(name='パイソン')
+        cls.john = Author.objects.create(name="John Smith", alias="smithj")
+        cls.elena = Author.objects.create(name="Élena Jordan", alias="elena")
+        cls.python = Author.objects.create(name="パイソン")
 
     def test_null(self):
-        author = Author.objects.annotate(backward=Reverse('alias')).get(pk=self.python.pk)
-        self.assertEqual(author.backward, '' if connection.features.interprets_empty_strings_as_nulls else None)
+        author = Author.objects.annotate(backward=Reverse("alias")).get(
+            pk=self.python.pk
+        )
+        self.assertEqual(
+            author.backward,
+            "" if connection.features.interprets_empty_strings_as_nulls else None,
+        )
 
     def test_basic(self):
-        authors = Author.objects.annotate(backward=Reverse('name'))
-        self.assertQuerysetEqual(
+        authors = Author.objects.annotate(backward=Reverse("name"))
+        self.assertQuerySetEqual(
             authors,
             [
-                ('John Smith', 'htimS nhoJ'),
-                ('Élena Jordan', 'nadroJ anelÉ'),
-                ('パイソン', 'ンソイパ'),
+                ("John Smith", "htimS nhoJ"),
+                ("Élena Jordan", "nadroJ anelÉ"),
+                ("パイソン", "ンソイパ"),
             ],
             lambda a: (a.name, a.backward),
             ordered=False,
@@ -34,13 +39,24 @@ class ReverseTests(TestCase):
     def test_transform(self):
         with register_lookup(CharField, Reverse):
             authors = Author.objects.all()
-            self.assertCountEqual(authors.filter(name__reverse=self.john.name[::-1]), [self.john])
-            self.assertCountEqual(authors.exclude(name__reverse=self.john.name[::-1]), [self.elena, self.python])
+            self.assertCountEqual(
+                authors.filter(name__reverse=self.john.name[::-1]), [self.john]
+            )
+            self.assertCountEqual(
+                authors.exclude(name__reverse=self.john.name[::-1]),
+                [self.elena, self.python],
+            )
 
     def test_expressions(self):
-        author = Author.objects.annotate(backward=Reverse(Trim('name'))).get(pk=self.john.pk)
+        author = Author.objects.annotate(backward=Reverse(Trim("name"))).get(
+            pk=self.john.pk
+        )
         self.assertEqual(author.backward, self.john.name[::-1])
         with register_lookup(CharField, Reverse), register_lookup(CharField, Length):
             authors = Author.objects.all()
-            self.assertCountEqual(authors.filter(name__reverse__length__gt=7), [self.john, self.elena])
-            self.assertCountEqual(authors.exclude(name__reverse__length__gt=7), [self.python])
+            self.assertCountEqual(
+                authors.filter(name__reverse__length__gt=7), [self.john, self.elena]
+            )
+            self.assertCountEqual(
+                authors.exclude(name__reverse__length__gt=7), [self.python]
+            )

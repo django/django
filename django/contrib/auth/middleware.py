@@ -7,14 +7,14 @@ from django.utils.functional import SimpleLazyObject
 
 
 def get_user(request):
-    if not hasattr(request, '_cached_user'):
+    if not hasattr(request, "_cached_user"):
         request._cached_user = auth.get_user(request)
     return request._cached_user
 
 
 class AuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if not hasattr(request, 'session'):
+        if not hasattr(request, "session"):
             raise ImproperlyConfigured(
                 "The Django authentication middleware requires session "
                 "middleware to be installed. Edit your MIDDLEWARE setting to "
@@ -27,7 +27,7 @@ class AuthenticationMiddleware(MiddlewareMixin):
 
 class RemoteUserMiddleware(MiddlewareMixin):
     """
-    Middleware for utilizing Web-server-provided authentication.
+    Middleware for utilizing web-server-provided authentication.
 
     If request.user is not authenticated, then this middleware attempts to
     authenticate the username passed in the ``REMOTE_USER`` request header.
@@ -47,13 +47,14 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         # AuthenticationMiddleware is required so that request.user exists.
-        if not hasattr(request, 'user'):
+        if not hasattr(request, "user"):
             raise ImproperlyConfigured(
                 "The Django remote user auth middleware requires the"
                 " authentication middleware to be installed.  Edit your"
                 " MIDDLEWARE setting to insert"
                 " 'django.contrib.auth.middleware.AuthenticationMiddleware'"
-                " before the RemoteUserMiddleware class.")
+                " before the RemoteUserMiddleware class."
+            )
         try:
             username = request.META[self.header]
         except KeyError:
@@ -102,7 +103,9 @@ class RemoteUserMiddleware(MiddlewareMixin):
         but only if the user is authenticated via the RemoteUserBackend.
         """
         try:
-            stored_backend = load_backend(request.session.get(auth.BACKEND_SESSION_KEY, ''))
+            stored_backend = load_backend(
+                request.session.get(auth.BACKEND_SESSION_KEY, "")
+            )
         except ImportError:
             # backend failed to load
             auth.logout(request)
@@ -113,7 +116,7 @@ class RemoteUserMiddleware(MiddlewareMixin):
 
 class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     """
-    Middleware for Web-server provided authentication on logon pages.
+    Middleware for web-server provided authentication on logon pages.
 
     Like RemoteUserMiddleware but keeps the user authenticated even if
     the header (``REMOTE_USER``) is not found in the request. Useful
@@ -121,4 +124,5 @@ class PersistentRemoteUserMiddleware(RemoteUserMiddleware):
     is only expected to happen on some "logon" URL and the rest of
     the application wants to use Django's authentication mechanism.
     """
+
     force_logout_if_no_header = False

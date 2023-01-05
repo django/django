@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2021
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2022
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 18:48+0000\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-07-25 06:49+0000\n"
 "Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -205,13 +205,16 @@ msgid "Macedonian"
 msgstr "makedonsk"
 
 msgid "Malayalam"
-msgstr "malaysisk"
+msgstr "malayalam"
 
 msgid "Mongolian"
 msgstr "mongolsk"
 
 msgid "Marathi"
-msgstr "Marathi"
+msgstr "marathi"
+
+msgid "Malay"
+msgstr "malajisk"
 
 msgid "Burmese"
 msgstr "burmesisk"
@@ -389,6 +392,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Denne værdi skal være større end eller lig %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Denne værdi skal være et multiplum af trinstørrelse %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -454,6 +461,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s med dette %(field_labels)s eksisterer allerede."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Begrænsning “%(name)s” er overtrådt."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Værdien %(value)r er ikke et gyldigt valg."
 
@@ -467,8 +478,8 @@ msgstr "Dette felt kan ikke være tomt."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s med dette %(field_label)s eksisterer allerede."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -765,16 +776,16 @@ msgstr ""
 "problemet varer ved."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Send venligst højst %d formular."
-msgstr[1] "Send venligst højst %d formularer."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Indsend venligst højst %(num)d formular."
+msgstr[1] "Indsend venligst højst %(num)d formularer."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Send venligst mindst %d formular."
-msgstr[1] "Send venligst mindst %d formularer."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Indsend venligst mindst %(num)d formular."
+msgstr[1] "Indsend venligst mindst %(num)d formularer."
 
 msgid "Order"
 msgstr "Rækkefølge"
@@ -1113,40 +1124,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d år"
-msgstr[1] "%d år"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d år"
+msgstr[1] "%(num)d år"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d måned"
-msgstr[1] "%d måneder"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d måned"
+msgstr[1] "%(num)d måneder"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d uge"
-msgstr[1] "%d uger"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d uge"
+msgstr[1] "%(num)d uger"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dag"
-msgstr[1] "%d dage"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d dag"
+msgstr[1] "%(num)d dage"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d time"
-msgstr[1] "%d timer"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d time"
+msgstr[1] "%(num)d timer"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minutter"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minut"
+msgstr[1] "%(num)d minutter"
 
 msgid "Forbidden"
 msgstr "Forbudt"
@@ -1156,12 +1167,12 @@ msgstr "CSRF-verifikationen mislykkedes. Forespørgslen blev afbrudt."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 "Du ser denne besked fordi denne HTTPS-webside kræver at din browser sender "
-"en “Referer header”, men den blev ikke sendt. Denne header er påkrævet af "
+"en “Referer header”, som ikke blev sendt. Denne header er påkrævet af "
 "sikkerhedsmæssige grunde for at sikre at din browser ikke bliver kapret af "
 "tredjepart."
 

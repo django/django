@@ -215,11 +215,11 @@ Minor features
   parameter to specify a custom class to encode data types not supported by the
   standard encoder.
 
-* The new :class:`~django.contrib.postgres.fields.CIText` mixin and
+* The new ``CIText`` mixin and
   :class:`~django.contrib.postgres.operations.CITextExtension` migration
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
-  lookups. Three fields are provided: :class:`.CICharField`,
-  :class:`.CIEmailField`, and :class:`.CITextField`.
+  lookups. Three fields are provided: ``CICharField``, ``CIEmailField``, and
+  ``CITextField``.
 
 * The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
   aggregating values as a JSON array.
@@ -256,10 +256,11 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses :ref:`server-side cursors
-  <psycopg2:server-side-cursors>` on PostgreSQL. This feature transfers some of
-  the worker memory load (used to hold query results) to the database and might
-  increase database memory usage.
+* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+  This feature transfers some of the worker memory load (used to hold query
+  results) to the database and might increase database memory usage.
+
+  .. _server-side cursors: https://www.psycopg.org/docs/usage.html#server-side-cursors
 
 * Added MySQL support for the ``'isolation_level'`` option in
   :setting:`OPTIONS` to allow specifying the :ref:`transaction isolation level
@@ -741,7 +742,7 @@ Miscellaneous
   to allow including lists inside help text.
 
 * :class:`~django.middleware.http.ConditionalGetMiddleware` no longer sets the
-  ``Date`` header as Web servers set that header. It also no longer sets the
+  ``Date`` header as web servers set that header. It also no longer sets the
   ``Content-Length`` header as this is now done by
   :class:`~django.middleware.common.CommonMiddleware`.
 

@@ -221,7 +221,7 @@ We'll demonstrate this with the ``Author`` model we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseForbidden, HttpResponseRedirect
     from django.urls import reverse
@@ -253,7 +253,7 @@ look up the author we're interested in, which it does with a call to
 We can hook this into our URLs easily enough:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import path
     from books.views import RecordInterestView
@@ -653,7 +653,7 @@ same behavior -- except for the format of the response.
 If you want to be really adventurous, you could even mix a
 :class:`~django.views.generic.detail.DetailView` subclass that is able
 to return *both* HTML and JSON content, depending on some property of
-the HTTP request, such as a query argument or a HTTP header. Mix in both the
+the HTTP request, such as a query argument or an HTTP header. Mix in both the
 ``JSONResponseMixin`` and a
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
 and override the implementation of

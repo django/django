@@ -214,8 +214,6 @@ attributes:
 
 .. method:: FileUploadHandler.upload_interrupted()
 
-    .. versionadded:: 3.2
-
     Callback signaling that the upload was interrupted, e.g. when the user
     closed their browser during file upload.
 

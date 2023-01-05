@@ -242,7 +242,7 @@ CSRF
   changes the form token value on every request (while keeping an invariant
   secret which can be used to validate the different tokens).
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -752,7 +752,7 @@ Maximum size of a request body and the number of GET/POST parameters is limited
 Two new settings help mitigate denial-of-service attacks via large requests:
 
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE` limits the size that a request body
-  may be. File uploads don't count towards this limit.
+  may be. File uploads don't count toward this limit.
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS` limits the number of GET/POST
   parameters that are parsed.
 
@@ -864,7 +864,7 @@ Miscellaneous
 
 * The WSGI handler no longer removes content of responses from ``HEAD``
   requests or responses with a ``status_code`` of 100-199, 204, or 304. Most
-  Web servers already implement this behavior. Responses retrieved using the
+  web servers already implement this behavior. Responses retrieved using the
   Django test client continue to have these "response fixes" applied.
 
 * ``Model.__init__()`` now receives ``django.db.models.DEFERRED`` as the value
@@ -918,7 +918,7 @@ Miscellaneous
   To adapt, move the fragment outside the template tag:
   ``{% static 'img.svg' %}#fragment``.
 
-* When :setting:`USE_L10N` is ``True``, localization is now applied for the
+* When ``USE_L10N`` is ``True``, localization is now applied for the
   :tfilter:`date` and :tfilter:`time` filters when no format string is
   specified. The ``DATE_FORMAT`` and ``TIME_FORMAT`` specifiers from the active
   locale are used instead of the settings of the same name.

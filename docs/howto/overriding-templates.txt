@@ -1,6 +1,6 @@
-====================
-Overriding templates
-====================
+=========================
+How to override templates
+=========================
 
 In your project, you might want to override a template in another Django
 application, whether it be a third-party application or a contrib application
@@ -112,7 +112,7 @@ For example, you can use this technique to add a custom logo to the
 ``admin/base_site.html`` template:
 
     .. code-block:: html+django
-       :caption: templates/admin/base_site.html
+       :caption: ``templates/admin/base_site.html``
 
         {% extends "admin/base_site.html" %}
 

@@ -7,7 +7,7 @@ from . import Error, Tags, register
 
 @register(Tags.files)
 def check_setting_file_upload_temp_dir(app_configs, **kwargs):
-    setting = getattr(settings, 'FILE_UPLOAD_TEMP_DIR', None)
+    setting = getattr(settings, "FILE_UPLOAD_TEMP_DIR", None)
     if setting and not Path(setting).is_dir():
         return [
             Error(

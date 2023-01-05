@@ -3,7 +3,7 @@ from functools import lru_cache
 
 
 class IntConverter:
-    regex = '[0-9]+'
+    regex = "[0-9]+"
 
     def to_python(self, value):
         return int(value)
@@ -13,7 +13,7 @@ class IntConverter:
 
 
 class StringConverter:
-    regex = '[^/]+'
+    regex = "[^/]+"
 
     def to_python(self, value):
         return value
@@ -23,7 +23,7 @@ class StringConverter:
 
 
 class UUIDConverter:
-    regex = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
+    regex = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
 
     def to_python(self, value):
         return uuid.UUID(value)
@@ -33,19 +33,19 @@ class UUIDConverter:
 
 
 class SlugConverter(StringConverter):
-    regex = '[-a-zA-Z0-9_]+'
+    regex = "[-a-zA-Z0-9_]+"
 
 
 class PathConverter(StringConverter):
-    regex = '.+'
+    regex = ".+"
 
 
 DEFAULT_CONVERTERS = {
-    'int': IntConverter(),
-    'path': PathConverter(),
-    'slug': SlugConverter(),
-    'str': StringConverter(),
-    'uuid': UUIDConverter(),
+    "int": IntConverter(),
+    "path": PathConverter(),
+    "slug": SlugConverter(),
+    "str": StringConverter(),
+    "uuid": UUIDConverter(),
 }
 
 

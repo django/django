@@ -5,18 +5,18 @@ FAQ: General
 Why does this project exist?
 ============================
 
-Django grew from a very practical need: World Online, a newspaper Web
-operation, is responsible for building intensive Web applications on journalism
+Django grew from a very practical need: World Online, a newspaper web
+operation, is responsible for building intensive web applications on journalism
 deadlines. In the fast-paced newsroom, World Online often has only a matter of
-hours to take a complicated Web application from concept to public launch.
+hours to take a complicated web application from concept to public launch.
 
-At the same time, the World Online Web developers have consistently been
-perfectionists when it comes to following best practices of Web development.
+At the same time, the World Online web developers have consistently been
+perfectionists when it comes to following best practices of web development.
 
 In fall 2003, the World Online developers (Adrian Holovaty and Simon Willison)
 ditched PHP and began using Python to develop its websites. As they built
 intensive, richly interactive sites such as Lawrence.com, they began to extract
-a generic Web development framework that let them build Web applications more
+a generic web development framework that let them build web applications more
 and more quickly. They tweaked this framework constantly, adding improvements
 over two years.
 
@@ -58,7 +58,7 @@ Yes. Compared to development time, hardware is cheap, and so Django is
 designed to take advantage of as much hardware as you can throw at it.
 
 Django uses a "shared-nothing" architecture, which means you can add hardware
-at any level -- database servers, caching servers or Web/application servers.
+at any level -- database servers, caching servers or web/application servers.
 
 The framework cleanly separates components such as its database layer and
 application layer. And it ships with a simple-yet-powerful
@@ -67,7 +67,7 @@ application layer. And it ships with a simple-yet-powerful
 Who's behind this?
 ==================
 
-Django was originally developed at World Online, the Web department of a
+Django was originally developed at World Online, the web department of a
 newspaper in Lawrence, Kansas, USA. Django's now run by an international
 `team of volunteers <https://www.djangoproject.com/foundation/teams/>`_.
 
@@ -127,7 +127,7 @@ us.
 <Framework X> does <feature Y> -- why doesn't Django?
 =====================================================
 
-We're well aware that there are other awesome Web frameworks out there, and
+We're well aware that there are other awesome web frameworks out there, and
 we're not averse to borrowing ideas where appropriate. However, Django was
 developed precisely because we were unhappy with the status quo, so please be
 aware that "because <Framework X> does it" is not going to be sufficient reason
@@ -137,7 +137,7 @@ Why did you write all of Django from scratch, instead of using other Python libr
 ======================================================================================
 
 When Django was originally written, Adrian and Simon spent quite a bit of time
-exploring the various Python Web frameworks available.
+exploring the various Python web frameworks available.
 
 In our opinion, none of them were completely up to snuff.
 
@@ -162,7 +162,7 @@ Is Django a content-management-system (CMS)?
 ============================================
 
 No, Django is not a CMS, or any sort of "turnkey product" in and of itself.
-It's a Web framework; it's a programming tool that lets you build websites.
+It's a web framework; it's a programming tool that lets you build websites.
 
 For example, it doesn't make much sense to compare Django to something like
 Drupal_, because Django is something you use to *create* things like Drupal.
@@ -179,7 +179,7 @@ How can I download the Django documentation to read it offline?
 
 The Django docs are available in the ``docs`` directory of each Django tarball
 release. These docs are in reST (reStructuredText) format, and each text file
-corresponds to a Web page on the official Django site.
+corresponds to a web page on the official Django site.
 
 Because the documentation is :source:`stored in revision control <docs>`, you
 can browse documentation changes just like you can browse code changes.

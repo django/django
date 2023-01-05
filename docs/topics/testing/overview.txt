@@ -81,7 +81,7 @@ your project's ``manage.py`` utility::
 
 Test discovery is based on the unittest module's :py:ref:`built-in test
 discovery <unittest-test-discovery>`.  By default, this will discover tests in
-any file named "test*.py" under the current working directory.
+any file named ``test*.py`` under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
@@ -235,14 +235,9 @@ the Django test runner reorders tests in the following way:
     for quicker feedback. This includes things like test modules that couldn't
     be found or that couldn't be loaded due to syntax errors.
 
-You may reverse the execution order inside groups using the :option:`test
---reverse` option. This can help with ensuring your tests are independent from
-each other.
-
-.. versionchanged:: 4.0
-
-    In older versions, failures detected when loading tests were not ordered
-    first.
+You may randomize and/or reverse the execution order inside groups using the
+:option:`test --shuffle` and :option:`--reverse <test --reverse>` options. This
+can help with ensuring your tests are independent from each other.
 
 .. _test-case-serialized-rollback:
 
@@ -283,8 +278,8 @@ file, all Django tests run with :setting:`DEBUG`\=False. This is to ensure that
 the observed output of your code matches what will be seen in a production
 setting.
 
-Caches are not cleared after each test, and running "manage.py test fooapp" can
-insert data from the tests into the cache of a live system if you run your
+Caches are not cleared after each test, and running ``manage.py test fooapp``
+can insert data from the tests into the cache of a live system if you run your
 tests in production because, unlike databases, a separate "test cache" is not
 used. This behavior :ticket:`may change <11505>` in the future.
 
@@ -331,9 +326,14 @@ but it's pretty intuitive. You can consult the documentation of Python's
 :mod:`unittest` library for details.
 
 Note that the return code for the test-runner script is 1 for any number of
-failed and erroneous tests. If all the tests pass, the return code is 0. This
+failed tests (whether the failure was caused by an error, a failed assertion,
+or an unexpected success). If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
+
+.. versionchanged:: 4.1
+
+    In older versions, the return code was 0 for unexpected successes.
 
 .. _speeding-up-tests-auth-hashers:
 

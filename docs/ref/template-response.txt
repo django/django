@@ -93,10 +93,6 @@ Methods
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
 
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
-
 .. method:: SimpleTemplateResponse.resolve_context(context)
 
     Preprocesses context data that will be used for rendering a template.
@@ -195,10 +191,6 @@ Methods
     ``headers``
         A :class:`dict` of HTTP headers to add to the response.
 
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
-
 The rendering process
 =====================
 
@@ -225,7 +217,7 @@ subsequent rendering calls do not change the response content.
 
 However, when ``response.content`` is explicitly assigned, the
 change is always applied. If you want to force the content to be
-re-rendered, you can re-evaluate the rendered content, and assign
+re-rendered, you can reevaluate the rendered content, and assign
 the content of the response manually::
 
     # Set up a rendered TemplateResponse

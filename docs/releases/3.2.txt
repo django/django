@@ -23,8 +23,9 @@ end in April 2022.
 Python compatibility
 ====================
 
-Django 3.2 supports Python 3.6, 3.7, 3.8, and 3.9. We **highly recommend** and
-only officially support the latest release of each series.
+Django 3.2 supports Python 3.6, 3.7, 3.8, 3.9, and 3.10 (as of 3.2.9). We
+**highly recommend** and only officially support the latest release of each
+series.
 
 .. _whats-new-3.2:
 
@@ -538,7 +539,8 @@ Tests
   <django.db.transaction.on_commit>` in a list. This allows you to test such
   callbacks without using the slower :class:`.TransactionTestCase`.
 
-* :meth:`.TransactionTestCase.assertQuerysetEqual` now supports direct
+* :meth:`TransactionTestCase.assertQuerysetEqual()
+  <django.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
   comparison against another queryset rather than being restricted to
   comparison against a list of string representations of objects when using the
   default value for the ``transform`` argument.
@@ -672,7 +674,7 @@ Miscellaneous
   and underscores.
 
 * The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
-  depend on the :setting:`USE_L10N` setting.
+  depend on the ``USE_L10N`` setting.
 
 * Support for ``argon2-cffi`` < 19.1.0 is removed.
 

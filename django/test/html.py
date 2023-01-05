@@ -1,5 +1,5 @@
 """Compare two HTML documents."""
-
+import html
 from html.parser import HTMLParser
 
 from django.utils.regex_helper import _lazy_re_compile
@@ -7,32 +7,52 @@ from django.utils.regex_helper import _lazy_re_compile
 # ASCII whitespace is U+0009 TAB, U+000A LF, U+000C FF, U+000D CR, or U+0020
 # SPACE.
 # https://infra.spec.whatwg.org/#ascii-whitespace
-ASCII_WHITESPACE = _lazy_re_compile(r'[\t\n\f\r ]+')
+ASCII_WHITESPACE = _lazy_re_compile(r"[\t\n\f\r ]+")
 
 # https://html.spec.whatwg.org/#attributes-3
 BOOLEAN_ATTRIBUTES = {
-    'allowfullscreen', 'async', 'autofocus', 'autoplay', 'checked', 'controls',
-    'default', 'defer ', 'disabled', 'formnovalidate', 'hidden', 'ismap',
-    'itemscope', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open',
-    'playsinline', 'readonly', 'required', 'reversed', 'selected',
+    "allowfullscreen",
+    "async",
+    "autofocus",
+    "autoplay",
+    "checked",
+    "controls",
+    "default",
+    "defer ",
+    "disabled",
+    "formnovalidate",
+    "hidden",
+    "ismap",
+    "itemscope",
+    "loop",
+    "multiple",
+    "muted",
+    "nomodule",
+    "novalidate",
+    "open",
+    "playsinline",
+    "readonly",
+    "required",
+    "reversed",
+    "selected",
     # Attributes for deprecated tags.
-    'truespeed',
+    "truespeed",
 }
 
 
 def normalize_whitespace(string):
-    return ASCII_WHITESPACE.sub(' ', string)
+    return ASCII_WHITESPACE.sub(" ", string)
 
 
 def normalize_attributes(attributes):
     normalized = []
     for name, value in attributes:
-        if name == 'class' and value:
+        if name == "class" and value:
             # Special case handling of 'class' attribute, so that comparisons
             # of DOM instances are not sensitive to ordering of classes.
-            value = ' '.join(sorted(
-                value for value in ASCII_WHITESPACE.split(value) if value
-            ))
+            value = " ".join(
+                sorted(value for value in ASCII_WHITESPACE.split(value) if value)
+            )
         # Boolean attributes without a value is same as attribute with value
         # that equals the attributes name. For example:
         #   <input checked> == <input checked="checked">
@@ -40,7 +60,7 @@ def normalize_attributes(attributes):
             if not value or value == name:
                 value = None
         elif value is None:
-            value = ''
+            value = ""
         normalized.append((name, value))
     return normalized
 
@@ -80,11 +100,11 @@ class Element:
         for i, child in enumerate(self.children):
             if isinstance(child, str):
                 self.children[i] = child.strip()
-            elif hasattr(child, 'finalize'):
+            elif hasattr(child, "finalize"):
                 child.finalize()
 
     def __eq__(self, element):
-        if not hasattr(element, 'name') or self.name != element.name:
+        if not hasattr(element, "name") or self.name != element.name:
             return False
         if self.attributes != element.attributes:
             return False
@@ -142,18 +162,23 @@ class Element:
         return self.children[key]
 
     def __str__(self):
-        output = '<%s' % self.name
+        output = "<%s" % self.name
         for key, value in self.attributes:
             if value is not None:
                 output += ' %s="%s"' % (key, value)
             else:
-                output += ' %s' % key
+                output += " %s" % key
         if self.children:
-            output += '>\n'
-            output += ''.join(str(c) for c in self.children)
-            output += '\n</%s>' % self.name
+            output += ">\n"
+            output += "".join(
+                [
+                    html.escape(c) if isinstance(c, str) else str(c)
+                    for c in self.children
+                ]
+            )
+            output += "\n</%s>" % self.name
         else:
-            output += '>'
+            output += ">"
         return output
 
     def __repr__(self):
@@ -165,7 +190,9 @@ class RootElement(Element):
         super().__init__(None, ())
 
     def __str__(self):
-        return ''.join(str(c) for c in self.children)
+        return "".join(
+            [html.escape(c) if isinstance(c, str) else str(c) for c in self.children]
+        )
 
 
 class HTMLParseError(Exception):
@@ -175,10 +202,23 @@ class HTMLParseError(Exception):
 class Parser(HTMLParser):
     # https://html.spec.whatwg.org/#void-elements
     SELF_CLOSING_TAGS = {
-        'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta',
-        'param', 'source', 'track', 'wbr',
+        "area",
+        "base",
+        "br",
+        "col",
+        "embed",
+        "hr",
+        "img",
+        "input",
+        "link",
+        "meta",
+        "param",
+        "source",
+        "track",
+        "wbr",
         # Deprecated tags
-        'frame', 'spacer',
+        "frame",
+        "spacer",
     }
 
     def __init__(self):
@@ -195,9 +235,9 @@ class Parser(HTMLParser):
             position = self.element_positions[element]
         if position is None:
             position = self.getpos()
-        if hasattr(position, 'lineno'):
+        if hasattr(position, "lineno"):
             position = position.lineno, position.offset
-        return 'Line %d, Column %d' % position
+        return "Line %d, Column %d" % position
 
     @property
     def current(self):
@@ -221,13 +261,13 @@ class Parser(HTMLParser):
 
     def handle_endtag(self, tag):
         if not self.open_tags:
-            self.error("Unexpected end tag `%s` (%s)" % (
-                tag, self.format_position()))
+            self.error("Unexpected end tag `%s` (%s)" % (tag, self.format_position()))
         element = self.open_tags.pop()
         while element.name != tag:
             if not self.open_tags:
-                self.error("Unexpected end tag `%s` (%s)" % (
-                    tag, self.format_position()))
+                self.error(
+                    "Unexpected end tag `%s` (%s)" % (tag, self.format_position())
+                )
             element = self.open_tags.pop()
 
     def handle_data(self, data):

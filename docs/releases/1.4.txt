@@ -167,7 +167,7 @@ You could import ``mysite.settings``, ``mysite.urls``, and ``mysite.myapp``,
 but not ``settings``, ``urls``, or ``myapp`` as top-level modules.
 
 Anything imported as a top-level module can be placed adjacent to the new
-``manage.py``. For instance, to decouple "myapp" from the project module and
+``manage.py``. For instance, to decouple ``myapp`` from the project module and
 import it as just ``myapp``, place it outside the ``mysite/`` directory::
 
     manage.py
@@ -331,7 +331,7 @@ Tools for cryptographic signing
 
 Django 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
-signing in Web applications.
+signing in web applications.
 
 See the :doc:`cryptographic signing </topics/signing>` docs for more
 information.
@@ -634,7 +634,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
-  the name ``'admin_password_reset'`` in your urls.py, so plugging in the
+  the name ``'admin_password_reset'`` in your ``urls.py``, so plugging in the
   built-in password reset mechanism and making it available is now much easier.
   For details, see :ref:`auth_password_reset`.
 
@@ -688,14 +688,14 @@ files included in apps.
 Starting in Django 1.4, the admin's static files also follow this
 convention, to make the files easier to deploy. In previous versions of Django,
 it was also common to define an ``ADMIN_MEDIA_PREFIX`` setting to point to the
-URL where the admin's static files live on a Web server. This setting has now
+URL where the admin's static files live on a web server. This setting has now
 been deprecated and replaced by the more general setting :setting:`STATIC_URL`.
 Django will now expect to find the admin static files under the URL
 ``<STATIC_URL>/admin/``.
 
 If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
-are configured and your Web server serves those files correctly. The
+are configured and your web server serves those files correctly. The
 development server continues to serve the admin files just like before. Read
 the :doc:`static files howto </howto/static-files/index>` for more details.
 
@@ -719,7 +719,7 @@ admin app. Our new policy formalizes existing practices: `YUI's A-grade`_
 browsers should provide a fully-functional admin experience, with the notable
 exception of Internet Explorer 6, which is no longer supported.
 
-Released over 10 years ago, IE6 imposes many limitations on modern Web
+Released over 10 years ago, IE6 imposes many limitations on modern web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 
@@ -900,8 +900,8 @@ object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
 
 As part of this change, all underlying SQLite connections are now enabled for
 potential thread-sharing (by passing the ``check_same_thread=False`` attribute
-to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
-disabling thread-sharing by default, so this does not affect any existing
+to ``pysqlite``). ``DatabaseWrapper`` however preserves the previous behavior
+by disabling thread-sharing by default, so this does not affect any existing
 code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
 
 Finally, while it's now possible to pass connections between threads, Django
@@ -1060,7 +1060,7 @@ Session cookies now have the ``httponly`` flag by default
 
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. As a consequence of
-this change, session cookie data, including sessionid, is no longer
+this change, session cookie data, including ``sessionid``, is no longer
 accessible from JavaScript in many browsers. For strict backwards
 compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
 settings file.

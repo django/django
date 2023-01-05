@@ -1,6 +1,6 @@
-===================================
-Upgrading Django to a newer version
-===================================
+========================================
+How to upgrade Django to a newer version
+========================================
 
 While it can be a complex process at times, upgrading to the latest Django
 version has several benefits:
@@ -21,7 +21,7 @@ Required Reading
 If it's your first time doing an upgrade, it is useful to read the :doc:`guide
 on the different release processes </internals/release-process>`.
 
-Afterwards, you should familiarize yourself with the changes that were made in
+Afterward, you should familiarize yourself with the changes that were made in
 the new Django version(s):
 
 * Read the :doc:`release notes </releases/index>` for each 'final' release from
@@ -69,7 +69,7 @@ environment variable. For example, to show warnings while running tests:
 
 If you're not using the Django test runner, you may need to also ensure that
 any console output is not captured which would hide deprecation warnings. For
-example, if you use `pytest <https://pytest.org/>`__:
+example, if you use `pytest <https://docs.pytest.org/>`__:
 
 .. code-block:: console
 

@@ -157,14 +157,17 @@ will be returned::
    but it raises :class:`~django.http.Http404` instead of the model's
    :class:`~django.db.models.Model.DoesNotExist` exception.
 
-Required arguments
-------------------
+Arguments
+---------
 
 ``klass``
     A :class:`~django.db.models.Model` class,
     a :class:`~django.db.models.Manager`,
     or a :class:`~django.db.models.query.QuerySet` instance from which to get
     the object.
+
+``*args``
+    :class:`Q objects <django.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -230,13 +233,16 @@ will be raised if more than one object is found.
    given model manager cast to a list, raising :class:`~django.http.Http404` if
    the resulting list is empty.
 
-Required arguments
-------------------
+Arguments
+---------
 
 ``klass``
     A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
     :class:`~django.db.models.query.QuerySet` instance from which to get the
     list.
+
+``*args``
+    :class:`Q objects <django.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and

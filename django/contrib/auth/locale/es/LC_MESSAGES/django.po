@@ -3,23 +3,23 @@
 # Translators:
 # albertoalcolea <albertoalcolea@gmail.com>, 2014
 # Antoni Aloy <aaloy@apsl.net>, 2012-2013,2015-2017
-# Ernesto Avilés, 2015-2016
-# Ernesto Avilés, 2020
-# Ernesto Rico Schmidt <e.rico.schmidt@gmail.com>, 2017
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015-2016
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2020
+# Ernesto Rico Schmidt <ernesto@rico-schmidt.name>, 2017
 # guillem <serra.guillem@gmail.com>, 2012
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
-# Uriel Medina <urimeba511@gmail.com>, 2020
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-09-25 17:48+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-04-25 08:09+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -80,8 +80,8 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Las contraseñas no se almacenan en bruto, así que no hay manera de ver la "
-"contraseña del usuario, pero se puede cambiar la contraseña mediante <a href="
-"\"{}\">este formulario</a>."
+"contraseña del usuario, pero se puede cambiar la contraseña mediante <a "
+"href=\"{}\">este formulario</a>."
 
 #, python-format
 msgid ""
@@ -145,6 +145,9 @@ msgstr "factor trabajo"
 
 msgid "checksum"
 msgstr "suma de verificación"
+
+msgid "block size"
+msgstr "tamaño de bloque"
 
 msgid "name"
 msgstr "nombre"
@@ -248,12 +251,16 @@ msgstr[0] ""
 msgstr[1] ""
 "Esta contraseña es demasiado corta. Debe contener al menos %(min_length)d "
 "caracteres."
+msgstr[2] ""
+"Esta contraseña es demasiado corta. Debe contener al menos %(min_length)d "
+"caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Su contraseña debe contener al menos %(min_length)d caracter."
 msgstr[1] "Su contraseña debe contener al menos %(min_length)d caracteres."
+msgstr[2] "Su contraseña debe contener al menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."

@@ -10,6 +10,7 @@ class DataPoint(models.Model):
     name = models.CharField(max_length=20)
     value = models.CharField(max_length=20)
     another_value = models.CharField(max_length=20, blank=True)
+    is_active = models.BooleanField(default=True)
 
 
 class RelatedPoint(models.Model):
@@ -39,8 +40,9 @@ class Foo(models.Model):
 
 
 class Bar(models.Model):
-    foo = models.ForeignKey(Foo, models.CASCADE, to_field='target')
-    m2m_foo = models.ManyToManyField(Foo, related_name='m2m_foo')
+    foo = models.ForeignKey(Foo, models.CASCADE, to_field="target")
+    m2m_foo = models.ManyToManyField(Foo, related_name="m2m_foo")
+    x = models.IntegerField(default=0)
 
 
 class UniqueNumber(models.Model):

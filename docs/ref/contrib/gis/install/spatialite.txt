@@ -87,30 +87,7 @@ __ https://www.gaia-gis.it/gaia-sins/libspatialite-sources/
 macOS-specific instructions
 ==============================
 
-To install the SpatiaLite library and tools, macOS users can choose between
-:ref:`kyngchaos` and `Homebrew`_.
-
-KyngChaos
----------
-
-First, follow the instructions in the :ref:`kyngchaos` section.
-
-When creating a SpatiaLite database, the ``spatialite`` program is required.
-However, instead of attempting to compile the SpatiaLite tools from source,
-download the `SpatiaLite Tools`__ package for macOS, and install ``spatialite``
-in a location available in your ``PATH``.  For example::
-
-    $ curl -O https://www.kyngchaos.com/files/software/frameworks/Spatialite_Tools-4.3.zip
-    $ unzip Spatialite_Tools-4.3.zip
-    $ cd Spatialite\ Tools/tools
-    $ sudo cp spatialite /Library/Frameworks/SQLite3.framework/Programs
-
-Finally, for GeoDjango to be able to find the KyngChaos SpatiaLite library,
-add the following to your ``settings.py``::
-
-    SPATIALITE_LIBRARY_PATH='/Library/Frameworks/SQLite3.framework/SQLite3'
-
-__ https://www.kyngchaos.com/software/frameworks/
+To install the SpatiaLite library and tools, macOS users can use `Homebrew`_.
 
 Homebrew
 --------

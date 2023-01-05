@@ -347,7 +347,7 @@ inherit the permissions of the concrete model they subclass::
 
 .. _auth-web-requests:
 
-Authentication in Web requests
+Authentication in web requests
 ==============================
 
 Django uses :doc:`sessions </topics/http/sessions>` and middleware to hook the
@@ -451,7 +451,7 @@ How to log a user out
 
     When you call :func:`~django.contrib.auth.logout()`, the session data for
     the current request is completely cleaned out. All existing data is
-    removed. This is to prevent another person from using the same Web browser
+    removed. This is to prevent another person from using the same web browser
     to log in and have access to the previous user's session data. If you want
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling
@@ -473,7 +473,7 @@ login page::
 
     def my_view(request):
         if not request.user.is_authenticated:
-            return redirect('%s?next=%s' % (settings.LOGIN_URL, request.path))
+            return redirect(f'{settings.LOGIN_URL}?next={request.path}')
         # ...
 
 ...or display an error message::
@@ -565,8 +565,8 @@ The ``login_required`` decorator
 
 .. currentmodule:: django.contrib.auth.mixins
 
-The ``LoginRequired`` mixin
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The ``LoginRequiredMixin`` mixin
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When using :doc:`class-based views </topics/class-based-views/index>`, you can
 achieve the same behavior as with ``login_required`` by using the
@@ -781,7 +781,7 @@ To apply permission checks to :doc:`class-based views
         class MyView(PermissionRequiredMixin, View):
             permission_required = 'polls.add_choice'
             # Or multiple of permissions:
-            permission_required = ('polls.view_choice', 'polls.change_choice')
+            permission_required = ['polls.view_choice', 'polls.change_choice']
 
     You can set any of the parameters of
     :class:`~django.contrib.auth.mixins.AccessMixin` to customize the handling
@@ -912,8 +912,9 @@ function.
 
     Since
     :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash()`
-    is based on :setting:`SECRET_KEY`, updating your site to use a new secret
-    will invalidate all existing sessions.
+    is based on :setting:`SECRET_KEY`, secret key values must be
+    rotated to avoid invalidating existing sessions when updating your site to
+    use a new secret. See :setting:`SECRET_KEY_FALLBACKS` for details.
 
 .. _built-in-auth-views:
 
@@ -1005,8 +1006,6 @@ implementation details see :ref:`using-the-views`.
 
     .. attribute:: next_page
 
-        .. versionadded:: 4.0
-
         The URL to redirect to after login. Defaults to
         :setting:`LOGIN_REDIRECT_URL`.
 
@@ -1053,8 +1052,6 @@ implementation details see :ref:`using-the-views`.
         after login. Defaults to an empty :class:`set`.
 
     .. method:: get_default_redirect_url()
-
-        .. versionadded:: 4.0
 
         Returns the URL to redirect to after login. The default implementation
         resolves and returns :attr:`next_page` if set, or
@@ -1145,7 +1142,7 @@ implementation details see :ref:`using-the-views`.
         <input type="hidden" name="next" value="{{ next }}">
         </form>
 
-        {# Assumes you setup the password_reset view in your URLconf #}
+        {# Assumes you set up the password_reset view in your URLconf #}
         <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
 
         {% endblock %}
@@ -1159,7 +1156,12 @@ implementation details see :ref:`using-the-views`.
 
 .. class:: LogoutView
 
-    Logs a user out.
+    Logs a user out on ``POST`` requests.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
     **URL name:** ``logout``
 
@@ -1211,7 +1213,7 @@ implementation details see :ref:`using-the-views`.
 
 .. function:: logout_then_login(request, login_url=None)
 
-    Logs a user out, then redirects to the login page.
+    Logs a user out on ``POST`` requests, then redirects to the login page.
 
     **URL name:** No default URL provided
 
@@ -1219,6 +1221,11 @@ implementation details see :ref:`using-the-views`.
 
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
+
+    .. deprecated:: 4.1
+
+        Support for logging out on ``GET`` requests is deprecated and will be
+        removed in Django 5.0.
 
 .. class:: PasswordChangeView
 
@@ -1228,7 +1235,7 @@ implementation details see :ref:`using-the-views`.
 
     **Attributes:**
 
-    .. attribute: template_name
+    .. attribute:: template_name
 
         The full name of a template to use for displaying the password change
         form. Defaults to :file:`registration/password_change_form.html` if not
@@ -1281,10 +1288,20 @@ implementation details see :ref:`using-the-views`.
     that can be used to reset the password, and sending that link to the
     user's registered email address.
 
-    If the email address provided does not exist in the system, this view
-    won't send an email, but the user won't receive any error message either.
-    This prevents information leaking to potential attackers. If you want to
-    provide an error message in this case, you can subclass
+    This view will send an email if the following conditions are met:
+
+    * The email address provided exists in the system.
+    * The requested user is active (``User.is_active`` is ``True``).
+    * The requested user has a usable password. Users flagged with an unusable
+      password (see
+      :meth:`~django.contrib.auth.models.User.set_unusable_password`) aren't
+      allowed to request a password reset to prevent misuse when using an
+      external authentication source like LDAP.
+
+    If any of these conditions are *not* met, no email will be sent, but the
+    user won't receive any error message either. This prevents information
+    leaking to potential attackers. If you want to provide an error message in
+    this case, you can subclass
     :class:`~django.contrib.auth.forms.PasswordResetForm` and use the
     ``form_class`` attribute.
 
@@ -1297,13 +1314,6 @@ implementation details see :ref:`using-the-views`.
         email address. To reduce the overhead, you can use a 3rd party package
         that allows to send emails asynchronously, e.g. `django-mailer
         <https://pypi.org/project/django-mailer/>`_.
-
-    Users flagged with an unusable password (see
-    :meth:`~django.contrib.auth.models.User.set_unusable_password()` aren't
-    allowed to request a password reset to prevent misuse when using an
-    external authentication source like LDAP. Note that they won't receive any
-    error message since this would expose their account's existence but no
-    mail will be sent either.
 
     **Attributes:**
 
@@ -1644,9 +1654,12 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     A form used in the admin interface to change a user's information and
     permissions.
 
-.. class:: UserCreationForm
+.. class:: BaseUserCreationForm
 
-    A :class:`~django.forms.ModelForm` for creating a new user.
+    .. versionadded:: 4.2
+
+    A :class:`~django.forms.ModelForm` for creating a new user. This is the
+    recommended base class if you need to customize the user creation form.
 
     It has three fields: ``username`` (from the user model), ``password1``,
     and ``password2``. It verifies that ``password1`` and ``password2`` match,
@@ -1654,6 +1667,19 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     :func:`~django.contrib.auth.password_validation.validate_password`, and
     sets the user's password using
     :meth:`~django.contrib.auth.models.User.set_password()`.
+
+.. class:: UserCreationForm
+
+    Inherits from :class:`BaseUserCreationForm`. To help prevent confusion with
+    similar usernames, the form doesn't allow usernames that differ only in
+    case.
+
+    .. versionchanged:: 4.2
+
+        In older versions, :class:`UserCreationForm` didn't save many-to-many
+        form fields for a custom user model.
+
+        In older versions, usernames that differ only in case are allowed.
 
 .. currentmodule:: django.contrib.auth
 

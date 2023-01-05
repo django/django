@@ -11,11 +11,13 @@ API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
-models, which comprise a Weblog application:
+models, which comprise a blog application:
 
 .. _queryset-model-example:
 
 .. code-block:: python
+
+    from datetime import date
 
     from django.db import models
 
@@ -38,11 +40,11 @@ models, which comprise a Weblog application:
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateField()
-        mod_date = models.DateField()
+        mod_date = models.DateField(default=date.today)
         authors = models.ManyToManyField(Author)
-        number_of_comments = models.IntegerField()
-        number_of_pingbacks = models.IntegerField()
-        rating = models.IntegerField()
+        number_of_comments = models.IntegerField(default=0)
+        number_of_pingbacks = models.IntegerField(default=0)
+        rating = models.IntegerField(default=5)
 
         def __str__(self):
             return self.headline
@@ -525,58 +527,82 @@ those latter objects, you could write::
 
     Blog.objects.filter(entry__authors__isnull=False, entry__authors__name__isnull=True)
 
+.. _spanning-multi-valued-relationships:
+
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you are filtering an object based on a
-:class:`~django.db.models.ManyToManyField` or a reverse
-:class:`~django.db.models.ForeignKey`, there are two different sorts of filter
-you may be interested in. Consider the ``Blog``/``Entry`` relationship
-(``Blog`` to ``Entry`` is a one-to-many relation). We might be interested in
-finding blogs that have an entry which has both *"Lennon"* in the headline and
-was published in 2008. Or we might want to find blogs that have an entry with
-*"Lennon"* in the headline as well as an entry that was published
-in 2008. Since there are multiple entries associated with a single ``Blog``,
-both of these queries are possible and make sense in some situations.
+When spanning a :class:`~django.db.models.ManyToManyField` or a reverse
+:class:`~django.db.models.ForeignKey` (such as from ``Blog`` to ``Entry``),
+filtering on multiple attributes raises the question of whether to require each
+attribute to coincide in the same related object. We might seek blogs that have
+an entry from 2008 with *“Lennon”* in its headline, or we might seek blogs that
+merely have any entry from 2008 as well as some newer or older entry with
+*“Lennon”* in its headline.
 
-The same type of situation arises with a
-:class:`~django.db.models.ManyToManyField`. For example, if an ``Entry`` has a
-:class:`~django.db.models.ManyToManyField` called ``tags``, we might want to
-find entries linked to tags called *"music"* and *"bands"* or we might want an
-entry that contains a tag with a name of *"music"* and a status of *"public"*.
-
-To handle both of these situations, Django has a consistent way of processing
-:meth:`~django.db.models.query.QuerySet.filter` calls. Everything inside a
-single :meth:`~django.db.models.query.QuerySet.filter` call is applied
-simultaneously to filter out items matching all those requirements. Successive
-:meth:`~django.db.models.query.QuerySet.filter` calls further restrict the set
-of objects, but for multi-valued relations, they apply to any object linked to
-the primary model, not necessarily those objects that were selected by an
-earlier :meth:`~django.db.models.query.QuerySet.filter` call.
-
-That may sound a bit confusing, so hopefully an example will clarify. To
-select all blogs that contain entries with both *"Lennon"* in the headline
-and that were published in 2008 (the same entry satisfying both conditions),
-we would write::
+To select all blogs containing at least one entry from 2008 having *"Lennon"*
+in its headline (the same entry satisfying both conditions), we would write::
 
     Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
 
-To select all blogs that contain an entry with *"Lennon"* in the headline
-**as well as** an entry that was published in 2008, we would write::
+Otherwise, to perform a more permissive query selecting any blogs with merely
+*some* entry with *"Lennon"* in its headline and *some* entry from 2008, we
+would write::
 
     Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
 
-Suppose there is only one blog that had both entries containing *"Lennon"* and
+Suppose there is only one blog that has both entries containing *"Lennon"* and
 entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
 The first query would not return any blogs, but the second query would return
-that one blog.
+that one blog. (This is because the entries selected by the second filter may
+or may not be the same as the entries in the first filter. We are filtering the
+``Blog`` items with each filter statement, not the ``Entry`` items.) In short,
+if each condition needs to match the same related object, then each should be
+contained in a single :meth:`~django.db.models.query.QuerySet.filter` call.
 
-In the second example, the first filter restricts the queryset to all those
-blogs linked to entries with *"Lennon"* in the headline. The second filter
-restricts the set of blogs *further* to those that are also linked to entries
-that were published in 2008. The entries selected by the second filter may or
-may not be the same as the entries in the first filter. We are filtering the
-``Blog`` items with each filter statement, not the ``Entry`` items.
+.. note::
+
+    As the second (more permissive) query chains multiple filters, it performs
+    multiple joins to the primary model, potentially yielding duplicates.
+
+        >>> from datetime import date
+        >>> beatles = Blog.objects.create(name='Beatles Blog')
+        >>> pop = Blog.objects.create(name='Pop Music Blog')
+        >>> Entry.objects.create(
+        ...     blog=beatles,
+        ...     headline='New Lennon Biography',
+        ...     pub_date=date(2008, 6, 1),
+        ... )
+        <Entry: New Lennon Biography>
+        >>> Entry.objects.create(
+        ...     blog=beatles,
+        ...     headline='New Lennon Biography in Paperback',
+        ...     pub_date=date(2009, 6, 1),
+        ... )
+        <Entry: New Lennon Biography in Paperback>
+        >>> Entry.objects.create(
+        ...     blog=pop,
+        ...     headline='Best Albums of 2008',
+        ...     pub_date=date(2008, 12, 15),
+        ... )
+        <Entry: Best Albums of 2008>
+        >>> Entry.objects.create(
+        ...     blog=pop,
+        ...     headline='Lennon Would Have Loved Hip Hop',
+        ...     pub_date=date(2020, 4, 1),
+        ... )
+        <Entry: Lennon Would Have Loved Hip Hop>
+        >>> Blog.objects.filter(
+        ...     entry__headline__contains='Lennon',
+        ...     entry__pub_date__year=2008,
+        ... )
+        <QuerySet [<Blog: Beatles Blog>]>
+        >>> Blog.objects.filter(
+        ...     entry__headline__contains='Lennon',
+        ... ).filter(
+        ...     entry__pub_date__year=2008,
+        ... )
+        <QuerySet [<Blog: Beatles Blog>, <Blog: Beatles Blog>, <Blog: Pop Music Blog]>
 
 .. note::
 
@@ -670,22 +696,23 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 Expressions can reference transforms
 ------------------------------------
 
-.. versionadded:: 3.2
-
 Django supports using transforms in expressions.
 
 For example, to find all ``Entry`` objects published in the same year as they
 were last modified::
 
+    >>> from django.db.models import F
     >>> Entry.objects.filter(pub_date__year=F('mod_date__year'))
 
 To find the earliest year an entry was published, we can issue the query::
 
+    >>> from django.db.models import Min
     >>> Entry.objects.aggregate(first_published_year=Min('pub_date__year'))
 
 This example finds the value of the highest rated entry and the total number
 of comments on all entries for each year::
 
+    >>> from django.db.models import OuterRef, Subquery, Sum
     >>> Entry.objects.values('pub_date__year').annotate(
     ...     top_rating=Subquery(
     ...         Entry.objects.filter(
@@ -786,7 +813,7 @@ reuse it::
 
     >>> queryset = Entry.objects.all()
     >>> print([p.headline for p in queryset]) # Evaluate the query set.
-    >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
+    >>> print([p.pub_date for p in queryset]) # Reuse the cache from the evaluation.
 
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -825,6 +852,102 @@ being evaluated and therefore populate the cache::
     Simply printing the queryset will not populate the cache. This is because
     the call to ``__repr__()`` only returns a slice of the entire queryset.
 
+.. _async-queries:
+
+Asynchronous queries
+====================
+
+.. versionadded:: 4.1
+
+If you are writing asynchronous views or code, you cannot use the ORM for
+queries in quite the way we have described above, as you cannot call *blocking*
+synchronous code from asynchronous code - it will block up the event loop
+(or, more likely, Django will notice and raise a ``SynchronousOnlyOperation``
+to stop that from happening).
+
+Fortunately, you can do many queries using Django's asynchronous query APIs.
+Every method that might block - such as ``get()`` or ``delete()`` - has an
+asynchronous variant (``aget()`` or ``adelete()``), and when you iterate over
+results, you can use asynchronous iteration (``async for``) instead.
+
+Query iteration
+---------------
+
+.. versionadded:: 4.1
+
+The default way of iterating over a query - with ``for`` - will result in a
+blocking database query behind the scenes as Django loads the results at
+iteration time. To fix this, you can swap to ``async for``::
+
+    async for entry in Authors.objects.filter(name__startswith="A"):
+        ...
+
+Be aware that you also can't do other things that might iterate over the
+queryset, such as wrapping ``list()`` around it to force its evaluation (you
+can use ``async for`` in a comprehension, if you want it).
+
+Because ``QuerySet`` methods like ``filter()`` and ``exclude()`` do not
+actually run the query - they set up the queryset to run when it's iterated
+over - you can use those freely in asynchronous code. For a guide to which
+methods can keep being used like this, and which have asynchronous versions,
+read the next section.
+
+``QuerySet`` and manager methods
+--------------------------------
+
+.. versionadded:: 4.1
+
+Some methods on managers and querysets - like ``get()`` and ``first()`` - force
+execution of the queryset and are blocking. Some, like ``filter()`` and
+``exclude()``, don't force execution and so are safe to run from asynchronous
+code. But how are you supposed to tell the difference?
+
+While you could poke around and see if there is an ``a``-prefixed version of
+the method (for example, we have ``aget()`` but not ``afilter()``), there is a
+more logical way - look up what kind of method it is in the
+:doc:`QuerySet reference </ref/models/querysets>`.
+
+In there, you'll find the methods on QuerySets grouped into two sections:
+
+* *Methods that return new querysets*: These are the non-blocking ones,
+  and don't have asynchronous versions. You're free to use these in any
+  situation, though read the notes on ``defer()`` and ``only()`` before you use
+  them.
+
+* *Methods that do not return querysets*: These are the blocking ones, and
+  have asynchronous versions - the asynchronous name for each is noted in its
+  documentation, though our standard pattern is to add an ``a`` prefix.
+
+Using this distinction, you can work out when you need to use asynchronous
+versions, and when you don't. For example, here's a valid asynchronous query::
+
+    user = await User.objects.filter(username=my_input).afirst()
+
+``filter()`` returns a queryset, and so it's fine to keep chaining it inside an
+asynchronous environment, whereas ``first()`` evaluates and returns a model
+instance - thus, we change to ``afirst()``, and use ``await`` at the front of
+the whole expression in order to call it in an asynchronous-friendly way.
+
+.. note::
+
+    If you forget to put the ``await`` part in, you may see errors like
+    *"coroutine object has no attribute x"* or *"<coroutine …>"* strings in
+    place of your model instances. If you ever see these, you are missing an
+    ``await`` somewhere to turn that coroutine into a real value.
+
+Transactions
+------------
+
+.. versionadded:: 4.1
+
+Transactions are **not** currently supported with asynchronous queries and
+updates. You will find that trying to use one raises
+``SynchronousOnlyOperation``.
+
+If you wish to use a transaction, we suggest you write your ORM code inside a
+separate, synchronous function and then call that using ``sync_to_async`` - see
+:doc:`/topics/async` for more.
+
 .. _querying-jsonfield:
 
 Querying ``JSONField``
@@ -848,7 +971,7 @@ Storing and querying for ``None``
 
 As with other fields, storing ``None`` as the field's value will store it as
 SQL ``NULL``. While not recommended, it is possible to store JSON scalar
-``null`` instead of SQL ``NULL`` by using :class:`Value('null')
+``null`` instead of SQL ``NULL`` by using :class:`Value(None, JSONField())
 <django.db.models.Value>`.
 
 Whichever of the values is stored, when retrieved from the database, the Python
@@ -864,11 +987,13 @@ query for SQL ``NULL``, use :lookup:`isnull`::
 
     >>> Dog.objects.create(name='Max', data=None)  # SQL NULL.
     <Dog: Max>
-    >>> Dog.objects.create(name='Archie', data=Value('null'))  # JSON null.
+    >>> Dog.objects.create(
+    ...     name='Archie', data=Value(None, JSONField())  # JSON null.
+    ... )
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
     <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value('null'))
+    >>> Dog.objects.filter(data=Value(None, JSONField())
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
@@ -883,6 +1008,15 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
+
+.. versionchanged:: 4.2
+
+    Support for expressing JSON ``null`` using ``Value(None, JSONField())`` was
+    added.
+
+.. deprecated:: 4.2
+
+    Passing ``Value("null")`` to express JSON ``null`` is deprecated.
 
 .. fieldlookup:: jsonfield.key
 
@@ -936,6 +1070,33 @@ To query for missing keys, use the ``isnull`` lookup::
     :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
     :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
 
+``KT()`` expressions
+~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+.. module:: django.db.models.fields.json
+
+.. class:: KT(lookup)
+
+    Represents the text value of a key, index, or path transform of
+    :class:`~django.db.models.JSONField`. You can use the double underscore
+    notation in ``lookup`` to chain dictionary key and index transforms.
+
+    For example::
+
+        >>> from django.db.models.fields.json import KT
+        >>> Dog.objects.create(name="Shep", data={
+        ...     "owner": {"name": "Bob"},
+        ...     "breed": ["collie", "lhasa apso"],
+        ... })
+        <Dog: Shep>
+        >>> Dogs.objects.annotate(
+        ...     first_breed=KT("data__breed__1"),
+        ...     owner_name=KT("data__owner__name")
+        ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
+        <QuerySet [<Dog: Shep>]>
+
 .. note::
 
     Due to the way in which key-path queries work,
@@ -970,6 +1131,12 @@ To query for missing keys, use the ``isnull`` lookup::
 
     On PostgreSQL, if only one key or index is used, the SQL operator ``->`` is
     used. If multiple operators are used then the ``#>`` operator is used.
+
+.. admonition:: SQLite users
+
+    On SQLite, ``"true"``, ``"false"``, and ``"null"`` string values will
+    always be interpreted as ``True``, ``False``, and JSON ``null``
+    respectively.
 
 .. _containment-and-key-lookups:
 
@@ -1087,8 +1254,8 @@ For example, this ``Q`` object encapsulates a single ``LIKE`` query::
     from django.db.models import Q
     Q(question__startswith='What')
 
-``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
-operator is used on two ``Q`` objects, it yields a new ``Q`` object.
+``Q`` objects can be combined using the ``&``, ``|``, and ``^`` operators. When
+an operator is used on two ``Q`` objects, it yields a new ``Q`` object.
 
 For example, this statement yields a single ``Q`` object that represents the
 "OR" of two ``"question__startswith"`` queries::
@@ -1100,9 +1267,10 @@ This is equivalent to the following SQL ``WHERE`` clause::
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
-objects can be negated using the ``~`` operator, allowing for combined lookups
-that combine both a normal query and a negated (``NOT``) query::
+with the ``&``, ``|``, and ``^`` operators and use parenthetical grouping.
+Also, ``Q`` objects can be negated using the ``~`` operator, allowing for
+combined lookups that combine both a normal query and a negated (``NOT``)
+query::
 
     Q(question__startswith='Who') | ~Q(pub_date__year=2005)
 
@@ -1151,6 +1319,10 @@ precede the definition of any keyword arguments. For example::
     The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
     unit tests show some possible uses of ``Q``.
 
+.. versionchanged:: 4.1
+
+    Support for the ``^`` (``XOR``) operator was added.
+
 Comparing objects
 =================
 
@@ -1181,7 +1353,7 @@ object and returns the number of objects deleted and a dictionary with
 the number of deletions per object type. Example::
 
     >>> e.delete()
-    (1, {'weblog.Entry': 1})
+    (1, {'blog.Entry': 1})
 
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
@@ -1303,7 +1475,7 @@ new value to be the new model instance you want to point to. For example::
     >>> b = Blog.objects.get(pk=1)
 
     # Change every Entry so that it belongs to this Blog.
-    >>> Entry.objects.all().update(blog=b)
+    >>> Entry.objects.update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
 matched by the query (which may not be equal to the number of rows updated if
@@ -1337,7 +1509,7 @@ update one field based on the value of another field in the model. This is
 especially useful for incrementing counters based upon their current value. For
 example, to increment the pingback count for every entry in the blog::
 
-    >>> Entry.objects.all().update(number_of_pingbacks=F('number_of_pingbacks') + 1)
+    >>> Entry.objects.update(number_of_pingbacks=F('number_of_pingbacks') + 1)
 
 However, unlike ``F()`` objects in filter and exclude clauses, you can't
 introduce joins when you use ``F()`` objects in an update -- you can only
@@ -1515,7 +1687,7 @@ instances::
     b = Blog.objects.get(id=1)
     b.entry_set.set([e1, e2])
 
-If the ``clear()`` method is available, any pre-existing objects will be
+If the ``clear()`` method is available, any preexisting objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
 case, a list) are added to the set. If the ``clear()`` method is *not*
 available, all objects in the iterable will be added without removing any

@@ -10,17 +10,23 @@ library`__. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP2` object requires
 the `geoip2 Python library`__ and the GeoIP ``Country`` and/or ``City``
-`datasets in binary format`__ (the CSV files will not work!). Grab the
-``GeoLite2-Country.mmdb.gz`` and ``GeoLite2-City.mmdb.gz`` files and unzip them
-in a directory corresponding to the :setting:`GEOIP_PATH` setting.
+datasets in binary format (the CSV files will not work!), downloaded from e.g.
+`MaxMind`__ or `DB-IP`__ websites. Grab the ``GeoLite2-Country.mmdb.gz`` and
+``GeoLite2-City.mmdb.gz`` files and unzip them in a directory corresponding to
+the :setting:`GEOIP_PATH` setting.
 
 Additionally, it is recommended to install the `libmaxminddb C library`__, so
 that ``geoip2`` can leverage the C library's faster speed.
 
 __ https://geoip2.readthedocs.io/
 __ https://pypi.org/project/geoip2/
-__ https://dev.maxmind.com/geoip/geoip2/geolite2/
+__ https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+__ https://db-ip.com/db/lite.php
 __ https://github.com/maxmind/libmaxminddb/
+
+.. versionchanged:: 4.2
+
+    Support for ``.mmdb`` files downloaded from DB-IP was added.
 
 Example
 =======

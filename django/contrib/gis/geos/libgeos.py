@@ -15,13 +15,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import SimpleLazyObject, cached_property
 from django.utils.version import get_version_tuple
 
-logger = logging.getLogger('django.contrib.gis')
+logger = logging.getLogger("django.contrib.gis")
 
 
 def load_geos():
     # Custom library path set?
     try:
         from django.conf import settings
+
         lib_path = settings.GEOS_LIBRARY_PATH
     except (AttributeError, ImportError, ImproperlyConfigured, OSError):
         lib_path = None
@@ -29,12 +30,12 @@ def load_geos():
     # Setting the appropriate names for the GEOS-C library.
     if lib_path:
         lib_names = None
-    elif os.name == 'nt':
+    elif os.name == "nt":
         # Windows NT libraries
-        lib_names = ['geos_c', 'libgeos_c-1']
-    elif os.name == 'posix':
+        lib_names = ["geos_c", "libgeos_c-1"]
+    elif os.name == "posix":
         # *NIX libraries
-        lib_names = ['geos_c', 'GEOS']
+        lib_names = ["geos_c", "GEOS"]
     else:
         raise ImportError('Unsupported OS "%s"' % os.name)
 
@@ -51,13 +52,12 @@ def load_geos():
     if lib_path is None:
         raise ImportError(
             'Could not find the GEOS library (tried "%s"). '
-            'Try setting GEOS_LIBRARY_PATH in your settings.' %
-            '", "'.join(lib_names)
+            "Try setting GEOS_LIBRARY_PATH in your settings." % '", "'.join(lib_names)
         )
     # Getting the GEOS C library.  The C interface (CDLL) is used for
     # both *NIX and Windows.
     # See the GEOS C API source code for more details on the library function calls:
-    # https://geos.osgeo.org/doxygen/geos__c_8h_source.html
+    # https://libgeos.org/doxygen/geos__c_8h_source.html
     _lgeos = CDLL(lib_path)
     # Here we set up the prototypes for the initGEOS_r and finishGEOS_r
     # routines.  These functions aren't actually called until they are
@@ -82,7 +82,7 @@ def notice_h(fmt, lst):
         warn_msg = fmt % lst
     except TypeError:
         warn_msg = fmt
-    logger.warning('GEOS_NOTICE: %s\n', warn_msg)
+    logger.warning("GEOS_NOTICE: %s\n", warn_msg)
 
 
 notice_h = NOTICEFUNC(notice_h)
@@ -96,7 +96,7 @@ def error_h(fmt, lst):
         err_msg = fmt % lst
     except TypeError:
         err_msg = fmt
-    logger.error('GEOS_ERROR: %s\n', err_msg)
+    logger.error("GEOS_ERROR: %s\n", err_msg)
 
 
 error_h = ERRORFUNC(error_h)
@@ -135,6 +135,7 @@ class GEOSFuncFactory:
     """
     Lazy loading of GEOS functions.
     """
+
     argtypes = None
     restype = None
     errcheck = None
@@ -154,6 +155,7 @@ class GEOSFuncFactory:
     @cached_property
     def func(self):
         from django.contrib.gis.geos.prototypes.threadsafe import GEOSFunc
+
         func = GEOSFunc(self.func_name)
         func.argtypes = self.argtypes or []
         func.restype = self.restype

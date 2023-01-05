@@ -123,8 +123,23 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.kwargs
 
-        The keyword arguments that would be passed to the view
+        All keyword arguments that would be passed to the view function, i.e.
+        :attr:`~ResolverMatch.captured_kwargs` and
+        :attr:`~ResolverMatch.extra_kwargs`.
+
+    .. attribute:: ResolverMatch.captured_kwargs
+
+        .. versionadded:: 4.1
+
+        The captured keyword arguments that would be passed to the view
         function, as parsed from the URL.
+
+    .. attribute:: ResolverMatch.extra_kwargs
+
+        .. versionadded:: 4.1
+
+        The additional keyword arguments that would be passed to the view
+        function.
 
     .. attribute:: ResolverMatch.url_name
 
@@ -138,8 +153,6 @@ If the URL does not resolve, the function raises a
         ``route`` will contain ``'users/<id>/'``.
 
     .. attribute:: ResolverMatch.tried
-
-        .. versionadded:: 3.2
 
         The list of URL patterns tried before the URL either matched one or
         exhausted available patterns.
@@ -216,7 +229,7 @@ Normally, you should always use :func:`~django.urls.reverse` to define URLs
 within your application. However, if your application constructs part of the
 URL hierarchy itself, you may occasionally need to generate URLs. In that
 case, you need to be able to find the base URL of the Django project within
-its Web server (normally, :func:`~django.urls.reverse` takes care of this for
+its web server (normally, :func:`~django.urls.reverse` takes care of this for
 you). In that case, you can call ``get_script_prefix()``, which will return
 the script prefix portion of the URL for your Django project. If your Django
 project is at the root of its web server, this is always ``"/"``.

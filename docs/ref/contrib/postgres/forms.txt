@@ -173,7 +173,7 @@ not greater than the upper bound. All of these fields use
 .. class:: IntegerRangeField
 
     Based on :class:`~django.forms.IntegerField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.NumericRange``. Default for
     :class:`~django.contrib.postgres.fields.IntegerRangeField` and
     :class:`~django.contrib.postgres.fields.BigIntegerRangeField`.
 
@@ -183,7 +183,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DecimalRangeField
 
     Based on :class:`~django.forms.DecimalField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.NumericRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.NumericRange``. Default for
     :class:`~django.contrib.postgres.fields.DecimalRangeField`.
 
 ``DateTimeRangeField``
@@ -192,7 +192,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DateTimeRangeField
 
     Based on :class:`~django.forms.DateTimeField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.DateTimeTZRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange``. Default for
     :class:`~django.contrib.postgres.fields.DateTimeRangeField`.
 
 ``DateRangeField``
@@ -201,7 +201,7 @@ not greater than the upper bound. All of these fields use
 .. class:: DateRangeField
 
     Based on :class:`~django.forms.DateField` and translates its input into
-    :class:`~psycopg2:psycopg2.extras.DateRange`. Default for
+    ``django.db.backends.postgresql.psycopg_any.DateRange``. Default for
     :class:`~django.contrib.postgres.fields.DateRangeField`.
 
 Widgets

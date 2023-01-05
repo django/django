@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020
+# Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2012
-# Nikolay Korotkiy <sikmir@gmail.com>, 2018
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
+# Klaus Dahlén, 2012
+# Nikolay Korotkiy <sikmir@disroot.org>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2020-12-09 06:47+0000\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -266,8 +267,9 @@ msgstr "0 valittuna %(cnt)s mahdollisesta"
 msgid "Change history: %s"
 msgstr "Muokkaushistoria: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -364,10 +366,10 @@ msgid "Change password"
 msgstr "Vaihda salasana"
 
 msgid "Please correct the error below."
-msgstr "Korjaa allaoleva virhe."
+msgstr "Korjaa alla oleva virhe."
 
 msgid "Please correct the errors below."
-msgstr "Korjaa allaolevat virheet."
+msgstr "Korjaa alla olevat virheet."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -399,7 +401,7 @@ msgid "Filter"
 msgstr "Suodatin"
 
 msgid "Clear all filters"
-msgstr "Tyhjennä kaikki suotimet"
+msgstr "Tyhjennä kaikki suodattimet"
 
 msgid "Remove from sorting"
 msgstr "Poista järjestämisestä"
@@ -475,7 +477,7 @@ msgid ""
 "Are you sure you want to delete the selected %(objects_name)s? All of the "
 "following objects and their related items will be deleted:"
 msgstr ""
-"Haluatki varmasti poistaa valitut %(objects_name)s? Samalla poistetaan "
+"Haluatko varmasti poistaa valitut %(objects_name)s? Samalla poistetaan "
 "kaikki alla mainitut ja niihin liittyvät kohteet:"
 
 msgid "Delete?"
@@ -522,6 +524,12 @@ msgstr "Unohditko salasanasi tai käyttäjätunnuksesi?"
 msgid "Toggle navigation"
 msgstr "Kytke navigaatio"
 
+msgid "Start typing to filter…"
+msgstr "Kirjoita suodattaaksesi..."
+
+msgid "Filter navigation items"
+msgstr "Suodata navigaatiovaihtoehtoja"
+
 msgid "Date/time"
 msgstr "Pvm/klo"
 
@@ -530,6 +538,12 @@ msgstr "Käyttäjä"
 
 msgid "Action"
 msgstr "Tapahtuma"
+
+msgid "entry"
+msgstr "merkintä"
+
+msgid "entries"
+msgstr "merkinnät"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -587,7 +601,11 @@ msgstr "Lisää toinen %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Poista valitut %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Näytä valitut %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Kiitos sivuillamme viettämästäsi ajasta."
 
 msgid "Log in again"

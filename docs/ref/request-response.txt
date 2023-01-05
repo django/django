@@ -57,10 +57,10 @@ All attributes should be considered read-only, unless stated otherwise.
 
 .. attribute:: HttpRequest.path_info
 
-    Under some Web server configurations, the portion of the URL after the
+    Under some web server configurations, the portion of the URL after the
     host name is split up into a script prefix portion and a path info
     portion. The ``path_info`` attribute always contains the path info portion
-    of the path, no matter what Web server is being used. Using this instead
+    of the path, no matter what web server is being used. Using this instead
     of :attr:`~HttpRequest.path` can make your code easier to move between
     test and deployment servers.
 
@@ -151,7 +151,7 @@ All attributes should be considered read-only, unless stated otherwise.
     * ``QUERY_STRING`` -- The query string, as a single (unparsed) string.
     * ``REMOTE_ADDR`` -- The IP address of the client.
     * ``REMOTE_HOST`` -- The hostname of the client.
-    * ``REMOTE_USER`` -- The user authenticated by the Web server, if any.
+    * ``REMOTE_USER`` -- The user authenticated by the web server, if any.
     * ``REQUEST_METHOD`` -- A string such as ``"GET"`` or ``"POST"``.
     * ``SERVER_NAME`` -- The hostname of the server.
     * ``SERVER_PORT`` -- The port of the server (as a string).
@@ -167,7 +167,7 @@ All attributes should be considered read-only, unless stated otherwise.
     name, so you won't see them in ``META``. This prevents header-spoofing
     based on ambiguity between underscores and dashes both being normalizing to
     underscores in WSGI environment variables. It matches the behavior of
-    Web servers like Nginx and Apache 2.4+.
+    web servers like Nginx and Apache 2.4+.
 
     :attr:`HttpRequest.headers` is a simpler way to access all HTTP-prefixed
     headers, plus ``CONTENT_LENGTH`` and ``CONTENT_TYPE``.
@@ -365,7 +365,7 @@ Methods
         Mixing HTTP and HTTPS on the same site is discouraged, therefore
         :meth:`~HttpRequest.build_absolute_uri()` will always generate an
         absolute URI with the same scheme the current request has. If you need
-        to redirect users to HTTPS, it's best to let your Web server redirect
+        to redirect users to HTTPS, it's best to let your web server redirect
         all HTTP traffic to HTTPS.
 
 .. method:: HttpRequest.get_signed_cookie(key, default=RAISE_ERROR, salt='', max_age=None)
@@ -662,7 +662,7 @@ Typical usage is to pass the contents of the page, as a string, bytestring,
 or :class:`memoryview`, to the :class:`HttpResponse` constructor::
 
     >>> from django.http import HttpResponse
-    >>> response = HttpResponse("Here's the text of the Web page.")
+    >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
     >>> response = HttpResponse(b'Bytestrings are also accepted.')
     >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
@@ -671,7 +671,7 @@ But if you want to add content incrementally, you can use ``response`` as a
 file-like object::
 
     >>> response = HttpResponse()
-    >>> response.write("<p>Here's the text of the Web page.</p>")
+    >>> response.write("<p>Here's the text of the web page.</p>")
     >>> response.write("<p>Here's another paragraph.</p>")
 
 Passing iterators
@@ -723,12 +723,6 @@ middleware, are not removed.
 HTTP header fields cannot contain newlines. An attempt to set a header field
 containing a newline character (CR or LF) will raise ``BadHeaderError``
 
-.. versionchanged:: 3.2
-
-    The :attr:`HttpResponse.headers` interface was added.
-
-    The ability to set headers on instantiation was added.
-
 Telling the browser to treat the response as a file attachment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -753,8 +747,6 @@ Attributes
 
 .. attribute:: HttpResponse.headers
 
-    .. versionadded:: 3.2
-
     A case insensitive, dict-like object that provides an interface to all
     HTTP headers on the response. See :ref:`setting-header-fields`.
 
@@ -767,7 +759,7 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -776,7 +768,7 @@ Attributes
 .. attribute:: HttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
@@ -811,9 +803,9 @@ Methods
     :setting:`DEFAULT_CHARSET` settings, by default:
     ``"text/html; charset=utf-8"``.
 
-    ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
-    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
-    such as ``HTTPStatus.NO_CONTENT``.
+    ``status`` is the :rfc:`HTTP status code <9110#section-15>` for the
+    response. You can use Python's :py:class:`http.HTTPStatus` for meaningful
+    aliases, such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -823,10 +815,6 @@ Methods
     is unsuccessful, the :setting:`DEFAULT_CHARSET` setting will be used.
 
     ``headers`` is a :class:`dict` of HTTP headers for the response.
-
-    .. versionchanged:: 3.2
-
-        The ``headers`` parameter was added.
 
 .. method:: HttpResponse.__setitem__(header, value)
 
@@ -865,9 +853,15 @@ Methods
     Sets a cookie. The parameters are the same as in the
     :class:`~http.cookies.Morsel` cookie object in the Python standard library.
 
-    * ``max_age`` should be an integer number of seconds, or ``None`` (default)
-      if the cookie should last only as long as the client's browser session.
-      If ``expires`` is not specified, it will be calculated.
+    * ``max_age`` should be a :class:`~datetime.timedelta` object, an integer
+      number of seconds, or ``None`` (default) if the cookie should last only
+      as long as the client's browser session. If ``expires`` is not specified,
+      it will be calculated.
+
+      .. versionchanged:: 4.1
+
+        Support for ``timedelta`` objects was added.
+
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
@@ -1092,6 +1086,10 @@ parameter to ``False``::
 
 Without passing ``safe=False``, a :exc:`TypeError` will be raised.
 
+Note that an API based on ``dict`` objects is more extensible, flexible, and
+makes it easier to maintain forwards compatibility. Therefore, you should avoid
+using non-dict objects in JSON-encoded response.
+
 .. warning::
 
     Before the `5th edition of ECMAScript
@@ -1118,39 +1116,75 @@ parameter to the constructor method::
 .. class:: StreamingHttpResponse
 
 The :class:`StreamingHttpResponse` class is used to stream a response from
-Django to the browser. You might want to do this if generating the response
-takes too long or uses too much memory. For instance, it's useful for
-:ref:`generating large CSV files <streaming-csv-files>`.
+Django to the browser.
 
-.. admonition:: Performance considerations
+.. admonition:: Advanced usage
 
-    Django is designed for short-lived requests. Streaming responses will tie
-    a worker process for the entire duration of the response. This may result
-    in poor performance.
+    :class:`StreamingHttpResponse` is somewhat advanced, in that it is
+    important to know whether you'll be serving your application synchronously
+    under WSGI or asynchronously under ASGI, and adjust your usage
+    appropriately.
 
-    Generally speaking, you should perform expensive tasks outside of the
-    request-response cycle, rather than resorting to a streamed response.
+    Please read these notes with care.
+
+An example usage of :class:`StreamingHttpResponse` under WSGI is streaming
+content when generating the response would take too long or uses too much
+memory. For instance, it's useful for :ref:`generating large CSV files
+<streaming-csv-files>`.
+
+There are performance considerations when doing this, though. Django, under
+WSGI, is designed for short-lived requests. Streaming responses will tie a
+worker process for the entire duration of the response. This may result in poor
+performance.
+
+Generally speaking, you would perform expensive tasks outside of the
+request-response cycle, rather than resorting to a streamed response.
+
+When serving under ASGI, however, a :class:`StreamingHttpResponse` need not
+stop other requests from being served whilst waiting for I/O. This opens up
+the possibility of long-lived requests for streaming content and implementing
+patterns such as long-polling, and server-sent events.
+
+Even under ASGI note, :class:`StreamingHttpResponse` should only be used in
+situations where it is absolutely required that the whole content isn't
+iterated before transferring the data to the client. Because the content can't
+be accessed, many middleware can't function normally. For example the ``ETag``
+and ``Content-Length`` headers can't be generated for streaming responses.
 
 The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
 because it features a slightly different API. However, it is almost identical,
 with the following notable differences:
 
-* It should be given an iterator that yields bytestrings as content.
+* It should be given an iterator that yields bytestrings as content. When
+  serving under WSGI, this should be a sync iterator. When serving under ASGI,
+  this is should an async iterator.
 
 * You cannot access its content, except by iterating the response object
-  itself. This should only occur when the response is returned to the client.
+  itself. This should only occur when the response is returned to the client:
+  you should not iterate the response yourself.
+
+  Under WSGI the response will be iterated synchronously. Under ASGI the
+  response will be iterated asynchronously. (This is why the iterator type must
+  match the protocol you're using.)
+
+  To avoid a crash, an incorrect iterator type will be mapped to the correct
+  type during iteration, and a warning will be raised, but in order to do this
+  the iterator must be fully-consumed, which defeats the purpose of using a
+  :class:`StreamingHttpResponse` at all.
 
 * It has no ``content`` attribute. Instead, it has a
-  :attr:`~StreamingHttpResponse.streaming_content` attribute.
+  :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
+  in middleware to wrap the response iterable, but should not be consumed.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
 
-:class:`StreamingHttpResponse` should only be used in situations where it is
-absolutely required that the whole content isn't iterated before transferring
-the data to the client. Because the content can't be accessed, many
-middleware can't function normally. For example the ``ETag`` and
-``Content-Length`` headers can't be generated for streaming responses.
+The :class:`HttpResponseBase` base class is common between
+:class:`HttpResponse` and :class:`StreamingHttpResponse`.
+
+.. versionchanged:: 4.2
+
+    Support for asynchronous iteration was added.
 
 Attributes
 ----------
@@ -1162,7 +1196,7 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -1171,7 +1205,7 @@ Attributes
 .. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
@@ -1179,6 +1213,16 @@ Attributes
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+.. attribute:: StreamingHttpResponse.is_async
+
+    .. versionadded:: 4.2
+
+    Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
+    is an asynchronous iterator or not.
+
+    This is useful for middleware needing to wrap
+    :attr:`StreamingHttpResponse.streaming_content`.
 
 ``FileResponse`` objects
 ========================
@@ -1212,6 +1256,15 @@ a file open in binary mode like so::
 
 The file will be closed automatically, so don't open it with a context manager.
 
+.. admonition:: Use under ASGI
+
+    Python's file API is synchronous. This means that the file must be fully
+    consumed in order to be served under ASGI.
+
+    In order to stream a file asynchronously you need to use a third-party
+    package that provides an asynchronous file API, such as `aiofiles
+    <https://github.com/Tinche/aiofiles>`_.
+
 Methods
 -------
 
@@ -1220,3 +1273,12 @@ Methods
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and
     ``Content-Disposition``) depending on ``open_file``.
+
+``HttpResponseBase`` class
+==========================
+
+.. class:: HttpResponseBase
+
+The :class:`HttpResponseBase` class is common to all Django responses.
+It should not be used to create responses directly, but it can be
+useful for type-checking.

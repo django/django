@@ -8,7 +8,7 @@ class Foo(models.Model):
 
 class Bar(models.Model):
     name = models.CharField(max_length=50)
-    normal = models.ForeignKey(Foo, models.CASCADE, related_name='normal_foo')
+    normal = models.ForeignKey(Foo, models.CASCADE, related_name="normal_foo")
     fwd = models.ForeignKey("Whiz", models.CASCADE)
     back = models.ForeignKey("Foo", models.CASCADE)
 
@@ -18,7 +18,7 @@ class Whiz(models.Model):
 
 
 class Child(models.Model):
-    parent = models.OneToOneField('Base', models.CASCADE)
+    parent = models.OneToOneField("Base", models.CASCADE)
     name = models.CharField(max_length=50)
 
 

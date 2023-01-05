@@ -17,7 +17,7 @@ class MiddlewareAccessingContent:
 
 
 def template_response_error_handler(request, exception=None):
-    return TemplateResponse(request, 'test_handler.html', status=403)
+    return TemplateResponse(request, "test_handler.html", status=403)
 
 
 def permission_denied_view(request):
@@ -25,19 +25,22 @@ def permission_denied_view(request):
 
 
 urlpatterns = [
-    path('', permission_denied_view),
+    path("", permission_denied_view),
 ]
 
 handler403 = template_response_error_handler
 
 
-@override_settings(ROOT_URLCONF='handlers.tests_custom_error_handlers')
-@modify_settings(MIDDLEWARE={'append': 'handlers.tests_custom_error_handlers.MiddlewareAccessingContent'})
+@override_settings(ROOT_URLCONF="handlers.tests_custom_error_handlers")
+@modify_settings(
+    MIDDLEWARE={
+        "append": "handlers.tests_custom_error_handlers.MiddlewareAccessingContent"
+    }
+)
 class CustomErrorHandlerTests(SimpleTestCase):
-
     def test_handler_renders_template_response(self):
         """
         BaseHandler should render TemplateResponse if necessary.
         """
-        response = self.client.get('/')
-        self.assertContains(response, 'Error handler content', status_code=403)
+        response = self.client.get("/")
+        self.assertContains(response, "Error handler content", status_code=403)

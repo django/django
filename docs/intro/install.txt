@@ -10,7 +10,7 @@ while you walk through the introduction.
 Install Python
 ==============
 
-Being a Python Web framework, Django requires Python. See
+Being a Python web framework, Django requires Python. See
 :ref:`faq-python-version-support` for details. Python includes a lightweight
 database called SQLite_ so you won't need to set up a database just yet.
 

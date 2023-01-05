@@ -26,7 +26,7 @@ The work on Django itself falls into three major areas:
 
 **Localizing Django** 🗺️
     Django is translated into over 100 languages - There's even some
-    translation for Klingon?! The i18n team are always looking for translators
+    translation for Klingon?! The i18n team is always looking for translators
     to help maintain and increase language reach.
 
     See :doc:`localizing` to help translate Django.
@@ -35,7 +35,7 @@ If you think working *with* Django is fun, wait until you start working *on*
 it. Really, **ANYONE** can do something to help make Django better and greater!
 
 This contributing guide contains everything you need to know to help build the
-Django Web framework. Browse the following sections to find out how:
+Django web framework. Browse the following sections to find out how:
 
 .. toctree::
    :maxdepth: 2

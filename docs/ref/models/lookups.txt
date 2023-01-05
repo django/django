@@ -34,7 +34,7 @@ Registration API
 ================
 
 Django uses :class:`~lookups.RegisterLookupMixin` to give a class the interface to
-register lookups on itself. The two prominent examples are
+register lookups on itself or its instances. The two prominent examples are
 :class:`~django.db.models.Field`, the base class of all model fields, and
 :class:`Transform`, the base class of all Django transforms.
 
@@ -44,34 +44,48 @@ register lookups on itself. The two prominent examples are
 
     .. classmethod:: register_lookup(lookup, lookup_name=None)
 
-        Registers a new lookup in the class. For example
-        ``DateField.register_lookup(YearExact)`` will register ``YearExact``
-        lookup on ``DateField``. It overrides a lookup that already exists with
-        the same name. ``lookup_name`` will be used for this lookup if
+        Registers a new lookup in the class or class instance. For example::
+
+            DateField.register_lookup(YearExact)
+            User._meta.get_field('date_joined').register_lookup(MonthExact)
+
+        will register ``YearExact`` lookup on ``DateField`` and ``MonthExact``
+        lookup on the ``User.date_joined`` (you can use :ref:`Field Access API
+        <model-meta-field-api>` to retrieve a single field instance). It
+        overrides a lookup that already exists with the same name. Lookups
+        registered on field instances take precedence over the lookups
+        registered on classes. ``lookup_name`` will be used for this lookup if
         provided, otherwise ``lookup.lookup_name`` will be used.
 
     .. method:: get_lookup(lookup_name)
 
-        Returns the :class:`Lookup` named ``lookup_name`` registered in the class.
-        The default implementation looks recursively on all parent classes
-        and checks if any has a registered lookup named ``lookup_name``, returning
-        the first match.
+        Returns the :class:`Lookup` named ``lookup_name`` registered in the
+        class or class instance depending on what calls it. The default
+        implementation looks recursively on all parent classes and checks if
+        any has a registered lookup named ``lookup_name``, returning the first
+        match. Instance lookups would override any class lookups with the same
+        ``lookup_name``.
 
     .. method:: get_lookups()
 
-        Returns a dictionary of each lookup name registered in the class mapped
-        to the :class:`Lookup` class.
+        Returns a dictionary of each lookup name registered in the class or
+        class instance mapped to the :class:`Lookup` class.
 
     .. method:: get_transform(transform_name)
 
-        Returns a :class:`Transform` named ``transform_name``. The default
-        implementation looks recursively on all parent classes to check if any
-        has the registered transform named ``transform_name``, returning the first
-        match.
+        Returns a :class:`Transform` named ``transform_name`` registered in the
+        class or class instance. The default implementation looks recursively
+        on all parent classes to check if any has the registered transform
+        named ``transform_name``, returning the first match.
 
 For a class to be a lookup, it must follow the :ref:`Query Expression API
 <query-expression>`. :class:`~Lookup` and :class:`~Transform` naturally
 follow this API.
+
+.. versionchanged:: 4.2
+
+    Support for registering lookups on :class:`~django.db.models.Field`
+    instances was added.
 
 .. _query-expression:
 
@@ -177,16 +191,21 @@ following methods:
     comparison between ``lhs`` and ``rhs`` such as ``lhs in rhs`` or
     ``lhs > rhs``.
 
-    The notation to use a lookup in an expression is
-    ``<lhs>__<lookup_name>=<rhs>``.
+    The primary notation to use a lookup in an expression is
+    ``<lhs>__<lookup_name>=<rhs>``. Lookups can also be used directly in
+    ``QuerySet`` filters::
 
-    This class acts as a query expression, but, since it has ``=<rhs>`` on its
-    construction, lookups must always be the end of a lookup expression.
+         Book.objects.filter(LessThan(F('word_count'), 7500))
+
+    …or annotations::
+
+         Book.objects.annotate(is_short_story=LessThan(F('word_count'), 7500))
 
     .. attribute:: lhs
 
-        The left-hand side - what is being looked up. The object must follow
-        the :ref:`Query Expression API <query-expression>`.
+        The left-hand side - what is being looked up. The object typically
+        follows the :ref:`Query Expression API <query-expression>`. It may also
+        be a plain value.
 
     .. attribute:: rhs
 

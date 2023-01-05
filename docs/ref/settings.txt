@@ -33,7 +33,7 @@ a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.weblog': lambda o: "/blogs/%s/" % o.slug,
+        'blogs.blog': lambda o: "/blogs/%s/" % o.slug,
         'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
@@ -153,14 +153,11 @@ The cache backend to use. The built-in cache backends are:
 * ``'django.core.cache.backends.locmem.LocMemCache'``
 * ``'django.core.cache.backends.memcached.PyMemcacheCache'``
 * ``'django.core.cache.backends.memcached.PyLibMCCache'``
+* ``'django.core.cache.backends.redis.RedisCache'``
 
 You can use a cache backend that doesn't ship with Django by setting
 :setting:`BACKEND <CACHES-BACKEND>` to a fully-qualified path of a cache
 backend class (i.e. ``mypackage.backends.whatever.WhateverCache``).
-
-.. versionchanged:: 3.2
-
-    The ``PyMemcacheCache`` backend was added.
 
 .. setting:: CACHES-KEY_FUNCTION
 
@@ -232,7 +229,8 @@ consult your backend module's own documentation.
 Default: ``300``
 
 The number of seconds before a cache entry is considered stale. If the value of
-this settings is ``None``, cache entries will not expire.
+this setting is ``None``, cache entries will not expire. A value of ``0``
+causes keys to immediately expire (effectively "don't cache").
 
 .. setting:: CACHES-VERSION
 
@@ -344,6 +342,22 @@ form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
 <acquiring-csrf-token-from-cookie>`.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
+
+.. setting:: CSRF_COOKIE_MASKED
+
+``CSRF_COOKIE_MASKED``
+----------------------
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+Whether to mask the CSRF cookie. See
+:ref:`release notes <csrf-cookie-masked-usage>` for usage details.
+
+.. deprecated:: 4.1
+
+    This transitional setting is deprecated and will be removed in Django 5.0.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -476,13 +490,6 @@ The setting also supports subdomains, so you could add
 ``'https://*.example.com'``, for example, to allow access from all subdomains
 of ``example.com``.
 
-.. versionchanged:: 4.0
-
-    The values in older versions must only include the hostname (possibly with
-    a leading dot) and not the scheme or an asterisk.
-
-    Also, ``Origin`` header checking isn't performed in older versions.
-
 .. setting:: DATABASES
 
 ``DATABASES``
@@ -610,7 +617,25 @@ Default: ``0``
 
 The lifetime of a database connection, as an integer of seconds. Use ``0`` to
 close database connections at the end of each request — Django's historical
-behavior — and ``None`` for unlimited persistent connections.
+behavior — and ``None`` for unlimited :ref:`persistent database connections
+<persistent-database-connections>`.
+
+.. setting:: CONN_HEALTH_CHECKS
+
+``CONN_HEALTH_CHECKS``
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.1
+
+Default: ``False``
+
+If set to ``True``, existing :ref:`persistent database connections
+<persistent-database-connections>` will be health checked before they are
+reused in each request performing database access. If the health check fails,
+the connection will be reestablished without failing the request when the
+connection is no longer usable but the database server is ready to accept and
+serve new connections (e.g. after database server restart closing existing
+connections).
 
 .. setting:: OPTIONS
 
@@ -671,8 +696,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
     otherwise, you should leave this option unset. It's best to store datetimes
     in UTC because it avoids ambiguous or nonexistent datetimes during daylight
     saving time changes. Also, receiving datetimes in UTC keeps datetime
-    arithmetic simple — there's no need for the ``normalize()`` method provided
-    by pytz.
+    arithmetic simple — there's no need to consider potential offset changes
+    over a DST transition.
 
   * If you're connecting to a third-party database that stores datetimes in a
     local time rather than UTC, then you must set this option to the
@@ -689,8 +714,8 @@ When :setting:`USE_TZ` is ``False``, it is an error to set this option.
   as ``date_trunc``, because their results depend on the time zone.
 
   However, this has a downside: receiving all datetimes in local time makes
-  datetime arithmetic more tricky — you must call the ``normalize()`` method
-  provided by pytz after each operation.
+  datetime arithmetic more tricky — you must account for possible offset
+  changes over DST transitions.
 
   Consider converting to local time explicitly with ``AT TIME ZONE`` in raw SQL
   queries instead of setting the ``TIME_ZONE`` option.
@@ -1105,11 +1130,17 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 Default::
 
     [
-        '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y', # '2006-10-25', '10/25/2006', '10/25/06'
-        '%b %d %Y', '%b %d, %Y',            # 'Oct 25 2006', 'Oct 25, 2006'
-        '%d %b %Y', '%d %b, %Y',            # '25 Oct 2006', '25 Oct, 2006'
-        '%B %d %Y', '%B %d, %Y',            # 'October 25 2006', 'October 25, 2006'
-        '%d %B %Y', '%d %B, %Y',            # '25 October 2006', '25 October, 2006'
+        '%Y-%m-%d',  # '2006-10-25'
+        '%m/%d/%Y',  # '10/25/2006'
+        '%m/%d/%y',  # '10/25/06'
+        '%b %d %Y',  # 'Oct 25 2006'
+        '%b %d, %Y',  # 'Oct 25, 2006'
+        '%d %b %Y',  # '25 Oct 2006'
+        '%d %b, %Y',  # '25 Oct, 2006'
+        '%B %d %Y',  # 'October 25 2006'
+        '%B %d, %Y',  # 'October 25, 2006'
+        '%d %B %Y',  # '25 October 2006'
+        '%d %B, %Y',  # '25 October, 2006'
     ]
 
 A list of formats that will be accepted when inputting data on a date field.
@@ -1226,7 +1257,7 @@ Default: ``False``
 If set to ``True``, Django's exception handling of view functions
 (:data:`~django.conf.urls.handler500`, or the debug view if :setting:`DEBUG`
 is ``True``) and logging of 500 responses (:ref:`django-request-logger`) is
-skipped and exceptions propagate upwards.
+skipped and exceptions propagate upward.
 
 This can be useful for some test setups. It shouldn't be used on a live site
 unless you want your web server (instead of Django) to generate "Internal
@@ -1252,8 +1283,6 @@ See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 
 ``DEFAULT_AUTO_FIELD``
 ----------------------
-
-.. versionadded:: 3.2
 
 Default: ``'``:class:`django.db.models.AutoField`\ ``'``
 
@@ -1636,8 +1665,8 @@ Monday and so on.
 
 Default: ``[]`` (Empty list)
 
-List of directories searched for fixture files, in addition to the
-``fixtures`` directory of each application, in search order.
+List of directories searched for :ref:`fixture <fixtures-explanation>` files,
+in addition to the ``fixtures`` directory of each application, in search order.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
@@ -1665,8 +1694,13 @@ generate correct URLs when ``SCRIPT_NAME`` is not ``/``.
 
 Default: ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
 
-The class that renders form widgets. It must implement :ref:`the low-level
-render API <low-level-widget-render-api>`.
+The class that renders forms and form widgets. It must implement
+:ref:`the low-level render API <low-level-widget-render-api>`. Included form
+renderers are:
+
+* ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``
+* ``'``:class:`django.forms.renderers.Jinja2`\ ``'``
+* ``'``:class:`django.forms.renderers.TemplatesSetting`\ ``'``
 
 .. setting:: FORMAT_MODULE_PATH
 
@@ -1998,8 +2032,8 @@ directories containing the actual translation files.
 
 Default: A logging configuration dictionary.
 
-A data structure containing configuration information. The contents of
-this data structure will be passed as the argument to the
+A data structure containing configuration information. When not-empty, the
+contents of this data structure will be passed as the argument to the
 configuration method described in :setting:`LOGGING_CONFIG`.
 
 Among other things, the default logging configuration passes HTTP 500 server
@@ -2252,15 +2286,47 @@ The secret key is used for:
 * Any usage of :doc:`cryptographic signing </topics/signing>`, unless a
   different key is provided.
 
-If you rotate your secret key, all of the above will be invalidated.
-Secret keys are not used for passwords of users and key rotation will not
-affect them.
+When a secret key is no longer set as :setting:`SECRET_KEY` or contained within
+:setting:`SECRET_KEY_FALLBACKS` all of the above will be invalidated. When
+rotating your secret key, you should move the old key to
+:setting:`SECRET_KEY_FALLBACKS` temporarily. Secret keys are not used for
+passwords of users and key rotation will not affect them.
 
 .. note::
 
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` creates a unique ``SECRET_KEY`` for
     convenience.
+
+.. setting:: SECRET_KEY_FALLBACKS
+
+``SECRET_KEY_FALLBACKS``
+------------------------
+
+.. versionadded:: 4.1
+
+Default: ``[]``
+
+A list of fallback secret keys for a particular Django installation. These are
+used to allow rotation of the ``SECRET_KEY``.
+
+In order to rotate your secret keys, set a new ``SECRET_KEY`` and move the
+previous value to the beginning of ``SECRET_KEY_FALLBACKS``. Then remove the
+old values from the end of the ``SECRET_KEY_FALLBACKS`` when you are ready to
+expire the sessions, password reset tokens, and so on, that make use of them.
+
+.. note::
+
+    Signing operations are computationally expensive. Having multiple old key
+    values in ``SECRET_KEY_FALLBACKS`` adds additional overhead to all checks
+    that don't match an earlier key.
+
+    As such, fallback values should be removed after an appropriate period,
+    allowing for key rotation.
+
+Uses of the secret key values shouldn't assume that they are text or bytes.
+Every use should go through :func:`~django.utils.encoding.force_str` or
+:func:`~django.utils.encoding.force_bytes` to convert it to the desired type.
 
 .. setting:: SECURE_CONTENT_TYPE_NOSNIFF
 
@@ -2277,8 +2343,6 @@ already have it.
 
 ``SECURE_CROSS_ORIGIN_OPENER_POLICY``
 -------------------------------------
-
-.. versionadded:: 4.0
 
 Default: ``'same-origin'``
 
@@ -2339,7 +2403,7 @@ already have it.
 
 Default: ``None``
 
-A tuple representing a HTTP header/value combination that signifies a request
+A tuple representing an HTTP header/value combination that signifies a request
 is secure. This controls the behavior of the request object's ``is_secure()``
 method.
 
@@ -2365,8 +2429,17 @@ required value. For example::
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
-proxy, and any time its value is ``'https'``, then the request is guaranteed to
-be secure (i.e., it originally came in via HTTPS).
+proxy and that the request is guaranteed to be secure (i.e., it originally came
+in via HTTPS) when:
+
+* the header value is ``'https'``, or
+* its initial, leftmost value is ``'https'`` in the case of a comma-separated
+  list of protocols (e.g. ``'https,http,http'``).
+
+.. versionchanged:: 4.1
+
+    Support for a comma-separated list of protocols in the header value was
+    added.
 
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
@@ -2386,8 +2459,9 @@ available in ``request.META``.)
 
     * Your Django app is behind a proxy.
     * Your proxy strips the ``X-Forwarded-Proto`` header from all incoming
-      requests. In other words, if end users include that header in their
-      requests, the proxy will discard it.
+      requests, even when it contains a comma-separated list of protocols. In
+      other words, if end users include that header in their requests, the
+      proxy will discard it.
     * Your proxy sets the ``X-Forwarded-Proto`` header and sends it to Django,
       but only for requests that originally come in via HTTPS.
 
@@ -2749,6 +2823,21 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
+.. setting:: USE_DEPRECATED_PYTZ
+
+``USE_DEPRECATED_PYTZ``
+-----------------------
+
+Default: ``False``
+
+A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
+as the default time zone implementation.
+
+.. deprecated:: 4.0
+
+    This transitional setting is deprecated. Support for using ``pytz`` will be
+    removed in Django 5.0.
+
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -2773,7 +2862,7 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
 ``USE_L10N``
 ------------
 
-Default: ``False``
+Default: ``True``
 
 A boolean that specifies if localized formatting of data will be enabled by
 default or not. If this is set to ``True``, e.g. Django will display numbers and
@@ -2781,10 +2870,11 @@ dates using the format of the current locale.
 
 See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 
-.. note::
+.. deprecated:: 4.0
 
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes ``USE_L10N = True`` for convenience.
+    This setting is deprecated. Starting with Django 5.0, localized formatting
+    of data will always be enabled. For example Django will display numbers and
+    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
@@ -2796,8 +2886,8 @@ Default: ``False``
 A boolean that specifies whether to display numbers using a thousand separator.
 When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
 format numbers using the :setting:`NUMBER_GROUPING` and
-:setting:`THOUSAND_SEPARATOR` settings. These settings may also be dictated by
-the locale, which takes precedence.
+:setting:`THOUSAND_SEPARATOR` settings. The latter two settings may also be
+dictated by the locale, which takes precedence.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
@@ -3323,14 +3413,11 @@ sessions won't be created, even if this setting is active.
 Default: ``'django.contrib.sessions.serializers.JSONSerializer'``
 
 Full import path of a serializer class to use for serializing session data.
-Included serializers are:
+Included serializer is:
 
-* ``'django.contrib.sessions.serializers.PickleSerializer'``
 * ``'django.contrib.sessions.serializers.JSONSerializer'``
 
-See :ref:`session_serialization` for details, including a warning regarding
-possible remote code execution when using
-:class:`~django.contrib.sessions.serializers.PickleSerializer`.
+See :ref:`session_serialization` for details.
 
 Sites
 =====
@@ -3667,6 +3754,7 @@ Security
   * :setting:`CSRF_USE_SESSIONS`
 
 * :setting:`SECRET_KEY`
+* :setting:`SECRET_KEY_FALLBACKS`
 * :setting:`X_FRAME_OPTIONS`
 
 Serialization

@@ -1,6 +1,6 @@
-==============
-Custom Lookups
-==============
+===========================
+How to write custom lookups
+===========================
 
 .. currentmodule:: django.db.models
 
@@ -132,7 +132,7 @@ We can now run the queries we had before.
     SELECT ... WHERE ABS("experiments"."change") = 27
 
 By using ``Transform`` instead of ``Lookup`` it means we are able to chain
-further lookups afterwards. So
+further lookups afterward. So
 ``Experiment.objects.filter(change__abs__lt=27)`` will generate the following
 SQL:
 

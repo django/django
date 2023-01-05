@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Claude Paroz <claude@2xlibre.net>, 2013-2019
+# Claude Paroz <claude@2xlibre.net>, 2013-2019,2021
 # Claude Paroz <claude@2xlibre.net>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # mlorant <maxime.lorant@gmail.com>, 2014
@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-18 15:54+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-25 09:56+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>\n"
 "Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,9 @@ msgstr "facteur travail"
 
 msgid "checksum"
 msgstr "somme de contrôle"
+
+msgid "block size"
+msgstr "taille de bloc"
 
 msgid "name"
 msgstr "nom"

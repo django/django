@@ -38,10 +38,6 @@ have to create the extension outside of Django migrations with a user that has
 them. In that case, connect to your Django database and run the query
 ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
-.. versionchanged:: 3.2
-
-    In older versions, the pre-existence of the extension isn't checked.
-
 .. currentmodule:: django.contrib.postgres.operations
 
 ``CreateExtension``
@@ -118,8 +114,6 @@ them. In that case, connect to your Django database and run the query
 Managing collations using migrations
 ====================================
 
-.. versionadded:: 3.2
-
 If you need to filter or order a column using a particular collation that your
 operating system provides but PostgreSQL does not, you can manage collations in
 your database using a migration file. These collations can then be used with
@@ -157,10 +151,6 @@ For example, to create a collation for German phone book ordering::
     ``provider``, and ``deterministic`` arguments. Therefore, ``locale`` is
     required to make this operation reversible.
 
-.. admonition:: Restrictions
-
-    Non-deterministic collations are supported only on PostgreSQL 12+.
-
 Concurrent index operations
 ===========================
 
@@ -191,8 +181,6 @@ database.
 
 Adding constraints without enforcing validation
 ===============================================
-
-.. versionadded:: 4.0
 
 PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
 statement to add check constraints without enforcing validation on existing

@@ -32,6 +32,10 @@ restricted subset of the test client API:
   attributes must be supplied by the test itself if required
   for the view to function properly.
 
+.. versionchanged:: 4.2
+
+    The ``headers`` parameter was added.
+
 Example
 -------
 
@@ -70,6 +74,8 @@ The following is a unit test using the request factory::
 AsyncRequestFactory
 -------------------
 
+.. class:: AsyncRequestFactory
+
 ``RequestFactory`` creates WSGI-like requests. If you want to create ASGI-like
 requests, including having a correct ASGI ``scope``, you can instead use
 ``django.test.AsyncRequestFactory``.
@@ -77,6 +83,13 @@ requests, including having a correct ASGI ``scope``, you can instead use
 This class is directly API-compatible with ``RequestFactory``, with the only
 difference being that it returns ``ASGIRequest`` instances rather than
 ``WSGIRequest`` instances. All of its methods are still synchronous callables.
+
+Arbitrary keyword arguments in ``defaults`` are added directly into the ASGI
+scope.
+
+.. versionchanged:: 4.2
+
+    The ``headers`` parameter was added.
 
 Testing class-based views
 =========================
@@ -88,7 +101,7 @@ must ensure that they are configured correctly, by calling
 For example, assuming the following class-based view:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.views.generic import TemplateView
 
@@ -105,7 +118,7 @@ the view, then passing a ``request`` to ``setup()``, before proceeding with
 your test's code:
 
 .. code-block:: python
-    :caption: tests.py
+    :caption: ``tests.py``
 
     from django.test import RequestFactory, TestCase
     from .views import HomeView
@@ -139,7 +152,10 @@ example, the test suite for docs.djangoproject.com includes the following::
 
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
-            response = self.client.get('/en/dev/search/', HTTP_HOST='docs.djangoproject.dev:8000')
+            response = self.client.get(
+                "/en/dev/search/",
+                headers={"host": "docs.djangoproject.dev:8000"},
+            )
             self.assertEqual(response.status_code, 200)
 
 and the settings file includes a list of the domains supported by the project::
@@ -412,7 +428,7 @@ following structure::
 Let's take a look inside a couple of those files:
 
 .. code-block:: python
-    :caption: runtests.py
+    :caption: ``runtests.py``
 
     #!/usr/bin/env python
     import os
@@ -440,7 +456,7 @@ command-line options for controlling verbosity, passing in specific test
 labels to run, etc.
 
 .. code-block:: python
-    :caption: tests/test_settings.py
+    :caption: ``tests/test_settings.py``
 
     SECRET_KEY = 'fake-key'
     INSTALLED_APPS = [
@@ -510,7 +526,7 @@ behavior. This class defines the ``run_tests()`` entry point, plus a
 selection of other methods that are used by ``run_tests()`` to set up, execute
 and tear down the test suite.
 
-.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, **kwargs)
+.. class:: DiscoverRunner(pattern='test*.py', top_level=None, verbosity=1, interactive=True, failfast=False, keepdb=False, reverse=False, debug_mode=False, debug_sql=False, parallel=0, tags=None, exclude_tags=None, test_name_patterns=None, pdb=False, buffer=False, enable_faulthandler=True, timing=True, shuffle=False, logger=None, **kwargs)
 
     ``DiscoverRunner`` will search for tests in any file matching ``pattern``.
 
@@ -539,7 +555,8 @@ and tear down the test suite.
     If ``reverse`` is ``True``, test cases will be executed in the opposite
     order. This could be useful to debug tests that aren't properly isolated
     and have side effects. :ref:`Grouping by test class <order-of-tests>` is
-    preserved when using this option.
+    preserved when using this option. This option can be used in conjunction
+    with ``--shuffle`` to reverse the order for a particular random seed.
 
     ``debug_mode`` specifies what the :setting:`DEBUG` setting should be
     set to prior to running tests.
@@ -576,6 +593,19 @@ and tear down the test suite.
     If ``timing`` is ``True``, test timings, including database setup and total
     run time, will be shown.
 
+    If ``shuffle`` is an integer, test cases will be shuffled in a random order
+    prior to execution, using the integer as a random seed. If ``shuffle`` is
+    ``None``, the seed will be generated randomly. In both cases, the seed will
+    be logged and set to ``self.shuffle_seed`` prior to running tests. This
+    option can be used to help detect tests that aren't properly isolated.
+    :ref:`Grouping by test class <order-of-tests>` is preserved when using this
+    option.
+
+    ``logger`` can be used to pass a Python :py:ref:`Logger object <logger>`.
+    If provided, the logger will be used to log messages instead of printing to
+    the console. The logger object will respect its logging level rather than
+    the ``verbosity``.
+
     Django may, from time to time, extend the capabilities of the test runner
     by adding new arguments. The ``**kwargs`` declaration allows for this
     expansion. If you subclass ``DiscoverRunner`` or write your own test
@@ -585,10 +615,6 @@ and tear down the test suite.
     Create or override an ``add_arguments(cls, parser)`` class method and add
     custom arguments by calling ``parser.add_argument()`` inside the method, so
     that the :djadmin:`test` command will be able to use those arguments.
-
-    .. versionadded:: 3.2
-
-        The ``enable_faulthandler`` and ``timing`` arguments were added.
 
 Attributes
 ~~~~~~~~~~
@@ -618,7 +644,7 @@ Attributes
 Methods
 ~~~~~~~
 
-.. method:: DiscoverRunner.run_tests(test_labels, extra_tests=None, **kwargs)
+.. method:: DiscoverRunner.run_tests(test_labels, **kwargs)
 
     Run the test suite.
 
@@ -626,9 +652,11 @@ Methods
     several formats (see :meth:`DiscoverRunner.build_suite` for a list of
     supported formats).
 
-    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
-    suite that is executed by the test runner. These extra tests are run
-    in addition to those discovered in the modules listed in ``test_labels``.
+    .. deprecated:: 4.0
+
+        ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+        suite that is executed by the test runner. These extra tests are run in
+        addition to those discovered in the modules listed in ``test_labels``.
 
     This method should return the number of tests that failed.
 
@@ -645,7 +673,7 @@ Methods
     :func:`~django.test.utils.setup_test_environment` and setting
     :setting:`DEBUG` to ``self.debug_mode`` (defaults to ``False``).
 
-.. method:: DiscoverRunner.build_suite(test_labels=None, extra_tests=None, **kwargs)
+.. method:: DiscoverRunner.build_suite(test_labels=None, **kwargs)
 
     Constructs a test suite that matches the test labels provided.
 
@@ -665,9 +693,11 @@ Methods
     tests in all files below the current directory whose names match its
     ``pattern`` (see above).
 
-    ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
-    suite that is executed by the test runner. These extra tests are run
-    in addition to those discovered in the modules listed in ``test_labels``.
+    .. deprecated:: 4.0
+
+        ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
+        suite that is executed by the test runner. These extra tests are run in
+        addition to those discovered in the modules listed in ``test_labels``.
 
     Returns a ``TestSuite`` instance ready to be run.
 
@@ -707,13 +737,13 @@ Methods
 
 .. method:: DiscoverRunner.log(msg, level=None)
 
-    .. versionadded:: 4.0
-
-    Prints to the console a message with the given integer `logging level`_
-    (e.g. ``logging.DEBUG``, ``logging.INFO``, or ``logging.WARNING``),
-    respecting the current ``verbosity``. For example, an ``INFO`` message will
-    be logged if the ``verbosity`` is at least 1, and ``DEBUG`` will be logged
-    if it is at least 2.
+    If a ``logger`` is set, logs the message at the given integer
+    `logging level`_ (e.g. ``logging.DEBUG``, ``logging.INFO``, or
+    ``logging.WARNING``). Otherwise, the message is printed to the console,
+    respecting the current ``verbosity``. For example, no message will be
+    printed if the ``verbosity`` is 0, ``INFO`` and above will be printed if
+    the ``verbosity`` is at least 1, and ``DEBUG`` will be printed if it is at
+    least 2. The ``level`` defaults to ``logging.INFO``.
 
 .. _`logging level`: https://docs.python.org/3/library/logging.html#levels
 
@@ -751,22 +781,13 @@ utility methods in the ``django.test.utils`` module.
     :func:`teardown_databases` function at the conclusion of testing.
 
     The ``aliases`` argument determines which :setting:`DATABASES` aliases test
-    databases should be setup for. If it's not provided, it defaults to all of
+    databases should be set up for. If it's not provided, it defaults to all of
     :setting:`DATABASES` aliases.
 
     The ``serialized_aliases`` argument determines what subset of ``aliases``
     test databases should have their state serialized to allow usage of the
     :ref:`serialized_rollback <test-case-serialized-rollback>` feature. If
     it's not provided, it defaults to ``aliases``.
-
-    .. versionchanged:: 3.2
-
-        The ``time_keeper`` kwarg was added, and all kwargs were made
-        keyword-only.
-
-    .. versionchanged:: 4.0
-
-        The ``serialized_aliases`` kwarg was added.
 
 .. function:: teardown_databases(old_config, parallel=0, keepdb=False)
 
@@ -797,7 +818,7 @@ can be useful during testing.
       approve destroying the existing database. ``sys.exit`` is
       called if the user does not approve.
 
-    * If autoclobber is ``True``, the database will be destroyed
+    * If ``autoclobber`` is ``True``, the database will be destroyed
       without consulting the user.
 
     ``serialize`` determines if Django serializes the database into an

@@ -58,10 +58,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       10+                 Requires PostGIS.
-MySQL               GEOS, GDAL                      5.7+                :ref:`Limited functionality <mysql-spatial-limitations>`.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       12+                 Requires PostGIS.
+MySQL               GEOS, GDAL                      8+                  :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      19+                 XE not supported.
-SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.9.0+              Requires SpatiaLite 4.3+
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.21.0+             Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -112,12 +112,12 @@ community!  You can:
 * Join the ``#django-geo`` IRC channel on Libera.Chat. Please be patient and
   polite -- while you may not get an immediate response, someone will attempt
   to answer your question as soon as they see it.
-* Ask your question on the `GeoDjango`__ mailing list.
+* Ask your question on the `GeoDjango`__ forum.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://groups.google.com/g/geodjango
+__ https://forum.djangoproject.com/c/internals/geodjango/13
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
@@ -197,7 +197,6 @@ several different options for installing GeoDjango. These options are:
 
 * :ref:`postgresapp` (easiest and recommended)
 * :ref:`homebrew`
-* :ref:`kyngchaos`
 * :ref:`fink`
 * :ref:`macports`
 * :ref:`build_from_source`
@@ -265,63 +264,6 @@ Summary::
 
 __ https://brew.sh/
 .. _Xcode: https://developer.apple.com/xcode/
-
-.. _kyngchaos:
-
-KyngChaos packages
-~~~~~~~~~~~~~~~~~~
-
-William Kyngesburye provides a number of `geospatial library binary packages`__
-that help to get GeoDjango installed on macOS without compiling them from
-source.  However, `Xcode`_ is still necessary for compiling the Python database
-adapters :ref:`psycopg2_kyngchaos` (for PostGIS).
-
-.. note::
-
-    SpatiaLite users should consult the :ref:`spatialite_macos` section
-    after installing the packages for additional instructions.
-
-Download the framework packages for:
-
-* UnixImageIO
-* PROJ
-* GEOS
-* SQLite3 (includes the SpatiaLite library)
-* GDAL
-
-Install the packages in the order they are listed above, as the GDAL and SQLite
-packages require the packages listed before them.
-
-Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
-and PostGIS`__.
-
-After installing the binary packages, you'll want to add the following to
-your ``.profile`` to be able to run the package programs from the command-line::
-
-    export PATH=/Library/Frameworks/UnixImageIO.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/PROJ.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/GEOS.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/SQLite3.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
-    export PATH=/usr/local/pgsql/bin:$PATH
-
-__ https://www.kyngchaos.com/software/frameworks
-__ https://www.kyngchaos.com/software/postgres
-
-.. _psycopg2_kyngchaos:
-
-psycopg2
-^^^^^^^^
-
-After you've installed the KyngChaos binaries and modified your ``PATH``, as
-described above, ``psycopg2`` may be installed using the following command::
-
-    $ python -m pip install psycopg2
-
-.. note::
-
-    If you don't have ``pip``, follow the :ref:`installation instructions
-    <installing-official-release>` to install it.
 
 .. _fink:
 
@@ -487,14 +429,14 @@ Install Django and set up database
 recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
-psycopg2
-~~~~~~~~
+psycopg
+~~~~~~~
 
-The ``psycopg2`` Python module provides the interface between Python and the
-PostgreSQL database. ``psycopg2`` can be installed via pip within your Python
+The ``psycopg`` Python module provides the interface between Python and the
+PostgreSQL database. ``psycopg`` can be installed via pip within your Python
 virtual environment::
 
-    ...\> py -m pip install psycopg2
+    ...\> py -m pip install psycopg
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from

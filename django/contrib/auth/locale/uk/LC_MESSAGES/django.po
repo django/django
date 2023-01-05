@@ -8,7 +8,7 @@
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # captain_m4l <qotsaman@gmail.com>, 2012
-# Mykola Zamkovoi <nickzam@gmail.com>, 2014
+# Mykola Zamkovoi <nickzam@gmail.com>, 2014,2021
 # Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 # Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
 # Zoriana Zaiats, 2016-2017
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2021-01-19 23:40+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-23 17:41+0000\n"
+"Last-Translator: Mykola Zamkovoi <nickzam@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr ""
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "Personal info"
-msgstr "Персональна інформація"
+msgstr "Особиста інформація"
 
 msgid "Permissions"
 msgstr "Дозволи"
@@ -147,6 +147,9 @@ msgstr "робочий фактор"
 
 msgid "checksum"
 msgstr "контрольна сума"
+
+msgid "block size"
+msgstr "розмір блоку"
 
 msgid "name"
 msgstr "ім'я"

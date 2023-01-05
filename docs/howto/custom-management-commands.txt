@@ -1,6 +1,6 @@
-========================================
-Writing custom ``django-admin`` commands
-========================================
+==============================================
+How to create custom ``django-admin`` commands
+==============================================
 
 .. module:: django.core.management
 
@@ -223,11 +223,6 @@ All attributes can be set in your derived class and can be used in
     ``'__all__'`` can be used to specify that all system checks should be
     performed. Default value is ``'__all__'``.
 
-    .. versionchanged:: 3.2
-
-        In older versions, the ``requires_system_checks`` attribute expects a
-        boolean value instead of a list or tuple of tags.
-
 .. attribute:: BaseCommand.style
 
     An instance attribute that helps create colored output when writing to
@@ -241,6 +236,12 @@ All attributes can be set in your derived class and can be used in
 
     If you pass the :option:`--no-color` option when running your command, all
     ``self.style()`` calls will return the original string uncolored.
+
+.. attribute:: BaseCommand.suppressed_base_arguments
+
+    The default command options to suppress in the help output. This should be
+    a set of option names (e.g. ``'--verbosity'``). The default values for the
+    suppressed options are still passed.
 
 Methods
 -------
@@ -284,7 +285,7 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Tries to execute this command, performing system checks if needed (as
     controlled by the :attr:`requires_system_checks` attribute). If the command
-    raises a :exc:`CommandError`, it's intercepted and printed to stderr.
+    raises a :exc:`CommandError`, it's intercepted and printed to ``stderr``.
 
 .. admonition:: Calling a management command in your code
 
@@ -302,7 +303,8 @@ the :meth:`~BaseCommand.handle` method must be implemented.
 
     Uses the system check framework to inspect the entire Django project for
     potential problems. Serious problems are raised as a :exc:`CommandError`;
-    warnings are output to stderr; minor notifications are output to stdout.
+    warnings are output to ``stderr``; minor notifications are output to
+    ``stdout``.
 
     If ``app_configs`` and ``tags`` are both ``None``, all system checks are
     performed. ``tags`` can be a list of check tags, like ``compatibility`` or
@@ -356,11 +358,11 @@ Exception class indicating a problem while executing a management command.
 
 If this exception is raised during the execution of a management command from a
 command line console, it will be caught and turned into a nicely-printed error
-message to the appropriate output stream (i.e., stderr); as a result, raising
-this exception (with a sensible description of the error) is the preferred way
-to indicate that something has gone wrong in the execution of a command. It
-accepts the optional ``returncode`` argument to customize the exit status for
-the management command to exit with, using :func:`sys.exit`.
+message to the appropriate output stream (i.e., ``stderr``); as a result,
+raising this exception (with a sensible description of the error) is the
+preferred way to indicate that something has gone wrong in the execution of a
+command. It accepts the optional ``returncode`` argument to customize the exit
+status for the management command to exit with, using :func:`sys.exit`.
 
 If a management command is called from code through
 :func:`~django.core.management.call_command`, it's up to you to catch the

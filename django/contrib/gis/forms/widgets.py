@@ -1,4 +1,5 @@
 import logging
+import warnings
 
 from django.conf import settings
 from django.contrib.gis import gdal
@@ -6,8 +7,9 @@ from django.contrib.gis.geometry import json_regex
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
 from django.forms.widgets import Widget
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango51Warning
 
-logger = logging.getLogger('django.contrib.gis')
+logger = logging.getLogger("django.contrib.gis")
 
 
 class BaseGeometryWidget(Widget):
@@ -15,24 +17,36 @@ class BaseGeometryWidget(Widget):
     The base class for rich geometry widgets.
     Render a map using the WKT of the geometry.
     """
-    geom_type = 'GEOMETRY'
+
+    geom_type = "GEOMETRY"
     map_srid = 4326
-    map_width = 600
-    map_height = 400
+    map_width = 600  # RemovedInDjango51Warning
+    map_height = 400  # RemovedInDjango51Warning
     display_raw = False
 
     supports_3d = False
-    template_name = ''  # set on subclasses
+    template_name = ""  # set on subclasses
 
     def __init__(self, attrs=None):
         self.attrs = {}
-        for key in ('geom_type', 'map_srid', 'map_width', 'map_height', 'display_raw'):
+        for key in ("geom_type", "map_srid", "map_width", "map_height", "display_raw"):
             self.attrs[key] = getattr(self, key)
+        if (
+            (attrs and ("map_width" in attrs or "map_height" in attrs))
+            or self.map_width != 600
+            or self.map_height != 400
+        ):
+            warnings.warn(
+                "The map_height and map_width widget attributes are deprecated. Please "
+                "use CSS to size map widgets.",
+                category=RemovedInDjango51Warning,
+                stacklevel=2,
+            )
         if attrs:
             self.attrs.update(attrs)
 
     def serialize(self, value):
-        return value.wkt if value else ''
+        return value.wkt if value else ""
 
     def deserialize(self, value):
         try:
@@ -58,40 +72,47 @@ class BaseGeometryWidget(Widget):
                 except gdal.GDALException as err:
                     logger.error(
                         "Error transforming geometry from srid '%s' to srid '%s' (%s)",
-                        value.srid, self.map_srid, err
+                        value.srid,
+                        self.map_srid,
+                        err,
                     )
 
-        geom_type = gdal.OGRGeomType(self.attrs['geom_type']).name
-        context.update(self.build_attrs(self.attrs, {
-            'name': name,
-            'module': 'geodjango_%s' % name.replace('-', '_'),  # JS-safe
-            'serialized': self.serialize(value),
-            'geom_type': 'Geometry' if geom_type == 'Unknown' else geom_type,
-            'STATIC_URL': settings.STATIC_URL,
-            'LANGUAGE_BIDI': translation.get_language_bidi(),
-            **(attrs or {}),
-        }))
+        geom_type = gdal.OGRGeomType(self.attrs["geom_type"]).name
+        context.update(
+            self.build_attrs(
+                self.attrs,
+                {
+                    "name": name,
+                    "module": "geodjango_%s" % name.replace("-", "_"),  # JS-safe
+                    "serialized": self.serialize(value),
+                    "geom_type": "Geometry" if geom_type == "Unknown" else geom_type,
+                    "STATIC_URL": settings.STATIC_URL,
+                    "LANGUAGE_BIDI": translation.get_language_bidi(),
+                    **(attrs or {}),
+                },
+            )
+        )
         return context
 
 
 class OpenLayersWidget(BaseGeometryWidget):
-    template_name = 'gis/openlayers.html'
+    template_name = "gis/openlayers.html"
     map_srid = 3857
 
     class Media:
         css = {
-            'all': (
-                'https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.css',
-                'gis/css/ol3.css',
+            "all": (
+                "https://cdn.jsdelivr.net/npm/ol@v7.2.2/ol.css",
+                "gis/css/ol3.css",
             )
         }
         js = (
-            'https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js',
-            'gis/js/OLMapWidget.js',
+            "https://cdn.jsdelivr.net/npm/ol@v7.2.2/dist/ol.js",
+            "gis/js/OLMapWidget.js",
         )
 
     def serialize(self, value):
-        return value.json if value else ''
+        return value.json if value else ""
 
     def deserialize(self, value):
         geom = super().deserialize(value)
@@ -105,14 +126,15 @@ class OSMWidget(OpenLayersWidget):
     """
     An OpenLayers/OpenStreetMap-based widget.
     """
-    template_name = 'gis/openlayers-osm.html'
+
+    template_name = "gis/openlayers-osm.html"
     default_lon = 5
     default_lat = 47
     default_zoom = 12
 
     def __init__(self, attrs=None):
         super().__init__()
-        for key in ('default_lon', 'default_lat', 'default_zoom'):
+        for key in ("default_lon", "default_lat", "default_zoom"):
             self.attrs[key] = getattr(self, key)
         if attrs:
             self.attrs.update(attrs)

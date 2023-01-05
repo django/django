@@ -36,7 +36,7 @@ Django's main documentation is broken up into "chunks" designed to fill
 different needs:
 
 * The :doc:`introductory material </intro/index>` is designed for people new
-  to Django -- or to Web development in general. It doesn't cover anything
+  to Django -- or to web development in general. It doesn't cover anything
   in depth, but instead gives a high-level overview of how developing in
   Django "feels".
 
@@ -106,7 +106,7 @@ Where to get it
 You can read Django documentation in several ways. They are, in order of
 preference:
 
-On the Web
+On the web
 ----------
 
 The most recent version of the Django documentation lives at
@@ -211,12 +211,12 @@ We follow this policy:
   been released yet, or "New in version X.Y" for released versions.
 
 * Documentation fixes and improvements may be backported to the last release
-  branch, at the discretion of the committer, however, once a version of
-  Django is :ref:`no longer supported<supported-versions-policy>`, that version
-  of the docs won't get any further updates.
+  branch, at the discretion of the merger, however, once a version of Django is
+  :ref:`no longer supported<supported-versions-policy>`, that version of the
+  docs won't get any further updates.
 
-* The `main documentation Web page`_ includes links to documentation for
+* The `main documentation web page`_ includes links to documentation for
   previous versions. Be sure you are using the version of the docs
   corresponding to the version of Django you are using!
 
-.. _main documentation Web page: https://docs.djangoproject.com/en/dev/
+.. _main documentation web page: https://docs.djangoproject.com/en/dev/

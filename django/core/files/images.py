@@ -14,6 +14,7 @@ class ImageFile(File):
     A mixin for use alongside django.core.files.base.File, which provides
     additional features for dealing with images.
     """
+
     @property
     def width(self):
         return self._get_image_dimensions()[0]
@@ -23,7 +24,7 @@ class ImageFile(File):
         return self._get_image_dimensions()[1]
 
     def _get_image_dimensions(self):
-        if not hasattr(self, '_dimensions_cache'):
+        if not hasattr(self, "_dimensions_cache"):
             close = self.closed
             self.open()
             self._dimensions_cache = get_image_dimensions(self, close=close)
@@ -39,12 +40,15 @@ def get_image_dimensions(file_or_path, close=False):
     from PIL import ImageFile as PillowImageFile
 
     p = PillowImageFile.Parser()
-    if hasattr(file_or_path, 'read'):
+    if hasattr(file_or_path, "read"):
         file = file_or_path
         file_pos = file.tell()
         file.seek(0)
     else:
-        file = open(file_or_path, 'rb')
+        try:
+            file = open(file_or_path, "rb")
+        except OSError:
+            return (None, None)
         close = True
     try:
         # Most of the time Pillow only needs a small chunk to parse the image

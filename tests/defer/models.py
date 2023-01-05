@@ -52,8 +52,9 @@ class ShadowParent(models.Model):
     overridden, the field value, rather than the scalar value must still be
     used when the field is deferred.
     """
-    name = 'aphrodite'
+
+    name = "aphrodite"
 
 
 class ShadowChild(ShadowParent):
-    name = models.CharField(default='adonis', max_length=6)
+    name = models.CharField(default="adonis", max_length=6)

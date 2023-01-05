@@ -1,9 +1,18 @@
 from django.db import models
 
 from .fields import (
-    ArrayField, BigIntegerRangeField, CICharField, CIEmailField, CITextField,
-    DateRangeField, DateTimeRangeField, DecimalRangeField, EnumField,
-    HStoreField, IntegerRangeField, SearchVectorField,
+    ArrayField,
+    BigIntegerRangeField,
+    CICharField,
+    CIEmailField,
+    CITextField,
+    DateRangeField,
+    DateTimeRangeField,
+    DecimalRangeField,
+    EnumField,
+    HStoreField,
+    IntegerRangeField,
+    SearchVectorField,
 )
 
 
@@ -16,7 +25,6 @@ class Tag:
 
 
 class TagField(models.SmallIntegerField):
-
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
@@ -36,7 +44,7 @@ class TagField(models.SmallIntegerField):
 class PostgreSQLModel(models.Model):
     class Meta:
         abstract = True
-        required_db_vendor = 'postgresql'
+        required_db_vendor = "postgresql"
 
 
 class IntegerArrayModel(PostgreSQLModel):
@@ -66,7 +74,9 @@ class NestedIntegerArrayModel(PostgreSQLModel):
 class OtherTypesArrayModel(PostgreSQLModel):
     ips = ArrayField(models.GenericIPAddressField(), default=list)
     uuids = ArrayField(models.UUIDField(), default=list)
-    decimals = ArrayField(models.DecimalField(max_digits=5, decimal_places=2), default=list)
+    decimals = ArrayField(
+        models.DecimalField(max_digits=5, decimal_places=2), default=list
+    )
     tags = ArrayField(TagField(), blank=True, null=True)
     json = ArrayField(models.JSONField(default=dict), default=list)
     int_ranges = ArrayField(IntegerRangeField(), blank=True, null=True)
@@ -83,7 +93,7 @@ class ArrayEnumModel(PostgreSQLModel):
 
 
 class CharFieldModel(models.Model):
-    field = models.CharField(max_length=16)
+    field = models.CharField(max_length=64)
 
 
 class TextFieldModel(models.Model):
@@ -101,7 +111,7 @@ class BigAutoFieldModel(models.Model):
 # Scene/Character/Line models are used to test full text search. They're
 # populated with content from Monty Python and the Holy Grail.
 class Scene(models.Model):
-    scene = models.CharField(max_length=255)
+    scene = models.TextField()
     setting = models.CharField(max_length=255)
 
 
@@ -109,6 +119,7 @@ class Character(models.Model):
     name = models.CharField(max_length=255)
 
 
+# RemovedInDjango51Warning.
 class CITestModel(PostgreSQLModel):
     name = CICharField(primary_key=True, max_length=255)
     email = CIEmailField()
@@ -117,15 +128,15 @@ class CITestModel(PostgreSQLModel):
 
 
 class Line(PostgreSQLModel):
-    scene = models.ForeignKey('Scene', models.CASCADE)
-    character = models.ForeignKey('Character', models.CASCADE)
+    scene = models.ForeignKey("Scene", models.CASCADE)
+    character = models.ForeignKey("Character", models.CASCADE)
     dialogue = models.TextField(blank=True, null=True)
     dialogue_search_vector = SearchVectorField(blank=True, null=True)
     dialogue_config = models.CharField(max_length=100, blank=True, null=True)
 
 
 class LineSavedSearch(PostgreSQLModel):
-    line = models.ForeignKey('Line', models.CASCADE)
+    line = models.ForeignKey("Line", models.CASCADE)
     query = models.CharField(max_length=100)
 
 
@@ -135,6 +146,11 @@ class RangesModel(PostgreSQLModel):
     decimals = DecimalRangeField(blank=True, null=True)
     timestamps = DateTimeRangeField(blank=True, null=True)
     timestamps_inner = DateTimeRangeField(blank=True, null=True)
+    timestamps_closed_bounds = DateTimeRangeField(
+        blank=True,
+        null=True,
+        default_bounds="[]",
+    )
     dates = DateRangeField(blank=True, null=True)
     dates_inner = DateRangeField(blank=True, null=True)
 
@@ -147,7 +163,9 @@ class RangeLookupsModel(PostgreSQLModel):
     timestamp = models.DateTimeField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
     small_integer = models.SmallIntegerField(blank=True, null=True)
-    decimal_field = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    decimal_field = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
 
 
 class ArrayFieldSubclass(ArrayField):
@@ -159,7 +177,9 @@ class AggregateTestModel(PostgreSQLModel):
     """
     To test postgres-specific general aggregation functions
     """
+
     char_field = models.CharField(max_length=30, blank=True)
+    text_field = models.TextField(blank=True)
     integer_field = models.IntegerField(null=True)
     boolean_field = models.BooleanField(null=True)
     json_field = models.JSONField(null=True)
@@ -169,6 +189,7 @@ class StatTestModel(PostgreSQLModel):
     """
     To test postgres-specific aggregation functions for statistics
     """
+
     int1 = models.IntegerField()
     int2 = models.IntegerField()
     related_field = models.ForeignKey(AggregateTestModel, models.SET_NULL, null=True)
@@ -187,7 +208,7 @@ class Room(models.Model):
 
 
 class HotelReservation(PostgreSQLModel):
-    room = models.ForeignKey('Room', on_delete=models.CASCADE)
+    room = models.ForeignKey("Room", on_delete=models.CASCADE)
     datespan = DateRangeField()
     start = models.DateTimeField()
     end = models.DateTimeField()

@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017,2020-2021
+# Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-04-14 12:20+0000\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -28,7 +29,7 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Tämä on lista saatavillaolevista %s. Valitse allaolevasta laatikosta "
+"Tämä on lista saatavilla olevista %s. Valitse alla olevasta laatikosta "
 "haluamasi ja siirrä ne valittuihin klikkamalla \"Valitse\"-nuolta "
 "laatikoiden välillä."
 
@@ -261,6 +262,12 @@ msgstr "Pe"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "La"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Olet jo lähettänyt tämän lomakkeen. Haluatko varmasti lähettää sen uudelleen?"
 
 msgid "Show"
 msgstr "Näytä"

@@ -12,7 +12,7 @@ Installing Uvicorn
 
 You can install Uvicorn with ``pip``::
 
-    python -m pip install uvicorn gunicorn
+    python -m pip install uvicorn
 
 Running Django in Uvicorn
 =========================
@@ -24,12 +24,30 @@ called (separated by a colon).
 
 For a typical Django project, invoking Uvicorn would look like::
 
-    gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
+    python -m uvicorn myproject.asgi:application
 
 This will start one process listening on ``127.0.0.1:8000``. It requires that
 your project be on the Python path; to ensure that run this command from the
 same directory as your ``manage.py`` file.
 
+In development mode, you can add ``--reload`` to cause the server to reload any
+time a file is changed on disk.
+
 For more advanced usage, please read the `Uvicorn documentation <Uvicorn_>`_.
 
+Deploying Django using Uvicorn and Gunicorn
+===========================================
+
+Gunicorn_ is a robust web server that implements process monitoring and automatic
+restarts. This can be useful when running Uvicorn in a production environment.
+
+To install Uvicorn and Gunicorn, use the following::
+
+    python -m pip install uvicorn gunicorn
+
+Then start Gunicorn using the Uvicorn worker class like this::
+
+    python -m gunicorn myproject.asgi:application -k uvicorn.workers.UvicornWorker
+
 .. _Uvicorn: https://www.uvicorn.org/
+.. _Gunicorn: https://gunicorn.org/

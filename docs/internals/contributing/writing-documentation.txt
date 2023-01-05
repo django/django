@@ -2,7 +2,7 @@
 Writing documentation
 =====================
 
-We place a high importance on consistency and readability of documentation.
+We place high importance on the consistency and readability of documentation.
 After all, Django was created in a journalism environment! So we treat our
 documentation like we treat our code: we aim to improve it as often as
 possible.
@@ -23,16 +23,16 @@ Getting the raw documentation
 
 Though Django's documentation is intended to be read as HTML at
 https://docs.djangoproject.com/, we edit it as a collection of text files for
-maximum flexibility. These files live in the top-level ``docs/`` directory of a
+maximum flexibility. These files live in the top-level :source:`docs/` directory of a
 Django release.
 
 If you'd like to start contributing to our docs, get the development version of
 Django from the source code repository
 (see :ref:`installing-development-version`). The development version has the
-latest-and-greatest documentation, just as it has latest-and-greatest code.
+latest-and-greatest documentation, just as it has the latest-and-greatest code.
 We also backport documentation fixes and improvements, at the discretion of the
-committer, to the last release branch. That's because it's highly advantageous
-to have the docs for the last release be up-to-date and correct (see
+merger, to the last release branch. That's because it's highly advantageous to
+have the docs for the last release be up-to-date and correct (see
 :ref:`differences-between-doc-versions`).
 
 Getting started with Sphinx
@@ -80,7 +80,7 @@ The documentation is organized into several categories:
   understands what we're trying to achieve. Don't feel that you need to begin
   with explanations of how things work - what matters is what the reader does,
   not what you explain. It can be helpful to refer back to what you've done and
-  explain afterwards.
+  explain afterward.
 
 * :doc:`Topic guides </topics/index>` aim to explain a concept or subject at a
   fairly high level.
@@ -92,7 +92,7 @@ The documentation is organized into several categories:
   Providing background context helps a newcomer connect the topic to things
   that they already know.
 
-* :doc:`Reference guides </ref/index>` contain technical reference for APIs.
+* :doc:`Reference guides </ref/index>` contain technical references for APIs.
   They describe the functioning of Django's internal machinery and instruct in
   its use.
 
@@ -120,7 +120,7 @@ Writing style
 =============
 
 When using pronouns in reference to a hypothetical person, such as "a user with
-a session cookie", gender neutral pronouns (they/their/them) should be used.
+a session cookie", gender-neutral pronouns (they/their/them) should be used.
 Instead of:
 
 * he or she... use they.
@@ -146,6 +146,9 @@ documentation:
 
 * **email** -- no hyphen.
 
+* **HTTP** -- the expected pronunciation is "Aitch Tee Tee Pee" and therefore
+  should be preceded by "an" and not "a".
+
 * **MySQL**, **PostgreSQL**, **SQLite**
 
 * **SQL** -- when referring to SQL, the expected pronunciation should be
@@ -160,8 +163,7 @@ documentation:
 * **subclass** -- it's a single word without a hyphen, both as a verb
   ("subclass that model") and as a noun ("create a subclass").
 
-* **Web**, **World Wide Web**, **the Web** -- note Web is always
-  capitalized when referring to the World Wide Web.
+* **the web**, **web framework** -- it's not capitalized.
 
 * **website** -- use one word, without capitalization.
 
@@ -349,7 +351,7 @@ Documenting new features
 Our policy for new features is:
 
     All documentation of new features should be written in a way that
-    clearly designates the features are only available in the Django
+    clearly designates the features that are only available in the Django
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
@@ -357,7 +359,7 @@ Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
 blank line and an optional description (indented).
 
-General improvements, or other changes to the APIs that should be emphasized
+General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
@@ -459,7 +461,7 @@ example:
     You can find both in the :doc:`settings reference document
     </ref/settings>`.
 
-  We use the Sphinx :rst:role:`doc` cross reference element when we want to
+  We use the Sphinx :rst:role:`doc` cross-reference element when we want to
   link to another document as a whole and the :rst:role:`ref` element when
   we want to link to an arbitrary location in a document.
 
@@ -529,7 +531,7 @@ Entries that have a status of "broken" need to be fixed. Those that have a
 status of "redirected" may need to be updated to point to the canonical
 location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
-point to the latest or stable version of documentation, e.g. ``/en/stable/`` →
+point to the latest or stable version of the documentation, e.g. ``/en/stable/`` →
 ``/en/3.2/``.
 
 Translating documentation

@@ -111,7 +111,7 @@ Customizing widget instances
 When Django renders a widget as HTML, it only renders very minimal markup -
 Django doesn't add class names, or any other widget-specific attributes. This
 means, for example, that all :class:`TextInput` widgets will appear the same
-on your Web pages.
+on your web pages.
 
 There are two ways to customize widgets: :ref:`per widget instance
 <styling-widget-instances>` and :ref:`per widget class <styling-widget-classes>`.
@@ -145,7 +145,7 @@ provided for each widget will be rendered exactly the same::
     <tr><th>Url:</th><td><input type="url" name="url" required></td></tr>
     <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
 
-On a real Web page, you probably don't want every widget to look the same. You
+On a real web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
 'name' widget to have some special CSS class. It is also possible to specify
 the 'type' attribute to take advantage of the new HTML5 input types.  To do
@@ -277,7 +277,8 @@ foundation for custom widgets.
     .. method:: id_for_label(id_)
 
         Returns the HTML ID attribute of this widget for use by a ``<label>``,
-        given the ID of the field. Returns ``None`` if an ID isn't available.
+        given the ID of the field. Returns an empty string if an ID isn't
+        available.
 
         This hook is necessary because some widgets have multiple HTML
         elements and, thus, multiple IDs. In that case, this method should
@@ -314,6 +315,19 @@ foundation for custom widgets.
         ``False`` because an unchecked checkbox and unselected
         ``<select multiple>`` don't appear in the data of an HTML form
         submission, so it's unknown whether or not the user submitted a value.
+
+    .. attribute:: Widget.use_fieldset
+
+        .. versionadded:: 4.1
+
+        An attribute to identify if the widget should be grouped in a
+        ``<fieldset>`` with a ``<legend>`` when rendered. Defaults to ``False``
+        but is ``True`` when the widget contains multiple ``<input>`` tags such as
+        :class:`~django.forms.CheckboxSelectMultiple`,
+        :class:`~django.forms.RadioSelect`,
+        :class:`~django.forms.MultiWidget`,
+        :class:`~django.forms.SplitDateTimeWidget`, and
+        :class:`~django.forms.SelectDateWidget`.
 
     .. method:: use_required_attribute(initial)
 
@@ -454,7 +468,7 @@ foundation for custom widgets.
                 return '{}-{}-{}'.format(year, month, day)
 
     The constructor creates several :class:`Select` widgets in a list. The
-    ``super()`` method uses this list to setup the widget.
+    ``super()`` method uses this list to set up the widget.
 
     The required method :meth:`~MultiWidget.decompress` breaks up a
     ``datetime.date`` value into the day, month, and year values corresponding
@@ -703,14 +717,14 @@ that specifies the template used to render each choice. For example, for the
     * ``option_template_name``: ``'django/forms/widgets/radio_option.html'``
 
     Similar to :class:`Select`, but rendered as a list of radio buttons within
-    ``<li>`` tags:
+    ``<div>`` tags:
 
     .. code-block:: html
 
-        <ul>
-          <li><input type="radio" name="..."></li>
+        <div>
+          <div><input type="radio" name="..."></div>
           ...
-        </ul>
+        </div>
 
     For more granular control over the generated markup, you can loop over the
     radio buttons in the template. Assuming a form ``myform`` with a field
@@ -788,10 +802,10 @@ that specifies the template used to render each choice. For example, for the
         </fieldset>
 
     If you decide not to loop over the radio buttons -- e.g., if your template
-    includes ``{{ myform.beatles }}`` -- they'll be output in a ``<ul>`` with
-    ``<li>`` tags, as above.
+    includes ``{{ myform.beatles }}`` -- they'll be output in a ``<div>`` with
+    ``<div>`` tags, as above.
 
-    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    The outer ``<div>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
 
     When looping over the radio buttons, the ``label`` and ``input`` tags include
@@ -810,12 +824,12 @@ that specifies the template used to render each choice. For example, for the
 
     .. code-block:: html
 
-        <ul>
-          <li><input type="checkbox" name="..." ></li>
+        <div>
+          <div><input type="checkbox" name="..." ></div>
           ...
-        </ul>
+        </div>
 
-    The outer ``<ul>`` container receives the ``id`` attribute of the widget,
+    The outer ``<div>`` container receives the ``id`` attribute of the widget,
     if defined, or :attr:`BoundField.auto_id` otherwise.
 
 Like :class:`RadioSelect`, you can loop over the individual checkboxes for the

@@ -3,7 +3,7 @@ Advanced tutorial: How to write reusable apps
 =============================================
 
 This advanced tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>`
-left off. We'll be turning our Web-poll into a standalone Python package
+left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
 If you haven't recently completed Tutorials 1–7, we encourage you to review
@@ -144,13 +144,13 @@ this. For a small app like polls, this process isn't too difficult.
 #. Create a file ``django-polls/README.rst`` with the following contents:
 
    .. code-block:: rst
-       :caption: django-polls/README.rst
+       :caption: ``django-polls/README.rst``
 
        =====
        Polls
        =====
 
-       Polls is a Django app to conduct Web-based polls. For each question,
+       Polls is a Django app to conduct web-based polls. For each question,
        visitors can choose between a fixed number of answers.
 
        Detailed documentation is in the "docs" directory.
@@ -186,25 +186,25 @@ this. For a small app like polls, this process isn't too difficult.
 #. Next we'll create ``pyproject.toml``, ``setup.cfg``, and ``setup.py`` files
    which detail how to build and install the app. A full explanation of these
    files is beyond the scope of this tutorial, but the `setuptools
-   documentation <https://setuptools.readthedocs.io/en/latest/>`_ has a good
+   documentation <https://setuptools.pypa.io/en/latest/>`_ has a good
    explanation. Create the ``django-polls/pyproject.toml``,
    ``django-polls/setup.cfg``, and ``django-polls/setup.py`` files with the
    following contents:
 
    .. code-block:: toml
-        :caption: django-polls/pyproject.toml
+        :caption: ``django-polls/pyproject.toml``
 
         [build-system]
-        requires = ['setuptools>=40.8.0', 'wheel']
-        build-backend = 'setuptools.build_meta:__legacy__'
+        requires = ['setuptools>=40.8.0']
+        build-backend = 'setuptools.build_meta'
 
    .. code-block:: ini
-        :caption: django-polls/setup.cfg
+        :caption: ``django-polls/setup.cfg``
 
         [metadata]
         name = django-polls
         version = 0.1
-        description = A Django app to conduct Web-based polls.
+        description = A Django app to conduct web-based polls.
         long_description = file: README.rst
         url = https://www.example.com/
         author = Your Name
@@ -233,7 +233,7 @@ this. For a small app like polls, this process isn't too difficult.
             Django >= X.Y  # Replace "X.Y" as appropriate
 
    .. code-block:: python
-        :caption: django-polls/setup.py
+        :caption: ``django-polls/setup.py``
 
         from setuptools import setup
 
@@ -242,12 +242,12 @@ this. For a small app like polls, this process isn't too difficult.
 #. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
    setuptools docs referred to in the previous step discuss this file in more
-   details. To include the templates, the ``README.rst`` and our ``LICENSE``
+   detail. To include the templates, the ``README.rst`` and our ``LICENSE``
    file, create a file ``django-polls/MANIFEST.in`` with the following
    contents:
 
    .. code-block:: text
-       :caption: django-polls/MANIFEST.in
+       :caption: ``django-polls/MANIFEST.in``
 
        include LICENSE
        include README.rst

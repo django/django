@@ -70,6 +70,17 @@ direction to make these releases possible.
 B. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING PYTHON
 ===============================================================
 
+Python software and documentation are licensed under the
+Python Software Foundation License Version 2.
+
+Starting with Python 3.8.6, examples, recipes, and other code in
+the documentation are dual licensed under the PSF License Version 2
+and the Zero-Clause BSD license.
+
+Some software incorporated into Python is under different licenses.
+The licenses are listed with code falling under that license.
+
+
 PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 --------------------------------------------
 
@@ -84,7 +95,7 @@ analyze, test, perform and/or display publicly, prepare derivative works,
 distribute, and otherwise use Python alone or in any derivative version,
 provided, however, that PSF's License Agreement and PSF's notice of copyright,
 i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020 Python Software Foundation;
+2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022 Python Software Foundation;
 All Rights Reserved" are retained in Python alone or in any derivative version
 prepared by Licensee.
 
@@ -191,9 +202,9 @@ version prepared by Licensee.  Alternately, in lieu of CNRI's License
 Agreement, Licensee may substitute the following text (omitting the
 quotes): "Python 1.6.1 is made available subject to the terms and
 conditions in CNRI's License Agreement.  This Agreement together with
-Python 1.6.1 may be located on the Internet using the following
+Python 1.6.1 may be located on the internet using the following
 unique, persistent identifier (known as a handle): 1895.22/1013.  This
-Agreement may also be obtained from a proxy server on the Internet
+Agreement may also be obtained from a proxy server on the internet
 using the following URL: http://hdl.handle.net/1895.22/1013".
 
 3. In the event Licensee prepares a derivative work that is based on
@@ -263,3 +274,17 @@ FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON DOCUMENTATION
+----------------------------------------------------------------------
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.

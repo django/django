@@ -3,47 +3,49 @@ import unittest
 
 from django.test import SimpleTestCase
 from django.utils.crypto import (
-    InvalidAlgorithm, constant_time_compare, pbkdf2, salted_hmac,
+    InvalidAlgorithm,
+    constant_time_compare,
+    pbkdf2,
+    salted_hmac,
 )
 
 
 class TestUtilsCryptoMisc(SimpleTestCase):
-
     def test_constant_time_compare(self):
         # It's hard to test for constant time, just test the result.
-        self.assertTrue(constant_time_compare(b'spam', b'spam'))
-        self.assertFalse(constant_time_compare(b'spam', b'eggs'))
-        self.assertTrue(constant_time_compare('spam', 'spam'))
-        self.assertFalse(constant_time_compare('spam', 'eggs'))
+        self.assertTrue(constant_time_compare(b"spam", b"spam"))
+        self.assertFalse(constant_time_compare(b"spam", b"eggs"))
+        self.assertTrue(constant_time_compare("spam", "spam"))
+        self.assertFalse(constant_time_compare("spam", "eggs"))
 
     def test_salted_hmac(self):
         tests = [
-            ((b'salt', b'value'), {}, 'b51a2e619c43b1ca4f91d15c57455521d71d61eb'),
-            (('salt', 'value'), {}, 'b51a2e619c43b1ca4f91d15c57455521d71d61eb'),
+            ((b"salt", b"value"), {}, "b51a2e619c43b1ca4f91d15c57455521d71d61eb"),
+            (("salt", "value"), {}, "b51a2e619c43b1ca4f91d15c57455521d71d61eb"),
             (
-                ('salt', 'value'),
-                {'secret': 'abcdefg'},
-                '8bbee04ccddfa24772d1423a0ba43bd0c0e24b76',
+                ("salt", "value"),
+                {"secret": "abcdefg"},
+                "8bbee04ccddfa24772d1423a0ba43bd0c0e24b76",
             ),
             (
-                ('salt', 'value'),
-                {'secret': 'x' * hashlib.sha1().block_size},
-                'bd3749347b412b1b0a9ea65220e55767ac8e96b0',
+                ("salt", "value"),
+                {"secret": "x" * hashlib.sha1().block_size},
+                "bd3749347b412b1b0a9ea65220e55767ac8e96b0",
             ),
             (
-                ('salt', 'value'),
-                {'algorithm': 'sha256'},
-                'ee0bf789e4e009371a5372c90f73fcf17695a8439c9108b0480f14e347b3f9ec',
+                ("salt", "value"),
+                {"algorithm": "sha256"},
+                "ee0bf789e4e009371a5372c90f73fcf17695a8439c9108b0480f14e347b3f9ec",
             ),
             (
-                ('salt', 'value'),
+                ("salt", "value"),
                 {
-                    'algorithm': 'blake2b',
-                    'secret': 'x' * hashlib.blake2b().block_size,
+                    "algorithm": "blake2b",
+                    "secret": "x" * hashlib.blake2b().block_size,
                 },
-                'fc6b9800a584d40732a07fa33fb69c35211269441823bca431a143853c32f'
-                'e836cf19ab881689528ede647dac412170cd5d3407b44c6d0f44630690c54'
-                'ad3d58',
+                "fc6b9800a584d40732a07fa33fb69c35211269441823bca431a143853c32f"
+                "e836cf19ab881689528ede647dac412170cd5d3407b44c6d0f44630690c54"
+                "ad3d58",
             ),
         ]
         for args, kwargs, digest in tests:
@@ -53,12 +55,12 @@ class TestUtilsCryptoMisc(SimpleTestCase):
     def test_invalid_algorithm(self):
         msg = "'whatever' is not an algorithm accepted by the hashlib module."
         with self.assertRaisesMessage(InvalidAlgorithm, msg):
-            salted_hmac('salt', 'value', algorithm='whatever')
+            salted_hmac("salt", "value", algorithm="whatever")
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
 
-    # http://tools.ietf.org/html/draft-josefsson-pbkdf2-test-vectors-06
+    # https://tools.ietf.org/html/draft-josefsson-pbkdf2-test-vectors-06
     rfc_vectors = [
         {
             "args": {
@@ -152,34 +154,44 @@ class TestUtilsCryptoPBKDF2(unittest.TestCase):
                 "dklen": 0,
                 "digest": hashlib.sha512,
             },
-            "result": ("afe6c5530785b6cc6b1c6453384731bd5ee432ee"
-                       "549fd42fb6695779ad8a1c5bf59de69c48f774ef"
-                       "c4007d5298f9033c0241d5ab69305e7b64eceeb8d"
-                       "834cfec"),
+            "result": (
+                "afe6c5530785b6cc6b1c6453384731bd5ee432ee"
+                "549fd42fb6695779ad8a1c5bf59de69c48f774ef"
+                "c4007d5298f9033c0241d5ab69305e7b64eceeb8d"
+                "834cfec"
+            ),
         },
         # Check leading zeros are not stripped (#17481)
         {
             "args": {
-                "password": b'\xba',
+                "password": b"\xba",
                 "salt": "salt",
                 "iterations": 1,
                 "dklen": 20,
                 "digest": hashlib.sha1,
             },
-            "result": '0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b',
+            "result": "0053d3b91a7f1e54effebd6d68771e8a6e0b2c5b",
         },
     ]
 
     def test_public_vectors(self):
         for vector in self.rfc_vectors:
-            result = pbkdf2(**vector['args'])
-            self.assertEqual(result.hex(), vector['result'])
+            result = pbkdf2(**vector["args"])
+            self.assertEqual(result.hex(), vector["result"])
 
     def test_regression_vectors(self):
         for vector in self.regression_vectors:
-            result = pbkdf2(**vector['args'])
-            self.assertEqual(result.hex(), vector['result'])
+            result = pbkdf2(**vector["args"])
+            self.assertEqual(result.hex(), vector["result"])
 
     def test_default_hmac_alg(self):
-        kwargs = {'password': b'password', 'salt': b'salt', 'iterations': 1, 'dklen': 20}
-        self.assertEqual(pbkdf2(**kwargs), hashlib.pbkdf2_hmac(hash_name=hashlib.sha256().name, **kwargs))
+        kwargs = {
+            "password": b"password",
+            "salt": b"salt",
+            "iterations": 1,
+            "dklen": 20,
+        }
+        self.assertEqual(
+            pbkdf2(**kwargs),
+            hashlib.pbkdf2_hmac(hash_name=hashlib.sha256().name, **kwargs),
+        )

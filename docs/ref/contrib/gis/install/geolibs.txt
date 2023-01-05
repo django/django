@@ -5,16 +5,16 @@ Installing Geospatial libraries
 GeoDjango uses and/or provides interfaces for the following open source
 geospatial libraries:
 
-========================  ====================================  ================================  =================================
+========================  ====================================  ================================  ================================================
 Program                   Description                           Required                          Supported Versions
-========================  ====================================  ================================  =================================
-:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.9, 3.8, 3.7, 3.6
-`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  8.x, 7.x, 6.x, 5.x, 4.x
-:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.2, 3.1, 3.0, 2.4, 2.3, 2.2, 2.1
+========================  ====================================  ================================  ================================================
+:doc:`GEOS <../geos>`     Geometry Engine Open Source           Yes                               3.11, 3.10, 3.9, 3.8, 3.7, 3.6
+`PROJ`_                   Cartographic Projections library      Yes (PostgreSQL and SQLite only)  9.x, 8.x, 7.x, 6.x, 5.x, 4.x
+:doc:`GDAL <../gdal>`     Geospatial Data Abstraction Library   Yes                               3.6, 3.5, 3.4, 3.3, 3.2, 3.1, 3.0, 2.4, 2.3, 2.2
 :doc:`GeoIP <../geoip2>`  IP-based geolocation library          No                                2
-`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.0, 2.5, 2.4
+`PostGIS`__               Spatial extensions for PostgreSQL     Yes (PostgreSQL only)             3.3, 3.2, 3.1, 3.0, 2.5
 `SpatiaLite`__            Spatial extensions for SQLite         Yes (SQLite only)                 5.0, 4.3
-========================  ====================================  ================================  =================================
+========================  ====================================  ================================  ================================================
 
 Note that older or more recent versions of these libraries *may* also work
 totally fine with GeoDjango. Your mileage may vary.
@@ -25,16 +25,30 @@ totally fine with GeoDjango. Your mileage may vary.
     GEOS 3.7.0 2018-09-10
     GEOS 3.8.0 2019-10-10
     GEOS 3.9.0 2020-12-14
-    GDAL 2.1.0 2016-04
+    GEOS 3.10.0 2021-10-20
+    GEOS 3.11.0 2022-07-01
     GDAL 2.2.0 2017-05
     GDAL 2.3.0 2018-05
     GDAL 2.4.0 2018-12
     GDAL 3.0.0 2019-05
     GDAL 3.1.0 2020-05-07
     GDAL 3.2.0 2020-11-02
-    PostGIS 2.4.0 2017-09-30
+    GDAL 3.3.0 2021-05-03
+    GDAL 3.4.0 2021-11-04
+    GDAL 3.5.0 2022-05-13
+    GDAL 3.6.0 2022-11-03
     PostGIS 2.5.0 2018-09-23
     PostGIS 3.0.0 2019-10-20
+    PostGIS 3.1.0 2020-12-18
+    PostGIS 3.2.0 2021-12-18
+    PostGIS 3.3.0 2022-08-27
+    PROJ 9.0.0 2022-03-01
+    PROJ 8.0.0 2021-03-01
+    PROJ 8.0.0 2021-03-01
+    PROJ 7.0.0 2020-02-25
+    PROJ 6.0.0 2019-02-26
+    PROJ 5.0.0 2018-03-01
+    PROJ 4.9.0 2014-09-14
     SpatiaLite 4.3.0 2015-09-07
     SpatiaLite 5.0.0 2020-08-23
 
@@ -98,14 +112,18 @@ First, download GEOS from the GEOS website and untar the source archive::
     $ wget https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
     $ tar xjf geos-X.Y.Z.tar.bz2
 
-Next, change into the directory where GEOS was unpacked, run the configure
-script, compile, and install::
+Then step into the GEOS directory, create a ``build`` folder, and step into
+it::
 
     $ cd geos-X.Y.Z
-    $ ./configure
-    $ make
-    $ sudo make install
-    $ cd ..
+    $ mkdir build
+    $ cd build
+
+Then build and install the package::
+
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
 
 Troubleshooting
 ~~~~~~~~~~~~~~~
@@ -167,14 +185,26 @@ done *prior* to configuration::
     $ tar xzf proj-X.Y.Z.tar.gz
     $ cd proj-X.Y.Z/data
     $ tar xzf ../../proj-data-X.Y.tar.gz
-    $ cd ..
+    $ cd ../..
+
+For PROJ 9.x and greater, releases only support builds using ``CMake`` (see
+`PROJ RFC-7`_).
+
+To build with ``CMake`` ensure your system meets the `build requirements`_.
+Then create a ``build`` folder in the PROJ directory, and step into it::
+
+    $ cd proj-X.Y.Z
+    $ mkdir build
+    $ cd build
 
 Finally, configure, make and install PROJ::
 
-    $ ./configure
-    $ make
-    $ sudo make install
-    $ cd ..
+    $ cmake ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
+
+.. _PROJ RFC-7: https://proj.org/community/rfc/rfc-7.html#rfc7
+.. _build requirements: https://proj.org/install.html#build-requirements
 
 .. _gdalbuild:
 
@@ -190,27 +220,25 @@ First download the latest GDAL release version and untar the archive::
 
     $ wget https://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
     $ tar xzf gdal-X.Y.Z.tar.gz
+
+For GDAL 3.6.x and greater, releases only support builds using ``CMake``. To
+build with ``CMake`` create a ``build`` folder in the GDAL directory, and step
+into it::
+
     $ cd gdal-X.Y.Z
+    $ mkdir build
+    $ cd build
 
-Configure, make and install::
+Finally, configure, make and install GDAL::
 
-    $ ./configure
-    $ make # Go get some coffee, this takes a while.
-    $ sudo make install
-    $ cd ..
-
-.. note::
-
-    Because GeoDjango has its own Python interface, the preceding instructions
-    do not build GDAL's own Python bindings. The bindings may be built by
-    adding the ``--with-python`` flag when running ``configure``. See
-    `GDAL/OGR In Python`__ for more information on GDAL's bindings.
+    $ cmake ..
+    $ cmake --build .
+    $ sudo cmake --build . --target install
 
 If you have any problems, please see the troubleshooting section below for
 suggestions and solutions.
 
-__ https://trac.osgeo.org/gdal/
-__ https://trac.osgeo.org/gdal/wiki/GdalOgrInPython
+__ https://gdal.org/
 
 .. _gdaltrouble:
 

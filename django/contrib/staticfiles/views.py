@@ -29,10 +29,10 @@ def serve(request, path, insecure=False, **kwargs):
     """
     if not settings.DEBUG and not insecure:
         raise Http404
-    normalized_path = posixpath.normpath(path).lstrip('/')
+    normalized_path = posixpath.normpath(path).lstrip("/")
     absolute_path = finders.find(normalized_path)
     if not absolute_path:
-        if path.endswith('/') or path == '':
+        if path.endswith("/") or path == "":
             raise Http404("Directory indexes are not allowed here.")
         raise Http404("'%s' could not be found" % path)
     document_root, path = os.path.split(absolute_path)

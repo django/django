@@ -7,6 +7,7 @@ class Tok:
     """
     A specification for a token class.
     """
+
     num = 0
 
     def __init__(self, name, regex, next=None):
@@ -92,7 +93,7 @@ class JsLexer(Lexer):
     # lex correct JavaScript, so much of this is simplified.
 
     # Details of JavaScript lexical structure are taken from
-    # http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-262.pdf
+    # https://www.ecma-international.org/publications-and-standards/standards/ecma-262/
 
     # A useful explanation of automatic semicolon insertion is at
     # http://inimino.org/~inimino/blog/javascript_semicolons
@@ -101,21 +102,34 @@ class JsLexer(Lexer):
         Tok("comment", r"/\*(.|\n)*?\*/"),
         Tok("linecomment", r"//.*?$"),
         Tok("ws", r"\s+"),
-        Tok("keyword", literals("""
+        Tok(
+            "keyword",
+            literals(
+                """
                            break case catch class const continue debugger
                            default delete do else enum export extends
                            finally for function if import in instanceof
                            new return super switch this throw try typeof
                            var void while with
-                           """, suffix=r"\b"), next='reg'),
-        Tok("reserved", literals("null true false", suffix=r"\b"), next='div'),
-        Tok("id", r"""
+                           """,
+                suffix=r"\b",
+            ),
+            next="reg",
+        ),
+        Tok("reserved", literals("null true false", suffix=r"\b"), next="div"),
+        Tok(
+            "id",
+            r"""
                   ([a-zA-Z_$   ]|\\u[0-9a-fA-Z]{4})   # first char
                   ([a-zA-Z_$0-9]|\\u[0-9a-fA-F]{4})*  # rest chars
-                  """, next='div'),
-        Tok("hnum", r"0[xX][0-9a-fA-F]+", next='div'),
+                  """,
+            next="div",
+        ),
+        Tok("hnum", r"0[xX][0-9a-fA-F]+", next="div"),
         Tok("onum", r"0[0-7]+"),
-        Tok("dnum", r"""
+        Tok(
+            "dnum",
+            r"""
                     (   (0|[1-9][0-9]*)     # DecimalIntegerLiteral
                         \.                  # dot
                         [0-9]*              # DecimalDigits-opt
@@ -128,15 +142,23 @@ class JsLexer(Lexer):
                         (0|[1-9][0-9]*)     # DecimalIntegerLiteral
                         ([eE][-+]?[0-9]+)?  # ExponentPart-opt
                     )
-                    """, next='div'),
-        Tok("punct", literals("""
+                    """,
+            next="div",
+        ),
+        Tok(
+            "punct",
+            literals(
+                """
                          >>>= === !== >>> <<= >>= <= >= == != << >> &&
                          || += -= *= %= &= |= ^=
-                         """), next="reg"),
-        Tok("punct", literals("++ -- ) ]"), next='div'),
-        Tok("punct", literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next='reg'),
-        Tok("string", r'"([^"\\]|(\\(.|\n)))*?"', next='div'),
-        Tok("string", r"'([^'\\]|(\\(.|\n)))*?'", next='div'),
+                         """
+            ),
+            next="reg",
+        ),
+        Tok("punct", literals("++ -- ) ]"), next="div"),
+        Tok("punct", literals("{ } ( [ . ; , < > + - * % & | ^ ! ~ ? : ="), next="reg"),
+        Tok("string", r'"([^"\\]|(\\(.|\n)))*?"', next="div"),
+        Tok("string", r"'([^'\\]|(\\(.|\n)))*?'", next="div"),
     ]
 
     both_after = [
@@ -145,13 +167,16 @@ class JsLexer(Lexer):
 
     states = {
         # slash will mean division
-        'div': both_before + [
-            Tok("punct", literals("/= /"), next='reg'),
-        ] + both_after,
-
+        "div": both_before
+        + [
+            Tok("punct", literals("/= /"), next="reg"),
+        ]
+        + both_after,
         # slash will mean regex
-        'reg': both_before + [
-            Tok("regex",
+        "reg": both_before
+        + [
+            Tok(
+                "regex",
                 r"""
                     /                       # opening slash
                     # First character is..
@@ -174,12 +199,15 @@ class JsLexer(Lexer):
                     )*                      # many times
                     /                       # closing slash
                     [a-zA-Z0-9]*            # trailing flags
-                """, next='div'),
-        ] + both_after,
+                """,
+                next="div",
+            ),
+        ]
+        + both_after,
     }
 
     def __init__(self):
-        super().__init__(self.states, 'reg')
+        super().__init__(self.states, "reg")
 
 
 def prepare_js_for_gettext(js):
@@ -190,31 +218,32 @@ def prepare_js_for_gettext(js):
     What actually happens is that all the regex literals are replaced with
     "REGEX".
     """
+
     def escape_quotes(m):
         """Used in a regex to properly escape double quotes."""
         s = m[0]
         if s == '"':
-            return r'\"'
+            return r"\""
         else:
             return s
 
     lexer = JsLexer()
     c = []
     for name, tok in lexer.lex(js):
-        if name == 'regex':
+        if name == "regex":
             # C doesn't grok regexes, and they aren't needed for gettext,
             # so just output a string instead.
             tok = '"REGEX"'
-        elif name == 'string':
+        elif name == "string":
             # C doesn't have single-quoted strings, so make all strings
             # double-quoted.
             if tok.startswith("'"):
                 guts = re.sub(r"\\.|.", escape_quotes, tok[1:-1])
                 tok = '"' + guts + '"'
-        elif name == 'id':
+        elif name == "id":
             # C can't deal with Unicode escapes in identifiers.  We don't
             # need them for gettext anyway, so replace them with something
             # innocuous
             tok = tok.replace("\\", "U")
         c.append(tok)
-    return ''.join(c)
+    return "".join(c)

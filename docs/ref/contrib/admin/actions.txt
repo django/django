@@ -119,13 +119,6 @@ function::
     provide human-readable descriptions for callback functions registered
     there, too.
 
-.. versionchanged:: 3.2
-
-    The ``description`` argument to the :func:`~django.contrib.admin.action`
-    decorator is equivalent to setting the ``short_description`` attribute on
-    the action function directly in previous versions. Setting the attribute
-    directly is still supported for backward compatibility.
-
 Adding actions to the :class:`ModelAdmin`
 -----------------------------------------
 
@@ -319,7 +312,7 @@ Disabling a site-wide action
     Once you've done the above, that action will no longer be available
     site-wide.
 
-    If, however, you need to re-enable a globally-disabled action for one
+    If, however, you need to reenable a globally-disabled action for one
     particular model, list it explicitly in your ``ModelAdmin.actions`` list::
 
         # Globally disable delete selected
@@ -419,19 +412,10 @@ For example::
             codename = get_permission_codename('publish', opts)
             return request.user.has_perm('%s.%s' % (opts.app_label, codename))
 
-.. versionchanged:: 3.2
-
-    The ``permissions`` argument to the :func:`~django.contrib.admin.action`
-    decorator is equivalent to setting the ``allowed_permissions`` attribute on
-    the action function directly in previous versions. Setting the attribute
-    directly is still supported for backward compatibility.
-
 The ``action`` decorator
 ========================
 
 .. function:: action(*, permissions=None, description=None)
-
-    .. versionadded:: 3.2
 
     This decorator can be used for setting specific attributes on custom action
     functions that can be used with

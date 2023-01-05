@@ -23,11 +23,11 @@ Function's summary:
 =========================  ========================  ======================  =======================  ==================  =====================
 Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
 =========================  ========================  ======================  =======================  ==================  =====================
-:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
-:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
-:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsEmpty`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`IsValid`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`MemSize`
+:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`      :class:`NumPoints`
 ..                         :class:`PointOnSurface`                           :class:`Transform`       :class:`AsWKT`
 ..                                                                           :class:`Translate`       :class:`GeoHash`
 =========================  ========================  ======================  =======================  ==================  =====================
@@ -52,8 +52,8 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: MariaDB (≥ 10.2.4), `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
@@ -221,7 +221,7 @@ south = ``π``; west = ``3π/2``.
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
@@ -307,8 +307,8 @@ queryset is calculated::
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
-SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
+spatial-operators-reference.html#GUID-ACED800F-3435-44AA-9606-D40934A23ED0>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
@@ -333,7 +333,7 @@ are returned unchanged.
 .. class:: GeoHash(expression, precision=None, **extra)
 
 *Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__ (≥ 5.7.5),
+<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
 `PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
 (LWGEOM/RTTOPO)
 
@@ -368,13 +368,25 @@ it provides index-assisted nearest-neighbor result sets.
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
 
+``IsEmpty``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: IsEmpty(expr)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Accepts a geographic field or expression and tests if the value is an empty
+geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
+
 ``IsValid``
 ===========
 
 .. class:: IsValid(expr)
 
 *Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__ (≥ 5.7.5),
+<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
 `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.

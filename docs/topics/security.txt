@@ -17,7 +17,7 @@ other users. This is usually achieved by storing the malicious scripts in the
 database where it will be retrieved and displayed to other users, or by getting
 users to click a link which will cause the attacker's JavaScript to be executed
 by the user's browser. However, XSS attacks can originate from any untrusted
-source of data, such as cookies or Web services, whenever the data is not
+source of data, such as cookies or web services, whenever the data is not
 sufficiently sanitized before including in a page.
 
 Using Django templates protects you against the majority of XSS attacks.
@@ -144,7 +144,7 @@ server, there are some additional steps you may need:
 
   Please note the caveats under :setting:`SECURE_PROXY_SSL_HEADER`. For the
   case of a reverse proxy, it may be easier or more secure to configure the
-  main Web server to do the redirect to HTTPS.
+  main web server to do the redirect to HTTPS.
 
 * Use 'secure' cookies.
 
@@ -165,7 +165,7 @@ server, there are some additional steps you may need:
   the added security of SSL provided one successful connection has occurred.
   HSTS may either be configured with :setting:`SECURE_HSTS_SECONDS`,
   :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`, and :setting:`SECURE_HSTS_PRELOAD`,
-  or on the Web server.
+  or on the web server.
 
 .. _host-headers-virtual-hosting:
 
@@ -216,8 +216,6 @@ security middleware reference <referrer-policy>` for details.
 Cross-origin opener policy
 ==========================
 
-.. versionadded:: 4.0
-
 The cross-origin opener policy (COOP) header allows browsers to isolate a
 top-level window from other documents by putting them in a different context
 group so that they cannot directly interact with the top-level window. If a
@@ -244,7 +242,7 @@ User-uploaded content
     <staticfiles-from-cdn>` to avoid some of these issues.
 
 * If your site accepts file uploads, it is strongly advised that you limit
-  these uploads in your Web server configuration to a reasonable
+  these uploads in your web server configuration to a reasonable
   size in order to prevent denial of service (DOS) attacks. In Apache, this
   can be easily set using the LimitRequestBody_ directive.
 
@@ -287,16 +285,17 @@ Additional security topics
 
 While Django provides good security protection out of the box, it is still
 important to properly deploy your application and take advantage of the
-security protection of the Web server, operating system and other components.
+security protection of the web server, operating system and other components.
 
-* Make sure that your Python code is outside of the Web server's root. This
+* Make sure that your Python code is outside of the web server's root. This
   will ensure that your Python code is not accidentally served as plain text
   (or accidentally executed).
 * Take care with any :ref:`user uploaded files <file-upload-security>`.
 * Django does not throttle requests to authenticate users. To protect against
   brute-force attacks against the authentication system, you may consider
-  deploying a Django plugin or Web server module to throttle these requests.
-* Keep your :setting:`SECRET_KEY` a secret.
+  deploying a Django plugin or web server module to throttle these requests.
+* Keep your :setting:`SECRET_KEY`, and :setting:`SECRET_KEY_FALLBACKS` if in
+  use, secret.
 * It is a good idea to limit the accessibility of your caching system and
   database using a firewall.
 * Take a look at the Open Web Application Security Project (OWASP) `Top 10
@@ -307,5 +306,5 @@ security protection of the Web server, operating system and other components.
   pages also include security principles that apply to any system.
 
 .. _LimitRequestBody: https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody
-.. _Top 10 list: https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/
+.. _Top 10 list: https://owasp.org/Top10/
 .. _web security: https://infosec.mozilla.org/guidelines/web_security.html

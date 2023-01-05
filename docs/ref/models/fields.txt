@@ -73,6 +73,12 @@ purely database-related, whereas :attr:`~Field.blank` is validation-related. If
 a field has ``blank=True``, form validation will allow entry of an empty value.
 If a field has ``blank=False``, the field will be required.
 
+.. admonition:: Supplying missing values
+
+    ``blank=True`` can be used with fields having ``null=False``, but this will
+    require implementing :meth:`~django.db.models.Model.clean` on the model in
+    order to programmatically supply any missing values.
+
 .. _field-choices:
 
 ``choices``
@@ -319,6 +325,21 @@ characters that aren't allowed in Python variable names -- notably, the
 hyphen -- that's OK. Django quotes column and table names behind the
 scenes.
 
+``db_comment``
+--------------
+
+.. versionadded:: 4.2
+
+.. attribute:: Field.db_comment
+
+The comment on the database column to use for this field. It is useful for
+documenting fields for individuals with direct database access who may not be
+looking at your Django code. For example::
+
+    pub_date = models.DateTimeField(
+        db_comment="Date and time when the article was published",
+    )
+
 ``db_index``
 ------------
 
@@ -436,11 +457,6 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
-.. versionchanged:: 3.2
-
-    In older versions, auto-created primary key fields were always
-    :class:`AutoField`\s.
-
 ``unique``
 ----------
 
@@ -515,13 +531,6 @@ underscores to spaces. See :ref:`Verbose field names <verbose-field-names>`.
 A list of validators to run for this field. See the :doc:`validators
 documentation </ref/validators>` for more information.
 
-Registering and fetching lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
-The API can be used to customize which lookups are available for a field class, and
-how lookups are fetched from a field.
-
 .. _model-field-types:
 
 Field types
@@ -568,11 +577,9 @@ A field to store raw binary data. It can be assigned :class:`bytes`,
 By default, ``BinaryField`` sets :attr:`~Field.editable` to ``False``, in which
 case it can't be included in a :class:`~django.forms.ModelForm`.
 
-``BinaryField`` has one extra optional argument:
-
 .. attribute:: BinaryField.max_length
 
-    The maximum length (in characters) of the field. The maximum length is
+    Optional. The maximum length (in bytes) of the field. The maximum length is
     enforced in Django's validation using
     :class:`~django.core.validators.MaxLengthValidator`.
 
@@ -606,13 +613,15 @@ For large amounts of text, use :class:`~django.db.models.TextField`.
 
 The default form widget for this field is a :class:`~django.forms.TextInput`.
 
-:class:`CharField` has two extra arguments:
+:class:`CharField` has the following extra arguments:
 
 .. attribute:: CharField.max_length
 
-    Required. The maximum length (in characters) of the field. The max_length
+    The maximum length (in characters) of the field. The ``max_length``
     is enforced at the database level and in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`.
+    :class:`~django.core.validators.MaxLengthValidator`. It's required for all
+    database backends included with Django except PostgreSQL, which supports
+    unlimited ``VARCHAR`` columns.
 
     .. note::
 
@@ -621,9 +630,11 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
 
-.. attribute:: CharField.db_collation
+    .. versionchanged:: 4.2
 
-    .. versionadded:: 3.2
+        Support for unlimited ``VARCHAR`` columns was added on PostgreSQL.
+
+.. attribute:: CharField.db_collation
 
     Optional. The database collation name of the field.
 
@@ -714,7 +725,7 @@ A fixed-precision decimal number, represented in Python by a
 :class:`~decimal.Decimal` instance. It validates the input using
 :class:`~django.core.validators.DecimalValidator`.
 
-Has two **required** arguments:
+Has the following **required** arguments:
 
 .. attribute:: DecimalField.max_digits
 
@@ -725,7 +736,7 @@ Has two **required** arguments:
 
     The number of decimal places to store with the number.
 
-For example, to store numbers up to ``999`` with a resolution of 2 decimal
+For example, to store numbers up to ``999.99`` with a resolution of 2 decimal
 places, you'd use::
 
     models.DecimalField(..., max_digits=5, decimal_places=2)
@@ -774,7 +785,7 @@ A :class:`CharField` that checks that the value is a valid email address using
 ``FileField``
 -------------
 
-.. class:: FileField(upload_to=None, max_length=100, **options)
+.. class:: FileField(upload_to='', storage=None, max_length=100, **options)
 
 A file-upload field.
 
@@ -782,7 +793,7 @@ A file-upload field.
     The ``primary_key`` argument isn't supported and will raise an error if
     used.
 
-Has two optional arguments:
+Has the following optional arguments:
 
 .. attribute:: FileField.upload_to
 
@@ -857,7 +868,7 @@ takes a few steps:
    full path to a directory where you'd like Django to store uploaded files.
    (For performance, these files are not stored in the database.) Define
    :setting:`MEDIA_URL` as the base public URL of that directory. Make sure
-   that this directory is writable by the Web server's user account.
+   that this directory is writable by the web server's user account.
 
 #. Add the :class:`FileField` or :class:`ImageField` to your model, defining
    the :attr:`~FileField.upload_to` option to specify a subdirectory of
@@ -900,7 +911,7 @@ Note that whenever you deal with uploaded files, you should pay close attention
 to where you're uploading them and what type of files they are, to avoid
 security holes. *Validate all uploaded files* so that you're sure the files are
 what you think they are. For example, if you blindly let somebody upload files,
-without validation, to a directory that's within your Web server's document
+without validation, to a directory that's within your web server's document
 root, then somebody could upload a CGI or PHP script and execute that script by
 visiting its URL on your site. Don't allow that.
 
@@ -1112,6 +1123,37 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     information on the difference between the two, see Python's documentation
     for the :mod:`decimal` module.
 
+``GenericIPAddressField``
+-------------------------
+
+.. class:: GenericIPAddressField(protocol='both', unpack_ipv4=False, **options)
+
+An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
+``2a02:42fe::4``). The default form widget for this field is a
+:class:`~django.forms.TextInput`.
+
+The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
+including using the IPv4 format suggested in paragraph 3 of that section, like
+``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
+``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
+are converted to lowercase.
+
+.. attribute:: GenericIPAddressField.protocol
+
+    Limits valid inputs to the specified protocol.
+    Accepted values are ``'both'`` (default), ``'IPv4'``
+    or ``'IPv6'``. Matching is case insensitive.
+
+.. attribute:: GenericIPAddressField.unpack_ipv4
+
+    Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
+    If this option is enabled that address would be unpacked to
+    ``192.0.2.1``. Default is disabled. Can only be used
+    when ``protocol`` is set to ``'both'``.
+
+If you allow for blank values, you have to allow for null values since blank
+values are stored as null.
+
 ``ImageField``
 --------------
 
@@ -1123,8 +1165,8 @@ validates that the uploaded object is a valid image.
 In addition to the special attributes that are available for :class:`FileField`,
 an :class:`ImageField` also has ``height`` and ``width`` attributes.
 
-To facilitate querying on those attributes, :class:`ImageField` has two extra
-optional arguments:
+To facilitate querying on those attributes, :class:`ImageField` has the
+following optional arguments:
 
 .. attribute:: ImageField.height_field
 
@@ -1163,37 +1205,6 @@ The default form widget for this field is a :class:`~django.forms.NumberInput`
 when :attr:`~django.forms.Field.localize` is ``False`` or
 :class:`~django.forms.TextInput` otherwise.
 
-``GenericIPAddressField``
--------------------------
-
-.. class:: GenericIPAddressField(protocol='both', unpack_ipv4=False, **options)
-
-An IPv4 or IPv6 address, in string format (e.g. ``192.0.2.30`` or
-``2a02:42fe::4``). The default form widget for this field is a
-:class:`~django.forms.TextInput`.
-
-The IPv6 address normalization follows :rfc:`4291#section-2.2` section 2.2,
-including using the IPv4 format suggested in paragraph 3 of that section, like
-``::ffff:192.0.2.0``. For example, ``2001:0::0:01`` would be normalized to
-``2001::1``, and ``::ffff:0a0a:0a0a`` to ``::ffff:10.10.10.10``. All characters
-are converted to lowercase.
-
-.. attribute:: GenericIPAddressField.protocol
-
-    Limits valid inputs to the specified protocol.
-    Accepted values are ``'both'`` (default), ``'IPv4'``
-    or ``'IPv6'``. Matching is case insensitive.
-
-.. attribute:: GenericIPAddressField.unpack_ipv4
-
-    Unpacks IPv4 mapped addresses like ``::ffff:192.0.2.1``.
-    If this option is enabled that address would be unpacked to
-    ``192.0.2.1``. Default is disabled. Can only be used
-    when ``protocol`` is set to ``'both'``.
-
-If you allow for blank values, you have to allow for null values since blank
-values are stored as null.
-
 ``JSONField``
 -------------
 
@@ -1203,9 +1214,8 @@ A field for storing JSON encoded data. In Python the data is represented in its
 Python native format: dictionaries, lists, strings, numbers, booleans and
 ``None``.
 
-``JSONField`` is supported on MariaDB 10.2.7+, MySQL 5.7.8+, Oracle,
-PostgreSQL, and SQLite (with the :ref:`JSON1 extension enabled
-<sqlite-json1>`).
+``JSONField`` is supported on MariaDB, MySQL, Oracle, PostgreSQL, and SQLite
+(with the :ref:`JSON1 extension enabled <sqlite-json1>`).
 
 .. attribute:: JSONField.encoder
 
@@ -1347,9 +1357,7 @@ However it is not enforced at the model or database level. Use a
 
 .. attribute:: TextField.db_collation
 
-    .. versionadded:: 3.2
-
-    The database collation name of the field.
+    Optional. The database collation name of the field.
 
     .. note::
 
@@ -1464,7 +1472,7 @@ Relationships defined this way on :ref:`abstract models
 concrete model and are not relative to the abstract model's ``app_label``:
 
 .. code-block:: python
-    :caption: products/models.py
+    :caption: ``products/models.py``
 
     from django.db import models
 
@@ -1475,7 +1483,7 @@ concrete model and are not relative to the abstract model's ``app_label``:
             abstract = True
 
 .. code-block:: python
-    :caption: production/models.py
+    :caption: ``production/models.py``
 
     from django.db import models
     from products.models import AbstractCar
@@ -1616,7 +1624,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Set the :class:`ForeignKey` to the value passed to
     :func:`~django.db.models.SET()`, or if a callable is passed in,
     the result of calling it. In most cases, passing a callable will be
-    necessary to avoid executing queries at the time your models.py is
+    necessary to avoid executing queries at the time your ``models.py`` is
     imported::
 
         from django.conf import settings
@@ -1755,7 +1763,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     Setting it to ``False`` does not mean you can reference a swappable model
@@ -1809,10 +1817,6 @@ that control how the relationship functions.
 .. attribute:: ManyToManyField.limit_choices_to
 
     Same as :attr:`ForeignKey.limit_choices_to`.
-
-    ``limit_choices_to`` has no effect when used on a ``ManyToManyField`` with a
-    custom intermediate table specified using the
-    :attr:`~ManyToManyField.through` parameter.
 
 .. attribute:: ManyToManyField.symmetrical
 
@@ -1969,7 +1973,7 @@ that control how the relationship functions.
     a reference to the setting, not to the model directly.
 
     You only want to override this to be ``False`` if you are sure your
-    model should always point towards the swapped-in model - for example,
+    model should always point toward the swapped-in model - for example,
     if it is a profile model designed specifically for your custom user model.
 
     If in doubt, leave it to its default of ``True``.
@@ -2029,13 +2033,14 @@ your resulting ``User`` model will have the following attributes::
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse
 relationship if an entry in the related table doesn't exist. This is a subclass
 of the target model's :exc:`Model.DoesNotExist
-<django.db.models.Model.DoesNotExist>` exception. For example, if a user
-doesn't have a supervisor designated by ``MySpecialUser``::
+<django.db.models.Model.DoesNotExist>` exception and can be accessed as an
+attribute of the reverse accessor. For example, if a user doesn't have a
+supervisor designated by ``MySpecialUser``::
 
-    >>> user.supervisor_of
-    Traceback (most recent call last):
-        ...
-    RelatedObjectDoesNotExist: User has no supervisor_of.
+    try:
+        user.supervisor_of
+    except User.supervisor_of.RelatedObjectDoesNotExist:
+        pass
 
 .. _onetoone-arguments:
 
@@ -2251,6 +2256,18 @@ Field API reference
 
         This method must be added to fields prior to 1.7 to migrate its data
         using :doc:`/topics/migrations`.
+
+Registering and fetching lookups
+================================
+
+``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
+The API can be used to customize which lookups are available for a field class
+and its instances, and how lookups are fetched from a field.
+
+.. versionchanged:: 4.2
+
+    Support for registering lookups on :class:`~django.db.models.Field`
+    instances was added.
 
 .. _model-field-attributes:
 

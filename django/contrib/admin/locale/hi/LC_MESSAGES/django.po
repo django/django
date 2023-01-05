@@ -6,13 +6,14 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pratik <kpratik217@gmail.com>, 2013
 # Sandeep Satavlekar <sandysat@gmail.com>, 2011
+# Vaarun Sinha, 2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Vaarun Sinha\n"
 "Language-Team: Hindi (http://www.transifex.com/django/django/language/hi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,8 +22,12 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "चुने हुए %(verbose_name_plural)s  हटा दीजिये "
+
+#, python-format
 msgid "Successfully deleted %(count)d %(items)s."
-msgstr "%(count)d %(items)s सफलतापूर्वक हटा दिया गया है| |"
+msgstr "%(count)d %(items)s सफलतापूर्वक हटा दिया गया है |"
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -30,10 +35,6 @@ msgstr "%(name)s नहीं हटा सकते"
 
 msgid "Are you sure?"
 msgstr "क्या आप निश्चित हैं?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "चुने हुए %(verbose_name_plural)s  हटा दीजिये "
 
 msgid "Administration"
 msgstr ""
@@ -71,6 +72,12 @@ msgstr ""
 msgid "Has date"
 msgstr ""
 
+msgid "Empty"
+msgstr ""
+
+msgid "Not empty"
+msgstr ""
+
 #, python-format
 msgid ""
 "Please enter the correct %(username)s and password for a staff account. Note "
@@ -89,8 +96,17 @@ msgstr "एक और %(verbose_name)s जोड़ें "
 msgid "Remove"
 msgstr "निकालें"
 
+msgid "Addition"
+msgstr ""
+
+msgid "Change"
+msgstr "बदलें"
+
+msgid "Deletion"
+msgstr ""
+
 msgid "action time"
-msgstr "कार्य समय"
+msgstr "कार्य के लिए समय"
 
 msgid "user"
 msgstr ""
@@ -99,12 +115,12 @@ msgid "content type"
 msgstr ""
 
 msgid "object id"
-msgstr "वस्तु आई डी "
+msgstr "वस्तु की आईडी "
 
 #. Translators: 'repr' means representation
-#. (https://docs.python.org/3/library/functions.html#repr)
+#. (https://docs.python.org/library/functions.html#repr)
 msgid "object repr"
-msgstr "वस्तु प्रतिनिधित्व"
+msgstr "वस्तु का निरूपण"
 
 msgid "action flag"
 msgstr "कार्य ध्वज"
@@ -119,22 +135,22 @@ msgid "log entries"
 msgstr "लॉग प्रविष्टियाँ"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" को जोड़ा गया."
+msgid "Added “%(object)s”."
+msgstr ""
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "परिवर्तित \"%(object)s\" - %(changes)s "
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr ""
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\" को नष्ट कर दिया है."
+msgid "Deleted “%(object)s.”"
+msgstr ""
 
 msgid "LogEntry Object"
 msgstr "LogEntry ऑब्जेक्ट"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
+msgid "Added {name} “{object}”."
 msgstr ""
 
 msgid "Added."
@@ -144,7 +160,7 @@ msgid "and"
 msgstr "और"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
+msgid "Changed {fields} for {name} “{object}”."
 msgstr ""
 
 #, python-brace-format
@@ -152,7 +168,7 @@ msgid "Changed {fields}."
 msgstr ""
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
+msgid "Deleted {name} “{object}”."
 msgstr ""
 
 msgid "No fields changed."
@@ -161,38 +177,38 @@ msgstr "कोई क्षेत्र नहीं बदला"
 msgid "None"
 msgstr "कोई नहीं"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr ""
+
+msgid "You may edit it again below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
+"The {name} “{obj}” was added successfully. You may add another {name} below."
 msgstr ""
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
 msgstr ""
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr ""
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr ""
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
+msgid "The {name} “{obj}” was changed successfully."
 msgstr ""
 
 msgid ""
@@ -204,11 +220,11 @@ msgid "No action selected."
 msgstr "कोई कार्रवाई नहीं चुनी है |"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" को कामयाबी से निकाला गया है"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr ""
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
 
 #, python-format
@@ -218,6 +234,10 @@ msgstr "%s बढाएं"
 #, python-format
 msgid "Change %s"
 msgstr "%s बदलो"
+
+#, python-format
+msgid "View %s"
+msgstr ""
 
 msgid "Database error"
 msgstr "डेटाबेस त्रुटि"
@@ -242,8 +262,9 @@ msgstr "%(cnt)s में से 0 चुने"
 msgid "Change history: %s"
 msgstr "इतिहास बदलो: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -273,8 +294,8 @@ msgstr ""
 msgid "Page not found"
 msgstr "पृष्ठ लापता"
 
-msgid "We're sorry, but the requested page could not be found."
-msgstr "क्षमा कीजिए पर निवेदित पृष्ठ लापता है ।"
+msgid "We’re sorry, but the requested page could not be found."
+msgstr ""
 
 msgid "Home"
 msgstr "गृह"
@@ -289,11 +310,9 @@ msgid "Server Error <em>(500)</em>"
 msgstr "सर्वर त्रुटि <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
-"एक त्रुटि मिली है। इसकी जानकारी स्थल के संचालकों को डाक द्वारा दे दी गई है, और यह जल्द "
-"ठीक हो जानी चाहिए। धीरज रखने के लिए शुक्रिया।"
 
 msgid "Run the selected action"
 msgstr "चयनित कार्रवाई चलाइये"
@@ -311,21 +330,32 @@ msgstr "तमाम %(total_count)s %(module_name)s चुनें"
 msgid "Clear selection"
 msgstr "चयन खालिज किया जाये "
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s अनुप्रयोग के प्रतिरूप"
+
+msgid "Add"
+msgstr "बढाएं"
+
+msgid "View"
+msgstr ""
+
+msgid "You don’t have permission to view or edit anything."
+msgstr ""
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
-"पहले प्रदवोक्ता नाम और कूटशब्द दर्ज करें । उसके पश्चात ही आप अधिक प्रवोक्ता विकल्प बदल "
-"सकते हैं ।"
 
 msgid "Enter a username and password."
 msgstr "उपयोगकर्ता का नाम और कूटशब्द दर्ज करें."
 
 msgid "Change password"
-msgstr "कूटशब्द बदलें"
+msgstr "पासवर्ड बदलें"
 
 msgid "Please correct the error below."
-msgstr "कृपया नीचे पायी गयी गलतियाँ ठीक करें ।"
+msgstr ""
 
 msgid "Please correct the errors below."
 msgstr ""
@@ -358,6 +388,9 @@ msgstr "साइट पे देखें"
 
 msgid "Filter"
 msgstr "छन्नी"
+
+msgid "Clear all filters"
+msgstr ""
 
 msgid "Remove from sorting"
 msgstr "श्रेणीकरण से हटाये "
@@ -400,8 +433,8 @@ msgstr ""
 msgid "Objects"
 msgstr ""
 
-msgid "Yes, I'm sure"
-msgstr "हाँ, मैंने पक्का तय किया हैं "
+msgid "Yes, I’m sure"
+msgstr ""
 
 msgid "No, take me back"
 msgstr ""
@@ -434,9 +467,6 @@ msgstr ""
 "क्या आप ने पक्का तय किया हैं की चयनित %(objects_name)s  को नष्ट किया जाये ? "
 "निम्नलिखित सभी वस्तुएं और उनसे सम्बंधित वस्तुए भी नष्ट की जाएगी:"
 
-msgid "Change"
-msgstr "बदलें"
-
 msgid "Delete?"
 msgstr "मिटाएँ ?"
 
@@ -446,16 +476,6 @@ msgstr "%(filter_title)s द्वारा"
 
 msgid "Summary"
 msgstr ""
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s अनुप्रयोग के प्रतिरूप"
-
-msgid "Add"
-msgstr "बढाएं"
-
-msgid "You don't have permission to edit anything."
-msgstr "आपके पास कुछ भी संपादन करने के लिये अनुमति नहीं है ।"
 
 msgid "Recent actions"
 msgstr ""
@@ -470,12 +490,10 @@ msgid "Unknown content"
 msgstr "अज्ञात सामग्री"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"अपने डेटाबेस स्थापना के साथ कुछ गलत तो है | सुनिश्चित करें कि उचित डेटाबेस तालिका बनायीं "
-"गयी है, और सुनिश्चित करें कि डेटाबेस उपयुक्त उपयोक्ता के द्वारा पठनीय है |"
 
 #, python-format
 msgid ""
@@ -486,6 +504,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "अपना पासवर्ड या उपयोगकर्ता नाम भूल गये हैं?"
 
+msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "तिथि / समय"
 
@@ -495,12 +522,16 @@ msgstr "उपभोक्ता"
 msgid "Action"
 msgstr "कार्य"
 
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
-"इस वस्तु का बदलाव इतिहास नहीं है. शायद वह इस साइट व्यवस्थापक के माध्यम से नहीं जोड़ा "
-"गया है."
 
 msgid "Show all"
 msgstr "सभी दिखाएँ"
@@ -508,19 +539,7 @@ msgstr "सभी दिखाएँ"
 msgid "Save"
 msgstr "सुरक्षित कीजिये"
 
-msgid "Popup closing..."
-msgstr ""
-
-#, python-format
-msgid "Change selected %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Add another %(model)s"
-msgstr ""
-
-#, python-format
-msgid "Delete selected %(model)s"
+msgid "Popup closing…"
 msgstr ""
 
 msgid "Search"
@@ -545,8 +564,30 @@ msgstr "सहेजें और एक और जोडें"
 msgid "Save and continue editing"
 msgstr "सहेजें और संपादन करें"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "आज हमारे वेब साइट पर आने के लिए धन्यवाद ।"
+msgid "Save and view"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr ""
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "फिर से लॉगिन कीजिए"
@@ -558,11 +599,9 @@ msgid "Your password was changed."
 msgstr "आपके कूटशब्द को बदला गया है"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
-"सुरक्षा कारणों के लिए कृपया पुराना कूटशब्द दर्ज करें । उसके पश्चात नए कूटशब्द को दो बार दर्ज "
-"करें ताकि हम उसे सत्यापित कर सकें ।"
 
 msgid "Change my password"
 msgstr "कूटशब्द बदलें"
@@ -595,16 +634,14 @@ msgstr ""
 "पुनस्थाप की आवेदन करें ।"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"अगर आपको कोई ईमेल प्राप्त नई होता है,यह ध्यान रखे की आपने सही पता रजिस्ट्रीकृत किया है "
-"और आपने स्पॅम फोल्डर को जाचे|"
 
 #, python-format
 msgid ""
@@ -617,8 +654,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "कृपया निम्नलिखित पृष्ठ पर नया कूटशब्द चुनिये :"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "आपका प्रवोक्ता नाम, यदि भूल गये हों :"
+msgid "Your username, in case you’ve forgotten:"
+msgstr ""
 
 msgid "Thanks for using our site!"
 msgstr "हमारे साइट को उपयोग करने के लिए धन्यवाद ।"
@@ -628,10 +665,9 @@ msgid "The %(site_name)s team"
 msgstr "%(site_name)s दल"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
-"कूटशब्द भूल गए? नीचे अपना डाक पता भरें, वहाँ पर हम आपको नया कूटशब्द रखने के निर्देश भेजेंगे।"
 
 msgid "Email address:"
 msgstr "डाक पता -"
@@ -649,6 +685,10 @@ msgstr "%s चुनें"
 #, python-format
 msgid "Select %s to change"
 msgstr "%s के बदली के लिए चयन करें"
+
+#, python-format
+msgid "Select %s to view"
+msgstr ""
 
 msgid "Date:"
 msgstr "तिथि:"

@@ -1,4 +1,4 @@
-import functools
+from functools import wraps
 
 from django.http import HttpRequest
 
@@ -28,19 +28,21 @@ def sensitive_variables(*variables):
     """
     if len(variables) == 1 and callable(variables[0]):
         raise TypeError(
-            'sensitive_variables() must be called to use it as a decorator, '
-            'e.g., use @sensitive_variables(), not @sensitive_variables.'
+            "sensitive_variables() must be called to use it as a decorator, "
+            "e.g., use @sensitive_variables(), not @sensitive_variables."
         )
 
     def decorator(func):
-        @functools.wraps(func)
+        @wraps(func)
         def sensitive_variables_wrapper(*func_args, **func_kwargs):
             if variables:
                 sensitive_variables_wrapper.sensitive_variables = variables
             else:
-                sensitive_variables_wrapper.sensitive_variables = '__ALL__'
+                sensitive_variables_wrapper.sensitive_variables = "__ALL__"
             return func(*func_args, **func_kwargs)
+
         return sensitive_variables_wrapper
+
     return decorator
 
 
@@ -69,13 +71,13 @@ def sensitive_post_parameters(*parameters):
     """
     if len(parameters) == 1 and callable(parameters[0]):
         raise TypeError(
-            'sensitive_post_parameters() must be called to use it as a '
-            'decorator, e.g., use @sensitive_post_parameters(), not '
-            '@sensitive_post_parameters.'
+            "sensitive_post_parameters() must be called to use it as a "
+            "decorator, e.g., use @sensitive_post_parameters(), not "
+            "@sensitive_post_parameters."
         )
 
     def decorator(view):
-        @functools.wraps(view)
+        @wraps(view)
         def sensitive_post_parameters_wrapper(request, *args, **kwargs):
             if not isinstance(request, HttpRequest):
                 raise TypeError(
@@ -86,7 +88,9 @@ def sensitive_post_parameters(*parameters):
             if parameters:
                 request.sensitive_post_parameters = parameters
             else:
-                request.sensitive_post_parameters = '__ALL__'
+                request.sensitive_post_parameters = "__ALL__"
             return view(request, *args, **kwargs)
+
         return sensitive_post_parameters_wrapper
+
     return decorator

@@ -42,33 +42,37 @@ import warnings
 from django.utils.deprecation import RemovedInDjango50Warning
 
 warnings.warn(
-    'The django.utils.baseconv module is deprecated.',
+    "The django.utils.baseconv module is deprecated.",
     category=RemovedInDjango50Warning,
     stacklevel=2,
 )
 
-BASE2_ALPHABET = '01'
-BASE16_ALPHABET = '0123456789ABCDEF'
-BASE56_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz'
-BASE36_ALPHABET = '0123456789abcdefghijklmnopqrstuvwxyz'
-BASE62_ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-BASE64_ALPHABET = BASE62_ALPHABET + '-_'
+BASE2_ALPHABET = "01"
+BASE16_ALPHABET = "0123456789ABCDEF"
+BASE56_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz"
+BASE36_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz"
+BASE62_ALPHABET = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+BASE64_ALPHABET = BASE62_ALPHABET + "-_"
 
 
 class BaseConverter:
-    decimal_digits = '0123456789'
+    decimal_digits = "0123456789"
 
-    def __init__(self, digits, sign='-'):
+    def __init__(self, digits, sign="-"):
         self.sign = sign
         self.digits = digits
         if sign in self.digits:
-            raise ValueError('Sign character found in converter base digits.')
+            raise ValueError("Sign character found in converter base digits.")
 
     def __repr__(self):
-        return "<%s: base%s (%s)>" % (self.__class__.__name__, len(self.digits), self.digits)
+        return "<%s: base%s (%s)>" % (
+            self.__class__.__name__,
+            len(self.digits),
+            self.digits,
+        )
 
     def encode(self, i):
-        neg, value = self.convert(i, self.decimal_digits, self.digits, '-')
+        neg, value = self.convert(i, self.decimal_digits, self.digits, "-")
         if neg:
             return self.sign + value
         return value
@@ -76,7 +80,7 @@ class BaseConverter:
     def decode(self, s):
         neg, value = self.convert(s, self.digits, self.decimal_digits, self.sign)
         if neg:
-            value = '-' + value
+            value = "-" + value
         return int(value)
 
     def convert(self, number, from_digits, to_digits, sign):
@@ -95,7 +99,7 @@ class BaseConverter:
         if x == 0:
             res = to_digits[0]
         else:
-            res = ''
+            res = ""
             while x > 0:
                 digit = x % len(to_digits)
                 res = to_digits[digit] + res
@@ -108,4 +112,4 @@ base16 = BaseConverter(BASE16_ALPHABET)
 base36 = BaseConverter(BASE36_ALPHABET)
 base56 = BaseConverter(BASE56_ALPHABET)
 base62 = BaseConverter(BASE62_ALPHABET)
-base64 = BaseConverter(BASE64_ALPHABET, sign='$')
+base64 = BaseConverter(BASE64_ALPHABET, sign="$")

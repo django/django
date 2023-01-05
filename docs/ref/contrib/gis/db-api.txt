@@ -22,11 +22,9 @@ GeoDjango currently provides the following spatial database backends:
 MySQL Spatial Limitations
 -------------------------
 
-Before MySQL 5.6.1, spatial extensions only support bounding box operations
-(what MySQL calls minimum bounding rectangles, or MBR). Specifically, MySQL did
-not conform to the OGC standard. Django supports spatial functions operating on
-real geometries available in modern MySQL versions. However, the spatial
-functions are not as rich as other backends like PostGIS.
+Django supports spatial functions operating on real geometries available in
+modern MySQL versions. However, the spatial functions are not as rich as other
+backends like PostGIS.
 
 Raster Support
 --------------
@@ -318,7 +316,8 @@ Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   Sp
 :lookup:`equals`                   X          X        X         X            X          C
 :lookup:`exact <same_as>`          X          X        X         X            X          B
 :lookup:`intersects`               X          X        X         X            X          B
-:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X
+:lookup:`isempty`                  X
+:lookup:`isvalid`                  X          X                  X            X
 :lookup:`overlaps`                 X          X        X         X            X          B
 :lookup:`relate`                   X          X        X                      X          C
 :lookup:`same_as`                  X          X        X         X            X          B
@@ -348,7 +347,7 @@ functions are available on each spatial backend.
 Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
 ====================================  =======  ============== ============ =========== =================
 :class:`Area`                         X        X              X            X           X
-:class:`AsGeoJSON`                    X        X              X (≥ 10.2.4) X (≥ 5.7.5) X
+:class:`AsGeoJSON`                    X        X              X            X           X
 :class:`AsGML`                        X        X                                       X
 :class:`AsKML`                        X                                                X
 :class:`AsSVG`                        X                                                X
@@ -361,9 +360,10 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`Distance`                     X        X              X            X           X
 :class:`Envelope`                     X        X              X            X           X
 :class:`ForcePolygonCW`               X                                                X
-:class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM/RTTOPO)
+:class:`GeoHash`                      X                                    X           X (LWGEOM/RTTOPO)
 :class:`Intersection`                 X        X              X            X           X
-:class:`IsValid`                      X        X                           X (≥ 5.7.5) X
+:class:`IsEmpty`                      X
+:class:`IsValid`                      X        X                           X           X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)

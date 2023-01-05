@@ -38,40 +38,39 @@ class CommonMiddleware(MiddlewareMixin):
         """
 
         # Check for denied User-Agents
-        user_agent = request.META.get('HTTP_USER_AGENT')
+        user_agent = request.META.get("HTTP_USER_AGENT")
         if user_agent is not None:
             for user_agent_regex in settings.DISALLOWED_USER_AGENTS:
                 if user_agent_regex.search(user_agent):
-                    raise PermissionDenied('Forbidden user agent')
+                    raise PermissionDenied("Forbidden user agent")
 
         # Check for a redirect based on settings.PREPEND_WWW
         host = request.get_host()
-        must_prepend = settings.PREPEND_WWW and host and not host.startswith('www.')
-        redirect_url = ('%s://www.%s' % (request.scheme, host)) if must_prepend else ''
 
-        # Check if a slash should be appended
-        if self.should_redirect_with_slash(request):
-            path = self.get_full_path_with_slash(request)
-        else:
-            path = request.get_full_path()
+        if settings.PREPEND_WWW and host and not host.startswith("www."):
+            # Check if we also need to append a slash so we can do it all
+            # with a single redirect. (This check may be somewhat expensive,
+            # so we only do it if we already know we're sending a redirect,
+            # or in process_response if we get a 404.)
+            if self.should_redirect_with_slash(request):
+                path = self.get_full_path_with_slash(request)
+            else:
+                path = request.get_full_path()
 
-        # Return a redirect if necessary
-        if redirect_url or path != request.get_full_path():
-            redirect_url += path
-            return self.response_redirect_class(redirect_url)
+            return self.response_redirect_class(f"{request.scheme}://www.{host}{path}")
 
     def should_redirect_with_slash(self, request):
         """
         Return True if settings.APPEND_SLASH is True and appending a slash to
         the request path turns an invalid path into a valid one.
         """
-        if settings.APPEND_SLASH and not request.path_info.endswith('/'):
-            urlconf = getattr(request, 'urlconf', None)
+        if settings.APPEND_SLASH and not request.path_info.endswith("/"):
+            urlconf = getattr(request, "urlconf", None)
             if not is_valid_path(request.path_info, urlconf):
-                match = is_valid_path('%s/' % request.path_info, urlconf)
+                match = is_valid_path("%s/" % request.path_info, urlconf)
                 if match:
                     view = match.func
-                    return getattr(view, 'should_append_slash', True)
+                    return getattr(view, "should_append_slash", True)
         return False
 
     def get_full_path_with_slash(self, request):
@@ -84,15 +83,16 @@ class CommonMiddleware(MiddlewareMixin):
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
         new_path = escape_leading_slashes(new_path)
-        if settings.DEBUG and request.method in ('POST', 'PUT', 'PATCH'):
+        if settings.DEBUG and request.method in ("POST", "PUT", "PATCH"):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
                 "redirect to the slash URL while maintaining %(method)s data. "
                 "Change your form to point to %(url)s (note the trailing "
-                "slash), or set APPEND_SLASH=False in your Django settings." % {
-                    'method': request.method,
-                    'url': request.get_host() + new_path,
+                "slash), or set APPEND_SLASH=False in your Django settings."
+                % {
+                    "method": request.method,
+                    "url": request.get_host() + new_path,
                 }
             )
         return new_path
@@ -109,28 +109,32 @@ class CommonMiddleware(MiddlewareMixin):
 
         # Add the Content-Length header to non-streaming responses if not
         # already set.
-        if not response.streaming and not response.has_header('Content-Length'):
-            response.headers['Content-Length'] = str(len(response.content))
+        if not response.streaming and not response.has_header("Content-Length"):
+            response.headers["Content-Length"] = str(len(response.content))
 
         return response
 
 
 class BrokenLinkEmailsMiddleware(MiddlewareMixin):
-
     def process_response(self, request, response):
         """Send broken link emails for relevant 404 NOT FOUND responses."""
         if response.status_code == 404 and not settings.DEBUG:
             domain = request.get_host()
             path = request.get_full_path()
-            referer = request.META.get('HTTP_REFERER', '')
+            referer = request.META.get("HTTP_REFERER", "")
 
             if not self.is_ignorable_request(request, path, domain, referer):
-                ua = request.META.get('HTTP_USER_AGENT', '<none>')
-                ip = request.META.get('REMOTE_ADDR', '<none>')
+                ua = request.META.get("HTTP_USER_AGENT", "<none>")
+                ip = request.META.get("REMOTE_ADDR", "<none>")
                 mail_managers(
-                    "Broken %slink on %s" % (
-                        ('INTERNAL ' if self.is_internal_request(domain, referer) else ''),
-                        domain
+                    "Broken %slink on %s"
+                    % (
+                        (
+                            "INTERNAL "
+                            if self.is_internal_request(domain, referer)
+                            else ""
+                        ),
+                        domain,
                     ),
                     "Referrer: %s\nRequested URL: %s\nUser agent: %s\n"
                     "IP address: %s\n" % (referer, path, ua, ip),
@@ -158,17 +162,17 @@ class BrokenLinkEmailsMiddleware(MiddlewareMixin):
 
         # APPEND_SLASH is enabled and the referer is equal to the current URL
         # without a trailing slash indicating an internal redirect.
-        if settings.APPEND_SLASH and uri.endswith('/') and referer == uri[:-1]:
+        if settings.APPEND_SLASH and uri.endswith("/") and referer == uri[:-1]:
             return True
 
         # A '?' in referer is identified as a search engine source.
-        if not self.is_internal_request(domain, referer) and '?' in referer:
+        if not self.is_internal_request(domain, referer) and "?" in referer:
             return True
 
         # The referer is equal to the current URL, ignoring the scheme (assumed
         # to be a poorly implemented bot).
         parsed_referer = urlparse(referer)
-        if parsed_referer.netloc in ['', domain] and parsed_referer.path == uri:
+        if parsed_referer.netloc in ["", domain] and parsed_referer.path == uri:
             return True
 
         return any(pattern.search(uri) for pattern in settings.IGNORABLE_404_URLS)

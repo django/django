@@ -15,28 +15,32 @@ class MethodsTests(TestCase):
         )
 
         self.assertFalse(a.was_published_today())
-        self.assertQuerysetEqual(
-            a.articles_from_same_day_1(), [
+        self.assertQuerySetEqual(
+            a.articles_from_same_day_1(),
+            [
                 "Beatles reunite",
             ],
             lambda a: a.headline,
         )
-        self.assertQuerysetEqual(
-            a.articles_from_same_day_2(), [
+        self.assertQuerySetEqual(
+            a.articles_from_same_day_2(),
+            [
                 "Beatles reunite",
             ],
-            lambda a: a.headline
+            lambda a: a.headline,
         )
 
-        self.assertQuerysetEqual(
-            b.articles_from_same_day_1(), [
+        self.assertQuerySetEqual(
+            b.articles_from_same_day_1(),
+            [
                 "Parrot programs in Python",
             ],
             lambda a: a.headline,
         )
-        self.assertQuerysetEqual(
-            b.articles_from_same_day_2(), [
+        self.assertQuerySetEqual(
+            b.articles_from_same_day_2(),
+            [
                 "Parrot programs in Python",
             ],
-            lambda a: a.headline
+            lambda a: a.headline,
         )

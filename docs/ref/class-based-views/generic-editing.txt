@@ -275,11 +275,23 @@ editing content:
     * :class:`django.views.generic.base.TemplateResponseMixin`
     * :class:`django.views.generic.edit.BaseDeleteView`
     * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.edit.FormMixin`
+    * :class:`django.views.generic.base.ContextMixin`
     * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
     **Attributes**
+
+    .. attribute:: form_class
+
+        Inherited from :class:`~django.views.generic.edit.BaseDeleteView`. The
+        form class that will be used to confirm the request. By default
+        :class:`django.forms.Form`, resulting in an empty form that is always
+        valid.
+
+        By providing your own ``Form`` subclass, you can add additional
+        requirements, such as a confirmation checkbox, for example.
 
     .. attribute:: template_name_suffix
 
@@ -305,6 +317,7 @@ editing content:
 
         <form method="post">{% csrf_token %}
             <p>Are you sure you want to delete "{{ object }}"?</p>
+            {{ form }}
             <input type="submit" value="Confirm">
         </form>
 
@@ -319,4 +332,5 @@ editing content:
     This view inherits methods and attributes from the following views:
 
     * :class:`django.views.generic.edit.DeletionMixin`
+    * :class:`django.views.generic.edit.FormMixin`
     * :class:`django.views.generic.detail.BaseDetailView`

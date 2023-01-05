@@ -20,7 +20,7 @@ the equivalent of the translation strings in the target language. Once the
 translators have filled in the message file, it must be compiled. This process
 relies on the GNU gettext toolset.
 
-Once this is done, Django takes care of translating Web apps on the fly in each
+Once this is done, Django takes care of translating web apps on the fly in each
 available language, according to users' language preferences.
 
 Django's internationalization hooks are on by default, and that means there's a
@@ -28,12 +28,6 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-
-.. note::
-
-    There is also an independent but related :setting:`USE_L10N` setting that
-    controls if Django should implement format localization. See
-    :doc:`/topics/i18n/formatting` for more details.
 
 .. note::
 
@@ -521,7 +515,7 @@ And then later::
 Localized names of languages
 ----------------------------
 
-.. function:: get_language_info
+.. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
 languages::
@@ -579,7 +573,7 @@ require translation in the future::
 
     <title>{% translate "myvar" noop %}</title>
 
-Internally, inline translations use an
+Internally, inline translations use a
 :func:`~django.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
@@ -655,8 +649,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
-inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
+not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -713,6 +707,11 @@ In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters.
 
+.. versionchanged:: 4.2
+
+    In older versions, ``asvar`` instances weren't marked as safe for (HTML)
+    output purposes.
+
 ``{% blocktranslate %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
 
@@ -726,8 +725,8 @@ the content of the ``{% blocktranslate %}`` tag, replace any whitespace at the
 beginning and end of a line and merge all lines into one using a space
 character to separate them. This is quite useful for indenting the content of a
 ``{% blocktranslate %}`` tag without having the indentation characters end up
-in the corresponding entry in the PO file, which makes the translation process
-easier.
+in the corresponding entry in the ``.po`` file, which makes the translation
+process easier.
 
 For instance, the following ``{% blocktranslate %}`` tag::
 
@@ -736,8 +735,8 @@ For instance, the following ``{% blocktranslate %}`` tag::
       Second paragraph.
     {% endblocktranslate %}
 
-will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
-compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
+will result in the entry ``"First sentence. Second paragraph."`` in the ``.po``
+file, compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
 
 String literals passed to tags and filters
@@ -1253,7 +1252,7 @@ URL::
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
         path('jsi18n/',
-             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
+             cache_page(86400, key_prefix='jsi18n-%s' % get_version())(JavaScriptCatalog.as_view()),
              name='javascript-catalog'),
     ]
 
@@ -1279,7 +1278,7 @@ You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
 in django-statici18n_.
 
-.. _django-statici18n: https://django-statici18n.readthedocs.io/en/latest/
+.. _django-statici18n: https://django-statici18n.readthedocs.io/
 
 .. _url-internationalization:
 
@@ -1613,9 +1612,9 @@ otherwise, they'll be tacked together without whitespace!
 
     Due to the way the ``gettext`` tools work internally and because we want to
     allow non-ASCII source strings in Django's core and your applications, you
-    **must** use UTF-8 as the encoding for your PO files (the default when PO
-    files are created).  This means that everybody will be using the same
-    encoding, which is important when Django processes the PO files.
+    **must** use UTF-8 as the encoding for your ``.po`` files (the default when
+    ``.po`` files are created).  This means that everybody will be using the
+    same encoding, which is important when Django processes the ``.po`` files.
 
 .. admonition:: Fuzzy entries
 
@@ -1652,7 +1651,7 @@ That's it. Your translations are ready for use.
    :djadmin:`django-admin compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
-.. admonition:: .po files: Encoding and BOM usage.
+.. admonition:: ``.po`` files: Encoding and BOM usage.
 
    Django only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
@@ -1715,7 +1714,7 @@ You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
-"xgettext.exe has generated errors and will be closed by Windows".
+"``xgettext.exe`` has generated errors and will be closed by Windows".
 
 .. _customizing-makemessages:
 
@@ -2081,7 +2080,7 @@ translations for the same literal:
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in :source:`django/conf/locale`
    is used as a fallback.
 
 .. seealso::

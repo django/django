@@ -2,9 +2,9 @@
 Built-in class-based generic views
 ==================================
 
-Writing Web applications can be monotonous, because we repeat certain patterns
+Writing web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
-and template layers, but Web developers also experience this boredom at the view
+and template layers, but web developers also experience this boredom at the view
 level.
 
 Django's *generic views* were developed to ease that pain. They take certain
@@ -67,8 +67,6 @@ of built-in generic views to help generate list and detail views of objects.
 
 Let's start by looking at some examples of showing a list of objects or an
 individual object.
-
-.. comment: link here to the other topic pages (form handling, date based, mixins)
 
 We'll be using these models::
 

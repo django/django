@@ -1,68 +1,155 @@
+import json
+import warnings
+
 from django.contrib.postgres.fields import ArrayField
-from django.db.models import Aggregate, BooleanField, JSONField, Value
+from django.db.models import Aggregate, BooleanField, JSONField, TextField, Value
+from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
 
 from .mixins import OrderableAggMixin
 
 __all__ = [
-    'ArrayAgg', 'BitAnd', 'BitOr', 'BoolAnd', 'BoolOr', 'JSONBAgg', 'StringAgg',
+    "ArrayAgg",
+    "BitAnd",
+    "BitOr",
+    "BitXor",
+    "BoolAnd",
+    "BoolOr",
+    "JSONBAgg",
+    "StringAgg",
 ]
 
 
-class ArrayAgg(OrderableAggMixin, Aggregate):
-    function = 'ARRAY_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+# RemovedInDjango50Warning
+NOT_PROVIDED = object()
+
+
+class DeprecatedConvertValueMixin:
+    def __init__(self, *expressions, default=NOT_PROVIDED, **extra):
+        if default is NOT_PROVIDED:
+            default = None
+            self._default_provided = False
+        else:
+            self._default_provided = True
+        super().__init__(*expressions, default=default, **extra)
+
+    def resolve_expression(self, *args, **kwargs):
+        resolved = super().resolve_expression(*args, **kwargs)
+        if not self._default_provided:
+            resolved.empty_result_set_value = getattr(
+                self, "deprecation_empty_result_set_value", self.deprecation_value
+            )
+        return resolved
+
+    def convert_value(self, value, expression, connection):
+        if value is None and not self._default_provided:
+            warnings.warn(self.deprecation_msg, category=RemovedInDjango50Warning)
+            return self.deprecation_value
+        return value
+
+
+class ArrayAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
+    function = "ARRAY_AGG"
+    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
     allow_distinct = True
+
+    # RemovedInDjango50Warning
+    deprecation_value = property(lambda self: [])
+    deprecation_msg = (
+        "In Django 5.0, ArrayAgg() will return None instead of an empty list "
+        "if there are no rows. Pass default=None to opt into the new behavior "
+        "and silence this warning or default=[] to keep the previous behavior."
+    )
 
     @property
     def output_field(self):
         return ArrayField(self.source_expressions[0].output_field)
 
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return []
-        return value
-
 
 class BitAnd(Aggregate):
-    function = 'BIT_AND'
+    function = "BIT_AND"
 
 
 class BitOr(Aggregate):
-    function = 'BIT_OR'
+    function = "BIT_OR"
+
+
+class BitXor(Aggregate):
+    function = "BIT_XOR"
 
 
 class BoolAnd(Aggregate):
-    function = 'BOOL_AND'
+    function = "BOOL_AND"
     output_field = BooleanField()
 
 
 class BoolOr(Aggregate):
-    function = 'BOOL_OR'
+    function = "BOOL_OR"
     output_field = BooleanField()
 
 
-class JSONBAgg(OrderableAggMixin, Aggregate):
-    function = 'JSONB_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+class JSONBAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
+    function = "JSONB_AGG"
+    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
     allow_distinct = True
     output_field = JSONField()
 
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return '[]'
-        return value
+    # RemovedInDjango50Warning
+    deprecation_value = "[]"
+    deprecation_empty_result_set_value = property(lambda self: [])
+    deprecation_msg = (
+        "In Django 5.0, JSONBAgg() will return None instead of an empty list "
+        "if there are no rows. Pass default=None to opt into the new behavior "
+        "and silence this warning or default=[] to keep the previous "
+        "behavior."
+    )
+
+    # RemovedInDjango51Warning: When the deprecation ends, remove __init__().
+    #
+    # RemovedInDjango50Warning: When the deprecation ends, replace with:
+    # def __init__(self, *expressions, default=None, **extra):
+    def __init__(self, *expressions, default=NOT_PROVIDED, **extra):
+        super().__init__(*expressions, default=default, **extra)
+        if (
+            isinstance(default, Value)
+            and isinstance(default.value, str)
+            and not isinstance(default.output_field, JSONField)
+        ):
+            value = default.value
+            try:
+                decoded = json.loads(value)
+            except json.JSONDecodeError:
+                warnings.warn(
+                    "Passing a Value() with an output_field that isn't a JSONField as "
+                    "JSONBAgg(default) is deprecated. Pass default="
+                    f"Value({value!r}, output_field=JSONField()) instead.",
+                    stacklevel=2,
+                    category=RemovedInDjango51Warning,
+                )
+                self.default.output_field = self.output_field
+            else:
+                self.default = Value(decoded, self.output_field)
+                warnings.warn(
+                    "Passing an encoded JSON string as JSONBAgg(default) is "
+                    f"deprecated. Pass default={decoded!r} instead.",
+                    stacklevel=2,
+                    category=RemovedInDjango51Warning,
+                )
 
 
-class StringAgg(OrderableAggMixin, Aggregate):
-    function = 'STRING_AGG'
-    template = '%(function)s(%(distinct)s%(expressions)s %(ordering)s)'
+class StringAgg(DeprecatedConvertValueMixin, OrderableAggMixin, Aggregate):
+    function = "STRING_AGG"
+    template = "%(function)s(%(distinct)s%(expressions)s %(ordering)s)"
     allow_distinct = True
+    output_field = TextField()
+
+    # RemovedInDjango50Warning
+    deprecation_value = ""
+    deprecation_msg = (
+        "In Django 5.0, StringAgg() will return None instead of an empty "
+        "string if there are no rows. Pass default=None to opt into the new "
+        'behavior and silence this warning or default="" to keep the previous behavior.'
+    )
 
     def __init__(self, expression, delimiter, **extra):
         delimiter_expr = Value(str(delimiter))
         super().__init__(expression, delimiter_expr, **extra)
-
-    def convert_value(self, value, expression, connection):
-        if not value:
-            return ''
-        return value

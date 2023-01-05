@@ -121,11 +121,6 @@ than the path to a configuration class.
 
         from django.apps import apps as django_apps
 
-.. versionchanged:: 3.2
-
-    In previous versions, a ``default_app_config`` variable in the application
-    module was used to identify the default application configuration class.
-
 For application users
 ---------------------
 
@@ -205,8 +200,6 @@ Configurable attributes
 
 .. attribute:: AppConfig.default
 
-    .. versionadded:: 3.2
-
     Set this attribute to ``False`` to prevent Django from selecting a
     configuration class automatically. This is useful when ``apps.py`` defines
     only one :class:`AppConfig` subclass but you don't want Django to use it by
@@ -220,8 +213,6 @@ Configurable attributes
     By default, this attribute isn't set.
 
 .. attribute:: AppConfig.default_auto_field
-
-    .. versionadded:: 3.2
 
     The implicit primary key type to add to models within this app. You can
     use this to keep :class:`~django.db.models.AutoField` as the primary key
@@ -251,7 +242,7 @@ Read-only attributes
 Methods
 -------
 
-.. method:: AppConfig.get_models()
+.. method:: AppConfig.get_models(include_auto_created=False, include_swapped=False)
 
     Returns an iterable of :class:`~django.db.models.Model` classes for this
     application.
@@ -320,7 +311,7 @@ Methods
         once by Django. But in some corner cases, particularly in tests which
         are fiddling with installed applications, ``ready`` might be called more
         than once. In that case, either write idempotent methods, or put a flag
-        on your ``AppConfig`` classes to prevent re-running code which should
+        on your ``AppConfig`` classes to prevent rerunning code which should
         be executed exactly one time.
 
 .. _namespace package:

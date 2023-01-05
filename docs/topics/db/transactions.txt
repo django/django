@@ -238,15 +238,10 @@ Django provides a single API to control database transactions.
     is especially important if you're using :func:`atomic` in long-running
     processes, outside of Django's request / response cycle.
 
-.. warning::
+.. versionchanged:: 4.1
 
-    :class:`django.test.TestCase` disables the durability check to allow
-    testing durable atomic blocks in a transaction for performance reasons. Use
-    :class:`django.test.TransactionTestCase` for testing durability.
-
-.. versionchanged:: 3.2
-
-    The ``durable`` argument was added.
+    In older versions, the durability check was disabled in
+    :class:`django.test.TestCase`.
 
 Autocommit
 ==========
@@ -295,38 +290,51 @@ Performing actions after commit
 
 Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
-include a `Celery`_ task, an email notification, or a cache invalidation.
+include a background task, an email notification, or a cache invalidation.
 
-.. _Celery: https://pypi.org/project/celery/
+:func:`on_commit` allows you to register callbacks that will be executed after
+the open transaction is successfully committed:
 
-Django provides the :func:`on_commit` function to register callback functions
-that should be executed after a transaction is successfully committed:
+.. function:: on_commit(func, using=None, robust=False)
 
-.. function:: on_commit(func, using=None)
-
-Pass any function (that takes no arguments) to :func:`on_commit`::
+Pass a function, or any callable, to :func:`on_commit`::
 
     from django.db import transaction
 
-    def do_something():
-        pass  # send a mail, invalidate a cache, fire off a Celery task, etc.
+    def send_welcome_email():
+        ...
 
-    transaction.on_commit(do_something)
+    transaction.on_commit(send_welcome_email)
 
-You can also wrap your function in a lambda::
+Callbacks will not be passed any arguments, but you can bind them with
+:func:`functools.partial`::
 
-    transaction.on_commit(lambda: some_celery_task.delay('arg1'))
+    from functools import partial
 
-The function you pass in will be called immediately after a hypothetical
-database write made where ``on_commit()`` is called would be successfully
-committed.
+    for user in users:
+        transaction.on_commit(
+            partial(send_invite_email, user=user)
+        )
 
-If you call ``on_commit()`` while there isn't an active transaction, the
-callback will be executed immediately.
+Callbacks are called after the open transaction is successfully committed. If
+the transaction is instead rolled back (typically when an unhandled exception
+is raised in an :func:`atomic` block), the callback will be discarded, and
+never called.
 
-If that hypothetical database write is instead rolled back (typically when an
-unhandled exception is raised in an :func:`atomic` block), your function will
-be discarded and never called.
+If you call ``on_commit()`` while there isn't an open transaction,
+the callback will be executed immediately.
+
+It's sometimes useful to register callbacks that can fail. Passing
+``robust=True`` allows the next callbacks to be executed even if the current
+one throws an exception. All errors derived from Python's ``Exception`` class
+are caught and logged to the ``django.db.backends.base`` logger.
+
+You can use :meth:`.TestCase.captureOnCommitCallbacks` to test callbacks
+registered with :func:`on_commit`.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Savepoints
 ----------
@@ -369,10 +377,14 @@ registered.
 Exception handling
 ------------------
 
-If one on-commit function within a given transaction raises an uncaught
-exception, no later registered functions in that same transaction will run.
-This is the same behavior as if you'd executed the functions sequentially
-yourself without :func:`on_commit`.
+If one on-commit function registered with ``robust=False`` within a given
+transaction raises an uncaught exception, no later registered functions in that
+same transaction will run. This is the same behavior as if you'd executed the
+functions sequentially yourself without :func:`on_commit`.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Timing of execution
 -------------------
@@ -380,13 +392,13 @@ Timing of execution
 Your callbacks are executed *after* a successful commit, so a failure in a
 callback will not cause the transaction to roll back. They are executed
 conditionally upon the success of the transaction, but they are not *part* of
-the transaction. For the intended use cases (mail notifications, Celery tasks,
-etc.), this should be fine. If it's not (if your follow-up action is so
+the transaction. For the intended use cases (mail notifications, background
+tasks, etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
 `two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
-<psycopg2:tpc>` and the :pep:`optional Two-Phase Commit Extensions in the
-Python DB-API specification <249#optional-two-phase-commit-extensions>`.
+<psycopg:two-phase-commit>` and the :pep:`optional Two-Phase Commit Extensions
+in the Python DB-API specification <249#optional-two-phase-commit-extensions>`.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an
@@ -614,7 +626,7 @@ When autocommit is enabled, savepoints don't make sense. When it's disabled,
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
 ``DELETE`` and ``REPLACE``.) This bug has two consequences:
 
-- The low level APIs for savepoints are only usable inside a transaction ie.
+- The low level APIs for savepoints are only usable inside a transaction i.e.
   inside an :func:`atomic` block.
 - It's impossible to use :func:`atomic` when autocommit is turned off.
 

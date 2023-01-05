@@ -8,10 +8,20 @@ class ContentNotRenderedError(Exception):
 
 
 class SimpleTemplateResponse(HttpResponse):
-    rendering_attrs = ['template_name', 'context_data', '_post_render_callbacks']
+    non_picklable_attrs = HttpResponse.non_picklable_attrs | frozenset(
+        ["template_name", "context_data", "_post_render_callbacks"]
+    )
 
-    def __init__(self, template, context=None, content_type=None, status=None,
-                 charset=None, using=None, headers=None):
+    def __init__(
+        self,
+        template,
+        context=None,
+        content_type=None,
+        status=None,
+        charset=None,
+        using=None,
+        headers=None,
+    ):
         # It would seem obvious to call these next two members 'template' and
         # 'context', but those names are reserved as part of the test Client
         # API. To avoid the name collision, we use different names.
@@ -33,7 +43,7 @@ class SimpleTemplateResponse(HttpResponse):
         # content argument doesn't make sense here because it will be replaced
         # with rendered template so we always pass empty string in order to
         # prevent errors and provide shorter signature.
-        super().__init__('', content_type, status, charset=charset, headers=headers)
+        super().__init__("", content_type, status, charset=charset, headers=headers)
 
         # _is_rendered tracks whether the template and context has been baked
         # into a final response.
@@ -47,15 +57,11 @@ class SimpleTemplateResponse(HttpResponse):
         Raise an exception if trying to pickle an unrendered response. Pickle
         only rendered data, not the data used to construct the response.
         """
-        obj_dict = self.__dict__.copy()
         if not self._is_rendered:
-            raise ContentNotRenderedError('The response content must be '
-                                          'rendered before it can be pickled.')
-        for attr in self.rendering_attrs:
-            if attr in obj_dict:
-                del obj_dict[attr]
-
-        return obj_dict
+            raise ContentNotRenderedError(
+                "The response content must be rendered before it can be pickled."
+            )
+        return super().__getstate__()
 
     def resolve_template(self, template):
         """Accept a template object, path-to-template, or list of paths."""
@@ -116,7 +122,7 @@ class SimpleTemplateResponse(HttpResponse):
     def __iter__(self):
         if not self._is_rendered:
             raise ContentNotRenderedError(
-                'The response content must be rendered before it can be iterated over.'
+                "The response content must be rendered before it can be iterated over."
             )
         return super().__iter__()
 
@@ -124,7 +130,7 @@ class SimpleTemplateResponse(HttpResponse):
     def content(self):
         if not self._is_rendered:
             raise ContentNotRenderedError(
-                'The response content must be rendered before it can be accessed.'
+                "The response content must be rendered before it can be accessed."
             )
         return super().content
 
@@ -136,9 +142,22 @@ class SimpleTemplateResponse(HttpResponse):
 
 
 class TemplateResponse(SimpleTemplateResponse):
-    rendering_attrs = SimpleTemplateResponse.rendering_attrs + ['_request']
+    non_picklable_attrs = SimpleTemplateResponse.non_picklable_attrs | frozenset(
+        ["_request"]
+    )
 
-    def __init__(self, request, template, context=None, content_type=None,
-                 status=None, charset=None, using=None, headers=None):
-        super().__init__(template, context, content_type, status, charset, using, headers=headers)
+    def __init__(
+        self,
+        request,
+        template,
+        context=None,
+        content_type=None,
+        status=None,
+        charset=None,
+        using=None,
+        headers=None,
+    ):
+        super().__init__(
+            template, context, content_type, status, charset, using, headers=headers
+        )
         self._request = request

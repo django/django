@@ -19,44 +19,51 @@ from .tests import AdminDocsTestCase, TestDataMixin
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
-
     def setUp(self):
         self.client.force_login(self.superuser)
 
     def test_index(self):
-        response = self.client.get(reverse('django-admindocs-docroot'))
-        self.assertContains(response, '<h1>Documentation</h1>', html=True)
-        self.assertContains(response, '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>')
+        response = self.client.get(reverse("django-admindocs-docroot"))
+        self.assertContains(response, "<h1>Documentation</h1>", html=True)
+        self.assertContains(
+            response,
+            '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+        )
         self.client.logout()
-        response = self.client.get(reverse('django-admindocs-docroot'), follow=True)
+        response = self.client.get(reverse("django-admindocs-docroot"), follow=True)
         # Should display the login screen
-        self.assertContains(response, '<input type="hidden" name="next" value="/admindocs/">', html=True)
+        self.assertContains(
+            response, '<input type="hidden" name="next" value="/admindocs/">', html=True
+        )
 
     def test_bookmarklets(self):
-        response = self.client.get(reverse('django-admindocs-bookmarklets'))
-        self.assertContains(response, '/admindocs/views/')
+        response = self.client.get(reverse("django-admindocs-bookmarklets"))
+        self.assertContains(response, "/admindocs/views/")
 
     def test_templatetag_index(self):
-        response = self.client.get(reverse('django-admindocs-tags'))
-        self.assertContains(response, '<h3 id="built_in-extends">extends</h3>', html=True)
+        response = self.client.get(reverse("django-admindocs-tags"))
+        self.assertContains(
+            response, '<h3 id="built_in-extends">extends</h3>', html=True
+        )
 
     def test_templatefilter_index(self):
-        response = self.client.get(reverse('django-admindocs-filters'))
+        response = self.client.get(reverse("django-admindocs-filters"))
         self.assertContains(response, '<h3 id="built_in-first">first</h3>', html=True)
 
     def test_view_index(self):
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse("django-admindocs-views-index"))
         self.assertContains(
             response,
-            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.BaseAdminDocsView/">/admindocs/</a></h3>',
-            html=True
+            '<h3><a href="/admindocs/views/django.contrib.admindocs.views.'
+            'BaseAdminDocsView/">/admindocs/</a></h3>',
+            html=True,
         )
-        self.assertContains(response, 'Views by namespace test')
-        self.assertContains(response, 'Name: <code>test:func</code>.')
+        self.assertContains(response, "Views by namespace test")
+        self.assertContains(response, "Name: <code>test:func</code>.")
         self.assertContains(
             response,
             '<h3><a href="/admindocs/views/admin_docs.views.XViewCallableObject/">'
-            '/xview/callable_object_without_xview/</a></h3>',
+            "/xview/callable_object_without_xview/</a></h3>",
             html=True,
         )
 
@@ -64,27 +71,37 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Views that are methods are listed correctly.
         """
-        response = self.client.get(reverse('django-admindocs-views-index'))
+        response = self.client.get(reverse("django-admindocs-views-index"))
         self.assertContains(
             response,
-            '<h3><a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">/admin/</a></h3>',
-            html=True
+            "<h3>"
+            '<a href="/admindocs/views/django.contrib.admin.sites.AdminSite.index/">'
+            "/admin/</a></h3>",
+            html=True,
         )
 
     def test_view_detail(self):
-        url = reverse('django-admindocs-views-detail', args=['django.contrib.admindocs.views.BaseAdminDocsView'])
+        url = reverse(
+            "django-admindocs-views-detail",
+            args=["django.contrib.admindocs.views.BaseAdminDocsView"],
+        )
         response = self.client.get(url)
         # View docstring
-        self.assertContains(response, 'Base view for admindocs views.')
+        self.assertContains(response, "Base view for admindocs views.")
 
-    @override_settings(ROOT_URLCONF='admin_docs.namespace_urls')
+    @override_settings(ROOT_URLCONF="admin_docs.namespace_urls")
     def test_namespaced_view_detail(self):
-        url = reverse('django-admindocs-views-detail', args=['admin_docs.views.XViewClass'])
+        url = reverse(
+            "django-admindocs-views-detail", args=["admin_docs.views.XViewClass"]
+        )
         response = self.client.get(url)
-        self.assertContains(response, '<h1>admin_docs.views.XViewClass</h1>')
+        self.assertContains(response, "<h1>admin_docs.views.XViewClass</h1>")
 
     def test_view_detail_illegal_import(self):
-        url = reverse('django-admindocs-views-detail', args=['urlpatterns_reverse.nonimported_module.view'])
+        url = reverse(
+            "django-admindocs-views-detail",
+            args=["urlpatterns_reverse.nonimported_module.view"],
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         self.assertNotIn("urlpatterns_reverse.nonimported_module", sys.modules)
@@ -93,41 +110,56 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Views that are methods can be displayed.
         """
-        url = reverse('django-admindocs-views-detail', args=['django.contrib.admin.sites.AdminSite.index'])
+        url = reverse(
+            "django-admindocs-views-detail",
+            args=["django.contrib.admin.sites.AdminSite.index"],
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_model_index(self):
-        response = self.client.get(reverse('django-admindocs-models-index'))
+        response = self.client.get(reverse("django-admindocs-models-index"))
         self.assertContains(
             response,
-            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)</h2>',
-            html=True
+            '<h2 id="app-auth">Authentication and Authorization (django.contrib.auth)'
+            "</h2>",
+            html=True,
         )
 
     def test_template_detail(self):
-        response = self.client.get(reverse('django-admindocs-templates', args=['admin_doc/template_detail.html']))
-        self.assertContains(response, '<h1>Template: <q>admin_doc/template_detail.html</q></h1>', html=True)
+        response = self.client.get(
+            reverse(
+                "django-admindocs-templates", args=["admin_doc/template_detail.html"]
+            )
+        )
+        self.assertContains(
+            response,
+            "<h1>Template: <q>admin_doc/template_detail.html</q></h1>",
+            html=True,
+        )
 
     def test_missing_docutils(self):
         utils.docutils_is_available = False
         try:
-            response = self.client.get(reverse('django-admindocs-docroot'))
+            response = self.client.get(reverse("django-admindocs-docroot"))
             self.assertContains(
                 response,
-                '<h3>The admin documentation system requires Python’s '
+                "<h3>The admin documentation system requires Python’s "
                 '<a href="https://docutils.sourceforge.io/">docutils</a> '
-                'library.</h3>'
-                '<p>Please ask your administrators to install '
+                "library.</h3>"
+                "<p>Please ask your administrators to install "
                 '<a href="https://docutils.sourceforge.io/">docutils</a>.</p>',
-                html=True
+                html=True,
             )
-            self.assertContains(response, '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>')
+            self.assertContains(
+                response,
+                '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+            )
         finally:
             utils.docutils_is_available = True
 
-    @modify_settings(INSTALLED_APPS={'remove': 'django.contrib.sites'})
-    @override_settings(SITE_ID=None)    # will restore SITE_ID after the test
+    @modify_settings(INSTALLED_APPS={"remove": "django.contrib.sites"})
+    @override_settings(SITE_ID=None)  # will restore SITE_ID after the test
     def test_no_sites_framework(self):
         """
         Without the sites framework, should not access SITE_ID or Site
@@ -135,73 +167,78 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         """
         Site.objects.all().delete()
         del settings.SITE_ID
-        response = self.client.get(reverse('django-admindocs-views-index'))
-        self.assertContains(response, 'View documentation')
+        response = self.client.get(reverse("django-admindocs-views-index"))
+        self.assertContains(response, "View documentation")
 
     def test_callable_urlconf(self):
         """
         Index view should correctly resolve view patterns when ROOT_URLCONF is
         not a string.
         """
+
         def urlpatterns():
             return (
-                path('admin/doc/', include('django.contrib.admindocs.urls')),
-                path('admin/', admin.site.urls),
+                path("admin/doc/", include("django.contrib.admindocs.urls")),
+                path("admin/", admin.site.urls),
             )
 
         with self.settings(ROOT_URLCONF=SimpleLazyObject(urlpatterns)):
-            response = self.client.get(reverse('django-admindocs-views-index'))
+            response = self.client.get(reverse("django-admindocs-views-index"))
             self.assertEqual(response.status_code, 200)
 
 
-@unittest.skipUnless(utils.docutils_is_available, 'no docutils installed.')
+@unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewDefaultEngineOnly(TestDataMixin, AdminDocsTestCase):
-
     def setUp(self):
         self.client.force_login(self.superuser)
 
     def test_template_detail_path_traversal(self):
-        cases = ['/etc/passwd', '../passwd']
+        cases = ["/etc/passwd", "../passwd"]
         for fpath in cases:
             with self.subTest(path=fpath):
                 response = self.client.get(
-                    reverse('django-admindocs-templates', args=[fpath]),
+                    reverse("django-admindocs-templates", args=[fpath]),
                 )
                 self.assertEqual(response.status_code, 400)
 
 
-@override_settings(TEMPLATES=[{
-    'NAME': 'ONE',
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'APP_DIRS': True,
-}, {
-    'NAME': 'TWO',
-    'BACKEND': 'django.template.backends.django.DjangoTemplates',
-    'APP_DIRS': True,
-}])
+@override_settings(
+    TEMPLATES=[
+        {
+            "NAME": "ONE",
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": True,
+        },
+        {
+            "NAME": "TWO",
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": True,
+        },
+    ]
+)
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class AdminDocViewWithMultipleEngines(AdminDocViewTests):
-
     def test_templatefilter_index(self):
         # Overridden because non-trivial TEMPLATES settings aren't supported
         # but the page shouldn't crash (#24125).
-        response = self.client.get(reverse('django-admindocs-filters'))
-        self.assertContains(response, '<title>Template filters</title>', html=True)
+        response = self.client.get(reverse("django-admindocs-filters"))
+        self.assertContains(response, "<title>Template filters</title>", html=True)
 
     def test_templatetag_index(self):
         # Overridden because non-trivial TEMPLATES settings aren't supported
         # but the page shouldn't crash (#24125).
-        response = self.client.get(reverse('django-admindocs-tags'))
-        self.assertContains(response, '<title>Template tags</title>', html=True)
+        response = self.client.get(reverse("django-admindocs-tags"))
+        self.assertContains(response, "<title>Template tags</title>", html=True)
 
 
 @unittest.skipUnless(utils.docutils_is_available, "no docutils installed.")
 class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
-
     def setUp(self):
         self.client.force_login(self.superuser)
         with captured_stderr() as self.docutils_stderr:
-            self.response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'Person']))
+            self.response = self.client.get(
+                reverse("django-admindocs-models-detail", args=["admin_docs", "Person"])
+            )
 
     def test_method_excludes(self):
         """
@@ -235,42 +272,52 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         """
         Methods with keyword arguments should have their arguments displayed.
         """
-        self.assertContains(self.response, '<td>suffix=&#x27;ltd&#x27;</td>')
+        self.assertContains(self.response, "<td>suffix=&#x27;ltd&#x27;</td>")
 
     def test_methods_with_multiple_arguments_display_arguments(self):
         """
         Methods with multiple arguments should have all their arguments
         displayed, but omitting 'self'.
         """
-        self.assertContains(self.response, "<td>baz, rox, *some_args, **some_kwargs</td>")
+        self.assertContains(
+            self.response, "<td>baz, rox, *some_args, **some_kwargs</td>"
+        )
 
     def test_instance_of_property_methods_are_displayed(self):
         """Model properties are displayed as fields."""
-        self.assertContains(self.response, '<td>a_property</td>')
+        self.assertContains(self.response, "<td>a_property</td>")
 
     def test_instance_of_cached_property_methods_are_displayed(self):
         """Model cached properties are displayed as fields."""
-        self.assertContains(self.response, '<td>a_cached_property</td>')
+        self.assertContains(self.response, "<td>a_cached_property</td>")
 
     def test_method_data_types(self):
         company = Company.objects.create(name="Django")
-        person = Person.objects.create(first_name="Human", last_name="User", company=company)
-        self.assertEqual(get_return_data_type(person.get_status_count.__name__), 'Integer')
-        self.assertEqual(get_return_data_type(person.get_groups_list.__name__), 'List')
+        person = Person.objects.create(
+            first_name="Human", last_name="User", company=company
+        )
+        self.assertEqual(
+            get_return_data_type(person.get_status_count.__name__), "Integer"
+        )
+        self.assertEqual(get_return_data_type(person.get_groups_list.__name__), "List")
 
     def test_descriptions_render_correctly(self):
         """
         The ``description`` field should render correctly for each field type.
         """
         # help text in fields
-        self.assertContains(self.response, "<td>first name - The person's first name</td>")
-        self.assertContains(self.response, "<td>last name - The person's last name</td>")
+        self.assertContains(
+            self.response, "<td>first name - The person's first name</td>"
+        )
+        self.assertContains(
+            self.response, "<td>last name - The person's last name</td>"
+        )
 
         # method docstrings
         self.assertContains(self.response, "<p>Get the full name of the person</p>")
 
         link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
-        markup = '<p>the related %s object</p>'
+        markup = "<p>the related %s object</p>"
         company_markup = markup % (link % ("admin_docs.company", "admin_docs.Company"))
 
         # foreign keys
@@ -282,18 +329,28 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         # many to many fields
         self.assertContains(
             self.response,
-            "number of related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
+            "number of related %s objects"
+            % (link % ("admin_docs.group", "admin_docs.Group")),
         )
         self.assertContains(
             self.response,
-            "all related %s objects" % (link % ("admin_docs.group", "admin_docs.Group"))
+            "all related %s objects"
+            % (link % ("admin_docs.group", "admin_docs.Group")),
         )
 
         # "raw" and "include" directives are disabled
-        self.assertContains(self.response, '<p>&quot;raw&quot; directive disabled.</p>',)
-        self.assertContains(self.response, '.. raw:: html\n    :file: admin_docs/evilfile.txt')
-        self.assertContains(self.response, '<p>&quot;include&quot; directive disabled.</p>',)
-        self.assertContains(self.response, '.. include:: admin_docs/evilfile.txt')
+        self.assertContains(
+            self.response,
+            "<p>&quot;raw&quot; directive disabled.</p>",
+        )
+        self.assertContains(
+            self.response, ".. raw:: html\n    :file: admin_docs/evilfile.txt"
+        )
+        self.assertContains(
+            self.response,
+            "<p>&quot;include&quot; directive disabled.</p>",
+        )
+        self.assertContains(self.response, ".. include:: admin_docs/evilfile.txt")
         out = self.docutils_stderr.getvalue()
         self.assertIn('"raw" directive disabled', out)
         self.assertIn('"include" directive disabled', out)
@@ -301,15 +358,17 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
     def test_model_with_many_to_one(self):
         link = '<a class="reference external" href="/admindocs/models/%s/">%s</a>'
         response = self.client.get(
-            reverse('django-admindocs-models-detail', args=['admin_docs', 'company'])
+            reverse("django-admindocs-models-detail", args=["admin_docs", "company"])
         )
         self.assertContains(
             response,
-            "number of related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+            "number of related %s objects"
+            % (link % ("admin_docs.person", "admin_docs.Person")),
         )
         self.assertContains(
             response,
-            "all related %s objects" % (link % ("admin_docs.person", "admin_docs.Person"))
+            "all related %s objects"
+            % (link % ("admin_docs.person", "admin_docs.Person")),
         )
 
     def test_model_with_no_backward_relations_render_only_relevant_fields(self):
@@ -317,40 +376,55 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
         A model with ``related_name`` of `+` shouldn't show backward
         relationship links.
         """
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'family']))
-        fields = response.context_data.get('fields')
+        response = self.client.get(
+            reverse("django-admindocs-models-detail", args=["admin_docs", "family"])
+        )
+        fields = response.context_data.get("fields")
         self.assertEqual(len(fields), 2)
 
     def test_model_docstring_renders_correctly(self):
         summary = (
-            '<h2 class="subhead"><p>Stores information about a person, related to <a class="reference external" '
-            'href="/admindocs/models/myapp.company/">myapp.Company</a>.</p></h2>'
+            '<h2 class="subhead"><p>Stores information about a person, related to '
+            '<a class="reference external" href="/admindocs/models/myapp.company/">'
+            "myapp.Company</a>.</p></h2>"
         )
-        subheading = '<p><strong>Notes</strong></p>'
-        body = '<p>Use <tt class="docutils literal">save_changes()</tt> when saving this object.</p>'
+        subheading = "<p><strong>Notes</strong></p>"
+        body = (
+            '<p>Use <tt class="docutils literal">save_changes()</tt> when saving this '
+            "object.</p>"
+        )
         model_body = (
             '<dl class="docutils"><dt><tt class="'
             'docutils literal">company</tt></dt><dd>Field storing <a class="'
             'reference external" href="/admindocs/models/myapp.company/">'
-            'myapp.Company</a> where the person works.</dd></dl>'
+            "myapp.Company</a> where the person works.</dd></dl>"
         )
-        self.assertContains(self.response, 'DESCRIPTION')
+        self.assertContains(self.response, "DESCRIPTION")
         self.assertContains(self.response, summary, html=True)
         self.assertContains(self.response, subheading, html=True)
         self.assertContains(self.response, body, html=True)
         self.assertContains(self.response, model_body, html=True)
 
     def test_model_detail_title(self):
-        self.assertContains(self.response, '<h1>admin_docs.Person</h1>', html=True)
+        self.assertContains(self.response, "<h1>admin_docs.Person</h1>", html=True)
 
     def test_app_not_found(self):
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['doesnotexist', 'Person']))
-        self.assertEqual(response.context['exception'], "App 'doesnotexist' not found")
+        response = self.client.get(
+            reverse("django-admindocs-models-detail", args=["doesnotexist", "Person"])
+        )
+        self.assertEqual(response.context["exception"], "App 'doesnotexist' not found")
         self.assertEqual(response.status_code, 404)
 
     def test_model_not_found(self):
-        response = self.client.get(reverse('django-admindocs-models-detail', args=['admin_docs', 'doesnotexist']))
-        self.assertEqual(response.context['exception'], "Model 'doesnotexist' not found in app 'admin_docs'")
+        response = self.client.get(
+            reverse(
+                "django-admindocs-models-detail", args=["admin_docs", "doesnotexist"]
+            )
+        )
+        self.assertEqual(
+            response.context["exception"],
+            "Model 'doesnotexist' not found in app 'admin_docs'",
+        )
         self.assertEqual(response.status_code, 404)
 
 
@@ -370,34 +444,134 @@ class TestFieldType(unittest.TestCase):
     def test_builtin_fields(self):
         self.assertEqual(
             views.get_readable_field_data_type(fields.BooleanField()),
-            'Boolean (Either True or False)'
+            "Boolean (Either True or False)",
+        )
+
+    def test_char_fields(self):
+        self.assertEqual(
+            views.get_readable_field_data_type(fields.CharField(max_length=255)),
+            "String (up to 255)",
+        )
+        self.assertEqual(
+            views.get_readable_field_data_type(fields.CharField()),
+            "String (unlimited)",
         )
 
     def test_custom_fields(self):
-        self.assertEqual(views.get_readable_field_data_type(CustomField()), 'A custom field type')
+        self.assertEqual(
+            views.get_readable_field_data_type(CustomField()), "A custom field type"
+        )
         self.assertEqual(
             views.get_readable_field_data_type(DescriptionLackingField()),
-            'Field of type: DescriptionLackingField'
+            "Field of type: DescriptionLackingField",
         )
 
 
 class AdminDocViewFunctionsTests(SimpleTestCase):
-
     def test_simplify_regex(self):
         tests = (
-            (r'^a', '/a'),
-            (r'^(?P<a>\w+)/b/(?P<c>\w+)/$', '/<a>/b/<c>/'),
-            (r'^(?P<a>\w+)/b/(?P<c>\w+)$', '/<a>/b/<c>'),
-            (r'^(?P<a>\w+)/b/(?P<c>\w+)', '/<a>/b/<c>'),
-            (r'^(?P<a>\w+)/b/(\w+)$', '/<a>/b/<var>'),
-            (r'^(?P<a>\w+)/b/(\w+)', '/<a>/b/<var>'),
-            (r'^(?P<a>\w+)/b/((x|y)\w+)$', '/<a>/b/<var>'),
-            (r'^(?P<a>\w+)/b/((x|y)\w+)', '/<a>/b/<var>'),
-            (r'^(?P<a>(x|y))/b/(?P<c>\w+)$', '/<a>/b/<c>'),
-            (r'^(?P<a>(x|y))/b/(?P<c>\w+)', '/<a>/b/<c>'),
-            (r'^(?P<a>(x|y))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
-            (r'^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab', '/<a>/b/<c>ab'),
-            (r'^a/?$', '/a/'),
+            # Named and unnamed groups.
+            (r"^(?P<a>\w+)/b/(?P<c>\w+)/$", "/<a>/b/<c>/"),
+            (r"^(?P<a>\w+)/b/(?P<c>\w+)$", "/<a>/b/<c>"),
+            (r"^(?P<a>\w+)/b/(?P<c>\w+)", "/<a>/b/<c>"),
+            (r"^(?P<a>\w+)/b/(\w+)$", "/<a>/b/<var>"),
+            (r"^(?P<a>\w+)/b/(\w+)", "/<a>/b/<var>"),
+            (r"^(?P<a>\w+)/b/((x|y)\w+)$", "/<a>/b/<var>"),
+            (r"^(?P<a>\w+)/b/((x|y)\w+)", "/<a>/b/<var>"),
+            (r"^(?P<a>(x|y))/b/(?P<c>\w+)$", "/<a>/b/<c>"),
+            (r"^(?P<a>(x|y))/b/(?P<c>\w+)", "/<a>/b/<c>"),
+            (r"^(?P<a>(x|y))/b/(?P<c>\w+)ab", "/<a>/b/<c>ab"),
+            (r"^(?P<a>(x|y)(\(|\)))/b/(?P<c>\w+)ab", "/<a>/b/<c>ab"),
+            # Non-capturing groups.
+            (r"^a(?:\w+)b", "/ab"),
+            (r"^a(?:(x|y))", "/a"),
+            (r"^(?:\w+(?:\w+))a", "/a"),
+            (r"^a(?:\w+)/b(?:\w+)", "/a/b"),
+            (r"(?P<a>\w+)/b/(?:\w+)c(?:\w+)", "/<a>/b/c"),
+            (r"(?P<a>\w+)/b/(\w+)/(?:\w+)c(?:\w+)", "/<a>/b/<var>/c"),
+            # Single and repeated metacharacters.
+            (r"^a", "/a"),
+            (r"^^a", "/a"),
+            (r"^^^a", "/a"),
+            (r"a$", "/a"),
+            (r"a$$", "/a"),
+            (r"a$$$", "/a"),
+            (r"a?", "/a"),
+            (r"a??", "/a"),
+            (r"a???", "/a"),
+            (r"a*", "/a"),
+            (r"a**", "/a"),
+            (r"a***", "/a"),
+            (r"a+", "/a"),
+            (r"a++", "/a"),
+            (r"a+++", "/a"),
+            (r"\Aa", "/a"),
+            (r"\A\Aa", "/a"),
+            (r"\A\A\Aa", "/a"),
+            (r"a\Z", "/a"),
+            (r"a\Z\Z", "/a"),
+            (r"a\Z\Z\Z", "/a"),
+            (r"\ba", "/a"),
+            (r"\b\ba", "/a"),
+            (r"\b\b\ba", "/a"),
+            (r"a\B", "/a"),
+            (r"a\B\B", "/a"),
+            (r"a\B\B\B", "/a"),
+            # Multiple mixed metacharacters.
+            (r"^a/?$", "/a/"),
+            (r"\Aa\Z", "/a"),
+            (r"\ba\B", "/a"),
+            # Escaped single metacharacters.
+            (r"\^a", r"/^a"),
+            (r"\\^a", r"/\\a"),
+            (r"\\\^a", r"/\\^a"),
+            (r"\\\\^a", r"/\\\\a"),
+            (r"\\\\\^a", r"/\\\\^a"),
+            (r"a\$", r"/a$"),
+            (r"a\\$", r"/a\\"),
+            (r"a\\\$", r"/a\\$"),
+            (r"a\\\\$", r"/a\\\\"),
+            (r"a\\\\\$", r"/a\\\\$"),
+            (r"a\?", r"/a?"),
+            (r"a\\?", r"/a\\"),
+            (r"a\\\?", r"/a\\?"),
+            (r"a\\\\?", r"/a\\\\"),
+            (r"a\\\\\?", r"/a\\\\?"),
+            (r"a\*", r"/a*"),
+            (r"a\\*", r"/a\\"),
+            (r"a\\\*", r"/a\\*"),
+            (r"a\\\\*", r"/a\\\\"),
+            (r"a\\\\\*", r"/a\\\\*"),
+            (r"a\+", r"/a+"),
+            (r"a\\+", r"/a\\"),
+            (r"a\\\+", r"/a\\+"),
+            (r"a\\\\+", r"/a\\\\"),
+            (r"a\\\\\+", r"/a\\\\+"),
+            (r"\\Aa", r"/\Aa"),
+            (r"\\\Aa", r"/\\a"),
+            (r"\\\\Aa", r"/\\\Aa"),
+            (r"\\\\\Aa", r"/\\\\a"),
+            (r"\\\\\\Aa", r"/\\\\\Aa"),
+            (r"a\\Z", r"/a\Z"),
+            (r"a\\\Z", r"/a\\"),
+            (r"a\\\\Z", r"/a\\\Z"),
+            (r"a\\\\\Z", r"/a\\\\"),
+            (r"a\\\\\\Z", r"/a\\\\\Z"),
+            # Escaped mixed metacharacters.
+            (r"^a\?$", r"/a?"),
+            (r"^a\\?$", r"/a\\"),
+            (r"^a\\\?$", r"/a\\?"),
+            (r"^a\\\\?$", r"/a\\\\"),
+            (r"^a\\\\\?$", r"/a\\\\?"),
+            # Adjacent escaped metacharacters.
+            (r"^a\?\$", r"/a?$"),
+            (r"^a\\?\\$", r"/a\\\\"),
+            (r"^a\\\?\\\$", r"/a\\?\\$"),
+            (r"^a\\\\?\\\\$", r"/a\\\\\\\\"),
+            (r"^a\\\\\?\\\\\$", r"/a\\\\?\\\\$"),
+            # Complex examples with metacharacters and (un)named groups.
+            (r"^\b(?P<slug>\w+)\B/(\w+)?", "/<slug>/<var>"),
+            (r"^\A(?P<slug>\w+)\Z", "/<slug>"),
         )
         for pattern, output in tests:
             with self.subTest(pattern=pattern):

@@ -4,24 +4,24 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import generic
 
-from .forms import AuthorForm, ContactForm
+from .forms import AuthorForm, ConfirmDeleteForm, ContactForm
 from .models import Artist, Author, Book, BookSigning, Page
 
 
 class CustomTemplateView(generic.TemplateView):
-    template_name = 'generic_views/about.html'
+    template_name = "generic_views/about.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update({'key': 'value'})
+        context.update({"key": "value"})
         return context
 
 
 class ObjectDetail(generic.DetailView):
-    template_name = 'generic_views/detail.html'
+    template_name = "generic_views/detail.html"
 
     def get_object(self):
-        return {'foo': 'bar'}
+        return {"foo": "bar"}
 
 
 class ArtistDetail(generic.DetailView):
@@ -33,32 +33,30 @@ class AuthorDetail(generic.DetailView):
 
 
 class AuthorCustomDetail(generic.DetailView):
-    template_name = 'generic_views/author_detail.html'
+    template_name = "generic_views/author_detail.html"
     queryset = Author.objects.all()
 
     def get(self, request, *args, **kwargs):
         # Ensures get_context_object_name() doesn't reference self.object.
         author = self.get_object()
-        context = {'custom_' + self.get_context_object_name(author): author}
+        context = {"custom_" + self.get_context_object_name(author): author}
         return self.render_to_response(context)
 
 
 class PageDetail(generic.DetailView):
     queryset = Page.objects.all()
-    template_name_field = 'template'
+    template_name_field = "template"
 
 
 class DictList(generic.ListView):
     """A ListView that doesn't use a model."""
-    queryset = [
-        {'first': 'John', 'last': 'Lennon'},
-        {'first': 'Yoko', 'last': 'Ono'}
-    ]
-    template_name = 'generic_views/list.html'
+
+    queryset = [{"first": "John", "last": "Lennon"}, {"first": "Yoko", "last": "Ono"}]
+    template_name = "generic_views/list.html"
 
 
 class ArtistList(generic.ListView):
-    template_name = 'generic_views/list.html'
+    template_name = "generic_views/list.html"
     queryset = Artist.objects.all()
 
 
@@ -77,33 +75,47 @@ class BookList(generic.ListView):
 
 class CustomPaginator(Paginator):
     def __init__(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        super().__init__(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
+        super().__init__(
+            queryset,
+            page_size,
+            orphans=2,
+            allow_empty_first_page=allow_empty_first_page,
+        )
 
 
 class AuthorListCustomPaginator(AuthorList):
     paginate_by = 5
 
-    def get_paginator(self, queryset, page_size, orphans=0, allow_empty_first_page=True):
-        return super().get_paginator(queryset, page_size, orphans=2, allow_empty_first_page=allow_empty_first_page)
+    def get_paginator(
+        self, queryset, page_size, orphans=0, allow_empty_first_page=True
+    ):
+        return super().get_paginator(
+            queryset,
+            page_size,
+            orphans=2,
+            allow_empty_first_page=allow_empty_first_page,
+        )
 
 
 class ContactView(generic.FormView):
     form_class = ContactForm
-    success_url = reverse_lazy('authors_list')
-    template_name = 'generic_views/form.html'
+    success_url = reverse_lazy("authors_list")
+    template_name = "generic_views/form.html"
 
 
 class ArtistCreate(generic.CreateView):
     model = Artist
-    fields = '__all__'
+    fields = "__all__"
 
 
 class NaiveAuthorCreate(generic.CreateView):
     queryset = Author.objects.all()
-    fields = '__all__'
+    fields = "__all__"
 
 
-class TemplateResponseWithoutTemplate(generic.detail.SingleObjectTemplateResponseMixin, generic.View):
+class TemplateResponseWithoutTemplate(
+    generic.detail.SingleObjectTemplateResponseMixin, generic.View
+):
     # we don't define the usual template_name here
 
     def __init__(self):
@@ -113,18 +125,18 @@ class TemplateResponseWithoutTemplate(generic.detail.SingleObjectTemplateRespons
 
 class AuthorCreate(generic.CreateView):
     model = Author
-    success_url = '/list/authors/'
-    fields = '__all__'
+    success_url = "/list/authors/"
+    fields = "__all__"
 
 
 class SpecializedAuthorCreate(generic.CreateView):
     model = Author
     form_class = AuthorForm
-    template_name = 'generic_views/form.html'
-    context_object_name = 'thingy'
+    template_name = "generic_views/form.html"
+    context_object_name = "thingy"
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id])
+        return reverse("author_detail", args=[self.object.id])
 
 
 class AuthorCreateRestricted(AuthorCreate):
@@ -133,19 +145,19 @@ class AuthorCreateRestricted(AuthorCreate):
 
 class ArtistUpdate(generic.UpdateView):
     model = Artist
-    fields = '__all__'
+    fields = "__all__"
 
 
 class NaiveAuthorUpdate(generic.UpdateView):
     queryset = Author.objects.all()
-    fields = '__all__'
+    fields = "__all__"
 
 
 class AuthorUpdate(generic.UpdateView):
     get_form_called_count = 0  # Used to ensure get_form() is called once.
     model = Author
-    success_url = '/list/authors/'
-    fields = '__all__'
+    success_url = "/list/authors/"
+    fields = "__all__"
 
     def get_form(self, *args, **kwargs):
         self.get_form_called_count += 1
@@ -153,8 +165,8 @@ class AuthorUpdate(generic.UpdateView):
 
 
 class OneAuthorUpdate(generic.UpdateView):
-    success_url = '/list/authors/'
-    fields = '__all__'
+    success_url = "/list/authors/"
+    fields = "__all__"
 
     def get_object(self):
         return Author.objects.get(pk=1)
@@ -163,11 +175,11 @@ class OneAuthorUpdate(generic.UpdateView):
 class SpecializedAuthorUpdate(generic.UpdateView):
     model = Author
     form_class = AuthorForm
-    template_name = 'generic_views/form.html'
-    context_object_name = 'thingy'
+    template_name = "generic_views/form.html"
+    context_object_name = "thingy"
 
     def get_success_url(self):
-        return reverse('author_detail', args=[self.object.id])
+        return reverse("author_detail", args=[self.object.id])
 
 
 class NaiveAuthorDelete(generic.DeleteView):
@@ -176,19 +188,27 @@ class NaiveAuthorDelete(generic.DeleteView):
 
 class AuthorDelete(generic.DeleteView):
     model = Author
-    success_url = '/list/authors/'
+    success_url = "/list/authors/"
+
+
+class AuthorDeleteFormView(generic.DeleteView):
+    model = Author
+    form_class = ConfirmDeleteForm
+
+    def get_success_url(self):
+        return reverse("authors_list")
 
 
 class SpecializedAuthorDelete(generic.DeleteView):
     queryset = Author.objects.all()
-    template_name = 'generic_views/confirm_delete.html'
-    context_object_name = 'thingy'
-    success_url = reverse_lazy('authors_list')
+    template_name = "generic_views/confirm_delete.html"
+    context_object_name = "thingy"
+    success_url = reverse_lazy("authors_list")
 
 
 class BookConfig:
     queryset = Book.objects.all()
-    date_field = 'pubdate'
+    date_field = "pubdate"
 
 
 class BookArchive(BookConfig, generic.ArchiveIndexView):
@@ -220,7 +240,7 @@ class BookDetail(BookConfig, generic.DateDetailView):
 
 
 class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
-    fields = '__all__'
+    fields = "__all__"
 
     def get_queryset(self):
         return Author.objects.all()
@@ -228,13 +248,13 @@ class AuthorGetQuerySetFormView(generic.edit.ModelFormMixin):
 
 class BookDetailGetObjectCustomQueryset(BookDetail):
     def get_object(self, queryset=None):
-        return super().get_object(queryset=Book.objects.filter(pk=self.kwargs['pk']))
+        return super().get_object(queryset=Book.objects.filter(pk=self.kwargs["pk"]))
 
 
 class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.View):
     queryset = [
-        {'name': 'John'},
-        {'name': 'Yoko'},
+        {"name": "John"},
+        {"name": "Yoko"},
     ]
 
     def get(self, request):
@@ -243,13 +263,13 @@ class CustomMultipleObjectMixinView(generic.list.MultipleObjectMixin, generic.Vi
 
 class CustomContextView(generic.detail.SingleObjectMixin, generic.View):
     model = Book
-    object = Book(name='dummy')
+    object = Book(name="dummy")
 
     def get_object(self):
         return Book(name="dummy")
 
     def get_context_data(self, **kwargs):
-        context = {'custom_key': 'custom_value'}
+        context = {"custom_key": "custom_value"}
         context.update(kwargs)
         return super().get_context_data(**context)
 
@@ -264,11 +284,11 @@ class CustomSingleObjectView(generic.detail.SingleObjectMixin, generic.View):
 
 class BookSigningConfig:
     model = BookSigning
-    date_field = 'event_date'
+    date_field = "event_date"
     # use the same templates as for books
 
     def get_template_names(self):
-        return ['generic_views/book%s.html' % self.template_name_suffix]
+        return ["generic_views/book%s.html" % self.template_name_suffix]
 
 
 class BookSigningArchive(BookSigningConfig, generic.ArchiveIndexView):
@@ -300,7 +320,7 @@ class BookArchiveWithoutDateField(generic.ArchiveIndexView):
 
 
 class BookSigningDetail(BookSigningConfig, generic.DateDetailView):
-    context_object_name = 'book'
+    context_object_name = "book"
 
 
 class NonModel:
@@ -311,7 +331,7 @@ class NonModel:
 
 class NonModelDetail(generic.DetailView):
 
-    template_name = 'generic_views/detail.html'
+    template_name = "generic_views/detail.html"
     model = NonModel
 
     def get_object(self, queryset=None):
@@ -325,9 +345,9 @@ class ObjectDoesNotExistDetail(generic.DetailView):
 
 class LateValidationView(generic.FormView):
     form_class = ContactForm
-    success_url = reverse_lazy('authors_list')
-    template_name = 'generic_views/form.html'
+    success_url = reverse_lazy("authors_list")
+    template_name = "generic_views/form.html"
 
     def form_valid(self, form):
-        form.add_error(None, 'There is an error')
+        form.add_error(None, "There is an error")
         return self.form_invalid(form)

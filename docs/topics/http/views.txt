@@ -3,8 +3,8 @@ Writing views
 =============
 
 A view function, or *view* for short, is a Python function that takes a
-Web request and returns a Web response. This response can be the HTML contents
-of a Web page, or a redirect, or a 404 error, or an XML document, or an image .
+web request and returns a web response. This response can be the HTML contents
+of a web page, or a redirect, or a 404 error, or an XML document, or an image .
 . . or anything, really. The view itself contains whatever arbitrary logic is
 necessary to return that response. This code can live anywhere you want, as long
 as it's on your Python path. There's no other requirement--no "magic," so to
@@ -137,7 +137,7 @@ template.
 Customizing error views
 =======================
 
-The default error views in Django should suffice for most Web applications,
+The default error views in Django should suffice for most web applications,
 but can easily be overridden if you need any custom behavior. Specify the
 handlers as seen below in your URLconf (setting them anywhere else will have no
 effect).

@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017,2019-2020
+# BouRock, 2015-2017,2019-2021
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-09-29 18:52+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 17:30+0000\n"
 "Last-Translator: BouRock\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
@@ -142,6 +142,9 @@ msgstr "iş faktörü"
 
 msgid "checksum"
 msgstr "sağlama"
+
+msgid "block size"
+msgstr "blok boyutu"
 
 msgid "name"
 msgstr "adı"

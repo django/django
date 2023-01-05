@@ -166,7 +166,7 @@ produce, or even an entire site.
 
 Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
-final steps towards producing well-performing code, not a shortcut.
+final steps toward producing well-performing code, not a shortcut.
 
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------

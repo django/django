@@ -2,7 +2,10 @@
 Many-to-one relationships
 =========================
 
-To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`::
+To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`.
+
+In this example, a ``Reporter`` can be associated with many ``Article``
+objects, but an ``Article`` can only have one ``Reporter`` object::
 
     from django.db import models
 
@@ -12,7 +15,7 @@ To define a many-to-one relationship, use :class:`~django.db.models.ForeignKey`:
         email = models.EmailField()
 
         def __str__(self):
-            return "%s %s" % (self.first_name, self.last_name)
+            return f"{self.first_name} {self.last_name}"
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
@@ -169,7 +172,7 @@ Querying in the opposite direction::
     >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
     <QuerySet [<Reporter: John Smith>]>
 
-Counting in the opposite direction works in conjunction with distinct()::
+Counting in the opposite direction works in conjunction with ``distinct()``::
 
     >>> Reporter.objects.filter(article__headline__startswith='This').count()
     3

@@ -294,7 +294,7 @@ method). The regular expressions used to find those paths
 (``django.contrib.staticfiles.storage.HashedFilesMixin.patterns``) cover:
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
-* The `source map`_ comment in JavaScript.
+* `Source map`_ comments in CSS and JavaScript files.
 * The `modules import`_ in JavaScript.
 * The `modules aggregation`_ in JavaScript.
 
@@ -313,12 +313,36 @@ For example, the ``'css/styles.css'`` file with this content:
 
     @import url("../admin/css/base.27e20196a850.css");
 
-.. versionchanged:: 4.0
+You can change the location of the manifest file by using a custom
+``ManifestStaticFilesStorage`` subclass that sets the ``manifest_storage``
+argument. For example::
 
-    Support for finding paths in the source map comments was added.
+    from django.conf import settings
+    from django.contrib.staticfiles.storage import (
+        ManifestStaticFilesStorage, StaticFilesStorage,
+    )
+
+    class MyManifestStaticFilesStorage(ManifestStaticFilesStorage):
+        def __init__(self, *args, **kwargs):
+            manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
+            super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
+
+.. versionchanged:: 4.1
+
+    Support for finding paths in CSS source map comments was added.
+
+.. versionchanged:: 4.2
 
     Support for finding paths to JavaScript modules in ``import`` and
     ``export`` statements was added.
+
+.. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
+
+.. versionadded:: 4.2
+
+This attribute provides a single hash that changes whenever a file in the
+manifest changes. This can be useful to communicate to SPAs that the assets on
+the server have changed (due to a new deployment).
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 

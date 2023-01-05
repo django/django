@@ -10,7 +10,7 @@ W003 = Warning(
     "('django.middleware.csrf.CsrfViewMiddleware' is not in your "
     "MIDDLEWARE). Enabling the middleware is the safest approach "
     "to ensure you don't leave any holes.",
-    id='security.W003',
+    id="security.W003",
 )
 
 W016 = Warning(
@@ -18,12 +18,12 @@ W016 = Warning(
     "MIDDLEWARE, but you have not set CSRF_COOKIE_SECURE to True. "
     "Using a secure-only CSRF cookie makes it more difficult for network "
     "traffic sniffers to steal the CSRF token.",
-    id='security.W016',
+    id="security.W016",
 )
 
 
 def _csrf_middleware():
-    return 'django.middleware.csrf.CsrfViewMiddleware' in settings.MIDDLEWARE
+    return "django.middleware.csrf.CsrfViewMiddleware" in settings.MIDDLEWARE
 
 
 @register(Tags.security, deploy=True)
@@ -35,9 +35,9 @@ def check_csrf_middleware(app_configs, **kwargs):
 @register(Tags.security, deploy=True)
 def check_csrf_cookie_secure(app_configs, **kwargs):
     passed_check = (
-        settings.CSRF_USE_SESSIONS or
-        not _csrf_middleware() or
-        settings.CSRF_COOKIE_SECURE
+        settings.CSRF_USE_SESSIONS
+        or not _csrf_middleware()
+        or settings.CSRF_COOKIE_SECURE is True
     )
     return [] if passed_check else [W016]
 
@@ -51,17 +51,17 @@ def check_csrf_failure_view(app_configs, **kwargs):
         view = _get_failure_view()
     except ImportError:
         msg = (
-            "The CSRF failure view '%s' could not be imported." %
-            settings.CSRF_FAILURE_VIEW
+            "The CSRF failure view '%s' could not be imported."
+            % settings.CSRF_FAILURE_VIEW
         )
-        errors.append(Error(msg, id='security.E102'))
+        errors.append(Error(msg, id="security.E102"))
     else:
         try:
             inspect.signature(view).bind(None, reason=None)
         except TypeError:
             msg = (
-                "The CSRF failure view '%s' does not take the correct number of arguments." %
-                settings.CSRF_FAILURE_VIEW
+                "The CSRF failure view '%s' does not take the correct number of "
+                "arguments." % settings.CSRF_FAILURE_VIEW
             )
-            errors.append(Error(msg, id='security.E101'))
+            errors.append(Error(msg, id="security.E101"))
     return errors

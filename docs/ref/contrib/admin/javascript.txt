@@ -8,15 +8,15 @@ Inline form events
 ==================
 
 You may want to execute some JavaScript when an inline form is added or removed
-in the admin change form. The ``formset:added`` and ``formset:removed`` jQuery
-events allow this. The event handler is passed three arguments:
+in the admin change form. The ``formset:added`` and ``formset:removed`` events
+allow this. ``event.detail.formsetName`` is the formset the row belongs to.
+For the ``formset:added`` event, ``event.target`` is the newly added row.
 
-* ``event`` is the ``jQuery`` event.
-* ``$row`` is the newly added (or removed) row.
-* ``formsetName`` is the formset the row belongs to.
+.. versionchanged:: 4.1
 
-The event is fired using the :ref:`django.jQuery namespace
-<contrib-admin-jquery>`.
+    In older versions, the event was a ``jQuery`` event with ``$row`` and
+    ``formsetName`` parameters. It is now a JavaScript ``CustomEvent`` with
+    parameters set in ``event.detail``.
 
 In your custom ``change_form.html`` template, extend the
 ``admin_change_form_document_ready`` block and add the event listener code:
@@ -32,19 +32,16 @@ In your custom ``change_form.html`` template, extend the
     {% endblock %}
 
 .. code-block:: javascript
-    :caption: app/static/app/formset_handlers.js
+    :caption: ``app/static/app/formset_handlers.js``
 
-    (function($) {
-        $(document).on('formset:added', function(event, $row, formsetName) {
-            if (formsetName == 'author_set') {
-                // Do something
-            }
-        });
-
-        $(document).on('formset:removed', function(event, $row, formsetName) {
-            // Row removed
-        });
-    })(django.jQuery);
+    document.addEventListener('formset:added', (event) => {
+        if (event.detail.formsetName == 'author_set') {
+            // Do something
+        }
+    });
+    document.addEventListener('formset:removed', (event) => {
+        // Row removed
+    });
 
 Two points to keep in mind:
 
@@ -54,28 +51,28 @@ Two points to keep in mind:
   ``admin_change_form_document_ready`` block contains JavaScript code to handle
   various operations in the change form and we need that to be rendered too.
 
-Sometimes you'll need to work with ``jQuery`` plugins that are not registered
-in the ``django.jQuery`` namespace. To do that, change how the code listens for
-events. Instead of wrapping the listener in the ``django.jQuery`` namespace,
-listen to the event triggered from there. For example:
+Supporting versions of Django older than 4.1
+--------------------------------------------
 
-.. code-block:: html+django
+If your event listener still has to support older versions of Django you have
+to use jQuery to register your event listener. jQuery handles JavaScript events
+but the reverse isn't true.
 
-    {% extends 'admin/change_form.html' %}
-    {% load static %}
-
-    {% block admin_change_form_document_ready %}
-    {{ block.super }}
-    <script src="{% static 'app/unregistered_handlers.js' %}"></script>
-    {% endblock %}
+You could check for the presence of ``event.detail.formsetName`` and fall back
+to the old listener signature as follows:
 
 .. code-block:: javascript
-    :caption: app/static/app/unregistered_handlers.js
 
-    django.jQuery(document).on('formset:added', function(event, $row, formsetName) {
-        // Row added
-    });
+    function handleFormsetAdded(row, formsetName) {
+        // Do something
+    }
 
-    django.jQuery(document).on('formset:removed', function(event, $row, formsetName) {
-        // Row removed
-    });
+    $(document).on('formset:added', (event, $row, formsetName) => {
+        if (event.detail && event.detail.formsetName) {
+            // Django >= 4.1
+            handleFormsetAdded(event.target, event.detail.formsetName)
+        } else {
+            // Django < 4.1, use $row and formsetName
+            handleFormsetAdded($row.get(0), formsetName)
+        }
+    })

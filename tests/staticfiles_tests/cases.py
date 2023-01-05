@@ -33,7 +33,10 @@ class BaseStaticFilesMixin:
 
     def static_template_snippet(self, path, asvar=False):
         if asvar:
-            return "{%% load static from static %%}{%% static '%s' as var %%}{{ var }}" % path
+            return (
+                "{%% load static from static %%}{%% static '%s' as var %%}{{ var }}"
+                % path
+            )
         return "{%% load static from static %%}{%% static '%s' %%}" % path
 
     def assertStaticRenders(self, path, result, asvar=False, **kwargs):
@@ -60,6 +63,7 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
     is separated because some test cases need those asserts without
     all these tests.
     """
+
     run_collectstatic_in_setUp = True
 
     def setUp(self):
@@ -82,13 +86,18 @@ class CollectionTestCase(BaseStaticFilesMixin, SimpleTestCase):
         return tempfile.mkdtemp()
 
     def run_collectstatic(self, *, verbosity=0, **kwargs):
-        call_command('collectstatic', interactive=False, verbosity=verbosity,
-                     ignore_patterns=['*.ignoreme'], **kwargs)
+        call_command(
+            "collectstatic",
+            interactive=False,
+            verbosity=verbosity,
+            ignore_patterns=["*.ignoreme"],
+            **kwargs,
+        )
 
     def _get_file(self, filepath):
-        assert filepath, 'filepath is empty.'
+        assert filepath, "filepath is empty."
         filepath = os.path.join(settings.STATIC_ROOT, filepath)
-        with open(filepath, encoding='utf-8') as f:
+        with open(filepath, encoding="utf-8") as f:
             return f.read()
 
 
@@ -96,43 +105,44 @@ class TestDefaults:
     """
     A few standard test cases.
     """
+
     def test_staticfiles_dirs(self):
         """
         Can find a file in a STATICFILES_DIRS directory.
         """
-        self.assertFileContains('test.txt', 'Can we find')
-        self.assertFileContains(os.path.join('prefix', 'test.txt'), 'Prefix')
+        self.assertFileContains("test.txt", "Can we find")
+        self.assertFileContains(os.path.join("prefix", "test.txt"), "Prefix")
 
     def test_staticfiles_dirs_subdir(self):
         """
         Can find a file in a subdirectory of a STATICFILES_DIRS
         directory.
         """
-        self.assertFileContains('subdir/test.txt', 'Can we find')
+        self.assertFileContains("subdir/test.txt", "Can we find")
 
     def test_staticfiles_dirs_priority(self):
         """
         File in STATICFILES_DIRS has priority over file in app.
         """
-        self.assertFileContains('test/file.txt', 'STATICFILES_DIRS')
+        self.assertFileContains("test/file.txt", "STATICFILES_DIRS")
 
     def test_app_files(self):
         """
         Can find a file in an app static/ directory.
         """
-        self.assertFileContains('test/file1.txt', 'file1 in the app dir')
+        self.assertFileContains("test/file1.txt", "file1 in the app dir")
 
     def test_nonascii_filenames(self):
         """
         Can find a file with non-ASCII character in an app static/ directory.
         """
-        self.assertFileContains('test/⊗.txt', '⊗ in the app dir')
+        self.assertFileContains("test/⊗.txt", "⊗ in the app dir")
 
     def test_camelcase_filenames(self):
         """
         Can find a file with capital letters.
         """
-        self.assertFileContains('test/camelCase.txt', 'camelCase')
+        self.assertFileContains("test/camelCase.txt", "camelCase")
 
     def test_filename_with_percent_sign(self):
-        self.assertFileContains('test/%2F.txt', '%2F content')
+        self.assertFileContains("test/%2F.txt", "%2F content")

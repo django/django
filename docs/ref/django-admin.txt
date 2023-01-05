@@ -76,8 +76,8 @@ Displaying debug output
 
 .. program:: None
 
-Use :option:`--verbosity` to specify the amount of notification and debug
-information that ``django-admin`` prints to the console.
+Use :option:`--verbosity`, where it is supported, to specify the amount of
+notification and debug information that ``django-admin`` prints to the console.
 
 Available commands
 ==================
@@ -296,6 +296,11 @@ If no application name is provided, all installed applications will be dumped.
 
 The output of ``dumpdata`` can be used as input for :djadmin:`loaddata`.
 
+When result of ``dumpdata`` is saved as a file, it can serve as a
+:ref:`fixture <fixtures-explanation>` for
+:ref:`tests <topics-testing-fixtures>` or as an
+:ref:`initial data <initial-data-via-fixtures>`.
+
 Note that ``dumpdata`` uses the default manager on the model for selecting the
 records to dump. If you're using a :ref:`custom manager <custom-managers>` as
 the default manager and it filters some of the available records, not all of the
@@ -363,8 +368,6 @@ progress bar is shown in the terminal.
 Fixtures compression
 ~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 3.2
-
 The output file can be compressed with one of the ``bz2``, ``gz``, ``lzma``, or
 ``xz`` formats by ending the filename with the corresponding extension.
 For example, to output the data as a compressed JSON file::
@@ -379,7 +382,7 @@ For example, to output the data as a compressed JSON file::
 Removes all data from the database and re-executes any post-synchronization
 handlers. The table of which migrations have been applied is not cleared.
 
-If you would rather start from an empty database and re-run all migrations, you
+If you would rather start from an empty database and rerun all migrations, you
 should drop and recreate the database and then run :djadmin:`migrate` instead.
 
 .. django-admin-option:: --noinput, --no-input
@@ -482,7 +485,8 @@ If this option is provided, models are also created for database views.
 
 .. django-admin:: loaddata fixture [fixture ...]
 
-Searches for and loads the contents of the named fixture into the database.
+Searches for and loads the contents of the named
+:ref:`fixture <fixtures-explanation>` into the database.
 
 .. django-admin-option:: --database DATABASE
 
@@ -510,139 +514,6 @@ Excludes loading the fixtures from the given applications and/or models (in the
 form of ``app_label`` or ``app_label.ModelName``). Use the option multiple
 times to exclude more than one app or model.
 
-What's a "fixture"?
-~~~~~~~~~~~~~~~~~~~
-
-A *fixture* is a collection of files that contain the serialized contents of
-the database. Each fixture has a unique name, and the files that comprise the
-fixture can be distributed over multiple directories, in multiple applications.
-
-Django will search in three locations for fixtures:
-
-1. In the ``fixtures`` directory of every installed application
-2. In any directory named in the :setting:`FIXTURE_DIRS` setting
-3. In the literal path named by the fixture
-
-Django will load any and all fixtures it finds in these locations that match
-the provided fixture names.
-
-If the named fixture has a file extension, only fixtures of that type
-will be loaded. For example::
-
-    django-admin loaddata mydata.json
-
-would only load JSON fixtures called ``mydata``. The fixture extension
-must correspond to the registered name of a
-:ref:`serializer <serialization-formats>` (e.g., ``json`` or ``xml``).
-
-If you omit the extensions, Django will search all available fixture types
-for a matching fixture. For example::
-
-    django-admin loaddata mydata
-
-would look for any fixture of any fixture type called ``mydata``. If a fixture
-directory contained ``mydata.json``, that fixture would be loaded
-as a JSON fixture.
-
-The fixtures that are named can include directory components. These
-directories will be included in the search path. For example::
-
-    django-admin loaddata foo/bar/mydata.json
-
-would search ``<app_label>/fixtures/foo/bar/mydata.json`` for each installed
-application,  ``<dirname>/foo/bar/mydata.json`` for each directory in
-:setting:`FIXTURE_DIRS`, and the literal path ``foo/bar/mydata.json``.
-
-When fixture files are processed, the data is saved to the database as is.
-Model defined :meth:`~django.db.models.Model.save` methods are not called, and
-any :data:`~django.db.models.signals.pre_save` or
-:data:`~django.db.models.signals.post_save` signals will be called with
-``raw=True`` since the instance only contains attributes that are local to the
-model. You may, for example, want to disable handlers that access
-related fields that aren't present during fixture loading and would otherwise
-raise an exception::
-
-    from django.db.models.signals import post_save
-    from .models import MyModel
-
-    def my_handler(**kwargs):
-        # disable the handler during fixture loading
-        if kwargs['raw']:
-            return
-        ...
-
-    post_save.connect(my_handler, sender=MyModel)
-
-You could also write a decorator to encapsulate this logic::
-
-    from functools import wraps
-
-    def disable_for_loaddata(signal_handler):
-        """
-        Decorator that turns off signal handlers when loading fixture data.
-        """
-        @wraps(signal_handler)
-        def wrapper(*args, **kwargs):
-            if kwargs['raw']:
-                return
-            signal_handler(*args, **kwargs)
-        return wrapper
-
-    @disable_for_loaddata
-    def my_handler(**kwargs):
-        ...
-
-Just be aware that this logic will disable the signals whenever fixtures are
-deserialized, not just during ``loaddata``.
-
-Note that the order in which fixture files are processed is undefined. However,
-all fixture data is installed as a single transaction, so data in
-one fixture can reference data in another fixture. If the database backend
-supports row-level constraints, these constraints will be checked at the
-end of the transaction.
-
-The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
-
-Compressed fixtures
-~~~~~~~~~~~~~~~~~~~
-
-Fixtures may be compressed in ``zip``, ``gz``, ``bz2``, ``lzma``, or ``xz``
-format. For example::
-
-    django-admin loaddata mydata.json
-
-would look for any of ``mydata.json``, ``mydata.json.zip``, ``mydata.json.gz``,
-``mydata.json.bz2``, ``mydata.json.lzma``, or ``mydata.json.xz``. The first
-file contained within a compressed archive is used.
-
-Note that if two fixtures with the same name but different
-fixture type are discovered (for example, if ``mydata.json`` and
-``mydata.xml.gz`` were found in the same fixture directory), fixture
-installation will be aborted, and any data installed in the call to
-``loaddata`` will be removed from the database.
-
-.. admonition:: MySQL with MyISAM and fixtures
-
-    The MyISAM storage engine of MySQL doesn't support transactions or
-    constraints, so if you use MyISAM, you won't get validation of fixture
-    data, or a rollback if multiple transaction files are found.
-
-.. versionchanged:: 3.2
-
-    Support for XZ archives (``.xz``) and LZMA archives (``.lzma``) was added.
-
-Database-specific fixtures
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you're in a multi-database setup, you might have fixture data that
-you want to load onto one database, but not onto another. In this
-situation, you can add a database identifier into the names of your fixtures.
-
-For example, if your :setting:`DATABASES` setting has a 'master' database
-defined, name the fixture ``mydata.master.json`` or
-``mydata.master.json.gz`` and the fixture will only be loaded when you
-specify you want to load data into the ``master`` database.
-
 .. _loading-fixtures-stdin:
 
 Loading fixtures from ``stdin``
@@ -661,6 +532,12 @@ Loading from ``stdin`` is useful with standard input and output redirections.
 For example::
 
     django-admin dumpdata --format=json --database=test app_label.ModelName | django-admin loaddata --format=json --database=prod -
+
+The :djadmin:`dumpdata` command can be used to generate input for ``loaddata``.
+
+.. seealso::
+
+    For more detail about fixtures see the :ref:`fixtures-explanation` topic.
 
 ``makemessages``
 ----------------
@@ -831,11 +708,24 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
-.. versionchanged:: 3.2
+.. versionchanged:: 4.2
 
-    Support for calling ``makemigrations`` without an active database
-    connection was added. In that case, check for a consistent migration
-    history is skipped.
+    In older versions, the missing migrations were also created when using the
+    ``--check`` option.
+
+.. django-admin-option:: --scriptable
+
+.. versionadded:: 4.1
+
+Diverts log output and input prompts to ``stderr``, writing only paths of
+generated migration files to ``stdout``.
+
+.. django-admin-option:: --update
+
+.. versionadded:: 4.2
+
+Merges model changes into the latest migration and optimize the resulting
+operations.
 
 ``migrate``
 -----------
@@ -913,12 +803,37 @@ content types.
 Makes ``migrate`` exit with a non-zero status when unapplied migrations are
 detected.
 
+.. django-admin-option:: --prune
+
+.. versionadded:: 4.1
+
+Deletes nonexistent migrations from the ``django_migrations`` table. This is
+useful when migration files replaced by a squashed migration have been removed.
+See :ref:`migration-squashing` for more details.
+
+``optimizemigration``
+---------------------
+
+.. versionadded:: 4.1
+
+.. django-admin:: optimizemigration app_label migration_name
+
+Optimizes the operations for the named migration and overrides the existing
+file. If the migration contains functions that must be manually copied, the
+command creates a new migration file suffixed with ``_optimized`` that is meant
+to replace the named migration.
+
+.. django-admin-option:: --check
+
+Makes ``optimizemigration`` exit with a non-zero status when a migration can be
+optimized.
+
 ``runserver``
 -------------
 
 .. django-admin:: runserver [addrport]
 
-Starts a lightweight development Web server on the local machine. By default,
+Starts a lightweight development web server on the local machine. By default,
 the server runs on port 8000 on the IP address ``127.0.0.1``. You can pass in an
 IP address and port number explicitly.
 
@@ -931,7 +846,7 @@ This server uses the WSGI application object specified by the
 
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that's how it's gonna stay. We're in
-the business of making Web frameworks, not Web servers, so improving this
+the business of making web frameworks, not web servers, so improving this
 server to be able to handle a production environment is outside the scope of
 Django.)
 
@@ -976,8 +891,8 @@ separate ports by executing ``django-admin runserver`` more than once.
 
 Note that the default IP address, ``127.0.0.1``, is not accessible from other
 machines on your network. To make your development server viewable to other
-machines on the network, use its own IP address (e.g. ``192.168.2.1``) or
-``0.0.0.0`` or ``::`` (with IPv6 enabled).
+machines on the network, use its own IP address (e.g. ``192.168.2.1``), ``0``
+(shortcut for ``0.0.0.0``), ``0.0.0.0``, or ``::`` (with IPv6 enabled).
 
 You can provide an IPv6 address surrounded by brackets
 (e.g. ``[200a::1]:8000``). This will automatically enable IPv6 support.
@@ -1006,10 +921,6 @@ multithreaded by default.
 
 Uses IPv6 for the development server. This changes the default IP address from
 ``127.0.0.1`` to ``::1``.
-
-.. versionchanged:: 4.0
-
-    Support for the ``--skip-checks`` option was added.
 
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1291,7 +1202,7 @@ fly.
 For example, taking advantage of GitHub's feature to expose repositories as
 zip files, you can use a URL like::
 
-    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/master.zip myapp
+    django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
 .. django-admin-option:: --extension EXTENSIONS, -e EXTENSIONS
 
@@ -1303,6 +1214,12 @@ template engine. Defaults to ``py``.
 Specifies which files in the app template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
+
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+Specifies which directories in the app template should be excluded, in addition
+to ``.git`` and ``__pycache__``. If this option is not provided, directories
+named ``__pycache__`` or starting with ``.`` will be excluded.
 
 The :class:`template context <django.template.Context>` used for all matching
 files is:
@@ -1332,6 +1249,19 @@ files is:
     language syntax while also preventing packaging systems from trying to
     byte-compile invalid ``*.py`` files, template files ending with ``.py-tpl``
     will be renamed to ``.py``.
+
+.. _trusted_code_warning:
+
+.. warning::
+
+   The contents of custom app (or project) templates should always be
+   audited before use: Such templates define code that will become
+   part of your project, and this means that such code will be trusted
+   as much as any app you install, or code you write yourself.
+   Further, even rendering the templates is, effectively, executing
+   code that was provided as input to the management command. The
+   Django template language may provide wide access into the system,
+   so make sure any custom template you use is worthy of your trust.
 
 ``startproject``
 ----------------
@@ -1373,6 +1303,12 @@ Specifies which files in the project template (in addition to those matching
 ``--extension``) should be rendered with the template engine. Defaults to an
 empty list.
 
+.. django-admin-option:: --exclude DIRECTORIES, -x DIRECTORIES
+
+Specifies which directories in the project template should be excluded, in
+addition to ``.git`` and ``__pycache__``. If this option is not provided,
+directories named ``__pycache__`` or starting with ``.`` will be excluded.
+
 The :class:`template context <django.template.Context>` used is:
 
 - Any option passed to the ``startproject`` command (among the command's
@@ -1383,8 +1319,9 @@ The :class:`template context <django.template.Context>` used is:
 - ``docs_version`` -- the version of the documentation: ``'dev'`` or ``'1.x'``
 - ``django_version`` -- the version of Django, e.g. ``'2.0.3'``
 
-Please also see the :ref:`rendering warning <render_warning>` as mentioned
-for :djadmin:`startapp`.
+Please also see the :ref:`rendering warning <render_warning>` and
+:ref:`trusted code warning <trusted_code_warning>` as mentioned for
+:djadmin:`startapp`.
 
 ``test``
 --------
@@ -1425,11 +1362,28 @@ subsequent run. Unless the :setting:`MIGRATE <TEST_MIGRATE>` test setting is
 ``False``, any unapplied migrations will also be applied to the test database
 before running the test suite.
 
+.. django-admin-option:: --shuffle [SEED]
+
+Randomizes the order of tests before running them. This can help detect tests
+that aren't properly isolated. The test order generated by this option is a
+deterministic function of the integer seed given. When no seed is passed, a
+seed is chosen randomly and printed to the console. To repeat a particular test
+order, pass a seed. The test orders generated by this option preserve Django's
+:ref:`guarantees on test order <order-of-tests>`. They also keep tests grouped
+by test case class.
+
+The shuffled orderings also have a special consistency property useful when
+narrowing down isolation issues. Namely, for a given seed and when running a
+subset of tests, the new order will be the original shuffling restricted to the
+smaller set. Similarly, when adding tests while keeping the seed the same, the
+order of the original tests will be the same in the new order.
+
 .. django-admin-option:: --reverse, -r
 
 Sorts test cases in the opposite execution order. This may help in debugging
 the side effects of tests that aren't properly isolated. :ref:`Grouping by test
-class <order-of-tests>` is preserved when using this option.
+class <order-of-tests>` is preserved when using this option. This can be used
+in conjunction with ``--shuffle`` to reverse the order for a particular seed.
 
 .. django-admin-option:: --debug-mode
 
@@ -1448,10 +1402,11 @@ Enables :ref:`SQL logging <django-db-logger>` for failing tests. If
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 
-By default ``--parallel`` runs one process per core according to
-:func:`multiprocessing.cpu_count()`. You can adjust the number of processes
-either by providing it as the option's value, e.g. ``--parallel=4``, or by
-setting the :envvar:`DJANGO_TEST_PROCESSES` environment variable.
+Using ``--parallel`` without a value, or with the value ``auto``, runs one test
+process per core according to :func:`multiprocessing.cpu_count()`. You can
+override this by passing the desired number of processes, e.g.
+``--parallel 4``, or by setting the :envvar:`DJANGO_TEST_PROCESSES` environment
+variable.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -1499,10 +1454,6 @@ May be specified multiple times and combined with :option:`test --exclude-tag`.
 
 Tests that fail to load are always considered matching.
 
-.. versionchanged:: 4.0
-
-    In older versions, tests that failed to load did not match tags.
-
 .. option:: --exclude-tag EXCLUDE_TAGS
 
 Excludes tests :ref:`marked with the specified tags <topics-tagging-tests>`.
@@ -1525,15 +1476,11 @@ as :option:`unittest's --buffer option<unittest.-b>`.
 
 .. django-admin-option:: --no-faulthandler
 
-.. versionadded:: 3.2
-
 Django automatically calls :func:`faulthandler.enable()` when starting the
 tests, which allows it to print a traceback if the interpreter crashes. Pass
 ``--no-faulthandler`` to disable this behavior.
 
 .. django-admin-option:: --timing
-
-.. versionadded:: 3.2
 
 Outputs timings, including database setup and total run time.
 
@@ -1561,15 +1508,15 @@ This is useful in a number of ways:
 
 * When you're writing :doc:`unit tests </topics/testing/overview>` of how your views
   act with certain fixture data, you can use ``testserver`` to interact with
-  the views in a Web browser, manually.
+  the views in a web browser, manually.
 
 * Let's say you're developing your Django application and have a "pristine"
   copy of a database that you'd like to interact with. You can dump your
-  database to a fixture (using the :djadmin:`dumpdata` command, explained
-  above), then use ``testserver`` to run your Web application with that data.
-  With this arrangement, you have the flexibility of messing up your data
-  in any way, knowing that whatever data changes you're making are only
-  being made to a test database.
+  database to a :ref:`fixture <fixtures-explanation>` (using the
+  :djadmin:`dumpdata` command, explained above), then use ``testserver`` to run
+  your web application with that data.  With this arrangement, you have the
+  flexibility of messing up your data in any way, knowing that whatever data
+  changes you're making are only being made to a test database.
 
 Note that this server does *not* automatically detect changes to your Python
 source code (as :djadmin:`runserver` does). It does, however, detect changes to
@@ -1772,7 +1719,7 @@ Default options
 .. program:: None
 
 Although some commands may allow their own custom options, every command
-allows for the following options:
+allows for the following options by default:
 
 .. django-admin-option:: --pythonpath PYTHONPATH
 
@@ -1809,6 +1756,8 @@ Displays a full stack trace when a :exc:`~django.core.management.CommandError`
 is raised. By default, ``django-admin`` will show an error message when a
 ``CommandError`` occurs and a full stack trace for any other exception.
 
+This option is ignored by :djadmin:`runserver`.
+
 Example usage::
 
     django-admin migrate --traceback
@@ -1822,6 +1771,8 @@ should print to the console.
 * ``1`` means normal output (default).
 * ``2`` means verbose output.
 * ``3`` means *very* verbose output.
+
+This option is ignored by :djadmin:`runserver`.
 
 Example usage::
 
@@ -1895,10 +1846,6 @@ Other modern terminal environments on Windows, that support terminal colors,
 but which are not automatically detected as supported by Django, may "fake" the
 installation of ``ANSICON`` by setting the appropriate environmental variable,
 ``ANSICON="on"``.
-
-.. versionchanged:: 3.2
-
-    Updated support for syntax coloring on Windows.
 
 .. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
 .. _`VS Code`: https://code.visualstudio.com
@@ -2000,7 +1947,7 @@ Bash completion
 ---------------
 
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in ``extras/django_bash_completion`` in the Django source
+script, which lives in :source:`extras/django_bash_completion` in the Django source
 distribution. It enables tab-completion of ``django-admin`` and
 ``manage.py`` commands, so you can, for instance...
 
@@ -2010,6 +1957,25 @@ distribution. It enables tab-completion of ``django-admin`` and
   with ``sql``.
 
 See :doc:`/howto/custom-management-commands` for how to add customized actions.
+
+Black formatting
+----------------
+
+.. versionadded:: 4.1
+
+The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
+:djadmin:`optimizemigration`, :djadmin:`makemigrations`, and
+:djadmin:`squashmigrations` are formatted using the ``black`` command if it is
+present on your ``PATH``.
+
+If you have ``black`` globally installed, but do not wish it used for the
+current project, you can set the ``PATH`` explicitly::
+
+    PATH=path/to/venv/bin django-admin makemigrations
+
+For commands using ``stdout`` you can pipe the output to ``black`` if needed::
+
+    django-admin inspectdb | black -
 
 ==========================================
 Running management commands from your code

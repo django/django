@@ -13,7 +13,7 @@ To create any syndication feed, all you have to do is write a short
 Python class. You can create as many feeds as you want.
 
 Django also comes with a lower-level feed-generating API. Use this if
-you want to generate feeds outside of a Web context, or in some other
+you want to generate feeds outside of a web context, or in some other
 lower-level way.
 
 .. _RSS: https://developer.mozilla.org/en-US/docs/Glossary/RSS
@@ -210,8 +210,8 @@ items based on information in the feed's URL.
 
 The police beat feeds could be accessible via URLs like this:
 
-* :file:`/beats/613/rss/` -- Returns recent crimes for beat 613.
-* :file:`/beats/1424/rss/` -- Returns recent crimes for beat 1424.
+* ``/beats/613/rss/`` -- Returns recent crimes for beat 613.
+* ``/beats/1424/rss/`` -- Returns recent crimes for beat 1424.
 
 These can be matched with a :doc:`URLconf </topics/http/urls>` line such as::
 
@@ -314,7 +314,7 @@ URLs
 ----
 
 The ``link`` method/attribute can return either an absolute path (e.g.
-:file:`"/blog/"`) or a URL with the fully-qualified domain and protocol (e.g.
+``"/blog/"``) or a URL with the fully-qualified domain and protocol (e.g.
 ``"https://www.example.com/blog/"``). If ``link`` doesn't return the domain,
 the syndication framework will insert the domain of the current site, according
 to your :setting:`SITE_ID setting <SITE_ID>`.
@@ -556,7 +556,7 @@ This example illustrates all possible attributes and methods for a
             Returns the feed's categories as iterable over strings.
             """
 
-        categories = ("python", "django") # Hard-coded list of categories.
+        categories = ["python", "django"] # Hard-coded list of categories.
 
         # COPYRIGHT NOTICE -- One of the following three is optional. The
         # framework looks for them in this order.
@@ -604,7 +604,7 @@ This example illustrates all possible attributes and methods for a
             Returns a list of items to publish in this feed.
             """
 
-        items = ('Item 1', 'Item 2') # Hard-coded items.
+        items = ['Item 1', 'Item 2'] # Hard-coded items.
 
         # GET_OBJECT -- This is required for feeds that publish different data
         # for different URL parameters. (See "A complex example" above.)
@@ -870,7 +870,7 @@ This example illustrates all possible attributes and methods for a
             Returns the categories for every item in the feed.
             """
 
-        item_categories = ("python", "django") # Hard-coded categories.
+        item_categories = ["python", "django"] # Hard-coded categories.
 
         # ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the
         # following three is optional. The framework looks for them in this
@@ -905,11 +905,6 @@ This example illustrates all possible attributes and methods for a
             """
 
         item_comments = 'https://www.example.com/comments' # Hard-coded comments URL
-
-.. versionchanged:: 3.2
-
-    Support for a comments URL per feed item was added through the
-    ``item_comments`` hook.
 
 The low-level framework
 =======================
@@ -1014,7 +1009,7 @@ For example, to create an Atom 1.0 feed and print it to standard output::
     >>> from django.utils import feedgenerator
     >>> from datetime import datetime
     >>> f = feedgenerator.Atom1Feed(
-    ...     title="My Weblog",
+    ...     title="My Blog",
     ...     link="https://www.example.com/",
     ...     description="In which I write about what I ate today.",
     ...     language="en",
@@ -1048,7 +1043,7 @@ and there are a set of methods that ``SyndicationFeed`` calls to get these extra
 attributes. Thus, you can subclass the appropriate feed generator class
 (``Atom1Feed`` or ``Rss201rev2Feed``) and extend these callbacks. They are:
 
-.. _georss: http://georss.org/
+.. _georss: https://georss.org
 .. _itunes podcast format: https://help.apple.com/itc/podcasts_connect/#/itcb54353390
 
 ``SyndicationFeed.root_attributes(self)``

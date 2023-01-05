@@ -3,7 +3,10 @@ import os
 import pkgutil
 import sys
 from argparse import (
-    _AppendConstAction, _CountAction, _StoreConstAction, _SubParsersAction,
+    _AppendConstAction,
+    _CountAction,
+    _StoreConstAction,
+    _SubParsersAction,
 )
 from collections import defaultdict
 from difflib import get_close_matches
@@ -14,7 +17,10 @@ from django.apps import apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import (
-    BaseCommand, CommandError, CommandParser, handle_default_options,
+    BaseCommand,
+    CommandError,
+    CommandParser,
+    handle_default_options,
 )
 from django.core.management.color import color_style
 from django.utils import autoreload
@@ -25,9 +31,12 @@ def find_commands(management_dir):
     Given a path to a management directory, return a list of all the command
     names that are available.
     """
-    command_dir = os.path.join(management_dir, 'commands')
-    return [name for _, name, is_pkg in pkgutil.iter_modules([command_dir])
-            if not is_pkg and not name.startswith('_')]
+    command_dir = os.path.join(management_dir, "commands")
+    return [
+        name
+        for _, name, is_pkg in pkgutil.iter_modules([command_dir])
+        if not is_pkg and not name.startswith("_")
+    ]
 
 
 def load_command_class(app_name, name):
@@ -36,7 +45,7 @@ def load_command_class(app_name, name):
     class instance. Allow all errors raised by the import process
     (ImportError, AttributeError) to propagate.
     """
-    module = import_module('%s.management.commands.%s' % (app_name, name))
+    module = import_module("%s.management.commands.%s" % (app_name, name))
     return module.Command()
 
 
@@ -56,20 +65,16 @@ def get_commands():
     pairs from this dictionary can then be used in calls to
     load_command_class(app_name, command_name)
 
-    If a specific version of a command must be loaded (e.g., with the
-    startapp command), the instantiated module can be placed in the
-    dictionary in place of the application name.
-
     The dictionary is cached on the first call and reused on subsequent
     calls.
     """
-    commands = {name: 'django.core' for name in find_commands(__path__[0])}
+    commands = {name: "django.core" for name in find_commands(__path__[0])}
 
     if not settings.configured:
         return commands
 
-    for app_config in reversed(list(apps.get_app_configs())):
-        path = os.path.join(app_config.path, 'management')
+    for app_config in reversed(apps.get_app_configs()):
+        path = os.path.join(app_config.path, "management")
         commands.update({name: app_config.name for name in find_commands(path)})
 
     return commands
@@ -98,7 +103,7 @@ def call_command(command_name, *args, **options):
     if isinstance(command_name, BaseCommand):
         # Command object passed in.
         command = command_name
-        command_name = command.__class__.__module__.split('.')[-1]
+        command_name = command.__class__.__module__.split(".")[-1]
     else:
         # Load the command object by name.
         try:
@@ -113,11 +118,12 @@ def call_command(command_name, *args, **options):
             command = load_command_class(app_name, command_name)
 
     # Simulate argument parsing to get the option defaults (see #10080 for details).
-    parser = command.create_parser('', command_name)
+    parser = command.create_parser("", command_name)
     # Use the `dest` option name from the parser option
     opt_mapping = {
-        min(s_opt.option_strings).lstrip('-').replace('-', '_'): s_opt.dest
-        for s_opt in parser._actions if s_opt.option_strings
+        min(s_opt.option_strings).lstrip("-").replace("-", "_"): s_opt.dest
+        for s_opt in parser._actions
+        if s_opt.option_strings
     }
     arg_options = {opt_mapping.get(key, key): value for key, value in options.items()}
     parse_args = []
@@ -140,15 +146,21 @@ def call_command(command_name, *args, **options):
     mutually_exclusive_required_options = {
         opt
         for group in parser._mutually_exclusive_groups
-        for opt in group._group_actions if group.required
+        for opt in group._group_actions
+        if group.required
     }
     # Any required arguments which are passed in via **options must be passed
     # to parse_args().
     for opt in parser_actions:
-        if (
-            opt.dest in options and
-            (opt.required or opt in mutually_exclusive_required_options)
+        if opt.dest in options and (
+            opt.required or opt in mutually_exclusive_required_options
         ):
+            opt_dest_count = sum(v == opt.dest for v in opt_mapping.values())
+            if opt_dest_count > 1:
+                raise TypeError(
+                    f"Cannot pass the dest {opt.dest!r} that matches multiple "
+                    f"arguments via **options."
+                )
             parse_args.append(min(opt.option_strings))
             if isinstance(opt, (_AppendConstAction, _CountAction, _StoreConstAction)):
                 continue
@@ -167,16 +179,17 @@ def call_command(command_name, *args, **options):
     if unknown_options:
         raise TypeError(
             "Unknown option(s) for %s command: %s. "
-            "Valid options are: %s." % (
+            "Valid options are: %s."
+            % (
                 command_name,
-                ', '.join(sorted(unknown_options)),
-                ', '.join(sorted(valid_options)),
+                ", ".join(sorted(unknown_options)),
+                ", ".join(sorted(valid_options)),
             )
         )
     # Move positional args out of options to mimic legacy optparse
-    args = defaults.pop('args', ())
-    if 'skip_checks' not in options:
-        defaults['skip_checks'] = True
+    args = defaults.pop("args", ())
+    if "skip_checks" not in options:
+        defaults["skip_checks"] = True
 
     return command.execute(*args, **defaults)
 
@@ -185,11 +198,12 @@ class ManagementUtility:
     """
     Encapsulate the logic of the django-admin and manage.py utilities.
     """
+
     def __init__(self, argv=None):
         self.argv = argv or sys.argv[:]
         self.prog_name = os.path.basename(self.argv[0])
-        if self.prog_name == '__main__.py':
-            self.prog_name = 'python -m django'
+        if self.prog_name == "__main__.py":
+            self.prog_name = "python -m django"
         self.settings_exception = None
 
     def main_help_text(self, commands_only=False):
@@ -199,16 +213,17 @@ class ManagementUtility:
         else:
             usage = [
                 "",
-                "Type '%s help <subcommand>' for help on a specific subcommand." % self.prog_name,
+                "Type '%s help <subcommand>' for help on a specific subcommand."
+                % self.prog_name,
                 "",
                 "Available subcommands:",
             ]
             commands_dict = defaultdict(lambda: [])
             for name, app in get_commands().items():
-                if app == 'django.core':
-                    app = 'django'
+                if app == "django.core":
+                    app = "django"
                 else:
-                    app = app.rpartition('.')[-1]
+                    app = app.rpartition(".")[-1]
                 commands_dict[app].append(name)
             style = color_style()
             for app in sorted(commands_dict):
@@ -218,12 +233,15 @@ class ManagementUtility:
                     usage.append("    %s" % name)
             # Output an extra note if settings are not properly configured
             if self.settings_exception is not None:
-                usage.append(style.NOTICE(
-                    "Note that only Django core commands are listed "
-                    "as settings are not properly configured (error: %s)."
-                    % self.settings_exception))
+                usage.append(
+                    style.NOTICE(
+                        "Note that only Django core commands are listed "
+                        "as settings are not properly configured (error: %s)."
+                        % self.settings_exception
+                    )
+                )
 
-        return '\n'.join(usage)
+        return "\n".join(usage)
 
     def fetch_command(self, subcommand):
         """
@@ -236,7 +254,7 @@ class ManagementUtility:
         try:
             app_name = commands[subcommand]
         except KeyError:
-            if os.environ.get('DJANGO_SETTINGS_MODULE'):
+            if os.environ.get("DJANGO_SETTINGS_MODULE"):
                 # If `subcommand` is missing due to misconfigured settings, the
                 # following line will retrigger an ImproperlyConfigured exception
                 # (get_commands() swallows the original one) so the user is
@@ -245,9 +263,9 @@ class ManagementUtility:
             elif not settings.configured:
                 sys.stderr.write("No Django settings specified.\n")
             possible_matches = get_close_matches(subcommand, commands)
-            sys.stderr.write('Unknown command: %r' % subcommand)
+            sys.stderr.write("Unknown command: %r" % subcommand)
             if possible_matches:
-                sys.stderr.write('. Did you mean %s?' % possible_matches[0])
+                sys.stderr.write(". Did you mean %s?" % possible_matches[0])
             sys.stderr.write("\nType '%s help' for usage.\n" % self.prog_name)
             sys.exit(1)
         if isinstance(app_name, BaseCommand):
@@ -279,29 +297,29 @@ class ManagementUtility:
         and formatted as potential completion suggestions.
         """
         # Don't complete if user hasn't sourced bash_completion file.
-        if 'DJANGO_AUTO_COMPLETE' not in os.environ:
+        if "DJANGO_AUTO_COMPLETE" not in os.environ:
             return
 
-        cwords = os.environ['COMP_WORDS'].split()[1:]
-        cword = int(os.environ['COMP_CWORD'])
+        cwords = os.environ["COMP_WORDS"].split()[1:]
+        cword = int(os.environ["COMP_CWORD"])
 
         try:
             curr = cwords[cword - 1]
         except IndexError:
-            curr = ''
+            curr = ""
 
-        subcommands = [*get_commands(), 'help']
-        options = [('--help', False)]
+        subcommands = [*get_commands(), "help"]
+        options = [("--help", False)]
 
         # subcommand
         if cword == 1:
-            print(' '.join(sorted(filter(lambda x: x.startswith(curr), subcommands))))
+            print(" ".join(sorted(filter(lambda x: x.startswith(curr), subcommands))))
         # subcommand options
         # special case: the 'help' subcommand has no options
-        elif cwords[0] in subcommands and cwords[0] != 'help':
+        elif cwords[0] in subcommands and cwords[0] != "help":
             subcommand_cls = self.fetch_command(cwords[0])
             # special case: add the names of installed apps to options
-            if cwords[0] in ('dumpdata', 'sqlmigrate', 'sqlsequencereset', 'test'):
+            if cwords[0] in ("dumpdata", "sqlmigrate", "sqlsequencereset", "test"):
                 try:
                     app_configs = apps.get_app_configs()
                     # Get the last part of the dotted path as the app name.
@@ -310,13 +328,14 @@ class ManagementUtility:
                     # Fail silently if DJANGO_SETTINGS_MODULE isn't set. The
                     # user will find out once they execute the command.
                     pass
-            parser = subcommand_cls.create_parser('', cwords[0])
+            parser = subcommand_cls.create_parser("", cwords[0])
             options.extend(
                 (min(s_opt.option_strings), s_opt.nargs != 0)
-                for s_opt in parser._actions if s_opt.option_strings
+                for s_opt in parser._actions
+                if s_opt.option_strings
             )
             # filter out previously specified options from available options
-            prev_opts = {x.split('=')[0] for x in cwords[1:cword - 1]}
+            prev_opts = {x.split("=")[0] for x in cwords[1 : cword - 1]}
             options = (opt for opt in options if opt[0] not in prev_opts)
 
             # filter options by current input
@@ -324,7 +343,7 @@ class ManagementUtility:
             for opt_label, require_arg in options:
                 # append '=' to options which require args
                 if require_arg:
-                    opt_label += '='
+                    opt_label += "="
                 print(opt_label)
         # Exit code of the bash completion function is never passed back to
         # the user, so it's safe to always exit with 0.
@@ -339,20 +358,20 @@ class ManagementUtility:
         try:
             subcommand = self.argv[1]
         except IndexError:
-            subcommand = 'help'  # Display help if no arguments were given.
+            subcommand = "help"  # Display help if no arguments were given.
 
         # Preprocess options to extract --settings and --pythonpath.
         # These options could affect the commands that are available, so they
         # must be processed early.
         parser = CommandParser(
             prog=self.prog_name,
-            usage='%(prog)s subcommand [options] [args]',
+            usage="%(prog)s subcommand [options] [args]",
             add_help=False,
             allow_abbrev=False,
         )
-        parser.add_argument('--settings')
-        parser.add_argument('--pythonpath')
-        parser.add_argument('args', nargs='*')  # catch-all
+        parser.add_argument("--settings")
+        parser.add_argument("--pythonpath")
+        parser.add_argument("args", nargs="*")  # catch-all
         try:
             options, args = parser.parse_known_args(self.argv[2:])
             handle_default_options(options)
@@ -370,7 +389,7 @@ class ManagementUtility:
             # Start the auto-reloading dev server even if the code is broken.
             # The hardcoded condition is a code smell but we can't rely on a
             # flag on the command class because we haven't located it yet.
-            if subcommand == 'runserver' and '--noreload' not in self.argv:
+            if subcommand == "runserver" and "--noreload" not in self.argv:
                 try:
                     autoreload.check_errors(django.setup)()
                 except Exception:
@@ -385,7 +404,9 @@ class ManagementUtility:
                     # (e.g. options for the contrib.staticfiles' runserver).
                     # Changes here require manually testing as described in
                     # #27522.
-                    _parser = self.fetch_command('runserver').create_parser('django', 'runserver')
+                    _parser = self.fetch_command("runserver").create_parser(
+                        "django", "runserver"
+                    )
                     _options, _args = _parser.parse_known_args(self.argv[2:])
                     for _arg in _args:
                         self.argv.remove(_arg)
@@ -396,19 +417,21 @@ class ManagementUtility:
 
         self.autocomplete()
 
-        if subcommand == 'help':
-            if '--commands' in args:
-                sys.stdout.write(self.main_help_text(commands_only=True) + '\n')
+        if subcommand == "help":
+            if "--commands" in args:
+                sys.stdout.write(self.main_help_text(commands_only=True) + "\n")
             elif not options.args:
-                sys.stdout.write(self.main_help_text() + '\n')
+                sys.stdout.write(self.main_help_text() + "\n")
             else:
-                self.fetch_command(options.args[0]).print_help(self.prog_name, options.args[0])
+                self.fetch_command(options.args[0]).print_help(
+                    self.prog_name, options.args[0]
+                )
         # Special-cases: We want 'django-admin --version' and
         # 'django-admin --help' to work, for backwards compatibility.
-        elif subcommand == 'version' or self.argv[1:] == ['--version']:
-            sys.stdout.write(django.get_version() + '\n')
-        elif self.argv[1:] in (['--help'], ['-h']):
-            sys.stdout.write(self.main_help_text() + '\n')
+        elif subcommand == "version" or self.argv[1:] == ["--version"]:
+            sys.stdout.write(django.get_version() + "\n")
+        elif self.argv[1:] in (["--help"], ["-h"]):
+            sys.stdout.write(self.main_help_text() + "\n")
         else:
             self.fetch_command(subcommand).run_from_argv(self.argv)
 

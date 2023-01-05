@@ -2,33 +2,35 @@ from ctypes import c_void_p
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import GDALException
-from django.contrib.gis.gdal.prototypes import ds as vcapi, raster as rcapi
+from django.contrib.gis.gdal.prototypes import ds as vcapi
+from django.contrib.gis.gdal.prototypes import raster as rcapi
 from django.utils.encoding import force_bytes, force_str
 
 
 class Driver(GDALBase):
     """
     Wrap a GDAL/OGR Data Source Driver.
-    For more information, see the C API source code:
-    https://www.gdal.org/gdal_8h.html - https://www.gdal.org/ogr__api_8h.html
+    For more information, see the C API documentation:
+    https://gdal.org/api/vector_c_api.html
+    https://gdal.org/api/raster_c_api.html
     """
 
     # Case-insensitive aliases for some GDAL/OGR Drivers.
     # For a complete list of original driver names see
-    # https://www.gdal.org/ogr_formats.html (vector)
-    # https://www.gdal.org/formats_list.html (raster)
+    # https://gdal.org/drivers/vector/
+    # https://gdal.org/drivers/raster/
     _alias = {
         # vector
-        'esri': 'ESRI Shapefile',
-        'shp': 'ESRI Shapefile',
-        'shape': 'ESRI Shapefile',
-        'tiger': 'TIGER',
-        'tiger/line': 'TIGER',
+        "esri": "ESRI Shapefile",
+        "shp": "ESRI Shapefile",
+        "shape": "ESRI Shapefile",
+        "tiger": "TIGER",
+        "tiger/line": "TIGER",
         # raster
-        'tiff': 'GTiff',
-        'tif': 'GTiff',
-        'jpeg': 'JPEG',
-        'jpg': 'JPEG',
+        "tiff": "GTiff",
+        "tif": "GTiff",
+        "jpeg": "JPEG",
+        "jpg": "JPEG",
     }
 
     def __init__(self, dr_input):
@@ -60,11 +62,15 @@ class Driver(GDALBase):
         elif isinstance(dr_input, c_void_p):
             driver = dr_input
         else:
-            raise GDALException('Unrecognized input type for GDAL/OGR Driver: %s' % type(dr_input))
+            raise GDALException(
+                "Unrecognized input type for GDAL/OGR Driver: %s" % type(dr_input)
+            )
 
         # Making sure we get a valid pointer to the OGR Driver
         if not driver:
-            raise GDALException('Could not initialize GDAL/OGR Driver on input: %s' % dr_input)
+            raise GDALException(
+                "Could not initialize GDAL/OGR Driver on input: %s" % dr_input
+            )
         self.ptr = driver
 
     def __str__(self):

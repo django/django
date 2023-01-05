@@ -1,0 +1,313 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Jafry Hisham, 2021
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-16 14:43+0000\n"
+"Last-Translator: Jafry Hisham\n"
+"Language-Team: Malay (http://www.transifex.com/django/django/language/ms/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ms\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Personal info"
+msgstr "Info peribadi"
+
+msgid "Permissions"
+msgstr "Kebenaran"
+
+msgid "Important dates"
+msgstr "Tarikh-tarikh penting"
+
+#, python-format
+msgid "%(name)s object with primary key %(key)r does not exist."
+msgstr "Objek %(name)s dengan kunci utama %(key)r tidak wujud."
+
+msgid "Password changed successfully."
+msgstr "Kata laluan berjaya ditukar."
+
+#, python-format
+msgid "Change password: %s"
+msgstr "Tukar kata laluan: %s"
+
+msgid "Authentication and Authorization"
+msgstr "Pengesahan dan Kebenaran"
+
+msgid "password"
+msgstr "kata laluan"
+
+msgid "last login"
+msgstr "log masuk terakhir"
+
+msgid "No password set."
+msgstr "Kata laluan tidak ditetapkan."
+
+msgid "Invalid password format or unknown hashing algorithm."
+msgstr ""
+"Format kata laluan tidak sah atau algoritma hash yang tidak dapat dipastikan."
+
+msgid "The two password fields didn’t match."
+msgstr "Medan kedua-dua kata laluan tidak sepadan."
+
+msgid "Password"
+msgstr "Kata laluan"
+
+msgid "Password confirmation"
+msgstr "Pengesahan kata laluan"
+
+msgid "Enter the same password as before, for verification."
+msgstr ""
+"Masukkan kata laluan yang sama seperti sebelumnya, bagi tujuan pengesahan."
+
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user’s "
+"password, but you can change the password using <a href=\"{}\">this form</a>."
+msgstr ""
+"Kata laluan mentah tidak disimpan, maka tiada cara untuk melihat kata laluan "
+"pengguna, tetapi anda boleh menukar kata laluan menggunakan <a href="
+"\"{}\">borang ini</a>."
+
+#, python-format
+msgid ""
+"Please enter a correct %(username)s and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Sila masukkan %(username)s dan kata laluan yang betul. Ambil perhatian "
+"bahawa kedua-dua medan berkemungkinan kes-sensitif. "
+
+msgid "This account is inactive."
+msgstr "Akaun ini tidak aktif."
+
+msgid "Email"
+msgstr "Emel"
+
+msgid "New password"
+msgstr "Kata laluan baru"
+
+msgid "New password confirmation"
+msgstr "Pengesahan kata laluan baru"
+
+msgid "Your old password was entered incorrectly. Please enter it again."
+msgstr ""
+"Kata laluan lama anda tidak dimasukkan dengan betul. Sila masukkan sekali "
+"lagi."
+
+msgid "Old password"
+msgstr "Kata laluan lama"
+
+msgid "Password (again)"
+msgstr "Kata laluan (sekali lagi)"
+
+msgid "algorithm"
+msgstr "algortima"
+
+msgid "iterations"
+msgstr "lelaran"
+
+msgid "salt"
+msgstr "garam"
+
+msgid "hash"
+msgstr "hash"
+
+msgid "variety"
+msgstr "kepelbagaian"
+
+msgid "version"
+msgstr "versi"
+
+msgid "memory cost"
+msgstr "kos memori"
+
+msgid "time cost"
+msgstr "kos masa"
+
+msgid "parallelism"
+msgstr "parallelisma"
+
+msgid "work factor"
+msgstr "faktor kerja"
+
+msgid "checksum"
+msgstr "checksum"
+
+msgid "block size"
+msgstr "saiz blok"
+
+msgid "name"
+msgstr "nama"
+
+msgid "content type"
+msgstr "jenis kandungan"
+
+msgid "codename"
+msgstr "nama kod"
+
+msgid "permission"
+msgstr "kebenaran"
+
+msgid "permissions"
+msgstr "kebenaran"
+
+msgid "group"
+msgstr "kumpulan"
+
+msgid "groups"
+msgstr "kumpulan-kumpulan"
+
+msgid "superuser status"
+msgstr "status pengguna hebat"
+
+msgid ""
+"Designates that this user has all permissions without explicitly assigning "
+"them."
+msgstr ""
+"Menentukan bahawa pengguna ini mempunyai semua kebenaran tanpa memberikannya "
+"secara eksplisit."
+
+msgid ""
+"The groups this user belongs to. A user will get all permissions granted to "
+"each of their groups."
+msgstr ""
+"Pengguna ini adalah ahli kepada kumpulan-kumpulan ini. Pengguna akan "
+"mewarisi semua kebenaran yang diberikan kepada kumpulan-kumpulan ini."
+
+msgid "user permissions"
+msgstr "kebenaran penguna"
+
+msgid "Specific permissions for this user."
+msgstr "Kebenaran-kebenaran spesifik bagi pengguna ini."
+
+msgid "username"
+msgstr "nama pengguna"
+
+msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+"Diperlukan. 150 karakter atau kurang. Huruf, digit dan  @/./+/-/_ sahaja."
+
+msgid "A user with that username already exists."
+msgstr "Pengguna dengan nama pengguna ini sudah wujud."
+
+msgid "first name"
+msgstr "nama pertama"
+
+msgid "last name"
+msgstr "nama akhir"
+
+msgid "email address"
+msgstr "alamat emel"
+
+msgid "staff status"
+msgstr "status staf"
+
+msgid "Designates whether the user can log into this admin site."
+msgstr "Menentukan samada pengguna ini boleh log masuk ke laman pentadbiran."
+
+msgid "active"
+msgstr "aktif"
+
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Menentukan samada pengguna ini patut dilayan sebagai aktif. Padam pilihan "
+"ini daripada menghapuskan terus akaun pengguna."
+
+msgid "date joined"
+msgstr "tarikh serta"
+
+msgid "user"
+msgstr "pengguna"
+
+msgid "users"
+msgstr "pengguna-pengguna"
+
+#, python-format
+msgid ""
+"This password is too short. It must contain at least %(min_length)d "
+"character."
+msgid_plural ""
+"This password is too short. It must contain at least %(min_length)d "
+"characters."
+msgstr[0] ""
+"Kata laluan ini terlalu singkat. Ia harus mempunyai sekurang-kurangnya "
+"%(min_length)d karakter."
+
+#, python-format
+msgid "Your password must contain at least %(min_length)d character."
+msgid_plural "Your password must contain at least %(min_length)d characters."
+msgstr[0] ""
+"Kata laluan anda harus mempunyai sekurang-kurangnya %(min_length)d karakter."
+
+#, python-format
+msgid "The password is too similar to the %(verbose_name)s."
+msgstr "Kata laluan ini hampir sama dengan %(verbose_name)s."
+
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Kata laluan anda tidak boleh hampir sama dengan maklumat peribadi anda yang "
+"lain."
+
+msgid "This password is too common."
+msgstr "Kata laluan anda terlalu singkat."
+
+msgid "Your password can’t be a commonly used password."
+msgstr ""
+"Kata laluan anda tidak boleh sama dengan kata laluan yang terlalu biasa "
+"digunakan."
+
+msgid "This password is entirely numeric."
+msgstr "Aksara kata laluan ini kesemuanya terdiri daripada nombor."
+
+msgid "Your password can’t be entirely numeric."
+msgstr ""
+"Kata laluan anda tidak boleh terdiri daripada aksara nombor secara "
+"sepenuhnya."
+
+#, python-format
+msgid "Password reset on %(site_name)s"
+msgstr "Penetapan semula kata laluan di %(site_name)s"
+
+msgid ""
+"Enter a valid username. This value may contain only English letters, "
+"numbers, and @/./+/-/_ characters."
+msgstr ""
+"Masukkan nama pengguna yang sah. Nilai ini hanya boleh mengandungi huruf "
+"bahasa Inggeris, nombor, dan karakter-karakter @/./+/-/_ ."
+
+msgid ""
+"Enter a valid username. This value may contain only letters, numbers, and "
+"@/./+/-/_ characters."
+msgstr ""
+"Masukkan nama pengguna yang sah. Nilai boleh mengandungi huruf, mombor, dan "
+"karakter-karakter @/./+/-/_ ."
+
+msgid "Logged out"
+msgstr "Telah di log keluar"
+
+msgid "Password reset"
+msgstr "Penetapan semula kata laluan"
+
+msgid "Password reset sent"
+msgstr "Penetapan semula kata laluan telah dihantar"
+
+msgid "Enter new password"
+msgstr "Masukkan kata laluan yang baru"
+
+msgid "Password reset unsuccessful"
+msgstr "Penetapan semula kata laluan tidak berjaya "
+
+msgid "Password reset complete"
+msgstr "Penetapan semula kata laluan telah lengkap"
+
+msgid "Password change"
+msgstr "Penukaran kata laluan"
+
+msgid "Password change successful"
+msgstr "Penukaran kata laluan berjaya dilakukan"

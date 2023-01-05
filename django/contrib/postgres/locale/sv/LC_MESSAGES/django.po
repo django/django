@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Elias Johnstone <eli87as@gmail.com>, 2022
 # Gustaf Hansen <gustaf.hansen@gmail.com>, 2015
 # Jonathan Lindén, 2015
 # Petter Strandmark <petter.strandmark@gmail.com>, 2019
@@ -10,8 +11,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"PO-Revision-Date: 2022-07-19 09:22+0000\n"
+"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +36,7 @@ msgstr "Funktion från sträng till sträng/null"
 
 #, python-format
 msgid "The value of “%(key)s” is not a string or null."
-msgstr ""
+msgstr "Värdet av “%(key)s” är inte en sträng eller null."
 
 msgid "Could not load JSON data."
 msgstr "Kunde inte ladda JSON-data."
