@@ -97,6 +97,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
             d.hour,
             d.minute,
             d.second,
+            tzinfo=d.tzinfo,
         )
     else:
         pivot = d
