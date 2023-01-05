@@ -486,7 +486,7 @@ Miscellaneous
 * The ``alias`` argument for :meth:`.Expression.get_group_by_cols` is removed.
 
 * The minimum supported version of ``sqlparse`` is increased from 0.2.2 to
-  0.2.3.
+  0.3.1.
 
 * The undocumented ``negated`` parameter of the
   :class:`~django.db.models.Exists` expression is removed.
@@ -509,6 +509,19 @@ Miscellaneous
 
 * The minimum supported version of ``mysqlclient`` is increased from 1.4.0 to
   1.4.3.
+
+* The minimum supported version of ``argon2-cffi`` is increased  from 19.1.0 to
+  19.2.0.
+
+* The minimum supported version of ``Pillow`` is increased from 6.2.0 to 6.2.1.
+
+* The minimum supported version of ``jinja2`` is increased from 2.9.2 to
+  2.11.0.
+
+* The minimum supported version of `redis-py`_ is increased from 3.0.0 to
+  3.4.0.
+
+.. _`redis-py`: https://pypi.org/project/redis/
 
 .. _deprecated-features-4.2:
 
