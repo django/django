@@ -507,6 +507,9 @@ Miscellaneous
   that differ only in case. If you need the previous behavior, use
   :class:`~django.contrib.auth.forms.BaseUserCreationForm` instead.
 
+* The minimum supported version of ``mysqlclient`` is increased from 1.4.0 to
+  1.4.3.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
