@@ -277,24 +277,24 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  aiosmtpd_
-*  argon2-cffi_ 19.1.0+
+*  argon2-cffi_ 19.2.0+
 *  asgiref_ 3.6.0+ (required)
 *  bcrypt_
 *  colorama_
 *  docutils_
 *  geoip2_
-*  jinja2_ 2.7+
+*  jinja2_ 2.11+
 *  numpy_
-*  Pillow_ 6.2.0+
+*  Pillow_ 6.2.1+
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
-*  redis_
+*  redis_ 3.4+
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_ 0.2.3+ (required)
+*  sqlparse_ 0.3.1+ (required)
 *  tblib_ 1.5.0+
 
 You can find these dependencies in `pip requirements files`_ inside the
