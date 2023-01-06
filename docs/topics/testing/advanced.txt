@@ -829,10 +829,6 @@ can be useful during testing.
     ``False`` to speed up creation time if you don't have any test classes
     with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
 
-    If you are using the default test runner, you can control this with the
-    the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the :setting:`TEST
-    <DATABASE-TEST>` dictionary.
-
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing
     database will be used, or created if not present. If ``False``,
