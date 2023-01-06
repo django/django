@@ -41,7 +41,7 @@ ALLOWED_HOSTS = []
 TIME_ZONE = "America/Chicago"
 
 # If you set this to True, Django will use timezone-aware datetimes.
-USE_TZ = False
+USE_TZ = True
 
 # RemovedInDjango50Warning: It's a transitional setting helpful in migrating
 # from pytz tzinfo to ZoneInfo(). Set True to continue using pytz tzinfo

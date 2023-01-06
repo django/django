@@ -2929,11 +2929,7 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 ``USE_TZ``
 ----------
 
-Default: ``False``
-
-.. note::
-
-    In Django 5.0, the default value will change from ``False`` to ``True``.
+Default: ``True``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
@@ -2944,11 +2940,9 @@ be retained if present.
 
 See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
 
-.. note::
+.. versionchanged:: 5.0
 
-    The default :file:`settings.py` file created by
-    :djadmin:`django-admin startproject <startproject>` includes
-    ``USE_TZ = True`` for convenience.
+    In older versions, the default value is ``False``.
 
 .. setting:: USE_X_FORWARDED_HOST
 
