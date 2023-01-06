@@ -527,10 +527,6 @@ For each field, we describe the default widget used if you don't specify
 
         Limit valid inputs to an integral multiple of ``step_size``.
 
-    .. versionchanged:: 4.1
-
-        The ``step_size`` argument was added.
-
 ``DurationField``
 -----------------
 
@@ -661,8 +657,6 @@ For each field, we describe the default widget used if you don't specify
         These control the range of values permitted in the field.
 
     .. attribute:: step_size
-
-        .. versionadded:: 4.1
 
         Limit valid inputs to an integral multiple of ``step_size``.
 
@@ -796,8 +790,6 @@ For each field, we describe the default widget used if you don't specify
         These control the range of values permitted in the field.
 
     .. attribute:: step_size
-
-        .. versionadded:: 4.1
 
         Limit valid inputs to an integral multiple of ``step_size``.
 

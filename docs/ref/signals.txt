@@ -204,7 +204,6 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-    .. versionadded:: 4.1
 
     The origin of the deletion being the instance of a ``Model`` or
     ``QuerySet`` class.
@@ -234,7 +233,6 @@ Arguments sent with this signal:
     The database alias being used.
 
 ``origin``
-    .. versionadded:: 4.1
 
     The origin of the deletion being the instance of a ``Model`` or
     ``QuerySet`` class.

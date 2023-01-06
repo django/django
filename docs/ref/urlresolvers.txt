@@ -129,14 +129,10 @@ If the URL does not resolve, the function raises a
 
     .. attribute:: ResolverMatch.captured_kwargs
 
-        .. versionadded:: 4.1
-
         The captured keyword arguments that would be passed to the view
         function, as parsed from the URL.
 
     .. attribute:: ResolverMatch.extra_kwargs
-
-        .. versionadded:: 4.1
 
         The additional keyword arguments that would be passed to the view
         function.

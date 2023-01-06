@@ -38,10 +38,6 @@ generate their own signed values.
 values will not be used to sign data, but if specified, they will be used to
 validate signed data and must be kept secure.
 
-.. versionchanged:: 4.1
-
-    The ``SECRET_KEY_FALLBACKS`` setting was added.
-
 Using the low-level API
 =======================
 
@@ -110,10 +106,6 @@ generate signatures. You can use a different secret by passing it to the
     :py:mod:`hashlib`, it defaults to ``'sha256'``. ``fallback_keys`` is a list
     of additional values used to validate signed data, defaults to
     :setting:`SECRET_KEY_FALLBACKS`.
-
-    .. versionchanged:: 4.1
-
-        The ``fallback_keys`` argument was added.
 
     .. deprecated:: 4.2
 
@@ -247,7 +239,3 @@ and tuples) if you pass in a tuple, you will get a list from
 
     Reverse of ``dumps()``, raises ``BadSignature`` if signature fails.
     Checks ``max_age`` (in seconds) if given.
-
-    .. versionchanged:: 4.1
-
-        The ``fallback_keys`` argument was added.

@@ -49,8 +49,6 @@ should return a rendered templates (as a string) or raise
 
     .. attribute:: form_template_name
 
-        .. versionadded:: 4.1
-
         The default name of the template to use to render a form.
 
         Defaults to ``"django/forms/default.html"``, which is a proxy for
@@ -63,8 +61,6 @@ should return a rendered templates (as a string) or raise
         ``"django/forms/div.html"`` at that time.
 
     .. attribute:: formset_template_name
-
-        .. versionadded:: 4.1
 
         The default name of the template to use to render a formset.
 
@@ -111,8 +107,6 @@ If you want to render templates with customizations from your
 
 .. class:: DjangoDivFormRenderer
 
-.. versionadded:: 4.1
-
 Subclass of :class:`DjangoTemplates` that specifies
 :attr:`~BaseRenderer.form_template_name` and
 :attr:`~BaseRenderer.formset_template_name` as ``"django/forms/div.html"`` and
@@ -146,8 +140,6 @@ example, :mod:`django.contrib.admin` doesn't include Jinja2 templates for its
 widgets due to their usage of Django template tags.
 
 .. class:: Jinja2DivFormRenderer
-
-.. versionadded:: 4.1
 
 A transitional renderer as per :class:`DjangoDivFormRenderer` above, but
 subclassing :class:`Jinja2` for use with the Jinja2 backend.

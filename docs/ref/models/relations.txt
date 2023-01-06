@@ -120,10 +120,6 @@ Related objects reference
         needed. You can use callables as values in the ``through_defaults``
         dictionary.
 
-        .. versionchanged:: 4.1
-
-            ``acreate()`` method was added.
-
     .. method:: remove(*objs, bulk=True)
     .. method:: aremove(*objs, bulk=True)
 

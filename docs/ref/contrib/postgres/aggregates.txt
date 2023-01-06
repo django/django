@@ -78,8 +78,6 @@ General-purpose aggregation functions
 ``BitXor``
 ----------
 
-.. versionadded:: 4.1
-
 .. class:: BitXor(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or

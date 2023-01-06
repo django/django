@@ -348,8 +348,6 @@ See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 ``CSRF_COOKIE_MASKED``
 ----------------------
 
-.. versionadded:: 4.1
-
 Default: ``False``
 
 Whether to mask the CSRF cookie. See
@@ -624,8 +622,6 @@ behavior — and ``None`` for unlimited :ref:`persistent database connections
 
 ``CONN_HEALTH_CHECKS``
 ~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.1
 
 Default: ``False``
 
@@ -2311,8 +2307,6 @@ passwords of users and key rotation will not affect them.
 ``SECRET_KEY_FALLBACKS``
 ------------------------
 
-.. versionadded:: 4.1
-
 Default: ``[]``
 
 A list of fallback secret keys for a particular Django installation. These are
@@ -2443,11 +2437,6 @@ in via HTTPS) when:
 * the header value is ``'https'``, or
 * its initial, leftmost value is ``'https'`` in the case of a comma-separated
   list of protocols (e.g. ``'https,http,http'``).
-
-.. versionchanged:: 4.1
-
-    Support for a comma-separated list of protocols in the header value was
-    added.
 
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.

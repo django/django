@@ -133,10 +133,6 @@ available from the ``django.contrib.postgres.indexes`` module.
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
-    .. versionchanged:: 4.1
-
-        Support for covering SP-GiST indexes on PostgreSQL 14+ was added.
-
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
 ``OpClass()`` expressions
@@ -177,9 +173,5 @@ available from the ``django.contrib.postgres.indexes`` module.
         )
 
     creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-    .. versionchanged:: 4.1
-
-        Support for exclusion constraints was added.
 
     .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html

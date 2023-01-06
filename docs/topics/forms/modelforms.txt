@@ -995,8 +995,6 @@ of forms displayed (1000). In practice this is equivalent to no limit.
 Preventing new objects creation
 -------------------------------
 
-.. versionadded:: 4.1
-
 Using the ``edit_only`` parameter, you can prevent creation of any new
 objects::
 

@@ -552,11 +552,6 @@ the :meth:`.Form.render`. Here's an example of this being used in a view::
 
 See :ref:`ref-forms-api-outputting-html` for more details.
 
-.. versionchanged:: 4.1
-
-    The ability to set the default ``form_template_name`` on the form renderer
-    was added.
-
 Form rendering options
 ----------------------
 
@@ -754,14 +749,10 @@ Useful attributes on ``{{ field }}`` include:
 
 ``{{ field.legend_tag }}``
 
-    .. versionadded:: 4.1
-
     Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
     ``<label>``, for widgets with multiple inputs wrapped in a ``<fieldset>``.
 
 ``{{ field.use_fieldset }}``
-
-    .. versionadded:: 4.1
 
     This attribute is ``True`` if the form field's widget contains multiple
     inputs that should be semantically grouped in a ``<fieldset>`` with a

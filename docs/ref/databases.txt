@@ -72,10 +72,6 @@ connections, e.g. after database server restart. The health check is performed
 only once per request and only if the database is being accessed during the
 handling of the request.
 
-.. versionchanged:: 4.1
-
-    The :setting:`CONN_HEALTH_CHECKS` setting was added.
-
 Caveats
 ~~~~~~~
 
@@ -366,11 +362,6 @@ cause a conflict. For example::
 If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
-
-.. versionchanged:: 4.1
-
-    In older versions, PostgreSQL’s ``SERIAL`` data type was used instead of
-    identity columns.
 
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
