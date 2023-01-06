@@ -849,23 +849,6 @@ test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :ref:`the-test-database`.
 
-.. setting:: TEST_SERIALIZE
-
-``SERIALIZE``
-^^^^^^^^^^^^^
-
-Boolean value to control whether or not the default test runner serializes the
-database into an in-memory JSON string before running tests (used to restore
-the database state between tests if you don't have transactions). You can set
-this to ``False`` to speed up creation time if you don't have any test classes
-with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
-
-.. deprecated:: 4.0
-
-   This setting is deprecated as it can be inferred from the
-   :attr:`~django.test.TestCase.databases` with the
-   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
-
 .. setting:: TEST_TEMPLATE
 
 ``TEMPLATE``
