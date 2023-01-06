@@ -257,6 +257,8 @@ to remove usage of these features.
 
 * The ``SERIALIZE`` test setting is removed.
 
+* The undocumented ``django.utils.baseconv`` module is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
