@@ -237,14 +237,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.USE_TZ is False and not self.is_overridden("USE_TZ"):
-            warnings.warn(
-                "The default value of USE_TZ will change from False to True "
-                "in Django 5.0. Set USE_TZ to False in your project settings "
-                "if you want to keep the current default behavior.",
-                category=RemovedInDjango50Warning,
-            )
-
         if self.is_overridden("USE_DEPRECATED_PYTZ"):
             warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
 

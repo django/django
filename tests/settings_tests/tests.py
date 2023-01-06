@@ -348,25 +348,9 @@ class SettingsTests(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()
 
-    def test_use_tz_false_deprecation(self):
-        settings_module = ModuleType("fake_settings_module")
-        settings_module.SECRET_KEY = "foo"
-        sys.modules["fake_settings_module"] = settings_module
-        msg = (
-            "The default value of USE_TZ will change from False to True in "
-            "Django 5.0. Set USE_TZ to False in your project settings if you "
-            "want to keep the current default behavior."
-        )
-        try:
-            with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-                Settings("fake_settings_module")
-        finally:
-            del sys.modules["fake_settings_module"]
-
     def test_use_deprecated_pytz_deprecation(self):
         settings_module = ModuleType("fake_settings_module")
         settings_module.USE_DEPRECATED_PYTZ = True
-        settings_module.USE_TZ = True
         sys.modules["fake_settings_module"] = settings_module
         try:
             with self.assertRaisesMessage(
