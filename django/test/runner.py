@@ -11,7 +11,6 @@ import random
 import sys
 import textwrap
 import unittest
-import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
@@ -30,7 +29,6 @@ from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango50Warning
 
 try:
     import ipdb as pdb
@@ -877,15 +875,8 @@ class DiscoverRunner:
         self.test_loader._top_level_dir = None
         return tests
 
-    def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def build_suite(self, test_labels=None, **kwargs):
         test_labels = test_labels or ["."]
-        extra_tests = extra_tests or []
 
         discover_kwargs = {}
         if self.pattern is not None:
@@ -898,8 +889,6 @@ class DiscoverRunner:
         for label in test_labels:
             tests = self.load_tests_for_label(label, discover_kwargs)
             all_tests.extend(iter_test_cases(tests))
-
-        all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
             if self.tags:
@@ -1030,7 +1019,7 @@ class DiscoverRunner:
             )
         return databases
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
 
@@ -1039,14 +1028,8 @@ class DiscoverRunner:
 
         Return the number of tests that failed.
         """
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
         self.setup_test_environment()
-        suite = self.build_suite(test_labels, extra_tests)
+        suite = self.build_suite(test_labels)
         databases = self.get_databases(suite)
         suite.serialized_aliases = set(
             alias for alias, serialize in databases.items() if serialize

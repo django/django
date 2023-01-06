@@ -267,6 +267,9 @@ to remove usage of these features.
 * The default sitemap protocol for sitemaps built outside the context of a
   request is changed from ``'http'`` to ``'https'``.
 
+* The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
+  ``DiscoverRunner.run_tests()`` is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
