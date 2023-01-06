@@ -274,6 +274,8 @@ to remove usage of these features.
   ``StringAgg`` aggregates no longer return ``[]``, ``[]``, and ``''``,
   respectively, when there are no rows.
 
+* The ``USE_L10N`` setting is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 

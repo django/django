@@ -1097,9 +1097,8 @@ database configurations <topics-db-multi-db-routing>`.
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
 The default formatting to use for displaying date fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
@@ -1130,8 +1129,7 @@ format strings use Python's :ref:`datetime module syntax
 <strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
 template filter.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -1143,9 +1141,8 @@ See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
 The default formatting to use for displaying datetime fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
@@ -1175,8 +1172,7 @@ these format strings use Python's :ref:`datetime module syntax
 template filter. Date-only formats are not included as datetime fields will
 automatically try :setting:`DATE_INPUT_FORMATS` in last resort.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -1254,8 +1250,8 @@ Default: ``'.'`` (Dot)
 
 Default decimal separator used when formatting decimal numbers.
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2170,8 +2166,8 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
-locale-dictated format has higher precedence and will be applied.
+Note that the corresponding locale-dictated format has higher precedence and
+will be applied instead.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
@@ -2203,8 +2199,8 @@ Example tuple for ``en_IN``::
 
     NUMBER_GROUPING = (3, 2, 0)
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2542,9 +2538,9 @@ The email address that error messages come from, such as those sent to
 Default: ``'m/d/Y'`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
-templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
-corresponding locale-dictated format has higher precedence and will be applied.
-See :tfilter:`allowed date format strings <date>`.
+templates. Note that the corresponding locale-dictated format has higher
+precedence and will be applied instead. See
+:tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
@@ -2556,9 +2552,9 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 Default: ``'m/d/Y P'`` (e.g. ``12/31/2003 4 p.m.``)
 
 An available formatting that can be used for displaying datetime fields on
-templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
-corresponding locale-dictated format has higher precedence and will be applied.
-See :tfilter:`allowed date format strings <date>`.
+templates. Note that the corresponding locale-dictated format has higher
+precedence and will be applied instead. See
+:tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
@@ -2769,8 +2765,8 @@ Default thousand separator used when formatting numbers. This setting is
 used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
 :setting:`NUMBER_GROUPING` is greater than ``0``.
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2783,9 +2779,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
 The default formatting to use for displaying time fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
@@ -2808,8 +2803,7 @@ format strings use Python's :ref:`datetime module syntax
 <strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
 template filter.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
@@ -2882,31 +2876,12 @@ This provides a way to turn it off, for performance. If this is set to
 ``False``, Django will make some optimizations so as not to load the
 translation machinery.
 
-See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
+See also :setting:`LANGUAGE_CODE` and :setting:`USE_TZ`.
 
 .. note::
 
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes ``USE_I18N = True`` for convenience.
-
-.. setting:: USE_L10N
-
-``USE_L10N``
-------------
-
-Default: ``True``
-
-A boolean that specifies if localized formatting of data will be enabled by
-default or not. If this is set to ``True``, e.g. Django will display numbers and
-dates using the format of the current locale.
-
-See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
-
-.. deprecated:: 4.0
-
-    This setting is deprecated. Starting with Django 5.0, localized formatting
-    of data will always be enabled. For example Django will display numbers and
-    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
@@ -2916,10 +2891,9 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
-When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
-format numbers using the :setting:`NUMBER_GROUPING` and
-:setting:`THOUSAND_SEPARATOR` settings. The latter two settings may also be
-dictated by the locale, which takes precedence.
+When set to ``True``, Django will format numbers using the
+:setting:`NUMBER_GROUPING` and :setting:`THOUSAND_SEPARATOR` settings. The
+latter two settings may also be dictated by the locale, which takes precedence.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
@@ -2938,7 +2912,7 @@ When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
 when parsing ISO 8601 formatted strings, where timezone information will always
 be retained if present.
 
-See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
+See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
 
 .. versionchanged:: 5.0
 
@@ -3005,8 +2979,8 @@ drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
-locale-dictated format has higher precedence and will be applied.
+Note that the corresponding locale-dictated format has higher precedence and
+will be applied instead.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`
@@ -3730,7 +3704,6 @@ Globalization (``i18n``/``l10n``)
 * :setting:`TIME_INPUT_FORMATS`
 * :setting:`TIME_ZONE`
 * :setting:`USE_I18N`
-* :setting:`USE_L10N`
 * :setting:`USE_THOUSAND_SEPARATOR`
 * :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`

@@ -30,12 +30,6 @@ USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
     "code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting."
 )
 
-USE_L10N_DEPRECATED_MSG = (
-    "The USE_L10N setting is deprecated. Starting with Django 5.0, localized "
-    "formatting of data will always be enabled. For example Django will "
-    "display numbers and dates using the format of the current locale."
-)
-
 CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
     "The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for "
     "it will be removed in Django 5.0."
@@ -173,20 +167,6 @@ class LazySettings(LazyObject):
         if not filename.startswith(os.path.dirname(django.__file__)):
             warnings.warn(message, category, stacklevel=2)
 
-    @property
-    def USE_L10N(self):
-        self._show_deprecation_warning(
-            USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning
-        )
-        return self.__getattr__("USE_L10N")
-
-    # RemovedInDjango50Warning.
-    @property
-    def _USE_L10N_INTERNAL(self):
-        # Special hook to avoid checking a traceback in internal use on hot
-        # paths.
-        return self.__getattr__("USE_L10N")
-
     # RemovedInDjango51Warning.
     @property
     def DEFAULT_FILE_STORAGE(self):
@@ -255,9 +235,6 @@ class Settings:
             os.environ["TZ"] = self.TIME_ZONE
             time.tzset()
 
-        if self.is_overridden("USE_L10N"):
-            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
-
         if self.is_overridden("DEFAULT_FILE_STORAGE"):
             if self.is_overridden("STORAGES"):
                 raise ImproperlyConfigured(
@@ -304,8 +281,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == "USE_L10N":
-            warnings.warn(USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning)
         if name == "CSRF_COOKIE_MASKED":
             warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
         if name == "DEFAULT_FILE_STORAGE":
