@@ -819,7 +819,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
             runner_instance.teardown_databases(old_config)
 
 
-class SetupDatabasesTests(SimpleTestCase):
+class SetupDatabasesTests(unittest.TestCase):
     def setUp(self):
         self.runner_instance = DiscoverRunner(verbosity=0)
 
@@ -910,30 +910,6 @@ class SetupDatabasesTests(SimpleTestCase):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
             verbosity=0, autoclobber=False, serialize=True, keepdb=False
-        )
-
-    def test_serialized_off(self):
-        tested_connections = db.ConnectionHandler(
-            {
-                "default": {
-                    "ENGINE": "django.db.backends.dummy",
-                    "TEST": {"SERIALIZE": False},
-                },
-            }
-        )
-        msg = (
-            "The SERIALIZE test database setting is deprecated as it can be "
-            "inferred from the TestCase/TransactionTestCase.databases that "
-            "enable the serialized_rollback feature."
-        )
-        with mock.patch(
-            "django.db.backends.dummy.base.DatabaseWrapper.creation_class"
-        ) as mocked_db_creation:
-            with mock.patch("django.test.utils.connections", new=tested_connections):
-                with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-                    self.runner_instance.setup_databases()
-        mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
 
 

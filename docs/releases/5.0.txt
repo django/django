@@ -255,7 +255,7 @@ in Django 5.0.
 See :ref:`deprecated-features-4.0` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* The ``SERIALIZE`` test setting is removed.
 
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
