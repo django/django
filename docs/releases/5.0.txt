@@ -264,6 +264,9 @@ to remove usage of these features.
 * The default value of the ``USE_TZ`` setting is changed from ``False`` to
   ``True``.
 
+* The default sitemap protocol for sitemaps built outside the context of a
+  request is changed from ``'http'`` to ``'https'``.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
