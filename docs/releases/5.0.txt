@@ -261,6 +261,9 @@ to remove usage of these features.
 
 * The undocumented ``django.utils.datetime_safe`` module is removed.
 
+* The default value of the ``USE_TZ`` setting is changed from ``False`` to
+  ``True``.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
