@@ -27,9 +27,9 @@ def format(
     """
     if number is None or number == "":
         return mark_safe(number)
-    use_grouping = (
-        use_l10n or (use_l10n is None and settings.USE_L10N)
-    ) and settings.USE_THOUSAND_SEPARATOR
+    if use_l10n is None:
+        use_l10n = True
+    use_grouping = use_l10n and settings.USE_THOUSAND_SEPARATOR
     use_grouping = use_grouping or force_grouping
     use_grouping = use_grouping and grouping != 0
     # Make the common case fast

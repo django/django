@@ -171,11 +171,6 @@ LANGUAGE_COOKIE_SECURE = False
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = None
 
-
-# If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale.
-USE_L10N = True
-
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
 MANAGERS = ADMINS
