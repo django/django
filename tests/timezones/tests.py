@@ -38,7 +38,7 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.timezone import timedelta
 
@@ -968,18 +968,9 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=True
-)
+@translation.override(None)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class TemplateTests(SimpleTestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
         """
@@ -1280,18 +1271,8 @@ class TemplateTests(SimpleTestCase):
             self.assertEqual(tpl.render(Context({})), "+0700")
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=False
-)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=False)
 class LegacyFormsTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     def test_form(self):
         form = EventForm({"dt": "2011-09-01 13:20:30"})
         self.assertTrue(form.is_valid())
@@ -1336,18 +1317,8 @@ class LegacyFormsTests(TestCase):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=True
-)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class NewFormsTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @requires_tz_support
     def test_form(self):
         form = EventForm({"dt": "2011-09-01 13:20:30"})
@@ -1426,19 +1397,14 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
+@translation.override(None)
 @override_settings(
     DATETIME_FORMAT="c",
     TIME_ZONE="Africa/Nairobi",
-    USE_L10N=False,
     USE_TZ=True,
     ROOT_URLCONF="timezones.urls",
 )
 class AdminTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @classmethod
     def setUpTestData(cls):
         cls.u1 = User.objects.create_user(
