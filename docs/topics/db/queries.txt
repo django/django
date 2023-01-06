@@ -857,8 +857,6 @@ being evaluated and therefore populate the cache::
 Asynchronous queries
 ====================
 
-.. versionadded:: 4.1
-
 If you are writing asynchronous views or code, you cannot use the ORM for
 queries in quite the way we have described above, as you cannot call *blocking*
 synchronous code from asynchronous code - it will block up the event loop
@@ -872,8 +870,6 @@ results, you can use asynchronous iteration (``async for``) instead.
 
 Query iteration
 ---------------
-
-.. versionadded:: 4.1
 
 The default way of iterating over a query - with ``for`` - will result in a
 blocking database query behind the scenes as Django loads the results at
@@ -894,8 +890,6 @@ read the next section.
 
 ``QuerySet`` and manager methods
 --------------------------------
-
-.. versionadded:: 4.1
 
 Some methods on managers and querysets - like ``get()`` and ``first()`` - force
 execution of the queryset and are blocking. Some, like ``filter()`` and
@@ -937,8 +931,6 @@ the whole expression in order to call it in an asynchronous-friendly way.
 
 Transactions
 ------------
-
-.. versionadded:: 4.1
 
 Transactions are **not** currently supported with asynchronous queries and
 updates. You will find that trying to use one raises
@@ -1318,10 +1310,6 @@ precede the definition of any keyword arguments. For example::
 
     The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
     unit tests show some possible uses of ``Q``.
-
-.. versionchanged:: 4.1
-
-    Support for the ``^`` (``XOR``) operator was added.
 
 Comparing objects
 =================

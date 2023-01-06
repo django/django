@@ -317,10 +317,6 @@ And here is a custom error message::
     >>> formset.non_form_errors()
     ['Sorry, something went wrong.']
 
-.. versionchanged:: 4.1
-
-    The ``'too_few_forms'`` and ``'too_many_forms'`` keys were added.
-
 Custom formset validation
 -------------------------
 
@@ -804,15 +800,7 @@ Formsets have the following attributes and methods associated with rendering:
     then each form in the formset as per the template defined by the form's
     :attr:`~django.forms.Form.template_name`.
 
-    .. versionchanged:: 4.1
-
-        In older versions ``template_name`` defaulted to the string value
-        ``'django/forms/formset/default.html'``.
-
-
 .. attribute:: BaseFormSet.template_name_div
-
-    .. versionadded:: 4.1
 
     The name of the template used when calling :meth:`.as_div`. By default this
     is ``"django/forms/formsets/div.html"``. This template renders the

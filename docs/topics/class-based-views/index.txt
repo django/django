@@ -134,8 +134,6 @@ information, the client may or may not download the full object list.
 Asynchronous class-based views
 ==============================
 
-.. versionadded:: 4.1
-
 As well as the synchronous (``def``) method handlers already shown, ``View``
 subclasses may define asynchronous (``async def``) method handlers to leverage
 asynchronous code using ``await``::

@@ -1601,19 +1601,6 @@ your test suite.
     which means that ``errors='error message'`` is the same as
     ``errors=['error message']``.
 
-    .. versionchanged:: 4.1
-
-        In older versions, using an empty error list with ``assertFormError()``
-        would always pass, regardless of whether the field had any errors or
-        not. Starting from Django 4.1, using ``errors=[]`` will only pass if
-        the field actually has no errors.
-
-        Django 4.1 also changed the behavior of ``assertFormError()`` when a
-        field has multiple errors. In older versions, if a field had multiple
-        errors and you checked for only some of them, the test would pass.
-        Starting from Django 4.1, the error list must be an exact match to the
-        field's actual errors.
-
     .. deprecated:: 4.1
 
         Support for passing a response object and a form name to

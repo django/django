@@ -712,8 +712,6 @@ You must then transition the squashed migration to a normal migration by:
 
 .. admonition:: Pruning references to deleted migrations
 
-    .. versionadded:: 4.1
-
     If it is likely that you may reuse the name of a deleted migration in the
     future, you should remove references to it from Django’s migrations table
     with the :option:`migrate --prune` option.

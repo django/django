@@ -244,8 +244,6 @@ Removes the index named ``name`` from the model with ``model_name``.
 ``RenameIndex``
 ---------------
 
-.. versionadded:: 4.1
-
 .. class:: RenameIndex(model_name, new_name, old_name=None, old_fields=None)
 
 Renames an index in the database table for the model with ``model_name``.

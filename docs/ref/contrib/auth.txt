@@ -666,10 +666,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
         (which passes it on to the backend).
 
-        .. versionchanged:: 4.1
-
-            The ``created`` argument was added.
-
     .. method:: user_can_authenticate()
 
         Returns whether the user is allowed to authenticate. This method

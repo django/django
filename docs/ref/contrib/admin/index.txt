@@ -1186,22 +1186,6 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
-    .. versionchanged:: 4.1
-
-        Searches using multiple search terms are now applied in a single call
-        to ``filter()``, rather than in sequential ``filter()`` calls.
-
-        For multi-valued relationships, this means that rows from the related
-        model must match all terms rather than any term. For example, if
-        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
-        user searches for ``'Jamal 17'``, parent rows will be returned only if
-        there is a relationship to some 17-year-old child named Jamal, rather
-        than also returning parents who merely have a younger or older child
-        named Jamal in addition to some other 17-year-old.
-
-        See the :ref:`spanning-multi-valued-relationships` topic for more
-        discussion of this difference.
-
 .. attribute:: ModelAdmin.search_help_text
 
     Set ``search_help_text`` to specify a descriptive text for the search box
@@ -1417,22 +1401,6 @@ templates used by the :class:`ModelAdmin` views:
     ('name', '=age')`` which results in a string comparison for the numeric
     field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
     on PostgreSQL.
-
-    .. versionchanged:: 4.1
-
-        Searches using multiple search terms are now applied in a single call
-        to ``filter()``, rather than in sequential ``filter()`` calls.
-
-        For multi-valued relationships, this means that rows from the related
-        model must match all terms rather than any term. For example, if
-        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
-        user searches for ``'Jamal 17'``, parent rows will be returned only if
-        there is a relationship to some 17-year-old child named Jamal, rather
-        than also returning parents who merely have a younger or older child
-        named Jamal in addition to some other 17-year-old.
-
-        See the :ref:`spanning-multi-valued-relationships` topic for more
-        discussion of this difference.
 
 .. _Solr: https://solr.apache.org
 .. _Haystack: https://haystacksearch.org
@@ -1998,10 +1966,6 @@ Other methods
 
     Django view for the page that shows the modification history for a given
     model instance.
-
-    .. versionchanged:: 4.1
-
-        Pagination was added.
 
 Unlike the hook-type ``ModelAdmin`` methods detailed in the previous section,
 these five methods are in reality designed to be invoked as Django views from
@@ -2725,11 +2689,6 @@ linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-.. versionchanged:: 4.1
-
-    The dark mode variables were moved to a separate stylesheet and template
-    block.
-
 ``AdminSite`` objects
 =====================
 
@@ -2899,10 +2858,6 @@ Templates can override or extend base admin templates as described in
     Lists of applications and models are sorted alphabetically by their names.
     You can override this method to change the default order on the admin index
     page.
-
-    .. versionchanged:: 4.1
-
-        The ``app_label`` argument was added.
 
 .. method:: AdminSite.has_permission(request)
 

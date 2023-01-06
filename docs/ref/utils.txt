@@ -670,10 +670,6 @@ escaping HTML.
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
-    .. versionchanged:: 4.1
-
-        In older versions, the ``element_id`` argument was required.
-
     .. versionchanged:: 4.2
 
         The ``encoder`` argument was added.

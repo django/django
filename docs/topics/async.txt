@@ -76,8 +76,6 @@ corruption.
 Queries & the ORM
 -----------------
 
-.. versionadded:: 4.1
-
 With some exceptions, Django can run ORM queries asynchronously as well::
 
     async for author in Author.objects.filter(name__startswith="A"):

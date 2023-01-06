@@ -118,11 +118,6 @@ If this last CSS definition were to be rendered, it would become the following H
     <link href="http://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
     <link href="http://static.example.com/newspaper.css" media="print" rel="stylesheet">
 
-.. versionchanged:: 4.1
-
-    In older versions, the ``type="text/css"`` attribute is included in CSS
-    links.
-
 ``js``
 ------
 
@@ -259,8 +254,6 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
 
 Paths as objects
 ----------------
-
-.. versionadded:: 4.1
 
 Asset paths may also be given as hashable objects implementing an
 ``__html__()`` method. The ``__html__()`` method is typically added using the

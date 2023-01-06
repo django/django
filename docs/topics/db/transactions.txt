@@ -238,11 +238,6 @@ Django provides a single API to control database transactions.
     is especially important if you're using :func:`atomic` in long-running
     processes, outside of Django's request / response cycle.
 
-.. versionchanged:: 4.1
-
-    In older versions, the durability check was disabled in
-    :class:`django.test.TestCase`.
-
 Autocommit
 ==========
 

@@ -659,8 +659,6 @@ Other Properties & Methods
 
 .. method:: GEOSGeometry.make_valid()
 
-    .. versionadded:: 4.1
-
     Returns a valid :class:`GEOSGeometry` equivalent, trying not to lose any of
     the input vertices. If the geometry is already valid, it is returned
     untouched. This is similar to the
@@ -679,10 +677,6 @@ Other Properties & Methods
         >>> g.normalize()
         >>> print(g)
         MULTIPOINT (2 2, 1 1, 0 0)
-
-    .. versionchanged:: 4.1
-
-        The ``clone`` argument was added.
 
 ``Point``
 ---------

@@ -70,11 +70,6 @@ If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
 Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a
 timely manner.
 
-.. versionchanged:: 4.1
-
-    The ``SECRET_KEY_FALLBACKS`` setting was added to support rotating secret
-    keys.
-
 :setting:`DEBUG`
 ----------------
 
