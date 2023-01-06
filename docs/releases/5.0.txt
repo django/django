@@ -270,6 +270,10 @@ to remove usage of these features.
 * The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
   ``DiscoverRunner.run_tests()`` is removed.
 
+* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+  ``StringAgg`` aggregates no longer return ``[]``, ``[]``, and ``''``,
+  respectively, when there are no rows.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
