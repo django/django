@@ -449,8 +449,8 @@ class TestQuerying(PostgreSQLTestCase):
                     expected,
                 )
 
-    @skipUnlessDBFeature("allows_group_by_refs")
-    def test_group_by_order_by_aliases(self):
+    @skipUnlessDBFeature("allows_group_by_select_index")
+    def test_group_by_order_by_select_index(self):
         with self.assertNumQueries(1) as ctx:
             self.assertSequenceEqual(
                 NullableIntegerArrayModel.objects.filter(
@@ -467,7 +467,7 @@ class TestQuerying(PostgreSQLTestCase):
             )
         alias = connection.ops.quote_name("field__0")
         sql = ctx[0]["sql"]
-        self.assertIn(f"GROUP BY {alias}", sql)
+        self.assertIn("GROUP BY 1", sql)
         self.assertIn(f"ORDER BY {alias}", sql)
 
     def test_index(self):

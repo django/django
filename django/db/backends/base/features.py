@@ -9,7 +9,7 @@ class BaseDatabaseFeatures:
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True
     allows_group_by_selected_pks = False
-    allows_group_by_refs = True
+    allows_group_by_select_index = True
     empty_fetchmany_value = []
     update_can_self_select = True
 

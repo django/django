@@ -123,7 +123,7 @@ class SQLCompiler:
         if self.query.group_by is None:
             return []
         expressions = []
-        allows_group_by_refs = self.connection.features.allows_group_by_refs
+        group_by_refs = set()
         if self.query.group_by is not True:
             # If the group by is set to a list (by .values() call most likely),
             # then we need to add everything in it to the GROUP BY clause.
@@ -133,21 +133,23 @@ class SQLCompiler:
             for expr in self.query.group_by:
                 if not hasattr(expr, "as_sql"):
                     expr = self.query.resolve_ref(expr)
-                if not allows_group_by_refs and isinstance(expr, Ref):
-                    expr = expr.source
-                expressions.append(expr)
+                if isinstance(expr, Ref):
+                    if expr.refs not in group_by_refs:
+                        group_by_refs.add(expr.refs)
+                        expressions.append(expr.source)
+                else:
+                    expressions.append(expr)
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
-        ref_sources = {expr.source for expr in expressions if isinstance(expr, Ref)}
-        aliased_exprs = {}
-        for expr, _, alias in select:
-            # Skip members of the select clause that are already included
-            # by reference.
-            if expr in ref_sources:
-                continue
+        selected_expr_indices = {}
+        for index, (expr, _, alias) in enumerate(select, start=1):
             if alias:
-                aliased_exprs[expr] = alias
+                selected_expr_indices[expr] = index
+            # Skip members of the select clause that are already explicitly
+            # grouped against.
+            if alias in group_by_refs:
+                continue
             expressions.extend(expr.get_group_by_cols())
         if not self._meta_ordering:
             for expr, (sql, params, is_ref) in order_by:
@@ -162,14 +164,21 @@ class SQLCompiler:
         seen = set()
         expressions = self.collapse_group_by(expressions, having_group_by)
 
+        allows_group_by_select_index = (
+            self.connection.features.allows_group_by_select_index
+        )
         for expr in expressions:
-            if allows_group_by_refs and (alias := aliased_exprs.get(expr)):
-                expr = Ref(alias, expr)
             try:
                 sql, params = self.compile(expr)
             except (EmptyResultSet, FullResultSet):
                 continue
-            sql, params = expr.select_format(self, sql, params)
+            if (
+                allows_group_by_select_index
+                and (select_index := selected_expr_indices.get(expr)) is not None
+            ):
+                sql, params = str(select_index), ()
+            else:
+                sql, params = expr.select_format(self, sql, params)
             params_hash = make_hashable(params)
             if (sql, params_hash) not in seen:
                 result.append((sql, params))
