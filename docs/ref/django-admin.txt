@@ -715,8 +715,6 @@ migrations are detected.
 
 .. django-admin-option:: --scriptable
 
-.. versionadded:: 4.1
-
 Diverts log output and input prompts to ``stderr``, writing only paths of
 generated migration files to ``stdout``.
 
@@ -805,16 +803,12 @@ detected.
 
 .. django-admin-option:: --prune
 
-.. versionadded:: 4.1
-
 Deletes nonexistent migrations from the ``django_migrations`` table. This is
 useful when migration files replaced by a squashed migration have been removed.
 See :ref:`migration-squashing` for more details.
 
 ``optimizemigration``
 ---------------------
-
-.. versionadded:: 4.1
 
 .. django-admin:: optimizemigration app_label migration_name
 
@@ -1960,8 +1954,6 @@ See :doc:`/howto/custom-management-commands` for how to add customized actions.
 
 Black formatting
 ----------------
-
-.. versionadded:: 4.1
 
 The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
 :djadmin:`optimizemigration`, :djadmin:`makemigrations`, and

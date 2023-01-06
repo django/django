@@ -330,10 +330,6 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-.. versionchanged:: 4.1
-
-    Support for finding paths in CSS source map comments was added.
-
 .. versionchanged:: 4.2
 
     Support for finding paths to JavaScript modules in ``import`` and

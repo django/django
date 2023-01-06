@@ -296,8 +296,6 @@ Note:
 
     .. method:: Sitemap.get_latest_lastmod()
 
-        .. versionadded:: 4.1
-
         **Optional.** A method that returns the latest value returned by
         :attr:`~Sitemap.lastmod`. This function is used to add the ``lastmod``
         attribute to :ref:`Sitemap index context
@@ -465,10 +463,6 @@ with a caching decorator -- you must name your sitemap view and pass
              {'sitemaps': sitemaps}, name='sitemaps'),
     ]
 
-.. versionchanged:: 4.1
-
-    Use of the ``Last-Modified`` header was added.
-
 Template customization
 ======================
 
@@ -515,11 +509,6 @@ attributes:
 - ``location``: The location (url & page) of the sitemap.
 - ``lastmod``: Populated by the :meth:`~Sitemap.get_latest_lastmod`
   method for each sitemap.
-
-.. versionchanged:: 4.1
-
-    The context was changed to a list of objects with ``location`` and optional
-    ``lastmod`` attributes.
 
 Sitemap
 -------

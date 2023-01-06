@@ -82,10 +82,6 @@ The CSRF protection is based on the following things:
    Expanding the accepted referers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
 
-.. versionchanged:: 4.1
-
-    In older versions, the CSRF cookie value was masked.
-
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
 

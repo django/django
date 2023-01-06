@@ -337,8 +337,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``StepValueValidator``
 ----------------------
 
-.. versionadded:: 4.1
-
 .. class:: StepValueValidator(limit_value, message=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of

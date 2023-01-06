@@ -1867,10 +1867,6 @@ This is compatible with a strict Content Security Policy that prohibits in-page
 script execution. It also maintains a clean separation between passive data and
 executable code.
 
-.. versionchanged:: 4.1
-
-    In older versions, the HTML "id" was a required argument.
-
 .. templatefilter:: last
 
 ``last``
