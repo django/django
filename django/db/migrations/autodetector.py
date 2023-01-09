@@ -390,9 +390,9 @@ class MigrationAutodetector:
             proxy_create = []
             rest = []
             for op in ops:
-                if type(op) == CreateModel and "proxy" in op.options:
+                if isinstance(op, CreateModel) and "proxy" in op.options:
                     proxy_create.append(op)
-                elif type(op) == CreateModel:
+                elif isinstance(op, CreateModel):
                     create.append(op)
                 else:
                     rest.append(op)
