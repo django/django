@@ -6,12 +6,12 @@ from django.db.models.lookups import Transform
 
 
 class MySQLSHA2Mixin:
-    def as_mysql(self, compiler, connection, **extra_content):
+    def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler,
             connection,
             template="SHA2(%%(expressions)s, %s)" % self.function[3:],
-            **extra_content,
+            **extra_context,
         )
 
 
@@ -29,13 +29,13 @@ class OracleHashMixin:
 
 
 class PostgreSQLSHAMixin:
-    def as_postgresql(self, compiler, connection, **extra_content):
+    def as_postgresql(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler,
             connection,
             template="ENCODE(DIGEST(%(expressions)s, '%(function)s'), 'hex')",
             function=self.function.lower(),
-            **extra_content,
+            **extra_context,
         )
 
 
