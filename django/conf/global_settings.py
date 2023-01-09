@@ -43,11 +43,6 @@ TIME_ZONE = "America/Chicago"
 # If you set this to True, Django will use timezone-aware datetimes.
 USE_TZ = True
 
-# RemovedInDjango50Warning: It's a transitional setting helpful in migrating
-# from pytz tzinfo to ZoneInfo(). Set True to continue using pytz tzinfo
-# objects during the Django 4.x release cycle.
-USE_DEPRECATED_PYTZ = False
-
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en-us"

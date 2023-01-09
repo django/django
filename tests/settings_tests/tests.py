@@ -4,13 +4,7 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import (
-    ENVIRONMENT_VARIABLE,
-    USE_DEPRECATED_PYTZ_DEPRECATED_MSG,
-    LazySettings,
-    Settings,
-    settings,
-)
+from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -23,7 +17,6 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import clear_script_prefix, set_script_prefix
-from django.utils.deprecation import RemovedInDjango50Warning
 
 
 @modify_settings(ITEMS={"prepend": ["b"], "append": ["d"], "remove": ["a", "e"]})
@@ -347,24 +340,6 @@ class SettingsTests(SimpleTestCase):
     def test_incorrect_timezone(self):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()
-
-    def test_use_deprecated_pytz_deprecation(self):
-        settings_module = ModuleType("fake_settings_module")
-        settings_module.USE_DEPRECATED_PYTZ = True
-        sys.modules["fake_settings_module"] = settings_module
-        try:
-            with self.assertRaisesMessage(
-                RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG
-            ):
-                Settings("fake_settings_module")
-        finally:
-            del sys.modules["fake_settings_module"]
-
-        holder = LazySettings()
-        with self.assertRaisesMessage(
-            RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG
-        ):
-            holder.configure(USE_DEPRECATED_PYTZ=True)
 
 
 class TestComplexSettingOverride(SimpleTestCase):

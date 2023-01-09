@@ -2849,21 +2849,6 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-.. setting:: USE_DEPRECATED_PYTZ
-
-``USE_DEPRECATED_PYTZ``
------------------------
-
-Default: ``False``
-
-A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
-as the default time zone implementation.
-
-.. deprecated:: 4.0
-
-    This transitional setting is deprecated. Support for using ``pytz`` will be
-    removed in Django 5.0.
-
 .. setting:: USE_I18N
 
 ``USE_I18N``

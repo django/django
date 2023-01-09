@@ -10,11 +10,6 @@ try:
 except ImportError:
     from backports import zoneinfo
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -157,9 +152,6 @@ MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 def make_aware_datetimes(dt, iana_key):
     """Makes one aware datetime for each supported time zone provider."""
     yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
-
-    if pytz is not None:
-        yield pytz.timezone(iana_key).localize(dt, is_dst=None)
 
 
 class AdminFieldExtractionMixin:
