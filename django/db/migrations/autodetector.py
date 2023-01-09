@@ -395,7 +395,7 @@ class MigrationAutodetector:
                 elif type(op) == CreateModel:
                     create.append(op)
                 else:
-                    rest.append(operation)
+                    rest.append(op)
             self.generated_operations[app_label] = create + proxy_create + rest
 
         for app_label, ops in sorted(self.generated_operations.items()):
