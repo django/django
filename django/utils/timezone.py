@@ -37,9 +37,6 @@ __all__ = [  # noqa for utc RemovedInDjango50Warning.
     "make_naive",
 ]
 
-# RemovedInDjango50Warning: sentinel for deprecation of is_dst parameters.
-NOT_PASSED = object()
-
 
 def __getattr__(name):
     if name != "utc":
@@ -259,17 +256,8 @@ def is_naive(value):
     return value.utcoffset() is None
 
 
-def make_aware(value, timezone=None, is_dst=NOT_PASSED):
+def make_aware(value, timezone=None):
     """Make a naive datetime.datetime in a given time zone aware."""
-    if is_dst is NOT_PASSED:
-        is_dst = None
-    else:
-        warnings.warn(
-            "The is_dst argument to make_aware(), used by the Trunc() "
-            "database functions and QuerySet.datetimes(), is deprecated as it "
-            "has no effect with zoneinfo time zones.",
-            RemovedInDjango50Warning,
-        )
     if timezone is None:
         timezone = get_current_timezone()
     # Check that we won't overwrite the timezone of an aware datetime.

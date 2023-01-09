@@ -837,7 +837,7 @@ Examples::
 ``datetimes()``
 ~~~~~~~~~~~~~~~
 
-.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None, is_dst=None)
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
 
 Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.datetime`
 objects representing all available dates of a particular kind within the
@@ -858,14 +858,6 @@ on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
 object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
-
-``is_dst`` indicates whether or not ``pytz`` should interpret nonexistent and
-ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
-``pytz`` raises an exception for such datetimes.
-
-.. deprecated:: 4.0
-
-    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 .. _database-time-zone-definitions:
 
