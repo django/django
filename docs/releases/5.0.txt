@@ -276,6 +276,10 @@ to remove usage of these features.
 
 * The ``USE_L10N`` setting is removed.
 
+* The ``USE_DEPRECATED_PYTZ`` transitional setting is removed.
+
+* Support for ``pytz`` timezones is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 

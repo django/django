@@ -32,15 +32,6 @@ RAN_DB_VERSION_CHECK = set()
 logger = logging.getLogger("django.db.backends.base")
 
 
-# RemovedInDjango50Warning
-def timezone_constructor(tzname):
-    if settings.USE_DEPRECATED_PYTZ:
-        import pytz
-
-        return pytz.timezone(tzname)
-    return zoneinfo.ZoneInfo(tzname)
-
-
 class BaseDatabaseWrapper:
     """Represent a database connection."""
 
@@ -166,7 +157,7 @@ class BaseDatabaseWrapper:
         elif self.settings_dict["TIME_ZONE"] is None:
             return datetime.timezone.utc
         else:
-            return timezone_constructor(self.settings_dict["TIME_ZONE"])
+            return zoneinfo.ZoneInfo(self.settings_dict["TIME_ZONE"])
 
     @cached_property
     def timezone_name(self):

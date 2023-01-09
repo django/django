@@ -677,5 +677,3 @@ Usage
    :func:`zoneinfo.available_timezones` provides the set of all valid keys for
    IANA time zones available to your system. See the docs for usage
    considerations.
-
-.. _pytz: http://pytz.sourceforge.net/

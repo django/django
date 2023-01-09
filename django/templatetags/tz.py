@@ -7,32 +7,10 @@ try:
 except ImportError:
     from backports import zoneinfo
 
-from django.conf import settings
 from django.template import Library, Node, TemplateSyntaxError
 from django.utils import timezone
 
 register = Library()
-
-
-# RemovedInDjango50Warning: shim to allow catching the exception in the calling
-# scope if pytz is not installed.
-class UnknownTimezoneException(BaseException):
-    pass
-
-
-# RemovedInDjango50Warning
-def timezone_constructor(tzname):
-    if settings.USE_DEPRECATED_PYTZ:
-        import pytz
-
-        try:
-            return pytz.timezone(tzname)
-        except pytz.UnknownTimeZoneError:
-            raise UnknownTimezoneException
-    try:
-        return zoneinfo.ZoneInfo(tzname)
-    except zoneinfo.ZoneInfoNotFoundError:
-        raise UnknownTimezoneException
 
 
 # HACK: datetime instances cannot be assigned new attributes. Define a subclass
@@ -79,8 +57,7 @@ def do_timezone(value, arg):
         if timezone.is_naive(value):
             default_timezone = timezone.get_default_timezone()
             value = timezone.make_aware(value, default_timezone)
-    # Filters must never raise exceptions, and pytz' exceptions inherit
-    # Exception directly, not a specific subclass. So catch everything.
+    # Filters must never raise exceptionsm, so catch everything.
     except Exception:
         return ""
 
@@ -89,8 +66,8 @@ def do_timezone(value, arg):
         tz = arg
     elif isinstance(arg, str):
         try:
-            tz = timezone_constructor(arg)
-        except UnknownTimezoneException:
+            tz = zoneinfo.ZoneInfo(arg)
+        except zoneinfo.ZoneInfoNotFoundError:
             return ""
     else:
         return ""
