@@ -972,37 +972,12 @@ appropriate entities.
     Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-.. function:: make_aware(value, timezone=None, is_dst=None)
+.. function:: make_aware(value, timezone=None)
 
     Returns an aware :class:`~datetime.datetime` that represents the same
     point in time as ``value`` in ``timezone``, ``value`` being a naive
     :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
-
-    .. deprecated:: 4.0
-
-        When using ``pytz``, the ``pytz.AmbiguousTimeError`` exception is
-        raised if you try to make ``value`` aware during a DST transition where
-        the same time occurs twice (when reverting from DST). Setting
-        ``is_dst`` to ``True`` or ``False`` will avoid the exception by
-        choosing if the time is pre-transition or post-transition respectively.
-
-        When using ``pytz``, the ``pytz.NonExistentTimeError`` exception is
-        raised if you try to make ``value`` aware during a DST transition such
-        that the time never occurred. For example, if the 2:00 hour is skipped
-        during a DST transition, trying to make 2:30 aware in that time zone
-        will raise an exception. To avoid that you can use ``is_dst`` to
-        specify how ``make_aware()`` should interpret such a nonexistent time.
-        If ``is_dst=True`` then the above time would be interpreted as 2:30 DST
-        time (equivalent to 1:30 local time). Conversely, if ``is_dst=False``
-        the time would be interpreted as 2:30 standard time (equivalent to 3:30
-        local time).
-
-        The ``is_dst`` parameter has no effect when using non-``pytz`` timezone
-        implementations.
-
-        The ``is_dst`` parameter is deprecated and will be removed in Django
-        5.0.
 
 .. function:: make_naive(value, timezone=None)
 

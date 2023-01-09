@@ -1372,11 +1372,7 @@ class QuerySet(AltersData):
             .order_by(("-" if order == "DESC" else "") + "datefield")
         )
 
-    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
-    # argument.
-    def datetimes(
-        self, field_name, kind, order="ASC", tzinfo=None, is_dst=timezone.NOT_PASSED
-    ):
+    def datetimes(self, field_name, kind, order="ASC", tzinfo=None):
         """
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
@@ -1400,7 +1396,6 @@ class QuerySet(AltersData):
                     kind,
                     output_field=DateTimeField(),
                     tzinfo=tzinfo,
-                    is_dst=is_dst,
                 ),
                 plain_field=F(field_name),
             )
