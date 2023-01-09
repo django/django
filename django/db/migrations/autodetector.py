@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.db.migrations import operations
 from django.db.migrations.migration import Migration
+from django.db.migrations.operations import CreateModel
 from django.db.migrations.operations.models import AlterModelOptions
 from django.db.migrations.optimizer import MigrationOptimizer
 from django.db.migrations.questioner import MigrationQuestioner
@@ -383,6 +384,20 @@ class MigrationAutodetector:
         Reorder to make things possible. Reordering may be needed so FKs work
         nicely inside the same app.
         """
+        # Order models, proxy models, rest
+        for app_label, ops in sorted(self.generated_operations.items()):
+            create = []
+            proxy_create = []
+            rest = []
+            for op in ops:
+                if type(op) == CreateModel and 'proxy' in op.options:
+                    proxy_create.append(op)
+                elif type(op) == CreateModel:
+                    create.append(op)
+                else:
+                    rest.append(operation)
+            self.generated_operations[app_label] = create + proxy_create + rest
+
         for app_label, ops in sorted(self.generated_operations.items()):
             # construct a dependency graph for intra-app dependencies
             dependency_graph = {op: set() for op in ops}
