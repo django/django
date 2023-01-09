@@ -24,12 +24,6 @@ DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
 
 # RemovedInDjango50Warning
-USE_DEPRECATED_PYTZ_DEPRECATED_MSG = (
-    "The USE_DEPRECATED_PYTZ setting, and support for pytz timezones is "
-    "deprecated in favor of the stdlib zoneinfo module. Please update your "
-    "code to use zoneinfo and remove the USE_DEPRECATED_PYTZ setting."
-)
-
 CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
     "The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for "
     "it will be removed in Django 5.0."
@@ -217,9 +211,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.is_overridden("USE_DEPRECATED_PYTZ"):
-            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
-
         if self.is_overridden("CSRF_COOKIE_MASKED"):
             warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
 
@@ -294,8 +285,6 @@ class UserSettingsHolder:
             }
             warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
         super().__setattr__(name, value)
-        if name == "USE_DEPRECATED_PYTZ":
-            warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
         # RemovedInDjango51Warning.
         if name == "STORAGES":
             self.STORAGES.setdefault(

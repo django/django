@@ -3,7 +3,6 @@ Timezone-related classes and functions.
 """
 
 import functools
-import sys
 import warnings
 
 try:
@@ -75,10 +74,6 @@ def get_default_timezone():
 
     This is the time zone defined by settings.TIME_ZONE.
     """
-    if settings.USE_DEPRECATED_PYTZ:
-        import pytz
-
-        return pytz.timezone(settings.TIME_ZONE)
     return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
 
@@ -125,12 +120,7 @@ def activate(timezone):
     if isinstance(timezone, tzinfo):
         _active.value = timezone
     elif isinstance(timezone, str):
-        if settings.USE_DEPRECATED_PYTZ:
-            import pytz
-
-            _active.value = pytz.timezone(timezone)
-        else:
-            _active.value = zoneinfo.ZoneInfo(timezone)
+        _active.value = zoneinfo.ZoneInfo(timezone)
     else:
         raise ValueError("Invalid timezone: %r" % timezone)
 
@@ -282,15 +272,11 @@ def make_aware(value, timezone=None, is_dst=NOT_PASSED):
         )
     if timezone is None:
         timezone = get_current_timezone()
-    if _is_pytz_zone(timezone):
-        # This method is available for pytz time zones.
-        return timezone.localize(value, is_dst=is_dst)
-    else:
-        # Check that we won't overwrite the timezone of an aware datetime.
-        if is_aware(value):
-            raise ValueError("make_aware expects a naive datetime, got %s" % value)
-        # This may be wrong around DST changes!
-        return value.replace(tzinfo=timezone)
+    # Check that we won't overwrite the timezone of an aware datetime.
+    if is_aware(value):
+        raise ValueError("make_aware expects a naive datetime, got %s" % value)
+    # This may be wrong around DST changes!
+    return value.replace(tzinfo=timezone)
 
 
 def make_naive(value, timezone=None):
@@ -303,53 +289,7 @@ def make_naive(value, timezone=None):
     return value.astimezone(timezone).replace(tzinfo=None)
 
 
-_PYTZ_IMPORTED = False
-
-
-def _pytz_imported():
-    """
-    Detects whether or not pytz has been imported without importing pytz.
-
-    Copied from pytz_deprecation_shim with thanks to Paul Ganssle.
-    """
-    global _PYTZ_IMPORTED
-
-    if not _PYTZ_IMPORTED and "pytz" in sys.modules:
-        _PYTZ_IMPORTED = True
-
-    return _PYTZ_IMPORTED
-
-
-def _is_pytz_zone(tz):
-    """Checks if a zone is a pytz zone."""
-    # See if pytz was already imported rather than checking
-    # settings.USE_DEPRECATED_PYTZ to *allow* manually passing a pytz timezone,
-    # which some of the test cases (at least) rely on.
-    if not _pytz_imported():
-        return False
-
-    # If tz could be pytz, then pytz is needed here.
-    import pytz
-
-    _PYTZ_BASE_CLASSES = (pytz.tzinfo.BaseTzInfo, pytz._FixedOffset)
-    # In releases prior to 2018.4, pytz.UTC was not a subclass of BaseTzInfo
-    if not isinstance(pytz.UTC, pytz._FixedOffset):
-        _PYTZ_BASE_CLASSES += (type(pytz.UTC),)
-
-    return isinstance(tz, _PYTZ_BASE_CLASSES)
-
-
 def _datetime_ambiguous_or_imaginary(dt, tz):
-    if _is_pytz_zone(tz):
-        import pytz
-
-        try:
-            tz.utcoffset(dt)
-        except (pytz.AmbiguousTimeError, pytz.NonExistentTimeError):
-            return True
-        else:
-            return False
-
     return tz.utcoffset(dt.replace(fold=not dt.fold)) != tz.utcoffset(dt)
 
 

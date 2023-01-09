@@ -26,7 +26,6 @@ from math import (
 )
 from re import search as re_search
 
-from django.db.backends.base.base import timezone_constructor
 from django.db.backends.utils import (
     split_tzname_delta,
     typecast_time,
@@ -35,6 +34,11 @@ from django.db.backends.utils import (
 from django.utils import timezone
 from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
+
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 
 def register(connection):
@@ -111,14 +115,14 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
+        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         tzname, sign, offset = split_tzname_delta(tzname)
         if offset:
             hours, minutes = offset.split(":")
             offset_delta = timedelta(hours=int(hours), minutes=int(minutes))
             dt += offset_delta if sign == "+" else -offset_delta
-        dt = timezone.localtime(dt, timezone_constructor(tzname))
+        dt = timezone.localtime(dt, zoneinfo.ZoneInfo(tzname))
     return dt
 
 
