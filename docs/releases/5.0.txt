@@ -297,6 +297,8 @@ to remove usage of these features.
 * The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
   are removed.
 
+* The undocumented ``BaseForm._html_output()`` method is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
