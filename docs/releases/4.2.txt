@@ -167,6 +167,11 @@ Minor features
   :class:`IsEmpty() <django.contrib.gis.db.models.functions.IsEmpty>`
   expression allow filtering empty geometries on PostGIS.
 
+* The new :class:`FromWKB() <django.contrib.gis.db.models.functions.FromWKB>`
+  and :class:`FromWKT() <django.contrib.gis.db.models.functions.FromWKT>`
+  functions allow creating geometries from Well-known binary (WKB) and
+  Well-known text (WKT) representations.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

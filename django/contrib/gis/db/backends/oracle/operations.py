@@ -76,6 +76,8 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "Difference": "SDO_GEOM.SDO_DIFFERENCE",
         "Distance": "SDO_GEOM.SDO_DISTANCE",
         "Envelope": "SDO_GEOM_MBR",
+        "FromWKB": "SDO_UTIL.FROM_WKBGEOMETRY",
+        "FromWKT": "SDO_UTIL.FROM_WKTGEOMETRY",
         "Intersection": "SDO_GEOM.SDO_INTERSECTION",
         "IsValid": "SDO_GEOM.VALIDATE_GEOMETRY_WITH_CONTEXT",
         "Length": "SDO_GEOM.SDO_LENGTH",

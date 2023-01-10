@@ -20,17 +20,17 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-=========================  ========================  ======================  =======================  ==================  =====================
-Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
-=========================  ========================  ======================  =======================  ==================  =====================
-:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsEmpty`
-:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`IsValid`
-:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`MemSize`
-:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumGeometries`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`      :class:`NumPoints`
-..                         :class:`PointOnSurface`                           :class:`Transform`       :class:`AsWKT`
-..                                                                           :class:`Translate`       :class:`GeoHash`
-=========================  ========================  ======================  =======================  ==================  =====================
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
+Measurement                Relationships             Operations              Editors                  Input format        Output format       Miscellaneous
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`                      :class:`AsGeoJSON`  :class:`IsEmpty`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`                           :class:`AsGML`      :class:`IsValid`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`                             :class:`AsKML`      :class:`MemSize`
+:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
+                           :class:`PointOnSurface`                           :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
+                                                                             :class:`Translate`                           :class:`GeoHash`
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
 
 ``Area``
 ========
@@ -174,14 +174,12 @@ __ https://www.w3.org/Graphics/SVG/
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known
-binary (WKB)`__ representation of the geometry.
+binary (WKB)`_ representation of the geometry.
 
 Example::
 
     >>> bytes(City.objects.annotate(wkb=AsWKB('point')).get(name='Chelyabinsk').wkb)
     b'\x01\x01\x00\x00\x00]3\xf9f\x9b\x91K@\x00X\x1d9\xd2\xb9N@'
-
-__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 
 ``AsWKT``
 =========
@@ -193,14 +191,12 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsText.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known text
-(WKT)`__ representation of the geometry.
+(WKT)`_ representation of the geometry.
 
 Example::
 
     >>> City.objects.annotate(wkt=AsWKT('point')).get(name='Chelyabinsk').wkt
     'POINT (55.137555 61.451728)'
-
-__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 
 ``Azimuth``
 ===========
@@ -326,6 +322,32 @@ Accepts a single geographic field or expression and returns a modified version
 of the polygon/multipolygon in which all exterior rings are oriented clockwise
 and all interior rings are oriented counterclockwise. Non-polygonal geometries
 are returned unchanged.
+
+``FromWKB``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: FromWKB(expression, **extra)
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
+
+Creates geometry from `Well-known binary (WKB)`_ representation.
+
+``FromWKT``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: FromWKT(expression, **extra)
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
+
+Creates geometry from `Well-known text (WKT)`_ representation.
 
 ``GeoHash``
 ===========
@@ -596,3 +618,6 @@ parameters.
 
 Accepts two geographic fields or expressions and returns the union of both
 geometries.
+
+.. _`Well-known binary (WKB)`: https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
+.. _`Well-known text (WKT)`: https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry

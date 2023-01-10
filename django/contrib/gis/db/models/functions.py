@@ -69,6 +69,8 @@ class GeoFuncMixin:
 
     def resolve_expression(self, *args, **kwargs):
         res = super().resolve_expression(*args, **kwargs)
+        if not self.geom_param_pos:
+            return res
 
         # Ensure that expressions are geometric.
         source_fields = res.get_source_fields()
@@ -349,6 +351,18 @@ class Envelope(GeomOutputGeoFunc):
 
 class ForcePolygonCW(GeomOutputGeoFunc):
     arity = 1
+
+
+class FromWKB(GeoFunc):
+    output_field = GeometryField(srid=0)
+    arity = 1
+    geom_param_pos = ()
+
+
+class FromWKT(GeoFunc):
+    output_field = GeometryField(srid=0)
+    arity = 1
+    geom_param_pos = ()
 
 
 class GeoHash(GeoFunc):
