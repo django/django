@@ -11,7 +11,7 @@ from django.contrib.admin import (
     register,
     site,
 )
-from django.contrib.gis.admin.options import GeoModelAdmin, GISModelAdmin, OSMGeoAdmin
+from django.contrib.gis.admin.options import GISModelAdmin
 from django.contrib.gis.admin.widgets import OpenLayersWidget
 
 __all__ = [
@@ -28,7 +28,5 @@ __all__ = [
     "site",
     "GISModelAdmin",
     # RemovedInDjango50Warning.
-    "GeoModelAdmin",
     "OpenLayersWidget",
-    "OSMGeoAdmin",
 ]
