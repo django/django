@@ -294,6 +294,9 @@ to remove usage of these features.
   * ``django.db.models.functions.TruncQuarter()``
   * ``django.db.models.functions.TruncYear()``
 
+* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+  are removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 
