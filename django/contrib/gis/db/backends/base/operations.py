@@ -45,6 +45,8 @@ class BaseSpatialOperations:
         "Difference",
         "Distance",
         "Envelope",
+        "FromWKB",
+        "FromWKT",
         "GeoHash",
         "GeometryDistance",
         "Intersection",

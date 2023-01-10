@@ -67,6 +67,8 @@ class SpatiaLiteOperations(BaseSpatialOperations, DatabaseOperations):
     function_names = {
         "AsWKB": "St_AsBinary",
         "ForcePolygonCW": "ST_ForceLHR",
+        "FromWKB": "ST_GeomFromWKB",
+        "FromWKT": "ST_GeomFromText",
         "Length": "ST_Length",
         "LineLocatePoint": "ST_Line_Locate_Point",
         "NumPoints": "ST_NPoints",
