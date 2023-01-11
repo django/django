@@ -91,6 +91,12 @@ In-memory file storage
 The new ``django.core.files.storage.InMemoryStorage`` class provides a
 non-persistent storage useful for speeding up tests by avoiding disk access.
 
+Custom file storages
+--------------------
+
+The new :setting:`STORAGES` setting allows configuring multiple custom file
+storage backends.
+
 Minor features
 --------------
 

@@ -4,6 +4,7 @@ from django.utils.module_loading import import_string
 
 from .base import Storage
 from .filesystem import FileSystemStorage
+from .handler import InvalidStorageError, StorageHandler
 from .memory import InMemoryStorage
 
 __all__ = (
@@ -13,6 +14,9 @@ __all__ = (
     "DefaultStorage",
     "default_storage",
     "get_storage_class",
+    "InvalidStorageError",
+    "StorageHandler",
+    "storages",
 )
 
 
@@ -25,4 +29,5 @@ class DefaultStorage(LazyObject):
         self._wrapped = get_storage_class()()
 
 
+storages = StorageHandler()
 default_storage = DefaultStorage()

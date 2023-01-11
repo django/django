@@ -14,9 +14,14 @@ from urllib.request import urlopen
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import FileSystemStorage, InvalidStorageError
 from django.core.files.storage import Storage as BaseStorage
-from django.core.files.storage import default_storage, get_storage_class
+from django.core.files.storage import (
+    StorageHandler,
+    default_storage,
+    get_storage_class,
+    storages,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile,
     SimpleUploadedFile,
@@ -1157,3 +1162,42 @@ class FileLikeObjectTestCase(LiveServerTestCase):
         remote_file = urlopen(self.live_server_url + "/")
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())
+
+
+class StorageHandlerTests(SimpleTestCase):
+    @override_settings(
+        STORAGES={
+            "custom_storage": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        }
+    )
+    def test_same_instance(self):
+        cache1 = storages["custom_storage"]
+        cache2 = storages["custom_storage"]
+        self.assertIs(cache1, cache2)
+
+    def test_defaults(self):
+        storages = StorageHandler()
+        self.assertEqual(storages.backends, {})
+
+    def test_nonexistent_alias(self):
+        msg = "Could not find config for 'nonexistent' in settings.STORAGES."
+        storages = StorageHandler()
+        with self.assertRaisesMessage(InvalidStorageError, msg):
+            storages["nonexistent"]
+
+    def test_nonexistent_backend(self):
+        test_storages = StorageHandler(
+            {
+                "invalid_backend": {
+                    "BACKEND": "django.nonexistent.NonexistentBackend",
+                },
+            }
+        )
+        msg = (
+            "Could not find backend 'django.nonexistent.NonexistentBackend': "
+            "No module named 'django.nonexistent'"
+        )
+        with self.assertRaisesMessage(InvalidStorageError, msg):
+            test_storages["invalid_backend"]
