@@ -549,6 +549,8 @@ Miscellaneous
   object for ``wsgi.input``. Previously, Django was more lax than the expected
   behavior as specified by the WSGI specification.
 
+* Support for ``PROJ`` < 5 is removed.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
