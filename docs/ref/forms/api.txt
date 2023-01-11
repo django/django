@@ -1015,11 +1015,6 @@ Customizing the error list format
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
 
-.. deprecated:: 4.0
-
-    The ability to return a ``str`` when calling the ``__str__`` method is
-    deprecated. Use the template engine instead which returns a ``SafeString``.
-
 More granular output
 ====================
 
