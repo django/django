@@ -299,6 +299,9 @@ to remove usage of these features.
 
 * The undocumented ``BaseForm._html_output()`` method is removed.
 
+* The ability to return a ``str``, rather than a ``SafeString``, when rendering
+  an ``ErrorDict`` and ``ErrorList`` is removed.
+
 See :ref:`deprecated-features-4.1` for details on these changes, including how
 to remove usage of these features.
 

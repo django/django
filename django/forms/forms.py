@@ -4,16 +4,13 @@ Form classes
 
 import copy
 import datetime
-import warnings
 
 from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.forms.fields import Field, FileField
 from django.forms.utils import ErrorDict, ErrorList, RenderableFormMixin
 from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
-from django.utils.safestring import SafeString, mark_safe
 from django.utils.translation import gettext as _
 
 from .renderers import get_default_renderer
@@ -238,15 +235,6 @@ class BaseForm(RenderableFormMixin):
                 hidden_fields.append(bf)
             else:
                 errors_str = str(bf_errors)
-                # RemovedInDjango50Warning.
-                if not isinstance(errors_str, SafeString):
-                    warnings.warn(
-                        f"Returning a plain string from "
-                        f"{self.error_class.__name__} is deprecated. Please "
-                        f"customize via the template system instead.",
-                        RemovedInDjango50Warning,
-                    )
-                    errors_str = mark_safe(errors_str)
                 fields.append((bf, errors_str))
         return {
             "form": self,
