@@ -112,6 +112,23 @@ def reset_template_engines(*, setting, **kwargs):
 
 
 @receiver(setting_changed)
+def storages_changed(*, setting, **kwargs):
+    from django.core.files.storage import storages
+
+    if setting in (
+        "STORAGES",
+        "STATIC_ROOT",
+        "STATIC_URL",
+    ):
+        try:
+            del storages.backends
+        except AttributeError:
+            pass
+        storages._backends = None
+        storages._storages = {}
+
+
+@receiver(setting_changed)
 def clear_serializers_cache(*, setting, **kwargs):
     if setting == "SERIALIZATION_MODULES":
         from django.core import serializers

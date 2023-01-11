@@ -23,6 +23,7 @@ Settings
 See :ref:`staticfiles settings <settings-staticfiles>` for details on the
 following settings:
 
+* :setting:`STORAGES`
 * :setting:`STATIC_ROOT`
 * :setting:`STATIC_URL`
 * :setting:`STATICFILES_DIRS`

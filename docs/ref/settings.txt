@@ -2606,6 +2606,43 @@ Silenced checks will not be output to the console.
 
 See also the :doc:`/ref/checks` documentation.
 
+.. setting:: STORAGES
+
+``STORAGES``
+------------
+
+.. versionadded:: 4.2
+
+Default::
+
+    {}
+
+A dictionary containing the settings for all storages to be used with Django.
+It is a nested dictionary whose contents map a storage alias to a dictionary
+containing the options for an individual storage.
+
+Storages can have any alias you choose.
+
+The following is an example ``settings.py`` snippet defining a custom file
+storage called ``example``::
+
+    STORAGES = {
+        # ...
+        "example": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": "/example",
+                "base_url": "/example/",
+            },
+        },
+    }
+
+``OPTIONS`` are passed to the ``BACKEND`` on initialization in ``**kwargs``.
+
+A ready-to-use instance of the storage backends can be retrieved from
+:data:`django.core.files.storage.storages`. Use a key corresponding to the
+backend definition in :setting:`STORAGES`.
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``
@@ -3663,6 +3700,7 @@ File uploads
 * :setting:`FILE_UPLOAD_TEMP_DIR`
 * :setting:`MEDIA_ROOT`
 * :setting:`MEDIA_URL`
+* :setting:`STORAGES`
 
 Forms
 -----

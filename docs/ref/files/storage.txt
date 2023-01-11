@@ -9,6 +9,12 @@ Getting the default storage class
 
 Django provides convenient ways to access the default storage class:
 
+.. data:: storages
+
+    .. versionadded:: 4.2
+
+    Storage instances as defined by :setting:`STORAGES`.
+
 .. class:: DefaultStorage
 
     :class:`~django.core.files.storage.DefaultStorage` provides
