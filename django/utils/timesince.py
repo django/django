@@ -104,7 +104,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     remaining_time = (now - pivot).total_seconds()
     partials = [years, months]
     for chunk in TIME_CHUNKS:
-        count = remaining_time // chunk
+        count = int(remaining_time // chunk)
         partials.append(count)
         remaining_time -= chunk * count
 
