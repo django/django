@@ -154,19 +154,20 @@ class LazySettings(LazyObject):
         """Return True if the settings have already been configured."""
         return self._wrapped is not empty
 
-    @property
-    def USE_L10N(self):
+    def _show_deprecation_warning(self, message, category):
         stack = traceback.extract_stack()
         # Show a warning if the setting is used outside of Django.
-        # Stack index: -1 this line, -2 the LazyObject __getattribute__(),
-        # -3 the caller.
-        filename, _, _, _ = stack[-3]
+        # Stack index: -1 this line, -2 the property, -3 the
+        # LazyObject __getattribute__(), -4 the caller.
+        filename, _, _, _ = stack[-4]
         if not filename.startswith(os.path.dirname(django.__file__)):
-            warnings.warn(
-                USE_L10N_DEPRECATED_MSG,
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+            warnings.warn(message, category, stacklevel=2)
+
+    @property
+    def USE_L10N(self):
+        self._show_deprecation_warning(
+            USE_L10N_DEPRECATED_MSG, RemovedInDjango50Warning
+        )
         return self.__getattr__("USE_L10N")
 
     # RemovedInDjango50Warning.
