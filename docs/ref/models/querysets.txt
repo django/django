@@ -2476,12 +2476,6 @@ value for ``chunk_size`` will result in Django using an implicit default of
 Depending on the database backend, query results will either be loaded all at
 once or streamed from the database using server-side cursors.
 
-.. deprecated:: 4.1
-
-    Using ``iterator()`` on a queryset that prefetches related objects without
-    providing the ``chunk_size`` is deprecated. In Django 5.0, an exception
-    will be raise.
-
 With server-side cursors
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

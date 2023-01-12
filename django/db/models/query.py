@@ -33,7 +33,6 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
@@ -529,16 +528,9 @@ class QuerySet(AltersData):
         """
         if chunk_size is None:
             if self._prefetch_related_lookups:
-                # When the deprecation ends, replace with:
-                # raise ValueError(
-                #     'chunk_size must be provided when using '
-                #     'QuerySet.iterator() after prefetch_related().'
-                # )
-                warnings.warn(
-                    "Using QuerySet.iterator() after prefetch_related() "
-                    "without specifying chunk_size is deprecated.",
-                    category=RemovedInDjango50Warning,
-                    stacklevel=2,
+                raise ValueError(
+                    "chunk_size must be provided when using QuerySet.iterator() after "
+                    "prefetch_related()."
                 )
         elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
