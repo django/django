@@ -12,8 +12,7 @@ from django.test import (
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import CaptureQueriesContext, ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test.utils import CaptureQueriesContext
 
 from .models import (
     Article,
@@ -385,25 +384,12 @@ class PrefetchRelatedTests(TestDataMixin, TestCase):
             [self.author1, self.author1, self.author3, self.author4],
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_m2m_prefetching_iterator_without_chunks(self):
-        # prefetch_related() is ignored.
-        with self.assertNumQueries(5):
-            authors = [
-                b.authors.first()
-                for b in Book.objects.prefetch_related("authors").iterator()
-            ]
-        self.assertEqual(
-            authors,
-            [self.author1, self.author1, self.author3, self.author4],
-        )
-
-    def test_m2m_prefetching_iterator_without_chunks_warning(self):
+    def test_m2m_prefetching_iterator_without_chunks_error(self):
         msg = (
-            "Using QuerySet.iterator() after prefetch_related() without "
-            "specifying chunk_size is deprecated."
+            "chunk_size must be provided when using QuerySet.iterator() after "
+            "prefetch_related()."
         )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Book.objects.prefetch_related("authors").iterator()
 
 
