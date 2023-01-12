@@ -4,9 +4,8 @@ from datetime import date
 from django.contrib.sitemaps import Sitemap
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured
-from django.test import ignore_warnings, modify_settings, override_settings
+from django.test import modify_settings, override_settings
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.formats import localize
 
 from .base import SitemapTestsBase
@@ -579,44 +578,3 @@ class HTTPSitemapTests(SitemapTestsBase):
         </sitemapindex>
         """
         self.assertXMLEqual(index_response.content.decode(), expected_content_index)
-
-
-# RemovedInDjango50Warning
-class DeprecatedTests(SitemapTestsBase):
-    @override_settings(
-        TEMPLATES=[
-            {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
-            }
-        ]
-    )
-    def test_simple_sitemap_custom_index_warning(self):
-        msg = (
-            "Calling `__str__` on SitemapIndexItem is deprecated, use the `location` "
-            "attribute instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            self.client.get("/simple/custom-index.xml")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(
-        TEMPLATES=[
-            {
-                "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.join(os.path.dirname(__file__), "templates")],
-            }
-        ]
-    )
-    def test_simple_sitemap_custom_index(self):
-        "A simple sitemap index can be rendered with a custom template"
-        response = self.client.get("/simple/custom-index.xml")
-        expected_content = """<?xml version="1.0" encoding="UTF-8"?>
-    <!-- This is a customised template -->
-    <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <sitemap><loc>%s/simple/sitemap-simple.xml</loc></sitemap>
-    </sitemapindex>
-    """ % (
-            self.base_url
-        )
-        self.assertXMLEqual(response.content.decode(), expected_content)

@@ -280,11 +280,6 @@ urlpatterns = [
         {"sitemaps": simple_sitemaps_not_callable},
     ),
     path(
-        "simple/custom-index.xml",
-        views.index,
-        {"sitemaps": simple_sitemaps, "template_name": "custom_sitemap_index.xml"},
-    ),
-    path(
         "simple/custom-lastmod-index.xml",
         views.index,
         {
