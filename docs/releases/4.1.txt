@@ -98,16 +98,15 @@ See :ref:`the Forms section (below)<forms-4.1>` for full details.
 ``CSRF_COOKIE_MASKED`` setting
 ------------------------------
 
-The new :setting:`CSRF_COOKIE_MASKED` transitional setting allows specifying
-whether to mask the CSRF cookie.
+The new ``CSRF_COOKIE_MASKED`` transitional setting allows specifying whether
+to mask the CSRF cookie.
 
 :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
 cookie like it does the CSRF token in the DOM. If you are upgrading multiple
 instances of the same project to Django 4.1, you should set
-:setting:`CSRF_COOKIE_MASKED` to ``True`` during the transition, in
-order to allow compatibility with the older versions of Django. Once the
-transition to 4.1 is complete you can stop overriding
-:setting:`CSRF_COOKIE_MASKED`.
+``CSRF_COOKIE_MASKED`` to ``True`` during the transition, in order to allow
+compatibility with the older versions of Django. Once the transition to 4.1 is
+complete you can stop overriding ``CSRF_COOKIE_MASKED``.
 
 This setting is deprecated as of this release and will be removed in Django
 5.0.

@@ -568,10 +568,6 @@ CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_TRUSTED_ORIGINS = []
 CSRF_USE_SESSIONS = False
 
-# Whether to mask CSRF cookie value. It's a transitional setting helpful in
-# migrating multiple instance of the same project to Django 4.1+.
-CSRF_COOKIE_MASKED = False
-
 ############
 # MESSAGES #
 ############

@@ -343,20 +343,6 @@ form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
 
-.. setting:: CSRF_COOKIE_MASKED
-
-``CSRF_COOKIE_MASKED``
-----------------------
-
-Default: ``False``
-
-Whether to mask the CSRF cookie. See
-:ref:`release notes <csrf-cookie-masked-usage>` for usage details.
-
-.. deprecated:: 4.1
-
-    This transitional setting is deprecated and will be removed in Django 5.0.
-
 .. setting:: CSRF_COOKIE_NAME
 
 ``CSRF_COOKIE_NAME``

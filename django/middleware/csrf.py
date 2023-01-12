@@ -85,13 +85,7 @@ def _add_new_csrf_cookie(request):
     csrf_secret = _get_new_csrf_string()
     request.META.update(
         {
-            # RemovedInDjango50Warning: when the deprecation ends, replace
-            # with: 'CSRF_COOKIE': csrf_secret
-            "CSRF_COOKIE": (
-                _mask_cipher_secret(csrf_secret)
-                if settings.CSRF_COOKIE_MASKED
-                else csrf_secret
-            ),
+            "CSRF_COOKIE": csrf_secret,
             "CSRF_COOKIE_NEEDS_UPDATE": True,
         }
     )
