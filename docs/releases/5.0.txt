@@ -311,3 +311,6 @@ to remove usage of these features.
 
 * The ``name`` argument of ``django.utils.functional.cached_property()`` is
   removed.
+
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` is removed.
