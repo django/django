@@ -364,6 +364,7 @@ class LiveServerPort(LiveServerBase):
                 % self.live_server_url,
             )
         finally:
+            TestCase.doClassCleanups()
             TestCase.tearDownClass()
 
     def test_specified_port_bind(self):
@@ -383,6 +384,7 @@ class LiveServerPort(LiveServerBase):
                 % TestCase.port,
             )
         finally:
+            TestCase.doClassCleanups()
             TestCase.tearDownClass()
 
 
