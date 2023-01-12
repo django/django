@@ -1,7 +1,6 @@
 import copy
 import itertools
 import operator
-import warnings
 from functools import total_ordering, wraps
 
 
@@ -23,16 +22,7 @@ class cached_property:
             "__set_name__() on it."
         )
 
-    def __init__(self, func, name=None):
-        from django.utils.deprecation import RemovedInDjango50Warning
-
-        if name is not None:
-            warnings.warn(
-                "The name argument is deprecated as it's unnecessary as of "
-                "Python 3.6.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def __init__(self, func):
         self.real_func = func
         self.__doc__ = getattr(func, "__doc__")
 
