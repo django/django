@@ -64,7 +64,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN c.relkind IN ('m', 'v') THEN 'v'
                     ELSE 't'
                 END,
-                obj_description(c.oid)
+                obj_description(c.oid, 'pg_class')
             FROM pg_catalog.pg_class c
             LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
             WHERE c.relkind IN ('f', 'm', 'p', 'r', 'v')
