@@ -322,3 +322,5 @@ to remove usage of these features.
 
 * The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
   objects without providing the ``chunk_size`` argument is no longer allowed.
+
+* Passing unsaved model instances to related filters is no longer allowed.
