@@ -724,15 +724,6 @@ class SimpleTestCase(unittest.TestCase):
 
         You can pass field=None to check the form's non-field errors.
         """
-        if errors is None:
-            warnings.warn(
-                "Passing errors=None to assertFormError() is deprecated, use "
-                "errors=[] instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-            errors = []
-
         if msg_prefix:
             msg_prefix += ": "
         errors = to_list(errors)
@@ -760,15 +751,6 @@ class SimpleTestCase(unittest.TestCase):
 
         Other parameters are the same as assertFormError().
         """
-        if errors is None:
-            warnings.warn(
-                "Passing errors=None to assertFormSetError() is deprecated, "
-                "use errors=[] instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-            errors = []
-
         if form_index is None and field is not None:
             raise ValueError("You must use field=None with form_index=None.")
 
