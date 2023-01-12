@@ -317,3 +317,5 @@ to remove usage of these features.
 
 * The undocumented ability to pass ``errors=None`` to
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is removed.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` is removed.
