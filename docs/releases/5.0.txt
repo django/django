@@ -314,3 +314,6 @@ to remove usage of these features.
 
 * The ``opclasses`` argument of
   ``django.contrib.postgres.constraints.ExclusionConstraint`` is removed.
+
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is removed.
