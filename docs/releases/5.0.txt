@@ -319,3 +319,6 @@ to remove usage of these features.
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is removed.
 
 * ``django.contrib.sessions.serializers.PickleSerializer`` is removed.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument is no longer allowed.
