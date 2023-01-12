@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_message=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -132,32 +132,6 @@ used for queries that select only included fields
 
 ``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
 ``include`` for SP-GiST indexes.
-
-``opclasses``
--------------
-
-.. attribute:: ExclusionConstraint.opclasses
-
-The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
-this constraint. If you require a custom operator class, you must provide one
-for each expression in the constraint.
-
-For example::
-
-    ExclusionConstraint(
-        name='exclude_overlapping_opclasses',
-        expressions=[('circle', RangeOperators.OVERLAPS)],
-        opclasses=['circle_ops'],
-    )
-
-creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-.. deprecated:: 4.1
-
-    The ``opclasses`` parameter is deprecated in favor of using
-    :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
-    :attr:`~ExclusionConstraint.expressions`.
 
 ``violation_error_message``
 ---------------------------
