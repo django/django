@@ -1769,23 +1769,6 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
     signature.
     """
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_form_error_errors_none(self):
-        msg = (
-            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
-            "fields=(field)> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(TestForm.invalid(), "field", None)
-
-    def test_assert_form_error_errors_none_warning(self):
-        msg = (
-            "Passing errors=None to assertFormError() is deprecated, use "
-            "errors=[] instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormError(TestForm.valid(), "field", None)
-
     def _assert_form_error_old_api_cases(self, form, field, errors, msg_prefix):
         response = mock.Mock(context=[{"form": TestForm.invalid()}])
         return (
@@ -1851,23 +1834,6 @@ class AssertFormErrorDeprecationTests(SimpleTestCase):
             with self.subTest(args=args, kwargs=kwargs):
                 with self.assertRaises(AssertionError):
                     self.assertFormError(*args, **kwargs)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_formset_error_errors_none(self):
-        msg = (
-            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
-            "valid=False total_forms=1> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormSetError(TestFormset.invalid(), 0, "field", None)
-
-    def test_assert_formset_error_errors_none_warning(self):
-        msg = (
-            "Passing errors=None to assertFormSetError() is deprecated, use "
-            "errors=[] instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormSetError(TestFormset.valid(), 0, "field", None)
 
     def _assert_formset_error_old_api_cases(
         self, formset, form_index, field, errors, msg_prefix
