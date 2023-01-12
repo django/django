@@ -16,18 +16,12 @@ from pathlib import Path
 import django
 from django.conf import global_settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.functional import LazyObject, empty
 
 ENVIRONMENT_VARIABLE = "DJANGO_SETTINGS_MODULE"
 DEFAULT_STORAGE_ALIAS = "default"
 STATICFILES_STORAGE_ALIAS = "staticfiles"
-
-# RemovedInDjango50Warning
-CSRF_COOKIE_MASKED_DEPRECATED_MSG = (
-    "The CSRF_COOKIE_MASKED transitional setting is deprecated. Support for "
-    "it will be removed in Django 5.0."
-)
 
 DEFAULT_FILE_STORAGE_DEPRECATED_MSG = (
     "The DEFAULT_FILE_STORAGE setting is deprecated. Use STORAGES instead."
@@ -211,9 +205,6 @@ class Settings:
                 setattr(self, setting, setting_value)
                 self._explicit_settings.add(setting)
 
-        if self.is_overridden("CSRF_COOKIE_MASKED"):
-            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
-
         if hasattr(time, "tzset") and self.TIME_ZONE:
             # When we can, attempt to validate the timezone. If we can't find
             # this file, no check happens and it's harmless.
@@ -272,8 +263,6 @@ class UserSettingsHolder:
 
     def __setattr__(self, name, value):
         self._deleted.discard(name)
-        if name == "CSRF_COOKIE_MASKED":
-            warnings.warn(CSRF_COOKIE_MASKED_DEPRECATED_MSG, RemovedInDjango50Warning)
         if name == "DEFAULT_FILE_STORAGE":
             self.STORAGES[DEFAULT_STORAGE_ALIAS] = {
                 "BACKEND": self.DEFAULT_FILE_STORAGE
