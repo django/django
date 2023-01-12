@@ -427,7 +427,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(func, name=None)
+.. class:: cached_property(func)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
@@ -508,11 +508,6 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
         y = person.get_friends()   # calls again
         z = person.friends         # does not call
         x is z                     # is True
-
-    .. deprecated:: 4.1
-
-        The ``name`` parameter is deprecated and will be removed in Django 5.0
-        as it's unnecessary as of Python 3.6.
 
 .. class:: classproperty(method=None)
 

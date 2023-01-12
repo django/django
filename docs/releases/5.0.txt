@@ -308,3 +308,6 @@ to remove usage of these features.
 * The ``SitemapIndexItem.__str__()`` method is removed.
 
 * The ``CSRF_COOKIE_MASKED`` transitional setting is removed.
+
+* The ``name`` argument of ``django.utils.functional.cached_property()`` is
+  removed.
