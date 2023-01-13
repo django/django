@@ -334,3 +334,7 @@ to remove usage of these features.
 
 * The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` is
   removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormSetError()`` is no
+  longer allowed.
