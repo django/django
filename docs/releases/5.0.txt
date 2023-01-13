@@ -327,3 +327,7 @@ to remove usage of these features.
 
 * ``created=True`` is required in the signature of
   ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` is removed.
