@@ -42,9 +42,8 @@ from django.forms.utils import ErrorList
 from django.http import QueryDict
 from django.template import Context, Template
 from django.test import SimpleTestCase
-from django.test.utils import isolate_lru_cache, override_settings
+from django.test.utils import override_settings
 from django.utils.datastructures import MultiValueDict
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.safestring import mark_safe
 
 from . import jinja2_tests
@@ -5084,16 +5083,3 @@ class OverrideTests(SimpleTestCase):
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
         )
-
-
-class DeprecationTests(SimpleTestCase):
-    def test_warning(self):
-        from django.forms.utils import DEFAULT_TEMPLATE_DEPRECATION_MSG
-
-        with isolate_lru_cache(get_default_renderer), self.settings(
-            FORM_RENDERER="django.forms.renderers.DjangoTemplates"
-        ), self.assertRaisesMessage(
-            RemovedInDjango50Warning, DEFAULT_TEMPLATE_DEPRECATION_MSG
-        ):
-            form = Person()
-            str(form)
