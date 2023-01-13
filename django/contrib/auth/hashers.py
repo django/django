@@ -17,7 +17,7 @@ from django.utils.crypto import (
     md5,
     pbkdf2,
 )
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -818,65 +818,6 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         decoded = self.decode(encoded)
         return {
             _("algorithm"): decoded["algorithm"],
-            _("hash"): mask_hash(decoded["hash"], show=3),
-        }
-
-    def harden_runtime(self, password, encoded):
-        pass
-
-
-# RemovedInDjango50Warning.
-class CryptPasswordHasher(BasePasswordHasher):
-    """
-    Password hashing using UNIX crypt (not recommended)
-
-    The crypt module is not supported on all platforms.
-    """
-
-    algorithm = "crypt"
-    library = "crypt"
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn(
-            "django.contrib.auth.hashers.CryptPasswordHasher is deprecated.",
-            RemovedInDjango50Warning,
-            stacklevel=2,
-        )
-        super().__init__(*args, **kwargs)
-
-    def salt(self):
-        return get_random_string(2)
-
-    def encode(self, password, salt):
-        crypt = self._load_library()
-        if len(salt) != 2:
-            raise ValueError("salt must be of length 2.")
-        hash = crypt.crypt(password, salt)
-        if hash is None:  # A platform like OpenBSD with a dummy crypt module.
-            raise TypeError("hash must be provided.")
-        # we don't need to store the salt, but Django used to do this
-        return "%s$%s$%s" % (self.algorithm, "", hash)
-
-    def decode(self, encoded):
-        algorithm, salt, hash = encoded.split("$", 2)
-        assert algorithm == self.algorithm
-        return {
-            "algorithm": algorithm,
-            "hash": hash,
-            "salt": salt,
-        }
-
-    def verify(self, password, encoded):
-        crypt = self._load_library()
-        decoded = self.decode(encoded)
-        data = crypt.crypt(password, decoded["hash"])
-        return constant_time_compare(decoded["hash"], data)
-
-    def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("salt"): decoded["salt"],
             _("hash"): mask_hash(decoded["hash"], show=3),
         }
 
