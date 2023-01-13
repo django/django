@@ -338,3 +338,5 @@ to remove usage of these features.
 * Passing a response object and a form/formset name to
   ``SimpleTestCase.assertFormError()`` and ``assertFormSetError()`` is no
   longer allowed.
+
+* The ``django.contrib.gis.admin.OpenLayersWidget`` is removed.

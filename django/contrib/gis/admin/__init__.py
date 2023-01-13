@@ -12,7 +12,6 @@ from django.contrib.admin import (
     site,
 )
 from django.contrib.gis.admin.options import GISModelAdmin
-from django.contrib.gis.admin.widgets import OpenLayersWidget
 
 __all__ = [
     "HORIZONTAL",
@@ -27,6 +26,4 @@ __all__ = [
     "register",
     "site",
     "GISModelAdmin",
-    # RemovedInDjango50Warning.
-    "OpenLayersWidget",
 ]
