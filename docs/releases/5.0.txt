@@ -324,3 +324,6 @@ to remove usage of these features.
   objects without providing the ``chunk_size`` argument is no longer allowed.
 
 * Passing unsaved model instances to related filters is no longer allowed.
+
+* ``created=True`` is required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
