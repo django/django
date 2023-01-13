@@ -75,6 +75,7 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "AsSVG",
             "Azimuth",
             "BoundingCircle",
+            "ClosestPoint",
             "ForcePolygonCW",
             "GeometryDistance",
             "IsEmpty",

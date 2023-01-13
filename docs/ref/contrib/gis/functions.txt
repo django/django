@@ -26,10 +26,10 @@ Measurement                Relationships             Operations              Edi
 :class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`                      :class:`AsGeoJSON`  :class:`IsEmpty`
 :class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`                           :class:`AsGML`      :class:`IsValid`
 :class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`                             :class:`AsKML`      :class:`MemSize`
-:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
-                           :class:`PointOnSurface`                           :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
-                                                                             :class:`Translate`                           :class:`GeoHash`
+:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`Envelope`                                 :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
+                           :class:`LineLocatePoint`                          :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
+                           :class:`PointOnSurface`                           :class:`Translate`                           :class:`GeoHash`
 =========================  ========================  ======================  =======================  ==================  ==================  ======================
 
 ``Area``
@@ -236,6 +236,19 @@ The ``num_seg`` parameter is used only on PostGIS.
 
 Accepts a single geographic field or expression and returns the ``centroid``
 value of the geometry.
+
+``ClosestPoint``
+================
+
+.. versionadded:: 5.0
+
+.. class:: ClosestPoint(expr1, expr2, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ClosestPoint.html>`__,
+SpatiaLite
+
+Accepts two geographic fields or expressions and returns the 2-dimensional
+point on geometry A that is closest to geometry B.
 
 ``Difference``
 ==============
