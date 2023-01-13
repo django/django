@@ -590,7 +590,7 @@ Miscellaneous
   :ref:`Localization section <use_l10n_deprecation>` above for more details.
 
 * As part of the :ref:`move to zoneinfo <whats-new-4.0>`,
-  :attr:`django.utils.timezone.utc` is changed to alias
+  ``django.utils.timezone.utc`` is changed to alias
   :attr:`datetime.timezone.utc`.
 
 * The minimum supported version of ``asgiref`` is increased from 3.3.2 to

@@ -331,3 +331,6 @@ to remove usage of these features.
 * Support for logging out via ``GET`` requests in the
   ``django.contrib.auth.views.LogoutView`` and
   ``django.contrib.auth.views.logout_then_login()`` is removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` is
+  removed.
