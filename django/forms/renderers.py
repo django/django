@@ -15,11 +15,8 @@ def get_default_renderer():
 
 
 class BaseRenderer:
-    # RemovedInDjango50Warning: When the deprecation ends, replace with
-    # form_template_name = "django/forms/div.html"
-    # formset_template_name = "django/forms/formsets/div.html"
-    form_template_name = "django/forms/default.html"
-    formset_template_name = "django/forms/formsets/default.html"
+    form_template_name = "django/forms/div.html"
+    formset_template_name = "django/forms/formsets/div.html"
 
     def get_template(self, template_name):
         raise NotImplementedError("subclasses must implement get_template()")

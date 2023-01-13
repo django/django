@@ -342,3 +342,8 @@ to remove usage of these features.
 * The ``django.contrib.gis.admin.OpenLayersWidget`` is removed.
 
 + The ``django.contrib.auth.hashers.CryptPasswordHasher`` is removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates are removed.
+
+* The default form and formset rendering style is changed to the div-based.
