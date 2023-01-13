@@ -340,3 +340,5 @@ to remove usage of these features.
   longer allowed.
 
 * The ``django.contrib.gis.admin.OpenLayersWidget`` is removed.
+
++ The ``django.contrib.auth.hashers.CryptPasswordHasher`` is removed.

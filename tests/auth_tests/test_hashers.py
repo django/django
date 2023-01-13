@@ -19,17 +19,7 @@ from django.contrib.auth.hashers import (
 )
 from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-
-# RemovedInDjango50Warning.
-try:
-    import crypt
-except ImportError:
-    crypt = None
-else:
-    # On some platforms (e.g. OpenBSD), crypt.crypt() always return None.
-    if crypt.crypt("") is None:
-        crypt = None
+from django.utils.deprecation import RemovedInDjango51Warning
 
 try:
     import bcrypt
@@ -238,57 +228,6 @@ class TestUtilsHashPass(SimpleTestCase):
         msg = "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated."
         with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
             get_hasher("unsalted_sha1")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt(self):
-        encoded = make_password("lètmei", "ab", "crypt")
-        self.assertEqual(encoded, "crypt$$ab1Hv2Lg7ltQo")
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password("lètmei", encoded))
-        self.assertFalse(check_password("lètmeiz", encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "crypt")
-        # Blank passwords
-        blank_encoded = make_password("", "ab", "crypt")
-        self.assertTrue(blank_encoded.startswith("crypt$"))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password("", blank_encoded))
-        self.assertFalse(check_password(" ", blank_encoded))
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt_encode_invalid_salt(self):
-        hasher = get_hasher("crypt")
-        msg = "salt must be of length 2."
-        with self.assertRaisesMessage(ValueError, msg):
-            hasher.encode("password", salt="a")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt_encode_invalid_hash(self):
-        hasher = get_hasher("crypt")
-        msg = "hash must be provided."
-        with mock.patch("crypt.crypt", return_value=None):
-            with self.assertRaisesMessage(TypeError, msg):
-                hasher.encode("password", salt="ab")
-
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt_deprecation_warning(self):
-        msg = "django.contrib.auth.hashers.CryptPasswordHasher is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            get_hasher("crypt")
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
