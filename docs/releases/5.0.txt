@@ -347,3 +347,7 @@ to remove usage of these features.
   ``"django/forms/formsets/default.html"`` templates are removed.
 
 * The default form and formset rendering style is changed to the div-based.
+
+* Passing ``nulls_first=False`` or ``nulls_last=False`` to ``Expression.asc()``
+  and ``Expression.desc()`` methods, and the ``OrderBy`` expression is no
+  longer allowed.
