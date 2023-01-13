@@ -280,6 +280,11 @@ class Centroid(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 1
 
 
+class ClosestPoint(GeomOutputGeoFunc):
+    arity = 2
+    geom_param_pos = (0, 1)
+
+
 class Difference(OracleToleranceMixin, GeomOutputGeoFunc):
     arity = 2
     geom_param_pos = (0, 1)

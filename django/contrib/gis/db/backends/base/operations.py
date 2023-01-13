@@ -42,6 +42,7 @@ class BaseSpatialOperations:
         "Azimuth",
         "BoundingCircle",
         "Centroid",
+        "ClosestPoint",
         "Difference",
         "Distance",
         "Envelope",
