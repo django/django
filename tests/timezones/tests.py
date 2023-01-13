@@ -33,7 +33,6 @@ from django.test import (
 from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import timezone, translation
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.timezone import timedelta
 
 from .forms import (
@@ -72,19 +71,6 @@ except ImportError:
 UTC = datetime.timezone.utc
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)  # Asia/Bangkok
-
-
-class UTCAliasTests(SimpleTestCase):
-    def test_alias_deprecation_warning(self):
-        msg = (
-            "The django.utils.timezone.utc alias is deprecated. "
-            "Please update your code to use datetime.timezone.utc instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            timezone.utc
-
-    def test_timezone_module_dir_includes_utc(self):
-        self.assertIn("utc", dir(timezone))
 
 
 @contextmanager

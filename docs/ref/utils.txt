@@ -862,15 +862,6 @@ appropriate entities.
 .. module:: django.utils.timezone
     :synopsis: Timezone support.
 
-.. data:: utc
-
-    :class:`~datetime.tzinfo` instance that represents UTC.
-
-    .. deprecated:: 4.1
-
-        This is an alias to :attr:`datetime.timezone.utc`. Use
-        :attr:`datetime.timezone.utc` directly.
-
 .. function:: get_fixed_timezone(offset)
 
     Returns a :class:`~datetime.tzinfo` instance that represents a time zone
