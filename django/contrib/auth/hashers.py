@@ -296,7 +296,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
 
     algorithm = "pbkdf2_sha256"
-    iterations = 480000
+    iterations = 580000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
