@@ -545,10 +545,12 @@ class SimpleTestCase(unittest.TestCase):
                 # Get the redirection page, using the same client that was used
                 # to obtain the original response.
                 extra = response.client.extra or {}
+                headers = response.client.headers or {}
                 redirect_response = response.client.get(
                     path,
                     QueryDict(query),
                     secure=(scheme == "https"),
+                    headers=headers,
                     **extra,
                 )
                 self.assertEqual(

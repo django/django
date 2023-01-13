@@ -845,6 +845,7 @@ class Client(ClientMixin, RequestFactory):
         self.raise_request_exception = raise_request_exception
         self.exc_info = None
         self.extra = None
+        self.headers = None
 
     def request(self, **request):
         """
@@ -905,6 +906,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Request a response from the server using GET."""
         self.extra = extra
+        self.headers = headers
         response = super().get(path, data=data, secure=secure, headers=headers, **extra)
         if follow:
             response = self._handle_redirects(
@@ -925,6 +927,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Request a response from the server using POST."""
         self.extra = extra
+        self.headers = headers
         response = super().post(
             path,
             data=data,
@@ -951,6 +954,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Request a response from the server using HEAD."""
         self.extra = extra
+        self.headers = headers
         response = super().head(
             path, data=data, secure=secure, headers=headers, **extra
         )
@@ -973,6 +977,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Request a response from the server using OPTIONS."""
         self.extra = extra
+        self.headers = headers
         response = super().options(
             path,
             data=data,
@@ -1000,6 +1005,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Send a resource to the server using PUT."""
         self.extra = extra
+        self.headers = headers
         response = super().put(
             path,
             data=data,
@@ -1027,6 +1033,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Send a resource to the server using PATCH."""
         self.extra = extra
+        self.headers = headers
         response = super().patch(
             path,
             data=data,
@@ -1054,6 +1061,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Send a DELETE request to the server."""
         self.extra = extra
+        self.headers = headers
         response = super().delete(
             path,
             data=data,
@@ -1080,6 +1088,7 @@ class Client(ClientMixin, RequestFactory):
     ):
         """Send a TRACE request to the server."""
         self.extra = extra
+        self.headers = headers
         response = super().trace(
             path, data=data, secure=secure, headers=headers, **extra
         )
@@ -1190,6 +1199,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         self.raise_request_exception = raise_request_exception
         self.exc_info = None
         self.extra = None
+        self.headers = None
 
     async def request(self, **request):
         """
