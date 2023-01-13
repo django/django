@@ -5,7 +5,7 @@ from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
 from django.utils import text
 from django.utils.functional import lazystr
-from django.utils.text import format_lazy
+from django.utils.text import format_lazy, strip_bom
 from django.utils.translation import gettext_lazy, override
 
 IS_WIDE_BUILD = len("\U0001F4A9") == 1
@@ -312,3 +312,8 @@ class TestUtilsText(SimpleTestCase):
         )
         with override("fr"):
             self.assertEqual("Ajout de article «\xa0My first try\xa0».", s)
+
+    def test_strip_bom(self):
+        self.assertEqual(
+            strip_bom(b"\xef\xbb\xbfDummy text".decode("utf-8")), "Dummy text"
+        )

@@ -453,3 +453,9 @@ def _format_lazy(format_string, *args, **kwargs):
 
 
 format_lazy = lazy(_format_lazy, str)
+
+
+@keep_lazy_text
+def strip_bom(value):
+    """Strip Byte Order Mark from UTF-8 text."""
+    return value.encode("utf-8").decode("utf-8-sig")
