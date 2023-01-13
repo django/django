@@ -1,5 +1,4 @@
 import difflib
-import inspect
 import json
 import logging
 import posixpath
@@ -42,7 +41,6 @@ from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
-from django.http.response import HttpResponseBase
 from django.test.client import AsyncClient, Client
 from django.test.html import HTMLParseError, parse_html
 from django.test.signals import template_rendered
@@ -53,7 +51,7 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.functional import classproperty
 from django.utils.version import PY310
 from django.views.static import serve
@@ -166,127 +164,6 @@ class _DatabaseFailure:
 
     def __call__(self):
         raise DatabaseOperationForbidden(self.message)
-
-
-# RemovedInDjango50Warning
-class _AssertFormErrorDeprecationHelper:
-    @staticmethod
-    def assertFormError(self, response, form, field, errors, msg_prefix=""):
-        """
-        Search through all the rendered contexts of the `response` for a form named
-        `form` then dispatch to the new assertFormError() using that instance.
-        If multiple contexts contain the form, they're all checked in order and any
-        failure will abort (this matches the old behavior).
-        """
-        warning_msg = (
-            f"Passing response to assertFormError() is deprecated. Use the form object "
-            f"directly: assertFormError(response.context[{form!r}], {field!r}, ...)"
-        )
-        warnings.warn(warning_msg, RemovedInDjango50Warning, stacklevel=2)
-
-        full_msg_prefix = f"{msg_prefix}: " if msg_prefix else ""
-        contexts = to_list(response.context) if response.context is not None else []
-        if not contexts:
-            self.fail(
-                f"{full_msg_prefix}Response did not use any contexts to render the "
-                f"response"
-            )
-        # Search all contexts for the error.
-        found_form = False
-        for i, context in enumerate(contexts):
-            if form not in context:
-                continue
-            found_form = True
-            self.assertFormError(context[form], field, errors, msg_prefix=msg_prefix)
-        if not found_form:
-            self.fail(
-                f"{full_msg_prefix}The form '{form}' was not used to render the "
-                f"response"
-            )
-
-    @staticmethod
-    def assertFormSetError(
-        self, response, formset, form_index, field, errors, msg_prefix=""
-    ):
-        """
-        Search for a formset named "formset" in the "response" and dispatch to
-        the new assertFormSetError() using that instance. If the name is found
-        in multiple contexts they're all checked in order and any failure will
-        abort the test.
-        """
-        warning_msg = (
-            f"Passing response to assertFormSetError() is deprecated. Use the formset "
-            f"object directly: assertFormSetError(response.context[{formset!r}], "
-            f"{form_index!r}, ...)"
-        )
-        warnings.warn(warning_msg, RemovedInDjango50Warning, stacklevel=2)
-
-        full_msg_prefix = f"{msg_prefix}: " if msg_prefix else ""
-        contexts = to_list(response.context) if response.context is not None else []
-        if not contexts:
-            self.fail(
-                f"{full_msg_prefix}Response did not use any contexts to render the "
-                f"response"
-            )
-        found_formset = False
-        for i, context in enumerate(contexts):
-            if formset not in context or not hasattr(context[formset], "forms"):
-                continue
-            found_formset = True
-            self.assertFormSetError(
-                context[formset], form_index, field, errors, msg_prefix
-            )
-        if not found_formset:
-            self.fail(
-                f"{full_msg_prefix}The formset '{formset}' was not used to render the "
-                f"response"
-            )
-
-    @classmethod
-    def patch_signature(cls, new_method):
-        """
-        Replace the decorated method with a new one that inspects the passed
-        args/kwargs and dispatch to the old implementation (with deprecation
-        warning) when it detects the old signature.
-        """
-
-        @wraps(new_method)
-        def patched_method(self, *args, **kwargs):
-            old_method = getattr(cls, new_method.__name__)
-            old_signature = inspect.signature(old_method)
-            try:
-                old_bound_args = old_signature.bind(self, *args, **kwargs)
-            except TypeError:
-                # If old signature doesn't match then either:
-                # 1) new signature will match
-                # 2) or a TypeError will be raised showing the user information
-                # about the new signature.
-                return new_method(self, *args, **kwargs)
-
-            new_signature = inspect.signature(new_method)
-            try:
-                new_bound_args = new_signature.bind(self, *args, **kwargs)
-            except TypeError:
-                # Old signature matches but not the new one (because of
-                # previous try/except).
-                return old_method(self, *args, **kwargs)
-
-            # If both signatures match, decide on which method to call by
-            # inspecting the first arg (arg[0] = self).
-            assert old_bound_args.args[1] == new_bound_args.args[1]
-            if hasattr(
-                old_bound_args.args[1], "context"
-            ):  # Looks like a response object => old method.
-                return old_method(self, *args, **kwargs)
-            elif isinstance(old_bound_args.args[1], HttpResponseBase):
-                raise ValueError(
-                    f"{old_method.__name__}() is only usable on responses fetched "
-                    f"using the Django test Client."
-                )
-            else:
-                return new_method(self, *args, **kwargs)
-
-        return patched_method
 
 
 class SimpleTestCase(unittest.TestCase):
@@ -711,9 +588,6 @@ class SimpleTestCase(unittest.TestCase):
 
         self.assertEqual(field_errors, errors, msg_prefix + failure_message)
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove the
-    # decorator.
-    @_AssertFormErrorDeprecationHelper.patch_signature
     def assertFormError(self, form, field, errors, msg_prefix=""):
         """
         Assert that a field named "field" on the given form object has specific
@@ -738,9 +612,6 @@ class SimpleTestCase(unittest.TestCase):
         )
         return self.assertFormSetError(*args, **kw)
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove the
-    # decorator.
-    @_AssertFormErrorDeprecationHelper.patch_signature
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
         Similar to assertFormError() but for formsets.

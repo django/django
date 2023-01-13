@@ -1601,12 +1601,6 @@ your test suite.
     which means that ``errors='error message'`` is the same as
     ``errors=['error message']``.
 
-    .. deprecated:: 4.1
-
-        Support for passing a response object and a form name to
-        ``assertFormError()`` is deprecated and will be removed in Django 5.0.
-        Use the form instance directly instead.
-
 .. method:: SimpleTestCase.assertFormSetError(formset, form_index, field, errors, msg_prefix='')
 
     Asserts that the ``formset`` raises the provided list of errors when
@@ -1623,12 +1617,6 @@ your test suite.
 
     ``field`` and ``errors`` have the same meaning as the parameters to
     ``assertFormError()``.
-
-    .. deprecated:: 4.1
-
-        Support for passing a response object and a formset name to
-        ``assertFormSetError()`` is deprecated and will be removed in Django
-        5.0. Use the formset instance directly instead.
 
     .. deprecated:: 4.2
 
