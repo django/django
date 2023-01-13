@@ -253,9 +253,6 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
         "fields.W907",
     ]
 
-    # RemovedInDjango50Warning
-    settings.FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
-
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()
 

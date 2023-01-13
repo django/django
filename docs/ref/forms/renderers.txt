@@ -51,27 +51,13 @@ should return a rendered templates (as a string) or raise
 
         The default name of the template to use to render a form.
 
-        Defaults to ``"django/forms/default.html"``, which is a proxy for
-        ``"django/forms/table.html"``.
-
-        .. deprecated:: 4.1
-
-        The ``"django/forms/default.html"`` template is deprecated and will be
-        removed in Django 5.0. The default will become
-        ``"django/forms/div.html"`` at that time.
+        Defaults to ``"django/forms/div.html"`` template.
 
     .. attribute:: formset_template_name
 
         The default name of the template to use to render a formset.
 
-        Defaults to ``"django/forms/formsets/default.html"``, which is a proxy
-        for ``"django/forms/formsets/table.html"``.
-
-        .. deprecated:: 4.1
-
-        The ``"django/forms/formset/default.html"`` template is deprecated and
-        will be removed in Django 5.0. The default will become
-        ``"django/forms/formset/div.html"`` template.
+        Defaults to ``"django/forms/formsets/div.html"`` template.
 
     .. method:: get_template(template_name)
 
