@@ -24,9 +24,8 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
@@ -568,19 +567,13 @@ class WriterTests(SimpleTestCase):
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {"import datetime"}),
         )
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            from django.utils.timezone import utc
-        for tzinfo in (utc, datetime.timezone.utc):
-            with self.subTest(tzinfo=tzinfo):
-                self.assertSerializedResultEqual(
-                    datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
-                    (
-                        "datetime.datetime"
-                        "(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
-                        {"import datetime"},
-                    ),
-                )
-
+        self.assertSerializedResultEqual(
+            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc),
+            (
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                {"import datetime"},
+            ),
+        )
         self.assertSerializedResultEqual(
             datetime.datetime(
                 2012, 1, 1, 2, 1, tzinfo=zoneinfo.ZoneInfo("Europe/Paris")

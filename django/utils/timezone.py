@@ -3,7 +3,6 @@ Timezone-related classes and functions.
 """
 
 import functools
-import warnings
 
 try:
     import zoneinfo
@@ -16,10 +15,8 @@ from datetime import datetime, timedelta, timezone, tzinfo
 from asgiref.local import Local
 
 from django.conf import settings
-from django.utils.deprecation import RemovedInDjango50Warning
 
-__all__ = [  # noqa for utc RemovedInDjango50Warning.
-    "utc",
+__all__ = [
     "get_fixed_timezone",
     "get_default_timezone",
     "get_default_timezone_name",
@@ -36,20 +33,6 @@ __all__ = [  # noqa for utc RemovedInDjango50Warning.
     "make_aware",
     "make_naive",
 ]
-
-
-def __getattr__(name):
-    if name != "utc":
-        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-    warnings.warn(
-        "The django.utils.timezone.utc alias is deprecated. "
-        "Please update your code to use datetime.timezone.utc instead.",
-        RemovedInDjango50Warning,
-        stacklevel=2,
-    )
-
-    return timezone.utc
 
 
 def get_fixed_timezone(offset):
@@ -279,11 +262,3 @@ def make_naive(value, timezone=None):
 
 def _datetime_ambiguous_or_imaginary(dt, tz):
     return tz.utcoffset(dt.replace(fold=not dt.fold)) != tz.utcoffset(dt)
-
-
-# RemovedInDjango50Warning.
-_DIR = dir()
-
-
-def __dir__():
-    return sorted([*_DIR, "utc"])
