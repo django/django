@@ -132,11 +132,6 @@ Minor features
 
 * jQuery is upgraded from version 3.6.0 to 3.6.3.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -148,11 +143,6 @@ Minor features
 
 * The new :class:`~django.contrib.auth.forms.BaseUserCreationForm` is now the
   recommended base class for customizing the user creation form.
-
-:mod:`django.contrib.contenttypes`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -183,11 +173,6 @@ Minor features
   functions allow creating geometries from Well-known binary (WKB) and
   Well-known text (WKT) representations.
 
-:mod:`django.contrib.messages`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -201,26 +186,11 @@ Minor features
 * The :lookup:`arrayfield.overlap` lookup now supports ``QuerySet.values()``
   and ``values_list()`` as a right-hand side.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.sitemaps`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The new :meth:`.Sitemap.get_languages_for_item` method allows customizing the
   list of languages for which the item is displayed.
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -232,21 +202,6 @@ Minor features
 * The new :attr:`.ManifestStaticFilesStorage.manifest_hash` attribute provides
   a hash over all files in the manifest and changes whenever one of the files
   changes.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Database backends
 ~~~~~~~~~~~~~~~~~
@@ -274,16 +229,6 @@ Error Reporting
 * The debug page now shows :pep:`exception notes <678>` and
   :pep:`fine-grained error locations <657>` on Python 3.11+.
 
-File Storage
-~~~~~~~~~~~~
-
-* ...
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 Forms
 ~~~~~
 
@@ -295,11 +240,6 @@ Forms
 
 * Session cookies are now treated as credentials and therefore hidden and
   replaced with stars (``**********``) in error reports.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -376,26 +316,6 @@ Requests and Responses
 * :class:`~django.http.StreamingHttpResponse` now supports async iterators
   when Django is served via ASGI.
 
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
-Signals
-~~~~~~~
-
-* ...
-
-Templates
-~~~~~~~~~
-
-* ...
-
 Tests
 ~~~~~
 
@@ -417,11 +337,6 @@ Tests
      # After:
      self.client.get("/home/", headers={"accept-language": "fr"})
      await self.async_client.get("/home/", headers={"accept-language": "fr"})
-
-URLs
-~~~~
-
-* ...
 
 Utilities
 ~~~~~~~~~
