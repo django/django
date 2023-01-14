@@ -54,7 +54,7 @@
             {% endfor %}
           {% endfor %}
         {% endfor %}
-        {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
+        {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission and forloop.counter > inline_admin_formset.formset.min_num %}
           <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
         {% endif %}
         </tr>
