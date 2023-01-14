@@ -70,7 +70,7 @@ Bugfixes
   hand side of an expression is the same type (:ticket:`30621`).
 
 * Fixed a regression in Django 2.2 where auto-reloader crashes if a file path
-  contains nulls characters (``'\x00'``) (:ticket:`30506`).
+  contains null characters (``'\x00'``) (:ticket:`30506`).
 
 * Fixed a regression in Django 2.2 where auto-reloader crashes if a translation
   directory cannot be resolved (:ticket:`30647`).
