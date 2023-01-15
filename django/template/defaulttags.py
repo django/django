@@ -474,7 +474,9 @@ class URLNode(Node):
             # Try to look up the URL. If it fails, raise NoReverseMatch unless the
             # {% url ... as var %} construct is used, in which case return nothing.
             try:
-                url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+                url = reverse(
+                    view_name, args=args, kwargs=kwargs, current_app=current_app
+                )
             except NoReverseMatch:
                 if self.asvar is None:
                     raise
