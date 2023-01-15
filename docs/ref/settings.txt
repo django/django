@@ -839,7 +839,9 @@ but for all apps.
 Default: ``None``
 
 The alias of the database that this database should mirror during
-testing.
+testing. It depends on transactions and therefore must be used within
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`.
 
 This setting exists to allow for testing of primary/replica
 (referred to as master/slave by some databases)
