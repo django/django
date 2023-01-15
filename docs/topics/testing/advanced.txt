@@ -241,7 +241,9 @@ will *not* be created. Instead the connection to ``replica``
 will be redirected to point at ``default``. As a result, writes to
 ``default`` will appear on ``replica`` -- but because they are actually
 the same database, not because there is data replication between the
-two databases.
+two databases. As this depends on transactions, the tests must use
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`.
 
 .. _topics-testing-creation-dependencies:
 
