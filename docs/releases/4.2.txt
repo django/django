@@ -64,7 +64,7 @@ example::
         question = models.ForeignKey(
             Question,
             on_delete=models.CASCADE,
-            db_comment="Reference to a question"
+            db_comment="Reference to a question",
         )
         answer = models.TextField(db_comment="Question answer")
 
@@ -88,7 +88,7 @@ The Breach (HTB) paper`_.
 In-memory file storage
 ----------------------
 
-The new ``django.core.files.storage.InMemoryStorage`` class provides a
+The new :class:`django.core.files.storage.InMemoryStorage` class provides a
 non-persistent storage useful for speeding up tests by avoiding disk access.
 
 Custom file storages
@@ -462,13 +462,13 @@ Miscellaneous
 * The minimum supported version of `redis-py`_ is increased from 3.0.0 to
   3.4.0.
 
-.. _`redis-py`: https://pypi.org/project/redis/
-
 * Manually instantiated ``WSGIRequest`` objects must be provided a file-like
   object for ``wsgi.input``. Previously, Django was more lax than the expected
   behavior as specified by the WSGI specification.
 
 * Support for ``PROJ`` < 5 is removed.
+
+.. _`redis-py`: https://pypi.org/project/redis/
 
 .. _deprecated-features-4.2:
 
@@ -515,7 +515,7 @@ but it should not be used for new migrations. Use
 Passing encoded JSON string literals to ``JSONField`` is deprecated
 -------------------------------------------------------------------
 
-``JSONField`` and its associated lookups and aggregates use to allow passing
+``JSONField`` and its associated lookups and aggregates used to allow passing
 JSON encoded string literals which caused ambiguity on whether string literals
 were already encoded from database backend's perspective.
 
