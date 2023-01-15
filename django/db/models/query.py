@@ -2161,18 +2161,14 @@ class RawQuerySet:
         return model_fields
 
 
-class Prefetch:
+
+class PrefetchBase:
     def __init__(self, lookup, queryset=None, to_attr=None):
         # `prefetch_through` is the path we traverse to perform the prefetch.
-        self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
-        self.prefetch_to = lookup
+        self.prefetch_to = self.prefetch_through = lookup
         if queryset is not None and (
-            isinstance(queryset, RawQuerySet)
-            or (
-                hasattr(queryset, "_iterable_class")
-                and not issubclass(queryset._iterable_class, ModelIterable)
-            )
+            isinstance(queryset, RawQuerySet) or (not issubclass(getattr(queryset, '_iterable_class', None), ModelIterable)
         ):
             raise ValueError(
                 "Prefetch querysets cannot use raw(), values(), and values_list()."
@@ -2213,13 +2209,23 @@ class Prefetch:
             return self.queryset
         return None
 
+
+
+    def __hash__(self):
+        return hash((self.__class__, self.prefetch_to))
+
+
+class Prefetch(PrefetchBase):
+
     def __eq__(self, other):
         if not isinstance(other, Prefetch):
             return NotImplemented
         return self.prefetch_to == other.prefetch_to
 
-    def __hash__(self):
-        return hash((self.__class__, self.prefetch_to))
+
+class PrefetchLatest(PrefetchBase):
+    def __init__(self, lookup, queryset=None, ordering=None, to_attr=None):
+        pass
 
 
 def normalize_prefetch_lookups(lookups, prefix=None):
