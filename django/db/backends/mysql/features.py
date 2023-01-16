@@ -144,6 +144,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if "ONLY_FULL_GROUP_BY" in self.connection.sql_mode:
+            skips.update(
+                {
+                    "GROUP BY cannot contain nonaggregated column when "
+                    "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #34262.": {
+                        "aggregation.tests.AggregateTestCase."
+                        "test_group_by_nested_expression_with_params",
+                    },
+                }
+            )
         return skips
 
     @cached_property

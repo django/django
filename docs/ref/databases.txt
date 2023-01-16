@@ -117,9 +117,6 @@ PostgreSQL notes
 Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
 2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
-.. _psycopg: https://www.psycopg.org/psycopg3/
-.. _psycopg2: https://www.psycopg.org/
-
 .. note::
 
     Support for ``psycopg2`` is likely to be deprecated and removed at some
@@ -251,6 +248,31 @@ database configuration in :setting:`DATABASES`::
         },
     }
 
+.. _database-server-side-parameters-binding:
+
+Server-side parameters binding
+------------------------------
+
+.. versionadded:: 4.2
+
+With `psycopg`_ 3.1.8+, Django defaults to the :ref:`client-side binding
+cursors <psycopg:client-side-binding-cursors>`. If you want to use the
+:ref:`server-side binding <psycopg:server-side-binding>` set it in the
+:setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "server_side_binding": True,
+            },
+        },
+    }
+
+This option is ignored with ``psycopg2``.
+
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
 
@@ -372,6 +394,9 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     or corruption in the case of a server crash or power loss. Only use this on
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
+
+.. _psycopg: https://www.psycopg.org/psycopg3/
+.. _psycopg2: https://www.psycopg.org/
 
 .. _mariadb-notes:
 

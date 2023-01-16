@@ -34,6 +34,7 @@ from django.db.models.functions import (
     Cast,
     Coalesce,
     Greatest,
+    Least,
     Lower,
     Now,
     Pi,
@@ -1613,6 +1614,20 @@ class AggregateTestCase(TestCase):
             Exists(long_books_qs),
         ).annotate(total=Count("*"))
         self.assertEqual(dict(has_long_books_breakdown), {True: 2, False: 3})
+
+    def test_group_by_nested_expression_with_params(self):
+        books_qs = (
+            Book.objects.annotate(greatest_pages=Greatest("pages", Value(600)))
+            .values(
+                "greatest_pages",
+            )
+            .annotate(
+                min_pages=Min("pages"),
+                least=Least("min_pages", "greatest_pages"),
+            )
+            .values_list("least", flat=True)
+        )
+        self.assertCountEqual(books_qs, [300, 946, 1132])
 
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_aggregation_subquery_annotation_related_field(self):
