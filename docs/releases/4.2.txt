@@ -254,6 +254,10 @@ Database backends
 * The new ``"assume_role"`` option is now supported in :setting:`OPTIONS` on
   PostgreSQL to allow specifying the :ref:`session role <database-role>`.
 
+* The new ``"server_side_binding"`` option is now supported in
+  :setting:`OPTIONS` on PostgreSQL with ``psycopg`` 3.1.8+ to allow using
+  :ref:`server-side binding cursors <database-server-side-parameters-binding>`.
+
 Decorators
 ~~~~~~~~~~
 

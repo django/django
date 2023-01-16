@@ -223,6 +223,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
+        conn_params.pop("server_side_binding", None)
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
         if settings_dict["PASSWORD"]:
@@ -268,14 +269,20 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
-        if not is_psycopg3:
+        if is_psycopg3:
+            connection.cursor_factory = (
+                ServerBindingCursor
+                if options.get("server_side_binding") is True
+                else Cursor
+            )
+        else:
             # Register dummy loads() to avoid a round trip from psycopg2's
             # decode to json.dumps() to json.loads(), when using a custom
             # decoder in JSONField.
             psycopg2.extras.register_default_jsonb(
                 conn_or_curs=connection, loads=lambda x: x
             )
-        connection.cursor_factory = Cursor
+            connection.cursor_factory = Cursor
         return connection
 
     def ensure_timezone(self):
@@ -436,7 +443,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
 if is_psycopg3:
 
-    class Cursor(Database.Cursor):
+    class CursorMixin:
         """
         A subclass of psycopg cursor implementing callproc.
         """
@@ -456,6 +463,12 @@ if is_psycopg3:
             stmt = sql.Composed(qparts)
             self.execute(stmt)
             return args
+
+    class ServerBindingCursor(CursorMixin, Database.Cursor):
+        pass
+
+    class Cursor(CursorMixin, Database.ClientCursor):
+        pass
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):
         def copy(self, statement):
