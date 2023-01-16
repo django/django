@@ -1107,6 +1107,11 @@ can change the maximum length using the :attr:`~CharField.max_length` argument.
 .. class:: FloatField(**options)
 
 A floating-point number represented in Python by a ``float`` instance.
+Non-numeric  values like ``float('inf')`` and ``float('nan')`` are stored
+differently depending on the database. For example, SQLite stores
+``float('nan')`` as ``NULL``, so the field must set
+:attr:`~django.db.models.Field.null` to ``True`` if you expect to store ``NaN``
+values.
 
 The default form widget for this field is a :class:`~django.forms.NumberInput`
 when :attr:`~django.forms.Field.localize` is ``False`` or
