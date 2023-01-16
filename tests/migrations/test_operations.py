@@ -1455,7 +1455,6 @@ class OperationTests(OperationTestBase):
         new_project_state = project_state.clone()
         # Add a new uuid pk
         operations = [
-            migrations.RemoveField("Pony", "id"),
             migrations.AddField(
                 model_name="Pony",
                 name="uid",
