@@ -1462,8 +1462,6 @@ class OperationTests(OperationTestBase):
                     default=uuid.uuid4,
                     editable=False,
                     primary_key=True,
-                    serialize=False,
-                    unique=True,
                 ),
             ),
         ]
