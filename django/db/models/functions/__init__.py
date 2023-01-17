@@ -114,6 +114,7 @@ __all__ = [
     "ExtractIsoYear",
     "ExtractYear",
     "Now",
+    "ToDate",
     "Trunc",
     "TruncDate",
     "TruncDay",

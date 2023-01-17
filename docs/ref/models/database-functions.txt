@@ -500,6 +500,21 @@ Usage example::
     Support for microsecond precision on MySQL and millisecond precision on
     SQLite were added.
 
+``ToDate``
+----------
+
+.. class:: ToDate()
+
+Converts a string in the specified format to DATE.
+
+Usage example::
+
+    >>> from django.db.models.functions import ToDate
+    >>> author = Author.objects.create(name="Jacques Derrida", bio="01 Apr 2015")
+    >>> Author.objects.filter(pk=author.pk).update(joined=ToDate("bio", Value("DD Mon YYYY")))
+    >>> author.refresh_from_db()
+    >>> author.joined = date(2015, 4, 1)
+
 ``Trunc``
 ---------
 

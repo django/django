@@ -9,6 +9,8 @@ class Author(models.Model):
     alias = models.CharField(max_length=50, null=True, blank=True)
     goes_by = models.CharField(max_length=50, null=True, blank=True)
     age = models.PositiveSmallIntegerField(default=30)
+    joined = models.DateField(null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
 
 
 class Article(models.Model):

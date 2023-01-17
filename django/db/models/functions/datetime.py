@@ -237,6 +237,28 @@ class Now(Func):
         )
 
 
+class ToDate(Func):
+    output_field = DateField()
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler, connection, template="TO_DATE(%(expressions)s)", **extra_context
+        )
+
+    def as_mysql(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler,
+            connection,
+            template="STR_TO_DATE(%(expressions)s)",
+            **extra_context,
+        )
+
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler, connection, template="TO_DATE(%(expressions)s)", **extra_context
+        )
+
+
 class TruncBase(TimezoneMixin, Transform):
     kind = None
     tzinfo = None
