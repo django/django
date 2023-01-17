@@ -229,6 +229,9 @@ Error Reporting
 * The debug page now shows :pep:`exception notes <678>` and
   :pep:`fine-grained error locations <657>` on Python 3.11+.
 
+* Session cookies are now treated as credentials and therefore hidden and
+  replaced with stars (``**********``) in error reports.
+
 Forms
 ~~~~~
 
@@ -237,9 +240,6 @@ Forms
 
 * :func:`~django.forms.models.modelform_factory` now respects the
   ``formfield_callback`` attribute of the ``form``’s ``Meta``.
-
-* Session cookies are now treated as credentials and therefore hidden and
-  replaced with stars (``**********``) in error reports.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
