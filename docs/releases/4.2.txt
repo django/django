@@ -29,7 +29,7 @@ What's new in Django 4.2
 Psycopg 3 support
 -----------------
 
-Django now supports `psycopg`_ version 3.1 or higher. To update your code,
+Django now supports `psycopg`_ version 3.1.8 or higher. To update your code,
 install the `psycopg library`_, you don't need to change the
 :setting:`ENGINE <DATABASE-ENGINE>` as ``django.db.backends.postgresql``
 supports both libraries.

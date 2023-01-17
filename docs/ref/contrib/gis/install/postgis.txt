@@ -24,7 +24,7 @@ platform-specific instructions if you are on :ref:`macos` or :ref:`windows`.
 
 .. versionchanged:: 4.2
 
-    Support for ``psycopg`` 3.1+ was added.
+    Support for ``psycopg`` 3.1.8+ was added.
 
 Post-installation
 =================
