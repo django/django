@@ -101,7 +101,7 @@ Custom file storages
 
 The new :setting:`STORAGES` setting allows configuring multiple custom file
 storage backends. It also controls storage engines for managing
-:doc:`files </topics/files>` (the ``"defaut"`` key) and :doc:`static files
+:doc:`files </topics/files>` (the ``"default"`` key) and :doc:`static files
 </ref/contrib/staticfiles>` (the ``"staticfiles"`` key).
 
 The old ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings are
