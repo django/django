@@ -15,6 +15,11 @@ want to be aware of when upgrading from Django 4.1 or earlier. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
+Django 4.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 3.2, will
+end in April 2024.
+
 Python compatibility
 ====================
 
