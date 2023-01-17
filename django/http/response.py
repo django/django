@@ -502,7 +502,7 @@ class StreamingHttpResponse(HttpResponseBase):
             self._iterator = iter(value)
             self.is_async = False
         except TypeError:
-            self._iterator = value.__aiter__()
+            self._iterator = aiter(value)
             self.is_async = True
         if hasattr(value, "close"):
             self._resource_closers.append(value.close)
