@@ -28,6 +28,7 @@
 """
 from ctypes import byref, c_char_p, c_int
 from enum import IntEnum
+from types import NoneType
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
@@ -57,7 +58,7 @@ class SpatialReference(GDALBase):
         EPSG code, a PROJ string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        if not isinstance(axis_order, (type(None), AxisOrder)):
+        if not isinstance(axis_order, (NoneType, AxisOrder)):
             raise ValueError(
                 "SpatialReference.axis_order must be an AxisOrder instance."
             )

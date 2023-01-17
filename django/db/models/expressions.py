@@ -4,6 +4,7 @@ import functools
 import inspect
 from collections import defaultdict
 from decimal import Decimal
+from types import NoneType
 from uuid import UUID
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
@@ -506,7 +507,6 @@ class Expression(BaseExpression, Combinable):
 # The current approach for NULL is based on lowest common denominator behavior
 # i.e. if one of the supported databases is raising an error (rather than
 # return NULL) for `val <op> NULL`, then Django raises FieldError.
-NoneType = type(None)
 
 _connector_combinations = [
     # Numeric operations - operands of same type.
