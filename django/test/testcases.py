@@ -53,7 +53,6 @@ from django.test.utils import (
 )
 from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.functional import classproperty
-from django.utils.version import PY310
 from django.views.static import serve
 
 logger = logging.getLogger("django.test")
@@ -794,32 +793,6 @@ class SimpleTestCase(unittest.TestCase):
             *args,
             **kwargs,
         )
-
-    # A similar method is available in Python 3.10+.
-    if not PY310:
-
-        @contextmanager
-        def assertNoLogs(self, logger, level=None):
-            """
-            Assert no messages are logged on the logger, with at least the
-            given level.
-            """
-            if isinstance(level, int):
-                level = logging.getLevelName(level)
-            elif level is None:
-                level = "INFO"
-            try:
-                with self.assertLogs(logger, level) as cm:
-                    yield
-            except AssertionError as e:
-                msg = e.args[0]
-                expected_msg = (
-                    f"no logs of level {level} or higher triggered on {logger}"
-                )
-                if msg != expected_msg:
-                    raise e
-            else:
-                self.fail(f"Unexpected logs found: {cm.output!r}")
 
     def assertFieldOutput(
         self,

@@ -32,8 +32,7 @@ False <USE_TZ>` in your settings file.
     In older version, time zone support was disabled by default.
 
 Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
-library from Python 3.9.  The ``backports.zoneinfo`` package is automatically
-installed alongside Django if you are using Python 3.8.
+library from Python 3.9.
 
 If you're wrestling with a particular problem, start with the :ref:`time zone
 FAQ <time-zones-faq>`.

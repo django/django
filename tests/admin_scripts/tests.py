@@ -32,7 +32,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY39
 from django.views.static import serve
 
 from . import urls
@@ -107,7 +106,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=-1):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -136,12 +135,11 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
-            # subprocess.run()'s umask was added in Python 3.9.
-            **({"umask": umask} if umask and PY39 else {}),
+            umask=umask,
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None, umask=None):
+    def run_django_admin(self, args, settings_file=None, umask=-1):
         return self.run_test(["-m", "django", *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
@@ -2812,7 +2810,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         sys.platform == "win32",
         "Windows only partially supports umasks and chmod.",
     )
-    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
     def test_honor_umask(self):
         _, err = self.run_django_admin(["startproject", "testproject"], umask=0o077)
         self.assertNoOutput(err)

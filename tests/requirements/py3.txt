@@ -1,7 +1,6 @@
 aiosmtpd
 asgiref >= 3.6.0
 argon2-cffi >= 19.2.0
-backports.zoneinfo; python_version < '3.9'
 bcrypt
 black
 docutils

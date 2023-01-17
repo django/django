@@ -1,10 +1,6 @@
+import zoneinfo
 from datetime import datetime, timedelta
 from datetime import timezone as datetime_timezone
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.conf import settings
 from django.db import DataError, OperationalError

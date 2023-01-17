@@ -1,14 +1,10 @@
 import gettext
 import os
 import re
+import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
 from unittest import skipUnless
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django import forms
 from django.conf import settings
