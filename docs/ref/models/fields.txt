@@ -457,6 +457,8 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
+If you specified the primary_key to an actual data field, after :ref:`topics-db-queries-delete` the primary_key will be set to None.
+
 ``unique``
 ----------
 
