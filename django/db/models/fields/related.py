@@ -857,7 +857,7 @@ class ForeignObject(RelatedField):
         return self.get_reverse_path_info()
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]

@@ -312,7 +312,7 @@ def get_finders():
         yield get_finder(finder_path)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_finder(import_path):
     """
     Import the staticfiles finder class described by import_path, where

@@ -213,7 +213,7 @@ class RegisterLookupMixin:
     def _get_lookup(self, lookup_name):
         return self.get_lookups().get(lookup_name, None)
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
