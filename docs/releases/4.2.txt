@@ -213,16 +213,6 @@ Database backends
   :setting:`OPTIONS` on PostgreSQL with ``psycopg`` 3.1.8+ to allow using
   :ref:`server-side binding cursors <database-server-side-parameters-binding>`.
 
-Decorators
-~~~~~~~~~~
-
-* ...
-
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
