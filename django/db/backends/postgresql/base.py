@@ -1,7 +1,7 @@
 """
 PostgreSQL database backend for Django.
 
-Requires psycopg2 >= 2.8.4 or psycopg >= 3.1
+Requires psycopg2 >= 2.8.4 or psycopg >= 3.1.8
 """
 
 import asyncio
@@ -38,9 +38,9 @@ if psycopg_version() < (2, 8, 4):
     raise ImproperlyConfigured(
         f"psycopg2 version 2.8.4 or newer is required; you have {Database.__version__}"
     )
-if (3,) <= psycopg_version() < (3, 1):
+if (3,) <= psycopg_version() < (3, 1, 8):
     raise ImproperlyConfigured(
-        f"psycopg version 3.1 or newer is required; you have {Database.__version__}"
+        f"psycopg version 3.1.8 or newer is required; you have {Database.__version__}"
     )
 
 

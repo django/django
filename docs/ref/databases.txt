@@ -114,8 +114,8 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1+ or `psycopg2`_ 2.8.4+
-is required, though the latest `psycopg`_ 3.1+ is recommended.
+Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
@@ -127,7 +127,7 @@ is required, though the latest `psycopg`_ 3.1+ is recommended.
 
 .. versionchanged:: 4.2
 
-    Support for ``psycopg`` 3.1+ was added.
+    Support for ``psycopg`` 3.1.8+ was added.
 
 .. _postgresql-connection-settings:
 
