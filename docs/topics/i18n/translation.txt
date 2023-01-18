@@ -668,7 +668,7 @@ This tag also provides for pluralization. To use it:
 
 An example::
 
-    {% blocktranslate count counter=list|length %}
+    {% blocktranslate with count counter=list|length %}
     There is only one {{ name }} object.
     {% plural %}
     There are {{ counter }} {{ name }} objects.
