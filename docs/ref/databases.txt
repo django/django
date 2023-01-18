@@ -283,6 +283,14 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
+Infinity and NaN handling
+-------------------------
+
+PostgreSQL's `float data types`_ can store special floating point values such
+as positive infinity, negative infinity, and NaN (not-a-number) directly.
+
+.. _float data types: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-FLOAT
+
 Migration operation for adding extensions
 -----------------------------------------
 
@@ -737,6 +745,19 @@ set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
 :class:`~django.db.models.DateTimeField` and if you enable timezone support,
 both MySQL and Django will attempt to convert the values from UTC to local time.
 
+Infinity and NaN handling
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL's floating-point data types are "subject to platform or implementation
+dependencies" (see `Problems with Floating-Point Values`_). On some platforms,
+infinity and negative infinity are supported, while on others, those values are
+reflected as ``0`` and ``-0``. ``NaN`` (not-a-number; represented as ``float('nan')``
+in Python) can't be stored. As a result, consider setting 
+:attr:`null <django.db.models.Field.null>` to ``True`` on ``FloatField``\ s
+if you expect to store ``NaN`` values.
+
+.. _Problems with Floating-Point Values: https://dev.mysql.com/doc/refman/8.0/en/problems-with-float.html
+
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
@@ -827,6 +848,15 @@ explained in the `SQLite datatypes documentation`__, so they don't support
 correctly-rounded decimal floating point arithmetic.
 
 __ https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
+
+Infinity and NaN handling
+-------------------------
+
+SQLite's ``REAL`` data type can store positive and negative infinities
+directly. ``NaN`` (not-a-number; represented as ``float('nan')`` in Python)
+is stored as ``NULL``. As a result, if you expect to store ``NaN`` values on
+SQLite, then your ``FloatField`` should have
+:attr:`null <django.db.models.Field.null>` set to ``True``.
 
 "Database is locked" errors
 ---------------------------
