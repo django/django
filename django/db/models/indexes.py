@@ -1,3 +1,5 @@
+from types import NoneType
+
 from django.db.backends.utils import names_digest, split_identifier
 from django.db.models.expressions import Col, ExpressionList, F, Func, OrderBy
 from django.db.models.functions import Collate
@@ -26,7 +28,7 @@ class Index:
     ):
         if opclasses and not name:
             raise ValueError("An index must be named to use opclasses.")
-        if not isinstance(condition, (type(None), Q)):
+        if not isinstance(condition, (NoneType, Q)):
             raise ValueError("Index.condition must be a Q instance.")
         if condition and not name:
             raise ValueError("An index must be named to use condition.")
@@ -58,7 +60,7 @@ class Index:
             raise ValueError("Index.fields must contain only strings with field names.")
         if include and not name:
             raise ValueError("A covering index must be named.")
-        if not isinstance(include, (type(None), list, tuple)):
+        if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("Index.include must be a list or tuple.")
         self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').

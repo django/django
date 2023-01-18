@@ -9,6 +9,7 @@ import re
 import sys
 import uuid
 import zoneinfo
+from types import NoneType
 from unittest import mock
 
 import custom_migration_operations.more_operations
@@ -797,7 +798,7 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.keywords, value.keywords)
 
     def test_serialize_type_none(self):
-        self.assertSerializedEqual(type(None))
+        self.assertSerializedEqual(NoneType)
 
     def test_serialize_type_model(self):
         self.assertSerializedEqual(models.Model)
