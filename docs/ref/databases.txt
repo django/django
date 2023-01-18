@@ -729,6 +729,19 @@ set :setting:`USE_TZ = False <USE_TZ>` to avoid data corruption.
 :class:`~django.db.models.DateTimeField` and if you enable timezone support,
 both MySQL and Django will attempt to convert the values from UTC to local time.
 
+Infinity and NaN handling
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MySQL's floating-point data types are "subject to platform or implementation
+dependencies" (see `Problems with Floating-Point Values`_). On some platforms,
+infinity and negative infinity are supported, while on others, those values are
+reflected as ``0`` and ``-0``. ``NaN`` (not-a-number; represented as ``float('nan')``
+in Python) can't be stored. As a result, consider setting 
+:attr:`null <django.db.models.Field.null>` to ``True`` on ``FloatField``\ s
+if you expect to store ``NaN`` values.
+
+.. _Problems with Floating-Point Values: https://dev.mysql.com/doc/refman/8.0/en/problems-with-float.html
+
 Row locking with ``QuerySet.select_for_update()``
 -------------------------------------------------
 
