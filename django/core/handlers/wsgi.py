@@ -187,7 +187,7 @@ def get_script_name(environ):
             # do the same with script_url before manipulating paths (#17133).
             script_url = _slashes_re.sub(b"/", script_url)
         path_info = get_bytes_from_wsgi(environ, "PATH_INFO", "")
-        script_name = script_url[: -len(path_info)] if path_info else script_url
+        script_name = script_url.removesuffix(path_info)
     else:
         script_name = get_bytes_from_wsgi(environ, "SCRIPT_NAME", "")
 

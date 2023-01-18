@@ -104,7 +104,7 @@ def get_template_tag_modules():
 
         if hasattr(pkg, "__path__"):
             for name in get_package_libraries(pkg):
-                yield name[len(candidate) + 1 :], name
+                yield name.removeprefix(candidate).lstrip("."), name
 
 
 def get_installed_libraries():

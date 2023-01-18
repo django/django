@@ -808,8 +808,8 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         }
 
     def verify(self, password, encoded):
-        if len(encoded) == 37 and encoded.startswith("md5$$"):
-            encoded = encoded[5:]
+        if len(encoded) == 37:
+            encoded = encoded.removeprefix("md5$$")
         encoded_2 = self.encode(password, "")
         return constant_time_compare(encoded, encoded_2)
 

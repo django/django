@@ -201,7 +201,7 @@ class SessionStore(SessionBase):
         for session_file in os.listdir(storage_path):
             if not session_file.startswith(file_prefix):
                 continue
-            session_key = session_file[len(file_prefix) :]
+            session_key = session_file.removeprefix(file_prefix)
             session = cls(session_key)
             # When an expired session is loaded, its file is removed, and a
             # new file is immediately created. Prevent this by disabling
