@@ -1109,11 +1109,11 @@ class ModelAdmin(BaseModelAdmin):
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
-                return "%s__istartswith" % field_name[1:]
+                return "%s__istartswith" % field_name.removeprefix("^")
             elif field_name.startswith("="):
-                return "%s__iexact" % field_name[1:]
+                return "%s__iexact" % field_name.removeprefix("=")
             elif field_name.startswith("@"):
-                return "%s__search" % field_name[1:]
+                return "%s__search" % field_name.removeprefix("@")
             # Use field_name if it includes a lookup.
             opts = queryset.model._meta
             lookup_fields = field_name.split(LOOKUP_SEP)

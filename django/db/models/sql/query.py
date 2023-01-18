@@ -2163,8 +2163,7 @@ class Query(BaseExpression):
             if isinstance(item, str):
                 if item == "?":
                     continue
-                if item.startswith("-"):
-                    item = item[1:]
+                item = item.removeprefix("-")
                 if item in self.annotations:
                     continue
                 if self.extra and item in self.extra:

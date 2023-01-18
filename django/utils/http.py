@@ -307,7 +307,7 @@ def escape_leading_slashes(url):
     redirecting to another host.
     """
     if url.startswith("//"):
-        url = "/%2F{}".format(url[2:])
+        url = "/%2F{}".format(url.removeprefix("//"))
     return url
 
 

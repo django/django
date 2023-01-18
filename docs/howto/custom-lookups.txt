@@ -312,7 +312,7 @@ would override ``get_lookup`` with something like::
         def get_lookup(self, lookup_name):
             if lookup_name.startswith('x'):
                 try:
-                    dimension = int(lookup_name[1:])
+                    dimension = int(lookup_name.removeprefix("x"))
                 except ValueError:
                     pass
                 else:
