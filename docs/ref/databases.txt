@@ -265,6 +265,14 @@ lookups that use the ``LIKE`` operator in their SQL, as is done with the
 
 .. _PostgreSQL operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
+Infinity and NaN handling
+-------------------------
+
+PostgreSQL's `float data types`_ can store special floating point values such
+as positive infinity, negative infinity, and NaN (not-a-number) directly.
+
+.. _float data types: https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-FLOAT
+
 Migration operation for adding extensions
 -----------------------------------------
 
