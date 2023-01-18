@@ -111,6 +111,8 @@ class FunctionTests(SimpleTestCase):
         self.assertEqual(
             floatformat(0.000000000000000000015, 20), "0.00000000000000000002"
         )
+        self.assertEqual(floatformat("0.00", 0), "0")
+        self.assertEqual(floatformat(Decimal("0.00"), 0), "0")
 
     def test_negative_zero_values(self):
         tests = [
