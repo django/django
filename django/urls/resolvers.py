@@ -108,12 +108,12 @@ def get_resolver(urlconf=None):
     return _get_cached_resolver(urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r"^/"), urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
