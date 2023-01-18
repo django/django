@@ -14,7 +14,6 @@ from django.utils.crypto import (
     RANDOM_STRING_CHARS,
     constant_time_compare,
     get_random_string,
-    md5,
     pbkdf2,
 )
 from django.utils.deprecation import RemovedInDjango51Warning
@@ -684,7 +683,7 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
-        hash = md5((salt + password).encode()).hexdigest()
+        hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def decode(self, encoded):
@@ -799,7 +798,7 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     def encode(self, password, salt):
         if salt != "":
             raise ValueError("salt must be empty.")
-        return md5(password.encode()).hexdigest()
+        return hashlib.md5(password.encode()).hexdigest()
 
     def decode(self, encoded):
         return {

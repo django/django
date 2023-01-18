@@ -2,13 +2,9 @@ import datetime
 import os
 import re
 import unittest
+import zoneinfo
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin

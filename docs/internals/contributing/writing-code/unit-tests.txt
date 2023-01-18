@@ -91,14 +91,14 @@ In addition to the default environments, ``tox`` supports running unit tests
 for other versions of Python and other database backends. Since Django's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
-<running-unit-tests-settings>`. For example, to run the tests on Python 3.9
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.10
 using PostgreSQL:
 
 .. console::
 
-    $ tox -e py39-postgres -- --settings=my_postgres_settings
+    $ tox -e py310-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.9 virtual environment, installs Django's
+This command sets up a Python 3.10 virtual environment, installs Django's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -113,14 +113,14 @@ above:
 
 .. code-block:: console
 
-    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py39-postgres
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py310-postgres
 
 Windows users should use:
 
 .. code-block:: doscon
 
     ...\> set DJANGO_SETTINGS_MODULE=my_postgres_settings
-    ...\> tox -e py39-postgres
+    ...\> tox -e py310-postgres
 
 Running the JavaScript tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
