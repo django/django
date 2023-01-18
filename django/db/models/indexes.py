@@ -63,7 +63,7 @@ class Index:
         self.fields = list(fields)
         # A list of 2-tuple with the field name and ordering ('' or 'DESC').
         self.fields_orders = [
-            (field_name[1:], "DESC") if field_name.startswith("-") else (field_name, "")
+            (field_name.removeprefix("-"), "DESC" if field_name.startswith("-") else "")
             for field_name in self.fields
         ]
         self.name = name or ""

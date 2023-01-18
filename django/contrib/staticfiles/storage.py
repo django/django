@@ -231,7 +231,7 @@ class HashedFilesMixin:
             if url_path.startswith("/"):
                 # Otherwise the condition above would have returned prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path[len(settings.STATIC_URL) :]
+                target_name = url_path.removeprefix(settings.STATIC_URL)
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
                 source_name = name if os.sep == "/" else name.replace(os.sep, "/")

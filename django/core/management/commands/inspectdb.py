@@ -275,7 +275,7 @@ class Command(BaseCommand):
 
         if is_relation:
             if new_name.endswith("_id"):
-                new_name = new_name[:-3]
+                new_name = new_name.removesuffix("_id")
             else:
                 field_params["db_column"] = col_name
 

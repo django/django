@@ -1524,7 +1524,7 @@ class FSFilesHandler(WSGIHandler):
 
     def file_path(self, url):
         """Return the relative path to the file on disk for the given URL."""
-        relative_url = url[len(self.base_url[2]) :]
+        relative_url = url.removeprefix(self.base_url[2])
         return url2pathname(relative_url)
 
     def get_response(self, request):

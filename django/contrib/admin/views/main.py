@@ -375,8 +375,8 @@ class ChangeList:
                             order_field.desc() if pfx == "-" else order_field.asc()
                         )
                     # reverse order if order_field has already "-" as prefix
-                    elif order_field.startswith("-") and pfx == "-":
-                        ordering.append(order_field[1:])
+                    elif pfx == "-" and order_field.startswith(pfx):
+                        ordering.append(order_field.removeprefix(pfx))
                     else:
                         ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
@@ -474,7 +474,7 @@ class ChangeList:
                     else:
                         continue
                 elif field.startswith("-"):
-                    field = field[1:]
+                    field = field.removeprefix("-")
                     order_type = "desc"
                 else:
                     order_type = "asc"
