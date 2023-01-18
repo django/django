@@ -233,9 +233,9 @@ Forms
 
 * In order to smooth adoption of the new ``<div>`` output style, two
   transitional form renderer classes are available:
-  :class:`django.forms.renderers.DjangoDivFormRenderer` and
-  :class:`django.forms.renderers.Jinja2DivFormRenderer`, for the Django and
-  Jinja2 template backends respectively.
+  ``django.forms.renderers.DjangoDivFormRenderer`` and
+  ``django.forms.renderers.Jinja2DivFormRenderer``, for the Django and Jinja2
+  template backends respectively.
 
   You can apply one of these via the :setting:`FORM_RENDERER` setting. For
   example::

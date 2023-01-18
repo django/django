@@ -93,21 +93,9 @@ If you want to render templates with customizations from your
 
 .. class:: DjangoDivFormRenderer
 
-Subclass of :class:`DjangoTemplates` that specifies
-:attr:`~BaseRenderer.form_template_name` and
-:attr:`~BaseRenderer.formset_template_name` as ``"django/forms/div.html"`` and
-``"django/forms/formset/div.html"`` respectively.
+.. deprecated:: 5.0
 
-This is a transitional renderer for opt-in to the new ``<div>`` based
-templates, which are the default from Django 5.0.
-
-Apply this via the :setting:`FORM_RENDERER` setting::
-
-    FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
-
-Once the ``<div>`` templates are the default, this transitional renderer will
-be deprecated, for removal in Django 6.0. The ``FORM_RENDERER`` declaration can
-be removed at that time.
+The alias of :class:`DjangoTemplates`.
 
 ``Jinja2``
 ----------
@@ -127,12 +115,9 @@ widgets due to their usage of Django template tags.
 
 .. class:: Jinja2DivFormRenderer
 
-A transitional renderer as per :class:`DjangoDivFormRenderer` above, but
-subclassing :class:`Jinja2` for use with the Jinja2 backend.
+.. deprecated:: 5.0
 
-Apply this via the :setting:`FORM_RENDERER` setting::
-
-    FORM_RENDERER = "django.forms.renderers.Jinja2DivFormRenderer"
+The alias of :class:`Jinja2`.
 
 ``TemplatesSetting``
 --------------------

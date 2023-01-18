@@ -247,7 +247,8 @@ Features deprecated in 5.0
 Miscellaneous
 -------------
 
-* ...
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers are deprecated.
 
 Features removed in 5.0
 =======================
