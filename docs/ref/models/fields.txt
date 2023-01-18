@@ -442,6 +442,9 @@ The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
 
+The primary key field is set to ``None`` when
+:meth:`deleting <django.db.models.Model.delete>` an object.
+
 ``unique``
 ----------
 
