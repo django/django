@@ -165,7 +165,7 @@ class Apps:
             raise LookupError(message)
 
     # This method is performance-critical at least for Django's test suite.
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
         Return a list of all installed models.
@@ -280,7 +280,7 @@ class Apps:
             raise LookupError("Model '%s.%s' not registered." % (app_label, model_name))
         return model
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_swappable_settings_name(self, to_string):
         """
         For a given model string (e.g. "auth.User"), return the name of the
