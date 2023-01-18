@@ -1,3 +1,5 @@
+from types import NoneType
+
 from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
 from django.db import DEFAULT_DB_ALIAS, NotSupportedError
@@ -45,13 +47,13 @@ class ExclusionConstraint(BaseConstraint):
             isinstance(expr, (list, tuple)) and len(expr) == 2 for expr in expressions
         ):
             raise ValueError("The expressions must be a list of 2-tuples.")
-        if not isinstance(condition, (type(None), Q)):
+        if not isinstance(condition, (NoneType, Q)):
             raise ValueError("ExclusionConstraint.condition must be a Q instance.")
-        if not isinstance(deferrable, (type(None), Deferrable)):
+        if not isinstance(deferrable, (NoneType, Deferrable)):
             raise ValueError(
                 "ExclusionConstraint.deferrable must be a Deferrable instance."
             )
-        if not isinstance(include, (type(None), list, tuple)):
+        if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("ExclusionConstraint.include must be a list or tuple.")
         self.expressions = expressions
         self.index_type = index_type or "GIST"
