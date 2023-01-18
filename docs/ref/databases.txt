@@ -812,6 +812,15 @@ correctly-rounded decimal floating point arithmetic.
 
 __ https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
 
+Infinity and NaN handling
+-------------------------
+
+SQLite's ``REAL`` data type can store positive and negative infinities
+directly. ``NaN`` (not-a-number; represented as ``float('nan')`` in Python)
+is stored as ``NULL``. As a result, if you expect to store ``NaN`` values on
+SQLite, then your ``FloatField`` should have
+:attr:`null <django.db.models.Field.null>` set to ``True``.
+
 "Database is locked" errors
 ---------------------------
 
