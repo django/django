@@ -183,11 +183,11 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname=None, conn_tzname=None):
     elif lookup_type == "iso_week_day":
         return dt.isoweekday()
     elif lookup_type == "week":
-        return dt.isocalendar()[1]
+        return dt.isocalendar().week
     elif lookup_type == "quarter":
         return ceil(dt.month / 3)
     elif lookup_type == "iso_year":
-        return dt.isocalendar()[0]
+        return dt.isocalendar().year
     else:
         return getattr(dt, lookup_type)
 
