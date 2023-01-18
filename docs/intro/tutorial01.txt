@@ -23,7 +23,7 @@ in a shell prompt (indicated by the $ prefix):
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|, which supports Python 3.8 and
+This tutorial is written for Django |version|, which supports Python 3.10 and
 later. If the Django version doesn't match, you can refer to the tutorial for
 your version of Django by using the version switcher at the bottom right corner
 of this page, or update Django to the newest version. If you're using an older

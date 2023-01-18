@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import faulthandler
+import hashlib
 import io
 import itertools
 import logging
@@ -27,7 +28,6 @@ from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
-from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
 
 try:
@@ -580,7 +580,7 @@ class Shuffler:
 
     @classmethod
     def _hash_text(cls, text):
-        h = new_hash(cls.hash_algorithm, usedforsecurity=False)
+        h = hashlib.new(cls.hash_algorithm, usedforsecurity=False)
         h.update(text.encode("utf-8"))
         return h.hexdigest()
 

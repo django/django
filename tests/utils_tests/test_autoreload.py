@@ -9,15 +9,11 @@ import time
 import types
 import weakref
 import zipfile
+import zoneinfo
 from importlib import import_module
 from pathlib import Path
 from subprocess import CompletedProcess
 from unittest import mock, skip, skipIf
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 import django.__main__
 from django.apps.registry import Apps

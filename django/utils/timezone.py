@@ -3,12 +3,7 @@ Timezone-related classes and functions.
 """
 
 import functools
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
+import zoneinfo
 from contextlib import ContextDecorator
 from datetime import datetime, timedelta, timezone, tzinfo
 

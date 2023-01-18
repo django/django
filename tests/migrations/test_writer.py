@@ -8,12 +8,8 @@ import pathlib
 import re
 import sys
 import uuid
+import zoneinfo
 from unittest import mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations

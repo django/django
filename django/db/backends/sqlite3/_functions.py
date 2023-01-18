@@ -4,8 +4,9 @@ Implementations of SQL functions for SQLite.
 import functools
 import random
 import statistics
+import zoneinfo
 from datetime import timedelta
-from hashlib import sha1, sha224, sha256, sha384, sha512
+from hashlib import md5, sha1, sha224, sha256, sha384, sha512
 from math import (
     acos,
     asin,
@@ -32,13 +33,7 @@ from django.db.backends.utils import (
     typecast_timestamp,
 )
 from django.utils import timezone
-from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 
 def register(connection):

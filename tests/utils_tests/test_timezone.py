@@ -1,10 +1,6 @@
 import datetime
+import zoneinfo
 from unittest import mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.test import SimpleTestCase, override_settings
 from django.utils import timezone

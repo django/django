@@ -1,14 +1,10 @@
 import datetime
 import re
 import sys
+import zoneinfo
 from contextlib import contextmanager
 from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.contrib.auth.models import User
 from django.core import serializers
