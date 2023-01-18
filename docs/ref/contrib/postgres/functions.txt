@@ -25,6 +25,39 @@ Usage example::
     >>> from django.contrib.postgres.functions import RandomUUID
     >>> Article.objects.update(uuid=RandomUUID())
 
+``Unnest``
+==============
+
+.. class:: Unnest()
+
+Returns an array expanded to a set of rows.
+
+Usage example::
+
+    >>> from django.contrib.postgres.functions import Unnest
+    >>> quoted_authors = [
+    ...     ["J. Derrida", "F. Nietzsche"],
+    ...     ["J. Derrida", "F. Nietzsche"],
+    ...     ["D. Pennac", "M. de Assis"],
+    ...     ["C. D. de Andrade", "J. Kerouac"],
+    ...     ["J. Derrida"],
+    ...     ["Molière", "C. D. de Andrade"],
+    ...     ["D. Pennac", "F. Nietzsche", "M. de Assis"],
+    ... ]
+    >>> Author.objects.bulk_create(
+    ...     [Author(field=author) for author in quoted_authors]
+    ... )
+    >>> Article.objects.annotate(
+    ...     elements=Unnest(
+    ...         "field", output_field=ArrayField(CharField(max_length=50)),
+    ...     )
+    ... )
+    ... .values_list("elements", flat=True)
+    ... .distinct()
+    <QuerySet ['C. D. de Andrade', 'F. Nietzsche', 'J. Kerouac', 'M. de Assis',
+    'Molière', 'D. Pennac', 'J. Derrida']>
+
+
 ``TransactionNow``
 ==================
 

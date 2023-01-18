@@ -2,10 +2,12 @@ import uuid
 from datetime import datetime
 from time import sleep
 
-from django.contrib.postgres.functions import RandomUUID, TransactionNow
+from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.functions import RandomUUID, TransactionNow, Unnest
+from django.db.models import CharField
 
 from . import PostgreSQLTestCase
-from .models import NowTestModel, UUIDTestModel
+from .models import CharArrayModel, NowTestModel, UUIDTestModel
 
 
 class TestTransactionNow(PostgreSQLTestCase):
@@ -26,6 +28,36 @@ class TestTransactionNow(PostgreSQLTestCase):
 
         self.assertIsInstance(m1.when, datetime)
         self.assertEqual(m1.when, m2.when)
+
+
+class TestUnnest(PostgreSQLTestCase):
+    def test_unnest(self):
+        field_values = [
+            ["field1", "field2"],
+            ["field3"],
+            ["field2", "field3"],
+            ["field1", "field3"],
+            ["field3"],
+            ["field1", "field4"],
+            ["field2", "field4", "field3"],
+        ]
+        CharArrayModel.objects.bulk_create(
+            [CharArrayModel(field=x) for x in field_values]
+        )
+        result = (
+            CharArrayModel.objects.annotate(
+                elements=Unnest(
+                    "field",
+                    output_field=ArrayField(CharField(max_length=10)),
+                )
+            )
+            .values_list("elements", flat=True)
+            .distinct()
+        )
+        breakpoint()
+        self.assertQuerySetEqual(
+            result, ["field2", "field4", "field3", "field1"], ordered=False
+        )
 
 
 class TestRandomUUID(PostgreSQLTestCase):

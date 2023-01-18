@@ -6,6 +6,11 @@ class RandomUUID(Func):
     output_field = UUIDField()
 
 
+class Unnest(Func):
+    arity = 1
+    function = "UNNEST"
+
+
 class TransactionNow(Func):
     template = "CURRENT_TIMESTAMP"
     output_field = DateTimeField()
