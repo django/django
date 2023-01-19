@@ -30,6 +30,9 @@ This will start one process listening on ``127.0.0.1:8000``. It requires that
 your project be on the Python path; to ensure that run this command from the
 same directory as your ``manage.py`` file.
 
+As Django does not currently support LifeSpan events, you can silence the
+related warning by setting ``--lifespan`` accordingly.
+
 In development mode, you can add ``--reload`` to cause the server to reload any
 time a file is changed on disk.
 
