@@ -545,14 +545,18 @@ Database backend API
 ``select_related()`` prohibits non-relational fields for nested relations
 -------------------------------------------------------------------------
 
-Django 1.8 added validation for non-relational fields in ``select_related()``::
+Django 1.8 added validation for non-relational fields in ``select_related()``:
+
+.. code-block:: pycon
 
     >>> Book.objects.select_related('title')
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'title'
 
-But it didn't prohibit nested non-relation fields as it does now::
+But it didn't prohibit nested non-relation fields as it does now:
+
+.. code-block:: pycon
 
     >>> Book.objects.select_related('author__name')
     Traceback (most recent call last):
@@ -618,8 +622,10 @@ Request and response handling of the ``runserver`` command is sent to the
 :ref:`django-server-logger` logger instead of to ``sys.stderr``. If you
 disable Django's logging configuration or override it with your own, you'll
 need to add the appropriate logging configuration if you want to see that
-output::
+output:
 
+.. code-block:: pycon
+    
     'formatters': {
         'django.server': {
             '()': 'django.utils.log.ServerFormatter',
@@ -725,7 +731,7 @@ custom lookup for it. For example::
     class MyFieldExact(Exact):
         def get_prep_lookup(self):
             # do_custom_stuff_for_myfield
-            ....
+            ...
 
     MyField.register_lookup(MyFieldExact)
 
@@ -931,15 +937,19 @@ Features deprecated in 1.10
 Direct assignment to a reverse foreign key or many-to-many relation
 -------------------------------------------------------------------
 
-Instead of assigning related objects using direct assignment::
+Instead of assigning related objects using direct assignment:
+
+.. code-block:: pycon
 
     >>> new_list = [obj1, obj2, obj3]
     >>> e.related_set = new_list
 
 Use the :meth:`~django.db.models.fields.related.RelatedManager.set` method
-added in Django 1.9::
+added in Django 1.9:
 
-        >>> e.related_set.set([obj1, obj2, obj3])
+.. code-block:: pycon
+
+    >>> e.related_set.set([obj1, obj2, obj3])
 
 This prevents confusion about an assignment resulting in an implicit save.
 
@@ -1022,12 +1032,16 @@ Assume the following models::
 In older versions, :attr:`~django.db.models.Options.default_related_name`
 couldn't be used as a query lookup. This is fixed and support for the old
 lookup name is deprecated. For example, since ``default_related_name`` is set
-in model ``Bar``, instead of using the model name ``bar`` as the lookup::
+in model ``Bar``, instead of using the model name ``bar`` as the lookup:
+
+.. code-block:: pycon
 
     >>> bar = Bar.objects.get(pk=1)
     >>> Foo.objects.get(bar=bar)
 
-use the default_related_name ``bars``::
+use the default_related_name ``bars``:
+
+.. code-block:: pycon
 
     >>> Foo.objects.get(bars=bar)
 

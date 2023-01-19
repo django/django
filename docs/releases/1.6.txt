@@ -463,11 +463,13 @@ explicitly import the User model in your test module::
     @override_settings(AUTH_USER_MODEL='auth.CustomUser')
     class CustomUserFeatureTests(TestCase):
         def test_something(self):
-            # Test code here ...
+            ...  # Test code here
 
 This import forces the custom user model to be registered. Without this import,
 the test will be unable to swap in the custom user model, and you will get an
-error reporting::
+error reporting:
+
+.. code-block: pycon
 
     ImproperlyConfigured: AUTH_USER_MODEL refers to model 'auth.CustomUser' that has not been installed
 
@@ -1010,11 +1012,15 @@ Django 1.6 starts a process to correct this inconsistency. The ``future``
 template library provides alternate implementations of :ttag:`cycle` and
 :ttag:`firstof` that autoescape their inputs. If you're using these tags,
 you're encouraged to include the following line at the top of your templates to
-enable the new behavior::
+enable the new behavior:
+
+.. code-block:: pycon
 
     {% load cycle from future %}
 
-or::
+or:
+
+.. code-block:: pycon
 
     {% load firstof from future %}
 

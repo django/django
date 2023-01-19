@@ -36,7 +36,9 @@ If the URL accepts arguments, you may pass them in ``args``. For example::
     def myview(request):
         return HttpResponseRedirect(reverse('arch-summary', args=[1945]))
 
-You can also pass ``kwargs`` instead of ``args``. For example::
+You can also pass ``kwargs`` instead of ``args``. For example:
+
+.. code-block:: pycon
 
     >>> reverse('admin:app_list', kwargs={'app_label': 'auth'})
     '/admin/auth/'
@@ -65,7 +67,9 @@ use for reversing. By default, the root URLconf for the current thread is used.
 .. note::
 
     The string returned by ``reverse()`` is already
-    :ref:`urlquoted <uri-and-iri-handling>`. For example::
+    :ref:`urlquoted <uri-and-iri-handling>`. For example:
+
+.. code-block:: pycon
 
         >>> reverse('cities', args=['Orléans'])
         '.../Orl%C3%A9ans/'
