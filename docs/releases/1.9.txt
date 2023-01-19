@@ -1020,9 +1020,9 @@ to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
 Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
 file size. If you need to support IE8 and must also use the latest version of
 Django, you can override the admin's copy of jQuery with your own by creating
-a Django application with this structure::
+a Django application with this structure:
 
-.. code-block:: pycon
+.. code-block:: console
 
     app/static/admin/js/vendor/
         jquery.js
