@@ -549,7 +549,7 @@ Django 1.8 added validation for non-relational fields in ``select_related()``:
 
 .. code-block:: pycon
 
-    >>> Book.objects.select_related('title')
+    >>> Book.objects.select_related("title")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'title'
@@ -558,7 +558,7 @@ But it didn't prohibit nested non-relation fields as it does now:
 
 .. code-block:: pycon
 
-    >>> Book.objects.select_related('author__name')
+    >>> Book.objects.select_related("author__name")
     Traceback (most recent call last):
     ...
     FieldError: Non-relational field given in select_related: 'name'
@@ -591,10 +591,11 @@ when creating a user or changing usernames::
 
     from django.contrib.auth.forms import UserCreationForm
 
+
     class MyUserCreationForm(UserCreationForm):
         username = forms.CharField(
             max_length=30,
-            help_text='Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.',
+            help_text="Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.",
         )
 
 If you wish to keep this restriction in the admin, set ``UserAdmin.add_form``
@@ -603,8 +604,10 @@ to use this form::
     from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.models import User
 
+
     class UserAdmin(BaseUserAdmin):
         add_form = MyUserCreationForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, UserAdmin)
@@ -685,11 +688,11 @@ hardware. To make Django users acknowledge continued use of weak hashers, the
 following hashers are removed from the default :setting:`PASSWORD_HASHERS`
 setting::
 
-    'django.contrib.auth.hashers.SHA1PasswordHasher'
-    'django.contrib.auth.hashers.MD5PasswordHasher'
-    'django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher'
-    'django.contrib.auth.hashers.UnsaltedMD5PasswordHasher'
-    'django.contrib.auth.hashers.CryptPasswordHasher'
+    "django.contrib.auth.hashers.SHA1PasswordHasher"
+    "django.contrib.auth.hashers.MD5PasswordHasher"
+    "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"
+    "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"
+    "django.contrib.auth.hashers.CryptPasswordHasher"
 
 Consider using a :ref:`wrapped password hasher <wrapping-password-hashers>` to
 strengthen the hashes in your database. If that's not feasible, add the
@@ -699,19 +702,21 @@ that you need.
 You can check if your database has any of the removed hashers like this::
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
 
     # Unsalted MD5/SHA1:
-    User.objects.filter(password__startswith='md5$$')
-    User.objects.filter(password__startswith='sha1$$')
+    User.objects.filter(password__startswith="md5$$")
+    User.objects.filter(password__startswith="sha1$$")
     # Salted MD5/SHA1:
-    User.objects.filter(password__startswith='md5$').exclude(password__startswith='md5$$')
-    User.objects.filter(password__startswith='sha1$').exclude(password__startswith='sha1$$')
+    User.objects.filter(password__startswith="md5$").exclude(password__startswith="md5$$")
+    User.objects.filter(password__startswith="sha1$").exclude(password__startswith="sha1$$")
     # Crypt hasher:
-    User.objects.filter(password__startswith='crypt$$')
+    User.objects.filter(password__startswith="crypt$$")
 
     from django.db.models import CharField
     from django.db.models.functions import Length
+
     CharField.register_lookup(Length)
     # Unsalted MD5 passwords might not have an 'md5$$' prefix:
     User.objects.filter(password__length=32)
@@ -725,13 +730,16 @@ custom lookup for it. For example::
     from django.db.models import Field
     from django.db.models.lookups import Exact
 
+
     class MyField(Field):
         ...
+
 
     class MyFieldExact(Exact):
         def get_prep_lookup(self):
             # do_custom_stuff_for_myfield
             ...
+
 
     MyField.register_lookup(MyFieldExact)
 
@@ -1001,6 +1009,7 @@ validator::
     from django.core.validators import validate_comma_separated_integer_list
     from django.db import models
 
+
     class MyModel(models.Model):
         numbers = models.CharField(..., validators=[validate_comma_separated_integer_list])
 
@@ -1020,14 +1029,16 @@ Assume the following models::
 
     from django.db import models
 
+
     class Foo(models.Model):
         pass
+
 
     class Bar(models.Model):
         foo = models.ForeignKey(Foo)
 
         class Meta:
-            default_related_name = 'bars'
+            default_related_name = "bars"
 
 In older versions, :attr:`~django.db.models.Options.default_related_name`
 couldn't be used as a query lookup. This is fixed and support for the old
@@ -1055,14 +1066,16 @@ features, is deprecated. Replace it with a custom lookup::
 
     from django.db import models
 
+
     class Search(models.Lookup):
-        lookup_name = 'search'
+        lookup_name = "search"
 
         def as_mysql(self, compiler, connection):
             lhs, lhs_params = self.process_lhs(compiler, connection)
             rhs, rhs_params = self.process_rhs(compiler, connection)
             params = lhs_params + rhs_params
-            return 'MATCH (%s) AGAINST (%s IN BOOLEAN MODE)' % (lhs, rhs), params
+            return "MATCH (%s) AGAINST (%s IN BOOLEAN MODE)" % (lhs, rhs), params
+
 
     models.CharField.register_lookup(Search)
     models.TextField.register_lookup(Search)
@@ -1083,9 +1096,9 @@ For example, if you use
 to know whether the user is currently logged-in you would use::
 
     if request.user.is_authenticated:
-        ... # Do something for logged-in users.
+        ...  # Do something for logged-in users.
     else:
-        ... # Do something for anonymous users.
+        ...  # Do something for anonymous users.
 
 instead of ``request.user.is_authenticated()``.
 

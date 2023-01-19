@@ -67,16 +67,16 @@ the included auth forms for your project, you could set, for example::
 
     AUTH_PASSWORD_VALIDATORS = [
         {
-            'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+            "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+            "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+            "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
         },
         {
-            'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+            "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
         },
     ]
 
@@ -800,8 +800,8 @@ version of Apache with ``mod_scgi`` that interprets a relative redirect as an
 
     class LocationHeaderFix(object):
         def process_response(self, request, response):
-            if 'Location' in response:
-                response['Location'] = request.build_absolute_uri(response['Location'])
+            if "Location" in response:
+                response["Location"] = request.build_absolute_uri(response["Location"])
             return response
 
 Dropped support for PostgreSQL 9.0
@@ -892,6 +892,7 @@ If you're passing aware :class:`~datetime.datetime` parameters to such
 queries, you should turn them into naive datetimes in UTC::
 
     from django.utils import timezone
+
     param = timezone.make_naive(param, timezone.utc)
 
 If you fail to do so, the conversion will be performed as in earlier versions
@@ -902,6 +903,7 @@ If you're reading :class:`~datetime.datetime` values from the results, they
 will be naive instead of aware. You can compensate as follows::
 
     from django.utils import timezone
+
     value = timezone.make_aware(value, timezone.utc)
 
 You don't need any of this if you're querying the database through the ORM,
@@ -947,7 +949,7 @@ exploit. For example::
 
     @register.simple_tag(takes_context=True)
     def greeting(context):
-        return "Hello {0}!".format(context['request'].user.first_name)
+        return "Hello {0}!".format(context["request"].user.first_name)
 
 In older versions of Django, this will be an XSS issue because
 ``user.first_name`` is not escaped.
@@ -1244,21 +1246,24 @@ has been replaced by passing the ``namespace`` argument to ``include()``. For
 example::
 
     polls_patterns = [
-         url(...),
+        url(...),
     ]
 
     urlpatterns = [
-        url(r'^polls/', include((polls_patterns, 'polls', 'author-polls'))),
+        url(r"^polls/", include((polls_patterns, "polls", "author-polls"))),
     ]
 
 becomes::
 
-    polls_patterns = ([
-         url(...),
-    ], 'polls')  # 'polls' is the app_name
+    polls_patterns = (
+        [
+            url(...),
+        ],
+        "polls",
+    )  # 'polls' is the app_name
 
     urlpatterns = [
-        url(r'^polls/', include(polls_patterns, namespace='author-polls')),
+        url(r"^polls/", include(polls_patterns, namespace="author-polls")),
     ]
 
 The ``app_name`` argument to ``include()`` has been replaced by passing a
@@ -1270,10 +1275,7 @@ attribute (as below). If the ``app_name`` is set in this new way, the
 .. code-block:: python
     :caption: ``mysite/urls.py``
 
-    urlpatterns = [
-        url(r'^polls/', include('polls.urls', namespace="polls")),
-        ...
-    ]
+    urlpatterns = [url(r"^polls/", include("polls.urls", namespace="polls")), ...]
 
 to:
 
@@ -1281,14 +1283,14 @@ to:
     :caption: ``mysite/urls.py``
 
     urlpatterns = [
-        url(r'^polls/', include('polls.urls')),  # 'namespace="polls"' removed
-        ...
+        url(r"^polls/", include("polls.urls")),  # 'namespace="polls"' removed
+        ...,
     ]
 
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    app_name = 'polls'  # added
+    app_name = "polls"  # added
     urlpatterns = [...]
 
 This change also means that the old way of including an ``AdminSite`` instance
@@ -1302,7 +1304,7 @@ is deprecated. Instead, pass ``admin.site.urls`` directly to
     from django.contrib import admin
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
+        url(r"^admin/", admin.site.urls),
     ]
 
 URL application namespace required if setting an instance namespace
