@@ -20,7 +20,7 @@ def file_upload_view(request):
     A file upload can be updated into the POST dictionary.
     """
     form_data = request.POST.copy()
-    form_data.update(request.FILES)
+    form_data.update(request.FILES.copy())
     if isinstance(form_data.get("file_field"), UploadedFile) and isinstance(
         form_data["name"], str
     ):
