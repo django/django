@@ -354,7 +354,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         include=None,
         expressions=None,
     ):
-        sql = (
+        sql = sql or (
             self.sql_create_index
             if not concurrently
             else self.sql_create_index_concurrently
