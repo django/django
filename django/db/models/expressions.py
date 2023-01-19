@@ -1548,6 +1548,7 @@ class Subquery(BaseExpression, Combinable):
 class Exists(Subquery):
     template = "EXISTS(%(subquery)s)"
     output_field = fields.BooleanField()
+    empty_result_set_value = False
 
     def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)
