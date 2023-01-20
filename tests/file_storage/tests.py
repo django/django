@@ -41,7 +41,13 @@ from django.utils import timezone
 from django.utils._os import symlinks_supported
 from django.utils.deprecation import RemovedInDjango51Warning
 
-from .models import Storage, callable_storage, temp_storage, temp_storage_location
+from .models import (
+    Storage,
+    callable_default_storage,
+    callable_storage,
+    temp_storage,
+    temp_storage_location,
+)
 
 FILE_SUFFIX_REGEX = "[A-Za-z0-9]{7}"
 
@@ -1017,6 +1023,15 @@ class FieldCallableFileStorageTests(SimpleTestCase):
         *_, kwargs = obj._meta.get_field("storage_callable").deconstruct()
         storage = kwargs["storage"]
         self.assertIs(storage, callable_storage)
+
+    def test_deconstruction_storage_callable_default(self):
+        """
+        A callable that returns default_storage is not omitted when
+        deconstructing.
+        """
+        obj = Storage()
+        *_, kwargs = obj._meta.get_field("storage_callable_default").deconstruct()
+        self.assertIs(kwargs["storage"], callable_default_storage)
 
 
 # Tests for a race condition on file saving (#4948).
