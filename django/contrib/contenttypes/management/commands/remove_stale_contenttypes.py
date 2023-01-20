@@ -8,7 +8,7 @@ from django.db.models.deletion import Collector
 
 
 class Command(BaseCommand):
-    help = "Deletes stale content types in database."
+    help = "Deletes stale content types in the database."
     
     def add_arguments(self, parser):
         parser.add_argument(
