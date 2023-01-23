@@ -318,7 +318,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: ProhibitNullCharactersValidator(message=None, code=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
-    contains one or more nulls characters (``'\x00'``).
+    contains one or more null characters (``'\x00'``).
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -336,8 +336,6 @@ to, or in lieu of custom ``field.clean()`` methods.
 
 ``StepValueValidator``
 ----------------------
-
-.. versionadded:: 4.1
 
 .. class:: StepValueValidator(limit_value, message=None)
 

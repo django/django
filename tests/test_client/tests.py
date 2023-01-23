@@ -1068,8 +1068,10 @@ class RequestFactoryTest(SimpleTestCase):
 
     def test_request_factory_default_headers(self):
         request = RequestFactory(
-            HTTP_AUTHORIZATION="Bearer faketoken",
-            HTTP_X_ANOTHER_HEADER="some other value",
+            headers={
+                "authorization": "Bearer faketoken",
+                "x-another-header": "some other value",
+            }
         ).get("/somewhere/")
         self.assertEqual(request.headers["authorization"], "Bearer faketoken")
         self.assertIn("HTTP_AUTHORIZATION", request.META)
@@ -1092,8 +1094,10 @@ class RequestFactoryTest(SimpleTestCase):
             method = getattr(self.request_factory, method_name)
             request = method(
                 "/somewhere/",
-                HTTP_AUTHORIZATION="Bearer faketoken",
-                HTTP_X_ANOTHER_HEADER="some other value",
+                headers={
+                    "authorization": "Bearer faketoken",
+                    "x-another-header": "some other value",
+                },
             )
             self.assertEqual(request.headers["authorization"], "Bearer faketoken")
             self.assertIn("HTTP_AUTHORIZATION", request.META)

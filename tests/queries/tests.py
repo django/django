@@ -13,8 +13,7 @@ from django.db.models.functions import ExtractYear, Length, LTrim
 from django.db.models.sql.constants import LOUTER
 from django.db.models.sql.where import AND, OR, NothingNode, WhereNode
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext, ignore_warnings, register_lookup
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test.utils import CaptureQueriesContext, register_lookup
 
 from .models import (
     FK1,
@@ -1956,16 +1955,13 @@ class Queries5Tests(TestCase):
         self.assertEqual(authors.count(), 1)
 
     def test_filter_unsaved_object(self):
-        # These tests will catch ValueError in Django 5.0 when passing unsaved
-        # model instances to related filters becomes forbidden.
-        # msg = "Model instances passed to related filters must be saved."
-        msg = "Passing unsaved model instances to related filters is deprecated."
+        msg = "Model instances passed to related filters must be saved."
         company = Company.objects.create(name="Django")
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.filter(employer=Company(name="unsaved"))
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.filter(employer__in=[company, Company(name="unsaved")])
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             StaffUser.objects.filter(staff=Staff(name="unsaved"))
 
 
@@ -3322,35 +3318,19 @@ class ExcludeTests(TestCase):
         )
         self.assertCountEqual(
             Job.objects.annotate(
-                responsibility=subquery.filter(job=OuterRef("name"),).values(
-                    "id"
-                )[:1]
+                responsibility=subquery.filter(job=OuterRef("name")).values("id")[:1]
             ),
             [self.j1, self.j2],
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_exclude_unsaved_o2o_object(self):
-        jack = Staff.objects.create(name="jack")
-        jack_staff = StaffUser.objects.create(staff=jack)
-        unsaved_object = Staff(name="jane")
-
-        self.assertIsNone(unsaved_object.pk)
-        self.assertSequenceEqual(
-            StaffUser.objects.exclude(staff=unsaved_object), [jack_staff]
-        )
-
     def test_exclude_unsaved_object(self):
-        # These tests will catch ValueError in Django 5.0 when passing unsaved
-        # model instances to related filters becomes forbidden.
-        # msg = "Model instances passed to related filters must be saved."
         company = Company.objects.create(name="Django")
-        msg = "Passing unsaved model instances to related filters is deprecated."
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        msg = "Model instances passed to related filters must be saved."
+        with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.exclude(employer=Company(name="unsaved"))
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             Employment.objects.exclude(employer__in=[company, Company(name="unsaved")])
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             StaffUser.objects.exclude(staff=Staff(name="unsaved"))
 
 

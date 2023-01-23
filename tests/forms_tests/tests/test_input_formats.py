@@ -120,7 +120,7 @@ class LocalizedTimeTests(SimpleTestCase):
         self.assertEqual(text, "13:30:00")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(TIME_INPUT_FORMATS=["%I:%M:%S %p", "%I:%M %p"])
 class CustomTimeInputFormatsTests(SimpleTestCase):
     def test_timeField(self):
@@ -434,7 +434,7 @@ class LocalizedDateTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y", "%d-%m-%Y"])
 class CustomDateInputFormatsTests(SimpleTestCase):
     def test_dateField(self):
@@ -756,7 +756,7 @@ class LocalizedDateTimeTests(SimpleTestCase):
         self.assertEqual(text, "21.12.2010 13:30:00")
 
 
-@translation.override(None)  # RemovedInDjango50Warning.
+@translation.override(None)
 @override_settings(DATETIME_INPUT_FORMATS=["%I:%M:%S %p %d/%m/%Y", "%I:%M %p %d-%m-%Y"])
 class CustomDateTimeInputFormatsTests(SimpleTestCase):
     def test_dateTimeField(self):

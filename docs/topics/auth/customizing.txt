@@ -840,6 +840,11 @@ extend these forms in this manner::
             model = CustomUser
             fields = UserCreationForm.Meta.fields + ('custom_field',)
 
+.. versionchanged:: 4.2
+
+    In older versions, :class:`~django.contrib.auth.forms.UserCreationForm`
+    didn't save many-to-many form fields for a custom user model.
+
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
 

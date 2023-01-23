@@ -290,7 +290,7 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(stream.read(2), b"")
         self.assertEqual(stream.read(), b"")
 
-    def test_stream(self):
+    def test_stream_read(self):
         payload = FakePayload("name=value")
         request = WSGIRequest(
             {
@@ -301,6 +301,19 @@ class RequestsTests(SimpleTestCase):
             },
         )
         self.assertEqual(request.read(), b"name=value")
+
+    def test_stream_readline(self):
+        payload = FakePayload("name=value\nother=string")
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            },
+        )
+        self.assertEqual(request.readline(), b"name=value\n")
+        self.assertEqual(request.readline(), b"other=string")
 
     def test_read_after_value(self):
         """
@@ -610,7 +623,7 @@ class RequestsTests(SimpleTestCase):
         """
 
         class ExplodingBytesIO(BytesIO):
-            def read(self, len=0):
+            def read(self, size=-1, /):
                 raise OSError("kaboom!")
 
         payload = b"name=value"
@@ -640,10 +653,11 @@ class RequestsTests(SimpleTestCase):
         self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
 
     def test_set_encoding_clears_GET(self):
+        payload = FakePayload("")
         request = WSGIRequest(
             {
                 "REQUEST_METHOD": "GET",
-                "wsgi.input": "",
+                "wsgi.input": payload,
                 "QUERY_STRING": "name=Hello%20G%C3%BCnter",
             }
         )
@@ -658,7 +672,7 @@ class RequestsTests(SimpleTestCase):
         """
 
         class ExplodingBytesIO(BytesIO):
-            def read(self, len=0):
+            def read(self, size=-1, /):
                 raise OSError("kaboom!")
 
         payload = b"x"

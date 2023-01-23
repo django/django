@@ -152,7 +152,10 @@ example, the test suite for docs.djangoproject.com includes the following::
 
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
-            response = self.client.get('/en/dev/search/', HTTP_HOST='docs.djangoproject.dev:8000')
+            response = self.client.get(
+                "/en/dev/search/",
+                headers={"host": "docs.djangoproject.dev:8000"},
+            )
             self.assertEqual(response.status_code, 200)
 
 and the settings file includes a list of the domains supported by the project::
@@ -238,7 +241,9 @@ will *not* be created. Instead the connection to ``replica``
 will be redirected to point at ``default``. As a result, writes to
 ``default`` will appear on ``replica`` -- but because they are actually
 the same database, not because there is data replication between the
-two databases.
+two databases. As this depends on transactions, the tests must use
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`.
 
 .. _topics-testing-creation-dependencies:
 
@@ -649,12 +654,6 @@ Methods
     several formats (see :meth:`DiscoverRunner.build_suite` for a list of
     supported formats).
 
-    .. deprecated:: 4.0
-
-        ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
-        suite that is executed by the test runner. These extra tests are run in
-        addition to those discovered in the modules listed in ``test_labels``.
-
     This method should return the number of tests that failed.
 
 .. classmethod:: DiscoverRunner.add_arguments(parser)
@@ -689,12 +688,6 @@ Methods
     If ``test_labels`` has a value of ``None``, the test runner will search for
     tests in all files below the current directory whose names match its
     ``pattern`` (see above).
-
-    .. deprecated:: 4.0
-
-        ``extra_tests`` is a list of extra ``TestCase`` instances to add to the
-        suite that is executed by the test runner. These extra tests are run in
-        addition to those discovered in the modules listed in ``test_labels``.
 
     Returns a ``TestSuite`` instance ready to be run.
 
@@ -823,10 +816,6 @@ can be useful during testing.
     state between tests if you don't have transactions). You can set this to
     ``False`` to speed up creation time if you don't have any test classes
     with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
-
-    If you are using the default test runner, you can control this with the
-    the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the :setting:`TEST
-    <DATABASE-TEST>` dictionary.
 
     ``keepdb`` determines if the test run should use an existing
     database, or create a new one. If ``True``, the existing

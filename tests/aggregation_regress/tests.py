@@ -11,6 +11,7 @@ from django.db.models import (
     Aggregate,
     Avg,
     Case,
+    CharField,
     Count,
     DecimalField,
     F,
@@ -23,12 +24,15 @@ from django.db.models import (
     Variance,
     When,
 )
+from django.db.models.functions import Cast, Concat
 from django.test import TestCase, skipUnlessDBFeature
 from django.test.utils import Approximate
 
 from .models import (
     Alfa,
     Author,
+    AuthorProxy,
+    AuthorUnmanaged,
     Book,
     Bravo,
     Charlie,
@@ -37,6 +41,8 @@ from .models import (
     HardbackBook,
     ItemTag,
     Publisher,
+    RecipeProxy,
+    RecipeUnmanaged,
     SelfRefFK,
     Store,
     WithManualPK,
@@ -188,9 +194,8 @@ class AggregationTests(TestCase):
                     }
                 ],
             )
-        if connection.features.allows_group_by_refs:
-            alias = connection.ops.quote_name("discount_price")
-            self.assertIn(f"GROUP BY {alias}", ctx[0]["sql"])
+        if connection.features.allows_group_by_select_index:
+            self.assertIn("GROUP BY 1", ctx[0]["sql"])
 
     def test_aggregates_in_where_clause(self):
         """
@@ -1826,6 +1831,85 @@ class AggregationTests(TestCase):
             Q(authors__in=authors) | Q(authors__count__gt=2)
         )
         self.assertEqual(set(books), {self.b1, self.b4})
+
+    def test_aggregate_and_annotate_duplicate_columns(self):
+        books = (
+            Book.objects.values("isbn")
+            .annotate(
+                name=F("publisher__name"),
+                num_authors=Count("authors"),
+            )
+            .order_by("isbn")
+        )
+        self.assertSequenceEqual(
+            books,
+            [
+                {"isbn": "013235613", "name": "Prentice Hall", "num_authors": 3},
+                {"isbn": "013790395", "name": "Prentice Hall", "num_authors": 2},
+                {"isbn": "067232959", "name": "Sams", "num_authors": 1},
+                {"isbn": "155860191", "name": "Morgan Kaufmann", "num_authors": 1},
+                {"isbn": "159059725", "name": "Apress", "num_authors": 2},
+                {"isbn": "159059996", "name": "Apress", "num_authors": 1},
+            ],
+        )
+
+    def test_aggregate_and_annotate_duplicate_columns_proxy(self):
+        author = AuthorProxy.objects.latest("pk")
+        recipe = RecipeProxy.objects.create(name="Dahl", author=author)
+        recipe.tasters.add(author)
+        recipes = RecipeProxy.objects.values("pk").annotate(
+            name=F("author__name"),
+            num_tasters=Count("tasters"),
+        )
+        self.assertSequenceEqual(
+            recipes,
+            [{"pk": recipe.pk, "name": "Stuart Russell", "num_tasters": 1}],
+        )
+
+    def test_aggregate_and_annotate_duplicate_columns_unmanaged(self):
+        author = AuthorProxy.objects.latest("pk")
+        recipe = RecipeProxy.objects.create(name="Dahl", author=author)
+        recipe.tasters.add(author)
+        recipes = RecipeUnmanaged.objects.values("pk").annotate(
+            name=F("author__age"),
+            num_tasters=Count("tasters"),
+        )
+        self.assertSequenceEqual(
+            recipes,
+            [{"pk": recipe.pk, "name": 46, "num_tasters": 1}],
+        )
+
+    def test_aggregate_group_by_unseen_columns_unmanaged(self):
+        author = AuthorProxy.objects.latest("pk")
+        shadow_author = AuthorProxy.objects.create(name=author.name, age=author.age - 2)
+        recipe = RecipeProxy.objects.create(name="Dahl", author=author)
+        shadow_recipe = RecipeProxy.objects.create(
+            name="Shadow Dahl",
+            author=shadow_author,
+        )
+        recipe.tasters.add(shadow_author)
+        shadow_recipe.tasters.add(author)
+        # This selects how many tasters each author had according to a
+        # calculated field "name". The table has a column "name" that Django is
+        # unaware of, and is equal for the two authors. The grouping column
+        # cannot be referenced by its name ("name"), as it'd return one result
+        # which is incorrect.
+        author_recipes = (
+            AuthorUnmanaged.objects.annotate(
+                name=Concat(
+                    Value("Writer at "),
+                    Cast(F("age"), output_field=CharField()),
+                )
+            )
+            .values("name")  # Field used for grouping.
+            .annotate(num_recipes=Count("recipeunmanaged"))
+            .filter(num_recipes__gt=0)
+            .values("num_recipes")  # Drop grouping column.
+        )
+        self.assertSequenceEqual(
+            author_recipes,
+            [{"num_recipes": 1}, {"num_recipes": 1}],
+        )
 
 
 class JoinPromotionTests(TestCase):

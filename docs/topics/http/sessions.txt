@@ -122,20 +122,6 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the ``SECRET_KEY`` or ``SECRET_KEY_FALLBACKS`` are not kept secret and
-    you are using the**
-    ``django.contrib.sessions.serializers.PickleSerializer``, **this can lead
-    to arbitrary remote code execution.**
-
-    An attacker in possession of the :setting:`SECRET_KEY` or
-    :setting:`SECRET_KEY_FALLBACKS` can not only generate falsified session
-    data, which your site will trust, but also remotely execute arbitrary code,
-    as the data is serialized using pickle.
-
-    If you use cookie-based sessions, pay extra care that your secret key is
-    always kept completely secret, for any system which might be remotely
-    accessible.
-
     **The session data is signed but not encrypted**
 
     When using the cookies backend the session data can be read by the client.
@@ -372,17 +358,6 @@ Bundled serializers
 
     See the :ref:`custom-serializers` section for more details on limitations
     of JSON serialization.
-
-.. class:: serializers.PickleSerializer
-
-    Supports arbitrary Python objects, but, as described above, can lead to a
-    remote code execution vulnerability if :setting:`SECRET_KEY` or any key of
-    :setting:`SECRET_KEY_FALLBACKS` becomes known by an attacker.
-
-    .. deprecated:: 4.1
-
-        Due to the risk of remote code execution, this serializer is deprecated
-        and will be removed in Django 5.0.
 
 .. _custom-serializers:
 

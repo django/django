@@ -7,6 +7,7 @@ from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import (
     base36_to_int,
+    content_disposition_header,
     escape_leading_slashes,
     http_date,
     int_to_base36,
@@ -511,3 +512,28 @@ class ParseHeaderParameterTests(unittest.TestCase):
         for raw_line, expected_title in test_data:
             parsed = parse_header_parameters(raw_line)
             self.assertEqual(parsed[1]["title"], expected_title)
+
+
+class ContentDispositionHeaderTests(unittest.TestCase):
+    def test_basic(self):
+        tests = (
+            ((False, None), None),
+            ((False, "example"), 'inline; filename="example"'),
+            ((True, None), "attachment"),
+            ((True, "example"), 'attachment; filename="example"'),
+            (
+                (True, '"example" file\\name'),
+                'attachment; filename="\\"example\\" file\\\\name"',
+            ),
+            ((True, "espécimen"), "attachment; filename*=utf-8''esp%C3%A9cimen"),
+            (
+                (True, '"espécimen" filename'),
+                "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
+            ),
+        )
+
+        for (is_attachment, filename), expected in tests:
+            with self.subTest(is_attachment=is_attachment, filename=filename):
+                self.assertEqual(
+                    content_disposition_header(is_attachment, filename), expected
+                )

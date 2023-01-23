@@ -19,7 +19,8 @@ Configuring static files
       STATIC_URL = 'static/'
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
-   the given relative path using the configured :setting:`STATICFILES_STORAGE`.
+   the given relative path using the configured ``staticfiles``
+   :setting:`STORAGES` alias.
 
    .. _staticfiles-in-templates:
 

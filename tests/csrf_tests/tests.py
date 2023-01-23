@@ -23,8 +23,6 @@ from django.middleware.csrf import (
     rotate_token,
 )
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.views.decorators.csrf import csrf_exempt, requires_csrf_token
 
 from .views import (
@@ -1494,31 +1492,3 @@ class CsrfInErrorHandlingViewsTests(CsrfFunctionTestMixin, SimpleTestCase):
         token2 = response.content.decode("ascii")
         secret2 = _unmask_cipher_token(token2)
         self.assertMaskedSecretCorrect(token1, secret2)
-
-
-@ignore_warnings(category=RemovedInDjango50Warning)
-class CsrfCookieMaskedTests(CsrfFunctionTestMixin, SimpleTestCase):
-    @override_settings(CSRF_COOKIE_MASKED=True)
-    def test_get_token_csrf_cookie_not_set(self):
-        request = HttpRequest()
-        self.assertNotIn("CSRF_COOKIE", request.META)
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
-        token = get_token(request)
-        cookie = request.META["CSRF_COOKIE"]
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertMaskedSecretCorrect(token, unmasked_cookie)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)
-
-    @override_settings(CSRF_COOKIE_MASKED=True)
-    def test_rotate_token(self):
-        request = HttpRequest()
-        request.META["CSRF_COOKIE"] = MASKED_TEST_SECRET1
-        self.assertNotIn("CSRF_COOKIE_NEEDS_UPDATE", request.META)
-        rotate_token(request)
-        # The underlying secret was changed.
-        cookie = request.META["CSRF_COOKIE"]
-        self.assertEqual(len(cookie), CSRF_TOKEN_LENGTH)
-        unmasked_cookie = _unmask_cipher_token(cookie)
-        self.assertNotEqual(unmasked_cookie, TEST_SECRET)
-        self.assertIs(request.META["CSRF_COOKIE_NEEDS_UPDATE"], True)

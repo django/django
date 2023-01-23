@@ -108,12 +108,12 @@ def get_resolver(urlconf=None):
     return _get_cached_resolver(urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def _get_cached_resolver(urlconf=None):
     return URLResolver(RegexPattern(r"^/"), urlconf)
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_ns_resolver(ns_pattern, resolver, converters):
     # Build a namespaced resolver for the given parent URLconf pattern.
     # This makes it possible to have captured parameters in the parent
@@ -359,7 +359,7 @@ class LocalePrefixPattern:
     def match(self, path):
         language_prefix = self.language_prefix
         if path.startswith(language_prefix):
-            return path[len(language_prefix) :], (), {}
+            return path.removeprefix(language_prefix), (), {}
         return None
 
     def check(self):
@@ -542,8 +542,7 @@ class URLResolver:
             language_code = get_language()
             for url_pattern in reversed(self.url_patterns):
                 p_pattern = url_pattern.pattern.regex.pattern
-                if p_pattern.startswith("^"):
-                    p_pattern = p_pattern[1:]
+                p_pattern = p_pattern.removeprefix("^")
                 if isinstance(url_pattern, URLPattern):
                     self._callback_strs.add(url_pattern.lookup_str)
                     bits = normalize(url_pattern.pattern.regex.pattern)
@@ -645,8 +644,7 @@ class URLResolver:
         """Join two routes, without the starting ^ in the second route."""
         if not route1:
             return route2
-        if route2.startswith("^"):
-            route2 = route2[1:]
+        route2 = route2.removeprefix("^")
         return route1 + route2
 
     def _is_callback(self, name):

@@ -10,7 +10,7 @@ display and edit geolocalized data on a map. By default, they use
 `OpenLayers`_-powered maps, with a base WMS layer provided by `NASA`_.
 
 .. _OpenLayers: https://openlayers.org/
-.. _NASA: https://earthdata.nasa.gov/
+.. _NASA: https://www.earthdata.nasa.gov/
 
 Field arguments
 ===============
@@ -157,11 +157,11 @@ Widget classes
     This is the default widget used by all GeoDjango form fields.
     ``template_name`` is ``gis/openlayers.html``.
 
-    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``openlayers.js`` file
-    hosted on the ``cdnjs.cloudflare.com`` content-delivery network. You can
-    subclass these widgets in order to specify your own version of the
-    ``OpenLayers.js`` file in the ``js`` property of the inner ``Media`` class
-    (see :ref:`assets-as-a-static-definition`).
+    ``OpenLayersWidget`` and :class:`OSMWidget` use the ``ol.js`` file hosted
+    on the ``cdn.jsdelivr.net`` content-delivery network. You can subclass
+    these widgets in order to specify your own version of the ``ol.js`` file in
+    the ``js`` property of the inner ``Media`` class (see
+    :ref:`assets-as-a-static-definition`).
 
 ``OSMWidget``
 

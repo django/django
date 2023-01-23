@@ -2,6 +2,7 @@ import logging
 import sys
 import tempfile
 import traceback
+from contextlib import aclosing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -40,9 +41,9 @@ class ASGIRequest(HttpRequest):
         self._read_started = False
         self.resolver_match = None
         self.script_name = self.scope.get("root_path", "")
-        if self.script_name and scope["path"].startswith(self.script_name):
+        if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
-            self.path_info = scope["path"][len(self.script_name) :]
+            self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
         # The Django path is different from ASGI scope path args, it should
@@ -263,19 +264,22 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # Access `__iter__` and not `streaming_content` directly in case
-            # it has been overridden in a subclass.
-            for part in response:
-                for chunk, _ in self.chunk_bytes(part):
-                    await send(
-                        {
-                            "type": "http.response.body",
-                            "body": chunk,
-                            # Ignore "more" as there may be more parts; instead,
-                            # use an empty final closing message with False.
-                            "more_body": True,
-                        }
-                    )
+            # - Consume via `__aiter__` and not `streaming_content` directly, to
+            #   allow mapping of a sync iterator.
+            # - Use aclosing() when consuming aiter.
+            #   See https://github.com/python/cpython/commit/6e8dcda
+            async with aclosing(aiter(response)) as content:
+                async for part in content:
+                    for chunk, _ in self.chunk_bytes(part):
+                        await send(
+                            {
+                                "type": "http.response.body",
+                                "body": chunk,
+                                # Ignore "more" as there may be more parts; instead,
+                                # use an empty final closing message with False.
+                                "more_body": True,
+                            }
+                        )
             # Final closing message.
             await send({"type": "http.response.body"})
         # Other responses just need chunking.

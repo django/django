@@ -38,7 +38,7 @@ class SetLanguageTests(TestCase):
         lang_code = self._get_inactive_language_code()
         post_data = {"language": lang_code, "next": "/"}
         response = self.client.post(
-            "/i18n/setlang/", post_data, HTTP_REFERER="/i_should_not_be_used/"
+            "/i18n/setlang/", post_data, headers={"referer": "/i_should_not_be_used/"}
         )
         self.assertRedirects(response, "/")
         # The language is set in a cookie.
@@ -80,7 +80,7 @@ class SetLanguageTests(TestCase):
         )
         # Insecure URL in HTTP referer.
         response = self.client.post(
-            "/i18n/setlang/", secure=True, HTTP_REFERER=non_https_next_url
+            "/i18n/setlang/", secure=True, headers={"referer": non_https_next_url}
         )
         self.assertEqual(response.url, "/")
         self.assertEqual(
@@ -94,7 +94,9 @@ class SetLanguageTests(TestCase):
         """
         lang_code = self._get_inactive_language_code()
         post_data = {"language": lang_code}
-        response = self.client.post("/i18n/setlang/", post_data, HTTP_REFERER="/i18n/")
+        response = self.client.post(
+            "/i18n/setlang/", post_data, headers={"referer": "/i18n/"}
+        )
         self.assertRedirects(response, "/i18n/", fetch_redirect_response=False)
         self.assertEqual(
             self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, lang_code
@@ -121,7 +123,7 @@ class SetLanguageTests(TestCase):
         lang_code = self._get_inactive_language_code()
         post_data = {"language": lang_code, "next": "/"}
         response = self.client.post(
-            "/i18n/setlang/", post_data, HTTP_ACCEPT="application/json"
+            "/i18n/setlang/", post_data, headers={"accept": "application/json"}
         )
         self.assertRedirects(response, "/")
         self.assertEqual(
@@ -150,7 +152,7 @@ class SetLanguageTests(TestCase):
         lang_code = self._get_inactive_language_code()
         post_data = {"language": lang_code}
         response = self.client.post(
-            "/i18n/setlang/", post_data, HTTP_ACCEPT="application/json"
+            "/i18n/setlang/", post_data, headers={"accept": "application/json"}
         )
         self.assertEqual(response.status_code, 204)
         self.assertEqual(
@@ -165,7 +167,7 @@ class SetLanguageTests(TestCase):
         lang_code = self._get_inactive_language_code()
         post_data = {"language": lang_code, "next": "//unsafe/redirection/"}
         response = self.client.post(
-            "/i18n/setlang/", post_data, HTTP_ACCEPT="application/json"
+            "/i18n/setlang/", post_data, headers={"accept": "application/json"}
         )
         self.assertEqual(response.url, "/")
         self.assertEqual(
@@ -213,7 +215,7 @@ class SetLanguageTests(TestCase):
         # %C3%A4 decodes to ä, %26 to &.
         encoded_url = "/test-setlang/%C3%A4/?foo=bar&baz=alpha%26omega"
         response = self.client.post(
-            "/i18n/setlang/", {"language": lang_code}, HTTP_REFERER=encoded_url
+            "/i18n/setlang/", {"language": lang_code}, headers={"referer": encoded_url}
         )
         self.assertRedirects(response, encoded_url, fetch_redirect_response=False)
         self.assertEqual(
@@ -230,7 +232,7 @@ class SetLanguageTests(TestCase):
             "/i18n/setlang/",
             data={"language": "nl"},
             follow=True,
-            HTTP_REFERER="/en/translated/",
+            headers={"referer": "/en/translated/"},
         )
         self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, "nl")
         self.assertRedirects(response, "/nl/vertaald/")
@@ -239,7 +241,7 @@ class SetLanguageTests(TestCase):
             "/i18n/setlang/",
             data={"language": "en"},
             follow=True,
-            HTTP_REFERER="/nl/vertaald/",
+            headers={"referer": "/nl/vertaald/"},
         )
         self.assertRedirects(response, "/en/translated/")
 

@@ -34,6 +34,7 @@ from django.db.models.functions import (
     Cast,
     Coalesce,
     Greatest,
+    Least,
     Lower,
     Now,
     Pi,
@@ -1500,27 +1501,29 @@ class AggregateTestCase(TestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_aggregation_subquery_annotation_values_collision(self):
         books_rating_qs = Book.objects.filter(
-            publisher=OuterRef("pk"),
-            price=Decimal("29.69"),
+            pk=OuterRef("book"),
         ).values("rating")
         publisher_qs = (
             Publisher.objects.filter(
                 book__contact__age__gt=20,
-                name=self.p1.name,
             )
             .annotate(
                 rating=Subquery(books_rating_qs),
-                contacts_count=Count("book__contact"),
             )
             .values("rating")
-            .annotate(total_count=Count("rating"))
+            .annotate(total_count=Count("*"))
+            .order_by("rating")
         )
         self.assertEqual(
             list(publisher_qs),
             [
-                {"rating": 4.0, "total_count": 2},
+                {"rating": 3.0, "total_count": 1},
+                {"rating": 4.0, "total_count": 3},
+                {"rating": 4.5, "total_count": 1},
+                {"rating": 5.0, "total_count": 1},
             ],
         )
 
@@ -1612,6 +1615,20 @@ class AggregateTestCase(TestCase):
         ).annotate(total=Count("*"))
         self.assertEqual(dict(has_long_books_breakdown), {True: 2, False: 3})
 
+    def test_group_by_nested_expression_with_params(self):
+        books_qs = (
+            Book.objects.annotate(greatest_pages=Greatest("pages", Value(600)))
+            .values(
+                "greatest_pages",
+            )
+            .annotate(
+                min_pages=Min("pages"),
+                least=Least("min_pages", "greatest_pages"),
+            )
+            .values_list("least", flat=True)
+        )
+        self.assertCountEqual(books_qs, [300, 946, 1132])
+
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
     def test_aggregation_subquery_annotation_related_field(self):
         publisher = Publisher.objects.create(name=self.a9.name, num_awards=2)
@@ -1642,9 +1659,7 @@ class AggregateTestCase(TestCase):
         )
         with self.assertNumQueries(1) as ctx:
             self.assertSequenceEqual(books_qs, [book])
-        # Outerquery SELECT, annotation SELECT, and WHERE SELECT but GROUP BY
-        # selected alias, if allowed.
-        if connection.features.allows_group_by_refs:
+        if connection.features.allows_group_by_select_index:
             self.assertEqual(ctx[0]["sql"].count("SELECT"), 3)
 
     @skipUnlessDBFeature("supports_subqueries_in_group_by")
@@ -2088,7 +2103,7 @@ class AggregateTestCase(TestCase):
 
     def test_aggregation_over_annotation_shared_alias(self):
         self.assertEqual(
-            Publisher.objects.annotate(agg=Count("book__authors"),).aggregate(
+            Publisher.objects.annotate(agg=Count("book__authors")).aggregate(
                 agg=Count("agg"),
             ),
             {"agg": 5},

@@ -525,6 +525,9 @@ class BaseDatabaseOperations:
         else:
             return value
 
+    def adapt_integerfield_value(self, value, internal_type):
+        return value
+
     def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected

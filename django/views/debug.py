@@ -1,4 +1,5 @@
 import functools
+import itertools
 import re
 import sys
 import types
@@ -15,7 +16,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.encoding import force_str
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
-from django.utils.version import get_docs_version
+from django.utils.version import PY311, get_docs_version
 
 # Minimal Django templates engine to render the error templates
 # regardless of the project's TEMPLATES setting. Templates are
@@ -546,6 +547,24 @@ class ExceptionReporter:
                 pre_context = []
                 context_line = "<source code not available>"
                 post_context = []
+
+            colno = tb_area_colno = ""
+            if PY311:
+                _, _, start_column, end_column = next(
+                    itertools.islice(
+                        tb.tb_frame.f_code.co_positions(), tb.tb_lasti // 2, None
+                    )
+                )
+                if start_column and end_column:
+                    underline = "^" * (end_column - start_column)
+                    spaces = " " * (start_column + len(str(lineno + 1)) + 2)
+                    colno = f"\n{spaces}{underline}"
+                    tb_area_spaces = " " * (
+                        4
+                        + start_column
+                        - (len(context_line) - len(context_line.lstrip()))
+                    )
+                    tb_area_colno = f"\n{tb_area_spaces}{underline}"
             yield {
                 "exc_cause": exc_cause,
                 "exc_cause_explicit": exc_cause_explicit,
@@ -562,6 +581,8 @@ class ExceptionReporter:
                 "context_line": context_line,
                 "post_context": post_context,
                 "pre_context_lineno": pre_context_lineno + 1,
+                "colno": colno,
+                "tb_area_colno": tb_area_colno,
             }
             tb = tb.tb_next
 

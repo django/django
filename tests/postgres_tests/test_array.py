@@ -12,12 +12,7 @@ from django.core.management import call_command
 from django.db import IntegrityError, connection, models
 from django.db.models.expressions import Exists, OuterRef, RawSQL, Value
 from django.db.models.functions import Cast, JSONObject, Upper
-from django.test import (
-    TransactionTestCase,
-    modify_settings,
-    override_settings,
-    skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
 from django.utils import timezone
 
@@ -36,8 +31,6 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import NumericRange
-
     from django.contrib.postgres.aggregates import ArrayAgg
     from django.contrib.postgres.expressions import ArraySubquery
     from django.contrib.postgres.fields import ArrayField
@@ -47,6 +40,7 @@ try:
         SplitArrayField,
         SplitArrayWidget,
     )
+    from django.db.backends.postgresql.psycopg_any import NumericRange
 except ImportError:
     pass
 
@@ -323,7 +317,7 @@ class TestQuerying(PostgreSQLTestCase):
     def test_in_including_F_object(self):
         # This test asserts that Array objects passed to filters can be
         # constructed to contain F objects. This currently doesn't work as the
-        # psycopg2 mogrify method that generates the ARRAY() syntax is
+        # psycopg mogrify method that generates the ARRAY() syntax is
         # expecting literals, not column references (#27095).
         self.assertSequenceEqual(
             NullableIntegerArrayModel.objects.filter(field__in=[[models.F("id")]]),
@@ -455,8 +449,8 @@ class TestQuerying(PostgreSQLTestCase):
                     expected,
                 )
 
-    @skipUnlessDBFeature("allows_group_by_refs")
-    def test_group_by_order_by_aliases(self):
+    @skipUnlessDBFeature("allows_group_by_select_index")
+    def test_group_by_order_by_select_index(self):
         with self.assertNumQueries(1) as ctx:
             self.assertSequenceEqual(
                 NullableIntegerArrayModel.objects.filter(
@@ -473,7 +467,7 @@ class TestQuerying(PostgreSQLTestCase):
             )
         alias = connection.ops.quote_name("field__0")
         sql = ctx[0]["sql"]
-        self.assertIn(f"GROUP BY {alias}", sql)
+        self.assertIn("GROUP BY 1", sql)
         self.assertIn(f"ORDER BY {alias}", sql)
 
     def test_index(self):
@@ -782,12 +776,12 @@ class TestOtherTypesExactQuerying(PostgreSQLTestCase):
 class TestChecks(PostgreSQLSimpleTestCase):
     def test_field_checks(self):
         class MyModel(PostgreSQLModel):
-            field = ArrayField(models.CharField())
+            field = ArrayField(models.CharField(max_length=-1))
 
         model = MyModel()
         errors = model.check()
         self.assertEqual(len(errors), 1)
-        # The inner CharField is missing a max_length.
+        # The inner CharField has a non-positive max_length.
         self.assertEqual(errors[0].id, "postgres.E001")
         self.assertIn("max_length", errors[0].msg)
 
@@ -843,12 +837,12 @@ class TestChecks(PostgreSQLSimpleTestCase):
         """
 
         class MyModel(PostgreSQLModel):
-            field = ArrayField(ArrayField(models.CharField()))
+            field = ArrayField(ArrayField(models.CharField(max_length=-1)))
 
         model = MyModel()
         errors = model.check()
         self.assertEqual(len(errors), 1)
-        # The inner CharField is missing a max_length.
+        # The inner CharField has a non-positive max_length.
         self.assertEqual(errors[0].id, "postgres.E001")
         self.assertIn("max_length", errors[0].msg)
 
@@ -1259,8 +1253,6 @@ class TestSplitFormField(PostgreSQLSimpleTestCase):
         with self.assertRaisesMessage(exceptions.ValidationError, msg):
             SplitArrayField(forms.IntegerField(max_value=100), size=2).clean([0, 101])
 
-    # To locate the widget's template.
-    @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
     def test_rendering(self):
         class SplitForm(forms.Form):
             array = SplitArrayField(forms.CharField(), size=3)

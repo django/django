@@ -104,7 +104,7 @@ The above code could be simplified by using the `JavaScript Cookie library
     Django provides a view decorator which forces setting of the cookie:
     :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 
 .. _acquiring-csrf-token-from-html:
 

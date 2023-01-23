@@ -857,8 +857,6 @@ being evaluated and therefore populate the cache::
 Asynchronous queries
 ====================
 
-.. versionadded:: 4.1
-
 If you are writing asynchronous views or code, you cannot use the ORM for
 queries in quite the way we have described above, as you cannot call *blocking*
 synchronous code from asynchronous code - it will block up the event loop
@@ -872,8 +870,6 @@ results, you can use asynchronous iteration (``async for``) instead.
 
 Query iteration
 ---------------
-
-.. versionadded:: 4.1
 
 The default way of iterating over a query - with ``for`` - will result in a
 blocking database query behind the scenes as Django loads the results at
@@ -894,8 +890,6 @@ read the next section.
 
 ``QuerySet`` and manager methods
 --------------------------------
-
-.. versionadded:: 4.1
 
 Some methods on managers and querysets - like ``get()`` and ``first()`` - force
 execution of the queryset and are blocking. Some, like ``filter()`` and
@@ -938,8 +932,6 @@ the whole expression in order to call it in an asynchronous-friendly way.
 Transactions
 ------------
 
-.. versionadded:: 4.1
-
 Transactions are **not** currently supported with asynchronous queries and
 updates. You will find that trying to use one raises
 ``SynchronousOnlyOperation``.
@@ -971,7 +963,7 @@ Storing and querying for ``None``
 
 As with other fields, storing ``None`` as the field's value will store it as
 SQL ``NULL``. While not recommended, it is possible to store JSON scalar
-``null`` instead of SQL ``NULL`` by using :class:`Value('null')
+``null`` instead of SQL ``NULL`` by using :class:`Value(None, JSONField())
 <django.db.models.Value>`.
 
 Whichever of the values is stored, when retrieved from the database, the Python
@@ -987,11 +979,13 @@ query for SQL ``NULL``, use :lookup:`isnull`::
 
     >>> Dog.objects.create(name='Max', data=None)  # SQL NULL.
     <Dog: Max>
-    >>> Dog.objects.create(name='Archie', data=Value('null'))  # JSON null.
+    >>> Dog.objects.create(
+    ...     name='Archie', data=Value(None, JSONField())  # JSON null.
+    ... )
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
     <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value('null'))
+    >>> Dog.objects.filter(data=Value(None, JSONField())
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
@@ -1006,6 +1000,15 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
 
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
+
+.. versionchanged:: 4.2
+
+    Support for expressing JSON ``null`` using ``Value(None, JSONField())`` was
+    added.
+
+.. deprecated:: 4.2
+
+    Passing ``Value("null")`` to express JSON ``null`` is deprecated.
 
 .. fieldlookup:: jsonfield.key
 
@@ -1307,10 +1310,6 @@ precede the definition of any keyword arguments. For example::
 
     The :source:`OR lookups examples <tests/or_lookups/tests.py>` in Django's
     unit tests show some possible uses of ``Q``.
-
-.. versionchanged:: 4.1
-
-    Support for the ``^`` (``XOR``) operator was added.
 
 Comparing objects
 =================

@@ -2,14 +2,14 @@ import json
 import os
 import posixpath
 import re
+from hashlib import md5
 from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 from django.core.exceptions import ImproperlyConfigured
 from django.core.files.base import ContentFile
-from django.core.files.storage import FileSystemStorage, get_storage_class
-from django.utils.crypto import md5
+from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
 
 
@@ -71,6 +71,28 @@ class HashedFilesMixin:
                 (
                     r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
+                ),
+                (
+                    (
+                        r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                        r"""\s*from\s*['"](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """import%(import)s from "%(url)s";""",
+                ),
+                (
+                    (
+                        r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
+                        r"""\s*from\s*["'](?P<url>[\.\/].*?)["']\s*;)"""
+                    ),
+                    """export%(exports)s from "%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\s*['"](?P<url>[\.\/].*?)["']\s*;)""",
+                    """import"%(url)s";""",
+                ),
+                (
+                    r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
+                    """import("%(url)s")""",
                 ),
             ),
         ),
@@ -209,7 +231,7 @@ class HashedFilesMixin:
             if url_path.startswith("/"):
                 # Otherwise the condition above would have returned prematurely.
                 assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path[len(settings.STATIC_URL) :]
+                target_name = url_path.removeprefix(settings.STATIC_URL)
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
                 source_name = name if os.sep == "/" else name.replace(os.sep, "/")
@@ -417,7 +439,7 @@ class HashedFilesMixin:
 
 
 class ManifestFilesMixin(HashedFilesMixin):
-    manifest_version = "1.0"  # the manifest format standard
+    manifest_version = "1.1"  # the manifest format standard
     manifest_name = "staticfiles.json"
     manifest_strict = True
     keep_intermediate_files = False
@@ -427,7 +449,7 @@ class ManifestFilesMixin(HashedFilesMixin):
         if manifest_storage is None:
             manifest_storage = self
         self.manifest_storage = manifest_storage
-        self.hashed_files = self.load_manifest()
+        self.hashed_files, self.manifest_hash = self.load_manifest()
 
     def read_manifest(self):
         try:
@@ -439,15 +461,15 @@ class ManifestFilesMixin(HashedFilesMixin):
     def load_manifest(self):
         content = self.read_manifest()
         if content is None:
-            return {}
+            return {}, ""
         try:
             stored = json.loads(content)
         except json.JSONDecodeError:
             pass
         else:
             version = stored.get("version")
-            if version == "1.0":
-                return stored.get("paths", {})
+            if version in ("1.0", "1.1"):
+                return stored.get("paths", {}), stored.get("hash", "")
         raise ValueError(
             "Couldn't load manifest '%s' (version %s)"
             % (self.manifest_name, self.manifest_version)
@@ -460,7 +482,14 @@ class ManifestFilesMixin(HashedFilesMixin):
             self.save_manifest()
 
     def save_manifest(self):
-        payload = {"paths": self.hashed_files, "version": self.manifest_version}
+        self.manifest_hash = self.file_hash(
+            None, ContentFile(json.dumps(sorted(self.hashed_files.items())).encode())
+        )
+        payload = {
+            "paths": self.hashed_files,
+            "version": self.manifest_version,
+            "hash": self.manifest_hash,
+        }
         if self.manifest_storage.exists(self.manifest_name):
             self.manifest_storage.delete(self.manifest_name)
         contents = json.dumps(payload).encode()
@@ -497,7 +526,7 @@ class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
 
 class ConfiguredStorage(LazyObject):
     def _setup(self):
-        self._wrapped = get_storage_class(settings.STATICFILES_STORAGE)()
+        self._wrapped = storages[STATICFILES_STORAGE_ALIAS]
 
 
 staticfiles_storage = ConfiguredStorage()

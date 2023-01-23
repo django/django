@@ -62,6 +62,11 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
         models.Union,
     )
 
+    function_names = {
+        "FromWKB": "ST_GeomFromWKB",
+        "FromWKT": "ST_GeomFromText",
+    }
+
     @cached_property
     def unsupported_functions(self):
         unsupported = {
@@ -70,8 +75,10 @@ class MySQLOperations(BaseSpatialOperations, DatabaseOperations):
             "AsSVG",
             "Azimuth",
             "BoundingCircle",
+            "ClosestPoint",
             "ForcePolygonCW",
             "GeometryDistance",
+            "IsEmpty",
             "LineLocatePoint",
             "MakeValid",
             "MemSize",

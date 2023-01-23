@@ -219,8 +219,4 @@ See the PostgreSQL documentation for more details about `covering indexes`_.
     covering :class:`SP-GiST indexes
     <django.contrib.postgres.indexes.SpGistIndex>`.
 
-.. versionchanged:: 4.1
-
-    Support for covering SP-GiST indexes with PostgreSQL 14+ was added.
-
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

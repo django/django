@@ -346,6 +346,21 @@ MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
 
+.. fieldlookup:: isempty
+
+``isempty``
+-----------
+
+.. versionadded:: 4.2
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Tests if the geometry is empty.
+
+Example::
+
+    Zipcode.objects.filter(poly__isempty=True)
+
 .. fieldlookup:: isvalid
 
 ``isvalid``

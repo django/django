@@ -1186,22 +1186,6 @@ subclass::
     :meth:`ModelAdmin.get_search_results` to provide additional or alternate
     search behavior.
 
-    .. versionchanged:: 4.1
-
-        Searches using multiple search terms are now applied in a single call
-        to ``filter()``, rather than in sequential ``filter()`` calls.
-
-        For multi-valued relationships, this means that rows from the related
-        model must match all terms rather than any term. For example, if
-        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
-        user searches for ``'Jamal 17'``, parent rows will be returned only if
-        there is a relationship to some 17-year-old child named Jamal, rather
-        than also returning parents who merely have a younger or older child
-        named Jamal in addition to some other 17-year-old.
-
-        See the :ref:`spanning-multi-valued-relationships` topic for more
-        discussion of this difference.
-
 .. attribute:: ModelAdmin.search_help_text
 
     Set ``search_help_text`` to specify a descriptive text for the search box
@@ -1418,22 +1402,6 @@ templates used by the :class:`ModelAdmin` views:
     field, for example ``... OR UPPER("polls_choice"."votes"::text) = UPPER('4')``
     on PostgreSQL.
 
-    .. versionchanged:: 4.1
-
-        Searches using multiple search terms are now applied in a single call
-        to ``filter()``, rather than in sequential ``filter()`` calls.
-
-        For multi-valued relationships, this means that rows from the related
-        model must match all terms rather than any term. For example, if
-        ``search_fields`` is set to ``['child__name', 'child__age']``, and a
-        user searches for ``'Jamal 17'``, parent rows will be returned only if
-        there is a relationship to some 17-year-old child named Jamal, rather
-        than also returning parents who merely have a younger or older child
-        named Jamal in addition to some other 17-year-old.
-
-        See the :ref:`spanning-multi-valued-relationships` topic for more
-        discussion of this difference.
-
 .. _Solr: https://solr.apache.org
 .. _Haystack: https://haystacksearch.org
 
@@ -1565,7 +1533,8 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_urls`` method on a ``ModelAdmin`` returns the URLs to be used for
     that ModelAdmin in the same way as a URLconf.  Therefore you can extend
-    them as documented in :doc:`/topics/http/urls`::
+    them as documented in :doc:`/topics/http/urls`, using the
+    ``AdminSite.admin_view()`` wrapper on your views::
 
         from django.contrib import admin
         from django.template.response import TemplateResponse
@@ -1575,7 +1544,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_urls(self):
                 urls = super().get_urls()
                 my_urls = [
-                    path('my_view/', self.my_view),
+                    path('my_view/', self.admin_site.admin_view(self.my_view))
                 ]
                 return my_urls + urls
 
@@ -1600,6 +1569,18 @@ templates used by the :class:`ModelAdmin` views:
 
     .. note::
 
+        Notice how the ``self.my_view`` function is wrapped in
+        ``self.admin_site.admin_view``. This is important, since it ensures two
+        things:
+
+        #. Permission checks are run, ensuring only active staff users can
+           access the view.
+        #. The :func:`django.views.decorators.cache.never_cache` decorator is
+           applied to prevent caching, ensuring the returned information is
+           up-to-date.
+
+    .. note::
+
         Notice that the custom patterns are included *before* the regular admin
         URLs: the admin URL patterns are very permissive and will match nearly
         anything, so you'll usually want to prepend your custom URLs to the
@@ -1608,36 +1589,6 @@ templates used by the :class:`ModelAdmin` views:
         In this example, ``my_view`` will be accessed at
         ``/admin/myapp/mymodel/my_view/`` (assuming the admin URLs are included
         at ``/admin/``.)
-
-    However, the ``self.my_view`` function registered above suffers from two
-    problems:
-
-    * It will *not* perform any permission checks, so it will be accessible
-      to the general public.
-    * It will *not* provide any header details to prevent caching. This means
-      if the page retrieves data from the database, and caching middleware is
-      active, the page could show outdated information.
-
-    Since this is usually not what you want, Django provides a convenience
-    wrapper to check permissions and mark the view as non-cacheable. This
-    wrapper is ``AdminSite.admin_view()`` (i.e. ``self.admin_site.admin_view``
-    inside a ``ModelAdmin`` instance); use it like so::
-
-        class MyModelAdmin(admin.ModelAdmin):
-            def get_urls(self):
-                urls = super().get_urls()
-                my_urls = [
-                    path('my_view/', self.admin_site.admin_view(self.my_view))
-                ]
-                return my_urls + urls
-
-    Notice the wrapped view in the fifth line above::
-
-        path('my_view/', self.admin_site.admin_view(self.my_view))
-
-    This wrapping will protect ``self.my_view`` from unauthorized access and
-    will apply the :func:`django.views.decorators.cache.never_cache` decorator to
-    make sure it is not cached if the cache middleware is active.
 
     If the page is cacheable, but you still want the permission check to be
     performed, you can pass a ``cacheable=True`` argument to
@@ -2016,10 +1967,6 @@ Other methods
     Django view for the page that shows the modification history for a given
     model instance.
 
-    .. versionchanged:: 4.1
-
-        Pagination was added.
-
 Unlike the hook-type ``ModelAdmin`` methods detailed in the previous section,
 these five methods are in reality designed to be invoked as Django views from
 the admin application URL dispatching handler to render the pages that deal
@@ -2081,12 +2028,16 @@ jQuery
 Django admin JavaScript makes use of the `jQuery`_ library.
 
 To avoid conflicts with user-supplied scripts or libraries, Django's jQuery
-(version 3.6.0) is namespaced as ``django.jQuery``. If you want to use jQuery
+(version 3.6.3) is namespaced as ``django.jQuery``. If you want to use jQuery
 in your own admin JavaScript without including a second copy, you can use the
 ``django.jQuery`` object on changelist and add/edit views. Also, your own admin
 forms or widgets depending on ``django.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', …]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
+
+.. versionchanged:: 4.2
+
+    jQuery was upgraded from 3.6.0 to 3.6.3.
 
 The :class:`ModelAdmin` class requires jQuery by default, so there is no need
 to add jQuery to your ``ModelAdmin``’s list of media resources unless you have
@@ -2738,11 +2689,6 @@ linked to the document in ``{% block dark-mode-vars %}``.
 
 .. _prefers-color-scheme: https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme
 
-.. versionchanged:: 4.1
-
-    The dark mode variables were moved to a separate stylesheet and template
-    block.
-
 ``AdminSite`` objects
 =====================
 
@@ -2912,10 +2858,6 @@ Templates can override or extend base admin templates as described in
     Lists of applications and models are sorted alphabetically by their names.
     You can override this method to change the default order on the admin index
     page.
-
-    .. versionchanged:: 4.1
-
-        The ``app_label`` argument was added.
 
 .. method:: AdminSite.has_permission(request)
 

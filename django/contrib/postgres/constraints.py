@@ -1,4 +1,4 @@
-import warnings
+from types import NoneType
 
 from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
@@ -9,7 +9,6 @@ from django.db.models.expressions import Exists, ExpressionList
 from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import PostgresOperatorLookup
 from django.db.models.sql import Query
-from django.utils.deprecation import RemovedInDjango50Warning
 
 __all__ = ["ExclusionConstraint"]
 
@@ -33,7 +32,6 @@ class ExclusionConstraint(BaseConstraint):
         condition=None,
         deferrable=None,
         include=None,
-        opclasses=(),
         violation_error_message=None,
     ):
         if index_type and index_type.lower() not in {"gist", "spgist"}:
@@ -49,36 +47,19 @@ class ExclusionConstraint(BaseConstraint):
             isinstance(expr, (list, tuple)) and len(expr) == 2 for expr in expressions
         ):
             raise ValueError("The expressions must be a list of 2-tuples.")
-        if not isinstance(condition, (type(None), Q)):
+        if not isinstance(condition, (NoneType, Q)):
             raise ValueError("ExclusionConstraint.condition must be a Q instance.")
-        if not isinstance(deferrable, (type(None), Deferrable)):
+        if not isinstance(deferrable, (NoneType, Deferrable)):
             raise ValueError(
                 "ExclusionConstraint.deferrable must be a Deferrable instance."
             )
-        if not isinstance(include, (type(None), list, tuple)):
+        if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("ExclusionConstraint.include must be a list or tuple.")
-        if not isinstance(opclasses, (list, tuple)):
-            raise ValueError("ExclusionConstraint.opclasses must be a list or tuple.")
-        if opclasses and len(expressions) != len(opclasses):
-            raise ValueError(
-                "ExclusionConstraint.expressions and "
-                "ExclusionConstraint.opclasses must have the same number of "
-                "elements."
-            )
         self.expressions = expressions
         self.index_type = index_type or "GIST"
         self.condition = condition
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
-        self.opclasses = opclasses
-        if self.opclasses:
-            warnings.warn(
-                "The opclasses argument is deprecated in favor of using "
-                "django.contrib.postgres.indexes.OpClass in "
-                "ExclusionConstraint.expressions.",
-                category=RemovedInDjango50Warning,
-                stacklevel=2,
-            )
         super().__init__(name=name, violation_error_message=violation_error_message)
 
     def _get_expressions(self, schema_editor, query):
@@ -86,10 +67,6 @@ class ExclusionConstraint(BaseConstraint):
         for idx, (expression, operator) in enumerate(self.expressions):
             if isinstance(expression, str):
                 expression = F(expression)
-            try:
-                expression = OpClass(expression, self.opclasses[idx])
-            except IndexError:
-                pass
             expression = ExclusionConstraintExpression(expression, operator=operator)
             expression.set_wrapper_classes(schema_editor.connection)
             expressions.append(expression)
@@ -161,8 +138,6 @@ class ExclusionConstraint(BaseConstraint):
             kwargs["deferrable"] = self.deferrable
         if self.include:
             kwargs["include"] = self.include
-        if self.opclasses:
-            kwargs["opclasses"] = self.opclasses
         return path, args, kwargs
 
     def __eq__(self, other):
@@ -174,13 +149,12 @@ class ExclusionConstraint(BaseConstraint):
                 and self.condition == other.condition
                 and self.deferrable == other.deferrable
                 and self.include == other.include
-                and self.opclasses == other.opclasses
                 and self.violation_error_message == other.violation_error_message
             )
         return super().__eq__(other)
 
     def __repr__(self):
-        return "<%s: index_type=%s expressions=%s name=%s%s%s%s%s>" % (
+        return "<%s: index_type=%s expressions=%s name=%s%s%s%s>" % (
             self.__class__.__qualname__,
             repr(self.index_type),
             repr(self.expressions),
@@ -188,7 +162,6 @@ class ExclusionConstraint(BaseConstraint):
             "" if self.condition is None else " condition=%s" % self.condition,
             "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
             "" if not self.include else " include=%s" % repr(self.include),
-            "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
         )
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):

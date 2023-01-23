@@ -2,15 +2,16 @@ import datetime
 
 from django.core import signing
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import freeze_time
+from django.test.utils import freeze_time, ignore_warnings
 from django.utils.crypto import InvalidAlgorithm
+from django.utils.deprecation import RemovedInDjango51Warning
 
 
 class TestSigner(SimpleTestCase):
     def test_signature(self):
         "signature() method should generate a signature"
-        signer = signing.Signer("predictable-secret")
-        signer2 = signing.Signer("predictable-secret2")
+        signer = signing.Signer(key="predictable-secret")
+        signer2 = signing.Signer(key="predictable-secret2")
         for s in (
             b"hello",
             b"3098247:529:087:",
@@ -28,8 +29,7 @@ class TestSigner(SimpleTestCase):
             self.assertNotEqual(signer.signature(s), signer2.signature(s))
 
     def test_signature_with_salt(self):
-        "signature(value, salt=...) should work"
-        signer = signing.Signer("predictable-secret", salt="extra-salt")
+        signer = signing.Signer(key="predictable-secret", salt="extra-salt")
         self.assertEqual(
             signer.signature("hello"),
             signing.base64_hmac(
@@ -40,12 +40,12 @@ class TestSigner(SimpleTestCase):
             ),
         )
         self.assertNotEqual(
-            signing.Signer("predictable-secret", salt="one").signature("hello"),
-            signing.Signer("predictable-secret", salt="two").signature("hello"),
+            signing.Signer(key="predictable-secret", salt="one").signature("hello"),
+            signing.Signer(key="predictable-secret", salt="two").signature("hello"),
         )
 
     def test_custom_algorithm(self):
-        signer = signing.Signer("predictable-secret", algorithm="sha512")
+        signer = signing.Signer(key="predictable-secret", algorithm="sha512")
         self.assertEqual(
             signer.signature("hello"),
             "Usf3uVQOZ9m6uPfVonKR-EBXjPe7bjMbp3_Fq8MfsptgkkM1ojidN0BxYaT5HAEN1"
@@ -53,14 +53,14 @@ class TestSigner(SimpleTestCase):
         )
 
     def test_invalid_algorithm(self):
-        signer = signing.Signer("predictable-secret", algorithm="whatever")
+        signer = signing.Signer(key="predictable-secret", algorithm="whatever")
         msg = "'whatever' is not an algorithm accepted by the hashlib module."
         with self.assertRaisesMessage(InvalidAlgorithm, msg):
             signer.sign("hello")
 
     def test_sign_unsign(self):
         "sign/unsign should be reversible"
-        signer = signing.Signer("predictable-secret")
+        signer = signing.Signer(key="predictable-secret")
         examples = [
             "q;wjmbk;wkmb",
             "3098247529087",
@@ -75,7 +75,7 @@ class TestSigner(SimpleTestCase):
             self.assertEqual(example, signer.unsign(signed))
 
     def test_sign_unsign_non_string(self):
-        signer = signing.Signer("predictable-secret")
+        signer = signing.Signer(key="predictable-secret")
         values = [
             123,
             1.23,
@@ -91,7 +91,7 @@ class TestSigner(SimpleTestCase):
 
     def test_unsign_detects_tampering(self):
         "unsign should raise an exception if the value has been tampered with"
-        signer = signing.Signer("predictable-secret")
+        signer = signing.Signer(key="predictable-secret")
         value = "Another string"
         signed_value = signer.sign(value)
         transforms = (
@@ -106,7 +106,7 @@ class TestSigner(SimpleTestCase):
                 signer.unsign(transform(signed_value))
 
     def test_sign_unsign_object(self):
-        signer = signing.Signer("predictable-secret")
+        signer = signing.Signer(key="predictable-secret")
         tests = [
             ["a", "list"],
             "a string \u2019",
@@ -155,7 +155,7 @@ class TestSigner(SimpleTestCase):
     def test_works_with_non_ascii_keys(self):
         binary_key = b"\xe7"  # Set some binary (non-ASCII key)
 
-        s = signing.Signer(binary_key)
+        s = signing.Signer(key=binary_key)
         self.assertEqual(
             "foo:EE4qGC5MEKyQG5msxYA0sBohAxLC0BJf8uRhemh0BGU",
             s.sign("foo"),
@@ -164,7 +164,7 @@ class TestSigner(SimpleTestCase):
     def test_valid_sep(self):
         separators = ["/", "*sep*", ","]
         for sep in separators:
-            signer = signing.Signer("predictable-secret", sep=sep)
+            signer = signing.Signer(key="predictable-secret", sep=sep)
             self.assertEqual(
                 "foo%sjZQoX_FtSO70jX9HLRGg2A_2s4kdDBxz1QoO_OpEQb0" % sep,
                 signer.sign("foo"),
@@ -181,16 +181,16 @@ class TestSigner(SimpleTestCase):
                 signing.Signer(sep=sep)
 
     def test_verify_with_non_default_key(self):
-        old_signer = signing.Signer("secret")
+        old_signer = signing.Signer(key="secret")
         new_signer = signing.Signer(
-            "newsecret", fallback_keys=["othersecret", "secret"]
+            key="newsecret", fallback_keys=["othersecret", "secret"]
         )
         signed = old_signer.sign("abc")
         self.assertEqual(new_signer.unsign(signed), "abc")
 
     def test_sign_unsign_multiple_keys(self):
         """The default key is a valid verification key."""
-        signer = signing.Signer("secret", fallback_keys=["oldsecret"])
+        signer = signing.Signer(key="secret", fallback_keys=["oldsecret"])
         signed = signer.sign("abc")
         self.assertEqual(signer.unsign(signed), "abc")
 
@@ -199,7 +199,7 @@ class TestSigner(SimpleTestCase):
         SECRET_KEY_FALLBACKS=["oldsecret"],
     )
     def test_sign_unsign_ignore_secret_key_fallbacks(self):
-        old_signer = signing.Signer("oldsecret")
+        old_signer = signing.Signer(key="oldsecret")
         signed = old_signer.sign("abc")
         signer = signing.Signer(fallback_keys=[])
         with self.assertRaises(signing.BadSignature):
@@ -210,7 +210,7 @@ class TestSigner(SimpleTestCase):
         SECRET_KEY_FALLBACKS=["oldsecret"],
     )
     def test_default_keys_verification(self):
-        old_signer = signing.Signer("oldsecret")
+        old_signer = signing.Signer(key="oldsecret")
         signed = old_signer.sign("abc")
         signer = signing.Signer()
         self.assertEqual(signer.unsign(signed), "abc")
@@ -220,9 +220,9 @@ class TestTimestampSigner(SimpleTestCase):
     def test_timestamp_signer(self):
         value = "hello"
         with freeze_time(123456789):
-            signer = signing.TimestampSigner("predictable-key")
+            signer = signing.TimestampSigner(key="predictable-key")
             ts = signer.sign(value)
-            self.assertNotEqual(ts, signing.Signer("predictable-key").sign(value))
+            self.assertNotEqual(ts, signing.Signer(key="predictable-key").sign(value))
             self.assertEqual(signer.unsign(ts), value)
 
         with freeze_time(123456800):
@@ -240,3 +240,23 @@ class TestBase62(SimpleTestCase):
         tests = [-(10**10), 10**10, 1620378259, *range(-100, 100)]
         for i in tests:
             self.assertEqual(i, signing.b62_decode(signing.b62_encode(i)))
+
+
+class SignerPositionalArgumentsDeprecationTests(SimpleTestCase):
+    def test_deprecation(self):
+        msg = "Passing positional arguments to Signer is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            signing.Signer("predictable-secret")
+        msg = "Passing positional arguments to TimestampSigner is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            signing.TimestampSigner("predictable-secret")
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_positional_arguments(self):
+        signer = signing.Signer("secret", "/", "somesalt", "sha1", ["oldsecret"])
+        signed = signer.sign("xyz")
+        self.assertEqual(signed, "xyz/zzdO_8rk-NGnm8jNasXRTF2P5kY")
+        self.assertEqual(signer.unsign(signed), "xyz")
+        old_signer = signing.Signer("oldsecret", "/", "somesalt", "sha1")
+        signed = old_signer.sign("xyz")
+        self.assertEqual(signer.unsign(signed), "xyz")

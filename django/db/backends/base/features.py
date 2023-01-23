@@ -9,7 +9,7 @@ class BaseDatabaseFeatures:
     # Oracle can't group by LOB (large object) data types.
     allows_group_by_lob = True
     allows_group_by_selected_pks = False
-    allows_group_by_refs = True
+    allows_group_by_select_index = True
     empty_fetchmany_value = []
     update_can_self_select = True
 
@@ -163,6 +163,8 @@ class BaseDatabaseFeatures:
 
     # Can we roll back DDL in a transaction?
     can_rollback_ddl = False
+
+    schema_editor_uses_clientside_param_binding = False
 
     # Does it support operations requiring references rename in a transaction?
     supports_atomic_references_rename = True
@@ -332,8 +334,19 @@ class BaseDatabaseFeatures:
     # Does the backend support non-deterministic collations?
     supports_non_deterministic_collations = True
 
+    # Does the backend support column and table comments?
+    supports_comments = False
+    # Does the backend support column comments in ADD COLUMN statements?
+    supports_comments_inline = False
+
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
+
+    # Set to (exception, message) if null characters in text are disallowed.
+    prohibits_null_characters_in_text_exception = None
+
+    # Does the backend support unlimited character columns?
+    supports_unlimited_charfield = False
 
     # Collation names for use by the Django test suite.
     test_collations = {

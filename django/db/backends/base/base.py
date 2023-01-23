@@ -5,15 +5,9 @@ import logging
 import threading
 import time
 import warnings
+import zoneinfo
 from collections import deque
 from contextlib import contextmanager
-
-from django.db.backends.utils import debug_transaction
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -21,6 +15,7 @@ from django.db import DEFAULT_DB_ALIAS, DatabaseError, NotSupportedError
 from django.db.backends import utils
 from django.db.backends.base.validation import BaseDatabaseValidation
 from django.db.backends.signals import connection_created
+from django.db.backends.utils import debug_transaction
 from django.db.transaction import TransactionManagementError
 from django.db.utils import DatabaseErrorWrapper
 from django.utils.asyncio import async_unsafe
@@ -30,15 +25,6 @@ NO_DB_ALIAS = "__no_db__"
 RAN_DB_VERSION_CHECK = set()
 
 logger = logging.getLogger("django.db.backends.base")
-
-
-# RemovedInDjango50Warning
-def timezone_constructor(tzname):
-    if settings.USE_DEPRECATED_PYTZ:
-        import pytz
-
-        return pytz.timezone(tzname)
-    return zoneinfo.ZoneInfo(tzname)
 
 
 class BaseDatabaseWrapper:
@@ -166,7 +152,7 @@ class BaseDatabaseWrapper:
         elif self.settings_dict["TIME_ZONE"] is None:
             return datetime.timezone.utc
         else:
-            return timezone_constructor(self.settings_dict["TIME_ZONE"])
+            return zoneinfo.ZoneInfo(self.settings_dict["TIME_ZONE"])
 
     @cached_property
     def timezone_name(self):

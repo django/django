@@ -1,4 +1,3 @@
-import asyncio
 import collections
 import logging
 import os
@@ -14,6 +13,8 @@ from types import SimpleNamespace
 from unittest import TestCase, skipIf, skipUnless
 from xml.dom.minidom import Node, parseString
 
+from asgiref.sync import iscoroutinefunction
+
 from django.apps import apps
 from django.apps.registry import Apps
 from django.conf import UserSettingsHolder, settings
@@ -25,7 +26,6 @@ from django.db.models.options import Options
 from django.template import Template
 from django.test.signals import template_rendered
 from django.urls import get_script_prefix, set_script_prefix
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.translation import deactivate
 
 try:
@@ -197,26 +197,9 @@ def setup_databases(
             if first_alias is None:
                 first_alias = alias
                 with time_keeper.timed("  Creating '%s'" % alias):
-                    # RemovedInDjango50Warning: when the deprecation ends,
-                    # replace with:
-                    # serialize_alias = (
-                    #     serialized_aliases is None
-                    #     or alias in serialized_aliases
-                    # )
-                    try:
-                        serialize_alias = connection.settings_dict["TEST"]["SERIALIZE"]
-                    except KeyError:
-                        serialize_alias = (
-                            serialized_aliases is None or alias in serialized_aliases
-                        )
-                    else:
-                        warnings.warn(
-                            "The SERIALIZE test database setting is "
-                            "deprecated as it can be inferred from the "
-                            "TestCase/TransactionTestCase.databases that "
-                            "enable the serialized_rollback feature.",
-                            category=RemovedInDjango50Warning,
-                        )
+                    serialize_alias = (
+                        serialized_aliases is None or alias in serialized_aliases
+                    )
                     connection.creation.create_test_db(
                         verbosity=verbosity,
                         autoclobber=not interactive,
@@ -440,7 +423,7 @@ class TestContextDecorator:
         raise TypeError("Can only decorate subclasses of unittest.TestCase")
 
     def decorate_callable(self, func):
-        if asyncio.iscoroutinefunction(func):
+        if iscoroutinefunction(func):
             # If the inner function is an async function, we must execute async
             # as well so that the `with` statement executes at the right time.
             @wraps(func)

@@ -343,7 +343,7 @@ class Urlizer:
             # Trim wrapping punctuation.
             for opening, closing in self.wrapping_punctuation:
                 if middle.startswith(opening):
-                    middle = middle[len(opening) :]
+                    middle = middle.removeprefix(opening)
                     lead += opening
                     trimmed_something = True
                 # Keep parentheses at the end only if they're balanced.
@@ -351,7 +351,7 @@ class Urlizer:
                     middle.endswith(closing)
                     and middle.count(closing) == middle.count(opening) + 1
                 ):
-                    middle = middle[: -len(closing)]
+                    middle = middle.removesuffix(closing)
                     trail = closing + trail
                     trimmed_something = True
             # Trim trailing punctuation (after trimming wrapping punctuation,

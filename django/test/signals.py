@@ -13,6 +13,7 @@ from django.dispatch import Signal, receiver
 from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
+from django.utils.module_loading import import_string
 
 template_rendered = Signal()
 
@@ -112,6 +113,27 @@ def reset_template_engines(*, setting, **kwargs):
 
 
 @receiver(setting_changed)
+def storages_changed(*, setting, **kwargs):
+    from django.contrib.staticfiles.storage import staticfiles_storage
+    from django.core.files.storage import default_storage, storages
+
+    if setting in (
+        "STORAGES",
+        "STATIC_ROOT",
+        "STATIC_URL",
+    ):
+        try:
+            del storages.backends
+        except AttributeError:
+            pass
+        storages._backends = None
+        storages._storages = {}
+
+        default_storage._wrapped = empty
+        staticfiles_storage._wrapped = empty
+
+
+@receiver(setting_changed)
 def clear_serializers_cache(*, setting, **kwargs):
     if setting == "SERIALIZATION_MODULES":
         from django.core import serializers
@@ -139,11 +161,18 @@ def localize_settings_changed(*, setting, **kwargs):
         reset_format_cache()
 
 
+# RemovedInDjango51Warning.
 @receiver(setting_changed)
 def file_storage_changed(*, setting, **kwargs):
     if setting == "DEFAULT_FILE_STORAGE":
-        from django.core.files.storage import default_storage
+        from django.conf import DEFAULT_STORAGE_ALIAS
+        from django.core.files.storage import default_storage, storages
 
+        try:
+            del storages.backends
+        except AttributeError:
+            pass
+        storages._storages[DEFAULT_STORAGE_ALIAS] = import_string(kwargs["value"])()
         default_storage._wrapped = empty
 
 
@@ -177,6 +206,17 @@ def static_storage_changed(*, setting, **kwargs):
         from django.contrib.staticfiles.storage import staticfiles_storage
 
         staticfiles_storage._wrapped = empty
+
+    # RemovedInDjango51Warning.
+    if setting == "STATICFILES_STORAGE":
+        from django.conf import STATICFILES_STORAGE_ALIAS
+        from django.core.files.storage import storages
+
+        try:
+            del storages.backends
+        except AttributeError:
+            pass
+        storages._storages[STATICFILES_STORAGE_ALIAS] = import_string(kwargs["value"])()
 
 
 @receiver(setting_changed)

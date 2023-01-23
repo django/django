@@ -857,11 +857,6 @@ Methods
       number of seconds, or ``None`` (default) if the cookie should last only
       as long as the client's browser session. If ``expires`` is not specified,
       it will be calculated.
-
-      .. versionchanged:: 4.1
-
-        Support for ``timedelta`` objects was added.
-
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
@@ -1116,42 +1111,75 @@ parameter to the constructor method::
 .. class:: StreamingHttpResponse
 
 The :class:`StreamingHttpResponse` class is used to stream a response from
-Django to the browser. You might want to do this if generating the response
-takes too long or uses too much memory. For instance, it's useful for
-:ref:`generating large CSV files <streaming-csv-files>`.
+Django to the browser.
 
-.. admonition:: Performance considerations
+.. admonition:: Advanced usage
 
-    Django is designed for short-lived requests. Streaming responses will tie
-    a worker process for the entire duration of the response. This may result
-    in poor performance.
+    :class:`StreamingHttpResponse` is somewhat advanced, in that it is
+    important to know whether you'll be serving your application synchronously
+    under WSGI or asynchronously under ASGI, and adjust your usage
+    appropriately.
 
-    Generally speaking, you should perform expensive tasks outside of the
-    request-response cycle, rather than resorting to a streamed response.
+    Please read these notes with care.
+
+An example usage of :class:`StreamingHttpResponse` under WSGI is streaming
+content when generating the response would take too long or uses too much
+memory. For instance, it's useful for :ref:`generating large CSV files
+<streaming-csv-files>`.
+
+There are performance considerations when doing this, though. Django, under
+WSGI, is designed for short-lived requests. Streaming responses will tie a
+worker process for the entire duration of the response. This may result in poor
+performance.
+
+Generally speaking, you would perform expensive tasks outside of the
+request-response cycle, rather than resorting to a streamed response.
+
+When serving under ASGI, however, a :class:`StreamingHttpResponse` need not
+stop other requests from being served whilst waiting for I/O. This opens up
+the possibility of long-lived requests for streaming content and implementing
+patterns such as long-polling, and server-sent events.
+
+Even under ASGI note, :class:`StreamingHttpResponse` should only be used in
+situations where it is absolutely required that the whole content isn't
+iterated before transferring the data to the client. Because the content can't
+be accessed, many middleware can't function normally. For example the ``ETag``
+and ``Content-Length`` headers can't be generated for streaming responses.
 
 The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
 because it features a slightly different API. However, it is almost identical,
 with the following notable differences:
 
-* It should be given an iterator that yields bytestrings as content.
+* It should be given an iterator that yields bytestrings as content. When
+  serving under WSGI, this should be a sync iterator. When serving under ASGI,
+  this is should an async iterator.
 
 * You cannot access its content, except by iterating the response object
-  itself. This should only occur when the response is returned to the client.
+  itself. This should only occur when the response is returned to the client:
+  you should not iterate the response yourself.
+
+  Under WSGI the response will be iterated synchronously. Under ASGI the
+  response will be iterated asynchronously. (This is why the iterator type must
+  match the protocol you're using.)
+
+  To avoid a crash, an incorrect iterator type will be mapped to the correct
+  type during iteration, and a warning will be raised, but in order to do this
+  the iterator must be fully-consumed, which defeats the purpose of using a
+  :class:`StreamingHttpResponse` at all.
 
 * It has no ``content`` attribute. Instead, it has a
-  :attr:`~StreamingHttpResponse.streaming_content` attribute.
+  :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
+  in middleware to wrap the response iterable, but should not be consumed.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
 
-:class:`StreamingHttpResponse` should only be used in situations where it is
-absolutely required that the whole content isn't iterated before transferring
-the data to the client. Because the content can't be accessed, many
-middleware can't function normally. For example the ``ETag`` and
-``Content-Length`` headers can't be generated for streaming responses.
-
 The :class:`HttpResponseBase` base class is common between
 :class:`HttpResponse` and :class:`StreamingHttpResponse`.
+
+.. versionchanged:: 4.2
+
+    Support for asynchronous iteration was added.
 
 Attributes
 ----------
@@ -1180,6 +1208,16 @@ Attributes
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+.. attribute:: StreamingHttpResponse.is_async
+
+    .. versionadded:: 4.2
+
+    Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
+    is an asynchronous iterator or not.
+
+    This is useful for middleware needing to wrap
+    :attr:`StreamingHttpResponse.streaming_content`.
 
 ``FileResponse`` objects
 ========================
@@ -1212,6 +1250,15 @@ a file open in binary mode like so::
     >>> response = FileResponse(open('myfile.png', 'rb'))
 
 The file will be closed automatically, so don't open it with a context manager.
+
+.. admonition:: Use under ASGI
+
+    Python's file API is synchronous. This means that the file must be fully
+    consumed in order to be served under ASGI.
+
+    In order to stream a file asynchronously you need to use a third-party
+    package that provides an asynchronous file API, such as `aiofiles
+    <https://github.com/Tinche/aiofiles>`_.
 
 Methods
 -------

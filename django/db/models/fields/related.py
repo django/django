@@ -857,7 +857,7 @@ class ForeignObject(RelatedField):
         return self.get_reverse_path_info()
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]
@@ -1426,6 +1426,14 @@ class ManyToManyField(RelatedField):
                     'with a symmetrical relationship, e.g. to "self".',
                     obj=self,
                     id="fields.W345",
+                )
+            )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
                 )
             )
 

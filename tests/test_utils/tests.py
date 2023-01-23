@@ -1,11 +1,10 @@
-import logging
 import os
 import unittest
 import warnings
 from io import StringIO
 from unittest import mock
 
-from django.conf import settings
+from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.finders import get_finder, get_finders
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.exceptions import ImproperlyConfigured
@@ -46,8 +45,7 @@ from django.test.utils import (
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango50Warning, RemovedInDjango51Warning
-from django.utils.log import DEFAULT_LOGGING
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.version import PY311
 
 from .models import Car, Person, PossessedCar
@@ -1198,47 +1196,6 @@ class AssertWarnsMessageTests(SimpleTestCase):
             func1()
 
 
-# TODO: Remove when dropping support for PY39.
-class AssertNoLogsTest(SimpleTestCase):
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        logging.config.dictConfig(DEFAULT_LOGGING)
-        cls.addClassCleanup(logging.config.dictConfig, settings.LOGGING)
-
-    def setUp(self):
-        self.logger = logging.getLogger("django")
-
-    @override_settings(DEBUG=True)
-    def test_fails_when_log_emitted(self):
-        msg = "Unexpected logs found: ['INFO:django:FAIL!']"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs("django", "INFO"):
-                self.logger.info("FAIL!")
-
-    @override_settings(DEBUG=True)
-    def test_text_level(self):
-        with self.assertNoLogs("django", "INFO"):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_int_level(self):
-        with self.assertNoLogs("django", logging.INFO):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_default_level(self):
-        with self.assertNoLogs("django"):
-            self.logger.debug("DEBUG logs are ignored.")
-
-    @override_settings(DEBUG=True)
-    def test_does_not_hide_other_failures(self):
-        msg = "1 != 2"
-        with self.assertRaisesMessage(AssertionError, msg):
-            with self.assertNoLogs("django"):
-                self.assertEqual(1, 2)
-
-
 class AssertFieldOutputTests(SimpleTestCase):
     def test_assert_field_output(self):
         error_invalid = ["Enter a valid email address."]
@@ -1383,44 +1340,6 @@ class TestFormset(formset_factory(TestForm)):
 
 
 class AssertFormErrorTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_non_client_response(self):
-        msg = (
-            "assertFormError() is only usable on responses fetched using the "
-            "Django test Client."
-        )
-        response = HttpResponse()
-        with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_response_with_no_context(self):
-        msg = "Response did not use any contexts to render the response"
-        response = mock.Mock(context=[])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
-        msg_prefix = "Custom prefix"
-        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormError(
-                response,
-                "form",
-                "field",
-                "invalid value",
-                msg_prefix=msg_prefix,
-            )
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_form_not_in_context(self):
-        msg = "The form 'form' was not used to render the response"
-        response = mock.Mock(context=[{}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(response, "form", "field", "invalid value")
-        msg_prefix = "Custom prefix"
-        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormError(
-                response, "form", "field", "invalid value", msg_prefix=msg_prefix
-            )
-
     def test_single_error(self):
         self.assertFormError(TestForm.invalid(), "field", "invalid value")
 
@@ -1523,35 +1442,6 @@ class AssertFormErrorTests(SimpleTestCase):
 
 
 class AssertFormSetErrorTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_non_client_response(self):
-        msg = (
-            "assertFormSetError() is only usable on responses fetched using "
-            "the Django test Client."
-        )
-        response = HttpResponse()
-        with self.assertRaisesMessage(ValueError, msg):
-            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_response_with_no_context(self):
-        msg = "Response did not use any contexts to render the response"
-        response = mock.Mock(context=[])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_formset_not_in_context(self):
-        msg = "The formset 'formset' was not used to render the response"
-        response = mock.Mock(context=[{}])
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormSetError(response, "formset", 0, "field", "invalid value")
-        msg_prefix = "Custom prefix"
-        with self.assertRaisesMessage(AssertionError, f"{msg_prefix}: {msg}"):
-            self.assertFormSetError(
-                response, "formset", 0, "field", "invalid value", msg_prefix=msg_prefix
-            )
-
     def test_rename_assertformseterror_deprecation_warning(self):
         msg = "assertFormsetError() is deprecated in favor of assertFormSetError()."
         with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
@@ -1762,219 +1652,6 @@ class AssertFormSetErrorTests(SimpleTestCase):
             self.assertFormSetError(formset, 2, "field", "error")
 
 
-# RemovedInDjango50Warning
-class AssertFormErrorDeprecationTests(SimpleTestCase):
-    """
-    Exhaustively test all possible combinations of args/kwargs for the old
-    signature.
-    """
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_form_error_errors_none(self):
-        msg = (
-            "The errors of field 'field' on form <TestForm bound=True, valid=False, "
-            "fields=(field)> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormError(TestForm.invalid(), "field", None)
-
-    def test_assert_form_error_errors_none_warning(self):
-        msg = (
-            "Passing errors=None to assertFormError() is deprecated, use "
-            "errors=[] instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormError(TestForm.valid(), "field", None)
-
-    def _assert_form_error_old_api_cases(self, form, field, errors, msg_prefix):
-        response = mock.Mock(context=[{"form": TestForm.invalid()}])
-        return (
-            ((response, form, field, errors), {}),
-            ((response, form, field, errors, msg_prefix), {}),
-            ((response, form, field, errors), {"msg_prefix": msg_prefix}),
-            ((response, form, field), {"errors": errors}),
-            ((response, form, field), {"errors": errors, "msg_prefix": msg_prefix}),
-            ((response, form), {"field": field, "errors": errors}),
-            (
-                (response, form),
-                {"field": field, "errors": errors, "msg_prefix": msg_prefix},
-            ),
-            ((response,), {"form": form, "field": field, "errors": errors}),
-            (
-                (response,),
-                {
-                    "form": form,
-                    "field": field,
-                    "errors": errors,
-                    "msg_prefix": msg_prefix,
-                },
-            ),
-            (
-                (),
-                {"response": response, "form": form, "field": field, "errors": errors},
-            ),
-            (
-                (),
-                {
-                    "response": response,
-                    "form": form,
-                    "field": field,
-                    "errors": errors,
-                    "msg_prefix": msg_prefix,
-                },
-            ),
-        )
-
-    def test_assert_form_error_old_api(self):
-        deprecation_msg = (
-            "Passing response to assertFormError() is deprecated. Use the form object "
-            "directly: assertFormError(response.context['form'], 'field', ...)"
-        )
-        for args, kwargs in self._assert_form_error_old_api_cases(
-            form="form",
-            field="field",
-            errors=["invalid value"],
-            msg_prefix="Custom prefix",
-        ):
-            with self.subTest(args=args, kwargs=kwargs):
-                with self.assertWarnsMessage(RemovedInDjango50Warning, deprecation_msg):
-                    self.assertFormError(*args, **kwargs)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_form_error_old_api_assertion_error(self):
-        for args, kwargs in self._assert_form_error_old_api_cases(
-            form="form",
-            field="field",
-            errors=["other error"],
-            msg_prefix="Custom prefix",
-        ):
-            with self.subTest(args=args, kwargs=kwargs):
-                with self.assertRaises(AssertionError):
-                    self.assertFormError(*args, **kwargs)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_formset_error_errors_none(self):
-        msg = (
-            "The errors of field 'field' on form 0 of formset <TestFormset: bound=True "
-            "valid=False total_forms=1> don't match."
-        )
-        with self.assertRaisesMessage(AssertionError, msg):
-            self.assertFormSetError(TestFormset.invalid(), 0, "field", None)
-
-    def test_assert_formset_error_errors_none_warning(self):
-        msg = (
-            "Passing errors=None to assertFormSetError() is deprecated, use "
-            "errors=[] instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.assertFormSetError(TestFormset.valid(), 0, "field", None)
-
-    def _assert_formset_error_old_api_cases(
-        self, formset, form_index, field, errors, msg_prefix
-    ):
-        response = mock.Mock(context=[{"formset": TestFormset.invalid()}])
-        return (
-            ((response, formset, form_index, field, errors), {}),
-            ((response, formset, form_index, field, errors, msg_prefix), {}),
-            (
-                (response, formset, form_index, field, errors),
-                {"msg_prefix": msg_prefix},
-            ),
-            ((response, formset, form_index, field), {"errors": errors}),
-            (
-                (response, formset, form_index, field),
-                {"errors": errors, "msg_prefix": msg_prefix},
-            ),
-            ((response, formset, form_index), {"field": field, "errors": errors}),
-            (
-                (response, formset, form_index),
-                {"field": field, "errors": errors, "msg_prefix": msg_prefix},
-            ),
-            (
-                (response, formset),
-                {"form_index": form_index, "field": field, "errors": errors},
-            ),
-            (
-                (response, formset),
-                {
-                    "form_index": form_index,
-                    "field": field,
-                    "errors": errors,
-                    "msg_prefix": msg_prefix,
-                },
-            ),
-            (
-                (response,),
-                {
-                    "formset": formset,
-                    "form_index": form_index,
-                    "field": field,
-                    "errors": errors,
-                },
-            ),
-            (
-                (response,),
-                {
-                    "formset": formset,
-                    "form_index": form_index,
-                    "field": field,
-                    "errors": errors,
-                    "msg_prefix": msg_prefix,
-                },
-            ),
-            (
-                (),
-                {
-                    "response": response,
-                    "formset": formset,
-                    "form_index": form_index,
-                    "field": field,
-                    "errors": errors,
-                },
-            ),
-            (
-                (),
-                {
-                    "response": response,
-                    "formset": formset,
-                    "form_index": form_index,
-                    "field": field,
-                    "errors": errors,
-                    "msg_prefix": msg_prefix,
-                },
-            ),
-        )
-
-    def test_assert_formset_error_old_api(self):
-        deprecation_msg = (
-            "Passing response to assertFormSetError() is deprecated. Use the formset "
-            "object directly: assertFormSetError(response.context['formset'], 0, ...)"
-        )
-        for args, kwargs in self._assert_formset_error_old_api_cases(
-            formset="formset",
-            form_index=0,
-            field="field",
-            errors=["invalid value"],
-            msg_prefix="Custom prefix",
-        ):
-            with self.subTest(args=args, kwargs=kwargs):
-                with self.assertWarnsMessage(RemovedInDjango50Warning, deprecation_msg):
-                    self.assertFormSetError(*args, **kwargs)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_assert_formset_error_old_api_assertion_error(self):
-        for args, kwargs in self._assert_formset_error_old_api_cases(
-            formset="formset",
-            form_index=0,
-            field="field",
-            errors=["other error"],
-            msg_prefix="Custom prefix",
-        ):
-            with self.subTest(args=args, kwargs=kwargs):
-                with self.assertRaises(AssertionError):
-                    self.assertFormSetError(*args, **kwargs)
-
-
 class FirstUrls:
     urlpatterns = [path("first/", empty_response, name="first")]
 
@@ -2106,12 +1783,14 @@ class OverrideSettingsTests(SimpleTestCase):
 
     def test_override_staticfiles_storage(self):
         """
-        Overriding the STATICFILES_STORAGE setting should be reflected in
+        Overriding the STORAGES setting should be reflected in
         the value of django.contrib.staticfiles.storage.staticfiles_storage.
         """
         new_class = "ManifestStaticFilesStorage"
         new_storage = "django.contrib.staticfiles.storage." + new_class
-        with self.settings(STATICFILES_STORAGE=new_storage):
+        with self.settings(
+            STORAGES={STATICFILES_STORAGE_ALIAS: {"BACKEND": new_storage}}
+        ):
             self.assertEqual(staticfiles_storage.__class__.__name__, new_class)
 
     def test_override_staticfiles_finders(self):

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -31,6 +31,7 @@ msgid "Type into this box to filter down the list of available %s."
 msgstr ""
 
 #: contrib/admin/static/admin/js/SelectFilter2.js:65
+#: contrib/admin/static/admin/js/SelectFilter2.js:110
 msgid "Filter"
 msgstr ""
 
@@ -63,13 +64,23 @@ msgid ""
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:99
+#: contrib/admin/static/admin/js/SelectFilter2.js:105
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:120
 msgid "Remove all"
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:99
+#: contrib/admin/static/admin/js/SelectFilter2.js:120
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
+msgstr ""
+
+#: contrib/admin/static/admin/js/SelectFilter2.js:210
+#, javascript-format
+msgid "%s selected options not visible"
 msgstr ""
 
 #: contrib/admin/static/admin/js/actions.js:67
@@ -99,7 +110,7 @@ msgid ""
 msgstr ""
 
 #: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:13
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:111
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:110
 msgid "Now"
 msgstr ""
 
@@ -133,33 +144,33 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:129
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:128
 msgid "Choose a Time"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:159
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:158
 msgid "Choose a time"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:176
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:334
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:175
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:333
 msgid "Cancel"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:239
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:319
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:238
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:318
 msgid "Today"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:256
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:255
 msgid "Choose a Date"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:313
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:312
 msgid "Yesterday"
 msgstr ""
 
-#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:325
+#: contrib/admin/static/admin/js/admin/DateTimeShortcuts.js:324
 msgid "Tomorrow"
 msgstr ""
 
@@ -304,12 +315,6 @@ msgstr ""
 #: contrib/admin/static/admin/js/calendar.js:45
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
-
-#: contrib/admin/static/admin/js/change_form.js:14
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
 msgstr ""
 
 #: contrib/admin/static/admin/js/collapse.js:16

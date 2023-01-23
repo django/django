@@ -256,10 +256,11 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses :ref:`server-side cursors
-  <psycopg2:server-side-cursors>` on PostgreSQL. This feature transfers some of
-  the worker memory load (used to hold query results) to the database and might
-  increase database memory usage.
+* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+  This feature transfers some of the worker memory load (used to hold query
+  results) to the database and might increase database memory usage.
+
+  .. _server-side cursors: https://www.psycopg.org/docs/usage.html#server-side-cursors
 
 * Added MySQL support for the ``'isolation_level'`` option in
   :setting:`OPTIONS` to allow specifying the :ref:`transaction isolation level

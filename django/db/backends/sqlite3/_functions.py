@@ -4,8 +4,9 @@ Implementations of SQL functions for SQLite.
 import functools
 import random
 import statistics
+import zoneinfo
 from datetime import timedelta
-from hashlib import sha1, sha224, sha256, sha384, sha512
+from hashlib import md5, sha1, sha224, sha256, sha384, sha512
 from math import (
     acos,
     asin,
@@ -26,14 +27,12 @@ from math import (
 )
 from re import search as re_search
 
-from django.db.backends.base.base import timezone_constructor
 from django.db.backends.utils import (
     split_tzname_delta,
     typecast_time,
     typecast_timestamp,
 )
 from django.utils import timezone
-from django.utils.crypto import md5
 from django.utils.duration import duration_microseconds
 
 
@@ -111,14 +110,14 @@ def _sqlite_datetime_parse(dt, tzname=None, conn_tzname=None):
     except (TypeError, ValueError):
         return None
     if conn_tzname:
-        dt = dt.replace(tzinfo=timezone_constructor(conn_tzname))
+        dt = dt.replace(tzinfo=zoneinfo.ZoneInfo(conn_tzname))
     if tzname is not None and tzname != conn_tzname:
         tzname, sign, offset = split_tzname_delta(tzname)
         if offset:
             hours, minutes = offset.split(":")
             offset_delta = timedelta(hours=int(hours), minutes=int(minutes))
             dt += offset_delta if sign == "+" else -offset_delta
-        dt = timezone.localtime(dt, timezone_constructor(tzname))
+        dt = timezone.localtime(dt, zoneinfo.ZoneInfo(tzname))
     return dt
 
 
@@ -184,11 +183,11 @@ def _sqlite_datetime_extract(lookup_type, dt, tzname=None, conn_tzname=None):
     elif lookup_type == "iso_week_day":
         return dt.isoweekday()
     elif lookup_type == "week":
-        return dt.isocalendar()[1]
+        return dt.isocalendar().week
     elif lookup_type == "quarter":
         return ceil(dt.month / 3)
     elif lookup_type == "iso_year":
-        return dt.isocalendar()[0]
+        return dt.isocalendar().year
     else:
         return getattr(dt, lookup_type)
 

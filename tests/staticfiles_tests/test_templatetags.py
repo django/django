@@ -1,3 +1,4 @@
+from django.conf import STATICFILES_STORAGE_ALIAS
 from django.test import override_settings
 
 from .cases import StaticFilesTestCase
@@ -12,7 +13,11 @@ class TestTemplateTag(StaticFilesTestCase):
         )
 
     @override_settings(
-        STATICFILES_STORAGE="staticfiles_tests.storage.QueryStringStorage"
+        STORAGES={
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "staticfiles_tests.storage.QueryStringStorage"
+            },
+        }
     )
     def test_template_tag_escapes(self):
         """

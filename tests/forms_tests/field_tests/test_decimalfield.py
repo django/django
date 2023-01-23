@@ -2,9 +2,8 @@ import decimal
 
 from django.core.exceptions import ValidationError
 from django.forms import DecimalField, NumberInput, Widget
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.utils import formats, translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -195,31 +194,22 @@ class DecimalFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             localized_d = formats.localize_input(d)  # -> '0,1' in French
             self.assertFalse(f.has_changed(d, localized_d))
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=",")
+    @override_settings(DECIMAL_SEPARATOR=",")
     def test_decimalfield_support_decimal_separator(self):
-        f = DecimalField(localize=True)
-        self.assertEqual(f.clean("1001,10"), decimal.Decimal("1001.10"))
-        self.assertEqual(f.clean("1001.10"), decimal.Decimal("1001.10"))
+        with translation.override(None):
+            f = DecimalField(localize=True)
+            self.assertEqual(f.clean("1001,10"), decimal.Decimal("1001.10"))
+            self.assertEqual(f.clean("1001.10"), decimal.Decimal("1001.10"))
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(
-        USE_L10N=False,
         DECIMAL_SEPARATOR=",",
         USE_THOUSAND_SEPARATOR=True,
         THOUSAND_SEPARATOR=".",
     )
     def test_decimalfield_support_thousands_separator(self):
-        f = DecimalField(localize=True)
-        self.assertEqual(f.clean("1.001,10"), decimal.Decimal("1001.10"))
-        msg = "'Enter a number.'"
-        with self.assertRaisesMessage(ValidationError, msg):
-            f.clean("1,001.1")
+        with translation.override(None):
+            f = DecimalField(localize=True)
+            self.assertEqual(f.clean("1.001,10"), decimal.Decimal("1001.10"))
+            msg = "'Enter a number.'"
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean("1,001.1")

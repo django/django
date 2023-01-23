@@ -720,6 +720,42 @@ class StreamingHttpResponseTests(SimpleTestCase):
             '<StreamingHttpResponse status_code=200, "text/html; charset=utf-8">',
         )
 
+    async def test_async_streaming_response(self):
+        async def async_iter():
+            yield b"hello"
+            yield b"world"
+
+        r = StreamingHttpResponse(async_iter())
+
+        chunks = []
+        async for chunk in r:
+            chunks.append(chunk)
+        self.assertEqual(chunks, [b"hello", b"world"])
+
+    def test_async_streaming_response_warning(self):
+        async def async_iter():
+            yield b"hello"
+            yield b"world"
+
+        r = StreamingHttpResponse(async_iter())
+
+        msg = (
+            "StreamingHttpResponse must consume asynchronous iterators in order to "
+            "serve them synchronously. Use a synchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(list(r), [b"hello", b"world"])
+
+    async def test_sync_streaming_response_warning(self):
+        r = StreamingHttpResponse(iter(["hello", "world"]))
+
+        msg = (
+            "StreamingHttpResponse must consume synchronous iterators in order to "
+            "serve them asynchronously. Use an asynchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(b"hello", await anext(aiter(r)))
+
 
 class FileCloseTests(SimpleTestCase):
     def setUp(self):

@@ -601,10 +601,24 @@ class AssertRedirectsTests(SimpleTestCase):
         for method in methods:
             with self.subTest(method=method):
                 req_method = getattr(self.client, method)
+                # HTTP_REDIRECT in "extra".
                 response = req_method(
                     "/redirect_based_on_extra_headers_1/",
                     follow=False,
                     HTTP_REDIRECT="val",
+                )
+                self.assertRedirects(
+                    response,
+                    "/redirect_based_on_extra_headers_2/",
+                    fetch_redirect_response=True,
+                    status_code=302,
+                    target_status_code=302,
+                )
+                # HTTP_REDIRECT in "headers".
+                response = req_method(
+                    "/redirect_based_on_extra_headers_1/",
+                    follow=False,
+                    headers={"redirect": "val"},
                 )
                 self.assertRedirects(
                     response,
@@ -1228,14 +1242,18 @@ class UploadedFileEncodingTest(SimpleTestCase):
 class RequestHeadersTest(SimpleTestCase):
     def test_client_headers(self):
         "A test client can receive custom headers"
-        response = self.client.get("/check_headers/", HTTP_X_ARG_CHECK="Testing 123")
+        response = self.client.get(
+            "/check_headers/", headers={"x-arg-check": "Testing 123"}
+        )
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertEqual(response.status_code, 200)
 
     def test_client_headers_redirect(self):
         "Test client headers are preserved through redirects"
         response = self.client.get(
-            "/check_headers_redirect/", follow=True, HTTP_X_ARG_CHECK="Testing 123"
+            "/check_headers_redirect/",
+            follow=True,
+            headers={"x-arg-check": "Testing 123"},
         )
         self.assertEqual(response.content, b"HTTP_X_ARG_CHECK: Testing 123")
         self.assertRedirects(

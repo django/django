@@ -23,6 +23,7 @@ Settings
 See :ref:`staticfiles settings <settings-staticfiles>` for details on the
 following settings:
 
+* :setting:`STORAGES`
 * :setting:`STATIC_ROOT`
 * :setting:`STATIC_URL`
 * :setting:`STATICFILES_DIRS`
@@ -59,11 +60,12 @@ specified by the :setting:`INSTALLED_APPS` setting.
 
 The :djadmin:`collectstatic` management command calls the
 :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
-method of the :setting:`STATICFILES_STORAGE` after each run and passes
-a list of paths that have been found by the management command. It also
-receives all command line options of :djadmin:`collectstatic`. This is used
-by the :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`
-by default.
+method of the ``staticfiles`` storage backend from :setting:`STORAGES` after
+each run and passes a list of paths that have been found by the management
+command. It also receives all command line options of :djadmin:`collectstatic`.
+This is used by the
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` by
+default.
 
 By default, collected files receive permissions from
 :setting:`FILE_UPLOAD_PERMISSIONS` and collected directories receive permissions
@@ -81,7 +83,7 @@ respectively. For example::
             kwargs['directory_permissions_mode'] = 0o760
             super().__init__(*args, **kwargs)
 
-Then set the :setting:`STATICFILES_STORAGE` setting to
+Then set the ``staticfiles`` storage backend in :setting:`STORAGES` setting to
 ``'path.to.MyStaticFilesStorage'``.
 
 Some commonly used options are:
@@ -112,7 +114,8 @@ Some commonly used options are:
 
     Don't call the
     :meth:`~django.contrib.staticfiles.storage.StaticFilesStorage.post_process`
-    method of the configured :setting:`STATICFILES_STORAGE` storage backend.
+    method of the configured ``staticfiles`` storage backend from
+    :setting:`STORAGES`.
 
 .. django-admin-option:: --no-default-ignore
 
@@ -295,6 +298,8 @@ method). The regular expressions used to find those paths
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
+* The `modules import`_ in JavaScript.
+* The `modules aggregation`_ in JavaScript.
 
 For example, the ``'css/styles.css'`` file with this content:
 
@@ -325,9 +330,18 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
-.. versionchanged:: 4.1
+.. versionchanged:: 4.2
 
-    Support for finding paths in CSS source map comments was added.
+    Support for finding paths to JavaScript modules in ``import`` and
+    ``export`` statements was added.
+
+.. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
+
+.. versionadded:: 4.2
+
+This attribute provides a single hash that changes whenever a file in the
+manifest changes. This can be useful to communicate to SPAs that the assets on
+the server have changed (due to a new deployment).
 
 .. attribute:: storage.ManifestStaticFilesStorage.max_post_process_passes
 
@@ -344,7 +358,7 @@ attribute. It defaults to 5.
 To enable the ``ManifestStaticFilesStorage`` you have to make sure the
 following requirements are met:
 
-* the :setting:`STATICFILES_STORAGE` setting is set to
+* the ``staticfiles`` storage backend in :setting:`STORAGES` setting is set to
   ``'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'``
 * the :setting:`DEBUG` setting is set to ``False``
 * you've collected all your static files by using the
@@ -365,9 +379,9 @@ If a file isn't found in the ``staticfiles.json`` manifest at runtime, a
 
 Due to the requirement of running :djadmin:`collectstatic`, this storage
 typically shouldn't be used when running tests as ``collectstatic`` isn't run
-as part of the normal test setup. During testing, ensure that the
-:setting:`STATICFILES_STORAGE` setting is set to something else like
-``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
+as part of the normal test setup. During testing, ensure that ``staticfiles``
+storage backend in the :setting:`STORAGES` setting is set to something else
+like ``'django.contrib.staticfiles.storage.StaticFilesStorage'`` (the default).
 
 .. method:: storage.ManifestStaticFilesStorage.file_hash(name, content=None)
 
@@ -382,6 +396,8 @@ hashing algorithm.
 .. _`url()`: https://www.w3.org/TR/CSS2/syndata.html#uri
 .. _`Cascading Style Sheets`: https://www.w3.org/Style/CSS/
 .. _`source map`: https://developer.mozilla.org/en-US/docs/Tools/Debugger/How_to/Use_a_source_map
+.. _`modules import`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#importing_features_into_your_script
+.. _`modules aggregation`: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules#aggregating_modules
 
 ``ManifestFilesMixin``
 ----------------------
@@ -416,7 +432,8 @@ files:
 - The builtin template tag :ttag:`static` which takes a path and urljoins it
   with the static prefix :setting:`STATIC_URL`. If
   ``django.contrib.staticfiles`` is installed, the tag uses the ``url()``
-  method of the :setting:`STATICFILES_STORAGE` instead.
+  method of the ``staticfiles`` storage backend from :setting:`STORAGES`
+  instead.
 
 - The builtin template tag :ttag:`get_static_prefix` which populates a
   template variable with the static prefix :setting:`STATIC_URL` to be
@@ -424,6 +441,9 @@ files:
 
 - The similar template tag :ttag:`get_media_prefix` which works like
   :ttag:`get_static_prefix` but uses :setting:`MEDIA_URL`.
+
+- The ``staticfiles`` key in :data:`django.core.files.storage.storages`
+  contains a ready-to-use instance of the staticfiles storage backend.
 
 .. _staticfiles-development-view:
 

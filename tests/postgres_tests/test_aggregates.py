@@ -1,9 +1,10 @@
-from django.db import connection
+from django.db import connection, transaction
 from django.db.models import (
     CharField,
     F,
     Func,
     IntegerField,
+    JSONField,
     OuterRef,
     Q,
     Subquery,
@@ -15,7 +16,7 @@ from django.db.models.functions import Cast, Concat, Substr
 from django.test import skipUnlessDBFeature
 from django.test.utils import Approximate, ignore_warnings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
@@ -83,36 +84,35 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             ]
         )
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
     def test_empty_result_set(self):
         AggregateTestModel.objects.all().delete()
         tests = [
-            (ArrayAgg("char_field"), []),
-            (ArrayAgg("integer_field"), []),
-            (ArrayAgg("boolean_field"), []),
-            (BitAnd("integer_field"), None),
-            (BitOr("integer_field"), None),
-            (BoolAnd("boolean_field"), None),
-            (BoolOr("boolean_field"), None),
-            (JSONBAgg("integer_field"), []),
-            (StringAgg("char_field", delimiter=";"), ""),
+            ArrayAgg("char_field"),
+            ArrayAgg("integer_field"),
+            ArrayAgg("boolean_field"),
+            BitAnd("integer_field"),
+            BitOr("integer_field"),
+            BoolAnd("boolean_field"),
+            BoolOr("boolean_field"),
+            JSONBAgg("integer_field"),
+            StringAgg("char_field", delimiter=";"),
         ]
         if connection.features.has_bit_xor:
             tests.append((BitXor("integer_field"), None))
-        for aggregation, expected_result in tests:
+        for aggregation in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
                 with self.assertNumQueries(0):
                     values = AggregateTestModel.objects.none().aggregate(
                         aggregation=aggregation,
                     )
-                    self.assertEqual(values, {"aggregation": expected_result})
+                    self.assertEqual(values, {"aggregation": None})
                 # Empty result when query must be executed.
                 with self.assertNumQueries(1):
                     values = AggregateTestModel.objects.aggregate(
                         aggregation=aggregation,
                     )
-                    self.assertEqual(values, {"aggregation": expected_result})
+                    self.assertEqual(values, {"aggregation": None})
 
     def test_default_argument(self):
         AggregateTestModel.objects.all().delete()
@@ -124,7 +124,12 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             (BitOr("integer_field", default=0), 0),
             (BoolAnd("boolean_field", default=False), False),
             (BoolOr("boolean_field", default=False), False),
-            (JSONBAgg("integer_field", default=Value('["<empty>"]')), ["<empty>"]),
+            (JSONBAgg("integer_field", default=["<empty>"]), ["<empty>"]),
+            (
+                JSONBAgg("integer_field", default=Value(["<empty>"], JSONField())),
+                ["<empty>"],
+            ),
+            (StringAgg("char_field", delimiter=";", default="<empty>"), "<empty>"),
             (
                 StringAgg("char_field", delimiter=";", default=Value("<empty>")),
                 "<empty>",
@@ -141,64 +146,64 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
                 # Empty result when query must be executed.
-                with self.assertNumQueries(1):
+                with transaction.atomic(), self.assertNumQueries(1):
                     values = AggregateTestModel.objects.aggregate(
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
 
-    def test_convert_value_deprecation(self):
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_jsonb_agg_default_str_value(self):
         AggregateTestModel.objects.all().delete()
         queryset = AggregateTestModel.objects.all()
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, ArrayAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=ArrayAgg("boolean_field"))
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, JSONBAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=JSONBAgg("integer_field"))
-
-        with self.assertWarnsMessage(
-            RemovedInDjango50Warning, StringAgg.deprecation_msg
-        ):
-            queryset.aggregate(aggregation=StringAgg("char_field", delimiter=";"))
-
-        # No warnings raised if default argument provided.
-        self.assertEqual(
-            queryset.aggregate(aggregation=ArrayAgg("boolean_field", default=None)),
-            {"aggregation": None},
-        )
-        self.assertEqual(
-            queryset.aggregate(aggregation=JSONBAgg("integer_field", default=None)),
-            {"aggregation": None},
-        )
         self.assertEqual(
             queryset.aggregate(
-                aggregation=StringAgg("char_field", delimiter=";", default=None),
+                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
             ),
-            {"aggregation": None},
+            {"aggregation": "<empty>"},
         )
-        self.assertEqual(
+
+    def test_jsonb_agg_default_str_value_deprecation(self):
+        queryset = AggregateTestModel.objects.all()
+        msg = (
+            "Passing a Value() with an output_field that isn't a JSONField as "
+            "JSONBAgg(default) is deprecated. Pass default=Value('<empty>', "
+            "output_field=JSONField()) instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
             queryset.aggregate(
-                aggregation=ArrayAgg("boolean_field", default=Value([]))
+                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
+            )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
+            queryset.none().aggregate(
+                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
             ),
-            {"aggregation": []},
-        )
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    def test_jsonb_agg_default_encoded_json_string(self):
+        AggregateTestModel.objects.all().delete()
+        queryset = AggregateTestModel.objects.all()
         self.assertEqual(
             queryset.aggregate(
                 aggregation=JSONBAgg("integer_field", default=Value("[]"))
             ),
             {"aggregation": []},
         )
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=StringAgg("char_field", delimiter=";", default=Value("")),
-            ),
-            {"aggregation": ""},
+
+    def test_jsonb_agg_default_encoded_json_string_deprecation(self):
+        queryset = AggregateTestModel.objects.all()
+        msg = (
+            "Passing an encoded JSON string as JSONBAgg(default) is deprecated. Pass "
+            "default=[] instead."
         )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
+            queryset.aggregate(
+                aggregation=JSONBAgg("integer_field", default=Value("[]"))
+            )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
+            queryset.none().aggregate(
+                aggregation=JSONBAgg("integer_field", default=Value("[]"))
+            )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg("char_field"))

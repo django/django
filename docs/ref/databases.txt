@@ -72,10 +72,6 @@ connections, e.g. after database server restart. The health check is performed
 only once per request and only if the database is being accessed during the
 handling of the request.
 
-.. versionchanged:: 4.1
-
-    The :setting:`CONN_HEALTH_CHECKS` setting was added.
-
 Caveats
 ~~~~~~~
 
@@ -114,10 +110,17 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 12 and higher. `psycopg2`_ 2.8.4 or higher is
-required, though the latest release is recommended.
+Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
-.. _psycopg2: https://www.psycopg.org/
+.. note::
+
+    Support for ``psycopg2`` is likely to be deprecated and removed at some
+    point in the future.
+
+.. versionchanged:: 4.2
+
+    Support for ``psycopg`` 3.1.8+ was added.
 
 .. _postgresql-connection-settings:
 
@@ -199,12 +202,12 @@ level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
 ``SERIALIZABLE``, set it in the :setting:`OPTIONS` part of your database
 configuration in :setting:`DATABASES`::
 
-    import psycopg2.extensions
+    from django.db.backends.postgresql.psycopg_any import IsolationLevel
 
     DATABASES = {
         # ...
         'OPTIONS': {
-            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+            'isolation_level': IsolationLevel.SERIALIZABLE,
         },
     }
 
@@ -215,6 +218,56 @@ configuration in :setting:`DATABASES`::
     designed for advanced uses.
 
 .. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
+
+.. versionchanged:: 4.2
+
+    ``IsolationLevel`` was added.
+
+.. _database-role:
+
+Role
+----
+
+.. versionadded:: 4.2
+
+If you need to use a different role for database connections than the role use
+to establish the connection, set it in the :setting:`OPTIONS` part of your
+database configuration in :setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "assume_role": "my_application_role",
+            },
+        },
+    }
+
+.. _database-server-side-parameters-binding:
+
+Server-side parameters binding
+------------------------------
+
+.. versionadded:: 4.2
+
+With `psycopg`_ 3.1.8+, Django defaults to the :ref:`client-side binding
+cursors <psycopg:client-side-binding-cursors>`. If you want to use the
+:ref:`server-side binding <psycopg:server-side-binding>` set it in the
+:setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "server_side_binding": True,
+            },
+        },
+    }
+
+This option is ignored with ``psycopg2``.
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -244,7 +297,7 @@ Server-side cursors
 
 When using :meth:`QuerySet.iterator()
 <django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
-cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
+cursor <psycopg:server-side-cursors>`. By default, PostgreSQL assumes that
 only the first 10% of the results of cursor queries will be fetched. The query
 planner spends less time planning the query and starts returning results
 faster, but this could diminish performance if more than 10% of the results are
@@ -310,11 +363,6 @@ If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
 
-.. versionchanged:: 4.1
-
-    In older versions, PostgreSQL’s ``SERIAL`` data type was used instead of
-    identity columns.
-
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
 Test database templates
@@ -337,6 +385,9 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     or corruption in the case of a server crash or power loss. Only use this on
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
+
+.. _psycopg: https://www.psycopg.org/psycopg3/
+.. _psycopg2: https://www.psycopg.org/
 
 .. _mariadb-notes:
 
@@ -415,7 +466,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.4.0 or later.
+Django requires `mysqlclient`_ 1.4.3 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -730,7 +781,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.9.0 and later.
+Django supports SQLite 3.21.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As

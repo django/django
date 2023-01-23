@@ -37,10 +37,12 @@ import base64
 import datetime
 import json
 import time
+import warnings
 import zlib
 
 from django.conf import settings
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.encoding import force_bytes
 from django.utils.module_loading import import_string
 from django.utils.regex_helper import _lazy_re_compile
@@ -147,7 +149,7 @@ def dumps(
 
     The serializer is expected to return a bytestring.
     """
-    return TimestampSigner(key, salt=salt).sign_object(
+    return TimestampSigner(key=key, salt=salt).sign_object(
         obj, serializer=serializer, compress=compress
     )
 
@@ -165,7 +167,9 @@ def loads(
 
     The serializer is expected to accept a bytestring.
     """
-    return TimestampSigner(key, salt=salt, fallback_keys=fallback_keys).unsign_object(
+    return TimestampSigner(
+        key=key, salt=salt, fallback_keys=fallback_keys
+    ).unsign_object(
         s,
         serializer=serializer,
         max_age=max_age,
@@ -173,8 +177,13 @@ def loads(
 
 
 class Signer:
+    # RemovedInDjango51Warning: When the deprecation ends, replace with:
+    # def __init__(
+    #   self, *, key=None, sep=":", salt=None, algorithm=None, fallback_keys=None
+    # ):
     def __init__(
         self,
+        *args,
         key=None,
         sep=":",
         salt=None,
@@ -188,16 +197,29 @@ class Signer:
             else settings.SECRET_KEY_FALLBACKS
         )
         self.sep = sep
-        if _SEP_UNSAFE.match(self.sep):
-            raise ValueError(
-                "Unsafe Signer separator: %r (cannot be empty or consist of "
-                "only A-z0-9-_=)" % sep,
-            )
         self.salt = salt or "%s.%s" % (
             self.__class__.__module__,
             self.__class__.__name__,
         )
         self.algorithm = algorithm or "sha256"
+        # RemovedInDjango51Warning.
+        if args:
+            warnings.warn(
+                f"Passing positional arguments to {self.__class__.__name__} is "
+                f"deprecated.",
+                RemovedInDjango51Warning,
+                stacklevel=2,
+            )
+            for arg, attr in zip(
+                args, ["key", "sep", "salt", "algorithm", "fallback_keys"]
+            ):
+                if arg or attr == "sep":
+                    setattr(self, attr, arg)
+        if _SEP_UNSAFE.match(self.sep):
+            raise ValueError(
+                "Unsafe Signer separator: %r (cannot be empty or consist of "
+                "only A-z0-9-_=)" % sep,
+            )
 
     def signature(self, value, key=None):
         key = key or self.key

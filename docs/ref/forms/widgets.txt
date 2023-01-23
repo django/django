@@ -318,8 +318,6 @@ foundation for custom widgets.
 
     .. attribute:: Widget.use_fieldset
 
-        .. versionadded:: 4.1
-
         An attribute to identify if the widget should be grouped in a
         ``<fieldset>`` with a ``<legend>`` when rendered. Defaults to ``False``
         but is ``True`` when the widget contains multiple ``<input>`` tags such as

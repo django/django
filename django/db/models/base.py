@@ -1556,6 +1556,7 @@ class Model(AltersData, metaclass=ModelBase):
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
+                *cls._check_db_table_comment(databases),
             ]
 
         return errors
@@ -1591,6 +1592,29 @@ class Model(AltersData, metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_db_table_comment(cls, databases):
+        if not cls._meta.db_table_comment:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in cls._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"tables (db_table_comment).",
+                        obj=cls,
+                        id="models.W046",
+                    )
+                )
+        return errors
 
     @classmethod
     def _check_swappable(cls):
@@ -2085,7 +2109,7 @@ class Model(AltersData, metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f, str) and f != "?")
 
         # Convert "-field" to "field".
-        fields = ((f[1:] if f.startswith("-") else f) for f in fields)
+        fields = (f.removeprefix("-") for f in fields)
 
         # Separate related fields and non-related fields.
         _fields = []

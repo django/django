@@ -1445,8 +1445,7 @@ The format passed can be one of the predefined ones :setting:`DATE_FORMAT`,
 specifiers shown in the table above. Note that predefined formats may vary
 depending on the current locale.
 
-Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
-for example, ``"es"``, then for::
+Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"es"``, then for::
 
     {{ value|date:"SHORT_DATE_FORMAT" }}
 
@@ -1867,10 +1866,6 @@ This is compatible with a strict Content Security Policy that prohibits in-page
 script execution. It also maintains a clean separation between passive data and
 executable code.
 
-.. versionchanged:: 4.1
-
-    In older versions, the HTML "id" was a required argument.
-
 .. templatefilter:: last
 
 ``last``
@@ -2230,8 +2225,7 @@ This would display as "01h 23m".
 
 Another example:
 
-Assuming that :setting:`USE_L10N` is ``True`` and :setting:`LANGUAGE_CODE` is,
-for example, ``"de"``, then for::
+Assuming that :setting:`LANGUAGE_CODE` is, for example, ``"de"``, then for::
 
     {{ value|time:"TIME_FORMAT" }}
 
@@ -2590,8 +2584,7 @@ See :ref:`specifying-translation-strings-in-template-code`.
 --------
 
 This library provides control over the localization of values in templates.
-You only need to load the library using ``{% load l10n %}``, but you'll often
-set :setting:`USE_L10N` to ``True`` so that localization is active by default.
+You only need to load the library using ``{% load l10n %}``.
 
 See :ref:`topic-l10n-templates`.
 
@@ -2629,7 +2622,7 @@ A set of Django template filters useful for adding a "human touch" to data. See
 To link to static files that are saved in :setting:`STATIC_ROOT` Django ships
 with a :ttag:`static` template tag. If the :mod:`django.contrib.staticfiles`
 app is installed, the tag will serve files using ``url()`` method of the
-storage specified by :setting:`STATICFILES_STORAGE`. For example::
+storage specified by ``staticfiles`` in :setting:`STORAGES`. For example::
 
     {% load static %}
     <img src="{% static 'images/hi.jpg' %}" alt="Hi!">

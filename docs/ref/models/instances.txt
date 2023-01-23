@@ -229,11 +229,6 @@ validation errors yourself, or if you have excluded fields from the
     ``django.db.models`` logger, like *"Got a database error calling check() on
     …"* to confirm it's validated properly.
 
-.. versionchanged:: 4.1
-
-    In older versions, constraints were not checked during the model
-    validation.
-
 .. method:: Model.full_clean(exclude=None, validate_unique=True, validate_constraints=True)
 
 This method calls :meth:`Model.clean_fields()`, :meth:`Model.clean()`,
@@ -262,14 +257,6 @@ models. For example::
         pass
 
 The first step ``full_clean()`` performs is to clean each individual field.
-
-.. versionchanged:: 4.1
-
-    The ``validate_constraints`` argument was added.
-
-.. versionchanged:: 4.1
-
-    An ``exclude`` value is now converted to a ``set`` rather than a ``list``.
 
 .. method:: Model.clean_fields(exclude=None)
 
@@ -391,14 +378,7 @@ the fields you provided will not be checked.
 
 Finally, ``full_clean()`` will check any other constraints on your model.
 
-.. versionchanged:: 4.1
-
-    In older versions, :class:`~django.db.models.UniqueConstraint`\s were
-    validated by ``validate_unique()``.
-
 .. method:: Model.validate_constraints(exclude=None)
-
-.. versionadded:: 4.1
 
 This method validates all constraints defined in
 :attr:`Meta.constraints <django.db.models.Options.constraints>`. The
@@ -664,8 +644,9 @@ Deleting objects
 
 Issues an SQL ``DELETE`` for the object. This only deletes the object in the
 database; the Python instance will still exist and will still have data in
-its fields. This method returns the number of objects deleted and a dictionary
-with the number of deletions per object type.
+its fields, except for the primary key set to ``None``. This method returns the
+number of objects deleted and a dictionary with the number of deletions per
+object type.
 
 For more details, including how to delete objects in bulk, see
 :ref:`topics-db-queries-delete`.

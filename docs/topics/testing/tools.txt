@@ -682,7 +682,7 @@ a name of :setting:`LANGUAGE_COOKIE_NAME` and a value of the language code::
 or by including the ``Accept-Language`` HTTP header in the request::
 
     def test_language_using_header(self):
-        response = self.client.get('/', HTTP_ACCEPT_LANGUAGE='fr')
+        response = self.client.get("/", headers={"accept-language": "fr"})
         self.assertEqual(response.content, b"Bienvenue sur mon site.")
 
 More details are in :ref:`how-django-discovers-language-preference`.
@@ -1441,15 +1441,15 @@ when settings are changed.
 
 Django itself uses this signal to reset various data:
 
-================================ ========================
-Overridden settings              Data reset
-================================ ========================
-USE_TZ, TIME_ZONE                Databases timezone
-TEMPLATES                        Template engines
-SERIALIZATION_MODULES            Serializers cache
-LOCALE_PATHS, LANGUAGE_CODE      Default translation and loaded translations
-MEDIA_ROOT, DEFAULT_FILE_STORAGE Default file storage
-================================ ========================
+============================================================================ ========================
+Overridden settings                                                          Data reset
+============================================================================ ========================
+USE_TZ, TIME_ZONE                                                            Databases timezone
+TEMPLATES                                                                    Template engines
+SERIALIZATION_MODULES                                                        Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE                                                  Default translation and loaded translations
+DEFAULT_FILE_STORAGE, STATICFILES_STORAGE, STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
+============================================================================ ========================
 
 Isolating apps
 --------------
@@ -1601,25 +1601,6 @@ your test suite.
     which means that ``errors='error message'`` is the same as
     ``errors=['error message']``.
 
-    .. versionchanged:: 4.1
-
-        In older versions, using an empty error list with ``assertFormError()``
-        would always pass, regardless of whether the field had any errors or
-        not. Starting from Django 4.1, using ``errors=[]`` will only pass if
-        the field actually has no errors.
-
-        Django 4.1 also changed the behavior of ``assertFormError()`` when a
-        field has multiple errors. In older versions, if a field had multiple
-        errors and you checked for only some of them, the test would pass.
-        Starting from Django 4.1, the error list must be an exact match to the
-        field's actual errors.
-
-    .. deprecated:: 4.1
-
-        Support for passing a response object and a form name to
-        ``assertFormError()`` is deprecated and will be removed in Django 5.0.
-        Use the form instance directly instead.
-
 .. method:: SimpleTestCase.assertFormSetError(formset, form_index, field, errors, msg_prefix='')
 
     Asserts that the ``formset`` raises the provided list of errors when
@@ -1636,12 +1617,6 @@ your test suite.
 
     ``field`` and ``errors`` have the same meaning as the parameters to
     ``assertFormError()``.
-
-    .. deprecated:: 4.1
-
-        Support for passing a response object and a formset name to
-        ``assertFormSetError()`` is deprecated and will be removed in Django
-        5.0. Use the formset instance directly instead.
 
     .. deprecated:: 4.2
 

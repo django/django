@@ -35,6 +35,10 @@ class CreateExtension(Operation):
         # installed, otherwise a subsequent data migration would use the same
         # connection.
         register_type_handlers(schema_editor.connection)
+        if hasattr(schema_editor.connection, "register_geometry_adapters"):
+            schema_editor.connection.register_geometry_adapters(
+                schema_editor.connection.connection, True
+            )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
         if not router.allow_migrate(schema_editor.connection.alias, app_label):

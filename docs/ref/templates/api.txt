@@ -102,11 +102,6 @@ overridden by what's passed by
       These loaders are then wrapped in
       :class:`django.template.loaders.cached.Loader`.
 
-      .. versionchanged:: 4.1
-
-        In older versions, the cached template loader was only enabled by
-        default when ``DEBUG`` was ``False``.
-
       See :ref:`template-loaders` for details.
 
     * ``string_if_invalid`` is the output, as a string, that the template
@@ -948,12 +943,6 @@ loaders that come with Django:
         that the ``Node`` implementation for each tag is thread-safe. For more
         information, see :ref:`template tag thread safety considerations
         <template_tag_thread_safety>`.
-
-    .. versionchanged:: 4.1
-
-        The cached template loader was enabled whenever ``OPTIONS['loaders']``
-        is not specified. Previously it was only enabled when ``DEBUG`` was
-        ``False``.
 
 ``django.template.loaders.locmem.Loader``
 

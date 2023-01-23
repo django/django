@@ -3,6 +3,7 @@ import random
 import re
 import struct
 from io import BytesIO
+from unittest import mock
 from urllib.parse import quote
 
 from django.conf import settings
@@ -689,7 +690,7 @@ class ConditionalGetMiddlewareTest(SimpleTestCase):
 
         response = ConditionalGetMiddleware(self.get_response)(self.req)
         etag = response.headers["ETag"]
-        put_request = self.request_factory.put("/", HTTP_IF_MATCH=etag)
+        put_request = self.request_factory.put("/", headers={"if-match": etag})
         conditional_get_response = ConditionalGetMiddleware(get_200_response)(
             put_request
         )
@@ -898,6 +899,28 @@ class GZipMiddlewareTest(SimpleTestCase):
         self.assertEqual(r.get("Content-Encoding"), "gzip")
         self.assertFalse(r.has_header("Content-Length"))
 
+    async def test_compress_async_streaming_response(self):
+        """
+        Compression is performed on responses with async streaming content.
+        """
+
+        async def get_stream_response(request):
+            async def iterator():
+                for chunk in self.sequence:
+                    yield chunk
+
+            resp = StreamingHttpResponse(iterator())
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        r = await GZipMiddleware(get_stream_response)(self.req)
+        self.assertEqual(
+            self.decompress(b"".join([chunk async for chunk in r])),
+            b"".join(self.sequence),
+        )
+        self.assertEqual(r.get("Content-Encoding"), "gzip")
+        self.assertFalse(r.has_header("Content-Length"))
+
     def test_compress_streaming_response_unicode(self):
         """
         Compression is performed on responses with streaming Unicode content.
@@ -978,11 +1001,46 @@ class GZipMiddlewareTest(SimpleTestCase):
         ConditionalGetMiddleware from recognizing conditional matches
         on gzipped content).
         """
-        r1 = GZipMiddleware(self.get_response)(self.req)
-        r2 = GZipMiddleware(self.get_response)(self.req)
+
+        class DeterministicGZipMiddleware(GZipMiddleware):
+            max_random_bytes = 0
+
+        r1 = DeterministicGZipMiddleware(self.get_response)(self.req)
+        r2 = DeterministicGZipMiddleware(self.get_response)(self.req)
         self.assertEqual(r1.content, r2.content)
         self.assertEqual(self.get_mtime(r1.content), 0)
         self.assertEqual(self.get_mtime(r2.content), 0)
+
+    def test_random_bytes(self):
+        """A random number of bytes is added to mitigate the BREACH attack."""
+        with mock.patch(
+            "django.utils.text.secrets.randbelow", autospec=True, return_value=3
+        ):
+            r = GZipMiddleware(self.get_response)(self.req)
+        # The fourth byte of a gzip stream contains flags.
+        self.assertEqual(r.content[3], gzip.FNAME)
+        # A 3 byte filename "aaa" and a null byte are added.
+        self.assertEqual(r.content[10:14], b"aaa\x00")
+        self.assertEqual(self.decompress(r.content), self.compressible_string)
+
+    def test_random_bytes_streaming_response(self):
+        """A random number of bytes is added to mitigate the BREACH attack."""
+
+        def get_stream_response(request):
+            resp = StreamingHttpResponse(self.sequence)
+            resp["Content-Type"] = "text/html; charset=UTF-8"
+            return resp
+
+        with mock.patch(
+            "django.utils.text.secrets.randbelow", autospec=True, return_value=3
+        ):
+            r = GZipMiddleware(get_stream_response)(self.req)
+            content = b"".join(r)
+        # The fourth byte of a gzip stream contains flags.
+        self.assertEqual(content[3], gzip.FNAME)
+        # A 3 byte filename "aaa" and a null byte are added.
+        self.assertEqual(content[10:14], b"aaa\x00")
+        self.assertEqual(self.decompress(content), b"".join(self.sequence))
 
 
 class ETagGZipMiddlewareTest(SimpleTestCase):
@@ -1003,7 +1061,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = '"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1017,7 +1075,7 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
             response.headers["ETag"] = 'W/"eggs"'
             return response
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         gzip_response = GZipMiddleware(get_response)(request)
         self.assertEqual(gzip_response.headers["ETag"], 'W/"eggs"')
 
@@ -1032,11 +1090,12 @@ class ETagGZipMiddlewareTest(SimpleTestCase):
         def get_cond_response(req):
             return ConditionalGetMiddleware(get_response)(req)
 
-        request = self.rf.get("/", HTTP_ACCEPT_ENCODING="gzip, deflate")
+        request = self.rf.get("/", headers={"accept-encoding": "gzip, deflate"})
         response = GZipMiddleware(get_cond_response)(request)
         gzip_etag = response.headers["ETag"]
         next_request = self.rf.get(
-            "/", HTTP_ACCEPT_ENCODING="gzip, deflate", HTTP_IF_NONE_MATCH=gzip_etag
+            "/",
+            headers={"accept-encoding": "gzip, deflate", "if-none-match": gzip_etag},
         )
         next_response = ConditionalGetMiddleware(get_response)(next_request)
         self.assertEqual(next_response.status_code, 304)

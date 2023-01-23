@@ -41,7 +41,7 @@ class CsrfViewTests(SimpleTestCase):
         Referer header is strictly checked for POST over HTTPS. Trigger the
         exception by sending an incorrect referer.
         """
-        response = self.client.post("/", HTTP_X_FORWARDED_PROTO="https")
+        response = self.client.post("/", headers={"x-forwarded-proto": "https"})
         self.assertContains(
             response,
             "You are seeing this message because this HTTPS site requires a "

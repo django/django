@@ -1,4 +1,6 @@
+import gzip
 import re
+import secrets
 import unicodedata
 from gzip import GzipFile
 from gzip import compress as gzip_compress
@@ -314,8 +316,23 @@ def phone2numeric(phone):
     return "".join(char2number.get(c, c) for c in phone.lower())
 
 
-def compress_string(s):
-    return gzip_compress(s, compresslevel=6, mtime=0)
+def _get_random_filename(max_random_bytes):
+    return b"a" * secrets.randbelow(max_random_bytes)
+
+
+def compress_string(s, *, max_random_bytes=None):
+    compressed_data = gzip_compress(s, compresslevel=6, mtime=0)
+
+    if not max_random_bytes:
+        return compressed_data
+
+    compressed_view = memoryview(compressed_data)
+    header = bytearray(compressed_view[:10])
+    header[3] = gzip.FNAME
+
+    filename = _get_random_filename(max_random_bytes) + b"\x00"
+
+    return bytes(header) + filename + compressed_view[10:]
 
 
 class StreamingBuffer(BytesIO):
@@ -327,9 +344,12 @@ class StreamingBuffer(BytesIO):
 
 
 # Like compress_string, but for iterators of strings.
-def compress_sequence(sequence):
+def compress_sequence(sequence, *, max_random_bytes=None):
     buf = StreamingBuffer()
-    with GzipFile(mode="wb", compresslevel=6, fileobj=buf, mtime=0) as zfile:
+    filename = _get_random_filename(max_random_bytes) if max_random_bytes else None
+    with GzipFile(
+        filename=filename, mode="wb", compresslevel=6, fileobj=buf, mtime=0
+    ) as zfile:
         # Output headers...
         yield buf.read()
         for item in sequence:

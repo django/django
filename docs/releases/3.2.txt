@@ -249,8 +249,8 @@ Minor features
 * The new :attr:`.ExclusionConstraint.include` attribute allows creating
   covering exclusion constraints on PostgreSQL 12+.
 
-* The new :attr:`.ExclusionConstraint.opclasses` attribute allows setting
-  PostgreSQL operator classes.
+* The new ``ExclusionConstraint.opclasses`` attribute allows setting PostgreSQL
+  operator classes.
 
 * The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
   aggregated elements.

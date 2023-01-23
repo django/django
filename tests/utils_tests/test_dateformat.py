@@ -25,8 +25,7 @@ class DateFormatTests(SimpleTestCase):
         self.assertEqual(datetime.fromtimestamp(int(format(dt, "U"))), dt)
 
     def test_naive_ambiguous_datetime(self):
-        # dt is ambiguous in Europe/Copenhagen. pytz raises an exception for
-        # the ambiguity, which results in an empty string.
+        # dt is ambiguous in Europe/Copenhagen.
         dt = datetime(2015, 10, 25, 2, 30, 0)
 
         # Try all formatters that involve self.timezone.
@@ -200,7 +199,7 @@ class DateFormatTests(SimpleTestCase):
     def test_invalid_time_format_specifiers(self):
         my_birthday = date(1984, 8, 7)
 
-        for specifier in ["a", "A", "f", "g", "G", "h", "H", "i", "P", "r", "s", "u"]:
+        for specifier in ["a", "A", "f", "g", "G", "h", "H", "i", "P", "s", "u"]:
             with self.subTest(specifier=specifier):
                 msg = (
                     "The format for date objects may not contain time-related "
@@ -236,6 +235,14 @@ class DateFormatTests(SimpleTestCase):
         ]:
             with self.subTest(time=t):
                 self.assertEqual(dateformat.time_format(t, "P"), expected)
+
+    def test_r_format_with_date(self):
+        # Assume midnight in default timezone if datetime.date provided.
+        dt = date(2022, 7, 1)
+        self.assertEqual(
+            dateformat.format(dt, "r"),
+            "Fri, 01 Jul 2022 00:00:00 +0200",
+        )
 
     def test_r_format_with_non_en_locale(self):
         # Changing the locale doesn't change the "r" format.

@@ -9,12 +9,18 @@ Getting the default storage class
 
 Django provides convenient ways to access the default storage class:
 
+.. data:: storages
+
+    .. versionadded:: 4.2
+
+    Storage instances as defined by :setting:`STORAGES`.
+
 .. class:: DefaultStorage
 
     :class:`~django.core.files.storage.DefaultStorage` provides
-    lazy access to the current default storage system as defined by
-    :setting:`DEFAULT_FILE_STORAGE`. :class:`DefaultStorage` uses
-    :func:`~django.core.files.storage.get_storage_class` internally.
+    lazy access to the default storage system as defined by ``default`` key in
+    :setting:`STORAGES`. :class:`DefaultStorage` uses
+    :data:`~django.core.files.storage.storages` internally.
 
 .. data:: default_storage
 
@@ -26,11 +32,16 @@ Django provides convenient ways to access the default storage class:
     Returns a class or module which implements the storage API.
 
     When called without the ``import_path`` parameter ``get_storage_class``
-    will return the current default storage system as defined by
-    :setting:`DEFAULT_FILE_STORAGE`. If ``import_path`` is provided,
-    ``get_storage_class`` will attempt to import the class or module from the
-    given path and will return it if successful. An exception will be
-    raised if the import is unsuccessful.
+    will return the default storage system as defined by ``default`` key in
+    :setting:`STORAGES`. If ``import_path`` is provided, ``get_storage_class``
+    will attempt to import the class or module from the given path and will
+    return it if successful. An exception will be raised if the import is
+    unsuccessful.
+
+    .. deprecated:: 4.2
+
+        The ``get_storage_class()`` function is deprecated. Use
+        :data:`storages` instead
 
 The ``FileSystemStorage`` class
 ===============================
@@ -73,6 +84,39 @@ The ``FileSystemStorage`` class
         :func:`os.path.getctime`. On some systems (like Unix), this is the
         time of the last metadata change, and on others (like Windows), it's
         the creation time of the file.
+
+The ``InMemoryStorage`` class
+=============================
+
+.. versionadded:: 4.2
+
+.. class:: InMemoryStorage(location=None, base_url=None, file_permissions_mode=None, directory_permissions_mode=None)
+
+    The :class:`~django.core.files.storage.InMemoryStorage` class implements
+    a memory-based file storage. It has no persistence, but can be useful for
+    speeding up tests by avoiding disk access.
+
+    .. attribute:: location
+
+        Absolute path to the directory name assigned to files. Defaults to the
+        value of your :setting:`MEDIA_ROOT` setting.
+
+    .. attribute:: base_url
+
+        URL that serves the files stored at this location.
+        Defaults to the value of your :setting:`MEDIA_URL` setting.
+
+    .. attribute:: file_permissions_mode
+
+        The file system permissions assigned to files, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_PERMISSIONS`.
+
+    .. attribute:: directory_permissions_mode
+
+        The file system permissions assigned to directories, provided for
+        compatibility with ``FileSystemStorage``. Defaults to
+        :setting:`FILE_UPLOAD_DIRECTORY_PERMISSIONS`.
 
 The ``Storage`` class
 =====================

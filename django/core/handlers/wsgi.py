@@ -1,4 +1,4 @@
-from io import BytesIO
+from io import IOBase
 
 from django.conf import settings
 from django.core import signals
@@ -12,55 +12,45 @@ from django.utils.regex_helper import _lazy_re_compile
 _slashes_re = _lazy_re_compile(rb"/+")
 
 
-class LimitedStream:
-    """Wrap another stream to disallow reading it past a number of bytes."""
+class LimitedStream(IOBase):
+    """
+    Wrap another stream to disallow reading it past a number of bytes.
+
+    Based on the implementation from werkzeug.wsgi.LimitedStream
+    See https://github.com/pallets/werkzeug/blob/dbf78f67/src/werkzeug/wsgi.py#L828
+    """
 
     def __init__(self, stream, limit):
-        self.stream = stream
-        self.remaining = limit
-        self.buffer = b""
+        self._read = stream.read
+        self._readline = stream.readline
+        self._pos = 0
+        self.limit = limit
 
-    def _read_limited(self, size=None):
-        if size is None or size > self.remaining:
-            size = self.remaining
-        if size == 0:
+    def read(self, size=-1, /):
+        _pos = self._pos
+        limit = self.limit
+        if _pos >= limit:
             return b""
-        result = self.stream.read(size)
-        self.remaining -= len(result)
-        return result
-
-    def read(self, size=None):
-        if size is None:
-            result = self.buffer + self._read_limited()
-            self.buffer = b""
-        elif size < len(self.buffer):
-            result = self.buffer[:size]
-            self.buffer = self.buffer[size:]
-        else:  # size >= len(self.buffer)
-            result = self.buffer + self._read_limited(size - len(self.buffer))
-            self.buffer = b""
-        return result
-
-    def readline(self, size=None):
-        while b"\n" not in self.buffer and (size is None or len(self.buffer) < size):
-            if size:
-                # since size is not None here, len(self.buffer) < size
-                chunk = self._read_limited(size - len(self.buffer))
-            else:
-                chunk = self._read_limited()
-            if not chunk:
-                break
-            self.buffer += chunk
-        sio = BytesIO(self.buffer)
-        if size:
-            line = sio.readline(size)
+        if size == -1 or size is None:
+            size = limit - _pos
         else:
-            line = sio.readline()
-        self.buffer = sio.read()
-        return line
+            size = min(size, limit - _pos)
+        data = self._read(size)
+        self._pos += len(data)
+        return data
 
-    def close(self):
-        pass
+    def readline(self, size=-1, /):
+        _pos = self._pos
+        limit = self.limit
+        if _pos >= limit:
+            return b""
+        if size == -1 or size is None:
+            size = limit - _pos
+        else:
+            size = min(size, limit - _pos)
+        line = self._readline(size)
+        self._pos += len(line)
+        return line
 
 
 class WSGIRequest(HttpRequest):
@@ -197,7 +187,7 @@ def get_script_name(environ):
             # do the same with script_url before manipulating paths (#17133).
             script_url = _slashes_re.sub(b"/", script_url)
         path_info = get_bytes_from_wsgi(environ, "PATH_INFO", "")
-        script_name = script_url[: -len(path_info)] if path_info else script_url
+        script_name = script_url.removesuffix(path_info)
     else:
         script_name = get_bytes_from_wsgi(environ, "SCRIPT_NAME", "")
 

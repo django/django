@@ -11,12 +11,22 @@ from io import StringIO
 from pathlib import Path
 from urllib.request import urlopen
 
+from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS
 from django.core.cache import cache
 from django.core.exceptions import SuspiciousFileOperation
 from django.core.files.base import ContentFile, File
-from django.core.files.storage import FileSystemStorage
+from django.core.files.storage import (
+    GET_STORAGE_CLASS_DEPRECATED_MSG,
+    FileSystemStorage,
+    InvalidStorageError,
+)
 from django.core.files.storage import Storage as BaseStorage
-from django.core.files.storage import default_storage, get_storage_class
+from django.core.files.storage import (
+    StorageHandler,
+    default_storage,
+    get_storage_class,
+    storages,
+)
 from django.core.files.uploadedfile import (
     InMemoryUploadedFile,
     SimpleUploadedFile,
@@ -25,17 +35,25 @@ from django.core.files.uploadedfile import (
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
-from django.test.utils import requires_tz_support
+from django.test.utils import ignore_warnings, requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
+from django.utils.deprecation import RemovedInDjango51Warning
 
-from .models import Storage, callable_storage, temp_storage, temp_storage_location
+from .models import (
+    Storage,
+    callable_default_storage,
+    callable_storage,
+    temp_storage,
+    temp_storage_location,
+)
 
 FILE_SUFFIX_REGEX = "[A-Za-z0-9]{7}"
 
 
 class GetStorageClassTests(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_get_filesystem_storage(self):
         """
         get_storage_class returns the class for a storage backend name/path.
@@ -45,6 +63,7 @@ class GetStorageClassTests(SimpleTestCase):
             FileSystemStorage,
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_get_invalid_storage_module(self):
         """
         get_storage_class raises an error if the requested import don't exist.
@@ -52,6 +71,7 @@ class GetStorageClassTests(SimpleTestCase):
         with self.assertRaisesMessage(ImportError, "No module named 'storage'"):
             get_storage_class("storage.NonexistentStorage")
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_get_nonexistent_storage_class(self):
         """
         get_storage_class raises an error if the requested class don't exist.
@@ -59,6 +79,7 @@ class GetStorageClassTests(SimpleTestCase):
         with self.assertRaises(ImportError):
             get_storage_class("django.core.files.storage.NonexistentStorage")
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_get_nonexistent_storage_module(self):
         """
         get_storage_class raises an error if the requested module don't exist.
@@ -69,6 +90,11 @@ class GetStorageClassTests(SimpleTestCase):
             get_storage_class(
                 "django.core.files.nonexistent_storage.NonexistentStorage"
             )
+
+    def test_deprecation_warning(self):
+        msg = GET_STORAGE_CLASS_DEPRECATED_MSG
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            get_storage_class("django.core.files.storage.FileSystemStorage"),
 
 
 class FileSystemStorageTests(unittest.TestCase):
@@ -998,6 +1024,15 @@ class FieldCallableFileStorageTests(SimpleTestCase):
         storage = kwargs["storage"]
         self.assertIs(storage, callable_storage)
 
+    def test_deconstruction_storage_callable_default(self):
+        """
+        A callable that returns default_storage is not omitted when
+        deconstructing.
+        """
+        obj = Storage()
+        *_, kwargs = obj._meta.get_field("storage_callable_default").deconstruct()
+        self.assertIs(kwargs["storage"], callable_default_storage)
+
 
 # Tests for a race condition on file saving (#4948).
 # This is written in such a way that it'll always pass on platforms
@@ -1157,3 +1192,52 @@ class FileLikeObjectTestCase(LiveServerTestCase):
         remote_file = urlopen(self.live_server_url + "/")
         with self.storage.open(stored_filename) as stored_file:
             self.assertEqual(stored_file.read(), remote_file.read())
+
+
+class StorageHandlerTests(SimpleTestCase):
+    @override_settings(
+        STORAGES={
+            "custom_storage": {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+        }
+    )
+    def test_same_instance(self):
+        cache1 = storages["custom_storage"]
+        cache2 = storages["custom_storage"]
+        self.assertIs(cache1, cache2)
+
+    def test_defaults(self):
+        storages = StorageHandler()
+        self.assertEqual(
+            storages.backends,
+            {
+                DEFAULT_STORAGE_ALIAS: {
+                    "BACKEND": "django.core.files.storage.FileSystemStorage",
+                },
+                STATICFILES_STORAGE_ALIAS: {
+                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+                },
+            },
+        )
+
+    def test_nonexistent_alias(self):
+        msg = "Could not find config for 'nonexistent' in settings.STORAGES."
+        storages = StorageHandler()
+        with self.assertRaisesMessage(InvalidStorageError, msg):
+            storages["nonexistent"]
+
+    def test_nonexistent_backend(self):
+        test_storages = StorageHandler(
+            {
+                "invalid_backend": {
+                    "BACKEND": "django.nonexistent.NonexistentBackend",
+                },
+            }
+        )
+        msg = (
+            "Could not find backend 'django.nonexistent.NonexistentBackend': "
+            "No module named 'django.nonexistent'"
+        )
+        with self.assertRaisesMessage(InvalidStorageError, msg):
+            test_storages["invalid_backend"]

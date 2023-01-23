@@ -325,6 +325,21 @@ characters that aren't allowed in Python variable names -- notably, the
 hyphen -- that's OK. Django quotes column and table names behind the
 scenes.
 
+``db_comment``
+--------------
+
+.. versionadded:: 4.2
+
+.. attribute:: Field.db_comment
+
+The comment on the database column to use for this field. It is useful for
+documenting fields for individuals with direct database access who may not be
+looking at your Django code. For example::
+
+    pub_date = models.DateTimeField(
+        db_comment="Date and time when the article was published",
+    )
+
 ``db_index``
 ------------
 
@@ -441,6 +456,9 @@ object.
 The primary key field is read-only. If you change the value of the primary
 key on an existing object and then save it, a new object will be created
 alongside the old one.
+
+The primary key field is set to ``None`` when
+:meth:`deleting <django.db.models.Model.delete>` an object.
 
 ``unique``
 ----------
@@ -602,9 +620,11 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
 
 .. attribute:: CharField.max_length
 
-    Required. The maximum length (in characters) of the field. The max_length
+    The maximum length (in characters) of the field. The ``max_length``
     is enforced at the database level and in Django's validation using
-    :class:`~django.core.validators.MaxLengthValidator`.
+    :class:`~django.core.validators.MaxLengthValidator`. It's required for all
+    database backends included with Django except PostgreSQL, which supports
+    unlimited ``VARCHAR`` columns.
 
     .. note::
 
@@ -612,6 +632,10 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
+
+    .. versionchanged:: 4.2
+
+        Support for unlimited ``VARCHAR`` columns was added on PostgreSQL.
 
 .. attribute:: CharField.db_collation
 

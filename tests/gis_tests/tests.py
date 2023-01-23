@@ -36,7 +36,7 @@ if HAS_POSTGRES:
                 raise NotImplementedError("This function was not expected to be called")
 
 
-@unittest.skipUnless(HAS_POSTGRES, "The psycopg2 driver is needed for these tests")
+@unittest.skipUnless(HAS_POSTGRES, "The psycopg driver is needed for these tests")
 class TestPostGISVersionCheck(unittest.TestCase):
     """
     The PostGIS version check parses correctly the version numbers

@@ -1,0 +1,6 @@
+{
+  "version": "1.0",
+  "paths": {
+    "dummy.txt": "dummy.txt"
+  }
+}
