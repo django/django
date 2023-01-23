@@ -705,8 +705,8 @@ Miscellaneous
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
   deprecated. Use::
 
-    assertFormError(response.context['form_name'], …)
-    assertFormsetError(response.context['formset_name'], …)
+    assertFormError(response.context['form_name'], ...)
+    assertFormsetError(response.context['formset_name'], ...)
 
   or pass the form/formset object directly instead.
 

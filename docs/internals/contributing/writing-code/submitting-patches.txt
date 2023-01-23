@@ -207,6 +207,7 @@ You can also add a test for the deprecation warning::
         msg = 'Expected deprecation message'
         with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
+            ...
 
 Finally, there are a couple of updates to Django's documentation to make:
 

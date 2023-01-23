@@ -74,9 +74,9 @@ p2 doesn't have an associated restaurant:
 
     >>> from django.core.exceptions import ObjectDoesNotExist
     >>> try:
-    >>>     p2.restaurant
-    >>> except ObjectDoesNotExist:
-    >>>     print("There is no restaurant here.")
+    ...     p2.restaurant
+    ... except ObjectDoesNotExist:
+    ...     print("There is no restaurant here.")
     There is no restaurant here.
 
 You can also use ``hasattr`` to avoid the need for exception catching:

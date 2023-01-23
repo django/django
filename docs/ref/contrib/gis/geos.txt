@@ -822,7 +822,7 @@ Other Properties & Methods
     .. code-block:: pycon
 
         >>> if poly_1.area > poly_2.area:
-        >>>     pass
+        ...     pass
 
 .. _geos-geometry-collections:
 

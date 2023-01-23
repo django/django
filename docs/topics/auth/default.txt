@@ -134,8 +134,10 @@ Authenticating users
         user = authenticate(username='john', password='secret')
         if user is not None:
             # A backend authenticated the credentials
+            ...
         else:
             # No backend authenticated the credentials
+            ...
 
     ``request`` is an optional :class:`~django.http.HttpRequest` which is
     passed on the ``authenticate()`` method of the authentication backends.
@@ -950,7 +952,9 @@ in your own URLconf, for example::
         path('accounts/', include('django.contrib.auth.urls')),
     ]
 
-This will include the following URL patterns::
+This will include the following URL patterns:
+
+.. code-block:: text
 
     accounts/login/ [name='login']
     accounts/logout/ [name='logout']

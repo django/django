@@ -1018,7 +1018,9 @@ to 2.1.4. jQuery 2.x has the same API as jQuery 1.x, but does not support
 Internet Explorer 6, 7, or 8, allowing for better performance and a smaller
 file size. If you need to support IE8 and must also use the latest version of
 Django, you can override the admin's copy of jQuery with your own by creating
-a Django application with this structure::
+a Django application with this structure:
+
+.. code-block:: text
 
     app/static/admin/js/vendor/
         jquery.js
@@ -1029,7 +1031,9 @@ a Django application with this structure::
 ``SyntaxError`` when installing Django setuptools 5.5.x
 -------------------------------------------------------
 
-When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see::
+When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see:
+
+.. code-block:: shell
 
     Compiling django/conf/app_template/apps.py ...
       File "django/conf/app_template/apps.py", line 4
@@ -1313,7 +1317,9 @@ the included URLconf sets an application namespace.
 ``current_app`` parameter to ``contrib.auth`` views
 ---------------------------------------------------
 
-All views in ``django.contrib.auth.views`` have the following structure::
+All views in ``django.contrib.auth.views`` have the following structure:
+
+.. code-block:: text
 
     def view(request, ..., current_app=None, ...):
 
