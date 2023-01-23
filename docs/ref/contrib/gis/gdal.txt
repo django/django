@@ -1007,15 +1007,15 @@ Coordinate System Objects
         >>> proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
         >>> wgs84 = SpatialReference(proj) # PROJ string
         >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
-        DATUM["WGS_1984",
-             SPHEROID["WGS 84",6378137,298.257223563,
-                 AUTHORITY["EPSG","7030"]],
-             AUTHORITY["EPSG","6326"]],
-         PRIMEM["Greenwich",0,
-             AUTHORITY["EPSG","8901"]],
-         UNIT["degree",0.01745329251994328,
-             AUTHORITY["EPSG","9122"]],
-         AUTHORITY["EPSG","4326"]]""") # OGC WKT
+        ... DATUM["WGS_1984",
+        ...      SPHEROID["WGS 84",6378137,298.257223563,
+        ...          AUTHORITY["EPSG","7030"]],
+        ...      AUTHORITY["EPSG","6326"]],
+        ...  PRIMEM["Greenwich",0,
+        ...      AUTHORITY["EPSG","8901"]],
+        ...  UNIT["degree",0.01745329251994328,
+        ...      AUTHORITY["EPSG","9122"]],
+        ...  AUTHORITY["EPSG","4326"]]""") # OGC WKT
 
     .. method:: __getitem__(target)
 
@@ -1025,7 +1025,7 @@ Coordinate System Objects
 
     .. code-block:: pycon
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
+        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
         >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
         >>> print(srs['GEOGCS'])
         WGS 84

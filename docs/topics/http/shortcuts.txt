@@ -127,13 +127,17 @@ You can use the :func:`redirect` function in a number of ways.
             ...
             return redirect('some-view-name', foo='bar')
 
-#. By passing a hardcoded URL to redirect to::
+#. By passing a hardcoded URL to redirect to:
+
+   .. code-block:: python
 
         def my_view(request):
             ...
             return redirect('/some/url/')
 
-   This also works with full URLs::
+   This also works with full URLs:
+   
+   .. code-block:: python
 
         def my_view(request):
             ...

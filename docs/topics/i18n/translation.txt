@@ -262,7 +262,9 @@ In a case like this, consider something like the following::
         }
 
     You would get an error when running :djadmin:`django-admin
-    compilemessages <compilemessages>`::
+    compilemessages <compilemessages>`:
+    
+    .. code-block: pytb
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
@@ -1094,7 +1096,9 @@ interface within your Python code::
 ~~~~~~~~~~~~
 
 The ``ngettext`` function provides an interface to pluralize words and
-phrases::
+phrases:
+
+.. code-block:: javascript
 
     const objectCount = 1 // or 0, or 2, or 3, ...
     const string = ngettext(
@@ -1113,7 +1117,9 @@ function supports both positional and named interpolation:
 * Positional interpolation: ``obj`` contains a JavaScript Array object
   whose elements values are then sequentially interpolated in their
   corresponding ``fmt`` placeholders in the same order they appear.
-  For example::
+  For example:
+  
+  .. code-block:: javascript
 
     const formats = ngettext(
       'There is %s object. Remaining: %s',
@@ -1125,7 +1131,9 @@ function supports both positional and named interpolation:
 
 * Named interpolation: This mode is selected by passing the optional
   boolean ``named`` parameter as ``true``. ``obj`` contains a JavaScript
-  object or associative array. For example::
+  object or associative array. For example:
+  
+  .. code-block:: javascript
 
     const data = {
       count: 10,
@@ -1149,7 +1157,9 @@ to produce proper pluralizations).
 ~~~~~~~~~~~~~~
 
 The ``get_format`` function has access to the configured i18n formatting
-settings and can retrieve the format string for a given setting name::
+settings and can retrieve the format string for a given setting name:
+
+.. code-block:: javascript
 
     document.write(get_format('DATE_FORMAT'));
     // 'N j, Y'
@@ -1199,7 +1209,9 @@ translated word::
 
 The ``npgettext`` function also behaves like the Python variant
 (:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
-contextually translated word::
+contextually translated word:
+
+.. code-block:: javascript
 
     document.write(npgettext('group', 'party', 1));
     // party
@@ -1211,7 +1223,9 @@ contextually translated word::
 
 The ``pluralidx`` function works in a similar way to the :tfilter:`pluralize`
 template filter, determining if a given ``count`` should use a plural form of
-a word or not::
+a word or not:
+
+.. code-block:: javascript
 
     document.write(pluralidx(0));
     // true

@@ -150,7 +150,7 @@ this would lead to incorrect behavior.
     @etag(etag_func)
     @last_modified(last_modified_func)
     def my_view(request):
-        # ...
+        ...
 
     # End of bad code.
 

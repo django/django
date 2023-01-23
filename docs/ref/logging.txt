@@ -228,17 +228,21 @@ logger, but only to the ``django.security`` logger.
 To silence a particular type of ``SuspiciousOperation``, you can override that
 specific logger following this example::
 
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
+    {
+        # ...
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
         },
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
+        'loggers': {
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
         },
-    },
+        # ...
+    }
 
 Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
 
@@ -280,13 +284,17 @@ Python logging module <python:logging.handlers>`.
     configuration, include it in the handler definition for
     ``django.utils.log.AdminEmailHandler``, like this::
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
+        {
+            # ...
+            'handlers': {
+                'mail_admins': {
+                    'level': 'ERROR',
+                    'class': 'django.utils.log.AdminEmailHandler',
+                    'include_html': True,
+                },
             },
-        },
+            # ...
+        }
 
     Be aware of the :ref:`security implications of logging
     <logging-security-implications>` when using the ``AdminEmailHandler``.
@@ -295,13 +303,17 @@ Python logging module <python:logging.handlers>`.
     :ref:`email backend <topic-email-backends>` that is being used by the
     handler can be overridden, like this::
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+        {
+            # ...
+            'handlers': {
+                'mail_admins': {
+                    'level': 'ERROR',
+                    'class': 'django.utils.log.AdminEmailHandler',
+                    'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+                },
             },
-        },
+            # ...
+        }
 
     By default, an instance of the email backend specified in
     :setting:`EMAIL_BACKEND` will be used.
@@ -311,14 +323,18 @@ Python logging module <python:logging.handlers>`.
     traceback text sent in the email body. You provide a string import path to
     the class you wish to use, like this::
 
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-                'reporter_class': 'somepackage.error_reporter.CustomErrorReporter',
+        {
+            # ...
+            'handlers': {
+                'mail_admins': {
+                    'level': 'ERROR',
+                    'class': 'django.utils.log.AdminEmailHandler',
+                    'include_html': True,
+                    'reporter_class': 'somepackage.error_reporter.CustomErrorReporter',
+                },
             },
-        },
+            # ...
+        }
 
     .. method:: send_mail(subject, message, *args, **kwargs)
 
@@ -354,19 +370,23 @@ logging module.
 
     and then add it to your logging config::
 
-        'filters': {
-            'skip_unreadable_posts': {
-                '()': 'django.utils.log.CallbackFilter',
-                'callback': skip_unreadable_post,
+        {
+            # ...
+            'filters': {
+                'skip_unreadable_posts': {
+                    '()': 'django.utils.log.CallbackFilter',
+                    'callback': skip_unreadable_post,
+                },
             },
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['skip_unreadable_posts'],
-                'class': 'django.utils.log.AdminEmailHandler',
+            'handlers': {
+                'mail_admins': {
+                    'level': 'ERROR',
+                    'filters': ['skip_unreadable_posts'],
+                    'class': 'django.utils.log.AdminEmailHandler',
+                },
             },
-        },
+            # ...
+        }
 
 .. class:: RequireDebugFalse()
 
@@ -376,18 +396,22 @@ logging module.
     configuration to ensure that the :class:`AdminEmailHandler` only sends
     error emails to admins when :setting:`DEBUG` is ``False``::
 
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+        {
+            # ...
+            'filters': {
+                'require_debug_false': {
+                    '()': 'django.utils.log.RequireDebugFalse',
+                },
             },
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler',
+            'handlers': {
+                'mail_admins': {
+                    'level': 'ERROR',
+                    'filters': ['require_debug_false'],
+                    'class': 'django.utils.log.AdminEmailHandler',
+                },
             },
-        },
+            # ...
+        }
 
 .. class:: RequireDebugTrue()
 

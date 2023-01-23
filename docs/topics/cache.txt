@@ -18,7 +18,9 @@ That's where caching comes in.
 
 To cache something is to save the result of an expensive calculation so that
 you don't have to perform the calculation next time. Here's some pseudocode
-explaining how this would work for a dynamically generated web page::
+explaining how this would work for a dynamically generated web page:
+
+.. code-block:: text
 
     given a URL, try finding that page in the cache
     if the page is in the cache:

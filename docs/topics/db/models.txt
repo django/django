@@ -675,7 +675,9 @@ Field name restrictions
 Django places some restrictions on model field names:
 
 #. A field name cannot be a Python reserved word, because that would result
-   in a Python syntax error. For example::
+   in a Python syntax error. For example:
+   
+   .. code-block:: pycon
 
        class Example(models.Model):
            pass = models.IntegerField() # 'pass' is a reserved word!
@@ -1221,7 +1223,9 @@ subclass with a :class:`~django.db.models.ManyToManyField`::
     class Supplier(Place):
         customers = models.ManyToManyField(Place)
 
-This results in the error::
+This results in the error:
+
+.. code-block:: pytb
 
     Reverse query name for 'Supplier.customers' clashes with reverse query
     name for 'Supplier.place_ptr'.

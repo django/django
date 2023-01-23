@@ -76,9 +76,9 @@ Alternatively, :setting:`INSTALLED_APPS` may contain the dotted path to a
 configuration class to specify it explicitly::
 
     INSTALLED_APPS = [
-        ...
+        ...,
         'polls.apps.PollsAppConfig',
-        ...
+        ...,
     ]
 
 For application authors

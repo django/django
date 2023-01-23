@@ -117,7 +117,7 @@ file ``general.log`` (at the project root):
     :emphasize-lines: 3-8
 
     LOGGING = {
-        [...]
+        # ...
         'handlers': {
             'file': {
                 'class': 'logging.FileHandler',
@@ -156,7 +156,7 @@ example:
     :emphasize-lines: 3-8
 
     LOGGING = {
-        [...]
+        # ...
         'loggers': {
             '': {
                 'level': 'DEBUG',
@@ -195,7 +195,7 @@ formatters named ``verbose`` and ``simple``:
     :emphasize-lines: 3-12
 
     LOGGING = {
-        [...]
+        # ...
         'formatters': {
             'verbose': {
                 'format': '{name} {levelname} {asctime} {module} {process:d} {thread:d} {message}',
@@ -220,13 +220,16 @@ dictionary referring to the formatter by name, for example:
 .. code-block:: python
     :emphasize-lines: 5
 
-    'handlers': {
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'general.log',
-            'formatter': 'verbose',
+    {
+        'handlers': {
+            'file': {
+                'class': 'logging.FileHandler',
+                'filename': 'general.log',
+                'formatter': 'verbose',
+            },
         },
-    },
+        # ...
+    }
 
 .. _naming-loggers:
 
@@ -253,7 +256,7 @@ A logger mapping named ``my_app.views`` will capture records from this logger:
     :emphasize-lines: 4
 
     LOGGING = {
-        [...]
+        # ...
         'loggers': {
             'my_app.views': {
                 ...
@@ -269,7 +272,7 @@ from loggers anywhere within the ``my_app`` namespace (including
     :emphasize-lines: 4
 
     LOGGING = {
-        [...]
+        # ...
         'loggers': {
             'my_app': {
                 ...
@@ -297,16 +300,16 @@ by a mapping for both ``my_app`` and ``my_app.views``.
 To manage this behavior, set the propagation key on the mappings you define::
 
     LOGGING = {
-        [...]
+        # ...
         'loggers': {
             'my_app': {
-                [...]
+                # ...
             },
             'my_app.views': {
-                [...]
+                # ...
             },
             'my_app.views.private': {
-                [...]
+                # ...
                 'propagate': False,
             },
         },

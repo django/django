@@ -1885,7 +1885,9 @@ more frequently.
 .. class:: PercentRank(*expressions, **extra)
 
 Computes the relative rank of the rows in the frame clause. This computation is
-equivalent to evaluating::
+equivalent to evaluating:
+
+.. code-block:: text
 
     (rank - 1) / (total rows - 1)
 
