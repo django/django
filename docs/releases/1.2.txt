@@ -453,42 +453,42 @@ several functions to support conversion of Python values into
 database-compatible values. A custom field might look something like::
 
     class CustomModelField(models.Field):
-        # ...
+        ...
         def db_type(self):
-            # ...
+            ...
 
         def get_db_prep_save(self, value):
-            # ...
+            ...
 
         def get_db_prep_value(self, value):
-            # ...
+            ...
 
         def get_db_prep_lookup(self, lookup_type, value):
-            # ...
+            ...
 
 In 1.2, these three methods have undergone a change in prototype, and
 two extra methods have been introduced::
 
     class CustomModelField(models.Field):
-        # ...
+        ...
 
         def db_type(self, connection):
-            # ...
+            ...
 
         def get_prep_value(self, value):
-            # ...
+            ...
 
         def get_prep_lookup(self, lookup_type, value):
-            # ...
+            ...
 
         def get_db_prep_save(self, value, connection):
-            # ...
+            ...
 
         def get_db_prep_value(self, value, connection, prepared=False):
-            # ...
+            ...
 
         def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-            # ...
+            ...
 
 These changes are required to support multiple databases --
 ``db_type`` and ``get_db_prep_*`` can no longer make any assumptions
@@ -537,21 +537,29 @@ You may also need to update your templates if you were relying on the
 implementation of Django's template tags *not* being thread safe. The
 :ttag:`cycle` tag is the most likely to be affected in this way,
 especially when used in conjunction with the :ttag:`include` tag.
-Consider the following template fragment::
+Consider the following template fragment:
+
+.. code-block:: html+django
 
     {% for object in object_list %}
         {% include "subtemplate.html" %}
     {% endfor %}
 
-with a ``subtemplate.html`` that reads::
+with a ``subtemplate.html`` that reads:
+
+.. code-block:: html+django
 
     {% cycle 'even' 'odd' %}
 
-Using the non-thread-safe, pre-Django 1.2 renderer, this would output::
+Using the non-thread-safe, pre-Django 1.2 renderer, this would output:
+
+.. code-block:: text
 
     even odd even odd ...
 
-Using the thread-safe Django 1.2 renderer, you will instead get::
+Using the thread-safe Django 1.2 renderer, you will instead get:
+
+.. code-block:: text
 
     even even even even ...
 
@@ -1133,14 +1141,18 @@ is using a supported spatial database backend.
     differs across spatial databases, the ``SpatialRefSys`` and
     ``GeometryColumns`` models can no longer be associated with
     the ``gis`` application name.  Thus, no models will be returned
-    when using the ``get_models`` method in the following example::
+    when using the ``get_models`` method in the following example:
+
+    .. code-block:: pycon
 
         >>> from django.db.models import get_app, get_models
         >>> get_models(get_app('gis'))
         []
 
 To get the correct ``SpatialRefSys`` and ``GeometryColumns``
-for your spatial database use the methods provided by the spatial backend::
+for your spatial database use the methods provided by the spatial backend:
+
+    .. code-block:: pycon
 
      >>> from django.db import connections
      >>> SpatialRefSys = connections['my_spatialite'].ops.spatial_ref_sys()

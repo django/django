@@ -746,7 +746,7 @@ For each field, we describe the default widget used if you don't specify
         >>> from django.core.files.uploadedfile import SimpleUploadedFile
         >>> class ImageForm(forms.Form):
         ...     img = forms.ImageField()
-        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        >>> file_data = {'img': SimpleUploadedFile('test.png', b"file data")}
         >>> form = ImageForm({}, file_data)
         # Pillow closes the underlying file descriptor.
         >>> form.is_valid()

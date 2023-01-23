@@ -575,7 +575,6 @@ Here's a sample configuration which uses a MySQL option file::
         }
     }
 
-
 .. code-block:: ini
 
     # my.cnf
@@ -1017,14 +1016,14 @@ using RAC or pluggable databases without ``tnsnames.ora``, for example.
 
 Example of an Easy Connect string::
 
-    'NAME': 'localhost:1521/orclpdb1',
+    'NAME': 'localhost:1521/orclpdb1'
 
 Example of a full DSN string::
 
     'NAME': (
         '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
         '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
-    ),
+    )
 
 Threaded option
 ---------------
@@ -1035,7 +1034,7 @@ the ``threaded`` option of your Oracle database configuration to ``True``::
 
     'OPTIONS': {
         'threaded': True,
-    },
+    }
 
 Failure to do this may result in crashes and other odd behavior.
 
@@ -1051,7 +1050,7 @@ The ``RETURNING INTO`` clause can be disabled by setting the
 
     'OPTIONS': {
         'use_returning_into': False,
-    },
+    }
 
 In this case, the Oracle backend will use a separate ``SELECT`` query to
 retrieve ``AutoField`` values.
@@ -1160,7 +1159,7 @@ file::
     DATABASES = {
         'default': {
             'ENGINE': 'mydbengine',
-            ...
+            # ...
         },
     }
 

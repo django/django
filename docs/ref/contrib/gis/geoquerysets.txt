@@ -702,11 +702,13 @@ Distance Lookups
 For an overview on performing distance queries, please refer to
 the :ref:`distance queries introduction <distance-queries>`.
 
-Distance lookups take the following form::
+Distance lookups take the following form:
 
-    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, 'spheroid'])
-    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
-    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
+.. code-block:: text
+
+    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, "spheroid"])
+    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
+    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
 
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,

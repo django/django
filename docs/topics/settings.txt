@@ -125,6 +125,7 @@ In your Django apps, use settings by importing the object
 
     if settings.DEBUG:
         # Do something
+        ...
 
 Note that ``django.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::

@@ -111,7 +111,7 @@ requirements::
         css = {
             'screen': ['pretty.css'],
             'tv,projector': ['lo_res.css'],
-            'print': ['newspaper.css],
+            'print': ['newspaper.css'],
         }
 
 If this last CSS definition were to be rendered, it would become the following HTML:
@@ -280,7 +280,7 @@ outputting the complete HTML ``<script>`` or ``<link>`` tag content:
     >>> from django.utils.html import html_safe
     >>>
     >>> @html_safe
-    >>> class JSPath:
+    ... class JSPath:
     ...     def __str__(self):
     ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
 
