@@ -1471,7 +1471,7 @@ need to bind the file data containing the mugshot image:
     ...         'message': 'Hi there',
     ...         'sender': 'foo@example.com',
     ...         'cc_myself': True}
-    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
+    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', b"file data")}
     >>> f = ContactFormWithMugshot(data, file_data)
 
 In practice, you will usually specify ``request.FILES`` as the source

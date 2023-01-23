@@ -245,7 +245,7 @@ JSON in the following way::
             "model": "sessions.session",
             "fields": {
                 "expire_date": "2013-01-16T08:16:59.844Z",
-                ...
+                # ...
             }
         }
     ]

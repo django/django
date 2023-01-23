@@ -499,7 +499,7 @@ Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 
 will be interpreted like:
 
-.. code-block:: python
+.. code-block:: pycon
 
     if (athlete_list and coach_list) or cheerleader_list
 
@@ -1118,14 +1118,16 @@ Example usage:
 
 This example would return this HTML::
 
-    <h1>José Mourinho</h1>
-    <p class="odd">Thibaut Courtois</p>
-    <p class="even">John Terry</p>
-    <p class="odd">Eden Hazard</p>
+.. code-block:: html
 
-    <h1>Carlo Ancelotti</h1>
-    <p class="odd">Manuel Neuer</p>
-    <p class="even">Thomas Müller</p>
+    <h1>Gareth</h1>
+    <p class="odd">Harry</p>
+    <p class="even">John</p>
+    <p class="odd">Nick</p>
+
+    <h1>John</h1>
+    <p class="odd">Andrea</p>
+    <p class="even">Melissa</p>
 
 Notice how the first block ends with ``class="odd"`` and the new one starts
 with ``class="odd"``. Without the ``{% resetcycle %}`` tag, the second block
@@ -1263,6 +1265,8 @@ such as this:
     path('clients/', include('project_name.app_name.urls'))
 
 ...then, in a template, you can create a link to this view like this::
+
+.. code-block:: html+django
 
     {% url 'app-views-client' client.id %}
 

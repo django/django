@@ -70,9 +70,10 @@ Example
 
     >>> from django.contrib.gis.utils import LayerMapping
     >>> from geoapp.models import TestGeo
-    >>> mapping = {'name' : 'str', # The 'name' model field maps to the 'str' layer field.
-                   'poly' : 'POLYGON', # For geometry fields use OGC name.
-                   } # The mapping is a dictionary
+    >>> mapping = {
+    ...     'name': 'str', # The 'name' model field maps to the 'str' layer field.
+    ...     'poly': 'POLYGON', # For geometry fields use OGC name.
+    ... } # The mapping is a dictionary
     >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping)
     >>> lm.save(verbose=True) # Save the layermap, imports the data.
     Saved: Name: 1

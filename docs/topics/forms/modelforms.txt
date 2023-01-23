@@ -778,7 +778,9 @@ keyword arguments, or the corresponding attributes on the ``ModelForm`` inner
 ``Meta`` class. Please see the ``ModelForm`` :ref:`modelforms-selecting-fields`
 documentation.
 
-... or enable localization for specific fields::
+... or enable localization for specific fields:
+
+.. code-block:: pycon
 
     >>> Form = modelform_factory(Author, form=AuthorForm, localized_fields=["birth_date"])
 

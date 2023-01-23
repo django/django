@@ -267,7 +267,7 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     <tr><th>Message:</th><td><input type="text" name="message" required></td></tr>
     <tr><th>Sender:</th><td><input type="email" name="sender" required><br>A valid email address, please.</td></tr>
     <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself"></td></tr>
-    >>> print(f.as_ul()))
+    >>> print(f.as_ul())
     <li>Subject: <input type="text" name="subject" maxlength="100" required> <span class="helptext">100 characters max.</span></li>
     <li>Message: <input type="text" name="message" required></li>
     <li>Sender: <input type="email" name="sender" required> A valid email address, please.</li>
@@ -764,7 +764,7 @@ For each field, we describe the default widget used if you don't specify
         >>> from django.core.files.uploadedfile import SimpleUploadedFile
         >>> class ImageForm(forms.Form):
         ...     img = forms.ImageField()
-        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        >>> file_data = {'img': SimpleUploadedFile('test.png', b"file data")}
         >>> form = ImageForm({}, file_data)
         # Pillow closes the underlying file descriptor.
         >>> form.is_valid()

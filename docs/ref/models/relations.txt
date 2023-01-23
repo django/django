@@ -24,7 +24,8 @@ Related objects reference
       In the above example, the methods below will be available on
       the manager ``blog.entry_set``.
 
-    * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
+    * Both sides of a :class:`~django.db.models.ManyToManyField` relation
+      ::
 
             class Topping(models.Model):
                 # ...

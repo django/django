@@ -93,11 +93,11 @@ Detailed notes can be found in :ref:`async-queries`, but in short:
 
 Django also supports some asynchronous model methods that use the database::
 
-    async def make_book(...):
+    async def make_book(*args, **kwargs):
         book = Book(...)
         await book.asave(using="secondary")
 
-    async def make_book_with_tags(tags, ...):
+    async def make_book_with_tags(tags, *args, **kwargs):
         book = await Book.objects.acreate(...)
         await book.tags.aset(tags)
 
@@ -229,13 +229,13 @@ as either a direct wrapper or a decorator::
 
     from asgiref.sync import async_to_sync
 
-    async def get_data(...):
+    async def get_data():
         ...
 
     sync_get_data = async_to_sync(get_data)
 
     @async_to_sync
-    async def get_other_data(...):
+    async def get_other_data():
         ...
 
 The async function is run in the event loop for the current thread, if one is
@@ -266,7 +266,7 @@ as either a direct wrapper or a decorator::
     async_function = sync_to_async(sensitive_sync_function, thread_sensitive=True)
 
     @sync_to_async
-    def sync_function(...):
+    def sync_function():
         ...
 
 Threadlocals and contextvars values are preserved across the boundary in both

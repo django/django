@@ -51,7 +51,7 @@ Lookup registration can also be done using a decorator pattern::
 
     @Field.register_lookup
     class NotEqualLookup(Lookup):
-        # ...
+        ...
 
 We can now use ``foo__ne`` for any field ``foo``. You will need to ensure that
 this registration happens before you try to create any querysets using it. You

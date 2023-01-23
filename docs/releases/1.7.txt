@@ -1009,7 +1009,9 @@ Standalone scripts
 If you're using Django in a plain Python script — rather than a management
 command — and you rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment
 variable, you must now explicitly initialize Django at the beginning of your
-script with::
+script with:
+
+.. code-block:: pycon
 
     >>> import django
     >>> django.setup()
@@ -1134,13 +1136,13 @@ method::
 
     # Old pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
     # New pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self.add_error(None, e)
 
@@ -1150,7 +1152,7 @@ wasn't available before Django 1.7, but you can use the following
 workaround to convert any ``list`` into ``ErrorList``::
 
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
@@ -1195,8 +1197,8 @@ manager will *not* be reset. This was necessary to resolve an inconsistency in
 the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
 
-pytz may be required
---------------------
+``pytz`` may be required
+------------------------
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
 a :exc:`ValueError` when encountering them, you will have to install pytz_. You

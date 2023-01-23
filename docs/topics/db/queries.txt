@@ -1075,7 +1075,7 @@ query for SQL ``NULL``, use :lookup:`isnull`:
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
     <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value(None, JSONField())
+    >>> Dog.objects.filter(data=Value(None, JSONField()))
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
@@ -1364,7 +1364,9 @@ For example, this statement yields a single ``Q`` object that represents the
 
     Q(question__startswith='Who') | Q(question__startswith='What')
 
-This is equivalent to the following SQL ``WHERE`` clause::
+This is equivalent to the following SQL ``WHERE`` clause:
+
+.. code-block: sql
 
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 

@@ -139,7 +139,7 @@ Geometry Lookups
 Geographic queries with geometries take the following general form (assuming
 the ``Zipcode`` model used in the :doc:`model-api`):
 
-.. code-block:: pycon
+.. code-block:: text
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
@@ -175,7 +175,7 @@ band index can be specified.
 This results in the following general form for lookups involving rasters
 (assuming the ``Elevation`` model used in the :doc:`model-api`):
 
-.. code-block:: pycon
+.. code-block:: text
 
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)

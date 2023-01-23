@@ -544,14 +544,14 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             # Do some conversion on string 's'
             ...
         fancy_utility_function = keep_lazy(str)(fancy_utility_function)
 
         # Or more succinctly:
         @keep_lazy(str)
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
 
     The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
@@ -576,12 +576,12 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         # Our previous example was:
         @keep_lazy(str)
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
 
         # Which can be rewritten as:
         @keep_lazy_text
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
 
 ``django.utils.html``

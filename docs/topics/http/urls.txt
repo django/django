@@ -865,7 +865,9 @@ Secondly, you can include an object that contains embedded namespace data. If
 you ``include()`` a list of :func:`~django.urls.path` or
 :func:`~django.urls.re_path` instances, the URLs contained in that object
 will be added to the global namespace. However, you can also ``include()`` a
-2-tuple containing::
+2-tuple containing:
+
+.. code-block:: text
 
     (<list of path()/re_path() instances>, <application namespace>)
 

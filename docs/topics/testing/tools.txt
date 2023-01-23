@@ -248,7 +248,9 @@ Use the ``django.test.Client`` class to make requests.
             >>> c = Client()
             >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
 
-        ...will result in the evaluation of a POST request to this URL::
+        ...will result in the evaluation of a POST request to this URL:
+
+        .. code-block:: text
 
             /login/
 

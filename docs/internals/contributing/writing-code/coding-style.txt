@@ -199,9 +199,10 @@ Imports
 
 
       class Example:
-          # ...
+          ...
 
-* Use convenience imports whenever available. For example, do this::
+* Use convenience imports whenever available. For example, do this
+  ::
 
       from django.views import View
 
@@ -236,12 +237,12 @@ View style
   Do this::
 
       def my_view(request, foo):
-          # ...
+          ...
 
   Don't do this::
 
       def my_view(req, foo):
-          # ...
+          ...
 
 Model style
 ===========

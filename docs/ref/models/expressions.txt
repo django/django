@@ -21,20 +21,20 @@ constants, variables, and even other expressions.
 Some examples
 =============
 
-.. code-block:: python
+.. code-block:: pycon
 
-    from django.db.models import Count, F, Value
-    from django.db.models.functions import Length, Upper
-    from django.db.models.lookups import GreaterThan
+    >>> from django.db.models import Count, F, Value
+    >>> from django.db.models.functions import Length, Upper
+    >>> from django.db.models.lookups import GreaterThan
 
     # Find companies that have more employees than chairs.
-    Company.objects.filter(num_employees__gt=F('num_chairs'))
+    >>> Company.objects.filter(num_employees__gt=F('num_chairs'))
 
     # Find companies that have at least twice as many employees
     # as chairs. Both the querysets below are equivalent.
-    Company.objects.filter(num_employees__gt=F('num_chairs') * 2)
-    Company.objects.filter(
-        num_employees__gt=F('num_chairs') + F('num_chairs'))
+    >>> Company.objects.filter(num_employees__gt=F('num_chairs') * 2)
+    >>> Company.objects.filter(
+    ...     num_employees__gt=F('num_chairs') + F('num_chairs'))
 
     # How many chairs are needed for each company to seat all employees?
     >>> company = Company.objects.filter(
@@ -817,12 +817,12 @@ the same studio in the same genre and release year:
 
     >>> from django.db.models import Avg, F, Window
     >>> Movie.objects.annotate(
-    >>>     avg_rating=Window(
-    >>>         expression=Avg('rating'),
-    >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by='released__year',
-    >>>     ),
-    >>> )
+    ...     avg_rating=Window(
+    ...         expression=Avg('rating'),
+    ...         partition_by=[F('studio'), F('genre')],
+    ...         order_by='released__year',
+    ...     ),
+    ... )
 
 This allows you to check if a movie is rated better or worse than its peers.
 
@@ -837,20 +837,20 @@ to reduce repetition:
 
     >>> from django.db.models import Avg, F, Max, Min, Window
     >>> window = {
-    >>>    'partition_by': [F('studio'), F('genre')],
-    >>>    'order_by': 'released__year',
-    >>> }
+    ...    'partition_by': [F('studio'), F('genre')],
+    ...    'order_by': 'released__year',
+    ... }
     >>> Movie.objects.annotate(
-    >>>     avg_rating=Window(
-    >>>         expression=Avg('rating'), **window,
-    >>>     ),
-    >>>     best=Window(
-    >>>         expression=Max('rating'), **window,
-    >>>     ),
-    >>>     worst=Window(
-    >>>         expression=Min('rating'), **window,
-    >>>     ),
-    >>> )
+    ...     avg_rating=Window(
+    ...         expression=Avg('rating'), **window,
+    ...     ),
+    ...     best=Window(
+    ...         expression=Max('rating'), **window,
+    ...     ),
+    ...     worst=Window(
+    ...         expression=Min('rating'), **window,
+    ...     ),
+    ... )
 
 Filtering against window functions is supported as long as lookups are not
 disjunctive (not using ``OR`` or ``XOR`` as a connector) and against a queryset
@@ -864,13 +864,13 @@ from groups to be included:
 .. code-block:: pycon
 
     >>> qs = Movie.objects.annotate(
-    >>>     category_rank=Window(
-    >>>         Rank(), partition_by='category', order_by='-rating'
-    >>>     ),
-    >>>     scenes_count=Count('actors'),
-    >>> ).filter(
-    >>>     Q(category_rank__lte=3) | Q(title__contains='Batman')
-    >>> )
+    ...     category_rank=Window(
+    ...         Rank(), partition_by='category', order_by='-rating'
+    ...     ),
+    ...     scenes_count=Count('actors'),
+    ... ).filter(
+    ...     Q(category_rank__lte=3) | Q(title__contains='Batman')
+    ... )
     >>> list(qs)
     NotImplementedError: Heterogeneous disjunctive predicates against window functions
     are not implemented when performing conditional aggregation.
@@ -949,13 +949,13 @@ with the average rating of a movie's two prior and two following peers:
 
     >>> from django.db.models import Avg, F, RowRange, Window
     >>> Movie.objects.annotate(
-    >>>     avg_rating=Window(
-    >>>         expression=Avg('rating'),
-    >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by='released__year',
-    >>>         frame=RowRange(start=-2, end=2),
-    >>>     ),
-    >>> )
+    ...     avg_rating=Window(
+    ...         expression=Avg('rating'),
+    ...         partition_by=[F('studio'), F('genre')],
+    ...         order_by='released__year',
+    ...         frame=RowRange(start=-2, end=2),
+    ...     ),
+    ... )
 
 If the database supports it, you can specify the start and end points based on
 values of an expression in the partition. If the ``released`` field of the
@@ -967,13 +967,13 @@ released between twelve months before and twelve months after the each movie:
 
     >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
-    >>>     avg_rating=Window(
-    >>>         expression=Avg('rating'),
-    >>>         partition_by=[F('studio'), F('genre')],
-    >>>         order_by='released__year',
-    >>>         frame=ValueRange(start=-12, end=12),
-    >>>     ),
-    >>> )
+    ...     avg_rating=Window(
+    ...         expression=Avg('rating'),
+    ...         partition_by=[F('studio'), F('genre')],
+    ...         order_by='released__year',
+    ...         frame=ValueRange(start=-12, end=12),
+    ...     ),
+    ... )
 
 .. currentmodule:: django.db.models
 
