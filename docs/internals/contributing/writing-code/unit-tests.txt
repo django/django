@@ -433,6 +433,26 @@ Run the ``locale`` command to confirm the change. Optionally, add those export
 commands to your shell's startup file (e.g. ``~/.bashrc`` for Bash) to avoid
 having to retype them.
 
+You can resolve this for Windows by passing ``encoding`` when opening the PO_FILE:
+
+.. code-block:: python
+    :caption: ``tests/i18n/test_percents.py``
+
+    with open(self.PO_FILE) as fp:
+
+to:
+
+.. code-block:: python
+    :caption: ``tests/i18n/test_percents.py``
+
+    with open(self.PO_FILE, encoding="utf-8") as fp:
+
+Then run again an individual test method like this (e.g. test_adds_python_format_to_all_percent_signs):
+
+.. console::
+
+    $ ./runtests.py i18n.test_percents.ExtractingStringsWithPercentSigns.test_adds_python_format_to_all_percent_signs
+
 Tests that only fail in combination
 -----------------------------------
 
