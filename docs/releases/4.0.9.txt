@@ -6,4 +6,12 @@ Django 4.0.9 release notes
 
 Django 4.0.9 fixes a security issue with severity "moderate" in 4.0.8.
 
-...
+CVE-2023-23969: Potential denial-of-service via ``Accept-Language`` headers
+===========================================================================
+
+The parsed values of ``Accept-Language`` headers are cached in order to avoid
+repetitive parsing. This leads to a potential denial-of-service vector via
+excessive memory usage if large header values are sent.
+
+In order to avoid this vulnerability, the ``Accept-Language`` header is now
+parsed up to a maximum length.
