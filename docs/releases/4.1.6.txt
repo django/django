@@ -4,7 +4,8 @@ Django 4.1.6 release notes
 
 *February 1, 2023*
 
-Django 4.1.6 fixes a security issue and several bugs in 4.1.5.
+Django 4.1.6 fixes a security issue with severity "moderate" and several bugs
+in 4.1.5.
 
 Bugfixes
 ========
