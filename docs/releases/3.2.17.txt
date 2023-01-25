@@ -1,0 +1,9 @@
+===========================
+Django 3.2.17 release notes
+===========================
+
+*February 1, 2023*
+
+Django 3.2.17 fixes a security issue in 3.2.16.
+
+...
