@@ -30,6 +30,11 @@ _default = None
 # magic gettext number to separate context from message
 CONTEXT_SEPARATOR = "\x04"
 
+# Maximum number of characters that will be parsed from the Accept-Language
+# header to prevent possible denial of service or memory exhaustion attacks.
+# About 10x longer than the longest value shown on MDN’s Accept-Language page.
+ACCEPT_LANGUAGE_HEADER_MAX_LENGTH = 500
+
 # Format of Accept-Language header values. From RFC 2616, section 14.4 and 3.9
 # and RFC 3066, section 2.1
 accept_language_re = _lazy_re_compile(
@@ -586,7 +591,7 @@ def get_language_from_request(request, check_path=False):
 
 
 @functools.lru_cache(maxsize=1000)
-def parse_accept_lang_header(lang_string):
+def _parse_accept_lang_header(lang_string):
     """
     Parse the lang_string, which is the body of an HTTP Accept-Language
     header, and return a tuple of (lang, q-value), ordered by 'q' values.
@@ -608,3 +613,27 @@ def parse_accept_lang_header(lang_string):
         result.append((lang, priority))
     result.sort(key=lambda k: k[1], reverse=True)
     return tuple(result)
+
+
+def parse_accept_lang_header(lang_string):
+    """
+    Parse the value of the Accept-Language header up to a maximum length.
+
+    The value of the header is truncated to a maximum length to avoid potential
+    denial of service and memory exhaustion attacks. Excessive memory could be
+    used if the raw value is very large as it would be cached due to the use of
+    functools.lru_cache() to avoid repetitive parsing of common header values.
+    """
+    # If the header value doesn't exceed the maximum allowed length, parse it.
+    if len(lang_string) <= ACCEPT_LANGUAGE_HEADER_MAX_LENGTH:
+        return _parse_accept_lang_header(lang_string)
+
+    # If there is at least one comma in the value, parse up to the last comma
+    # before the max length, skipping any truncated parts at the end of the
+    # header value.
+    if (index := lang_string.rfind(",", 0, ACCEPT_LANGUAGE_HEADER_MAX_LENGTH)) > 0:
+        return _parse_accept_lang_header(lang_string[:index])
+
+    # Don't attempt to parse if there is only one language-range value which is
+    # longer than the maximum allowed length and so truncated.
+    return ()
