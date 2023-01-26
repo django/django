@@ -33,7 +33,7 @@ from .models import (
 
 
 class SelectForUpdateTests(TransactionTestCase):
-    available_apps = ["select_for_update"]
+    available_apps = ["select_for"]
 
     def setUp(self):
         # This is executed in autocommit mode so that code in
@@ -140,12 +140,9 @@ class SelectForUpdateTests(TransactionTestCase):
             )
         features = connections["default"].features
         if features.select_for_update_of_column:
-            expected = [
-                'select_for_update_person"."id',
-                'select_for_update_country"."entity_ptr_id',
-            ]
+            expected = ['select_for_person"."id', 'select_for_country"."entity_ptr_id']
         else:
-            expected = ["select_for_update_person", "select_for_update_country"]
+            expected = ["select_for_person", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -154,9 +151,9 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(EUCountry.objects.select_for_update(of=("self",)))
         if connection.features.select_for_update_of_column:
-            expected = ['select_for_update_eucountry"."country_ptr_id']
+            expected = ['select_for_eucountry"."country_ptr_id']
         else:
-            expected = ["select_for_update_eucountry"]
+            expected = ["select_for_eucountry"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -173,11 +170,11 @@ class SelectForUpdateTests(TransactionTestCase):
             )
         if connection.features.select_for_update_of_column:
             expected = [
-                'select_for_update_eucountry"."country_ptr_id',
-                'select_for_update_country"."entity_ptr_id',
+                'select_for_eucountry"."country_ptr_id',
+                'select_for_country"."entity_ptr_id',
             ]
         else:
-            expected = ["select_for_update_eucountry", "select_for_update_country"]
+            expected = ["select_for_eucountry", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -191,11 +188,11 @@ class SelectForUpdateTests(TransactionTestCase):
             )
         if connection.features.select_for_update_of_column:
             expected = [
-                'select_for_update_eucity"."id',
-                'select_for_update_eucountry"."country_ptr_id',
+                'select_for_eucity"."id',
+                'select_for_eucountry"."country_ptr_id',
             ]
         else:
-            expected = ["select_for_update_eucity", "select_for_update_eucountry"]
+            expected = ["select_for_eucity", "select_for_eucountry"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -211,12 +208,9 @@ class SelectForUpdateTests(TransactionTestCase):
                 )
             )
         if connection.features.select_for_update_of_column:
-            expected = [
-                'select_for_update_eucity"."id',
-                'select_for_update_country"."entity_ptr_id',
-            ]
+            expected = ['select_for_eucity"."id', 'select_for_country"."entity_ptr_id']
         else:
-            expected = ["select_for_update_eucity", "select_for_update_country"]
+            expected = ["select_for_eucity", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -229,12 +223,9 @@ class SelectForUpdateTests(TransactionTestCase):
                 )
             )
         if connection.features.select_for_update_of_column:
-            expected = [
-                'select_for_update_country"."entity_ptr_id',
-                'select_for_update_entity"."id',
-            ]
+            expected = ['select_for_country"."entity_ptr_id', 'select_for_entity"."id']
         else:
-            expected = ["select_for_update_country", "select_for_update_entity"]
+            expected = ["select_for_country", "select_for_entity"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
@@ -247,9 +238,9 @@ class SelectForUpdateTests(TransactionTestCase):
                 )
             )
         if connection.features.select_for_update_of_column:
-            expected = ['select_for_update_country"."entity_ptr_id']
+            expected = ['select_for_country"."entity_ptr_id']
         else:
-            expected = ["select_for_update_country"]
+            expected = ["select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
 
