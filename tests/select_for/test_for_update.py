@@ -28,11 +28,11 @@ from .models import (
 class SelectForUpdateSQLTests(TransactionTestCase):
     available_apps = ["select_for"]
 
-    def has_for_update_sql(self, queries, **kwargs):
-        # Examine the SQL that was executed to determine whether it
-        # contains the 'SELECT..FOR UPDATE' stanza.
+    def assert_has_for_update_sql(self, queries, **kwargs):
+        # Examine the SQL that was executed to determine whether it contains
+        # the "SELECT ... FOR UPDATE" stanza.
         for_update_sql = connection.ops.for_update_sql(**kwargs)
-        return any(for_update_sql in query["sql"] for query in queries)
+        self.assertIs(any(for_update_sql in query["sql"] for query in queries), True)
 
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_sql_generated(self):
@@ -42,7 +42,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update())
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries))
+        self.assert_has_for_update_sql(ctx.captured_queries)
 
     @skipUnlessDBFeature("has_select_for_update_nowait")
     def test_for_update_sql_generated_nowait(self):
@@ -52,7 +52,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update(nowait=True))
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, nowait=True))
+        self.assert_has_for_update_sql(ctx.captured_queries, nowait=True)
 
     @skipUnlessDBFeature("has_select_for_update_skip_locked")
     def test_for_update_sql_generated_skip_locked(self):
@@ -62,7 +62,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update(skip_locked=True))
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, skip_locked=True))
+        self.assert_has_for_update_sql(ctx.captured_queries, skip_locked=True)
 
     @skipUnlessDBFeature("has_select_for_no_key_update")
     def test_update_sql_generated_no_key(self):
@@ -72,7 +72,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update(no_key=True))
-        self.assertIs(self.has_for_update_sql(ctx.captured_queries, no_key=True), True)
+        self.assert_has_for_update_sql(ctx.captured_queries, no_key=True)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_generated_of(self):
@@ -95,7 +95,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_person", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_generated_of(self):
@@ -106,7 +106,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_eucountry"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_ptr_generated_of(self):
@@ -127,7 +127,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_eucountry", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_related_model_inheritance_generated_of(self):
@@ -145,7 +145,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_eucity", "select_for_eucountry"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_nested_ptr_generated_of(self):
@@ -163,7 +163,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_eucity", "select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_multilevel_model_inheritance_ptr_generated_of(self):
@@ -178,7 +178,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_country", "select_for_entity"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_proxy_generated_of(self):
@@ -193,7 +193,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         else:
             expected = ["select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
-        self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+        self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
 
 class SelectForUpdateTests(TransactionTestCase):
