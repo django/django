@@ -10,4 +10,5 @@ in 4.1.5.
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 4.1 that caused a crash of model validation on
+  ``UniqueConstraint`` with ordered expressions (:ticket:`34291`).
