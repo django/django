@@ -143,6 +143,39 @@ class TestGeneralAggregate(PostgreSQLTestCase):
         ).filter(array__overlap=[2]).values_list('array', flat=True)
         self.assertCountEqual(qs.get(), [1, 2])
 
+    def test_array_agg_filter_index(self):
+        aggr1 = AggregateTestModel.objects.create(integer_field=1)
+        aggr2 = AggregateTestModel.objects.create(integer_field=2)
+        StatTestModel.objects.create(related_field=aggr1, int1=1, int2=0)
+        StatTestModel.objects.create(related_field=aggr1, int1=2, int2=1)
+        StatTestModel.objects.create(related_field=aggr2, int1=3, int2=0)
+        StatTestModel.objects.create(related_field=aggr2, int1=4, int2=1)
+        qs = (
+            AggregateTestModel.objects
+            .filter(pk__in=[aggr1.pk, aggr2.pk])  # Exclude those created by setUpTestData
+            .annotate(array=ArrayAgg("stattestmodel__int1", filter=Q(stattestmodel__int2=0)))
+            .annotate(array_value=F('array__0'))
+            .values_list("array_value", flat=True)
+        )
+        self.assertCountEqual(qs.all(), [1, 3])
+
+    def test_array_agg_filter_slice(self):
+        aggr1 = AggregateTestModel.objects.create(integer_field=1)
+        aggr2 = AggregateTestModel.objects.create(integer_field=2)
+        StatTestModel.objects.create(related_field=aggr1, int1=1, int2=0)
+        StatTestModel.objects.create(related_field=aggr1, int1=2, int2=1)
+        StatTestModel.objects.create(related_field=aggr2, int1=3, int2=0)
+        StatTestModel.objects.create(related_field=aggr2, int1=4, int2=1)
+        StatTestModel.objects.create(related_field=aggr2, int1=5, int2=0)
+        qs = (
+            AggregateTestModel.objects
+            .filter(pk__in=[aggr1.pk, aggr2.pk])  # Exclude those created by setUpTestData
+            .annotate(array=ArrayAgg("stattestmodel__int1", filter=Q(stattestmodel__int2=0)))
+            .annotate(array_value=F('array__1_2'))
+            .values_list("array_value", flat=True)
+        )
+        self.assertCountEqual(qs.all(), [[], [5]])
+
     def test_bit_and_general(self):
         values = AggregateTestModel.objects.filter(
             integer_field__in=[0, 1]).aggregate(bitand=BitAnd('integer_field'))
