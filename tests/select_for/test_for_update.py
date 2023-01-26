@@ -1,5 +1,6 @@
 import threading
 import time
+from contextlib import contextmanager
 from unittest import mock
 
 from multiple_database.routers import TestRouter
@@ -245,34 +246,32 @@ class SelectForUpdateTests(TransactionTestCase):
         )
         self.person_profile = PersonProfile.objects.create(person=self.person)
 
+    def build_raw_sql(self, connection, model, **kwargs):
+        for_update_sql = connection.ops.for_update_sql(**kwargs)
+        table = connection.ops.quote_name(model._meta.db_table)
+        return f"SELECT * FROM {table} {for_update_sql};"
+
+    @contextmanager
+    def blocking_transaction(self, **kwargs):
         # We need another database connection in transaction to test that one
         # connection issuing a SELECT ... FOR UPDATE will block.
-        self.new_connection = connection.copy()
-
-    def tearDown(self):
+        new_connection = connection.copy()
         try:
-            self.end_blocking_transaction()
-        except (DatabaseError, AttributeError):
-            pass
-        self.new_connection.close()
+            new_connection.set_autocommit(False)
+            # Start a blocking transaction.
+            cursor = new_connection.cursor()
+            sql = self.build_raw_sql(new_connection, Country, **kwargs)
+            cursor.execute(sql, ())
+            cursor.fetchone()
 
-    def start_blocking_transaction(self):
-        self.new_connection.set_autocommit(False)
-        # Start a blocking transaction. At some point,
-        # end_blocking_transaction() should be called.
-        self.cursor = self.new_connection.cursor()
-        sql = "SELECT * FROM %(db_table)s %(for_update)s;" % {
-            "db_table": Person._meta.db_table,
-            "for_update": self.new_connection.ops.for_update_sql(),
-        }
-        self.cursor.execute(sql, ())
-        self.cursor.fetchone()
+            yield cursor
 
-    def end_blocking_transaction(self):
-        # Roll back the blocking transaction.
-        self.cursor.close()
-        self.new_connection.rollback()
-        self.new_connection.set_autocommit(True)
+        finally:
+            # Roll back the blocking transaction.
+            cursor.close()
+            new_connection.rollback()
+            new_connection.set_autocommit(True)
+            new_connection.close()
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_of_followed_by_values(self):
@@ -317,19 +316,17 @@ class SelectForUpdateTests(TransactionTestCase):
         If nowait is specified, we expect an error to be raised rather
         than blocking.
         """
-        self.start_blocking_transaction()
-        status = []
+        with self.blocking_transaction():
+            status = []
+            thread = threading.Thread(
+                target=self.run_select_for_update,
+                args=(status,),
+                kwargs={"nowait": True},
+            )
+            thread.start()
+            time.sleep(1)
+            thread.join()
 
-        thread = threading.Thread(
-            target=self.run_select_for_update,
-            args=(status,),
-            kwargs={"nowait": True},
-        )
-
-        thread.start()
-        time.sleep(1)
-        thread.join()
-        self.end_blocking_transaction()
         self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature("has_select_for_update_skip_locked", "supports_transactions")
@@ -338,17 +335,17 @@ class SelectForUpdateTests(TransactionTestCase):
         If skip_locked is specified, the locked row is skipped resulting in
         Person.DoesNotExist.
         """
-        self.start_blocking_transaction()
-        status = []
-        thread = threading.Thread(
-            target=self.run_select_for_update,
-            args=(status,),
-            kwargs={"skip_locked": True},
-        )
-        thread.start()
-        time.sleep(1)
-        thread.join()
-        self.end_blocking_transaction()
+        with self.blocking_transaction():
+            status = []
+            thread = threading.Thread(
+                target=self.run_select_for_update,
+                args=(status,),
+                kwargs={"skip_locked": True},
+            )
+            thread.start()
+            time.sleep(1)
+            thread.join()
+
         self.assertIsInstance(status[-1], Person.DoesNotExist)
 
     @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
@@ -507,31 +504,30 @@ class SelectForUpdateTests(TransactionTestCase):
         by a similar operation on another connection blocks correctly.
         """
         # First, let's start the transaction in our thread.
-        self.start_blocking_transaction()
+        with self.blocking_transaction():
 
-        # Now, try it again using the ORM's select_for_update
-        # facility. Do this in a separate thread.
-        status = []
-        thread = threading.Thread(target=self.run_select_for_update, args=(status,))
+            # Now, try it again using the ORM's select_for_update
+            # facility. Do this in a separate thread.
+            status = []
+            thread = threading.Thread(target=self.run_select_for_update, args=(status,))
 
-        # The thread should immediately block, but we'll sleep
-        # for a bit to make sure.
-        thread.start()
-        sanity_count = 0
-        while len(status) != 1 and sanity_count < 10:
-            sanity_count += 1
-            time.sleep(1)
-        if sanity_count >= 10:
-            raise ValueError("Thread did not run and block")
+            # The thread should immediately block, but we'll sleep
+            # for a bit to make sure.
+            thread.start()
+            sanity_count = 0
+            while len(status) != 1 and sanity_count < 10:
+                sanity_count += 1
+                time.sleep(1)
+            if sanity_count >= 10:
+                raise ValueError("Thread did not run and block")
 
-        # Check the person hasn't been updated. Since this isn't
-        # using FOR UPDATE, it won't block.
-        p = Person.objects.get(pk=self.person.pk)
-        self.assertEqual("Reinhardt", p.name)
+            # Check the person hasn't been updated. Since this isn't
+            # using FOR UPDATE, it won't block.
+            p = Person.objects.get(pk=self.person.pk)
+            self.assertEqual("Reinhardt", p.name)
 
         # When we end our blocking transaction, our thread should
         # be able to continue.
-        self.end_blocking_transaction()
         thread.join(5.0)
 
         # Check the thread has finished. Assuming it has, we should
@@ -551,35 +547,35 @@ class SelectForUpdateTests(TransactionTestCase):
         Running a raw query which can't obtain a FOR UPDATE lock raises
         the correct exception
         """
-        self.start_blocking_transaction()
+        with self.blocking_transaction():
 
-        def raw(status):
-            try:
-                list(
-                    Person.objects.raw(
-                        "SELECT * FROM %s %s"
-                        % (
-                            Person._meta.db_table,
-                            connection.ops.for_update_sql(nowait=True),
+            def raw(status):
+                try:
+                    list(
+                        Person.objects.raw(
+                            "SELECT * FROM %s %s"
+                            % (
+                                Person._meta.db_table,
+                                connection.ops.for_update_sql(nowait=True),
+                            )
                         )
                     )
-                )
-            except DatabaseError as e:
-                status.append(e)
-            finally:
-                # This method is run in a separate thread. It uses its own
-                # database connection. Close it without waiting for the GC.
-                # Connection cannot be closed on Oracle because cursor is still
-                # open.
-                if connection.vendor != "oracle":
-                    connection.close()
+                except DatabaseError as e:
+                    status.append(e)
+                finally:
+                    # This method is run in a separate thread. It uses its own
+                    # database connection. Close it without waiting for the GC.
+                    # Connection cannot be closed on Oracle because cursor is still
+                    # open.
+                    if connection.vendor != "oracle":
+                        connection.close()
 
-        status = []
-        thread = threading.Thread(target=raw, kwargs={"status": status})
-        thread.start()
-        time.sleep(1)
-        thread.join()
-        self.end_blocking_transaction()
+            status = []
+            thread = threading.Thread(target=raw, kwargs={"status": status})
+            thread.start()
+            time.sleep(1)
+            thread.join()
+
         self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature("has_select_for_update")
