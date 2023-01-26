@@ -5,14 +5,7 @@ from unittest import mock
 from multiple_database.routers import TestRouter
 
 from django.core.exceptions import FieldError
-from django.db import (
-    DatabaseError,
-    NotSupportedError,
-    connection,
-    connections,
-    router,
-    transaction,
-)
+from django.db import DatabaseError, NotSupportedError, connection, router, transaction
 from django.test import (
     TransactionTestCase,
     override_settings,
@@ -138,8 +131,7 @@ class SelectForUpdateTests(TransactionTestCase):
                 )
                 .select_for_update(of=("self", "born__country"))
             )
-        features = connections["default"].features
-        if features.select_for_update_of_column:
+        if connection.features.select_for_update_of_column:
             expected = ['select_for_person"."id', 'select_for_country"."entity_ptr_id']
         else:
             expected = ["select_for_person", "select_for_country"]
@@ -469,10 +461,9 @@ class SelectForUpdateTests(TransactionTestCase):
 
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_after_from(self):
-        features_class = connections["default"].features.__class__
         attribute_to_patch = "%s.%s.for_update_after_from" % (
-            features_class.__module__,
-            features_class.__name__,
+            connection.features.__class__.__module__,
+            connection.features.__class__.__name__,
         )
         with mock.patch(attribute_to_patch, return_value=True):
             with transaction.atomic():
