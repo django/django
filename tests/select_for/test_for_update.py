@@ -25,49 +25,8 @@ from .models import (
 )
 
 
-class SelectForUpdateTests(TransactionTestCase):
+class SelectForUpdateSQLTests(TransactionTestCase):
     available_apps = ["select_for"]
-
-    def setUp(self):
-        # This is executed in autocommit mode so that code in
-        # run_select_for_update can see this data.
-        self.country1 = Country.objects.create(name="Belgium")
-        self.country2 = Country.objects.create(name="France")
-        self.city1 = City.objects.create(name="Liberchies", country=self.country1)
-        self.city2 = City.objects.create(name="Samois-sur-Seine", country=self.country2)
-        self.person = Person.objects.create(
-            name="Reinhardt", born=self.city1, died=self.city2
-        )
-        self.person_profile = PersonProfile.objects.create(person=self.person)
-
-        # We need another database connection in transaction to test that one
-        # connection issuing a SELECT ... FOR UPDATE will block.
-        self.new_connection = connection.copy()
-
-    def tearDown(self):
-        try:
-            self.end_blocking_transaction()
-        except (DatabaseError, AttributeError):
-            pass
-        self.new_connection.close()
-
-    def start_blocking_transaction(self):
-        self.new_connection.set_autocommit(False)
-        # Start a blocking transaction. At some point,
-        # end_blocking_transaction() should be called.
-        self.cursor = self.new_connection.cursor()
-        sql = "SELECT * FROM %(db_table)s %(for_update)s;" % {
-            "db_table": Person._meta.db_table,
-            "for_update": self.new_connection.ops.for_update_sql(),
-        }
-        self.cursor.execute(sql, ())
-        self.cursor.fetchone()
-
-    def end_blocking_transaction(self):
-        # Roll back the blocking transaction.
-        self.cursor.close()
-        self.new_connection.rollback()
-        self.new_connection.set_autocommit(True)
 
     def has_for_update_sql(self, queries, **kwargs):
         # Examine the SQL that was executed to determine whether it
@@ -235,6 +194,51 @@ class SelectForUpdateTests(TransactionTestCase):
             expected = ["select_for_country"]
         expected = [connection.ops.quote_name(value) for value in expected]
         self.assertTrue(self.has_for_update_sql(ctx.captured_queries, of=expected))
+
+
+class SelectForUpdateTests(TransactionTestCase):
+    available_apps = ["select_for"]
+
+    def setUp(self):
+        # This is executed in autocommit mode so that code in
+        # run_select_for_update can see this data.
+        self.country1 = Country.objects.create(name="Belgium")
+        self.country2 = Country.objects.create(name="France")
+        self.city1 = City.objects.create(name="Liberchies", country=self.country1)
+        self.city2 = City.objects.create(name="Samois-sur-Seine", country=self.country2)
+        self.person = Person.objects.create(
+            name="Reinhardt", born=self.city1, died=self.city2
+        )
+        self.person_profile = PersonProfile.objects.create(person=self.person)
+
+        # We need another database connection in transaction to test that one
+        # connection issuing a SELECT ... FOR UPDATE will block.
+        self.new_connection = connection.copy()
+
+    def tearDown(self):
+        try:
+            self.end_blocking_transaction()
+        except (DatabaseError, AttributeError):
+            pass
+        self.new_connection.close()
+
+    def start_blocking_transaction(self):
+        self.new_connection.set_autocommit(False)
+        # Start a blocking transaction. At some point,
+        # end_blocking_transaction() should be called.
+        self.cursor = self.new_connection.cursor()
+        sql = "SELECT * FROM %(db_table)s %(for_update)s;" % {
+            "db_table": Person._meta.db_table,
+            "for_update": self.new_connection.ops.for_update_sql(),
+        }
+        self.cursor.execute(sql, ())
+        self.cursor.fetchone()
+
+    def end_blocking_transaction(self):
+        # Roll back the blocking transaction.
+        self.cursor.close()
+        self.new_connection.rollback()
+        self.new_connection.set_autocommit(True)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_of_followed_by_values(self):
