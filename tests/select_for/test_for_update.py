@@ -170,7 +170,7 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_nowait_raises_error(self):
         """
-        NotSupportedError is raised if a SELECT...FOR UPDATE NOWAIT is run on
+        NotSupportedError is raised if a SELECT ... FOR UPDATE NOWAIT is run on
         a database backend that supports FOR UPDATE but not NOWAIT.
         """
         msg = "NOWAIT is not supported on this database backend."
@@ -181,8 +181,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_skip_locked_raises_error(self):
         """
-        NotSupportedError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run
-        on a database backend that supports FOR UPDATE but not SKIP LOCKED.
+        NotSupportedError is raised if a SELECT ... FOR UPDATE SKIP LOCKED is
+        run on a database backend that supports FOR UPDATE but not SKIP LOCKED.
         """
         msg = "SKIP LOCKED is not supported on this database backend."
         with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
@@ -192,7 +192,7 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_of_raises_error(self):
         """
-        NotSupportedError is raised if a SELECT...FOR UPDATE OF... is run on
+        NotSupportedError is raised if a SELECT ... FOR UPDATE OF ... is run on
         a database backend that supports FOR UPDATE but not OF.
         """
         msg = "FOR UPDATE OF is not supported on this database backend."
@@ -203,8 +203,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_no_key_raises_error(self):
         """
-        NotSupportedError is raised if a SELECT...FOR NO KEY UPDATE... is run
-        on a database backend that supports FOR UPDATE but not NO KEY.
+        NotSupportedError is raised if a SELECT ... FOR NO KEY UPDATE ... is
+        run on a database backend that supports FOR UPDATE but not NO KEY.
         """
         msg = "FOR NO KEY UPDATE is not supported on this database backend."
         with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
