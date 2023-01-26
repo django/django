@@ -46,8 +46,8 @@ class SelectForUpdateSQLTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_sql_generated(self):
         """
-        The backend's FOR UPDATE variant appears in
-        generated SQL when select_for_update is invoked.
+        The backend's FOR UPDATE variant appears in generated SQL when
+        select_for_update() is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update())
@@ -56,8 +56,8 @@ class SelectForUpdateSQLTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update_nowait")
     def test_for_update_sql_generated_nowait(self):
         """
-        The backend's FOR UPDATE NOWAIT variant appears in
-        generated SQL when select_for_update is invoked.
+        The backend's FOR UPDATE NOWAIT variant appears in generated SQL when
+        select_for_update() is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update(nowait=True))
@@ -66,15 +66,15 @@ class SelectForUpdateSQLTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update_skip_locked")
     def test_for_update_sql_generated_skip_locked(self):
         """
-        The backend's FOR UPDATE SKIP LOCKED variant appears in
-        generated SQL when select_for_update is invoked.
+        The backend's FOR UPDATE SKIP LOCKED variant appears in generated SQL
+        when select_for_update() is invoked.
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(Person.objects.select_for_update(skip_locked=True))
         self.assert_has_for_update_sql(ctx.captured_queries, skip_locked=True)
 
     @skipUnlessDBFeature("has_select_for_no_key_update")
-    def test_update_sql_generated_no_key(self):
+    def test_for_update_sql_generated_no_key(self):
         """
         The backend's FOR NO KEY UPDATE variant appears in generated SQL when
         select_for_update() is invoked.
@@ -91,12 +91,8 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         """
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
-                Person.objects.select_related(
-                    "born__country",
-                )
-                .select_for_update(
-                    of=("born__country",),
-                )
+                Person.objects.select_related("born__country")
+                .select_for_update(of=("born__country",))
                 .select_for_update(of=("self", "born__country"))
             )
         expected = ['"select_for_person"."id"', '"select_for_country"."entity_ptr_id"']
@@ -112,14 +108,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_ptr_generated_of(self):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
-            list(
-                EUCountry.objects.select_for_update(
-                    of=(
-                        "self",
-                        "country_ptr",
-                    )
-                )
-            )
+            list(EUCountry.objects.select_for_update(of=("self", "country_ptr")))
         expected = [
             '"select_for_eucountry"."country_ptr_id"',
             '"select_for_country"."entity_ptr_id"',
@@ -131,7 +120,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
                 EUCity.objects.select_related("country").select_for_update(
-                    of=("self", "country"),
+                    of=("self", "country")
                 )
             )
         expected = [
@@ -145,10 +134,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
                 EUCity.objects.select_related("country").select_for_update(
-                    of=(
-                        "self",
-                        "country__country_ptr",
-                    ),
+                    of=("self", "country__country_ptr")
                 )
             )
         expected = ['"select_for_eucity"."id"', '"select_for_country"."entity_ptr_id"']
@@ -159,7 +145,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
                 EUCountry.objects.select_for_update(
-                    of=("country_ptr", "country_ptr__entity_ptr"),
+                    of=("country_ptr", "country_ptr__entity_ptr")
                 )
             )
         expected = ['"select_for_country"."entity_ptr_id"', '"select_for_entity"."id"']
@@ -170,7 +156,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
                 CityCountryProxy.objects.select_related("country").select_for_update(
-                    of=("country",),
+                    of=("country",)
                 )
             )
         expected = ['"select_for_country"."entity_ptr_id"']
