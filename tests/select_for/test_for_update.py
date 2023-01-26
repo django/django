@@ -174,9 +174,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         a database backend that supports FOR UPDATE but not NOWAIT.
         """
         msg = "NOWAIT is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(nowait=True).get()
+        with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
+            Person.objects.select_for_update(nowait=True).get()
 
     @skipIfDBFeature("has_select_for_update_skip_locked")
     @skipUnlessDBFeature("has_select_for_update")
@@ -186,9 +185,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         on a database backend that supports FOR UPDATE but not SKIP LOCKED.
         """
         msg = "SKIP LOCKED is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(skip_locked=True).get()
+        with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
+            Person.objects.select_for_update(skip_locked=True).get()
 
     @skipIfDBFeature("has_select_for_update_of")
     @skipUnlessDBFeature("has_select_for_update")
@@ -198,9 +196,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         a database backend that supports FOR UPDATE but not OF.
         """
         msg = "FOR UPDATE OF is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(of=("self",)).get()
+        with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
+            Person.objects.select_for_update(of=("self",)).get()
 
     @skipIfDBFeature("has_select_for_no_key_update")
     @skipUnlessDBFeature("has_select_for_update")
@@ -210,9 +207,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         on a database backend that supports FOR UPDATE but not NO KEY.
         """
         msg = "FOR NO KEY UPDATE is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(no_key=True).get()
+        with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
+            Person.objects.select_for_update(no_key=True).get()
 
     @skipIfDBFeature("supports_select_for_update_with_limit")
     def test_unsupported_select_for_update_with_limit(self):
@@ -220,22 +216,18 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             "LIMIT/OFFSET is not supported with select_for_update on this database "
             "backend."
         )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                list(Person.objects.order_by("pk").select_for_update()[1:2])
+        with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
+            list(Person.objects.order_by("pk").select_for_update()[1:2])
 
     @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_after_from(self):
-        attribute_to_patch = "%s.%s.for_update_after_from" % (
-            connection.features.__class__.__module__,
-            connection.features.__class__.__name__,
-        )
-        with mock.patch(attribute_to_patch, return_value=True):
-            with transaction.atomic():
-                self.assertIn(
-                    "FOR UPDATE WHERE",
-                    str(Person.objects.filter(name="foo").select_for_update().query),
-                )
+        klass = connection.features.__class__
+        feature_to_patch = f"{klass.__module__}.{klass.__name__}.for_update_after_from"
+        with mock.patch(feature_to_patch, return_value=True), transaction.atomic():
+            self.assertIn(
+                "FOR UPDATE WHERE",
+                str(Person.objects.filter(name="foo").select_for_update().query),
+            )
 
 
 class SelectForUpdateTests(TransactionTestCase):
