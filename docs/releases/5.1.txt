@@ -226,7 +226,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The ``BaseDatabaseOperations.for_update_sql()`` method now expects all
+  arguments to be keyword-only.
 
 Miscellaneous
 -------------
