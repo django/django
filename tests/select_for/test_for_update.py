@@ -163,6 +163,83 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
 
+class SelectForUpdateFeatureTests(TransactionTestCase):
+    available_apps = ["select_for"]
+
+    @skipIfDBFeature("has_select_for_update_nowait")
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_unsupported_nowait_raises_error(self):
+        """
+        NotSupportedError is raised if a SELECT...FOR UPDATE NOWAIT is run on
+        a database backend that supports FOR UPDATE but not NOWAIT.
+        """
+        with self.assertRaisesMessage(
+            NotSupportedError, "NOWAIT is not supported on this database backend."
+        ):
+            with transaction.atomic():
+                Person.objects.select_for_update(nowait=True).get()
+
+    @skipIfDBFeature("has_select_for_update_skip_locked")
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_unsupported_skip_locked_raises_error(self):
+        """
+        NotSupportedError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run
+        on a database backend that supports FOR UPDATE but not SKIP LOCKED.
+        """
+        with self.assertRaisesMessage(
+            NotSupportedError, "SKIP LOCKED is not supported on this database backend."
+        ):
+            with transaction.atomic():
+                Person.objects.select_for_update(skip_locked=True).get()
+
+    @skipIfDBFeature("has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_unsupported_of_raises_error(self):
+        """
+        NotSupportedError is raised if a SELECT...FOR UPDATE OF... is run on
+        a database backend that supports FOR UPDATE but not OF.
+        """
+        msg = "FOR UPDATE OF is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic():
+                Person.objects.select_for_update(of=("self",)).get()
+
+    @skipIfDBFeature("has_select_for_no_key_update")
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_unsuported_no_key_raises_error(self):
+        """
+        NotSupportedError is raised if a SELECT...FOR NO KEY UPDATE... is run
+        on a database backend that supports FOR UPDATE but not NO KEY.
+        """
+        msg = "FOR NO KEY UPDATE is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic():
+                Person.objects.select_for_update(no_key=True).get()
+
+    @skipIfDBFeature("supports_select_for_update_with_limit")
+    def test_unsupported_select_for_update_with_limit(self):
+        msg = (
+            "LIMIT/OFFSET is not supported with select_for_update on this database "
+            "backend."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            with transaction.atomic():
+                list(Person.objects.order_by("pk").select_for_update()[1:2])
+
+    @skipUnlessDBFeature("has_select_for_update")
+    def test_for_update_after_from(self):
+        attribute_to_patch = "%s.%s.for_update_after_from" % (
+            connection.features.__class__.__module__,
+            connection.features.__class__.__name__,
+        )
+        with mock.patch(attribute_to_patch, return_value=True):
+            with transaction.atomic():
+                self.assertIn(
+                    "FOR UPDATE WHERE",
+                    str(Person.objects.filter(name="foo").select_for_update().query),
+                )
+
+
 class SelectForUpdateTests(TransactionTestCase):
     available_apps = ["select_for"]
 
@@ -284,56 +361,6 @@ class SelectForUpdateTests(TransactionTestCase):
         self.end_blocking_transaction()
         self.assertIsInstance(status[-1], Person.DoesNotExist)
 
-    @skipIfDBFeature("has_select_for_update_nowait")
-    @skipUnlessDBFeature("has_select_for_update")
-    def test_unsupported_nowait_raises_error(self):
-        """
-        NotSupportedError is raised if a SELECT...FOR UPDATE NOWAIT is run on
-        a database backend that supports FOR UPDATE but not NOWAIT.
-        """
-        with self.assertRaisesMessage(
-            NotSupportedError, "NOWAIT is not supported on this database backend."
-        ):
-            with transaction.atomic():
-                Person.objects.select_for_update(nowait=True).get()
-
-    @skipIfDBFeature("has_select_for_update_skip_locked")
-    @skipUnlessDBFeature("has_select_for_update")
-    def test_unsupported_skip_locked_raises_error(self):
-        """
-        NotSupportedError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run
-        on a database backend that supports FOR UPDATE but not SKIP LOCKED.
-        """
-        with self.assertRaisesMessage(
-            NotSupportedError, "SKIP LOCKED is not supported on this database backend."
-        ):
-            with transaction.atomic():
-                Person.objects.select_for_update(skip_locked=True).get()
-
-    @skipIfDBFeature("has_select_for_update_of")
-    @skipUnlessDBFeature("has_select_for_update")
-    def test_unsupported_of_raises_error(self):
-        """
-        NotSupportedError is raised if a SELECT...FOR UPDATE OF... is run on
-        a database backend that supports FOR UPDATE but not OF.
-        """
-        msg = "FOR UPDATE OF is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(of=("self",)).get()
-
-    @skipIfDBFeature("has_select_for_no_key_update")
-    @skipUnlessDBFeature("has_select_for_update")
-    def test_unsuported_no_key_raises_error(self):
-        """
-        NotSupportedError is raised if a SELECT...FOR NO KEY UPDATE... is run
-        on a database backend that supports FOR UPDATE but not NO KEY.
-        """
-        msg = "FOR NO KEY UPDATE is not supported on this database backend."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                Person.objects.select_for_update(no_key=True).get()
-
     @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
     def test_unrelated_of_argument_raises_error(self):
         """
@@ -430,19 +457,6 @@ class SelectForUpdateTests(TransactionTestCase):
             )
             self.assertEqual(person.profile, self.person_profile)
 
-    @skipUnlessDBFeature("has_select_for_update")
-    def test_for_update_after_from(self):
-        attribute_to_patch = "%s.%s.for_update_after_from" % (
-            connection.features.__class__.__module__,
-            connection.features.__class__.__name__,
-        )
-        with mock.patch(attribute_to_patch, return_value=True):
-            with transaction.atomic():
-                self.assertIn(
-                    "FOR UPDATE WHERE",
-                    str(Person.objects.filter(name="foo").select_for_update().query),
-                )
-
     @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_requires_transaction(self):
         """
@@ -471,16 +485,6 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             qs = list(Person.objects.order_by("pk").select_for_update()[1:2])
             self.assertEqual(qs[0], other)
-
-    @skipIfDBFeature("supports_select_for_update_with_limit")
-    def test_unsupported_select_for_update_with_limit(self):
-        msg = (
-            "LIMIT/OFFSET is not supported with select_for_update on this database "
-            "backend."
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with transaction.atomic():
-                list(Person.objects.order_by("pk").select_for_update()[1:2])
 
     def run_select_for_update(self, status, **kwargs):
         """
