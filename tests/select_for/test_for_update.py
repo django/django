@@ -173,9 +173,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         NotSupportedError is raised if a SELECT...FOR UPDATE NOWAIT is run on
         a database backend that supports FOR UPDATE but not NOWAIT.
         """
-        with self.assertRaisesMessage(
-            NotSupportedError, "NOWAIT is not supported on this database backend."
-        ):
+        msg = "NOWAIT is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic():
                 Person.objects.select_for_update(nowait=True).get()
 
@@ -186,9 +185,8 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         NotSupportedError is raised if a SELECT...FOR UPDATE SKIP LOCKED is run
         on a database backend that supports FOR UPDATE but not SKIP LOCKED.
         """
-        with self.assertRaisesMessage(
-            NotSupportedError, "SKIP LOCKED is not supported on this database backend."
-        ):
+        msg = "SKIP LOCKED is not supported on this database backend."
+        with self.assertRaisesMessage(NotSupportedError, msg):
             with transaction.atomic():
                 Person.objects.select_for_update(skip_locked=True).get()
 
@@ -206,7 +204,7 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
 
     @skipIfDBFeature("has_select_for_no_key_update")
     @skipUnlessDBFeature("has_select_for_update")
-    def test_unsuported_no_key_raises_error(self):
+    def test_unsupported_no_key_raises_error(self):
         """
         NotSupportedError is raised if a SELECT...FOR NO KEY UPDATE... is run
         on a database backend that supports FOR UPDATE but not NO KEY.
