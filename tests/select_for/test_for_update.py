@@ -6,6 +6,7 @@ from multiple_database.routers import TestRouter
 
 from django.core.exceptions import FieldError
 from django.db import DatabaseError, NotSupportedError, connection, router, transaction
+from django.db.backends.utils import split_identifier
 from django.test import (
     TransactionTestCase,
     override_settings,
@@ -29,6 +30,14 @@ class SelectForUpdateSQLTests(TransactionTestCase):
     available_apps = ["select_for"]
 
     def assert_has_for_update_sql(self, queries, **kwargs):
+        # To keep test cases simple and consistent, always pass in the expected
+        # `of` values in `"table"."column"` form and let the column be stripped
+        # off here if not required for the backend. Also ensure correct quotes.
+        if of := kwargs.get("of"):
+            if not connection.features.select_for_update_of_column:
+                of = [split_identifier(column)[0] for column in of]
+            kwargs["of"] = [connection.ops.quote_name(value) for value in of]
+
         # Examine the SQL that was executed to determine whether it contains
         # the "SELECT ... FOR UPDATE" stanza.
         for_update_sql = connection.ops.for_update_sql(**kwargs)
@@ -90,22 +99,14 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                 )
                 .select_for_update(of=("self", "born__country"))
             )
-        if connection.features.select_for_update_of_column:
-            expected = ['select_for_person"."id', 'select_for_country"."entity_ptr_id']
-        else:
-            expected = ["select_for_person", "select_for_country"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = ['"select_for_person"."id"', '"select_for_country"."entity_ptr_id"']
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_sql_model_inheritance_generated_of(self):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(EUCountry.objects.select_for_update(of=("self",)))
-        if connection.features.select_for_update_of_column:
-            expected = ['select_for_eucountry"."country_ptr_id']
-        else:
-            expected = ["select_for_eucountry"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = ['"select_for_eucountry"."country_ptr_id"']
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -119,14 +120,10 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                     )
                 )
             )
-        if connection.features.select_for_update_of_column:
-            expected = [
-                'select_for_eucountry"."country_ptr_id',
-                'select_for_country"."entity_ptr_id',
-            ]
-        else:
-            expected = ["select_for_eucountry", "select_for_country"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = [
+            '"select_for_eucountry"."country_ptr_id"',
+            '"select_for_country"."entity_ptr_id"',
+        ]
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -137,14 +134,10 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                     of=("self", "country"),
                 )
             )
-        if connection.features.select_for_update_of_column:
-            expected = [
-                'select_for_eucity"."id',
-                'select_for_eucountry"."country_ptr_id',
-            ]
-        else:
-            expected = ["select_for_eucity", "select_for_eucountry"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = [
+            '"select_for_eucity"."id"',
+            '"select_for_eucountry"."country_ptr_id"',
+        ]
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -158,11 +151,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                     ),
                 )
             )
-        if connection.features.select_for_update_of_column:
-            expected = ['select_for_eucity"."id', 'select_for_country"."entity_ptr_id']
-        else:
-            expected = ["select_for_eucity", "select_for_country"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = ['"select_for_eucity"."id"', '"select_for_country"."entity_ptr_id"']
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -173,11 +162,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                     of=("country_ptr", "country_ptr__entity_ptr"),
                 )
             )
-        if connection.features.select_for_update_of_column:
-            expected = ['select_for_country"."entity_ptr_id', 'select_for_entity"."id']
-        else:
-            expected = ["select_for_country", "select_for_entity"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = ['"select_for_country"."entity_ptr_id"', '"select_for_entity"."id"']
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
     @skipUnlessDBFeature("has_select_for_update_of")
@@ -188,11 +173,7 @@ class SelectForUpdateSQLTests(TransactionTestCase):
                     of=("country",),
                 )
             )
-        if connection.features.select_for_update_of_column:
-            expected = ['select_for_country"."entity_ptr_id']
-        else:
-            expected = ["select_for_country"]
-        expected = [connection.ops.quote_name(value) for value in expected]
+        expected = ['"select_for_country"."entity_ptr_id"']
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
 
