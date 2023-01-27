@@ -231,20 +231,12 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             )
 
 
-class SelectForUpdateTests(TransactionTestCase):
+class SelectForUpdateBlockingTests(TransactionTestCase):
     available_apps = ["select_for"]
 
     def setUp(self):
-        # This is executed in autocommit mode so that code in
-        # run_select_for_update can see this data.
-        self.country1 = Country.objects.create(name="Belgium")
-        self.country2 = Country.objects.create(name="France")
-        self.city1 = City.objects.create(name="Liberchies", country=self.country1)
-        self.city2 = City.objects.create(name="Samois-sur-Seine", country=self.country2)
-        self.person = Person.objects.create(
-            name="Reinhardt", born=self.city1, died=self.city2
-        )
-        self.person_profile = PersonProfile.objects.create(person=self.person)
+        # Executed in autocommit mode so that data can be seen inside thread.
+        self.country = Country.objects.create(name="United States")
 
     def build_raw_sql(self, connection, model, **kwargs):
         for_update_sql = connection.ops.for_update_sql(**kwargs)
@@ -272,6 +264,146 @@ class SelectForUpdateTests(TransactionTestCase):
             new_connection.rollback()
             new_connection.set_autocommit(True)
             new_connection.close()
+
+    def run_select_for_update(self, *, status, raw=False, **kwargs):
+        """
+        Utility method that runs a SELECT FOR UPDATE against all Country
+        instances. After the select_for_update, it attempts to update the name
+        of the only record, save, and commit.
+
+        This function expects to run in a separate thread.
+        """
+        status.append("started")
+        try:
+            # We need to enter transaction management again, as this is done on
+            # per-thread basis
+            with transaction.atomic():
+                if raw:
+                    sql = self.build_raw_sql(connection, Country, **kwargs)
+                    obj = Country.objects.raw(sql)[0]
+                else:
+                    obj = Country.objects.select_for_update(**kwargs).get()
+                obj.name = "United Kingdom"
+                obj.save()
+        except (DatabaseError, IndexError, Country.DoesNotExist) as exc:
+            status.append(exc)
+        else:
+            status.append(obj)
+        finally:
+            # This method is run in a separate thread. It uses its own database
+            # connection. Close it without waiting for the GC.
+            # Connection cannot be closed on Oracle because cursor is still
+            # open. TODO: Check whether this is actually still the case...
+            if not raw or connection.vendor != "oracle":
+                connection.close()
+
+    def run_blocking_test(self, **kwargs):
+        status = []
+        thread = threading.Thread(
+            target=self.run_select_for_update,
+            kwargs={"status": status} | kwargs,
+        )
+        thread_is_blocking = not kwargs.get("nowait", False) and not kwargs.get(
+            "skip_locked", False
+        )
+
+        # Start a blocking transaction in the current thread.
+        with self.blocking_transaction():
+            # Start a separate thread that will attempt to take a lock on the
+            # same records as the blocking transaction in the current thread.
+            thread.start()
+
+            # Sanity check to ensure that the thread has started.
+            while not status:
+                time.sleep(0.1)
+
+            # If the query in the thread is non-blocking, the thread should be
+            # able to complete before the blocking transaction in the current
+            # thread is resolved.
+            if not thread_is_blocking:
+                thread.join(2.0)
+
+        # Country should not have been modified at this point.
+        # Since this isn't using FOR UPDATE it won't block.
+        country = Country.objects.get(pk=self.country.pk)
+        self.assertEqual(country.name, "United States")
+
+        # If the query in the thread is blocking, it should be able to continue
+        # once the earlier blocking transaction is ended.
+        if thread_is_blocking:
+            thread.join(2.0)
+
+        # Check the thread actually finished and didn't time out to prevent
+        # test execution from hanging indefinitely.
+        self.assertIs(thread.is_alive(), False)
+
+        # Commit the transaction to ensure that MySQL gets a fresh read, since
+        # by default it runs in REPEATABLE READ mode.
+        transaction.commit()
+
+        return status[-1]
+
+    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
+    def test_for_update_blocks_on_other_for_update(self):
+        """
+        A thread running a select_for_update that accesses rows being touched
+        by a similar operation on another connection blocks correctly.
+        """
+        for raw, expected in [(False, Country), (True, Country)]:
+            with self.subTest(raw=raw):
+                result = self.run_blocking_test(raw=raw)
+                self.assertIsInstance(result, expected)
+
+                # Country should have been modified.
+                country = Country.objects.get(pk=self.country.pk)
+                self.assertEqual(country.name, "United Kingdom")
+
+                # Need to reset to the original value due to subTest().
+                Country.objects.filter(pk=self.country.pk).update(name="United States")
+
+    @skipUnlessDBFeature("has_select_for_update_nowait", "supports_transactions")
+    def test_for_update_nowait_raises_error_on_block(self):
+        """
+        If nowait is specified, we expect an error to be raised rather than
+        blocking. Also perform the same test for a raw query.
+        """
+        for raw, expected in [(False, DatabaseError), (True, DatabaseError)]:
+            with self.subTest(raw=raw):
+                result = self.run_blocking_test(raw=raw, nowait=True)
+                self.assertIsInstance(result, expected)
+
+                # Country should not have been modified.
+                country = Country.objects.get(pk=self.country.pk)
+                self.assertEqual(country.name, "United States")
+
+    @skipUnlessDBFeature("has_select_for_update_skip_locked", "supports_transactions")
+    def test_for_update_skip_locked_skips_locked_rows(self):
+        """
+        If skip_locked is specified, the locked row is skipped resulting in
+        Country.DoesNotExist. Also perform the same test for a raw query.
+        """
+        for raw, expected in [(False, Country.DoesNotExist), (True, IndexError)]:
+            with self.subTest(raw=raw):
+                result = self.run_blocking_test(raw=raw, skip_locked=True)
+                self.assertIsInstance(result, expected)
+
+                # Country should not have been modified.
+                country = Country.objects.get(pk=self.country.pk)
+                self.assertEqual(country.name, "United States")
+
+
+class SelectForUpdateTests(TransactionTestCase):
+    available_apps = ["select_for"]
+
+    def setUp(self):
+        country1 = Country.objects.create(name="Belgium")
+        country2 = Country.objects.create(name="France")
+        self.city1 = City.objects.create(name="Liberchies", country=country1)
+        self.city2 = City.objects.create(name="Samois-sur-Seine", country=country2)
+        self.person = Person.objects.create(
+            name="Reinhardt", born=self.city1, died=self.city2
+        )
+        self.person_profile = PersonProfile.objects.create(person=self.person)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_of_followed_by_values(self):
@@ -309,44 +441,6 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             qs = Person.objects.select_for_update(of=("self", "born"))
             self.assertIs(qs.exists(), True)
-
-    @skipUnlessDBFeature("has_select_for_update_nowait", "supports_transactions")
-    def test_nowait_raises_error_on_block(self):
-        """
-        If nowait is specified, we expect an error to be raised rather
-        than blocking.
-        """
-        with self.blocking_transaction():
-            status = []
-            thread = threading.Thread(
-                target=self.run_select_for_update,
-                args=(status,),
-                kwargs={"nowait": True},
-            )
-            thread.start()
-            time.sleep(1)
-            thread.join()
-
-        self.assertIsInstance(status[-1], DatabaseError)
-
-    @skipUnlessDBFeature("has_select_for_update_skip_locked", "supports_transactions")
-    def test_skip_locked_skips_locked_rows(self):
-        """
-        If skip_locked is specified, the locked row is skipped resulting in
-        Person.DoesNotExist.
-        """
-        with self.blocking_transaction():
-            status = []
-            thread = threading.Thread(
-                target=self.run_select_for_update,
-                args=(status,),
-                kwargs={"skip_locked": True},
-            )
-            thread.start()
-            time.sleep(1)
-            thread.join()
-
-        self.assertIsInstance(status[-1], Person.DoesNotExist)
 
     @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
     def test_unrelated_of_argument_raises_error(self):
@@ -472,111 +566,6 @@ class SelectForUpdateTests(TransactionTestCase):
         with transaction.atomic():
             qs = list(Person.objects.order_by("pk").select_for_update()[1:2])
             self.assertEqual(qs[0], other)
-
-    def run_select_for_update(self, status, **kwargs):
-        """
-        Utility method that runs a SELECT FOR UPDATE against all
-        Person instances. After the select_for_update, it attempts
-        to update the name of the only record, save, and commit.
-
-        This function expects to run in a separate thread.
-        """
-        status.append("started")
-        try:
-            # We need to enter transaction management again, as this is done on
-            # per-thread basis
-            with transaction.atomic():
-                person = Person.objects.select_for_update(**kwargs).get()
-                person.name = "Fred"
-                person.save()
-        except (DatabaseError, Person.DoesNotExist) as e:
-            status.append(e)
-        finally:
-            # This method is run in a separate thread. It uses its own
-            # database connection. Close it without waiting for the GC.
-            connection.close()
-
-    @skipUnlessDBFeature("has_select_for_update")
-    @skipUnlessDBFeature("supports_transactions")
-    def test_block(self):
-        """
-        A thread running a select_for_update that accesses rows being touched
-        by a similar operation on another connection blocks correctly.
-        """
-        # First, let's start the transaction in our thread.
-        with self.blocking_transaction():
-
-            # Now, try it again using the ORM's select_for_update
-            # facility. Do this in a separate thread.
-            status = []
-            thread = threading.Thread(target=self.run_select_for_update, args=(status,))
-
-            # The thread should immediately block, but we'll sleep
-            # for a bit to make sure.
-            thread.start()
-            sanity_count = 0
-            while len(status) != 1 and sanity_count < 10:
-                sanity_count += 1
-                time.sleep(1)
-            if sanity_count >= 10:
-                raise ValueError("Thread did not run and block")
-
-            # Check the person hasn't been updated. Since this isn't
-            # using FOR UPDATE, it won't block.
-            p = Person.objects.get(pk=self.person.pk)
-            self.assertEqual("Reinhardt", p.name)
-
-        # When we end our blocking transaction, our thread should
-        # be able to continue.
-        thread.join(5.0)
-
-        # Check the thread has finished. Assuming it has, we should
-        # find that it has updated the person's name.
-        self.assertFalse(thread.is_alive())
-
-        # We must commit the transaction to ensure that MySQL gets a fresh read,
-        # since by default it runs in REPEATABLE READ mode
-        transaction.commit()
-
-        p = Person.objects.get(pk=self.person.pk)
-        self.assertEqual("Fred", p.name)
-
-    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
-    def test_raw_lock_not_available(self):
-        """
-        Running a raw query which can't obtain a FOR UPDATE lock raises
-        the correct exception
-        """
-        with self.blocking_transaction():
-
-            def raw(status):
-                try:
-                    list(
-                        Person.objects.raw(
-                            "SELECT * FROM %s %s"
-                            % (
-                                Person._meta.db_table,
-                                connection.ops.for_update_sql(nowait=True),
-                            )
-                        )
-                    )
-                except DatabaseError as e:
-                    status.append(e)
-                finally:
-                    # This method is run in a separate thread. It uses its own
-                    # database connection. Close it without waiting for the GC.
-                    # Connection cannot be closed on Oracle because cursor is still
-                    # open.
-                    if connection.vendor != "oracle":
-                        connection.close()
-
-            status = []
-            thread = threading.Thread(target=raw, kwargs={"status": status})
-            thread.start()
-            time.sleep(1)
-            thread.join()
-
-        self.assertIsInstance(status[-1], DatabaseError)
 
     @skipUnlessDBFeature("has_select_for_update")
     @override_settings(DATABASE_ROUTERS=[TestRouter()])
