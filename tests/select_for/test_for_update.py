@@ -27,6 +27,7 @@ from .models import (
 )
 
 
+@skipUnlessDBFeature("has_select_for_update")
 class SelectForUpdateSQLTests(TransactionTestCase):
     available_apps = ["select_for"]
 
@@ -44,7 +45,6 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         for_update_sql = connection.ops.for_update_sql(**kwargs)
         self.assertIs(any(for_update_sql in query["sql"] for query in queries), True)
 
-    @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_sql_generated(self):
         """
         The backend's FOR UPDATE variant appears in generated SQL when
@@ -164,11 +164,11 @@ class SelectForUpdateSQLTests(TransactionTestCase):
         self.assert_has_for_update_sql(ctx.captured_queries, of=expected)
 
 
+@skipUnlessDBFeature("has_select_for_update")
 class SelectForUpdateFeatureTests(TransactionTestCase):
     available_apps = ["select_for"]
 
     @skipIfDBFeature("has_select_for_update_nowait")
-    @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_nowait_raises_error(self):
         """
         NotSupportedError is raised if a SELECT ... FOR UPDATE NOWAIT is run on
@@ -179,7 +179,6 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             Person.objects.select_for_update(nowait=True).get()
 
     @skipIfDBFeature("has_select_for_update_skip_locked")
-    @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_skip_locked_raises_error(self):
         """
         NotSupportedError is raised if a SELECT ... FOR UPDATE SKIP LOCKED is
@@ -190,7 +189,6 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             Person.objects.select_for_update(skip_locked=True).get()
 
     @skipIfDBFeature("has_select_for_update_of")
-    @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_of_raises_error(self):
         """
         NotSupportedError is raised if a SELECT ... FOR UPDATE OF ... is run on
@@ -201,7 +199,6 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             Person.objects.select_for_update(of=("self",)).get()
 
     @skipIfDBFeature("has_select_for_no_key_update")
-    @skipUnlessDBFeature("has_select_for_update")
     def test_unsupported_no_key_raises_error(self):
         """
         NotSupportedError is raised if a SELECT ... FOR NO KEY UPDATE ... is
@@ -220,7 +217,6 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
         with self.assertRaisesMessage(NotSupportedError, msg), transaction.atomic():
             list(Person.objects.order_by("pk").select_for_update()[1:2])
 
-    @skipUnlessDBFeature("has_select_for_update")
     def test_for_update_after_from(self):
         klass = connection.features.__class__
         feature_to_patch = f"{klass.__module__}.{klass.__name__}.for_update_after_from"
@@ -231,6 +227,7 @@ class SelectForUpdateFeatureTests(TransactionTestCase):
             )
 
 
+@skipUnlessDBFeature("has_select_for_update", "supports_transactions")
 class SelectForUpdateBlockingTests(TransactionTestCase):
     available_apps = ["select_for"]
 
@@ -343,7 +340,6 @@ class SelectForUpdateBlockingTests(TransactionTestCase):
 
         return status[-1]
 
-    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
     def test_for_update_blocks_on_other_for_update(self):
         """
         A thread running a select_for_update that accesses rows being touched
@@ -361,7 +357,7 @@ class SelectForUpdateBlockingTests(TransactionTestCase):
                 # Need to reset to the original value due to subTest().
                 Country.objects.filter(pk=self.country.pk).update(name="United States")
 
-    @skipUnlessDBFeature("has_select_for_update_nowait", "supports_transactions")
+    @skipUnlessDBFeature("has_select_for_update_nowait")
     def test_for_update_nowait_raises_error_on_block(self):
         """
         If nowait is specified, we expect an error to be raised rather than
@@ -376,7 +372,7 @@ class SelectForUpdateBlockingTests(TransactionTestCase):
                 country = Country.objects.get(pk=self.country.pk)
                 self.assertEqual(country.name, "United States")
 
-    @skipUnlessDBFeature("has_select_for_update_skip_locked", "supports_transactions")
+    @skipUnlessDBFeature("has_select_for_update_skip_locked")
     def test_for_update_skip_locked_skips_locked_rows(self):
         """
         If skip_locked is specified, the locked row is skipped resulting in
@@ -392,6 +388,7 @@ class SelectForUpdateBlockingTests(TransactionTestCase):
                 self.assertEqual(country.name, "United States")
 
 
+@skipUnlessDBFeature("has_select_for_update")
 class SelectForUpdateTests(TransactionTestCase):
     available_apps = ["select_for"]
 
@@ -442,7 +439,7 @@ class SelectForUpdateTests(TransactionTestCase):
             qs = Person.objects.select_for_update(of=("self", "born"))
             self.assertIs(qs.exists(), True)
 
-    @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update_of")
     def test_unrelated_of_argument_raises_error(self):
         """
         FieldError is raised if a non-relation field is specified in of=(...).
@@ -468,7 +465,7 @@ class SelectForUpdateTests(TransactionTestCase):
                             "born__country"
                         ).select_for_update(of=of).get()
 
-    @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update_of")
     def test_related_but_unselected_of_argument_raises_error(self):
         """
         FieldError is raised if a relation field that is not followed in the
@@ -487,7 +484,7 @@ class SelectForUpdateTests(TransactionTestCase):
                             profile=None
                         ).select_for_update(of=(name,)).get()
 
-    @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update_of")
     def test_model_inheritance_of_argument_raises_error_ptr_in_choices(self):
         msg = (
             "Invalid field name(s) given in select_for_update(of=(...)): "
@@ -508,7 +505,7 @@ class SelectForUpdateTests(TransactionTestCase):
             with transaction.atomic():
                 EUCountry.objects.select_for_update(of=("name",)).get()
 
-    @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update_of")
     def test_model_proxy_of_argument_raises_error_proxy_field_in_choices(self):
         msg = (
             "Invalid field name(s) given in select_for_update(of=(...)): "
@@ -521,7 +518,7 @@ class SelectForUpdateTests(TransactionTestCase):
                     "country",
                 ).select_for_update(of=("name",)).get()
 
-    @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
+    @skipUnlessDBFeature("has_select_for_update_of")
     def test_reverse_one_to_one_of_arguments(self):
         """
         Reverse OneToOneFields may be included in of=(...) as long as NULLs
@@ -538,7 +535,7 @@ class SelectForUpdateTests(TransactionTestCase):
             )
             self.assertEqual(person.profile, self.person_profile)
 
-    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
+    @skipUnlessDBFeature("supports_transactions")
     def test_for_update_requires_transaction(self):
         """
         A TransactionManagementError is raised
@@ -548,7 +545,7 @@ class SelectForUpdateTests(TransactionTestCase):
         with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
             list(Person.objects.select_for_update())
 
-    @skipUnlessDBFeature("has_select_for_update", "supports_transactions")
+    @skipUnlessDBFeature("supports_transactions")
     def test_for_update_requires_transaction_only_in_execution(self):
         """
         No TransactionManagementError is raised
@@ -567,13 +564,11 @@ class SelectForUpdateTests(TransactionTestCase):
             qs = list(Person.objects.order_by("pk").select_for_update()[1:2])
             self.assertEqual(qs[0], other)
 
-    @skipUnlessDBFeature("has_select_for_update")
     @override_settings(DATABASE_ROUTERS=[TestRouter()])
     def test_select_for_update_on_multidb(self):
         query = Person.objects.select_for_update()
         self.assertEqual(router.db_for_write(Person), query.db)
 
-    @skipUnlessDBFeature("has_select_for_update")
     def test_select_for_update_with_get(self):
         with transaction.atomic():
             person = Person.objects.select_for_update().get(name="Reinhardt")
