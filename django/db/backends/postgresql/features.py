@@ -85,6 +85,26 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
 
     @cached_property
+    def django_test_expected_failures(self):
+        expected_failures = set()
+        if self.uses_server_side_binding:
+            expected_failures.update(
+                {
+                    # Parameters passed to expressions in SELECT and GROUP BY
+                    # clauses are not recognized as the same values when using
+                    # server-side binding cursors (#34255).
+                    "aggregation.tests.AggregateTestCase."
+                    "test_group_by_nested_expression_with_params",
+                }
+            )
+        return expected_failures
+
+    @cached_property
+    def uses_server_side_binding(self):
+        options = self.connection.settings_dict["OPTIONS"]
+        return is_psycopg3 and options.get("server_side_binding") is True
+
+    @cached_property
     def prohibits_null_characters_in_text_exception(self):
         if is_psycopg3:
             return DataError, "PostgreSQL text fields cannot contain NUL (0x00) bytes"
