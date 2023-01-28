@@ -308,7 +308,7 @@ but it is used for filtering, ordering, or as a part of a complex expression.
 Not selecting the unused value removes redundant work from the database which
 should result in better performance.
 
-For example, if you want to find blogs with more than 5 entries, but are not
+For example, if you want to find blogs with more than 5 entries, but you are not
 interested in the exact number of entries, you could do this::
 
     >>> from django.db.models import Count
