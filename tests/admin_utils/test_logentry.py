@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.html import escape
 
-from .models import Article, ArticleProxy, Site
+from .models import Article, ArticleProxy, Car, Site
 
 
 @override_settings(ROOT_URLCONF="admin_utils.urls")
@@ -318,3 +318,30 @@ class LogEntryTests(TestCase):
             with self.subTest(action_flag=action_flag):
                 log = LogEntry(action_flag=action_flag)
                 self.assertEqual(log.get_action_flag_display(), display_name)
+
+    def test_log_registrated_entry(self):
+        LogEntry.objects.log_action(
+            self.user.pk,
+            ContentType.objects.get_for_model(Article).pk,
+            self.a1.pk,
+            "Article changed",
+            CHANGE,
+            change_message="Article changed message",
+        )
+        c1 = Car.objects.create()
+        LogEntry.objects.log_action(
+            self.user.pk,
+            ContentType.objects.get_for_model(Car).pk,
+            c1.pk,
+            "Car created",
+            ADDITION,
+            change_message="Car created message",
+        )
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, "Article changed")
+        self.assertContains(response, "Car created")
+
+        # site "custom_admin" only renders log entries of registered models
+        response = self.client.get(reverse("custom_admin:index"))
+        self.assertContains(response, "Article changed")
+        self.assertNotContains(response, "Car created")

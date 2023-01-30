@@ -13,7 +13,7 @@ from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedi
 from django.template.response import TemplateResponse
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.decorators import method_decorator
-from django.utils.functional import LazyObject
+from django.utils.functional import LazyObject, cached_property
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
@@ -68,6 +68,7 @@ class AdminSite:
     password_change_done_template = None
 
     final_catch_all_view = True
+    log_registered_models = False
 
     def __init__(self, name="admin"):
         self._registry = {}  # model_class class -> admin_class instance
@@ -337,6 +338,7 @@ class AdminSite:
             "available_apps": self.get_app_list(request),
             "is_popup": False,
             "is_nav_sidebar_enabled": self.enable_nav_sidebar,
+            "log_entries": self.get_log_entries(),
         }
 
     def password_change(self, request, extra_context=None):
@@ -588,6 +590,24 @@ class AdminSite:
             or ["admin/%s/app_index.html" % app_label, "admin/app_index.html"],
             context,
         )
+
+    @cached_property
+    def site_content_types(self):
+        from django.contrib.contenttypes.models import ContentType
+
+        content_types = []
+        for model in self._registry.keys():
+            content_types.append(ContentType.objects.get(
+                app_label=model._meta.app_label, model=model._meta.model_name))
+        return content_types
+
+    def get_log_entries(self):
+        from django.contrib.admin.models import LogEntry
+
+        entries = LogEntry.objects.select_related("content_type", "user")
+        if self.log_registered_models:
+            entries = entries.filter(content_type__in=self.site_content_types)
+        return entries
 
 
 class DefaultAdminSite(LazyObject):

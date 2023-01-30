@@ -35,3 +35,7 @@ site = admin.AdminSite(name="admin")
 site.register(Article)
 site.register(ArticleProxy)
 site.register(Site, SiteAdmin)
+
+custom_site = admin.AdminSite(name="custom_admin")
+custom_site.log_registered_models = True
+custom_site.register(Article)
