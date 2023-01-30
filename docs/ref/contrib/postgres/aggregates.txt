@@ -52,12 +52,11 @@ General-purpose aggregation functions
             from django.db.models import F
             F('some_field').desc()
 
-    .. deprecated:: 4.0
+    .. versionchanged:: 5.0
 
-        If there are no rows and ``default`` is not provided, ``ArrayAgg``
-        returns an empty list instead of ``None``. This behavior is deprecated
-        and will be removed in Django 5.0. If you need it, explicitly set
-        ``default`` to ``Value([])``.
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``ArrayAgg`` returned an empty list instead of ``None``. If
+        you need it, explicitly set ``default`` to ``Value([])``.
 
 ``BitAnd``
 ----------
@@ -77,8 +76,6 @@ General-purpose aggregation functions
 
 ``BitXor``
 ----------
-
-.. versionadded:: 4.1
 
 .. class:: BitXor(expression, filter=None, default=None, **extra)
 
@@ -175,12 +172,11 @@ General-purpose aggregation functions
             {'parking': True, 'double_bed': True}
         ]}]>
 
-    .. deprecated:: 4.0
+    .. versionchanged:: 5.0
 
-        If there are no rows and ``default`` is not provided, ``JSONBAgg``
-        returns an empty list instead of ``None``. This behavior is deprecated
-        and will be removed in Django 5.0. If you need it, explicitly set
-        ``default`` to ``Value('[]')``.
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``JSONBAgg`` returned an empty list instead of ``None``. If
+        you need it, explicitly set ``default`` to ``Value([])``.
 
 ``StringAgg``
 -------------
@@ -234,12 +230,11 @@ General-purpose aggregation functions
             'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
         }]>
 
-    .. deprecated:: 4.0
+    .. versionchanged:: 5.0
 
-        If there are no rows and ``default`` is not provided, ``StringAgg``
-        returns an empty string instead of ``None``. This behavior is
-        deprecated and will be removed in Django 5.0. If you need it,
-        explicitly set ``default`` to ``Value('')``.
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``StringAgg`` returned an empty string instead of ``None``.
+        If you need it, explicitly set ``default`` to ``Value("")``.
 
 Aggregate functions for statistics
 ==================================

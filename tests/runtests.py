@@ -29,8 +29,8 @@ else:
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
     from django.utils.deprecation import (
-        RemovedInDjango50Warning,
         RemovedInDjango51Warning,
+        RemovedInDjango60Warning,
     )
     from django.utils.log import DEFAULT_LOGGING
 
@@ -43,7 +43,7 @@ else:
     warnings.filterwarnings("ignore", r"\(1003, *", category=MySQLdb.Warning)
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
-warnings.simplefilter("error", RemovedInDjango50Warning)
+warnings.simplefilter("error", RemovedInDjango60Warning)
 warnings.simplefilter("error", RemovedInDjango51Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
@@ -252,9 +252,6 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
         # django.contrib.postgres.fields.CITextField deprecated.
         "fields.W907",
     ]
-
-    # RemovedInDjango50Warning
-    settings.FORM_RENDERER = "django.forms.renderers.DjangoDivFormRenderer"
 
     # Load all the ALWAYS_INSTALLED_APPS.
     django.setup()

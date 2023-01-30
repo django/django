@@ -242,9 +242,7 @@ class HttpRequest:
                 # If location starts with '//' but has no netloc, reuse the
                 # schema and netloc from the current request. Strip the double
                 # slashes and continue as if it wasn't specified.
-                if location.startswith("//"):
-                    location = location[2:]
-                location = self._current_scheme_host + location
+                location = self._current_scheme_host + location.removeprefix("//")
             else:
                 # Join the constructed URL with the provided location, which
                 # allows the provided location to apply query strings to the
@@ -456,7 +454,7 @@ class HttpHeaders(CaseInsensitiveMapping):
     @classmethod
     def parse_header_name(cls, header):
         if header.startswith(cls.HTTP_PREFIX):
-            header = header[len(cls.HTTP_PREFIX) :]
+            header = header.removeprefix(cls.HTTP_PREFIX)
         elif header not in cls.UNPREFIXED_HEADERS:
             return None
         return header.replace("_", "-").title()
@@ -724,7 +722,7 @@ def split_domain_port(host):
     bits = host.rsplit(":", 1)
     domain, port = bits if len(bits) == 2 else (bits[0], "")
     # Remove a trailing dot (if present) from the domain.
-    domain = domain[:-1] if domain.endswith(".") else domain
+    domain = domain.removesuffix(".")
     return domain, port
 
 

@@ -182,7 +182,7 @@ class TemplateCommand(BaseCommand):
                 )
                 for old_suffix, new_suffix in self.rewrite_template_suffixes:
                     if new_path.endswith(old_suffix):
-                        new_path = new_path[: -len(old_suffix)] + new_suffix
+                        new_path = new_path.removesuffix(old_suffix) + new_suffix
                         break  # Only rewrite once
 
                 if os.path.exists(new_path):
@@ -241,8 +241,7 @@ class TemplateCommand(BaseCommand):
         if template is None:
             return os.path.join(django.__path__[0], "conf", subdir)
         else:
-            if template.startswith("file://"):
-                template = template[7:]
+            template = template.removeprefix("file://")
             expanded_template = os.path.expanduser(template)
             expanded_template = os.path.normpath(expanded_template)
             if os.path.isdir(expanded_template):

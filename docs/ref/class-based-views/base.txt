@@ -83,11 +83,6 @@ MRO is an acronym for Method Resolution Order.
         asynchronous (``async def``) and synchronous (``def``) handlers are
         defined on a single view-class.
 
-        .. versionchanged:: 4.1
-
-            Compatibility with asynchronous (``async def``) method handlers was
-            added.
-
     .. method:: setup(request, *args, **kwargs)
 
         Performs key view initialization prior to :meth:`dispatch`.
@@ -125,11 +120,6 @@ MRO is an acronym for Method Resolution Order.
         If the other HTTP methods handlers on the class are asynchronous
         (``async def``) then the response will be wrapped in a coroutine
         function for use with ``await``.
-
-        .. versionchanged:: 4.1
-
-            Compatibility with classes defining asynchronous (``async def``)
-            method handlers was added.
 
 ``TemplateView``
 ================

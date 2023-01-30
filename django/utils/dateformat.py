@@ -257,7 +257,7 @@ class DateFormat(TimeFormat):
 
     def o(self):
         "ISO 8601 year number matching the ISO week number (W)"
-        return self.data.isocalendar()[0]
+        return self.data.isocalendar().year
 
     def r(self):
         "RFC 5322 formatted date; e.g. 'Thu, 21 Dec 2000 16:01:07 +0200'"
@@ -303,7 +303,7 @@ class DateFormat(TimeFormat):
 
     def W(self):
         "ISO-8601 week number of year, weeks starting on Monday"
-        return self.data.isocalendar()[1]
+        return self.data.isocalendar().week
 
     def y(self):
         """Year, 2 digits with leading zeros; e.g. '99'."""

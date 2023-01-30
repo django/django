@@ -586,8 +586,6 @@ the ``default_bounds`` argument.
 
     .. attribute:: DecimalRangeField.default_bounds
 
-        .. versionadded:: 4.1
-
         Optional. The value of ``bounds`` for list and tuple inputs. The
         default is lower bound included, upper bound excluded, that is ``[)``
         (see the PostgreSQL documentation for details about
@@ -605,8 +603,6 @@ the ``default_bounds`` argument.
     ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange`` in Python.
 
     .. attribute:: DateTimeRangeField.default_bounds
-
-        .. versionadded:: 4.1
 
         Optional. The value of ``bounds`` for list and tuple inputs. The
         default is lower bound included, upper bound excluded, that is ``[)``

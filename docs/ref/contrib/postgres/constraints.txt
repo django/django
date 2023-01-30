@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_message=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -29,11 +29,6 @@ PostgreSQL supports additional data integrity constraints available from the
 
     Exclusion constraints are checked during the :ref:`model validation
     <validating-objects>`.
-
-    .. versionchanged:: 4.1
-
-        In older versions, exclusion constraints were not checked during model
-        validation.
 
 ``name``
 --------
@@ -70,10 +65,6 @@ For example::
     ]
 
 creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-.. versionchanged:: 4.1
-
-    Support for the ``OpClass()`` expression was added.
 
 .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
@@ -142,41 +133,8 @@ used for queries that select only included fields
 ``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
 ``include`` for SP-GiST indexes.
 
-.. versionchanged:: 4.1
-
-    Support for covering exclusion constraints using SP-GiST indexes on
-    PostgreSQL 14+ was added.
-
-``opclasses``
--------------
-
-.. attribute:: ExclusionConstraint.opclasses
-
-The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
-this constraint. If you require a custom operator class, you must provide one
-for each expression in the constraint.
-
-For example::
-
-    ExclusionConstraint(
-        name='exclude_overlapping_opclasses',
-        expressions=[('circle', RangeOperators.OVERLAPS)],
-        opclasses=['circle_ops'],
-    )
-
-creates an exclusion constraint on ``circle`` using ``circle_ops``.
-
-.. deprecated:: 4.1
-
-    The ``opclasses`` parameter is deprecated in favor of using
-    :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` in
-    :attr:`~ExclusionConstraint.expressions`.
-
 ``violation_error_message``
 ---------------------------
-
-.. versionadded:: 4.1
 
 The error message used when ``ValidationError`` is raised during
 :ref:`model validation <validating-objects>`. Defaults to

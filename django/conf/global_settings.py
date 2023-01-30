@@ -41,12 +41,7 @@ ALLOWED_HOSTS = []
 TIME_ZONE = "America/Chicago"
 
 # If you set this to True, Django will use timezone-aware datetimes.
-USE_TZ = False
-
-# RemovedInDjango50Warning: It's a transitional setting helpful in migrating
-# from pytz tzinfo to ZoneInfo(). Set True to continue using pytz tzinfo
-# objects during the Django 4.x release cycle.
-USE_DEPRECATED_PYTZ = False
+USE_TZ = True
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -170,11 +165,6 @@ LANGUAGE_COOKIE_PATH = "/"
 LANGUAGE_COOKIE_SECURE = False
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = None
-
-
-# If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale.
-USE_L10N = True
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
@@ -577,10 +567,6 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_TRUSTED_ORIGINS = []
 CSRF_USE_SESSIONS = False
-
-# Whether to mask CSRF cookie value. It's a transitional setting helpful in
-# migrating multiple instance of the same project to Django 4.1+.
-CSRF_COOKIE_MASKED = False
 
 ############
 # MESSAGES #

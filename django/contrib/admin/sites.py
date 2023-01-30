@@ -1,4 +1,3 @@
-import re
 from functools import update_wrapper
 from weakref import WeakSet
 
@@ -127,7 +126,7 @@ class AdminSite:
                 msg = "The model %s is already registered " % model.__name__
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
-                    msg += "in app %r." % re.sub(r"\.ModelAdmin$", "", registered_admin)
+                    msg += "in app %r." % registered_admin.removesuffix(".ModelAdmin")
                 else:
                     msg += "with %r." % registered_admin
                 raise AlreadyRegistered(msg)

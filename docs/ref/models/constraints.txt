@@ -45,10 +45,6 @@ option.
     ``django.db.models`` logger, like *"Got a database error calling check() on
     …"* to confirm it's validated properly.
 
-.. versionchanged:: 4.1
-
-    In older versions, constraints were not checked during model validation.
-
 ``BaseConstraint``
 ==================
 
@@ -71,8 +67,6 @@ constraint.
 ``violation_error_message``
 ---------------------------
 
-.. versionadded:: 4.1
-
 .. attribute:: BaseConstraint.violation_error_message
 
 The error message used when ``ValidationError`` is raised during
@@ -81,8 +75,6 @@ The error message used when ``ValidationError`` is raised during
 
 ``validate()``
 --------------
-
-.. versionadded:: 4.1
 
 .. method:: BaseConstraint.validate(model, instance, exclude=None, using=DEFAULT_DB_ALIAS)
 
@@ -121,10 +113,6 @@ ensures the age field is never less than 18.
     is a nullable field::
 
         CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name='age_gte_18')
-
-.. versionchanged:: 4.1
-
-    The ``violation_error_message`` argument was added.
 
 ``UniqueConstraint``
 ====================
@@ -252,8 +240,6 @@ creates a unique index on ``username`` using ``varchar_pattern_ops``.
 
 ``violation_error_message``
 ---------------------------
-
-.. versionadded:: 4.1
 
 .. attribute:: UniqueConstraint.violation_error_message
 

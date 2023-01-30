@@ -1,6 +1,7 @@
 import functools
 import re
 from collections import defaultdict
+from graphlib import TopologicalSorter
 from itertools import chain
 
 from django.conf import settings
@@ -15,7 +16,6 @@ from django.db.migrations.utils import (
     RegexObject,
     resolve_relation,
 )
-from django.utils.topological_sort import stable_topological_sort
 
 
 class MigrationAutodetector:
@@ -384,22 +384,17 @@ class MigrationAutodetector:
         nicely inside the same app.
         """
         for app_label, ops in sorted(self.generated_operations.items()):
-            # construct a dependency graph for intra-app dependencies
-            dependency_graph = {op: set() for op in ops}
+            ts = TopologicalSorter()
             for op in ops:
+                ts.add(op)
                 for dep in op._auto_deps:
                     # Resolve intra-app dependencies to handle circular
                     # references involving a swappable model.
                     dep = self._resolve_dependency(dep)[0]
-                    if dep[0] == app_label:
-                        for op2 in ops:
-                            if self.check_dependency(op2, dep):
-                                dependency_graph[op].add(op2)
-
-            # we use a stable sort for deterministic tests & general behavior
-            self.generated_operations[app_label] = stable_topological_sort(
-                ops, dependency_graph
-            )
+                    if dep[0] != app_label:
+                        continue
+                    ts.add(op, *(x for x in ops if self.check_dependency(x, dep)))
+            self.generated_operations[app_label] = list(ts.static_order())
 
     def _optimize_migrations(self):
         # Add in internal dependencies among the migrations

@@ -319,8 +319,6 @@ reconstructing the field::
 Field attributes not affecting database column definition
 ---------------------------------------------------------
 
-.. versionadded:: 4.1
-
 You can override ``Field.non_db_attrs`` to customize attributes of a field that
 don't affect a column definition. It's used during model migrations to detect
 no-op ``AlterField`` operations.

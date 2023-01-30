@@ -121,6 +121,7 @@ class OracleOperations(BaseSpatialOperations, DatabaseOperations):
         "AsKML",
         "AsSVG",
         "Azimuth",
+        "ClosestPoint",
         "ForcePolygonCW",
         "GeoHash",
         "GeometryDistance",

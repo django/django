@@ -754,7 +754,7 @@ class StreamingHttpResponseTests(SimpleTestCase):
             "serve them asynchronously. Use an asynchronous iterator instead."
         )
         with self.assertWarnsMessage(Warning, msg):
-            self.assertEqual(b"hello", await r.__aiter__().__anext__())
+            self.assertEqual(b"hello", await anext(aiter(r)))
 
 
 class FileCloseTests(SimpleTestCase):

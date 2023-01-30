@@ -2,6 +2,7 @@ import logging
 import sys
 import tempfile
 import traceback
+from contextlib import aclosing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -19,7 +20,6 @@ from django.http import (
     parse_cookie,
 )
 from django.urls import set_script_prefix
-from django.utils.asyncio import aclosing
 from django.utils.functional import cached_property
 
 logger = logging.getLogger("django.request")
@@ -41,9 +41,9 @@ class ASGIRequest(HttpRequest):
         self._read_started = False
         self.resolver_match = None
         self.script_name = self.scope.get("root_path", "")
-        if self.script_name and scope["path"].startswith(self.script_name):
+        if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
-            self.path_info = scope["path"][len(self.script_name) :]
+            self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
         # The Django path is different from ASGI scope path args, it should
@@ -268,7 +268,7 @@ class ASGIHandler(base.BaseHandler):
             #   allow mapping of a sync iterator.
             # - Use aclosing() when consuming aiter.
             #   See https://github.com/python/cpython/commit/6e8dcda
-            async with aclosing(response.__aiter__()) as content:
+            async with aclosing(aiter(response)) as content:
                 async for part in content:
                     for chunk, _ in self.chunk_bytes(part):
                         await send(

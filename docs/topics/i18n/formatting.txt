@@ -9,12 +9,8 @@ Django's formatting system is capable of displaying dates, times and numbers in
 templates using the format specified for the current
 :term:`locale <locale name>`. It also handles localized input in forms.
 
-When it's enabled, two users accessing the same content may see dates, times and
-numbers formatted in different ways, depending on the formats for their current
-locale.
-
-The formatting system is enabled by default. To disable it, it's
-necessary to set :setting:`USE_L10N = False <USE_L10N>` in your settings file.
+Two users accessing the same content may see dates, times and numbers formatted
+in different ways, depending on the formats for their current locale.
 
 .. note::
 
@@ -55,9 +51,8 @@ argument::
 Controlling localization in templates
 =====================================
 
-When you have enabled formatting with :setting:`USE_L10N`, Django
-will try to use a locale specific format whenever it outputs a value
-in a template.
+Django tries to use a locale specific format whenever it outputs a value in a
+template.
 
 However, it may not always be appropriate to use localized values --
 for example, if you're outputting JavaScript or XML that is designed
@@ -80,9 +75,6 @@ Template tags
 Enables or disables localization of template variables in the
 contained block.
 
-This tag allows a more fine grained control of localization than
-:setting:`USE_L10N`.
-
 To activate or deactivate localization for a template block, use::
 
     {% load l10n %}
@@ -94,11 +86,6 @@ To activate or deactivate localization for a template block, use::
     {% localize off %}
         {{ value }}
     {% endlocalize %}
-
-.. note::
-
-    The value of :setting:`USE_L10N` isn't respected inside of a
-    ``{% localize %}`` block.
 
 See :tfilter:`localize` and :tfilter:`unlocalize` for template filters that will
 do the same job on a per-variable basis.

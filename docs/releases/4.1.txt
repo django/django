@@ -98,16 +98,15 @@ See :ref:`the Forms section (below)<forms-4.1>` for full details.
 ``CSRF_COOKIE_MASKED`` setting
 ------------------------------
 
-The new :setting:`CSRF_COOKIE_MASKED` transitional setting allows specifying
-whether to mask the CSRF cookie.
+The new ``CSRF_COOKIE_MASKED`` transitional setting allows specifying whether
+to mask the CSRF cookie.
 
 :class:`~django.middleware.csrf.CsrfViewMiddleware` no longer masks the CSRF
 cookie like it does the CSRF token in the DOM. If you are upgrading multiple
 instances of the same project to Django 4.1, you should set
-:setting:`CSRF_COOKIE_MASKED` to ``True`` during the transition, in
-order to allow compatibility with the older versions of Django. Once the
-transition to 4.1 is complete you can stop overriding
-:setting:`CSRF_COOKIE_MASKED`.
+``CSRF_COOKIE_MASKED`` to ``True`` during the transition, in order to allow
+compatibility with the older versions of Django. Once the transition to 4.1 is
+complete you can stop overriding ``CSRF_COOKIE_MASKED``.
 
 This setting is deprecated as of this release and will be removed in Django
 5.0.
@@ -234,9 +233,9 @@ Forms
 
 * In order to smooth adoption of the new ``<div>`` output style, two
   transitional form renderer classes are available:
-  :class:`django.forms.renderers.DjangoDivFormRenderer` and
-  :class:`django.forms.renderers.Jinja2DivFormRenderer`, for the Django and
-  Jinja2 template backends respectively.
+  ``django.forms.renderers.DjangoDivFormRenderer`` and
+  ``django.forms.renderers.Jinja2DivFormRenderer``, for the Django and Jinja2
+  template backends respectively.
 
   You can apply one of these via the :setting:`FORM_RENDERER` setting. For
   example::
@@ -696,8 +695,8 @@ Miscellaneous
   :meth:`.RemoteUserBackend.configure_user`. Support  for ``RemoteUserBackend``
   subclasses that do not accept this argument is deprecated.
 
-* The :data:`django.utils.timezone.utc` alias to :attr:`datetime.timezone.utc`
-  is deprecated. Use :attr:`datetime.timezone.utc` directly.
+* The ``django.utils.timezone.utc`` alias to :attr:`datetime.timezone.utc` is
+  deprecated. Use :attr:`datetime.timezone.utc` directly.
 
 * Passing a response object and a form/formset name to
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is

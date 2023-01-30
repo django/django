@@ -30,10 +30,9 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import connection
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csrf import CsrfViewMiddleware, get_token
-from django.test import Client, TestCase, ignore_warnings, override_settings
+from django.test import Client, TestCase, override_settings
 from django.test.client import RedirectCycleError
 from django.urls import NoReverseMatch, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.http import urlsafe_base64_encode
 
 from .client import PasswordResetConfirmClient
@@ -1020,7 +1019,6 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         self.confirm_logged_out()
         self.assertRedirects(response, "/custom/", fetch_redirect_response=False)
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(LOGIN_URL="/login/")
     def test_default_logout_then_login_get(self):
         self.login()
@@ -1030,10 +1028,7 @@ class LogoutThenLoginTests(AuthViewsTestCase):
         req.META["SERVER_PORT"] = 80
         req.session = self.client.session
         response = logout_then_login(req)
-        # RemovedInDjango50Warning: When the deprecation ends, replace with
-        #   self.assertEqual(response.status_code, 405)
-        self.confirm_logged_out()
-        self.assertRedirects(response, "/login/", fetch_redirect_response=False)
+        self.assertEqual(response.status_code, 405)
 
 
 class LoginRedirectAuthenticatedUser(AuthViewsTestCase):
@@ -1184,17 +1179,6 @@ class LogoutTest(AuthViewsTestCase):
     def test_logout_with_post(self):
         self.login()
         response = self.client.post("/logout/")
-        self.assertContains(response, "Logged out")
-        self.confirm_logged_out()
-
-    def test_logout_with_get_raises_deprecation_warning(self):
-        self.login()
-        msg = (
-            "Log out via GET requests is deprecated and will be removed in Django 5.0. "
-            "Use POST requests for logging out."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            response = self.client.get("/logout/")
         self.assertContains(response, "Logged out")
         self.confirm_logged_out()
 

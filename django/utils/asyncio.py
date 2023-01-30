@@ -37,28 +37,3 @@ def async_unsafe(message):
         return decorator(func)
     else:
         return decorator
-
-
-try:
-    from contextlib import aclosing
-except ImportError:
-    # TODO: Remove when dropping support for PY39.
-    from contextlib import AbstractAsyncContextManager
-
-    # Backport of contextlib.aclosing() from Python 3.10. Copyright (C) Python
-    # Software Foundation (see LICENSE.python).
-    class aclosing(AbstractAsyncContextManager):
-        """
-        Async context manager for safely finalizing an asynchronously
-        cleaned-up resource such as an async generator, calling its
-        ``aclose()`` method.
-        """
-
-        def __init__(self, thing):
-            self.thing = thing
-
-        async def __aenter__(self):
-            return self.thing
-
-        async def __aexit__(self, *exc_info):
-            await self.thing.aclose()

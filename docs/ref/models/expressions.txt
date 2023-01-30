@@ -784,10 +784,6 @@ and second row.
 The ``frame`` parameter specifies which other rows that should be used in the
 computation. See :ref:`window-frames` for details.
 
-.. versionchanged:: 4.1
-
-    Support for ``order_by`` by field name references was added.
-
 For example, to annotate each movie with the average rating for the movies by
 the same studio in the same genre and release year::
 
@@ -1067,32 +1063,12 @@ calling the appropriate methods on the wrapped expression.
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
 
-        .. versionchanged:: 4.1
-
-            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
-            ``False``.
-
-        .. deprecated:: 4.1
-
-            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``asc()``
-            is deprecated. Use ``None`` instead.
-
     .. method:: desc(nulls_first=None, nulls_last=None)
 
         Returns the expression ready to be sorted in descending order.
 
         ``nulls_first`` and ``nulls_last`` define how null values are sorted.
         See :ref:`using-f-to-sort-null-values` for example usage.
-
-        .. versionchanged:: 4.1
-
-            In older versions, ``nulls_first`` and ``nulls_last`` defaulted to
-            ``False``.
-
-        .. deprecated:: 4.1
-
-            Passing ``nulls_first=False`` or ``nulls_last=False`` to ``desc()``
-            is deprecated. Use ``None`` instead.
 
     .. method:: reverse_ordering()
 

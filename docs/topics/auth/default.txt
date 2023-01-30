@@ -1158,11 +1158,6 @@ implementation details see :ref:`using-the-views`.
 
     Logs a user out on ``POST`` requests.
 
-    .. deprecated:: 4.1
-
-        Support for logging out on ``GET`` requests is deprecated and will be
-        removed in Django 5.0.
-
     **URL name:** ``logout``
 
     **Attributes:**

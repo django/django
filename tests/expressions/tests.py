@@ -70,7 +70,6 @@ from django.test.utils import (
     isolate_apps,
     register_lookup,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -2632,18 +2631,12 @@ class OrderByTests(SimpleTestCase):
         )
 
     def test_nulls_false(self):
-        # These tests will catch ValueError in Django 5.0 when passing False to
-        # nulls_first and nulls_last becomes forbidden.
-        # msg = "nulls_first and nulls_last values must be True or None."
-        msg = (
-            "Passing nulls_first=False or nulls_last=False is deprecated, use None "
-            "instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        msg = "nulls_first and nulls_last values must be True or None."
+        with self.assertRaisesMessage(ValueError, msg):
             OrderBy(F("field"), nulls_first=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             OrderBy(F("field"), nulls_last=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             F("field").asc(nulls_first=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)

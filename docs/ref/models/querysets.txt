@@ -43,10 +43,6 @@ You can evaluate a ``QuerySet`` in the following ways:
   Both synchronous and asynchronous iterators of QuerySets share the same
   underlying cache.
 
-  .. versionchanged:: 4.1
-
-    Support for asynchronous iteration was added.
-
 * **Slicing.** As explained in :ref:`limiting-querysets`, a ``QuerySet`` can
   be sliced, using Python's array-slicing syntax. Slicing an unevaluated
   ``QuerySet`` usually returns another unevaluated ``QuerySet``, but Django
@@ -841,7 +837,7 @@ Examples::
 ``datetimes()``
 ~~~~~~~~~~~~~~~
 
-.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None, is_dst=None)
+.. method:: datetimes(field_name, kind, order='ASC', tzinfo=None)
 
 Returns a ``QuerySet`` that evaluates to a list of :class:`datetime.datetime`
 objects representing all available dates of a particular kind within the
@@ -862,14 +858,6 @@ on the time zone in use. This parameter must be a :class:`datetime.tzinfo`
 object. If it's ``None``, Django uses the :ref:`current time zone
 <default-current-time-zone>`. It has no effect when :setting:`USE_TZ` is
 ``False``.
-
-``is_dst`` indicates whether or not ``pytz`` should interpret nonexistent and
-ambiguous datetimes in daylight saving time. By default (when ``is_dst=None``),
-``pytz`` raises an exception for such datetimes.
-
-.. deprecated:: 4.0
-
-    The ``is_dst`` parameter is deprecated and will be removed in Django 5.0.
 
 .. _database-time-zone-definitions:
 
@@ -1250,10 +1238,8 @@ could be generated, which, depending on the database, might have performance
 problems of its own when it comes to parsing or executing the SQL query. Always
 profile for your use case!
 
-.. versionchanged:: 4.1
-
-    If you use ``iterator()`` to run the query, ``prefetch_related()``
-    calls will only be observed if a value for ``chunk_size`` is provided.
+If you use ``iterator()`` to run the query, ``prefetch_related()`` calls will
+only be observed if a value for ``chunk_size`` is provided.
 
 You can use the :class:`~django.db.models.Prefetch` object to further control
 the prefetch operation.
@@ -1955,8 +1941,6 @@ may be generated.
 XOR (``^``)
 ~~~~~~~~~~~
 
-.. versionadded:: 4.1
-
 Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
 
 The following are equivalent::
@@ -2002,10 +1986,6 @@ this reason, each has a corresponding asynchronous version with an ``a`` prefix
 
 There is usually no difference in behavior apart from their asynchronous
 nature, but any differences are noted below next to each method.
-
-.. versionchanged:: 4.1
-
-    The asynchronous versions of each method, prefixed with ``a`` was added.
 
 ``get()``
 ~~~~~~~~~
@@ -2053,10 +2033,6 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
     except ObjectDoesNotExist:
         print("Either the blog or entry doesn't exist.")
 
-.. versionchanged:: 4.1
-
-    ``aget()`` method was added.
-
 ``create()``
 ~~~~~~~~~~~~
 
@@ -2083,10 +2059,6 @@ manual primary key value that you set and if that value already exists in the
 database, a call to ``create()`` will fail with an
 :exc:`~django.db.IntegrityError` since primary keys must be unique. Be
 prepared to handle the exception if you are using manual primary keys.
-
-.. versionchanged:: 4.1
-
-    ``acreate()`` method was added.
 
 ``get_or_create()``
 ~~~~~~~~~~~~~~~~~~~
@@ -2216,10 +2188,6 @@ whenever a request to a page has a side effect on your data. For more, see
   chapter because it isn't related to that book, but it can't create it either
   because ``title`` field should be unique.
 
-.. versionchanged:: 4.1
-
-    ``aget_or_create()`` method was added.
-
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2272,10 +2240,6 @@ if uniqueness is not enforced at the database level.
 Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
-
-.. versionchanged:: 4.1
-
-    ``aupdate_or_create()`` method was added.
 
 .. versionchanged:: 4.2
 
@@ -2354,14 +2318,6 @@ support it).
 .. _MySQL documentation: https://dev.mysql.com/doc/refman/en/sql-mode.html#ignore-strict-comparison
 .. _MariaDB documentation: https://mariadb.com/kb/en/ignore/
 
-.. versionchanged:: 4.1
-
-    The ``update_conflicts``, ``update_fields``, and ``unique_fields``
-    parameters were added to support updating fields when a row insertion fails
-    on conflict.
-
-    ``abulk_create()`` method was added.
-
 ``bulk_update()``
 ~~~~~~~~~~~~~~~~~
 
@@ -2407,10 +2363,6 @@ The ``batch_size`` parameter controls how many objects are saved in a single
 query. The default is to update all objects in one batch, except for SQLite
 and Oracle which have restrictions on the number of variables used in a query.
 
-.. versionchanged:: 4.1
-
-    ``abulk_update()`` method was added.
-
 ``count()``
 ~~~~~~~~~~~
 
@@ -2442,10 +2394,6 @@ database query like ``count()`` would.
 
 If the queryset has already been fully retrieved, ``count()`` will use that
 length rather than perform an extra database query.
-
-.. versionchanged:: 4.1
-
-    ``acount()`` method was added.
 
 ``in_bulk()``
 ~~~~~~~~~~~~~
@@ -2481,10 +2429,6 @@ Example::
     {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
-
-.. versionchanged:: 4.1
-
-    ``ain_bulk()`` method was added.
 
 ``iterator()``
 ~~~~~~~~~~~~~~
@@ -2531,18 +2475,6 @@ value for ``chunk_size`` will result in Django using an implicit default of
 
 Depending on the database backend, query results will either be loaded all at
 once or streamed from the database using server-side cursors.
-
-.. versionchanged:: 4.1
-
-    Support for prefetching related objects was added to ``iterator()``.
-
-    ``aiterator()`` method was added.
-
-.. deprecated:: 4.1
-
-    Using ``iterator()`` on a queryset that prefetches related objects without
-    providing the ``chunk_size`` is deprecated. In Django 5.0, an exception
-    will be raise.
 
 With server-side cursors
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2640,10 +2572,6 @@ readability.
 
         Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
 
-.. versionchanged:: 4.1
-
-    ``alatest()`` method was added.
-
 ``earliest()``
 ~~~~~~~~~~~~~~
 
@@ -2654,10 +2582,6 @@ readability.
 
 Works otherwise like :meth:`~django.db.models.query.QuerySet.latest` except
 the direction is changed.
-
-.. versionchanged:: 4.1
-
-    ``aearliest()`` method was added.
 
 ``first()``
 ~~~~~~~~~~~
@@ -2684,10 +2608,6 @@ equivalent to the above example::
     except IndexError:
         p = None
 
-.. versionchanged:: 4.1
-
-    ``afirst()`` method was added.
-
 ``last()``
 ~~~~~~~~~~
 
@@ -2697,10 +2617,6 @@ equivalent to the above example::
 *Asynchronous version*: ``alast()``
 
 Works like  :meth:`first()`, but returns the last object in the queryset.
-
-.. versionchanged:: 4.1
-
-    ``alast()`` method was added.
 
 ``aggregate()``
 ~~~~~~~~~~~~~~~
@@ -2741,10 +2657,6 @@ control the name of the aggregation value that is returned::
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
 Aggregation </topics/db/aggregation>`.
 
-.. versionchanged:: 4.1
-
-    ``aaggregate()`` method was added.
-
 ``exists()``
 ~~~~~~~~~~~~
 
@@ -2781,10 +2693,6 @@ more overall work (one query for the existence check plus an extra one to later
 retrieve the results) than using ``bool(some_queryset)``, which retrieves the
 results and then checks if any were returned.
 
-.. versionchanged:: 4.1
-
-    ``aexists()`` method was added.
-
 ``contains()``
 ~~~~~~~~~~~~~~
 
@@ -2814,10 +2722,6 @@ Like :meth:`exists`, if ``some_queryset`` has not yet been evaluated, but you
 know that it will be at some point, then using ``some_queryset.contains(obj)``
 will make an additional database query, generally resulting in slower overall
 performance.
-
-.. versionchanged:: 4.1
-
-    ``acontains()`` method was added.
 
 ``update()``
 ~~~~~~~~~~~~
@@ -2896,10 +2800,6 @@ update a bunch of records for a model that has a custom
         e.comments_on = False
         e.save()
 
-.. versionchanged:: 4.1
-
-    ``aupdate()`` method was added.
-
 Ordered queryset
 ^^^^^^^^^^^^^^^^
 
@@ -2971,10 +2871,6 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
 
-.. versionchanged:: 4.1
-
-    ``adelete()`` method was added.
-
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
 
@@ -3032,10 +2928,6 @@ On some databases, flags may cause the query to be executed which could have
 adverse effects on your database. For example, the ``ANALYZE`` flag supported
 by MariaDB, MySQL 8.0.18+, and PostgreSQL could result in changes to data if
 there are triggers or if a function is called, even for a ``SELECT`` query.
-
-.. versionchanged:: 4.1
-
-    ``aexplain()`` method was added.
 
 .. _field-lookups:
 
@@ -3981,10 +3873,6 @@ database-related operations. It's similar to how an
 or annotation. They make it possible to define and reuse conditions, and
 combine them using operators such as ``|`` (``OR``), ``&`` (``AND``), and ``^``
 (``XOR``). See :ref:`complex-lookups-with-q`.
-
-.. versionchanged:: 4.1
-
-    Support for the ``^`` (``XOR``) operator was added.
 
 ``Prefetch()`` objects
 ----------------------

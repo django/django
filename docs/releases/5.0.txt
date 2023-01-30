@@ -1,0 +1,360 @@
+============================================
+Django 5.0 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected December 2023*
+
+Welcome to Django 5.0!
+
+These release notes cover the :ref:`new features <whats-new-5.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.0>` you'll
+want to be aware of when upgrading from Django 4.2 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 5.0 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
+only officially support the latest release of each series.
+
+The Django 4.2.x series is the last to support Python 3.8 and 3.9.
+
+Third-party library support for older version of Django
+=======================================================
+
+Following the release of Django 5.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 4.2. At that time, you should
+be able to run your package's tests using ``python -Wd`` so that deprecation
+warnings appear. After making the deprecation warning fixes, your app should be
+compatible with Django 5.0.
+
+.. _whats-new-5.0:
+
+What's new in Django 5.0
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  480,000 to 580,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new
+  :class:`ClosestPoint() <django.contrib.gis.db.models.functions.ClosestPoint>`
+  function returns a 2-dimensional point on the geometry that is closest to
+  another geometry.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* ...
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.0:
+
+Backwards incompatible changes in 5.0
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Miscellaneous
+-------------
+
+* ...
+
+.. _deprecated-features-5.0:
+
+Features deprecated in 5.0
+==========================
+
+Miscellaneous
+-------------
+
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers are deprecated.
+
+Features removed in 5.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 5.0.
+
+See :ref:`deprecated-features-4.0` for details on these changes, including how
+to remove usage of these features.
+
+* The ``SERIALIZE`` test setting is removed.
+
+* The undocumented ``django.utils.baseconv`` module is removed.
+
+* The undocumented ``django.utils.datetime_safe`` module is removed.
+
+* The default value of the ``USE_TZ`` setting is changed from ``False`` to
+  ``True``.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request is changed from ``'http'`` to ``'https'``.
+
+* The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
+  ``DiscoverRunner.run_tests()`` is removed.
+
+* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+  ``StringAgg`` aggregates no longer return ``[]``, ``[]``, and ``''``,
+  respectively, when there are no rows.
+
+* The ``USE_L10N`` setting is removed.
+
+* The ``USE_DEPRECATED_PYTZ`` transitional setting is removed.
+
+* Support for ``pytz`` timezones is removed.
+
+* The ``is_dst`` argument is removed from:
+
+  * ``QuerySet.datetimes()``
+  * ``django.utils.timezone.make_aware()``
+  * ``django.db.models.functions.Trunc()``
+  * ``django.db.models.functions.TruncSecond()``
+  * ``django.db.models.functions.TruncMinute()``
+  * ``django.db.models.functions.TruncHour()``
+  * ``django.db.models.functions.TruncDay()``
+  * ``django.db.models.functions.TruncWeek()``
+  * ``django.db.models.functions.TruncMonth()``
+  * ``django.db.models.functions.TruncQuarter()``
+  * ``django.db.models.functions.TruncYear()``
+
+* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+  are removed.
+
+* The undocumented ``BaseForm._html_output()`` method is removed.
+
+* The ability to return a ``str``, rather than a ``SafeString``, when rendering
+  an ``ErrorDict`` and ``ErrorList`` is removed.
+
+See :ref:`deprecated-features-4.1` for details on these changes, including how
+to remove usage of these features.
+
+* The ``SitemapIndexItem.__str__()`` method is removed.
+
+* The ``CSRF_COOKIE_MASKED`` transitional setting is removed.
+
+* The ``name`` argument of ``django.utils.functional.cached_property()`` is
+  removed.
+
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` is removed.
+
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is removed.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` is removed.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument is no longer allowed.
+
+* Passing unsaved model instances to related filters is no longer allowed.
+
+* ``created=True`` is required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` is removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` is
+  removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormSetError()`` is no
+  longer allowed.
+
+* The ``django.contrib.gis.admin.OpenLayersWidget`` is removed.
+
++ The ``django.contrib.auth.hashers.CryptPasswordHasher`` is removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates are removed.
+
+* The default form and formset rendering style is changed to the div-based.
+
+* Passing ``nulls_first=False`` or ``nulls_last=False`` to ``Expression.asc()``
+  and ``Expression.desc()`` methods, and the ``OrderBy`` expression is no
+  longer allowed.

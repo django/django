@@ -1,10 +1,9 @@
 from datetime import date
 
 from django.forms import DateField, Form, SelectDateWidget
-from django.test import ignore_warnings, override_settings
+from django.test import override_settings
 from django.utils import translation
 from django.utils.dates import MONTHS_AP
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from .base import WidgetTest
 
@@ -542,32 +541,28 @@ class SelectDateWidgetTest(WidgetTest):
             "13-08-0001",
         )
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False, DATE_INPUT_FORMATS=["%d.%m.%Y"])
+    @override_settings(DATE_INPUT_FORMATS=["%d.%m.%Y"])
     def test_custom_input_format(self):
         w = SelectDateWidget(years=("0001", "1899", "2009", "2010"))
-        for values, expected_value in (
-            (("0001", "8", "13"), "13.08.0001"),
-            (("1899", "7", "11"), "11.07.1899"),
-            (("2009", "3", "7"), "07.03.2009"),
-        ):
-            with self.subTest(values=values):
-                data = {
-                    "field_%s" % field: value
-                    for field, value in zip(("year", "month", "day"), values)
-                }
-                self.assertEqual(
-                    w.value_from_datadict(data, {}, "field"), expected_value
-                )
-                expected_dict = {
-                    field: int(value)
-                    for field, value in zip(("year", "month", "day"), values)
-                }
-                self.assertEqual(w.format_value(expected_value), expected_dict)
+        with translation.override(None):
+            for values, expected_value in (
+                (("0001", "8", "13"), "13.08.0001"),
+                (("1899", "7", "11"), "11.07.1899"),
+                (("2009", "3", "7"), "07.03.2009"),
+            ):
+                with self.subTest(values=values):
+                    data = {
+                        "field_%s" % field: value
+                        for field, value in zip(("year", "month", "day"), values)
+                    }
+                    self.assertEqual(
+                        w.value_from_datadict(data, {}, "field"), expected_value
+                    )
+                    expected_dict = {
+                        field: int(value)
+                        for field, value in zip(("year", "month", "day"), values)
+                    }
+                    self.assertEqual(w.format_value(expected_value), expected_dict)
 
     def test_format_value(self):
         valid_formats = [

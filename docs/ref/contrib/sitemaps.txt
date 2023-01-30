@@ -242,12 +242,12 @@ Note:
         This attribute defines the protocol (``'http'`` or ``'https'``) of the
         URLs in the sitemap. If it isn't set, the protocol with which the
         sitemap was requested is used. If the sitemap is built outside the
-        context of a request, the default is ``'http'``.
+        context of a request, the default is ``'https'``.
 
-        .. deprecated:: 4.0
+        .. versionchanged:: 5.0
 
-            The default protocol for sitemaps built outside the context of a
-            request will change from ``'http'`` to ``'https'`` in Django 5.0.
+            In older versions, the default protocol for sitemaps built outside
+            the context of a request was ``'http'``.
 
     .. attribute:: Sitemap.limit
 
@@ -295,8 +295,6 @@ Note:
         ``False``.
 
     .. method:: Sitemap.get_latest_lastmod()
-
-        .. versionadded:: 4.1
 
         **Optional.** A method that returns the latest value returned by
         :attr:`~Sitemap.lastmod`. This function is used to add the ``lastmod``
@@ -465,10 +463,6 @@ with a caching decorator -- you must name your sitemap view and pass
              {'sitemaps': sitemaps}, name='sitemaps'),
     ]
 
-.. versionchanged:: 4.1
-
-    Use of the ``Last-Modified`` header was added.
-
 Template customization
 ======================
 
@@ -515,11 +509,6 @@ attributes:
 - ``location``: The location (url & page) of the sitemap.
 - ``lastmod``: Populated by the :meth:`~Sitemap.get_latest_lastmod`
   method for each sitemap.
-
-.. versionchanged:: 4.1
-
-    The context was changed to a list of objects with ``location`` and optional
-    ``lastmod`` attributes.
 
 Sitemap
 -------

@@ -1,4 +1,5 @@
 from enum import Enum
+from types import NoneType
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connections
@@ -148,7 +149,7 @@ class UniqueConstraint(BaseConstraint):
             raise ValueError(
                 "UniqueConstraint.fields and expressions are mutually exclusive."
             )
-        if not isinstance(condition, (type(None), Q)):
+        if not isinstance(condition, (NoneType, Q)):
             raise ValueError("UniqueConstraint.condition must be a Q instance.")
         if condition and deferrable:
             raise ValueError("UniqueConstraint with conditions cannot be deferred.")
@@ -163,11 +164,11 @@ class UniqueConstraint(BaseConstraint):
                 "UniqueConstraint.opclasses cannot be used with expressions. "
                 "Use django.contrib.postgres.indexes.OpClass() instead."
             )
-        if not isinstance(deferrable, (type(None), Deferrable)):
+        if not isinstance(deferrable, (NoneType, Deferrable)):
             raise ValueError(
                 "UniqueConstraint.deferrable must be a Deferrable instance."
             )
-        if not isinstance(include, (type(None), list, tuple)):
+        if not isinstance(include, (NoneType, list, tuple)):
             raise ValueError("UniqueConstraint.include must be a list or tuple.")
         if not isinstance(opclasses, (list, tuple)):
             raise ValueError("UniqueConstraint.opclasses must be a list or tuple.")

@@ -2,9 +2,9 @@ import copy
 import datetime
 import functools
 import inspect
-import warnings
 from collections import defaultdict
 from decimal import Decimal
+from types import NoneType
 from uuid import UUID
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
@@ -13,7 +13,6 @@ from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -508,7 +507,6 @@ class Expression(BaseExpression, Combinable):
 # The current approach for NULL is based on lowest common denominator behavior
 # i.e. if one of the supported databases is raising an error (rather than
 # return NULL) for `val <op> NULL`, then Django raises FieldError.
-NoneType = type(None)
 
 _connector_combinations = [
     # Numeric operations - operands of same type.
@@ -1572,16 +1570,7 @@ class OrderBy(Expression):
         if nulls_first and nulls_last:
             raise ValueError("nulls_first and nulls_last are mutually exclusive")
         if nulls_first is False or nulls_last is False:
-            # When the deprecation ends, replace with:
-            # raise ValueError(
-            #     "nulls_first and nulls_last values must be True or None."
-            # )
-            warnings.warn(
-                "Passing nulls_first=False or nulls_last=False is deprecated, use None "
-                "instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+            raise ValueError("nulls_first and nulls_last values must be True or None.")
         self.nulls_first = nulls_first
         self.nulls_last = nulls_last
         self.descending = descending

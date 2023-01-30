@@ -539,11 +539,6 @@ By default, a property returning the value of the renderer's
 as a string template name in order to override that for a particular form
 class.
 
-.. versionchanged:: 4.1
-
-    In older versions ``template_name`` defaulted to the string value
-    ``'django/forms/default.html'``.
-
 ``render()``
 ~~~~~~~~~~~~
 
@@ -604,13 +599,9 @@ template name.
 
 .. attribute:: Form.template_name_div
 
-.. versionadded:: 4.1
-
 The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
 
 .. method:: Form.as_div()
-
-.. versionadded:: 4.1
 
 ``as_div()`` renders the form as a series of ``<div>`` elements, with each
 ``<div>`` containing one field, such as:
@@ -1024,11 +1015,6 @@ Customizing the error list format
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
 
-.. deprecated:: 4.0
-
-    The ability to return a ``str`` when calling the ``__str__`` method is
-    deprecated. Use the template engine instead which returns a ``SafeString``.
-
 More granular output
 ====================
 
@@ -1196,8 +1182,6 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.use_fieldset
 
-    .. versionadded:: 4.1
-
     Returns the value of this BoundField widget's ``use_fieldset`` attribute.
 
 .. attribute:: BoundField.widget_type
@@ -1292,13 +1276,7 @@ Methods of ``BoundField``
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
 
-    .. versionchanged:: 4.1
-
-        The ``tag`` argument was added.
-
 .. method:: BoundField.legend_tag(contents=None, attrs=None, label_suffix=None)
-
-    .. versionadded:: 4.1
 
     Calls :meth:`.label_tag` with ``tag='legend'`` to render the label with
     ``<legend>`` tags. This is useful when rendering radio and multiple

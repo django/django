@@ -2,6 +2,7 @@ import codecs
 import datetime
 import locale
 from decimal import Decimal
+from types import NoneType
 from urllib.parse import quote
 
 from django.utils.functional import Promise
@@ -34,7 +35,7 @@ def smart_str(s, encoding="utf-8", strings_only=False, errors="strict"):
 
 
 _PROTECTED_TYPES = (
-    type(None),
+    NoneType,
     int,
     float,
     Decimal,
