@@ -597,8 +597,11 @@ class AdminSite:
 
         content_types = []
         for model in self._registry.keys():
-            content_types.append(ContentType.objects.get(
-                app_label=model._meta.app_label, model=model._meta.model_name))
+            content_types.append(
+                ContentType.objects.get(
+                    app_label=model._meta.app_label, model=model._meta.model_name
+                )
+            )
         return content_types
 
     def get_log_entries(self):

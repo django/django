@@ -17,9 +17,7 @@ class AdminLogNode(template.Node):
             if not user_id.isdigit():
                 user_id = context[self.user].pk
             entries = entries.filter(user__pk=user_id)
-        context[self.varname] = entries[
-            : int(self.limit)
-        ]
+        context[self.varname] = entries[: int(self.limit)]
         return ""
 
 
