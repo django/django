@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .admin import site, custom_site
+from .admin import custom_site, site
 
 urlpatterns = [
     path("test_admin/admin/", site.urls),
