@@ -96,8 +96,12 @@ def result_headers(cl):
 
             # if the field is the action checkbox: no sorting and special class
             if field_name == "action_checkbox":
+                aria_label = _("Select all objects on this page for an action")
                 yield {
-                    "text": text,
+                    "text": mark_safe(
+                        f'<input type="checkbox" id="action-toggle" '
+                        f'aria-label="{aria_label}">'
+                    ),
                     "class_attrib": mark_safe(' class="action-checkbox-column"'),
                     "sortable": False,
                 }

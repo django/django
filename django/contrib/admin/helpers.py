@@ -36,9 +36,6 @@ class ActionForm(forms.Form):
     )
 
 
-checkbox = forms.CheckboxInput({"class": "action-select"}, lambda value: False)
-
-
 class AdminForm:
     def __init__(
         self,
