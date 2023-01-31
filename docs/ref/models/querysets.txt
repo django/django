@@ -2263,14 +2263,18 @@ whenever a request to a page has a side effect on your data. For more, see
 ``update_or_create()``
 ~~~~~~~~~~~~~~~~~~~~~~
 
-.. method:: update_or_create(defaults=None, **kwargs)
-.. method:: aupdate_or_create(defaults=None, **kwargs)
+.. method:: update_or_create(defaults=None, create_defaults=None, **kwargs)
+.. method:: aupdate_or_create(defaults=None, create_defaults=None, **kwargs)
 
 *Asynchronous version*: ``aupdate_or_create()``
 
 A convenience method for updating an object with the given ``kwargs``, creating
-a new one if necessary. The ``defaults`` is a dictionary of (field, value)
-pairs used to update the object. The values in ``defaults`` can be callables.
+a new one if necessary. Both ``create_defaults`` and ``defaults`` are
+dictionaries of (field, value) pairs. The values in both ``create_defaults``
+and ``defaults`` can be callables. ``defaults`` is used to update the object
+while ``create_defaults`` are used for the create operation. If
+``create_defaults`` is not supplied, ``defaults`` will be used for the create
+operation.
 
 Returns a tuple of ``(object, created)``, where ``object`` is the created or
 updated object and ``created`` is a boolean specifying whether a new object was
@@ -2283,6 +2287,7 @@ the given ``kwargs``. If a match is found, it updates the fields passed in the
 This is meant as a shortcut to boilerplatish code. For example::
 
     defaults = {'first_name': 'Bob'}
+    create_defaults = {'first_name': 'Bob', 'birthday': date(1940, 10, 9)}
     try:
         obj = Person.objects.get(first_name='John', last_name='Lennon')
         for key, value in defaults.items():
@@ -2290,7 +2295,7 @@ This is meant as a shortcut to boilerplatish code. For example::
         obj.save()
     except Person.DoesNotExist:
         new_values = {'first_name': 'John', 'last_name': 'Lennon'}
-        new_values.update(defaults)
+        new_values.update(create_defaults)
         obj = Person(**new_values)
         obj.save()
 
@@ -2300,6 +2305,7 @@ The above example can be rewritten using ``update_or_create()`` like so::
     obj, created = Person.objects.update_or_create(
         first_name='John', last_name='Lennon',
         defaults={'first_name': 'Bob'},
+        create_defaults={'first_name': 'Bob', 'birthday': date(1940, 10, 9)},
     )
 
 For a detailed description of how names passed in ``kwargs`` are resolved, see
@@ -2317,6 +2323,10 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
     In older versions, ``update_or_create()`` didn't specify ``update_fields``
     when calling :meth:`Model.save() <django.db.models.Model.save>`.
+
+.. versionchanged:: 5.0
+
+    The ``create_defaults`` argument was added.
 
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
