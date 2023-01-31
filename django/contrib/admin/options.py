@@ -13,7 +13,6 @@ from django.contrib.admin.checks import (
     InlineModelAdminChecks,
     ModelAdminChecks,
 )
-from django.contrib.admin.decorators import display
 from django.contrib.admin.exceptions import DisallowedModelAdminToField
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
@@ -962,12 +961,16 @@ class ModelAdmin(BaseModelAdmin):
             action_flag=DELETION,
         )
 
-    @display(description=mark_safe('<input type="checkbox" id="action-toggle">'))
     def action_checkbox(self, obj):
         """
         A list_display column containing a checkbox widget.
         """
-        return helpers.checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
+        attrs = {
+            "class": "action-select",
+            "aria-label": format_html(_("Select this object for an action - {}"), obj),
+        }
+        checkbox = forms.CheckboxInput(attrs, lambda value: False)
+        return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
 
     @staticmethod
     def _get_action_description(func, name):

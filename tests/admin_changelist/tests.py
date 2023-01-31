@@ -74,15 +74,15 @@ from .models import (
 )
 
 
-def build_tbody_html(pk, href, extra_fields):
+def build_tbody_html(obj, href, extra_fields):
     return (
         "<tbody><tr>"
         '<td class="action-checkbox">'
         '<input type="checkbox" name="_selected_action" value="{}" '
-        'class="action-select"></td>'
+        'class="action-select" aria-label="Select this object for an action - {}"></td>'
         '<th class="field-name"><a href="{}">name</a></th>'
         "{}</tr></tbody>"
-    ).format(pk, href, extra_fields)
+    ).format(obj.pk, str(obj), href, extra_fields)
 
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
@@ -245,7 +245,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child.id, link, '<td class="field-parent nowrap">-</td>'
+            new_child, link, '<td class="field-parent nowrap">-</td>'
         )
         self.assertNotEqual(
             table_output.find(row_html),
@@ -272,7 +272,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child.id, link, '<td class="field-parent nowrap">???</td>'
+            new_child, link, '<td class="field-parent nowrap">???</td>'
         )
         self.assertNotEqual(
             table_output.find(row_html),
@@ -297,7 +297,7 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child.id,
+            new_child,
             link,
             '<td class="field-age_display">&amp;dagger;</td>'
             '<td class="field-age">-empty-</td>',
@@ -327,12 +327,17 @@ class ChangeListTests(TestCase):
         table_output = template.render(context)
         link = reverse("admin:admin_changelist_child_change", args=(new_child.id,))
         row_html = build_tbody_html(
-            new_child.id, link, '<td class="field-parent nowrap">%s</td>' % new_parent
+            new_child, link, '<td class="field-parent nowrap">%s</td>' % new_parent
         )
         self.assertNotEqual(
             table_output.find(row_html),
             -1,
             "Failed to find expected row element: %s" % table_output,
+        )
+        self.assertInHTML(
+            '<input type="checkbox" id="action-toggle" '
+            'aria-label="Select all objects on this page for an action">',
+            table_output,
         )
 
     def test_result_list_editable_html(self):
