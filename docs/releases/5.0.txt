@@ -178,7 +178,9 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new ``create_defaults`` argument of :meth:`.QuerySet.update_or_create`
+  and :meth:`.QuerySet.aupdate_or_create` methods allows specifying a different
+  field values for the create operation.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -237,6 +239,14 @@ This section describes changes that may be needed in third-party database
 backends.
 
 * ...
+
+Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
+-----------------------------------------------------------------------------------------
+
+:meth:`.QuerySet.update_or_create` now supports the parameter
+``create_defaults``. As a consequence, any models that have a field named
+``create_defaults`` that are used with an ``update_or_create()`` should specify
+the field in the lookup with ``create_defaults__exact``.
 
 Miscellaneous
 -------------

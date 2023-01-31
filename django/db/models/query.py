@@ -926,25 +926,32 @@ class QuerySet(AltersData):
             **kwargs,
         )
 
-    def update_or_create(self, defaults=None, **kwargs):
+    def update_or_create(self, defaults=None, create_defaults=None, **kwargs):
         """
         Look up an object with the given kwargs, updating one with defaults
-        if it exists, otherwise create a new one.
+        if it exists, otherwise create a new one. Optionally, an object can
+        be created with different values than defaults by using
+        create_defaults.
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        defaults = defaults or {}
+        if create_defaults is None:
+            update_defaults = create_defaults = defaults or {}
+        else:
+            update_defaults = defaults or {}
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
             # update_or_create() has performed its save.
-            obj, created = self.select_for_update().get_or_create(defaults, **kwargs)
+            obj, created = self.select_for_update().get_or_create(
+                create_defaults, **kwargs
+            )
             if created:
                 return obj, created
-            for k, v in resolve_callables(defaults):
+            for k, v in resolve_callables(update_defaults):
                 setattr(obj, k, v)
 
-            update_fields = set(defaults)
+            update_fields = set(update_defaults)
             concrete_field_names = self.model._meta._non_pk_concrete_field_names
             # update_fields does not support non-concrete fields.
             if concrete_field_names.issuperset(update_fields):
@@ -964,9 +971,10 @@ class QuerySet(AltersData):
                 obj.save(using=self.db)
         return obj, False
 
-    async def aupdate_or_create(self, defaults=None, **kwargs):
+    async def aupdate_or_create(self, defaults=None, create_defaults=None, **kwargs):
         return await sync_to_async(self.update_or_create)(
             defaults=defaults,
+            create_defaults=create_defaults,
             **kwargs,
         )
 
