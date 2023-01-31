@@ -340,7 +340,9 @@ class UniqueConstraint(BaseConstraint):
                 # Ignore ordering.
                 if isinstance(expr, OrderBy):
                     expr = expr.expression
-                expressions.append(Exact(expr, expr.replace_references(replacement_map)))
+                expressions.append(
+                    Exact(expr, expr.replace_references(replacement_map))
+                )
             queryset = queryset.filter(*expressions)
         model_class_pk = instance._get_pk_val(model._meta)
         if not instance._state.adding and model_class_pk is not None:
