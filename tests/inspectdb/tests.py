@@ -388,7 +388,8 @@ class InspectDBTestCase(TestCase):
         """
         out = StringIO()
         with mock.patch(
-            "django.db.connection.introspection.data_types_reverse.base_data_types_reverse",
+            "django.db.connection.introspection.data_types_reverse."
+            "base_data_types_reverse",
             {
                 "text": "myfields.TextField",
                 "bigint": "BigIntegerField",
