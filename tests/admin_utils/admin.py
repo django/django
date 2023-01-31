@@ -35,3 +35,19 @@ site = admin.AdminSite(name="admin")
 site.register(Article)
 site.register(ArticleProxy)
 site.register(Site, SiteAdmin)
+
+
+class CustomAdminSite(admin.AdminSite):
+    def get_log_entries(self, request):
+        from django.contrib.contenttypes.models import ContentType
+
+        log_entries = super().get_log_entries(request)
+        return log_entries.filter(
+            content_type__in=ContentType.objects.get_for_models(
+                *self._registry.keys()
+            ).values()
+        )
+
+
+custom_site = CustomAdminSite(name="custom_admin")
+custom_site.register(Article)

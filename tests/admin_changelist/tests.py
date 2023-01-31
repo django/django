@@ -1595,7 +1595,12 @@ class GetAdminLogTests(TestCase):
         {% get_admin_log %} works if the user model's primary key isn't named
         'id'.
         """
-        context = Context({"user": CustomIdUser()})
+        context = Context(
+            {
+                "user": CustomIdUser(),
+                "log_entries": LogEntry.objects.all(),
+            }
+        )
         template = Template(
             "{% load log %}{% get_admin_log 10 as admin_log for_user user %}"
         )
@@ -1608,6 +1613,7 @@ class GetAdminLogTests(TestCase):
         user.save()
         ct = ContentType.objects.get_for_model(User)
         LogEntry.objects.log_action(user.pk, ct.pk, user.pk, repr(user), 1)
+        context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"
             "{% get_admin_log 100 as admin_log %}"
@@ -1615,7 +1621,7 @@ class GetAdminLogTests(TestCase):
             "{{ entry|safe }}"
             "{% endfor %}"
         )
-        self.assertEqual(t.render(Context({})), "Added “<User: jondoe>”.")
+        self.assertEqual(t.render(context), "Added “<User: jondoe>”.")
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"
