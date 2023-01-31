@@ -79,22 +79,18 @@ work, see :ref:`troubleshooting-django-admin`.
 Let's look at what :djadmin:`startproject` created::
 
     mysite/
-        manage.py
         mysite/
             __init__.py
+            asgi.py
             settings.py
             urls.py
-            asgi.py
             wsgi.py
+        manage.py
 
 These files are:
 
 * The outer :file:`mysite/` root directory is a container for your project. Its
   name doesn't matter to Django; you can rename it to anything you like.
-
-* :file:`manage.py`: A command-line utility that lets you interact with this
-  Django project in various ways. You can read all the details about
-  :file:`manage.py` in :doc:`/ref/django-admin`.
 
 * The inner :file:`mysite/` directory is the actual Python package for your
   project. Its name is the Python package name you'll need to use to import
@@ -103,6 +99,9 @@ These files are:
 * :file:`mysite/__init__.py`: An empty file that tells Python that this
   directory should be considered a Python package. If you're a Python beginner,
   read :ref:`more about packages <tut-packages>` in the official Python docs.
+  
+* :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
+  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
 
 * :file:`mysite/settings.py`: Settings/configuration for this Django
   project.  :doc:`/topics/settings` will tell you all about how settings
@@ -112,11 +111,12 @@ These files are:
   "table of contents" of your Django-powered site. You can read more about
   URLs in :doc:`/topics/http/urls`.
 
-* :file:`mysite/asgi.py`: An entry-point for ASGI-compatible web servers to
-  serve your project. See :doc:`/howto/deployment/asgi/index` for more details.
-
 * :file:`mysite/wsgi.py`: An entry-point for WSGI-compatible web servers to
   serve your project. See :doc:`/howto/deployment/wsgi/index` for more details.
+  
+* :file:`manage.py`: A command-line utility that lets you interact with this
+  Django project in various ways. You can read all the details about
+  :file:`manage.py` in :doc:`/ref/django-admin`.
 
 The development server
 ======================
