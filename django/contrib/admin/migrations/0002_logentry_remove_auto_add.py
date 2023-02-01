@@ -3,7 +3,6 @@ from django.utils import timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("admin", "0001_initial"),
     ]

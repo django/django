@@ -1264,7 +1264,9 @@ class AggregateTestCase(TestCase):
     def test_aggregate_over_aggregate(self):
         msg = "Cannot compute Avg('age'): 'age' is an aggregate"
         with self.assertRaisesMessage(FieldError, msg):
-            Author.objects.annotate(age_alias=F("age"),).aggregate(
+            Author.objects.annotate(
+                age_alias=F("age"),
+            ).aggregate(
                 age=Sum(F("age")),
                 avg_age=Avg(F("age")),
             )

@@ -129,7 +129,6 @@ class Tests(TestCase):
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 @isolate_apps("backends")
 class SchemaTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def test_autoincrement(self):

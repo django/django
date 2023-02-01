@@ -435,7 +435,6 @@ class SerializerAPITests(SimpleTestCase):
 
 
 class SerializersTransactionTestBase:
-
     available_apps = ["serializers"]
 
     @skipUnlessDBFeature("supports_forward_references")

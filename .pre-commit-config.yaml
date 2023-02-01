@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.1.0
+    rev: 23.1.0
     hooks:
     - id: black
   - repo: https://github.com/PyCQA/isort

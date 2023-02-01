@@ -2240,7 +2240,6 @@ class SyncOnlyDefaultDatabaseRouter:
 
 
 class MigrateTestCase(TestCase):
-
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         "multiple_database",

@@ -6,7 +6,6 @@ from django.db.backends.utils import strip_quotes
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_create_sequence = "CREATE SEQUENCE %(sequence)s"
     sql_delete_sequence = "DROP SEQUENCE IF EXISTS %(sequence)s CASCADE"
     sql_set_sequence_max = (

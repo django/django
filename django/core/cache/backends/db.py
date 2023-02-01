@@ -40,7 +40,6 @@ class BaseDatabaseCache(BaseCache):
 
 
 class DatabaseCache(BaseDatabaseCache):
-
     # This class uses cursors provided by the database connection. This means
     # it reads expiration values as aware or naive datetimes, depending on the
     # value of USE_TZ and whether the database supports time zones. The ORM's

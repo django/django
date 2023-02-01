@@ -83,7 +83,6 @@ class I18nStringLiteralTests(SimpleTestCase):
 
     @setup({"i18n13": '{{ _("Password") }}'})
     def test_i18n13(self):
-
         with translation.override("de"):
             output = self.engine.render_to_string("i18n13")
         self.assertEqual(output, "Passwort")

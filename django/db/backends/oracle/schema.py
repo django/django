@@ -10,7 +10,6 @@ from django.db.backends.base.schema import (
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_create_column = "ALTER TABLE %(table)s ADD %(column)s %(definition)s"
     sql_alter_column_type = "MODIFY %(column)s %(type)s"
     sql_alter_column_null = "MODIFY %(column)s NULL"

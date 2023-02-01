@@ -255,9 +255,9 @@ class MySQLUpdateOrderByTest(TestCase):
         # Ordering by annotations is omitted because they cannot be resolved in
         # .update().
         with self.assertRaises(IntegrityError):
-            UniqueNumber.objects.annotate(number_inverse=F("number").desc(),).order_by(
-                "number_inverse"
-            ).update(
+            UniqueNumber.objects.annotate(
+                number_inverse=F("number").desc(),
+            ).order_by("number_inverse").update(
                 number=F("number") + 1,
             )
 

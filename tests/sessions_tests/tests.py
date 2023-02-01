@@ -396,7 +396,6 @@ class SessionTestsMixin:
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
-
     backend = DatabaseSession
     session_engine = "django.contrib.sessions.backends.db"
 
@@ -507,7 +506,6 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
-
     backend = CacheDBSession
 
     def test_exists_searches_cache_first(self):
@@ -534,7 +532,6 @@ class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
 
 
 class FileSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = FileSession
 
     def setUp(self):
@@ -630,7 +627,6 @@ class FileSessionPathLibTests(FileSessionTests):
 
 
 class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = CacheSession
 
     # Some backends might issue a warning
@@ -873,7 +869,6 @@ class SessionMiddlewareTests(TestCase):
 
 
 class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = CookieSession
 
     def test_save(self):

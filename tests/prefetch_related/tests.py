@@ -1706,7 +1706,9 @@ class DirectPrefetchedObjectCacheReuseTests(TestCase):
         lookup.
         """
         with self.assertNumQueries(3):
-            books = Book.objects.filter(title__in=["book1", "book2"],).prefetch_related(
+            books = Book.objects.filter(
+                title__in=["book1", "book2"],
+            ).prefetch_related(
                 Prefetch(
                     "first_time_authors",
                     Author.objects.prefetch_related(
@@ -1760,7 +1762,9 @@ class DirectPrefetchedObjectCacheReuseTests(TestCase):
 
     def test_detect_is_fetched_with_to_attr(self):
         with self.assertNumQueries(3):
-            books = Book.objects.filter(title__in=["book1", "book2"],).prefetch_related(
+            books = Book.objects.filter(
+                title__in=["book1", "book2"],
+            ).prefetch_related(
                 Prefetch(
                     "first_time_authors",
                     Author.objects.prefetch_related(

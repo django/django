@@ -745,6 +745,7 @@ class FieldNamesTests(TestCase):
         #13711 -- Model check for long M2M column names when database has
         column name length limits.
         """
+
         # A model with very long name which will be used to set relations to.
         class VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
             models.Model

@@ -213,7 +213,6 @@ class SequenceResetTest(TestCase):
 # This test needs to run outside of a transaction, otherwise closing the
 # connection would implicitly rollback and cause problems during teardown.
 class ConnectionCreatedSignalTest(TransactionTestCase):
-
     available_apps = []
 
     # Unfortunately with sqlite3 the in-memory test database cannot be closed,
@@ -263,7 +262,6 @@ class EscapingChecksDebug(EscapingChecks):
 
 
 class BackendTestCase(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def create_squares_with_executemany(self, args):
@@ -557,7 +555,6 @@ class BackendTestCase(TransactionTestCase):
 # These tests aren't conditional because it would require differentiating
 # between MySQL+InnoDB and MySQL+MYISAM (something we currently can't do).
 class FkConstraintsTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def setUp(self):
@@ -705,7 +702,6 @@ class FkConstraintsTests(TransactionTestCase):
 
 
 class ThreadTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def test_default_connection_thread_local(self):

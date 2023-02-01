@@ -927,7 +927,6 @@ class Star(Expression):
 
 
 class Col(Expression):
-
     contains_column_references = True
     possibly_multivalued = False
 

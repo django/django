@@ -754,7 +754,6 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
 
 @override_settings(TIME_ZONE="Africa/Nairobi")
 class SerializationTests(SimpleTestCase):
-
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
     # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes.

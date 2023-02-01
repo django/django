@@ -619,7 +619,6 @@ class ModelLookupTest(TestCase):
 
 
 class ConcurrentSaveTests(TransactionTestCase):
-
     available_apps = ["basic"]
 
     @skipUnlessDBFeature("test_db_allows_multiple_connections")

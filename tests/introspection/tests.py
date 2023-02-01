@@ -18,7 +18,6 @@ from .models import (
 
 
 class IntrospectionTests(TransactionTestCase):
-
     available_apps = ["introspection"]
 
     def test_table_names(self):

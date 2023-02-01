@@ -57,6 +57,7 @@ def method_decorator(decorator, name=""):
     """
     Convert a function decorator into a method decorator
     """
+
     # 'obj' can be a class or a function. If 'obj' is a function at the time it
     # is passed to _dec,  it will eventually be a method of the class it is
     # defined on. If 'obj' is a class, the 'name' is required to be the name

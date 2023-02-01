@@ -901,7 +901,6 @@ class M2MNaturalKeyFixtureTests(TestCase):
 
 
 class TestTicket11101(TransactionTestCase):
-
     available_apps = ["fixtures_regress"]
 
     @skipUnlessDBFeature("supports_transactions")

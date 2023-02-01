@@ -33,7 +33,6 @@ from .models import (
 
 
 class SelectForUpdateTests(TransactionTestCase):
-
     available_apps = ["select_for_update"]
 
     def setUp(self):
@@ -243,7 +242,9 @@ class SelectForUpdateTests(TransactionTestCase):
     def test_for_update_sql_model_proxy_generated_of(self):
         with transaction.atomic(), CaptureQueriesContext(connection) as ctx:
             list(
-                CityCountryProxy.objects.select_related("country",).select_for_update(
+                CityCountryProxy.objects.select_related(
+                    "country",
+                ).select_for_update(
                     of=("country",),
                 )
             )
@@ -413,7 +414,10 @@ class SelectForUpdateTests(TransactionTestCase):
             with self.subTest(name=name):
                 with self.assertRaisesMessage(FieldError, msg % name):
                     with transaction.atomic():
-                        Person.objects.select_related("born", "profile",).exclude(
+                        Person.objects.select_related(
+                            "born",
+                            "profile",
+                        ).exclude(
                             profile=None
                         ).select_for_update(of=(name,)).get()
 

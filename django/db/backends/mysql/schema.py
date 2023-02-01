@@ -3,7 +3,6 @@ from django.db.models import NOT_PROVIDED
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"

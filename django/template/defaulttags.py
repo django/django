@@ -309,7 +309,6 @@ class IfNode(Node):
 
     def render(self, context):
         for condition, nodelist in self.conditions_nodelists:
-
             if condition is not None:  # if / elif clause
                 try:
                     match = condition.eval(context)

@@ -56,7 +56,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, **options):
-
         self.verbosity = options["verbosity"]
         self.interactive = options["interactive"]
         app_label = options["app_label"]

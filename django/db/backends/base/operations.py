@@ -264,6 +264,7 @@ class BaseDatabaseOperations:
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
+
         # Convert params to contain string values.
         def to_string(s):
             return force_str(s, strings_only=True, errors="replace")

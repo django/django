@@ -150,7 +150,6 @@ class TemplateCommand(BaseCommand):
         prefix_length = len(template_dir) + 1
 
         for root, dirs, files in os.walk(template_dir):
-
             path_rest = root[prefix_length:]
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:

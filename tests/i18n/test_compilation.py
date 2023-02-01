@@ -22,12 +22,10 @@ has_msgfmt = find_command("msgfmt")
 
 @unittest.skipUnless(has_msgfmt, "msgfmt is mandatory for compilation tests")
 class MessageCompilationTests(RunInTmpDirMixin, SimpleTestCase):
-
     work_subdir = "commands"
 
 
 class PoFileTests(MessageCompilationTests):
-
     LOCALE = "es_AR"
     MO_FILE = "locale/%s/LC_MESSAGES/django.mo" % LOCALE
     MO_FILE_EN = "locale/en/LC_MESSAGES/django.mo"
@@ -83,7 +81,6 @@ class PoFileContentsTests(MessageCompilationTests):
 
 
 class MultipleLocaleCompilationTests(MessageCompilationTests):
-
     MO_FILE_HR = None
     MO_FILE_FR = None
 
@@ -108,7 +105,6 @@ class MultipleLocaleCompilationTests(MessageCompilationTests):
 
 
 class ExcludedLocaleCompilationTests(MessageCompilationTests):
-
     work_subdir = "exclude"
 
     MO_FILE = "locale/%s/LC_MESSAGES/django.mo"
