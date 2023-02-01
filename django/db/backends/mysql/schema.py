@@ -4,7 +4,6 @@ from django.db.models.constants import LOOKUP_SEP
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"

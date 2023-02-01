@@ -128,8 +128,7 @@ def Deserializer(
         field_names = field_names_cache[Model]
 
         # Handle each field
-        for (field_name, field_value) in d["fields"].items():
-
+        for field_name, field_value in d["fields"].items():
             if ignorenonexistent and field_name not in field_names:
                 # skip fields no longer on model
                 continue

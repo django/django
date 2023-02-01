@@ -97,6 +97,7 @@ class OpenLayersWidget(Textarea):
 
     def map_options(self):
         """Build the map options hash for the OpenLayers template."""
+
         # JavaScript construction utilities for the Bounds and Projection.
         def ol_bounds(extent):
             return "new OpenLayers.Bounds(%s)" % extent

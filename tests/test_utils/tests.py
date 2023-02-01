@@ -70,6 +70,7 @@ class SkippingTestCase(SimpleTestCase):
         """
         Testing the django.test.skipUnlessDBFeature decorator.
         """
+
         # Total hack, but it works, just want an attribute that's always true.
         @skipUnlessDBFeature("__class__")
         def test_func():
@@ -2002,7 +2003,6 @@ class SetupTestEnvironmentTests(SimpleTestCase):
 
 
 class OverrideSettingsTests(SimpleTestCase):
-
     # #21518 -- If neither override_settings nor a setting_changed receiver
     # clears the URL cache between tests, then one of test_first or
     # test_second will fail.

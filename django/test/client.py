@@ -270,7 +270,7 @@ def encode_multipart(boundary, data):
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
-    for (key, value) in data.items():
+    for key, value in data.items():
         if value is None:
             raise TypeError(
                 "Cannot encode None for key '%s' as POST data. Did you mean "

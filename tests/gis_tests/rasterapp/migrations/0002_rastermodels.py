@@ -4,7 +4,6 @@ from django.db.models import deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("rasterapp", "0001_setup_extensions"),
     ]

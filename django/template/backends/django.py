@@ -12,7 +12,6 @@ from .base import BaseEngine
 
 
 class DjangoTemplates(BaseEngine):
-
     app_dirname = "templates"
 
     def __init__(self, params):

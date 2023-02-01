@@ -193,7 +193,7 @@ class Command(BaseCommand):
                 # There is no need to sort dependencies when natural foreign
                 # keys are not used.
                 models = []
-                for (app_config, model_list) in app_list.items():
+                for app_config, model_list in app_list.items():
                     if model_list is None:
                         models.extend(app_config.get_models())
                     else:

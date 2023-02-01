@@ -344,7 +344,6 @@ class RelatedField(FieldCacheMixin, Field):
         return None
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
@@ -541,7 +540,6 @@ class ForeignObject(RelatedField):
         swappable=True,
         **kwargs,
     ):
-
         if rel is None:
             rel = self.rel_class(
                 self,
@@ -1616,7 +1614,6 @@ class ManyToManyField(RelatedField):
                     (source_field_name, source),
                     (target_field_name, target),
                 ):
-
                     possible_field_names = []
                     for f in through._meta.fields:
                         if (

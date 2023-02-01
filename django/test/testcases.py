@@ -290,7 +290,6 @@ class _AssertFormErrorDeprecationHelper:
 
 
 class SimpleTestCase(unittest.TestCase):
-
     # The class we'll use for the test client self.client.
     # Can be overridden in derived classes.
     client_class = Client
@@ -800,7 +799,6 @@ class SimpleTestCase(unittest.TestCase):
             )
 
     def _get_template_used(self, response, template_name, msg_prefix, method_name):
-
         if response is None and template_name is None:
             raise TypeError("response and/or template_name argument must be provided")
 
@@ -1157,7 +1155,6 @@ class SimpleTestCase(unittest.TestCase):
 
 
 class TransactionTestCase(SimpleTestCase):
-
     # Subclasses can ask for resetting of auto increment sequence before each
     # test case
     reset_sequences = False
