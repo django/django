@@ -651,7 +651,7 @@ class GeoQuerySetTest(TestCase):
         self.assertEqual(len(line), ref_points.count())
         # Compare pairs of manually sorted points, as the default ordering is
         # flaky.
-        for (point, ref_city) in zip(sorted(line), sorted(ref_points)):
+        for point, ref_city in zip(sorted(line), sorted(ref_points)):
             point_x, point_y = point
             self.assertAlmostEqual(point_x, ref_city.x, 5),
             self.assertAlmostEqual(point_y, ref_city.y, 5),

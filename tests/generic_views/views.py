@@ -330,7 +330,6 @@ class NonModel:
 
 
 class NonModelDetail(generic.DetailView):
-
     template_name = "generic_views/detail.html"
     model = NonModel
 

@@ -31,7 +31,6 @@ else:
 
 
 class Migration(migrations.Migration):
-
     operations = [
         BloomExtension(),
         BtreeGinExtension(),

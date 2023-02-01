@@ -5,7 +5,6 @@ from django.db.backends.utils import strip_quotes
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     # Setting all constraints to IMMEDIATE to allow changing data in the same
     # transaction.
     sql_update_with_default = (

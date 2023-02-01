@@ -45,7 +45,6 @@ from .models import (
 # get two connections to an in-memory database.
 @skipUnlessDBFeature("test_db_allows_multiple_connections")
 class DeleteLockingTest(TransactionTestCase):
-
     available_apps = ["delete_regress"]
 
     def setUp(self):
@@ -126,7 +125,6 @@ class DeleteCascadeTests(TestCase):
 
 
 class DeleteCascadeTransactionTests(TransactionTestCase):
-
     available_apps = ["delete_regress"]
 
     def test_inheritance(self):

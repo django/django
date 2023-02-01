@@ -95,7 +95,6 @@ class CursorWrapper:
 
 
 class CursorDebugWrapper(CursorWrapper):
-
     # XXX callproc isn't instrumented at this time.
 
     def execute(self, sql, params=None):

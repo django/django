@@ -2,7 +2,6 @@ from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
-
     help = "Test suppress base options command."
     requires_system_checks = []
     suppressed_base_arguments = {

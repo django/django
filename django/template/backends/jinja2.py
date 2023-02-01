@@ -12,7 +12,6 @@ from .utils import csrf_input_lazy, csrf_token_lazy
 
 
 class Jinja2(BaseEngine):
-
     app_dirname = "jinja2"
 
     def __init__(self, params):

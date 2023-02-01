@@ -476,7 +476,6 @@ if is_psycopg3:
                 return self.cursor.copy(statement)
 
 else:
-
     Cursor = psycopg2.extensions.cursor
 
     class CursorDebugWrapper(BaseCursorDebugWrapper):

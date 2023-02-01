@@ -135,7 +135,6 @@ class PersonThroughProxySubclass(ProxyPerson):
 
 
 class Relating(models.Model):
-
     # ForeignKey to BasePerson
     baseperson = models.ForeignKey(
         BasePerson, models.CASCADE, related_name="relating_baseperson"

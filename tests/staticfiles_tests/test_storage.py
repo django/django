@@ -696,7 +696,6 @@ class CustomStaticFilesStorage(storage.StaticFilesStorage):
 
 @unittest.skipIf(sys.platform == "win32", "Windows only partially supports chmod.")
 class TestStaticFilePermissions(CollectionTestCase):
-
     command_params = {
         "interactive": False,
         "verbosity": 0,
