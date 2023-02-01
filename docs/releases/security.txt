@@ -36,6 +36,16 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 1, 2023 - :cve:`2023-23969`
+------------------------------------
+
+Potential denial-of-service via ``Accept-Language`` headers. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/01/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d7bd5a56b1ce0576e8e07a8001373576d277942>`
+* Django 4.0 :commit:`(patch) <4452642f193533e288a52c02efb5bbc766a68f95>`
+* Django 3.2 :commit:`(patch) <c7e0151fdf33e1b11d488b6f67b94fdf3a30614a>`
+
 October 4, 2022 - :cve:`2022-41323`
 -----------------------------------
 
