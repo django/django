@@ -686,7 +686,6 @@ class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
 
 
 class TestRunnerInitializerTests(SimpleTestCase):
-
     # Raise an exception to don't actually run tests.
     @mock.patch.object(
         multiprocessing, "Pool", side_effect=Exception("multiprocessing.Pool()")

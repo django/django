@@ -33,7 +33,6 @@ requires_gettext_019 = skipIf(
 
 @skipUnless(has_xgettext, "xgettext is mandatory for extraction tests")
 class ExtractorTests(POFileAssertionMixin, RunInTmpDirMixin, SimpleTestCase):
-
     work_subdir = "commands"
 
     PO_FILE = "locale/%s/LC_MESSAGES/django.po" % LOCALE
@@ -509,7 +508,6 @@ class BasicExtractorTests(ExtractorTests):
 
 
 class JavaScriptExtractorTests(ExtractorTests):
-
     PO_FILE = "locale/%s/LC_MESSAGES/djangojs.po" % LOCALE
 
     def test_javascript_literals(self):
@@ -622,7 +620,6 @@ class SymlinkExtractorTests(ExtractorTests):
 
 
 class CopyPluralFormsExtractorTests(ExtractorTests):
-
     PO_FILE_ES = "locale/es/LC_MESSAGES/django.po"
 
     def test_copy_plural_forms(self):
@@ -788,7 +785,6 @@ class LocationCommentsTests(ExtractorTests):
 
 
 class KeepPotFileExtractorTests(ExtractorTests):
-
     POT_FILE = "locale/django.pot"
 
     def test_keep_pot_disabled_by_default(self):
@@ -833,7 +829,6 @@ class MultipleLocaleExtractionTests(ExtractorTests):
 
 
 class ExcludedLocaleExtractionTests(ExtractorTests):
-
     work_subdir = "exclude"
 
     LOCALES = ["en", "fr", "it"]
@@ -888,7 +883,6 @@ class ExcludedLocaleExtractionTests(ExtractorTests):
 
 
 class CustomLayoutExtractionTests(ExtractorTests):
-
     work_subdir = "project_dir"
 
     def test_no_locale_raises(self):

@@ -143,7 +143,6 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="forms_tests.urls")
 class FloatFieldHTMLTest(SeleniumTestCase):
-
     available_apps = ["forms_tests"]
 
     def test_float_field_rendering_passes_client_side_validation(self):

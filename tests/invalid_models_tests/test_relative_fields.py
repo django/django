@@ -1593,7 +1593,6 @@ class SelfReferentialFKClashTests(SimpleTestCase):
 
 @isolate_apps("invalid_models_tests")
 class ComplexClashTests(SimpleTestCase):
-
     # New tests should not be included here, because this is a single,
     # self-contained sanity check, not a test of everything.
     def test_complex_clash(self):

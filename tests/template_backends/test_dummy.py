@@ -14,7 +14,6 @@ from django.test import SimpleTestCase
 
 
 class TemplateStringsTests(SimpleTestCase):
-
     engine_class = TemplateStrings
     backend_name = "dummy"
     options = {}

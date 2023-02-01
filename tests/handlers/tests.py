@@ -95,7 +95,6 @@ class HandlerTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="handlers.urls", MIDDLEWARE=[])
 class TransactionsPerRequestTests(TransactionTestCase):
-
     available_apps = []
 
     def test_no_transaction(self):

@@ -99,7 +99,6 @@ class NestedObjectsTests(TestCase):
 
 
 class UtilsTests(SimpleTestCase):
-
     empty_value = "-empty-"
 
     def test_values_from_lookup_field(self):

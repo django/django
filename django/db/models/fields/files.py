@@ -221,7 +221,6 @@ class FileDescriptor(DeferredAttribute):
 
 
 class FileField(Field):
-
     # The class to wrap instance attributes in. Accessing the file object off
     # the instance will always return an instance of attr_class.
     attr_class = FieldFile

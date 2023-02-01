@@ -1489,7 +1489,6 @@ class TestVerboseNameInlineForms(TestDataMixin, TestCase):
 
 @override_settings(ROOT_URLCONF="admin_inlines.urls")
 class SeleniumTests(AdminSeleniumTestCase):
-
     available_apps = ["admin_inlines"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):

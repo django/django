@@ -36,7 +36,6 @@ def get_response_404(request):
 
 @override_settings(ROOT_URLCONF="middleware.urls")
 class CommonMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     @override_settings(APPEND_SLASH=True)
@@ -379,7 +378,6 @@ class CommonMiddlewareTest(SimpleTestCase):
     MANAGERS=[("PHD", "PHB@dilbert.com")],
 )
 class BrokenLinkEmailsMiddlewareTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     def setUp(self):

@@ -11,7 +11,6 @@ from .base import BaseEngine
 
 
 class Jinja2(BaseEngine):
-
     app_dirname = "jinja2"
 
     def __init__(self, params):

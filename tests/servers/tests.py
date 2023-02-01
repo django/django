@@ -29,7 +29,6 @@ TEST_SETTINGS = {
 
 @override_settings(ROOT_URLCONF="servers.urls", **TEST_SETTINGS)
 class LiveServerBase(LiveServerTestCase):
-
     available_apps = [
         "servers",
         "django.contrib.auth",
@@ -55,7 +54,6 @@ class CloseConnectionTestServer(ThreadedWSGIServer):
 
 
 class CloseConnectionTestLiveServerThread(LiveServerThread):
-
     server_class = CloseConnectionTestServer
 
     def _create_server(self, connections_override=None):
@@ -63,7 +61,6 @@ class CloseConnectionTestLiveServerThread(LiveServerThread):
 
 
 class LiveServerTestCloseConnectionTest(LiveServerBase):
-
     server_thread_class = CloseConnectionTestLiveServerThread
 
     @classmethod

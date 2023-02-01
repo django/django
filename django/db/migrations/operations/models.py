@@ -400,7 +400,7 @@ class RenameModel(ModelOperation):
             fields = zip(
                 old_model._meta.local_many_to_many, new_model._meta.local_many_to_many
             )
-            for (old_field, new_field) in fields:
+            for old_field, new_field in fields:
                 # Skip self-referential fields as these are renamed above.
                 if (
                     new_field.model == new_field.related_model
@@ -505,7 +505,7 @@ class AlterModelTable(ModelOptionOperation):
                 new_model._meta.db_table,
             )
             # Rename M2M fields whose name is based on this model's db_table
-            for (old_field, new_field) in zip(
+            for old_field, new_field in zip(
                 old_model._meta.local_many_to_many, new_model._meta.local_many_to_many
             ):
                 if new_field.remote_field.through._meta.auto_created:

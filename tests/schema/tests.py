@@ -703,7 +703,6 @@ class SchemaTests(TransactionTestCase):
         """
 
         class TestTransformField(IntegerField):
-
             # Weird field that saves the count of items in its value
             def get_default(self):
                 return self.default

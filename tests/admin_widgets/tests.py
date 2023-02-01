@@ -73,6 +73,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         Helper to call formfield_for_dbfield for a given model and field name
         and verify that the returned formfield is appropriate.
         """
+
         # Override any settings on the model admin
         class MyModelAdmin(admin.ModelAdmin):
             pass
@@ -317,7 +318,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         )
 
     def test_invalid_target_id(self):
-
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post(
@@ -886,7 +886,6 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
-
     available_apps = ["admin_widgets"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -1086,7 +1085,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
             # Test with every locale
             with override_settings(LANGUAGE_CODE=language_code):
-
                 # Open a page that has a date picker widget
                 url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
                 self.selenium.get(self.live_server_url + url)

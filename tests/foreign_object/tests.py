@@ -93,7 +93,6 @@ class MultiColumnFKTests(TestCase):
             self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
-
         # Creating a to valid memberships
         Membership.objects.create(
             membership_country_id=self.usa.id,
@@ -120,7 +119,6 @@ class MultiColumnFKTests(TestCase):
         )
 
     def test_reverse_query_filters_correctly(self):
-
         timemark = datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None)
         timedelta = datetime.timedelta(days=1)
 

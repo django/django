@@ -75,7 +75,6 @@ class StateTests(SimpleTestCase):
                 indexes = [models.Index(fields=["title"])]
 
         class Food(models.Model):
-
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
             food_no_mgr = NoMigrationFoodManager("x", "y")
@@ -90,7 +89,6 @@ class StateTests(SimpleTestCase):
                 apps = new_apps
 
         class FoodNoDefaultManager(models.Model):
-
             food_no_mgr = NoMigrationFoodManager("x", "y")
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
@@ -1816,7 +1814,6 @@ class ModelStateTests(SimpleTestCase):
         new_apps = Apps(["migrations"])
 
         class Food(models.Model):
-
             food_mgr = FoodManager("a", "b")
             food_qs = FoodQuerySet.as_manager()
             food_no_mgr = NoMigrationFoodManager("x", "y")

@@ -18,7 +18,6 @@ from django.utils.deprecation import RemovedInDjango50Warning
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
 class RemoteUserTest(TestCase):
-
     middleware = "django.contrib.auth.middleware.RemoteUserMiddleware"
     backend = "django.contrib.auth.backends.RemoteUserBackend"
     header = "REMOTE_USER"

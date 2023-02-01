@@ -12,7 +12,6 @@ def shrink_tail(x, y):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     operations = [

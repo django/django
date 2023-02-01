@@ -220,6 +220,7 @@ class ModelAdminTests(TestCase):
         conjunction with `ModelAdmin.readonly_fields` and when no
         `ModelAdmin.exclude` is defined (#14496).
         """
+
         # With ModelAdmin
         class AdminBandForm(forms.ModelForm):
             class Meta:
@@ -284,6 +285,7 @@ class ModelAdminTests(TestCase):
         The custom ModelForm's `Meta.exclude` is overridden if
         `ModelAdmin.exclude` or `InlineModelAdmin.exclude` are defined (#14496).
         """
+
         # With ModelAdmin
         class AdminBandForm(forms.ModelForm):
             class Meta:

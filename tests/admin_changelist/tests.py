@@ -1594,7 +1594,6 @@ class GetAdminLogTests(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
 class SeleniumTests(AdminSeleniumTestCase):
-
     available_apps = ["admin_changelist"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):

@@ -77,7 +77,6 @@ class SiteManager(models.Manager):
 
 
 class Site(models.Model):
-
     domain = models.CharField(
         _("domain name"),
         max_length=100,

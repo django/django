@@ -347,7 +347,6 @@ class TruncBase(TimezoneMixin, Transform):
 
 
 class Trunc(TruncBase):
-
     # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
     # argument.
     def __init__(

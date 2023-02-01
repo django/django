@@ -11,7 +11,6 @@ from django.db.transaction import atomic
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
@@ -191,6 +190,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           4. Rename the "new__app_model" table to "app_model"
           5. Restore any index of the previous "app_model" table.
         """
+
         # Self-referential fields must be recreated rather than copied from
         # the old model to ensure their remote_field.field_name doesn't refer
         # to an altered field.

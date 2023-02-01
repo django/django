@@ -39,7 +39,6 @@ def format(
     if isinstance(number, float) and "e" in str(number).lower():
         number = Decimal(str(number))
     if isinstance(number, Decimal):
-
         if decimal_pos is not None:
             # If the provided number is too small to affect any of the visible
             # decimal places, consider it equal to '0'.

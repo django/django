@@ -7,7 +7,6 @@ from .models import CharFieldModel, TextFieldModel
 
 @modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class UnaccentTest(PostgreSQLTestCase):
-
     Model = CharFieldModel
 
     @classmethod
