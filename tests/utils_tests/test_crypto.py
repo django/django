@@ -59,7 +59,6 @@ class TestUtilsCryptoMisc(SimpleTestCase):
 
 
 class TestUtilsCryptoPBKDF2(unittest.TestCase):
-
     # https://tools.ietf.org/html/draft-josefsson-pbkdf2-test-vectors-06
     rfc_vectors = [
         {

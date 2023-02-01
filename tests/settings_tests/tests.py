@@ -24,7 +24,6 @@ from django.urls import clear_script_prefix, set_script_prefix
     ITEMS=["a", "c", "e"], ITEMS_OUTER=[1, 2, 3], TEST="override", TEST_OUTER="outer"
 )
 class FullyDecoratedTranTestCase(TransactionTestCase):
-
     available_apps = []
 
     def test_override(self):

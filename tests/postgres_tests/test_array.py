@@ -864,7 +864,6 @@ class TestChecks(PostgreSQLSimpleTestCase):
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
 class TestMigrations(TransactionTestCase):
-
     available_apps = ["postgres_tests"]
 
     def test_deconstruct(self):

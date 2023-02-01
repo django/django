@@ -982,7 +982,7 @@ class ModelAdmin(BaseModelAdmin):
         base_action_names = {name for _, name, _ in base_actions}
 
         # Gather actions from the admin site first
-        for (name, func) in self.admin_site.actions:
+        for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
             description = self._get_action_description(func, name)
@@ -1106,6 +1106,7 @@ class ModelAdmin(BaseModelAdmin):
         Return a tuple containing a queryset to implement the search
         and a boolean indicating if the results may contain duplicates.
         """
+
         # Apply keyword searches.
         def construct_search(field_name):
             if field_name.startswith("^"):
