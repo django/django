@@ -27,7 +27,8 @@ BILATERAL = "bilateral"
 class PostGISOperator(SpatialOperator):
     def __init__(self, geography=False, raster=False, **kwargs):
         # Only a subset of the operators and functions are available for the
-        # geography type.
+        # geography type. Lookups that don't support geography will be cast to
+        # geometry.
         self.geography = geography
         # Only a subset of the operators and functions are available for the
         # raster type. Lookups that don't support raster will be converted to
@@ -37,13 +38,8 @@ class PostGISOperator(SpatialOperator):
         super().__init__(**kwargs)
 
     def as_sql(self, connection, lookup, template_params, *args):
-        if lookup.lhs.output_field.geography and not self.geography:
-            raise ValueError(
-                'PostGIS geography does not support the "%s" '
-                "function/operator." % (self.func or self.op,)
-            )
-
         template_params = self.check_raster(lookup, template_params)
+        template_params = self.check_geography(lookup, template_params)
         return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
@@ -91,6 +87,12 @@ class PostGISOperator(SpatialOperator):
             elif rhs_is_raster and not lhs_is_raster:
                 template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
 
+        return template_params
+
+    def check_geography(self, lookup, template_params):
+        """Convert geography fields to geometry types, if necessary."""
+        if lookup.lhs.output_field.geography and not self.geography:
+            template_params["lhs"] += "::geometry"
         return template_params
 
 
