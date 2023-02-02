@@ -4,6 +4,7 @@ Tests for django.core.servers.
 import errno
 import os
 import socket
+import sys
 import threading
 from http.client import HTTPConnection
 from urllib.error import HTTPError
@@ -364,7 +365,11 @@ class LiveServerPort(LiveServerBase):
                 % self.live_server_url,
             )
         finally:
-            TestCase.doClassCleanups()
+            # Class cleanups registered in TestCase subclasses are no longer
+            # called as TestCase.doClassCleanups() only cleans up the
+            # particular class in Python 3.10.9+.
+            if sys.version_info >= (3, 10, 9):
+                TestCase.doClassCleanups()
             TestCase.tearDownClass()
 
     def test_specified_port_bind(self):
@@ -384,7 +389,11 @@ class LiveServerPort(LiveServerBase):
                 % TestCase.port,
             )
         finally:
-            TestCase.doClassCleanups()
+            # Class cleanups registered in TestCase subclasses are no longer
+            # called as TestCase.doClassCleanups() only cleans up the
+            # particular class in Python 3.10.9+.
+            if sys.version_info >= (3, 10, 9):
+                TestCase.doClassCleanups()
             TestCase.tearDownClass()
 
 
