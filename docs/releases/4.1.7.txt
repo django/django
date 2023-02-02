@@ -2,9 +2,12 @@
 Django 4.1.7 release notes
 ==========================
 
-*Expected February 14, 2023*
+*February 14, 2023*
 
-Django 4.1.7 fixes several bugs in 4.1.6.
+Django 4.1.7 fixes a security issue with severity "moderate" and several bugs
+in 4.1.6.
+
+...
 
 Bugfixes
 ========
