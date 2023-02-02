@@ -1,0 +1,9 @@
+===========================
+Django 4.0.10 release notes
+===========================
+
+*February 14, 2023*
+
+Django 4.0.10 fixes fixes a security issue with severity "moderate" in 4.0.9.
+
+...
