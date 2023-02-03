@@ -339,19 +339,13 @@ class SettingsTests(SimpleTestCase):
             settings._setup()
 
     def test_unable_to_import_settings_module(self):
-        with self.assertRaisesMessage(
-            ImproperlyConfigured,
-            "Settings module fake_settings_module could not be imported",
-        ):
+        msg = "Settings module fake_settings_module could not be imported"
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
             Settings("fake_settings_module")
 
     def test_unable_to_import_a_random_module(self):
-        def mock_import_module(_):
-            raise ModuleNotFoundError(
-                "No module named 'fake_module'", name="fake_module"
-            )
-
-        with mock.patch("importlib.import_module", mock_import_module):
+        exc = ModuleNotFoundError("No module named 'fake_module'", name="fake_module")
+        with mock.patch("importlib.import_module", side_effect=exc):
             with self.assertRaisesMessage(ImportError, "No module named 'fake_module'"):
                 Settings("fake_settings_module")
 
