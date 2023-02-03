@@ -252,13 +252,23 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         handler.run(self.server.get_app())
 
 
-def run(addr, port, wsgi_handler, ipv6=False, threading=False, server_cls=WSGIServer):
+def run(
+    addr,
+    port,
+    wsgi_handler,
+    ipv6=False,
+    threading=False,
+    on_bind=None,
+    server_cls=WSGIServer,
+):
     server_address = (addr, port)
     if threading:
         httpd_cls = type("WSGIServer", (socketserver.ThreadingMixIn, server_cls), {})
     else:
         httpd_cls = server_cls
     httpd = httpd_cls(server_address, WSGIRequestHandler, ipv6=ipv6)
+    if on_bind is not None:
+        on_bind(getattr(httpd, "server_port", port))
     if threading:
         # ThreadingMixIn.daemon_threads indicates how threads will behave on an
         # abrupt shutdown; like quitting the server by the user or restarting
