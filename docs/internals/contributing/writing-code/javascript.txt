@@ -21,8 +21,9 @@ Code style
   conform to the code style of each file.
 
 * Use the `ESLint`_ code linter to check your code for bugs and style errors.
-  ESLint will be run when you run the JavaScript tests. We also recommended
-  installing a ESLint plugin in your text editor.
+  ESLint will be run with :ref:`pre-commit <coding-style-pre-commit>` and when
+  you run the JavaScript tests. We also recommended installing a ESLint plugin
+  in your text editor.
 
 * Where possible, write code that will work even if the page structure is later
   changed with JavaScript. For instance, when binding a click handler, use
