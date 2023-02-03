@@ -385,7 +385,6 @@ class ManagementUtility:
             # The following commands can be run without a valid settings file configured
             if subcommand not in {"startproject", "startapp", "makemessages"}:
                 sys.stderr.write(str(exc) + "\n")
-            self.settings_exception = exc
 
         if settings.configured:
             # Start the auto-reloading dev server even if the code is broken.
