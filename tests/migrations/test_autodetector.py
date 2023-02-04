@@ -1953,6 +1953,59 @@ class AutodetectorTests(BaseAutodetectorTests):
         # no AlterField for the related field.
         self.assertNumberMigrations(changes, "otherapp", 0)
 
+    def test_move_model_to_another_app(self):
+        """Tests autodetection of moved models."""
+        author_with_book_moved = ModelState(
+            "otherapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+                ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+            ],
+        )
+
+        book_with_author_moved = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("otherapp.Author", models.CASCADE)),
+                ("title", models.CharField(max_length=200)),
+            ],
+        )
+
+        changes = self.get_changes(
+            [self.author_with_book, self.book],
+            [author_with_book_moved, book_with_author_moved],
+            MigrationQuestioner({"ask_move_model": True}),
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 2)
+        self.assertNumberMigrations(changes, "otherapp", 1)
+
+        self.assertOperationTypes(changes, "testapp", 0, ["SeparateDatabaseAndState"])
+        self.assertOperationTypes(changes, "testapp", 1, ["SeparateDatabaseAndState"])
+
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["SeparateDatabaseAndState", "AlterField"],
+        )
+
+        self.assertMigrationDependencies(
+            changes, "testapp", 0, [("otherapp", "__first__")]
+        )
+
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("testapp", "auto_1"), ("otherapp", "auto_1")]
+        )
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+
     def test_rename_model_case(self):
         """
         Model name is case-insensitive. Changing case doesn't lead to any
@@ -1990,6 +2043,61 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertNumberMigrations(changes, "testapp", 0)
         self.assertNumberMigrations(changes, "otherapp", 0)
 
+    def test_move_referenced_m2m_model_case(self):
+        publisher_moved = ModelState(
+            "otherapp",
+            "Publisher",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=100)),
+            ],
+        )
+
+        author_with_m2m_updated = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("publishers", models.ManyToManyField("otherapp.Publisher")),
+            ],
+        )
+
+        changes = self.get_changes(
+            [self.publisher, self.author_with_m2m],
+            [publisher_moved, author_with_m2m_updated],
+            questioner=MigrationQuestioner({"ask_move_model": True}),
+        )
+        self.assertNumberMigrations(changes, "testapp", 2)
+        self.assertNumberMigrations(changes, "otherapp", 1)
+
+        self.assertOperationTypes(changes, "testapp", 0, ["SeparateDatabaseAndState"])
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            1,
+            [
+                "AlterField",
+                "SeparateDatabaseAndState",
+            ],
+        )
+
+        self.assertOperationTypes(changes, "otherapp", 0, ["SeparateDatabaseAndState"])
+
+        self.assertMigrationDependencies(
+            changes,
+            "testapp",
+            0,
+            [],
+        )
+
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("testapp", "auto_1"), ("otherapp", "auto_1")]
+        )
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+
     def test_rename_m2m_through_model(self):
         """
         Tests autodetection of renamed models that are used in M2M relations as
@@ -2009,6 +2117,178 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationTypes(changes, "testapp", 0, ["RenameModel"])
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, old_name="Contract", new_name="Deal"
+        )
+
+    def test_move_m2m_through_model(self):
+        """
+        Tests autodetection of moved models that are used in M2M relations as
+        through models.
+        """
+        author_with_moved_m2m_through = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                (
+                    "publishers",
+                    models.ManyToManyField(
+                        "testapp.Publisher",
+                        through="otherapp.Contract",
+                    ),
+                ),
+            ],
+        )
+        contract_moved = ModelState(
+            "otherapp",
+            "Contract",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("author", models.ForeignKey("testapp.Author", models.CASCADE)),
+                ("publisher", models.ForeignKey("testapp.Publisher", models.CASCADE)),
+            ],
+        )
+        changes = self.get_changes(
+            [self.author_with_m2m_through, self.publisher, self.contract],
+            [
+                author_with_moved_m2m_through,
+                self.publisher,
+                contract_moved,
+            ],
+            MigrationQuestioner({"ask_move_model": True}),
+        )
+        self.assertNumberMigrations(changes, "testapp", 2)
+        self.assertNumberMigrations(changes, "otherapp", 1)
+
+        self.assertOperationTypes(changes, "testapp", 0, ["SeparateDatabaseAndState"])
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            1,
+            [
+                "AlterField",
+                "SeparateDatabaseAndState",
+            ],
+        )
+
+        self.assertOperationTypes(changes, "otherapp", 0, ["SeparateDatabaseAndState"])
+
+        self.assertMigrationDependencies(
+            changes,
+            "testapp",
+            0,
+            [],
+        )
+
+        self.assertMigrationDependencies(
+            changes, "testapp", 1, [("testapp", "auto_1"), ("otherapp", "auto_1")]
+        )
+
+        self.assertMigrationDependencies(
+            changes, "otherapp", 0, [("testapp", "auto_1")]
+        )
+
+    def test_move_models_that_have_generic_foreign_keys(self):
+        content_type = ModelState(
+            "contenttypes",
+            "ContentType",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("app_label", models.CharField(max_length=100)),
+                ("model", models.CharField(max_length=100)),
+            ],
+        )
+
+        comment = ModelState(
+            "testapp",
+            "Comment",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("text", models.TextField()),
+                (
+                    "content_type",
+                    models.ForeignKey("contenttypes.ContentType", models.CASCADE),
+                ),
+                ("object_id", models.PositiveIntegerField()),
+            ],
+        )
+        post = ModelState(
+            "testapp",
+            "Post",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("body", models.TextField()),
+            ],
+        )
+        profile = ModelState(
+            "testapp",
+            "Profile",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("about", models.CharField(max_length=100)),
+            ],
+        )
+        comment_moved = ModelState(
+            "comments",
+            "Comment",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("text", models.TextField()),
+                (
+                    "content_type",
+                    models.ForeignKey("contenttypes.ContentType", models.CASCADE),
+                ),
+                ("object_id", models.PositiveIntegerField()),
+            ],
+        )
+
+        changes = self.get_changes(
+            [content_type, comment, post, profile],
+            [content_type, comment_moved, post, profile],
+            MigrationQuestioner({"ask_move_model": True}),
+        )
+
+        self.assertNumberMigrations(changes, "testapp", 2)
+        self.assertNumberMigrations(changes, "comments", 1)
+
+        self.assertOperationTypes(changes, "testapp", 0, ["SeparateDatabaseAndState"])
+
+        for app_label, migration_list in changes.items():
+            for i, _ in enumerate(migration_list):
+                self.assertOperationTypes(
+                    changes,
+                    app_label,
+                    i,
+                    ["SeparateDatabaseAndState"],
+                )
+
+        alter_model_table_op = changes["testapp"][0].operations[0]
+
+        self.assertEquals(len(alter_model_table_op.database_operations), 1)
+        self.assertEquals(len(alter_model_table_op.state_operations), 0)
+
+        self.assertIsInstance(
+            alter_model_table_op.database_operations[0],
+            migrations.AlterModelTable,
+        )
+
+        delete_model_op = changes["testapp"][1].operations[0]
+
+        self.assertEquals(len(delete_model_op.database_operations), 0)
+        self.assertEquals(len(delete_model_op.state_operations), 1)
+
+        self.assertIsInstance(
+            delete_model_op.state_operations[0],
+            migrations.DeleteModel,
+        )
+
+        create_model_op = changes["comments"][0].operations[0]
+
+        self.assertEquals(len(create_model_op.database_operations), 0)
+        self.assertEquals(len(create_model_op.state_operations), 1)
+
+        self.assertIsInstance(
+            create_model_op.state_operations[0],
+            migrations.CreateModel,
         )
 
     def test_rename_model_with_renamed_rel_field(self):

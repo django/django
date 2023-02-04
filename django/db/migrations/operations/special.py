@@ -13,9 +13,15 @@ class SeparateDatabaseAndState(Operation):
 
     serialization_expand_args = ["database_operations", "state_operations"]
 
-    def __init__(self, database_operations=None, state_operations=None):
+    def __init__(
+        self,
+        database_operations=None,
+        state_operations=None,
+        description="Custom state/database change combination",
+    ):
         self.database_operations = database_operations or []
         self.state_operations = state_operations or []
+        self.description = description
 
     def deconstruct(self):
         kwargs = {}
@@ -57,7 +63,7 @@ class SeparateDatabaseAndState(Operation):
             )
 
     def describe(self):
-        return "Custom state/database change combination"
+        return self.description
 
 
 class RunSQL(Operation):
