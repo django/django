@@ -387,7 +387,12 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=('first_name', 'last_name'),
+                    name='unique_name'
+                )
+            ]
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -431,7 +436,12 @@ name::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=('first_name', 'last_name'),
+                    name='unique_name'
+                )
+            ]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -454,12 +464,12 @@ into the primary key of an actual ``Person`` object.
 
     Whatever fields you use for a natural key must be able to uniquely
     identify an object. This will usually mean that your model will
-    have a uniqueness clause (either unique=True on a single field, or
-    ``unique_together`` over multiple fields) for the field or fields
-    in your natural key. However, uniqueness doesn't need to be
-    enforced at the database level. If you are certain that a set of
-    fields will be effectively unique, you can still use those fields
-    as a natural key.
+    have a uniqueness clause (either ``unique=True`` on a single field, or
+    a ``UniqueConstraint`` or ``unique_together`` over multiple fields)
+    for the field or fields in your natural key. However, uniqueness
+    doesn't need to be enforced at the database level. If you are certain
+    that a set of fields will be effectively unique, you can still use
+    those fields as a natural key.
 
 Deserialization of objects with no primary key will always check whether the
 model's manager has a ``get_by_natural_key()`` method and if so, use it to
@@ -479,7 +489,12 @@ Firstly, you need to add another method -- this time to the model itself::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=('first_name', 'last_name'),
+                    name='unique_name'
+                )
+            ]
 
         def natural_key(self):
             return (self.first_name, self.last_name)
