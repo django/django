@@ -7949,6 +7949,21 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertRedirects(response, self.get_add_url())
         post_data.pop("_addanother")
 
+    def test_change_view_close_link(self):
+        viewuser = User.objects.create_user(
+            username="view", password="secret", is_staff=True
+        )
+        viewuser.user_permissions.add(
+            get_perm(User, get_permission_codename("view", User._meta))
+        )
+        self.client.force_login(viewuser)
+        response = self.client.get(self.get_change_url())
+        close_link = re.search(
+            '<a href="(.*?)" class="closelink">Close</a>', response.content.decode()
+        )
+        close_link = close_link[1].replace("&amp;", "&")
+        self.assertURLEqual(close_link, self.get_changelist_url())
+
     def test_change_view_without_preserved_filters(self):
         response = self.client.get(self.get_change_url(add_preserved_filters=False))
         # The action attribute is omitted.
