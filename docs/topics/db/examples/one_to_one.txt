@@ -137,6 +137,16 @@ This also works in reverse::
     >>> Place.objects.get(restaurant__place__name__startswith="Demon")
     <Place: Demon Dogs the place>
 
+If you delete a place, its restaurant will be deleted (assuming that the
+``OneToOneField`` was defined with
+:attr:`~django.db.models.ForeignKey.on_delete` set to ``CASCADE``, which is the
+default)::
+
+    >>> p2.delete()
+    (2, {'one_to_one.Restaurant': 1, 'one_to_one.Place': 1})
+    >>> Restaurant.objects.all()
+    <QuerySet [<Restaurant: Demon Dogs the restaurant>]>
+
 Add a Waiter to the Restaurant::
 
     >>> w = r.waiter_set.create(name='Joe')
