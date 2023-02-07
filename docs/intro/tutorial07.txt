@@ -420,13 +420,3 @@ object-specific admin pages in whatever way you think is best.
 
 When you're comfortable with the admin, read :doc:`part 8 of this
 tutorial </intro/tutorial08>` to learn how to use third-party packages.
-
-What's next?
-============
-
-The beginner tutorial ends here. In the meantime, you might want to check out
-some pointers on :doc:`where to go from here </intro/whatsnext>`.
-
-If you are familiar with Python packaging and interested in learning how to
-turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
-write reusable apps</intro/reusable-apps>`.
