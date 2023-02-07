@@ -93,8 +93,10 @@ class AdminSidebarTests(TestCase):
         )
         # Does not include aria-current attribute.
         self.assertContains(response, '<a href="%s">Users</a>' % url)
-        self.assertNotContains(response, '<a href="%s" aria-current="page">Users</a>' % url)
-
+        self.assertNotContains(
+            response, f'<a href="{url}" aria-current="page">Users</a>'
+        )
+        
     @override_settings(DEBUG=True)
     def test_included_app_list_template_context_fully_set(self):
         # All context variables should be set when rendering the sidebar.
