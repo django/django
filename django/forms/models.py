@@ -756,7 +756,7 @@ class BaseModelFormSet(BaseFormSet, AltersData):
         """Save and return a new model instance for the given form."""
         return form.save(commit=commit)
 
-    def save_existing(self, form, instance, commit=True):
+    def save_existing(self, form, obj, commit=True):
         """Save and return an existing model instance for the given form."""
         return form.save(commit=commit)
 

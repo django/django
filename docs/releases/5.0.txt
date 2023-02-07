@@ -240,7 +240,8 @@ backends.
 Miscellaneous
 -------------
 
-* ...
+* The ``instance`` argument of the undocumented
+  ``BaseModelFormSet.save_existing()`` method is renamed to ``obj``.
 
 .. _deprecated-features-5.0:
 
