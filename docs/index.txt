@@ -22,7 +22,8 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
   :doc:`Part 6: Static files <intro/tutorial06>` |
-  :doc:`Part 7: Customizing the admin site <intro/tutorial07>`
+  :doc:`Part 7: Customizing the admin site <intro/tutorial07>` |
+  :doc:`Part 8: Adding third-party packages <intro/tutorial08>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |

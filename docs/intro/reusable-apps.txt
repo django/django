@@ -2,7 +2,7 @@
 Advanced tutorial: How to write reusable apps
 =============================================
 
-This advanced tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>`
+This advanced tutorial begins where :doc:`Tutorial 8 </intro/tutorial08>`
 left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
