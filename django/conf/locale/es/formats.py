@@ -26,5 +26,5 @@ DATETIME_INPUT_FORMATS = [
     "%d/%m/%y %H:%M",
 ]
 DECIMAL_SEPARATOR = ","
-THOUSAND_SEPARATOR = "."
+THOUSAND_SEPARATOR = "\xa0"  # non-breaking space
 NUMBER_GROUPING = 3
