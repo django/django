@@ -43,7 +43,8 @@ Minor features
 :mod:`django.contrib.admin`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.AdminSite.get_log_entries` method allows customizing the
+  queryset for the site's listed log entries.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
