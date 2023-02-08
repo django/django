@@ -1444,7 +1444,10 @@ class Model(AltersData, metaclass=ModelBase):
                 try:
                     constraint.validate(model_class, self, exclude=exclude, using=using)
                 except ValidationError as e:
-                    if e.code == "unique" and len(constraint.fields) == 1:
+                    if (
+                        getattr(e, "code", None) == "unique"
+                        and len(constraint.fields) == 1
+                    ):
                         errors.setdefault(constraint.fields[0], []).append(e)
                     else:
                         errors = e.update_error_dict(errors)
