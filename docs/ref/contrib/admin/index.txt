@@ -2830,6 +2830,9 @@ Templates can override or extend base admin templates as described in
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
 
+    * ``is_popup``: whether the current page is displayed in a popup window
+    * ``is_nav_sidebar_enabled``: :attr:`AdminSite.enable_nav_sidebar`
+
 .. method:: AdminSite.get_app_list(request, app_label=None)
 
     Returns a list of applications from the :doc:`application registry
