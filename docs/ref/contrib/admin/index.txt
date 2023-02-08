@@ -2832,6 +2832,7 @@ Templates can override or extend base admin templates as described in
 
     * ``is_popup``: whether the current page is displayed in a popup window
     * ``is_nav_sidebar_enabled``: :attr:`AdminSite.enable_nav_sidebar`
+    * ``log_entries``: :meth:`.AdminSite.get_log_entries`
 
 .. method:: AdminSite.get_app_list(request, app_label=None)
 
@@ -2888,6 +2889,15 @@ Templates can override or extend base admin templates as described in
 
     Raises ``django.contrib.admin.sites.NotRegistered`` if a model isn't
     already registered.
+
+.. method:: AdminSite.get_log_entries(request)
+
+    .. versionadded:: 5.0
+
+    Returns a queryset for the related
+    :class:`~django.contrib.admin.models.LogEntry` instances, shown on the site
+    index page. This method can be overridden to filter the log entries by
+    other criteria.
 
 .. _hooking-adminsite-to-urlconf:
 
