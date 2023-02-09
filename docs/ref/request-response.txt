@@ -179,7 +179,9 @@ All attributes should be considered read-only, unless stated otherwise.
     the request.
 
     The name of each header is stylized with title-casing (e.g. ``User-Agent``)
-    when it's displayed. You can access headers case-insensitively::
+    when it's displayed. You can access headers case-insensitively:
+
+    .. code-block:: pycon
 
         >>> request.headers
         {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
@@ -200,7 +202,9 @@ All attributes should be considered read-only, unless stated otherwise.
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
     For use in, for example, Django templates, headers can also be looked up
-    using underscores in place of hyphens::
+    using underscores in place of hyphens:
+
+    .. code-block:: html+django
 
         {{ request.headers.user_agent }}
 
@@ -381,7 +385,9 @@ Methods
     attached to the cookie value to ensure the cookie is not older than
     ``max_age`` seconds.
 
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> request.get_signed_cookie('name')
         'Tony'
@@ -411,7 +417,9 @@ Methods
 .. method:: HttpRequest.accepts(mime_type)
 
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument::
+    argument:
+
+    .. code-block:: pycon
 
         >>> request.accepts('text/html')
         True
@@ -492,7 +500,9 @@ a subclass of dictionary. Exceptions are outlined here:
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
-    equal to ``value``. For example::
+    equal to ``value``. For example:
+
+    .. code-block:: pycon
 
         >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
         <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
@@ -530,7 +540,9 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Takes either a ``QueryDict`` or a dictionary. Like :meth:`dict.update`,
     except it *appends* to the current dictionary items rather than replacing
-    them. For example::
+    them. For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1', mutable=True)
         >>> q.update({'a': '2'})
@@ -543,7 +555,9 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator object instead of a view object.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> list(q.items())
@@ -553,7 +567,9 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Like :meth:`dict.values`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator instead of a view object. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> list(q.values())
@@ -588,7 +604,9 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.lists()
 
     Like :meth:`items()`, except it includes all values, as a list, for each
-    member of the dictionary. For example::
+    member of the dictionary. For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=2&a=3')
         >>> q.lists()
@@ -597,7 +615,9 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.pop(key)
 
     Returns a list of values for the given key and removes them from the
-    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+    dictionary. Raises ``KeyError`` if the key does not exist. For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.pop('a')
@@ -608,7 +628,9 @@ In addition, ``QueryDict`` has the following methods:
     Removes an arbitrary member of the dictionary (since there's no concept
     of ordering), and returns a two value tuple containing the key and a list
     of all values for the key. Raises ``KeyError`` when called on an empty
-    dictionary. For example::
+    dictionary. For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
         >>> q.popitem()
@@ -618,7 +640,9 @@ In addition, ``QueryDict`` has the following methods:
 
     Returns a ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
-    element of the list, using the same logic as :meth:`QueryDict.__getitem__`::
+    element of the list, using the same logic as :meth:`QueryDict.__getitem__`:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=1&a=3&a=5')
         >>> q.dict()
@@ -626,14 +650,18 @@ In addition, ``QueryDict`` has the following methods:
 
 .. method:: QueryDict.urlencode(safe=None)
 
-    Returns a string of the data in query string format. For example::
+    Returns a string of the data in query string format. For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict('a=2&b=3&b=5')
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
     Use the ``safe`` parameter to pass characters which don't require encoding.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict(mutable=True)
         >>> q['next'] = '/a&b/'
@@ -659,7 +687,9 @@ Passing strings
 ~~~~~~~~~~~~~~~
 
 Typical usage is to pass the contents of the page, as a string, bytestring,
-or :class:`memoryview`, to the :class:`HttpResponse` constructor::
+or :class:`memoryview`, to the :class:`HttpResponse` constructor:
+
+.. code-block:: pycon
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the web page.")
@@ -668,7 +698,9 @@ or :class:`memoryview`, to the :class:`HttpResponse` constructor::
     >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
 
 But if you want to add content incrementally, you can use ``response`` as a
-file-like object::
+file-like object:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
     >>> response.write("<p>Here's the text of the web page.</p>")
@@ -691,13 +723,17 @@ Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
 To set or remove a header field in your response, use
-:attr:`HttpResponse.headers`::
+:attr:`HttpResponse.headers`:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
     >>> response.headers['Age'] = 120
     >>> del response.headers['Age']
 
-You can also manipulate headers by treating your response like a dictionary::
+You can also manipulate headers by treating your response like a dictionary:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
     >>> response['Age'] = 120
@@ -709,7 +745,9 @@ by ``HttpResponse``.
 When using this interface, unlike a dictionary, ``del`` doesn't raise
 ``KeyError`` if the header field doesn't exist.
 
-You can also set headers on instantiation::
+You can also set headers on instantiation:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse(headers={'Age': 120})
 
@@ -728,7 +766,9 @@ Telling the browser to treat the response as a file attachment
 
 To tell the browser to treat the response as a file attachment, set the
 ``Content-Type`` and ``Content-Disposition`` headers. For example, this is how
-you might return a Microsoft Excel spreadsheet::
+you might return a Microsoft Excel spreadsheet:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse(my_data, headers={
     ...     'Content-Type': 'application/vnd.ms-excel',
@@ -1030,7 +1070,9 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example::
+can create it with the help of :py:class:`http.HTTPStatus`. For example:
+
+.. code-block:: pycon
 
     from http import HTTPStatus
     from django.http import HttpResponse
@@ -1069,7 +1111,9 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
 Usage
 -----
 
-Typical usage could look like::
+Typical usage could look like:
+
+.. code-block:: pycon
 
     >>> from django.http import JsonResponse
     >>> response = JsonResponse({'foo': 'bar'})
@@ -1080,7 +1124,9 @@ Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to serialize objects other than ``dict`` you must set the ``safe``
-parameter to ``False``::
+parameter to ``False``:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse([1, 2, 3], safe=False)
 
@@ -1104,7 +1150,9 @@ Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you need to use a different JSON encoder class you can pass the ``encoder``
-parameter to the constructor method::
+parameter to the constructor method:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)
 
@@ -1249,7 +1297,9 @@ Attributes
     when they can be guessed from contents of ``open_file``.
 
 ``FileResponse`` accepts any file-like object with binary content, for example
-a file open in binary mode like so::
+a file open in binary mode like so:
+
+.. code-block:: pycon
 
     >>> from django.http import FileResponse
     >>> response = FileResponse(open('myfile.png', 'rb'))

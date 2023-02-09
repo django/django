@@ -518,7 +518,9 @@ Localized names of languages
 .. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
-languages::
+languages:
+
+.. code-block:: pycon
 
     >>> from django.utils.translation import activate, get_language_info
     >>> activate('fr')
@@ -538,8 +540,6 @@ Similar access to this information is available for template code. See below.
 
 Internationalization: in template code
 ======================================
-
-.. highlight:: html+django
 
 Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
@@ -562,14 +562,18 @@ have already loaded the ``i18n`` tag.
 --------------------------
 
 The ``{% translate %}`` template tag translates either a constant string
-(enclosed in single or double quotes) or variable content::
+(enclosed in single or double quotes) or variable content:
+
+.. code-block:: html+django
 
     <title>{% translate "This is the title." %}</title>
     <title>{% translate myvar %}</title>
 
 If the ``noop`` option is present, variable lookup still takes place but the
 translation is skipped. This is useful when "stubbing out" content that will
-require translation in the future::
+require translation in the future:
+
+.. code-block:: html+django
 
     <title>{% translate "myvar" noop %}</title>
 
@@ -585,7 +589,9 @@ It's not possible to mix a template variable inside a string within
 (placeholders), use :ttag:`{% blocktranslate %}<blocktranslate>` instead.
 
 If you'd like to retrieve a translated string without displaying it, you can
-use the following syntax::
+use the following syntax:
+
+.. code-block:: html+django
 
     {% translate "This is the title" as the_title %}
 
@@ -594,7 +600,9 @@ use the following syntax::
 
 In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
-filters::
+filters:
+
+.. code-block:: html+django
 
     {% translate "starting point" as start %}
     {% translate "end point" as end %}
@@ -624,13 +632,17 @@ using the ``context`` keyword:
 
 Contrarily to the :ttag:`translate` tag, the ``blocktranslate`` tag allows you
 to mark complex sentences consisting of literals and variable content for
-translation by making use of placeholders::
+translation by making use of placeholders:
+
+.. code-block:: html+django
 
     {% blocktranslate %}This string will have {{ value }} inside.{% endblocktranslate %}
 
 To translate a template expression -- say, accessing object attributes or
 using template filters -- you need to bind the expression to a local variable
-for use within the translation block. Examples::
+for use within the translation block. Examples:
+
+.. code-block:: html+django
 
     {% blocktranslate with amount=article.price %}
     That will cost $ {{ amount }}.
@@ -640,7 +652,9 @@ for use within the translation block. Examples::
     This will have {{ myvar }} inside.
     {% endblocktranslate %}
 
-You can use multiple expressions inside a single ``blocktranslate`` tag::
+You can use multiple expressions inside a single ``blocktranslate`` tag:
+
+.. code-block:: html+django
 
     {% blocktranslate with book_t=book|title author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
@@ -666,7 +680,9 @@ This tag also provides for pluralization. To use it:
   ``{% plural %}`` tag within the ``{% blocktranslate %}`` and
   ``{% endblocktranslate %}`` tags.
 
-An example::
+An example:
+
+.. code-block:: html+django
 
     {% blocktranslate count counter=list|length %}
     There is only one {{ name }} object.
@@ -674,7 +690,9 @@ An example::
     There are {{ counter }} {{ name }} objects.
     {% endblocktranslate %}
 
-A more complex example::
+A more complex example:
+
+.. code-block:: html+django
 
     {% blocktranslate with amount=article.price count years=i.length %}
     That will cost $ {{ amount }} per year.
@@ -689,7 +707,9 @@ same :ref:`notes regarding ngettext variables <pluralization-var-notes>`
 apply.
 
 Reverse URL lookups cannot be carried out within the ``blocktranslate`` and
-should be retrieved (and stored) beforehand::
+should be retrieved (and stored) beforehand:
+
+.. code-block:: html+django
 
     {% url 'path.to.view' arg arg2 as the_url %}
     {% blocktranslate %}
@@ -697,7 +717,9 @@ should be retrieved (and stored) beforehand::
     {% endblocktranslate %}
 
 If you'd like to retrieve a translated string without displaying it, you can
-use the following syntax::
+use the following syntax:
+
+.. code-block:: html+django
 
     {% blocktranslate asvar the_title %}The title is {{ title }}.{% endblocktranslate %}
     <title>{{ the_title }}</title>
@@ -728,7 +750,9 @@ character to separate them. This is quite useful for indenting the content of a
 in the corresponding entry in the ``.po`` file, which makes the translation
 process easier.
 
-For instance, the following ``{% blocktranslate %}`` tag::
+For instance, the following ``{% blocktranslate %}`` tag:
+
+.. code-block:: html+django
 
     {% blocktranslate trimmed %}
       First sentence.
@@ -743,7 +767,9 @@ String literals passed to tags and filters
 ------------------------------------------
 
 You can translate string literals passed as arguments to tags and filters
-by using the familiar ``_()`` syntax::
+by using the familiar ``_()`` syntax:
+
+.. code-block:: html+django
 
     {% some_tag _("Page not found") value|yesno:_("yes,no") %}
 
@@ -891,12 +917,16 @@ processor, then each ``RequestContext`` will have access to ``LANGUAGES``,
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
-use the ``{% get_language_info %}`` tag::
+use the ``{% get_language_info %}`` tag:
+
+.. code-block:: html+django
 
     {% get_language_info for LANGUAGE_CODE as lang %}
     {% get_language_info for "pl" as lang %}
 
-You can then access the information::
+You can then access the information:
+
+.. code-block:: html+django
 
     Language code: {{ lang.code }}<br>
     Name of language: {{ lang.name_local }}<br>
@@ -924,7 +954,9 @@ If you do this in your view:
     context = {'available_languages': ['en', 'es', 'fr']}
     return render(request, 'mytemplate.html', context)
 
-you can iterate over those languages in the template::
+you can iterate over those languages in the template:
+
+.. code-block:: html+django
 
   {% get_language_info_list for available_languages as langs %}
   {% for lang in langs %} ... {% endfor %}
@@ -946,8 +978,6 @@ There are also some filters available for convenience:
 
 Internationalization: in JavaScript code
 ========================================
-
-.. highlight:: python
 
 Adding translations to JavaScript poses some problems:
 
@@ -1033,8 +1063,6 @@ precedence.
 
 Using the JavaScript translation catalog
 ----------------------------------------
-
-.. highlight:: javascript
 
 To use the catalog, pull in the dynamically generated script like this:
 
@@ -1202,8 +1230,6 @@ Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
 
-.. highlight:: python
-
 The ``JSONCatalog`` view
 ------------------------
 
@@ -1342,7 +1368,9 @@ Example URL patterns::
 
 After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
-function. Example::
+function. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
@@ -1358,7 +1386,9 @@ function. Example::
     '/nl/news/news-slug/'
 
 With ``prefix_default_language=False`` and  ``LANGUAGE_CODE='en'``, the URLs
-will be::
+will be:
+
+.. code-block:: pycon
 
     >>> activate('en')
     >>> reverse('news:index')
@@ -1411,7 +1441,9 @@ URL patterns can also be marked translatable using the
     )
 
 After you've created the translations, the :func:`~django.urls.reverse`
-function will return the URL in the active language. Example::
+function will return the URL in the active language. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
@@ -1484,7 +1516,9 @@ Django comes with a tool, :djadmin:`django-admin makemessages
 
     The minimum version of the ``gettext`` utilities supported is 0.15.
 
-To create or update a message file, run this command::
+To create or update a message file, run this command:
+
+.. code-block:: shell
 
     django-admin makemessages -l de
 
@@ -1516,12 +1550,16 @@ will generate an error if :setting:`LOCALE_PATHS` is empty.
 By default :djadmin:`django-admin makemessages <makemessages>` examines every
 file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
 override that default, use the :option:`--extension <makemessages --extension>`
-or ``-e`` option to specify the file extensions to examine::
+or ``-e`` option to specify the file extensions to examine:
+
+.. code-block:: shell
 
     django-admin makemessages -l de -e txt
 
 Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
-multiple times::
+multiple times:
+
+.. code-block:: shell
 
     django-admin makemessages -l de -e html,txt -e xml
 
@@ -1537,7 +1575,9 @@ multiple times::
     To extract strings from a project containing Jinja2 templates, use `Message
     Extracting`_ from Babel_ instead.
 
-    Here's an example ``babel.cfg`` configuration file::
+    Here's an example ``babel.cfg`` configuration file:
+
+    .. code-block:: ini
 
         # Extraction from Python source files
         [python: **.py]
@@ -1624,7 +1664,9 @@ otherwise, they'll be tacked together without whitespace!
     :djadmin:`compilemessages`.
 
 To reexamine all source code and templates for new translation strings and
-update all message files for **all** languages, run this::
+update all message files for **all** languages, run this:
+
+.. code-block:: shell
 
     django-admin makemessages -a
 
@@ -1639,7 +1681,9 @@ utility.
 This tool runs over all available ``.po`` files and creates ``.mo`` files, which
 are binary files optimized for use by ``gettext``. In the same directory from
 which you ran :djadmin:`django-admin makemessages <makemessages>`, run
-:djadmin:`django-admin compilemessages <compilemessages>` like this::
+:djadmin:`django-admin compilemessages <compilemessages>` like this:
+
+.. code-block:: shell
 
    django-admin compilemessages
 
@@ -1691,7 +1735,9 @@ You create and update the message files the same way as the other Django message
 files -- with the :djadmin:`django-admin makemessages <makemessages>` tool.
 The only difference is you need to explicitly specify what in gettext parlance
 is known as a domain in this case the ``djangojs`` domain, by providing a ``-d
-djangojs`` parameter, like this::
+djangojs`` parameter, like this:
+
+.. code-block:: shell
 
     django-admin makemessages -d djangojs -l de
 
@@ -1830,8 +1876,6 @@ redirected in the ``redirect_to`` context variable.
 
 Explicitly setting the active language
 --------------------------------------
-
-.. highlight:: python
 
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.

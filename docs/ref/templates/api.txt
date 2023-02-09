@@ -216,7 +216,9 @@ different contexts.
 .. method:: Template.render(context)
 
     Call the :class:`Template` object's ``render()`` method with a
-    :class:`Context` to "fill" the template::
+    :class:`Context` to "fill" the template:
+
+    .. code-block:: pycon
 
         >>> from django.template import Context, Template
         >>> template = Template("My name is {{ my_name }}.")
@@ -248,7 +250,9 @@ interpreted as a literal string and not using the value of the variable "bar",
 if one exists in the template context.
 
 The template system uses the first lookup type that works. It's short-circuit
-logic. Here are a few examples::
+logic. Here are a few examples:
+
+.. code-block:: pycon
 
     >>> from django.template import Context, Template
     >>> t = Template("My name is {{ person.first_name }}.")
@@ -269,7 +273,9 @@ logic. Here are a few examples::
     "The first stooge in the list is Larry."
 
 If any part of the variable is callable, the template system will try calling
-it. Example::
+it. Example:
+
+.. code-block:: pycon
 
     >>> class PersonClass2:
     ...     def name(self):
@@ -287,7 +293,9 @@ straight lookups. Here are some things to keep in mind:
   *does* have a ``silent_variable_failure`` attribute whose value is
   ``True``, the variable will render as the value of the engine's
   ``string_if_invalid`` configuration option (an empty string, by default).
-  Example::
+  Example:
+
+  .. code-block:: pycon
 
     >>> t = Template("My name is {{ person.first_name }}.")
     >>> class PersonClass3:
@@ -325,9 +333,11 @@ straight lookups. Here are some things to keep in mind:
 
   A good example is the :meth:`~django.db.models.Model.delete` method on
   each Django model object. The template system shouldn't be allowed to do
-  something like this::
+  something like this:
 
-    I will now delete this valuable data. {{ data.delete }}
+  .. code-block:: html+django
+
+      I will now delete this valuable data. {{ data.delete }}
 
   To prevent this, set an ``alters_data`` attribute on the callable
   variable. The template system won't call a variable if it has
@@ -400,14 +410,18 @@ A similar issue exists if you want to include these sequences in template filter
 or tag arguments. For example, when parsing a block tag, Django's template
 parser looks for the first occurrence of ``%}`` after a ``{%``. This prevents
 the use of ``"%}"`` as a string literal. For example, a ``TemplateSyntaxError``
-will be raised for the following expressions::
+will be raised for the following expressions:
+
+.. code-block:: html+django
 
   {% include "template.html" tvar="Some string literal with %} in it." %}
 
   {% with tvar="Some string literal with %} in it." %}{% endwith %}
 
 The same issue can be triggered by using a reserved sequence in filter
-arguments::
+arguments:
+
+.. code-block:: html+django
 
   {{ some.variable|default:"}}" }}
 
@@ -422,7 +436,9 @@ Playing with ``Context`` objects
 Most of the time, you'll instantiate :class:`Context` objects by passing in a
 fully-populated dictionary to ``Context()``. But you can add and delete items
 from a ``Context`` object once it's been instantiated, too, using standard
-dictionary syntax::
+dictionary syntax:
+
+.. code-block:: pycon
 
     >>> from django.template import Context
     >>> c = Context({"foo": "bar"})
@@ -453,7 +469,9 @@ dictionary syntax::
 
 A ``Context`` object is a stack. That is, you can ``push()`` and ``pop()`` it.
 If you ``pop()`` too much, it'll raise
-``django.template.ContextPopException``::
+``django.template.ContextPopException``:
+
+.. code-block:: pycon
 
     >>> c = Context()
     >>> c['foo'] = 'first level'

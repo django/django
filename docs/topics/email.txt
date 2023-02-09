@@ -672,7 +672,9 @@ to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
-anything. The `aiosmtpd`_ package provides a way to accomplish this::
+anything. The `aiosmtpd`_ package provides a way to accomplish this:
+
+.. code-block:: shell
 
     python -m pip install aiosmtpd
 

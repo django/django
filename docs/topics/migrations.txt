@@ -110,7 +110,9 @@ Workflow
 ========
 
 Django can create migrations for you. Make changes to your models - say, add a
-field and remove a model - and then run :djadmin:`makemigrations`::
+field and remove a model - and then run :djadmin:`makemigrations`:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations
     Migrations for 'books':
@@ -124,7 +126,9 @@ will be written out. Make sure to read the output to see what
 complex changes it might not be detecting what you expect.
 
 Once you have your new migration files, you should apply them to your
-database to make sure they work as expected::
+database to make sure they work as expected:
+
+.. code-block:: shell
 
     $ python manage.py migrate
     Operations to perform:
@@ -140,7 +144,9 @@ get both the changes to your models and the accompanying migration at the
 same time.
 
 If you want to give the migration(s) a meaningful name instead of a generated
-one, you can use the :option:`makemigrations --name` option::
+one, you can use the :option:`makemigrations --name` option:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations --name changed_my_model your_app_label
 
@@ -342,7 +348,9 @@ by running :djadmin:`makemigrations` once you've made some changes.
 
 If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
-need to convert it to use migrations by running::
+need to convert it to use migrations by running:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations your_app_label
 
@@ -521,7 +529,9 @@ the main operation you use for data migrations is
 :class:`~django.db.migrations.operations.RunPython`.
 
 To start, make an empty migration file you can work from (Django will put
-the file in the right place, suggest a name, and add dependencies for you)::
+the file in the right place, suggest a name, and add dependencies for you):
+
+.. code-block:: shell
 
     python manage.py makemigrations --empty yourappname
 
@@ -660,7 +670,9 @@ releases in order without skipping any), and then remove the old files, commit
 and do a second release.
 
 The command that backs all this is :djadmin:`squashmigrations` - pass it the
-app label and migration name you want to squash up to, and it'll get to work::
+app label and migration name you want to squash up to, and it'll get to work:
+
+.. code-block:: shell
 
   $ ./manage.py squashmigrations myapp 0004
   Will squash the following migrations:

@@ -25,12 +25,16 @@ A :class:`Form` instance is either **bound** to a set of data, or **unbound**.
 
 .. class:: Form
 
-To create an unbound :class:`Form` instance, instantiate the class::
+To create an unbound :class:`Form` instance, instantiate the class:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
 
 To bind data to a form, pass the data as a dictionary as the first parameter to
-your :class:`Form` class constructor::
+your :class:`Form` class constructor:
+
+.. code-block:: pycon
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -47,7 +51,9 @@ in a moment.
 .. attribute:: Form.is_bound
 
 If you need to distinguish between bound and unbound form instances at runtime,
-check the value of the form's :attr:`~Form.is_bound` attribute::
+check the value of the form's :attr:`~Form.is_bound` attribute:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> f.is_bound
@@ -56,7 +62,9 @@ check the value of the form's :attr:`~Form.is_bound` attribute::
     >>> f.is_bound
     True
 
-Note that passing an empty dictionary creates a *bound* form with empty data::
+Note that passing an empty dictionary creates a *bound* form with empty data:
+
+.. code-block:: pycon
 
     >>> f = ContactForm({})
     >>> f.is_bound
@@ -81,7 +89,9 @@ validation for fields that are interdependent. See
 
 The primary task of a :class:`Form` object is to validate data. With a bound
 :class:`Form` instance, call the :meth:`~Form.is_valid` method to run validation
-and return a boolean designating whether the data was valid::
+and return a boolean designating whether the data was valid:
+
+.. code-block:: pycon
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -93,7 +103,9 @@ and return a boolean designating whether the data was valid::
 
 Let's try with some invalid data. In this case, ``subject`` is blank (an error,
 because all fields are required by default) and ``sender`` is not a valid
-email address::
+email address:
+
+.. code-block:: pycon
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -106,7 +118,9 @@ email address::
 .. attribute:: Form.errors
 
 Access the :attr:`~Form.errors` attribute to get a dictionary of error
-messages::
+messages:
+
+.. code-block:: pycon
 
     >>> f.errors
     {'sender': ['Enter a valid email address.'], 'subject': ['This field is required.']}
@@ -214,7 +228,9 @@ Behavior of unbound forms
 -------------------------
 
 It's meaningless to validate a form with no data, but, for the record, here's
-what happens with unbound forms::
+what happens with unbound forms:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> f.is_valid()
@@ -236,7 +252,9 @@ username of the current session.
 To accomplish this, use the :attr:`~Form.initial` argument to a :class:`Form`.
 This argument, if given, should be a dictionary mapping field names to initial
 values. Only include the fields for which you're specifying an initial value;
-it's not necessary to include every field in your form. For example::
+it's not necessary to include every field in your form. For example:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(initial={'subject': 'Hi there!'})
 
@@ -247,7 +265,9 @@ If a :class:`~django.forms.Field` defines :attr:`~Field.initial` *and* you
 include :attr:`~Form.initial` when instantiating the ``Form``, then the latter
 ``initial`` will have precedence. In this example, ``initial`` is provided both
 at the field level and at the form instance level, and the latter gets
-precedence::
+precedence:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
@@ -271,7 +291,9 @@ It is recommended to use :attr:`BoundField.initial` over
 simpler interface. Also, unlike :meth:`~Form.get_initial_for_field()`,
 :attr:`BoundField.initial` caches its values. This is useful especially when
 dealing with callables whose return values can change (e.g. ``datetime.now`` or
-``uuid.uuid4``)::
+``uuid.uuid4``):
+
+.. code-block:: pycon
 
     >>> import uuid
     >>> class UUIDCommentForm(CommentForm):
@@ -332,7 +354,9 @@ Accessing the fields from the form
 .. attribute:: Form.fields
 
 You can access the fields of :class:`Form` instance from its ``fields``
-attribute::
+attribute:
+
+.. code-block:: pycon
 
     >>> for row in f.fields.values(): print(row)
     ...
@@ -343,7 +367,9 @@ attribute::
     <django.forms.fields.CharField object at 0x7ffaac6324d0>
 
 You can alter the field and :class:`.BoundField` of :class:`Form` instance to
-change the way it is presented in the form::
+change the way it is presented in the form:
+
+.. code-block:: pycon
 
     >>> f.as_div().split("</div>")[0]
     '<div><label for="id_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_subject">'
@@ -353,7 +379,9 @@ change the way it is presented in the form::
 
 Beware not to alter the ``base_fields`` attribute because this modification
 will influence all subsequent ``ContactForm`` instances within the same Python
-process::
+process:
+
+.. code-block:: pycon
 
     >>> f.base_fields["subject"].label_suffix = "?"
     >>> another_f = CommentForm(auto_id=False)
@@ -377,7 +405,9 @@ formats, ``DateField`` will always normalize it to a ``datetime.date`` object
 as long as it's valid.
 
 Once you've created a :class:`~Form` instance with a set of data and validated
-it, you can access the clean data via its ``cleaned_data`` attribute::
+it, you can access the clean data via its ``cleaned_data`` attribute:
+
+.. code-block:: pycon
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -394,7 +424,9 @@ always cleans the input into a string. We'll cover the encoding implications
 later in this document.
 
 If your data does *not* validate, the ``cleaned_data`` dictionary contains
-only the valid fields::
+only the valid fields:
+
+.. code-block:: pycon
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -409,7 +441,9 @@ only the valid fields::
 ``cleaned_data`` will always *only* contain a key for fields defined in the
 ``Form``, even if you pass extra data when you define the ``Form``. In this
 example, we pass a bunch of extra fields to the ``ContactForm`` constructor,
-but ``cleaned_data`` contains only the form's fields::
+but ``cleaned_data`` contains only the form's fields:
+
+.. code-block:: pycon
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -427,7 +461,9 @@ but ``cleaned_data`` contains only the form's fields::
 When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
 *all* its fields, even if the data didn't include a value for some optional
 fields. In this example, the data dictionary doesn't include a value for the
-``nick_name`` field, but ``cleaned_data`` includes it, with an empty value::
+``nick_name`` field, but ``cleaned_data`` includes it, with an empty value:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class OptionalPersonForm(forms.Form):
@@ -458,7 +494,9 @@ Outputting forms as HTML
 ========================
 
 The second task of a ``Form`` object is to render itself as HTML. To do so,
-``print`` it::
+``print`` it:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> print(f)
@@ -471,7 +509,9 @@ If the form is bound to data, the HTML output will include that data
 appropriately. For example, if a field is represented by an
 ``<input type="text">``, the data will be in the ``value`` attribute. If a
 field is represented by an ``<input type="checkbox">``, then that HTML will
-include ``checked`` if appropriate::
+include ``checked`` if appropriate:
+
+.. code-block:: pycon
 
     >>> data = {'subject': 'hello',
     ...         'message': 'Hi there',
@@ -658,7 +698,9 @@ The template used by ``as_p()``. Default: ``'django/forms/p.html'``.
 .. method:: Form.as_p()
 
 ``as_p()`` renders the form as a series of ``<p>`` tags, with each ``<p>``
-containing one field::
+containing one field:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> f.as_p()
@@ -680,7 +722,9 @@ The template used by ``as_ul()``. Default: ``'django/forms/ul.html'``.
 
 ``as_ul()`` renders the form as a series of ``<li>`` tags, with each ``<li>``
 containing one field. It does *not* include the ``<ul>`` or ``</ul>``, so that
-you can specify any HTML attributes on the ``<ul>`` for flexibility::
+you can specify any HTML attributes on the ``<ul>`` for flexibility:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> f.as_ul()
@@ -700,7 +744,9 @@ The template used by ``as_table()``. Default: ``'django/forms/table.html'``.
 
 .. method:: Form.as_table()
 
-``as_table()`` renders the form as an HTML ``<table>``::
+``as_table()`` renders the form as an HTML ``<table>``:
+
+.. code-block:: pycon
 
     >>> f = ContactForm()
     >>> f.as_table()
@@ -737,7 +783,9 @@ attributes::
         # ... and the rest of your fields here
 
 Once you've done that, rows will be given ``"error"`` and/or ``"required"``
-classes, as needed. The HTML will look something like::
+classes, as needed. The HTML will look something like:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(data)
     >>> print(f.as_table())
@@ -779,7 +827,9 @@ Use the ``auto_id`` argument to the ``Form`` constructor to control the ``id``
 and label behavior. This argument must be ``True``, ``False`` or a string.
 
 If ``auto_id`` is ``False``, then the form output will not include ``<label>``
-tags nor ``id`` attributes::
+tags nor ``id`` attributes:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(auto_id=False)
     >>> print(f.as_div())
@@ -790,7 +840,9 @@ tags nor ``id`` attributes::
 
 If ``auto_id`` is set to ``True``, then the form output *will* include
 ``<label>`` tags and will use the field name as its ``id`` for each form
-field::
+field:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(auto_id=True)
     >>> print(f.as_div())
@@ -803,7 +855,9 @@ If ``auto_id`` is set to a string containing the format character ``'%s'``,
 then the form output will include ``<label>`` tags, and will generate ``id``
 attributes based on the format string. For example, for a format string
 ``'field_%s'``, a field named ``subject`` will get the ``id`` value
-``'field_subject'``. Continuing our example::
+``'field_subject'``. Continuing our example:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(auto_id='id_for_%s')
     >>> print(f.as_div())
@@ -823,7 +877,9 @@ A translatable string (defaults to a colon (``:``) in English) that will be
 appended after any label name when a form is rendered.
 
 It's possible to customize that character, or omit it entirely, using the
-``label_suffix`` parameter::
+``label_suffix`` parameter:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
     >>> print(f.as_div())
@@ -916,7 +972,9 @@ If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
 will include the validation errors as a ``<ul class="errorlist">`` near the
 field. The particular positioning of the error messages depends on the output
-method you're using::
+method you're using:
+
+.. code-block:: pycon
 
     >>> data = {'subject': '',
     ...         'message': 'Hi there',
@@ -1043,13 +1101,17 @@ they're not the only way a form object can be displayed.
    The ``__str__()`` method of this object displays the HTML for this field.
 
 To retrieve a single ``BoundField``, use dictionary lookup syntax on your form
-using the field's name as the key::
+using the field's name as the key:
+
+.. code-block:: pycon
 
     >>> form = ContactForm()
     >>> print(form['subject'])
     <input id="id_subject" type="text" name="subject" maxlength="100" required>
 
-To retrieve all ``BoundField`` objects, iterate the form::
+To retrieve all ``BoundField`` objects, iterate the form:
+
+.. code-block:: pycon
 
     >>> form = ContactForm()
     >>> for boundfield in form: print(boundfield)
@@ -1058,7 +1120,9 @@ To retrieve all ``BoundField`` objects, iterate the form::
     <input type="email" name="sender" id="id_sender" required>
     <input type="checkbox" name="cc_myself" id="id_cc_myself">
 
-The field-specific output honors the form object's ``auto_id`` setting::
+The field-specific output honors the form object's ``auto_id`` setting:
+
+.. code-block:: pycon
 
     >>> f = ContactForm(auto_id=False)
     >>> print(f['message'])
@@ -1079,7 +1143,9 @@ Attributes of ``BoundField``
 
     This property returns the data for this :class:`~django.forms.BoundField`
     extracted by the widget's :meth:`~django.forms.Widget.value_from_datadict`
-    method, or ``None`` if it wasn't given::
+    method, or ``None`` if it wasn't given:
+
+    .. code-block:: pycon
 
         >>> unbound_form = ContactForm()
         >>> print(unbound_form['subject'].data)
@@ -1091,7 +1157,9 @@ Attributes of ``BoundField``
 .. attribute:: BoundField.errors
 
     A :ref:`list-like object <ref-forms-error-list-format>` that is displayed
-    as an HTML ``<ul class="errorlist">`` when printed::
+    as an HTML ``<ul class="errorlist">`` when printed:
+
+    .. code-block:: pycon
 
         >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
         >>> f = ContactForm(data, auto_id=False)
@@ -1160,7 +1228,9 @@ Attributes of ``BoundField``
 
     :attr:`BoundField.initial` caches its return value, which is useful
     especially when dealing with callables whose return values can change (e.g.
-    ``datetime.now`` or ``uuid.uuid4``)::
+    ``datetime.now`` or ``uuid.uuid4``):
+
+    .. code-block:: pycon
 
         >>> from datetime import datetime
         >>> class DatedCommentForm(CommentForm):
@@ -1186,7 +1256,9 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.name
 
-    The name of this field in the form::
+    The name of this field in the form:
+
+    .. code-block:: pycon
 
         >>> f = ContactForm()
         >>> print(f['subject'].name)
@@ -1204,7 +1276,9 @@ Attributes of ``BoundField``
 
     Returns the lowercased class name of the wrapped field's widget, with any
     trailing ``input`` or ``widget`` removed. This may be used when building
-    forms where the layout is dependent upon the widget type. For example::
+    forms where the layout is dependent upon the widget type. For example:
+
+    .. code-block:: html+django
 
         {% for field in form %}
             {% if field.widget_type == 'checkbox' %}
@@ -1240,7 +1314,9 @@ Methods of ``BoundField``
     When you use Django's rendering shortcuts, CSS classes are used to
     indicate required form fields or fields that contain errors. If you're
     manually rendering a form, you can access these CSS classes using the
-    ``css_classes`` method::
+    ``css_classes`` method:
+
+    .. code-block:: pycon
 
         >>> f = ContactForm(data={'message': ''})
         >>> f['message'].css_classes()
@@ -1248,7 +1324,9 @@ Methods of ``BoundField``
 
     If you want to provide some additional classes in addition to the
     error and required classes that may be required, you can provide
-    those classes as an argument::
+    those classes as an argument:
+
+    .. code-block:: pycon
 
         >>> f = ContactForm(data={'message': ''})
         >>> f['message'].css_classes('foo bar')
@@ -1281,7 +1359,9 @@ Methods of ``BoundField``
         the field you declare, e.g. ``forms.CharField``.
 
     To separately render the label tag of a form field, you can call its
-    ``label_tag()`` method::
+    ``label_tag()`` method:
+
+    .. code-block:: pycon
 
         >>> f = ContactForm(data={'message': ''})
         >>> print(f['message'].label_tag())
@@ -1308,7 +1388,9 @@ Methods of ``BoundField``
 .. method:: BoundField.value()
 
     Use this method to render the raw value of this field as it would be rendered
-    by a ``Widget``::
+    by a ``Widget``:
+
+    .. code-block:: pycon
 
         >>> initial = {'subject': 'welcome'}
         >>> unbound_form = ContactForm(initial=initial)
@@ -1368,7 +1450,9 @@ is a little more complicated than a normal form.
 
 Firstly, in order to upload files, you'll need to make sure that your
 ``<form>`` element correctly defines the ``enctype`` as
-``"multipart/form-data"``::
+``"multipart/form-data"``:
+
+.. code-block:: html
 
   <form enctype="multipart/form-data" method="post" action="/foo/">
 
@@ -1377,7 +1461,9 @@ data is handled separately to normal form data, so when your form
 contains a ``FileField`` and ``ImageField``, you will need to specify
 a second argument when you bind your form. So if we extend our
 ContactForm to include an ``ImageField`` called ``mugshot``, we
-need to bind the file data containing the mugshot image::
+need to bind the file data containing the mugshot image:
+
+.. code-block:: pycon
 
     # Bound form with an image field
     >>> from django.core.files.uploadedfile import SimpleUploadedFile
@@ -1390,13 +1476,17 @@ need to bind the file data containing the mugshot image::
 
 In practice, you will usually specify ``request.FILES`` as the source
 of file data (just like you use ``request.POST`` as the source of
-form data)::
+form data):
+
+.. code-block:: pycon
 
     # Bound form with an image field, data from the request
     >>> f = ContactFormWithMugshot(request.POST, request.FILES)
 
 Constructing an unbound form is the same as always -- omit both form data *and*
-file data::
+file data:
+
+.. code-block:: pycon
 
     # Unbound form with an image field
     >>> f = ContactFormWithMugshot()
@@ -1408,13 +1498,17 @@ Testing for multipart forms
 
 If you're writing reusable views or templates, you may not know ahead of time
 whether your form is a multipart form or not. The ``is_multipart()`` method
-tells you whether the form requires multipart encoding for submission::
+tells you whether the form requires multipart encoding for submission:
+
+.. code-block:: pycon
 
     >>> f = ContactFormWithMugshot()
     >>> f.is_multipart()
     True
 
-Here's an example of how you might use this in a template::
+Here's an example of how you might use this in a template:
+
+.. code-block:: html+django
 
     {% if form.is_multipart %}
         <form enctype="multipart/form-data" method="post" action="/foo/">
@@ -1436,7 +1530,9 @@ in the subclass.
 
 In this example, ``ContactFormWithPriority`` contains all the fields from
 ``ContactForm``, plus an additional field, ``priority``. The ``ContactForm``
-fields are ordered first::
+fields are ordered first:
+
+.. code-block:: pycon
 
     >>> class ContactFormWithPriority(ContactForm):
     ...     priority = forms.CharField()
@@ -1451,7 +1547,9 @@ fields are ordered first::
 It's possible to subclass multiple forms, treating forms as mixins. In this
 example, ``BeatleForm`` subclasses both ``PersonForm`` and ``InstrumentForm``
 (in that order), and its field list includes the fields from the parent
-classes::
+classes:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class PersonForm(forms.Form):
@@ -1469,7 +1567,9 @@ classes::
     <div>Haircut type:<input type="text" name="haircut_type" required></div>
 
 It's possible to declaratively remove a ``Field`` inherited from a parent class
-by setting the name of the field to ``None`` on the subclass. For example::
+by setting the name of the field to ``None`` on the subclass. For example:
+
+.. code-block:: pycon
 
     >>> from django import forms
 
@@ -1491,7 +1591,9 @@ Prefixes for forms
 .. attribute:: Form.prefix
 
 You can put several Django forms inside one ``<form>`` tag. To give each
-``Form`` its own namespace, use the ``prefix`` keyword argument::
+``Form`` its own namespace, use the ``prefix`` keyword argument:
+
+.. code-block:: pycon
 
     >>> mother = PersonForm(prefix="mother")
     >>> father = PersonForm(prefix="father")
@@ -1502,7 +1604,9 @@ You can put several Django forms inside one ``<form>`` tag. To give each
     <div><label for="id_father-first_name">First name:</label><input type="text" name="father-first_name" required id="id_father-first_name"></div>
     <div><label for="id_father-last_name">Last name:</label><input type="text" name="father-last_name" required id="id_father-last_name"></div>
 
-The prefix can also be specified on the form class::
+The prefix can also be specified on the form class:
+
+.. code-block:: pycon
 
     >>> class PersonForm(forms.Form):
     ...     ...

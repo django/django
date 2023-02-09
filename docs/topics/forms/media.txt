@@ -67,7 +67,9 @@ to include the CSS file ``pretty.css``, and the JavaScript files
 
 This static definition is converted at runtime into a widget property
 named ``media``. The list of assets for a ``CalendarWidget`` instance
-can be retrieved through this property::
+can be retrieved through this property:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -112,7 +114,9 @@ requirements::
             'print': ['newspaper.css],
         }
 
-If this last CSS definition were to be rendered, it would become the following HTML::
+If this last CSS definition were to be rendered, it would become the following HTML:
+
+.. code-block:: html+django
 
     <link href="http://static.example.com/pretty.css" media="screen" rel="stylesheet">
     <link href="http://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
@@ -139,7 +143,9 @@ By default, any object using a static ``Media`` definition will
 inherit all the assets associated with the parent widget. This occurs
 regardless of how the parent defines its own requirements. For
 example, if we were to extend our basic Calendar widget from the
-example above::
+example above:
+
+.. code-block:: pycon
 
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
@@ -158,7 +164,9 @@ example above::
 
 The FancyCalendar widget inherits all the assets from its parent
 widget. If you don't want ``Media`` to be inherited in this way, add
-an ``extend=False`` declaration to the ``Media`` declaration::
+an ``extend=False`` declaration to the ``Media`` declaration:
+
+.. code-block:: pycon
 
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
@@ -224,7 +232,9 @@ To find the appropriate prefix to use, Django will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
 to using :setting:`MEDIA_URL`. For example, if the :setting:`MEDIA_URL` for
 your site was ``'http://uploads.example.com/'`` and :setting:`STATIC_URL`
-was ``None``::
+was ``None``:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
@@ -240,7 +250,9 @@ was ``None``::
     <script src="http://uploads.example.com/animations.js"></script>
     <script src="http://othersite.com/actions.js"></script>
 
-But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
+But if :setting:`STATIC_URL` is ``'http://static.example.com/'``:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -249,7 +261,9 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
     <script src="http://othersite.com/actions.js"></script>
 
 Or if :mod:`~django.contrib.staticfiles` is configured using the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`::
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -265,7 +279,9 @@ Paths as objects
 Asset paths may also be given as hashable objects implementing an
 ``__html__()`` method. The ``__html__()`` method is typically added using the
 :func:`~django.utils.html.html_safe` decorator. The object is responsible for
-outputting the complete HTML ``<script>`` or ``<link>`` tag content::
+outputting the complete HTML ``<script>`` or ``<link>`` tag content:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> from django.utils.html import html_safe
@@ -294,7 +310,9 @@ Subsets of assets
 -----------------
 
 If you only want files of a particular type, you can use the subscript
-operator to filter out a medium of interest. For example::
+operator to filter out a medium of interest. For example:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -313,7 +331,9 @@ Combining ``Media`` objects
 
 ``Media`` objects can also be added together. When two ``Media`` objects are
 added, the resulting ``Media`` object contains the union of the assets
-specified by both::
+specified by both:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
@@ -345,7 +365,9 @@ example, you may have a script that depends on jQuery. Therefore, combining
 ``Media`` objects attempts to preserve the relative order in which assets are
 defined in each ``Media`` class.
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
@@ -377,7 +399,9 @@ are exactly the same.
 Regardless of whether you define a ``media`` declaration, *all* Form
 objects have a ``media`` property. The default value for this property
 is the result of adding the ``media`` definitions for all widgets that
-are part of the form::
+are part of the form:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class ContactForm(forms.Form):
@@ -392,7 +416,9 @@ are part of the form::
     <script src="http://static.example.com/whizbang.js"></script>
 
 If you want to associate additional assets with a form -- for example,
-CSS for form layout -- add a ``Media`` declaration to the form::
+CSS for form layout -- add a ``Media`` declaration to the form:
+
+.. code-block:: pycon
 
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)

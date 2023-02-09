@@ -2,8 +2,6 @@
 How to use Django with Daphne
 =============================
 
-.. highlight:: bash
-
 Daphne_ is a pure-Python ASGI server for UNIX, maintained by members of the
 Django project. It acts as the reference server for ASGI.
 
@@ -12,7 +10,9 @@ Django project. It acts as the reference server for ASGI.
 Installing Daphne
 ===================
 
-You can install Daphne with ``pip``::
+You can install Daphne with ``pip``:
+
+.. code-block:: shell
 
     python -m pip install daphne
 
@@ -24,7 +24,9 @@ Daphne server process. At its simplest, Daphne needs to be called with the
 location of a module containing an ASGI application object, followed by what
 the application is called (separated by a colon).
 
-For a typical Django project, invoking Daphne would look like::
+For a typical Django project, invoking Daphne would look like:
+
+.. code-block:: shell
 
     daphne myproject.asgi:application
 

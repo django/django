@@ -381,7 +381,9 @@ We're using this instead of simply typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
 
-Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
+Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
+
+.. code-block:: pycon
 
     >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
 
@@ -468,7 +470,9 @@ you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
 Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again::
+``python manage.py shell`` again:
+
+.. code-block:: pycon
 
     >>> from polls.models import Choice, Question
 

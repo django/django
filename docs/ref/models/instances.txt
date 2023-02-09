@@ -125,7 +125,9 @@ Refreshing objects from database
 ================================
 
 If you delete a field from a model instance, accessing it again reloads the
-value from the database::
+value from the database:
+
+.. code-block:: pycon
 
     >>> obj = MyModel.objects.first()
     >>> del obj.field
@@ -435,7 +437,9 @@ Auto-incrementing primary keys
 
 If a model has an :class:`~django.db.models.AutoField` — an auto-incrementing
 primary key — then that auto-incremented value will be calculated and saved as
-an attribute on your object the first time you call ``save()``::
+an attribute on your object the first time you call ``save()``:
+
+.. code-block:: pycon
 
     >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b2.id     # Returns None, because b2 doesn't have an ID yet.
@@ -467,7 +471,9 @@ Explicitly specifying auto-primary-key values
 
 If a model has an :class:`~django.db.models.AutoField` but you want to define a
 new object's ID explicitly when saving, define it explicitly before saving,
-rather than relying on the auto-assignment of the ID::
+rather than relying on the auto-assignment of the ID:
+
+.. code-block:: pycon
 
     >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
     >>> b3.id     # Returns 3.
@@ -593,7 +599,9 @@ Updating attributes based on existing fields
 
 Sometimes you'll need to perform a simple arithmetic task on a field, such
 as incrementing or decrementing the current value. One way of achieving this is
-doing the arithmetic in Python like::
+doing the arithmetic in Python like:
+
+.. code-block:: pycon
 
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
     >>> product.number_sold += 1
@@ -608,7 +616,9 @@ the update relative to the original field value, rather than as an explicit
 assignment of a new value. Django provides :class:`F expressions
 <django.db.models.F>` for performing this kind of relative update. Using
 :class:`F expressions <django.db.models.F>`, the previous example is expressed
-as::
+as:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F
     >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
@@ -882,7 +892,7 @@ For example::
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)
 
-::
+.. code-block:: pycon
 
     >>> p = Person(name="Fred Flintstone", shirt_size="L")
     >>> p.save()

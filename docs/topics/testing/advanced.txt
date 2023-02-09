@@ -414,7 +414,9 @@ you may want to use the Django test runner to run your own test suite
 and thus benefit from the Django testing infrastructure.
 
 A common practice is a *tests* directory next to the application code, with the
-following structure::
+following structure:
+
+.. code-block:: text
 
     runtests.py
     polls/
@@ -869,12 +871,16 @@ the coverage of your tests.
 
 Django can be easily integrated with `coverage.py`_, a tool for measuring code
 coverage of Python programs. First, `install coverage.py`_. Next, run the
-following from your project folder containing ``manage.py``::
+following from your project folder containing ``manage.py``:
+
+.. code-block:: shell
 
    coverage run --source='.' manage.py test myapp
 
 This runs your tests and collects coverage data of the executed files in your
-project. You can see a report of this data by typing following command::
+project. You can see a report of this data by typing following command:
+
+.. code-block:: shell
 
    coverage report
 

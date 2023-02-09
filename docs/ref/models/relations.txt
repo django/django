@@ -43,7 +43,9 @@ Related objects reference
 
         Adds the specified model objects to the related object set.
 
-        Example::
+        Example:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry.objects.get(id=234)
@@ -88,7 +90,9 @@ Related objects reference
         *Asynchronous version*: ``acreate``
 
         Creates a new object, saves it and puts it in the related object set.
-        Returns the newly created object::
+        Returns the newly created object:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = b.entry_set.create(
@@ -99,7 +103,9 @@ Related objects reference
 
             # No need to call e.save() at this point -- it's already been saved.
 
-        This is equivalent to (but simpler than)::
+        This is equivalent to (but simpler than):
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry(
@@ -129,7 +135,9 @@ Related objects reference
 
         *Asynchronous version*: ``aremove``
 
-        Removes the specified model objects from the related object set::
+        Removes the specified model objects from the related object set:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry.objects.get(id=234)
@@ -176,7 +184,9 @@ Related objects reference
 
         *Asynchronous version*: ``aclear``
 
-        Removes all objects from the related object set::
+        Removes all objects from the related object set:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> b.entry_set.clear()
@@ -200,7 +210,9 @@ Related objects reference
 
         *Asynchronous version*: ``aset``
 
-        Replace the set of related objects::
+        Replace the set of related objects:
+
+        .. code-block:: pycon
 
             >>> new_list = [obj1, obj2, obj3]
             >>> e.related_set.set(new_list)

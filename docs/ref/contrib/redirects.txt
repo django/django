@@ -74,7 +74,9 @@ Via the Python API
     Redirects are represented by a standard :doc:`Django model </topics/db/models>`,
     which lives in :source:`django/contrib/redirects/models.py`. You can access
     redirect objects via the :doc:`Django database API </topics/db/queries>`.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> from django.conf import settings
         >>> from django.contrib.redirects.models import Redirect

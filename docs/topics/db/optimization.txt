@@ -82,13 +82,17 @@ Understand cached attributes
 As well as caching of the whole ``QuerySet``, there is caching of the result of
 attributes on ORM objects. In general, attributes that are not callable will be
 cached. For example, assuming the :ref:`example blog models
-<queryset-model-example>`::
+<queryset-model-example>`:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=1)
   >>> entry.blog   # Blog object is retrieved at this point
   >>> entry.blog   # cached version, no DB access
 
-But in general, callable attributes cause DB lookups every time::
+But in general, callable attributes cause DB lookups every time:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=1)
   >>> entry.authors.all()   # query performed
@@ -164,17 +168,23 @@ First, the query will be quicker because of the underlying database index.
 Also, the query could run much slower if multiple objects match the lookup;
 having a unique constraint on the column guarantees this will never happen.
 
-So using the :ref:`example blog models <queryset-model-example>`::
+So using the :ref:`example blog models <queryset-model-example>`:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=10)
 
 will be quicker than:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(headline="News Item Title")
 
 because ``id`` is indexed by the database and is guaranteed to be unique.
 
 Doing the following is potentially quite slow:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(headline__startswith="News")
 

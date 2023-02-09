@@ -85,7 +85,9 @@ The :djadmin:`migrate` management command operates on one database at a
 time. By default, it operates on the ``default`` database, but by
 providing the :option:`--database <migrate --database>` option, you can tell it
 to synchronize a different database. So, to synchronize all models onto
-all databases in the first example above, you would need to call::
+all databases in the first example above, you would need to call:
+
+.. code-block:: shell
 
     $ ./manage.py migrate
     $ ./manage.py migrate --database=users
@@ -97,7 +99,9 @@ constraining the availability of particular models.
 
 If, as in the second example above, you've left the ``default`` database empty,
 you must provide a database name each time you run :djadmin:`migrate`. Omitting
-the database name would raise an error. For the second example::
+the database name would raise an error. For the second example:
+
+.. code-block:: shell
 
     $ ./manage.py migrate --database=users
     $ ./manage.py migrate --database=customers
@@ -405,7 +409,9 @@ catch-all nature of the PrimaryReplicaRouter implementation would mean
 that all models would be available on all databases.
 
 With this setup installed, and all databases migrated as per
-:ref:`synchronizing_multiple_databases`, lets run some Django code::
+:ref:`synchronizing_multiple_databases`, lets run some Django code:
+
+.. code-block:: pycon
 
     >>> # This retrieval will be performed on the 'auth_db' database
     >>> fred = User.objects.get(username='fred')
@@ -453,7 +459,9 @@ You can select the database for a ``QuerySet`` at any point in the
 ``QuerySet`` that uses the specified database.
 
 ``using()`` takes a single argument: the alias of the database on
-which you want to run the query. For example::
+which you want to run the query. For example:
+
+.. code-block:: pycon
 
     >>> # This will run on the 'default' database.
     >>> Author.objects.all()
@@ -471,7 +479,9 @@ Use the ``using`` keyword to ``Model.save()`` to specify to which
 database the data should be saved.
 
 For example, to save an object to the ``legacy_users`` database, you'd
-use this::
+use this:
+
+.. code-block:: pycon
 
     >>> my_object.save(using='legacy_users')
 
@@ -486,7 +496,9 @@ use ``save(using=...)`` as a way to migrate the instance to a new
 database. However, if you don't take appropriate steps, this could
 have some unexpected consequences.
 
-Consider the following example::
+Consider the following example:
+
+.. code-block:: pycon
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')  # (statement 1)
@@ -510,7 +522,9 @@ will be overridden when ``p`` is saved.
 You can avoid this in two ways. First, you can clear the primary key
 of the instance. If an object has no primary key, Django will treat it
 as a new object, avoiding any loss of data on the ``second``
-database::
+database:
+
+.. code-block:: pycon
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
@@ -518,7 +532,9 @@ database::
     >>> p.save(using='second') # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
-to ensure that Django does an SQL ``INSERT``::
+to ensure that Django does an SQL ``INSERT``:
+
+.. code-block:: pycon
 
     >>> p = Person(name='Fred')
     >>> p.save(using='first')
@@ -534,7 +550,9 @@ Selecting a database to delete from
 
 By default, a call to delete an existing object will be executed on
 the same database that was used to retrieve the object in the first
-place::
+place:
+
+.. code-block:: pycon
 
     >>> u = User.objects.using('legacy_users').get(username='fred')
     >>> u.delete() # will delete from the `legacy_users` database
@@ -544,7 +562,9 @@ To specify the database from which a model will be deleted, pass a
 argument works just like the ``using`` keyword argument to ``save()``.
 
 For example, if you're migrating a user from the ``legacy_users``
-database to the ``new_users`` database, you might use these commands::
+database to the ``new_users`` database, you might use these commands:
+
+.. code-block:: pycon
 
     >>> user_obj.save(using='new_users')
     >>> user_obj.delete(using='legacy_users')

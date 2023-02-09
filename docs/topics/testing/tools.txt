@@ -48,7 +48,9 @@ Overview and a quick example
 ----------------------------
 
 To use the test client, instantiate ``django.test.Client`` and retrieve
-web pages::
+web pages:
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> c = Client()
@@ -70,11 +72,15 @@ Note a few important things about how the test client works:
   framework. This helps make the unit tests run quickly.
 
 * When retrieving pages, remember to specify the *path* of the URL, not the
-  whole domain. For example, this is correct::
+  whole domain. For example, this is correct:
+
+  .. code-block:: pycon
 
       >>> c.get('/login/')
 
-  This is incorrect::
+  This is incorrect:
+
+  .. code-block:: pycon
 
       >>> c.get('https://www.example.com/login/')
 
@@ -102,7 +108,9 @@ Note a few important things about how the test client works:
   checks, you can create an instance of the test client that
   enforces CSRF checks. To do this, pass in the
   ``enforce_csrf_checks`` argument when you construct your
-  client::
+  client:
+
+  .. code-block:: pycon
 
       >>> from django.test import Client
       >>> csrf_client = Client(enforce_csrf_checks=True)
@@ -160,17 +168,23 @@ Use the ``django.test.Client`` class to make requests.
         object, which is documented below.
 
         The key-value pairs in the ``data`` dictionary are used to create a GET
-        data payload. For example::
+        data payload. For example:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> c.get('/customers/details/', {'name': 'fred', 'age': 7})
 
-        ...will result in the evaluation of a GET request equivalent to::
+        ...will result in the evaluation of a GET request equivalent to:
+
+        .. code-block:: text
 
             /customers/details/?name=fred&age=7
 
         The ``headers`` parameter can be used to specify headers to be sent in
-        the request. For example::
+        the request. For example:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> c.get('/customers/details/', {'name': 'fred', 'age': 7},
@@ -182,17 +196,21 @@ Use the ``django.test.Client`` class to make requests.
 
         Arbitrary keyword arguments set WSGI
         :pep:`environ variables <3333#environ-variables>`. For example, headers
-        to set the script name::
+        to set the script name:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> c.get("/", SCRIPT_NAME="/app/")
 
         If you already have the GET arguments in URL-encoded form, you can
         use that encoding instead of using the data argument. For example,
-        the previous GET request could also be posed as::
+        the previous GET request could also be posed as:
 
-        >>> c = Client()
-        >>> c.get('/customers/details/?name=fred&age=7')
+        .. code-block:: pycon
+
+            >>> c = Client()
+            >>> c.get('/customers/details/?name=fred&age=7')
 
         If you provide a URL with both an encoded GET data and a data argument,
         the data argument will take precedence.
@@ -202,7 +220,9 @@ Use the ``django.test.Client`` class to make requests.
         containing tuples of the intermediate urls and status codes.
 
         If you had a URL ``/redirect_me/`` that redirected to ``/next/``, that
-        redirected to ``/final/``, this is what you'd see::
+        redirected to ``/final/``, this is what you'd see:
+
+        .. code-block:: pycon
 
             >>> response = c.get('/redirect_me/', follow=True)
             >>> response.redirect_chain
@@ -221,7 +241,9 @@ Use the ``django.test.Client`` class to make requests.
         ``Response`` object, which is documented below.
 
         The key-value pairs in the ``data`` dictionary are used to submit POST
-        data. For example::
+        data. For example:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> c.post('/login/', {'name': 'fred', 'passwd': 'secret'})
@@ -264,7 +286,9 @@ Use the ``django.test.Client`` class to make requests.
         provide the file field name as a key, and a file handle to the file you
         wish to upload as a value. For example, if your form has fields
         ``name`` and ``attachment``, the latter a
-        :class:`~django.forms.FileField`::
+        :class:`~django.forms.FileField`:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> with open('wishlist.doc', 'rb') as fp:
@@ -275,7 +299,9 @@ Use the ``django.test.Client`` class to make requests.
         :class:`~django.db.models.ImageField`, the object needs a ``name``
         attribute that passes the
         :data:`~django.core.validators.validate_image_file_extension` validator.
-        For example::
+        For example:
+
+        .. code-block:: pycon
 
             >>> from io import BytesIO
             >>> img = BytesIO(
@@ -300,9 +326,11 @@ Use the ``django.test.Client`` class to make requests.
 
         If the URL you request with a POST contains encoded parameters, these
         parameters will be made available in the request.GET data. For example,
-        if you were to make the request::
+        if you were to make the request:
 
-        >>> c.post('/login/?visitor=true', {'name': 'fred', 'passwd': 'secret'})
+        .. code-block:: pycon
+
+            >>> c.post('/login/?visitor=true', {'name': 'fred', 'passwd': 'secret'})
 
         ... the view handling this request could interrogate request.POST
         to retrieve the username and password, and could interrogate request.GET
@@ -419,7 +447,9 @@ Use the ``django.test.Client`` class to make requests.
         (which is configured by your :setting:`AUTHENTICATION_BACKENDS`
         setting). If you're using the standard authentication backend provided
         by Django (``ModelBackend``), ``credentials`` should be the user's
-        username and password, provided as keyword arguments::
+        username and password, provided as keyword arguments:
+
+        .. code-block:: pycon
 
             >>> c = Client()
             >>> c.login(username='fred', password='secret')
@@ -513,7 +543,9 @@ Specifically, a ``Response`` object has the following attributes:
 
         Regardless of the number of templates used during rendering, you can
         retrieve context values using the ``[]`` operator. For example, the
-        context variable ``name`` could be retrieved using::
+        context variable ``name`` could be retrieved using:
+
+        .. code-block:: pycon
 
             >>> response = client.get('/foo/')
             >>> response.context['name']
@@ -545,7 +577,9 @@ Specifically, a ``Response`` object has the following attributes:
     .. method:: json(**kwargs)
 
         The body of the response, parsed as JSON. Extra keyword arguments are
-        passed to :func:`json.loads`. For example::
+        passed to :func:`json.loads`. For example:
+
+        .. code-block:: pycon
 
             >>> response = client.get('/foo/')
             >>> response.json()['name']
@@ -1970,7 +2004,9 @@ test client, with two exceptions:
 * The ``follow`` parameter is not supported.
 * Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
   prefix required by the synchronous client (see :meth:`Client.get`). For
-  example, here is how to set an HTTP ``Accept`` header::
+  example, here is how to set an HTTP ``Accept`` header:
+
+  .. code-block:: pycon
 
     >>> c = AsyncClient()
     >>> c.get(

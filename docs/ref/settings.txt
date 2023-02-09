@@ -1724,7 +1724,9 @@ formats defined in this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
-like::
+like:
+
+.. code-block:: text
 
     mysite/
         formats/

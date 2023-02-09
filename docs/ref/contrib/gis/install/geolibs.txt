@@ -85,7 +85,9 @@ is required.
 .. note::
 
     On Linux platforms, it may be necessary to run the ``ldconfig`` command
-    after installing each library. For example::
+    after installing each library. For example:
+
+    .. code-block:: shell
 
         $ sudo make install
         $ sudo ldconfig
@@ -106,19 +108,25 @@ internal geometry representation used by GeoDjango (it's behind the "lazy"
 geometries).  Specifically, the C API library is called (e.g., ``libgeos_c.so``)
 directly from Python using ctypes.
 
-First, download GEOS from the GEOS website and untar the source archive::
+First, download GEOS from the GEOS website and untar the source archive:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
     $ tar xjf geos-X.Y.Z.tar.bz2
 
 Then step into the GEOS directory, create a ``build`` folder, and step into
-it::
+it:
+
+.. code-block:: shell
 
     $ cd geos-X.Y.Z
     $ mkdir build
     $ cd build
 
-Then build and install the package::
+Then build and install the package:
+
+.. code-block:: shell
 
     $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ cmake --build .
@@ -149,7 +157,9 @@ If using a binary package of GEOS (e.g., on Ubuntu), you may need to :ref:`binut
 If your GEOS library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GEOS_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to the
-GEOS C library.  For example::
+GEOS C library.  For example:
+
+.. code-block:: shell
 
     GEOS_LIBRARY_PATH = '/home/bob/local/lib/libgeos_c.so'
 
@@ -168,18 +178,24 @@ PROJ
 `PROJ`_ is a library for converting geospatial data to different coordinate
 reference systems.
 
-First, download the PROJ source code::
+First, download the PROJ source code:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
 
 ... and datum shifting files (download ``proj-datumgrid-X.Y.tar.gz`` for
-PROJ < 7.x) [#]_::
+PROJ < 7.x) [#]_:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
 
 Next, untar the source code archive, and extract the datum shifting files in the
 ``data`` subdirectory (use ``nad`` subdirectory for PROJ < 6.x). This must be
-done *prior* to configuration::
+done *prior* to configuration:
+
+.. code-block:: shell
 
     $ tar xzf proj-X.Y.Z.tar.gz
     $ cd proj-X.Y.Z/data
@@ -190,13 +206,17 @@ For PROJ 9.x and greater, releases only support builds using ``CMake`` (see
 `PROJ RFC-7`_).
 
 To build with ``CMake`` ensure your system meets the `build requirements`_.
-Then create a ``build`` folder in the PROJ directory, and step into it::
+Then create a ``build`` folder in the PROJ directory, and step into it:
+
+.. code-block:: shell
 
     $ cd proj-X.Y.Z
     $ mkdir build
     $ cd build
 
-Finally, configure, make and install PROJ::
+Finally, configure, make and install PROJ:
+
+.. code-block:: shell
 
     $ cmake ..
     $ cmake --build .
@@ -215,20 +235,26 @@ reading most vector and raster spatial data formats.  Currently, GeoDjango only
 supports :doc:`GDAL's vector data <../gdal>` capabilities [#]_.
 :ref:`geosbuild` and :ref:`proj4` should be installed prior to building GDAL.
 
-First download the latest GDAL release version and untar the archive::
+First download the latest GDAL release version and untar the archive:
+
+.. code-block:: shell
 
     $ wget https://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
     $ tar xzf gdal-X.Y.Z.tar.gz
 
 For GDAL 3.6.x and greater, releases only support builds using ``CMake``. To
 build with ``CMake`` create a ``build`` folder in the GDAL directory, and step
-into it::
+into it:
+
+.. code-block:: shell
 
     $ cd gdal-X.Y.Z
     $ mkdir build
     $ cd build
 
-Finally, configure, make and install GDAL::
+Finally, configure, make and install GDAL:
+
+.. code-block:: shell
 
     $ cmake ..
     $ cmake --build .
@@ -258,7 +284,9 @@ When GeoDjango can't find the GDAL library, configure your :ref:`libsettings`
 If your GDAL library is in a non-standard location, or you don't want to
 modify the system's library path then the :setting:`GDAL_LIBRARY_PATH`
 setting may be added to your Django settings file with the full path to
-the GDAL library.  For example::
+the GDAL library.  For example:
+
+.. code-block:: shell
 
     GDAL_LIBRARY_PATH = '/home/sue/local/lib/libgdal.so'
 

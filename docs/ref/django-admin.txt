@@ -65,7 +65,9 @@ Determining the version
 
 Run ``django-admin version`` to display the current Django version.
 
-The output follows the schema described in :pep:`440`::
+The output follows the schema described in :pep:`440`:
+
+.. code-block:: text
 
     1.4.dev17026
     1.4a1
@@ -91,7 +93,9 @@ Uses the :doc:`system check framework </ref/checks>` to inspect the entire
 Django project for common problems.
 
 By default, all apps will be checked. You can check a subset of apps by
-providing a list of app labels as arguments::
+providing a list of app labels as arguments:
+
+.. console::
 
     django-admin check auth admin myapp
 
@@ -100,13 +104,17 @@ providing a list of app labels as arguments::
 The system check framework performs many different types of checks that are
 :ref:`categorized with tags <system-check-builtin-tags>`. You can use these
 tags to restrict the checks performed to just those in a particular category.
-For example, to perform only models and compatibility checks, run::
+For example, to perform only models and compatibility checks, run:
+
+.. console::
 
     django-admin check --tag models --tag compatibility
 
 .. django-admin-option:: --database DATABASE
 
-Specifies the database to run checks requiring database access::
+Specifies the database to run checks requiring database access:
+
+.. console::
 
     django-admin check --database default --database other
 
@@ -124,7 +132,9 @@ You can use this option in your local development environment, but since your
 local development settings module may not have many of your production settings,
 you will probably want to point the ``check`` command at a different settings
 module, either by setting the :envvar:`DJANGO_SETTINGS_MODULE` environment
-variable, or by passing the ``--settings`` option::
+variable, or by passing the ``--settings`` option:
+
+.. console::
 
     django-admin check --deploy --settings=production_settings
 
@@ -158,7 +168,9 @@ are excluded.
 
 Includes `fuzzy translations`_ into compiled files.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin compilemessages --locale=pt_BR
     django-admin compilemessages --locale=pt_BR --locale=fr -f
@@ -176,7 +188,9 @@ Example usage::
 Ignores directories matching the given :mod:`glob`-style pattern. Use
 multiple times to ignore more.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin compilemessages --ignore=cache --ignore=outdated/*/locale
 
@@ -329,7 +343,9 @@ only that model will be excluded, rather than the entire application. You can
 also mix application names and model names.
 
 If you want to exclude multiple applications, pass ``--exclude`` more than
-once::
+once:
+
+.. console::
 
     django-admin dumpdata --exclude=auth --exclude=contenttypes
 
@@ -370,7 +386,9 @@ Fixtures compression
 
 The output file can be compressed with one of the ``bz2``, ``gz``, ``lzma``, or
 ``xz`` formats by ending the filename with the corresponding extension.
-For example, to output the data as a compressed JSON file::
+For example, to output the data as a compressed JSON file:
+
+.. console::
 
     django-admin dumpdata -o mydata.json.gz
 
@@ -520,7 +538,9 @@ Loading fixtures from ``stdin``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can use a dash as the fixture name to load input from ``sys.stdin``. For
-example::
+example:
+
+.. console::
 
     django-admin loaddata --format=json -
 
@@ -529,7 +549,9 @@ is required to specify the :ref:`serialization format <serialization-formats>`
 of the input (e.g., ``json`` or ``xml``).
 
 Loading from ``stdin`` is useful with standard input and output redirections.
-For example::
+For example:
+
+.. console::
 
     django-admin dumpdata --format=json --database=test app_label.ModelName | django-admin loaddata --format=json --database=prod -
 
@@ -564,12 +586,16 @@ Updates the message files for all available languages.
 Specifies a list of file extensions to examine (default: ``html``, ``txt``,
 ``py`` or ``js`` if :option:`--domain` is ``js``).
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin makemessages --locale=de --extension xhtml
 
 Separate multiple extensions with commas or use ``-e`` or ``--extension``
-multiple times::
+multiple times:
+
+.. console::
 
     django-admin makemessages --locale=de --extension=html,txt --extension xml
 
@@ -582,7 +608,9 @@ Specifies the locale(s) to process.
 Specifies the locale(s) to exclude from processing. If not provided, no locales
 are excluded.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin makemessages --locale=pt_BR
     django-admin makemessages --locale=pt_BR --locale=fr
@@ -604,7 +632,9 @@ Specifies the domain of the messages files. Supported options are:
 
 Follows symlinks to directories when looking for new translation strings.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin makemessages --locale=de --symlinks
 
@@ -615,7 +645,9 @@ multiple times to ignore more.
 
 These patterns are used by default: ``'CVS'``, ``'.*'``, ``'*~'``, ``'*.pyc'``.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin makemessages --locale=en_US --ignore=apps/* --ignore=secret/*.html
 
@@ -925,39 +957,57 @@ Uses IPv6 for the development server. This changes the default IP address from
 Examples of using different ports and addresses
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Port 8000 on IP address ``127.0.0.1``::
+Port 8000 on IP address ``127.0.0.1``:
+
+.. console::
 
     django-admin runserver
 
-Port 8000 on IP address ``1.2.3.4``::
+Port 8000 on IP address ``1.2.3.4``:
+
+.. console::
 
     django-admin runserver 1.2.3.4:8000
 
-Port 7000 on IP address ``127.0.0.1``::
+Port 7000 on IP address ``127.0.0.1``:
+
+.. console::
 
     django-admin runserver 7000
 
-Port 7000 on IP address ``1.2.3.4``::
+Port 7000 on IP address ``1.2.3.4``:
+
+.. console::
 
     django-admin runserver 1.2.3.4:7000
 
-Port 8000 on IPv6 address ``::1``::
+Port 8000 on IPv6 address ``::1``:
+
+.. console::
 
     django-admin runserver -6
 
-Port 7000 on IPv6 address ``::1``::
+Port 7000 on IPv6 address ``::1``:
+
+.. console::
 
     django-admin runserver -6 7000
 
-Port 7000 on IPv6 address ``2001:0db8:1234:5678::9``::
+Port 7000 on IPv6 address ``2001:0db8:1234:5678::9``:
+
+.. console::
 
     django-admin runserver [2001:0db8:1234:5678::9]:7000
 
-Port 8000 on IPv4 address of host ``localhost``::
+Port 8000 on IPv4 address of host ``localhost``:
+
+.. console::
 
     django-admin runserver localhost:8000
 
-Port 8000 on IPv6 address of host ``localhost``::
+Port 8000 on IPv6 address of host ``localhost``:
+
+.. console::
 
     django-admin runserver -6 localhost:8000
 
@@ -975,7 +1025,9 @@ you want to configure Django to serve static media, read
 .. django-admin:: sendtestemail [email [email ...]]
 
 Sends a test email (to confirm email sending through Django is working) to the
-recipient(s) specified. For example::
+recipient(s) specified. For example:
+
+.. console::
 
     django-admin sendtestemail foo@example.com bar@example.com
 
@@ -1004,16 +1056,22 @@ Starts the Python interactive interpreter.
 Specifies the shell to use. By default, Django will use IPython_ or bpython_ if
 either is installed. If both are installed, specify which one you want like so:
 
-IPython::
+IPython:
+
+.. console::
 
     django-admin shell -i ipython
 
-bpython::
+bpython:
+
+.. console::
 
     django-admin shell -i bpython
 
 If you have a "rich" shell installed but want to force use of the "plain"
-Python interpreter, use ``python`` as the interface name, like so::
+Python interpreter, use ``python`` as the interface name, like so:
+
+.. console::
 
     django-admin shell -i python
 
@@ -1028,7 +1086,9 @@ variable or the ``~/.pythonrc.py`` script is read.
 
 .. django-admin-option:: --command COMMAND, -c COMMAND
 
-Lets you pass a command as a string to execute it as Django, like so::
+Lets you pass a command as a string to execute it as Django, like so:
+
+.. console::
 
     django-admin shell --command="import django; print(django.__version__)"
 
@@ -1177,7 +1237,9 @@ If the optional destination is provided, Django will use that existing
 directory rather than creating a new one. You can use '.' to denote the current
 working directory.
 
-For example::
+For example:
+
+.. console::
 
     django-admin startapp myapp /Users/jezdez/Code/myapp
 
@@ -1191,7 +1253,9 @@ an uncompressed archive (``.tar``) or a compressed archive (``.tar.gz``,
 ``.tlz``, ``.zip``) containing the app template files.
 
 For example, this would look for an app template in the given directory when
-creating the ``myapp`` app::
+creating the ``myapp`` app:
+
+.. console::
 
     django-admin startapp --template=/Users/jezdez/Code/my_app_template myapp
 
@@ -1200,7 +1264,9 @@ archives with the app template files, downloading and extracting them on the
 fly.
 
 For example, taking advantage of GitHub's feature to expose repositories as
-zip files, you can use a URL like::
+zip files, you can use a URL like:
+
+.. console::
 
     django-admin startapp --template=https://github.com/githubuser/django-app-template/archive/main.zip myapp
 
@@ -1283,7 +1349,9 @@ If the optional destination is provided, Django will use that existing
 directory as the project directory, and create ``manage.py`` and the project
 package within it. Use '.' to denote the current working directory.
 
-For example::
+For example:
+
+.. console::
 
     django-admin startproject myproject /Users/jezdez/Code/myproject_repo
 
@@ -1492,7 +1560,9 @@ Outputs timings, including database setup and total run time.
 Runs a Django development server (as in :djadmin:`runserver`) using data from
 the given fixture(s).
 
-For example, this command::
+For example, this command:
+
+.. console::
 
     django-admin testserver mydata.json
 
@@ -1530,7 +1600,9 @@ exactly the same function as the argument to the :djadmin:`runserver` command.
 
 Examples:
 
-To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
+To run the test server on port 7000 with ``fixture1`` and ``fixture2``:
+
+.. console::
 
     django-admin testserver --addrport 7000 fixture1 fixture2
     django-admin testserver fixture1 fixture2 --addrport 7000
@@ -1539,7 +1611,9 @@ To run the test server on port 7000 with ``fixture1`` and ``fixture2``::
 that it doesn't matter whether the options come before or after the fixture
 arguments.)
 
-To run on 1.2.3.4:7000 with a ``test`` fixture::
+To run on 1.2.3.4:7000 with a ``test`` fixture:
+
+.. console::
 
     django-admin testserver --addrport 1.2.3.4:7000 test
 
@@ -1576,7 +1650,9 @@ the password whose username matches the current user.
 
 Specifies the database to query for the user. Defaults to ``default``.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin changepassword ringo
 
@@ -1730,7 +1806,9 @@ variable.
 This option is unnecessary in ``manage.py``, because it takes care of setting
 the Python path for you.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
 
@@ -1746,7 +1824,9 @@ variable.
 This option is unnecessary in ``manage.py``, because it uses
 ``settings.py`` from the current project by default.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin migrate --settings=mysite.settings
 
@@ -1758,7 +1838,9 @@ is raised. By default, ``django-admin`` will show an error message when a
 
 This option is ignored by :djadmin:`runserver`.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin migrate --traceback
 
@@ -1774,7 +1856,9 @@ should print to the console.
 
 This option is ignored by :djadmin:`runserver`.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin migrate --verbosity 2
 
@@ -1784,7 +1868,9 @@ Disables colorized command output.  Some commands format their output to be
 colorized. For example, errors will be printed to the console in red and SQL
 statements will be syntax highlighted.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin runserver --no-color
 
@@ -1801,7 +1887,9 @@ available if the
 :attr:`~django.core.management.BaseCommand.requires_system_checks` command
 attribute is not an empty list or tuple.
 
-Example usage::
+Example usage:
+
+.. console::
 
     django-admin migrate --skip-checks
 
@@ -1834,7 +1922,9 @@ two third-party libraries are needed:
 * Install colorama_, a Python package that translates ANSI color codes into
   Windows API calls. Django commands will detect its presence and will make use
   of its services to color output just like on Unix-based platforms.
-  ``colorama`` can be installed via pip::
+  ``colorama`` can be installed via pip:
+
+  .. code-block:: doscon
 
     ...\> py -m pip install colorama
 
@@ -1869,7 +1959,9 @@ ships with three color palettes:
 You select a palette by setting a :envvar:`DJANGO_COLORS` environment
 variable to specify the palette you want to use. For example, to
 specify the ``light`` palette under a Unix or OS/X BASH shell, you
-would run the following at a command prompt::
+would run the following at a command prompt:
+
+.. code-block:: shell
 
     export DJANGO_COLORS="light"
 
@@ -1925,7 +2017,9 @@ A color specification follows one of the following patterns:
 where ``role`` is the name of a valid color role, ``fg`` is the
 foreground color, ``bg`` is the background color and each ``option``
 is one of the color modifying options. Multiple color specifications
-are then separated by a semicolon. For example::
+are then separated by a semicolon. For example:
+
+.. code-block:: shell
 
     export DJANGO_COLORS="error=yellow/blue,blink;notice=magenta"
 
@@ -1935,7 +2029,9 @@ left uncolored.
 
 Colors can also be specified by extending a base palette. If you put
 a palette name in a color specification, all the colors implied by that
-palette will be loaded. So::
+palette will be loaded. So:
+
+.. code-block:: shell
 
     export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"
 
@@ -1969,11 +2065,15 @@ The Python files created by :djadmin:`startproject`, :djadmin:`startapp`,
 present on your ``PATH``.
 
 If you have ``black`` globally installed, but do not wish it used for the
-current project, you can set the ``PATH`` explicitly::
+current project, you can set the ``PATH`` explicitly:
+
+.. code-block:: shell
 
     PATH=path/to/venv/bin django-admin makemigrations
 
-For commands using ``stdout`` you can pipe the output to ``black`` if needed::
+For commands using ``stdout`` you can pipe the output to ``black`` if needed:
+
+.. code-block:: shell
 
     django-admin inspectdb | black -
 

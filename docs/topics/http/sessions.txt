@@ -357,7 +357,9 @@ Bundled serializers
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
-    keys in ``request.session`` won't work as expected::
+    keys in ``request.session`` won't work as expected:
+
+    .. code-block:: pycon
 
         >>> # initial assignment
         >>> request.session[0] = 'bar'
@@ -499,11 +501,15 @@ Using sessions out of views
     you should consider importing ``SessionStore`` from the session engine
     designated by :setting:`SESSION_ENGINE`, as below:
 
+    .. code-block:: pycon
+
       >>> from importlib import import_module
       >>> from django.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
-An API is available to manipulate session data outside of a view::
+An API is available to manipulate session data outside of a view:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
@@ -526,7 +532,9 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
 :source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
-access sessions using the normal Django database API::
+access sessions using the normal Django database API:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.models import Session
     >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
@@ -536,7 +544,9 @@ access sessions using the normal Django database API::
 Note that you'll need to call
 :meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
-format::
+format:
+
+.. code-block:: pycon
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'

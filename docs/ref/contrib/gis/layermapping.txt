@@ -32,7 +32,9 @@ Example
 =======
 
 #. You need a GDAL-supported data source, like a shapefile (here we're using
-   a simple polygon shapefile, ``test_poly.shp``, with three features)::
+   a simple polygon shapefile, ``test_poly.shp``, with three features):
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource('test_poly.shp')
@@ -62,7 +64,9 @@ Example
             return 'Name: %s' % self.name
 
 #. Use :class:`LayerMapping` to extract all the features and place them in the
-   database::
+   database:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.utils import LayerMapping
     >>> from geoapp.models import TestGeo
@@ -206,13 +210,17 @@ should stop excessive memory use when running ``LayerMapping`` scripts.
 MySQL: ``max_allowed_packet`` error
 -----------------------------------
 
-If you encounter the following error when using ``LayerMapping`` and MySQL::
+If you encounter the following error when using ``LayerMapping`` and MySQL:
+
+.. code-block:: pytb
 
     OperationalError: (1153, "Got a packet bigger than 'max_allowed_packet' bytes")
 
 Then the solution is to increase the value of the ``max_allowed_packet``
 setting in your MySQL configuration.  For example, the default value may
 be something low like one megabyte -- the setting may be modified in MySQL's
-configuration file (``my.cnf``) in the ``[mysqld]`` section::
+configuration file (``my.cnf``) in the ``[mysqld]`` section:
+
+.. code-block:: ini
 
     max_allowed_packet = 10M

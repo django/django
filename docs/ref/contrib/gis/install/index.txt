@@ -2,8 +2,6 @@
 GeoDjango Installation
 ======================
 
-.. highlight:: console
-
 Overview
 ========
 In general, GeoDjango installation requires:
@@ -141,7 +139,9 @@ A user may set this environment variable to customize the library paths
 they want to use.  The typical library directory for software
 built from source is ``/usr/local/lib``.  Thus, ``/usr/local/lib`` needs
 to be included in the ``LD_LIBRARY_PATH`` variable.  For example, the user
-could place the following in their bash profile::
+could place the following in their bash profile:
+
+.. code-block:: shell
 
     export LD_LIBRARY_PATH=/usr/local/lib
 
@@ -151,7 +151,9 @@ Setting system library path
 On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
 additional paths from files in another directory, such as ``/etc/ld.so.conf.d``.
 As the root user, add the custom library path (like ``/usr/local/lib``) on a
-new line in ``ld.so.conf``.  This is *one* example of how to do so::
+new line in ``ld.so.conf``.  This is *one* example of how to do so:
+
+.. code-block:: shell
 
     $ sudo echo /usr/local/lib >> /etc/ld.so.conf
     $ sudo ldconfig
@@ -159,7 +161,9 @@ new line in ``ld.so.conf``.  This is *one* example of how to do so::
 For OpenSolaris users, the system library path may be modified using the
 ``crle`` utility.  Run ``crle`` with no options to see the current configuration
 and use ``crle -l`` to set with the new library path.  Be *very* careful when
-modifying the system library path::
+modifying the system library path:
+
+.. code-block:: shell
 
     # crle -l $OLD_PATH:/usr/local/lib
 
@@ -176,11 +180,15 @@ Linux system then Python's ctypes may not be able to find your library even if
 your library path is set correctly and geospatial libraries were built perfectly.
 
 The ``binutils`` package may be installed on Debian and Ubuntu systems using the
-following command::
+following command:
+
+.. code-block:: shell
 
     $ sudo apt-get install binutils
 
-Similarly, on Red Hat and CentOS systems::
+Similarly, on Red Hat and CentOS systems:
+
+.. code-block:: shell
 
     $ sudo yum install binutils
 
@@ -221,7 +229,9 @@ __ https://www.python.org/ftp/python/
 
     You will need to modify the ``PATH`` environment variable in your
     ``.profile`` file so that the new version of Python is used when
-    ``python`` is entered at the command-line::
+    ``python`` is entered at the command-line:
+
+    .. code-block:: shell
 
         export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
 
@@ -255,7 +265,9 @@ It provides recipes for the GeoDjango prerequisites on Macintosh computers
 running macOS. Because Homebrew still builds the software from source, `Xcode`_
 is required.
 
-Summary::
+Summary:
+
+.. code-block:: shell
 
     $ brew install postgresql
     $ brew install postgis
@@ -287,7 +299,9 @@ MacPorts
 running macOS.  Because MacPorts still builds the software from source,
 `Xcode`_ is required.
 
-Summary::
+Summary:
+
+.. code-block:: shell
 
     $ sudo port install postgresql13-server
     $ sudo port install geos
@@ -299,12 +313,16 @@ Summary::
 .. note::
 
     You will also have to modify the ``PATH`` in your ``.profile`` so
-    that the MacPorts programs are accessible from the command-line::
+    that the MacPorts programs are accessible from the command-line:
+
+    .. code-block:: shell
 
         export PATH=/opt/local/bin:/opt/local/lib/postgresql13/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
-    the libraries can be found by Python::
+    the libraries can be found by Python:
+
+    .. code-block:: shell
 
         export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql13
 
@@ -434,7 +452,9 @@ psycopg
 
 The ``psycopg`` Python module provides the interface between Python and the
 PostgreSQL database. ``psycopg`` can be installed via pip within your Python
-virtual environment::
+virtual environment:
+
+.. code-block:: doscon
 
     ...\> py -m pip install psycopg
 

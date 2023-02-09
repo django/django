@@ -253,8 +253,6 @@ output for computers rather than for humans. The following filters and tags,
 provided by the ``tz`` template tag library, allow you to control the time zone
 conversions.
 
-.. highlight:: html+django
-
 Template tags
 -------------
 
@@ -270,7 +268,9 @@ This tag has exactly the same effects as the :setting:`USE_TZ` setting as far
 as the template engine is concerned. It allows a more fine grained control of
 conversion.
 
-To activate or deactivate conversion for a template block, use::
+To activate or deactivate conversion for a template block, use:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -295,7 +295,7 @@ To activate or deactivate conversion for a template block, use::
 Sets or unsets the current time zone in the contained block. When the current
 time zone is unset, the default time zone applies.
 
-::
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -313,7 +313,9 @@ time zone is unset, the default time zone applies.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can get the name of the current time zone using the
-``get_current_timezone`` tag::
+``get_current_timezone`` tag:
+
+.. code-block:: html+django
 
     {% get_current_timezone as TIME_ZONE %}
 
@@ -335,7 +337,9 @@ return aware datetimes.
 
 Forces conversion of a single value to the current time zone.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -348,7 +352,9 @@ For example::
 
 Forces conversion of a single value to UTC.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -364,13 +370,13 @@ Forces conversion of a single value to an arbitrary timezone.
 The argument must be an instance of a :class:`~datetime.tzinfo` subclass or a
 time zone name.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
     {{ value|timezone:"Europe/Paris" }}
-
-.. highlight:: python
 
 .. _time-zones-migration-guide:
 
@@ -427,7 +433,9 @@ code: :func:`~django.utils.timezone.now`,
 :func:`~django.utils.timezone.make_naive`.
 
 Finally, in order to help you locate code that needs upgrading, Django raises
-a warning when you attempt to save a naive datetime to the database::
+a warning when you attempt to save a naive datetime to the database:
+
+.. code-block:: pytb
 
     RuntimeWarning: DateTimeField ModelName.field_name received a naive
     datetime (2012-01-01 00:00:00) while time zone support is active.
@@ -504,7 +512,9 @@ Setup
    their values should be in UTC (or both!).
 
    Finally, our calendar system contains interesting edge cases. For example,
-   you can't always subtract one year directly from a given date::
+   you can't always subtract one year directly from a given date:
+
+   .. code-block:: pycon
 
        >>> import datetime
        >>> def one_year_before(value):  # Wrong example.
@@ -534,7 +544,9 @@ Troubleshooting
 #. **My application crashes with** ``TypeError: can't compare offset-naive``
    ``and offset-aware datetimes`` **-- what's wrong?**
 
-   Let's reproduce this error by comparing a naive and an aware datetime::
+   Let's reproduce this error by comparing a naive and an aware datetime:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> aware = timezone.now()
@@ -582,7 +594,9 @@ Troubleshooting
    method. You also consider that a :class:`~datetime.date` is a lot like a
    :class:`~datetime.datetime`, except that it's less accurate.
 
-   None of this is true in a time zone aware environment::
+   None of this is true in a time zone aware environment:
+
+   .. code-block:: pycon
 
        >>> import datetime
        >>> import zoneinfo
@@ -620,7 +634,9 @@ Troubleshooting
 
    If you really need to do the conversion yourself, you must ensure the
    datetime is converted to the appropriate time zone first. Usually, this
-   will be the current timezone::
+   will be the current timezone:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> timezone.activate(zoneinfo.ZoneInfo("Asia/Singapore"))
@@ -647,7 +663,9 @@ Usage
    datetime?**
 
    Here you need to create the required ``ZoneInfo`` instance and attach it to
-   the naïve datetime::
+   the naïve datetime:
+
+   .. code-block:: pycon
 
        >>> import zoneinfo
        >>> from django.utils.dateparse import parse_datetime
@@ -670,7 +688,9 @@ Usage
    sufficient.
 
    For the sake of completeness, though, if you really want the local time
-   in the current time zone, here's how you can obtain it::
+   in the current time zone, here's how you can obtain it:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> timezone.localtime(timezone.now())

@@ -76,7 +76,9 @@ work, see :ref:`troubleshooting-django-admin`.
     Put your code in some directory **outside** of the document root, such as
     :file:`/home/mycode`.
 
-Let's look at what :djadmin:`startproject` created::
+Let's look at what :djadmin:`startproject` created:
+
+.. code-block:: text
 
     mysite/
         manage.py
@@ -224,7 +226,9 @@ and type this command:
 
     $ python manage.py startapp polls
 
-That'll create a directory :file:`polls`, which is laid out like this::
+That'll create a directory :file:`polls`, which is laid out like this:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -257,7 +261,9 @@ This is the simplest view possible in Django. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the polls directory, create a file called ``urls.py``.
-Your app directory should now look like::
+Your app directory should now look like:
+
+.. code-block:: text
 
     polls/
         __init__.py

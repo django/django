@@ -327,7 +327,9 @@ If we connected a handler like this::
 
     m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
 
-and then did something like this::
+and then did something like this:
+
+.. code-block:: pycon
 
     >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
@@ -357,7 +359,9 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
-And if we would then do something like this::
+And if we would then do something like this:
+
+.. code-block:: pycon
 
     >>> t.pizza_set.remove(p)
 
