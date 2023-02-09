@@ -234,20 +234,26 @@ not be looking at your Django code. For example::
     and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
     example, assuming that a ``Question`` object has multiple related ``Answer``
     objects, the list returned contains the primary keys of the related ``Answer``
-    objects::
+    objects:
+
+    .. code-block:: pycon
 
         >>> question = Question.objects.get(id=1)
         >>> question.get_answer_order()
         [1, 2, 3]
 
     The order of a ``Question`` object's related ``Answer`` objects can be set by
-    passing in a list of ``Answer`` primary keys::
+    passing in a list of ``Answer`` primary keys:
+
+    .. code-block:: pycon
 
         >>> question.set_answer_order([3, 1, 2])
 
     The related objects also get two methods, ``get_next_in_order()`` and
     ``get_previous_in_order()``, which can be used to access those objects in their
-    proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+    proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+
+    .. code-block:: pycon
 
         >>> answer = Answer.objects.get(id=2)
         >>> answer.get_next_in_order()

@@ -46,7 +46,9 @@ Creating users
 --------------
 
 The most direct way to create users is to use the included
-:meth:`~django.contrib.auth.models.UserManager.create_user` helper function::
+:meth:`~django.contrib.auth.models.UserManager.create_user` helper function:
+
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
     >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
@@ -65,7 +67,9 @@ interactively <auth-admin>`.
 Creating superusers
 -------------------
 
-Create superusers using the :djadmin:`createsuperuser` command::
+Create superusers using the :djadmin:`createsuperuser` command:
+
+.. console::
 
     $ python manage.py createsuperuser --username=joe --email=joe@example.com
 
@@ -329,6 +333,8 @@ inherit the permissions of the concrete model they subclass::
         class Meta:
             proxy = True
             permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+
+.. code-block:: pycon
 
     >>> # Fetch the content type for the proxy model.
     >>> content_type = ContentType.objects.get_for_model(Student, for_concrete_model=False)
@@ -1723,13 +1729,17 @@ template-friendly proxy of permissions.
 Evaluating a single-attribute lookup of ``{{ perms }}`` as a boolean is a proxy
 to :meth:`User.has_module_perms()
 <django.contrib.auth.models.User.has_module_perms>`. For example, to check if
-the logged-in user has any permissions in the ``foo`` app::
+the logged-in user has any permissions in the ``foo`` app:
+
+.. code-block:: html+django
 
     {% if perms.foo %}
 
 Evaluating a two-level-attribute lookup as a boolean is a proxy to
 :meth:`User.has_perm() <django.contrib.auth.models.User.has_perm>`. For example,
-to check if the logged-in user has the permission ``foo.add_vote``::
+to check if the logged-in user has the permission ``foo.add_vote``:
+
+.. code-block:: html+django
 
     {% if perms.foo.add_vote %}
 

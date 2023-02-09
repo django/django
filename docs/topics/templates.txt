@@ -49,8 +49,6 @@ namespace.
 The Django template language
 ============================
 
-.. highlight:: html+django
-
 Syntax
 ------
 
@@ -75,17 +73,23 @@ Variables
 A variable outputs a value from the context, which is a dict-like object
 mapping keys to values.
 
-Variables are surrounded by ``{{`` and ``}}`` like this::
+Variables are surrounded by ``{{`` and ``}}`` like this:
+
+.. code-block:: html+django
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
 With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this template
-renders to::
+renders to:
+
+.. code-block:: html+django
 
     My first name is John. My last name is Doe.
 
 Dictionary lookup, attribute lookup and list-index lookups are implemented with
-a dot notation::
+a dot notation:
+
+.. code-block:: html+django
 
     {{ my_dict.key }}
     {{ my_object.attribute }}
@@ -103,15 +107,21 @@ This definition is deliberately vague. For example, a tag can output content,
 serve as a control structure e.g. an "if" statement or a "for" loop, grab
 content from a database, or even enable access to other template tags.
 
-Tags are surrounded by ``{%`` and ``%}`` like this::
+Tags are surrounded by ``{%`` and ``%}`` like this:
+
+.. code-block:: html+django
 
     {% csrf_token %}
 
-Most tags accept arguments::
+Most tags accept arguments:
+
+.. code-block:: html+django
 
     {% cycle 'odd' 'even' %}
 
-Some tags require beginning and ending tags::
+Some tags require beginning and ending tags:
+
+.. code-block:: html+django
 
     {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
 
@@ -124,16 +134,22 @@ Filters
 
 Filters transform the values of variables and tag arguments.
 
-They look like this::
+They look like this:
+
+.. code-block:: html+django
 
      {{ django|title }}
 
 With a context of ``{'django': 'the web framework for perfectionists with
-deadlines'}``, this template renders to::
+deadlines'}``, this template renders to:
+
+.. code-block:: html+django
 
     The Web Framework For Perfectionists With Deadlines
 
-Some filters take an argument::
+Some filters take an argument:
+
+.. code-block:: html+django
 
     {{ my_date|date:"Y-m-d" }}
 
@@ -144,7 +160,9 @@ available as well as :ref:`instructions for writing custom filters
 Comments
 ~~~~~~~~
 
-Comments look like this::
+Comments look like this:
+
+.. code-block:: html+django
 
     {# this won't be rendered #}
 
@@ -218,8 +236,6 @@ and you can implement your own additional context processors, too.
 
 Support for template engines
 ============================
-
-.. highlight:: python
 
 Configuration
 -------------

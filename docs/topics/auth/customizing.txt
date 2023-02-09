@@ -323,7 +323,9 @@ you might create an Employee model::
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
 model, you can access the related information using Django's standard related
-model conventions::
+model conventions:
+
+.. code-block:: pycon
 
     >>> u = User.objects.get(username='fsmith')
     >>> freds_department = u.employee.department

@@ -321,14 +321,18 @@ First, invoke the Django shell:
     $ python manage.py shell
 
 If you downloaded the :ref:`worldborders` data earlier in the tutorial, then
-you can determine its path using Python's :class:`pathlib.Path`::
+you can determine its path using Python's :class:`pathlib.Path`:
+
+.. code-block:: pycon
 
     >>> from pathlib import Path
     >>> import world
     >>> world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
 
 Now, open the world borders shapefile using GeoDjango's
-:class:`~django.contrib.gis.gdal.DataSource` interface::
+:class:`~django.contrib.gis.gdal.DataSource` interface:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
@@ -336,7 +340,9 @@ Now, open the world borders shapefile using GeoDjango's
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
 
 Data source objects can have different layers of geospatial features; however,
-shapefiles are only allowed to have one layer::
+shapefiles are only allowed to have one layer:
+
+.. code-block:: pycon
 
     >>> print(len(ds))
     1
@@ -344,7 +350,9 @@ shapefiles are only allowed to have one layer::
     >>> print(lyr)
     TM_WORLD_BORDERS-0.3
 
-You can see the layer's geometry type and how many features it contains::
+You can see the layer's geometry type and how many features it contains:
+
+.. code-block:: pycon
 
     >>> print(lyr.geom_type)
     Polygon
@@ -363,7 +371,9 @@ You can see the layer's geometry type and how many features it contains::
 
 The :class:`~django.contrib.gis.gdal.Layer` may also have a spatial reference
 system associated with it.  If it does, the ``srs`` attribute will return a
-:class:`~django.contrib.gis.gdal.SpatialReference` object::
+:class:`~django.contrib.gis.gdal.SpatialReference` object:
+
+.. code-block:: pycon
 
     >>> srs = lyr.srs
     >>> print(srs)
@@ -401,7 +411,9 @@ string) associated with each of the fields:
 You can iterate over each feature in the layer and extract information from both
 the feature's geometry (accessed via the ``geom`` attribute) as well as the
 feature's attribute fields (whose **values** are accessed via ``get()``
-method)::
+method):
+
+.. code-block:: pycon
 
     >>> for feat in lyr:
     ...    print(feat.get('NAME'), feat.geom.num_points)
@@ -411,18 +423,24 @@ method)::
     South Georgia South Sandwich Islands 338
     Taiwan 363
 
-:class:`~django.contrib.gis.gdal.Layer` objects may be sliced::
+:class:`~django.contrib.gis.gdal.Layer` objects may be sliced:
+
+.. code-block:: pycon
 
     >>> lyr[0:2]
     [<django.contrib.gis.gdal.feature.Feature object at 0x2f47690>, <django.contrib.gis.gdal.feature.Feature object at 0x2f47650>]
 
-And individual features may be retrieved by their feature ID::
+And individual features may be retrieved by their feature ID:
+
+.. code-block:: pycon
 
     >>> feat = lyr[234]
     >>> print(feat.get('NAME'))
     San Marino
 
-Boundary geometries may be exported as WKT and GeoJSON::
+Boundary geometries may be exported as WKT and GeoJSON:
+
+.. code-block:: pycon
 
     >>> geom = feat.geom
     >>> print(geom.wkt)
@@ -484,7 +502,9 @@ Afterward, invoke the Django shell from the ``geodjango`` project directory:
     $ python manage.py shell
 
 Next, import the ``load`` module, call the ``run`` routine, and watch
-``LayerMapping`` do the work::
+``LayerMapping`` do the work:
+
+.. code-block:: pycon
 
     >>> from world import load
     >>> load.run()
@@ -576,7 +596,9 @@ a particular point.  First, fire up the management shell:
 
     $ python manage.py shell
 
-Now, define a point of interest [#]_::
+Now, define a point of interest [#]_:
+
+.. code-block:: pycon
 
     >>> pnt_wkt = 'POINT(-95.3385 29.7245)'
 
@@ -584,7 +606,9 @@ The ``pnt_wkt`` string represents the point at -95.3385 degrees longitude,
 29.7245 degrees latitude.  The geometry is in a format known as
 Well Known Text (WKT), a standard issued by the Open Geospatial
 Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
-a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
+a ``contains`` lookup using the ``pnt_wkt`` as the parameter:
+
+.. code-block:: pycon
 
     >>> from world.models import WorldBorder
     >>> WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
@@ -596,7 +620,9 @@ United States (exactly what you would expect).
 Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
 Here, you can combine the ``intersects`` spatial lookup with the ``get``
 method to retrieve only the ``WorldBorder`` instance for San Marino instead
-of a queryset::
+of a queryset:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
@@ -614,19 +640,25 @@ When doing spatial queries, GeoDjango automatically transforms
 geometries if they're in a different coordinate system.  In the following
 example, coordinates will be expressed in `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
-**meters**, not degrees::
+**meters**, not degrees:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry, Point
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
-WKT that includes the SRID::
+WKT that includes the SRID:
+
+.. code-block:: pycon
 
     >>> pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
 
 GeoDjango's ORM will automatically wrap geometry values
 in transformation SQL, allowing the developer to work at a higher level
-of abstraction::
+of abstraction:
+
+.. code-block:: pycon
 
     >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
     >>> print(qs.query) # Generating the SQL
@@ -646,7 +678,9 @@ __ https://spatialreference.org/ref/epsg/32140/
 .. admonition:: Raw queries
 
     When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
-    fields so that the field value can be recognized by GEOS::
+    fields so that the field value can be recognized by GEOS:
+
+    .. code-block:: pycon
 
         from django.db import connection
         # or if you're querying a non-default database:
@@ -663,7 +697,9 @@ GeoDjango loads geometries in a standardized textual representation.  When the
 geometry field is first accessed, GeoDjango creates a
 :class:`~django.contrib.gis.geos.GEOSGeometry` object, exposing powerful
 functionality, such as serialization properties for popular geospatial
-formats::
+formats:
+
+.. code-block:: pycon
 
     >>> sm = WorldBorder.objects.get(name='San Marino')
     >>> sm.mpoly
@@ -676,7 +712,9 @@ formats::
     '{ "type": "MultiPolygon", "coordinates": [ [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
 
 This includes access to all of the advanced geometric operations provided by
-the GEOS library::
+the GEOS library:
+
+.. code-block:: pycon
 
     >>> pnt = Point(12.4604, 43.9420)
     >>> sm.mpoly.contains(pnt)

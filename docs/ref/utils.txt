@@ -298,7 +298,9 @@ The functions defined in this module share the following properties:
 .. module:: django.utils.feedgenerator
    :synopsis: Syndication feed generation library -- used for generating RSS, etc.
 
-Sample usage::
+Sample usage:
+
+.. code-block:: pycon
 
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
@@ -655,9 +657,11 @@ escaping HTML.
     Escapes all HTML/XML special characters with their Unicode escapes, so
     value is safe for use with JavaScript. Also wraps the escaped JSON in a
     ``<script>`` tag. If the ``element_id`` parameter is not ``None``, the
-    ``<script>`` tag is given the passed id. For example::
+    ``<script>`` tag is given the passed id. For example:
 
-        >> json_script({"hello": "world"}, element_id="hello-data")
+    .. code-block:: pycon
+
+        >>> json_script({"hello": "world"}, element_id="hello-data")
         '<script id="hello-data" type="application/json">{"hello": "world"}</script>'
 
     The ``encoder``, which defaults to
@@ -797,7 +801,9 @@ appropriate entities.
     For building up fragments of HTML, you should normally be using
     :func:`django.utils.html.format_html` instead.
 
-    String marked safe will become unsafe again if modified. For example::
+    String marked safe will become unsafe again if modified. For example:
+
+    .. code-block:: pycon
 
         >>> mystr = '<b>Hello World</b>   '
         >>> mystr = mark_safe(mystr)
@@ -843,13 +849,17 @@ appropriate entities.
     #. Replacing any whitespace or repeated dashes with single dashes.
     #. Removing leading and trailing whitespace, dashes, and underscores.
 
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> slugify(' Joel is a slug ')
         'joel-is-a-slug'
 
     If you want to allow Unicode characters, pass ``allow_unicode=True``. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> slugify('你好 World', allow_unicode=True)
         '你好-world'

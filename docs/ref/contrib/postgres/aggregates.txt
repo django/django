@@ -12,7 +12,9 @@ module. They are described in more detail in the `PostgreSQL docs
 .. note::
 
     All functions come without default aliases, so you must explicitly provide
-    one. For example::
+    one. For example:
+
+    .. code-block:: pycon
 
         >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
         {'arr': [0, 1, 2]}
@@ -97,6 +99,8 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
+    .. code-block:: pycon
+
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolAnd
         >>> Comment.objects.aggregate(booland=BoolAnd('published'))
@@ -118,6 +122,8 @@ General-purpose aggregation functions
             body = models.TextField()
             published = models.BooleanField()
             rank = models.IntegerField()
+
+    .. code-block:: pycon
 
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolOr
@@ -159,6 +165,8 @@ General-purpose aggregation functions
             start = models.DateTimeField()
             end = models.DateTimeField()
             requirements = models.JSONField(blank=True, null=True)
+
+    .. code-block:: pycon
 
         >>> from django.contrib.postgres.aggregates import JSONBAgg
         >>> Room.objects.annotate(
@@ -212,6 +220,8 @@ General-purpose aggregation functions
         class Article(models.Model):
             headline = models.CharField(max_length=100)
             publications = models.ManyToManyField(Publication)
+
+    .. code-block:: pycon
 
         >>> article = Article.objects.create(headline="NASA uses Python")
         >>> article.publications.create(title="The Python Journal")
@@ -349,7 +359,9 @@ field or an expression returning a numeric data. Both are required.
 Usage examples
 ==============
 
-We will use this example table::
+We will use this example table:
+
+.. code-block:: text
 
     | FIELD1 | FIELD2 | FIELD3 |
     |--------|--------|--------|
@@ -357,8 +369,9 @@ We will use this example table::
     |    bar |      2 | (null) |
     |   test |      3 |     13 |
 
+Here's some examples of some of the general-purpose aggregation functions:
 
-Here's some examples of some of the general-purpose aggregation functions::
+.. code-block:: pycon
 
     >>> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
     {'result': 'foo;bar;test'}
@@ -369,7 +382,9 @@ Here's some examples of some of the general-purpose aggregation functions::
 
 The next example shows the usage of statistical aggregate functions. The
 underlying math will be not described (you can read about this, for example, at
-`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_)::
+`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_):
+
+.. code-block:: pycon
 
     >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
     {'count': 2}

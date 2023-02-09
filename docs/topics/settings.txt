@@ -55,17 +55,23 @@ When using :doc:`django-admin </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
-Example (Unix Bash shell)::
+Example (Unix Bash shell):
+
+.. code-block:: shell
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin runserver
 
-Example (Windows shell)::
+Example (Windows shell):
+
+.. code-block:: doscon
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin runserver
 
-Use the ``--settings`` command-line argument to specify the settings manually::
+Use the ``--settings`` command-line argument to specify the settings manually:
+
+.. code-block:: shell
 
     django-admin runserver --settings=mysite.settings
 

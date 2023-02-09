@@ -189,7 +189,7 @@ ones:
             name = models.CharField(max_length=60)
             shirt_size = models.CharField(max_length=1, choices=SHIRT_SIZES)
 
-    ::
+    .. code-block:: pycon
 
         >>> p = Person(name="Fred Flintstone", shirt_size="L")
         >>> p.save()
@@ -503,7 +503,9 @@ There are a few restrictions on the intermediate model:
 Now that you have set up your :class:`~django.db.models.ManyToManyField` to use
 your intermediary model (``Membership``, in this case), you're ready to start
 creating some many-to-many relationships. You do this by creating instances of
-the intermediate model::
+the intermediate model:
+
+.. code-block:: pycon
 
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
@@ -526,7 +528,9 @@ You can also use :meth:`~django.db.models.fields.related.RelatedManager.add`,
 :meth:`~django.db.models.fields.related.RelatedManager.create`, or
 :meth:`~django.db.models.fields.related.RelatedManager.set` to create
 relationships, as long as you specify ``through_defaults`` for any required
-fields::
+fields:
+
+.. code-block:: pycon
 
     >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
     >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
@@ -537,7 +541,9 @@ You may prefer to create instances of the intermediate model directly.
 If the custom through table defined by the intermediate model does not enforce
 uniqueness on the ``(model1, model2)`` pair, allowing multiple values, the
 :meth:`~django.db.models.fields.related.RelatedManager.remove` call will
-remove all intermediate model instances::
+remove all intermediate model instances:
+
+.. code-block:: pycon
 
     >>> Membership.objects.create(person=ringo, group=beatles,
     ...     date_joined=date(1968, 9, 4),
@@ -550,7 +556,9 @@ remove all intermediate model instances::
     <QuerySet [<Person: Paul McCartney>]>
 
 The :meth:`~django.db.models.fields.related.RelatedManager.clear`
-method can be used to remove all many-to-many relationships for an instance::
+method can be used to remove all many-to-many relationships for an instance:
+
+.. code-block:: pycon
 
     >>> # Beatles have broken up
     >>> beatles.members.clear()
@@ -560,13 +568,17 @@ method can be used to remove all many-to-many relationships for an instance::
 
 Once you have established the many-to-many relationships, you can issue
 queries. Just as with normal many-to-many relationships, you can query using
-the attributes of the many-to-many-related model::
+the attributes of the many-to-many-related model:
+
+.. code-block:: pycon
 
     # Find all the groups with a member whose name starts with 'Paul'
     >>> Group.objects.filter(members__name__startswith='Paul')
     <QuerySet [<Group: The Beatles>]>
 
-As you are using an intermediate model, you can also query on its attributes::
+As you are using an intermediate model, you can also query on its attributes:
+
+.. code-block:: pycon
 
     # Find all the members of the Beatles that joined after 1 Jan 1961
     >>> Person.objects.filter(
@@ -575,7 +587,9 @@ As you are using an intermediate model, you can also query on its attributes::
     <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
-querying the ``Membership`` model::
+querying the ``Membership`` model:
+
+.. code-block:: pycon
 
     >>> ringos_membership = Membership.objects.get(group=beatles, person=ringo)
     >>> ringos_membership.date_joined
@@ -585,7 +599,9 @@ querying the ``Membership`` model::
 
 Another way to access the same information is by querying the
 :ref:`many-to-many reverse relationship<m2m-reverse-relationships>` from a
-``Person`` object::
+``Person`` object:
+
+.. code-block:: pycon
 
     >>> ringos_membership = ringo.membership_set.get(group=beatles)
     >>> ringos_membership.date_joined
@@ -1120,14 +1136,18 @@ For example::
 
 All of the fields of ``Place`` will also be available in ``Restaurant``,
 although the data will reside in a different database table. So these are both
-possible::
+possible:
+
+.. code-block:: pycon
 
     >>> Place.objects.filter(name="Bob's Cafe")
     >>> Restaurant.objects.filter(name="Bob's Cafe")
 
 If you have a ``Place`` that is also a ``Restaurant``, you can get from the
 ``Place`` object to the ``Restaurant`` object by using the lowercase version of
-the model name::
+the model name:
+
+.. code-block:: pycon
 
     >>> p = Place.objects.get(id=12)
     # If p is a Restaurant object, this will give the child class:
@@ -1264,7 +1284,9 @@ For example, suppose you want to add a method to the ``Person`` model. You can d
 
 The ``MyPerson`` class operates on the same database table as its parent
 ``Person`` class. In particular, any new instances of ``Person`` will also be
-accessible through ``MyPerson``, and vice-versa::
+accessible through ``MyPerson``, and vice-versa:
+
+.. code-block:: pycon
 
     >>> p = Person.objects.create(first_name="foobar")
     >>> MyPerson.objects.get(first_name="foobar")

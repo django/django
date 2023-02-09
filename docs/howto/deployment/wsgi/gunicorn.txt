@@ -2,8 +2,6 @@
 How to use Django with Gunicorn
 ===============================
 
-.. highlight:: bash
-
 Gunicorn_ ('Green Unicorn') is a pure-Python WSGI server for UNIX. It has no
 dependencies and can be installed using ``pip``.
 
@@ -23,7 +21,9 @@ Running Django in Gunicorn as a generic WSGI application
 When Gunicorn is installed, a ``gunicorn`` command is available which starts
 the Gunicorn server process. The simplest invocation of gunicorn is to pass the
 location of a module containing a WSGI application object named
-``application``, which for a typical Django project would look like::
+``application``, which for a typical Django project would look like:
+
+.. code-block:: shell
 
     gunicorn myproject.wsgi
 
