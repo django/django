@@ -20,7 +20,9 @@ Get the latest version of Python at https://www.python.org/downloads/ or with
 your operating system's package manager.
 
 You can verify that Python is installed by typing ``python`` from your shell;
-you should see something like::
+you should see something like:
+
+.. code-block:: pycon
 
     Python 3.x.y
     [GCC 4.x] on linux

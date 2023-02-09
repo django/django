@@ -206,7 +206,9 @@ In the terminal, we can run our test:
 
     $ python manage.py test polls
 
-and you'll see something like::
+and you'll see something like:
+
+.. code-block:: shell
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -267,7 +269,9 @@ past:
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
-and run the test again::
+and run the test again:
+
+.. code-block:: pytb
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -376,13 +380,17 @@ it earlier, check it before continuing.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
-this won't be required)::
+this won't be required):
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
-With that ready, we can ask the client to do some work for us::
+With that ready, we can ask the client to do some work for us:
+
+.. code-block:: pycon
 
     >>> # get a response from '/'
     >>> response = client.get('/')

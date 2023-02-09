@@ -1004,7 +1004,9 @@ They share this interface:
 :meth:`.SyndicationFeed.writeString`
     Returns the feed as a string in the given encoding.
 
-For example, to create an Atom 1.0 feed and print it to standard output::
+For example, to create an Atom 1.0 feed and print it to standard output:
+
+.. code-block:: pycon
 
     >>> from django.utils import feedgenerator
     >>> from datetime import datetime

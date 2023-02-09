@@ -75,7 +75,9 @@ Template tags
 Enables or disables localization of template variables in the
 contained block.
 
-To activate or deactivate localization for a template block, use::
+To activate or deactivate localization for a template block, use:
+
+.. code-block:: html+django
 
     {% load l10n %}
 
@@ -100,7 +102,9 @@ Template filters
 
 Forces localization of a single value.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load l10n %}
 
@@ -117,7 +121,9 @@ tag.
 
 Forces a single value to be printed without localization.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load l10n %}
 
@@ -154,7 +160,9 @@ information in these files as values inside can be exposed if you pass the
 string to ``django.utils.formats.get_format()`` (used by the :tfilter:`date`
 template filter).
 
-To customize the English formats, a structure like this would be needed::
+To customize the English formats, a structure like this would be needed:
+
+.. code-block:: text
 
     mysite/
         formats/

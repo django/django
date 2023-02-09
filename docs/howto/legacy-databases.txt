@@ -30,15 +30,17 @@ connection:
 Auto-generate the models
 ========================
 
-.. highlight:: bash
-
 Django comes with a utility called :djadmin:`inspectdb` that can create models
 by introspecting an existing database. You can view the output by running this
-command::
+command:
+
+.. code-block:: shell
 
     $ python manage.py inspectdb
 
-Save this as a file by using standard Unix output redirection::
+Save this as a file by using standard Unix output redirection:
+
+.. code-block:: shell
 
     $ python manage.py inspectdb > models.py
 
@@ -68,7 +70,9 @@ Install the core Django tables
 ==============================
 
 Next, run the :djadmin:`migrate` command to install any extra needed database
-records such as admin permissions and content types::
+records such as admin permissions and content types:
+
+.. code-block:: shell
 
     $ python manage.py migrate
 

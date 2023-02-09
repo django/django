@@ -2,15 +2,15 @@
 How to use Django with Hypercorn
 ================================
 
-.. highlight:: bash
-
 Hypercorn_ is an ASGI server that supports HTTP/1, HTTP/2, and HTTP/3
 with an emphasis on protocol support.
 
 Installing Hypercorn
 ====================
 
-You can install Hypercorn with ``pip``::
+You can install Hypercorn with ``pip``:
+
+.. code-block:: shell
 
     python -m pip install hypercorn
 
@@ -22,7 +22,9 @@ which runs ASGI applications. Hypercorn needs to be called with the
 location of a module containing an ASGI application object, followed
 by what the application is called (separated by a colon).
 
-For a typical Django project, invoking Hypercorn would look like::
+For a typical Django project, invoking Hypercorn would look like:
+
+.. code-block:: shell
 
     hypercorn myproject.asgi:application
 

@@ -12,7 +12,9 @@ command for the ``polls`` application from the
 
 To do this, add a ``management/commands`` directory to the application. Django
 will register a ``manage.py`` command for each Python module in that directory
-whose name doesn't begin with an underscore. For example::
+whose name doesn't begin with an underscore. For example:
+
+.. code-block:: text
 
     polls/
         __init__.py

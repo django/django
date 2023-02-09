@@ -425,7 +425,9 @@ Implementation concerns
 
 Whatever features you add to your custom ``Manager``, it must be
 possible to make a shallow copy of a ``Manager`` instance; i.e., the
-following code must work::
+following code must work:
+
+.. code-block:: pycon
 
     >>> import copy
     >>> manager = MyManager()

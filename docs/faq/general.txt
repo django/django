@@ -195,7 +195,9 @@ It's difficult to give an official citation format, for two reasons: citation
 formats can vary wildly between publications, and citation standards for
 software are still a matter of some debate.
 
-For example, `APA style`_,  would dictate something like::
+For example, `APA style`_,  would dictate something like:
+
+.. code-block:: text
 
     Django (Version 1.5) [Computer Software]. (2013). Retrieved from https://www.djangoproject.com/.
 

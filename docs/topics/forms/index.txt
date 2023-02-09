@@ -743,7 +743,9 @@ Useful attributes on ``{{ field }}`` include:
 ``{{ field.label_tag }}``
     The field's label wrapped in the appropriate HTML ``<label>`` tag. This
     includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
-    the default ``label_suffix`` is a colon::
+    the default ``label_suffix`` is a colon:
+
+    .. code-block:: html+django
 
         <label for="id_email">Email address:</label>
 

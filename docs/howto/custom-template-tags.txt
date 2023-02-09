@@ -35,7 +35,9 @@ later, so be careful to pick a name that won't clash with custom tags and
 filters in another app.
 
 For example, if your custom tags/filters are in a file called
-``poll_extras.py``, your app layout might look like this::
+``poll_extras.py``, your app layout might look like this:
+
+.. code-block:: text
 
     polls/
         __init__.py

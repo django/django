@@ -232,7 +232,9 @@ directly support ``output_field`` you will need to wrap the expression with
             F('active_at') + F('duration'), output_field=DateTimeField()))
 
 When referencing relational fields such as ``ForeignKey``, ``F()`` returns the
-primary key value rather than a model instance::
+primary key value rather than a model instance:
+
+.. code-block:: pycon
 
     >> car = Company.objects.annotate(built_by=F('manufacturer'))[0]
     >> car.manufacturer
@@ -547,7 +549,9 @@ You can add an explicit subquery to a ``QuerySet`` using the ``Subquery``
 expression.
 
 For example, to annotate each post with the email address of the author of the
-newest comment on that post::
+newest comment on that post:
+
+.. code-block:: pycon
 
     >>> from django.db.models import OuterRef, Subquery
     >>> newest = Comment.objects.filter(post=OuterRef('pk')).order_by('-created_at')
@@ -584,7 +588,9 @@ outer queryset is resolved.
 Instances of ``OuterRef`` may be used in conjunction with nested instances
 of ``Subquery`` to refer to a containing queryset that isn't the immediate
 parent. For example, this queryset would need to be within a nested pair of
-``Subquery`` instances to resolve correctly::
+``Subquery`` instances to resolve correctly:
+
+.. code-block:: pycon
 
     >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
 
@@ -593,7 +599,9 @@ Limiting a subquery to a single column
 
 There are times when a single column must be returned from a ``Subquery``, for
 instance, to use a ``Subquery`` as the target of an ``__in`` lookup. To return
-all comments for posts published within the last day::
+all comments for posts published within the last day:
+
+.. code-block:: pycon
 
     >>> from datetime import timedelta
     >>> from django.utils import timezone
@@ -608,7 +616,9 @@ Limiting the subquery to a single row
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To prevent a subquery from returning multiple rows, a slice (``[:1]``) of the
-queryset is used::
+queryset is used:
+
+.. code-block:: pycon
 
     >>> subquery = Subquery(newest.values('email')[:1])
     >>> Post.objects.annotate(newest_commenter_email=subquery)
@@ -630,7 +640,9 @@ many cases it will perform better than a subquery since the database is able to
 stop evaluation of the subquery when a first matching row is found.
 
 For example, to annotate each post with whether or not it has a comment from
-within the last day::
+within the last day:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Exists, OuterRef
     >>> from datetime import timedelta
@@ -668,7 +680,9 @@ Filtering on a ``Subquery()`` or ``Exists()`` expressions
 
 ``Subquery()`` that returns a boolean value and ``Exists()`` may be used as a
 ``condition`` in :class:`~django.db.models.expressions.When` expressions, or to
-directly filter a queryset::
+directly filter a queryset:
+
+.. code-block:: pycon
 
     >>> recent_comments = Comment.objects.filter(...)  # From above
     >>> Post.objects.filter(Exists(recent_comments))
@@ -684,7 +698,9 @@ combination of :meth:`~.QuerySet.filter`, :meth:`~.QuerySet.values`, and
 :meth:`~.QuerySet.annotate` to get the subquery grouping correct.
 
 Assuming both models have a ``length`` field, to find posts where the post
-length is greater than the total length of all combined comments::
+length is greater than the total length of all combined comments:
+
+.. code-block:: pycon
 
     >>> from django.db.models import OuterRef, Subquery, Sum
     >>> comments = Comment.objects.filter(post=OuterRef('pk')).order_by().values('post')
@@ -710,7 +726,9 @@ Raw SQL expressions
 .. class:: RawSQL(sql, params, output_field=None)
 
 Sometimes database expressions can't easily express a complex ``WHERE`` clause.
-In these edge cases, use the ``RawSQL`` expression. For example::
+In these edge cases, use the ``RawSQL`` expression. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models.expressions import RawSQL
     >>> queryset.annotate(val=RawSQL("select col from sometable where othercol = %s", (param,)))
@@ -719,7 +737,9 @@ These extra lookups may not be portable to different database engines (because
 you're explicitly writing SQL code) and violate the DRY principle, so you
 should avoid them if possible.
 
-``RawSQL`` expressions can also be used as the target of ``__in`` filters::
+``RawSQL`` expressions can also be used as the target of ``__in`` filters:
+
+.. code-block:: pycon
 
     >>> queryset.filter(id__in=RawSQL("select id from sometable where col = %s", (param,)))
 
@@ -732,7 +752,9 @@ should avoid them if possible.
     your SQL with user-provided data.
 
     You also must not quote placeholders in the SQL string. This example is
-    vulnerable to SQL injection because of the quotes around ``%s``::
+    vulnerable to SQL injection because of the quotes around ``%s``:
+
+    .. code-block:: pycon
 
         RawSQL("select col from sometable where othercol = '%s'")  # unsafe!
 
@@ -785,7 +807,9 @@ The ``frame`` parameter specifies which other rows that should be used in the
 computation. See :ref:`window-frames` for details.
 
 For example, to annotate each movie with the average rating for the movies by
-the same studio in the same genre and release year::
+the same studio in the same genre and release year:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, F, Window
     >>> Movie.objects.annotate(
@@ -803,7 +827,9 @@ same partition and frame. For example, you could modify the previous example
 to also include the best and worst rating in each movie's group (same studio,
 genre, and release year) by using three window functions in the same query. The
 partition and ordering from the previous example is extracted into a dictionary
-to reduce repetition::
+to reduce repetition:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, F, Max, Min, Window
     >>> window = {
@@ -829,7 +855,9 @@ performing aggregation.
 For example, a query that relies on aggregation and has an ``OR``-ed filter
 against a window function and a field is not supported. Applying combined
 predicates post-aggregation could cause rows that would normally be excluded
-from groups to be included::
+from groups to be included:
+
+.. code-block:: pycon
 
     >>> qs = Movie.objects.annotate(
     >>>     category_rank=Window(
@@ -878,7 +906,9 @@ ordinary sequence of rows.
 
         This attribute is set to ``'ROWS'``.
 
-Both classes return SQL with the template::
+Both classes return SQL with the template:
+
+.. code-block:: sql
 
     %(frame_type)s BETWEEN %(start)s AND %(end)s
 
@@ -909,7 +939,9 @@ includes both the ``start`` and ``end`` points, this may be expressed with::
 
 If a movie's "peers" are described as movies released by the same studio in the
 same genre in the same year, this ``RowRange`` example annotates each movie
-with the average rating of a movie's two prior and two following peers::
+with the average rating of a movie's two prior and two following peers:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, F, RowRange, Window
     >>> Movie.objects.annotate(
@@ -925,7 +957,9 @@ If the database supports it, you can specify the start and end points based on
 values of an expression in the partition. If the ``released`` field of the
 ``Movie`` model stores the release month of each movies, this ``ValueRange``
 example annotates each movie with the average rating of a movie's peers
-released between twelve months before and twelve months after the each movie::
+released between twelve months before and twelve months after the each movie:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
@@ -1012,7 +1046,9 @@ calling the appropriate methods on the wrapped expression.
 
     .. method:: get_source_expressions()
 
-        Returns an ordered list of inner expressions. For example::
+        Returns an ordered list of inner expressions. For example:
+
+        .. code-block:: pycon
 
           >>> Sum(F('foo')).get_source_expressions()
           [F('foo')]
@@ -1170,7 +1206,9 @@ to play nice with other query expressions::
     def set_source_expressions(self, expressions):
         self.expressions = expressions
 
-Let's see how it works::
+Let's see how it works:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F, Value, CharField
     >>> qs = Company.objects.annotate(

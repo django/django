@@ -48,7 +48,9 @@ objects that have an ``output_field`` that is a
 :class:`~django.db.models.BooleanField`. The result is provided using the
 ``then`` keyword.
 
-Some examples::
+Some examples:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F, Q, When
     >>> # String arguments refer to fields; the following two examples are equivalent:
@@ -83,7 +85,9 @@ Keep in mind that each of these values can be an expression.
     Since the ``then`` keyword argument is reserved for the result of the
     ``When()``, there is a potential conflict if a
     :class:`~django.db.models.Model` has a field named ``then``. This can be
-    resolved in two ways::
+    resolved in two ways:
+
+    .. code-block:: pycon
 
         >>> When(then__exact=0, then=1)
         >>> When(Q(then=0), then=1)
@@ -99,7 +103,9 @@ A ``Case()`` expression is like the :keyword:`if` ... :keyword:`elif` ...
 truthful value. The ``result`` expression from the matching ``When()`` object
 is returned.
 
-An example::
+An example:
+
+.. code-block:: pycon
 
     >>>
     >>> from datetime import date, timedelta
@@ -133,7 +139,9 @@ argument is returned. If a ``default`` argument isn't provided, ``None`` is
 used.
 
 If we wanted to change our previous query to get the discount based on how long
-the ``Client`` has been with us, we could do so using lookups::
+the ``Client`` has been with us, we could do so using lookups:
+
+.. code-block:: pycon
 
     >>> a_month_ago = date.today() - timedelta(days=30)
     >>> a_year_ago = date.today() - timedelta(days=365)
@@ -156,7 +164,9 @@ the ``Client`` has been with us, we could do so using lookups::
 
 ``Case()`` also works in a ``filter()`` clause. For example, to find gold
 clients that registered more than a month ago and platinum clients that
-registered more than a year ago::
+registered more than a year ago:
+
+.. code-block:: pycon
 
     >>> a_month_ago = date.today() - timedelta(days=30)
     >>> a_year_ago = date.today() - timedelta(days=365)
@@ -180,7 +190,9 @@ Conditional update
 
 Let's say we want to change the ``account_type`` for our clients to match
 their registration dates. We can do this using a conditional expression and the
-:meth:`~django.db.models.query.QuerySet.update` method::
+:meth:`~django.db.models.query.QuerySet.update` method:
+
+.. code-block:: pycon
 
     >>> a_month_ago = date.today() - timedelta(days=30)
     >>> a_year_ago = date.today() - timedelta(days=365)
@@ -204,7 +216,9 @@ Conditional aggregation
 
 What if we want to find out how many clients there are for each
 ``account_type``? We can use the ``filter`` argument of :ref:`aggregate
-functions <aggregation-functions>` to achieve this::
+functions <aggregation-functions>` to achieve this:
+
+.. code-block:: pycon
 
     >>> # Create some more Clients first so we can have something to count
     >>> Client.objects.create(
@@ -255,7 +269,9 @@ Conditional filter
 
 When a conditional expression returns a boolean value, it is possible to use it
 directly in filters. This means that it will not be added to the ``SELECT``
-columns, but you can still use it to filter results::
+columns, but you can still use it to filter results:
+
+.. code-block:: pycon
 
     >>> non_unique_account_type = Client.objects.filter(
     ...     account_type=OuterRef('account_type'),

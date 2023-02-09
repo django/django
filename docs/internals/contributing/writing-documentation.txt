@@ -192,11 +192,15 @@ documentation:
   good reason.
 
 * The main thing to keep in mind as you write and edit docs is that the
-  more semantic markup you can add the better. So::
+  more semantic markup you can add the better. So:
+
+  .. code-block:: rst
 
       Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
 
-  Isn't nearly as helpful as::
+  Isn't nearly as helpful as:
+
+  .. code-block:: rst
 
       Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
@@ -219,7 +223,9 @@ documentation:
 * To improve readability, use ``.. admonition:: Descriptive title`` rather than
   ``.. note::``. Use these boxes sparingly.
 
-* Use these heading styles::
+* Use these heading styles:
+
+  .. code-block:: rst
 
     ===
     One
@@ -258,44 +264,58 @@ Django-specific markup
 Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Django's docs
 define some extra description units:
 
-* Settings::
+* Settings:
+
+  .. code-block:: rst
 
         .. setting:: INSTALLED_APPS
 
   To link to a setting, use ``:setting:`INSTALLED_APPS```.
 
-* Template tags::
+* Template tags:
+
+  .. code-block:: rst
 
         .. templatetag:: regroup
 
   To link, use ``:ttag:`regroup```.
 
-* Template filters::
+* Template filters:
+
+  .. code-block:: rst
 
         .. templatefilter:: linebreaksbr
 
   To link, use ``:tfilter:`linebreaksbr```.
 
-* Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``)::
+* Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``):
+
+  .. code-block:: rst
 
         .. fieldlookup:: exact
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands::
+* ``django-admin`` commands:
+
+  .. code-block:: rst
 
         .. django-admin:: migrate
 
   To link, use ``:djadmin:`migrate```.
 
-* ``django-admin`` command-line options::
+* ``django-admin`` command-line options:
+
+  .. code-block:: rst
 
         .. django-admin-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).
 
-* Links to Trac tickets (typically reserved for patch release notes)::
+* Links to Trac tickets (typically reserved for patch release notes):
+
+  .. code-block:: rst
 
         :ticket:`12345`
 
@@ -304,7 +324,9 @@ command-line examples involving ``django-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
-For example, you can replace this fragment::
+For example, you can replace this fragment:
+
+.. code-block:: rst
 
     use this command:
 
@@ -312,7 +334,9 @@ For example, you can replace this fragment::
 
         $ python manage.py shell
 
-with this one::
+with this one:
+
+.. code-block:: rst
 
     use this command:
 
@@ -368,7 +392,9 @@ In other words, since we only keep these annotations around for two releases,
 it's nice to be able to remove the annotation and its contents without having
 to reflow, reindent, or edit the surrounding text. For example, instead of
 putting the entire description of a new or changed feature in a block, do
-something like this::
+something like this:
+
+.. code-block:: rst
 
     .. class:: Author(first_name, last_name, middle_name=None)
 
@@ -392,7 +418,9 @@ redundant to do so as these annotations render as "New in Django A.B:" and
 "Changed in Django A.B", respectively.
 
 If a function, attribute, etc. is added, it's also okay to use a
-``versionadded`` annotation like this::
+``versionadded`` annotation like this:
+
+.. code-block:: rst
 
     .. attribute:: Author.middle_name
 

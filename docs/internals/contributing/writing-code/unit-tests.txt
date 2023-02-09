@@ -396,13 +396,17 @@ Ensure you have the latest point release of a :ref:`supported Python version
 that may cause the test suite to fail or hang.
 
 On **macOS** (High Sierra and newer versions), you might see this message
-logged, after which the tests hang::
+logged, after which the tests hang:
+
+.. code-block:: pytb
 
     objc[42074]: +[__NSPlaceholderDate initialize] may have been in progress in
     another thread when fork() was called.
 
 To avoid this set a ``OBJC_DISABLE_INITIALIZE_FORK_SAFETY`` environment
-variable, for example::
+variable, for example:
+
+.. code-block:: shell
 
     $ OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ./runtests.py
 
@@ -514,8 +518,6 @@ this purpose.
 
 Tips for writing tests
 ======================
-
-.. highlight:: python
 
 Isolating model registration
 ----------------------------

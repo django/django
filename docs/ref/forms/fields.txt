@@ -20,7 +20,9 @@ you can also instantiate them and use them directly to get a better idea of
 how they work. Each ``Field`` instance has a ``clean()`` method, which takes
 a single argument and either raises a
 ``django.core.exceptions.ValidationError`` exception or returns the clean
-value::
+value:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> f = forms.EmailField()
@@ -47,7 +49,9 @@ should *always* be accepted:
 
 By default, each ``Field`` class assumes the value is required, so if you pass
 an empty value -- either ``None`` or the empty string (``""``) -- then
-``clean()`` will raise a ``ValidationError`` exception::
+``clean()`` will raise a ``ValidationError`` exception:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> f = forms.CharField()
@@ -71,7 +75,9 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     'False'
 
 To specify that a field is *not* required, pass ``required=False`` to the
-``Field`` constructor::
+``Field`` constructor:
+
+.. code-block:: pycon
 
     >>> f = forms.CharField(required=False)
     >>> f.clean('foo')
@@ -112,7 +118,9 @@ spaces and upper-casing the first letter. Specify ``label`` if that default
 behavior doesn't result in an adequate label.
 
 Here's a full example ``Form`` that implements ``label`` for two of its fields.
-We've specified ``auto_id=False`` to simplify the output::
+We've specified ``auto_id=False`` to simplify the output:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
@@ -131,7 +139,9 @@ We've specified ``auto_id=False`` to simplify the output::
 .. attribute:: Field.label_suffix
 
 The ``label_suffix`` argument lets you override the form's
-:attr:`~django.forms.Form.label_suffix` on a per-field basis::
+:attr:`~django.forms.Form.label_suffix` on a per-field basis:
+
+.. code-block:: pycon
 
     >>> class ContactForm(forms.Form):
     ...     age = forms.IntegerField()
@@ -154,7 +164,9 @@ rendering this ``Field`` in an unbound ``Form``.
 To specify dynamic initial data, see the :attr:`Form.initial` parameter.
 
 The use-case for this is when you want to display an "empty" form in which a
-field is initialized to a particular value. For example::
+field is initialized to a particular value. For example:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
@@ -169,7 +181,9 @@ field is initialized to a particular value. For example::
 
 You may be thinking, why not just pass a dictionary of the initial values as
 data when displaying the form? Well, if you do that, you'll trigger validation,
-and the HTML output will include any validation errors::
+and the HTML output will include any validation errors:
+
+.. code-block:: pycon
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField()
@@ -187,7 +201,9 @@ forms, the HTML output will use the bound data.
 
 Also note that ``initial`` values are *not* used as "fallback" data in
 validation if a particular field's value is not given. ``initial`` values are
-*only* intended for initial form display::
+*only* intended for initial form display:
+
+.. code-block:: pycon
 
     >>> class CommentForm(forms.Form):
     ...     name = forms.CharField(initial='Your name')
@@ -201,7 +217,9 @@ validation if a particular field's value is not given. ``initial`` values are
     >>> f.errors
     {'url': ['This field is required.'], 'name': ['This field is required.']}
 
-Instead of a constant, you can also pass any callable::
+Instead of a constant, you can also pass any callable:
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> class DateForm(forms.Form):
@@ -233,7 +251,9 @@ Like the model field's :attr:`~django.db.models.Field.help_text`, this value
 isn't HTML-escaped in automatically-generated forms.
 
 Here's a full example ``Form`` that implements ``help_text`` for two of its
-fields. We've specified ``auto_id=False`` to simplify the output::
+fields. We've specified ``auto_id=False`` to simplify the output:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
@@ -265,7 +285,9 @@ fields. We've specified ``auto_id=False`` to simplify the output::
 
 The ``error_messages`` argument lets you override the default messages that the
 field will raise. Pass in a dictionary with keys matching the error messages you
-want to override. For example, here is the default error message::
+want to override. For example, here is the default error message:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> generic = forms.CharField()
@@ -274,7 +296,9 @@ want to override. For example, here is the default error message::
       ...
     ValidationError: ['This field is required.']
 
-And here is a custom error message::
+And here is a custom error message:
+
+.. code-block:: pycon
 
     >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
     >>> name.clean('')
@@ -463,15 +487,15 @@ For each field, we describe the default widget used if you don't specify
 
     The field always accepts strings in ISO 8601 formatted dates or similar
     recognized by :func:`~django.utils.dateparse.parse_datetime`. Some examples
-    are::
+    are:
 
-        * '2006-10-25 14:30:59'
-        * '2006-10-25T14:30:59'
-        * '2006-10-25 14:30'
-        * '2006-10-25T14:30'
-        * '2006-10-25T14:30Z'
-        * '2006-10-25T14:30+02:00'
-        * '2006-10-25'
+    * ``'2006-10-25 14:30:59'``
+    * ``'2006-10-25T14:30:59'``
+    * ``'2006-10-25 14:30'``
+    * ``'2006-10-25T14:30'``
+    * ``'2006-10-25T14:30Z'``
+    * ``'2006-10-25T14:30+02:00'``
+    * ``'2006-10-25'``
 
     If no ``input_formats`` argument is provided, the default input formats are
     taken from the active locale format ``DATETIME_INPUT_FORMATS`` and
@@ -723,7 +747,9 @@ For each field, we describe the default widget used if you don't specify
     non-image data attributes, such as ``format``, ``height``, and ``width``,
     are available, methods that access the underlying image data, such as
     ``getdata()`` or ``getpixel()``, cannot be used without reopening the file.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> from PIL import Image
         >>> from django import forms

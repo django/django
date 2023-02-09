@@ -249,7 +249,9 @@ the ``.name`` and ``.value`` properties on the members.
 
 If you don't need to have the human-readable names translated, you can have
 them inferred from the member name (replacing underscores with spaces and using
-title-case)::
+title-case):
+
+.. code-block:: pycon
 
     >>> class Vehicle(models.TextChoices):
     ...     CAR = 'C'
@@ -274,7 +276,9 @@ Django provides an ``IntegerChoices`` class. For example::
 
 It is also possible to make use of the `Enum Functional API
 <https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
-that labels are automatically generated as highlighted above::
+that labels are automatically generated as highlighted above:
+
+.. code-block:: pycon
 
     >>> MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
     >>> MedalType.choices
@@ -1597,7 +1601,9 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     ``Artist`` can be deleted even if that implies deleting an ``Album``
     which is referenced by a ``Song``, because ``Song`` also references
-    ``Artist`` itself through a cascading relationship. For example::
+    ``Artist`` itself through a cascading relationship. For example:
+
+    .. code-block:: pycon
 
         >>> artist_one = Artist.objects.create(name='artist one')
         >>> artist_two = Artist.objects.create(name='artist two')
@@ -2025,7 +2031,9 @@ With the following example::
             related_name='supervisor_of',
         )
 
-your resulting ``User`` model will have the following attributes::
+your resulting ``User`` model will have the following attributes:
+
+.. code-block:: pycon
 
     >>> user = User.objects.get(pk=1)
     >>> hasattr(user, 'myspecialuser')

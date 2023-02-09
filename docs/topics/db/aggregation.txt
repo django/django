@@ -44,7 +44,9 @@ Cheat sheet
 ===========
 
 In a hurry? Here's how to do common aggregate queries, assuming the models
-above::
+above:
+
+.. code-block:: pycon
 
     # Total number of books.
     >>> Book.objects.count()
@@ -102,19 +104,25 @@ Generating aggregates over a ``QuerySet``
 Django provides two ways to generate aggregates. The first way is to generate
 summary values over an entire ``QuerySet``. For example, say you wanted to
 calculate the average price of all books available for sale. Django's query
-syntax provides a means for describing the set of all books::
+syntax provides a means for describing the set of all books:
+
+.. code-block:: pycon
 
     >>> Book.objects.all()
 
 What we need is a way to calculate summary values over the objects that
 belong to this ``QuerySet``. This is done by appending an ``aggregate()``
-clause onto the ``QuerySet``::
+clause onto the ``QuerySet``:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg
     >>> Book.objects.all().aggregate(Avg('price'))
     {'price__avg': 34.35}
 
-The ``all()`` is redundant in this example, so this could be simplified to::
+The ``all()`` is redundant in this example, so this could be simplified to:
+
+.. code-block:: pycon
 
     >>> Book.objects.aggregate(Avg('price'))
     {'price__avg': 34.35}
@@ -129,14 +137,18 @@ returns a dictionary of name-value pairs. The name is an identifier for the
 aggregate value; the value is the computed aggregate. The name is
 automatically generated from the name of the field and the aggregate function.
 If you want to manually specify a name for the aggregate value, you can do so
-by providing that name when you specify the aggregate clause::
+by providing that name when you specify the aggregate clause:
+
+.. code-block:: pycon
 
     >>> Book.objects.aggregate(average_price=Avg('price'))
     {'average_price': 34.35}
 
 If you want to generate more than one aggregate, you add another argument to
 the ``aggregate()`` clause. So, if we also wanted to know the maximum and
-minimum price of all books, we would issue the query::
+minimum price of all books, we would issue the query:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, Max, Min
     >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
@@ -159,7 +171,9 @@ specified values.
 The syntax for these annotations is identical to that used for the
 :meth:`~.QuerySet.aggregate` clause. Each argument to ``annotate()`` describes
 an aggregate that is to be calculated. For example, to annotate books with the
-number of authors::
+number of authors:
+
+.. code-block:: pycon
 
     # Build an annotated queryset
     >>> from django.db.models import Count
@@ -178,7 +192,9 @@ number of authors::
 As with ``aggregate()``, the name for the annotation is automatically derived
 from the name of the aggregate function and the name of the field being
 aggregated. You can override this default name by providing an alias when you
-specify the annotation::
+specify the annotation:
+
+.. code-block:: pycon
 
     >>> q = Book.objects.annotate(num_authors=Count('authors'))
     >>> q[0].num_authors
@@ -239,7 +255,9 @@ filters. Django will then handle any table joins that are required to retrieve
 and aggregate the related value.
 
 For example, to find the price range of books offered in each store,
-you could use the annotation::
+you could use the annotation:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Max, Min
     >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
@@ -250,13 +268,17 @@ price field of the book model to produce a minimum and maximum value.
 
 The same rules apply to the ``aggregate()`` clause. If you wanted to
 know the lowest and highest price of any book that is available for sale
-in any of the stores, you could use the aggregate::
+in any of the stores, you could use the aggregate:
+
+.. code-block:: pycon
 
     >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Max('books__price'))
 
 Join chains can be as deep as you require. For example, to extract the
 age of the youngest author of any book available for sale, you could
-issue the query::
+issue the query:
+
+.. code-block:: pycon
 
     >>> Store.objects.aggregate(youngest_age=Min('books__authors__age'))
 
@@ -270,7 +292,9 @@ of related models and double-underscores are used here too.
 
 For example, we can ask for all publishers, annotated with their respective
 total book stock counters (note how we use ``'book'`` to specify the
-``Publisher`` -> ``Book`` reverse foreign key hop)::
+``Publisher`` -> ``Book`` reverse foreign key hop):
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, Count, Min, Sum
     >>> Publisher.objects.annotate(Count('book'))
@@ -278,7 +302,9 @@ total book stock counters (note how we use ``'book'`` to specify the
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
 called ``book__count``.)
 
-We can also ask for the oldest book of any of those managed by every publisher::
+We can also ask for the oldest book of any of those managed by every publisher:
+
+.. code-block:: pycon
 
     >>> Publisher.objects.aggregate(oldest_pubdate=Min('book__pubdate'))
 
@@ -288,7 +314,9 @@ such alias were specified, it would be the rather long ``'book__pubdate__min'``.
 This doesn't apply just to foreign keys. It also works with many-to-many
 relations. For example, we can ask for every author, annotated with the total
 number of pages considering all the books the author has (co-)authored (note how we
-use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop)::
+use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop):
+
+.. code-block:: pycon
 
     >>> Author.objects.annotate(total_pages=Sum('book__pages'))
 
@@ -297,7 +325,9 @@ called ``total_pages``. If no such alias were specified, it would be the rather
 long ``book__pages__sum``.)
 
 Or ask for the average rating of all the books written by author(s) we have on
-file::
+file:
+
+.. code-block:: pycon
 
     >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
 
@@ -317,7 +347,9 @@ constraining the objects that are considered for aggregation.
 When used with an ``annotate()`` clause, a filter has the effect of
 constraining the objects for which an annotation is calculated. For example,
 you can generate an annotated list of all books that have a title starting
-with "Django" using the query::
+with "Django" using the query:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, Count
     >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
@@ -325,7 +357,9 @@ with "Django" using the query::
 When used with an ``aggregate()`` clause, a filter has the effect of
 constraining the objects over which the aggregate is calculated.
 For example, you can generate the average price of all books with a
-title that starts with "Django" using the query::
+title that starts with "Django" using the query:
+
+.. code-block:: pycon
 
     >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
 
@@ -339,7 +373,9 @@ used in ``filter()`` and ``exclude()`` clauses in the same way as any other
 model field.
 
 For example, to generate a list of books that have more than one author,
-you can issue the query::
+you can issue the query:
+
+.. code-block:: pycon
 
     >>> Book.objects.annotate(num_authors=Count('authors')).filter(num_authors__gt=1)
 
@@ -348,7 +384,9 @@ based upon that annotation.
 
 If you need two annotations with two separate filters you can use the
 ``filter`` argument with any aggregate. For example, to generate a list of
-authors with a count of highly rated books::
+authors with a count of highly rated books:
+
+.. code-block:: pycon
 
     >>> highly_rated = Count('book', filter=Q(book__rating__gte=7))
     >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
@@ -381,7 +419,9 @@ Given:
 * Publisher B has two books with ratings 1 and 4.
 * Publisher C has one book with rating 1.
 
-Here's an example with the ``Count`` aggregate::
+Here's an example with the ``Count`` aggregate:
+
+.. code-block:: pycon
 
     >>> a, b = Publisher.objects.annotate(num_books=Count('book', distinct=True)).filter(book__rating__gt=3.0)
     >>> a, a.num_books
@@ -406,7 +446,9 @@ The second query counts the number of books that have a rating exceeding 3.0
 for each publisher. The filter precedes the annotation, so the filter
 constrains the objects considered when calculating the annotation.
 
-Here's another example with the ``Avg`` aggregate::
+Here's another example with the ``Avg`` aggregate:
+
+.. code-block:: pycon
 
     >>> a, b = Publisher.objects.annotate(avg_rating=Avg('book__rating')).filter(book__rating__gt=3.0)
     >>> a, a.avg_rating
@@ -437,7 +479,9 @@ define an ``order_by()`` clause, the aggregates you provide can reference
 any alias defined as part of an ``annotate()`` clause in the query.
 
 For example, to order a ``QuerySet`` of books by the number of authors
-that have contributed to the book, you could use the following query::
+that have contributed to the book, you could use the following query:
+
+.. code-block:: pycon
 
     >>> Book.objects.annotate(num_authors=Count('authors')).order_by('num_authors')
 
@@ -462,7 +506,9 @@ rating of books written by each author:
 This will return one result for each author in the database, annotated with
 their average book rating.
 
-However, the result will be slightly different if you use a ``values()`` clause::
+However, the result will be slightly different if you use a ``values()`` clause:
+
+.. code-block:: pycon
 
     >>> Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
 
@@ -486,7 +532,9 @@ the ``values()`` clause only constrains the fields that are generated on
 output.
 
 For example, if we reverse the order of the ``values()`` and ``annotate()``
-clause from our previous example::
+clause from our previous example:
+
+.. code-block:: pycon
 
     >>> Author.objects.annotate(average_rating=Avg('book__rating')).values('name', 'average_rating')
 
@@ -563,7 +611,9 @@ any alias defined as part of an ``annotate()`` clause in the query.
 
 For example, if you wanted to calculate the average number of authors per
 book you first annotate the set of books with the author count, then
-aggregate that author count, referencing the annotation field::
+aggregate that author count, referencing the annotation field:
+
+.. code-block:: pycon
 
     >>> from django.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))

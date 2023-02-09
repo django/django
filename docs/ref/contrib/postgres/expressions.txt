@@ -22,7 +22,9 @@ in the way that it does not act as an aggregate function and does not require
 an SQL ``GROUP BY`` clause to build the list of values.
 
 For example, if you want to annotate all related books to an author as JSON
-objects::
+objects:
+
+.. code-block:: pycon
 
     >>> from django.db.models import OuterRef
     >>> from django.db.models.functions import JSONObject

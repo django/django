@@ -856,7 +856,9 @@ Keyword Argument       Description
 __ https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
    spatial-concepts.html#GUID-CE10AB14-D5EA-43BA-A647-DAC9EEF41EE6
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.db.models import Extent, Union
     >>> WorldBorder.objects.aggregate(Extent('mpoly'), Union('mpoly'))
@@ -886,7 +888,9 @@ Oracle, SpatiaLite
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
     >>> print(qs['poly__extent'])
@@ -903,7 +907,9 @@ Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
 comprising the lower left coordinate and upper right coordinate (each with x, y,
 and z coordinates).
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
     >>> print(qs['poly__extent3d'])
@@ -920,7 +926,9 @@ SpatiaLite
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(MakeLine('poly'))
     >>> print(qs['poly__makeline'])
@@ -944,7 +952,9 @@ large querysets.
     If the computation time for using this method is too expensive, consider
     using :class:`Collect` instead.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
     >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
