@@ -45,7 +45,7 @@ Django's signing methods live in the ``django.core.signing`` module.
 To sign a value, first instantiate a ``Signer`` instance::
 
     >>> from django.core.signing import Signer
-    >>> signer = Signer()
+    >>> signer = Signer(salt='purpose.specific.salt')
     >>> value = signer.sign('My string')
     >>> value
     'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
@@ -111,20 +111,25 @@ generate signatures. You can use a different secret by passing it to the
 
         Support for passing positional arguments is deprecated.
 
-Using the ``salt`` argument
----------------------------
+.. _understanding-signing-salt:
 
-If you do not wish for every occurrence of a particular string to have the same
-signature hash, you can use the optional ``salt`` argument to the ``Signer``
-class. Using a salt will seed the signing hash function with both the salt and
-your :setting:`SECRET_KEY`::
+Understanding and using the ``salt`` argument
+---------------------------------------------
 
-    >>> signer = Signer()
+Every different purpose for which you use signing should either have a
+different secret (which is passed as the first argument to ``Signer`` and is
+equal to :setting:`SECRET_KEY` by default), or use a unique ``salt`` argument
+or both.
+
+Using a salt will seed the signing hash function with both the salt and
+your secret::
+
+    >>> signer = Signer(salt='myproject.purpose1')
     >>> signer.sign('My string')
     'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
     >>> signer.sign_object({'message': 'Hello!'})
     'eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4'
-    >>> signer = Signer(salt='extra')
+    >>> signer = Signer(salt='myproject.purpose2')
     >>> signer.sign('My string')
     'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
     >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
@@ -139,11 +144,66 @@ namespaces.  A signature that comes from one namespace (a particular salt
 value) cannot be used to validate the same plaintext string in a different
 namespace that is using a different salt setting. The result is to prevent an
 attacker from using a signed string generated in one place in the code as input
-to another piece of code that is generating (and verifying) signatures using a
-different salt.
+to another piece of code that is generating (and verifying) signatures for a
+different purpose or in a different context.
 
 Unlike your :setting:`SECRET_KEY`, your salt argument does not need to stay
 secret.
+
+In addition to using salt values, you should think carefully about the value
+you are signing, and how it might be re-used by an attacker.
+
+For example, suppose you are an insurance company, and give a user a quote for
+home insurance of $20/month. You send the user a signed value generated as
+follows, perhaps stored in a cookie:
+
+::
+
+    >>> signer = Signer(salt='acmeinsurance.quotes')
+    >>> signer.sign("20")
+
+
+There are multiple issues with this:
+
+1. It has no time limit or timestamp, so the value can be used forever.
+
+2. We are simply signing the string ``"20"`` which is very ambiguous in
+   meaning. You might also sell car insurance, and an attacker would be able to
+   take this signed value that was intended for home insurance and re-use it to
+   get cheap car insurance. Or they might re-use it for a completely different
+   house, or re-use it in a context where it means a yearly amount, rather than
+   a monthly amount.
+
+3. There is no scoping to the user. The user could take this signed value and
+   share it with a friend, who would also be able to use it on your site.
+
+The answers to these problems are:
+
+- Use :class:`~TimestampSigner`, or build an expiration timestamp into the
+  value that you sign, which you check later.
+
+- Use a more specific salt.
+
+- Instead of signing simple values without context, sign complex objects that
+  express more completely what you want to sign - “we offer the user with email
+  address ``user@example.com`` home insurance for 123 Main St, for the price of
+  20 dollars a month, valid until 2022-05-01”::
+
+    >>> signer = Signer(salt="acmeinsurance.quotes.home_insurance")
+    >>> signer.sign_object({
+    ...    'user_email': 'user@example.com',
+    ...    'address': '123 Main St, 9980-999',
+    ...    'amount': 20,
+    ...    'unit': 'dollars',
+    ...    'period': 'month',
+    ...    'valid_until': '2022-05-01',
+    ... })
+
+- Make sure you use or check each part of the value returned after calling
+  ``unsign``, rather than assuming it matches what you expect.
+
+- Instead of doing this at all, store the values in the database and give
+  the user just a reference.
 
 Verifying timestamped values
 ----------------------------
@@ -154,7 +214,7 @@ created within a specified period of time::
 
     >>> from datetime import timedelta
     >>> from django.core.signing import TimestampSigner
-    >>> signer = TimestampSigner()
+    >>> signer = TimestampSigner(salt='purpose.specific.salt')
     >>> value = signer.sign('hello')
     >>> value
     'hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c'
@@ -209,16 +269,16 @@ These use JSON serialization under the hood. JSON ensures that even if your
 arbitrary commands by exploiting the pickle format::
 
     >>> from django.core import signing
-    >>> signer = signing.TimestampSigner()
+    >>> signer = signing.TimestampSigner(salt='myproject.purpose1')
     >>> value = signer.sign_object({'foo': 'bar'})
     >>> value
     'eyJmb28iOiJiYXIifQ:1kx6R3:D4qGKiptAqo5QW9iv4eNLc6xl4RwiFfes6oOcYhkYnc'
     >>> signer.unsign_object(value)
     {'foo': 'bar'}
-    >>> value = signing.dumps({'foo': 'bar'})
+    >>> value = signing.dumps({'foo': 'bar'}, salt='myproject.purpose1')
     >>> value
     'eyJmb28iOiJiYXIifQ:1kx6Rf:LBB39RQmME-SRvilheUe5EmPYRbuDBgQp2tCAi7KGLk'
-    >>> signing.loads(value)
+    >>> signing.loads(value, salt='myproject.purpose1')
     {'foo': 'bar'}
 
 Because of the nature of JSON (there is no native distinction between lists

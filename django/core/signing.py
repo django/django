@@ -3,7 +3,7 @@ Functions for creating and restoring url-safe signed JSON objects.
 
 The format used looks like this:
 
->>> signing.dumps("hello")
+>>> signing.dumps("hello", salt="purpose1")
 'ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk'
 
 There are two components here, separated by a ':'. The first component is a
@@ -13,9 +13,9 @@ component is a base64 encoded hmac/SHA-256 hash of "$first_component:$secret"
 signing.loads(s) checks the signature and returns the deserialized object.
 If the signature fails, a BadSignature exception is raised.
 
->>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv422nZA4sgmk", salt="purpose1")
 'hello'
->>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified")
+>>> signing.loads("ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified", salt="purpose1")
 ...
 BadSignature: Signature "ImhlbGxvIg:1QaUZC:YIye-ze3TTx7gtSv42-modified" does not match
 
@@ -23,7 +23,7 @@ You can optionally compress the JSON prior to base64 encoding it to save
 space, using the compress=True argument. This checks if compression actually
 helps and only applies compression if the result is a shorter string:
 
->>> signing.dumps(list(range(1, 20)), compress=True)
+>>> signing.dumps(list(range(1, 20)), salt="purpose1", compress=True)
 '.eJwFwcERACAIwLCF-rCiILN47r-GyZVJsNgkxaFxoDgxcOHGxMKD_T7vhAml:1QaUaL:BA0thEZrp4FQVXIXuOvYJtLJSrQ'
 
 The fact that the string is compressed is signalled by the prefixed '.' at the

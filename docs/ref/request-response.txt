@@ -375,11 +375,12 @@ Methods
     no longer valid. If you provide the ``default`` argument the exception
     will be suppressed and that default value will be returned instead.
 
-    The optional ``salt`` argument can be used to provide extra protection
-    against brute force attacks on your secret key. If supplied, the
-    ``max_age`` argument will be checked against the signed timestamp
-    attached to the cookie value to ensure the cookie is not older than
-    ``max_age`` seconds.
+    The optional ``salt`` argument must be the same value used for the
+    corresponding :meth:`~HttpResponse.set_signed_cookie` call.
+
+    If supplied, the ``max_age`` argument will be checked against the signed
+    timestamp attached to the cookie value to ensure the cookie is not older
+    than ``max_age`` seconds.
 
     For example::
 
@@ -895,12 +896,16 @@ Methods
 
 .. method:: HttpResponse.set_signed_cookie(key, value, salt='', max_age=None, expires=None, path='/', domain=None, secure=False, httponly=False, samesite=None)
 
-    Like :meth:`~HttpResponse.set_cookie()`, but
-    :doc:`cryptographic signing </topics/signing>` the cookie before setting
-    it. Use in conjunction with :meth:`HttpRequest.get_signed_cookie`.
-    You can use the optional ``salt`` argument for added key strength, but
-    you will need to remember to pass it to the corresponding
-    :meth:`HttpRequest.get_signed_cookie` call.
+    Like :meth:`~HttpResponse.set_cookie()`, but uses :doc:`cryptographic
+    signing </topics/signing>` on the cookie value before setting it. Use in
+    conjunction with :meth:`HttpRequest.get_signed_cookie`.
+
+    The ``key`` is used to generate the signature, to stop attackers re-using a
+    value signed for one key as a valid value for a different key. In addition,
+    it is helpful to use a unique ``salt`` argument for every different purpose
+    you use signed cookies for. See :ref:`understanding-signing-salt` for more
+    details. You will need to remember to pass the same ``salt`` value to the
+    corresponding :meth:`HttpRequest.get_signed_cookie` call.
 
 .. method:: HttpResponse.delete_cookie(key, path='/', domain=None, samesite=None)
 
