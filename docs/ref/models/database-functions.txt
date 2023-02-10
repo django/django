@@ -1738,16 +1738,16 @@ more frequently.
 
 .. class:: PercentRank(*expressions, **extra)
 
-Computes the percentile rank of the rows in the frame clause. This
-computation is equivalent to evaluating::
+Computes the relative rank of the rows in the frame clause. This computation is
+equivalent to evaluating::
 
     (rank - 1) / (total rows - 1)
 
-The following table explains the calculation for the percentile rank of a row:
+The following table explains the calculation for the relative rank of a row:
 
-===== ===== ==== ============ ============
-Row # Value Rank Calculation  Percent Rank
-===== ===== ==== ============ ============
+===== ===== ==== ============ =============
+Row # Value Rank Calculation  Relative Rank
+===== ===== ==== ============ =============
 1     15    1    (1-1)/(7-1)  0.0000
 2     20    2    (2-1)/(7-1)  0.1666
 3     20    2    (2-1)/(7-1)  0.1666
@@ -1755,7 +1755,7 @@ Row # Value Rank Calculation  Percent Rank
 5     30    5    (5-1)/(7-1)  0.6666
 6     30    5    (5-1)/(7-1)  0.6666
 7     40    7    (7-1)/(7-1)  1.0000
-===== ===== ==== ============ ============
+===== ===== ==== ============ =============
 
 ``Rank``
 --------
