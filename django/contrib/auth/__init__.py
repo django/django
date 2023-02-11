@@ -1,6 +1,8 @@
 import inspect
 import re
 
+from asgiref.sync import sync_to_async
+
 from django.apps import apps as django_apps
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -91,6 +93,12 @@ def authenticate(request=None, **credentials):
     )
 
 
+@sensitive_variables("credentials")
+async def aauthenticate(request=None, **credentials):
+    """See authenticate()."""
+    return await sync_to_async(authenticate)(request, **credentials)
+
+
 def login(request, user, backend=None):
     """
     Persist a user id and a backend in the request. This way a user doesn't
@@ -144,6 +152,11 @@ def login(request, user, backend=None):
     user_logged_in.send(sender=user.__class__, request=request, user=user)
 
 
+async def alogin(request, user, backend=None):
+    """See login()."""
+    return await sync_to_async(login)(request, user, backend)
+
+
 def logout(request):
     """
     Remove the authenticated user's ID from the request and flush their session
@@ -160,6 +173,11 @@ def logout(request):
         from django.contrib.auth.models import AnonymousUser
 
         request.user = AnonymousUser()
+
+
+async def alogout(request):
+    """See logout()."""
+    return await sync_to_async(logout)(request)
 
 
 def get_user_model():
@@ -223,6 +241,11 @@ def get_user(request):
     return user or AnonymousUser()
 
 
+async def aget_user(request):
+    """See get_user()."""
+    return await sync_to_async(get_user)(request)
+
+
 def get_permission_codename(action, opts):
     """
     Return the codename of the permission for the specified action.
@@ -242,3 +265,8 @@ def update_session_auth_hash(request, user):
     request.session.cycle_key()
     if hasattr(user, "get_session_auth_hash") and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
+
+
+async def aupdate_session_auth_hash(request, user):
+    """See update_session_auth_hash()."""
+    return await sync_to_async(update_session_auth_hash)(request, user)

@@ -150,6 +150,12 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   600,000 to 720,000.
 
+* The new asynchronous functions are now provided, using an
+  ``a`` prefix: :func:`django.contrib.auth.aauthenticate`,
+  :func:`~.django.contrib.auth.aget_user`,
+  :func:`~.django.contrib.auth.alogin`, :func:`~.django.contrib.auth.alogout`,
+  and :func:`~.django.contrib.auth.aupdate_session_auth_hash`.
+
 * ``AuthenticationMiddleware`` now adds an :meth:`.HttpRequest.auser`
   asynchronous method that returns the currently logged-in user.
 
@@ -366,7 +372,11 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :class:`~django.test.Client` and :class:`~django.test.AsyncClient` now
+  provide asynchronous methods, using an ``a`` prefix:
+  :meth:`~django.test.Client.asession`, :meth:`~django.test.Client.alogin`,
+  :meth:`~django.test.Client.aforce_login`, and
+  :meth:`~django.test.Client.alogout`.
 
 URLs
 ~~~~

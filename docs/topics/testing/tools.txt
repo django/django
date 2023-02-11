@@ -440,6 +440,9 @@ Use the ``django.test.Client`` class to make requests.
             The ``headers`` parameter was added.
 
     .. method:: Client.login(**credentials)
+    .. method:: Client.alogin(**credentials)
+
+        *Asynchronous version*: ``alogin()``
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`
         and you deal with logging in users, you can use the test client's
@@ -485,7 +488,14 @@ Use the ``django.test.Client`` class to make requests.
         :meth:`~django.contrib.auth.models.UserManager.create_user` helper
         method to create a new user with a correctly hashed password.
 
+        .. versionchanged:: 5.0
+
+            ``alogin()`` method was added.
+
     .. method:: Client.force_login(user, backend=None)
+    .. method:: Client.aforce_login(user, backend=None)
+
+        *Asynchronous version*: ``aforce_login()``
 
         If your site uses Django's :doc:`authentication
         system</topics/auth/index>`, you can use the ``force_login()`` method
@@ -509,7 +519,14 @@ Use the ``django.test.Client`` class to make requests.
         ``login()`` by :ref:`using a weaker hasher while testing
         <speeding-up-tests-auth-hashers>`.
 
+        .. versionchanged:: 5.0
+
+            ``aforce_login()`` method was added.
+
     .. method:: Client.logout()
+    .. method:: Client.alogout()
+
+        *Asynchronous version*: ``alogout()``
 
         If your site uses Django's :doc:`authentication system</topics/auth/index>`,
         the ``logout()`` method can be used to simulate the effect of a user
@@ -518,6 +535,10 @@ Use the ``django.test.Client`` class to make requests.
         After you call this method, the test client will have all the cookies
         and session data cleared to defaults. Subsequent requests will appear
         to come from an :class:`~django.contrib.auth.models.AnonymousUser`.
+
+        .. versionchanged:: 5.0
+
+            ``alogout()`` method was added.
 
 Testing responses
 -----------------
@@ -702,6 +723,13 @@ access these properties as part of a test condition.
             session = self.client.session
             session["somekey"] = "test"
             session.save()
+
+.. method:: Client.asession()
+
+    .. versionadded:: 5.0
+
+    This is similar to the :attr:`session` attribute but it works in async
+    contexts.
 
 Setting the language
 --------------------

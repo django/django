@@ -693,6 +693,9 @@ Utility functions
 .. currentmodule:: django.contrib.auth
 
 .. function:: get_user(request)
+.. function:: aget_user(request)
+
+    *Asynchronous version*: ``aget_user()``
 
     Returns the user model instance associated with the given ``request``’s
     session.
@@ -716,3 +719,7 @@ Utility functions
     .. versionchanged:: 4.1.8
 
         Fallback verification with :setting:`SECRET_KEY_FALLBACKS` was added.
+
+    .. versionchanged:: 5.0
+
+        ``aget_user()`` function was added.

@@ -747,6 +747,9 @@ class ClientMixin:
         self.cookies[settings.SESSION_COOKIE_NAME] = session.session_key
         return session
 
+    async def asession(self):
+        return await sync_to_async(lambda: self.session)()
+
     def login(self, **credentials):
         """
         Set the Factory to appear as if it has successfully logged into a site.
@@ -762,19 +765,35 @@ class ClientMixin:
             return True
         return False
 
+    async def alogin(self, **credentials):
+        """See login()."""
+        from django.contrib.auth import aauthenticate
+
+        user = await aauthenticate(**credentials)
+        if user:
+            await self._alogin(user)
+            return True
+        return False
+
     def force_login(self, user, backend=None):
-        def get_backend():
-            from django.contrib.auth import load_backend
-
-            for backend_path in settings.AUTHENTICATION_BACKENDS:
-                backend = load_backend(backend_path)
-                if hasattr(backend, "get_user"):
-                    return backend_path
-
         if backend is None:
-            backend = get_backend()
+            backend = self._get_backend()
         user.backend = backend
         self._login(user, backend)
+
+    async def aforce_login(self, user, backend=None):
+        if backend is None:
+            backend = self._get_backend()
+        user.backend = backend
+        await self._alogin(user, backend)
+
+    def _get_backend(self):
+        from django.contrib.auth import load_backend
+
+        for backend_path in settings.AUTHENTICATION_BACKENDS:
+            backend = load_backend(backend_path)
+            if hasattr(backend, "get_user"):
+                return backend_path
 
     def _login(self, user, backend=None):
         from django.contrib.auth import login
@@ -789,6 +808,26 @@ class ClientMixin:
         login(request, user, backend)
         # Save the session values.
         request.session.save()
+        self._set_login_cookies(request)
+
+    async def _alogin(self, user, backend=None):
+        from django.contrib.auth import alogin
+
+        # Create a fake request to store login details.
+        request = HttpRequest()
+        session = await self.asession()
+        if session:
+            request.session = session
+        else:
+            engine = import_module(settings.SESSION_ENGINE)
+            request.session = engine.SessionStore()
+
+        await alogin(request, user, backend)
+        # Save the session values.
+        await sync_to_async(request.session.save)()
+        self._set_login_cookies(request)
+
+    def _set_login_cookies(self, request):
         # Set the cookie to represent the session.
         session_cookie = settings.SESSION_COOKIE_NAME
         self.cookies[session_cookie] = request.session.session_key
@@ -813,6 +852,21 @@ class ClientMixin:
             engine = import_module(settings.SESSION_ENGINE)
             request.session = engine.SessionStore()
         logout(request)
+        self.cookies = SimpleCookie()
+
+    async def alogout(self):
+        """See logout()."""
+        from django.contrib.auth import aget_user, alogout
+
+        request = HttpRequest()
+        session = await self.asession()
+        if session:
+            request.session = session
+            request.user = await aget_user(request)
+        else:
+            engine = import_module(settings.SESSION_ENGINE)
+            request.session = engine.SessionStore()
+        await alogout(request)
         self.cookies = SimpleCookie()
 
     def _parse_json(self, response, **extra):
