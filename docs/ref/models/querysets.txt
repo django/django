@@ -2535,11 +2535,6 @@ evaluated will force it to evaluate again, repeating the query.
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
 
-.. note::
-
-    ``aiterator()`` is *not* compatible with previous calls to
-    ``prefetch_related()``.
-
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
 of terms in an SQL ``IN`` clause might be limited. Hence values below this
