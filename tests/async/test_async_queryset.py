@@ -8,7 +8,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import SimpleModel, RelatedModel
+from .models import RelatedModel, SimpleModel
 
 
 class AsyncQuerySetTest(TestCase):
