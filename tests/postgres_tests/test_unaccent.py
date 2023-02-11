@@ -5,7 +5,6 @@ from .models import CharFieldModel, TextFieldModel
 
 
 class UnaccentTest(PostgreSQLTestCase):
-
     Model = CharFieldModel
 
     @classmethod

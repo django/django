@@ -20,7 +20,6 @@ from django.utils.encoding import force_bytes, force_str
 
 
 class GEOSGeometryBase(GEOSBase):
-
     _GEOS_CLASSES = None
 
     ptr_type = GEOM_PTR

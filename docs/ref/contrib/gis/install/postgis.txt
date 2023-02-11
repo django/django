@@ -35,7 +35,9 @@ Creating a spatial database
 ---------------------------
 
 PostGIS 2 includes an extension for PostgreSQL that's used to enable spatial
-functionality::
+functionality:
+
+.. code-block:: shell
 
     $ createdb  <db name>
     $ psql <db name>
@@ -74,7 +76,9 @@ To administer the database, you can either use the pgAdmin III program
 (:menuselection:`Start --> PostgreSQL X --> pgAdmin III`) or the SQL Shell
 (:menuselection:`Start --> PostgreSQL X --> SQL Shell`). For example, to create
 a ``geodjango`` spatial database and user, the following may be executed from
-the SQL Shell as the ``postgres`` user::
+the SQL Shell as the ``postgres`` user:
+
+.. code-block:: psql
 
     postgres# CREATE USER geodjango PASSWORD 'my_passwd';
     postgres# CREATE DATABASE geodjango OWNER geodjango;

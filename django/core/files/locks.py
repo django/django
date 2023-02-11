@@ -32,12 +32,12 @@ if os.name == "nt":
         POINTER,
         Structure,
         Union,
+        WinDLL,
         byref,
         c_int64,
         c_ulong,
         c_void_p,
         sizeof,
-        windll,
     )
     from ctypes.wintypes import BOOL, DWORD, HANDLE
 
@@ -73,10 +73,11 @@ if os.name == "nt":
     LPOVERLAPPED = POINTER(OVERLAPPED)
 
     # --- Define function prototypes for extra safety ---
-    LockFileEx = windll.kernel32.LockFileEx
+    kernel32 = WinDLL("kernel32")
+    LockFileEx = kernel32.LockFileEx
     LockFileEx.restype = BOOL
     LockFileEx.argtypes = [HANDLE, DWORD, DWORD, DWORD, DWORD, LPOVERLAPPED]
-    UnlockFileEx = windll.kernel32.UnlockFileEx
+    UnlockFileEx = kernel32.UnlockFileEx
     UnlockFileEx.restype = BOOL
     UnlockFileEx.argtypes = [HANDLE, DWORD, DWORD, DWORD, LPOVERLAPPED]
 

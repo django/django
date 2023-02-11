@@ -37,13 +37,17 @@ Creating and Saving Models with Geometry Fields
 ===============================================
 
 Here is an example of how to create a geometry object (assuming the ``Zipcode``
-model)::
+model):
+
+.. code-block:: pycon
 
     >>> from zipcode.models import Zipcode
     >>> z = Zipcode(code=77096, poly='POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
     >>> z.save()
 
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models::
+:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
     >>> poly = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
@@ -53,7 +57,9 @@ model)::
 Moreover, if the ``GEOSGeometry`` is in a different coordinate system (has a
 different SRID value) than that of the field, then it will be implicitly
 transformed into the SRID of the model's field, using the spatial database's
-transform procedure::
+transform procedure:
+
+.. code-block:: pycon
 
     >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
     >>> z = Zipcode(code=78212, poly=poly_3084)
@@ -82,14 +88,18 @@ The raster field will therefore accept any input that is accepted by the
 :class:`~django.contrib.gis.gdal.GDALRaster` constructor.
 
 Here is an example of how to create a raster object from a raster file
-``volcano.tif`` (assuming the ``Elevation`` model)::
+``volcano.tif`` (assuming the ``Elevation`` model):
+
+.. code-block:: pycon
 
     >>> from elevation.models import Elevation
     >>> dem = Elevation(name='Volcano', rast='/path/to/raster/volcano.tif')
     >>> dem.save()
 
 :class:`~django.contrib.gis.gdal.GDALRaster` objects may also be used to save
-raster models::
+raster models:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import GDALRaster
     >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
@@ -97,7 +107,9 @@ raster models::
     >>> dem = Elevation(name='Canyon', rast=rast)
     >>> dem.save()
 
-Note that this equivalent to::
+Note that this equivalent to:
+
+.. code-block:: pycon
 
     >>> dem = Elevation.objects.create(
     ...     name='Canyon',
@@ -125,12 +137,16 @@ Geometry Lookups
 ----------------
 
 Geographic queries with geometries take the following general form (assuming
-the ``Zipcode`` model used in the :doc:`model-api`)::
+the ``Zipcode`` model used in the :doc:`model-api`):
+
+.. code-block:: pycon
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> qs = Zipcode.objects.filter(poly__contains=pnt)
     >>> qs = Elevation.objects.filter(poly__contains=rst)
@@ -157,13 +173,17 @@ used to pass a band index. On the right hand side, a tuple of the raster and
 band index can be specified.
 
 This results in the following general form for lookups involving rasters
-(assuming the ``Elevation`` model used in the :doc:`model-api`)::
+(assuming the ``Elevation`` model used in the :doc:`model-api`):
+
+.. code-block:: pycon
 
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=(<raster_input, <band_index>)
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> qs = Elevation.objects.filter(rast__contains=geom)
     >>> qs = Elevation.objects.filter(rast__contains=rst)
@@ -256,7 +276,9 @@ For example, let's say we have a ``SouthTexasCity`` model (from the
         # is used, units are in meters.
         point = models.PointField(srid=32140)
 
-Then distance queries may be performed as follows::
+Then distance queries may be performed as follows:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
     >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
@@ -273,7 +295,9 @@ Then distance queries may be performed as follows::
 Raster queries work the same way by replacing the geometry field ``point`` with
 a raster field, or the ``pnt`` object with a raster object, or both. To specify
 the band index of a raster input on the right hand side, a 3-tuple can be
-passed to the lookup as follows::
+passed to the lookup as follows:
+
+.. code-block:: pycon
 
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(rst, 2, D(km=7)))
 

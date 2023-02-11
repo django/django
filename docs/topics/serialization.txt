@@ -173,7 +173,9 @@ Identifier  Information
 XML
 ---
 
-The basic XML serialization format looks like this::
+The basic XML serialization format looks like this:
+
+.. code-block:: xml
 
     <?xml version="1.0" encoding="utf-8"?>
     <django-objects version="1.0">
@@ -193,7 +195,9 @@ Each field of the object is serialized as a ``<field>``-element sporting the
 fields "type" and "name". The text content of the element represents the value
 that should be stored.
 
-Foreign keys and other relational fields are treated a little bit differently::
+Foreign keys and other relational fields are treated a little bit differently:
+
+.. code-block:: xml
 
     <object pk="27" model="auth.permission">
         <!-- ... -->
@@ -205,7 +209,9 @@ In this example we specify that the ``auth.Permission`` object with the PK 27
 has a foreign key to the ``contenttypes.ContentType`` instance with the PK 9.
 
 ManyToMany-relations are exported for the model that binds them. For instance,
-the ``auth.User`` model has such a relation to the ``auth.Permission`` model::
+the ``auth.User`` model has such a relation to the ``auth.Permission`` model:
+
+.. code-block:: xml
 
     <object pk="1" model="auth.user">
         <!-- ... -->
@@ -326,7 +332,9 @@ YAML
 
 YAML serialization looks quite similar to JSON. The object list is serialized
 as a sequence mappings with the keys "pk", "model" and "fields". Each field is
-again a mapping with the key being name of the field and the value the value::
+again a mapping with the key being name of the field and the value the value:
+
+.. code-block:: yaml
 
     - model: sessions.session
       pk: 4b678b301dfd8a4e0dad910de3ae245b
@@ -387,7 +395,12 @@ Consider the following two models::
         birthdate = models.DateField()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["first_name", "last_name"],
+                    name="unique_first_last_name",
+                ),
+            ]
 
     class Book(models.Model):
         name = models.CharField(max_length=100)
@@ -431,7 +444,12 @@ name::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["first_name", "last_name"],
+                    name="unique_first_last_name",
+                ),
+            ]
 
 Now books can use that natural key to refer to ``Person`` objects::
 
@@ -454,12 +472,12 @@ into the primary key of an actual ``Person`` object.
 
     Whatever fields you use for a natural key must be able to uniquely
     identify an object. This will usually mean that your model will
-    have a uniqueness clause (either unique=True on a single field, or
-    ``unique_together`` over multiple fields) for the field or fields
-    in your natural key. However, uniqueness doesn't need to be
-    enforced at the database level. If you are certain that a set of
-    fields will be effectively unique, you can still use those fields
-    as a natural key.
+    have a uniqueness clause (either ``unique=True`` on a single field, or a
+    ``UniqueConstraint`` or ``unique_together`` over multiple fields) for the
+    field or fields in your natural key. However, uniqueness doesn't need to be
+    enforced at the database level. If you are certain that a set of fields
+    will be effectively unique, you can still use those fields as a natural
+    key.
 
 Deserialization of objects with no primary key will always check whether the
 model's manager has a ``get_by_natural_key()`` method and if so, use it to
@@ -479,7 +497,12 @@ Firstly, you need to add another method -- this time to the model itself::
         objects = PersonManager()
 
         class Meta:
-            unique_together = [['first_name', 'last_name']]
+            constraints = [
+                models.UniqueConstraint(
+                    fields=["first_name", "last_name"],
+                    name="unique_first_last_name",
+                ),
+            ]
 
         def natural_key(self):
             return (self.first_name, self.last_name)
@@ -487,7 +510,9 @@ Firstly, you need to add another method -- this time to the model itself::
 That method should always return a natural key tuple -- in this
 example, ``(first name, last name)``. Then, when you call
 ``serializers.serialize()``, you provide ``use_natural_foreign_keys=True``
-or ``use_natural_primary_keys=True`` arguments::
+or ``use_natural_primary_keys=True`` arguments:
+
+.. code-block:: pycon
 
     >>> serializers.serialize('json', [book1, book2], indent=2,
     ...      use_natural_foreign_keys=True, use_natural_primary_keys=True)

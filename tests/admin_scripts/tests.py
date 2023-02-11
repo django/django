@@ -1585,18 +1585,21 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
-    @mock.patch("django.core.management.commands.runserver.run")
-    @mock.patch("django.core.management.base.BaseCommand.check_migrations")
-    def test_zero_ip_addr(self, *mocked_objects):
-        call_command(
-            "runserver",
-            addrport="0:8000",
-            use_reloader=False,
-            skip_checks=True,
-            stdout=self.output,
-        )
+    def test_zero_ip_addr(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
         self.assertIn(
             "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+
+    def test_on_bind(self):
+        self.cmd.addr = "127.0.0.1"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("14437")
+        self.assertIn(
+            "Starting development server at http://127.0.0.1:14437/",
             self.output.getvalue(),
         )
 
@@ -2376,7 +2379,6 @@ class ExecuteFromCommandLine(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
-
     available_apps = [
         "admin_scripts",
         "django.contrib.auth",

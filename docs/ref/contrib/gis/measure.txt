@@ -16,7 +16,9 @@ Example
 
 :class:`Distance` objects may be instantiated using a keyword argument indicating the
 context of the units.  In the example below, two different distance objects are
-instantiated in units of kilometers (``km``) and miles (``mi``)::
+instantiated in units of kilometers (``km``) and miles (``mi``):
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.measure import D, Distance
     >>> d1 = Distance(km=5)
@@ -27,7 +29,9 @@ instantiated in units of kilometers (``km``) and miles (``mi``)::
     5.0 mi
 
 For conversions, access the preferred unit attribute to get a converted
-distance quantity::
+distance quantity:
+
+.. code-block:: pycon
 
     >>> print(d1.mi) # Converting 5 kilometers to miles
     3.10685596119
@@ -35,7 +39,9 @@ distance quantity::
     8.04672
 
 Moreover, arithmetic operations may be performed between the distance
-objects::
+objects:
+
+.. code-block:: pycon
 
     >>> print(d1 + d2) # Adding 5 miles to 5 kilometers
     13.04672 km
@@ -43,14 +49,18 @@ objects::
     1.89314403881 mi
 
 Two :class:`Distance` objects multiplied together will yield an :class:`Area`
-object, which uses squared units of measure::
+object, which uses squared units of measure:
+
+.. code-block:: pycon
 
     >>> a = d1 * d2 # Returns an Area object.
     >>> print(a)
     40.2336 sq_km
 
 To determine what the attribute abbreviation of a unit is, the ``unit_attname``
-class method may be used::
+class method may be used:
+
+.. code-block:: pycon
 
     >>> print(Distance.unit_attname('US Survey Foot'))
     survey_ft
@@ -117,14 +127,18 @@ Measurement API
     To initialize a distance object, pass in a keyword corresponding to the
     desired :ref:`unit attribute name <supported_units>` set with desired
     value. For example, the following creates a distance object representing 5
-    miles::
+    miles:
+
+    .. code-block:: pycon
 
         >>> dist = Distance(mi=5)
 
     .. method:: __getattr__(unit_att)
 
     Returns the distance value in units corresponding to the given unit
-    attribute. For example::
+    attribute. For example:
+
+    .. code-block:: pycon
 
         >>> print(dist.km)
         8.04672
@@ -132,7 +146,9 @@ Measurement API
     .. classmethod:: unit_attname(unit_name)
 
     Returns the distance unit attribute name for the given full unit name. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> Distance.unit_attname('Mile')
         'mi'
@@ -149,14 +165,18 @@ Measurement API
     To initialize an area object, pass in a keyword corresponding to the
     desired :ref:`unit attribute name <supported_units>` set with desired
     value. For example, the following creates an area object representing 5
-    square miles::
+    square miles:
+
+    .. code-block:: pycon
 
         >>> a = Area(sq_mi=5)
 
     .. method:: __getattr__(unit_att)
 
     Returns the area value in units corresponding to the given unit attribute.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> print(a.sq_km)
         12.949940551680001
@@ -164,7 +184,9 @@ Measurement API
     .. classmethod:: unit_attname(unit_name)
 
     Returns the area unit attribute name for the given full unit name. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> Area.unit_attname('Kilometer')
         'sq_km'

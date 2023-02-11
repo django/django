@@ -3,7 +3,7 @@ from types import NoneType
 
 from django.core.exceptions import FieldError, ValidationError
 from django.db import connections
-from django.db.models.expressions import Exists, ExpressionList, F
+from django.db.models.expressions import Exists, ExpressionList, F, OrderBy
 from django.db.models.indexes import IndexExpression
 from django.db.models.lookups import Exact
 from django.db.models.query_utils import Q
@@ -339,10 +339,12 @@ class UniqueConstraint(BaseConstraint):
                     meta=model._meta, exclude=exclude
                 ).items()
             }
-            expressions = [
-                Exact(expr, expr.replace_expressions(replacements))
-                for expr in self.expressions
-            ]
+            expressions = []
+            for expr in self.expressions:
+                # Ignore ordering.
+                if isinstance(expr, OrderBy):
+                    expr = expr.expression
+                expressions.append(Exact(expr, expr.replace_expressions(replacements)))
             queryset = queryset.filter(*expressions)
         model_class_pk = instance._get_pk_val(model._meta)
         if not instance._state.adding and model_class_pk is not None:

@@ -657,7 +657,6 @@ class DiscoverRunner:
         logger=None,
         **kwargs,
     ):
-
         self.pattern = pattern
         self.top_level = top_level
         self.verbosity = verbosity

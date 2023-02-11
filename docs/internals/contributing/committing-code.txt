@@ -16,7 +16,7 @@ requests.
 
 When committing a pull request, make sure each individual commit matches the
 commit guidelines described below. Contributors are expected to provide the
-best pull requests possible. In practice mergers - who will likely be more 
+best pull requests possible. In practice mergers - who will likely be more
 familiar with the commit guidelines - may decide to bring a commit up to
 standard themselves.
 
@@ -27,7 +27,9 @@ Selenium. See the `CI wiki page`_ for instructions.
 .. _CI wiki page: https://code.djangoproject.com/wiki/CI
 
 If you find yourself checking out pull requests locally more often, this git
-alias will be helpful::
+alias will be helpful:
+
+.. code-block:: ini
 
     [alias]
         pr = !sh -c \"git fetch upstream pull/${1}/head:pr/${1} && git checkout pr/${1}\"

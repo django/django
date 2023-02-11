@@ -148,7 +148,7 @@ class ViewIndexView(BaseAdminDocsView):
             view_functions = extract_views_from_urlpatterns(url_resolver.url_patterns)
         except ImproperlyConfigured:
             view_functions = []
-        for (func, regex, namespace, name) in view_functions:
+        for func, regex, namespace, name in view_functions:
             views.append(
                 {
                     "full_name": get_view_name(func),

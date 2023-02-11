@@ -166,14 +166,18 @@ running your Django code. For example, Jupyter_ notebooks and IPython_
 interactive shells both transparently provide an active event loop so that it is
 easier to interact with asynchronous APIs.
 
-If you're using an IPython shell, you can disable this event loop by running::
+If you're using an IPython shell, you can disable this event loop by running:
+
+.. code-block:: shell
 
     %autoawait off
 
 as a command at the IPython prompt. This will allow you to run synchronous code
 without generating :exc:`~django.core.exceptions.SynchronousOnlyOperation`
 errors; however, you also won't be able to ``await`` asynchronous APIs. To turn
-the event loop back on, run::
+the event loop back on, run:
+
+.. code-block:: shell
 
     %autoawait on
 

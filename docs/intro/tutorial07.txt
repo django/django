@@ -423,12 +423,5 @@ How to completely delete an app from the project
 Now that you have learned every aspect of app creation, customization and etc.
 You need to know how to properly delete an app from the project.
 
-What's next?
-============
-
-The beginner tutorial ends here. In the meantime, you might want to check out
-some pointers on :doc:`where to go from here </intro/whatsnext>`.
-
-If you are familiar with Python packaging and interested in learning how to
-turn polls into a "reusable app", check out :doc:`Advanced tutorial: How to
-write reusable apps</intro/reusable-apps>`.
+When you're comfortable with the admin, read :doc:`part 8 of this
+tutorial </intro/tutorial08>` to learn how to use third-party packages.

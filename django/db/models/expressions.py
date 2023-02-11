@@ -1106,7 +1106,6 @@ class Star(Expression):
 
 
 class Col(Expression):
-
     contains_column_references = True
     possibly_multivalued = False
 
@@ -1546,6 +1545,7 @@ class Subquery(BaseExpression, Combinable):
 class Exists(Subquery):
     template = "EXISTS(%(subquery)s)"
     output_field = fields.BooleanField()
+    empty_result_set_value = False
 
     def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)

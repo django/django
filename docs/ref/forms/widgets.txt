@@ -86,7 +86,9 @@ buttons.
 :class:`Select` widgets are used by default on :class:`ChoiceField` fields. The
 choices displayed on the widget are inherited from the :class:`ChoiceField` and
 changing :attr:`ChoiceField.choices` will update :attr:`Select.choices`. For
-example::
+example:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> CHOICES = [('1', 'First'), ('2', 'Second')]
@@ -137,7 +139,9 @@ For example, take the following form::
 
 This form will include three default :class:`TextInput` widgets, with default
 rendering -- no CSS class, no extra attributes. This means that the input boxes
-provided for each widget will be rendered exactly the same::
+provided for each widget will be rendered exactly the same:
+
+.. code-block:: pycon
 
     >>> f = CommentForm(auto_id=False)
     >>> f.as_table()
@@ -232,7 +236,9 @@ foundation for custom widgets.
             '<input title="Your name" type="text" name="name" value="A name" size="10">'
 
         If you assign a value of ``True`` or ``False`` to an attribute,
-        it will be rendered as an HTML5 boolean attribute::
+        it will be rendered as an HTML5 boolean attribute:
+
+        .. code-block:: pycon
 
             >>> name = forms.TextInput(attrs={'required': True})
             >>> name.render('name', 'A name')
@@ -361,7 +367,9 @@ foundation for custom widgets.
 
     .. attribute:: MultiWidget.widgets
 
-        An iterable containing the widgets needed. For example::
+        An iterable containing the widgets needed. For example:
+
+        .. code-block:: pycon
 
             >>> from django.forms import MultiWidget, TextInput
             >>> widget = MultiWidget(widgets=[TextInput, TextInput])
@@ -373,7 +381,9 @@ foundation for custom widgets.
         ``(key, widget)`` pair, the key will be appended to the ``name`` of the
         widget in order to generate the attribute value. You may provide the
         empty string (``''``) for a single key, in order to suppress the suffix
-        for one widget. For example::
+        for one widget. For example:
+
+        .. code-block:: pycon
 
             >>> widget = MultiWidget(widgets={'': TextInput, 'last': TextInput})
             >>> widget.render('name', ['john', 'paul'])

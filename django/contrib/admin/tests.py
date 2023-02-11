@@ -17,7 +17,6 @@ class CSPMiddleware(MiddlewareMixin):
 
 @modify_settings(MIDDLEWARE={"append": "django.contrib.admin.tests.CSPMiddleware"})
 class AdminSeleniumTestCase(SeleniumTestCase, StaticLiveServerTestCase):
-
     available_apps = [
         "django.contrib.admin",
         "django.contrib.auth",

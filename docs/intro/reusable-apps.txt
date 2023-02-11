@@ -2,7 +2,7 @@
 Advanced tutorial: How to write reusable apps
 =============================================
 
-This advanced tutorial begins where :doc:`Tutorial 7 </intro/tutorial07>`
+This advanced tutorial begins where :doc:`Tutorial 8 </intro/tutorial08>`
 left off. We'll be turning our web-poll into a standalone Python package
 you can reuse in new projects and share with other people.
 
@@ -53,7 +53,9 @@ projects and ready to publish for others to install and use.
 Your project and your reusable app
 ==================================
 
-After the previous tutorials, our project should look like this::
+After the previous tutorials, our project should look like this:
+
+.. code-block:: text
 
     mysite/
         manage.py
@@ -256,9 +258,11 @@ this. For a small app like polls, this process isn't too difficult.
 
 #. It's optional, but recommended, to include detailed documentation with your
    app. Create an empty directory ``django-polls/docs`` for future
-   documentation. Add an additional line to ``django-polls/MANIFEST.in``::
+   documentation. Add an additional line to ``django-polls/MANIFEST.in``:
 
-    recursive-include docs *
+   .. code-block:: text
+
+      recursive-include docs *
 
    Note that the ``docs`` directory won't be included in your package unless
    you add some files to it. Many Django apps also provide their documentation
@@ -291,16 +295,20 @@ working. We'll now fix this by installing our new ``django-polls`` package.
    solution (see below).
 
 #. To install the package, use pip (you already :ref:`installed it
-   <installing-reusable-apps-prerequisites>`, right?)::
+   <installing-reusable-apps-prerequisites>`, right?):
 
-    python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
+   .. code-block:: shell
+
+      python -m pip install --user django-polls/dist/django-polls-0.1.tar.gz
 
 #. With luck, your Django project should now work correctly again. Run the
    server again to confirm this.
 
-#. To uninstall the package, use pip::
+#. To uninstall the package, use pip:
 
-    python -m pip uninstall django-polls
+   .. code-block:: shell
+
+      python -m pip uninstall django-polls
 
 Publishing your app
 ===================

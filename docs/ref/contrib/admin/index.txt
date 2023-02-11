@@ -2830,6 +2830,10 @@ Templates can override or extend base admin templates as described in
       * ``admin_url``: admin changelist URL for the model
       * ``add_url``: admin URL to add a new model instance
 
+    * ``is_popup``: whether the current page is displayed in a popup window
+    * ``is_nav_sidebar_enabled``: :attr:`AdminSite.enable_nav_sidebar`
+    * ``log_entries``: :meth:`.AdminSite.get_log_entries`
+
 .. method:: AdminSite.get_app_list(request, app_label=None)
 
     Returns a list of applications from the :doc:`application registry
@@ -2885,6 +2889,15 @@ Templates can override or extend base admin templates as described in
 
     Raises ``django.contrib.admin.sites.NotRegistered`` if a model isn't
     already registered.
+
+.. method:: AdminSite.get_log_entries(request)
+
+    .. versionadded:: 5.0
+
+    Returns a queryset for the related
+    :class:`~django.contrib.admin.models.LogEntry` instances, shown on the site
+    index page. This method can be overridden to filter the log entries by
+    other criteria.
 
 .. _hooking-adminsite-to-urlconf:
 
@@ -3188,7 +3201,9 @@ with an instance namespace corresponding to the name of the Site instance.
 
 So - if you wanted to get a reference to the Change view for a particular
 ``Choice`` object (from the polls application) in the default admin, you would
-call::
+call:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> c = Choice.objects.get(...)
@@ -3201,7 +3216,9 @@ This will find the first registered instance of the admin application
 If you want to find a URL in a specific admin instance, provide the name of
 that instance as a ``current_app`` hint to the reverse call. For example,
 if you specifically wanted the admin view from the admin instance named
-``custom``, you would need to call::
+``custom``, you would need to call:
+
+.. code-block:: pycon
 
     >>> change_url = reverse('admin:polls_choice_change', args=(c.id,), current_app='custom')
 

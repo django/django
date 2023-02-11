@@ -262,7 +262,6 @@ class GetOrCreateTestsWithManualPKs(TestCase):
 
 
 class GetOrCreateTransactionTests(TransactionTestCase):
-
     available_apps = ["get_or_create"]
 
     def test_get_or_create_integrityerror(self):

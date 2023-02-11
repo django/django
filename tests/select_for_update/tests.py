@@ -33,7 +33,6 @@ from .models import (
 
 
 class SelectForUpdateTests(TransactionTestCase):
-
     available_apps = ["select_for_update"]
 
     def setUp(self):

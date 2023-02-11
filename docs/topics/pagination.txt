@@ -18,7 +18,9 @@ Example
 
 Give :class:`~django.core.paginator.Paginator` a list of objects, plus the
 number of items you'd like to have on each page, and it gives you methods for
-accessing the items for each page::
+accessing the items for each page:
+
+.. code-block:: pycon
 
     >>> from django.core.paginator import Paginator
     >>> objects = ['john', 'paul', 'george', 'ringo']

@@ -31,7 +31,9 @@ __ https://github.com/maxmind/libmaxminddb/
 Example
 =======
 
-Here is an example of its usage::
+Here is an example of its usage:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geoip2 import GeoIP2
     >>> g = GeoIP2()

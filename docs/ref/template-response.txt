@@ -218,7 +218,9 @@ subsequent rendering calls do not change the response content.
 However, when ``response.content`` is explicitly assigned, the
 change is always applied. If you want to force the content to be
 re-rendered, you can reevaluate the rendered content, and assign
-the content of the response manually::
+the content of the response manually:
+
+.. code-block:: pycon
 
     # Set up a rendered TemplateResponse
     >>> from django.template.response import TemplateResponse

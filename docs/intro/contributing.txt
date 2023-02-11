@@ -357,7 +357,9 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
     $ ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error::
+method we added, with this error:
+
+.. code-block:: pytb
 
     ImportError: cannot import name 'make_toast' from 'django.shortcuts'
 
@@ -407,7 +409,9 @@ Writing Documentation
 
 This is a new feature, so it should be documented. Open the file
 ``docs/topics/http/shortcuts.txt`` and add the following at the end of the
-file::
+file:
+
+.. code-block:: rst
 
     ``make_toast()``
     ================
@@ -421,7 +425,9 @@ file::
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
 latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
-Add a note under the "Minor Features" header::
+Add a note under the "Minor Features" header:
+
+.. code-block:: rst
 
     :mod:`django.shortcuts`
     ~~~~~~~~~~~~~~~~~~~~~~~

@@ -413,8 +413,6 @@ the ticket database:
 Bisecting a regression
 ======================
 
-.. highlight:: console
-
 A regression is a bug that's present in some newer version of Django but not in
 an older one. An extremely helpful piece of information is the commit that
 introduced the regression. Knowing the commit that caused the change in
@@ -425,11 +423,15 @@ Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
 written the test and confirmed that it fails on the latest main branch, put it
 in a separate file that you can run standalone. For our example, we'll pretend
-we created ``tests/migrations/test_regression.py``, which can be run with::
+we created ``tests/migrations/test_regression.py``, which can be run with:
+
+.. code-block:: shell
 
     $ ./runtests.py migrations.test_regression
 
-Next, we mark the current point in history as being "bad" since the test fails::
+Next, we mark the current point in history as being "bad" since the test fails:
+
+.. code-block:: shell
 
     $ git bisect bad
     You need to start by "git bisect start"
@@ -440,14 +442,18 @@ introduced (i.e. a point where the test passes). Use something like
 ``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
 in this case). Check if the test fails. If so, mark that point as "bad"
 (``git bisect bad``), then check out an earlier revision and recheck. Once you
-find a revision where your test passes, mark it as "good"::
+find a revision where your test passes, mark it as "good":
+
+.. code-block:: shell
 
     $ git bisect good
     Bisecting: X revisions left to test after this (roughly Y steps)
     ...
 
 Now we're ready for the fun part: using ``git bisect run`` to automate the rest
-of the process::
+of the process:
+
+.. code-block:: shell
 
     $ git bisect run tests/runtests.py migrations.test_regression
 

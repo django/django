@@ -1167,7 +1167,6 @@ class NonexistentFixtureTests(TestCase):
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
-
     available_apps = [
         "fixtures",
         "django.contrib.sites",

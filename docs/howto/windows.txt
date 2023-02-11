@@ -2,8 +2,6 @@
 How to install Django on Windows
 ================================
 
-.. highlight:: doscon
-
 This document will guide you through installing Python 3.11 and Django on
 Windows. It also provides instructions for setting up a virtual environment,
 which makes it easier to work on Python projects. This is meant as a beginner's
@@ -28,7 +26,9 @@ Download the executable installer and run it. Check the boxes next to "Install
 launcher for all users (recommended)" then click "Install Now".
 
 After installation, open the command prompt and check that the Python version
-matches the version you installed by executing::
+matches the version you installed by executing:
+
+.. code-block:: doscon
 
     ...\> py --version
 
@@ -60,12 +60,16 @@ environments which we will use for this guide.
 
 To create a virtual environment for your project, open a new command prompt,
 navigate to the folder where you want to create your project and then enter the
-following::
+following:
+
+.. code-block:: doscon
 
     ...\> py -m venv project-name
 
 This will create a folder called 'project-name' if it does not already exist
-and set up the virtual environment. To activate the environment, run::
+and set up the virtual environment. To activate the environment, run:
+
+.. code-block:: doscon
 
     ...\> project-name\Scripts\activate.bat
 
@@ -79,7 +83,9 @@ Install Django
 Django can be installed easily using ``pip`` within your virtual environment.
 
 In the command prompt, ensure your virtual environment is active, and execute
-the following command::
+the following command:
+
+.. code-block:: doscon
 
     ...\> py -m pip install Django
 
@@ -100,7 +106,9 @@ for some reason this needs to be disabled, set the environmental variable
 :envvar:`DJANGO_COLORS` to ``nocolor``.
 
 On older Windows versions, or legacy terminals, colorama_ must be installed to
-enable syntax coloring::
+enable syntax coloring:
+
+.. code-block:: doscon
 
     ...\> py -m pip install colorama
 
@@ -119,7 +127,9 @@ Common pitfalls
 
 * If you are connecting to the internet behind a proxy, there might be problems
   in running the command ``py -m pip install Django``. Set the environment
-  variables for proxy configuration in the command prompt as follows::
+  variables for proxy configuration in the command prompt as follows:
+
+  .. code-block:: doscon
 
     ...\> set http_proxy=http://username:password@proxyserver:proxyport
     ...\> set https_proxy=https://username:password@proxyserver:proxyport

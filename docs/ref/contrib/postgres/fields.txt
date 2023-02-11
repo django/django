@@ -127,7 +127,9 @@ We will use the following example model::
 
 The :lookup:`contains` lookup is overridden on :class:`ArrayField`. The
 returned objects will be those where the values passed are a subset of the
-data. It uses the SQL operator ``@>``. For example::
+data. It uses the SQL operator ``@>``. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -149,7 +151,9 @@ data. It uses the SQL operator ``@>``. For example::
 
 This is the inverse of the :lookup:`contains <arrayfield.contains>` lookup -
 the objects returned will be those where the data is a subset of the values
-passed. It uses the SQL operator ``<@``. For example::
+passed. It uses the SQL operator ``<@``. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -167,7 +171,9 @@ passed. It uses the SQL operator ``<@``. For example::
 ~~~~~~~~~~~
 
 Returns objects where the data shares any results with the values passed. Uses
-the SQL operator ``&&``. For example::
+the SQL operator ``&&``. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts', 'tutorial'])
@@ -193,7 +199,9 @@ the SQL operator ``&&``. For example::
 ~~~~~~~
 
 Returns the length of the array. The lookups available afterward are those
-available for :class:`~django.db.models.IntegerField`. For example::
+available for :class:`~django.db.models.IntegerField`. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -209,7 +217,9 @@ Index transforms
 Index transforms index into the array. Any non-negative integer can be used.
 There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
 array. The lookups available after the transform are those from the
-:attr:`base_field <ArrayField.base_field>`. For example::
+:attr:`base_field <ArrayField.base_field>`. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -236,7 +246,9 @@ Slice transforms
 
 Slice transforms take a slice of the array. Any two non-negative integers can
 be used, separated by a single underscore. The lookups available after the
-transform do not change. For example::
+transform do not change. For example:
+
+.. code-block:: pycon
 
     >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
     >>> Post.objects.create(name='Second post', tags=['thoughts'])
@@ -374,7 +386,9 @@ We will use the following example model::
 Key lookups
 ~~~~~~~~~~~
 
-To query based on a given key, you can use that key as the lookup name::
+To query based on a given key, you can use that key as the lookup name:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
@@ -382,12 +396,16 @@ To query based on a given key, you can use that key as the lookup name::
     >>> Dog.objects.filter(data__breed='collie')
     <QuerySet [<Dog: Meg>]>
 
-You can chain other lookups after key lookups::
+You can chain other lookups after key lookups:
+
+.. code-block:: pycon
 
     >>> Dog.objects.filter(data__breed__contains='l')
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
-or use ``F()`` expressions to annotate a key value. For example::
+or use ``F()`` expressions to annotate a key value. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F
     >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
@@ -419,7 +437,9 @@ need to use the :lookup:`hstorefield.contains` lookup instead.
 The :lookup:`contains` lookup is overridden on
 :class:`~django.contrib.postgres.fields.HStoreField`. The returned objects are
 those where the given ``dict`` of key-value pairs are all contained in the
-field. It uses the SQL operator ``@>``. For example::
+field. It uses the SQL operator ``@>``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -439,7 +459,9 @@ field. It uses the SQL operator ``@>``. For example::
 This is the inverse of the :lookup:`contains <hstorefield.contains>` lookup -
 the objects returned will be those where the key-value pairs on the object are
 a subset of those in the value passed. It uses the SQL operator ``<@``. For
-example::
+example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -457,7 +479,9 @@ example::
 ~~~~~~~~~~~
 
 Returns objects where the given key is in the data. Uses the SQL operator
-``?``. For example::
+``?``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -471,7 +495,9 @@ Returns objects where the given key is in the data. Uses the SQL operator
 ~~~~~~~~~~~~~~~~
 
 Returns objects where any of the given keys are in the data. Uses the SQL
-operator ``?|``. For example::
+operator ``?|``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'owner': 'Bob'})
@@ -486,7 +512,9 @@ operator ``?|``. For example::
 ~~~~~~~~~~~~
 
 Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example::
+``?&``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -503,7 +531,9 @@ Returns objects where the array of keys is the given value. Note that the order
 is not guaranteed to be reliable, so this transform is mainly useful for using
 in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``akeys()``. For example::
+``akeys()``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'toy': 'bone'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -520,7 +550,9 @@ Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``avals()``. For example::
+``avals()``. For example:
+
+.. code-block:: pycon
 
     >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
     >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
@@ -642,7 +674,9 @@ model::
         def __str__(self):
             return self.name
 
-We will also use the following example objects::
+We will also use the following example objects:
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> from django.utils import timezone
@@ -685,7 +719,9 @@ The ``contained_by`` lookup is also available on the non-range field types:
 :class:`~django.db.models.BigIntegerField`,
 :class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
 :class:`~django.db.models.DateField`, and
-:class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DateTimeField`. For example:
+
+.. code-block:: pycon
 
     >>> from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
     >>> Event.objects.filter(

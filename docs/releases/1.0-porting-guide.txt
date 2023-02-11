@@ -2,8 +2,6 @@
 Porting your apps from Django 0.96 to 1.0
 =========================================
 
-.. highlight:: python
-
 Django 1.0 breaks compatibility with 0.96 in some areas.
 
 This guide will help you port 0.96 projects and apps to 1.0. The first part of

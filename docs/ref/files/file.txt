@@ -137,10 +137,14 @@ below) will also have a couple of extra methods:
     to point to it. If ``save`` is ``True``, the model's ``save()`` method will
     be called once the file is saved. That is, these two lines::
 
+    .. code-block:: pycon
+
         >>> car.photo.save('myphoto.jpg', content, save=False)
         >>> car.save()
 
-    are equivalent to::
+    are equivalent to:
+
+    .. code-block:: pycon
 
         >>> car.photo.save('myphoto.jpg', content, save=True)
 

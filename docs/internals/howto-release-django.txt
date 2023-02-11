@@ -2,8 +2,6 @@
 How is Django Formed?
 =====================
 
-.. highlight:: console
-
 This document explains how to release Django.
 
 **Please, keep these instructions up-to-date if you make changes!** The point
@@ -56,7 +54,9 @@ You'll need a few things before getting started:
   ``you@example.com`` is the email address associated with the key you want to
   use.
 
-* An install of some required Python packages::
+* An install of some required Python packages:
+
+  .. code-block:: shell
 
       $ python -m pip install wheel twine
 
@@ -117,7 +117,9 @@ any time leading up to the actual release:
 #. If this is a feature release, ensure translations from Transifex have been
    integrated. This is typically done by a separate translation's manager
    rather than the releaser, but here are the steps. Provided you have an
-   account on Transifex::
+   account on Transifex:
+
+   .. code-block:: shell
 
         $ python scripts/manage_translations.py fetch
 
@@ -125,7 +127,9 @@ any time leading up to the actual release:
    Sometimes there are validation errors which need to be debugged, so avoid
    doing this task immediately before a release is needed.
 
-#. :ref:`Update the django-admin manual page <django-admin-manpage>`::
+#. :ref:`Update the django-admin manual page <django-admin-manpage>`:
+
+   .. code-block:: shell
 
         $ cd docs
         $ make man
@@ -135,7 +139,9 @@ any time leading up to the actual release:
    and then commit the changed man page.
 
 #. If this is the alpha release of a new series, create a new stable branch
-   from main. For example, when releasing Django 3.1::
+   from main. For example, when releasing Django 3.1:
+
+   .. code-block:: shell
 
     $ git checkout -b stable/3.1.x origin/main
     $ git push origin -u stable/3.1.x:stable/3.1.x
@@ -148,7 +154,9 @@ any time leading up to the actual release:
 #. If this is the "dot zero" release of a new series, create a new branch from
    the current stable branch in the `django-docs-translations
    <https://github.com/django/django-docs-translations>`_ repository. For
-   example, when releasing Django 2.2::
+   example, when releasing Django 2.2:
+
+   .. code-block:: shell
 
     $ git checkout -b stable/2.2.x origin/stable/2.1.x
     $ git push origin stable/2.2.x:stable/2.2.x
@@ -176,7 +184,9 @@ OK, this is the fun part, where we actually push out a release!
    __ https://djangoci.com
 
 #. A release always begins from a release branch, so you should make sure
-   you're on a stable branch and up-to-date. For example::
+   you're on a stable branch and up-to-date. For example:
+
+   .. code-block:: shell
 
         $ git checkout stable/1.5.x
         $ git pull
@@ -184,7 +194,9 @@ OK, this is the fun part, where we actually push out a release!
 #. If this is a security release, merge the appropriate patches from
    ``django-security``. Rebase these patches as necessary to make each one a
    plain commit on the release branch rather than a merge commit. To ensure
-   this, merge them with the ``--ff-only`` flag; for example::
+   this, merge them with the ``--ff-only`` flag; for example:
+
+   .. code-block:: shell
 
         $ git checkout stable/1.5.x
         $ git merge --ff-only security/1.5.x
@@ -214,7 +226,9 @@ OK, this is the fun part, where we actually push out a release!
    classifier in ``setup.cfg`` to reflect this. Otherwise, make sure the
    classifier is set to ``Development Status :: 5 - Production/Stable``.
 
-#. Tag the release using ``git tag``. For example::
+#. Tag the release using ``git tag``. For example:
+
+   .. code-block:: shell
 
         $ git tag --sign --message="Tag 1.5.1" 1.5.1
 
@@ -227,7 +241,9 @@ OK, this is the fun part, where we actually push out a release!
 #. Run ``make -f extras/Makefile`` to generate the release packages. This will
    create the release packages in a ``dist/`` directory.
 
-#. Generate the hashes of the release packages::
+#. Generate the hashes of the release packages:
+
+   .. code-block:: shell
 
         $ cd dist
         $ md5sum *
@@ -303,19 +319,25 @@ Making the release(s) available to the public
 Now you're ready to actually put the release out there. To do this:
 
 #. Upload the release package(s) to the djangoproject server, replacing
-   A.B. with the appropriate version number, e.g. 1.5 for a 1.5.x release::
+   A.B. with the appropriate version number, e.g. 1.5 for a 1.5.x release:
+
+   .. code-block:: shell
 
         $ scp Django-* djangoproject.com:/home/www/www/media/releases/A.B
 
    If this is the alpha release of a new series, you will need to create the
    directory A.B.
 
-#. Upload the checksum file(s)::
+#. Upload the checksum file(s):
+
+   .. code-block:: shell
 
         $ scp Django-A.B.C.checksum.txt.asc djangoproject.com:/home/www/www/media/pgp/Django-A.B.C.checksum.txt
 
 #. Test that the release packages install correctly using ``pip``. Here's one
-   method::
+   method:
+
+   .. code-block:: shell
 
         $ RELEASE_VERSION='1.7.2'
         $ MAJOR_VERSION=`echo $RELEASE_VERSION| cut -c 1-3`
@@ -340,7 +362,9 @@ Now you're ready to actually put the release out there. To do this:
    files).
 
 #. Upload the release packages to PyPI (for pre-releases, only upload the wheel
-   file)::
+   file):
+
+   .. code-block:: shell
 
        $ twine upload -s dist/*
 
@@ -368,7 +392,9 @@ Now you're ready to actually put the release out there. To do this:
    for the previous release. Update djangoproject.com's `robots.docs.txt`__
    file by copying entries from ``manage_translations.py robots_txt`` from the
    current stable branch in the ``django-docs-translations`` repository. For
-   example, when releasing Django 2.2::
+   example, when releasing Django 2.2:
+
+   .. code-block:: shell
 
         $ git checkout stable/2.2.x
         $ git pull

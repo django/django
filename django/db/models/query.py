@@ -2110,7 +2110,7 @@ class RawQuerySet:
         """
         columns = self.query.get_columns()
         # Adjust any column names which don't match field names
-        for (query_name, model_name) in self.translations.items():
+        for query_name, model_name in self.translations.items():
             # Ignore translations for nonexistent column names
             try:
                 index = columns.index(query_name)

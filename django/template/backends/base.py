@@ -5,7 +5,6 @@ from django.utils.functional import cached_property
 
 
 class BaseEngine:
-
     # Core methods: engines have to provide their own implementation
     #               (except for from_string which is optional).
 

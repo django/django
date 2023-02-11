@@ -172,7 +172,9 @@ for gathering static files in a single directory so you can serve them easily.
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-#. Run the :djadmin:`collectstatic` management command::
+#. Run the :djadmin:`collectstatic` management command:
+
+   .. code-block:: shell
 
        $ python manage.py collectstatic
 

@@ -1595,7 +1595,12 @@ class GetAdminLogTests(TestCase):
         {% get_admin_log %} works if the user model's primary key isn't named
         'id'.
         """
-        context = Context({"user": CustomIdUser()})
+        context = Context(
+            {
+                "user": CustomIdUser(),
+                "log_entries": LogEntry.objects.all(),
+            }
+        )
         template = Template(
             "{% load log %}{% get_admin_log 10 as admin_log for_user user %}"
         )
@@ -1608,6 +1613,7 @@ class GetAdminLogTests(TestCase):
         user.save()
         ct = ContentType.objects.get_for_model(User)
         LogEntry.objects.log_action(user.pk, ct.pk, user.pk, repr(user), 1)
+        context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"
             "{% get_admin_log 100 as admin_log %}"
@@ -1615,7 +1621,7 @@ class GetAdminLogTests(TestCase):
             "{{ entry|safe }}"
             "{% endfor %}"
         )
-        self.assertEqual(t.render(Context({})), "Added “<User: jondoe>”.")
+        self.assertEqual(t.render(context), "Added “<User: jondoe>”.")
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"
@@ -1642,7 +1648,6 @@ class GetAdminLogTests(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_changelist.urls")
 class SeleniumTests(AdminSeleniumTestCase):
-
     available_apps = ["admin_changelist"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -1908,5 +1913,25 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.find_element(
                 By.CSS_SELECTOR,
                 "[data-filter-title='number of members']",
+            ).get_attribute("open")
+        )
+
+    def test_collapse_filter_with_unescaped_title(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret")
+        changelist_url = reverse("admin:admin_changelist_proxyuser_changelist")
+        self.selenium.get(self.live_server_url + changelist_url)
+        # Title is escaped.
+        filter_title = self.selenium.find_element(
+            By.CSS_SELECTOR, "[data-filter-title='It\\'s OK']"
+        )
+        filter_title.find_element(By.CSS_SELECTOR, "summary").click()
+        self.assertFalse(filter_title.get_attribute("open"))
+        # Filter is in the same state after refresh.
+        self.selenium.refresh()
+        self.assertFalse(
+            self.selenium.find_element(
+                By.CSS_SELECTOR, "[data-filter-title='It\\'s OK']"
             ).get_attribute("open")
         )
