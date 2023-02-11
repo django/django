@@ -418,6 +418,11 @@ uses a template variable called ``app_list``. That variable contains every
 installed Django app. Instead of using that, you can hard-code links to
 object-specific admin pages in whatever way you think is best.
 
+How to completely delete an app from the project
+==============================
+Now that you have learned every aspect of app creation, customization and etc.
+You need to know how to properly delete an app from the project.
+
 What's next?
 ============
 
