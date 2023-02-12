@@ -872,13 +872,19 @@ Formsets have the following attributes and methods associated with rendering:
 
     .. versionadded:: 4.0
 
-    The render method is called by ``__str__`` as well as the :meth:`.as_p`,
-    :meth:`.as_ul`, and :meth:`.as_table` methods. All arguments are optional
-    and will default to:
+    The render method is called by ``__str__`` as well as the :meth:`.as_div`,
+    :meth:`.as_p`, :meth:`.as_ul`, and :meth:`.as_table` methods. All arguments
+    are optional and will default to:
 
     * ``template_name``: :attr:`.template_name`
     * ``context``: Value returned by :meth:`.get_context`
     * ``renderer``: Value returned by :attr:`.renderer`
+
+.. method:: BaseFormSet.as_div()
+
+    .. versionadded:: 4.1
+
+    Renders the formset with the :attr:`.template_name_div` template.
 
 .. method:: BaseFormSet.as_p()
 
