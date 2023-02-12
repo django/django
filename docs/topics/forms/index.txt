@@ -493,6 +493,8 @@ appropriately.
     ``<form>`` tags, or the form's ``submit`` control. You will have to provide
     these yourself.
 
+.. _reusable-form-templates:
+
 Reusable form templates
 -----------------------
 
@@ -551,44 +553,6 @@ the :meth:`.Form.render`. Here's an example of this being used in a view::
         return render(request, 'index.html', context)
 
 See :ref:`ref-forms-api-outputting-html` for more details.
-
-Form rendering options
-----------------------
-
-There are other output options though for the ``<label>``/``<input>`` pairs:
-
-* ``{{ form.as_div }}`` will render them wrapped in ``<div>`` tags.
-
-* ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
-  tags.
-
-* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags.
-
-* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags.
-
-Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
-elements yourself.
-
-Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
-
-.. code-block:: html+django
-
-    <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="id_message">Message:</label>
-        <textarea name="message" id="id_message" required></textarea></p>
-    <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" required></p>
-    <p><label for="id_cc_myself">Cc myself:</label>
-        <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
-
-Note that each form field has an ID attribute set to ``id_<field-name>``, which
-is referenced by the accompanying label tag. This is important in ensuring that
-forms are accessible to assistive technology such as screen reader software.
-You can also :ref:`customize the way in which labels and ids are generated
-<ref-forms-api-configuring-label>`.
-
-See :ref:`ref-forms-api-outputting-html` for more on this.
 
 Rendering fields manually
 -------------------------

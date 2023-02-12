@@ -554,9 +554,9 @@ This default output wraps each field with a ``<div>``. Notice the following:
   it uses boolean attributes such as ``checked`` rather than the XHTML style
   of ``checked='checked'``.
 
-Although ``<div>`` output is the default output style when you ``print`` a
-form, other output styles are available. Each style is available as a method on
-a form object, and each rendering method returns a string.
+Although ``<div>`` output is the default output style when you ``print`` a form
+you can customize the output by using your own form template which can be set
+site-wide, per-form, or per-instance. See :ref:`reusable-form-templates`.
 
 Default rendering
 -----------------
@@ -620,14 +620,20 @@ template, see also :ref:`overriding-built-in-form-templates`.
 Output styles
 -------------
 
-As well as rendering the form directly, such as in a template with
-``{{ form }}``, the following helper functions serve as a proxy to
-:meth:`Form.render` passing a particular ``template_name`` value.
+The recommended approach for changing form output style is to set a custom form
+template either site-wide, per-form, or per-instance. See
+:ref:`reusable-form-templates` for examples.
 
-These helpers are most useful in a template, where you need to override the
-form renderer or form provided value but cannot pass the additional parameter
-to :meth:`~Form.render`. For example, you can render a form as an unordered
-list using ``{{ form.as_ul }}``.
+The following helper functions are provided for backward compatibility and are
+a proxy to :meth:`Form.render` passing a particular ``template_name`` value.
+
+.. note::
+
+    Of the framework provided templates and output styles, the default
+    ``as_div()`` is recommended over the ``as_p()``, ``as_table()``, and
+    ``as_ul()`` versions as the template implements ``<fieldset>`` and
+    ``<legend>`` to group related inputs and is easier for screen reader users
+    to navigate.
 
 Each helper pairs a form method with an attribute giving the appropriate
 template name.
@@ -669,13 +675,6 @@ The template used by ``as_div()``. Default: ``'django/forms/div.html'``.
     <label for="id_cc_myself">Cc myself:</label>
     <input type="checkbox" name="cc_myself" id="id_cc_myself">
     </div>
-
-.. note::
-
-    Of the framework provided templates and output styles, ``as_div()`` is
-    recommended over the ``as_p()``, ``as_table()``, and ``as_ul()`` versions
-    as the template implements ``<fieldset>`` and ``<legend>`` to group related
-    inputs and is easier for screen reader users to navigate.
 
 ``as_p()``
 ~~~~~~~~~~
