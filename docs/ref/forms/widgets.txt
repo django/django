@@ -144,10 +144,10 @@ provided for each widget will be rendered exactly the same:
 .. code-block:: pycon
 
     >>> f = CommentForm(auto_id=False)
-    >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" required></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url" required></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
+    >>> print(f)
+    <div>Name:<input type="text" name="name" required></div>
+    <div>Url:<input type="url" name="url" required></div>
+    <div>Comment:<input type="text" name="comment" required></div>
 
 On a real web page, you probably don't want every widget to look the same. You
 might want a larger input element for the comment, and you might want the
@@ -182,10 +182,10 @@ you can use the :attr:`Form.fields` attribute::
 Django will then include the extra attributes in the rendered output:
 
     >>> f = CommentForm(auto_id=False)
-    >>> f.as_table()
-    <tr><th>Name:</th><td><input type="text" name="name" class="special" required></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url" required></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" size="40" required></td></tr>
+    >>> print(f)
+    <div>Name:<input type="text" name="name" class="special" required></div>
+    <div>Url:<input type="url" name="url" required></div>
+    <div>Comment:<input type="text" name="comment" size="40" required></div>
 
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.

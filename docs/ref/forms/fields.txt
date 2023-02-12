@@ -129,9 +129,9 @@ We've specified ``auto_id=False`` to simplify the output:
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
-    <tr><th>Your name:</th><td><input type="text" name="name" required></td></tr>
-    <tr><th>Your website:</th><td><input type="url" name="url"></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
+    <div>Your name:<input type="text" name="name" required></div>
+    <div>Your website:<input type="url" name="url"></div>
+    <div>Comment:<input type="text" name="comment" required></div>
 
 ``label_suffix``
 ----------------
@@ -148,10 +148,10 @@ The ``label_suffix`` argument lets you override the form's
     ...     nationality = forms.CharField()
     ...     captcha_answer = forms.IntegerField(label='2 + 2', label_suffix=' =')
     >>> f = ContactForm(label_suffix='?')
-    >>> print(f.as_p())
-    <p><label for="id_age">Age?</label> <input id="id_age" name="age" type="number" required></p>
-    <p><label for="id_nationality">Nationality?</label> <input id="id_nationality" name="nationality" type="text" required></p>
-    <p><label for="id_captcha_answer">2 + 2 =</label> <input id="id_captcha_answer" name="captcha_answer" type="number" required></p>
+    >>> print(f)
+    <div><label for="id_age">Age?</label><input type="number" name="age" required id="id_age"></div>
+    <div><label for="id_nationality">Nationality?</label><input type="text" name="nationality" required id="id_nationality"></div>
+    <div><label for="id_captcha_answer">2 + 2 =</label><input type="number" name="captcha_answer" required id="id_captcha_answer"></div>
 
 ``initial``
 -----------
@@ -175,9 +175,9 @@ field is initialized to a particular value. For example:
     ...     comment = forms.CharField()
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
-    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" required></td></tr>
-    <tr><th>Url:</th><td><input type="url" name="url" value="http://" required></td></tr>
-    <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
+    <div>Name:<input type="text" name="name" value="Your name" required></div>
+    <div>Url:<input type="url" name="url" value="http://" required></div>
+    <div>Comment:<input type="text" name="comment" required></div>
 
 You may be thinking, why not just pass a dictionary of the initial values as
 data when displaying the form? Well, if you do that, you'll trigger validation,
@@ -192,9 +192,9 @@ and the HTML output will include any validation errors:
     >>> default_data = {'name': 'Your name', 'url': 'http://'}
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
-    <tr><th>Name:</th><td><input type="text" name="name" value="Your name" required></td></tr>
-    <tr><th>Url:</th><td><ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="url" name="url" value="http://" required></td></tr>
-    <tr><th>Comment:</th><td><ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" required></td></tr>
+    <div>Name:<input type="text" name="name" value="Your name" required></div>
+    <div>Url:<ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="url" name="url" value="http://" required></div>
+    <div>Comment:<ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" required></div>
 
 This is why ``initial`` values are only displayed for unbound forms. For bound
 forms, the HTML output will use the bound data.
@@ -225,7 +225,7 @@ Instead of a constant, you can also pass any callable:
     >>> class DateForm(forms.Form):
     ...     day = forms.DateField(initial=datetime.date.today)
     >>> print(DateForm())
-    <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" required><td></tr>
+    <div><label for="id_day">Day:</label><input type="text" name="day" value="2023-02-11" required id="id_day"></div>
 
 The callable will be evaluated only when the unbound form is displayed, not when it is defined.
 
@@ -262,21 +262,11 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     ...     sender = forms.EmailField(help_text='A valid email address, please.')
     ...     cc_myself = forms.BooleanField(required=False)
     >>> f = HelpTextContactForm(auto_id=False)
-    >>> print(f.as_table())
-    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" required><br><span class="helptext">100 characters max.</span></td></tr>
-    <tr><th>Message:</th><td><input type="text" name="message" required></td></tr>
-    <tr><th>Sender:</th><td><input type="email" name="sender" required><br>A valid email address, please.</td></tr>
-    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself"></td></tr>
-    >>> print(f.as_ul()))
-    <li>Subject: <input type="text" name="subject" maxlength="100" required> <span class="helptext">100 characters max.</span></li>
-    <li>Message: <input type="text" name="message" required></li>
-    <li>Sender: <input type="email" name="sender" required> A valid email address, please.</li>
-    <li>Cc myself: <input type="checkbox" name="cc_myself"></li>
-    >>> print(f.as_p())
-    <p>Subject: <input type="text" name="subject" maxlength="100" required> <span class="helptext">100 characters max.</span></p>
-    <p>Message: <input type="text" name="message" required></p>
-    <p>Sender: <input type="email" name="sender" required> A valid email address, please.</p>
-    <p>Cc myself: <input type="checkbox" name="cc_myself"></p>
+    >>> print(f)
+    <div>Subject:<div class="helptext">100 characters max.</div><input type="text" name="subject" maxlength="100" required></div>
+    <div>Message:<input type="text" name="message" required></div>
+    <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
+    <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
 ``error_messages``
 ------------------
