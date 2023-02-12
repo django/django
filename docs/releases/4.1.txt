@@ -596,6 +596,9 @@ Miscellaneous
   crash with mixed types. You will need to explicitly set the ``output_field``
   in such cases.
 
+* The :djadmin:`makemessages` command no longer changes ``.po`` files when up
+  to date. In older versions, ``POT-Creation-Date`` was always updated.
+
 .. _deprecated-features-4.1:
 
 Features deprecated in 4.1
