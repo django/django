@@ -567,7 +567,10 @@ class QuerySet(AltersData):
                 chunk.clear()
                 num_items = 0
 
-        if num_items:
+        if chunk:
+           await sync_to_async(prefetch_related_objects)(
+                chunk, *self._prefetch_related_lookups
+            )
             for each_item in chunk:
                 yield each_item
 
