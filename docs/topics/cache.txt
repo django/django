@@ -375,6 +375,14 @@ the user ``apache``.
     content, which your site will trust, but also remotely execute arbitrary
     code, as the data is serialized using :mod:`pickle`.
 
+.. warning::
+
+    Filesystem caching may become slow when storing a large number of files. If
+    you run into this problem, consider using a different caching mechanism.
+    You can also subclass
+    :source:`FileBasedCache <django/core/cache/backends/filebased.py>` and
+    improve the culling strategy.
+
 .. _local-memory-caching:
 
 Local-memory caching
