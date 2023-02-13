@@ -5,7 +5,6 @@ The main QuerySet implementation. This provides the public API for the ORM.
 import copy
 import operator
 import warnings
-from collections import deque
 from itertools import chain, islice
 
 from asgiref.sync import sync_to_async
@@ -551,24 +550,21 @@ class QuerySet(AltersData):
             "DISABLE_SERVER_SIDE_CURSORS"
         )
 
-        chunk = deque()
-        num_items = 0
+        chunk = []
         async for item in self._iterable_class(
             self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
         ):
             chunk.append(item)
-            num_items += 1
-            if num_items == chunk_size:
+            if len(chunk) == chunk_size:
                 await sync_to_async(prefetch_related_objects)(
                     chunk, *self._prefetch_related_lookups
                 )
                 for each_item in chunk:
                     yield each_item
                 chunk.clear()
-                num_items = 0
 
         if chunk:
-           await sync_to_async(prefetch_related_objects)(
+            await sync_to_async(prefetch_related_objects)(
                 chunk, *self._prefetch_related_lookups
             )
             for each_item in chunk:
