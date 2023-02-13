@@ -65,6 +65,9 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   600,000 to 720,000.
 
+* ``AuthenticationMiddleware`` now adds an :meth:`.HttpRequest.auser`
+  asynchronous method that returns the currently logged-in user.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

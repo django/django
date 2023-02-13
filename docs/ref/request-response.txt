@@ -281,8 +281,22 @@ middleware class is listed in :setting:`MIDDLEWARE`.
         else:
             ...  # Do something for anonymous users.
 
+    The :meth:`auser` method does the same thing but can be used from async
+    contexts.
+
 Methods
 -------
+
+.. method:: HttpRequest.auser()
+
+    .. versionadded:: 5.0
+
+    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    Coroutine. Returns an instance of :setting:`AUTH_USER_MODEL` representing
+    the currently logged-in user. If the user isn't currently logged in,
+    ``auser`` will return an instance of
+    :class:`~django.contrib.auth.models.AnonymousUser`. This is similar to the
+    :attr:`user` attribute but it works in async contexts.
 
 .. method:: HttpRequest.get_host()
 
