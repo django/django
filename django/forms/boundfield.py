@@ -198,7 +198,7 @@ class BoundField:
         context = {
             "field": self,
             "label": contents,
-            "attrs": attrs,
+            "attrs": attrs or {},
             "use_tag": bool(id_),
             "tag": tag or "label",
         }
