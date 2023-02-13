@@ -368,6 +368,7 @@ Django uses :doc:`sessions </topics/http/sessions>` and middleware to hook the
 authentication system into :class:`request objects <django.http.HttpRequest>`.
 
 These provide a :attr:`request.user <django.http.HttpRequest.user>`  attribute
+and a :meth:`request.auser <django.http.HttpRequest.auser>` async method
 on every request which represents the current user. If the current user has not
 logged in, this attribute will be set to an instance
 of :class:`~django.contrib.auth.models.AnonymousUser`, otherwise it will be an
@@ -382,6 +383,20 @@ You can tell them apart with
     else:
         # Do something for anonymous users.
         ...
+
+Or in an asynchronous view::
+
+    user = await request.auser()
+    if user.is_authenticated:
+        # Do something for authenticated users.
+        ...
+    else:
+        # Do something for anonymous users.
+        ...
+
+.. versionchanged:: 5.0
+
+    The :meth:`.HttpRequest.auser` method was added.
 
 .. _how-to-log-a-user-in:
 
