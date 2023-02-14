@@ -434,6 +434,9 @@ However, be careful when running this command when you have other apps
 dependent on the migrations of the deleting app. After it is deleted, 
 migration system will crash because it can not find those migrations.
 
+However you can avoid such situations by simply squashing migrations. 
+For more information, read :ref:`Squashing Migrations <migration-squashing>`.
+
 Next, you need to remove app from the :setting:`INSTALLED_APPS` in settings
 of the project, the app directory itself and every reference of the app from 
 other files, such as ``include(app_name.urls)`` statement from ``urls.py``.
