@@ -371,6 +371,25 @@ Here's an example of how to create a middleware function that supports both::
     Thus, even if you are wrapping an async view, you may be called in sync
     mode if there is other, synchronous middleware between you and the view.
 
+When using an asynchronous class-based middleware, you must ensure that
+instances are correctly marked as coroutine functions::
+
+    from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+
+    class AsyncMiddleware:
+        async_capable = True
+        sync_capable = False
+
+        def __init__(self, get_response):
+            self.get_response = get_response
+            if iscoroutinefunction(self.get_response):
+                markcoroutinefunction(self)
+
+        async def __call__(self, request):
+            response = await self.get_response(request)
+            # Some logic ...
+            return response
+
 .. _upgrading-middleware:
 
 Upgrading pre-Django 1.10-style middleware

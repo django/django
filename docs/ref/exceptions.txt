@@ -95,11 +95,16 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
     * ``TooManyFieldsSent``
+    * ``TooManyFilesSent``
 
     If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
     it is logged at the ``Error`` level and results in
     a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
+
+.. versionchanged:: 3.2.18
+
+    ``SuspiciousOperation`` is raised when too many files are submitted.
 
 ``PermissionDenied``
 --------------------
