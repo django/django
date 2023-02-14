@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_message=None)
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_code=None, violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -132,6 +132,16 @@ used for queries that select only included fields
 
 ``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
 ``include`` for SP-GiST indexes.
+
+``violation_error_code``
+------------------------
+
+.. versionadded:: 5.0
+
+.. attribute:: ExclusionConstraint.violation_error_code
+
+The error code used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to ``None``.
 
 ``violation_error_message``
 ---------------------------
