@@ -78,7 +78,10 @@ Minor features
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :attr:`~.ExclusionConstraint.violation_error_code` attribute of
+  :class:`~django.contrib.postgres.constraints.ExclusionConstraint` allows
+  customizing the ``code`` of ``ValidationError`` raised during
+  :ref:`model validation <validating-objects>`.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -181,6 +184,13 @@ Models
 * The new ``create_defaults`` argument of :meth:`.QuerySet.update_or_create`
   and :meth:`.QuerySet.aupdate_or_create` methods allows specifying a different
   field values for the create operation.
+
+* The new ``violation_error_code`` attribute of
+  :class:`~django.db.models.BaseConstraint`,
+  :class:`~django.db.models.CheckConstraint`, and
+  :class:`~django.db.models.UniqueConstraint` allows customizing the ``code``
+  of ``ValidationError`` raised during
+  :ref:`model validation <validating-objects>`.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
