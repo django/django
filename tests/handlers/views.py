@@ -65,6 +65,14 @@ async def async_regular(request):
     return HttpResponse(b"regular content")
 
 
+async def async_streaming(request):
+    async def async_streaming_generator():
+        yield b"streaming"
+        yield b" "
+        yield b"content"
+    return StreamingHttpResponse(async_streaming_generator())
+
+
 class CoroutineClearingView:
     def __call__(self, request):
         """Return an unawaited coroutine (common error for async views)."""

@@ -248,6 +248,11 @@ class HandlerRequestTests(SimpleTestCase):
             ):
                 self.client.get(url)
 
+    def test_streaming(self):
+        response = self.client.get("/streaming/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(response.streaming_content), b"streaming content")
+
 
 class ScriptNameTests(SimpleTestCase):
     def test_get_script_name(self):
@@ -312,3 +317,9 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get("/unawaited/")
+
+    async def test_async_streaming(self):
+        response = await self.async_client.get("/async_streaming/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(chunk async for chunk in response.streaming_content), b"streaming content")
+
