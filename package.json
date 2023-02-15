@@ -13,7 +13,7 @@
     "puppeteer": "^19.7.0",
     "grunt": "^1.6.1",
     "grunt-cli": "^1.4.3",
-    "grunt-contrib-qunit": "^6.2.1",
+    "grunt-contrib-qunit": "^7.0.0",
     "qunit": "^2.19.4"
   }
 }
