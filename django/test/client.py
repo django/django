@@ -116,6 +116,16 @@ def closing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+async def aclosing_iterator_wrapper(iterable, close):
+    try:
+        async for chunk in iterable:
+            yield chunk
+    finally:
+        request_finished.disconnect(close_old_connections)
+        close()  # will fire request_finished
+        request_finished.connect(close_old_connections)
+
+
 def conditional_content_removal(request, response):
     """
     Simulate the behavior of most web servers by removing the content of
@@ -174,9 +184,14 @@ class ClientHandler(BaseHandler):
 
         # Emulate a WSGI server by calling the close method on completion.
         if response.streaming:
-            response.streaming_content = closing_iterator_wrapper(
-                response.streaming_content, response.close
-            )
+            if response.is_async:
+                response.streaming_content = aclosing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
+            else:
+                response.streaming_content = closing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
         else:
             request_finished.disconnect(close_old_connections)
             response.close()  # will fire request_finished
@@ -223,12 +238,14 @@ class AsyncClientHandler(BaseHandler):
         response.asgi_request = request
         # Emulate a server by calling the close method on completion.
         if response.streaming:
-            response.streaming_content = await sync_to_async(
-                closing_iterator_wrapper, thread_sensitive=False
-            )(
-                response.streaming_content,
-                response.close,
-            )
+            if response.is_async:
+                response.streaming_content = aclosing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
+            else:
+                response.streaming_content = closing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
         else:
             request_finished.disconnect(close_old_connections)
             # Will fire request_finished.
