@@ -9,9 +9,11 @@ from django.contrib.admin.exceptions import (
     DisallowedModelAdminToField,
 )
 from django.contrib.admin.options import (
+    IS_FACETS_VAR,
     IS_POPUP_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
+    ShowFacets,
 )
 from django.contrib.admin.utils import (
     get_fields_from_path,
@@ -39,7 +41,14 @@ PAGE_VAR = "p"
 SEARCH_VAR = "q"
 ERROR_FLAG = "e"
 
-IGNORED_PARAMS = (ALL_VAR, ORDER_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
+IGNORED_PARAMS = (
+    ALL_VAR,
+    ORDER_VAR,
+    SEARCH_VAR,
+    IS_FACETS_VAR,
+    IS_POPUP_VAR,
+    TO_FIELD_VAR,
+)
 
 
 class ChangeListSearchForm(forms.Form):
@@ -103,6 +112,10 @@ class ChangeList:
             self.page_num = 1
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
+        self.add_facets = model_admin.show_facets is ShowFacets.ALWAYS or (
+            model_admin.show_facets is ShowFacets.ALLOW and IS_FACETS_VAR in request.GET
+        )
+        self.is_facets_optional = model_admin.show_facets is ShowFacets.ALLOW
         to_field = request.GET.get(TO_FIELD_VAR)
         if to_field and not model_admin.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
@@ -114,6 +127,8 @@ class ChangeList:
             del self.params[PAGE_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
+        self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
+        self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
 
         if self.is_popup:
             self.list_editable = ()
@@ -492,7 +507,7 @@ class ChangeList:
                 ordering_fields[idx] = "desc" if pfx == "-" else "asc"
         return ordering_fields
 
-    def get_queryset(self, request):
+    def get_queryset(self, request, exclude_parameters=None):
         # First, we collect all the declared list filters.
         (
             self.filter_specs,
@@ -504,9 +519,13 @@ class ChangeList:
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
         for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs)
-            if new_qs is not None:
-                qs = new_qs
+            if (
+                exclude_parameters is None
+                or filter_spec.expected_parameters() != exclude_parameters
+            ):
+                new_qs = filter_spec.queryset(request, qs)
+                if new_qs is not None:
+                    qs = new_qs
 
         try:
             # Finally, we apply the remaining lookup parameters from the query

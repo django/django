@@ -1002,6 +1002,54 @@ subclass::
     editing, or deleting an object. You can have filters cleared by setting
     this attribute to ``False``.
 
+.. attribute:: ModelAdmin.show_facets
+
+    .. versionadded:: 5.0
+
+    Controls whether facet counts are displayed for filters in the admin
+    changelist. Defaults to :attr:`.ShowFacets.ALLOW`.
+
+    When displayed, facet counts update in line with currently applied filters.
+
+    .. class:: ShowFacets
+
+        .. versionadded:: 5.0
+
+        Enum of allowed values for :attr:`.ModelAdmin.show_facets`.
+
+        .. attribute:: ALWAYS
+
+            Always show facet counts.
+
+        .. attribute:: ALLOW
+
+            Show facet counts when the ``_facets`` query string parameter is
+            provided.
+
+        .. attribute:: NEVER
+
+            Never show facet counts.
+
+    Set ``show_facets`` to the desired :class:`.ShowFacets` value. For example,
+    to always show facet counts without needing to provide the query
+    parameter::
+
+        from django.contrib import admin
+
+
+        class MyModelAdmin(admin.ModelAdmin):
+            ...
+            # Have facets always shown for this model admin.
+            show_facets = admin.ShowFacets.ALWAYS
+
+    .. admonition:: Performance considerations with facets
+
+        Enabling facet filters will increase the number of queries on the admin
+        changelist page in line with the number of filters. These queries may
+        cause performance problems, especially for large datasets. In these
+        cases it may be appropriate to set ``show_facets`` to
+        :attr:`.ShowFacets.NEVER` to disable faceting entirely.
+
 .. attribute:: ModelAdmin.radio_fields
 
     By default, Django's admin uses a select-box interface (<select>) for

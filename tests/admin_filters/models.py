@@ -40,6 +40,13 @@ class Book(models.Model):
     )
     # This field name is intentionally 2 characters long (#16080).
     no = models.IntegerField(verbose_name="number", blank=True, null=True)
+    CHOICES = [
+        ("non-fiction", "Non-Fictional"),
+        ("fiction", "Fictional"),
+        (None, "Not categorized"),
+        ("", "We don't know"),
+    ]
+    category = models.CharField(max_length=20, choices=CHOICES, blank=True, null=True)
 
     def __str__(self):
         return self.title

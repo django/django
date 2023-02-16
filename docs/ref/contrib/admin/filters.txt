@@ -210,3 +210,14 @@ It is possible to specify a custom template for rendering a list filter::
 
 See the default template provided by Django (``admin/filter.html``) for a
 concrete example.
+
+.. _facet-filters:
+
+Facets
+======
+
+.. versionadded:: 5.0
+
+By default, counts for each filter, known as facets, can be shown by toggling
+on via the admin UI. These counts will update according to the currently
+applied filters. See :attr:`ModelAdmin.show_facets` for more details.

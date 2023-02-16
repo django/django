@@ -12,11 +12,12 @@ from django.contrib.admin import (
     SimpleListFilter,
     site,
 )
-from django.contrib.admin.options import IncorrectLookupParameters
+from django.contrib.admin.filters import FacetsMixin
+from django.contrib.admin.options import IncorrectLookupParameters, ShowFacets
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
-from django.test import RequestFactory, TestCase, override_settings
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
 
@@ -217,8 +218,26 @@ class BookAdminRelatedOnlyFilter(ModelAdmin):
 
 
 class DecadeFilterBookAdmin(ModelAdmin):
-    list_filter = ("author", DecadeListFilterWithTitleAndParameter)
+    empty_value_display = "???"
+    list_filter = (
+        "author",
+        DecadeListFilterWithTitleAndParameter,
+        "is_best_seller",
+        "category",
+        "date_registered",
+        ("author__email", AllValuesFieldListFilter),
+        ("contributors", RelatedOnlyFieldListFilter),
+        ("category", EmptyFieldListFilter),
+    )
     ordering = ("-id",)
+
+
+class DecadeFilterBookAdminWithAlwaysFacets(DecadeFilterBookAdmin):
+    show_facets = ShowFacets.ALWAYS
+
+
+class DecadeFilterBookAdminDisallowFacets(DecadeFilterBookAdmin):
+    show_facets = ShowFacets.NEVER
 
 
 class NotNinetiesListFilterAdmin(ModelAdmin):
@@ -324,6 +343,7 @@ class ListFiltersTests(TestCase):
             is_best_seller=True,
             date_registered=cls.today,
             availability=True,
+            category="non-fiction",
         )
         cls.bio_book = Book.objects.create(
             title="Django: a biography",
@@ -332,6 +352,7 @@ class ListFiltersTests(TestCase):
             is_best_seller=False,
             no=207,
             availability=False,
+            category="fiction",
         )
         cls.django_book = Book.objects.create(
             title="The Django Book",
@@ -348,6 +369,7 @@ class ListFiltersTests(TestCase):
             is_best_seller=True,
             date_registered=cls.one_week_ago,
             availability=None,
+            category="",
         )
         cls.guitar_book.contributors.set([cls.bob, cls.lisa])
 
@@ -358,6 +380,10 @@ class ListFiltersTests(TestCase):
         # Employees
         cls.john = Employee.objects.create(name="John Blue", department=cls.dev)
         cls.jack = Employee.objects.create(name="Jack Red", department=cls.design)
+
+    def assertChoicesDisplay(self, choices, expected_displays):
+        for choice, expected_display in zip(choices, expected_displays, strict=True):
+            self.assertEqual(choice["display"], expected_display)
 
     def test_choicesfieldlistfilter_has_none_choice(self):
         """
@@ -1315,6 +1341,185 @@ class ListFiltersTests(TestCase):
         self.assertIs(choices[2]["selected"], False)
         self.assertEqual(choices[2]["query_string"], "?publication-decade=the+00s")
 
+    def _test_facets(self, modeladmin, request, query_string=None):
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(queryset, list(Book.objects.order_by("-id")))
+        filters = changelist.get_filters(request)[0]
+        # Filters for DateFieldListFilter.
+        expected_date_filters = ["Any date (4)", "Today (2)", "Past 7 days (3)"]
+        if (
+            self.today.month == self.one_week_ago.month
+            and self.today.year == self.one_week_ago.year
+        ):
+            expected_date_filters.extend(["This month (3)", "This year (3)"])
+        elif self.today.year == self.one_week_ago.year:
+            expected_date_filters.extend(["This month (2)", "This year (3)"])
+        else:
+            expected_date_filters.extend(["This month (2)", "This year (2)"])
+        expected_date_filters.extend(["No date (1)", "Has date (3)"])
+
+        tests = [
+            # RelatedFieldListFilter.
+            ["All", "alfred (2)", "bob (1)", "lisa (0)", "??? (1)"],
+            # SimpleListFilter.
+            [
+                "All",
+                "the 1980's (0)",
+                "the 1990's (1)",
+                "the 2000's (2)",
+                "other decades (-)",
+            ],
+            # BooleanFieldListFilter.
+            ["All", "Yes (2)", "No (1)", "Unknown (1)"],
+            # ChoicesFieldListFilter.
+            [
+                "All",
+                "Non-Fictional (1)",
+                "Fictional (1)",
+                "We don't know (1)",
+                "Not categorized (1)",
+            ],
+            # DateFieldListFilter.
+            expected_date_filters,
+            # AllValuesFieldListFilter.
+            [
+                "All",
+                "alfred@example.com (2)",
+                "bob@example.com (1)",
+                "lisa@example.com (0)",
+            ],
+            # RelatedOnlyFieldListFilter.
+            ["All", "bob (1)", "lisa (1)", "??? (3)"],
+            # EmptyFieldListFilter.
+            ["All", "Empty (2)", "Not empty (2)"],
+        ]
+        for filterspec, expected_displays in zip(filters, tests, strict=True):
+            with self.subTest(filterspec.__class__.__name__):
+                choices = list(filterspec.choices(changelist))
+                self.assertChoicesDisplay(choices, expected_displays)
+                if query_string:
+                    for choice in choices:
+                        self.assertIn(query_string, choice["query_string"])
+
+    def test_facets_always(self):
+        modeladmin = DecadeFilterBookAdminWithAlwaysFacets(Book, site)
+        request = self.request_factory.get("/")
+        self._test_facets(modeladmin, request)
+
+    def test_facets_no_filter(self):
+        modeladmin = DecadeFilterBookAdmin(Book, site)
+        request = self.request_factory.get("/?_facets")
+        self._test_facets(modeladmin, request, query_string="_facets")
+
+    def test_facets_filter(self):
+        modeladmin = DecadeFilterBookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/", {"author__id__exact": self.alfred.pk, "_facets": ""}
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(
+            queryset,
+            list(Book.objects.filter(author=self.alfred).order_by("-id")),
+        )
+        filters = changelist.get_filters(request)[0]
+
+        tests = [
+            # RelatedFieldListFilter.
+            ["All", "alfred (2)", "bob (1)", "lisa (0)", "??? (1)"],
+            # SimpleListFilter.
+            [
+                "All",
+                "the 1980's (0)",
+                "the 1990's (1)",
+                "the 2000's (1)",
+                "other decades (-)",
+            ],
+            # BooleanFieldListFilter.
+            ["All", "Yes (1)", "No (1)", "Unknown (0)"],
+            # ChoicesFieldListFilter.
+            [
+                "All",
+                "Non-Fictional (1)",
+                "Fictional (1)",
+                "We don't know (0)",
+                "Not categorized (0)",
+            ],
+            # DateFieldListFilter.
+            [
+                "Any date (2)",
+                "Today (1)",
+                "Past 7 days (1)",
+                "This month (1)",
+                "This year (1)",
+                "No date (1)",
+                "Has date (1)",
+            ],
+            # AllValuesFieldListFilter.
+            [
+                "All",
+                "alfred@example.com (2)",
+                "bob@example.com (0)",
+                "lisa@example.com (0)",
+            ],
+            # RelatedOnlyFieldListFilter.
+            ["All", "bob (0)", "lisa (0)", "??? (2)"],
+            # EmptyFieldListFilter.
+            ["All", "Empty (0)", "Not empty (2)"],
+        ]
+        for filterspec, expected_displays in zip(filters, tests, strict=True):
+            with self.subTest(filterspec.__class__.__name__):
+                choices = list(filterspec.choices(changelist))
+                self.assertChoicesDisplay(choices, expected_displays)
+                for choice in choices:
+                    self.assertIn("_facets", choice["query_string"])
+
+    def test_facets_disallowed(self):
+        modeladmin = DecadeFilterBookAdminDisallowFacets(Book, site)
+        # Facets are not visible even when in the url query.
+        request = self.request_factory.get("/?_facets")
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(queryset, list(Book.objects.order_by("-id")))
+        filters = changelist.get_filters(request)[0]
+
+        tests = [
+            # RelatedFieldListFilter.
+            ["All", "alfred", "bob", "lisa", "???"],
+            # SimpleListFilter.
+            ["All", "the 1980's", "the 1990's", "the 2000's", "other decades"],
+            # BooleanFieldListFilter.
+            ["All", "Yes", "No", "Unknown"],
+            # ChoicesFieldListFilter.
+            ["All", "Non-Fictional", "Fictional", "We don't know", "Not categorized"],
+            # DateFieldListFilter.
+            [
+                "Any date",
+                "Today",
+                "Past 7 days",
+                "This month",
+                "This year",
+                "No date",
+                "Has date",
+            ],
+            # AllValuesFieldListFilter.
+            ["All", "alfred@example.com", "bob@example.com", "lisa@example.com"],
+            # RelatedOnlyFieldListFilter.
+            ["All", "bob", "lisa", "???"],
+            # EmptyFieldListFilter.
+            ["All", "Empty", "Not empty"],
+        ]
+        for filterspec, expected_displays in zip(filters, tests, strict=True):
+            with self.subTest(filterspec.__class__.__name__):
+                self.assertChoicesDisplay(
+                    filterspec.choices(changelist),
+                    expected_displays,
+                )
+
     def test_two_characters_long_field(self):
         """
         list_filter works with two-characters long field names (#16080).
@@ -1698,3 +1903,10 @@ class ListFiltersTests(TestCase):
         # Make sure the correct queryset is returned
         queryset = changelist.get_queryset(request)
         self.assertEqual(list(queryset), [jane])
+
+
+class FacetsMixinTests(SimpleTestCase):
+    def test_get_facet_counts(self):
+        msg = "subclasses of FacetsMixin must provide a get_facet_counts() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            FacetsMixin().get_facet_counts(None, None)
