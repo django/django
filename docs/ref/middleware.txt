@@ -67,6 +67,7 @@ Adds a few conveniences for perfectionists:
 
     from django.views.decorators.common import no_append_slash
 
+
     @no_append_slash
     def sensitive_fbv(request, *args, **kwargs):
         """View to be excluded from APPEND_SLASH."""

@@ -26,7 +26,7 @@ single column in the database. For example:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.filter(body_text__search='Cheese')
+    >>> Entry.objects.filter(body_text__search="Cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 This creates a ``to_tsvector`` in the database from the ``body_text`` field
@@ -50,8 +50,8 @@ To query against both fields, use a ``SearchVector``:
 
     >>> from django.contrib.postgres.search import SearchVector
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('body_text', 'blog__tagline'),
-    ... ).filter(search='Cheese')
+    ...     search=SearchVector("body_text", "blog__tagline"),
+    ... ).filter(search="Cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 The arguments to ``SearchVector`` can be any
@@ -65,8 +65,8 @@ For example:
 .. code-block:: pycon
 
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('body_text') + SearchVector('blog__tagline'),
-    ... ).filter(search='Cheese')
+    ...     search=SearchVector("body_text") + SearchVector("blog__tagline"),
+    ... ).filter(search="Cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza Recipes>]
 
 See :ref:`postgresql-fts-search-configuration` and
@@ -107,9 +107,9 @@ Examples:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery
-    >>> SearchQuery('meat') & SearchQuery('cheese')  # AND
-    >>> SearchQuery('meat') | SearchQuery('cheese')  # OR
-    >>> ~SearchQuery('meat')  # NOT
+    >>> SearchQuery("meat") & SearchQuery("cheese")  # AND
+    >>> SearchQuery("meat") | SearchQuery("cheese")  # OR
+    >>> ~SearchQuery("meat")  # NOT
 
 See :ref:`postgresql-fts-search-configuration` for an explanation of the
 ``config`` parameter.
@@ -130,9 +130,9 @@ order by relevancy:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-    >>> vector = SearchVector('body_text')
-    >>> query = SearchQuery('cheese')
-    >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by('-rank')
+    >>> vector = SearchVector("body_text")
+    >>> query = SearchQuery("cheese")
+    >>> Entry.objects.annotate(rank=SearchRank(vector, query)).order_by("-rank")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 See :ref:`postgresql-fts-weighting-queries` for an explanation of the
@@ -199,13 +199,13 @@ Usage example:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchHeadline, SearchQuery
-    >>> query = SearchQuery('red tomato')
+    >>> query = SearchQuery("red tomato")
     >>> entry = Entry.objects.annotate(
     ...     headline=SearchHeadline(
-    ...         'body_text',
+    ...         "body_text",
     ...         query,
-    ...         start_sel='<span>',
-    ...         stop_sel='</span>',
+    ...         start_sel="<span>",
+    ...         stop_sel="</span>",
     ...     ),
     ... ).get()
     >>> print(entry.headline)
@@ -229,8 +229,8 @@ different language parsers and dictionaries as defined by the database:
 
     >>> from django.contrib.postgres.search import SearchQuery, SearchVector
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('body_text', config='french'),
-    ... ).filter(search=SearchQuery('œuf', config='french'))
+    ...     search=SearchVector("body_text", config="french"),
+    ... ).filter(search=SearchQuery("œuf", config="french"))
     [<Entry: Pain perdu>]
 
 The value of ``config`` could also be stored in another column:
@@ -239,8 +239,8 @@ The value of ``config`` could also be stored in another column:
 
     >>> from django.db.models import F
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('body_text', config=F('blog__language')),
-    ... ).filter(search=SearchQuery('œuf', config=F('blog__language')))
+    ...     search=SearchVector("body_text", config=F("blog__language")),
+    ... ).filter(search=SearchQuery("œuf", config=F("blog__language")))
     [<Entry: Pain perdu>]
 
 .. _postgresql-fts-weighting-queries:
@@ -254,9 +254,13 @@ of various vectors before you combine them:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import SearchQuery, SearchRank, SearchVector
-    >>> vector = SearchVector('body_text', weight='A') + SearchVector('blog__tagline', weight='B')
-    >>> query = SearchQuery('cheese')
-    >>> Entry.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.3).order_by('rank')
+    >>> vector = SearchVector("body_text", weight="A") + SearchVector(
+    ...     "blog__tagline", weight="B"
+    ... )
+    >>> query = SearchQuery("cheese")
+    >>> Entry.objects.annotate(rank=SearchRank(vector, query)).filter(rank__gte=0.3).order_by(
+    ...     "rank"
+    ... )
 
 The weight should be one of the following letters: D, C, B, A. By default,
 these weights refer to the numbers ``0.1``, ``0.2``, ``0.4``, and ``1.0``,
@@ -266,7 +270,7 @@ floats to :class:`SearchRank` as ``weights`` in the same order above:
 .. code-block:: pycon
 
     >>> rank = SearchRank(vector, query, weights=[0.2, 0.4, 0.6, 0.8])
-    >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by('-rank')
+    >>> Entry.objects.annotate(rank=rank).filter(rank__gte=0.3).order_by("-rank")
 
 Performance
 ===========
@@ -283,8 +287,8 @@ particular model, you can create a functional
 the search vector you wish to use. For example::
 
     GinIndex(
-        SearchVector('body_text', 'headline', config='english'),
-        name='search_vector_idx',
+        SearchVector("body_text", "headline", config="english"),
+        name="search_vector_idx",
     )
 
 The PostgreSQL documentation has details on
@@ -303,8 +307,8 @@ if it were an annotated ``SearchVector``:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.update(search_vector=SearchVector('body_text'))
-    >>> Entry.objects.filter(search_vector='cheese')
+    >>> Entry.objects.update(search_vector=SearchVector("body_text"))
+    >>> Entry.objects.filter(search_vector="cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 .. _PostgreSQL documentation: https://www.postgresql.org/docs/current/textsearch-features.html#TEXTSEARCH-UPDATE-TRIGGERS
@@ -336,12 +340,12 @@ Usage example:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import TrigramSimilarity
-    >>> Author.objects.create(name='Katy Stevens')
-    >>> Author.objects.create(name='Stephen Keats')
-    >>> test = 'Katie Stephens'
-    >>> Author.objects.annotate(
-    ...     similarity=TrigramSimilarity('name', test),
-    ... ).filter(similarity__gt=0.3).order_by('-similarity')
+    >>> Author.objects.create(name="Katy Stevens")
+    >>> Author.objects.create(name="Stephen Keats")
+    >>> test = "Katie Stephens"
+    >>> Author.objects.annotate(similarity=TrigramSimilarity("name", test),).filter(
+    ...     similarity__gt=0.3
+    ... ).order_by("-similarity")
     [<Author: Katy Stevens>, <Author: Stephen Keats>]
 
 ``TrigramWordSimilarity``
@@ -357,12 +361,12 @@ Usage example:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import TrigramWordSimilarity
-    >>> Author.objects.create(name='Katy Stevens')
-    >>> Author.objects.create(name='Stephen Keats')
-    >>> test = 'Kat'
-    >>> Author.objects.annotate(
-    ...     similarity=TrigramWordSimilarity(test, 'name'),
-    ... ).filter(similarity__gt=0.3).order_by('-similarity')
+    >>> Author.objects.create(name="Katy Stevens")
+    >>> Author.objects.create(name="Stephen Keats")
+    >>> test = "Kat"
+    >>> Author.objects.annotate(similarity=TrigramWordSimilarity(test, "name"),).filter(
+    ...     similarity__gt=0.3
+    ... ).order_by("-similarity")
     [<Author: Katy Stevens>]
 
 ``TrigramStrictWordSimilarity``
@@ -390,12 +394,12 @@ Usage example:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import TrigramDistance
-    >>> Author.objects.create(name='Katy Stevens')
-    >>> Author.objects.create(name='Stephen Keats')
-    >>> test = 'Katie Stephens'
-    >>> Author.objects.annotate(
-    ...     distance=TrigramDistance('name', test),
-    ... ).filter(distance__lte=0.7).order_by('distance')
+    >>> Author.objects.create(name="Katy Stevens")
+    >>> Author.objects.create(name="Stephen Keats")
+    >>> test = "Katie Stephens"
+    >>> Author.objects.annotate(distance=TrigramDistance("name", test),).filter(
+    ...     distance__lte=0.7
+    ... ).order_by("distance")
     [<Author: Katy Stevens>, <Author: Stephen Keats>]
 
 ``TrigramWordDistance``
@@ -411,12 +415,12 @@ Usage example:
 .. code-block:: pycon
 
     >>> from django.contrib.postgres.search import TrigramWordDistance
-    >>> Author.objects.create(name='Katy Stevens')
-    >>> Author.objects.create(name='Stephen Keats')
-    >>> test = 'Kat'
-    >>> Author.objects.annotate(
-    ...     distance=TrigramWordDistance(test, 'name'),
-    ... ).filter(distance__lte=0.7).order_by('distance')
+    >>> Author.objects.create(name="Katy Stevens")
+    >>> Author.objects.create(name="Stephen Keats")
+    >>> test = "Kat"
+    >>> Author.objects.annotate(distance=TrigramWordDistance(test, "name"),).filter(
+    ...     distance__lte=0.7
+    ... ).order_by("distance")
     [<Author: Katy Stevens>]
 
 ``TrigramStrictWordDistance``

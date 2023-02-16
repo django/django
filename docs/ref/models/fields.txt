@@ -96,11 +96,11 @@ The first element in each tuple is the actual value to be set on the model,
 and the second element is the human-readable name. For example::
 
     YEAR_IN_SCHOOL_CHOICES = [
-        ('FR', 'Freshman'),
-        ('SO', 'Sophomore'),
-        ('JR', 'Junior'),
-        ('SR', 'Senior'),
-        ('GR', 'Graduate'),
+        ("FR", "Freshman"),
+        ("SO", "Sophomore"),
+        ("JR", "Junior"),
+        ("SR", "Senior"),
+        ("GR", "Graduate"),
     ]
 
 Generally, it's best to define choices inside a model class, and to
@@ -108,18 +108,19 @@ define a suitably-named constant for each value::
 
     from django.db import models
 
+
     class Student(models.Model):
-        FRESHMAN = 'FR'
-        SOPHOMORE = 'SO'
-        JUNIOR = 'JR'
-        SENIOR = 'SR'
-        GRADUATE = 'GR'
+        FRESHMAN = "FR"
+        SOPHOMORE = "SO"
+        JUNIOR = "JR"
+        SENIOR = "SR"
+        GRADUATE = "GR"
         YEAR_IN_SCHOOL_CHOICES = [
-            (FRESHMAN, 'Freshman'),
-            (SOPHOMORE, 'Sophomore'),
-            (JUNIOR, 'Junior'),
-            (SENIOR, 'Senior'),
-            (GRADUATE, 'Graduate'),
+            (FRESHMAN, "Freshman"),
+            (SOPHOMORE, "Sophomore"),
+            (JUNIOR, "Junior"),
+            (SENIOR, "Senior"),
+            (GRADUATE, "Graduate"),
         ]
         year_in_school = models.CharField(
             max_length=2,
@@ -142,17 +143,21 @@ You can also collect your available choices into named groups that can
 be used for organizational purposes::
 
     MEDIA_CHOICES = [
-        ('Audio', (
-                ('vinyl', 'Vinyl'),
-                ('cd', 'CD'),
-            )
+        (
+            "Audio",
+            (
+                ("vinyl", "Vinyl"),
+                ("cd", "CD"),
+            ),
         ),
-        ('Video', (
-                ('vhs', 'VHS Tape'),
-                ('dvd', 'DVD'),
-            )
+        (
+            "Video",
+            (
+                ("vhs", "VHS Tape"),
+                ("dvd", "DVD"),
+            ),
         ),
-        ('unknown', 'Unknown'),
+        ("unknown", "Unknown"),
     ]
 
 The first element in each tuple is the name to apply to the group. The
@@ -194,14 +199,14 @@ choices in a concise way::
 
     from django.utils.translation import gettext_lazy as _
 
-    class Student(models.Model):
 
+    class Student(models.Model):
         class YearInSchool(models.TextChoices):
-            FRESHMAN = 'FR', _('Freshman')
-            SOPHOMORE = 'SO', _('Sophomore')
-            JUNIOR = 'JR', _('Junior')
-            SENIOR = 'SR', _('Senior')
-            GRADUATE = 'GR', _('Graduate')
+            FRESHMAN = "FR", _("Freshman")
+            SOPHOMORE = "SO", _("Sophomore")
+            JUNIOR = "JR", _("Junior")
+            SENIOR = "SR", _("Senior")
+            GRADUATE = "GR", _("Graduate")
 
         year_in_school = models.CharField(
             max_length=2,
@@ -254,9 +259,9 @@ title-case):
 .. code-block:: pycon
 
     >>> class Vehicle(models.TextChoices):
-    ...     CAR = 'C'
-    ...     TRUCK = 'T'
-    ...     JET_SKI = 'J'
+    ...     CAR = "C"
+    ...     TRUCK = "T"
+    ...     JET_SKI = "J"
     ...
     >>> Vehicle.JET_SKI.label
     'Jet Ski'
@@ -265,7 +270,6 @@ Since the case where the enum values need to be integers is extremely common,
 Django provides an ``IntegerChoices`` class. For example::
 
     class Card(models.Model):
-
         class Suit(models.IntegerChoices):
             DIAMOND = 1
             SPADE = 2
@@ -280,10 +284,10 @@ that labels are automatically generated as highlighted above:
 
 .. code-block:: pycon
 
-    >>> MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+    >>> MedalType = models.TextChoices("MedalType", "GOLD SILVER BRONZE")
     >>> MedalType.choices
     [('GOLD', 'Gold'), ('SILVER', 'Silver'), ('BRONZE', 'Bronze')]
-    >>> Place = models.IntegerChoices('Place', 'FIRST SECOND THIRD')
+    >>> Place = models.IntegerChoices("Place", "FIRST SECOND THIRD")
     >>> Place.choices
     [(1, 'First'), (2, 'Second'), (3, 'Third')]
 
@@ -294,12 +298,12 @@ you can subclass ``Choices`` and the required concrete data type, e.g.
 :class:`~datetime.date` for use with :class:`~django.db.models.DateField`::
 
     class MoonLandings(datetime.date, models.Choices):
-        APOLLO_11 = 1969, 7, 20, 'Apollo 11 (Eagle)'
-        APOLLO_12 = 1969, 11, 19, 'Apollo 12 (Intrepid)'
-        APOLLO_14 = 1971, 2, 5, 'Apollo 14 (Antares)'
-        APOLLO_15 = 1971, 7, 30, 'Apollo 15 (Falcon)'
-        APOLLO_16 = 1972, 4, 21, 'Apollo 16 (Orion)'
-        APOLLO_17 = 1972, 12, 11, 'Apollo 17 (Challenger)'
+        APOLLO_11 = 1969, 7, 20, "Apollo 11 (Eagle)"
+        APOLLO_12 = 1969, 11, 19, "Apollo 12 (Intrepid)"
+        APOLLO_14 = 1971, 2, 5, "Apollo 14 (Antares)"
+        APOLLO_15 = 1971, 7, 30, "Apollo 15 (Falcon)"
+        APOLLO_16 = 1972, 4, 21, "Apollo 16 (Orion)"
+        APOLLO_17 = 1972, 12, 11, "Apollo 17 (Challenger)"
 
 There are some additional caveats to be aware of:
 
@@ -311,10 +315,10 @@ There are some additional caveats to be aware of:
   set the ``__empty__`` attribute on the class::
 
     class Answer(models.IntegerChoices):
-        NO = 0, _('No')
-        YES = 1, _('Yes')
+        NO = 0, _("No")
+        YES = 1, _("Yes")
 
-        __empty__ = _('(Unknown)')
+        __empty__ = _("(Unknown)")
 
 ``db_column``
 -------------
@@ -379,6 +383,7 @@ callable. For example, if you want to specify a default ``dict`` for
     def contact_default():
         return {"email": "to1@example.com"}
 
+
     contact_info = JSONField("ContactInfo", default=contact_default)
 
 ``lambda``\s can't be used for field options like ``default`` because they
@@ -430,7 +435,7 @@ Note that this value is *not* HTML-escaped in automatically-generated
 forms. This lets you include HTML in :attr:`~Field.help_text` if you so
 desire. For example::
 
-    help_text="Please use the following format: <em>YYYY-MM-DD</em>."
+    help_text = "Please use the following format: <em>YYYY-MM-DD</em>."
 
 Alternatively you can use plain text and
 :func:`django.utils.html.escape` to escape any HTML special characters. Ensure
@@ -815,10 +820,10 @@ Has the following optional arguments:
 
         class MyModel(models.Model):
             # file will be uploaded to MEDIA_ROOT/uploads
-            upload = models.FileField(upload_to='uploads/')
+            upload = models.FileField(upload_to="uploads/")
             # or...
             # file will be saved to MEDIA_ROOT/uploads/2015/01/30
-            upload = models.FileField(upload_to='uploads/%Y/%m/%d/')
+            upload = models.FileField(upload_to="uploads/%Y/%m/%d/")
 
     If you are using the default
     :class:`~django.core.files.storage.FileSystemStorage`, the string value
@@ -854,7 +859,8 @@ Has the following optional arguments:
 
         def user_directory_path(instance, filename):
             # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-            return 'user_{0}/{1}'.format(instance.user.id, filename)
+            return "user_{0}/{1}".format(instance.user.id, filename)
+
 
         class MyModel(models.Model):
             upload = models.FileField(upload_to=user_directory_path)
@@ -1016,13 +1022,15 @@ You can construct a :class:`~django.core.files.File` from an existing
 Python file object like this::
 
     from django.core.files import File
+
     # Open an existing file using Python's built-in open()
-    f = open('/path/to/hello.world')
+    f = open("/path/to/hello.world")
     myfile = File(f)
 
 Or you can construct one from a Python string like this::
 
     from django.core.files.base import ContentFile
+
     myfile = ContentFile("hello world")
 
 For more information, see :doc:`/topics/files`.
@@ -1065,8 +1073,10 @@ directory on the filesystem. Has some special arguments, of which the first is
         from django.conf import settings
         from django.db import models
 
+
         def images_path():
-            return os.path.join(settings.LOCAL_FILE_DIR, 'images')
+            return os.path.join(settings.LOCAL_FILE_DIR, "images")
+
 
         class MyModel(models.Model):
             file = models.FilePathField(path=images_path)
@@ -1416,6 +1426,7 @@ it is recommended to use :attr:`~Field.default`::
     import uuid
     from django.db import models
 
+
     class MyUUIDModel(models.Model):
         id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
         # other fields
@@ -1463,12 +1474,14 @@ you can use the name of the model, rather than the model object itself::
 
     from django.db import models
 
+
     class Car(models.Model):
         manufacturer = models.ForeignKey(
-            'Manufacturer',
+            "Manufacturer",
             on_delete=models.CASCADE,
         )
         # ...
+
 
     class Manufacturer(models.Model):
         # ...
@@ -1483,8 +1496,9 @@ concrete model and are not relative to the abstract model's ``app_label``:
 
     from django.db import models
 
+
     class AbstractCar(models.Model):
-        manufacturer = models.ForeignKey('Manufacturer', on_delete=models.CASCADE)
+        manufacturer = models.ForeignKey("Manufacturer", on_delete=models.CASCADE)
 
         class Meta:
             abstract = True
@@ -1495,11 +1509,14 @@ concrete model and are not relative to the abstract model's ``app_label``:
     from django.db import models
     from products.models import AbstractCar
 
+
     class Manufacturer(models.Model):
         pass
 
+
     class Car(AbstractCar):
         pass
+
 
     # Car.manufacturer will point to `production.Manufacturer` here.
 
@@ -1510,7 +1527,7 @@ need to use::
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(
-            'production.Manufacturer',
+            "production.Manufacturer",
             on_delete=models.CASCADE,
         )
 
@@ -1592,8 +1609,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         class Artist(models.Model):
             name = models.CharField(max_length=10)
 
+
         class Album(models.Model):
             artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
+
 
         class Song(models.Model):
             artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
@@ -1605,8 +1624,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     .. code-block:: pycon
 
-        >>> artist_one = Artist.objects.create(name='artist one')
-        >>> artist_two = Artist.objects.create(name='artist two')
+        >>> artist_one = Artist.objects.create(name="artist one")
+        >>> artist_two = Artist.objects.create(name="artist two")
         >>> album_one = Album.objects.create(artist=artist_one)
         >>> album_two = Album.objects.create(artist=artist_two)
         >>> song_one = Song.objects.create(artist=artist_one, album=album_one)
@@ -1640,8 +1659,10 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         from django.contrib.auth import get_user_model
         from django.db import models
 
+
         def get_sentinel_user():
-            return get_user_model().objects.get_or_create(username='deleted')[0]
+            return get_user_model().objects.get_or_create(username="deleted")[0]
+
 
         class MyModel(models.Model):
             user = models.ForeignKey(
@@ -1668,7 +1689,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         staff_member = models.ForeignKey(
             User,
             on_delete=models.CASCADE,
-            limit_choices_to={'is_staff': True},
+            limit_choices_to={"is_staff": True},
         )
 
     causes the corresponding field on the ``ModelForm`` to list only ``Users``
@@ -1679,7 +1700,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     example::
 
         def limit_pub_date_choices():
-            return {'pub_date__lte': datetime.date.today()}
+            return {"pub_date__lte": datetime.date.today()}
+
 
         limit_choices_to = limit_pub_date_choices
 
@@ -1717,7 +1739,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
         user = models.ForeignKey(
             User,
             on_delete=models.CASCADE,
-            related_name='+',
+            related_name="+",
         )
 
 .. attribute:: ForeignKey.related_query_name
@@ -1736,6 +1758,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
                 related_query_name="tag",
             )
             name = models.CharField(max_length=255)
+
 
         # That's now the name of the reverse filter
         Article.objects.filter(tag__name="important")
@@ -1834,6 +1857,7 @@ that control how the relationship functions.
 
         from django.db import models
 
+
         class Person(models.Model):
             friends = models.ManyToManyField("self")
 
@@ -1911,16 +1935,19 @@ that control how the relationship functions.
 
         from django.db import models
 
+
         class Person(models.Model):
             name = models.CharField(max_length=50)
+
 
         class Group(models.Model):
             name = models.CharField(max_length=128)
             members = models.ManyToManyField(
                 Person,
-                through='Membership',
-                through_fields=('group', 'person'),
+                through="Membership",
+                through_fields=("group", "person"),
             )
+
 
         class Membership(models.Model):
             group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -2020,6 +2047,7 @@ With the following example::
     from django.conf import settings
     from django.db import models
 
+
     class MySpecialUser(models.Model):
         user = models.OneToOneField(
             settings.AUTH_USER_MODEL,
@@ -2028,7 +2056,7 @@ With the following example::
         supervisor = models.OneToOneField(
             settings.AUTH_USER_MODEL,
             on_delete=models.CASCADE,
-            related_name='supervisor_of',
+            related_name="supervisor_of",
         )
 
 your resulting ``User`` model will have the following attributes:
@@ -2036,9 +2064,9 @@ your resulting ``User`` model will have the following attributes:
 .. code-block:: pycon
 
     >>> user = User.objects.get(pk=1)
-    >>> hasattr(user, 'myspecialuser')
+    >>> hasattr(user, "myspecialuser")
     True
-    >>> hasattr(user, 'supervisor_of')
+    >>> hasattr(user, "supervisor_of")
     True
 
 A ``RelatedObjectDoesNotExist`` exception is raised when accessing the reverse

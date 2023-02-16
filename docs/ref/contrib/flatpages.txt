@@ -42,7 +42,7 @@ Then either:
 3. Add an entry in your URLconf. For example::
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 or:
@@ -69,7 +69,7 @@ There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 You can also set it up as a "catchall" pattern. In this case, it is important
@@ -79,7 +79,7 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += [
-        re_path(r'^(?P<url>.*/)$', views.flatpage),
+        re_path(r"^(?P<url>.*/)$", views.flatpage),
     ]
 
 .. warning::
@@ -95,8 +95,8 @@ tag::
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
-        path('license/', views.flatpage, {'url': '/license/'}, name='license'),
+        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
     ]
 
 Using the middleware
@@ -186,16 +186,20 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
     # Define a new FlatPageAdmin
     class FlatPageAdmin(FlatPageAdmin):
         fieldsets = [
-            (None, {'fields': ['url', 'title', 'content', 'sites']}),
-            (_('Advanced options'), {
-                'classes': ['collapse'],
-                'fields': [
-                    'enable_comments',
-                    'registration_required',
-                    'template_name',
-                ],
-            }),
+            (None, {"fields": ["url", "title", "content", "sites"]}),
+            (
+                _("Advanced options"),
+                {
+                    "classes": ["collapse"],
+                    "fields": [
+                        "enable_comments",
+                        "registration_required",
+                        "template_name",
+                    ],
+                },
+            ),
         ]
+
 
     # Re-register FlatPageAdmin
     admin.site.unregister(FlatPage)
@@ -344,9 +348,11 @@ Here's an example of a URLconf using :class:`FlatPageSitemap`::
 
     urlpatterns = [
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-            {'sitemaps': {'flatpages': FlatPageSitemap}},
-            name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"flatpages": FlatPageSitemap}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]

@@ -17,8 +17,10 @@ changes::
     from django.apps import AppConfig
     from django.core.signals import setting_changed
 
+
     def my_callback(sender, **kwargs):
         print("Setting changed!")
+
 
     class MyAppConfig(AppConfig):
         ...
@@ -119,6 +121,7 @@ Here's how you connect with the decorator::
     from django.core.signals import request_finished
     from django.dispatch import receiver
 
+
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
         print("Request finished!")
@@ -142,12 +145,14 @@ Now, our ``my_callback`` function will be called each time a request finishes.
         from django.apps import AppConfig
         from django.core.signals import request_finished
 
+
         class MyAppConfig(AppConfig):
             ...
 
             def ready(self):
                 # Implicitly connect signal handlers decorated with @receiver.
                 from . import signals
+
                 # Explicitly connect a signal handler.
                 request_finished.connect(signals.my_callback)
 

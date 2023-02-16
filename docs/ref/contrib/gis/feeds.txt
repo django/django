@@ -33,6 +33,7 @@ API Reference
 
         from django.contrib.gis.feeds import Feed
 
+
         class MyFeed(Feed):
 
             # First, as a class attribute.
@@ -60,10 +61,9 @@ API Reference
     to represent a point or a box. For example::
 
         class ZipcodeFeed(Feed):
-
             def geometry(self, obj):
                 # Can also return: `obj.poly`, and `obj.poly.centroid`.
-                return obj.poly.extent # tuple like: (X0, Y0, X1, Y1).
+                return obj.poly.extent  # tuple like: (X0, Y0, X1, Y1).
 
     .. method:: item_geometry(item)
 
@@ -72,7 +72,6 @@ API Reference
     bounding box. For example::
 
         class ZipcodeFeed(Feed):
-
             def item_geometry(self, obj):
                 # Returns the polygon.
                 return obj.poly

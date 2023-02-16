@@ -123,7 +123,7 @@ do them faster than the template language can::
     # Django template filter
     # slower still, because it will have to count them in Python anyway,
     # and because of template language overheads
-    {{ my_bicycles|length }}
+    {{my_bicycles | length}}
 
 Generally speaking, the most appropriate level for the job is the lowest-level
 one that it is comfortable to code for.

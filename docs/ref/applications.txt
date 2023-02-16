@@ -14,7 +14,7 @@ This registry is called :attr:`~django.apps.apps` and it's available in
 .. code-block:: pycon
 
     >>> from django.apps import apps
-    >>> apps.get_app_config('admin').verbose_name
+    >>> apps.get_app_config("admin").verbose_name
     'Administration'
 
 Projects and applications
@@ -77,7 +77,7 @@ configuration class to specify it explicitly::
 
     INSTALLED_APPS = [
         ...,
-        'polls.apps.PollsAppConfig',
+        "polls.apps.PollsAppConfig",
         ...,
     ]
 
@@ -91,8 +91,9 @@ would provide a proper name for the admin::
 
     from django.apps import AppConfig
 
+
     class RockNRollConfig(AppConfig):
-        name = 'rock_n_roll'
+        name = "rock_n_roll"
         verbose_name = "Rock ’n’ roll"
 
 ``RockNRollConfig`` will be loaded automatically when :setting:`INSTALLED_APPS`
@@ -134,13 +135,15 @@ configuration::
 
     from rock_n_roll.apps import RockNRollConfig
 
+
     class JazzManoucheConfig(RockNRollConfig):
         verbose_name = "Jazz Manouche"
+
 
     # anthology/settings.py
 
     INSTALLED_APPS = [
-        'anthology.apps.JazzManoucheConfig',
+        "anthology.apps.JazzManoucheConfig",
         # ...
     ]
 
@@ -289,10 +292,11 @@ Methods
             def ready(self):
                 # importing model classes
                 from .models import MyModel  # or...
-                MyModel = self.get_model('MyModel')
+
+                MyModel = self.get_model("MyModel")
 
                 # registering signals with the model's string label
-                pre_save.connect(receiver, sender='app_label.MyModel')
+                pre_save.connect(receiver, sender="app_label.MyModel")
 
     .. warning::
 

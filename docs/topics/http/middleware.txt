@@ -111,13 +111,13 @@ example, here's the default value created by :djadmin:`django-admin
 startproject <startproject>`::
 
     MIDDLEWARE = [
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
 A Django installation doesn't require any middleware — :setting:`MIDDLEWARE`
@@ -344,16 +344,19 @@ Here's an example of how to create a middleware function that supports both::
     from asgiref.sync import iscoroutinefunction
     from django.utils.decorators import sync_and_async_middleware
 
+
     @sync_and_async_middleware
     def simple_middleware(get_response):
         # One-time configuration and initialization goes here.
         if iscoroutinefunction(get_response):
+
             async def middleware(request):
                 # Do something here!
                 response = await get_response(request)
                 return response
 
         else:
+
             def middleware(request):
                 # Do something here!
                 response = get_response(request)
@@ -375,6 +378,7 @@ When using an asynchronous class-based middleware, you must ensure that
 instances are correctly marked as coroutine functions::
 
     from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+
 
     class AsyncMiddleware:
         async_capable = True

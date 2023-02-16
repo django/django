@@ -77,10 +77,11 @@ respectively. For example::
 
     from django.contrib.staticfiles import storage
 
+
     class MyStaticFilesStorage(storage.StaticFilesStorage):
         def __init__(self, *args, **kwargs):
-            kwargs['file_permissions_mode'] = 0o640
-            kwargs['directory_permissions_mode'] = 0o760
+            kwargs["file_permissions_mode"] = 0o640
+            kwargs["directory_permissions_mode"] = 0o760
             super().__init__(*args, **kwargs)
 
 Then set the ``staticfiles`` storage backend in :setting:`STORAGES` setting to
@@ -141,6 +142,7 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 :setting:`INSTALLED_APPS` setting::
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
+
 
     class MyStaticFilesConfig(StaticFilesConfig):
         ignore_patterns = [...]  # your custom ignore list
@@ -322,8 +324,10 @@ argument. For example::
 
     from django.conf import settings
     from django.contrib.staticfiles.storage import (
-        ManifestStaticFilesStorage, StaticFilesStorage,
+        ManifestStaticFilesStorage,
+        StaticFilesStorage,
     )
+
 
     class MyManifestStaticFilesStorage(ManifestStaticFilesStorage):
         def __init__(self, *args, **kwargs):
@@ -415,7 +419,7 @@ of directory paths in which the finders searched. Example usage::
 
     from django.contrib.staticfiles import finders
 
-    result = finders.find('css/base.css')
+    result = finders.find("css/base.css")
     searched_locations = finders.searched_locations
 
 Other Helpers
@@ -493,7 +497,7 @@ primary URL configuration::
 
    if settings.DEBUG:
        urlpatterns += [
-           re_path(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r"^static/(?P<path>.*)$", views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your

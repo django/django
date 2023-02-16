@@ -24,11 +24,12 @@ editing content:
         from django.db import models
         from django.urls import reverse
 
+
         class Author(models.Model):
             name = models.CharField(max_length=200)
 
             def get_absolute_url(self):
-                return reverse('author-detail', kwargs={'pk': self.pk})
+                return reverse("author-detail", kwargs={"pk": self.pk})
 
 ``FormView``
 ============
@@ -52,6 +53,7 @@ editing content:
 
         from django import forms
 
+
         class ContactForm(forms.Form):
             name = forms.CharField()
             message = forms.CharField(widget=forms.Textarea)
@@ -65,10 +67,11 @@ editing content:
         from myapp.forms import ContactForm
         from django.views.generic.edit import FormView
 
+
         class ContactFormView(FormView):
-            template_name = 'contact.html'
+            template_name = "contact.html"
             form_class = ContactForm
-            success_url = '/thanks/'
+            success_url = "/thanks/"
 
             def form_valid(self, form):
                 # This method is called when valid form data has been POSTed.
@@ -141,9 +144,10 @@ editing content:
         from django.views.generic.edit import CreateView
         from myapp.models import Author
 
+
         class AuthorCreateView(CreateView):
             model = Author
-            fields = ['name']
+            fields = ["name"]
 
     **Example myapp/author_form.html**:
 
@@ -220,10 +224,11 @@ editing content:
         from django.views.generic.edit import UpdateView
         from myapp.models import Author
 
+
         class AuthorUpdateView(UpdateView):
             model = Author
-            fields = ['name']
-            template_name_suffix = '_update_form'
+            fields = ["name"]
+            template_name_suffix = "_update_form"
 
     **Example myapp/author_update_form.html**:
 
@@ -307,9 +312,10 @@ editing content:
         from django.views.generic.edit import DeleteView
         from myapp.models import Author
 
+
         class AuthorDeleteView(DeleteView):
             model = Author
-            success_url = reverse_lazy('author-list')
+            success_url = reverse_lazy("author-list")
 
     **Example myapp/author_confirm_delete.html**:
 

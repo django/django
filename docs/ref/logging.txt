@@ -64,51 +64,51 @@ available as ``django.utils.log.DEFAULT_LOGGING`` and defined in
 :source:`django/utils/log.py`::
 
     {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
             },
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
             },
         },
-        'formatters': {
-            'django.server': {
-                '()': 'django.utils.log.ServerFormatter',
-                'format': '[{server_time}] {message}',
-                'style': '{',
+        "formatters": {
+            "django.server": {
+                "()": "django.utils.log.ServerFormatter",
+                "format": "[{server_time}] {message}",
+                "style": "{",
             }
         },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
+        "handlers": {
+            "console": {
+                "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
             },
-            'django.server': {
-                'level': 'INFO',
-                'class': 'logging.StreamHandler',
-                'formatter': 'django.server',
+            "django.server": {
+                "level": "INFO",
+                "class": "logging.StreamHandler",
+                "formatter": "django.server",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            }
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
+        "loggers": {
+            "django": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
             },
-            'django.server': {
-                'handlers': ['django.server'],
-                'level': 'INFO',
-                'propagate': False,
+            "django.server": {
+                "handlers": ["django.server"],
+                "level": "INFO",
+                "propagate": False,
             },
-        }
+        },
     }
 
 See :ref:`configuring-logging` on how to complement or replace this default
@@ -230,15 +230,15 @@ specific logger following this example::
 
     {
         # ...
-        'handlers': {
-            'null': {
-                'class': 'logging.NullHandler',
+        "handlers": {
+            "null": {
+                "class": "logging.NullHandler",
             },
         },
-        'loggers': {
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
+        "loggers": {
+            "django.security.DisallowedHost": {
+                "handlers": ["null"],
+                "propagate": False,
             },
         },
         # ...
@@ -286,11 +286,11 @@ Python logging module <python:logging.handlers>`.
 
         {
             # ...
-            'handlers': {
-                'mail_admins': {
-                    'level': 'ERROR',
-                    'class': 'django.utils.log.AdminEmailHandler',
-                    'include_html': True,
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "include_html": True,
                 },
             },
             # ...
@@ -305,11 +305,11 @@ Python logging module <python:logging.handlers>`.
 
         {
             # ...
-            'handlers': {
-                'mail_admins': {
-                    'level': 'ERROR',
-                    'class': 'django.utils.log.AdminEmailHandler',
-                    'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "email_backend": "django.core.mail.backends.filebased.EmailBackend",
                 },
             },
             # ...
@@ -325,12 +325,12 @@ Python logging module <python:logging.handlers>`.
 
         {
             # ...
-            'handlers': {
-                'mail_admins': {
-                    'level': 'ERROR',
-                    'class': 'django.utils.log.AdminEmailHandler',
-                    'include_html': True,
-                    'reporter_class': 'somepackage.error_reporter.CustomErrorReporter',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "class": "django.utils.log.AdminEmailHandler",
+                    "include_html": True,
+                    "reporter_class": "somepackage.error_reporter.CustomErrorReporter",
                 },
             },
             # ...
@@ -361,6 +361,7 @@ logging module.
 
         from django.http import UnreadablePostError
 
+
         def skip_unreadable_post(record):
             if record.exc_info:
                 exc_type, exc_value = record.exc_info[:2]
@@ -372,17 +373,17 @@ logging module.
 
         {
             # ...
-            'filters': {
-                'skip_unreadable_posts': {
-                    '()': 'django.utils.log.CallbackFilter',
-                    'callback': skip_unreadable_post,
+            "filters": {
+                "skip_unreadable_posts": {
+                    "()": "django.utils.log.CallbackFilter",
+                    "callback": skip_unreadable_post,
                 },
             },
-            'handlers': {
-                'mail_admins': {
-                    'level': 'ERROR',
-                    'filters': ['skip_unreadable_posts'],
-                    'class': 'django.utils.log.AdminEmailHandler',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "filters": ["skip_unreadable_posts"],
+                    "class": "django.utils.log.AdminEmailHandler",
                 },
             },
             # ...
@@ -398,16 +399,16 @@ logging module.
 
         {
             # ...
-            'filters': {
-                'require_debug_false': {
-                    '()': 'django.utils.log.RequireDebugFalse',
+            "filters": {
+                "require_debug_false": {
+                    "()": "django.utils.log.RequireDebugFalse",
                 },
             },
-            'handlers': {
-                'mail_admins': {
-                    'level': 'ERROR',
-                    'filters': ['require_debug_false'],
-                    'class': 'django.utils.log.AdminEmailHandler',
+            "handlers": {
+                "mail_admins": {
+                    "level": "ERROR",
+                    "filters": ["require_debug_false"],
+                    "class": "django.utils.log.AdminEmailHandler",
                 },
             },
             # ...

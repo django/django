@@ -26,7 +26,7 @@ A class-based view is deployed into a URL pattern using the
 :meth:`~django.views.generic.base.View.as_view()` classmethod::
 
     urlpatterns = [
-        path('view/', MyView.as_view(size=42)),
+        path("view/", MyView.as_view(size=42)),
     ]
 
 .. admonition:: Thread safety with view arguments

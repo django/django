@@ -33,8 +33,8 @@ a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.blog': lambda o: "/blogs/%s/" % o.slug,
-        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        "blogs.blog": lambda o: "/blogs/%s/" % o.slug,
+        "news.story": lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
 The model name used in this setting should be all lowercase, regardless of the
@@ -54,7 +54,7 @@ people the details of exceptions raised in the request/response cycle.
 
 Each item in the list should be a tuple of (Full name, email address). Example::
 
-    [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+    [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
 .. setting:: ALLOWED_HOSTS
 
@@ -123,8 +123,8 @@ The :setting:`APPEND_SLASH` setting is only used if
 Default::
 
     {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
 
@@ -169,7 +169,7 @@ compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), key])
+        return ":".join([key_prefix, str(version), key])
 
 You may use any key function you want, as long as it has the same
 argument signature.
@@ -201,9 +201,9 @@ file system cache, a host and port for a memcache server, or an identifying
 name for a local memory cache. e.g.::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/django_cache",
         }
     }
 
@@ -492,9 +492,9 @@ The simplest possible settings file is for a single-database setup using
 SQLite. This can be configured using the following::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'mydatabase',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "mydatabase",
         }
     }
 
@@ -504,13 +504,13 @@ the :setting:`ENGINE <DATABASE-ENGINE>` setting below on how to specify
 other database types. This example is for PostgreSQL::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'mydatabase',
-            'USER': 'mydatabaseuser',
-            'PASSWORD': 'mypassword',
-            'HOST': '127.0.0.1',
-            'PORT': '5432',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "mydatabase",
+            "USER": "mydatabaseuser",
+            "PASSWORD": "mypassword",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
         }
     }
 
@@ -567,7 +567,7 @@ localhost. Not used with SQLite.
 If this value starts with a forward slash (``'/'``) and you're using MySQL,
 MySQL will connect via a Unix socket to the specified socket. For example::
 
-    "HOST": '/var/run/mysql'
+    "HOST": "/var/run/mysql"
 
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
@@ -737,12 +737,12 @@ creation and use of test databases, see :ref:`the-test-database`.
 Here's an example with a test database configuration::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'USER': 'mydatabaseuser',
-            'NAME': 'mydatabase',
-            'TEST': {
-                'NAME': 'mytestdatabase',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "USER": "mydatabaseuser",
+            "NAME": "mydatabase",
+            "TEST": {
+                "NAME": "mytestdatabase",
             },
         },
     }
@@ -1118,17 +1118,17 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 Default::
 
     [
-        '%Y-%m-%d',  # '2006-10-25'
-        '%m/%d/%Y',  # '10/25/2006'
-        '%m/%d/%y',  # '10/25/06'
-        '%b %d %Y',  # 'Oct 25 2006'
-        '%b %d, %Y',  # 'Oct 25, 2006'
-        '%d %b %Y',  # '25 Oct 2006'
-        '%d %b, %Y',  # '25 Oct, 2006'
-        '%B %d %Y',  # 'October 25 2006'
-        '%B %d, %Y',  # 'October 25, 2006'
-        '%d %B %Y',  # '25 October 2006'
-        '%d %B, %Y',  # '25 October, 2006'
+        "%Y-%m-%d",  # '2006-10-25'
+        "%m/%d/%Y",  # '10/25/2006'
+        "%m/%d/%y",  # '10/25/06'
+        "%b %d %Y",  # 'Oct 25 2006'
+        "%b %d, %Y",  # 'Oct 25, 2006'
+        "%d %b %Y",  # '25 Oct 2006'
+        "%d %b, %Y",  # '25 Oct, 2006'
+        "%B %d %Y",  # 'October 25 2006'
+        "%B %d, %Y",  # 'October 25, 2006'
+        "%d %B %Y",  # '25 October 2006'
+        "%d %B, %Y",  # '25 October, 2006'
     ]
 
 A list of formats that will be accepted when inputting data on a date field.
@@ -1162,15 +1162,15 @@ See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE
 Default::
 
     [
-        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
-        '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
-        '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-        '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
-        '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
-        '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-        '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
-        '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
-        '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+        "%Y-%m-%d %H:%M:%S",  # '2006-10-25 14:30:59'
+        "%Y-%m-%d %H:%M:%S.%f",  # '2006-10-25 14:30:59.000200'
+        "%Y-%m-%d %H:%M",  # '2006-10-25 14:30'
+        "%m/%d/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
+        "%m/%d/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
+        "%m/%d/%Y %H:%M",  # '10/25/2006 14:30'
+        "%m/%d/%y %H:%M:%S",  # '10/25/06 14:30:59'
+        "%m/%d/%y %H:%M:%S.%f",  # '10/25/06 14:30:59.000200'
+        "%m/%d/%y %H:%M",  # '10/25/06 14:30'
     ]
 
 A list of formats that will be accepted when inputting data on a datetime
@@ -1550,8 +1550,8 @@ attempt.
 Default::
 
     [
-        'django.core.files.uploadhandler.MemoryFileUploadHandler',
-        'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+        "django.core.files.uploadhandler.MemoryFileUploadHandler",
+        "django.core.files.uploadhandler.TemporaryFileUploadHandler",
     ]
 
 A list of handlers to use for uploading. Changing this setting allows complete
@@ -1721,8 +1721,8 @@ like:
 You can also set this setting to a list of Python paths, for example::
 
     FORMAT_MODULE_PATH = [
-        'mysite.formats',
-        'some_app.formats',
+        "mysite.formats",
+        "some_app.formats",
     ]
 
 When Django searches for a certain format, it will go through all given Python
@@ -1977,8 +1977,8 @@ Here's a sample settings file::
     from django.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
-        ('de', _('German')),
-        ('en', _('English')),
+        ("de", _("German")),
+        ("en", _("English")),
     ]
 
 .. setting:: LANGUAGES_BIDI
@@ -2011,8 +2011,8 @@ See :ref:`how-django-discovers-translations`.
 Example::
 
     LOCALE_PATHS = [
-        '/home/www/project/common_files/locale',
-        '/var/local/translations/locale',
+        "/home/www/project/common_files/locale",
+        "/var/local/translations/locale",
     ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
@@ -2142,7 +2142,7 @@ the default package name for migration modules is ``migrations``.
 
 Example::
 
-    {'blog': 'blog.db_migrations'}
+    {"blog": "blog.db_migrations"}
 
 In this case, migrations pertaining to the ``blog`` app will be contained in
 the ``blog.db_migrations`` package.
@@ -2417,7 +2417,7 @@ Django whether the request came in via HTTPS, and set
 Set a tuple with two elements -- the name of the header to look for and the
 required value. For example::
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
 proxy and that the request is guaranteed to be secure (i.e., it originally came
@@ -2522,7 +2522,7 @@ A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
-    SERIALIZATION_MODULES = {'yaml': 'path.to.yaml_serializer'}
+    SERIALIZATION_MODULES = {"yaml": "path.to.yaml_serializer"}
 
 .. setting:: SERVER_EMAIL
 
@@ -2660,8 +2660,8 @@ Here's a setup that tells the Django template engine to load templates from the
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": True,
         },
     ]
 
@@ -2802,9 +2802,9 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 Default::
 
     [
-        '%H:%M:%S',     # '14:30:59'
-        '%H:%M:%S.%f',  # '14:30:59.000200'
-        '%H:%M',        # '14:30'
+        "%H:%M:%S",  # '14:30:59'
+        "%H:%M:%S.%f",  # '14:30:59.000200'
+        "%H:%M",  # '14:30'
     ]
 
 A list of formats that will be accepted when inputting data on a time field.
@@ -3094,10 +3094,10 @@ See :ref:`auth_password_storage`.
 Default::
 
     [
-        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-        'django.contrib.auth.hashers.Argon2PasswordHasher',
-        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+        "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+        "django.contrib.auth.hashers.Argon2PasswordHasher",
+        "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
     ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
@@ -3135,6 +3135,7 @@ framework. See :ref:`message levels <message-level>` for more details.
    avoid the potential for circular imports, e.g.::
 
        from django.contrib.messages import constants as message_constants
+
        MESSAGE_LEVEL = message_constants.DEBUG
 
    If desired, you may specify the numeric values for the constants directly
@@ -3170,11 +3171,11 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 Default::
 
     {
-        messages.DEBUG: 'debug',
-        messages.INFO: 'info',
-        messages.SUCCESS: 'success',
-        messages.WARNING: 'warning',
-        messages.ERROR: 'error',
+        messages.DEBUG: "debug",
+        messages.INFO: "info",
+        messages.SUCCESS: "success",
+        messages.WARNING: "warning",
+        messages.ERROR: "error",
     }
 
 This sets the mapping of message level to message tag, which is typically
@@ -3189,7 +3190,8 @@ to override. See :ref:`message-displaying` above for more details.
    avoid the potential for circular imports, e.g.::
 
        from django.contrib.messages import constants as message_constants
-       MESSAGE_TAGS = {message_constants.INFO: ''}
+
+       MESSAGE_TAGS = {message_constants.INFO: ""}
 
    If desired, you may specify the numeric values for the constants directly
    according to the values in the above :ref:`constants table
@@ -3574,8 +3576,8 @@ For an example, see :ref:`staticfiles-from-cdn`.
 Default::
 
     [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     ]
 
 The list of finder backends that know how to find static files in

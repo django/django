@@ -29,11 +29,12 @@ store a photo::
 
     from django.db import models
 
+
     class Car(models.Model):
         name = models.CharField(max_length=255)
         price = models.DecimalField(max_digits=5, decimal_places=2)
-        photo = models.ImageField(upload_to='cars')
-        specs = models.FileField(upload_to='specs')
+        photo = models.ImageField(upload_to="cars")
+        specs = models.FileField(upload_to="specs")
 
 Any ``Car`` instance will have a ``photo`` attribute that you can use to get at
 the details of the attached photo:
@@ -68,7 +69,7 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> import os
     >>> from django.conf import settings
     >>> initial_path = car.photo.path
-    >>> car.photo.name = 'cars/chevy_ii.jpg'
+    >>> car.photo.name = "cars/chevy_ii.jpg"
     >>> new_path = settings.MEDIA_ROOT + car.photo.name
     >>> # Move the file on the filesystem
     >>> os.rename(initial_path, new_path)
@@ -84,11 +85,12 @@ To save an existing file on disk to a :class:`~django.db.models.FileField`:
 
     >>> from pathlib import Path
     >>> from django.core.files import File
-    >>> path = Path('/some/external/specs.pdf')
-    >>> car = Car.objects.get(name='57 Chevy')
-    >>> with path.open(mode='rb') as f:
+    >>> path = Path("/some/external/specs.pdf")
+    >>> car = Car.objects.get(name="57 Chevy")
+    >>> with path.open(mode="rb") as f:
     ...     car.specs = File(f, name=path.name)
     ...     car.save()
+    ...
 
 .. note::
 
@@ -100,7 +102,7 @@ To save an existing file on disk to a :class:`~django.db.models.FileField`:
     .. code-block:: pycon
 
         >>> from PIL import Image
-        >>> car = Car.objects.get(name='57 Chevy')
+        >>> car = Car.objects.get(name="57 Chevy")
         >>> car.photo.width
         191
         >>> car.photo.height
@@ -130,7 +132,7 @@ using a Python built-in ``file`` object:
     >>> from django.core.files import File
 
     # Create a Python file object using open()
-    >>> f = open('/path/to/hello.world', 'w')
+    >>> f = open("/path/to/hello.world", "w")
     >>> myfile = File(f)
 
 Now you can use any of the documented attributes and methods
@@ -144,9 +146,9 @@ The following approach may be used to close files automatically:
     >>> from django.core.files import File
 
     # Create a Python file object using open() and the with statement
-    >>> with open('/path/to/hello.world', 'w') as f:
+    >>> with open("/path/to/hello.world", "w") as f:
     ...     myfile = File(f)
-    ...     myfile.write('Hello World')
+    ...     myfile.write("Hello World")
     ...
     >>> myfile.closed
     True
@@ -192,7 +194,7 @@ useful -- you can use the global default storage system:
     >>> from django.core.files.base import ContentFile
     >>> from django.core.files.storage import default_storage
 
-    >>> path = default_storage.save('path/to/file', ContentFile(b'new content'))
+    >>> path = default_storage.save("path/to/file", ContentFile(b"new content"))
     >>> path
     'path/to/file'
 
@@ -221,7 +223,8 @@ For example, the following code will store uploaded files under
     from django.core.files.storage import FileSystemStorage
     from django.db import models
 
-    fs = FileSystemStorage(location='/media/photos')
+    fs = FileSystemStorage(location="/media/photos")
+
 
     class Car(models.Model):
         ...
@@ -261,6 +264,7 @@ In order to set a storage defined in the :setting:`STORAGES` setting you can
 use a lambda function::
 
     from django.core.files.storage import storages
+
 
     class MyModel(models.Model):
         upload = models.FileField(storage=lambda: storages["custom_storage"])

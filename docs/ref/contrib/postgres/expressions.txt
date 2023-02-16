@@ -29,8 +29,8 @@ objects:
     >>> from django.db.models import OuterRef
     >>> from django.db.models.functions import JSONObject
     >>> from django.contrib.postgres.expressions import ArraySubquery
-    >>> books = Book.objects.filter(author=OuterRef('pk')).values(
-    ...     json=JSONObject(title='title', pages='pages')
+    >>> books = Book.objects.filter(author=OuterRef("pk")).values(
+    ...     json=JSONObject(title="title", pages="pages")
     ... )
     >>> author = Author.objects.annotate(books=ArraySubquery(books)).first()
     >>> author.books

@@ -106,19 +106,19 @@ that can be used to run the entire Django test suite, including those
 in :mod:`django.contrib.gis`::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'geodjango',
-            'USER': 'geodjango',
+        "default": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "geodjango",
+            "USER": "geodjango",
         },
-        'other': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'other',
-            'USER': 'geodjango',
+        "other": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "other",
+            "USER": "geodjango",
         },
     }
 
-    SECRET_KEY = 'django_tests_secret_key'
+    SECRET_KEY = "django_tests_secret_key"
 
 Assuming the settings above were in a ``postgis.py`` file in the same
 directory as ``runtests.py``, then all Django and GeoDjango tests would

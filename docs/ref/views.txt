@@ -33,9 +33,13 @@ built-in handling for user-uploaded files, but you can have Django serve your
 
     if settings.DEBUG:
         urlpatterns += [
-            re_path(r'^media/(?P<path>.*)$', serve, {
-                'document_root': settings.MEDIA_ROOT,
-            }),
+            re_path(
+                r"^media/(?P<path>.*)$",
+                serve,
+                {
+                    "document_root": settings.MEDIA_ROOT,
+                },
+            ),
         ]
 
 Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
@@ -130,6 +134,7 @@ string representation of the exception that triggered the view.
 view you can use code like this::
 
     from django.core.exceptions import PermissionDenied
+
 
     def edit(request, pk):
         if not request.user.is_staff:

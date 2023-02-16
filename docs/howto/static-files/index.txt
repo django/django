@@ -16,7 +16,7 @@ Configuring static files
 
 #. In your settings file, define :setting:`STATIC_URL`, for example::
 
-      STATIC_URL = 'static/'
+      STATIC_URL = "static/"
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
    the given relative path using the configured ``staticfiles``
@@ -54,7 +54,7 @@ settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
         BASE_DIR / "static",
-        '/var/www/static/',
+        "/var/www/static/",
     ]
 
 See the documentation for the :setting:`STATICFILES_FINDERS` setting for

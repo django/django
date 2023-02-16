@@ -99,9 +99,9 @@ In this example, Memcached is running on localhost (127.0.0.1) port 11211, using
 the ``pymemcache`` binding::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': '127.0.0.1:11211',
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": "127.0.0.1:11211",
         }
     }
 
@@ -109,9 +109,9 @@ In this example, Memcached is available through a local Unix socket file
 :file:`/tmp/memcached.sock` using the ``pymemcache`` binding::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': 'unix:/tmp/memcached.sock',
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": "unix:/tmp/memcached.sock",
         }
     }
 
@@ -127,12 +127,12 @@ In this example, the cache is shared over Memcached instances running on IP
 address 172.19.26.240 and 172.19.26.242, both on port 11211::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': [
-                '172.19.26.240:11211',
-                '172.19.26.242:11211',
-            ]
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": [
+                "172.19.26.240:11211",
+                "172.19.26.242:11211",
+            ],
         }
     }
 
@@ -141,23 +141,23 @@ on the IP addresses 172.19.26.240 (port 11211), 172.19.26.242 (port 11212), and
 172.19.26.244 (port 11213)::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': [
-                '172.19.26.240:11211',
-                '172.19.26.242:11212',
-                '172.19.26.244:11213',
-            ]
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": [
+                "172.19.26.240:11211",
+                "172.19.26.242:11212",
+                "172.19.26.244:11213",
+            ],
         }
     }
 
 By default, the ``PyMemcacheCache`` backend sets the following options (you can
 override them in your :setting:`OPTIONS <CACHES-OPTIONS>`)::
 
-    'OPTIONS': {
-        'allow_unicode_keys': True,
-        'default_noreply': False,
-        'serde': pymemcache.serde.pickle_serde,
+    "OPTIONS": {
+        "allow_unicode_keys": True,
+        "default_noreply": False,
+        "serde": pymemcache.serde.pickle_serde,
     }
 
 A final point about Memcached is that memory-based caching has a
@@ -199,9 +199,9 @@ To use Redis as your cache backend with Django:
 For example, if Redis is running on localhost (127.0.0.1) port 6379::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': 'redis://127.0.0.1:6379',
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379",
         }
     }
 
@@ -209,9 +209,9 @@ Often Redis servers are protected with authentication. In order to supply a
 username and password, add them in the ``LOCATION`` along with the URL::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': 'redis://username:password@127.0.0.1:6379',
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://username:password@127.0.0.1:6379",
         }
     }
 
@@ -222,12 +222,12 @@ server (leader). Read operations are performed on the other servers (replicas)
 chosen at random::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': [
-                'redis://127.0.0.1:6379', # leader
-                'redis://127.0.0.1:6378', # read-replica 1
-                'redis://127.0.0.1:6377', # read-replica 2
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": [
+                "redis://127.0.0.1:6379",  # leader
+                "redis://127.0.0.1:6378",  # read-replica 1
+                "redis://127.0.0.1:6377",  # read-replica 2
             ],
         }
     }
@@ -252,9 +252,9 @@ To use a database table as your cache backend:
 In this example, the cache table's name is ``my_cache_table``::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-            'LOCATION': 'my_cache_table',
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "my_cache_table",
         }
     }
 
@@ -308,20 +308,20 @@ operations to ``cache_replica``, and all write operations to
 
         def db_for_read(self, model, **hints):
             "All cache read operations go to the replica"
-            if model._meta.app_label == 'django_cache':
-                return 'cache_replica'
+            if model._meta.app_label == "django_cache":
+                return "cache_replica"
             return None
 
         def db_for_write(self, model, **hints):
             "All cache write operations go to primary"
-            if model._meta.app_label == 'django_cache':
-                return 'cache_primary'
+            if model._meta.app_label == "django_cache":
+                return "cache_primary"
             return None
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
             "Only install the cache model on primary"
-            if app_label == 'django_cache':
-                return db == 'cache_primary'
+            if app_label == "django_cache":
+                return db == "cache_primary"
             return None
 
 If you don't specify routing directions for the database cache model,
@@ -340,9 +340,9 @@ file. To use this backend set :setting:`BACKEND <CACHES-BACKEND>` to
 to store cached data in ``/var/tmp/django_cache``, use this setting::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/django_cache",
         }
     }
 
@@ -350,9 +350,9 @@ If you're on Windows, put the drive letter at the beginning of the path,
 like this::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': 'c:/foo/bar',
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "c:/foo/bar",
         }
     }
 
@@ -398,9 +398,9 @@ per-process (see below) and thread-safe. To use it, set :setting:`BACKEND
 example::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'unique-snowflake',
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
         }
     }
 
@@ -429,8 +429,8 @@ and don't want to have to change your code to special-case the latter. To
 activate dummy caching, set :setting:`BACKEND <CACHES-BACKEND>` like so::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         }
     }
 
@@ -443,8 +443,8 @@ cache backend with Django, use the Python import path as the
 :setting:`BACKEND <CACHES-BACKEND>` of the :setting:`CACHES` setting, like so::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'path.to.backend',
+        "default": {
+            "BACKEND": "path.to.backend",
         }
     }
 
@@ -523,13 +523,11 @@ In this example, a filesystem backend is being configured with a timeout
 of 60 seconds, and a maximum capacity of 1000 items::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
-            'TIMEOUT': 60,
-            'OPTIONS': {
-                'MAX_ENTRIES': 1000
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/django_cache",
+            "TIMEOUT": 60,
+            "OPTIONS": {"MAX_ENTRIES": 1000},
         }
     }
 
@@ -537,17 +535,17 @@ Here's an example configuration for a ``pylibmc`` based backend that enables
 the binary protocol, SASL authentication, and the ``ketama`` behavior mode::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
-            'LOCATION': '127.0.0.1:11211',
-            'OPTIONS': {
-                'binary': True,
-                'username': 'user',
-                'password': 'pass',
-                'behaviors': {
-                    'ketama': True,
-                }
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyLibMCCache",
+            "LOCATION": "127.0.0.1:11211",
+            "OPTIONS": {
+                "binary": True,
+                "username": "user",
+                "password": "pass",
+                "behaviors": {
+                    "ketama": True,
+                },
+            },
         }
     }
 
@@ -557,15 +555,15 @@ treats memcache/network errors as cache misses, and sets the ``TCP_NODELAY``
 flag on the connection's socket::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-            'LOCATION': '127.0.0.1:11211',
-            'OPTIONS': {
-                'no_delay': True,
-                'ignore_exc': True,
-                'max_pool_size': 4,
-                'use_pooling': True,
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+            "LOCATION": "127.0.0.1:11211",
+            "OPTIONS": {
+                "no_delay": True,
+                "ignore_exc": True,
+                "max_pool_size": 4,
+                "use_pooling": True,
+            },
         }
     }
 
@@ -576,14 +574,14 @@ the ``hiredis-py`` package is installed), and sets a custom `connection pool
 class`_ (``redis.ConnectionPool`` is used by default)::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': 'redis://127.0.0.1:6379',
-            'OPTIONS': {
-                'db': '10',
-                'parser_class': 'redis.connection.PythonParser',
-                'pool_class': 'redis.BlockingConnectionPool',
-            }
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379",
+            "OPTIONS": {
+                "db": "10",
+                "parser_class": "redis.connection.PythonParser",
+                "pool_class": "redis.BlockingConnectionPool",
+            },
         }
     }
 
@@ -602,9 +600,9 @@ entire site. You'll need to add
 :setting:`MIDDLEWARE` setting, as in this example::
 
     MIDDLEWARE = [
-        'django.middleware.cache.UpdateCacheMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.cache.FetchFromCacheMiddleware',
+        "django.middleware.cache.UpdateCacheMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.cache.FetchFromCacheMiddleware",
     ]
 
 .. note::
@@ -674,6 +672,7 @@ decorator that will automatically cache the view's response for you::
 
     from django.views.decorators.cache import cache_page
 
+
     @cache_page(60 * 15)
     def my_view(request):
         ...
@@ -692,7 +691,7 @@ multiple URLs point at the same view, each URL will be cached separately.
 Continuing the ``my_view`` example, if your URLconf looks like this::
 
     urlpatterns = [
-        path('foo/<int:code>/', my_view),
+        path("foo/<int:code>/", my_view),
     ]
 
 then requests to ``/foo/1/`` and ``/foo/23/`` will be cached separately, as
@@ -742,7 +741,7 @@ You can do so by wrapping the view function with ``cache_page`` when you refer
 to it in the URLconf. Here's the old URLconf from earlier::
 
     urlpatterns = [
-        path('foo/<int:code>/', my_view),
+        path("foo/<int:code>/", my_view),
     ]
 
 Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
@@ -750,7 +749,7 @@ Here's the same thing, with ``my_view`` wrapped in ``cache_page``::
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        path('foo/<int:code>/', cache_page(60 * 15)(my_view)),
+        path("foo/<int:code>/", cache_page(60 * 15)(my_view)),
     ]
 
 .. templatetag:: cache
@@ -843,8 +842,8 @@ a cached item, for example:
     >>> from django.core.cache import cache
     >>> from django.core.cache.utils import make_template_fragment_key
     # cache key for {% cache 500 sidebar username %}
-    >>> key = make_template_fragment_key('sidebar', [username])
-    >>> cache.delete(key) # invalidates cached template fragment
+    >>> key = make_template_fragment_key("sidebar", [username])
+    >>> cache.delete(key)  # invalidates cached template fragment
     True
 
 .. _low-level-cache-api:
@@ -933,7 +932,7 @@ If the object doesn't exist in the cache, ``cache.get()`` returns ``None``:
 .. code-block:: pycon
 
     >>> # Wait 30 seconds for 'my_key' to expire...
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
 
 If you need to determine whether the object exists in the cache and you have
@@ -942,10 +941,10 @@ stored a literal value ``None``, use a sentinel object as the default:
 .. code-block:: pycon
 
     >>> sentinel = object()
-    >>> cache.get('my_key', sentinel) is sentinel
+    >>> cache.get("my_key", sentinel) is sentinel
     False
     >>> # Wait 30 seconds for 'my_key' to expire...
-    >>> cache.get('my_key', sentinel) is sentinel
+    >>> cache.get("my_key", sentinel) is sentinel
     True
 
 ``cache.get()`` can take a ``default`` argument. This specifies which value to
@@ -953,7 +952,7 @@ return if the object doesn't exist in the cache:
 
 .. code-block:: pycon
 
-    >>> cache.get('my_key', 'has expired')
+    >>> cache.get("my_key", "has expired")
     'has expired'
 
 .. method:: cache.add(key, value, timeout=DEFAULT_TIMEOUT, version=None)
@@ -964,9 +963,9 @@ update the cache if the key specified is already present:
 
 .. code-block:: pycon
 
-    >>> cache.set('add_key', 'Initial value')
-    >>> cache.add('add_key', 'New value')
-    >>> cache.get('add_key')
+    >>> cache.set("add_key", "Initial value")
+    >>> cache.add("add_key", "New value")
+    >>> cache.get("add_key")
     'Initial value'
 
 If you need to know whether ``add()`` stored a value in the cache, you can
@@ -982,8 +981,8 @@ returned:
 
 .. code-block:: pycon
 
-    >>> cache.get('my_new_key')  # returns None
-    >>> cache.get_or_set('my_new_key', 'my new value', 100)
+    >>> cache.get("my_new_key")  # returns None
+    >>> cache.get_or_set("my_new_key", "my new value", 100)
     'my new value'
 
 You can also pass any callable as a *default* value:
@@ -991,7 +990,7 @@ You can also pass any callable as a *default* value:
 .. code-block:: pycon
 
     >>> import datetime
-    >>> cache.get_or_set('some-timestamp-key', datetime.datetime.now)
+    >>> cache.get_or_set("some-timestamp-key", datetime.datetime.now)
     datetime.datetime(2014, 12, 11, 0, 15, 49, 457920)
 
 .. method:: cache.get_many(keys, version=None)
@@ -1002,10 +1001,10 @@ actually exist in the cache (and haven't expired):
 
 .. code-block:: pycon
 
-    >>> cache.set('a', 1)
-    >>> cache.set('b', 2)
-    >>> cache.set('c', 3)
-    >>> cache.get_many(['a', 'b', 'c'])
+    >>> cache.set("a", 1)
+    >>> cache.set("b", 2)
+    >>> cache.set("c", 3)
+    >>> cache.get_many(["a", "b", "c"])
     {'a': 1, 'b': 2, 'c': 3}
 
 .. method:: cache.set_many(dict, timeout)
@@ -1015,8 +1014,8 @@ of key-value pairs:
 
 .. code-block:: pycon
 
-    >>> cache.set_many({'a': 1, 'b': 2, 'c': 3})
-    >>> cache.get_many(['a', 'b', 'c'])
+    >>> cache.set_many({"a": 1, "b": 2, "c": 3})
+    >>> cache.get_many(["a", "b", "c"])
     {'a': 1, 'b': 2, 'c': 3}
 
 Like ``cache.set()``, ``set_many()`` takes an optional ``timeout`` parameter.
@@ -1031,7 +1030,7 @@ particular object:
 
 .. code-block:: pycon
 
-    >>> cache.delete('a')
+    >>> cache.delete("a")
     True
 
 ``delete()`` returns ``True`` if the key was successfully deleted, ``False``
@@ -1044,7 +1043,7 @@ of keys to be cleared:
 
 .. code-block:: pycon
 
-    >>> cache.delete_many(['a', 'b', 'c'])
+    >>> cache.delete_many(["a", "b", "c"])
 
 .. method:: cache.clear()
 
@@ -1063,7 +1062,7 @@ to expire 10 seconds from now:
 
 .. code-block:: pycon
 
-    >>> cache.touch('a', 10)
+    >>> cache.touch("a", 10)
     True
 
 Like other methods, the ``timeout`` argument is optional and defaults to the
@@ -1084,14 +1083,14 @@ nonexistent cache key:
 
 .. code-block:: pycon
 
-    >>> cache.set('num', 1)
-    >>> cache.incr('num')
+    >>> cache.set("num", 1)
+    >>> cache.incr("num")
     2
-    >>> cache.incr('num', 10)
+    >>> cache.incr("num", 10)
     12
-    >>> cache.decr('num')
+    >>> cache.decr("num")
     11
-    >>> cache.decr('num', 5)
+    >>> cache.decr("num", 5)
     6
 
 .. note::
@@ -1163,12 +1162,12 @@ key version to set or get. For example:
 .. code-block:: pycon
 
     >>> # Set version 2 of a cache key
-    >>> cache.set('my_key', 'hello world!', version=2)
+    >>> cache.set("my_key", "hello world!", version=2)
     >>> # Get the default version (assuming version=1)
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
     >>> # Get version 2 of the same key
-    >>> cache.get('my_key', version=2)
+    >>> cache.get("my_key", version=2)
     'hello world!'
 
 The version of a specific key can be incremented and decremented using
@@ -1179,15 +1178,15 @@ keys unaffected. Continuing our previous example:
 .. code-block:: pycon
 
     >>> # Increment the version of 'my_key'
-    >>> cache.incr_version('my_key')
+    >>> cache.incr_version("my_key")
     >>> # The default version still isn't available
-    >>> cache.get('my_key')
+    >>> cache.get("my_key")
     None
     # Version 2 isn't available, either
-    >>> cache.get('my_key', version=2)
+    >>> cache.get("my_key", version=2)
     None
     >>> # But version 3 *is* available
-    >>> cache.get('my_key', version=3)
+    >>> cache.get("my_key", version=3)
     'hello world!'
 
 .. _cache_key_transformation:
@@ -1201,7 +1200,7 @@ key version to provide a final cache key. By default, the three parts
 are joined using colons to produce a final string::
 
     def make_key(key, key_prefix, version):
-        return '%s:%s:%s' % (key_prefix, version, key)
+        return "%s:%s:%s" % (key_prefix, version, key)
 
 If you want to combine the parts in different ways, or apply other
 processing to the final key (e.g., taking a hash digest of the key
@@ -1241,6 +1240,7 @@ instance, to do this for the ``locmem`` backend, put this code in a module::
 
     from django.core.cache.backends.locmem import LocMemCache
 
+
     class CustomLocMemCache(LocMemCache):
         def validate_key(self, key):
             """Custom validation, raising exceptions or warnings as needed."""
@@ -1264,8 +1264,8 @@ variants are the same:
 
 .. code-block:: pycon
 
-    >>> await cache.aset('num', 1)
-    >>> await cache.ahas_key('num')
+    >>> await cache.aset("num", 1)
+    >>> await cache.ahas_key("num")
     True
 
 .. _downstream-caches:
@@ -1338,7 +1338,8 @@ To do this in Django, use the convenient
 
     from django.views.decorators.vary import vary_on_headers
 
-    @vary_on_headers('User-Agent')
+
+    @vary_on_headers("User-Agent")
     def my_view(request):
         ...
 
@@ -1353,7 +1354,7 @@ anything that was already in there.
 
 You can pass multiple headers to ``vary_on_headers()``::
 
-    @vary_on_headers('User-Agent', 'Cookie')
+    @vary_on_headers("User-Agent", "Cookie")
     def my_view(request):
         ...
 
@@ -1371,7 +1372,8 @@ are equivalent::
     def my_view(request):
         ...
 
-    @vary_on_headers('Cookie')
+
+    @vary_on_headers("Cookie")
     def my_view(request):
         ...
 
@@ -1384,10 +1386,11 @@ directly. This function sets, or adds to, the ``Vary header``. For example::
     from django.shortcuts import render
     from django.utils.cache import patch_vary_headers
 
+
     def my_view(request):
         ...
-        response = render(request, 'template_name', context)
-        patch_vary_headers(response, ['Cookie'])
+        response = render(request, "template_name", context)
+        patch_vary_headers(response, ["Cookie"])
         return response
 
 ``patch_vary_headers`` takes an :class:`~django.http.HttpResponse` instance as
@@ -1416,6 +1419,7 @@ decorator. Example::
 
     from django.views.decorators.cache import cache_control
 
+
     @cache_control(private=True)
     def my_view(request):
         ...
@@ -1435,6 +1439,7 @@ cache control header (it is internally called by the
     from django.views.decorators.cache import patch_cache_control
     from django.views.decorators.vary import vary_on_cookie
 
+
     @vary_on_cookie
     def list_blog_entries_view(request):
         if request.user.is_anonymous:
@@ -1453,6 +1458,7 @@ certain amount of time with the :rfc:`max-age <9111#section-5.2.2.1>`
 directive::
 
     from django.views.decorators.cache import cache_control
+
 
     @cache_control(max_age=3600)
     def my_view(request):
@@ -1483,6 +1489,7 @@ adds headers to ensure the response won't be cached by browsers or other
 caches. Example::
 
     from django.views.decorators.cache import never_cache
+
 
     @never_cache
     def myview(request):

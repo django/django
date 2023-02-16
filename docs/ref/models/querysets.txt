@@ -38,7 +38,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``async for``::
 
       async for e in Entry.objects.all():
-        results.append(e)
+          results.append(e)
 
   Both synchronous and asynchronous iterators of QuerySets share the same
   underlying cache.
@@ -82,7 +82,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   ``True``, otherwise ``False``. For example::
 
       if Entry.objects.filter(headline="Test"):
-         print("There is at least one Entry with the headline Test")
+          print("There is at least one Entry with the headline Test")
 
   Note: If you only want to determine if at least one result exists (and don't
   need the actual objects), it's more efficient to use :meth:`~QuerySet.exists`.
@@ -108,9 +108,9 @@ any results loaded) using some code like this:
 .. code-block:: pycon
 
     >>> import pickle
-    >>> query = pickle.loads(s)     # Assuming 's' is the pickled string.
+    >>> query = pickle.loads(s)  # Assuming 's' is the pickled string.
     >>> qs = MyModel.objects.all()
-    >>> qs.query = query            # Restore the original 'query'.
+    >>> qs.query = query  # Restore the original 'query'.
 
 The ``query`` attribute is an opaque object. It represents the internals of
 the query construction and is not part of the public API. However, it is safe
@@ -125,7 +125,7 @@ described here.
     .. code-block:: pycon
 
         >>> import pickle
-        >>> qs = Blog.objects.values_list('id', 'name')
+        >>> qs = Blog.objects.values_list("id", "name")
         >>> qs
         <QuerySet [(1, 'Beatles Blog')]>
         >>> reloaded_qs = Blog.objects.all()
@@ -225,7 +225,7 @@ underlying SQL statement, and the whole thing is enclosed in a ``NOT()``.
 This example excludes all entries whose ``pub_date`` is later than 2005-1-3
 AND whose ``headline`` is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline='Hello')
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3), headline="Hello")
 
 In SQL terms, that evaluates to:
 
@@ -237,7 +237,7 @@ In SQL terms, that evaluates to:
 This example excludes all entries whose ``pub_date`` is later than 2005-1-3
 OR whose headline is "Hello"::
 
-    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline='Hello')
+    Entry.objects.exclude(pub_date__gt=datetime.date(2005, 1, 3)).exclude(headline="Hello")
 
 In SQL terms, that evaluates to:
 
@@ -282,7 +282,7 @@ to determine how many entries have been made in each blog:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> q = Blog.objects.annotate(Count('entry'))
+    >>> q = Blog.objects.annotate(Count("entry"))
     # The name of the first blog
     >>> q[0].name
     'Blogasaurus'
@@ -296,7 +296,7 @@ control the name of the annotation:
 
 .. code-block:: pycon
 
-    >>> q = Blog.objects.annotate(number_of_entries=Count('entry'))
+    >>> q = Blog.objects.annotate(number_of_entries=Count("entry"))
     # The number of entries on the first blog, using the name provided
     >>> q[0].number_of_entries
     42
@@ -322,16 +322,16 @@ interested in the exact number of entries, you could do this:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> blogs = Blog.objects.alias(entries=Count('entry')).filter(entries__gt=5)
+    >>> blogs = Blog.objects.alias(entries=Count("entry")).filter(entries__gt=5)
 
 ``alias()`` can be used in conjunction with :meth:`annotate`, :meth:`exclude`,
 :meth:`filter`, :meth:`order_by`, and :meth:`update`. To use aliased expression
 with other methods (e.g. :meth:`aggregate`), you must promote it to an
 annotation::
 
-    Blog.objects.alias(entries=Count('entry')).annotate(
-        entries=F('entries'),
-    ).aggregate(Sum('entries'))
+    Blog.objects.alias(entries=Count("entry")).annotate(
+        entries=F("entries"),
+    ).aggregate(Sum("entries"))
 
 :meth:`filter` and :meth:`order_by` can take expressions directly, but
 expression construction and usage often does not happen in the same place (for
@@ -351,14 +351,14 @@ override this on a per-``QuerySet`` basis by using the ``order_by`` method.
 
 Example::
 
-    Entry.objects.filter(pub_date__year=2005).order_by('-pub_date', 'headline')
+    Entry.objects.filter(pub_date__year=2005).order_by("-pub_date", "headline")
 
 The result above will be ordered by ``pub_date`` descending, then by
 ``headline`` ascending. The negative sign in front of ``"-pub_date"`` indicates
 *descending* order. Ascending order is implied. To order randomly, use ``"?"``,
 like so::
 
-    Entry.objects.order_by('?')
+    Entry.objects.order_by("?")
 
 Note: ``order_by('?')`` queries may be expensive and slow, depending on the
 database backend you're using.
@@ -368,7 +368,7 @@ querying across model relations. That is, the name of the field, followed by a
 double underscore (``__``), followed by the name of the field in the new model,
 and so on for as many models as you want to join. For example::
 
-    Entry.objects.order_by('blog__name', 'headline')
+    Entry.objects.order_by("blog__name", "headline")
 
 If you try to order by a field that is a relation to another model, Django will
 use the default ordering on the related model, or order by the related model's
@@ -376,22 +376,22 @@ primary key if there is no :attr:`Meta.ordering
 <django.db.models.Options.ordering>` specified. For example, since the ``Blog``
 model has no default ordering specified::
 
-    Entry.objects.order_by('blog')
+    Entry.objects.order_by("blog")
 
 ...is identical to::
 
-    Entry.objects.order_by('blog__id')
+    Entry.objects.order_by("blog__id")
 
 If ``Blog`` had ``ordering = ['name']``, then the first queryset would be
 identical to::
 
-    Entry.objects.order_by('blog__name')
+    Entry.objects.order_by("blog__name")
 
 You can also order by :doc:`query expressions </ref/models/expressions>` by
 calling :meth:`~.Expression.asc` or :meth:`~.Expression.desc` on the
 expression::
 
-    Entry.objects.order_by(Coalesce('summary', 'headline').desc())
+    Entry.objects.order_by(Coalesce("summary", "headline").desc())
 
 :meth:`~.Expression.asc` and :meth:`~.Expression.desc` have arguments
 (``nulls_first`` and ``nulls_last``) that control how null values are sorted.
@@ -408,14 +408,15 @@ related model ordering can change the expected results.
     Consider this case::
 
          class Event(Model):
-            parent = models.ForeignKey(
-                'self',
-                on_delete=models.CASCADE,
-                related_name='children',
-            )
-            date = models.DateField()
+             parent = models.ForeignKey(
+                 "self",
+                 on_delete=models.CASCADE,
+                 related_name="children",
+             )
+             date = models.DateField()
 
-         Event.objects.order_by('children__date')
+
+         Event.objects.order_by("children__date")
 
     Here, there could potentially be multiple ordering data for each ``Event``;
     each ``Event`` with multiple ``children`` will be returned multiple times
@@ -437,7 +438,7 @@ You can order by a field converted to lowercase with
 :class:`~django.db.models.functions.Lower` which will achieve case-consistent
 ordering::
 
-    Entry.objects.order_by(Lower('headline').desc())
+    Entry.objects.order_by(Lower("headline").desc())
 
 If you don't want any ordering to be applied to a query, not even the default
 ordering, call :meth:`order_by()` with no parameters.
@@ -449,7 +450,7 @@ You can tell if a query is ordered or not by checking the
 Each ``order_by()`` call will clear any previous ordering. For example, this
 query will be ordered by ``pub_date`` and not ``headline``::
 
-    Entry.objects.order_by('headline').order_by('pub_date')
+    Entry.objects.order_by("headline").order_by("pub_date")
 
 .. warning::
 
@@ -545,19 +546,19 @@ Examples (those after the first will only work on PostgreSQL):
     >>> Author.objects.distinct()
     [...]
 
-    >>> Entry.objects.order_by('pub_date').distinct('pub_date')
+    >>> Entry.objects.order_by("pub_date").distinct("pub_date")
     [...]
 
-    >>> Entry.objects.order_by('blog').distinct('blog')
+    >>> Entry.objects.order_by("blog").distinct("blog")
     [...]
 
-    >>> Entry.objects.order_by('author', 'pub_date').distinct('author', 'pub_date')
+    >>> Entry.objects.order_by("author", "pub_date").distinct("author", "pub_date")
     [...]
 
-    >>> Entry.objects.order_by('blog__name', 'mod_date').distinct('blog__name', 'mod_date')
+    >>> Entry.objects.order_by("blog__name", "mod_date").distinct("blog__name", "mod_date")
     [...]
 
-    >>> Entry.objects.order_by('author', 'pub_date').distinct('author')
+    >>> Entry.objects.order_by("author", "pub_date").distinct("author")
     [...]
 
 .. note::
@@ -568,7 +569,7 @@ Examples (those after the first will only work on PostgreSQL):
     the ``Blog`` model defined an :attr:`~django.db.models.Options.ordering` by
     ``name``::
 
-        Entry.objects.order_by('blog').distinct('blog')
+        Entry.objects.order_by("blog").distinct("blog")
 
     ...wouldn't work because the query would be ordered by ``blog__name`` thus
     mismatching the ``DISTINCT ON`` expression. You'd have to explicitly order
@@ -592,11 +593,11 @@ objects:
 .. code-block:: pycon
 
     # This list contains a Blog object.
-    >>> Blog.objects.filter(name__startswith='Beatles')
+    >>> Blog.objects.filter(name__startswith="Beatles")
     <QuerySet [<Blog: Beatles Blog>]>
 
     # This list contains a dictionary.
-    >>> Blog.objects.filter(name__startswith='Beatles').values()
+    >>> Blog.objects.filter(name__startswith="Beatles").values()
     <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
 
 The ``values()`` method takes optional positional arguments, ``*fields``, which
@@ -611,7 +612,7 @@ Example:
 
     >>> Blog.objects.values()
     <QuerySet [{'id': 1, 'name': 'Beatles Blog', 'tagline': 'All the latest Beatles news.'}]>
-    >>> Blog.objects.values('id', 'name')
+    >>> Blog.objects.values("id", "name")
     <QuerySet [{'id': 1, 'name': 'Beatles Blog'}]>
 
 The ``values()`` method also takes optional keyword arguments,
@@ -620,7 +621,7 @@ The ``values()`` method also takes optional keyword arguments,
 .. code-block:: pycon
 
     >>> from django.db.models.functions import Lower
-    >>> Blog.objects.values(lower_name=Lower('name'))
+    >>> Blog.objects.values(lower_name=Lower("name"))
     <QuerySet [{'lower_name': 'beatles blog'}]>
 
 You can use built-in and :doc:`custom lookups </howto/custom-lookups>` in
@@ -631,7 +632,7 @@ ordering. For example:
     >>> from django.db.models import CharField
     >>> from django.db.models.functions import Lower
     >>> CharField.register_lookup(Lower)
-    >>> Blog.objects.values('name__lower')
+    >>> Blog.objects.values("name__lower")
     <QuerySet [{'name__lower': 'beatles blog'}]>
 
 An aggregate within a ``values()`` clause is applied before other arguments
@@ -641,9 +642,9 @@ add it to an earlier ``values()`` clause instead. For example:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> Blog.objects.values('entry__authors', entries=Count('entry'))
+    >>> Blog.objects.values("entry__authors", entries=Count("entry"))
     <QuerySet [{'entry__authors': 1, 'entries': 20}, {'entry__authors': 1, 'entries': 13}]>
-    >>> Blog.objects.values('entry__authors').annotate(entries=Count('entry'))
+    >>> Blog.objects.values("entry__authors").annotate(entries=Count("entry"))
     <QuerySet [{'entry__authors': 1, 'entries': 33}]>
 
 A few subtleties that are worth mentioning:
@@ -664,10 +665,10 @@ A few subtleties that are worth mentioning:
     >>> Entry.objects.values()
     <QuerySet [{'blog_id': 1, 'headline': 'First Entry', ...}, ...]>
 
-    >>> Entry.objects.values('blog')
+    >>> Entry.objects.values("blog")
     <QuerySet [{'blog': 1}, ...]>
 
-    >>> Entry.objects.values('blog_id')
+    >>> Entry.objects.values("blog_id")
     <QuerySet [{'blog_id': 1}, ...]>
 
 * When using ``values()`` together with :meth:`distinct()`, be aware that
@@ -693,15 +694,15 @@ A few subtleties that are worth mentioning:
     >>> from django.db.models import CharField, Count
     >>> from django.db.models.functions import Lower
     >>> CharField.register_lookup(Lower)
-    >>> Blog.objects.values('entry__authors__name__lower').annotate(entries=Count('entry'))
+    >>> Blog.objects.values("entry__authors__name__lower").annotate(entries=Count("entry"))
     <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
-    >>> Blog.objects.values(
-    ...     entry__authors__name__lower=Lower('entry__authors__name')
-    ... ).annotate(entries=Count('entry'))
+    >>> Blog.objects.values(entry__authors__name__lower=Lower("entry__authors__name")).annotate(
+    ...     entries=Count("entry")
+    ... )
     <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
-    >>> Blog.objects.annotate(
-    ...     entry__authors__name__lower=Lower('entry__authors__name')
-    ... ).values('entry__authors__name__lower').annotate(entries=Count('entry'))
+    >>> Blog.objects.annotate(entry__authors__name__lower=Lower("entry__authors__name")).values(
+    ...     "entry__authors__name__lower"
+    ... ).annotate(entries=Count("entry"))
     <QuerySet [{'entry__authors__name__lower': 'test author', 'entries': 33}]>
 
 It is useful when you know you're only going to need values from a small number
@@ -711,8 +712,8 @@ instance object. It's more efficient to select only the fields you need to use.
 Finally, note that you can call ``filter()``, ``order_by()``, etc. after the
 ``values()`` call, that means that these two calls are identical::
 
-    Blog.objects.values().order_by('id')
-    Blog.objects.order_by('id').values()
+    Blog.objects.values().order_by("id")
+    Blog.objects.order_by("id").values()
 
 The people who made Django prefer to put all the SQL-affecting methods first,
 followed (optionally) by any output-affecting methods (such as ``values()``),
@@ -724,7 +725,7 @@ You can also refer to fields on related models with reverse relations through
 
 .. code-block:: pycon
 
-    >>> Blog.objects.values('name', 'entry__headline')
+    >>> Blog.objects.values("name", "entry__headline")
     <QuerySet [{'name': 'My blog', 'entry__headline': 'An entry'},
          {'name': 'My blog', 'entry__headline': 'Another entry'}, ...]>
 
@@ -756,10 +757,10 @@ first item is the first field, etc. For example:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.values_list('id', 'headline')
+    >>> Entry.objects.values_list("id", "headline")
     <QuerySet [(1, 'First entry'), ...]>
     >>> from django.db.models.functions import Lower
-    >>> Entry.objects.values_list('id', Lower('headline'))
+    >>> Entry.objects.values_list("id", Lower("headline"))
     <QuerySet [(1, 'first entry'), ...]>
 
 If you only pass in a single field, you can also pass in the ``flat``
@@ -768,10 +769,10 @@ rather than one-tuples. An example should make the difference clearer:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.values_list('id').order_by('id')
+    >>> Entry.objects.values_list("id").order_by("id")
     <QuerySet[(1,), (2,), (3,), ...]>
 
-    >>> Entry.objects.values_list('id', flat=True).order_by('id')
+    >>> Entry.objects.values_list("id", flat=True).order_by("id")
     <QuerySet [1, 2, 3, ...]>
 
 It is an error to pass in ``flat`` when there is more than one field.
@@ -781,7 +782,7 @@ You can pass ``named=True`` to get results as a
 
 .. code-block:: pycon
 
-    >>> Entry.objects.values_list('id', 'headline', named=True)
+    >>> Entry.objects.values_list("id", "headline", named=True)
     <QuerySet [Row(id=1, headline='First entry'), ...]>
 
 Using a named tuple may make use of the results more readable, at the expense
@@ -795,7 +796,7 @@ achieve that, use ``values_list()`` followed by a ``get()`` call:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.values_list('headline', flat=True).get(pk=1)
+    >>> Entry.objects.values_list("headline", flat=True).get(pk=1)
     'First entry'
 
 ``values()`` and ``values_list()`` are both intended as optimizations for a
@@ -809,7 +810,7 @@ For example, notice the behavior when querying across a
 
 .. code-block:: pycon
 
-    >>> Author.objects.values_list('name', 'entry__headline')
+    >>> Author.objects.values_list("name", "entry__headline")
     <QuerySet [('Noam Chomsky', 'Impressions of Gaza'),
      ('George Orwell', 'Why Socialists Do Not Believe in Fun'),
      ('George Orwell', 'In Defence of English Cooking'),
@@ -823,7 +824,7 @@ not having any author:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.values_list('authors')
+    >>> Entry.objects.values_list("authors")
     <QuerySet [('Noam Chomsky',), ('George Orwell',), (None,)]>
 
 .. admonition:: Special values for ``JSONField`` on SQLite
@@ -863,17 +864,17 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.dates('pub_date', 'year')
+    >>> Entry.objects.dates("pub_date", "year")
     [datetime.date(2005, 1, 1)]
-    >>> Entry.objects.dates('pub_date', 'month')
+    >>> Entry.objects.dates("pub_date", "month")
     [datetime.date(2005, 2, 1), datetime.date(2005, 3, 1)]
-    >>> Entry.objects.dates('pub_date', 'week')
+    >>> Entry.objects.dates("pub_date", "week")
     [datetime.date(2005, 2, 14), datetime.date(2005, 3, 14)]
-    >>> Entry.objects.dates('pub_date', 'day')
+    >>> Entry.objects.dates("pub_date", "day")
     [datetime.date(2005, 2, 20), datetime.date(2005, 3, 20)]
-    >>> Entry.objects.dates('pub_date', 'day', order='DESC')
+    >>> Entry.objects.dates("pub_date", "day", order="DESC")
     [datetime.date(2005, 3, 20), datetime.date(2005, 2, 20)]
-    >>> Entry.objects.filter(headline__contains='Lennon').dates('pub_date', 'day')
+    >>> Entry.objects.filter(headline__contains="Lennon").dates("pub_date", "day")
     [datetime.date(2005, 3, 20)]
 
 ``datetimes()``
@@ -977,9 +978,9 @@ resulting ``QuerySet``. For example:
 
 .. code-block:: pycon
 
-    >>> qs1 = Author.objects.values_list('name')
-    >>> qs2 = Entry.objects.values_list('headline')
-    >>> qs1.union(qs2).order_by('name')
+    >>> qs1 = Author.objects.values_list("name")
+    >>> qs2 = Entry.objects.values_list("headline")
+    >>> qs1.union(qs2).order_by("name")
 
 In addition, only ``LIMIT``, ``OFFSET``, ``COUNT(*)``, ``ORDER BY``, and
 specifying columns (i.e. slicing, :meth:`count`, :meth:`exists`,
@@ -1036,7 +1037,7 @@ The following examples illustrate the difference between plain lookups and
 And here's ``select_related`` lookup::
 
     # Hits the database.
-    e = Entry.objects.select_related('blog').get(id=5)
+    e = Entry.objects.select_related("blog").get(id=5)
 
     # Doesn't hit the database, because e.blog has been prepopulated
     # in the previous query.
@@ -1049,7 +1050,7 @@ You can use ``select_related()`` with any queryset of objects::
     # Find all the blogs with entries scheduled to be published in the future.
     blogs = set()
 
-    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog'):
+    for e in Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog"):
         # Without select_related(), this would make a database query for each
         # loop iteration in order to fetch the related blog for each entry.
         blogs.add(e.blog)
@@ -1057,17 +1058,19 @@ You can use ``select_related()`` with any queryset of objects::
 The order of ``filter()`` and ``select_related()`` chaining isn't important.
 These querysets are equivalent::
 
-    Entry.objects.filter(pub_date__gt=timezone.now()).select_related('blog')
-    Entry.objects.select_related('blog').filter(pub_date__gt=timezone.now())
+    Entry.objects.filter(pub_date__gt=timezone.now()).select_related("blog")
+    Entry.objects.select_related("blog").filter(pub_date__gt=timezone.now())
 
 You can follow foreign keys in a similar way to querying them. If you have the
 following models::
 
     from django.db import models
 
+
     class City(models.Model):
         # ...
         pass
+
 
     class Person(models.Model):
         # ...
@@ -1078,6 +1081,7 @@ following models::
             null=True,
         )
 
+
     class Book(models.Model):
         # ...
         author = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -1086,14 +1090,14 @@ following models::
 will cache the related ``Person`` *and* the related ``City``::
 
     # Hits the database with joins to the author and hometown tables.
-    b = Book.objects.select_related('author__hometown').get(id=4)
-    p = b.author         # Doesn't hit the database.
-    c = p.hometown       # Doesn't hit the database.
+    b = Book.objects.select_related("author__hometown").get(id=4)
+    p = b.author  # Doesn't hit the database.
+    c = p.hometown  # Doesn't hit the database.
 
     # Without select_related()...
     b = Book.objects.get(id=4)  # Hits the database.
-    p = b.author         # Hits the database.
-    c = p.hometown       # Hits the database.
+    p = b.author  # Hits the database.
+    c = p.hometown  # Hits the database.
 
 You can refer to any :class:`~django.db.models.ForeignKey` or
 :class:`~django.db.models.OneToOneField` relation in the list of fields
@@ -1158,8 +1162,10 @@ For example, suppose you have these models::
 
     from django.db import models
 
+
     class Topping(models.Model):
         name = models.CharField(max_length=30)
+
 
     class Pizza(models.Model):
         name = models.CharField(max_length=50)
@@ -1238,14 +1244,16 @@ You can also use the normal join syntax to do related fields of related
 fields. Suppose we have an additional model to the example above::
 
     class Restaurant(models.Model):
-        pizzas = models.ManyToManyField(Pizza, related_name='restaurants')
-        best_pizza = models.ForeignKey(Pizza, related_name='championed_by', on_delete=models.CASCADE)
+        pizzas = models.ManyToManyField(Pizza, related_name="restaurants")
+        best_pizza = models.ForeignKey(
+            Pizza, related_name="championed_by", on_delete=models.CASCADE
+        )
 
 The following are all legal:
 
 .. code-block:: pycon
 
-    >>> Restaurant.objects.prefetch_related('pizzas__toppings')
+    >>> Restaurant.objects.prefetch_related("pizzas__toppings")
 
 This will prefetch all pizzas belonging to restaurants, and all toppings
 belonging to those pizzas. This will result in a total of 3 database queries -
@@ -1253,7 +1261,7 @@ one for the restaurants, one for the pizzas, and one for the toppings.
 
 .. code-block:: pycon
 
-    >>> Restaurant.objects.prefetch_related('best_pizza__toppings')
+    >>> Restaurant.objects.prefetch_related("best_pizza__toppings")
 
 This will fetch the best pizza and all the toppings for the best pizza for each
 restaurant. This will be done in 3 database queries - one for the restaurants,
@@ -1264,7 +1272,7 @@ to reduce the query count to 2:
 
 .. code-block:: pycon
 
-    >>> Restaurant.objects.select_related('best_pizza').prefetch_related('best_pizza__toppings')
+    >>> Restaurant.objects.select_related("best_pizza").prefetch_related("best_pizza__toppings")
 
 Since the prefetch is executed after the main query (which includes the joins
 needed by ``select_related``), it is able to detect that the ``best_pizza``
@@ -1379,20 +1387,20 @@ database selected by the outer query. All of the following are valid:
 .. code-block:: pycon
 
     >>> # Both inner and outer queries will use the 'replica' database
-    >>> Restaurant.objects.prefetch_related('pizzas__toppings').using('replica')
+    >>> Restaurant.objects.prefetch_related("pizzas__toppings").using("replica")
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings'),
-    ... ).using('replica')
+    ...     Prefetch("pizzas__toppings"),
+    ... ).using("replica")
     >>>
     >>> # Inner will use the 'replica' database; outer will use 'default' database
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.using('replica')),
+    ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.using("replica")),
     ... )
     >>>
     >>> # Inner will use 'replica' database; outer will use 'cold-storage' database
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.using('replica')),
-    ... ).using('cold-storage')
+    ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.using("replica")),
+    ... ).using("cold-storage")
 
 .. note::
 
@@ -1449,7 +1457,7 @@ generated by a ``QuerySet``.
     .. code-block:: pycon
 
         >>> qs.extra(
-        ...     select={'val': "select col from sometable where othercol = %s"},
+        ...     select={"val": "select col from sometable where othercol = %s"},
         ...     select_params=(someparam,),
         ... )
 
@@ -1496,7 +1504,7 @@ of the arguments is required, but you should use at least one of them.
 
   Example::
 
-      Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
+      Entry.objects.extra(select={"is_recent": "pub_date > '2006-01-01'"})
 
   As a result, each ``Entry`` object will have an extra attribute,
   ``is_recent``, a boolean representing whether the entry's ``pub_date``
@@ -1517,7 +1525,7 @@ of the arguments is required, but you should use at least one of them.
 
       Blog.objects.extra(
           select={
-              'entry_count': 'SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id'
+              "entry_count": "SELECT COUNT(*) FROM blog_entry WHERE blog_entry.blog_id = blog_blog.id"
           },
       )
 
@@ -1543,8 +1551,8 @@ of the arguments is required, but you should use at least one of them.
   This will work, for example::
 
       Blog.objects.extra(
-          select={'a': '%s', 'b': '%s'},
-          select_params=('one', 'two'),
+          select={"a": "%s", "b": "%s"},
+          select_params=("one", "two"),
       )
 
   If you need to use a literal ``%s`` inside your select string, use
@@ -1602,8 +1610,8 @@ of the arguments is required, but you should use at least one of them.
 
   For example::
 
-      q = Entry.objects.extra(select={'is_recent': "pub_date > '2006-01-01'"})
-      q = q.extra(order_by = ['-is_recent'])
+      q = Entry.objects.extra(select={"is_recent": "pub_date > '2006-01-01'"})
+      q = q.extra(order_by=["-is_recent"])
 
   This would sort all the items for which ``is_recent`` is true to the
   front of the result set (``True`` sorts before ``False`` in a
@@ -1621,7 +1629,7 @@ of the arguments is required, but you should use at least one of them.
 
   Example::
 
-      Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+      Entry.objects.extra(where=["headline=%s"], params=["Lennon"])
 
   Always use ``params`` instead of embedding values directly into
   ``where`` because ``params`` will ensure values are quoted correctly
@@ -1634,7 +1642,7 @@ of the arguments is required, but you should use at least one of them.
 
   Good::
 
-      Entry.objects.extra(where=['headline=%s'], params=['Lennon'])
+      Entry.objects.extra(where=["headline=%s"], params=["Lennon"])
 
 .. warning::
 
@@ -1729,18 +1737,20 @@ one, doing so will result in an error.
 
             class Meta:
                 managed = False
-                db_table = 'app_largetable'
+                db_table = "app_largetable"
+
 
         class ManagedModel(models.Model):
             f1 = models.CharField(max_length=10)
             f2 = models.CharField(max_length=10)
 
             class Meta:
-                db_table = 'app_largetable'
+                db_table = "app_largetable"
+
 
         # Two equivalent QuerySets:
         CommonlyUsedModel.objects.all()
-        ManagedModel.objects.defer('f2')
+        ManagedModel.objects.defer("f2")
 
     If many fields need to be duplicated in the unmanaged model, it may be best
     to create an abstract model with the shared fields and then have the
@@ -1830,7 +1840,7 @@ For example:
     >>> Entry.objects.all()
 
     # queries the database with the 'backup' alias
-    >>> Entry.objects.using('backup')
+    >>> Entry.objects.using("backup")
 
 ``select_for_update()``
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -1878,7 +1888,7 @@ to refer to the queryset's model.
     <multi-table-inheritance>`, you must specify parent link fields (by default
     ``<parent_model_name>_ptr``) in the ``of`` argument. For example::
 
-        Restaurant.objects.select_for_update(of=('self', 'place_ptr'))
+        Restaurant.objects.select_for_update(of=("self", "place_ptr"))
 
 .. admonition:: Using ``select_for_update(of=(...))`` with specified fields
 
@@ -1896,7 +1906,7 @@ You can't use ``select_for_update()`` on nullable relations:
 
 .. code-block:: pycon
 
-    >>> Person.objects.select_related('hometown').select_for_update()
+    >>> Person.objects.select_related("hometown").select_for_update()
     Traceback (most recent call last):
     ...
     django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
@@ -1906,7 +1916,7 @@ them:
 
 .. code-block:: pycon
 
-    >>> Person.objects.select_related('hometown').select_for_update().exclude(hometown=None)
+    >>> Person.objects.select_related("hometown").select_for_update().exclude(hometown=None)
     <QuerySet [<Person: ...)>, ...]>
 
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
@@ -1980,6 +1990,7 @@ The following are equivalent::
     Model.objects.filter(x=1) & Model.objects.filter(y=2)
     Model.objects.filter(x=1, y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) & Q(y=2))
 
 SQL equivalent:
@@ -1997,6 +2008,7 @@ The following are equivalent::
 
     Model.objects.filter(x=1) | Model.objects.filter(y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) | Q(y=2))
 
 SQL equivalent:
@@ -2017,6 +2029,7 @@ The following are equivalent::
 
     Model.objects.filter(x=1) ^ Model.objects.filter(y=2)
     from django.db.models import Q
+
     Model.objects.filter(Q(x=1) ^ Q(y=2))
 
 SQL equivalent:
@@ -2081,13 +2094,13 @@ without any arguments to return the object for that row::
 If ``get()`` doesn't find any object, it raises a :exc:`Model.DoesNotExist
 <django.db.models.Model.DoesNotExist>` exception::
 
-    Entry.objects.get(id=-999) # raises Entry.DoesNotExist
+    Entry.objects.get(id=-999)  # raises Entry.DoesNotExist
 
 If ``get()`` finds more than one object, it raises a
 :exc:`Model.MultipleObjectsReturned
 <django.db.models.Model.MultipleObjectsReturned>` exception::
 
-    Entry.objects.get(name='A Duplicated Name') # raises Entry.MultipleObjectsReturned
+    Entry.objects.get(name="A Duplicated Name")  # raises Entry.MultipleObjectsReturned
 
 Both these exception classes are attributes of the model class, and specific to
 that model. If you want to handle such exceptions from several ``get()`` calls
@@ -2149,9 +2162,9 @@ This is meant to prevent duplicate objects from being created when requests are
 made in parallel, and as a shortcut to boilerplatish code. For example::
 
     try:
-        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        obj = Person.objects.get(first_name="John", last_name="Lennon")
     except Person.DoesNotExist:
-        obj = Person(first_name='John', last_name='Lennon', birthday=date(1940, 10, 9))
+        obj = Person(first_name="John", last_name="Lennon", birthday=date(1940, 10, 9))
         obj.save()
 
 Here, with concurrent requests, multiple attempts to save a ``Person`` with
@@ -2159,9 +2172,9 @@ the same parameters may be made. To avoid this race condition, the above
 example can be rewritten using ``get_or_create()`` like so::
 
     obj, created = Person.objects.get_or_create(
-        first_name='John',
-        last_name='Lennon',
-        defaults={'birthday': date(1940, 10, 9)},
+        first_name="John",
+        last_name="Lennon",
+        defaults={"birthday": date(1940, 10, 9)},
     )
 
 Any keyword arguments passed to ``get_or_create()`` — *except* an optional one
@@ -2185,8 +2198,8 @@ exists, and create the latter otherwise::
     from django.db.models import Q
 
     obj, created = Person.objects.filter(
-        Q(first_name='Bob') | Q(first_name='Robert'),
-    ).get_or_create(last_name='Marley', defaults={'first_name': 'Bob'})
+        Q(first_name="Bob") | Q(first_name="Robert"),
+    ).get_or_create(last_name="Marley", defaults={"first_name": "Bob"})
 
 If multiple objects are found, ``get_or_create()`` raises
 :exc:`~django.core.exceptions.MultipleObjectsReturned`. If an object is *not*
@@ -2194,7 +2207,7 @@ found, ``get_or_create()`` will instantiate and save a new object, returning a
 tuple of the new object and ``True``. The new object will be created roughly
 according to this algorithm::
 
-    params = {k: v for k, v in kwargs.items() if '__' not in k}
+    params = {k: v for k, v in kwargs.items() if "__" not in k}
     params.update({k: v() if callable(v) else v for k, v in defaults.items()})
     obj = self.model(**params)
     obj.save()
@@ -2211,7 +2224,7 @@ handles some extra edge-conditions; if you're interested, read the code.
 If you have a field named ``defaults`` and want to use it as an exact lookup in
 ``get_or_create()``, use ``'defaults__exact'``, like so::
 
-    Foo.objects.get_or_create(defaults__exact='bar', defaults={'defaults': 'baz'})
+    Foo.objects.get_or_create(defaults__exact="bar", defaults={"defaults": "baz"})
 
 The ``get_or_create()`` method has similar error behavior to :meth:`create()`
 when you're using manually specified primary keys. If an object needs to be
@@ -2235,6 +2248,7 @@ whenever a request to a page has a side effect on your data. For more, see
 
       class Chapter(models.Model):
           title = models.CharField(max_length=255, unique=True)
+
 
       class Book(models.Model):
           title = models.CharField(max_length=256)
@@ -2286,15 +2300,15 @@ the given ``kwargs``. If a match is found, it updates the fields passed in the
 
 This is meant as a shortcut to boilerplatish code. For example::
 
-    defaults = {'first_name': 'Bob'}
-    create_defaults = {'first_name': 'Bob', 'birthday': date(1940, 10, 9)}
+    defaults = {"first_name": "Bob"}
+    create_defaults = {"first_name": "Bob", "birthday": date(1940, 10, 9)}
     try:
-        obj = Person.objects.get(first_name='John', last_name='Lennon')
+        obj = Person.objects.get(first_name="John", last_name="Lennon")
         for key, value in defaults.items():
             setattr(obj, key, value)
         obj.save()
     except Person.DoesNotExist:
-        new_values = {'first_name': 'John', 'last_name': 'Lennon'}
+        new_values = {"first_name": "John", "last_name": "Lennon"}
         new_values.update(create_defaults)
         obj = Person(**new_values)
         obj.save()
@@ -2303,9 +2317,10 @@ This pattern gets quite unwieldy as the number of fields in a model goes up.
 The above example can be rewritten using ``update_or_create()`` like so::
 
     obj, created = Person.objects.update_or_create(
-        first_name='John', last_name='Lennon',
-        defaults={'first_name': 'Bob'},
-        create_defaults={'first_name': 'Bob', 'birthday': date(1940, 10, 9)},
+        first_name="John",
+        last_name="Lennon",
+        defaults={"first_name": "Bob"},
+        create_defaults={"first_name": "Bob", "birthday": date(1940, 10, 9)},
     )
 
 For a detailed description of how names passed in ``kwargs`` are resolved, see
@@ -2342,10 +2357,12 @@ are), and returns created objects as a list, in the same order as provided:
 
 .. code-block:: pycon
 
-    >>> objs = Entry.objects.bulk_create([
-    ...     Entry(headline='This is a test'),
-    ...     Entry(headline='This is only a test'),
-    ... ])
+    >>> objs = Entry.objects.bulk_create(
+    ...     [
+    ...         Entry(headline="This is a test"),
+    ...         Entry(headline="This is only a test"),
+    ...     ]
+    ... )
 
 This has a number of caveats though:
 
@@ -2366,7 +2383,7 @@ This has a number of caveats though:
     from itertools import islice
 
     batch_size = 100
-    objs = (Entry(headline='Test %s' % i) for i in range(1000))
+    objs = (Entry(headline="Test %s" % i) for i in range(1000))
     while True:
         batch = list(islice(objs, batch_size))
         if not batch:
@@ -2417,12 +2434,12 @@ updated:
 .. code-block:: pycon
 
     >>> objs = [
-    ...    Entry.objects.create(headline='Entry 1'),
-    ...    Entry.objects.create(headline='Entry 2'),
+    ...     Entry.objects.create(headline="Entry 1"),
+    ...     Entry.objects.create(headline="Entry 2"),
     ... ]
-    >>> objs[0].headline = 'This is entry 1'
-    >>> objs[1].headline = 'This is entry 2'
-    >>> Entry.objects.bulk_update(objs, ['headline'])
+    >>> objs[0].headline = "This is entry 1"
+    >>> objs[1].headline = "This is entry 2"
+    >>> Entry.objects.bulk_update(objs, ["headline"])
     2
 
 :meth:`.QuerySet.update` is used to save the changes, so this is more efficient
@@ -2466,7 +2483,7 @@ Example::
     Entry.objects.count()
 
     # Returns the number of entries whose headline contains 'Lennon'
-    Entry.objects.filter(headline__contains='Lennon').count()
+    Entry.objects.filter(headline__contains="Lennon").count()
 
 A ``count()`` call performs a ``SELECT COUNT(*)`` behind the scenes, so you
 should always use ``count()`` rather than loading all of the record into Python
@@ -2511,9 +2528,9 @@ Example:
     {}
     >>> Blog.objects.in_bulk()
     {1: <Blog: Beatles Blog>, 2: <Blog: Cheddar Talk>, 3: <Blog: Django Weblog>}
-    >>> Blog.objects.in_bulk(['beatles_blog'], field_name='slug')
+    >>> Blog.objects.in_bulk(["beatles_blog"], field_name="slug")
     {'beatles_blog': <Blog: Beatles Blog>}
-    >>> Blog.objects.distinct('name').in_bulk(field_name='name')
+    >>> Blog.objects.distinct("name").in_bulk(field_name="name")
     {'Beatles Blog': <Blog: Beatles Blog>, 'Cheddar Talk': <Blog: Cheddar Talk>, 'Django Weblog': <Blog: Django Weblog>}
 
 If you pass ``in_bulk()`` an empty list, you'll get an empty dictionary.
@@ -2625,13 +2642,13 @@ Returns the latest object in the table based on the given field(s).
 This example returns the latest ``Entry`` in the table, according to the
 ``pub_date`` field::
 
-    Entry.objects.latest('pub_date')
+    Entry.objects.latest("pub_date")
 
 You can also choose the latest based on several fields. For example, to select
 the ``Entry`` with the earliest ``expire_date`` when two entries have the same
 ``pub_date``::
 
-    Entry.objects.latest('pub_date', '-expire_date')
+    Entry.objects.latest("pub_date", "-expire_date")
 
 The negative sign in ``'-expire_date'`` means to sort ``expire_date`` in
 *descending* order. Since ``latest()`` gets the last result, the ``Entry`` with
@@ -2658,7 +2675,7 @@ readability.
 
     You may want to filter out null values::
 
-        Entry.objects.filter(pub_date__isnull=False).latest('pub_date')
+        Entry.objects.filter(pub_date__isnull=False).latest("pub_date")
 
 ``earliest()``
 ~~~~~~~~~~~~~~
@@ -2686,13 +2703,13 @@ aggregation results as described in :ref:`aggregation-ordering-interaction`.
 
 Example::
 
-    p = Article.objects.order_by('title', 'pub_date').first()
+    p = Article.objects.order_by("title", "pub_date").first()
 
 Note that ``first()`` is a convenience method, the following code sample is
 equivalent to the above example::
 
     try:
-        p = Article.objects.order_by('title', 'pub_date')[0]
+        p = Article.objects.order_by("title", "pub_date")[0]
     except IndexError:
         p = None
 
@@ -2735,7 +2752,7 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> q = Blog.objects.aggregate(Count('entry'))
+    >>> q = Blog.objects.aggregate(Count("entry"))
     {'entry__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
@@ -2743,7 +2760,7 @@ control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> q = Blog.objects.aggregate(number_of_entries=Count('entry'))
+    >>> q = Blog.objects.aggregate(number_of_entries=Count("entry"))
     {'number_of_entries': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
@@ -2802,13 +2819,13 @@ not. This tries to perform the query in the simplest and fastest way possible.
 To check whether a queryset contains a specific item::
 
     if some_queryset.contains(obj):
-        print('Entry contained in queryset')
+        print("Entry contained in queryset")
 
 This will be faster than the following which requires evaluating and iterating
 through the entire queryset::
 
     if obj in some_queryset:
-        print('Entry contained in queryset')
+        print("Entry contained in queryset")
 
 Like :meth:`exists`, if ``some_queryset`` has not yet been evaluated, but you
 know that it will be at some point, then using ``some_queryset.contains(obj)``
@@ -2841,7 +2858,9 @@ here we update the ``comments_on`` and ``headline`` fields:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False, headline='This is old')
+    >>> Entry.objects.filter(pub_date__year=2010).update(
+    ...     comments_on=False, headline="This is old"
+    ... )
 
 The ``update()`` method is applied instantly, and the only restriction on the
 :class:`.QuerySet` that is updated is that it can only update columns in the
@@ -2849,7 +2868,7 @@ model's main table, not on related models. You can't do this, for example:
 
 .. code-block:: pycon
 
-    >>> Entry.objects.update(blog__name='foo') # Won't work!
+    >>> Entry.objects.update(blog__name="foo")  # Won't work!
 
 Filtering based on related fields is still possible, though:
 
@@ -2867,7 +2886,7 @@ The ``update()`` method returns the number of affected rows:
     >>> Entry.objects.filter(id=64).update(comments_on=True)
     1
 
-    >>> Entry.objects.filter(slug='nonexistent-slug').update(comments_on=True)
+    >>> Entry.objects.filter(slug="nonexistent-slug").update(comments_on=True)
     0
 
     >>> Entry.objects.filter(pub_date__year=2010).update(comments_on=False)
@@ -2909,7 +2928,7 @@ Chaining ``order_by()`` with ``update()`` is supported only on MariaDB and
 MySQL, and is ignored for different databases. This is useful for updating a
 unique field in the order that is specified without conflicts. For example::
 
-    Entry.objects.order_by('-number').update(number=F('number') + 1)
+    Entry.objects.order_by("-number").update(number=F("number") + 1)
 
 .. note::
 
@@ -3006,7 +3025,7 @@ For example, when using PostgreSQL:
 
 .. code-block:: pycon
 
-    >>> print(Blog.objects.filter(title='My Blog').explain())
+    >>> print(Blog.objects.filter(title="My Blog").explain())
     Seq Scan on blog  (cost=0.00..35.50 rows=10 width=12)
       Filter: (title = 'My Blog'::bpchar)
 
@@ -3027,7 +3046,7 @@ Pass these flags as keyword arguments. For example, when using PostgreSQL:
 
 .. code-block:: pycon
 
-    >>> print(Blog.objects.filter(title='My Blog').explain(verbose=True, analyze=True))
+    >>> print(Blog.objects.filter(title="My Blog").explain(verbose=True, analyze=True))
     Seq Scan on public.blog  (cost=0.00..35.50 rows=10 width=12) (actual time=0.004..0.004 rows=10 loops=1)
       Output: id, title
       Filter: (blog.title = 'My Blog'::bpchar)
@@ -3097,7 +3116,7 @@ details).
 
 Example::
 
-    Blog.objects.get(name__iexact='beatles blog')
+    Blog.objects.get(name__iexact="beatles blog")
     Blog.objects.get(name__iexact=None)
 
 SQL equivalents:
@@ -3125,7 +3144,7 @@ Case-sensitive containment test.
 
 Example::
 
-    Entry.objects.get(headline__contains='Lennon')
+    Entry.objects.get(headline__contains="Lennon")
 
 SQL equivalent:
 
@@ -3152,7 +3171,7 @@ Case-insensitive containment test.
 
 Example::
 
-    Entry.objects.get(headline__icontains='Lennon')
+    Entry.objects.get(headline__icontains="Lennon")
 
 SQL equivalent:
 
@@ -3176,7 +3195,7 @@ case, but strings (being iterables) are accepted.
 Examples::
 
     Entry.objects.filter(id__in=[1, 3, 4])
-    Entry.objects.filter(headline__in='abc')
+    Entry.objects.filter(headline__in="abc")
 
 SQL equivalents:
 
@@ -3188,7 +3207,7 @@ SQL equivalents:
 You can also use a queryset to dynamically evaluate the list of values
 instead of providing a list of literal values::
 
-    inner_qs = Blog.objects.filter(name__contains='Cheddar')
+    inner_qs = Blog.objects.filter(name__contains="Cheddar")
     entries = Entry.objects.filter(blog__in=inner_qs)
 
 This queryset will be evaluated as subselect statement:
@@ -3202,14 +3221,14 @@ as the value to an ``__in`` lookup, you need to ensure you are only extracting
 one field in the result. For example, this will work (filtering on the blog
 names)::
 
-    inner_qs = Blog.objects.filter(name__contains='Ch').values('name')
+    inner_qs = Blog.objects.filter(name__contains="Ch").values("name")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
 This example will raise an exception, since the inner query is trying to
 extract two field values, where only one is expected::
 
     # Bad code! Will raise a TypeError.
-    inner_qs = Blog.objects.filter(name__contains='Ch').values('name', 'id')
+    inner_qs = Blog.objects.filter(name__contains="Ch").values("name", "id")
     entries = Entry.objects.filter(blog__name__in=inner_qs)
 
 .. _nested-queries-performance:
@@ -3223,8 +3242,7 @@ extract two field values, where only one is expected::
     and then pass that into the second query. That is, execute two queries
     instead of one::
 
-        values = Blog.objects.filter(
-                name__contains='Cheddar').values_list('pk', flat=True)
+        values = Blog.objects.filter(name__contains="Cheddar").values_list("pk", flat=True)
         entries = Entry.objects.filter(blog__in=list(values))
 
     Note the ``list()`` call around the Blog ``QuerySet`` to force execution of
@@ -3278,7 +3296,7 @@ Case-sensitive starts-with.
 
 Example::
 
-    Entry.objects.filter(headline__startswith='Lennon')
+    Entry.objects.filter(headline__startswith="Lennon")
 
 SQL equivalent:
 
@@ -3298,7 +3316,7 @@ Case-insensitive starts-with.
 
 Example::
 
-    Entry.objects.filter(headline__istartswith='Lennon')
+    Entry.objects.filter(headline__istartswith="Lennon")
 
 SQL equivalent:
 
@@ -3320,7 +3338,7 @@ Case-sensitive ends-with.
 
 Example::
 
-    Entry.objects.filter(headline__endswith='Lennon')
+    Entry.objects.filter(headline__endswith="Lennon")
 
 SQL equivalent:
 
@@ -3343,7 +3361,7 @@ Case-insensitive ends-with.
 
 Example::
 
-    Entry.objects.filter(headline__iendswith='Lennon')
+    Entry.objects.filter(headline__iendswith="Lennon")
 
 SQL equivalent:
 
@@ -3366,6 +3384,7 @@ Range test (inclusive).
 Example::
 
     import datetime
+
     start_date = datetime.date(2005, 1, 1)
     end_date = datetime.date(2005, 3, 31)
     Entry.objects.filter(pub_date__range=(start_date, end_date))
@@ -3743,7 +3762,7 @@ the regular expression syntax is therefore that of Python's ``re`` module.
 
 Example::
 
-    Entry.objects.get(title__regex=r'^(An?|The) +')
+    Entry.objects.get(title__regex=r"^(An?|The) +")
 
 SQL equivalents:
 
@@ -3769,7 +3788,7 @@ Case-insensitive regular expression match.
 
 Example::
 
-    Entry.objects.get(title__iregex=r'^(an?|the) +')
+    Entry.objects.get(title__iregex=r"^(an?|the) +")
 
 SQL equivalents:
 
@@ -4048,7 +4067,7 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 
     >>> from django.db.models import prefetch_related_objects
     >>> restaurants = fetch_top_restaurants_from_cache()  # A list of Restaurants
-    >>> prefetch_related_objects(restaurants, 'pizzas__toppings')
+    >>> prefetch_related_objects(restaurants, "pizzas__toppings")
 
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
@@ -4079,10 +4098,11 @@ For example, to find restaurants that have vegetarian pizzas with
 
     >>> from django.db.models import FilteredRelation, Q
     >>> Restaurant.objects.annotate(
-    ...    pizzas_vegetarian=FilteredRelation(
-    ...        'pizzas', condition=Q(pizzas__vegetarian=True),
-    ...    ),
-    ... ).filter(pizzas_vegetarian__name__icontains='mozzarella')
+    ...     pizzas_vegetarian=FilteredRelation(
+    ...         "pizzas",
+    ...         condition=Q(pizzas__vegetarian=True),
+    ...     ),
+    ... ).filter(pizzas_vegetarian__name__icontains="mozzarella")
 
 If there are a large number of pizzas, this queryset performs better than:
 
@@ -4090,7 +4110,7 @@ If there are a large number of pizzas, this queryset performs better than:
 
     >>> Restaurant.objects.filter(
     ...     pizzas__vegetarian=True,
-    ...     pizzas__name__icontains='mozzarella',
+    ...     pizzas__name__icontains="mozzarella",
     ... )
 
 because the filtering in the ``WHERE`` clause of the first queryset will only

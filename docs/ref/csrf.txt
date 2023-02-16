@@ -145,9 +145,10 @@ class-based views<decorating-class-based-views>`.
         from django.http import HttpResponse
         from django.views.decorators.csrf import csrf_exempt
 
+
         @csrf_exempt
         def my_view(request):
-            return HttpResponse('Hello world')
+            return HttpResponse("Hello world")
 
 .. function:: csrf_protect(view)
 
@@ -157,6 +158,7 @@ class-based views<decorating-class-based-views>`.
 
         from django.shortcuts import render
         from django.views.decorators.csrf import csrf_protect
+
 
         @csrf_protect
         def my_view(request):
@@ -176,6 +178,7 @@ class-based views<decorating-class-based-views>`.
 
         from django.shortcuts import render
         from django.views.decorators.csrf import requires_csrf_token
+
 
         @requires_csrf_token
         def my_view(request):

@@ -95,6 +95,7 @@ Django also supports some asynchronous model methods that use the database::
         book = Book(...)
         await book.asave(using="secondary")
 
+
     async def make_book_with_tags(tags):
         book = await Book.objects.acreate(...)
         await book.tags.aset(tags)
@@ -227,10 +228,13 @@ as either a direct wrapper or a decorator::
 
     from asgiref.sync import async_to_sync
 
+
     async def get_data():
         ...
 
+
     sync_get_data = async_to_sync(get_data)
+
 
     @async_to_sync
     async def get_other_data():
@@ -262,6 +266,7 @@ as either a direct wrapper or a decorator::
 
     async_function = sync_to_async(sync_function, thread_sensitive=False)
     async_function = sync_to_async(sensitive_sync_function, thread_sensitive=True)
+
 
     @sync_to_async
     def sync_function():
@@ -320,12 +325,10 @@ trigger the thread safety checks:
     >>> from django.db import connection
     >>> # In an async context so you cannot use the database directly:
     >>> connection.cursor()
-    ...
     django.core.exceptions.SynchronousOnlyOperation: You cannot call this from
     an async context - use a thread or sync_to_async.
     >>> # Nor can you pass resolved connection attributes across threads:
     >>> await sync_to_async(connection.cursor)()
-    ...
     django.db.utils.DatabaseError: DatabaseWrapper objects created in a thread
     can only be used in that same thread. The object with alias 'default' was
     created in thread id 4371465600 and this is thread id 6131478528.

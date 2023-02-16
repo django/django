@@ -186,6 +186,7 @@ level:
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     def test_foo(self):
         ...
@@ -195,6 +196,7 @@ level:
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     class MyDeprecatedTests(unittest.TestCase):
         ...
@@ -203,8 +205,9 @@ You can also add a test for the deprecation warning::
 
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     def test_foo_deprecation_warning(self):
-        msg = 'Expected deprecation message'
+        msg = "Expected deprecation message"
         with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
             ...

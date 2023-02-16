@@ -134,9 +134,9 @@ widget. For example::
 
     from django.contrib.gis import forms
 
+
     class MyGeoForm(forms.Form):
-        point = forms.PointField(widget=
-            forms.OSMWidget(attrs={'display_raw': True}))
+        point = forms.PointField(widget=forms.OSMWidget(attrs={"display_raw": True}))
 
 Widget classes
 --------------

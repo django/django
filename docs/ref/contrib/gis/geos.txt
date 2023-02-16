@@ -55,10 +55,16 @@ are examples of creating the same geometry from WKT, HEX, WKB, and GeoJSON:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> pnt = GEOSGeometry('POINT(5 23)') # WKT
-    >>> pnt = GEOSGeometry('010100000000000000000014400000000000003740') # HEX
-    >>> pnt = GEOSGeometry(memoryview(b'\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14@\x00\x00\x00\x00\x00\x007@')) # WKB
-    >>> pnt = GEOSGeometry('{ "type": "Point", "coordinates": [ 5.000000, 23.000000 ] }') # GeoJSON
+    >>> pnt = GEOSGeometry("POINT(5 23)")  # WKT
+    >>> pnt = GEOSGeometry("010100000000000000000014400000000000003740")  # HEX
+    >>> pnt = GEOSGeometry(
+    ...     memoryview(
+    ...         b"\x01\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14@\x00\x00\x00\x00\x00\x007@"
+    ...     )
+    ... )  # WKB
+    >>> pnt = GEOSGeometry(
+    ...     '{ "type": "Point", "coordinates": [ 5.000000, 23.000000 ] }'
+    ... )  # GeoJSON
 
 Another option is to use the constructor for the specific geometry type
 that you wish to create.  For example, a :class:`Point` object may be
@@ -74,7 +80,7 @@ All these constructors take the keyword argument ``srid``. For example:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry, LineString, Point
-    >>> print(GEOSGeometry('POINT (0 0)', srid=4326))
+    >>> print(GEOSGeometry("POINT (0 0)", srid=4326))
     SRID=4326;POINT (0 0)
     >>> print(LineString((0, 0), (1, 1), srid=4326))
     SRID=4326;LINESTRING (0 0, 1 1)
@@ -87,8 +93,8 @@ Finally, there is the :func:`fromfile` factory method which returns a
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import fromfile
-    >>> pnt = fromfile('/path/to/pnt.wkt')
-    >>> pnt = fromfile(open('/path/to/pnt.wkt'))
+    >>> pnt = fromfile("/path/to/pnt.wkt")
+    >>> pnt = fromfile(open("/path/to/pnt.wkt"))
 
 .. _geos-exceptions-in-logfile:
 
@@ -141,10 +147,10 @@ Whereas indexing on a :class:`Polygon` will return the ring
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Polygon
-    >>> poly = Polygon( ((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)) )
+    >>> poly = Polygon(((0.0, 0.0), (0.0, 50.0), (50.0, 50.0), (50.0, 0.0), (0.0, 0.0)))
     >>> poly[0]
     <LinearRing object at 0x1044395b0>
-    >>> poly[0][-2] # second-to-last coordinate of external ring
+    >>> poly[0][-2]  # second-to-last coordinate of external ring
     (50.0, 0.0)
 
 In addition, coordinates/components of the geometry may added or modified,
@@ -218,11 +224,11 @@ The ``srid`` parameter, if given, is set as the SRID of the created geometry if
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> GEOSGeometry('POINT EMPTY', srid=4326).ewkt
+    >>> GEOSGeometry("POINT EMPTY", srid=4326).ewkt
     'SRID=4326;POINT EMPTY'
-    >>> GEOSGeometry('SRID=4326;POINT EMPTY', srid=4326).ewkt
+    >>> GEOSGeometry("SRID=4326;POINT EMPTY", srid=4326).ewkt
     'SRID=4326;POINT EMPTY'
-    >>> GEOSGeometry('SRID=1;POINT EMPTY', srid=4326)
+    >>> GEOSGeometry("SRID=1;POINT EMPTY", srid=4326)
     Traceback (most recent call last):
     ...
     ValueError: Input geometry already has SRID: 1.
@@ -274,7 +280,7 @@ Properties
 
     .. code-block:: pycon
 
-        >>> pnt = GEOSGeometry('POINT(5 23)')
+        >>> pnt = GEOSGeometry("POINT(5 23)")
         >>> pnt.geom_type
         'Point'
 
@@ -749,8 +755,8 @@ Other Properties & Methods
 
     .. code-block:: pycon
 
-        >>> ls = LineString( ((0, 0), (1, 1)) )
-        >>> ls = LineString( [Point(0, 0), Point(1, 1)] )
+        >>> ls = LineString(((0, 0), (1, 1)))
+        >>> ls = LineString([Point(0, 0), Point(1, 1)])
 
     Empty ``LineString`` objects may be instantiated by passing no arguments
     or an empty sequence. The following are equivalent:
@@ -823,6 +829,7 @@ Other Properties & Methods
 
         >>> if poly_1.area > poly_2.area:
         ...     pass
+        ...
 
 .. _geos-geometry-collections:
 
@@ -840,7 +847,7 @@ Geometry Collections
     .. code-block:: pycon
 
         >>> mp = MultiPoint(Point(0, 0), Point(1, 1))
-        >>> mp = MultiPoint( (Point(0, 0), Point(1, 1)) )
+        >>> mp = MultiPoint((Point(0, 0), Point(1, 1)))
 
 ``MultiLineString``
 -------------------
@@ -877,8 +884,8 @@ Geometry Collections
 
     .. code-block:: pycon
 
-        >>> p1 = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
-        >>> p2 = Polygon( ((1, 1), (1, 2), (2, 2), (1, 1)) )
+        >>> p1 = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
+        >>> p2 = Polygon(((1, 1), (1, 2), (2, 2), (1, 1)))
         >>> mp = MultiPolygon(p1, p2)
         >>> mp = MultiPolygon([p1, p2])
 
@@ -893,7 +900,7 @@ Geometry Collections
 
     .. code-block:: pycon
 
-        >>> poly = Polygon( ((0, 0), (0, 1), (1, 1), (0, 0)) )
+        >>> poly = Polygon(((0, 0), (0, 1), (1, 1), (0, 0)))
         >>> gc = GeometryCollection(Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly)
         >>> gc = GeometryCollection((Point(0, 0), MultiPoint(Point(0, 0), Point(1, 1)), poly))
 
@@ -960,7 +967,7 @@ Geometry Factories
     .. code-block:: pycon
 
         >>> from django.contrib.gis.geos import fromfile
-        >>> g = fromfile('/home/bob/geom.wkt')
+        >>> g = fromfile("/home/bob/geom.wkt")
 
 .. function:: fromstr(string, srid=None)
 
@@ -978,7 +985,7 @@ Geometry Factories
     .. code-block:: pycon
 
         >>> from django.contrib.gis.geos import fromstr
-        >>> pnt = fromstr('POINT(-90.5 29.5)', srid=4326)
+        >>> pnt = fromstr("POINT(-90.5 29.5)", srid=4326)
 
 I/O Objects
 ===========
@@ -997,7 +1004,7 @@ and/or WKT input given to their ``read(geom)`` method.
 
         >>> from django.contrib.gis.geos import WKBReader
         >>> wkb_r = WKBReader()
-        >>> wkb_r.read('0101000000000000000000F03F000000000000F03F')
+        >>> wkb_r.read("0101000000000000000000F03F000000000000F03F")
         <Point object at 0x103a88910>
 
 .. class:: WKTReader
@@ -1008,7 +1015,7 @@ and/or WKT input given to their ``read(geom)`` method.
 
         >>> from django.contrib.gis.geos import WKTReader
         >>> wkt_r = WKTReader()
-        >>> wkt_r.read('POINT(1 1)')
+        >>> wkt_r.read("POINT(1 1)")
         <Point object at 0x103a88b50>
 
 Writer Objects
@@ -1099,9 +1106,9 @@ include the SRID value (in other words, EWKB).
         >>> wkb_w.outdim
         2
         >>> pnt = Point(1, 1, 1)
-        >>> wkb_w.write_hex(pnt) # By default, no Z value included:
+        >>> wkb_w.write_hex(pnt)  # By default, no Z value included:
         '0101000000000000000000F03F000000000000F03F'
-        >>> wkb_w.outdim = 3 # Tell writer to include Z values
+        >>> wkb_w.outdim = 3  # Tell writer to include Z values
         >>> wkb_w.write_hex(pnt)
         '0101000080000000000000F03F000000000000F03F000000000000F03F'
 
@@ -1115,9 +1122,9 @@ include the SRID value (in other words, EWKB).
         >>> from django.contrib.gis.geos import Point, WKBWriter
         >>> wkb_w = WKBWriter()
         >>> pnt = Point(1, 1, srid=4326)
-        >>> wkb_w.write_hex(pnt) # By default, no SRID included:
+        >>> wkb_w.write_hex(pnt)  # By default, no SRID included:
         '0101000000000000000000F03F000000000000F03F'
-        >>> wkb_w.srid = True # Tell writer to include SRID
+        >>> wkb_w.srid = True  # Tell writer to include SRID
         >>> wkb_w.write_hex(pnt)
         '0101000020E6100000000000000000F03F000000000000F03F'
 
