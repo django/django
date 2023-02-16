@@ -376,37 +376,37 @@ class DateFieldListFilter(FieldListFilter):
             (
                 _("Today"),
                 {
-                    self.lookup_kwarg_since: str(today),
-                    self.lookup_kwarg_until: str(tomorrow),
+                    self.lookup_kwarg_since: today,
+                    self.lookup_kwarg_until: tomorrow,
                 },
             ),
             (
                 _("Past 7 days"),
                 {
-                    self.lookup_kwarg_since: str(today - datetime.timedelta(days=7)),
-                    self.lookup_kwarg_until: str(tomorrow),
+                    self.lookup_kwarg_since: today - datetime.timedelta(days=7),
+                    self.lookup_kwarg_until: tomorrow,
                 },
             ),
             (
                 _("This month"),
                 {
-                    self.lookup_kwarg_since: str(today.replace(day=1)),
-                    self.lookup_kwarg_until: str(next_month),
+                    self.lookup_kwarg_since: today.replace(day=1),
+                    self.lookup_kwarg_until: next_month,
                 },
             ),
             (
                 _("This year"),
                 {
-                    self.lookup_kwarg_since: str(today.replace(month=1, day=1)),
-                    self.lookup_kwarg_until: str(next_year),
+                    self.lookup_kwarg_since: today.replace(month=1, day=1),
+                    self.lookup_kwarg_until: next_year,
                 },
             ),
         )
         if field.null:
             self.lookup_kwarg_isnull = "%s__isnull" % field_path
             self.links += (
-                (_("No date"), {self.field_generic + "isnull": "True"}),
-                (_("Has date"), {self.field_generic + "isnull": "False"}),
+                (_("No date"), {self.field_generic + "isnull": True}),
+                (_("Has date"), {self.field_generic + "isnull": False}),
             )
         super().__init__(field, request, params, model, model_admin, field_path)
 
@@ -418,10 +418,11 @@ class DateFieldListFilter(FieldListFilter):
 
     def choices(self, changelist):
         for title, param_dict in self.links:
+            param_dict_str = {key: str(value) for key, value in param_dict.items()}
             yield {
-                "selected": self.date_params == param_dict,
+                "selected": self.date_params == param_dict_str,
                 "query_string": changelist.get_query_string(
-                    param_dict, [self.field_generic]
+                    param_dict_str, [self.field_generic]
                 ),
                 "display": title,
             }
