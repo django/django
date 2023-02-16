@@ -1,4 +1,5 @@
 import copy
+import enum
 import json
 import re
 from functools import partial, update_wrapper
@@ -68,6 +69,13 @@ from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
 TO_FIELD_VAR = "_to_field"
+IS_FACETS_VAR = "_facets"
+
+
+class ShowFacets(enum.Enum):
+    NEVER = "NEVER"
+    ALLOW = "ALLOW"
+    ALWAYS = "ALWAYS"
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -628,6 +636,7 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
+    show_facets = ShowFacets.ALLOW
     inlines = ()
 
     # Custom templates (designed to be over-ridden in subclasses)

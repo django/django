@@ -679,11 +679,13 @@ class ReadOnlyPizzaAdmin(admin.ModelAdmin):
 class WorkHourAdmin(admin.ModelAdmin):
     list_display = ("datum", "employee")
     list_filter = ("employee",)
+    show_facets = admin.ShowFacets.ALWAYS
 
 
 class FoodDeliveryAdmin(admin.ModelAdmin):
     list_display = ("reference", "driver", "restaurant")
     list_editable = ("driver", "restaurant")
+    show_facets = admin.ShowFacets.NEVER
 
 
 class CoverLetterAdmin(admin.ModelAdmin):

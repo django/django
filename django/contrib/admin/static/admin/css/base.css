@@ -722,6 +722,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
+.hidelink {
+    padding-left: 16px;
+    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+}
+
 .addlink {
     padding-left: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;

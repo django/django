@@ -8,6 +8,7 @@ from django.contrib.admin.templatetags.admin_list import pagination
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.main import (
     ALL_VAR,
+    IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
     PAGE_VAR,
@@ -1031,6 +1032,7 @@ class ChangeListTests(TestCase):
             {TO_FIELD_VAR: "id"},
             {PAGE_VAR: "1"},
             {IS_POPUP_VAR: "1"},
+            {IS_FACETS_VAR: ""},
             {"username__startswith": "test"},
         ):
             with self.subTest(data=data):
@@ -1599,6 +1601,11 @@ class ChangeListTests(TestCase):
         for data, href in (
             ({"is_staff__exact": "0"}, "?"),
             ({"is_staff__exact": "0", IS_POPUP_VAR: "1"}, f"?{IS_POPUP_VAR}=1"),
+            ({"is_staff__exact": "0", IS_FACETS_VAR: ""}, f"?{IS_FACETS_VAR}"),
+            (
+                {"is_staff__exact": "0", IS_POPUP_VAR: "1", IS_FACETS_VAR: ""},
+                f"?{IS_POPUP_VAR}=1&{IS_FACETS_VAR}",
+            ),
         ):
             with self.subTest(data=data):
                 response = self.client.get(url, data=data)
