@@ -81,6 +81,9 @@ if is_psycopg3:
 
 class DatabaseWrapper(PsycopgDatabaseWrapper):
     SchemaEditorClass = PostGISSchemaEditor
+    features_class = DatabaseFeatures
+    ops_class = PostGISOperations
+    introspection_class = PostGISIntrospection
 
     _type_infos = {
         "geometry": {},
@@ -91,9 +94,9 @@ class DatabaseWrapper(PsycopgDatabaseWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if kwargs.get("alias", "") != NO_DB_ALIAS:
-            self.features = DatabaseFeatures(self)
-            self.ops = PostGISOperations(self)
-            self.introspection = PostGISIntrospection(self)
+            self.features = self.features_class(self)
+            self.ops = self.ops_class(self)
+            self.introspection = self.introspection_class(self)
 
     def prepare_database(self):
         super().prepare_database()
