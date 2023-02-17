@@ -253,7 +253,7 @@ class AdminActionsTest(TestCase):
         response = self.client.post(
             reverse("admin:admin_views_externalsubscriber_changelist"), action_data
         )
-        content = b"".join(response.streaming_content)
+        content = b"".join(list(response))
         self.assertEqual(content, b"This is the content of the file")
         self.assertEqual(response.status_code, 200)
 
