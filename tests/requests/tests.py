@@ -359,6 +359,23 @@ class RequestsTests(SimpleTestCase):
                 )
                 self.assertEqual(request.data, {"key": ["value"]})
 
+    def test_json_data(self):
+        """
+        JSON from various methods.
+        """
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload("{\"key\": \"value\"}")
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/json",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.data, {"key": ["value"]})
+
     # TODO: RemovedInDjango51Warning
     def test_basic_POST_alias(self):
         # Parsed data available for POST request.

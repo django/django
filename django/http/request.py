@@ -1,5 +1,6 @@
 import codecs
 import copy
+import json
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -388,6 +389,11 @@ class HttpRequest:
         elif self.content_type == "application/x-www-form-urlencoded":
             self._post, self._files = (
                 QueryDict(self.body, encoding=self._encoding),
+                MultiValueDict(),
+            )
+        elif self.content_type == "application/json":
+            self._post, self._files = (
+                QueryDict(urlencode(json.loads(self.body)), encoding=self._encoding),
                 MultiValueDict(),
             )
         else:
