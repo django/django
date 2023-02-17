@@ -102,7 +102,10 @@ srlist = (
         ang_name="Degree",
         lin_units=0.3048006096012192,
         ang_units=0.0174532925199,
-        auth={"PROJCS": (None, None)},
+        auth={
+            None: (None, None),  # Top-level authority.
+            "PROJCS": (None, None),
+        },
         attr=(
             ("PROJCS|GeOgCs|spheroid", "GRS 1980"),
             (("projcs", 9), "UNIT"),
@@ -391,3 +394,10 @@ class SpatialRefTest(SimpleTestCase):
         self.assertIn('DATUM["D_North_American_1983"', srs.wkt)
         srs.from_esri()
         self.assertIn('DATUM["North_American_Datum_1983"', srs.wkt)
+
+    def test_srid(self):
+        """The srid property returns top-level authority code."""
+        for s in srlist:
+            if hasattr(s, "epsg"):
+                srs = SpatialReference(s.wkt)
+                self.assertEqual(srs.srid, s.epsg)
