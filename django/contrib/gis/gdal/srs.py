@@ -208,7 +208,7 @@ class SpatialReference(GDALBase):
     def srid(self):
         "Return the SRID of top-level authority, or None if undefined."
         try:
-            return int(self.attr_value("AUTHORITY", 1))
+            return int(self.auth_code(target=None))
         except (TypeError, ValueError):
             return None
 
