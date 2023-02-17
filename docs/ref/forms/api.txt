@@ -1234,7 +1234,7 @@ Attributes of ``BoundField``
 
 .. attribute:: BoundField.template_name
 
-    .. versionadded:: 4.2
+    .. versionadded:: 5.0
 
     The name of the template rendered with :meth:`.BoundField.as_field`.
 
@@ -1268,7 +1268,7 @@ Methods of ``BoundField``
 
 .. method:: BoundField.as_field()
 
-    .. versionadded:: 4.2
+    .. versionadded:: 5.0
 
     Renders the field using :meth:`.BoundField.render` with default values
     which renders the ``BoundField``, including its label, help text and errors
