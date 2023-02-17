@@ -171,7 +171,7 @@ class SignalsTests(SimpleTestCase):
     def test_request_signals_streaming_response(self):
         response = self.client.get("/streaming/")
         self.assertEqual(self.signals, ["started"])
-        self.assertEqual(b"".join(response.streaming_content), b"streaming content")
+        self.assertEqual(b"".join(list(response)), b"streaming content")
         self.assertEqual(self.signals, ["started", "finished"])
 
 
@@ -248,6 +248,11 @@ class HandlerRequestTests(SimpleTestCase):
             ):
                 self.client.get(url)
 
+    def test_streaming(self):
+        response = self.client.get("/streaming/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(b"".join(list(response)), b"streaming content")
+
 
 class ScriptNameTests(SimpleTestCase):
     def test_get_script_name(self):
@@ -312,3 +317,15 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get("/unawaited/")
+
+    async def test_sync_streaming(self):
+        response = await self.async_client.get("/streaming/")
+        self.assertEqual(response.status_code, 200)
+        msg = (
+            "StreamingHttpResponse must consume synchronous iterators in order to "
+            "serve them asynchronously. Use an asynchronous iterator instead."
+        )
+        with self.assertWarnsMessage(Warning, msg):
+            self.assertEqual(
+                b"".join([chunk async for chunk in response]), b"streaming content"
+            )
