@@ -35,7 +35,11 @@ srlist = (
         ang_name="degree",
         lin_units=1.0,
         ang_units=0.0174532925199,
-        auth={"GEOGCS": ("EPSG", "4326"), "spheroid": ("EPSG", "7030")},
+        auth={
+            None: ("EPSG", "4326"),  # Top-level authority.
+            "GEOGCS": ("EPSG", "4326"),
+            "spheroid": ("EPSG", "7030"),
+        },
         attr=(
             ("DATUM", "WGS_1984"),
             (("SPHEROID", 1), "6378137"),
@@ -64,6 +68,7 @@ srlist = (
         lin_units=1.0,
         ang_units=0.0174532925199,
         auth={
+            None: ("EPSG", "32140"),  # Top-level authority.
             "PROJCS": ("EPSG", "32140"),
             "spheroid": ("EPSG", "7019"),
             "unit": ("EPSG", "9001"),
