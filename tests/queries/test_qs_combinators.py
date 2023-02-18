@@ -359,6 +359,23 @@ class QuerySetSetOperationTests(TestCase):
             [reserved_name.pk],
         )
 
+    def test_union_multiple_models_with_values_list_and_annotations(self):
+        ReservedName.objects.create(name="rn1", order=10)
+        Celebrity.objects.create(name="c1")
+        qs1 = ReservedName.objects.annotate(type=Value("rn")).values_list(
+            "name", "order", "type"
+        )
+        qs2 = Celebrity.objects.annotate(
+            type=Value("cb"), order=Value(-10)
+        ).values_list("name", "order", "type")
+        self.assertSequenceEqual(
+            qs1.union(qs2).order_by("order"),
+            # Expected:
+            [("rn1", 10, "rn"), ("c1", -10, "cb")],
+            # Actual: (order and type are reversed in the second result)
+            # [('rn1', 10, 'rn'), ('c1', 'cb', -10)],
+        )
+
     def test_union_in_subquery(self):
         ReservedName.objects.bulk_create(
             [
