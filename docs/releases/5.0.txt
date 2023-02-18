@@ -254,6 +254,8 @@ Miscellaneous
 * The ``instance`` argument of the undocumented
   ``BaseModelFormSet.save_existing()`` method is renamed to ``obj``.
 
+* The undocumented ``django.contrib.admin.helpers.checkbox`` is removed.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0

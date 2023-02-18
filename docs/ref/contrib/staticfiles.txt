@@ -330,6 +330,12 @@ argument. For example::
             manifest_storage = StaticFilesStorage(location=settings.BASE_DIR)
             super().__init__(*args, manifest_storage=manifest_storage, **kwargs)
 
+.. admonition:: References in comments
+
+    ``ManifestStaticFilesStorage`` doesn't ignore paths in statements that are
+    commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
+    You should check and eventually strip comments.
+
 .. versionchanged:: 4.2
 
     Support for finding paths to JavaScript modules in ``import`` and

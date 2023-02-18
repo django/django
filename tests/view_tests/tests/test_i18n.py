@@ -1,6 +1,7 @@
 import gettext
 import json
 from os import path
+from unittest import mock
 
 from django.conf import settings
 from django.test import (
@@ -506,6 +507,20 @@ class I18NViewTests(SimpleTestCase):
         msg += ",unknown_package2"
         with self.assertRaisesMessage(ValueError, msg):
             view(request, packages="unknown_package+unknown_package2")
+
+    def test_template_encoding(self):
+        """
+        The template is loaded directly, not via a template loader, and should
+        be opened as utf-8 charset as is the default specified on template
+        engines.
+        """
+        from django.views.i18n import Path
+
+        view = JavaScriptCatalog.as_view()
+        request = RequestFactory().get("/")
+        with mock.patch.object(Path, "open") as m:
+            view(request)
+            m.assert_called_once_with(encoding="utf-8")
 
 
 @override_settings(ROOT_URLCONF="view_tests.urls")
