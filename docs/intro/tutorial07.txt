@@ -418,34 +418,6 @@ uses a template variable called ``app_list``. That variable contains every
 installed Django app. Instead of using that, you can hard-code links to
 object-specific admin pages in whatever way you think is best.
 
-How to completely delete an app from the project
-================================================
-Now that you have learned every aspect of app creation, customization and etc.
-You need to know how to properly delete an app from the project.
-
-First, you need to remove all the tables from your database or any other traces 
-the app might have. For this, use:
-.. console::
-
-   $ python manage.py migrate app_name zero
-This command also executes your SQL too.
-
-However, be careful when running this command when you have other apps 
-dependent on the migrations of the deleting app. After it is deleted, 
-migration system will crash because it can not find those migrations.
-
-However you can avoid such situations by simply squashing migrations. 
-For more information, read :ref:`Squashing Migrations <migration-squashing>`.
-
-Next, you need to remove app from the :setting:`INSTALLED_APPS` in settings
-of the project, the app directory itself and every reference of the app from 
-other files, such as ``include(app_name.urls)`` statement from ``urls.py``.
-
-After that, you should delete all the unnecessary media, cache, or any other 
-files that are related to the deleted app.
-
-Congratulations, you have successfully deleted your first app.
-
 What's next?
 ============
 
