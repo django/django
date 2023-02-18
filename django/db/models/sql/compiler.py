@@ -142,10 +142,10 @@ class SQLCompiler:
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
-        selected_expr_indices = {}
-        for index, (expr, _, alias) in enumerate(select, start=1):
+        selected_expr_positions = {}
+        for ordinal, (expr, _, alias) in enumerate(select, start=1):
             if alias:
-                selected_expr_indices[expr] = index
+                selected_expr_positions[expr] = ordinal
             # Skip members of the select clause that are already explicitly
             # grouped against.
             if alias in group_by_refs:
@@ -174,9 +174,9 @@ class SQLCompiler:
                 continue
             if (
                 allows_group_by_select_index
-                and (select_index := selected_expr_indices.get(expr)) is not None
+                and (position := selected_expr_positions.get(expr)) is not None
             ):
-                sql, params = str(select_index), ()
+                sql, params = str(position), ()
             else:
                 sql, params = expr.select_format(self, sql, params)
             params_hash = make_hashable(params)
