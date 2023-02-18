@@ -465,10 +465,9 @@ class TestQuerying(PostgreSQLTestCase):
                     {"field__0": 20, "arrayagg": [self.objs[3].pk]},
                 ],
             )
-        alias = connection.ops.quote_name("field__0")
         sql = ctx[0]["sql"]
         self.assertIn("GROUP BY 1", sql)
-        self.assertIn(f"ORDER BY {alias}", sql)
+        self.assertIn("ORDER BY 1", sql)
 
     def test_index(self):
         self.assertSequenceEqual(
