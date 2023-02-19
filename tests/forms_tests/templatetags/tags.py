@@ -10,7 +10,7 @@ class CountRenderNode(Node):
         self.count += 1
         for v in context.flatten().values():
             try:
-                str(v)
+                str(v.widget)
             except AttributeError:
                 pass
         return str(self.count)

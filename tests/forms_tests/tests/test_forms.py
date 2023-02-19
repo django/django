@@ -100,17 +100,17 @@ class FormsTestCase(SimpleTestCase):
         self.assertEqual(p.cleaned_data["last_name"], "Lennon")
         self.assertEqual(p.cleaned_data["birthday"], datetime.date(1940, 10, 9))
         self.assertHTMLEqual(
-            str(p["first_name"]),
+            str(p["first_name"].widget),
             '<input type="text" name="first_name" value="John" id="id_first_name" '
             "required>",
         )
         self.assertHTMLEqual(
-            str(p["last_name"]),
+            str(p["last_name"].widget),
             '<input type="text" name="last_name" value="Lennon" id="id_last_name" '
             "required>",
         )
         self.assertHTMLEqual(
-            str(p["birthday"]),
+            str(p["birthday"].widget),
             '<input type="text" name="birthday" value="1940-10-9" id="id_birthday" '
             "required>",
         )
@@ -125,7 +125,7 @@ class FormsTestCase(SimpleTestCase):
         form_output = []
 
         for boundfield in p:
-            form_output.append(str(boundfield))
+            form_output.append(str(boundfield.widget))
 
         self.assertHTMLEqual(
             "\n".join(form_output),
@@ -384,15 +384,15 @@ class FormsTestCase(SimpleTestCase):
 
         p = Person()
         self.assertHTMLEqual(
-            str(p["first_name"]),
+            str(p["first_name"].widget),
             '<input type="text" name="first_name" id="id_first_name" required>',
         )
         self.assertHTMLEqual(
-            str(p["last_name"]),
+            str(p["last_name"].widget),
             '<input type="text" name="last_name" id="id_last_name" required>',
         )
         self.assertHTMLEqual(
-            str(p["birthday"]),
+            str(p["birthday"].widget),
             '<input type="text" name="birthday" id="id_birthday" required>',
         )
 
@@ -546,32 +546,33 @@ class FormsTestCase(SimpleTestCase):
 
         f = SignupForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["email"]), '<input type="email" name="email" required>'
+            str(f["email"].widget), '<input type="email" name="email" required>'
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
+            str(f["get_spam"].widget),
+            '<input type="checkbox" name="get_spam" required>',
         )
 
         f = SignupForm({"email": "test@example.com", "get_spam": True}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["email"]),
+            str(f["email"].widget),
             '<input type="email" name="email" value="test@example.com" required>',
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]),
+            str(f["get_spam"].widget),
             '<input checked type="checkbox" name="get_spam" required>',
         )
 
         # 'True' or 'true' should be rendered without a value attribute
         f = SignupForm({"email": "test@example.com", "get_spam": "True"}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["get_spam"]),
+            str(f["get_spam"].widget),
             '<input checked type="checkbox" name="get_spam" required>',
         )
 
         f = SignupForm({"email": "test@example.com", "get_spam": "true"}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["get_spam"]),
+            str(f["get_spam"].widget),
             '<input checked type="checkbox" name="get_spam" required>',
         )
 
@@ -580,14 +581,16 @@ class FormsTestCase(SimpleTestCase):
             {"email": "test@example.com", "get_spam": "False"}, auto_id=False
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
+            str(f["get_spam"].widget),
+            '<input type="checkbox" name="get_spam" required>',
         )
 
         f = SignupForm(
             {"email": "test@example.com", "get_spam": "false"}, auto_id=False
         )
         self.assertHTMLEqual(
-            str(f["get_spam"]), '<input type="checkbox" name="get_spam" required>'
+            str(f["get_spam"].widget),
+            '<input type="checkbox" name="get_spam" required>',
         )
 
         # A value of '0' should be interpreted as a True value (#16820)
@@ -603,24 +606,24 @@ class FormsTestCase(SimpleTestCase):
 
         f = ContactForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["subject"]), '<input type="text" name="subject" required>'
+            str(f["subject"].widget), '<input type="text" name="subject" required>'
         )
         self.assertHTMLEqual(
-            str(f["message"]),
+            str(f["message"].widget),
             '<textarea name="message" rows="10" cols="40" required></textarea>',
         )
 
         # as_textarea(), as_text() and as_hidden() are shortcuts for changing the output
         # widget type:
         self.assertHTMLEqual(
-            f["subject"].as_textarea(),
+            f["subject"].widget.as_textarea(),
             '<textarea name="subject" rows="10" cols="40" required></textarea>',
         )
         self.assertHTMLEqual(
-            f["message"].as_text(), '<input type="text" name="message" required>'
+            f["message"].widget.as_text(), '<input type="text" name="message" required>'
         )
         self.assertHTMLEqual(
-            f["message"].as_hidden(), '<input type="hidden" name="message">'
+            f["message"].widget.as_hidden(), '<input type="hidden" name="message">'
         )
 
         # The 'widget' parameter to a Field can also be an instance:
@@ -630,26 +633,26 @@ class FormsTestCase(SimpleTestCase):
 
         f = ContactForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["message"]),
+            str(f["message"].widget),
             '<textarea name="message" rows="80" cols="20" required></textarea>',
         )
 
         # Instance-level attrs are *not* carried over to as_textarea(), as_text() and
         # as_hidden():
         self.assertHTMLEqual(
-            f["message"].as_text(), '<input type="text" name="message" required>'
+            f["message"].widget.as_text(), '<input type="text" name="message" required>'
         )
         f = ContactForm({"subject": "Hello", "message": "I love you."}, auto_id=False)
         self.assertHTMLEqual(
-            f["subject"].as_textarea(),
+            f["subject"].widget.as_textarea(),
             '<textarea rows="10" cols="40" name="subject" required>Hello</textarea>',
         )
         self.assertHTMLEqual(
-            f["message"].as_text(),
+            f["message"].widget.as_text(),
             '<input type="text" name="message" value="I love you." required>',
         )
         self.assertHTMLEqual(
-            f["message"].as_hidden(),
+            f["message"].widget.as_hidden(),
             '<input type="hidden" name="message" value="I love you.">',
         )
 
@@ -661,7 +664,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
@@ -669,7 +672,7 @@ class FormsTestCase(SimpleTestCase):
         )
         f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -686,7 +689,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select name="language" required>
 <option value="" selected>------</option>
 <option value="P">Python</option>
@@ -704,7 +707,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
@@ -712,7 +715,7 @@ class FormsTestCase(SimpleTestCase):
         )
         f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -733,7 +736,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select class="foo" name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
@@ -741,7 +744,7 @@ class FormsTestCase(SimpleTestCase):
         )
         f = FrameworkForm({"name": "Django", "language": "P"}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select class="foo" name="language">
 <option value="P" selected>Python</option>
 <option value="J">Java</option>
@@ -755,13 +758,13 @@ class FormsTestCase(SimpleTestCase):
 
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select name="language">
 </select>""",
         )
         f.fields["language"].choices = [("P", "Python"), ("J", "Java")]
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<select name="language">
 <option value="P">Python</option>
 <option value="J">Java</option>
@@ -772,7 +775,7 @@ class FormsTestCase(SimpleTestCase):
         # Add widget=RadioSelect to use that widget with a ChoiceField.
         f = FrameworkForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """<div>
 <div><label><input type="radio" name="language" value="P" required> Python</label></div>
 <div><label><input type="radio" name="language" value="J" required> Java</label></div>
@@ -809,7 +812,7 @@ class FormsTestCase(SimpleTestCase):
         # plus the button's zero-based index.
         f = FrameworkForm(auto_id="id_%s")
         self.assertHTMLEqual(
-            str(f["language"]),
+            str(f["language"].widget),
             """
             <div id="id_language">
             <div><label for="id_language_0">
@@ -1030,7 +1033,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = SongForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """<select multiple name="composers" required>
 </select>""",
         )
@@ -1043,7 +1046,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = SongForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """<select multiple name="composers" required>
 <option value="J">John Lennon</option>
 <option value="P">Paul McCartney</option>
@@ -1051,10 +1054,11 @@ class FormsTestCase(SimpleTestCase):
         )
         f = SongForm({"name": "Yesterday", "composers": ["P"]}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["name"]), '<input type="text" name="name" value="Yesterday" required>'
+            str(f["name"].widget),
+            '<input type="text" name="name" value="Yesterday" required>',
         )
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """<select multiple name="composers" required>
 <option value="J">John Lennon</option>
 <option value="P" selected>Paul McCartney</option>
@@ -1205,12 +1209,12 @@ class FormsTestCase(SimpleTestCase):
         # tags.
         f = SongForm({"name": "Yesterday", "composers": ["P"]}, auto_id=False)
         self.assertHTMLEqual(
-            f["composers"].as_hidden(),
+            f["composers"].widget.as_hidden(),
             '<input type="hidden" name="composers" value="P">',
         )
         f = SongForm({"name": "From Me To You", "composers": ["P", "J"]}, auto_id=False)
         self.assertHTMLEqual(
-            f["composers"].as_hidden(),
+            f["composers"].widget.as_hidden(),
             """<input type="hidden" name="composers" value="P">
 <input type="hidden" name="composers" value="J">""",
         )
@@ -1222,13 +1226,13 @@ class FormsTestCase(SimpleTestCase):
         f = MessageForm({"when_0": "1992-01-01", "when_1": "01:01"})
         self.assertTrue(f.is_valid())
         self.assertHTMLEqual(
-            str(f["when"]),
+            str(f["when"].widget),
             '<input type="text" name="when_0" value="1992-01-01" id="id_when_0" '
             "required>"
             '<input type="text" name="when_1" value="01:01" id="id_when_1" required>',
         )
         self.assertHTMLEqual(
-            f["when"].as_hidden(),
+            f["when"].widget.as_hidden(),
             '<input type="hidden" name="when_0" value="1992-01-01" id="id_when_0">'
             '<input type="hidden" name="when_1" value="01:01" id="id_when_1">',
         )
@@ -1237,7 +1241,7 @@ class FormsTestCase(SimpleTestCase):
         # MultipleChoiceField can also be used with the CheckboxSelectMultiple widget.
         f = SongForm(auto_id=False)
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """
             <div>
             <div><label><input type="checkbox" name="composers" value="J">
@@ -1249,7 +1253,7 @@ class FormsTestCase(SimpleTestCase):
         )
         f = SongForm({"composers": ["J"]}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """
             <div>
             <div><label><input checked type="checkbox" name="composers" value="J">
@@ -1261,7 +1265,7 @@ class FormsTestCase(SimpleTestCase):
         )
         f = SongForm({"composers": ["J", "P"]}, auto_id=False)
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """
             <div>
             <div><label><input checked type="checkbox" name="composers" value="J">
@@ -1285,7 +1289,7 @@ class FormsTestCase(SimpleTestCase):
 
         f = SongForm(auto_id="%s_id")
         self.assertHTMLEqual(
-            str(f["composers"]),
+            str(f["composers"].widget),
             """
             <div id="composers_id">
             <div><label for="composers_id_0">
@@ -3100,17 +3104,17 @@ Options: <select multiple name="options" required>
             """,
         )
         self.assertHTMLEqual(
-            str(p["first_name"]),
+            str(p["first_name"].widget),
             '<input type="text" name="person1-first_name" value="John" '
             'id="id_person1-first_name" required>',
         )
         self.assertHTMLEqual(
-            str(p["last_name"]),
+            str(p["last_name"].widget),
             '<input type="text" name="person1-last_name" value="Lennon" '
             'id="id_person1-last_name" required>',
         )
         self.assertHTMLEqual(
-            str(p["birthday"]),
+            str(p["birthday"].widget),
             '<input type="text" name="person1-birthday" value="1940-10-9" '
             'id="id_person1-birthday" required>',
         )
@@ -3228,7 +3232,7 @@ Options: <select multiple name="options" required>
 
         p = Person({"name": "Joe"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown" selected>Unknown</option>
 <option value="true">Yes</option>
@@ -3237,7 +3241,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "1"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown" selected>Unknown</option>
 <option value="true">Yes</option>
@@ -3246,7 +3250,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "2"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true" selected>Yes</option>
@@ -3255,7 +3259,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "3"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true">Yes</option>
@@ -3264,7 +3268,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": True}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true" selected>Yes</option>
@@ -3273,7 +3277,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": False}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true">Yes</option>
@@ -3282,7 +3286,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "unknown"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown" selected>Unknown</option>
 <option value="true">Yes</option>
@@ -3291,7 +3295,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "true"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true" selected>Yes</option>
@@ -3300,7 +3304,7 @@ Options: <select multiple name="options" required>
         )
         p = Person({"name": "Joe", "is_cool": "false"}, auto_id=False)
         self.assertHTMLEqual(
-            str(p["is_cool"]),
+            str(p["is_cool"].widget),
             """<select name="is_cool">
 <option value="unknown">Unknown</option>
 <option value="true">Yes</option>
@@ -4384,7 +4388,9 @@ Options: <select multiple name="options" required>
         self.assertTrue(hasattr(SimpleForm, "__html__"))
         self.assertEqual(str(form), form.__html__())
         self.assertTrue(hasattr(form["username"], "__html__"))
-        self.assertEqual(str(form["username"]), form["username"].__html__())
+        self.assertEqual(
+            str(form["username"].widget), form["username"].widget.__html__()
+        )
 
     def test_use_required_attribute_true(self):
         class MyForm(Form):
@@ -4704,11 +4710,11 @@ class TemplateTests(SimpleTestCase):
         t = Template(
             "<form>"
             "{{ form.username.errors.as_ul }}"
-            "<p><label>Your username: {{ form.username }}</label></p>"
+            "<p><label>Your username: {{ form.username.widget }}</label></p>"
             "{{ form.password1.errors.as_ul }}"
-            "<p><label>Password: {{ form.password1 }}</label></p>"
+            "<p><label>Password: {{ form.password1.widget }}</label></p>"
             "{{ form.password2.errors.as_ul }}"
-            "<p><label>Password (again): {{ form.password2 }}</label></p>"
+            "<p><label>Password (again): {{ form.password2.widget }}</label></p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4747,9 +4753,12 @@ class TemplateTests(SimpleTestCase):
         # underscores converted to spaces, and the initial letter capitalized.
         t = Template(
             "<form>"
-            "<p><label>{{ form.username.label }}: {{ form.username }}</label></p>"
-            "<p><label>{{ form.password1.label }}: {{ form.password1 }}</label></p>"
-            "<p><label>{{ form.password2.label }}: {{ form.password2 }}</label></p>"
+            "<p><label>{{ form.username.label }}: "
+            "{{ form.username.widget }}</label></p>"
+            "<p><label>{{ form.password1.label }}: "
+            "{{ form.password1.widget }}</label></p>"
+            "<p><label>{{ form.password2.label }}: "
+            "{{ form.password2.widget }}</label></p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4772,9 +4781,9 @@ class TemplateTests(SimpleTestCase):
         # Form gives each field an "id" attribute.
         t = Template(
             "<form>"
-            "<p>{{ form.username.label_tag }} {{ form.username }}</p>"
-            "<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>"
-            "<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>"
+            "<p>{{ form.username.label_tag }} {{ form.username.widget }}</p>"
+            "<p>{{ form.password1.label_tag }} {{ form.password1.widget }}</p>"
+            "<p>{{ form.password2.label_tag }} {{ form.password2.widget }}</p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4808,9 +4817,9 @@ class TemplateTests(SimpleTestCase):
         # Form gives each field an "id" attribute.
         t = Template(
             "<form>"
-            "<p>{{ form.username.legend_tag }} {{ form.username }}</p>"
-            "<p>{{ form.password1.legend_tag }} {{ form.password1 }}</p>"
-            "<p>{{ form.password2.legend_tag }} {{ form.password2 }}</p>"
+            "<p>{{ form.username.legend_tag }} {{ form.username.widget }}</p>"
+            "<p>{{ form.password1.legend_tag }} {{ form.password1.widget }}</p>"
+            "<p>{{ form.password2.legend_tag }} {{ form.password2.widget }}</p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4843,10 +4852,10 @@ class TemplateTests(SimpleTestCase):
         # given field does not have help text, nothing will be output.
         t = Template(
             "<form>"
-            "<p>{{ form.username.label_tag }} {{ form.username }}<br>"
+            "<p>{{ form.username.label_tag }} {{ form.username.widget }}<br>"
             "{{ form.username.help_text }}</p>"
-            "<p>{{ form.password1.label_tag }} {{ form.password1 }}</p>"
-            "<p>{{ form.password2.label_tag }} {{ form.password2 }}</p>"
+            "<p>{{ form.password1.label_tag }} {{ form.password1.widget }}</p>"
+            "<p>{{ form.password2.label_tag }} {{ form.password2.widget }}</p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4874,11 +4883,11 @@ class TemplateTests(SimpleTestCase):
         t = Template(
             "<form>"
             "{{ form.username.errors.as_ul }}"
-            "<p><label>Your username: {{ form.username }}</label></p>"
+            "<p><label>Your username: {{ form.username.widget }}</label></p>"
             "{{ form.password1.errors.as_ul }}"
-            "<p><label>Password: {{ form.password1 }}</label></p>"
+            "<p><label>Password: {{ form.password1.widget }}</label></p>"
             "{{ form.password2.errors.as_ul }}"
-            "<p><label>Password (again): {{ form.password2 }}</label></p>"
+            "<p><label>Password (again): {{ form.password2.widget }}</label></p>"
             '<input type="submit" required>'
             "</form>"
         )
@@ -4903,11 +4912,11 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             "{{ form.non_field_errors }}"
             "{{ form.username.errors.as_ul }}"
-            "<p><label>Your username: {{ form.username }}</label></p>"
+            "<p><label>Your username: {{ form.username.widget }}</label></p>"
             "{{ form.password1.errors.as_ul }}"
-            "<p><label>Password: {{ form.password1 }}</label></p>"
+            "<p><label>Password: {{ form.password1.widget }}</label></p>"
             "{{ form.password2.errors.as_ul }}"
-            "<p><label>Password (again): {{ form.password2 }}</label></p>"
+            "<p><label>Password (again): {{ form.password2.widget }}</label></p>"
             '<input type="submit" required>'
             "</form>"
         )

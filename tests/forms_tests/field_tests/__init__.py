@@ -6,4 +6,4 @@ class FormFieldAssertionsMixin:
         class Form(forms.Form):
             f = field
 
-        self.assertHTMLEqual(str(Form()["f"]), to)
+        self.assertHTMLEqual(str(Form()["f"].widget), to)

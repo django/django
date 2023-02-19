@@ -1,10 +1,12 @@
 import json
+import warnings
 from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.renderers import get_default_renderer
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import escape, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -60,25 +62,63 @@ class RenderableMixin:
 
 class RenderableFieldMixin(RenderableMixin):
     def as_field(self):
+        # RemovedInDjango60Warning
+        # Deprecate this in 6.0 for removal in 7.0. Call __str__ instead.
         return self.render()
 
-    # TODO -- I'm not sure how best to structure this as __str__ on boundfield does
-    # something different to RenderableMixin.
-    def as_hidden(self):
-        raise NotImplementedError(
-            "Subclasses of RenderableFieldMixin must provide an as_hidden() method."
+    def __str__(self):
+        # In Django 6.0 change to
+        # return self.render()
+        warnings.warn(
+            "Calling __str__ on BoundField will change from rendering the"
+            "Field's Widget to rendering the whole Field in Django 6.0."
+            "Call __str__ on BoundField.widget to retain current behaviour."
+            f"{self.template_name=}, {self.widget}",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
         )
+        boundwidget = self.widget
+        return str(boundwidget)
 
     def as_widget(self):
-        raise NotImplementedError(
-            "Subclasses of RenderableFieldMixin must provide an as_widget() method."
+        warnings.warn(
+            "BoundField.as_widget() is deprecated. Use "
+            "BoundField.widget.as_widget() instead.",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
         )
+        widget = self.widget
+        return widget.as_widget()
 
-    def __str__(self):
-        """Render this field as an HTML widget."""
-        if self.field.show_hidden_initial:
-            return self.as_widget() + self.as_hidden(only_initial=True)
-        return self.as_widget()
+    def as_text(self):
+        warnings.warn(
+            "BoundField.as_text() is deprecated. Use "
+            "BoundField.widget.as_text() instead.",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        widget = self.widget
+        return widget.as_text()
+
+    def as_textarea(self):
+        warnings.warn(
+            "BoundField.as_textarea() is deprecated. Use "
+            "BoundField.widget.as_textarea() instead.",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        widget = self.widget
+        return widget.as_textarea()
+
+    def as_hidden(self):
+        warnings.warn(
+            "BoundField.as_hidden() is deprecated. Use "
+            "BoundField.widget.as_hidden() instead.",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        widget = self.widget
+        return widget.as_hidden()
 
     __html__ = __str__
 

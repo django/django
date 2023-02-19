@@ -288,10 +288,10 @@ def items_for_result(cl, result, form):
                 )
             ):
                 bf = form[field_name]
-                result_repr = mark_safe(str(bf.errors) + str(bf))
+                result_repr = mark_safe(str(bf.errors) + str(bf.widget))
             yield format_html("<td{}>{}</td>", row_class, result_repr)
     if form and not form[cl.model._meta.pk.name].is_hidden:
-        yield format_html("<td>{}</td>", form[cl.model._meta.pk.name])
+        yield format_html("<td>{}</td>", form[cl.model._meta.pk.name].widget)
 
 
 class ResultList(list):
@@ -319,7 +319,7 @@ def result_hidden_fields(cl):
     if cl.formset:
         for res, form in zip(cl.result_list, cl.formset.forms):
             if form[cl.model._meta.pk.name].is_hidden:
-                yield mark_safe(form[cl.model._meta.pk.name])
+                yield mark_safe(form[cl.model._meta.pk.name].widget)
 
 
 def result_list(cl):

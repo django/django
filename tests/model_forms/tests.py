@@ -929,17 +929,17 @@ class TestFieldOverridesByFormMeta(SimpleTestCase):
     def test_widget_overrides(self):
         form = FieldOverridesByFormMetaForm()
         self.assertHTMLEqual(
-            str(form["name"]),
+            str(form["name"].widget),
             '<textarea id="id_name" rows="10" cols="40" name="name" maxlength="20" '
             "required></textarea>",
         )
         self.assertHTMLEqual(
-            str(form["url"]),
+            str(form["url"].widget),
             '<input id="id_url" type="text" class="url" name="url" maxlength="40" '
             "required>",
         )
         self.assertHTMLEqual(
-            str(form["slug"]),
+            str(form["slug"].widget),
             '<input id="id_slug" type="text" name="slug" maxlength="20" required>',
         )
 
@@ -1478,7 +1478,7 @@ class ModelFormBasicTests(TestCase):
             """,
         )
         self.assertHTMLEqual(
-            str(f["name"]),
+            str(f["name"].widget),
             """<input id="id_name" type="text" name="name" maxlength="20" required>""",
         )
 
@@ -2239,7 +2239,7 @@ class ModelMultipleChoiceFieldTests(TestCase):
 
         form = ModelMultipleChoiceForm()
         field = form["categories"]  # BoundField
-        template = Template("{{ field.name }}{{ field }}{{ field.help_text }}")
+        template = Template("{{ field.name }}{{ field.widget }}{{ field.help_text }}")
         with self.assertNumQueries(1):
             template.render(Context({"field": field}))
 
@@ -2507,7 +2507,8 @@ class FileAndImageFieldTests(TestCase):
         doc = Document.objects.create()
         form = DocumentForm(instance=doc)
         self.assertHTMLEqual(
-            str(form["myfile"]), '<input id="id_myfile" name="myfile" type="file">'
+            str(form["myfile"].widget),
+            '<input id="id_myfile" name="myfile" type="file">',
         )
 
     def test_file_field_data(self):
@@ -2970,7 +2971,7 @@ class OtherModelFormTests(TestCase):
 
         form = InventoryForm(instance=core)
         self.assertHTMLEqual(
-            str(form["parent"]),
+            str(form["parent"].widget),
             """<select name="parent" id="id_parent">
 <option value="">---------</option>
 <option value="86" selected>Apple</option>

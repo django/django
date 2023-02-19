@@ -3,7 +3,7 @@
     <td colspan="2">
       {{ errors }}
       {% if not fields %}
-        {% for field in hidden_fields %}{{ field }}{% endfor %}
+        {% for field in hidden_fields %}{{ field.widget }}{% endfor %}
       {% endif %}
     </td>
   </tr>
@@ -13,17 +13,17 @@
     <th>{% if field.label %}{{ field.label_tag() }}{% endif %}</th>
     <td>
       {{ errors }}
-      {{ field }}
+      {{ field.widget }}
       {% if field.help_text %}
         <br>
         <span class="helptext">{{ field.help_text|safe }}</span>
       {% endif %}
       {% if loop.last %}
-        {% for field in hidden_fields %}{{ field }}{% endfor %}
+        {% for field in hidden_fields %}{{ field.widget }}{% endfor %}
       {% endif %}
     </td>
   </tr>
 {% endfor %}
 {% if not fields and not errors %}
-  {% for field in hidden_fields %}{{ field }}{% endfor %}
+  {% for field in hidden_fields %}{{ field.widget }}{% endfor %}
 {% endif %}

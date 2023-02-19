@@ -19,7 +19,7 @@ class DateFieldTest(SimpleTestCase):
         # As with any widget that implements get_value_from_datadict(), we must
         # accept the input from the "as_hidden" rendering as well.
         self.assertHTMLEqual(
-            a["mydate"].as_hidden(),
+            a["mydate"].widget.as_hidden(),
             '<input type="hidden" name="mydate" value="2008-04-01" id="id_mydate">',
         )
 

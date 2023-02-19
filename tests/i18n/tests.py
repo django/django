@@ -1376,15 +1376,18 @@ class FormattingTests(SimpleTestCase):
 
         with translation.override("de-at", deactivate=True):
             template = Template(
-                "{% load l10n %}{{ form.date_added }}; {{ form.cents_paid }}"
+                "{% load l10n %}{{ form.date_added.widget }}; "
+                "{{ form.cents_paid.widget }}"
             )
             template_as_text = Template(
                 "{% load l10n %}"
-                "{{ form.date_added.as_text }}; {{ form.cents_paid.as_text }}"
+                "{{ form.date_added.widget.as_text }}; "
+                "{{ form.cents_paid.widget.as_text }}"
             )
             template_as_hidden = Template(
                 "{% load l10n %}"
-                "{{ form.date_added.as_hidden }}; {{ form.cents_paid.as_hidden }}"
+                "{{ form.date_added.widget.as_hidden }}; "
+                "{{ form.cents_paid.widget.as_hidden }}"
             )
             form = CompanyForm(
                 {

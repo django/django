@@ -46,11 +46,11 @@
 <form action="{{ app_path }}" method="post" id="login-form">{% csrf_token %}
   <div class="form-row">
     {{ form.username.errors }}
-    {{ form.username.label_tag }} {{ form.username }}
+    {{ form.username.label_tag }} {{ form.username.widget }}
   </div>
   <div class="form-row">
     {{ form.password.errors }}
-    {{ form.password.label_tag }} {{ form.password }}
+    {{ form.password.label_tag }} {{ form.password.widget }}
     <input type="hidden" name="next" value="{{ next }}">
   </div>
   {% url 'admin_password_reset' as password_reset_url %}

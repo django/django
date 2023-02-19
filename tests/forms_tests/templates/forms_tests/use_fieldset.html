@@ -6,13 +6,13 @@
     {% else %}
       {% if field.label %}{{ field.label_tag }}{% endif %}
     {% endif %}
-    {{ field }}
+    {{ field.widget }}
     {% if field.use_fieldset %}</fieldset>{% endif %}
     {% if forloop.last %}
-      {% for field in hidden_fields %}{{ field }}{% endfor %}
+      {% for field in hidden_fields %}{{ field.widget }}{% endfor %}
     {% endif %}
   </div>
 {% endfor %}
 {% if not fields and not errors %}
-  {% for field in hidden_fields %}{{ field }}{% endfor %}
+  {% for field in hidden_fields %}{{ field.widget }}{% endfor %}
 {% endif %}

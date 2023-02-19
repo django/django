@@ -37,8 +37,8 @@
           {% endif %}
           {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% translate "View on site" %}</a>{% endif %}
             </p>{% endif %}
-          {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
-          {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
+          {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field.widget }}{% endif %}
+          {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field.widget }}{% endif %}
         </td>
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
@@ -48,14 +48,14 @@
                   <p>{{ field.contents }}</p>
               {% else %}
                   {{ field.field.errors.as_ul }}
-                  {{ field.field }}
+                  {{ field.field.widget }}
               {% endif %}
               </td>
             {% endfor %}
           {% endfor %}
         {% endfor %}
         {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}
-          <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field }}{% endif %}</td>
+          <td class="delete">{% if inline_admin_form.original %}{{ inline_admin_form.deletion_field.field.widget }}{% endif %}</td>
         {% endif %}
         </tr>
      {% endfor %}

@@ -509,7 +509,7 @@ class ModelAdminTests(TestCase):
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(
-            str(form["main_band"]),
+            str(form["main_band"].widget),
             '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'
@@ -532,7 +532,7 @@ class ModelAdminTests(TestCase):
         form = ma.get_form(request)()
 
         self.assertHTMLEqual(
-            str(form["main_band"]),
+            str(form["main_band"].widget),
             '<div class="related-widget-wrapper" data-model-ref="band">'
             '<select name="main_band" id="id_main_band" required>'
             '<option value="" selected>---------</option>'

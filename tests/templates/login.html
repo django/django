@@ -7,8 +7,8 @@
 
 <form method="post">
 <table>
-<tr><td><label for="id_username">Username:</label></td><td>{{ form.username }}</td></tr>
-<tr><td><label for="id_password">Password:</label></td><td>{{ form.password }}</td></tr>
+<tr><td><label for="id_username">Username:</label></td><td>{{ form.username.widget }}</td></tr>
+<tr><td><label for="id_password">Password:</label></td><td>{{ form.password.widget }}</td></tr>
 </table>
 
 <input type="submit" value="login">

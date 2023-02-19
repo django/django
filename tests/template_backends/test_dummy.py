@@ -72,7 +72,7 @@ class TemplateStringsTests(SimpleTestCase):
         template = self.engine.get_template("template_backends/django_escaping.html")
         content = template.render({"media": media, "test_form": form})
 
-        expected = "{}\n\n{}\n\n{}".format(media, form, form["test_field"])
+        expected = "{}\n\n{}\n\n{}".format(media, form, form["test_field"].widget)
 
         self.assertHTMLEqual(content, expected)
 

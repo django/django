@@ -40,7 +40,7 @@ class BoundField(RenderableFieldMixin):
         attrs = {"id": id_} if id_ else {}
         attrs = self.build_widget_attrs(attrs)
         return [
-            BoundWidget(self.field.widget, widget, self.form.renderer)
+            BoundSubWidget(self.field.widget, widget, self.form.renderer)
             for widget in self.field.widget.subwidgets(
                 self.html_name, self.value(), attrs=attrs
             )
@@ -81,52 +81,6 @@ class BoundField(RenderableFieldMixin):
 
     def get_context(self):
         return {"field": self}
-
-    def as_widget(self, widget=None, attrs=None, only_initial=False):
-        """
-        Render the field by rendering the passed widget, adding any HTML
-        attributes passed as attrs. If a widget isn't specified, use the
-        field's default widget.
-        """
-        widget = widget or self.field.widget
-        if self.field.localize:
-            widget.is_localized = True
-        attrs = attrs or {}
-        attrs = self.build_widget_attrs(attrs, widget)
-        if self.auto_id and "id" not in widget.attrs:
-            attrs.setdefault(
-                "id", self.html_initial_id if only_initial else self.auto_id
-            )
-        if only_initial and self.html_initial_name in self.form.data:
-            # Propagate the hidden initial value.
-            value = self.form._widget_data_value(
-                self.field.hidden_widget(),
-                self.html_initial_name,
-            )
-        else:
-            value = self.value()
-        return widget.render(
-            name=self.html_initial_name if only_initial else self.html_name,
-            value=value,
-            attrs=attrs,
-            renderer=self.form.renderer,
-        )
-
-    def as_text(self, attrs=None, **kwargs):
-        """
-        Return a string of HTML for representing this as an <input type="text">.
-        """
-        return self.as_widget(TextInput(), attrs, **kwargs)
-
-    def as_textarea(self, attrs=None, **kwargs):
-        """Return a string of HTML for representing this as a <textarea>."""
-        return self.as_widget(Textarea(), attrs, **kwargs)
-
-    def as_hidden(self, attrs=None, **kwargs):
-        """
-        Return a string of HTML for representing this as an <input type="hidden">.
-        """
-        return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
 
     @property
     def data(self):
@@ -302,9 +256,83 @@ class BoundField(RenderableFieldMixin):
         """
         return self.field.widget.use_fieldset
 
+    @cached_property
+    def widget(self):
+        return BoundWidget(self.field.widget, self)
+
+
+class BoundWidget:
+    "A widget plus data"
+
+    def __init__(self, widget, boundfield):
+        self.widget = widget
+        self.boundfield = boundfield
+        self.field = boundfield.field
+        self.form = boundfield.form
+
+        self.auto_id = boundfield.auto_id
+        self.initial = boundfield.initial
+        self.html_initial_id = boundfield.html_initial_id
+        self.html_initial_name = boundfield.html_initial_name
+        self.html_name = boundfield.html_name
+
+    def as_widget(self, widget=None, attrs=None, only_initial=False):
+        """
+        Render the field by rendering the passed widget, adding any HTML
+        attributes passed as attrs. If a widget isn't specified, use the
+        field's default widget.
+        """
+        widget = widget or self.widget
+        if self.field.localize:
+            widget.is_localized = True
+        attrs = attrs or {}
+        attrs = self.boundfield.build_widget_attrs(attrs, widget)
+        if self.auto_id and "id" not in widget.attrs:
+            attrs.setdefault(
+                "id", self.html_initial_id if only_initial else self.auto_id
+            )
+        if only_initial and self.html_initial_name in self.form.data:
+            # Propagate the hidden initial value.
+            value = self.form._widget_data_value(
+                self.field.hidden_widget(),
+                self.html_initial_name,
+            )
+        else:
+            value = self.boundfield.value()
+        return widget.render(
+            name=self.html_initial_name if only_initial else self.html_name,
+            value=value,
+            attrs=attrs,
+            renderer=self.form.renderer,
+        )
+
+    def as_text(self, attrs=None, **kwargs):
+        """
+        Return a string of HTML for representing this as an <input type="text">.
+        """
+        return self.as_widget(TextInput(), attrs, **kwargs)
+
+    def as_textarea(self, attrs=None, **kwargs):
+        """Return a string of HTML for representing this as a <textarea>."""
+        return self.as_widget(Textarea(), attrs, **kwargs)
+
+    def as_hidden(self, attrs=None, **kwargs):
+        """
+        Return a string of HTML for representing this as an <input type="hidden">.
+        """
+        return self.as_widget(self.field.hidden_widget(), attrs, **kwargs)
+
+    def __str__(self):
+        """Render this field as an HTML widget."""
+        if self.field.show_hidden_initial:
+            return self.as_widget() + self.as_hidden(only_initial=True)
+        return self.as_widget()
+
+    __html__ = __str__
+
 
 @html_safe
-class BoundWidget:
+class BoundSubWidget:
     """
     A container class used for iterating over widgets. This is useful for
     widgets that have choices. For example, the following can be used in a

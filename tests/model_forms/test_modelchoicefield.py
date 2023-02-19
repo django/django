@@ -235,7 +235,7 @@ class ModelChoiceFieldTests(TestCase):
 
         form = ModelChoiceForm()
         field = form["category"]  # BoundField
-        template = Template("{{ field.name }}{{ field }}{{ field.help_text }}")
+        template = Template("{{ field.name }}{{ field.widget }}{{ field.help_text }}")
         with self.assertNumQueries(1):
             template.render(Context({"field": field}))
 

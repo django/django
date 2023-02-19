@@ -288,8 +288,8 @@ class FormsModelTestCase(TestCase):
             DefaultsForm().fields["def_date"].initial, datetime.date(1980, 1, 1)
         )
         self.assertEqual(DefaultsForm().fields["value"].initial, 42)
-        r1 = DefaultsForm()["callable_default"].as_widget()
-        r2 = DefaultsForm()["callable_default"].as_widget()
+        r1 = DefaultsForm()["callable_default"].widget.as_widget()
+        r2 = DefaultsForm()["callable_default"].widget.as_widget()
         self.assertNotEqual(r1, r2)
 
         # In a ModelForm that is passed an instance, the initial values come from the

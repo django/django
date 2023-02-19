@@ -6,5 +6,5 @@
 {% endif %}
 {% if field.help_text %}<div class="helptext">{{ field.help_text|safe }}</div>{% endif %}
 {{ field.errors }}
-{{ field }}
+{{ field.widget }}
 {% if field.use_fieldset %}</fieldset>{% endif %}
