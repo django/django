@@ -51,7 +51,12 @@ class Command(BaseCommand):
 
         if len(all_replace) >= 1:
             for replace in all_replace:
-                if "{%" not in replace and replace not in self.pattern_executed:
+                if (
+                    "{%" not in replace
+                    and replace not in self.pattern_executed
+                    and replace.find("http:") == -1
+                    and replace.find("https:") == -1
+                ):
                     search = replace
                     replace_string = " ".join(
                         ["{% static", '"{}"'.format(replace), "%}"]
@@ -80,9 +85,7 @@ class Command(BaseCommand):
 
             if "{% load static %}" not in lines:
                 self.stdout.write(
-                    self.style.ERROR(
-                        "no detect load_static inside template {}".format(file_path)
-                    )
+                    self.style.ERROR("no detect load_static file {}".format(file_path))
                 )
                 self.prepend_line(file, "{% load static %}")
 
