@@ -1,9 +1,11 @@
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 import fileinput
-import glob, os
+import glob
+import os
 import shutil
 import re
+
 
 class Command(BaseCommand):
     help = 'load all url for static img,js,css'
@@ -27,26 +29,42 @@ class Command(BaseCommand):
 
         for line in lines:
             result_replace = self.check_pattern(line, file, just_check=True)
-            if result_replace == True:
+            if result_replace is True:
                 return result_replace
         return result_replace
 
     def check_pattern(self, html, file_path="", just_check=False):
         replace_need = False
         is_image = re.findall(r'<img.*?src=["|\'](.*?)["|\']', html, re.I)
-        is_javascript = re.findall(r'<script[^<>]+src=["\']([^"\'<>]+\.js)["\']', html, re.I)
-        is_css = re.findall(r'<link[^<>]+href=["\']([^"\'<>]+\.(?:css|png))["\']', html, re.I)
+
+        is_javascript = re.findall(
+                        r'<script[^<>]+src=["\']([^"\'<>]+\.js)["\']',
+                        html, re.I)
+
+        is_css = re.findall(
+                        r'<link[^<>]+href=["\']([^"\'<>]+\.(?:css|png))["\']',
+                        html, re.I)
+
         all_replace = is_image + is_javascript + is_css
-        file_paths = "".join(file_path.split(str(settings.TEMPLATES[0]['DIRS'][0])))
+        file_paths = "".join(file_path.split(
+                        str(settings.TEMPLATES[0]['DIRS'][0])
+                     ))
 
         if len(all_replace) >= 1:
             for replace in all_replace:
-                if "{%" not in replace and replace not in self.pattern_executed:
+                if "{%" not in replace and \
+                   replace not in self.pattern_executed:
                     search = replace
-                    replace_string = " ".join(["{% static", '"{}"'.format(replace), '%}'])
+                    replace_string = " ".join(
+                        ["{% static", '"{}"'.format(replace), '%}']
+                    )
                     replace_need = True
                     if not just_check:
-                        print("replace {} to \"{}\" file {}".format(search, replace_string, file_paths))
+                        print(
+                             "replace {} to \"{}\" file {}".format(
+                                search, replace_string, file_paths
+                             )
+                        )
                         self.replace_in_file(file_path, search, replace_string)
                         self.pattern_executed.append(search)
 
@@ -61,17 +79,25 @@ class Command(BaseCommand):
             fs = open(file, "r")
             lines = [line.strip() for line in fs.readlines()]
 
-            file_path = "".join(file.split(str(settings.TEMPLATES[0]['DIRS'][0])))
+            file_path = "".join(file.split(
+                            str(settings.TEMPLATES[0]['DIRS'][0])
+                         ))
 
             if "{% load static %}" not in lines:
                 # print("no detect load_static")
-                self.stdout.write(self.style.ERROR('no detect : load_static variable inside template {}'.format(file_path)))
+                self.stdout.write(
+                  self.style.ERROR(
+                   'no detect load_static inside template {}'.format(file_path)
+                  )
+                )
                 self.prepend_line(file, "{% load static %}")
 
             check_replace = self.checkfile_replace_need(file, lines)
 
-            if check_replace == True:
-                lineinput = input("do you want to automaticaly for file {} replace assets path ? [Y/n]\n".format(file_path))
+            if check_replace is True:
+                text_input = "do you want to automaticaly for file {}" \
+                             " replace assets path ? [Y/n]\n".format(file_path)
+                lineinput = input(text_input)
 
                 if "n" in lineinput or "N" in lineinput:
                     continue
@@ -80,4 +106,4 @@ class Command(BaseCommand):
                     # write first line
 
                     for line in lines:
-                        result_replace = self.check_pattern(line, file)
+                        self.check_pattern(line, file)
