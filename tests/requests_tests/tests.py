@@ -352,6 +352,23 @@ class RequestsTests(SimpleTestCase):
             request.body
         self.assertEqual(request.POST, {})
 
+    def test_json_data(self):
+        """
+        Test a JSON data from various methods.
+        """
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload(urlencode({"key": "value"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/json",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.data, {"key": ["value"]})
+
     def test_non_ascii_POST(self):
         payload = FakePayload(urlencode({"key": "España"}))
         request = WSGIRequest(
