@@ -99,6 +99,5 @@ class Command(BaseCommand):
                     continue
 
                 if "y" in lineinput or "Y" in lineinput:
-
                     for line in lines:
                         self.check_pattern(line, file)
