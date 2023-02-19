@@ -79,7 +79,6 @@ class Command(BaseCommand):
             file_path = "".join(file.split(str(settings.TEMPLATES[0]["DIRS"][0])))
 
             if "{% load static %}" not in lines:
-                # print("no detect load_static")
                 self.stdout.write(
                     self.style.ERROR(
                         "no detect load_static inside template {}".format(file_path)
@@ -100,7 +99,6 @@ class Command(BaseCommand):
                     continue
 
                 if "y" in lineinput or "Y" in lineinput:
-                    # write first line
 
                     for line in lines:
                         self.check_pattern(line, file)
