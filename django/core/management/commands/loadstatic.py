@@ -83,12 +83,6 @@ class Command(BaseCommand):
 
             file_path = "".join(file.split(str(settings.TEMPLATES[0]["DIRS"][0])))
 
-            if "{% load static %}" not in lines:
-                self.stdout.write(
-                    self.style.ERROR("no detect load_static file {}".format(file_path))
-                )
-                self.prepend_line(file, "{% load static %}")
-
             check_replace = self.checkfile_replace_need(file, lines)
 
             if check_replace is True:
@@ -96,6 +90,7 @@ class Command(BaseCommand):
                     "do you want to automaticaly for file {}"
                     " replace assets path ? [Y/n]\n".format(file_path)
                 )
+
                 lineinput = input(text_input)
 
                 if "n" in lineinput or "N" in lineinput:
@@ -104,3 +99,11 @@ class Command(BaseCommand):
                 if "y" in lineinput or "Y" in lineinput:
                     for line in lines:
                         self.check_pattern(line, file)
+
+                if "{% load static %}" not in lines:
+                    self.stdout.write(
+                        self.style.ERROR(
+                            "no detect load_static file {}".format(file_path)
+                        )
+                    )
+                    self.prepend_line(file, "{% load static %}")
