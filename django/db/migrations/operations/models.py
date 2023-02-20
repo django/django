@@ -407,20 +407,12 @@ class RenameModel(ModelOperation):
                     or not new_field.remote_field.through._meta.auto_created
                 ):
                     continue
-                # Rename the M2M table that's based on this model's name.
-                old_m2m_model = old_field.remote_field.through
-                new_m2m_model = new_field.remote_field.through
-                schema_editor.alter_db_table(
-                    new_m2m_model,
-                    old_m2m_model._meta.db_table,
-                    new_m2m_model._meta.db_table,
-                )
-                # Rename the column in the M2M table that's based on this
-                # model's name.
-                schema_editor.alter_field(
-                    new_m2m_model,
-                    old_m2m_model._meta.get_field(old_model._meta.model_name),
-                    new_m2m_model._meta.get_field(new_model._meta.model_name),
+                # Rename columns and the M2M table.
+                schema_editor._alter_many_to_many(
+                    new_model,
+                    old_field,
+                    new_field,
+                    strict=False,
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):

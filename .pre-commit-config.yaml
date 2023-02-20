@@ -5,7 +5,7 @@ repos:
     - id: black
       exclude: \.py-tpl$
   - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
+    rev: 5.12.0
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
@@ -13,6 +13,6 @@ repos:
     hooks:
       - id: flake8
   - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.29.0
+    rev: v8.34.0
     hooks:
       - id: eslint

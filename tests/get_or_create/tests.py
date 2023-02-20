@@ -330,15 +330,24 @@ class UpdateOrCreateTests(TestCase):
         self.assertEqual(p.birthday, date(1940, 10, 10))
 
     def test_create_twice(self):
-        params = {
-            "first_name": "John",
-            "last_name": "Lennon",
-            "birthday": date(1940, 10, 10),
-        }
-        Person.objects.update_or_create(**params)
-        # If we execute the exact same statement, it won't create a Person.
-        p, created = Person.objects.update_or_create(**params)
-        self.assertFalse(created)
+        p, created = Person.objects.update_or_create(
+            first_name="John",
+            last_name="Lennon",
+            create_defaults={"birthday": date(1940, 10, 10)},
+            defaults={"birthday": date(1950, 2, 2)},
+        )
+        self.assertIs(created, True)
+        self.assertEqual(p.birthday, date(1940, 10, 10))
+        # If we execute the exact same statement, it won't create a Person, but
+        # will update the birthday.
+        p, created = Person.objects.update_or_create(
+            first_name="John",
+            last_name="Lennon",
+            create_defaults={"birthday": date(1940, 10, 10)},
+            defaults={"birthday": date(1950, 2, 2)},
+        )
+        self.assertIs(created, False)
+        self.assertEqual(p.birthday, date(1950, 2, 2))
 
     def test_integrity(self):
         """
@@ -391,8 +400,14 @@ class UpdateOrCreateTests(TestCase):
         """
         p = Publisher.objects.create(name="Acme Publishing")
         book, created = p.books.update_or_create(name="The Book of Ed & Fred")
-        self.assertTrue(created)
+        self.assertIs(created, True)
         self.assertEqual(p.books.count(), 1)
+        book, created = p.books.update_or_create(
+            name="Basics of Django", create_defaults={"name": "Advanced Django"}
+        )
+        self.assertIs(created, True)
+        self.assertEqual(book.name, "Advanced Django")
+        self.assertEqual(p.books.count(), 2)
 
     def test_update_with_related_manager(self):
         """
@@ -406,6 +421,14 @@ class UpdateOrCreateTests(TestCase):
         book, created = p.books.update_or_create(defaults={"name": name}, id=book.id)
         self.assertFalse(created)
         self.assertEqual(book.name, name)
+        # create_defaults should be ignored.
+        book, created = p.books.update_or_create(
+            create_defaults={"name": "Basics of Django"},
+            defaults={"name": name},
+            id=book.id,
+        )
+        self.assertIs(created, False)
+        self.assertEqual(book.name, name)
         self.assertEqual(p.books.count(), 1)
 
     def test_create_with_many(self):
@@ -418,8 +441,16 @@ class UpdateOrCreateTests(TestCase):
         book, created = author.books.update_or_create(
             name="The Book of Ed & Fred", publisher=p
         )
-        self.assertTrue(created)
+        self.assertIs(created, True)
         self.assertEqual(author.books.count(), 1)
+        book, created = author.books.update_or_create(
+            name="Basics of Django",
+            publisher=p,
+            create_defaults={"name": "Advanced Django"},
+        )
+        self.assertIs(created, True)
+        self.assertEqual(book.name, "Advanced Django")
+        self.assertEqual(author.books.count(), 2)
 
     def test_update_with_many(self):
         """
@@ -436,6 +467,14 @@ class UpdateOrCreateTests(TestCase):
             defaults={"name": name}, id=book.id
         )
         self.assertFalse(created)
+        self.assertEqual(book.name, name)
+        # create_defaults should be ignored.
+        book, created = author.books.update_or_create(
+            create_defaults={"name": "Basics of Django"},
+            defaults={"name": name},
+            id=book.id,
+        )
+        self.assertIs(created, False)
         self.assertEqual(book.name, name)
         self.assertEqual(author.books.count(), 1)
 
@@ -467,11 +506,49 @@ class UpdateOrCreateTests(TestCase):
         self.assertFalse(created)
         self.assertEqual(obj.defaults, "another testing")
 
+    def test_create_defaults_exact(self):
+        """
+        If you have a field named create_defaults and want to use it as an
+        exact lookup, you need to use 'create_defaults__exact'.
+        """
+        obj, created = Person.objects.update_or_create(
+            first_name="George",
+            last_name="Harrison",
+            create_defaults__exact="testing",
+            create_defaults={
+                "birthday": date(1943, 2, 25),
+                "create_defaults": "testing",
+            },
+        )
+        self.assertIs(created, True)
+        self.assertEqual(obj.create_defaults, "testing")
+        obj, created = Person.objects.update_or_create(
+            first_name="George",
+            last_name="Harrison",
+            create_defaults__exact="testing",
+            create_defaults={
+                "birthday": date(1943, 2, 25),
+                "create_defaults": "another testing",
+            },
+        )
+        self.assertIs(created, False)
+        self.assertEqual(obj.create_defaults, "testing")
+
     def test_create_callable_default(self):
         obj, created = Person.objects.update_or_create(
             first_name="George",
             last_name="Harrison",
             defaults={"birthday": lambda: date(1943, 2, 25)},
+        )
+        self.assertIs(created, True)
+        self.assertEqual(obj.birthday, date(1943, 2, 25))
+
+    def test_create_callable_create_defaults(self):
+        obj, created = Person.objects.update_or_create(
+            first_name="George",
+            last_name="Harrison",
+            defaults={},
+            create_defaults={"birthday": lambda: date(1943, 2, 25)},
         )
         self.assertIs(created, True)
         self.assertEqual(obj.birthday, date(1943, 2, 25))
@@ -693,6 +770,12 @@ class InvalidCreateArgumentsTests(TransactionTestCase):
     def test_update_or_create_with_invalid_defaults(self):
         with self.assertRaisesMessage(FieldError, self.msg):
             Thing.objects.update_or_create(name="a", defaults={"nonexistent": "b"})
+
+    def test_update_or_create_with_invalid_create_defaults(self):
+        with self.assertRaisesMessage(FieldError, self.msg):
+            Thing.objects.update_or_create(
+                name="a", create_defaults={"nonexistent": "b"}
+            )
 
     def test_update_or_create_with_invalid_kwargs(self):
         with self.assertRaisesMessage(FieldError, self.bad_field_msg):

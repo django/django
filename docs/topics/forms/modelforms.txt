@@ -815,13 +815,13 @@ with the ``Author`` model. It works just like a regular formset:
     >>> formset = AuthorFormSet()
     >>> print(formset)
     <input type="hidden" name="form-TOTAL_FORMS" value="1" id="id_form-TOTAL_FORMS"><input type="hidden" name="form-INITIAL_FORMS" value="0" id="id_form-INITIAL_FORMS"><input type="hidden" name="form-MIN_NUM_FORMS" value="0" id="id_form-MIN_NUM_FORMS"><input type="hidden" name="form-MAX_NUM_FORMS" value="1000" id="id_form-MAX_NUM_FORMS">
-    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100"></td></tr>
-    <tr><th><label for="id_form-0-title">Title:</label></th><td><select name="form-0-title" id="id_form-0-title">
+    <div><label for="id_form-0-name">Name:</label><input id="id_form-0-name" type="text" name="form-0-name" maxlength="100"></div>
+    <div><label for="id_form-0-title">Title:</label><select name="form-0-title" id="id_form-0-title">
     <option value="" selected>---------</option>
     <option value="MR">Mr.</option>
     <option value="MRS">Mrs.</option>
     <option value="MS">Ms.</option>
-    </select><input type="hidden" name="form-0-id" id="id_form-0-id"></td></tr>
+    </select><input type="hidden" name="form-0-id" id="id_form-0-id"></div>
 
 .. note::
 
@@ -1021,11 +1021,11 @@ so long as the total number of forms does not exceed ``max_num``:
     >>> AuthorFormSet = modelformset_factory(Author, fields=['name'], max_num=4, extra=2)
     >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
     >>> for form in formset:
-    ...     print(form.as_table())
-    <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id"></td></tr>
-    <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100"><input type="hidden" name="form-1-id" value="3" id="id_form-1-id"></td></tr>
-    <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100"><input type="hidden" name="form-2-id" value="2" id="id_form-2-id"></td></tr>
-    <tr><th><label for="id_form-3-name">Name:</label></th><td><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100"><input type="hidden" name="form-3-id" id="id_form-3-id"></td></tr>
+    ...     print(form)
+    <div><label for="id_form-0-name">Name:</label><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id"></div>
+    <div><label for="id_form-1-name">Name:</label><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100"><input type="hidden" name="form-1-id" value="3" id="id_form-1-id"></div>
+    <div><label for="id_form-2-name">Name:</label><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100"><input type="hidden" name="form-2-id" value="2" id="id_form-2-id"></div>
+    <div><label for="id_form-3-name">Name:</label><input id="id_form-3-name" type="text" name="form-3-name" maxlength="100"><input type="hidden" name="form-3-id" id="id_form-3-id"></div>
 
 A ``max_num`` value of ``None`` (the default) puts a high limit on the number
 of forms displayed (1000). In practice this is equivalent to no limit.

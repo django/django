@@ -59,6 +59,19 @@ class GenericRelationsTests(TestCase):
         self.assertTrue(created)
         self.assertEqual(count + 1, self.bacon.tags.count())
 
+    def test_generic_update_or_create_when_created_with_create_defaults(self):
+        count = self.bacon.tags.count()
+        tag, created = self.bacon.tags.update_or_create(
+            # Since, the "stinky" tag doesn't exist create
+            # a "juicy" tag.
+            create_defaults={"tag": "juicy"},
+            defaults={"tag": "uncured"},
+            tag="stinky",
+        )
+        self.assertEqual(tag.tag, "juicy")
+        self.assertIs(created, True)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+
     def test_generic_update_or_create_when_updated(self):
         """
         Should be able to use update_or_create from the generic related manager
@@ -74,6 +87,17 @@ class GenericRelationsTests(TestCase):
         self.assertEqual(count + 1, self.bacon.tags.count())
         self.assertEqual(tag.tag, "juicy")
 
+    def test_generic_update_or_create_when_updated_with_defaults(self):
+        count = self.bacon.tags.count()
+        tag = self.bacon.tags.create(tag="stinky")
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        tag, created = self.bacon.tags.update_or_create(
+            create_defaults={"tag": "uncured"}, defaults={"tag": "juicy"}, id=tag.id
+        )
+        self.assertIs(created, False)
+        self.assertEqual(count + 1, self.bacon.tags.count())
+        self.assertEqual(tag.tag, "juicy")
+
     async def test_generic_async_aupdate_or_create(self):
         tag, created = await self.bacon.tags.aupdate_or_create(
             id=self.fatty.id, defaults={"tag": "orange"}
@@ -85,6 +109,22 @@ class GenericRelationsTests(TestCase):
         self.assertIs(created, True)
         self.assertEqual(await self.bacon.tags.acount(), 3)
         self.assertEqual(tag.tag, "pink")
+
+    async def test_generic_async_aupdate_or_create_with_create_defaults(self):
+        tag, created = await self.bacon.tags.aupdate_or_create(
+            id=self.fatty.id,
+            create_defaults={"tag": "pink"},
+            defaults={"tag": "orange"},
+        )
+        self.assertIs(created, False)
+        self.assertEqual(tag.tag, "orange")
+        self.assertEqual(await self.bacon.tags.acount(), 2)
+        tag, created = await self.bacon.tags.aupdate_or_create(
+            tag="pink", create_defaults={"tag": "brown"}
+        )
+        self.assertIs(created, True)
+        self.assertEqual(await self.bacon.tags.acount(), 3)
+        self.assertEqual(tag.tag, "brown")
 
     def test_generic_get_or_create_when_created(self):
         """
@@ -548,6 +588,26 @@ class GenericRelationsTests(TestCase):
             tag="shiny", defaults={"content_object": diamond}
         )
         self.assertFalse(created)
+        self.assertEqual(tag.content_object.id, diamond.id)
+
+    def test_update_or_create_defaults_with_create_defaults(self):
+        # update_or_create() should work with virtual fields (content_object).
+        quartz = Mineral.objects.create(name="Quartz", hardness=7)
+        diamond = Mineral.objects.create(name="Diamond", hardness=7)
+        tag, created = TaggedItem.objects.update_or_create(
+            tag="shiny",
+            create_defaults={"content_object": quartz},
+            defaults={"content_object": diamond},
+        )
+        self.assertIs(created, True)
+        self.assertEqual(tag.content_object.id, quartz.id)
+
+        tag, created = TaggedItem.objects.update_or_create(
+            tag="shiny",
+            create_defaults={"content_object": quartz},
+            defaults={"content_object": diamond},
+        )
+        self.assertIs(created, False)
         self.assertEqual(tag.content_object.id, diamond.id)
 
     def test_query_content_type(self):

@@ -6,14 +6,14 @@
     "test": "grunt test --verbose"
   },
   "engines": {
-    "npm": ">=1.3.0 <3.0.0"
+    "npm": ">=1.3.0"
   },
   "devDependencies": {
-    "eslint": "^8.29.0",
-    "puppeteer": "^18.1.0",
-    "grunt": "^1.5.3",
+    "eslint": "^8.34.0",
+    "puppeteer": "^19.7.0",
+    "grunt": "^1.6.1",
     "grunt-cli": "^1.4.3",
-    "grunt-contrib-qunit": "^6.2.1",
-    "qunit": "^2.19.3"
+    "grunt-contrib-qunit": "^7.0.0",
+    "qunit": "^2.19.4"
   }
 }
