@@ -321,14 +321,15 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     @async_unsafe
     def create_cursor(self, name=None):
+        extra = {"binary": True} if is_psycopg3 else {}
         if name:
             # In autocommit mode, the cursor will be used outside of a
             # transaction, hence use a holdable cursor.
             cursor = self.connection.cursor(
-                name, scrollable=False, withhold=self.connection.autocommit
+                name, scrollable=False, withhold=self.connection.autocommit, **extra
             )
         else:
-            cursor = self.connection.cursor()
+            cursor = self.connection.cursor(**extra)
 
         if is_psycopg3:
             # Register the cursor timezone only if the connection disagrees, to
