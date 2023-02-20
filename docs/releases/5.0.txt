@@ -267,6 +267,10 @@ Miscellaneous
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers are deprecated.
 
+* Passing positional arguments  ``name`` and ``violation_error_message`` to
+  :class:`~django.db.models.BaseConstraint` is deprecated in favor of
+  keyword-only arguments.
+
 Features removed in 5.0
 =======================
 

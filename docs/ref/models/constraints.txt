@@ -48,11 +48,15 @@ option.
 ``BaseConstraint``
 ==================
 
-.. class:: BaseConstraint(name, violation_error_message=None)
+.. class:: BaseConstraint(*, name, violation_error_message=None)
 
     Base class for all constraints. Subclasses must implement
     ``constraint_sql()``, ``create_sql()``, ``remove_sql()`` and
     ``validate()`` methods.
+
+    .. deprecated:: 5.0
+
+        Support for passing positional arguments is deprecated.
 
 All constraints have the following parameters in common:
 
