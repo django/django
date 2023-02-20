@@ -7,6 +7,8 @@ from django.db.models.constraints import BaseConstraint, UniqueConstraint
 from django.db.models.functions import Lower
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     ChildModel,
@@ -26,48 +28,48 @@ def get_constraints(table):
 
 class BaseConstraintTests(SimpleTestCase):
     def test_constraint_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.constraint_sql(None, None)
 
     def test_contains_expressions(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         self.assertIs(c.contains_expressions, False)
 
     def test_create_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.create_sql(None, None)
 
     def test_remove_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.remove_sql(None, None)
 
     def test_validate(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.validate(None, None)
 
     def test_default_violation_error_message(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         self.assertEqual(
             c.get_violation_error_message(), "Constraint “name” is violated."
         )
 
     def test_custom_violation_error_message(self):
         c = BaseConstraint(
-            "base_name", violation_error_message="custom %(name)s message"
+            name="base_name", violation_error_message="custom %(name)s message"
         )
         self.assertEqual(c.get_violation_error_message(), "custom base_name message")
 
     def test_custom_violation_error_message_clone(self):
         constraint = BaseConstraint(
-            "base_name",
+            name="base_name",
             violation_error_message="custom %(name)s message",
         ).clone()
         self.assertEqual(
@@ -77,7 +79,7 @@ class BaseConstraintTests(SimpleTestCase):
 
     def test_deconstruction(self):
         constraint = BaseConstraint(
-            "base_name",
+            name="base_name",
             violation_error_message="custom %(name)s message",
         )
         path, args, kwargs = constraint.deconstruct()
@@ -87,6 +89,23 @@ class BaseConstraintTests(SimpleTestCase):
             kwargs,
             {"name": "base_name", "violation_error_message": "custom %(name)s message"},
         )
+
+    def test_deprecation(self):
+        msg = "Passing positional arguments to BaseConstraint is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+            BaseConstraint("name", "violation error message")
+
+    def test_name_required(self):
+        msg = (
+            "BaseConstraint.__init__() missing 1 required keyword-only argument: 'name'"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            BaseConstraint()
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_positional_arguments(self):
+        c = BaseConstraint("name", "custom %(name)s message")
+        self.assertEqual(c.get_violation_error_message(), "custom name message")
 
 
 class CheckConstraintTests(TestCase):
