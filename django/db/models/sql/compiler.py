@@ -2074,7 +2074,7 @@ class SQLAggregateCompiler(SQLCompiler):
         inner_query_sql, inner_query_params = self.query.inner_query.get_compiler(
             self.using,
             elide_empty=self.elide_empty,
-        ).as_sql(with_col_aliases=True)
+        ).as_sql()
         sql = "SELECT %s FROM (%s) subquery" % (sql, inner_query_sql)
         params += inner_query_params
         return sql, params

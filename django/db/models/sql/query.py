@@ -484,10 +484,8 @@ class Query(BaseExpression):
             ):
                 # In case of Model.objects[0:3].count(), there would be no
                 # field selected in the inner query, yet we must use a subquery.
-                # So, make sure at least one field is selected.
-                inner_query.select = (
-                    self.model._meta.pk.get_col(inner_query.get_initial_alias()),
-                )
+                # So, make sure at least one value is selected.
+                inner_query.select = (Value(1),)
         else:
             outer_query = self
             self.select = ()
