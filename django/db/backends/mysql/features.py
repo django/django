@@ -154,6 +154,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if self.connection.mysql_version < (8, 0, 31):
+            skips.update(
+                {
+                    "Nesting of UNIONs at the right-hand side is not supported on "
+                    "MySQL < 8.0.31": {
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_nested"
+                    },
+                }
+            )
         return skips
 
     @cached_property
