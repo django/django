@@ -178,6 +178,45 @@ class ProjectState:
         self.remove_model(app_label, old_name_lower)
         self.reload_model(app_label, new_name_lower, delay=True)
 
+    def move_model(self, name, old_app_label, new_app_label):
+        # Add a new model.
+        name_lower = name.lower()
+        moved_model = self.models[old_app_label, name_lower].clone()
+        moved_model.app_label = new_app_label
+        self.models[new_app_label, name_lower] = moved_model
+        # Repoint all fields pointing to the model in old app to the model in new app.
+        old_model_tuple = (old_app_label, name_lower)
+        new_remote_model = f"{new_app_label}.{name_lower}"
+        to_reload = set()
+        for model_state, name, field, reference in get_references(
+            self, old_model_tuple
+        ):
+            changed_field = None
+            if reference.to:
+                changed_field = field.clone()
+                changed_field.remote_field.model = new_remote_model
+            if reference.through:
+                if changed_field is None:
+                    changed_field = field.clone()
+                changed_field.remote_field.through = new_remote_model
+            if changed_field:
+                model_state.fields[name] = changed_field
+                to_reload.add((model_state.app_label, model_state.name_lower))
+
+        if self._relations is not None:
+            old_name_key = old_app_label, name_lower
+            new_name_key = new_app_label, name_lower
+            if old_name_key in self._relations:
+                self._relations[new_name_key] = self._relations.pop(old_name_key)
+            for model_relations in self._relations.values():
+                if old_name_key in model_relations:
+                    model_relations[new_name_key] = model_relations.pop(old_name_key)
+        # Reload models related to model in old app before removing it.
+        self.reload_models(to_reload, delay=True)
+        # Remove the model in old app.
+        self.remove_model(old_app_label, name_lower)
+        self.reload_model(new_app_label, name_lower, delay=True)
+
     def alter_model_options(self, app_label, model_name, options, option_keys=None):
         model_state = self.models[app_label, model_name]
         model_state.options = {**model_state.options, **options}

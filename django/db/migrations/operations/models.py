@@ -460,6 +460,138 @@ class RenameModel(ModelOperation):
         ) or not operation.references_model(self.new_name, app_label)
 
 
+class MoveModel(ModelOperation):
+    """Move a model."""
+
+    def __init__(self, name, old_app_label, new_app_label):
+        self.name = name
+        self.old_app_label = old_app_label
+        self.new_app_label = new_app_label
+        super().__init__(name)
+
+    def deconstruct(self):
+        kwargs = {
+            "name": self.name,
+            "old_app_label": self.old_app_label,
+            "new_app_label": self.new_app_label,
+        }
+        return (self.__class__.__qualname__, [], kwargs)
+
+    def state_forwards(self, app_label, state):
+        state.move_model(self.name, app_label, self.new_app_label)
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(self.new_app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            old_model = from_state.apps.get_model(app_label, self.name)
+            # Move the main table
+            schema_editor.alter_db_table(
+                new_model,
+                old_model._meta.db_table,
+                new_model._meta.db_table,
+            )
+            # Alter the fields pointing to us
+            for related_object in old_model._meta.related_objects:
+                if related_object.related_model == old_model:
+                    model = new_model
+                    related_key = (app_label, self.new_name_lower)
+                else:
+                    model = related_object.related_model
+                    related_key = (
+                        related_object.related_model._meta.app_label,
+                        related_object.related_model._meta.model_name,
+                    )
+                to_field = to_state.apps.get_model(*related_key)._meta.get_field(
+                    related_object.field.name
+                )
+                schema_editor.alter_field(
+                    model,
+                    related_object.field,
+                    to_field,
+                )
+            # Rename M2M fields whose name is based on this model's name.
+            fields = zip(
+                old_model._meta.local_many_to_many, new_model._meta.local_many_to_many
+            )
+            for old_field, new_field in fields:
+                # Skip self-referential fields as these are renamed above.
+                if (
+                    new_field.model == new_field.related_model
+                    or not new_field.remote_field.through._meta.auto_created
+                ):
+                    continue
+                # Rename columns and the M2M table.
+                schema_editor._alter_many_to_many(
+                    new_model,
+                    old_field,
+                    new_field,
+                    strict=False,
+                )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        self.new_app_label, app_label = app_label, self.new_app_label
+
+        self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+        self.new_app_label, app_label = app_label, self.new_app_label
+
+    def describe(self):
+        return "Move model %s from %s to %s" % (
+            self.name,
+            self.old_app_label,
+            self.new_app_label,
+        )
+
+    @property
+    def migration_name_fragment(self):
+        return "move_model_%s_from_%s_to_%s" % (
+            self.name,
+            self.old_app_label,
+            self.new_app_label,
+        )
+
+
+class MoveModelPlaceholder(Operation):
+    _comment = (
+        "This is a required noop operation to construct dependencies for moving model"
+    )
+
+    reduces_to_sql = False
+
+    def __init__(
+        self, name, old_app_label, new_app_label, comment=None, *args, **kwargs
+    ):
+        self.name = name
+        self.old_app_label = old_app_label
+        self.new_app_label = new_app_label
+        super().__init__(*args, **kwargs)
+
+    def deconstruct(self):
+        kwargs = {
+            "name": self.name,
+            "old_app_label": self.old_app_label,
+            "new_app_label": self.new_app_label,
+            "comment": self._comment,
+        }
+        return (self.__class__.__qualname__, [], kwargs)
+
+    def state_forwards(self, app_label, state):
+        pass
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        pass
+
+    def describe(self):
+        return "Move model %s from %s to %s (Placeholder)" % (
+            self.name,
+            self.old_app_label,
+            self.new_app_label,
+        )
+
+
 class ModelOptionOperation(ModelOperation):
     def reduce(self, operation, app_label):
         if (
