@@ -1,4 +1,5 @@
 import sys
+from contextlib import contextmanager
 
 from django.conf import settings
 from django.db import DatabaseError
@@ -13,9 +14,8 @@ class DatabaseCreation(BaseDatabaseCreation):
     @cached_property
     def _maindb_connection(self):
         """
-        This is analogous to other backends' `_nodb_connection` property,
-        which allows access to an "administrative" connection which can
-        be used to manage the test databases.
+        Allow access to an "administrative" connection which can be used to
+        manage the test databases.
         For Oracle, the only connection that can be used for that purpose
         is the main (non-test) connection.
         """
@@ -26,9 +26,18 @@ class DatabaseCreation(BaseDatabaseCreation):
         DatabaseWrapper = type(self.connection)
         return DatabaseWrapper(settings_dict, alias=self.connection.alias)
 
+    @contextmanager
+    def _maindb_cursor(self):
+        conn = self._maindb_connection
+        try:
+            with conn.cursor() as cursor:
+                yield cursor
+        finally:
+            conn.close()
+
     def _create_test_db(self, verbosity=1, autoclobber=False, keepdb=False):
         parameters = self._get_test_db_params()
-        with self._maindb_connection.cursor() as cursor:
+        with self._maindb_cursor() as cursor:
             if self._test_database_create():
                 try:
                     self._execute_test_db_creation(
@@ -119,7 +128,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                         self.log("Tests cancelled.")
                         sys.exit(1)
         # Done with main user -- test user and tablespaces created.
-        self._maindb_connection.close()
         self._switch_to_test_user(parameters)
         return self.connection.settings_dict["NAME"]
 
@@ -213,7 +221,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         ]
         self.connection.close()
         parameters = self._get_test_db_params()
-        with self._maindb_connection.cursor() as cursor:
+        with self._maindb_cursor() as cursor:
             if self._test_user_create():
                 if verbosity >= 1:
                     self.log("Destroying test user...")
@@ -222,7 +230,6 @@ class DatabaseCreation(BaseDatabaseCreation):
                 if verbosity >= 1:
                     self.log("Destroying test database tables...")
                 self._execute_test_db_destruction(cursor, parameters, verbosity)
-        self._maindb_connection.close()
 
     def _execute_test_db_creation(self, cursor, parameters, verbosity, keepdb=False):
         if verbosity >= 2:
