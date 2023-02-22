@@ -117,10 +117,16 @@ class CheckConstraint(BaseConstraint):
             pass
 
     def __repr__(self):
-        return "<%s: check=%s name=%s>" % (
+        return "<%s: check=%s name=%s%s>" % (
             self.__class__.__qualname__,
             self.check,
             repr(self.name),
+            (
+                ""
+                if self.violation_error_message is None
+                or self.violation_error_message == self.default_violation_error_message
+                else " violation_error_message=%r" % self.violation_error_message
+            ),
         )
 
     def __eq__(self, other):
@@ -287,7 +293,7 @@ class UniqueConstraint(BaseConstraint):
         )
 
     def __repr__(self):
-        return "<%s:%s%s%s%s%s%s%s>" % (
+        return "<%s:%s%s%s%s%s%s%s%s>" % (
             self.__class__.__qualname__,
             "" if not self.fields else " fields=%s" % repr(self.fields),
             "" if not self.expressions else " expressions=%s" % repr(self.expressions),
@@ -296,6 +302,12 @@ class UniqueConstraint(BaseConstraint):
             "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
             "" if not self.include else " include=%s" % repr(self.include),
             "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
+            (
+                ""
+                if self.violation_error_message is None
+                or self.violation_error_message == self.default_violation_error_message
+                else " violation_error_message=%r" % self.violation_error_message
+            ),
         )
 
     def __eq__(self, other):

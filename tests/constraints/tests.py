@@ -160,6 +160,18 @@ class CheckConstraintTests(TestCase):
             "name='price_gt_discounted_price'>",
         )
 
+    def test_repr_with_violation_error_message(self):
+        constraint = models.CheckConstraint(
+            check=models.Q(price__lt=1),
+            name="price_lt_one",
+            violation_error_message="More than 1",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<CheckConstraint: check=(AND: ('price__lt', 1)) name='price_lt_one' "
+            "violation_error_message='More than 1'>",
+        )
+
     def test_invalid_check_types(self):
         msg = "CheckConstraint.check must be a Q instance or boolean expression."
         with self.assertRaisesMessage(TypeError, msg):
@@ -484,6 +496,20 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: expressions=(Lower(F(title)), F(author)) "
             "name='book_func_uq'>",
+        )
+
+    def test_repr_with_violation_error_message(self):
+        constraint = models.UniqueConstraint(
+            models.F("baz__lower"),
+            name="unique_lower_baz",
+            violation_error_message="BAZ",
+        )
+        self.assertEqual(
+            repr(constraint),
+            (
+                "<UniqueConstraint: expressions=(F(baz__lower),) "
+                "name='unique_lower_baz' violation_error_message='BAZ'>"
+            ),
         )
 
     def test_deconstruction(self):

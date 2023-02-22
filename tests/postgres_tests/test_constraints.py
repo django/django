@@ -386,6 +386,17 @@ class ExclusionConstraintTests(PostgreSQLTestCase):
             "(OpClass(F(datespan), name=range_ops), '-|-')] "
             "name='exclude_overlapping'>",
         )
+        constraint = ExclusionConstraint(
+            name="exclude_overlapping",
+            expressions=[(F("datespan"), RangeOperators.ADJACENT_TO)],
+            violation_error_message="Overlapping must be excluded",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<ExclusionConstraint: index_type='GIST' expressions=["
+            "(F(datespan), '-|-')] name='exclude_overlapping' "
+            "violation_error_message='Overlapping must be excluded'>",
+        )
 
     def test_eq(self):
         constraint_1 = ExclusionConstraint(

@@ -154,7 +154,7 @@ class ExclusionConstraint(BaseConstraint):
         return super().__eq__(other)
 
     def __repr__(self):
-        return "<%s: index_type=%s expressions=%s name=%s%s%s%s>" % (
+        return "<%s: index_type=%s expressions=%s name=%s%s%s%s%s>" % (
             self.__class__.__qualname__,
             repr(self.index_type),
             repr(self.expressions),
@@ -162,6 +162,12 @@ class ExclusionConstraint(BaseConstraint):
             "" if self.condition is None else " condition=%s" % self.condition,
             "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
             "" if not self.include else " include=%s" % repr(self.include),
+            (
+                ""
+                if self.violation_error_message is None
+                or self.violation_error_message == self.default_violation_error_message
+                else " violation_error_message=%r" % self.violation_error_message
+            ),
         )
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
