@@ -3,7 +3,7 @@ import random as random_module
 import re
 import types
 import warnings
-from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
 from operator import itemgetter
@@ -184,6 +184,7 @@ def floatformat(text, arg=-1):
     units = len(tupl[1])
     units += -tupl[2] if m else tupl[2]
     prec = abs(p) + units + 1
+    prec = max(getcontext().prec, prec)
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
