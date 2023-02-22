@@ -182,11 +182,9 @@ def floatformat(text, arg=-1):
     # Set the precision high enough to avoid an exception (#15789).
     tupl = d.as_tuple()
     units = len(tupl[1])
-    units += tupl[2]
+    units += -tupl[2] if m else tupl[2]
     prec = abs(p) + units + 1
-    prec = max(1, prec)
-    if d == 0:
-        prec = p
+    prec = max(1, prec)  # Prevent out-of-range precision.
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
