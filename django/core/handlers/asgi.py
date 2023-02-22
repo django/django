@@ -198,12 +198,10 @@ class ASGIHandler(base.BaseHandler):
             ]
             await asyncio.wait(tasks, return_when=asyncio.FIRST_EXCEPTION)
             for task in tasks:
-                if task.done():
-                    exception = task.exception()
-                    if exception:
-                        break
+                if task.done() and task.exception():
+                    break
         except RequestAborted:
-            raise RequestAborted()
+            return
         except asyncio.CancelledError:
             pass
 
