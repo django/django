@@ -392,10 +392,13 @@ class HttpRequest:
                 MultiValueDict(),
             )
         elif self.content_type == "application/json":
-            self._post, self._files = (
-                QueryDict(urlencode(json.loads(self.body)), encoding=self._encoding),
-                MultiValueDict(),
-            )
+            try:
+                self._post, self._files = (
+                    json.loads(self.body),
+                    MultiValueDict(),
+                )
+            except json.JSONDecodeError:
+                raise
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),

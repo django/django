@@ -1,3 +1,4 @@
+import json
 import pickle
 from io import BytesIO
 from itertools import chain
@@ -374,7 +375,25 @@ class RequestsTests(SimpleTestCase):
                         "wsgi.input": payload,
                     }
                 )
-                self.assertEqual(request.data, {"key": ["value"]})
+                self.assertEqual(request.data, {"key": "value"})
+
+    def test_invalid_json_data_error(self):
+        """
+        Catch an error for invalid JSON data from various methods.
+        """
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload("name=value")
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/json",
+                        "wsgi.input": payload,
+                    }
+                )
+                with self.assertRaises(json.JSONDecodeError):
+                    request.data
 
     # TODO: RemovedInDjango51Warning
     def test_basic_POST_alias(self):
