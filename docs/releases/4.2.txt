@@ -373,6 +373,10 @@ backends.
   should be enabled if your backend supports functional dependency detection in
   ``GROUP BY`` clauses as specified by the ``SQL:1999`` standard.
 
+* :djadmin:`inspectdb` now uses ``display_size`` from
+  ``DatabaseIntrospection.get_table_description()`` rather than
+  ``internal_size`` for ``CharField``.
+
 Dropped support for MariaDB 10.3
 --------------------------------
 
@@ -431,10 +435,6 @@ Miscellaneous
   method is removed.
 
 * The minimum supported version of SQLite is increased from 3.9.0 to 3.21.0.
-
-* :djadmin:`inspectdb` now uses ``display_size`` from
-  ``DatabaseIntrospection.get_table_description()`` rather than
-  ``internal_size`` for ``CharField``.
 
 * The minimum supported version of ``asgiref`` is increased from 3.5.2 to
   3.6.0.
