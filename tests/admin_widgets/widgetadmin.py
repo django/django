@@ -8,10 +8,12 @@ from .models import (
     Car,
     CarTire,
     Event,
+    House,
     Inventory,
     Member,
     Profile,
     ReleaseEvent,
+    Room,
     School,
     Student,
     User,
@@ -76,3 +78,5 @@ site.register(School, SchoolAdmin)
 site.register(Student)
 
 site.register(Profile)
+site.register(House)
+site.register(Room)
