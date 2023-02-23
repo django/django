@@ -17,3 +17,4 @@ tests/.coverage*
 build/
 tests/report/
 requirements.txt
+/.idea
