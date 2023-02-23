@@ -3555,7 +3555,6 @@ class OperationTests(OperationTestBase):
         self.assertIndexNotExists(table_name, ["pink", "weight"])
         self.assertUniqueConstraintExists(table_name, ["pink", "weight"])
 
-    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_add_constraint(self):
         project_state = self.set_up_test_model("test_addconstraint")
         gt_check = models.Q(pink__gt=2)
@@ -3581,11 +3580,20 @@ class OperationTests(OperationTestBase):
         Pony = new_state.apps.get_model("test_addconstraint", "Pony")
         self.assertEqual(len(Pony._meta.constraints), 1)
         # Test the database alteration
-        with connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             gt_operation.database_forwards(
                 "test_addconstraint", editor, project_state, new_state
             )
-        with self.assertRaises(IntegrityError), transaction.atomic():
+        if connection.features.supports_table_check_constraints:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=1, weight=1.0)
+        else:
+            self.assertIs(
+                any("CHECK" in query["sql"] for query in ctx.captured_queries), False
+            )
             Pony.objects.create(pink=1, weight=1.0)
         # Add another one.
         lt_check = models.Q(pink__lt=100)
@@ -3600,11 +3608,20 @@ class OperationTests(OperationTestBase):
         )
         Pony = new_state.apps.get_model("test_addconstraint", "Pony")
         self.assertEqual(len(Pony._meta.constraints), 2)
-        with connection.schema_editor() as editor:
+        with (
+            CaptureQueriesContext(connection) as ctx,
+            connection.schema_editor() as editor,
+        ):
             lt_operation.database_forwards(
                 "test_addconstraint", editor, project_state, new_state
             )
-        with self.assertRaises(IntegrityError), transaction.atomic():
+        if connection.features.supports_table_check_constraints:
+            with self.assertRaises(IntegrityError), transaction.atomic():
+                Pony.objects.create(pink=100, weight=1.0)
+        else:
+            self.assertIs(
+                any("CHECK" in query["sql"] for query in ctx.captured_queries), False
+            )
             Pony.objects.create(pink=100, weight=1.0)
         # Test reversal
         with connection.schema_editor() as editor:
