@@ -2073,6 +2073,9 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             NoteRename.objects.create(detail_info=None)
 
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
     @isolate_apps("schema")
     def test_rename_field_with_check_to_truncated_name(self):
         class AuthorWithLongColumn(Model):
