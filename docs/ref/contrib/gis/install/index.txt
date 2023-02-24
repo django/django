@@ -346,7 +346,7 @@ for further information.
 PostgreSQL
 ~~~~~~~~~~
 
-Download the latest `PostgreSQL 12.x installer`__ from the
+Download the latest `PostgreSQL 15.x installer`__ from the
 `EnterpriseDB`__ website.  After downloading, run the installer, follow the
 on-screen directions, and keep the default options unless you know the
 consequences of changing them.
@@ -363,7 +363,7 @@ keep this checked, as it is necessary to install :ref:`postgisasb`.
 
     If installed successfully, the PostgreSQL server will run in the background
     each time the system as started as a Windows service. A
-    :menuselection:`PostgreSQL 12` start menu group will created and contains
+    :menuselection:`PostgreSQL 15` start menu group will created and contains
     shortcuts for the Application Stack Builder (ASB) as well as the
     'SQL Shell', which will launch a ``psql`` command window.
 
@@ -376,17 +376,17 @@ PostGIS
 ~~~~~~~
 
 From within the Stack Builder (to run outside of the installer,
-:menuselection:`Start --> PostgreSQL 12 --> Application Stack Builder`), select
-:menuselection:`PostgreSQL 12 (x64) on port 5432` from the drop down
+:menuselection:`Start --> PostgreSQL 15 --> Application Stack Builder`), select
+:menuselection:`PostgreSQL 15 (x64) on port 5432` from the drop down
 menu and click next. Expand the
 :menuselection:`Categories --> Spatial Extensions` menu tree and select
-:menuselection:`PostGIS X.Y for PostgreSQL 12`.
+:menuselection:`PostGIS X.Y for PostgreSQL 15`.
 
 After clicking next, you will be prompted to confirm the selected package and
 "Download directory". Click next again, this will download PostGIS and you will
 be asked to click next to begin the PostGIS installer. Select the default
-options during install. The install process includes three Yes/No dialog boxes,
-the default option for all three is "No".
+options during install. The install process includes four Yes/No dialog boxes,
+the default option for all four is "No".
 
 .. _osgeo4w:
 
@@ -394,12 +394,13 @@ OSGeo4W
 ~~~~~~~
 
 The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
-required by GeoDjango. First, download the `OSGeo4W installer`_ (64bit), and
+required by GeoDjango. First, download the `OSGeo4W installer`_, and
 run it. Select :menuselection:`Express Web-GIS Install` and click next.  In the
-'Select Packages' list, ensure that GDAL is selected; MapServer is also enabled
-by default, but is not required by GeoDjango and may be unchecked safely. After
-clicking next and accepting the license agreements, the packages will be
-automatically downloaded and installed, after which you may exit the installer.
+'Select Packages' list, ensure that GDAL is selected. If any other packages are
+enabled by default, they are not required by GeoDjango and may be unchecked
+safely. After clicking next and accepting the license agreements, the packages
+will be automatically downloaded and installed, after which you may exit the
+installer.
 
 .. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 
@@ -414,19 +415,13 @@ once this is complete for new environment variables to be recognized:
 
 .. code-block:: bat
 
-    set OSGEO4W_ROOT=C:\OSGeo4W64
-    set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
+    set OSGEO4W_ROOT=C:\OSGeo4W
+    set GDAL_DATA=%OSGEO4W_ROOT%\apps\gdal\share\gdal
     set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
     set PATH=%PATH%;%OSGEO4W_ROOT%\bin
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /f /d "%PATH%"
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
-
-.. note::
-
-    This assumes 64bit version of OSGeo4W is installed. If you have installed
-    the 32bit version you will need to change the first command to
-    ``set OSGEO4W_ROOT=C:\OSGeo4W``.
 
 .. note::
 
@@ -443,7 +438,7 @@ once this is complete for new environment variables to be recognized:
 Install Django and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`install Django <installing-official-release>` on your system. It is
+:ref:`Install Django <installing-official-release>` on your system. It is
 recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
