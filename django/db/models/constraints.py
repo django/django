@@ -428,8 +428,8 @@ class UniqueConstraint(BaseConstraint):
                 for model, constraints in instance.get_constraints():
                     for constraint in constraints:
                         if constraint is self:
-                            raise ValidationError(
-                                instance.unique_error_message(model, self.fields),
+                            raise instance.unique_error_message(
+                                model, self.fields, code=self.violation_error_code
                             )
         else:
             against = instance._get_field_value_map(meta=model._meta, exclude=exclude)

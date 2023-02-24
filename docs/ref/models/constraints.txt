@@ -262,11 +262,10 @@ creates a unique index on ``username`` using ``varchar_pattern_ops``.
 The error code used when ``ValidationError`` is raised during
 :ref:`model validation <validating-objects>`. Defaults to ``None``.
 
-This code is *not used* for :class:`UniqueConstraint`\s with
-:attr:`~UniqueConstraint.fields` and without a
-:attr:`~UniqueConstraint.condition`. Such :class:`~UniqueConstraint`\s have the
-same error code as constraints defined with :attr:`.Field.unique` or in
-:attr:`Meta.unique_together <django.db.models.Options.constraints>`.
+For :class:`UniqueConstraint`\s with :attr:`~UniqueConstraint.fields` and
+without a :attr:`~UniqueConstraint.condition` and if ``violation_error_code``
+is ``None``, the ``ValidationError`` raised will use the ``unique`` or
+``unique_together`` code depending on :attr:`~UniqueConstraint.fields` length.
 
 ``violation_error_message``
 ---------------------------

@@ -750,7 +750,7 @@ class UniqueConstraintTests(TestCase):
         )
         with self.assertRaisesMessage(ValidationError, msg) as cm:
             constraint.validate(UniqueConstraintProduct, non_unique_product)
-        self.assertEqual(cm.exception.code, "unique_together")
+        self.assertEqual(cm.exception.code, "custom_code")
         # Null values are ignored.
         constraint.validate(
             UniqueConstraintProduct,
