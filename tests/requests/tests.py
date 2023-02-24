@@ -366,7 +366,7 @@ class RequestsTests(SimpleTestCase):
         """
         for method in ["GET", "POST", "PUT", "DELETE"]:
             with self.subTest(method=method):
-                payload = FakePayload("{\"key\": \"value\"}")
+                payload = FakePayload('{"key": "value"}')
                 request = WSGIRequest(
                     {
                         "REQUEST_METHOD": method,
@@ -448,6 +448,70 @@ class RequestsTests(SimpleTestCase):
             }
         )
         self.assertEqual(request.POST, {"key": ["España"]})
+
+    def test_POST_multipart_json_data(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json_data"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.data.get("json_data"), {"key": "value"})
+
+    def test_POST_multipart_form_and_json_data(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json_data"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary--",
+                    'Content-Disposition: form-data; name="new_json_data"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary--",
+                    'Content-Disposition: form-data; name="json_data"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key_1": "value_1"}',
+                    "--boundary--",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(
+            request.data.getlist("json_data"), [{"key": "value"}, {"key_1": "value_1"}]
+        )
+        self.assertEqual(request.data.get("new_json_data"), {"key": "value"})
+        self.assertEqual(request.data.get("name"), "value")
 
     def test_body_after_POST_multipart_form_data(self):
         """

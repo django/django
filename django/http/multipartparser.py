@@ -8,6 +8,7 @@ import base64
 import binascii
 import collections
 import html
+import json
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -224,9 +225,18 @@ class MultiPartParser:
                             "settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
                         )
 
-                    self._post.appendlist(
-                        field_name, force_str(data, encoding, errors="replace")
-                    )
+                    try:
+                        sub_content_type = meta_data["content-type"][0]
+                        sub_content_type = sub_content_type.strip()
+
+                        if sub_content_type == "application/json":
+                            self._post.appendlist(field_name, json.loads(data))
+
+                    except (KeyError, IndexError, AttributeError, json.JSONDecodeError):
+                        self._post.appendlist(
+                            field_name, force_str(data, encoding, errors="replace")
+                        )
+
                 elif item_type == FILE:
                     # This is a file, use the handler...
                     file_name = disposition.get("filename")
