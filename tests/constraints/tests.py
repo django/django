@@ -744,9 +744,6 @@ class UniqueConstraintTests(TestCase):
 
     def test_validate(self):
         constraint = UniqueConstraintProduct._meta.constraints[0]
-        # Custom message and error code are ignored.
-        constraint.violation_error_message = "Custom message"
-        constraint.violation_error_code = "custom_code"
         msg = "Unique constraint product with this Name and Color already exists."
         non_unique_product = UniqueConstraintProduct(
             name=self.p1.name, color=self.p1.color
@@ -811,9 +808,13 @@ class UniqueConstraintTests(TestCase):
     @skipUnlessDBFeature("supports_partial_indexes")
     def test_validate_conditon_custom_error(self):
         p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
-        constraint = UniqueConstraintConditionProduct._meta.constraints[0]
-        constraint.violation_error_message = "Custom message"
-        constraint.violation_error_code = "custom_code"
+        constraint = models.UniqueConstraint(
+            fields=["name"],
+            name="name_without_color_uniq",
+            condition=models.Q(color__isnull=True),
+            violation_error_code="custom_code",
+            violation_error_message="Custom message",
+        )
         msg = "Custom message"
         with self.assertRaisesMessage(ValidationError, msg) as cm:
             constraint.validate(
