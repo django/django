@@ -1,7 +1,7 @@
 import itertools
 import math
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
@@ -389,6 +389,24 @@ class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = "lte"
 
 
+class IntegerFieldOverflow:
+    underflow_exception = EmptyResultSet
+    overflow_exception = EmptyResultSet
+
+    def process_rhs(self, compiler, connection):
+        rhs = self.rhs
+        if isinstance(rhs, int):
+            field_internal_type = self.lhs.output_field.get_internal_type()
+            min_value, max_value = connection.ops.integer_field_range(
+                field_internal_type
+            )
+            if min_value is not None and rhs < min_value:
+                raise self.underflow_exception
+            if max_value is not None and rhs > max_value:
+                raise self.overflow_exception
+        return super().process_rhs(compiler, connection)
+
+
 class IntegerFieldFloatRounding:
     """
     Allow floats to work as query values for IntegerField. Without this, the
@@ -402,13 +420,30 @@ class IntegerFieldFloatRounding:
 
 
 @IntegerField.register_lookup
-class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+class IntegerFieldExact(IntegerFieldOverflow, Exact):
     pass
 
 
 @IntegerField.register_lookup
-class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
-    pass
+class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerGreaterThanOrEqual(
+    IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual
+):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan):
+    overflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
+    overflow_exception = FullResultSet
 
 
 @Field.register_lookup
