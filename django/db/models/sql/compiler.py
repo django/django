@@ -676,7 +676,7 @@ class SQLCompiler:
                 )
             )
         inner_query_compiler = inner_query.get_compiler(
-            self.using, elide_empty=self.elide_empty
+            self.using, connection=self.connection, elide_empty=self.elide_empty
         )
         inner_sql, inner_params = inner_query_compiler.as_sql(
             # The limits must be applied to the outer query to avoid pruning
