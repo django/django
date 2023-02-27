@@ -60,9 +60,9 @@ class CookieTests(BaseTests, SimpleTestCase):
 
     def encode_decode(self, *args, **kwargs):
         storage = self.get_storage()
-        message = Message(constants.DEBUG, *args, **kwargs)
+        message = [Message(constants.DEBUG, *args, **kwargs)]
         encoded = storage._encode(message)
-        return storage._decode(encoded)
+        return storage._decode(encoded)[0]
 
     def test_get(self):
         storage = self.storage_class(self.get_request())
