@@ -73,7 +73,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(list(storage), example_messages)
 
     @override_settings(SESSION_COOKIE_SAMESITE="Strict")
-    def test_cookie_setings(self):
+    def test_cookie_settings(self):
         """
         CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
         SESSION_COOKIE_HTTPONLY (#15618, #20972).
