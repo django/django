@@ -838,6 +838,17 @@ class BaseDatabaseSchemaEditor:
             strict,
         )
 
+    def _field_db_check(self, field, field_db_params):
+        # Always check constraints with the same mocked column name to avoid
+        # recreating constrains when the column is renamed.
+        check_constraints = self.connection.data_type_check_constraints
+        data = field.db_type_parameters(self.connection)
+        data["column"] = "__column_name__"
+        try:
+            return check_constraints[field.get_internal_type()] % data
+        except KeyError:
+            return None
+
     def _alter_field(
         self,
         model,
@@ -956,7 +967,9 @@ class BaseDatabaseSchemaEditor:
                 # is to look at its name (refs #28053).
                 self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
-        if old_db_params["check"] != new_db_params["check"] and old_db_params["check"]:
+        old_db_check = self._field_db_check(old_field, old_db_params)
+        new_db_check = self._field_db_check(new_field, new_db_params)
+        if old_db_check != new_db_check and old_db_check:
             meta_constraint_names = {
                 constraint.name for constraint in model._meta.constraints
             }
@@ -1162,7 +1175,7 @@ class BaseDatabaseSchemaEditor:
                         self._create_fk_sql(rel.related_model, rel.field, "_fk")
                     )
         # Does it have check constraints we need to add?
-        if old_db_params["check"] != new_db_params["check"] and new_db_params["check"]:
+        if old_db_check != new_db_check and new_db_check:
             constraint_name = self._create_index_name(
                 model._meta.db_table, [new_field.column], suffix="_check"
             )
