@@ -47,14 +47,28 @@ class MessageDecoder(json.JSONDecoder):
         return self.process_messages(decoded)
 
 
-class MessageSerializer:
+class MessagePartSerializer:
     def dumps(self, obj):
-        return json.dumps(
-            obj,
-            separators=(",", ":"),
-            cls=MessageEncoder,
-        ).encode("latin-1")
+        return [
+            json.dumps(
+                o,
+                separators=(",", ":"),
+                cls=MessageEncoder,
+            )
+            for o in obj
+        ]
 
+
+class MessagePartGatherSerializer:
+    def dumps(self, obj):
+        """
+        The parameter is an already serialized list of Message objects. No need
+        to serialize it again, only join the list together and encode it.
+        """
+        return ("[" + ",".join(obj) + "]").encode("latin-1")
+
+
+class MessageSerializer:
     def loads(self, data):
         return json.loads(data.decode("latin-1"), cls=MessageDecoder)
 
@@ -70,6 +84,7 @@ class CookieStorage(BaseStorage):
     # restrict the session cookie to 1/2 of 4kb. See #18781.
     max_cookie_size = 2048
     not_finished = "__messagesnotfinished__"
+    not_finished_json = json.dumps("__messagesnotfinished__")
     key_salt = "django.contrib.messages"
 
     def __init__(self, *args, **kwargs):
@@ -122,7 +137,8 @@ class CookieStorage(BaseStorage):
         returned), and add the not_finished sentinel value to indicate as much.
         """
         unstored_messages = []
-        encoded_data = self._encode(messages)
+        serialized_messages = MessagePartSerializer().dumps(messages)
+        encoded_data = self._encode_parts(serialized_messages)
         if self.max_cookie_size:
             # data is going to be stored eventually by SimpleCookie, which
             # adds its own overhead, which we must account for.
@@ -134,26 +150,39 @@ class CookieStorage(BaseStorage):
             while encoded_data and stored_length(encoded_data) > self.max_cookie_size:
                 if remove_oldest:
                     unstored_messages.append(messages.pop(0))
+                    serialized_messages.pop(0)
                 else:
                     unstored_messages.insert(0, messages.pop())
-                encoded_data = self._encode(
-                    messages + [self.not_finished], encode_empty=unstored_messages
+                    serialized_messages.pop()
+                encoded_data = self._encode_parts(
+                    serialized_messages + [self.not_finished_json],
+                    encode_empty=bool(unstored_messages),
                 )
         self._update_cookie(encoded_data, response)
         return unstored_messages
 
-    def _encode(self, messages, encode_empty=False):
+    def _encode_parts(self, messages, encode_empty=False):
         """
-        Return an encoded version of the messages list which can be stored as
-        plain text.
+        Return an encoded version of the serialized messages list which can be
+        stored as plain text.
 
         Since the data will be retrieved from the client-side, the encoded data
         also contains a hash to ensure that the data was not tampered with.
         """
         if messages or encode_empty:
             return self.signer.sign_object(
-                messages, serializer=MessageSerializer, compress=True
+                messages, serializer=MessagePartGatherSerializer, compress=True
             )
+
+    def _encode(self, messages, encode_empty=False):
+        """
+        Return an encoded version of the messages list which can be stored as
+        plain text.
+
+        Proxies MessagePartSerializer.dumps and _encoded_parts.
+        """
+        serialized_messages = MessagePartSerializer().dumps(messages)
+        return self._encode_parts(serialized_messages, encode_empty=encode_empty)
 
     def _decode(self, data):
         """
