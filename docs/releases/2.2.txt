@@ -298,11 +298,13 @@ For example, in older versions of Django::
 
     from django.contrib import admin
 
+
     class BaseAdmin(admin.ModelAdmin):
-        actions = ['a']
+        actions = ["a"]
+
 
     class SubAdmin(BaseAdmin):
-        actions = ['b']
+        actions = ["b"]
 
 ``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
@@ -310,7 +312,7 @@ Now ``actions`` follows standard Python inheritance. To get the same result as
 before::
 
     class SubAdmin(BaseAdmin):
-        actions = BaseAdmin.actions + ['b']
+        actions = BaseAdmin.actions + ["b"]
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -342,8 +344,8 @@ In usage like::
 
     from django.utils.functional import cached_property
 
-    class A:
 
+    class A:
         @cached_property
         def base(self):
             return ...
@@ -358,11 +360,12 @@ Use this instead::
 
     import operator
 
+
     class A:
 
         ...
 
-        alias = property(operator.attrgetter('base'))
+        alias = property(operator.attrgetter("base"))
 
 Permissions for proxy models
 ----------------------------

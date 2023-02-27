@@ -54,11 +54,11 @@ Simplified URL routing syntax
 The new :func:`django.urls.path()` function allows a simpler, more readable URL
 routing syntax. For example, this example from previous Django releases::
 
-    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+    url(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
 
 could be written as::
 
-    path('articles/<int:year>/', views.year_archive),
+    path("articles/<int:year>/", views.year_archive),
 
 The new syntax supports type coercion of URL parameters. In the example, the
 view will receive the ``year`` keyword argument as an integer rather than as
@@ -434,6 +434,7 @@ form::
 
     from django.contrib.auth.forms import UserChangeForm
 
+
     class MyUserChangeForm(UserChangeForm):
         last_name = forms.CharField(max_length=30, required=False)
 
@@ -443,8 +444,10 @@ If you wish to keep this restriction in the admin when editing users, set
     from django.contrib.auth.admin import UserAdmin
     from django.contrib.auth.models import User
 
+
     class MyUserAdmin(UserAdmin):
         form = MyUserChangeForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
@@ -486,18 +489,18 @@ For custom management commands that use options not created using
 ``parser.add_argument()``, add a ``stealth_options`` attribute on the command::
 
     class MyCommand(BaseCommand):
-        stealth_options = ('option_name', ...)
+        stealth_options = ("option_name", ...)
 
 Indexes no longer accept positional arguments
 ---------------------------------------------
 
 For example::
 
-    models.Index(['headline', '-pub_date'], 'index_name')
+    models.Index(["headline", "-pub_date"], "index_name")
 
 raises an exception and should be replaced with::
 
-    models.Index(fields=['headline', '-pub_date'], name='index_name')
+    models.Index(fields=["headline", "-pub_date"], name="index_name")
 
 Foreign key constraints are now enabled on SQLite
 -------------------------------------------------
@@ -530,7 +533,7 @@ rebuild tables using a script similar to this::
         for model in app.get_models(include_auto_created=True):
             if model._meta.managed and not (model._meta.proxy or model._meta.swapped):
                 for base in model.__bases__:
-                    if hasattr(base, '_meta'):
+                    if hasattr(base, "_meta"):
                         base._meta.local_many_to_many = []
                 model._meta.local_many_to_many = []
                 with connection.schema_editor() as editor:
@@ -567,8 +570,8 @@ Miscellaneous
 
      USE_L10N = False
      USE_THOUSAND_SEPARATOR = True
-     DECIMAL_SEPARATOR = ','
-     THOUSAND_SEPARATOR = '.'
+     DECIMAL_SEPARATOR = ","
+     THOUSAND_SEPARATOR = "."
 
   an input of ``"1.345"`` is now converted to ``1345`` instead of ``1.345``.
 

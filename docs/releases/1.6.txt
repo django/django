@@ -460,7 +460,8 @@ explicitly import the User model in your test module::
 
     from django.contrib.auth.tests.custom_user import CustomUser
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+
+    @override_settings(AUTH_USER_MODEL="auth.CustomUser")
     class CustomUserFeatureTests(TestCase):
         def test_something(self):
             # Test code here
@@ -771,15 +772,19 @@ match the ``uidb64`` pattern.
 
 For example::
 
-    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
-        name='password_reset_confirm'),
+    url(
+        r"^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm",
+        name="password_reset_confirm",
+    ),
 
 becomes::
 
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
-        name='password_reset_confirm'),
+    url(
+        r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm",
+        name="password_reset_confirm",
+    ),
 
 You may also want to add the shim to support the old style reset links. Using
 the example above, you would modify the existing url by replacing
@@ -787,8 +792,10 @@ the example above, you would modify the existing url by replacing
 ``django.contrib.auth.views.password_reset_confirm_uidb36`` and also remove
 the ``name`` argument so it doesn't conflict with the new url::
 
-    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm_uidb36'),
+    url(
+        r"^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm_uidb36",
+    ),
 
 You can remove this URL pattern after your app has been deployed with Django
 1.6 for ``PASSWORD_RESET_TIMEOUT_DAYS``.
@@ -921,11 +928,15 @@ Miscellaneous
   views without a ``name``, you should update your ``urlpatterns`` to use
   ``django.conf.urls.url()`` with the ``name`` parameter. For example::
 
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete')
+    (r"^reset/done/$", "django.contrib.auth.views.password_reset_complete")
 
   becomes::
 
-    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
+    url(
+        r"^reset/done/$",
+        "django.contrib.auth.views.password_reset_complete",
+        name="password_reset_complete",
+    )
 
 * :class:`~django.views.generic.base.RedirectView` now has a ``pattern_name``
   attribute which allows it to choose the target by reversing the URL.
@@ -1103,7 +1114,7 @@ you should rename the method and conditionally add an alias with the old name::
 
     class CustomManager(models.Manager):
         def get_queryset(self):
-            pass # ...
+            pass  # ...
 
         if django.VERSION < (1, 6):
             get_query_set = get_queryset
@@ -1114,10 +1125,12 @@ you should rename the method and conditionally add an alias with the old name::
 If you are writing a library that needs to call the ``get_queryset`` method and
 must support old Django versions, you should write::
 
-    get_queryset = (some_manager.get_query_set
-                    if hasattr(some_manager, 'get_query_set')
-                    else some_manager.get_queryset)
-    return get_queryset() # etc
+    get_queryset = (
+        some_manager.get_query_set
+        if hasattr(some_manager, "get_query_set")
+        else some_manager.get_queryset
+    )
+    return get_queryset()  # etc
 
 In the general case of a custom manager that both implements its own
 ``get_queryset`` method and calls that method, and needs to work with older Django
@@ -1126,18 +1139,18 @@ a ``get_queryset_compat`` method as below and use it internally to your manager:
 
     class YourCustomManager(models.Manager):
         def get_queryset(self):
-            return YourCustomQuerySet() # for example
+            return YourCustomQuerySet()  # for example
 
         if django.VERSION < (1, 6):
             get_query_set = get_queryset
 
-        def active(self): # for example
+        def active(self):  # for example
             return self.get_queryset_compat().filter(active=True)
 
         def get_queryset_compat(self):
-            get_queryset = (self.get_query_set
-                            if hasattr(self, 'get_query_set')
-                            else self.get_queryset)
+            get_queryset = (
+                self.get_query_set if hasattr(self, "get_query_set") else self.get_queryset
+            )
             return get_queryset()
 
 This helps to minimize the changes that are needed, but also works correctly in
@@ -1156,11 +1169,14 @@ and you should now use the new location.
 The URLconf ``django.conf.urls.shortcut`` was also deprecated. If you're
 including it in an URLconf, simply replace::
 
-    (r'^prefix/', include('django.conf.urls.shortcut')),
+    (r"^prefix/", include("django.conf.urls.shortcut")),
 
 with::
 
-    (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+    (
+        r"^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$",
+        "django.contrib.contenttypes.views.shortcut",
+    ),
 
 ``ModelForm`` without ``fields`` or ``exclude``
 -----------------------------------------------
