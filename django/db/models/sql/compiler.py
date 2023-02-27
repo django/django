@@ -358,11 +358,13 @@ class SQLCompiler:
                     if (
                         field.nulls_first is None and field.nulls_last is None
                     ) or self.connection.features.supports_order_by_nulls_modifier:
+                        field = field.copy()
                         field.expression = select_ref
                     # Alias collisions are not possible when dealing with
                     # combined queries so fallback to it if emulation of NULLS
                     # handling is required.
                     elif self.query.combinator:
+                        field = field.copy()
                         field.expression = Ref(select_ref.refs, select_ref.source)
                 yield field, select_ref is not None
                 continue
