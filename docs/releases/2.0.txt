@@ -454,7 +454,9 @@ If you wish to keep this restriction in the admin when editing users, set
 
 Calling ``QuerySet.reverse()`` or ``last()`` on a sliced queryset leads to
 unexpected results due to the slice being applied after reordering. This is
-now prohibited, e.g.::
+now prohibited, e.g.:
+
+.. code-block:: pycon
 
     >>> Model.objects.all()[:2].reverse()
     Traceback (most recent call last):

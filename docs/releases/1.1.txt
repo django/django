@@ -36,12 +36,16 @@ differences as a result of this change.
 However, **users on 64-bit platforms may experience some problems** using the
 ``reset`` management command. Prior to this change, 64-bit platforms
 would generate a 64-bit, 16 character digest in the constraint name; for
-example::
+example:
+
+.. code-block:: sql
 
     ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_5e8f10c132091d1e FOREIGN KEY ...
 
 Following this change, all platforms, regardless of word size, will generate a
-32-bit, 8 character digest in the constraint name; for example::
+32-bit, 8 character digest in the constraint name; for example:
+
+.. code-block:: sql
 
     ALTER TABLE myapp_sometable ADD CONSTRAINT object_id_refs_id_32091d1e FOREIGN KEY ...
 

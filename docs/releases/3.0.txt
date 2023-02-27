@@ -392,7 +392,9 @@ existing row will result in an ``IntegrityError``.
 
 In order to update an existing model for a specific primary key value, use the
 :meth:`~django.db.models.query.QuerySet.update_or_create` method or
-``QuerySet.filter(pk=…).update(…)`` instead. For example::
+``QuerySet.filter(pk=…).update(…)`` instead. For example:
+
+.. code-block:: pycon
 
     >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={'name': 'new name'})
     >>> MyModel.objects.filter(pk=existing_pk).update(name='new name')

@@ -152,7 +152,9 @@ using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
 
-For instance, with the following layout::
+For instance, with the following layout:
+
+.. code-block:: text
 
     manage.py
     mysite/
@@ -168,7 +170,9 @@ but not ``settings``, ``urls``, or ``myapp`` as top-level modules.
 
 Anything imported as a top-level module can be placed adjacent to the new
 ``manage.py``. For instance, to decouple ``myapp`` from the project module and
-import it as just ``myapp``, place it outside the ``mysite/`` directory::
+import it as just ``myapp``, place it outside the ``mysite/`` directory:
+
+.. code-block:: text
 
     manage.py
     myapp/
@@ -191,12 +195,16 @@ now have a ``--template`` option for specifying a path or URL to a custom app
 or project template.
 
 For example, Django will use the ``/path/to/my_project_template`` directory
-when you run the following command::
+when you run the following command:
+
+.. code-block:: text
 
     django-admin.py startproject --template=/path/to/my_project_template myproject
 
 You can also now provide a destination directory as the second
-argument to both :djadmin:`startapp` and :djadmin:`startproject`::
+argument to both :djadmin:`startapp` and :djadmin:`startproject`:
+
+.. code-block:: text
 
     django-admin.py startapp myapp /path/to/new/app
     django-admin.py startproject myproject /path/to/new/project
@@ -1136,7 +1144,9 @@ Development Server Multithreading
 
 The development server is now is multithreaded by default. Use the
 :option:`runserver --nothreading` option to disable the use of threading in the
-development server::
+development server:
+
+.. code-block:: text
 
     django-admin.py runserver --nothreading
 
@@ -1199,9 +1209,11 @@ To increase the flexibility of error logging for requests, the
 separate filter attached to :class:`django.utils.log.AdminEmailHandler` to
 prevent admin error emails in ``DEBUG`` mode::
 
-   'filters': {
+  {
+    ...: ...,
+    'filters': {
         'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
+            '()': 'django.utils.log.RequireDebugFalse',
         }
     },
     'handlers': {
@@ -1211,6 +1223,8 @@ prevent admin error emails in ``DEBUG`` mode::
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
+    ...: ...,
+  }
 
 If your project was created prior to this change, your :setting:`LOGGING`
 setting will not include this new filter. In order to maintain
