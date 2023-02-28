@@ -69,17 +69,18 @@ command from any place in the Django source tree:
     $ tox
 
 By default, ``tox`` runs the test suite with the bundled test settings file for
-SQLite, ``black``, ``flake8``, ``isort``, and the documentation spelling
-checker. In addition to the system dependencies noted elsewhere in this
-documentation, the command ``python3`` must be on your path and linked to the
-appropriate version of Python. A list of default environments can be seen as
-follows:
+SQLite, ``black``, ``blacken-docs``, ``flake8``, ``isort``, and the
+documentation spelling checker. In addition to the system dependencies noted
+elsewhere in this documentation, the command ``python3`` must be on your path
+and linked to the appropriate version of Python. A list of default environments
+can be seen as follows:
 
 .. console::
 
     $ tox -l
     py3
     black
+    blacken-docs
     flake8>=3.7.0
     docs
     isort>=5.1.0
