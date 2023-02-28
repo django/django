@@ -60,8 +60,9 @@ You could then execute custom SQL like so:
 
 .. code-block:: pycon
 
-    >>> for p in Person.objects.raw('SELECT * FROM myapp_person'):
+    >>> for p in Person.objects.raw("SELECT * FROM myapp_person"):
     ...     print(p)
+    ...
     John Smith
     Jane Jones
 
@@ -110,10 +111,8 @@ of the following queries work identically:
 
 .. code-block:: pycon
 
-    >>> Person.objects.raw('SELECT id, first_name, last_name, birth_date FROM myapp_person')
-    ...
-    >>> Person.objects.raw('SELECT last_name, birth_date, first_name, id FROM myapp_person')
-    ...
+    >>> Person.objects.raw("SELECT id, first_name, last_name, birth_date FROM myapp_person")
+    >>> Person.objects.raw("SELECT last_name, birth_date, first_name, id FROM myapp_person")
 
 Matching is done by name. This means that you can use SQL's ``AS`` clauses to
 map fields in the query to model fields. So if you had some other table that
@@ -121,11 +120,13 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances:
 
 .. code-block:: pycon
 
-    >>> Person.objects.raw('''SELECT first AS first_name,
+    >>> Person.objects.raw(
+    ...     """SELECT first AS first_name,
     ...                              last AS last_name,
     ...                              bd AS birth_date,
     ...                              pk AS id,
-    ...                       FROM some_other_table''')
+    ...                       FROM some_other_table"""
+    ... )
 
 As long as the names match, the model instances will be created correctly.
 
@@ -136,8 +137,8 @@ query could also be written:
 
 .. code-block:: pycon
 
-    >>> name_map = {'first': 'first_name', 'last': 'last_name', 'bd': 'birth_date', 'pk': 'id'}
-    >>> Person.objects.raw('SELECT * FROM some_other_table', translations=name_map)
+    >>> name_map = {"first": "first_name", "last": "last_name", "bd": "birth_date", "pk": "id"}
+    >>> Person.objects.raw("SELECT * FROM some_other_table", translations=name_map)
 
 Index lookups
 -------------
@@ -147,7 +148,7 @@ write:
 
 .. code-block:: pycon
 
-    >>> first_person = Person.objects.raw('SELECT * FROM myapp_person')[0]
+    >>> first_person = Person.objects.raw("SELECT * FROM myapp_person")[0]
 
 However, the indexing and slicing are not performed at the database level. If
 you have a large number of ``Person`` objects in your database, it is more
@@ -155,7 +156,7 @@ efficient to limit the query at the SQL level:
 
 .. code-block:: pycon
 
-    >>> first_person = Person.objects.raw('SELECT * FROM myapp_person LIMIT 1')[0]
+    >>> first_person = Person.objects.raw("SELECT * FROM myapp_person LIMIT 1")[0]
 
 Deferring model fields
 ----------------------
@@ -164,7 +165,7 @@ Fields may also be left out:
 
 .. code-block:: pycon
 
-    >>> people = Person.objects.raw('SELECT id, first_name FROM myapp_person')
+    >>> people = Person.objects.raw("SELECT id, first_name FROM myapp_person")
 
 The ``Person`` objects returned by this query will be deferred model instances
 (see :meth:`~django.db.models.query.QuerySet.defer()`). This means that the
@@ -172,9 +173,10 @@ fields that are omitted from the query will be loaded on demand. For example:
 
 .. code-block:: pycon
 
-    >>> for p in Person.objects.raw('SELECT id, first_name FROM myapp_person'):
-    ...     print(p.first_name, # This will be retrieved by the original query
-    ...           p.last_name) # This will be retrieved on demand
+    >>> for p in Person.objects.raw("SELECT id, first_name FROM myapp_person"):
+    ...     print(
+    ...         p.first_name, p.last_name  # This will be retrieved by the original query
+    ...     )  # This will be retrieved on demand
     ...
     John Smith
     Jane Jones
@@ -199,9 +201,10 @@ of people with their ages calculated by the database:
 
 .. code-block:: pycon
 
-    >>> people = Person.objects.raw('SELECT *, age(birth_date) AS age FROM myapp_person')
+    >>> people = Person.objects.raw("SELECT *, age(birth_date) AS age FROM myapp_person")
     >>> for p in people:
     ...     print("%s is %s." % (p.first_name, p.age))
+    ...
     John is 37.
     Jane is 42.
     ...
@@ -219,8 +222,8 @@ argument to ``raw()``:
 
 .. code-block:: pycon
 
-    >>> lname = 'Doe'
-    >>> Person.objects.raw('SELECT * FROM myapp_person WHERE last_name = %s', [lname])
+    >>> lname = "Doe"
+    >>> Person.objects.raw("SELECT * FROM myapp_person WHERE last_name = %s", [lname])
 
 ``params`` is a list or dictionary of parameters. You'll use ``%s``
 placeholders in the query string for a list, or ``%(key)s``
@@ -242,7 +245,7 @@ replaced with parameters from the ``params`` argument.
 
     .. code-block:: pycon
 
-        >>> query = 'SELECT * FROM myapp_person WHERE last_name = %s' % lname
+        >>> query = "SELECT * FROM myapp_person WHERE last_name = %s" % lname
         >>> Person.objects.raw(query)
 
     You might also think you should write your query like this (with quotes
@@ -284,6 +287,7 @@ For example::
 
     from django.db import connection
 
+
     def my_custom_sql(self):
         with connection.cursor() as cursor:
             cursor.execute("UPDATE bar SET foo = 1 WHERE baz = %s", [self.baz])
@@ -308,7 +312,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    with connections['my_db_alias'].cursor() as cursor:
+
+    with connections["my_db_alias"].cursor() as cursor:
         # Your code here
         ...
 
@@ -320,10 +325,7 @@ using something like this::
     def dictfetchall(cursor):
         "Return all rows from a cursor as a dict"
         columns = [col[0] for col in cursor.description]
-        return [
-            dict(zip(columns, row))
-            for row in cursor.fetchall()
-        ]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
 Another option is to use :func:`collections.namedtuple` from the Python
 standard library. A ``namedtuple`` is a tuple-like object that has fields
@@ -332,10 +334,11 @@ immutable and accessible by field names or indices, which might be useful::
 
     from collections import namedtuple
 
+
     def namedtuplefetchall(cursor):
         "Return all rows from a cursor as a namedtuple"
         desc = cursor.description
-        nt_result = namedtuple('Result', [col[0] for col in desc])
+        nt_result = namedtuple("Result", [col[0] for col in desc])
         return [nt_result(*row) for row in cursor.fetchall()]
 
 Here is an example of the difference between the three:
@@ -414,4 +417,4 @@ Calling stored procedures
     This will call it::
 
         with connection.cursor() as cursor:
-            cursor.callproc('test_procedure', [1, 'test'])
+            cursor.callproc("test_procedure", [1, "test"])

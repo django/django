@@ -37,15 +37,15 @@ Example
 .. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import DataSource
-    >>> ds = DataSource('test_poly.shp')
+    >>> ds = DataSource("test_poly.shp")
     >>> layer = ds[0]
-    >>> print(layer.fields) # Exploring the fields in the layer, we only want the 'str' field.
+    >>> print(layer.fields)  # Exploring the fields in the layer, we only want the 'str' field.
     ['float', 'int', 'str']
-    >>> print(len(layer)) # getting the number of features in the layer (should be 3)
+    >>> print(len(layer))  # getting the number of features in the layer (should be 3)
     3
-    >>> print(layer.geom_type) # Should be 'Polygon'
+    >>> print(layer.geom_type)  # Should be 'Polygon'
     Polygon
-    >>> print(layer.srs) # WGS84 in WKT
+    >>> print(layer.srs)  # WGS84 in WKT
     GEOGCS["GCS_WGS_1984",
         DATUM["WGS_1984",
             SPHEROID["WGS_1984",6378137,298.257223563]],
@@ -56,12 +56,13 @@ Example
 
     from django.contrib.gis.db import models
 
+
     class TestGeo(models.Model):
-        name = models.CharField(max_length=25) # corresponds to the 'str' field
-        poly = models.PolygonField(srid=4269) # we want our model in a different SRID
+        name = models.CharField(max_length=25)  # corresponds to the 'str' field
+        poly = models.PolygonField(srid=4269)  # we want our model in a different SRID
 
         def __str__(self):
-            return 'Name: %s' % self.name
+            return "Name: %s" % self.name
 
 #. Use :class:`LayerMapping` to extract all the features and place them in the
    database:
@@ -71,11 +72,11 @@ Example
     >>> from django.contrib.gis.utils import LayerMapping
     >>> from geoapp.models import TestGeo
     >>> mapping = {
-    ...     'name': 'str', # The 'name' model field maps to the 'str' layer field.
-    ...     'poly': 'POLYGON', # For geometry fields use OGC name.
-    ... } # The mapping is a dictionary
-    >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping)
-    >>> lm.save(verbose=True) # Save the layermap, imports the data.
+    ...     "name": "str",  # The 'name' model field maps to the 'str' layer field.
+    ...     "poly": "POLYGON",  # For geometry fields use OGC name.
+    ... }  # The mapping is a dictionary
+    >>> lm = LayerMapping(TestGeo, "test_poly.shp", mapping)
+    >>> lm.save(verbose=True)  # Save the layermap, imports the data.
     Saved: Name: 1
     Saved: Name: 2
     Saved: Name: 3

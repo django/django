@@ -247,10 +247,10 @@ more useful value::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'APP_DIRS': True,
-            'OPTIONS': {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": True,
+            "OPTIONS": {
                 # ... some options here ...
             },
         },
@@ -363,16 +363,16 @@ Here's an example of the search algorithm. For this example the
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                '/home/html/example.com',
-                '/home/html/default',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [
+                "/home/html/example.com",
+                "/home/html/default",
             ],
         },
         {
-            'BACKEND': 'django.template.backends.jinja2.Jinja2',
-            'DIRS': [
-                '/home/html/jinja2',
+            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "DIRS": [
+                "/home/html/jinja2",
             ],
         },
     ]
@@ -416,7 +416,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
-    get_template('news/story_detail.html')
+    get_template("news/story_detail.html")
 
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
@@ -455,7 +455,8 @@ templates, Django provides a shortcut function which automates the process.
     Usage example::
 
         from django.template.loader import render_to_string
-        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
+        rendered = render_to_string("my_template.html", {"foo": "bar"})
 
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
@@ -469,7 +470,7 @@ Finally, you can use configured engines directly:
 
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
         template = django_engine.from_string("Hello {{ name }}!")
 
     The lookup key — ``'django'`` in this example — is the engine's
@@ -546,10 +547,10 @@ applications. This generic name was kept for backwards-compatibility.
   tag modules to register with the template engine. This can be used to add
   new libraries or provide alternate labels for existing ones. For example::
 
-      OPTIONS={
-          'libraries': {
-              'myapp_tags': 'path.to.myapp.tags',
-              'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+      OPTIONS = {
+          "libraries": {
+              "myapp_tags": "path.to.myapp.tags",
+              "admin.urls": "django.contrib.admin.templatetags.admin_urls",
           },
       }
 
@@ -559,8 +560,8 @@ applications. This generic name was kept for backwards-compatibility.
 * ``'builtins'``: A list of dotted Python paths of template tag modules to
   add to :doc:`built-ins </ref/templates/builtins>`. For example::
 
-      OPTIONS={
-          'builtins': ['myapp.builtins'],
+      OPTIONS = {
+          "builtins": ["myapp.builtins"],
       }
 
   Tags and filters from built-in libraries can be used without first calling
@@ -648,10 +649,12 @@ For example, you can create ``myproject/jinja2.py`` with this content::
 
     def environment(**options):
         env = Environment(**options)
-        env.globals.update({
-            'static': static,
-            'url': reverse,
-        })
+        env.globals.update(
+            {
+                "static": static,
+                "url": reverse,
+            }
+        )
         return env
 
 and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.

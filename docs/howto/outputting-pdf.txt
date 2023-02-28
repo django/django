@@ -52,6 +52,7 @@ Here's a "Hello World" example::
     from django.http import FileResponse
     from reportlab.pdfgen import canvas
 
+
     def some_view(request):
         # Create a file-like buffer to receive PDF data.
         buffer = io.BytesIO()
@@ -70,7 +71,7 @@ Here's a "Hello World" example::
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+        return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
 The code and comments should be self-explanatory, but a few things deserve a
 mention:

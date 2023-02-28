@@ -160,11 +160,11 @@ One feature has been marked as deprecated in Django 1.1:
 * You should no longer use ``AdminSite.root()`` to register that admin
   views. That is, if your URLconf contains the line::
 
-        (r'^admin/(.*)', admin.site.root),
+        (r"^admin/(.*)", admin.site.root),
 
   You should change it to read::
 
-        (r'^admin/', include(admin.site.urls)),
+        (r"^admin/", include(admin.site.urls)),
 
 You should begin to remove use of this feature from your code immediately.
 

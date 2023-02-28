@@ -27,7 +27,7 @@ Available ``Meta`` options
     If a model is defined outside of an application in
     :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
-        app_label = 'myapp'
+        app_label = "myapp"
 
     If you want to represent a model with the format ``app_label.object_name``
     or ``app_label.model_name`` you can use ``model._meta.label``
@@ -48,7 +48,7 @@ Available ``Meta`` options
 
     The name of the database table to use for the model::
 
-        db_table = 'music_album'
+        db_table = "music_album"
 
 .. _table-names:
 
@@ -161,7 +161,7 @@ not be looking at your Django code. For example::
         get_latest_by = "order_date"
 
         # Latest by priority descending, order_date ascending.
-        get_latest_by = ['-priority', 'order_date']
+        get_latest_by = ["-priority", "order_date"]
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
@@ -218,16 +218,18 @@ not be looking at your Django code. For example::
 
         from django.db import models
 
+
         class Question(models.Model):
             text = models.TextField()
             # ...
+
 
         class Answer(models.Model):
             question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
-                order_with_respect_to = 'question'
+                order_with_respect_to = "question"
 
     When ``order_with_respect_to`` is set, two additional methods are provided to
     retrieve and to set the order of the related objects: ``get_RELATED_order()``
@@ -283,7 +285,7 @@ not be looking at your Django code. For example::
 
     The default ordering for the object, for use when obtaining lists of objects::
 
-        ordering = ['-order_date']
+        ordering = ["-order_date"]
 
     This is a tuple or list of strings and/or query expressions. Each string is
     a field name with an optional "-" prefix, which indicates descending order.
@@ -292,22 +294,22 @@ not be looking at your Django code. For example::
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
-        ordering = ['pub_date']
+        ordering = ["pub_date"]
 
     To order by ``pub_date`` descending, use this::
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
     To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
-        ordering = ['-pub_date', 'author']
+        ordering = ["-pub_date", "author"]
 
     You can also use :doc:`query expressions </ref/models/expressions>`. To
     order by ``author`` ascending and make null values sort last, use this::
 
         from django.db.models import F
 
-        ordering = [F('author').asc(nulls_last=True)]
+        ordering = [F("author").asc(nulls_last=True)]
 
 .. warning::
 
@@ -330,7 +332,7 @@ not be looking at your Django code. For example::
     Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
-        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+        permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -406,14 +408,15 @@ not be looking at your Django code. For example::
 
         from django.db import models
 
+
         class Customer(models.Model):
             first_name = models.CharField(max_length=100)
             last_name = models.CharField(max_length=100)
 
             class Meta:
                 indexes = [
-                    models.Index(fields=['last_name', 'first_name']),
-                    models.Index(fields=['first_name'], name='first_name_idx'),
+                    models.Index(fields=["last_name", "first_name"]),
+                    models.Index(fields=["first_name"], name="first_name_idx"),
                 ]
 
 ``unique_together``
@@ -429,7 +432,7 @@ not be looking at your Django code. For example::
 
     Sets of field names that, taken together, must be unique::
 
-        unique_together = [['driver', 'restaurant']]
+        unique_together = [["driver", "restaurant"]]
 
     This is a list of lists that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
@@ -439,7 +442,7 @@ not be looking at your Django code. For example::
     For convenience, ``unique_together`` can be a single list when dealing with
     a single set of fields::
 
-        unique_together = ['driver', 'restaurant']
+        unique_together = ["driver", "restaurant"]
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
     unique_together. (It's not clear what that would even mean!) If you
@@ -483,12 +486,13 @@ not be looking at your Django code. For example::
 
         from django.db import models
 
+
         class Customer(models.Model):
             age = models.IntegerField()
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+                    models.CheckConstraint(check=models.Q(age__gte=18), name="age_gte_18"),
                 ]
 
 ``verbose_name``

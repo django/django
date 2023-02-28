@@ -59,7 +59,7 @@ To set the same ``X-Frame-Options`` value for all responses in your site, put
 
     MIDDLEWARE = [
         ...,
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
         ...,
     ]
 
@@ -70,7 +70,7 @@ By default, the middleware will set the ``X-Frame-Options`` header to
 ``DENY`` for every outgoing ``HttpResponse``. If you want any other value for
 this header instead, set the :setting:`X_FRAME_OPTIONS` setting::
 
-    X_FRAME_OPTIONS = 'SAMEORIGIN'
+    X_FRAME_OPTIONS = "SAMEORIGIN"
 
 When using the middleware there may be some views where you do **not** want the
 ``X-Frame-Options`` header set. For those cases, you can use a view decorator
@@ -78,6 +78,7 @@ that tells the middleware not to set the header::
 
     from django.http import HttpResponse
     from django.views.decorators.clickjacking import xframe_options_exempt
+
 
     @xframe_options_exempt
     def ok_to_load_in_a_frame(request):
@@ -99,9 +100,11 @@ decorators::
     from django.views.decorators.clickjacking import xframe_options_deny
     from django.views.decorators.clickjacking import xframe_options_sameorigin
 
+
     @xframe_options_deny
     def view_one(request):
         return HttpResponse("I won't display in any frame!")
+
 
     @xframe_options_sameorigin
     def view_two(request):

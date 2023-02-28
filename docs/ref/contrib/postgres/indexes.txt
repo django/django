@@ -149,16 +149,16 @@ available from the ``django.contrib.postgres.indexes`` module.
     For example::
 
         Index(
-            OpClass(Lower('username'), name='varchar_pattern_ops'),
-            name='lower_username_idx',
+            OpClass(Lower("username"), name="varchar_pattern_ops"),
+            name="lower_username_idx",
         )
 
     creates an index on ``Lower('username')`` using ``varchar_pattern_ops``.
     ::
 
         UniqueConstraint(
-            OpClass(Upper('description'), name='text_pattern_ops'),
-            name='upper_description_unique',
+            OpClass(Upper("description"), name="text_pattern_ops"),
+            name="upper_description_unique",
         )
 
     creates a unique constraint on ``Upper('description')`` using
@@ -166,9 +166,9 @@ available from the ``django.contrib.postgres.indexes`` module.
     ::
 
         ExclusionConstraint(
-            name='exclude_overlapping_ops',
+            name="exclude_overlapping_ops",
             expressions=[
-                (OpClass('circle', name='circle_ops'), RangeOperators.OVERLAPS),
+                (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
             ],
         )
 

@@ -89,9 +89,9 @@ For example::
         class Meta:
             constraints = [
                 UniqueConstraint(
-                    Lower('first_name'),
-                    Lower('last_name').desc(),
-                    name='first_last_name_unique',
+                    Lower("first_name"),
+                    Lower("last_name").desc(),
+                    name="first_last_name_unique",
                 ),
             ]
 
@@ -468,7 +468,7 @@ instead.
 If you want to support legacy browsers and set the header, use this line in a
 custom middleware::
 
-    response.headers.setdefault('X-XSS-Protection', '1; mode=block')
+    response.headers.setdefault("X-XSS-Protection", "1; mode=block")
 
 .. _Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 

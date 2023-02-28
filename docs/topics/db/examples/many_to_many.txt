@@ -12,21 +12,23 @@ objects, and a ``Publication`` has multiple ``Article`` objects:
 
     from django.db import models
 
+
     class Publication(models.Model):
         title = models.CharField(max_length=30)
 
         class Meta:
-            ordering = ['title']
+            ordering = ["title"]
 
         def __str__(self):
             return self.title
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
         publications = models.ManyToManyField(Publication)
 
         class Meta:
-            ordering = ['headline']
+            ordering = ["headline"]
 
         def __str__(self):
             return self.headline
@@ -38,18 +40,18 @@ Create a few ``Publications``:
 
 .. code-block:: pycon
 
-    >>> p1 = Publication(title='The Python Journal')
+    >>> p1 = Publication(title="The Python Journal")
     >>> p1.save()
-    >>> p2 = Publication(title='Science News')
+    >>> p2 = Publication(title="Science News")
     >>> p2.save()
-    >>> p3 = Publication(title='Science Weekly')
+    >>> p3 = Publication(title="Science Weekly")
     >>> p3.save()
 
 Create an ``Article``:
 
 .. code-block:: pycon
 
-    >>> a1 = Article(headline='Django lets you build web apps easily')
+    >>> a1 = Article(headline="Django lets you build web apps easily")
 
 You can't associate it with a ``Publication`` until it's been saved:
 
@@ -76,7 +78,7 @@ Create another ``Article``, and set it to appear in the ``Publications``:
 
 .. code-block:: pycon
 
-    >>> a2 = Article(headline='NASA uses Python')
+    >>> a2 = Article(headline="NASA uses Python")
     >>> a2.save()
     >>> a2.publications.add(p1, p2)
     >>> a2.publications.add(p3)
@@ -101,7 +103,7 @@ Create and add a ``Publication`` to an ``Article`` in one step using
 
 .. code-block:: pycon
 
-    >>> new_publication = a2.publications.create(title='Highlights for Children')
+    >>> new_publication = a2.publications.create(title="Highlights for Children")
 
 ``Article`` objects have access to their related ``Publication`` objects:
 
@@ -154,9 +156,9 @@ The :meth:`~django.db.models.query.QuerySet.count` function respects
     >>> Article.objects.filter(publications__title__startswith="Science").distinct().count()
     1
 
-    >>> Article.objects.filter(publications__in=[1,2]).distinct()
+    >>> Article.objects.filter(publications__in=[1, 2]).distinct()
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
-    >>> Article.objects.filter(publications__in=[p1,p2]).distinct()
+    >>> Article.objects.filter(publications__in=[p1, p2]).distinct()
     <QuerySet [<Article: Django lets you build web apps easily>, <Article: NASA uses Python>]>
 
 Reverse m2m queries are supported (i.e., starting at the table that doesn't have
@@ -181,9 +183,9 @@ a :class:`~django.db.models.ManyToManyField`):
     >>> Publication.objects.filter(article=a1)
     <QuerySet [<Publication: The Python Journal>]>
 
-    >>> Publication.objects.filter(article__in=[1,2]).distinct()
+    >>> Publication.objects.filter(article__in=[1, 2]).distinct()
     <QuerySet [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]>
-    >>> Publication.objects.filter(article__in=[a1,a2]).distinct()
+    >>> Publication.objects.filter(article__in=[a1, a2]).distinct()
     <QuerySet [<Publication: Highlights for Children>, <Publication: Science News>, <Publication: Science Weekly>, <Publication: The Python Journal>]>
 
 Excluding a related item works as you would expect, too (although the SQL
@@ -219,7 +221,7 @@ Adding via the 'other' end of an m2m:
 
 .. code-block:: pycon
 
-    >>> a4 = Article(headline='NASA finds intelligent life on Earth')
+    >>> a4 = Article(headline="NASA finds intelligent life on Earth")
     >>> a4.save()
     >>> p2.article_set.add(a4)
     >>> p2.article_set.all()
@@ -231,7 +233,7 @@ Adding via the other end using keywords:
 
 .. code-block:: pycon
 
-    >>> new_article = p2.article_set.create(headline='Oxygen-free diet works wonders')
+    >>> new_article = p2.article_set.create(headline="Oxygen-free diet works wonders")
     >>> p2.article_set.all()
     <QuerySet [<Article: NASA finds intelligent life on Earth>, <Article: Oxygen-free diet works wonders>]>
     >>> a5 = p2.article_set.all()[1]
@@ -295,9 +297,9 @@ Recreate the ``Article`` and ``Publication`` we have deleted:
 
 .. code-block:: pycon
 
-    >>> p1 = Publication(title='The Python Journal')
+    >>> p1 = Publication(title="The Python Journal")
     >>> p1.save()
-    >>> a2 = Article(headline='NASA uses Python')
+    >>> a2 = Article(headline="NASA uses Python")
     >>> a2.save()
     >>> a2.publications.add(p1, p2, p3)
 
@@ -306,7 +308,7 @@ go:
 
 .. code-block:: pycon
 
-    >>> Publication.objects.filter(title__startswith='Science').delete()
+    >>> Publication.objects.filter(title__startswith="Science").delete()
     >>> Publication.objects.all()
     <QuerySet [<Publication: Highlights for Children>, <Publication: The Python Journal>]>
     >>> Article.objects.all()
@@ -318,7 +320,7 @@ Bulk delete some articles - references to deleted objects should go:
 
 .. code-block:: pycon
 
-    >>> q = Article.objects.filter(headline__startswith='Django')
+    >>> q = Article.objects.filter(headline__startswith="Django")
     >>> print(q)
     <QuerySet [<Article: Django lets you build web apps easily>]>
     >>> q.delete()

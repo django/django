@@ -184,6 +184,7 @@ The functions defined in this module share the following properties:
 
          cache_page = decorator_from_middleware_with_args(CacheMiddleware)
 
+
          @cache_page(3600)
          def my_view(request):
              pass
@@ -314,8 +315,9 @@ Sample usage:
     ...     link="http://www.holovaty.com/test/",
     ...     description="Testing.",
     ... )
-    >>> with open('test.rss', 'w') as fp:
-    ...     feed.write(fp, 'utf-8')
+    >>> with open("test.rss", "w") as fp:
+    ...     feed.write(fp, "utf-8")
+    ...
 
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
@@ -442,11 +444,11 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         # the model
         class Person(models.Model):
-
             def friends(self):
                 # expensive computation
                 ...
                 return friends
+
 
         # in the view:
         if person.friends():
@@ -464,8 +466,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import cached_property
 
-        class Person(models.Model):
 
+        class Person(models.Model):
             @cached_property
             def friends(self):
                 ...
@@ -480,7 +482,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     The cached value can be treated like an ordinary attribute of the instance::
 
         # clear it, requiring re-computation next time it's called
-        del person.friends # or delattr(person, "friends")
+        del person.friends  # or delattr(person, "friends")
 
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
@@ -506,10 +508,10 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     value of the cached property will persist until you delete it as described
     above::
 
-        x = person.friends         # calls first time
-        y = person.get_friends()   # calls again
-        z = person.friends         # does not call
-        x is z                     # is True
+        x = person.friends  # calls first time
+        y = person.get_friends()  # calls again
+        z = person.friends  # does not call
+        x is z  # is True
 
 .. class:: classproperty(method=None)
 
@@ -539,10 +541,14 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
+
         def fancy_utility_function(s, *args, **kwargs):
             # Do some conversion on string 's'
             ...
+
+
         fancy_utility_function = keep_lazy(str)(fancy_utility_function)
+
 
         # Or more succinctly:
         @keep_lazy(str)
@@ -569,10 +575,12 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
+
         # Our previous example was:
         @keep_lazy(str)
         def fancy_utility_function(s, *args, **kwargs):
             ...
+
 
         # Which can be rewritten as:
         @keep_lazy_text
@@ -614,15 +622,19 @@ escaping HTML.
 
     So, instead of writing::
 
-        mark_safe("%s <b>%s</b> %s" % (
-            some_html,
-            escape(some_text),
-            escape(some_other_text),
-        ))
+        mark_safe(
+            "%s <b>%s</b> %s"
+            % (
+                some_html,
+                escape(some_text),
+                escape(some_other_text),
+            )
+        )
 
     You should instead use::
 
-        format_html("{} <b>{}</b> {}",
+        format_html(
+            "{} <b>{}</b> {}",
             mark_safe(some_html),
             some_text,
             some_other_text,
@@ -647,10 +659,7 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join(
-            '\n', "<li>{} {}</li>",
-            ((u.first_name, u.last_name) for u in users)
-        )
+        format_html_join("\n", "<li>{} {}</li>", ((u.first_name, u.last_name) for u in users))
 
 .. function:: json_script(value, element_id=None, encoder=None)
 
@@ -766,7 +775,8 @@ Functions for working with Python modules.
     example::
 
         from django.utils.module_loading import import_string
-        ValidationError = import_string('django.core.exceptions.ValidationError')
+
+        ValidationError = import_string("django.core.exceptions.ValidationError")
 
     is equivalent to::
 
@@ -805,7 +815,7 @@ appropriate entities.
 
     .. code-block:: pycon
 
-        >>> mystr = '<b>Hello World</b>   '
+        >>> mystr = "<b>Hello World</b>   "
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
         <class 'django.utils.safestring.SafeString'>
@@ -830,8 +840,10 @@ appropriate entities.
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
-                 PersonDetailView.as_view()),
+            path(
+                format_lazy("{person}/<int:pk>/", person=pgettext_lazy("URL", "person")),
+                PersonDetailView.as_view(),
+            ),
         ]
 
     This example allows translators to translate part of the URL. If "person"
@@ -853,7 +865,7 @@ appropriate entities.
 
     .. code-block:: pycon
 
-        >>> slugify(' Joel is a slug ')
+        >>> slugify(" Joel is a slug ")
         'joel-is-a-slug'
 
     If you want to allow Unicode characters, pass ``allow_unicode=True``. For
@@ -861,7 +873,7 @@ appropriate entities.
 
     .. code-block:: pycon
 
-        >>> slugify('你好 World', allow_unicode=True)
+        >>> slugify("你好 World", allow_unicode=True)
         '你好-world'
 
 .. _time-zone-selection-functions:
