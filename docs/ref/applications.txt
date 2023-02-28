@@ -425,7 +425,7 @@ application registry.
 
     This function is called automatically:
 
-    * When running an HTTP server via Django's WSGI support.
+    * When running an HTTP server via Django's ASGI or WSGI support.
     * When invoking a management command.
 
     It must be called explicitly in other cases, for instance in plain Python
