@@ -76,6 +76,7 @@ object. For instance you could add these lines at the bottom of
 :file:`wsgi.py`::
 
     from helloworld.wsgi import HelloWorldApplication
+
     application = HelloWorldApplication(application)
 
 You could also replace the Django WSGI application with a custom WSGI

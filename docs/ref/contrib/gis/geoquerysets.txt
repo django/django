@@ -428,7 +428,7 @@ Geometry example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, "T*T***FF*"))
 
 PostGIS and MariaDB SQL equivalent:
 
@@ -444,8 +444,8 @@ SpatiaLite SQL equivalent:
 
 Raster example::
 
-    Zipcode.objects.filter(poly__relate=(rast, 1, 'T*T***FF*'))
-    Zipcode.objects.filter(rast__2__relate=(rast, 1, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(rast, 1, "T*T***FF*"))
+    Zipcode.objects.filter(rast__2__relate=(rast, 1, "T*T***FF*"))
 
 PostGIS SQL equivalent:
 
@@ -466,7 +466,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, "anyinteract"))
 
 Oracle SQL equivalent:
 
@@ -863,7 +863,7 @@ Example:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.db.models import Extent, Union
-    >>> WorldBorder.objects.aggregate(Extent('mpoly'), Union('mpoly'))
+    >>> WorldBorder.objects.aggregate(Extent("mpoly"), Union("mpoly"))
 
 ``Collect``
 ~~~~~~~~~~~
@@ -894,8 +894,8 @@ Example:
 
 .. code-block:: pycon
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
-    >>> print(qs['poly__extent'])
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent("poly"))
+    >>> print(qs["poly__extent"])
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
@@ -913,8 +913,8 @@ Example:
 
 .. code-block:: pycon
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
-    >>> print(qs['poly__extent3d'])
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent3D("poly"))
+    >>> print(qs["poly__extent3d"])
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
@@ -932,8 +932,8 @@ Example:
 
 .. code-block:: pycon
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(MakeLine('poly'))
-    >>> print(qs['poly__makeline'])
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(MakeLine("poly"))
+    >>> print(qs["poly__makeline"])
     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
@@ -959,7 +959,9 @@ Example:
 .. code-block:: pycon
 
     >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
-    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(
+    ...     Union(poly)
+    ... )  # A more sensible approach.
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).

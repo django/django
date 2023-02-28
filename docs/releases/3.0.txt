@@ -396,8 +396,8 @@ In order to update an existing model for a specific primary key value, use the
 
 .. code-block:: pycon
 
-    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={'name': 'new name'})
-    >>> MyModel.objects.filter(pk=existing_pk).update(name='new name')
+    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={"name": "new name"})
+    >>> MyModel.objects.filter(pk=existing_pk).update(name="new name")
 
 Database backend API
 --------------------

@@ -231,8 +231,9 @@ it in Django is this:
 
     from django import forms
 
+
     class NameForm(forms.Form):
-        your_name = forms.CharField(label='Your name', max_length=100)
+        your_name = forms.CharField(label="Your name", max_length=100)
 
 This defines a :class:`Form` class with a single field (``your_name``). We've
 applied a human-friendly label to the field, which will appear in the
@@ -284,9 +285,10 @@ want it to be published:
 
     from .forms import NameForm
 
+
     def get_name(request):
         # if this is a POST request we need to process the form data
-        if request.method == 'POST':
+        if request.method == "POST":
             # create a form instance and populate it with data from the request:
             form = NameForm(request.POST)
             # check whether it's valid:
@@ -294,13 +296,13 @@ want it to be published:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                return HttpResponseRedirect('/thanks/')
+                return HttpResponseRedirect("/thanks/")
 
         # if a GET (or any other method) we'll create a blank form
         else:
             form = NameForm()
 
-        return render(request, 'name.html', {'form': form})
+        return render(request, "name.html", {"form": form})
 
 If we arrive at this view with a ``GET`` request, it will create an empty form
 instance and place it in the template context to be rendered. This is what we
@@ -408,6 +410,7 @@ to implement "contact me" functionality on a personal website:
 
     from django import forms
 
+
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
         message = forms.CharField(widget=forms.Textarea)
@@ -458,17 +461,17 @@ Here's how the form data could be processed in the view that handles this form:
     from django.core.mail import send_mail
 
     if form.is_valid():
-        subject = form.cleaned_data['subject']
-        message = form.cleaned_data['message']
-        sender = form.cleaned_data['sender']
-        cc_myself = form.cleaned_data['cc_myself']
+        subject = form.cleaned_data["subject"]
+        message = form.cleaned_data["message"]
+        sender = form.cleaned_data["sender"]
+        cc_myself = form.cleaned_data["cc_myself"]
 
-        recipients = ['info@example.com']
+        recipients = ["info@example.com"]
         if cc_myself:
             recipients.append(sender)
 
         send_mail(subject, message, sender, recipients)
-        return HttpResponseRedirect('/thanks/')
+        return HttpResponseRedirect("/thanks/")
 
 .. tip::
 
@@ -532,8 +535,10 @@ Then you can configure the :setting:`FORM_RENDERER` setting:
 
     from django.forms.renderers import TemplatesSetting
 
+
     class CustomFormRenderer(TemplatesSetting):
         form_template_name = "form_snippet.html"
+
 
     FORM_RENDERER = "project.settings.CustomFormRenderer"
 
@@ -549,8 +554,8 @@ the :meth:`.Form.render`. Here's an example of this being used in a view::
     def index(request):
         form = MyForm()
         rendered_form = form.render("form_snippet.html")
-        context = {'form': rendered_form}
-        return render(request, 'index.html', context)
+        context = {"form": rendered_form}
+        return render(request, "index.html", context)
 
 See :ref:`ref-forms-api-outputting-html` for more details.
 

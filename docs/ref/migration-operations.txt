@@ -297,7 +297,7 @@ queries and parameters in the same way as :ref:`cursor.execute()
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
     migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
-    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
@@ -307,8 +307,8 @@ should undo what is done by the ``sql`` queries. For example, to undo the above
 insertion with a deletion::
 
     migrations.RunSQL(
-        sql=[("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
-        reverse_sql=[("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+        sql=[("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])],
+        reverse_sql=[("DELETE FROM musician where name=%s;", ["Reinhardt"])],
     )
 
 If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
@@ -325,8 +325,8 @@ operation that adds that field and so will try to run it again. For example::
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
         state_operations=[
             migrations.AddField(
-                'musician',
-                'name',
+                "musician",
+                "name",
                 models.CharField(max_length=255),
             ),
         ],
@@ -377,15 +377,19 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
 
     from django.db import migrations
 
+
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.using(db_alias).bulk_create([
-            Country(name="USA", code="us"),
-            Country(name="France", code="fr"),
-        ])
+        Country.objects.using(db_alias).bulk_create(
+            [
+                Country(name="USA", code="us"),
+                Country(name="France", code="fr"),
+            ]
+        )
+
 
     def reverse_func(apps, schema_editor):
         # forwards_func() creates two Country instances,
@@ -395,8 +399,8 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
         Country.objects.using(db_alias).filter(name="USA", code="us").delete()
         Country.objects.using(db_alias).filter(name="France", code="fr").delete()
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = []
 
         operations = [
@@ -484,8 +488,8 @@ structure of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
-    class MyCustomOperation(Operation):
 
+    class MyCustomOperation(Operation):
         # If this is False, it means that this operation will be ignored by
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
@@ -574,8 +578,8 @@ state changes, all it does is run one command::
 
     from django.db.migrations.operations.base import Operation
 
-    class LoadExtension(Operation):
 
+    class LoadExtension(Operation):
         reversible = True
 
         def __init__(self, name):

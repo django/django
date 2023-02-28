@@ -83,16 +83,16 @@ Via the Python API
         >>> # Add a new redirect.
         >>> redirect = Redirect.objects.create(
         ...     site_id=1,
-        ...     old_path='/contact-us/',
-        ...     new_path='/contact/',
+        ...     old_path="/contact-us/",
+        ...     new_path="/contact/",
         ... )
         >>> # Change a redirect.
-        >>> redirect.new_path = '/contact-details/'
+        >>> redirect.new_path = "/contact-details/"
         >>> redirect.save()
         >>> redirect
         <Redirect: /contact-us/ ---> /contact-details/>
         >>> # Delete a redirect.
-        >>> Redirect.objects.filter(site_id=1, old_path='/contact-us/').delete()
+        >>> Redirect.objects.filter(site_id=1, old_path="/contact-us/").delete()
         (1, {'redirects.Redirect': 1})
 
 Middleware

@@ -33,15 +33,15 @@ called ``blog``, which provides the templates ``blog/post.html`` and
 
     INSTALLED_APPS = [
         ...,
-        'blog',
+        "blog",
         ...,
     ]
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
             # ...
         },
     ]
@@ -78,7 +78,7 @@ First, make sure your template settings are checking inside app directories::
     TEMPLATES = [
         {
             # ...
-            'APP_DIRS': True,
+            "APP_DIRS": True,
             # ...
         },
     ]

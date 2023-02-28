@@ -519,7 +519,7 @@ example:
     with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
-        [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+        [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
     Note that Django will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.

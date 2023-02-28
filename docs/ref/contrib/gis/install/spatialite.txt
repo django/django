@@ -114,6 +114,6 @@ including SQLite, SpatiaLite, PROJ, and GEOS. Install them like this:
 Finally, for GeoDjango to be able to find the SpatiaLite library, add the
 following to your ``settings.py``::
 
-    SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
+    SPATIALITE_LIBRARY_PATH = "/usr/local/lib/mod_spatialite.dylib"
 
 .. _Homebrew: https://brew.sh/

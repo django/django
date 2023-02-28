@@ -139,14 +139,14 @@ below) will also have a couple of extra methods:
 
     .. code-block:: pycon
 
-        >>> car.photo.save('myphoto.jpg', content, save=False)
+        >>> car.photo.save("myphoto.jpg", content, save=False)
         >>> car.save()
 
     are equivalent to:
 
     .. code-block:: pycon
 
-        >>> car.photo.save('myphoto.jpg', content, save=True)
+        >>> car.photo.save("myphoto.jpg", content, save=True)
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as

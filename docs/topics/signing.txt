@@ -48,7 +48,7 @@ To sign a value, first instantiate a ``Signer`` instance:
 
     >>> from django.core.signing import Signer
     >>> signer = Signer()
-    >>> value = signer.sign('My string')
+    >>> value = signer.sign("My string")
     >>> value
     'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
 
@@ -77,7 +77,7 @@ If you wish to protect a list, tuple, or dictionary you can do so using the
 
 .. code-block:: pycon
 
-    >>> signed_obj = signer.sign_object({'message': 'Hello!'})
+    >>> signed_obj = signer.sign_object({"message": "Hello!"})
     >>> signed_obj
     'eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4'
     >>> obj = signer.unsign_object(signed_obj)
@@ -92,11 +92,12 @@ If the signature or value have been altered in any way, a
 .. code-block:: pycon
 
     >>> from django.core import signing
-    >>> value += 'm'
+    >>> value += "m"
     >>> try:
-    ...    original = signer.unsign(value)
+    ...     original = signer.unsign(value)
     ... except signing.BadSignature:
-    ...    print("Tampering detected!")
+    ...     print("Tampering detected!")
+    ...
 
 By default, the ``Signer`` class uses the :setting:`SECRET_KEY` setting to
 generate signatures. You can use a different secret by passing it to the
@@ -104,8 +105,8 @@ generate signatures. You can use a different secret by passing it to the
 
 .. code-block:: pycon
 
-    >>> signer = Signer(key='my-other-secret')
-    >>> value = signer.sign('My string')
+    >>> signer = Signer(key="my-other-secret")
+    >>> value = signer.sign("My string")
     >>> value
     'My string:EkfQJafvGyiofrdGnuthdxImIJw'
 
@@ -134,18 +135,20 @@ your :setting:`SECRET_KEY`:
 .. code-block:: pycon
 
     >>> signer = Signer()
-    >>> signer.sign('My string')
+    >>> signer.sign("My string")
     'My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w'
-    >>> signer.sign_object({'message': 'Hello!'})
+    >>> signer.sign_object({"message": "Hello!"})
     'eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4'
-    >>> signer = Signer(salt='extra')
-    >>> signer.sign('My string')
+    >>> signer = Signer(salt="extra")
+    >>> signer.sign("My string")
     'My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw'
-    >>> signer.unsign('My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw')
+    >>> signer.unsign("My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw")
     'My string'
-    >>> signer.sign_object({'message': 'Hello!'})
+    >>> signer.sign_object({"message": "Hello!"})
     'eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I'
-    >>> signer.unsign_object('eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I')
+    >>> signer.unsign_object(
+    ...     "eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I"
+    ... )
     {'message': 'Hello!'}
 
 Using salt in this way puts the different signatures into different
@@ -171,13 +174,12 @@ created within a specified period of time:
     >>> from datetime import timedelta
     >>> from django.core.signing import TimestampSigner
     >>> signer = TimestampSigner()
-    >>> value = signer.sign('hello')
+    >>> value = signer.sign("hello")
     >>> value
     'hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c'
     >>> signer.unsign(value)
     'hello'
     >>> signer.unsign(value, max_age=10)
-    ...
     SignatureExpired: Signature age 15.5289158821 > 10 seconds
     >>> signer.unsign(value, max_age=20)
     'hello'
@@ -228,12 +230,12 @@ arbitrary commands by exploiting the pickle format:
 
     >>> from django.core import signing
     >>> signer = signing.TimestampSigner()
-    >>> value = signer.sign_object({'foo': 'bar'})
+    >>> value = signer.sign_object({"foo": "bar"})
     >>> value
     'eyJmb28iOiJiYXIifQ:1kx6R3:D4qGKiptAqo5QW9iv4eNLc6xl4RwiFfes6oOcYhkYnc'
     >>> signer.unsign_object(value)
     {'foo': 'bar'}
-    >>> value = signing.dumps({'foo': 'bar'})
+    >>> value = signing.dumps({"foo": "bar"})
     >>> value
     'eyJmb28iOiJiYXIifQ:1kx6Rf:LBB39RQmME-SRvilheUe5EmPYRbuDBgQp2tCAi7KGLk'
     >>> signing.loads(value)
@@ -246,7 +248,7 @@ and tuples) if you pass in a tuple, you will get a list from
 .. code-block:: pycon
 
     >>> from django.core import signing
-    >>> value = signing.dumps(('a','b','c'))
+    >>> value = signing.dumps(("a", "b", "c"))
     >>> signing.loads(value)
     ['a', 'b', 'c']
 

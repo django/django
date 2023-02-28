@@ -212,16 +212,16 @@ messages to the console:
     import os
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
         },
-        'root': {
-            'handlers': ['console'],
-            'level': 'WARNING',
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
         },
     }
 
@@ -240,22 +240,22 @@ logger:
     import os
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
         },
-        'root': {
-            'handlers': ['console'],
-            'level': 'WARNING',
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-                'propagate': False,
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
             },
         },
     }
@@ -275,20 +275,20 @@ logging from the :ref:`django-logger` named logger to a local file:
     :caption: ``settings.py``
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/path/to/django/debug.log',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "file": {
+                "level": "DEBUG",
+                "class": "logging.FileHandler",
+                "filename": "/path/to/django/debug.log",
             },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": "DEBUG",
+                "propagate": True,
             },
         },
     }
@@ -302,56 +302,56 @@ Finally, here's an example of a fairly complex logging setup:
     :caption: ``settings.py``
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+                "style": "{",
             },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
-            },
-        },
-        'filters': {
-            'special': {
-                '()': 'project.logging.SpecialFilter',
-                'foo': 'bar',
-            },
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
             },
         },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
-                'formatter': 'simple'
+        "filters": {
+            "special": {
+                "()": "project.logging.SpecialFilter",
+                "foo": "bar",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'filters': ['special']
-            }
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'propagate': True,
+        "handlers": {
+            "console": {
+                "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
+                "formatter": "simple",
             },
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': False,
+            "mail_admins": {
+                "level": "ERROR",
+                "class": "django.utils.log.AdminEmailHandler",
+                "filters": ["special"],
             },
-            'myproject.custom': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
-                'filters': ['special']
-            }
-        }
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "propagate": True,
+            },
+            "django.request": {
+                "handlers": ["mail_admins"],
+                "level": "ERROR",
+                "propagate": False,
+            },
+            "myproject.custom": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
+                "filters": ["special"],
+            },
+        },
     }
 
 This logging configuration does the following things:
@@ -449,6 +449,7 @@ manually configures logging:
     LOGGING_CONFIG = None
 
     import logging.config
+
     logging.config.dictConfig(...)
 
 Note that the default configuration process only calls

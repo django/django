@@ -82,10 +82,10 @@ each feature in that layer.
     .. code-block:: pycon
 
         >>> from django.contrib.gis.gdal import DataSource
-        >>> ds = DataSource('/path/to/your/cities.shp')
+        >>> ds = DataSource("/path/to/your/cities.shp")
         >>> ds.name
         '/path/to/your/cities.shp'
-        >>> ds.layer_count                  # This file only contains one layer
+        >>> ds.layer_count  # This file only contains one layer
         1
 
     .. attribute:: layer_count
@@ -248,13 +248,13 @@ __ https://gdal.org/drivers/vector/
         None
         >>> print(len(layer))
         3
-        >>> [feat.get('Name') for feat in layer]
+        >>> [feat.get("Name") for feat in layer]
         ['Pueblo', 'Lawrence', 'Houston']
-        >>> ks_extent = (-102.051, 36.99, -94.59, 40.00) # Extent for state of Kansas
+        >>> ks_extent = (-102.051, 36.99, -94.59, 40.00)  # Extent for state of Kansas
         >>> layer.spatial_filter = ks_extent
         >>> len(layer)
         1
-        >>> [feat.get('Name') for feat in layer]
+        >>> [feat.get("Name") for feat in layer]
         ['Lawrence']
         >>> layer.spatial_filter = None
         >>> len(layer)
@@ -267,7 +267,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> layer.get_fields('Name')
+        >>> layer.get_fields("Name")
         ['Pueblo', 'Lawrence', 'Houston']
 
     .. method:: get_geoms(geos=False)
@@ -321,7 +321,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city.get('Population')
+        >>> city.get("Population")
         102121
 
     .. attribute:: geom_type
@@ -371,7 +371,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city.index('Population')
+        >>> city.index("Population")
         1
 
 ``Field``
@@ -385,7 +385,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Name'].name
+        >>> city["Name"].name
         'Name'
 
     .. attribute:: type
@@ -395,7 +395,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Density'].type
+        >>> city["Density"].type
         2
 
     .. attribute:: type_name
@@ -404,7 +404,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Name'].type_name
+        >>> city["Name"].type_name
         'String'
 
     .. attribute:: value
@@ -415,7 +415,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Population'].value
+        >>> city["Population"].value
         102121
 
     .. attribute:: width
@@ -424,7 +424,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Name'].width
+        >>> city["Name"].width
         80
 
     .. attribute:: precision
@@ -434,7 +434,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Density'].precision
+        >>> city["Density"].precision
         15
 
     .. method:: as_double()
@@ -443,7 +443,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Density'].as_double()
+        >>> city["Density"].as_double()
         874.7
 
     .. method:: as_int()
@@ -452,7 +452,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Population'].as_int()
+        >>> city["Population"].as_int()
         102121
 
     .. method:: as_string()
@@ -461,7 +461,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Name'].as_string()
+        >>> city["Name"].as_string()
         'Pueblo'
 
     .. method:: as_datetime()
@@ -470,7 +470,7 @@ __ https://gdal.org/drivers/vector/
 
     .. code-block:: pycon
 
-        >>> city['Created'].as_datetime()
+        >>> city["Created"].as_datetime()
         (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_long(0), c_long(0))
 
 ``Driver``
@@ -501,7 +501,7 @@ coordinate transformation:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import OGRGeometry
-    >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
+    >>> polygon = OGRGeometry("POLYGON((0 0, 5 0, 5 5, 0 5))")
 
 .. class:: OGRGeometry(geom_input, srs=None)
 
@@ -650,7 +650,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT(1 2)').gml
+        >>> OGRGeometry("POINT(1 2)").gml
         '<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>'
 
     .. attribute:: hex
@@ -659,7 +659,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT(1 2)').hex
+        >>> OGRGeometry("POINT(1 2)").hex
         '0101000000000000000000F03F0000000000000040'
 
     .. attribute:: json
@@ -668,7 +668,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT(1 2)').json
+        >>> OGRGeometry("POINT(1 2)").json
         '{ "type": "Point", "coordinates": [ 1.000000, 2.000000 ] }'
 
     .. attribute:: kml
@@ -682,7 +682,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT(1 2)').wkb_size
+        >>> OGRGeometry("POINT(1 2)").wkb_size
         21
 
     .. attribute:: wkb
@@ -708,7 +708,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> triangle = OGRGeometry('LINEARRING (0 0,0 1,1 0)')
+        >>> triangle = OGRGeometry("LINEARRING (0 0,0 1,1 0)")
         >>> triangle.close_rings()
         >>> triangle.wkt
         'LINEARRING (0 0,0 1,1 0,0 0)'
@@ -800,9 +800,9 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT (1 2)').tuple
+        >>> OGRGeometry("POINT (1 2)").tuple
         (1.0, 2.0)
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').tuple
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").tuple
         ((1.0, 2.0), (3.0, 4.0))
 
     .. attribute:: coords
@@ -817,7 +817,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT (1 2)').x
+        >>> OGRGeometry("POINT (1 2)").x
         1.0
 
     .. attribute:: y
@@ -826,7 +826,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT (1 2)').y
+        >>> OGRGeometry("POINT (1 2)").y
         2.0
 
     .. attribute:: z
@@ -836,7 +836,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('POINT (1 2 3)').z
+        >>> OGRGeometry("POINT (1 2 3)").z
         3.0
 
 .. class:: LineString
@@ -847,7 +847,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').x
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").x
         [1.0, 3.0]
 
     .. attribute:: y
@@ -856,7 +856,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').y
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").y
         [2.0, 4.0]
 
     .. attribute:: z
@@ -866,7 +866,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >>> OGRGeometry('LINESTRING (1 2 3,4 5 6)').z
+        >>> OGRGeometry("LINESTRING (1 2 3,4 5 6)").z
         [3.0, 6.0]
 
 
@@ -903,10 +903,10 @@ coordinate transformation:
     .. code-block:: pycon
 
         >>> from django.contrib.gis.gdal import OGRGeomType
-        >>> gt1 = OGRGeomType(3)             # Using an integer for the type
-        >>> gt2 = OGRGeomType('Polygon')     # Using a string
-        >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
-        >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+        >>> gt1 = OGRGeomType(3)  # Using an integer for the type
+        >>> gt2 = OGRGeomType("Polygon")  # Using a string
+        >>> gt3 = OGRGeomType("POLYGON")  # It's case-insensitive
+        >>> print(gt1 == 3, gt1 == "Polygon")  # Equivalence works w/non-OGRGeomType objects
         True True
 
     .. attribute:: name
@@ -1001,12 +1001,13 @@ Coordinate System Objects
 
     .. code-block:: pycon
 
-        >>> wgs84 = SpatialReference('WGS84') # shorthand string
-        >>> wgs84 = SpatialReference(4326) # EPSG code
-        >>> wgs84 = SpatialReference('EPSG:4326') # EPSG string
-        >>> proj = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
-        >>> wgs84 = SpatialReference(proj) # PROJ string
-        >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
+        >>> wgs84 = SpatialReference("WGS84")  # shorthand string
+        >>> wgs84 = SpatialReference(4326)  # EPSG code
+        >>> wgs84 = SpatialReference("EPSG:4326")  # EPSG string
+        >>> proj = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs "
+        >>> wgs84 = SpatialReference(proj)  # PROJ string
+        >>> wgs84 = SpatialReference(
+        ...     """GEOGCS["WGS 84",
         ... DATUM["WGS_1984",
         ...      SPHEROID["WGS 84",6378137,298.257223563,
         ...          AUTHORITY["EPSG","7030"]],
@@ -1015,7 +1016,8 @@ Coordinate System Objects
         ...      AUTHORITY["EPSG","8901"]],
         ... UNIT["degree",0.01745329251994328,
         ...      AUTHORITY["EPSG","9122"]],
-        ... AUTHORITY["EPSG","4326"]]""") # OGC WKT
+        ... AUTHORITY["EPSG","4326"]]"""
+        ... )  # OGC WKT
 
     .. method:: __getitem__(target)
 
@@ -1026,20 +1028,20 @@ Coordinate System Objects
     .. code-block:: pycon
 
         >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
-        >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
-        >>> print(srs['GEOGCS'])
+        >>> srs = SpatialReference(wkt)  # could also use 'WGS84', or 4326
+        >>> print(srs["GEOGCS"])
         WGS 84
-        >>> print(srs['DATUM'])
+        >>> print(srs["DATUM"])
         WGS_1984
-        >>> print(srs['AUTHORITY'])
+        >>> print(srs["AUTHORITY"])
         EPSG
-        >>> print(srs['AUTHORITY', 1]) # The authority value
+        >>> print(srs["AUTHORITY", 1])  # The authority value
         4326
-        >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
+        >>> print(srs["TOWGS84", 4])  # the fourth value in this wkt
         0
-        >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbol.
+        >>> print(srs["UNIT|AUTHORITY"])  # For the units authority, have to use the pipe symbol.
         EPSG
-        >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
+        >>> print(srs["UNIT|AUTHORITY", 1])  # The authority value for the units
         9122
 
     .. method:: attr_value(target, index=0)
@@ -1188,10 +1190,11 @@ coordinate transformation repeatedly on different geometries:
 
 .. code-block:: pycon
 
-    >>> ct = CoordTransform(SpatialReference('WGS84'), SpatialReference('NAD83'))
+    >>> ct = CoordTransform(SpatialReference("WGS84"), SpatialReference("NAD83"))
     >>> for feat in layer:
-    ...     geom = feat.geom # getting clone of feature geometry
-    ...     geom.transform(ct) # transforming
+    ...     geom = feat.geom  # getting clone of feature geometry
+    ...     geom.transform(ct)  # transforming
+    ...
 
 .. _raster-data-source-objects:
 
@@ -1366,8 +1369,8 @@ blue.
         tuple of six coefficients which map pixel/line coordinates into
         georeferenced space using the following relationship::
 
-            Xgeo = GT(0) + Xpixel*GT(1) + Yline*GT(2)
-            Ygeo = GT(3) + Xpixel*GT(4) + Yline*GT(5)
+            Xgeo = GT(0) + Xpixel * GT(1) + Yline * GT(2)
+            Ygeo = GT(3) + Xpixel * GT(4) + Yline * GT(5)
 
         The same values can be retrieved by accessing the :attr:`origin`
         (indices 0 and 3), :attr:`scale` (indices 1 and 5) and :attr:`skew`
@@ -1843,21 +1846,23 @@ Key               Default  Usage
 
     .. code-block:: pycon
 
-        >>> GDALRaster({
-        ...    'driver': 'GTiff',
-        ...    'name': '/path/to/new/file.tif',
-        ...    'srid': 4326,
-        ...    'width': 255,
-        ...    'height': 255,
-        ...    'nr_of_bands': 1,
-        ...    'papsz_options': {
-        ...        'compress': 'packbits',
-        ...        'pixeltype': 'signedbyte',
-        ...        'tiled': 'yes',
-        ...        'blockxsize': 23,
-        ...        'blockysize': 23,
-        ...    }
-        ... })
+        >>> GDALRaster(
+        ...     {
+        ...         "driver": "GTiff",
+        ...         "name": "/path/to/new/file.tif",
+        ...         "srid": 4326,
+        ...         "width": 255,
+        ...         "height": 255,
+        ...         "nr_of_bands": 1,
+        ...         "papsz_options": {
+        ...             "compress": "packbits",
+        ...             "pixeltype": "signedbyte",
+        ...             "tiled": "yes",
+        ...             "blockxsize": 23,
+        ...             "blockysize": 23,
+        ...         },
+        ...     }
+        ... )
 
 __ https://gdal.org/drivers/raster/gtiff.html
 
@@ -1913,7 +1918,7 @@ For instance:
 
     # Read a raster as a file object from a remote source.
     >>> from urllib.request import urlopen
-    >>> dat = urlopen('http://example.com/raster.tif').read()
+    >>> dat = urlopen("http://example.com/raster.tif").read()
     # Instantiate a raster from the bytes object.
     >>> rst = GDALRaster(dat)
     # The name starts with /vsimem/, indicating that the raster lives in the
@@ -1934,15 +1939,19 @@ Here's how to create a raster and return it as a file in an
 .. code-block:: pycon
 
     >>> from django.http import HttpResponse
-    >>> rst = GDALRaster({
-    ...     'name': '/vsimem/temporarymemfile',
-    ...     'driver': 'tif',
-    ...     'width': 6, 'height': 6, 'srid': 3086,
-    ...     'origin': [500000, 400000],
-    ...     'scale': [100, -100],
-    ...     'bands': [{'data': range(36), 'nodata_value': 99}]
-    ... })
-    >>> HttpResponse(rast.vsi_buffer, 'image/tiff')
+    >>> rst = GDALRaster(
+    ...     {
+    ...         "name": "/vsimem/temporarymemfile",
+    ...         "driver": "tif",
+    ...         "width": 6,
+    ...         "height": 6,
+    ...         "srid": 3086,
+    ...         "origin": [500000, 400000],
+    ...         "scale": [100, -100],
+    ...         "bands": [{"data": range(36), "nodata_value": 99}],
+    ...     }
+    ... )
+    >>> HttpResponse(rast.vsi_buffer, "image/tiff")
 
 Using other Virtual Filesystems
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1967,9 +1976,9 @@ directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
 .. code-block:: pycon
 
    >>> from django.contrib.gis.gdal import GDALRaster
-   >>> rst = GDALRaster('/vsizip/path/to/your/file.zip/path/to/raster.tif')
-   >>> rst = GDALRaster('/vsigzip/path/to/your/file.gz')
-   >>> rst = GDALRaster('/vsitar/path/to/your/file.tar/path/to/raster.tif')
+   >>> rst = GDALRaster("/vsizip/path/to/your/file.zip/path/to/raster.tif")
+   >>> rst = GDALRaster("/vsigzip/path/to/your/file.gz")
+   >>> rst = GDALRaster("/vsitar/path/to/your/file.tar/path/to/raster.tif")
 
 Network rasters
 ^^^^^^^^^^^^^^^
@@ -1983,7 +1992,7 @@ To access a public raster file with no authentication, you can use
 .. code-block:: pycon
 
    >>> from django.contrib.gis.gdal import GDALRaster
-   >>> rst = GDALRaster('/vsicurl/https://example.com/raster.tif')
+   >>> rst = GDALRaster("/vsicurl/https://example.com/raster.tif")
    >>> rst.name
    '/vsicurl/https://example.com/raster.tif'
 

@@ -21,13 +21,14 @@ attribute::
 
     from django.db import migrations
 
+
     def forwards(apps, schema_editor):
-        if schema_editor.connection.alias != 'default':
+        if schema_editor.connection.alias != "default":
             return
         # Your migration code goes here
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = [
             # Dependencies to other migrations
         ]
@@ -43,28 +44,28 @@ method of database routers as ``**hints``:
     :caption: ``myapp/dbrouters.py``
 
     class MyRouter:
-
         def allow_migrate(self, db, app_label, model_name=None, **hints):
-            if 'target_db' in hints:
-                return db == hints['target_db']
+            if "target_db" in hints:
+                return db == hints["target_db"]
             return True
 
 Then, to leverage this in your migrations, do the following::
 
     from django.db import migrations
 
+
     def forwards(apps, schema_editor):
         # Your migration code goes here
         ...
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = [
             # Dependencies to other migrations
         ]
 
         operations = [
-            migrations.RunPython(forwards, hints={'target_db': 'default'}),
+            migrations.RunPython(forwards, hints={"target_db": "default"}),
         ]
 
 If your ``RunPython`` or ``RunSQL`` operation only affects one model, it's good
@@ -104,16 +105,16 @@ the respective field according to your needs.
     from django.db import migrations, models
     import uuid
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = [
-            ('myapp', '0005_populate_uuid_values'),
+            ("myapp", "0005_populate_uuid_values"),
         ]
 
         operations = [
             migrations.AlterField(
-                model_name='mymodel',
-                name='uuid',
+                model_name="mymodel",
+                name="uuid",
                 field=models.UUIDField(default=uuid.uuid4, unique=True),
             ),
         ]
@@ -125,15 +126,14 @@ the respective field according to your needs.
     :caption: ``0004_add_uuid_field.py``
 
     class Migration(migrations.Migration):
-
         dependencies = [
-            ('myapp', '0003_auto_20150129_1705'),
+            ("myapp", "0003_auto_20150129_1705"),
         ]
 
         operations = [
             migrations.AddField(
-                model_name='mymodel',
-                name='uuid',
+                model_name="mymodel",
+                name="uuid",
                 field=models.UUIDField(default=uuid.uuid4, unique=True),
             ),
         ]
@@ -155,16 +155,17 @@ the respective field according to your needs.
     from django.db import migrations
     import uuid
 
+
     def gen_uuid(apps, schema_editor):
-        MyModel = apps.get_model('myapp', 'MyModel')
+        MyModel = apps.get_model("myapp", "MyModel")
         for row in MyModel.objects.all():
             row.uuid = uuid.uuid4()
-            row.save(update_fields=['uuid'])
+            row.save(update_fields=["uuid"])
+
 
     class Migration(migrations.Migration):
-
         dependencies = [
-            ('myapp', '0004_add_uuid_field'),
+            ("myapp", "0004_add_uuid_field"),
         ]
 
         operations = [
@@ -190,6 +191,7 @@ a transaction by setting the ``atomic`` attribute to ``False``::
 
     from django.db import migrations
 
+
     class Migration(migrations.Migration):
         atomic = False
 
@@ -205,13 +207,15 @@ smaller batches::
 
     from django.db import migrations, transaction
 
+
     def gen_uuid(apps, schema_editor):
-        MyModel = apps.get_model('myapp', 'MyModel')
+        MyModel = apps.get_model("myapp", "MyModel")
         while MyModel.objects.filter(uuid__isnull=True).exists():
             with transaction.atomic():
                 for row in MyModel.objects.filter(uuid__isnull=True)[:1000]:
                     row.uuid = uuid.uuid4()
                     row.save()
+
 
     class Migration(migrations.Migration):
         atomic = False
@@ -241,10 +245,10 @@ The ``dependencies`` property is declared like this::
 
     from django.db import migrations
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = [
-            ('myapp', '0123_the_previous_migration'),
+            ("myapp", "0123_the_previous_migration"),
         ]
 
 Usually this will be enough, but from time to time you may need to
@@ -259,7 +263,7 @@ the ``run_before`` attribute on your ``Migration`` class::
         ...
 
         run_before = [
-            ('third_party_app', '0001_do_awesome'),
+            ("third_party_app", "0001_do_awesome"),
         ]
 
 Prefer using ``dependencies`` over ``run_before`` when possible. You should
@@ -288,30 +292,32 @@ Here's a sample migration:
     from django.apps import apps as global_apps
     from django.db import migrations
 
+
     def forwards(apps, schema_editor):
         try:
-            OldModel = apps.get_model('old_app', 'OldModel')
+            OldModel = apps.get_model("old_app", "OldModel")
         except LookupError:
             # The old app isn't installed.
             return
 
-        NewModel = apps.get_model('new_app', 'NewModel')
+        NewModel = apps.get_model("new_app", "NewModel")
         NewModel.objects.bulk_create(
             NewModel(new_attribute=old_object.old_attribute)
             for old_object in OldModel.objects.all()
         )
+
 
     class Migration(migrations.Migration):
         operations = [
             migrations.RunPython(forwards, migrations.RunPython.noop),
         ]
         dependencies = [
-            ('myapp', '0123_the_previous_migration'),
-            ('new_app', '0001_initial'),
+            ("myapp", "0123_the_previous_migration"),
+            ("new_app", "0001_initial"),
         ]
 
-        if global_apps.is_installed('old_app'):
-            dependencies.append(('old_app', '0001_initial'))
+        if global_apps.is_installed("old_app"):
+            dependencies.append(("old_app", "0001_initial"))
 
 Also consider what you want to happen when the migration is unapplied. You
 could either do nothing (as in the example above) or remove some or all of the
@@ -345,7 +351,7 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
 
     class Migration(migrations.Migration):
         dependencies = [
-            ('core', '0001_initial'),
+            ("core", "0001_initial"),
         ]
 
         operations = [
@@ -354,52 +360,52 @@ For example, if we had a ``Book`` model with a ``ManyToManyField`` linking to
                     # Old table name from checking with sqlmigrate, new table
                     # name from AuthorBook._meta.db_table.
                     migrations.RunSQL(
-                        sql='ALTER TABLE core_book_authors RENAME TO core_authorbook',
-                        reverse_sql='ALTER TABLE core_authorbook RENAME TO core_book_authors',
+                        sql="ALTER TABLE core_book_authors RENAME TO core_authorbook",
+                        reverse_sql="ALTER TABLE core_authorbook RENAME TO core_book_authors",
                     ),
                 ],
                 state_operations=[
                     migrations.CreateModel(
-                        name='AuthorBook',
+                        name="AuthorBook",
                         fields=[
                             (
-                                'id',
+                                "id",
                                 models.AutoField(
                                     auto_created=True,
                                     primary_key=True,
                                     serialize=False,
-                                    verbose_name='ID',
+                                    verbose_name="ID",
                                 ),
                             ),
                             (
-                                'author',
+                                "author",
                                 models.ForeignKey(
                                     on_delete=django.db.models.deletion.DO_NOTHING,
-                                    to='core.Author',
+                                    to="core.Author",
                                 ),
                             ),
                             (
-                                'book',
+                                "book",
                                 models.ForeignKey(
                                     on_delete=django.db.models.deletion.DO_NOTHING,
-                                    to='core.Book',
+                                    to="core.Book",
                                 ),
                             ),
                         ],
                     ),
                     migrations.AlterField(
-                        model_name='book',
-                        name='authors',
+                        model_name="book",
+                        name="authors",
                         field=models.ManyToManyField(
-                            to='core.Author',
-                            through='core.AuthorBook',
+                            to="core.Author",
+                            through="core.AuthorBook",
                         ),
                     ),
                 ],
             ),
             migrations.AddField(
-                model_name='authorbook',
-                name='is_primary',
+                model_name="authorbook",
+                name="is_primary",
                 field=models.BooleanField(default=False),
             ),
         ]

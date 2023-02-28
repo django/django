@@ -21,7 +21,7 @@ wish to allow lookup up an author like so:
 
 .. code-block:: pycon
 
-    >>> Author.objects.filter(name__contains='Terry')
+    >>> Author.objects.filter(name__contains="Terry")
     [<Author: Terry Gilliam>, <Author: Terry Jones>]
 
 This is a very fragile solution as it requires the user to know an exact
@@ -53,7 +53,7 @@ use :lookup:`unaccented comparison <unaccent>`:
 
 .. code-block:: pycon
 
-    >>> Author.objects.filter(name__unaccent__icontains='Helen')
+    >>> Author.objects.filter(name__unaccent__icontains="Helen")
     [<Author: Helen Mirren>, <Author: Helena Bonham Carter>, <Author: Hélène Joy>]
 
 This shows another issue, where we are matching against a different spelling of
@@ -66,7 +66,7 @@ For example:
 
 .. code-block:: pycon
 
-    >>> Author.objects.filter(name__unaccent__lower__trigram_similar='Hélène')
+    >>> Author.objects.filter(name__unaccent__lower__trigram_similar="Hélène")
     [<Author: Helen Mirren>, <Author: Hélène Joy>]
 
 Now we have a different problem - the longer name of "Helena Bonham Carter"
@@ -120,7 +120,7 @@ queries. For example, a query might select all the blog entries which mention
 
 .. code-block:: pycon
 
-    >>> Entry.objects.filter(body_text__search='cheese')
+    >>> Entry.objects.filter(body_text__search="cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
 You can also filter on a combination of fields and on related models:
@@ -128,8 +128,8 @@ You can also filter on a combination of fields and on related models:
 .. code-block:: pycon
 
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('blog__tagline', 'body_text'),
-    ... ).filter(search='cheese')
+    ...     search=SearchVector("blog__tagline", "body_text"),
+    ... ).filter(search="cheese")
     [
         <Entry: Cheese on Toast recipes>,
         <Entry: Pizza Recipes>,
