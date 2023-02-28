@@ -211,6 +211,9 @@ documentation:
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
 
+* All Python code blocks should be formatted using the `blacken-docs`_
+  auto-formatter. This will be run by ``pre-commit`` if that is configured.
+
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
 
@@ -257,6 +260,13 @@ documentation:
 * Use :rst:role:`:envvar:<envvar>` to refer to an environment variable. You may
   also need to define a reference to the documentation for that environment
   variable using :rst:dir:`.. envvar:: <envvar>`.
+
+.. versionchanged:: 4.2
+
+    All Python code blocks in the Django documentation were reformatted with
+    `blacken-docs`_.
+
+.. _blacken-docs: https://pypi.org/project/blacken-docs/
 
 Django-specific markup
 ======================
