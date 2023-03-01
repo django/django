@@ -254,7 +254,9 @@ Use the ``django.test.Client`` class to make requests.
 
             /login/
 
-        ...with this POST data::
+        ...with this POST data:
+
+        .. code-block:: text
 
             name=fred&passwd=secret
 
