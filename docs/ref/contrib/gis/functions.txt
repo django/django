@@ -13,7 +13,7 @@ Example:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.db.models.functions import Length
-    >>> Track.objects.annotate(length=Length('line')).filter(length__gt=100)
+    >>> Track.objects.annotate(length=Length("line")).filter(length__gt=100)
 
 Not all backends support all functions, so refer to the documentation of each
 function to see if your database backend supports the function you want to use.
@@ -67,7 +67,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> City.objects.annotate(json=AsGeoJSON('point')).get(name='Chicago').json
+    >>> City.objects.annotate(json=AsGeoJSON("point")).get(name="Chicago").json
     {"type":"Point","coordinates":[-87.65018,41.85039]}
 
 =====================  =====================================================
@@ -102,7 +102,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> qs = Zipcode.objects.annotate(gml=AsGML('poly'))
+    >>> qs = Zipcode.objects.annotate(gml=AsGML("poly"))
     >>> print(qs[0].gml)
     <gml:Polygon srsName="EPSG:4326"><gml:OuterBoundaryIs>-147.78711,70.245363 ...
     -147.78711,70.245363</gml:OuterBoundaryIs></gml:Polygon>
@@ -133,7 +133,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> qs = Zipcode.objects.annotate(kml=AsKML('poly'))
+    >>> qs = Zipcode.objects.annotate(kml=AsKML("poly"))
     >>> print(qs[0].kml)
     <Polygon><outerBoundaryIs><LinearRing><coordinates>-103.04135,36.217596,0 ...
     -103.04135,36.217596,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
@@ -188,7 +188,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> bytes(City.objects.annotate(wkb=AsWKB('point')).get(name='Chelyabinsk').wkb)
+    >>> bytes(City.objects.annotate(wkb=AsWKB("point")).get(name="Chelyabinsk").wkb)
     b'\x01\x01\x00\x00\x00]3\xf9f\x9b\x91K@\x00X\x1d9\xd2\xb9N@'
 
 ``AsWKT``
@@ -207,7 +207,7 @@ Example:
 
 .. code-block:: pycon
 
-    >>> City.objects.annotate(wkt=AsWKT('point')).get(name='Chelyabinsk').wkt
+    >>> City.objects.annotate(wkt=AsWKT("point")).get(name="Chelyabinsk").wkt
     'POINT (55.137555 61.451728)'
 
 ``Azimuth``
@@ -293,9 +293,10 @@ queryset is calculated:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.db.models.functions import Distance
-    >>> pnt = AustraliaCity.objects.get(name='Hobart').point
-    >>> for city in AustraliaCity.objects.annotate(distance=Distance('point', pnt)):
+    >>> pnt = AustraliaCity.objects.get(name="Hobart").point
+    >>> for city in AustraliaCity.objects.annotate(distance=Distance("point", pnt)):
     ...     print(city.name, city.distance)
+    ...
     Wollongong 990071.220408 m
     Shellharbour 972804.613941 m
     Thirroul 1002334.36351 m

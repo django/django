@@ -13,9 +13,9 @@ A settings file is just a Python module with module-level variables.
 
 Here are a couple of example settings::
 
-    ALLOWED_HOSTS = ['www.example.com']
+    ALLOWED_HOSTS = ["www.example.com"]
     DEBUG = False
-    DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+    DEFAULT_FROM_EMAIL = "webmaster@example.com"
 
 .. note::
 
@@ -85,7 +85,7 @@ application what settings file to use. Do that with ``os.environ``::
 
     import os
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
 Read the :doc:`Django mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common
@@ -146,7 +146,7 @@ don't do this in a view::
 
     from django.conf import settings
 
-    settings.DEBUG = True   # Don't do this!
+    settings.DEBUG = True  # Don't do this!
 
 The only place you should assign to settings is in a settings file.
 
@@ -262,6 +262,7 @@ purpose:
 For example::
 
     from django.conf import settings
+
     if not settings.configured:
         settings.configure(myapp_defaults, DEBUG=True)
 
@@ -304,8 +305,9 @@ standalone. When invoked by your web server, or through :doc:`django-admin
     If you can't avoid that, put the call to ``django.setup()`` inside an
     ``if`` block::
 
-        if __name__ == '__main__':
+        if __name__ == "__main__":
             import django
+
             django.setup()
 
 .. seealso::

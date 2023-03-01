@@ -205,6 +205,7 @@ will require a CSRF token to be inserted you should use the
   from django.views.decorators.cache import cache_page
   from django.views.decorators.csrf import csrf_protect
 
+
   @cache_page(60 * 15)
   @csrf_protect
   def my_view(request):
@@ -280,17 +281,17 @@ path within it that needs protection. Example::
 
     from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+
     @csrf_exempt
     def my_view(request):
-
         @csrf_protect
         def protected_path(request):
             do_something()
 
         if some_condition():
-           return protected_path(request)
+            return protected_path(request)
         else:
-           do_something_else()
+            do_something_else()
 
 Protecting a page that uses AJAX without an HTML form
 -----------------------------------------------------

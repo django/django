@@ -141,11 +141,11 @@ password from the `password file`_, you must specify them in the
     :caption: ``settings.py``
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'OPTIONS': {
-                'service': 'my_service',
-                'passfile': '.my_pgpass',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "OPTIONS": {
+                "service": "my_service",
+                "passfile": ".my_pgpass",
             },
         }
     }
@@ -210,8 +210,8 @@ configuration in :setting:`DATABASES`::
 
     DATABASES = {
         # ...
-        'OPTIONS': {
-            'isolation_level': IsolationLevel.SERIALIZABLE,
+        "OPTIONS": {
+            "isolation_level": IsolationLevel.SERIALIZABLE,
         },
     }
 
@@ -357,11 +357,10 @@ cause a conflict. For example:
 .. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> User.objects.create(username='alice', pk=1)
+    >>> User.objects.create(username="alice", pk=1)
     <User: alice>
     >>> # The sequence hasn't been updated; its next value is 1.
-    >>> User.objects.create(username='bob')
-    ...
+    >>> User.objects.create(username="bob")
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
@@ -576,10 +575,10 @@ Here's a sample configuration which uses a MySQL option file::
 
     # settings.py
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': '/path/to/my.cnf',
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "OPTIONS": {
+                "read_default_file": "/path/to/my.cnf",
             },
         }
     }
@@ -666,8 +665,8 @@ storage engine, you have a couple of options.
 * Another option is to use the ``init_command`` option for MySQLdb prior to
   creating your tables::
 
-      'OPTIONS': {
-         'init_command': 'SET default_storage_engine=INNODB',
+      "OPTIONS": {
+          "init_command": "SET default_storage_engine=INNODB",
       }
 
   This sets the default storage engine upon connecting to the database.
@@ -873,9 +872,9 @@ If you're getting this error, you can solve it by:
 * Increase the default timeout value by setting the ``timeout`` database
   option::
 
-      'OPTIONS': {
+      "OPTIONS": {
           # ...
-          'timeout': 20,
+          "timeout": 20,
           # ...
       }
 
@@ -985,13 +984,13 @@ To connect using the service name of your Oracle database, your ``settings.py``
 file should look something like this::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.oracle',
-            'NAME': 'xe',
-            'USER': 'a_user',
-            'PASSWORD': 'a_password',
-            'HOST': '',
-            'PORT': '',
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            "NAME": "xe",
+            "USER": "a_user",
+            "PASSWORD": "a_password",
+            "HOST": "",
+            "PORT": "",
         }
     }
 
@@ -1002,13 +1001,13 @@ and want to connect using the SID ("xe" in this example), then fill in both
 :setting:`HOST` and :setting:`PORT` like so::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.oracle',
-            'NAME': 'xe',
-            'USER': 'a_user',
-            'PASSWORD': 'a_password',
-            'HOST': 'dbprod01ned.mycompany.com',
-            'PORT': '1540',
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            "NAME": "xe",
+            "USER": "a_user",
+            "PASSWORD": "a_password",
+            "HOST": "dbprod01ned.mycompany.com",
+            "PORT": "1540",
         }
     }
 
@@ -1025,13 +1024,13 @@ using RAC or pluggable databases without ``tnsnames.ora``, for example.
 
 Example of an Easy Connect string::
 
-    'NAME': 'localhost:1521/orclpdb1'
+    "NAME": "localhost:1521/orclpdb1"
 
 Example of a full DSN string::
 
-    'NAME': (
-        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
-        '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
+    "NAME": (
+        "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
+        "(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))"
     )
 
 Threaded option
@@ -1041,8 +1040,8 @@ If you plan to run Django in a multithreaded environment (e.g. Apache using the
 default MPM module on any modern operating system), then you **must** set
 the ``threaded`` option of your Oracle database configuration to ``True``::
 
-    'OPTIONS': {
-        'threaded': True,
+    "OPTIONS": {
+        "threaded": True,
     }
 
 Failure to do this may result in crashes and other odd behavior.
@@ -1057,8 +1056,8 @@ inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
 ``use_returning_into`` option of the database configuration to ``False``::
 
-    'OPTIONS': {
-        'use_returning_into': False,
+    "OPTIONS": {
+        "use_returning_into": False,
     }
 
 In this case, the Oracle backend will use a separate ``SELECT`` query to
@@ -1079,6 +1078,7 @@ a quoted name as the value for ``db_table``::
     class LegacyModel(models.Model):
         class Meta:
             db_table = '"name_left_in_lowercase"'
+
 
     class ForeignModel(models.Model):
         class Meta:
@@ -1155,9 +1155,11 @@ example of subclassing the PostgreSQL engine to change a feature class
 
     from django.db.backends.postgresql import base, features
 
+
     class DatabaseFeatures(features.DatabaseFeatures):
         def allows_group_by_selected_pks_on_model(self, model):
             return True
+
 
     class DatabaseWrapper(base.DatabaseWrapper):
         features_class = DatabaseFeatures
@@ -1166,8 +1168,8 @@ Finally, you must specify a :setting:`DATABASE-ENGINE` in your ``settings.py``
 file::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'mydbengine',
+        "default": {
+            "ENGINE": "mydbengine",
             # ...
         },
     }

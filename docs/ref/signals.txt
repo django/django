@@ -313,6 +313,7 @@ like this::
         # ...
         pass
 
+
     class Pizza(models.Model):
         # ...
         toppings = models.ManyToManyField(Topping)
@@ -321,9 +322,11 @@ If we connected a handler like this::
 
     from django.db.models.signals import m2m_changed
 
+
     def toppings_changed(sender, **kwargs):
         # Do something
         pass
+
 
     m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
 
@@ -531,9 +534,11 @@ For example, you could register a callback in an
     from django.apps import AppConfig
     from django.db.models.signals import post_migrate
 
+
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
+
 
     class MyAppConfig(AppConfig):
         ...

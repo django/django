@@ -20,12 +20,15 @@ used to track the inventory for a series of online bookstores:
 
     from django.db import models
 
+
     class Author(models.Model):
         name = models.CharField(max_length=100)
         age = models.IntegerField()
 
+
     class Publisher(models.Model):
         name = models.CharField(max_length=300)
+
 
     class Book(models.Model):
         name = models.CharField(max_length=300)
@@ -35,6 +38,7 @@ used to track the inventory for a series of online bookstores:
         authors = models.ManyToManyField(Author)
         publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         pubdate = models.DateField()
+
 
     class Store(models.Model):
         name = models.CharField(max_length=300)
@@ -53,23 +57,24 @@ above:
     2452
 
     # Total number of books with publisher=BaloneyPress
-    >>> Book.objects.filter(publisher__name='BaloneyPress').count()
+    >>> Book.objects.filter(publisher__name="BaloneyPress").count()
     73
 
     # Average price across all books.
     >>> from django.db.models import Avg
-    >>> Book.objects.aggregate(Avg('price'))
+    >>> Book.objects.aggregate(Avg("price"))
     {'price__avg': 34.35}
 
     # Max price across all books.
     >>> from django.db.models import Max
-    >>> Book.objects.aggregate(Max('price'))
+    >>> Book.objects.aggregate(Max("price"))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
     >>> from django.db.models import FloatField
     >>> Book.objects.aggregate(
-    ...     price_diff=Max('price', output_field=FloatField()) - Avg('price'))
+    ...     price_diff=Max("price", output_field=FloatField()) - Avg("price")
+    ... )
     {'price_diff': 46.85}
 
     # All the following queries involve traversing the Book<->Publisher
@@ -77,7 +82,7 @@ above:
 
     # Each publisher, each with a count of books as a "num_books" attribute.
     >>> from django.db.models import Count
-    >>> pubs = Publisher.objects.annotate(num_books=Count('book'))
+    >>> pubs = Publisher.objects.annotate(num_books=Count("book"))
     >>> pubs
     <QuerySet [<Publisher: BaloneyPress>, <Publisher: SalamiPress>, ...]>
     >>> pubs[0].num_books
@@ -85,8 +90,8 @@ above:
 
     # Each publisher, with a separate count of books with a rating above and below 5
     >>> from django.db.models import Q
-    >>> above_5 = Count('book', filter=Q(book__rating__gt=5))
-    >>> below_5 = Count('book', filter=Q(book__rating__lte=5))
+    >>> above_5 = Count("book", filter=Q(book__rating__gt=5))
+    >>> below_5 = Count("book", filter=Q(book__rating__lte=5))
     >>> pubs = Publisher.objects.annotate(below_5=below_5).annotate(above_5=above_5)
     >>> pubs[0].above_5
     23
@@ -94,7 +99,7 @@ above:
     12
 
     # The top 5 publishers, in order by number of books.
-    >>> pubs = Publisher.objects.annotate(num_books=Count('book')).order_by('-num_books')[:5]
+    >>> pubs = Publisher.objects.annotate(num_books=Count("book")).order_by("-num_books")[:5]
     >>> pubs[0].num_books
     1323
 
@@ -117,14 +122,14 @@ clause onto the ``QuerySet``:
 .. code-block:: pycon
 
     >>> from django.db.models import Avg
-    >>> Book.objects.all().aggregate(Avg('price'))
+    >>> Book.objects.all().aggregate(Avg("price"))
     {'price__avg': 34.35}
 
 The ``all()`` is redundant in this example, so this could be simplified to:
 
 .. code-block:: pycon
 
-    >>> Book.objects.aggregate(Avg('price'))
+    >>> Book.objects.aggregate(Avg("price"))
     {'price__avg': 34.35}
 
 The argument to the ``aggregate()`` clause describes the aggregate value that
@@ -141,7 +146,7 @@ by providing that name when you specify the aggregate clause:
 
 .. code-block:: pycon
 
-    >>> Book.objects.aggregate(average_price=Avg('price'))
+    >>> Book.objects.aggregate(average_price=Avg("price"))
     {'average_price': 34.35}
 
 If you want to generate more than one aggregate, you add another argument to
@@ -151,7 +156,7 @@ minimum price of all books, we would issue the query:
 .. code-block:: pycon
 
     >>> from django.db.models import Avg, Max, Min
-    >>> Book.objects.aggregate(Avg('price'), Max('price'), Min('price'))
+    >>> Book.objects.aggregate(Avg("price"), Max("price"), Min("price"))
     {'price__avg': 34.35, 'price__max': Decimal('81.20'), 'price__min': Decimal('12.99')}
 
 Generating aggregates for each item in a ``QuerySet``
@@ -177,7 +182,7 @@ number of authors:
 
     # Build an annotated queryset
     >>> from django.db.models import Count
-    >>> q = Book.objects.annotate(Count('authors'))
+    >>> q = Book.objects.annotate(Count("authors"))
     # Interrogate the first object in the queryset
     >>> q[0]
     <Book: The Definitive Guide to Django>
@@ -196,7 +201,7 @@ specify the annotation:
 
 .. code-block:: pycon
 
-    >>> q = Book.objects.annotate(num_authors=Count('authors'))
+    >>> q = Book.objects.annotate(num_authors=Count("authors"))
     >>> q[0].num_authors
     2
     >>> q[1].num_authors
@@ -260,7 +265,7 @@ you could use the annotation:
 .. code-block:: pycon
 
     >>> from django.db.models import Max, Min
-    >>> Store.objects.annotate(min_price=Min('books__price'), max_price=Max('books__price'))
+    >>> Store.objects.annotate(min_price=Min("books__price"), max_price=Max("books__price"))
 
 This tells Django to retrieve the ``Store`` model, join (through the
 many-to-many relationship) with the ``Book`` model, and aggregate on the
@@ -272,7 +277,7 @@ in any of the stores, you could use the aggregate:
 
 .. code-block:: pycon
 
-    >>> Store.objects.aggregate(min_price=Min('books__price'), max_price=Max('books__price'))
+    >>> Store.objects.aggregate(min_price=Min("books__price"), max_price=Max("books__price"))
 
 Join chains can be as deep as you require. For example, to extract the
 age of the youngest author of any book available for sale, you could
@@ -280,7 +285,7 @@ issue the query:
 
 .. code-block:: pycon
 
-    >>> Store.objects.aggregate(youngest_age=Min('books__authors__age'))
+    >>> Store.objects.aggregate(youngest_age=Min("books__authors__age"))
 
 Following relationships backwards
 ---------------------------------
@@ -297,7 +302,7 @@ total book stock counters (note how we use ``'book'`` to specify the
 .. code-block:: pycon
 
     >>> from django.db.models import Avg, Count, Min, Sum
-    >>> Publisher.objects.annotate(Count('book'))
+    >>> Publisher.objects.annotate(Count("book"))
 
 (Every ``Publisher`` in the resulting ``QuerySet`` will have an extra attribute
 called ``book__count``.)
@@ -306,7 +311,7 @@ We can also ask for the oldest book of any of those managed by every publisher:
 
 .. code-block:: pycon
 
-    >>> Publisher.objects.aggregate(oldest_pubdate=Min('book__pubdate'))
+    >>> Publisher.objects.aggregate(oldest_pubdate=Min("book__pubdate"))
 
 (The resulting dictionary will have a key called ``'oldest_pubdate'``. If no
 such alias were specified, it would be the rather long ``'book__pubdate__min'``.)
@@ -318,7 +323,7 @@ use ``'book'`` to specify the ``Author`` -> ``Book`` reverse many-to-many hop):
 
 .. code-block:: pycon
 
-    >>> Author.objects.annotate(total_pages=Sum('book__pages'))
+    >>> Author.objects.annotate(total_pages=Sum("book__pages"))
 
 (Every ``Author`` in the resulting ``QuerySet`` will have an extra attribute
 called ``total_pages``. If no such alias were specified, it would be the rather
@@ -329,7 +334,7 @@ file:
 
 .. code-block:: pycon
 
-    >>> Author.objects.aggregate(average_rating=Avg('book__rating'))
+    >>> Author.objects.aggregate(average_rating=Avg("book__rating"))
 
 (The resulting dictionary will have a key called ``'average_rating'``. If no
 such alias were specified, it would be the rather long ``'book__rating__avg'``.)
@@ -352,7 +357,7 @@ with "Django" using the query:
 .. code-block:: pycon
 
     >>> from django.db.models import Avg, Count
-    >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count('authors'))
+    >>> Book.objects.filter(name__startswith="Django").annotate(num_authors=Count("authors"))
 
 When used with an ``aggregate()`` clause, a filter has the effect of
 constraining the objects over which the aggregate is calculated.
@@ -361,7 +366,7 @@ title that starts with "Django" using the query:
 
 .. code-block:: pycon
 
-    >>> Book.objects.filter(name__startswith="Django").aggregate(Avg('price'))
+    >>> Book.objects.filter(name__startswith="Django").aggregate(Avg("price"))
 
 .. _filtering-on-annotations:
 
@@ -377,7 +382,7 @@ you can issue the query:
 
 .. code-block:: pycon
 
-    >>> Book.objects.annotate(num_authors=Count('authors')).filter(num_authors__gt=1)
+    >>> Book.objects.annotate(num_authors=Count("authors")).filter(num_authors__gt=1)
 
 This query generates an annotated result set, and then generates a filter
 based upon that annotation.
@@ -388,8 +393,8 @@ authors with a count of highly rated books:
 
 .. code-block:: pycon
 
-    >>> highly_rated = Count('book', filter=Q(book__rating__gte=7))
-    >>> Author.objects.annotate(num_books=Count('book'), highly_rated_books=highly_rated)
+    >>> highly_rated = Count("book", filter=Q(book__rating__gte=7))
+    >>> Author.objects.annotate(num_books=Count("book"), highly_rated_books=highly_rated)
 
 Each ``Author`` in the result set will have the ``num_books`` and
 ``highly_rated_books`` attributes. See also :ref:`conditional-aggregation`.
@@ -423,13 +428,15 @@ Here's an example with the ``Count`` aggregate:
 
 .. code-block:: pycon
 
-    >>> a, b = Publisher.objects.annotate(num_books=Count('book', distinct=True)).filter(book__rating__gt=3.0)
+    >>> a, b = Publisher.objects.annotate(num_books=Count("book", distinct=True)).filter(
+    ...     book__rating__gt=3.0
+    ... )
     >>> a, a.num_books
     (<Publisher: A>, 2)
     >>> b, b.num_books
     (<Publisher: B>, 2)
 
-    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count('book'))
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(num_books=Count("book"))
     >>> a, a.num_books
     (<Publisher: A>, 2)
     >>> b, b.num_books
@@ -450,13 +457,17 @@ Here's another example with the ``Avg`` aggregate:
 
 .. code-block:: pycon
 
-    >>> a, b = Publisher.objects.annotate(avg_rating=Avg('book__rating')).filter(book__rating__gt=3.0)
+    >>> a, b = Publisher.objects.annotate(avg_rating=Avg("book__rating")).filter(
+    ...     book__rating__gt=3.0
+    ... )
     >>> a, a.avg_rating
     (<Publisher: A>, 4.5)  # (5+4)/2
     >>> b, b.avg_rating
     (<Publisher: B>, 2.5)  # (1+4)/2
 
-    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(avg_rating=Avg('book__rating'))
+    >>> a, b = Publisher.objects.filter(book__rating__gt=3.0).annotate(
+    ...     avg_rating=Avg("book__rating")
+    ... )
     >>> a, a.avg_rating
     (<Publisher: A>, 4.5)  # (5+4)/2
     >>> b, b.avg_rating
@@ -483,7 +494,7 @@ that have contributed to the book, you could use the following query:
 
 .. code-block:: pycon
 
-    >>> Book.objects.annotate(num_authors=Count('authors')).order_by('num_authors')
+    >>> Book.objects.annotate(num_authors=Count("authors")).order_by("num_authors")
 
 ``values()``
 ------------
@@ -510,7 +521,7 @@ However, the result will be slightly different if you use a ``values()`` clause:
 
 .. code-block:: pycon
 
-    >>> Author.objects.values('name').annotate(average_rating=Avg('book__rating'))
+    >>> Author.objects.values("name").annotate(average_rating=Avg("book__rating"))
 
 In this example, the authors will be grouped by name, so you will only get
 an annotated result for each *unique* author name. This means if you have
@@ -536,7 +547,9 @@ clause from our previous example:
 
 .. code-block:: pycon
 
-    >>> Author.objects.annotate(average_rating=Avg('book__rating')).values('name', 'average_rating')
+    >>> Author.objects.annotate(average_rating=Avg("book__rating")).values(
+    ...     "name", "average_rating"
+    ... )
 
 This will now yield one unique result for each author; however, only
 the author's name and the ``average_rating`` annotation will be returned
@@ -566,6 +579,7 @@ By way of example, suppose you have a model like this::
 
     from django.db import models
 
+
     class Item(models.Model):
         name = models.CharField(max_length=10)
         data = models.IntegerField()
@@ -573,9 +587,9 @@ By way of example, suppose you have a model like this::
 If you want to count how many times each distinct ``data`` value appears in an
 ordered queryset, you might try this::
 
-    items = Item.objects.order_by('name')
+    items = Item.objects.order_by("name")
     # Warning: not quite correct!
-    items.values('data').annotate(Count('id'))
+    items.values("data").annotate(Count("id"))
 
 ...which will group the ``Item`` objects by their common ``data`` values and
 then count the number of ``id`` values in each group. Except that it won't
@@ -583,7 +597,7 @@ quite work. The ordering by ``name`` will also play a part in the grouping, so
 this query will group by distinct ``(data, name)`` pairs, which isn't what you
 want. Instead, you should construct this queryset::
 
-    items.values('data').annotate(Count('id')).order_by()
+    items.values("data").annotate(Count("id")).order_by()
 
 ...clearing any ordering in the query. You could also order by, say, ``data``
 without any harmful effects, since that is already playing a role in the
@@ -616,5 +630,5 @@ aggregate that author count, referencing the annotation field:
 .. code-block:: pycon
 
     >>> from django.db.models import Avg, Count
-    >>> Book.objects.annotate(num_authors=Count('authors')).aggregate(Avg('num_authors'))
+    >>> Book.objects.annotate(num_authors=Count("authors")).aggregate(Avg("num_authors"))
     {'num_authors__avg': 1.66}

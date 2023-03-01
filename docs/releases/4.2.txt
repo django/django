@@ -55,6 +55,7 @@ example::
 
     from django.db import models
 
+
     class Question(models.Model):
         text = models.TextField(db_comment="Poll question")
         pub_date = models.DateTimeField(
@@ -526,7 +527,7 @@ Code that use to pass JSON encoded string literals::
         Document(data=Value('"foo-bar"')),
     )
     Document.objects.annotate(
-        JSONBAgg("field", default=Value('[]')),
+        JSONBAgg("field", default=Value("[]")),
     )
 
 Should become::

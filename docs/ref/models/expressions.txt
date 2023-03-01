@@ -28,18 +28,19 @@ Some examples
     >>> from django.db.models.lookups import GreaterThan
 
     # Find companies that have more employees than chairs.
-    >>> Company.objects.filter(num_employees__gt=F('num_chairs'))
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs"))
 
     # Find companies that have at least twice as many employees
     # as chairs. Both the querysets below are equivalent.
-    >>> Company.objects.filter(num_employees__gt=F('num_chairs') * 2)
-    >>> Company.objects.filter(
-    ...     num_employees__gt=F('num_chairs') + F('num_chairs'))
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs") * 2)
+    >>> Company.objects.filter(num_employees__gt=F("num_chairs") + F("num_chairs"))
 
     # How many chairs are needed for each company to seat all employees?
-    >>> company = Company.objects.filter(
-    ...    num_employees__gt=F('num_chairs')).annotate(
-    ...    chairs_needed=F('num_employees') - F('num_chairs')).first()
+    >>> company = (
+    ...     Company.objects.filter(num_employees__gt=F("num_chairs"))
+    ...     .annotate(chairs_needed=F("num_employees") - F("num_chairs"))
+    ...     .first()
+    ... )
     >>> company.num_employees
     120
     >>> company.num_chairs
@@ -48,7 +49,7 @@ Some examples
     70
 
     # Create a new company using expressions.
-    >>> company = Company.objects.create(name='Google', ticker=Upper(Value('goog')))
+    >>> company = Company.objects.create(name="Google", ticker=Upper(Value("goog")))
     # Be sure to refresh it if you need to access the field.
     >>> company.refresh_from_db()
     >>> company.ticker
@@ -109,7 +110,7 @@ describes the required operation at the database level.
 Let's try this with an example. Normally, one might do something like this::
 
     # Tintin filed a news story!
-    reporter = Reporters.objects.get(name='Tintin')
+    reporter = Reporters.objects.get(name="Tintin")
     reporter.stories_filed += 1
     reporter.save()
 
@@ -119,8 +120,8 @@ the object back to the database. But instead we could also have done::
 
     from django.db.models import F
 
-    reporter = Reporters.objects.get(name='Tintin')
-    reporter.stories_filed = F('stories_filed') + 1
+    reporter = Reporters.objects.get(name="Tintin")
+    reporter.stories_filed = F("stories_filed") + 1
     reporter.save()
 
 Although ``reporter.stories_filed = F('stories_filed') + 1`` looks like a
@@ -148,15 +149,15 @@ be used on ``QuerySets`` of object instances, with ``update()``. This reduces
 the two queries we were using above - the ``get()`` and the
 :meth:`~Model.save()` - to just one::
 
-    reporter = Reporters.objects.filter(name='Tintin')
-    reporter.update(stories_filed=F('stories_filed') + 1)
+    reporter = Reporters.objects.filter(name="Tintin")
+    reporter.update(stories_filed=F("stories_filed") + 1)
 
 We can also use :meth:`~django.db.models.query.QuerySet.update()` to increment
 the field value on multiple objects - which could be very much faster than
 pulling them all into Python from the database, looping over them, incrementing
 the field value of each one, and saving each one back to the database::
 
-    Reporter.objects.update(stories_filed=F('stories_filed') + 1)
+    Reporter.objects.update(stories_filed=F("stories_filed") + 1)
 
 ``F()`` therefore can offer performance advantages by:
 
@@ -187,11 +188,11 @@ than based on its value when the instance was retrieved.
 ``F()`` objects assigned to model fields persist after saving the model
 instance and will be applied on each :meth:`~Model.save()`. For example::
 
-    reporter = Reporters.objects.get(name='Tintin')
-    reporter.stories_filed = F('stories_filed') + 1
+    reporter = Reporters.objects.get(name="Tintin")
+    reporter.stories_filed = F("stories_filed") + 1
     reporter.save()
 
-    reporter.name = 'Tintin Jr.'
+    reporter.name = "Tintin Jr."
     reporter.save()
 
 ``stories_filed`` will be updated twice in this case. If it's initially ``1``,
@@ -217,8 +218,7 @@ Using ``F()`` with annotations
 ``F()`` can be used to create dynamic fields on your models by combining
 different fields with arithmetic::
 
-    company = Company.objects.annotate(
-        chairs_needed=F('num_employees') - F('num_chairs'))
+    company = Company.objects.annotate(chairs_needed=F("num_employees") - F("num_chairs"))
 
 If the fields that you're combining are of different types you'll need
 to tell Django what kind of field will be returned. Since ``F()`` does not
@@ -229,7 +229,9 @@ directly support ``output_field`` you will need to wrap the expression with
 
     Ticket.objects.annotate(
         expires=ExpressionWrapper(
-            F('active_at') + F('duration'), output_field=DateTimeField()))
+            F("active_at") + F("duration"), output_field=DateTimeField()
+        )
+    )
 
 When referencing relational fields such as ``ForeignKey``, ``F()`` returns the
 primary key value rather than a model instance:
@@ -255,7 +257,8 @@ For example, to sort companies that haven't been contacted (``last_contacted``
 is null) after companies that have been contacted::
 
     from django.db.models import F
-    Company.objects.order_by(F('last_contacted').desc(nulls_last=True))
+
+    Company.objects.order_by(F("last_contacted").desc(nulls_last=True))
 
 Using ``F()`` with logical operations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -268,7 +271,7 @@ companies::
 
     from django.db.models import F
 
-    Company.objects.update(is_active=~F('is_active'))
+    Company.objects.update(is_active=~F("is_active"))
 
 .. _func-expressions:
 
@@ -281,14 +284,15 @@ They can be used directly::
 
     from django.db.models import F, Func
 
-    queryset.annotate(field_lower=Func(F('field'), function='LOWER'))
+    queryset.annotate(field_lower=Func(F("field"), function="LOWER"))
 
 or they can be used to build a library of database functions::
 
     class Lower(Func):
-        function = 'LOWER'
+        function = "LOWER"
 
-    queryset.annotate(field_lower=Lower('field'))
+
+    queryset.annotate(field_lower=Lower("field"))
 
 But both cases will result in a queryset where each model is annotated with an
 extra attribute ``field_lower`` produced, roughly, from the following SQL:
@@ -350,13 +354,14 @@ The ``Func`` API is as follows:
 
             class ConcatPair(Func):
                 ...
-                function = 'CONCAT'
+                function = "CONCAT"
                 ...
 
                 def as_mysql(self, compiler, connection, **extra_context):
                     return super().as_sql(
-                        compiler, connection,
-                        function='CONCAT_WS',
+                        compiler,
+                        connection,
+                        function="CONCAT_WS",
                         template="%(function)s('', %(expressions)s)",
                         **extra_context
                     )
@@ -400,7 +405,8 @@ some complex computations::
     from django.db.models import Count
 
     Company.objects.annotate(
-        managers_required=(Count('num_employees') / 4) + Count('num_managers'))
+        managers_required=(Count("num_employees") / 4) + Count("num_managers")
+    )
 
 The ``Aggregate`` API is as follows:
 
@@ -477,18 +483,15 @@ generated. Here's a brief example::
 
     from django.db.models import Aggregate
 
+
     class Sum(Aggregate):
         # Supports SUM(ALL field).
-        function = 'SUM'
-        template = '%(function)s(%(all_values)s%(expressions)s)'
+        function = "SUM"
+        template = "%(function)s(%(all_values)s%(expressions)s)"
         allow_distinct = False
 
         def __init__(self, expression, all_values=False, **extra):
-            super().__init__(
-                expression,
-                all_values='ALL ' if all_values else '',
-                **extra
-            )
+            super().__init__(expression, all_values="ALL " if all_values else "", **extra)
 
 ``Value()`` expressions
 -----------------------
@@ -554,8 +557,8 @@ newest comment on that post:
 .. code-block:: pycon
 
     >>> from django.db.models import OuterRef, Subquery
-    >>> newest = Comment.objects.filter(post=OuterRef('pk')).order_by('-created_at')
-    >>> Post.objects.annotate(newest_commenter_email=Subquery(newest.values('email')[:1]))
+    >>> newest = Comment.objects.filter(post=OuterRef("pk")).order_by("-created_at")
+    >>> Post.objects.annotate(newest_commenter_email=Subquery(newest.values("email")[:1]))
 
 On PostgreSQL, the SQL looks like:
 
@@ -592,7 +595,7 @@ parent. For example, this queryset would need to be within a nested pair of
 
 .. code-block:: pycon
 
-    >>> Book.objects.filter(author=OuterRef(OuterRef('pk')))
+    >>> Book.objects.filter(author=OuterRef(OuterRef("pk")))
 
 Limiting a subquery to a single column
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -607,7 +610,7 @@ all comments for posts published within the last day:
     >>> from django.utils import timezone
     >>> one_day_ago = timezone.now() - timedelta(days=1)
     >>> posts = Post.objects.filter(published_at__gte=one_day_ago)
-    >>> Comment.objects.filter(post__in=Subquery(posts.values('pk')))
+    >>> Comment.objects.filter(post__in=Subquery(posts.values("pk")))
 
 In this case, the subquery must use :meth:`~.QuerySet.values`
 to return only a single column: the primary key of the post.
@@ -620,7 +623,7 @@ queryset is used:
 
 .. code-block:: pycon
 
-    >>> subquery = Subquery(newest.values('email')[:1])
+    >>> subquery = Subquery(newest.values("email")[:1])
     >>> Post.objects.annotate(newest_commenter_email=subquery)
 
 In this case, the subquery must only return a single column *and* a single
@@ -649,7 +652,7 @@ within the last day:
     >>> from django.utils import timezone
     >>> one_day_ago = timezone.now() - timedelta(days=1)
     >>> recent_comments = Comment.objects.filter(
-    ...     post=OuterRef('pk'),
+    ...     post=OuterRef("pk"),
     ...     created_at__gte=one_day_ago,
     ... )
     >>> Post.objects.annotate(recent_comment=Exists(recent_comments))
@@ -703,8 +706,8 @@ length is greater than the total length of all combined comments:
 .. code-block:: pycon
 
     >>> from django.db.models import OuterRef, Subquery, Sum
-    >>> comments = Comment.objects.filter(post=OuterRef('pk')).order_by().values('post')
-    >>> total_comments = comments.annotate(total=Sum('length')).values('total')
+    >>> comments = Comment.objects.filter(post=OuterRef("pk")).order_by().values("post")
+    >>> total_comments = comments.annotate(total=Sum("length")).values("total")
     >>> Post.objects.filter(length__gt=Subquery(total_comments))
 
 The initial ``filter(...)`` limits the subquery to the relevant parameters.
@@ -818,9 +821,9 @@ the same studio in the same genre and release year:
     >>> from django.db.models import Avg, F, Window
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
-    ...         expression=Avg('rating'),
-    ...         partition_by=[F('studio'), F('genre')],
-    ...         order_by='released__year',
+    ...         expression=Avg("rating"),
+    ...         partition_by=[F("studio"), F("genre")],
+    ...         order_by="released__year",
     ...     ),
     ... )
 
@@ -837,18 +840,21 @@ to reduce repetition:
 
     >>> from django.db.models import Avg, F, Max, Min, Window
     >>> window = {
-    ...    'partition_by': [F('studio'), F('genre')],
-    ...    'order_by': 'released__year',
+    ...     "partition_by": [F("studio"), F("genre")],
+    ...     "order_by": "released__year",
     ... }
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
-    ...         expression=Avg('rating'), **window,
+    ...         expression=Avg("rating"),
+    ...         **window,
     ...     ),
     ...     best=Window(
-    ...         expression=Max('rating'), **window,
+    ...         expression=Max("rating"),
+    ...         **window,
     ...     ),
     ...     worst=Window(
-    ...         expression=Min('rating'), **window,
+    ...         expression=Min("rating"),
+    ...         **window,
     ...     ),
     ... )
 
@@ -864,13 +870,9 @@ from groups to be included:
 .. code-block:: pycon
 
     >>> qs = Movie.objects.annotate(
-    ...     category_rank=Window(
-    ...         Rank(), partition_by='category', order_by='-rating'
-    ...     ),
-    ...     scenes_count=Count('actors'),
-    ... ).filter(
-    ...     Q(category_rank__lte=3) | Q(title__contains='Batman')
-    ... )
+    ...     category_rank=Window(Rank(), partition_by="category", order_by="-rating"),
+    ...     scenes_count=Count("actors"),
+    ... ).filter(Q(category_rank__lte=3) | Q(title__contains="Batman"))
     >>> list(qs)
     NotImplementedError: Heterogeneous disjunctive predicates against window functions
     are not implemented when performing conditional aggregation.
@@ -950,9 +952,9 @@ with the average rating of a movie's two prior and two following peers:
     >>> from django.db.models import Avg, F, RowRange, Window
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
-    ...         expression=Avg('rating'),
-    ...         partition_by=[F('studio'), F('genre')],
-    ...         order_by='released__year',
+    ...         expression=Avg("rating"),
+    ...         partition_by=[F("studio"), F("genre")],
+    ...         order_by="released__year",
     ...         frame=RowRange(start=-2, end=2),
     ...     ),
     ... )
@@ -968,9 +970,9 @@ released between twelve months before and twelve months after the each movie:
     >>> from django.db.models import Avg, F, ValueRange, Window
     >>> Movie.objects.annotate(
     ...     avg_rating=Window(
-    ...         expression=Avg('rating'),
-    ...         partition_by=[F('studio'), F('genre')],
-    ...         order_by='released__year',
+    ...         expression=Avg("rating"),
+    ...         partition_by=[F("studio"), F("genre")],
+    ...         order_by="released__year",
     ...         frame=ValueRange(start=-12, end=12),
     ...     ),
     ... )
@@ -1054,7 +1056,7 @@ calling the appropriate methods on the wrapped expression.
 
         .. code-block:: pycon
 
-          >>> Sum(F('foo')).get_source_expressions()
+          >>> Sum(F("foo")).get_source_expressions()
           [F('foo')]
 
     .. method:: set_source_expressions(expressions)
@@ -1157,17 +1159,18 @@ an ``__init__()`` method to set some attributes::
   import copy
   from django.db.models import Expression
 
+
   class Coalesce(Expression):
-      template = 'COALESCE( %(expressions)s )'
+      template = "COALESCE( %(expressions)s )"
 
       def __init__(self, expressions, output_field):
-        super().__init__(output_field=output_field)
-        if len(expressions) < 2:
-            raise ValueError('expressions must have at least 2 elements')
-        for expression in expressions:
-            if not hasattr(expression, 'resolve_expression'):
-                raise TypeError('%r is not an Expression' % expression)
-        self.expressions = expressions
+          super().__init__(output_field=output_field)
+          if len(expressions) < 2:
+              raise ValueError("expressions must have at least 2 elements")
+          for expression in expressions:
+              if not hasattr(expression, "resolve_expression"):
+                  raise TypeError("%r is not an Expression" % expression)
+          self.expressions = expressions
 
 We do some basic validation on the parameters, including requiring at least
 2 columns or values, and ensuring they are expressions. We are requiring
@@ -1178,11 +1181,15 @@ Now we implement the preprocessing and validation. Since we do not have
 any of our own validation at this point, we delegate to the nested
 expressions::
 
-    def resolve_expression(self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False):
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
         c = self.copy()
         c.is_summary = summarize
         for pos, expression in enumerate(self.expressions):
-            c.expressions[pos] = expression.resolve_expression(query, allow_joins, reuse, summarize, for_save)
+            c.expressions[pos] = expression.resolve_expression(
+                query, allow_joins, reuse, summarize, for_save
+            )
         return c
 
 Next, we write the method responsible for generating the SQL::
@@ -1194,15 +1201,16 @@ Next, we write the method responsible for generating the SQL::
             sql_expressions.append(sql)
             sql_params.extend(params)
         template = template or self.template
-        data = {'expressions': ','.join(sql_expressions)}
+        data = {"expressions": ",".join(sql_expressions)}
         return template % data, sql_params
+
 
     def as_oracle(self, compiler, connection):
         """
         Example of vendor specific handling (Oracle in this case).
         Let's make the function name lowercase.
         """
-        return self.as_sql(compiler, connection, template='coalesce( %(expressions)s )')
+        return self.as_sql(compiler, connection, template="coalesce( %(expressions)s )")
 
 ``as_sql()`` methods can support custom keyword arguments, allowing
 ``as_vendorname()`` methods to override data used to generate the SQL string.
@@ -1227,6 +1235,7 @@ to play nice with other query expressions::
     def get_source_expressions(self):
         return self.expressions
 
+
     def set_source_expressions(self, expressions):
         self.expressions = expressions
 
@@ -1236,12 +1245,11 @@ Let's see how it works:
 
     >>> from django.db.models import F, Value, CharField
     >>> qs = Company.objects.annotate(
-    ...    tagline=Coalesce([
-    ...        F('motto'),
-    ...        F('ticker_name'),
-    ...        F('description'),
-    ...        Value('No Tagline')
-    ...        ], output_field=CharField()))
+    ...     tagline=Coalesce(
+    ...         [F("motto"), F("ticker_name"), F("description"), Value("No Tagline")],
+    ...         output_field=CharField(),
+    ...     )
+    ... )
     >>> for c in qs:
     ...     print("%s: %s" % (c.name, c.tagline))
     ...
@@ -1265,8 +1273,9 @@ SQL injection::
 
     from django.db.models import Func
 
+
     class Position(Func):
-        function = 'POSITION'
+        function = "POSITION"
         template = "%(function)s('%(substring)s' in %(expressions)s)"
 
         def __init__(self, expression, substring):
@@ -1280,8 +1289,8 @@ interpolated into the SQL string before the query is sent to the database.
 Here's a corrected rewrite::
 
     class Position(Func):
-        function = 'POSITION'
-        arg_joiner = ' IN '
+        function = "POSITION"
+        arg_joiner = " IN "
 
         def __init__(self, expression, substring):
             super().__init__(substring, expression)
@@ -1303,8 +1312,10 @@ class::
 
     from django.db.models.functions import Length
 
+
     def sqlserver_length(self, compiler, connection):
-        return self.as_sql(compiler, connection, function='LEN')
+        return self.as_sql(compiler, connection, function="LEN")
+
 
     Length.as_sqlserver = sqlserver_length
 

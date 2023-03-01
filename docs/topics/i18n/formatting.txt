@@ -47,8 +47,8 @@ To enable a form field to localize input and output data use its ``localize``
 argument::
 
     class CashRegisterForm(forms.Form):
-       product = forms.CharField()
-       revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
+        product = forms.CharField()
+        revenue = forms.DecimalField(max_digits=4, decimal_places=2, localize=True)
 
 .. _topic-l10n-templates:
 
@@ -163,8 +163,8 @@ first.  To do that, set your :setting:`FORMAT_MODULE_PATH` setting to the
 package where format files will exist, for instance::
 
     FORMAT_MODULE_PATH = [
-        'mysite.formats',
-        'some_app.formats',
+        "mysite.formats",
+        "some_app.formats",
     ]
 
 Files are not placed directly in this directory, but in a directory named as
@@ -186,7 +186,7 @@ To customize the English formats, a structure like this would be needed:
 
 where :file:`formats.py` contains custom format definitions. For example::
 
-    THOUSAND_SEPARATOR = '\xa0'
+    THOUSAND_SEPARATOR = "\xa0"
 
 to use a non-breaking space (Unicode ``00A0``) as a thousand separator,
 instead of the default for English, a comma.

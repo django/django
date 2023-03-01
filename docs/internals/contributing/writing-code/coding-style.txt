@@ -68,20 +68,20 @@ Python style
   guide, f-strings should use only plain variable and property access, with
   prior local variable assignment for more complex cases::
 
-    # Allowed
-    f'hello {user}'
-    f'hello {user.name}'
-    f'hello {self.user.name}'
+    # Allowed
+    f"hello {user}"
+    f"hello {user.name}"
+    f"hello {self.user.name}"
 
     # Disallowed
-    f'hello {get_user()}'
-    f'you are {user.age * 365.25} days old'
+    f"hello {get_user()}"
+    f"you are {user.age * 365.25} days old"
 
     # Allowed with local variable assignment
     user = get_user()
-    f'hello {user}'
+    f"hello {user}"
     user_days_old = user.age * 365.25
-    f'you are {user_days_old} days old'
+    f"you are {user_days_old} days old"
 
   f-strings should not be used for any string that may require translation,
   including error and logging messages. In general ``format()`` is more
@@ -182,7 +182,10 @@ Imports
       # Django
       from django.http import Http404
       from django.http.response import (
-          Http404, HttpResponse, HttpResponseNotAllowed, StreamingHttpResponse,
+          Http404,
+          HttpResponse,
+          HttpResponseNotAllowed,
+          StreamingHttpResponse,
           cookie,
       )
 
@@ -195,7 +198,7 @@ Imports
       except ImportError:
           yaml = None
 
-      CONSTANT = 'foo'
+      CONSTANT = "foo"
 
 
       class Example:
@@ -272,21 +275,22 @@ Model style
           last_name = models.CharField(max_length=40)
 
           class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
   Don't do this::
 
       class Person(models.Model):
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
+
           class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
   Don't do this, either::
 
       class Person(models.Model):
           class Meta:
-              verbose_name_plural = 'people'
+              verbose_name_plural = "people"
 
           first_name = models.CharField(max_length=20)
           last_name = models.CharField(max_length=40)
@@ -307,11 +311,11 @@ Model style
   Example::
 
     class MyModel(models.Model):
-        DIRECTION_UP = 'U'
-        DIRECTION_DOWN = 'D'
+        DIRECTION_UP = "U"
+        DIRECTION_DOWN = "D"
         DIRECTION_CHOICES = [
-            (DIRECTION_UP, 'Up'),
-            (DIRECTION_DOWN, 'Down'),
+            (DIRECTION_UP, "Up"),
+            (DIRECTION_DOWN, "Down"),
         ]
 
 Use of ``django.conf.settings``
@@ -327,7 +331,7 @@ as follows::
 
     from django.conf import settings
 
-    settings.configure({}, SOME_SETTING='foo')
+    settings.configure({}, SOME_SETTING="foo")
 
 However, if any setting is accessed before the ``settings.configure`` line,
 this will not work. (Internally, ``settings`` is a ``LazyObject`` which

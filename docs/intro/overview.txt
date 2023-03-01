@@ -30,11 +30,13 @@ database-schema problems. Here's a quick example:
 
     from django.db import models
 
+
     class Reporter(models.Model):
         full_name = models.CharField(max_length=70)
 
         def __str__(self):
             return self.full_name
+
 
     class Article(models.Model):
         pub_date = models.DateField()
@@ -78,7 +80,7 @@ necessary:
     <QuerySet []>
 
     # Create a new Reporter.
-    >>> r = Reporter(full_name='John Smith')
+    >>> r = Reporter(full_name="John Smith")
 
     # Save the object into the database. You have to call save() explicitly.
     >>> r.save()
@@ -98,9 +100,9 @@ necessary:
     # Django provides a rich database lookup API.
     >>> Reporter.objects.get(id=1)
     <Reporter: John Smith>
-    >>> Reporter.objects.get(full_name__startswith='John')
+    >>> Reporter.objects.get(full_name__startswith="John")
     <Reporter: John Smith>
-    >>> Reporter.objects.get(full_name__contains='mith')
+    >>> Reporter.objects.get(full_name__contains="mith")
     <Reporter: John Smith>
     >>> Reporter.objects.get(id=2)
     Traceback (most recent call last):
@@ -109,8 +111,9 @@ necessary:
 
     # Create an article.
     >>> from datetime import date
-    >>> a = Article(pub_date=date.today(), headline='Django is cool',
-    ...     content='Yeah.', reporter=r)
+    >>> a = Article(
+    ...     pub_date=date.today(), headline="Django is cool", content="Yeah.", reporter=r
+    ... )
     >>> a.save()
 
     # Now the article is in the database.
@@ -129,11 +132,11 @@ necessary:
     # The API follows relationships as far as you need, performing efficient
     # JOINs for you behind the scenes.
     # This finds all articles by a reporter whose name starts with "John".
-    >>> Article.objects.filter(reporter__full_name__startswith='John')
+    >>> Article.objects.filter(reporter__full_name__startswith="John")
     <QuerySet [<Article: Django is cool>]>
 
     # Change an object by altering its attributes and calling save().
-    >>> r.full_name = 'Billy Goat'
+    >>> r.full_name = "Billy Goat"
     >>> r.save()
 
     # Delete an object with delete().
@@ -151,6 +154,7 @@ only step required is to register your model in the admin site:
     :caption: ``mysite/news/models.py``
 
     from django.db import models
+
 
     class Article(models.Model):
         pub_date = models.DateField()
@@ -198,9 +202,9 @@ example above:
     from . import views
 
     urlpatterns = [
-        path('articles/<int:year>/', views.year_archive),
-        path('articles/<int:year>/<int:month>/', views.month_archive),
-        path('articles/<int:year>/<int:month>/<int:pk>/', views.article_detail),
+        path("articles/<int:year>/", views.year_archive),
+        path("articles/<int:year>/<int:month>/", views.month_archive),
+        path("articles/<int:year>/<int:month>/<int:pk>/", views.article_detail),
     ]
 
 The code above maps URL paths to Python callback functions ("views"). The path
@@ -237,10 +241,11 @@ and renders the template with the retrieved data. Here's an example view for
 
     from .models import Article
 
+
     def year_archive(request, year):
         a_list = Article.objects.filter(pub_date__year=year)
-        context = {'year': year, 'article_list': a_list}
-        return render(request, 'news/year_archive.html', context)
+        context = {"year": year, "article_list": a_list}
+        return render(request, "news/year_archive.html", context)
 
 This example uses Django's :doc:`template system </topics/templates>`, which has
 several powerful features but strives to stay simple enough for non-programmers

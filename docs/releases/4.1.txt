@@ -36,6 +36,7 @@ View subclasses may now define async HTTP method handlers::
     from django.http import HttpResponse
     from django.views import View
 
+
     class AsyncView(View):
         async def get(self, request, *args, **kwargs):
             # Perform view logic using await.
@@ -669,12 +670,8 @@ Miscellaneous
             migrations.SeparateDatabaseAndState(
                 database_operations=[],
                 state_operations=[
-                    migrations.RemoveConstraint(
-                        ...
-                    ),
-                    migrations.AddConstraint(
-                        ...
-                    ),
+                    migrations.RemoveConstraint(...),
+                    migrations.AddConstraint(...),
                 ],
             ),
         ]
@@ -706,8 +703,8 @@ Miscellaneous
   ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is
   deprecated. Use::
 
-    assertFormError(response.context['form_name'], ...)
-    assertFormsetError(response.context['formset_name'], ...)
+    assertFormError(response.context["form_name"], ...)
+    assertFormsetError(response.context["formset_name"], ...)
 
   or pass the form/formset object directly instead.
 

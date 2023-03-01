@@ -53,12 +53,13 @@ Here's an example::
 
     from django import forms
 
+
     class CalendarWidget(forms.TextInput):
         class Media:
             css = {
-                'all': ['pretty.css'],
+                "all": ["pretty.css"],
             }
-            js = ['animations.js', 'actions.js']
+            js = ["animations.js", "actions.js"]
 
 This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
 Every time the CalendarWidget is used on a form, that form will be directed
@@ -98,8 +99,8 @@ provide two CSS options -- one for the screen, and one for print::
 
     class Media:
         css = {
-            'screen': ['pretty.css'],
-            'print': ['newspaper.css'],
+            "screen": ["pretty.css"],
+            "print": ["newspaper.css"],
         }
 
 If a group of CSS files are appropriate for multiple output media types,
@@ -109,9 +110,9 @@ requirements::
 
     class Media:
         css = {
-            'screen': ['pretty.css'],
-            'tv,projector': ['lo_res.css'],
-            'print': ['newspaper.css'],
+            "screen": ["pretty.css"],
+            "tv,projector": ["lo_res.css"],
+            "print": ["newspaper.css"],
         }
 
 If this last CSS definition were to be rendered, it would become the following HTML:
@@ -150,9 +151,10 @@ example above:
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
     ...         css = {
-    ...             'all': ['fancy.css'],
+    ...             "all": ["fancy.css"],
     ...         }
-    ...         js = ['whizbang.js']
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -172,9 +174,10 @@ an ``extend=False`` declaration to the ``Media`` declaration:
     ...     class Media:
     ...         extend = False
     ...         css = {
-    ...             'all': ['fancy.css'],
+    ...             "all": ["fancy.css"],
     ...         }
-    ...         js = ['whizbang.js']
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -203,8 +206,9 @@ be defined in a dynamic fashion::
     class CalendarWidget(forms.TextInput):
         @property
         def media(self):
-            return forms.Media(css={'all': ['pretty.css']},
-                               js=['animations.js', 'actions.js'])
+            return forms.Media(
+                css={"all": ["pretty.css"]}, js=["animations.js", "actions.js"]
+            )
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.
@@ -240,9 +244,10 @@ was ``None``:
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ['/css/pretty.css'],
+    ...             "all": ["/css/pretty.css"],
     ...         }
-    ...         js = ['animations.js', 'http://othersite.com/actions.js']
+    ...         js = ["animations.js", "http://othersite.com/actions.js"]
+    ...
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -290,10 +295,12 @@ outputting the complete HTML ``<script>`` or ``<link>`` tag content:
     ... class JSPath:
     ...     def __str__(self):
     ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
+    ...
 
     >>> class SomeWidget(forms.TextInput):
     ...     class Media:
     ...         js = [JSPath()]
+    ...
 
 ``Media`` objects
 =================
@@ -320,7 +327,7 @@ operator to filter out a medium of interest. For example:
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
 
-    >>> print(w.media['css'])
+    >>> print(w.media["css"])
     <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
 
 When you use the subscript operator, the value that is returned is a
@@ -339,13 +346,15 @@ specified by both:
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ['pretty.css'],
+    ...             "all": ["pretty.css"],
     ...         }
-    ...         js = ['animations.js', 'actions.js']
+    ...         js = ["animations.js", "actions.js"]
+    ...
 
     >>> class OtherWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ['whizbang.js']
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
@@ -372,10 +381,12 @@ For example:
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ['jQuery.js', 'calendar.js', 'noConflict.js']
+    ...         js = ["jQuery.js", "calendar.js", "noConflict.js"]
+    ...
     >>> class TimeWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ['jQuery.js', 'time.js', 'noConflict.js']
+    ...         js = ["jQuery.js", "time.js", "noConflict.js"]
+    ...
     >>> w1 = CalendarWidget()
     >>> w2 = TimeWidget()
     >>> print(w1.media + w2.media)
@@ -407,6 +418,7 @@ are part of the form:
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)
+    ...
 
     >>> f = ContactForm()
     >>> f.media
@@ -423,11 +435,11 @@ CSS for form layout -- add a ``Media`` declaration to the form:
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)
-    ...
     ...     class Media:
     ...         css = {
-    ...             'all': ['layout.css'],
+    ...             "all": ["layout.css"],
     ...         }
+    ...
 
     >>> f = ContactForm()
     >>> f.media

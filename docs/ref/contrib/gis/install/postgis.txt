@@ -50,12 +50,9 @@ process. An alternative is to use a migration operation in your project::
     from django.contrib.postgres.operations import CreateExtension
     from django.db import migrations
 
-    class Migration(migrations.Migration):
 
-        operations = [
-            CreateExtension('postgis'),
-            ...
-        ]
+    class Migration(migrations.Migration):
+        operations = [CreateExtension("postgis"), ...]
 
 If you plan to use PostGIS raster functionality on PostGIS 3+, you should also
 activate the ``postgis_raster`` extension. You can install the extension using

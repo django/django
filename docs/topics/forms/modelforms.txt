@@ -28,7 +28,8 @@ For example:
     >>> class ArticleForm(ModelForm):
     ...     class Meta:
     ...         model = Article
-    ...         fields = ['pub_date', 'headline', 'content', 'reporter']
+    ...         fields = ["pub_date", "headline", "content", "reporter"]
+    ...
 
     # Creating a form to add an article.
     >>> form = ArticleForm()
@@ -173,10 +174,11 @@ Consider this set of models::
     from django.forms import ModelForm
 
     TITLE_CHOICES = [
-        ('MR', 'Mr.'),
-        ('MRS', 'Mrs.'),
-        ('MS', 'Ms.'),
+        ("MR", "Mr."),
+        ("MRS", "Mrs."),
+        ("MS", "Ms."),
     ]
+
 
     class Author(models.Model):
         name = models.CharField(max_length=100)
@@ -186,19 +188,22 @@ Consider this set of models::
         def __str__(self):
             return self.name
 
+
     class Book(models.Model):
         name = models.CharField(max_length=100)
         authors = models.ManyToManyField(Author)
 
+
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ['name', 'title', 'birth_date']
+            fields = ["name", "title", "birth_date"]
+
 
     class BookForm(ModelForm):
         class Meta:
             model = Book
-            fields = ['name', 'authors']
+            fields = ["name", "authors"]
 
 
 With these models, the ``ModelForm`` subclasses above would be roughly
@@ -207,6 +212,7 @@ we'll discuss in a moment.)::
 
     from django import forms
 
+
     class AuthorForm(forms.Form):
         name = forms.CharField(max_length=100)
         title = forms.CharField(
@@ -214,6 +220,7 @@ we'll discuss in a moment.)::
             widget=forms.Select(choices=TITLE_CHOICES),
         )
         birth_date = forms.DateField(required=False)
+
 
     class BookForm(forms.Form):
         name = forms.CharField(max_length=100)
@@ -305,11 +312,12 @@ to the ``error_messages`` dictionary of the ``ModelForm``’s inner ``Meta`` cla
     from django.core.exceptions import NON_FIELD_ERRORS
     from django.forms import ModelForm
 
+
     class ArticleForm(ModelForm):
         class Meta:
             error_messages = {
                 NON_FIELD_ERRORS: {
-                    'unique_together': "%(model_name)s's %(field_labels)s are not unique.",
+                    "unique_together": "%(model_name)s's %(field_labels)s are not unique.",
                 }
             }
 
@@ -388,7 +396,7 @@ you've manually saved the instance produced by the form, you can invoke
     >>> new_author = f.save(commit=False)
 
     # Modify the author in some way.
-    >>> new_author.some_field = 'some_value'
+    >>> new_author.some_field = "some_value"
 
     # Save the new instance.
     >>> new_author.save()
@@ -440,10 +448,11 @@ these security concerns do not apply to you:
 
        from django.forms import ModelForm
 
+
        class AuthorForm(ModelForm):
            class Meta:
                model = Author
-               fields = '__all__'
+               fields = "__all__"
 
 2. Set the ``exclude`` attribute of the ``ModelForm``’s inner ``Meta`` class to
    a list of fields to be excluded from the form.
@@ -453,7 +462,7 @@ these security concerns do not apply to you:
        class PartialAuthorForm(ModelForm):
            class Meta:
                model = Author
-               exclude = ['title']
+               exclude = ["title"]
 
    Since the ``Author`` model has the 3 fields ``name``, ``title`` and
    ``birth_date``, this will result in the fields ``name`` and ``birth_date``
@@ -481,7 +490,7 @@ include that field.
     avoid this failure, you must instantiate your model with initial
     values for the missing, but required fields::
 
-        author = Author(title='Mr')
+        author = Author(title="Mr")
         form = PartialAuthorForm(request.POST, instance=author)
         form.save()
 
@@ -490,7 +499,7 @@ include that field.
 
         form = PartialAuthorForm(request.POST)
         author = form.save(commit=False)
-        author.title = 'Mr'
+        author.title = "Mr"
         author.save()
 
     See the `section on saving forms`_ for more details on using
@@ -519,12 +528,13 @@ For example, if you want the ``CharField`` for the ``name`` attribute of
     from django.forms import ModelForm, Textarea
     from myapp.models import Author
 
+
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ['name', 'title', 'birth_date']
+            fields = ["name", "title", "birth_date"]
             widgets = {
-                'name': Textarea(attrs={'cols': 80, 'rows': 20}),
+                "name": Textarea(attrs={"cols": 80, "rows": 20}),
             }
 
 The ``widgets`` dictionary accepts either widget instances (e.g.,
@@ -540,19 +550,20 @@ the ``name`` field::
 
     from django.utils.translation import gettext_lazy as _
 
+
     class AuthorForm(ModelForm):
         class Meta:
             model = Author
-            fields = ['name', 'title', 'birth_date']
+            fields = ["name", "title", "birth_date"]
             labels = {
-                'name': _('Writer'),
+                "name": _("Writer"),
             }
             help_texts = {
-                'name': _('Some useful help text.'),
+                "name": _("Some useful help text."),
             }
             error_messages = {
-                'name': {
-                    'max_length': _("This writer's name is too long."),
+                "name": {
+                    "max_length": _("This writer's name is too long."),
                 },
             }
 
@@ -565,12 +576,13 @@ field, you could do the following::
     from django.forms import ModelForm
     from myapp.models import Article
 
+
     class ArticleForm(ModelForm):
         class Meta:
             model = Article
-            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+            fields = ["pub_date", "headline", "content", "reporter", "slug"]
             field_classes = {
-                'slug': MySlugFormField,
+                "slug": MySlugFormField,
             }
 
 or::
@@ -578,10 +590,12 @@ or::
     from django.forms import ModelForm
     from myapp.models import Article
 
+
     def formfield_for_dbfield(db_field, **kwargs):
         if db_field.name == "slug":
             return MySlugFormField()
         return db_field.formfield(**kwargs)
+
 
     class ArticleForm(ModelForm):
         class Meta:
@@ -599,12 +613,13 @@ the field declaratively and setting its ``validators`` parameter::
     from django.forms import CharField, ModelForm
     from myapp.models import Article
 
+
     class ArticleForm(ModelForm):
         slug = CharField(validators=[validate_slug])
 
         class Meta:
             model = Article
-            fields = ['pub_date', 'headline', 'content', 'reporter', 'slug']
+            fields = ["pub_date", "headline", "content", "reporter", "slug"]
 
 .. note::
 
@@ -635,7 +650,7 @@ the field declaratively and setting its ``validators`` parameter::
                 max_length=200,
                 null=True,
                 blank=True,
-                help_text='Use puns liberally',
+                help_text="Use puns liberally",
             )
             content = models.TextField()
 
@@ -647,12 +662,12 @@ the field declaratively and setting its ``validators`` parameter::
             headline = MyFormField(
                 max_length=200,
                 required=False,
-                help_text='Use puns liberally',
+                help_text="Use puns liberally",
             )
 
             class Meta:
                 model = Article
-                fields = ['headline', 'content']
+                fields = ["headline", "content"]
 
     You must ensure that the type of the form field can be used to set the
     contents of the corresponding model field. When they are not compatible,
@@ -695,6 +710,7 @@ using the previous ``ArticleForm`` class:
     >>> class EnhancedArticleForm(ArticleForm):
     ...     def clean_pub_date(self):
     ...         ...
+    ...
 
 This creates a form that behaves identically to ``ArticleForm``, except there's
 some extra validation and cleaning for the ``pub_date`` field.
@@ -706,7 +722,8 @@ the ``Meta.fields`` or ``Meta.exclude`` lists:
 
     >>> class RestrictedArticleForm(EnhancedArticleForm):
     ...     class Meta(ArticleForm.Meta):
-    ...         exclude = ['body']
+    ...         exclude = ["body"]
+    ...
 
 This adds the extra method from the ``EnhancedArticleForm`` and modifies
 the original ``ArticleForm.Meta`` to remove one field.
@@ -744,8 +761,8 @@ and values from an attached model instance. For example:
     >>> article = Article.objects.get(pk=1)
     >>> article.headline
     'My headline'
-    >>> form = ArticleForm(initial={'headline': 'Initial headline'}, instance=article)
-    >>> form['headline'].value()
+    >>> form = ArticleForm(initial={"headline": "Initial headline"}, instance=article)
+    >>> form["headline"].value()
     'Initial headline'
 
 .. _modelforms-factory:
@@ -770,8 +787,7 @@ specifying the widgets to be used for a given field:
 .. code-block:: pycon
 
     >>> from django.forms import Textarea
-    >>> Form = modelform_factory(Book, form=BookForm,
-    ...                          widgets={"title": Textarea()})
+    >>> Form = modelform_factory(Book, form=BookForm, widgets={"title": Textarea()})
 
 The fields to include can be specified using the ``fields`` and ``exclude``
 keyword arguments, or the corresponding attributes on the ``ModelForm`` inner
@@ -799,7 +815,7 @@ convenient. Let's reuse the ``Author`` model from above:
 
     >>> from django.forms import modelformset_factory
     >>> from myapp.models import Author
-    >>> AuthorFormSet = modelformset_factory(Author, fields=['name', 'title'])
+    >>> AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
 
 Using ``fields`` restricts the formset to use only the given fields.
 Alternatively, you can take an "opt-out" approach, specifying which fields to
@@ -807,7 +823,7 @@ exclude:
 
 .. code-block:: pycon
 
-    >>> AuthorFormSet = modelformset_factory(Author, exclude=['birth_date'])
+    >>> AuthorFormSet = modelformset_factory(Author, exclude=["birth_date"])
 
 This will create a formset that is capable of working with the data associated
 with the ``Author`` model. It works just like a regular formset:
@@ -848,7 +864,7 @@ queryset that includes all objects in the model (e.g.,
 
 .. code-block:: pycon
 
-    >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith='O'))
+    >>> formset = AuthorFormSet(queryset=Author.objects.filter(name__startswith="O"))
 
 Alternatively, you can create a subclass that sets ``self.queryset`` in
 ``__init__``::
@@ -856,17 +872,19 @@ Alternatively, you can create a subclass that sets ``self.queryset`` in
     from django.forms import BaseModelFormSet
     from myapp.models import Author
 
+
     class BaseAuthorFormSet(BaseModelFormSet):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.queryset = Author.objects.filter(name__startswith='O')
+            self.queryset = Author.objects.filter(name__startswith="O")
 
 Then, pass your ``BaseAuthorFormSet`` class to the factory function:
 
 .. code-block:: pycon
 
     >>> AuthorFormSet = modelformset_factory(
-    ...     Author, fields=['name', 'title'], formset=BaseAuthorFormSet)
+    ...     Author, fields=["name", "title"], formset=BaseAuthorFormSet
+    ... )
 
 If you want to return a formset that doesn't include *any* preexisting
 instances of the model, you can specify an empty QuerySet:
@@ -886,7 +904,7 @@ you can create a custom model form that has custom validation::
     class AuthorForm(forms.ModelForm):
         class Meta:
             model = Author
-            fields = ['name', 'title']
+            fields = ["name", "title"]
 
         def clean_name(self):
             # custom validation for the name field
@@ -911,8 +929,10 @@ class of a ``ModelForm`` works:
 .. code-block:: pycon
 
     >>> AuthorFormSet = modelformset_factory(
-    ...     Author, fields=['name', 'title'],
-    ...     widgets={'name': Textarea(attrs={'cols': 80, 'rows': 20})})
+    ...     Author,
+    ...     fields=["name", "title"],
+    ...     widgets={"name": Textarea(attrs={"cols": 80, "rows": 20})},
+    ... )
 
 Enabling localization for fields with ``localized_fields``
 ----------------------------------------------------------
@@ -975,6 +995,7 @@ Pass ``commit=False`` to return the unsaved model instances:
     >>> for instance in instances:
     ...     # do something with instance
     ...     instance.save()
+    ...
 
 This gives you the ability to attach data to the instances before saving them
 to the database. If your formset contains a ``ManyToManyField``, you'll also
@@ -1001,11 +1022,11 @@ extra forms displayed.
 
 .. code-block:: pycon
 
-    >>> Author.objects.order_by('name')
+    >>> Author.objects.order_by("name")
     <QuerySet [<Author: Charles Baudelaire>, <Author: Paul Verlaine>, <Author: Walt Whitman>]>
 
-    >>> AuthorFormSet = modelformset_factory(Author, fields=['name'], max_num=1)
-    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> AuthorFormSet = modelformset_factory(Author, fields=["name"], max_num=1)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by("name"))
     >>> [x.name for x in formset.get_queryset()]
     ['Charles Baudelaire', 'Paul Verlaine', 'Walt Whitman']
 
@@ -1020,10 +1041,11 @@ so long as the total number of forms does not exceed ``max_num``:
 
 .. code-block:: pycon
 
-    >>> AuthorFormSet = modelformset_factory(Author, fields=['name'], max_num=4, extra=2)
-    >>> formset = AuthorFormSet(queryset=Author.objects.order_by('name'))
+    >>> AuthorFormSet = modelformset_factory(Author, fields=["name"], max_num=4, extra=2)
+    >>> formset = AuthorFormSet(queryset=Author.objects.order_by("name"))
     >>> for form in formset:
     ...     print(form.as_table())
+    ...
     <tr><th><label for="id_form-0-name">Name:</label></th><td><input id="id_form-0-name" type="text" name="form-0-name" value="Charles Baudelaire" maxlength="100"><input type="hidden" name="form-0-id" value="1" id="id_form-0-id"></td></tr>
     <tr><th><label for="id_form-1-name">Name:</label></th><td><input id="id_form-1-name" type="text" name="form-1-name" value="Paul Verlaine" maxlength="100"><input type="hidden" name="form-1-id" value="3" id="id_form-1-id"></td></tr>
     <tr><th><label for="id_form-2-name">Name:</label></th><td><input id="id_form-2-name" type="text" name="form-2-name" value="Walt Whitman" maxlength="100"><input type="hidden" name="form-2-id" value="2" id="id_form-2-id"></td></tr>
@@ -1046,7 +1068,7 @@ objects:
 
     >>> AuthorFormSet = modelformset_factory(
     ...     Author,
-    ...     fields=['name', 'title'],
+    ...     fields=["name", "title"],
     ...     edit_only=True,
     ... )
 
@@ -1063,16 +1085,17 @@ formset to edit ``Author`` model instances::
     from django.shortcuts import render
     from myapp.models import Author
 
+
     def manage_authors(request):
-        AuthorFormSet = modelformset_factory(Author, fields=['name', 'title'])
-        if request.method == 'POST':
+        AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
+        if request.method == "POST":
             formset = AuthorFormSet(request.POST, request.FILES)
             if formset.is_valid():
                 formset.save()
                 # do something.
         else:
             formset = AuthorFormSet()
-        return render(request, 'manage_authors.html', {'formset': formset})
+        return render(request, "manage_authors.html", {"formset": formset})
 
 As you can see, the view logic of a model formset isn't drastically different
 than that of a "normal" formset. The only difference is that we call
@@ -1093,6 +1116,7 @@ class's ``clean`` method::
 
     from django.forms import BaseModelFormSet
 
+
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
             super().clean()
@@ -1109,13 +1133,14 @@ to modify a value in ``ModelFormSet.clean()`` you must modify
 
     from django.forms import BaseModelFormSet
 
+
     class MyModelFormSet(BaseModelFormSet):
         def clean(self):
             super().clean()
 
             for form in self.forms:
-                name = form.cleaned_data['name'].upper()
-                form.cleaned_data['name'] = name
+                name = form.cleaned_data["name"].upper()
+                form.cleaned_data["name"] = name
                 # update the instance value.
                 form.instance.name = name
 
@@ -1129,12 +1154,14 @@ formset::
     from django.shortcuts import render
     from myapp.models import Author
 
+
     def manage_authors(request):
-        AuthorFormSet = modelformset_factory(Author, fields=['name', 'title'])
-        queryset = Author.objects.filter(name__startswith='O')
+        AuthorFormSet = modelformset_factory(Author, fields=["name", "title"])
+        queryset = Author.objects.filter(name__startswith="O")
         if request.method == "POST":
             formset = AuthorFormSet(
-                request.POST, request.FILES,
+                request.POST,
+                request.FILES,
                 queryset=queryset,
             )
             if formset.is_valid():
@@ -1142,7 +1169,7 @@ formset::
                 # Do something.
         else:
             formset = AuthorFormSet(queryset=queryset)
-        return render(request, 'manage_authors.html', {'formset': formset})
+        return render(request, "manage_authors.html", {"formset": formset})
 
 Note that we pass the ``queryset`` argument in both the ``POST`` and ``GET``
 cases in this example.
@@ -1224,8 +1251,10 @@ you have these two models::
 
     from django.db import models
 
+
     class Author(models.Model):
         name = models.CharField(max_length=100)
+
 
     class Book(models.Model):
         author = models.ForeignKey(Author, on_delete=models.CASCADE)
@@ -1237,8 +1266,8 @@ a particular author, you could do this:
 .. code-block:: pycon
 
     >>> from django.forms import inlineformset_factory
-    >>> BookFormSet = inlineformset_factory(Author, Book, fields=['title'])
-    >>> author = Author.objects.get(name='Mike Royko')
+    >>> BookFormSet = inlineformset_factory(Author, Book, fields=["title"])
+    >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
 ``BookFormSet``'s :ref:`prefix <formset-prefix>` is ``'book_set'``
@@ -1266,6 +1295,7 @@ For example, if you want to override ``clean()``::
 
     from django.forms import BaseInlineFormSet
 
+
     class CustomInlineFormSet(BaseInlineFormSet):
         def clean(self):
             super().clean()
@@ -1282,9 +1312,10 @@ Then when you create your inline formset, pass in the optional argument
 .. code-block:: pycon
 
     >>> from django.forms import inlineformset_factory
-    >>> BookFormSet = inlineformset_factory(Author, Book, fields=['title'],
-    ...     formset=CustomInlineFormSet)
-    >>> author = Author.objects.get(name='Mike Royko')
+    >>> BookFormSet = inlineformset_factory(
+    ...     Author, Book, fields=["title"], formset=CustomInlineFormSet
+    ... )
+    >>> author = Author.objects.get(name="Mike Royko")
     >>> formset = BookFormSet(instance=author)
 
 More than one foreign key to the same model
@@ -1298,12 +1329,12 @@ the following model::
         from_friend = models.ForeignKey(
             Friend,
             on_delete=models.CASCADE,
-            related_name='from_friends',
+            related_name="from_friends",
         )
         to_friend = models.ForeignKey(
             Friend,
             on_delete=models.CASCADE,
-            related_name='friends',
+            related_name="friends",
         )
         length_in_months = models.IntegerField()
 
@@ -1312,8 +1343,9 @@ To resolve this, you can use ``fk_name`` to
 
 .. code-block:: pycon
 
-    >>> FriendshipFormSet = inlineformset_factory(Friend, Friendship, fk_name='from_friend',
-    ...     fields=['to_friend', 'length_in_months'])
+    >>> FriendshipFormSet = inlineformset_factory(
+    ...     Friend, Friendship, fk_name="from_friend", fields=["to_friend", "length_in_months"]
+    ... )
 
 Using an inline formset in a view
 ---------------------------------
@@ -1323,7 +1355,7 @@ of a model. Here's how you can do that::
 
     def manage_books(request, author_id):
         author = Author.objects.get(pk=author_id)
-        BookInlineFormSet = inlineformset_factory(Author, Book, fields=['title'])
+        BookInlineFormSet = inlineformset_factory(Author, Book, fields=["title"])
         if request.method == "POST":
             formset = BookInlineFormSet(request.POST, request.FILES, instance=author)
             if formset.is_valid():
@@ -1332,7 +1364,7 @@ of a model. Here's how you can do that::
                 return HttpResponseRedirect(author.get_absolute_url())
         else:
             formset = BookInlineFormSet(instance=author)
-        return render(request, 'manage_books.html', {'formset': formset})
+        return render(request, "manage_books.html", {"formset": formset})
 
 Notice how we pass ``instance`` in both the ``POST`` and ``GET`` cases.
 

@@ -286,7 +286,7 @@ In the ``polls/urls.py`` file include the following code:
     from . import views
 
     urlpatterns = [
-        path('', views.index, name='index'),
+        path("", views.index, name="index"),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
@@ -300,8 +300,8 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
     from django.urls import include, path
 
     urlpatterns = [
-        path('polls/', include('polls.urls')),
-        path('admin/', admin.site.urls),
+        path("polls/", include("polls.urls")),
+        path("admin/", admin.site.urls),
     ]
 
 The :func:`~django.urls.include` function allows referencing other URLconfs.

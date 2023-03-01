@@ -126,8 +126,8 @@ overridden by what's passed by
 
           Engine(
               libraries={
-                  'myapp_tags': 'path.to.myapp.tags',
-                  'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+                  "myapp_tags": "path.to.myapp.tags",
+                  "admin.urls": "django.contrib.admin.templatetags.admin_urls",
               },
           )
 
@@ -138,7 +138,7 @@ overridden by what's passed by
       add to :doc:`built-ins </ref/templates/builtins>`. For example::
 
           Engine(
-              builtins=['myapp.builtins'],
+              builtins=["myapp.builtins"],
           )
 
       Tags and filters from built-in libraries can be used without first calling
@@ -260,7 +260,9 @@ logic. Here are a few examples:
     >>> t.render(Context(d))
     "My name is Joe."
 
-    >>> class PersonClass: pass
+    >>> class PersonClass:
+    ...     pass
+    ...
     >>> p = PersonClass()
     >>> p.first_name = "Ron"
     >>> p.last_name = "Nasty"
@@ -280,6 +282,7 @@ it. Example:
     >>> class PersonClass2:
     ...     def name(self):
     ...         return "Samantha"
+    ...
     >>> t = Template("My name is {{ person.name }}.")
     >>> t.render(Context({"person": PersonClass2}))
     "My name is Samantha."
@@ -301,6 +304,7 @@ straight lookups. Here are some things to keep in mind:
     >>> class PersonClass3:
     ...     def first_name(self):
     ...         raise AssertionError("foo")
+    ...
     >>> p = PersonClass3()
     >>> t.render(Context({"person": p}))
     Traceback (most recent call last):
@@ -309,9 +313,11 @@ straight lookups. Here are some things to keep in mind:
 
     >>> class SilentAssertionError(Exception):
     ...     silent_variable_failure = True
+    ...
     >>> class PersonClass4:
     ...     def first_name(self):
     ...         raise SilentAssertionError
+    ...
     >>> p = PersonClass4()
     >>> t.render(Context({"person": p}))
     "My name is ."
@@ -349,6 +355,8 @@ straight lookups. Here are some things to keep in mind:
 
     def sensitive_function(self):
         self.database_record.delete()
+
+
     sensitive_function.alters_data = True
 
 * Occasionally you may want to turn off this feature for other reasons,
@@ -442,15 +450,15 @@ dictionary syntax:
 
     >>> from django.template import Context
     >>> c = Context({"foo": "bar"})
-    >>> c['foo']
+    >>> c["foo"]
     'bar'
-    >>> del c['foo']
-    >>> c['foo']
+    >>> del c["foo"]
+    >>> c["foo"]
     Traceback (most recent call last):
     ...
     KeyError: 'foo'
-    >>> c['newvariable'] = 'hello'
-    >>> c['newvariable']
+    >>> c["newvariable"] = "hello"
+    >>> c["newvariable"]
     'hello'
 
 .. method:: Context.get(key, otherwise=None)
@@ -474,18 +482,18 @@ If you ``pop()`` too much, it'll raise
 .. code-block:: pycon
 
     >>> c = Context()
-    >>> c['foo'] = 'first level'
+    >>> c["foo"] = "first level"
     >>> c.push()
     {}
-    >>> c['foo'] = 'second level'
-    >>> c['foo']
+    >>> c["foo"] = "second level"
+    >>> c["foo"]
     'second level'
     >>> c.pop()
     {'foo': 'second level'}
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
-    >>> c['foo'] = 'overwritten'
-    >>> c['foo']
+    >>> c["foo"] = "overwritten"
+    >>> c["foo"]
     'overwritten'
     >>> c.pop()
     Traceback (most recent call last):
@@ -576,13 +584,16 @@ against ``dict``::
     class ContextTest(unittest.TestCase):
         def test_against_dictionary(self):
             c1 = Context()
-            c1['update'] = 'value'
-            self.assertEqual(c1.flatten(), {
-                'True': True,
-                'None': None,
-                'False': False,
-                'update': 'value',
-            })
+            c1["update"] = "value"
+            self.assertEqual(
+                c1.flatten(),
+                {
+                    "True": True,
+                    "None": None,
+                    "False": False,
+                    "update": "value",
+                },
+            )
 
 .. _subclassing-context-requestcontext:
 
@@ -596,9 +607,12 @@ Django comes with a special ``Context`` class,
 normal ``django.template.Context``. The first difference is that it takes an
 :class:`~django.http.HttpRequest` as its first argument. For example::
 
-    c = RequestContext(request, {
-        'foo': 'bar',
-    })
+    c = RequestContext(
+        request,
+        {
+            "foo": "bar",
+        },
+    )
 
 The second difference is that it automatically populates the context with a
 few variables, according to the engine's ``context_processors`` configuration
@@ -611,10 +625,10 @@ settings file, the default template engine contains the following context
 processors::
 
     [
-        'django.template.context_processors.debug',
-        'django.template.context_processors.request',
-        'django.contrib.auth.context_processors.auth',
-        'django.contrib.messages.context_processors.messages',
+        "django.template.context_processors.debug",
+        "django.template.context_processors.request",
+        "django.contrib.auth.context_processors.auth",
+        "django.contrib.messages.context_processors.messages",
     ]
 
 In addition to these, :class:`RequestContext` always enables
@@ -655,14 +669,20 @@ example, the :class:`RequestContext` instance gets an ``ip_address`` variable::
     from django.http import HttpResponse
     from django.template import RequestContext, Template
 
+
     def ip_address_processor(request):
-        return {'ip_address': request.META['REMOTE_ADDR']}
+        return {"ip_address": request.META["REMOTE_ADDR"]}
+
 
     def client_ip_view(request):
-        template = Template('{{ title }}: {{ ip_address }}')
-        context = RequestContext(request, {
-            'title': 'Your IP Address',
-        }, [ip_address_processor])
+        template = Template("{{ title }}: {{ ip_address }}")
+        context = RequestContext(
+            request,
+            {
+                "title": "Your IP Address",
+            },
+            [ip_address_processor],
+        )
         return HttpResponse(template.render(context))
 
 .. _context-processors:
@@ -785,6 +805,7 @@ context::
 
     from django.conf import settings
 
+
     def from_email(request):
         return {
             "DEFAULT_FROM_EMAIL": settings.DEFAULT_FROM_EMAIL,
@@ -819,10 +840,10 @@ directories::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                '/home/html/templates/lawrence.com',
-                '/home/html/templates/default',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [
+                "/home/html/templates/lawrence.com",
+                "/home/html/templates/default",
             ],
         },
     ]
@@ -861,25 +882,29 @@ loaders that come with Django:
     This loader is enabled by default. However it won't find any templates
     until you set :setting:`DIRS <TEMPLATES-DIRS>` to a non-empty list::
 
-        TEMPLATES = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-        }]
+        TEMPLATES = [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": [BASE_DIR / "templates"],
+            }
+        ]
 
     You can also override ``'DIRS'`` and specify specific directories for a
     particular filesystem loader::
 
-        TEMPLATES = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'OPTIONS': {
-                'loaders': [
-                    (
-                        'django.template.loaders.filesystem.Loader',
-                        [BASE_DIR / 'templates'],
-                    ),
-                ],
-            },
-        }]
+        TEMPLATES = [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.filesystem.Loader",
+                            [BASE_DIR / "templates"],
+                        ),
+                    ],
+                },
+            }
+        ]
 
 ``django.template.loaders.app_directories.Loader``
 
@@ -894,7 +919,7 @@ loaders that come with Django:
 
     For example, for this setting::
 
-        INSTALLED_APPS = ['myproject.polls', 'myproject.music']
+        INSTALLED_APPS = ["myproject.polls", "myproject.music"]
 
     ...then ``get_template('foo.html')`` will look for ``foo.html`` in these
     directories, in this order:
@@ -919,10 +944,12 @@ loaders that come with Django:
     You can enable this loader by setting :setting:`APP_DIRS
     <TEMPLATES-APP_DIRS>` to ``True``::
 
-        TEMPLATES = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
-        }]
+        TEMPLATES = [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "APP_DIRS": True,
+            }
+        ]
 
 ``django.template.loaders.cached.Loader``
 
@@ -944,19 +971,24 @@ loaders that come with Django:
     You can manually specify template caching with some custom template loaders
     using settings like this::
 
-        TEMPLATES = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'OPTIONS': {
-                'loaders': [
-                    ('django.template.loaders.cached.Loader', [
-                        'django.template.loaders.filesystem.Loader',
-                        'django.template.loaders.app_directories.Loader',
-                        'path.to.custom.Loader',
-                    ]),
-                ],
-            },
-        }]
+        TEMPLATES = [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "DIRS": [BASE_DIR / "templates"],
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.cached.Loader",
+                            [
+                                "django.template.loaders.filesystem.Loader",
+                                "django.template.loaders.app_directories.Loader",
+                                "path.to.custom.Loader",
+                            ],
+                        ),
+                    ],
+                },
+            }
+        ]
 
     .. note::
 
@@ -981,16 +1013,21 @@ loaders that come with Django:
 
     This loader takes a dictionary of templates as its first argument::
 
-        TEMPLATES = [{
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'OPTIONS': {
-                'loaders': [
-                    ('django.template.loaders.locmem.Loader', {
-                        'index.html': 'content here',
-                    }),
-                ],
-            },
-        }]
+        TEMPLATES = [
+            {
+                "BACKEND": "django.template.backends.django.DjangoTemplates",
+                "OPTIONS": {
+                    "loaders": [
+                        (
+                            "django.template.loaders.locmem.Loader",
+                            {
+                                "index.html": "content here",
+                            },
+                        ),
+                    ],
+                },
+            }
+        ]
 
     This loader is disabled by default.
 

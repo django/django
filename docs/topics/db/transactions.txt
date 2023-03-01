@@ -78,11 +78,13 @@ still possible to prevent views from running in a transaction.
 
         from django.db import transaction
 
+
         @transaction.non_atomic_requests
         def my_view(request):
             do_stuff()
 
-        @transaction.non_atomic_requests(using='other')
+
+        @transaction.non_atomic_requests(using="other")
         def my_other_view(request):
             do_stuff_on_the_other_database()
 
@@ -115,6 +117,7 @@ Django provides a single API to control database transactions.
 
         from django.db import transaction
 
+
         @transaction.atomic
         def viewfunc(request):
             # This code executes inside a transaction.
@@ -123,6 +126,7 @@ Django provides a single API to control database transactions.
     and as a :py:term:`context manager`::
 
         from django.db import transaction
+
 
         def viewfunc(request):
             # This code executes in autocommit mode (Django's default).
@@ -136,6 +140,7 @@ Django provides a single API to control database transactions.
     integrity errors::
 
         from django.db import IntegrityError, transaction
+
 
         @transaction.atomic
         def viewfunc(request):
@@ -301,8 +306,10 @@ Pass a function, or any callable, to :func:`on_commit`::
 
     from django.db import transaction
 
+
     def send_welcome_email():
         ...
+
 
     transaction.on_commit(send_welcome_email)
 
@@ -312,9 +319,7 @@ Callbacks will not be passed any arguments, but you can bind them with
     from functools import partial
 
     for user in users:
-        transaction.on_commit(
-            partial(send_invite_email, user=user)
-        )
+        transaction.on_commit(partial(send_invite_email, user=user))
 
 Callbacks are called after the open transaction is successfully committed. If
 the transaction is instead rolled back (typically when an unhandled exception
@@ -572,10 +577,10 @@ The following example demonstrates the use of savepoints::
 
     from django.db import transaction
 
+
     # open a transaction
     @transaction.atomic
     def viewfunc(request):
-
         a.save()
         # transaction now contains a.save()
 
@@ -670,12 +675,12 @@ Transaction rollback
 
 The first option is to roll back the entire transaction. For example::
 
-    a.save() # Succeeds, but may be undone by transaction rollback
+    a.save()  # Succeeds, but may be undone by transaction rollback
     try:
-        b.save() # Could throw exception
+        b.save()  # Could throw exception
     except IntegrityError:
         transaction.rollback()
-    c.save() # Succeeds, but a.save() may have been undone
+    c.save()  # Succeeds, but a.save() may have been undone
 
 Calling ``transaction.rollback()`` rolls back the entire transaction. Any
 uncommitted database operations will be lost. In this example, the changes
@@ -691,14 +696,14 @@ fail, you can set or update the savepoint; that way, if the operation fails,
 you can roll back the single offending operation, rather than the entire
 transaction. For example::
 
-    a.save() # Succeeds, and never undone by savepoint rollback
+    a.save()  # Succeeds, and never undone by savepoint rollback
     sid = transaction.savepoint()
     try:
-        b.save() # Could throw exception
+        b.save()  # Could throw exception
         transaction.savepoint_commit(sid)
     except IntegrityError:
         transaction.savepoint_rollback(sid)
-    c.save() # Succeeds, and a.save() is never undone
+    c.save()  # Succeeds, and a.save() is never undone
 
 In this example, ``a.save()`` will not be undone in the case where
 ``b.save()`` raises an exception.

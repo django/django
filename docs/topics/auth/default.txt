@@ -51,12 +51,12 @@ The most direct way to create users is to use the included
 .. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> user = User.objects.create_user('john', 'lennon@thebeatles.com', 'johnpassword')
+    >>> user = User.objects.create_user("john", "lennon@thebeatles.com", "johnpassword")
 
     # At this point, user is a User object that has already been saved
     # to the database. You can continue to change its attributes
     # if you want to change other fields.
-    >>> user.last_name = 'Lennon'
+    >>> user.last_name = "Lennon"
     >>> user.save()
 
 If you have the Django admin installed, you can also :ref:`create users
@@ -102,8 +102,8 @@ You can also change a password programmatically, using
 .. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> u = User.objects.get(username='john')
-    >>> u.set_password('new password')
+    >>> u = User.objects.get(username="john")
+    >>> u.set_password("new password")
     >>> u.save()
 
 If you have the Django admin installed, you can also change user's passwords
@@ -131,7 +131,8 @@ Authenticating users
     returns ``None``. For example::
 
         from django.contrib.auth import authenticate
-        user = authenticate(username='john', password='secret')
+
+        user = authenticate(username="john", password="secret")
         if user is not None:
             # A backend authenticated the credentials
             ...
@@ -258,8 +259,8 @@ in ``myapp``::
 
     content_type = ContentType.objects.get_for_model(BlogPost)
     permission = Permission.objects.create(
-        codename='can_publish',
-        name='Can Publish Posts',
+        codename="can_publish",
+        name="Can Publish Posts",
         content_type=content_type,
     )
 
@@ -275,7 +276,9 @@ attribute or to a :class:`~django.contrib.auth.models.Group` via its
     :meth:`.ContentTypeManager.get_for_model` to get the appropriate
     ``ContentType``::
 
-        content_type = ContentType.objects.get_for_model(BlogPostProxy, for_concrete_model=False)
+        content_type = ContentType.objects.get_for_model(
+            BlogPostProxy, for_concrete_model=False
+        )
 
 Permission caching
 ------------------
@@ -294,27 +297,28 @@ the user from the database. For example::
 
     from myapp.models import BlogPost
 
+
     def user_gains_perms(request, user_id):
         user = get_object_or_404(User, pk=user_id)
         # any permission check will cache the current set of permissions
-        user.has_perm('myapp.change_blogpost')
+        user.has_perm("myapp.change_blogpost")
 
         content_type = ContentType.objects.get_for_model(BlogPost)
         permission = Permission.objects.get(
-            codename='change_blogpost',
+            codename="change_blogpost",
             content_type=content_type,
         )
         user.user_permissions.add(permission)
 
         # Checking the cached permission set
-        user.has_perm('myapp.change_blogpost')  # False
+        user.has_perm("myapp.change_blogpost")  # False
 
         # Request new instance of User
         # Be aware that user.refresh_from_db() won't clear the cache.
         user = get_object_or_404(User, pk=user_id)
 
         # Permission cache is repopulated from the database
-        user.has_perm('myapp.change_blogpost')  # True
+        user.has_perm("myapp.change_blogpost")  # True
 
         ...
 
@@ -329,12 +333,13 @@ inherit the permissions of the concrete model they subclass::
 
     class Person(models.Model):
         class Meta:
-            permissions = [('can_eat_pizzas', 'Can eat pizzas')]
+            permissions = [("can_eat_pizzas", "Can eat pizzas")]
+
 
     class Student(Person):
         class Meta:
             proxy = True
-            permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+            permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
 .. code-block:: pycon
 
@@ -346,11 +351,12 @@ inherit the permissions of the concrete model they subclass::
     'can_deliver_pizzas']
     >>> for permission in student_permissions:
     ...     user.user_permissions.add(permission)
-    >>> user.has_perm('app.add_person')
+    ...
+    >>> user.has_perm("app.add_person")
     False
-    >>> user.has_perm('app.can_eat_pizzas')
+    >>> user.has_perm("app.can_eat_pizzas")
     False
-    >>> user.has_perms(('app.add_student', 'app.can_deliver_pizzas'))
+    >>> user.has_perms(("app.add_student", "app.can_deliver_pizzas"))
     True
 
 .. _auth-web-requests:
@@ -402,9 +408,10 @@ If you have an authenticated user you want to attach to the current session
 
         from django.contrib.auth import authenticate, login
 
+
         def my_view(request):
-            username = request.POST['username']
-            password = request.POST['password']
+            username = request.POST["username"]
+            password = request.POST["password"]
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -450,6 +457,7 @@ How to log a user out
 
         from django.contrib.auth import logout
 
+
         def logout_view(request):
             logout(request)
             # Redirect to a success page.
@@ -479,18 +487,20 @@ login page::
     from django.conf import settings
     from django.shortcuts import redirect
 
+
     def my_view(request):
         if not request.user.is_authenticated:
-            return redirect(f'{settings.LOGIN_URL}?next={request.path}')
+            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
         # ...
 
 ...or display an error message::
 
     from django.shortcuts import render
 
+
     def my_view(request):
         if not request.user.is_authenticated:
-            return render(request, 'myapp/login_error.html')
+            return render(request, "myapp/login_error.html")
         # ...
 
 .. currentmodule:: django.contrib.auth.decorators
@@ -504,6 +514,7 @@ The ``login_required`` decorator
     :func:`~django.contrib.auth.decorators.login_required` decorator::
 
         from django.contrib.auth.decorators import login_required
+
 
         @login_required
         def my_view(request):
@@ -526,7 +537,8 @@ The ``login_required`` decorator
 
         from django.contrib.auth.decorators import login_required
 
-        @login_required(redirect_field_name='my_redirect_field')
+
+        @login_required(redirect_field_name="my_redirect_field")
         def my_view(request):
             ...
 
@@ -540,7 +552,8 @@ The ``login_required`` decorator
 
         from django.contrib.auth.decorators import login_required
 
-        @login_required(login_url='/accounts/login/')
+
+        @login_required(login_url="/accounts/login/")
         def my_view(request):
             ...
 
@@ -551,7 +564,7 @@ The ``login_required`` decorator
 
         from django.contrib.auth import views as auth_views
 
-        path('accounts/login/', auth_views.LoginView.as_view()),
+        path("accounts/login/", auth_views.LoginView.as_view()),
 
     The :setting:`settings.LOGIN_URL <LOGIN_URL>` also accepts view function
     names and :ref:`named URL patterns <naming-url-patterns>`. This allows you
@@ -595,9 +608,10 @@ inheritance list.
 
         from django.contrib.auth.mixins import LoginRequiredMixin
 
+
         class MyView(LoginRequiredMixin, View):
-            login_url = '/login/'
-            redirect_field_name = 'redirect_to'
+            login_url = "/login/"
+            redirect_field_name = "redirect_to"
 
 .. note::
 
@@ -619,9 +633,10 @@ email in the desired domain and if not, redirects to the login page::
 
     from django.shortcuts import redirect
 
+
     def my_view(request):
-        if not request.user.email.endswith('@example.com'):
-            return redirect('/login/?next=%s' % request.path)
+        if not request.user.email.endswith("@example.com"):
+            return redirect("/login/?next=%s" % request.path)
         # ...
 
 .. function:: user_passes_test(test_func, login_url=None, redirect_field_name='next')
@@ -631,8 +646,10 @@ email in the desired domain and if not, redirects to the login page::
 
         from django.contrib.auth.decorators import user_passes_test
 
+
         def email_check(user):
-            return user.email.endswith('@example.com')
+            return user.email.endswith("@example.com")
+
 
         @user_passes_test(email_check)
         def my_view(request):
@@ -662,7 +679,7 @@ email in the desired domain and if not, redirects to the login page::
 
     For example::
 
-        @user_passes_test(email_check, login_url='/login/')
+        @user_passes_test(email_check, login_url="/login/")
         def my_view(request):
             ...
 
@@ -682,10 +699,10 @@ email in the desired domain and if not, redirects to the login page::
 
             from django.contrib.auth.mixins import UserPassesTestMixin
 
-            class MyView(UserPassesTestMixin, View):
 
+            class MyView(UserPassesTestMixin, View):
                 def test_func(self):
-                    return self.request.user.email.endswith('@example.com')
+                    return self.request.user.email.endswith("@example.com")
 
     .. method:: get_test_func()
 
@@ -700,11 +717,13 @@ email in the desired domain and if not, redirects to the login page::
 
             class TestMixin1(UserPassesTestMixin):
                 def test_func(self):
-                    return self.request.user.email.endswith('@example.com')
+                    return self.request.user.email.endswith("@example.com")
+
 
             class TestMixin2(UserPassesTestMixin):
                 def test_func(self):
-                    return self.request.user.username.startswith('django')
+                    return self.request.user.username.startswith("django")
+
 
             class MyView(TestMixin1, TestMixin2, View):
                 ...
@@ -725,7 +744,8 @@ The ``permission_required`` decorator
 
         from django.contrib.auth.decorators import permission_required
 
-        @permission_required('polls.add_choice')
+
+        @permission_required("polls.add_choice")
         def my_view(request):
             ...
 
@@ -742,7 +762,8 @@ The ``permission_required`` decorator
 
         from django.contrib.auth.decorators import permission_required
 
-        @permission_required('polls.add_choice', login_url='/loginpage/')
+
+        @permission_required("polls.add_choice", login_url="/loginpage/")
         def my_view(request):
             ...
 
@@ -760,8 +781,9 @@ The ``permission_required`` decorator
 
         from django.contrib.auth.decorators import login_required, permission_required
 
+
         @login_required
-        @permission_required('polls.add_choice', raise_exception=True)
+        @permission_required("polls.add_choice", raise_exception=True)
         def my_view(request):
             ...
 
@@ -786,10 +808,11 @@ To apply permission checks to :doc:`class-based views
 
         from django.contrib.auth.mixins import PermissionRequiredMixin
 
+
         class MyView(PermissionRequiredMixin, View):
-            permission_required = 'polls.add_choice'
+            permission_required = "polls.add_choice"
             # Or multiple of permissions:
-            permission_required = ['polls.view_choice', 'polls.change_choice']
+            permission_required = ["polls.view_choice", "polls.change_choice"]
 
     You can set any of the parameters of
     :class:`~django.contrib.auth.mixins.AccessMixin` to customize the handling
@@ -907,8 +930,9 @@ function.
 
         from django.contrib.auth import update_session_auth_hash
 
+
         def password_change(request):
-            if request.method == 'POST':
+            if request.method == "POST":
                 form = PasswordChangeForm(user=request.user, data=request.POST)
                 if form.is_valid():
                     form.save()
@@ -949,7 +973,7 @@ easiest way is to include the provided URLconf in ``django.contrib.auth.urls``
 in your own URLconf, for example::
 
     urlpatterns = [
-        path('accounts/', include('django.contrib.auth.urls')),
+        path("accounts/", include("django.contrib.auth.urls")),
     ]
 
 This will include the following URL patterns:
@@ -974,7 +998,7 @@ your URLconf::
     from django.contrib.auth import views as auth_views
 
     urlpatterns = [
-        path('change-password/', auth_views.PasswordChangeView.as_view()),
+        path("change-password/", auth_views.PasswordChangeView.as_view()),
     ]
 
 The views have optional arguments you can use to alter the behavior of the
@@ -984,8 +1008,8 @@ arguments in the URLconf, these will be passed on to the view. For example::
 
     urlpatterns = [
         path(
-            'change-password/',
-            auth_views.PasswordChangeView.as_view(template_name='change-password.html'),
+            "change-password/",
+            auth_views.PasswordChangeView.as_view(template_name="change-password.html"),
         ),
     ]
 
@@ -1106,7 +1130,7 @@ implementation details see :ref:`using-the-views`.
     the ``as_view`` method in your URLconf. For example, this URLconf line would
     use :file:`myapp/login.html` instead::
 
-        path('accounts/login/', auth_views.LoginView.as_view(template_name='myapp/login.html')),
+        path("accounts/login/", auth_views.LoginView.as_view(template_name="myapp/login.html")),
 
     You can also specify the name of the ``GET`` field which contains the URL
     to redirect to after login using ``redirect_field_name``. By default, the
@@ -1602,6 +1626,7 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
             from django.contrib.auth.forms import AuthenticationForm
 
+
             class AuthenticationFormWithInactiveUsersOkay(AuthenticationForm):
                 def confirm_login_allowed(self, user):
                     pass
@@ -1617,12 +1642,12 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
                     if not user.is_active:
                         raise ValidationError(
                             _("This account is inactive."),
-                            code='inactive',
+                            code="inactive",
                         )
-                    if user.username.startswith('b'):
+                    if user.username.startswith("b"):
                         raise ValidationError(
                             _("Sorry, accounts starting with 'b' aren't welcome here."),
-                            code='no_b_users',
+                            code="no_b_users",
                         )
 
 .. class:: PasswordChangeForm

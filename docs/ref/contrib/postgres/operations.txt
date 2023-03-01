@@ -22,13 +22,11 @@ For example::
 
     from django.contrib.postgres.operations import HStoreExtension
 
+
     class Migration(migrations.Migration):
         ...
 
-        operations = [
-            HStoreExtension(),
-            ...
-        ]
+        operations = [HStoreExtension(), ...]
 
 The operation skips adding the extension if it already exists.
 
@@ -124,16 +122,17 @@ For example, to create a collation for German phone book ordering::
 
     from django.contrib.postgres.operations import CreateCollation
 
+
     class Migration(migrations.Migration):
         ...
 
         operations = [
             CreateCollation(
-                'german_phonebook',
-                provider='icu',
-                locale='und-u-ks-level2',
+                "german_phonebook",
+                provider="icu",
+                locale="und-u-ks-level2",
             ),
-            ...
+            ...,
         ]
 
 .. class:: CreateCollation(name, locale, *, provider='libc', deterministic=True)

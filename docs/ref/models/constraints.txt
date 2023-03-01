@@ -120,7 +120,7 @@ ensures the age field is never less than 18.
     to behave the same as check constraints validation. For example, if ``age``
     is a nullable field::
 
-        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name='age_gte_18')
+        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name="age_gte_18")
 
 .. versionchanged:: 4.1
 
@@ -143,7 +143,7 @@ constraints on expressions and database functions.
 
 For example::
 
-    UniqueConstraint(Lower('name').desc(), 'category', name='unique_lower_name_category')
+    UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
 
 creates a unique constraint on the lowercased value of the ``name`` field in
 descending order and the ``category`` field in the default ascending order.
@@ -173,7 +173,7 @@ enforce.
 
 For example::
 
-    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+    UniqueConstraint(fields=["user"], condition=Q(status="DRAFT"), name="unique_draft_user")
 
 ensures that each user only has one draft.
 
@@ -191,8 +191,8 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
     from django.db.models import Deferrable, UniqueConstraint
 
     UniqueConstraint(
-        name='unique_order',
-        fields=['order'],
+        name="unique_order",
+        fields=["order"],
         deferrable=Deferrable.DEFERRED,
     )
 
@@ -222,7 +222,7 @@ and filter only by unique fields (:attr:`~UniqueConstraint.fields`).
 
 For example::
 
-    UniqueConstraint(name='unique_booking', fields=['room', 'date'], include=['full_name'])
+    UniqueConstraint(name="unique_booking", fields=["room", "date"], include=["full_name"])
 
 will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
 while fetching data only from the index.
@@ -244,7 +244,9 @@ for each field in the index.
 
 For example::
 
-    UniqueConstraint(name='unique_username', fields=['username'], opclasses=['varchar_pattern_ops'])
+    UniqueConstraint(
+        name="unique_username", fields=["username"], opclasses=["varchar_pattern_ops"]
+    )
 
 creates a unique index on ``username`` using ``varchar_pattern_ops``.
 

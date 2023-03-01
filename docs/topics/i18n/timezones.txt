@@ -172,12 +172,13 @@ Add the following middleware to :setting:`MIDDLEWARE`::
 
     from django.utils import timezone
 
+
     class TimezoneMiddleware:
         def __init__(self, get_response):
             self.get_response = get_response
 
         def __call__(self, request):
-            tzname = request.session.get('django_timezone')
+            tzname = request.session.get("django_timezone")
             if tzname:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             else:
@@ -190,17 +191,18 @@ Create a view that can set the current timezone::
 
     # Prepare a map of common locations to timezone choices you wish to offer.
     common_timezones = {
-        'London': 'Europe/London',
-        'Paris': 'Europe/Paris',
-        'New York': 'America/New_York',
+        "London": "Europe/London",
+        "Paris": "Europe/Paris",
+        "New York": "America/New_York",
     }
 
+
     def set_timezone(request):
-        if request.method == 'POST':
-            request.session['django_timezone'] = request.POST['timezone']
-            return redirect('/')
+        if request.method == "POST":
+            request.session["django_timezone"] = request.POST["timezone"]
+            return redirect("/")
         else:
-            return render(request, 'template.html', {'timezones': common_timezones})
+            return render(request, "template.html", {"timezones": common_timezones})
 
 Include a form in ``template.html`` that will ``POST`` to this view:
 
@@ -444,9 +446,12 @@ During development, you can turn such warnings into exceptions and get a
 traceback by adding the following to your settings file::
 
     import warnings
+
     warnings.filterwarnings(
-        'error', r"DateTimeField .* received a naive datetime",
-        RuntimeWarning, r'django\.db\.models\.fields',
+        "error",
+        r"DateTimeField .* received a naive datetime",
+        RuntimeWarning,
+        r"django\.db\.models\.fields",
     )
 
 Fixtures
@@ -519,6 +524,7 @@ Setup
        >>> import datetime
        >>> def one_year_before(value):  # Wrong example.
        ...     return value.replace(year=value.year - 1)
+       ...
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)
        >>> one_year_before(datetime.datetime(2012, 2, 29, 10, 0))
