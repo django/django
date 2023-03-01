@@ -279,6 +279,9 @@ Miscellaneous
 
 * The undocumented ``django.contrib.admin.helpers.checkbox`` is removed.
 
+* Integer fields are now validated as 64-bit integers on SQLite to match the
+  behavior of ``sqlite3``.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
