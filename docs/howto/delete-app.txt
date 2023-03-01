@@ -1,0 +1,38 @@
+================================================
+How to delete an app from the project
+================================================
+
+In this document, you will learn how to completely and properly delete an app.
+
+1. You need to remove all the tables from your database and every traces 
+of the app. For this, use:
+
+.. console::
+
+    $ python manage.py migrate app_name zero
+* This command also executes your SQL.
+
+* However, be careful when running this command when you have other apps 
+  dependent on the migrations of the deleting app. After it is deleted, 
+  migration system will crash because it can not find those migrations.
+
+* But you can avoid such situations by simply squashing migrations. 
+  For more information, read :ref:`Squashing Migrations <migration-squashing>`.
+
+2. Next, you need to remove: 
+
+* App name from the :setting:`INSTALLED_APPS` in settings of the project::
+
+      INSTALLED_APPS = [
+         'django.contrib.admin',
+         ...
+         'app_name',
+      ]
+
+* the app directory itself and every reference of the app from 
+  other files, such as ``include(app_name.urls)`` statement from ``urls.py``.
+
+3. After that, you should delete all the unnecessary media, cache, or any 
+other files that are related to the deleted app.
+
+Congratulations, you have successfully deleted your first app.
