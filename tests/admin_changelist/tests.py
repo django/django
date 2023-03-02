@@ -1593,6 +1593,19 @@ class ChangeListTests(TestCase):
             'aria-describedby="searchbar_helptext">',
         )
 
+    def test_search_bar_total_link_preserves_options(self):
+        self.client.force_login(self.superuser)
+        url = reverse("admin:auth_user_changelist")
+        for data, href in (
+            ({"is_staff__exact": "0"}, "?"),
+            ({"is_staff__exact": "0", IS_POPUP_VAR: "1"}, f"?{IS_POPUP_VAR}=1"),
+        ):
+            with self.subTest(data=data):
+                response = self.client.get(url, data=data)
+                self.assertContains(
+                    response, f'0 results (<a href="{href}">1 total</a>)'
+                )
+
 
 class GetAdminLogTests(TestCase):
     def test_custom_user_pk_not_named_id(self):
