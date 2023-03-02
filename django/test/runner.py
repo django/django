@@ -874,7 +874,7 @@ class DiscoverRunner:
         self.test_loader._top_level_dir = None
         return tests
 
-    def build_suite(self, test_labels=None, **kwargs):
+    def build_suite(self, test_labels=None):
         test_labels = test_labels or ["."]
 
         discover_kwargs = {}
