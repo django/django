@@ -1108,9 +1108,9 @@ class QuerySet(AltersData):
                 qs = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset : offset + batch_size]
-                    qs += tuple(self.filter(**{filter_key: batch}).order_by())
+                    qs += tuple(self.filter(**{filter_key: batch}))
             else:
-                qs = self.filter(**{filter_key: id_list}).order_by()
+                qs = self.filter(**{filter_key: id_list})
         else:
             qs = self._chain()
         return {getattr(obj, field_name): obj for obj in qs}
