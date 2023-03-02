@@ -247,6 +247,35 @@ class LookupTests(TestCase):
             Article.objects.in_bulk([self.au1], field_name="author")
 
     @skipUnlessDBFeature("can_distinct_on_fields")
+    def test_in_bulk_preserve_ordering(self):
+        articles = (
+            Article.objects.order_by("author_id", "-pub_date")
+            .distinct("author_id")
+            .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
+        )
+        self.assertEqual(
+            articles,
+            {self.au1.id: self.a4, self.au2.id: self.a5},
+        )
+
+    @skipUnlessDBFeature("can_distinct_on_fields")
+    def test_in_bulk_preserve_ordering_with_batch_size(self):
+        old_max_query_params = connection.features.max_query_params
+        connection.features.max_query_params = 1
+        try:
+            articles = (
+                Article.objects.order_by("author_id", "-pub_date")
+                .distinct("author_id")
+                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
+            )
+            self.assertEqual(
+                articles,
+                {self.au1.id: self.a4, self.au2.id: self.a5},
+            )
+        finally:
+            connection.features.max_query_params = old_max_query_params
+
+    @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):
         self.assertEqual(
             Article.objects.order_by("headline")
