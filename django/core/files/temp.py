@@ -18,8 +18,10 @@ arguments available in tempfile.NamedTemporaryFile.
 
 import os
 import tempfile
+from functools import partial
 
 from django.core.files.utils import FileProxyMixin
+from django.utils.version import PY312
 
 __all__ = (
     "NamedTemporaryFile",
@@ -28,51 +30,54 @@ __all__ = (
 
 
 if os.name == "nt":
+    if PY312:
+        NamedTemporaryFile = partial(tempfile.NamedTemporaryFile, delete_on_close=False)
+    else:
+        # TODO: Remove when dropping support for PY311.
+        class TemporaryFile(FileProxyMixin):
+            """
+            Temporary file object constructor that supports reopening of the
+            temporary file in Windows.
 
-    class TemporaryFile(FileProxyMixin):
-        """
-        Temporary file object constructor that supports reopening of the
-        temporary file in Windows.
+            Unlike tempfile.NamedTemporaryFile from the standard library,
+            __init__() doesn't support the 'delete', 'buffering', 'encoding', or
+            'newline' keyword arguments.
+            """
 
-        Unlike tempfile.NamedTemporaryFile from the standard library,
-        __init__() doesn't support the 'delete', 'buffering', 'encoding', or
-        'newline' keyword arguments.
-        """
+            def __init__(self, mode="w+b", bufsize=-1, suffix="", prefix="", dir=None):
+                fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
+                self.name = name
+                self.file = os.fdopen(fd, mode, bufsize)
+                self.close_called = False
 
-        def __init__(self, mode="w+b", bufsize=-1, suffix="", prefix="", dir=None):
-            fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
-            self.name = name
-            self.file = os.fdopen(fd, mode, bufsize)
-            self.close_called = False
+            # Because close can be called during shutdown
+            # we need to cache os.unlink and access it
+            # as self.unlink only
+            unlink = os.unlink
 
-        # Because close can be called during shutdown
-        # we need to cache os.unlink and access it
-        # as self.unlink only
-        unlink = os.unlink
+            def close(self):
+                if not self.close_called:
+                    self.close_called = True
+                    try:
+                        self.file.close()
+                    except OSError:
+                        pass
+                    try:
+                        self.unlink(self.name)
+                    except OSError:
+                        pass
 
-        def close(self):
-            if not self.close_called:
-                self.close_called = True
-                try:
-                    self.file.close()
-                except OSError:
-                    pass
-                try:
-                    self.unlink(self.name)
-                except OSError:
-                    pass
+            def __del__(self):
+                self.close()
 
-        def __del__(self):
-            self.close()
+            def __enter__(self):
+                self.file.__enter__()
+                return self
 
-        def __enter__(self):
-            self.file.__enter__()
-            return self
+            def __exit__(self, exc, value, tb):
+                self.file.__exit__(exc, value, tb)
 
-        def __exit__(self, exc, value, tb):
-            self.file.__exit__(exc, value, tb)
-
-    NamedTemporaryFile = TemporaryFile
+        NamedTemporaryFile = TemporaryFile
 else:
     NamedTemporaryFile = tempfile.NamedTemporaryFile
 
