@@ -707,7 +707,7 @@ class ForeignObject(RelatedField):
             raise ValueError(
                 "Foreign Object from and to fields must be the same non-zero length"
             )
-        if isinstance(self.remote_field.model, str):
+        if isinstance(self.remote_field.model, str) and not self.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
             raise ValueError(
                 "Related model %r cannot be resolved" % self.remote_field.model
             )
@@ -720,11 +720,12 @@ class ForeignObject(RelatedField):
                 if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
                 else self.opts.get_field(from_field_name)
             )
-            to_field = (
-                self.remote_field.model._meta.pk
-                if to_field_name is None
-                else self.remote_field.model._meta.get_field(to_field_name)
-            )
+            if to_field_name is not None:
+                to_field = self.remote_field.model._meta.get_field(to_field_name)
+            elif self.remote_field.model == RECURSIVE_RELATIONSHIP_CONSTANT:
+                to_field = self
+            else:
+                to_field = self.remote_field.model._meta.pk
             related_fields.append((from_field, to_field))
         return related_fields
 
