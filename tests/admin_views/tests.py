@@ -8386,6 +8386,21 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     * Catch-all view disabled via AdminSite.final_catch_all_view.
     """
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.staff_user = User.objects.create_user(
+            username="staff",
+            password="secret",
+            email="staff@example.com",
+            is_staff=True,
+        )
+        cls.non_staff_user = User.objects.create_user(
+            username="user",
+            password="secret",
+            email="user@example.com",
+            is_staff=False,
+        )
+
     def test_unknown_url_redirects_login_if_not_authenticated(self):
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url)
@@ -8394,12 +8409,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         )
 
     def test_unknown_url_404_if_authenticated(self):
-        superuser = User.objects.create_superuser(
-            username="super",
-            password="secret",
-            email="super@example.com",
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url)
         self.assertEqual(response.status_code, 404)
@@ -8437,26 +8447,14 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_unknown_url(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8465,13 +8463,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_query_string(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get("%s?id=1" % known_url[:-1])
         self.assertRedirects(
@@ -8483,13 +8475,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_script_name(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1], SCRIPT_NAME="/prefix/")
         self.assertRedirects(
@@ -8501,13 +8487,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_script_name_query_string(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get("%s?id=1" % known_url[:-1], SCRIPT_NAME="/prefix/")
         self.assertRedirects(
@@ -8519,13 +8499,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True, FORCE_SCRIPT_NAME="/prefix/")
     def test_missing_slash_append_slash_true_force_script_name(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8537,13 +8511,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_non_staff_user(self):
-        user = User.objects.create_user(
-            username="user",
-            password="secret",
-            email="user@example.com",
-            is_staff=False,
-        )
-        self.client.force_login(user)
+        self.client.force_login(self.non_staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8553,13 +8521,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_non_staff_user_query_string(self):
-        user = User.objects.create_user(
-            username="user",
-            password="secret",
-            email="user@example.com",
-            is_staff=False,
-        )
-        self.client.force_login(user)
+        self.client.force_login(self.non_staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get("%s?id=1" % known_url[:-1])
         self.assertRedirects(
@@ -8570,26 +8532,14 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=False)
     def test_missing_slash_append_slash_false(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_single_model_no_append_slash(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin9:admin_views_actor_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)
@@ -8602,12 +8552,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_unknown_url_404_if_authenticated_without_final_catch_all_view(self):
-        superuser = User.objects.create_superuser(
-            username="super",
-            password="secret",
-            email="super@example.com",
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin10/unknown/"
         response = self.client.get(unknown_url)
         self.assertEqual(response.status_code, 404)
@@ -8656,26 +8601,14 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_unknown_url_without_final_catch_all_view(
         self,
     ):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin10/unknown/"
         response = self.client.get(unknown_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_without_final_catch_all_view(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8684,13 +8617,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_query_without_final_catch_all_view(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get("%s?id=1" % known_url[:-1])
         self.assertRedirects(
@@ -8702,13 +8629,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=False)
     def test_missing_slash_append_slash_false_without_final_catch_all_view(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)
