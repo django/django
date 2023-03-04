@@ -1605,7 +1605,11 @@ class Query(BaseExpression):
 
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
-        lookups = dict(get_children_from_q(filtered_relation.condition))
+        lookups = dict(
+            l
+            for l in get_children_from_q(filtered_relation.condition)
+            if isinstance(l, tuple)
+        )
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
             filtered_relation.relation_name
         )

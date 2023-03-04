@@ -11,6 +11,7 @@ from django.db.models import (
     FilteredRelation,
     Q,
     Sum,
+    Value,
     When,
 )
 from django.test import TestCase
@@ -683,6 +684,19 @@ class FilteredRelationTests(TestCase):
     def test_eq(self):
         self.assertEqual(
             FilteredRelation("book", condition=Q(book__title="b")), mock.ANY
+        )
+
+    def test_conditional_expression(self):
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                the_book=FilteredRelation(
+                    "book",
+                    condition=Q(Value(False)),
+                ),
+            ).filter(
+                the_book__isnull=False,
+            ),
+            [],
         )
 
 
