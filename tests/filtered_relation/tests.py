@@ -4,9 +4,11 @@ from unittest import mock
 
 from django.db import connection, transaction
 from django.db.models import (
+    BooleanField,
     Case,
     Count,
     DecimalField,
+    ExpressionWrapper,
     F,
     FilteredRelation,
     Q,
@@ -15,6 +17,7 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Concat
+from django.db.models.lookups import Exact, IStartsWith
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -706,6 +709,88 @@ class FilteredRelationTests(TestCase):
         self.assertEqual(
             FilteredRelation("book", condition=Q(book__title="b")), mock.ANY
         )
+
+    def test_conditional_expression(self):
+        qs = Author.objects.annotate(
+            the_book=FilteredRelation("book", condition=Q(Value(False))),
+        ).filter(the_book__isnull=False)
+        self.assertSequenceEqual(qs, [])
+
+    def test_expression_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(
+                    Exact(F("book__author__name"), "Alice"),
+                    Value(True),
+                    book__title__startswith="Poem",
+                ),
+            ),
+        ).filter(book_editor__isnull=False)
+        self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_case(self):
+        qs = Book.objects.annotate(
+            alice_author=FilteredRelation(
+                "author",
+                condition=Q(
+                    Case(When(author__name="Alice", then=True), default=False),
+                ),
+            ),
+        ).filter(alice_author__isnull=False)
+        self.assertCountEqual(qs, [self.book1, self.book4])
+
+    def test_conditional_expression_outside_relation_name(self):
+        tests = [
+            Q(Case(When(book__author__name="Alice", then=True), default=False)),
+            Q(
+                ExpressionWrapper(
+                    Q(Value(True), Exact(F("book__author__name"), "Alice")),
+                    output_field=BooleanField(),
+                ),
+            ),
+        ]
+        for condition in tests:
+            with self.subTest(condition=condition):
+                qs = Author.objects.annotate(
+                    book_editor=FilteredRelation("book__editor", condition=condition),
+                ).filter(book_editor__isnull=True)
+                self.assertSequenceEqual(qs, [self.author2, self.author2])
+
+    def test_conditional_expression_with_lookup(self):
+        lookups = [
+            Q(book__title__istartswith="poem"),
+            Q(IStartsWith(F("book__title"), "poem")),
+        ]
+        for condition in lookups:
+            with self.subTest(condition=condition):
+                qs = Author.objects.annotate(
+                    poem_book=FilteredRelation("book", condition=condition)
+                ).filter(poem_book__isnull=False)
+                self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_expressionwrapper(self):
+        qs = Author.objects.annotate(
+            poem_book=FilteredRelation(
+                "book",
+                condition=Q(
+                    ExpressionWrapper(
+                        Q(Exact(F("book__title"), "Poem by Alice")),
+                        output_field=BooleanField(),
+                    ),
+                ),
+            ),
+        ).filter(poem_book__isnull=False)
+        self.assertSequenceEqual(qs, [self.author1])
+
+    def test_conditional_expression_with_multiple_fields(self):
+        qs = Author.objects.annotate(
+            my_books=FilteredRelation(
+                "book__author",
+                condition=Q(Exact(F("book__author__name"), F("book__author__name"))),
+            ),
+        ).filter(my_books__isnull=True)
+        self.assertSequenceEqual(qs, [])
 
 
 class FilteredRelationAggregationTests(TestCase):
