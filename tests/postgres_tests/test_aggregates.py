@@ -98,7 +98,7 @@ class TestGeneralAggregate(PostgreSQLTestCase):
             StringAgg("char_field", delimiter=";"),
         ]
         if connection.features.has_bit_xor:
-            tests.append((BitXor("integer_field"), None))
+            tests.append(BitXor("integer_field"))
         for aggregation in tests:
             with self.subTest(aggregation=aggregation):
                 # Empty result with non-execution optimization.
