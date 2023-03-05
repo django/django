@@ -1,4 +1,3 @@
-import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
@@ -588,19 +587,17 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 "CREATE SERVER inspectdb_server FOREIGN DATA WRAPPER file_fdw"
             )
             cursor.execute(
-                connection.ops.compose_sql(
-                    """
-                    CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
-                        petal_length real,
-                        petal_width real,
-                        sepal_length real,
-                        sepal_width real
-                    ) SERVER inspectdb_server OPTIONS (
-                        filename %s
-                    )
-                    """,
-                    [os.devnull],
+                """
+                CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
+                    petal_length real,
+                    petal_width real,
+                    sepal_length real,
+                    sepal_width real
+                ) SERVER inspectdb_server OPTIONS (
+                    program 'echo 1,2,3,4',
+                    format 'csv'
                 )
+                """
             )
         out = StringIO()
         foreign_table_model = "class InspectdbIrisForeignTable(models.Model):"
