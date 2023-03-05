@@ -40,7 +40,7 @@ What's new in Django 5.0
 Facet filters in the admin
 --------------------------
 
-Facet counts are now show for applied filters in the admin changelist when
+Facet counts are now shown for applied filters in the admin changelist when
 toggled on via the UI. This behavior can be changed via the new
 :attr:`.ModelAdmin.show_facets` attribute. For more information see
 :ref:`facet-filters`.
@@ -394,3 +394,9 @@ to remove usage of these features.
 * Passing ``nulls_first=False`` or ``nulls_last=False`` to ``Expression.asc()``
   and ``Expression.desc()`` methods, and the ``OrderBy`` expression is no
   longer allowed.
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
+
