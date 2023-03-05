@@ -1,5 +1,4 @@
 """SMTP email backend class."""
-import certifi
 import smtplib
 import ssl
 import threading
@@ -62,7 +61,7 @@ class EmailBackend(BaseEmailBackend):
             ssl_context = ssl.SSLContext(protocol=ssl.PROTOCOL_TLS_CLIENT)
             ssl_context.load_cert_chain(self.ssl_certfile, self.ssl_keyfile)
         else:
-            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            ssl_context = ssl.create_default_context()
         return ssl_context
 
     def open(self):
