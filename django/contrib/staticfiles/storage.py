@@ -451,6 +451,44 @@ class ManifestFilesMixin(HashedFilesMixin):
             unparsed_name[2] += '?'
         return urlunsplit(unparsed_name)
 
+class CheckFilesModification(ManifestFilesMixin):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+    
+    def ctime(self, paths):
+        def path_level(name):
+            return len(name.split(os.sep))
+        for name in sorted(paths, key=path_level, reverse=True):   
+            path = paths[name]
+            cached_stamp = os.path.getctime(path)
+            return cached_stamp
+        
+    def check(self, paths):
+        stamp = os.stat(paths).st_mtime
+        if stamp != self.ctime(paths):
+            raise ValueError("This is not the orginal file.")
+        else:
+            print('This is the non-modified file.')       
+
+    def delete_original(self, paths):
+        def path_level(name):
+            return len(name.split(os.sep))
+        for name in sorted(paths, key=path_level, reverse=True):
+            storage, path = paths[name]
+            with storage.open(path) as original_file:
+                    cleaned_name = self.clean_name(name)
+                    hash_key = self.hash_key(cleaned_name)
+                    
+                    def post_process(self, *args, **kwargs):
+                        
+                        all_post_processed = super(ManifestFilesMixin, self).post_process(*args, **kwargs)
+                        for post_processed in all_post_processed:
+                            yield post_processed
+                            self.save_manifest()
+                            for original_file in self.hashed_files:
+                                self.delete(original_file)                              
+
 
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
     """
