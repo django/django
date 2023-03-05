@@ -17,6 +17,7 @@ from django.contrib.admin.options import IncorrectLookupParameters, ShowFacets
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
+from django.db import connection
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 
 from .models import Book, Bookmark, Department, Employee, ImprovedBook, TaggedItem
@@ -1360,6 +1361,9 @@ class ListFiltersTests(TestCase):
             expected_date_filters.extend(["This month (2)", "This year (2)"])
         expected_date_filters.extend(["No date (1)", "Has date (3)"])
 
+        empty_choice_count = (
+            2 if connection.features.interprets_empty_strings_as_nulls else 1
+        )
         tests = [
             # RelatedFieldListFilter.
             ["All", "alfred (2)", "bob (1)", "lisa (0)", "??? (1)"],
@@ -1378,8 +1382,8 @@ class ListFiltersTests(TestCase):
                 "All",
                 "Non-Fictional (1)",
                 "Fictional (1)",
-                "We don't know (1)",
-                "Not categorized (1)",
+                f"We don't know ({empty_choice_count})",
+                f"Not categorized ({empty_choice_count})",
             ],
             # DateFieldListFilter.
             expected_date_filters,
