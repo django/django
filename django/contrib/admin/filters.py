@@ -9,6 +9,7 @@ import datetime
 
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
+    build_q_object_from_lookup_parameters,
     get_last_value_from_parameters,
     get_model_from_relation,
     prepare_lookup_value,
@@ -187,7 +188,8 @@ class FieldListFilter(FacetsMixin, ListFilter):
 
     def queryset(self, request, queryset):
         try:
-            return queryset.filter(**self.used_parameters)
+            q_object = build_q_object_from_lookup_parameters(self.used_parameters)
+            return queryset.filter(q_object)
         except (ValueError, ValidationError) as e:
             # Fields may raise a ValueError or ValidationError when converting
             # the parameters to the correct type.
@@ -220,7 +222,7 @@ class RelatedFieldListFilter(FieldListFilter):
         other_model = get_model_from_relation(field)
         self.lookup_kwarg = "%s__%s__exact" % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
         )
@@ -293,7 +295,8 @@ class RelatedFieldListFilter(FieldListFilter):
                 count = facet_counts[f"{pk_val}__c"]
                 val = f"{val} ({count})"
             yield {
-                "selected": self.lookup_val == str(pk_val),
+                "selected": self.lookup_val is not None
+                and str(pk_val) in self.lookup_val,
                 "query_string": changelist.get_query_string(
                     {self.lookup_kwarg: pk_val}, [self.lookup_kwarg_isnull]
                 ),
@@ -391,7 +394,7 @@ class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = "%s__exact" % field_path
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
         )
@@ -432,7 +435,8 @@ class ChoicesFieldListFilter(FieldListFilter):
                 none_title = title
                 continue
             yield {
-                "selected": str(lookup) == self.lookup_val,
+                "selected": self.lookup_val is not None
+                and str(lookup) in self.lookup_val,
                 "query_string": changelist.get_query_string(
                     {self.lookup_kwarg: lookup}, [self.lookup_kwarg_isnull]
                 ),
@@ -555,7 +559,7 @@ class AllValuesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = field_path
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val = params.get(self.lookup_kwarg)
         self.lookup_val_isnull = get_last_value_from_parameters(
             params, self.lookup_kwarg_isnull
         )
@@ -609,7 +613,7 @@ class AllValuesFieldListFilter(FieldListFilter):
                 continue
             val = str(val)
             yield {
-                "selected": self.lookup_val == val,
+                "selected": self.lookup_val is not None and val in self.lookup_val,
                 "query_string": changelist.get_query_string(
                     {self.lookup_kwarg: val}, [self.lookup_kwarg_isnull]
                 ),

@@ -54,6 +54,11 @@ Minor features
 * The new :meth:`.AdminSite.get_log_entries` method allows customizing the
   queryset for the site's listed log entries.
 
+* The ``django.contrib.admin.AllValuesFieldListFilter``,
+  ``ChoicesFieldListFilter``, ``RelatedFieldListFilter``, and
+  ``RelatedOnlyFieldListFilter`` admin filters now handle multi-valued query
+  parameters.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -16,6 +16,7 @@ from django.contrib.admin.options import (
     ShowFacets,
 )
 from django.contrib.admin.utils import (
+    build_q_object_from_lookup_parameters,
     get_fields_from_path,
     lookup_spawns_duplicates,
     prepare_lookup_value,
@@ -173,9 +174,10 @@ class ChangeList:
         may_have_duplicates = False
         has_active_filters = False
 
-        for key, value in lookup_params.items():
-            if not self.model_admin.lookup_allowed(key, value[-1]):
-                raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
+        for key, value_list in lookup_params.items():
+            for value in value_list:
+                if not self.model_admin.lookup_allowed(key, value):
+                    raise DisallowedModelAdminLookup(f"Filtering by {key} not allowed")
 
         filter_specs = []
         for list_filter in self.list_filter:
@@ -246,8 +248,8 @@ class ChangeList:
                     to_date = make_aware(to_date)
                 lookup_params.update(
                     {
-                        "%s__gte" % self.date_hierarchy: from_date,
-                        "%s__lt" % self.date_hierarchy: to_date,
+                        "%s__gte" % self.date_hierarchy: [from_date],
+                        "%s__lt" % self.date_hierarchy: [to_date],
                     }
                 )
 
@@ -534,7 +536,8 @@ class ChangeList:
             # Finally, we apply the remaining lookup parameters from the query
             # string (i.e. those that haven't already been processed by the
             # filters).
-            qs = qs.filter(**remaining_lookup_params)
+            q_object = build_q_object_from_lookup_parameters(remaining_lookup_params)
+            qs = qs.filter(q_object)
         except (SuspiciousOperation, ImproperlyConfigured):
             # Allow certain types of errors to be re-raised as-is so that the
             # caller can treat them in a special way.

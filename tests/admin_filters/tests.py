@@ -1533,6 +1533,100 @@ class ListFiltersTests(TestCase):
                     expected_displays,
                 )
 
+    def test_multi_related_field_filter(self):
+        modeladmin = DecadeFilterBookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/",
+            [("author__id__exact", self.alfred.pk), ("author__id__exact", self.bob.pk)],
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(
+            queryset,
+            list(
+                Book.objects.filter(
+                    author__pk__in=[self.alfred.pk, self.bob.pk]
+                ).order_by("-id")
+            ),
+        )
+        filterspec = changelist.get_filters(request)[0][0]
+        choices = list(filterspec.choices(changelist))
+        expected_choice_values = [
+            ("All", False, "?"),
+            ("alfred", True, f"?author__id__exact={self.alfred.pk}"),
+            ("bob", True, f"?author__id__exact={self.bob.pk}"),
+            ("lisa", False, f"?author__id__exact={self.lisa.pk}"),
+        ]
+        for i, (display, selected, query_string) in enumerate(expected_choice_values):
+            self.assertEqual(choices[i]["display"], display)
+            self.assertIs(choices[i]["selected"], selected)
+            self.assertEqual(choices[i]["query_string"], query_string)
+
+    def test_multi_choice_field_filter(self):
+        modeladmin = DecadeFilterBookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/",
+            [("category__exact", "non-fiction"), ("category__exact", "fiction")],
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(
+            queryset,
+            list(
+                Book.objects.filter(category__in=["non-fiction", "fiction"]).order_by(
+                    "-id"
+                )
+            ),
+        )
+        filterspec = changelist.get_filters(request)[0][3]
+        choices = list(filterspec.choices(changelist))
+        expected_choice_values = [
+            ("All", False, "?"),
+            ("Non-Fictional", True, "?category__exact=non-fiction"),
+            ("Fictional", True, "?category__exact=fiction"),
+            ("We don't know", False, "?category__exact="),
+            ("Not categorized", False, "?category__isnull=True"),
+        ]
+        for i, (display, selected, query_string) in enumerate(expected_choice_values):
+            self.assertEqual(choices[i]["display"], display)
+            self.assertIs(choices[i]["selected"], selected)
+            self.assertEqual(choices[i]["query_string"], query_string)
+
+    def test_multi_all_values_field_filter(self):
+        modeladmin = DecadeFilterBookAdmin(Book, site)
+        request = self.request_factory.get(
+            "/",
+            [
+                ("author__email", "bob@example.com"),
+                ("author__email", "lisa@example.com"),
+            ],
+        )
+        request.user = self.alfred
+        changelist = modeladmin.get_changelist_instance(request)
+        queryset = changelist.get_queryset(request)
+        self.assertSequenceEqual(
+            queryset,
+            list(
+                Book.objects.filter(
+                    author__email__in=["bob@example.com", "lisa@example.com"]
+                ).order_by("-id")
+            ),
+        )
+        filterspec = changelist.get_filters(request)[0][5]
+        choices = list(filterspec.choices(changelist))
+        expected_choice_values = [
+            ("All", False, "?"),
+            ("alfred@example.com", False, "?author__email=alfred%40example.com"),
+            ("bob@example.com", True, "?author__email=bob%40example.com"),
+            ("lisa@example.com", True, "?author__email=lisa%40example.com"),
+        ]
+        for i, (display, selected, query_string) in enumerate(expected_choice_values):
+            self.assertEqual(choices[i]["display"], display)
+            self.assertIs(choices[i]["selected"], selected)
+            self.assertEqual(choices[i]["query_string"], query_string)
+
     def test_two_characters_long_field(self):
         """
         list_filter works with two-characters long field names (#16080).
