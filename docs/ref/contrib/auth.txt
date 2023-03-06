@@ -699,10 +699,17 @@ Utility functions
     ``get_user()`` method to retrieve the user model instance and then verifies
     the session by calling the user model's
     :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
-    method.
+    method. If the verification fails and :setting:`SECRET_KEY_FALLBACKS` are
+    provided, it verifies the session against each fallback key using
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.\
+    get_session_auth_fallback_hash`.
 
     Returns an instance of :class:`~django.contrib.auth.models.AnonymousUser`
     if the authentication backend stored in the session is no longer in
     :setting:`AUTHENTICATION_BACKENDS`, if a user isn't returned by the
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
+
+    .. versionchanged:: 4.1.8
+
+        Fallback verification with :setting:`SECRET_KEY_FALLBACKS` was added.
