@@ -722,6 +722,13 @@ The following attributes and methods are available on any subclass of
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
 
+    .. method:: models.AbstractBaseUser.get_session_auth_fallback_hash()
+
+        .. versionadded:: 4.1.8
+
+        Yields the HMAC of the password field using
+        :setting:`SECRET_KEY_FALLBACKS`. Used by ``get_user()``.
+
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
 .. class:: models.AbstractUser
