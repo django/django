@@ -1162,6 +1162,9 @@ class ForeignKey(ForeignObject):
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
 
+    def cast_db_type(self, connection):
+        return self.target_field.cast_db_type(connection=connection)
+
     def db_parameters(self, connection):
         target_db_parameters = self.target_field.db_parameters(connection)
         return {
