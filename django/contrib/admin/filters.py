@@ -9,6 +9,7 @@ import datetime
 
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
+    get_last_value_from_parameters,
     get_model_from_relation,
     prepare_lookup_value,
     reverse_field_path,
@@ -98,7 +99,7 @@ class SimpleListFilter(FacetsMixin, ListFilter):
             )
         if self.parameter_name in params:
             value = params.pop(self.parameter_name)
-            self.used_parameters[self.parameter_name] = value
+            self.used_parameters[self.parameter_name] = value[-1]
         lookup_choices = self.lookups(request, model_admin)
         if lookup_choices is None:
             lookup_choices = ()
@@ -219,8 +220,10 @@ class RelatedFieldListFilter(FieldListFilter):
         other_model = get_model_from_relation(field)
         self.lookup_kwarg = "%s__%s__exact" % (field_path, field.target_field.name)
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
+        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val_isnull = get_last_value_from_parameters(
+            params, self.lookup_kwarg_isnull
+        )
         super().__init__(field, request, params, model, model_admin, field_path)
         self.lookup_choices = self.field_choices(field, request, model_admin)
         if hasattr(field, "verbose_name"):
@@ -317,8 +320,8 @@ class BooleanFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = "%s__exact" % field_path
         self.lookup_kwarg2 = "%s__isnull" % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val2 = params.get(self.lookup_kwarg2)
+        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val2 = get_last_value_from_parameters(params, self.lookup_kwarg2)
         super().__init__(field, request, params, model, model_admin, field_path)
         if (
             self.used_parameters
@@ -388,8 +391,10 @@ class ChoicesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = "%s__exact" % field_path
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
+        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val_isnull = get_last_value_from_parameters(
+            params, self.lookup_kwarg_isnull
+        )
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def expected_parameters(self):
@@ -450,7 +455,7 @@ class DateFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.field_generic = "%s__" % field_path
         self.date_params = {
-            k: v for k, v in params.items() if k.startswith(self.field_generic)
+            k: v[-1] for k, v in params.items() if k.startswith(self.field_generic)
         }
 
         now = timezone.now()
@@ -550,8 +555,10 @@ class AllValuesFieldListFilter(FieldListFilter):
     def __init__(self, field, request, params, model, model_admin, field_path):
         self.lookup_kwarg = field_path
         self.lookup_kwarg_isnull = "%s__isnull" % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
-        self.lookup_val_isnull = params.get(self.lookup_kwarg_isnull)
+        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
+        self.lookup_val_isnull = get_last_value_from_parameters(
+            params, self.lookup_kwarg_isnull
+        )
         self.empty_value_display = model_admin.get_empty_value_display()
         parent_model, reverse_path = reverse_field_path(model, field_path)
         # Obey parent ModelAdmin queryset when deciding which options to show
@@ -646,7 +653,7 @@ class EmptyFieldListFilter(FieldListFilter):
                 )
             )
         self.lookup_kwarg = "%s__isempty" % field_path
-        self.lookup_val = params.get(self.lookup_kwarg)
+        self.lookup_val = get_last_value_from_parameters(params, self.lookup_kwarg)
         super().__init__(field, request, params, model, model_admin, field_path)
 
     def get_lookup_condition(self):
