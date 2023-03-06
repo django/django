@@ -143,16 +143,19 @@ class TimeFormat(Formatter):
 
     def P(self):
         """
-        Time, in 12-hour hours, minutes and 'a.m.'/'p.m.', with minutes left off
-        if they're zero and the strings 'midnight' and 'noon' if appropriate.
-        Examples: '1 a.m.', '1:30 p.m.', 'midnight', 'noon', '12:30 p.m.'
-        Proprietary extension.
+        Difference to Greenwich time (GMT) with colon between hours and minutes.
+        Example : +02:00, -05:00
+
+        If timezone information is not available, return an empty string.
         """
-        if self.data.minute == 0 and self.data.hour == 0:
-            return _("midnight")
-        if self.data.minute == 0 and self.data.hour == 12:
-            return _("noon")
-        return "%s %s" % (self.f(), self.a())
+        if self.timezone is None:
+            return ""
+
+        offset = self.timezone.utcoffset(self.data)
+        seconds = offset.days * 86400 + offset.seconds
+        sign = "-" if seconds < 0 else "+"
+        seconds = abs(seconds)
+        return "%s%02d:%02d" % (sign, seconds // 3600, (seconds // 60) % 60)
 
     def s(self):
         "Seconds; i.e. '00' to '59'"
