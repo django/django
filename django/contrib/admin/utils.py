@@ -54,10 +54,17 @@ def lookup_spawns_duplicates(opts, lookup_path):
     return False
 
 
+def get_last_value_from_parameters(parameters, key):
+    value = parameters.get(key)
+    return value[-1] if isinstance(value, list) else value
+
+
 def prepare_lookup_value(key, value, separator=","):
     """
     Return a lookup value prepared to be used in queryset filtering.
     """
+    if isinstance(value, list):
+        value = value[-1]
     # if key ends with __in, split parameter into separate values
     if key.endswith("__in"):
         value = value.split(separator)

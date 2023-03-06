@@ -123,10 +123,13 @@ class ChangeList:
             )
         self.to_field = to_field
         self.params = dict(request.GET.items())
+        self.filter_params = dict(request.GET.lists())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
+            del self.filter_params[PAGE_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
+            del self.filter_params[ERROR_FLAG]
         self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
         self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
 
@@ -156,7 +159,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        params = params or self.params
+        params = params or self.filter_params
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -171,7 +174,7 @@ class ChangeList:
         has_active_filters = False
 
         for key, value in lookup_params.items():
-            if not self.model_admin.lookup_allowed(key, value):
+            if not self.model_admin.lookup_allowed(key, value[-1]):
                 raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
 
         filter_specs = []
@@ -224,9 +227,9 @@ class ChangeList:
                 day = lookup_params.pop("%s__day" % self.date_hierarchy, None)
                 try:
                     from_date = datetime(
-                        int(year),
-                        int(month if month is not None else 1),
-                        int(day if day is not None else 1),
+                        int(year[-1]),
+                        int(month[-1] if month is not None else 1),
+                        int(day[-1] if day is not None else 1),
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
@@ -273,7 +276,7 @@ class ChangeList:
             new_params = {}
         if remove is None:
             remove = []
-        p = self.params.copy()
+        p = self.filter_params.copy()
         for r in remove:
             for k in list(p):
                 if k.startswith(r):
@@ -284,7 +287,7 @@ class ChangeList:
                     del p[k]
             else:
                 p[k] = v
-        return "?%s" % urlencode(sorted(p.items()))
+        return "?%s" % urlencode(sorted(p.items()), doseq=True)
 
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(
