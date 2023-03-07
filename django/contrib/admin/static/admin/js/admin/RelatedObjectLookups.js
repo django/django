@@ -11,7 +11,7 @@
         relatedWindows.forEach(function(win) {
             if(!win.closed) {
                 win.dismissChildPopups();
-                win.close();    
+                win.close();
             }
         });
     }
@@ -19,7 +19,7 @@
     function setPopupIndex() {
         if(document.getElementsByName("_popup").length > 0) {
             const index = window.name.lastIndexOf("__") + 2;
-            popupIndex = parseInt(window.name.substring(index));   
+            popupIndex = parseInt(window.name.substring(index));
         } else {
             popupIndex = 0;
         }
@@ -76,9 +76,11 @@
         }
         const value = $this.val();
         if (value) {
+
+            const quotedValue = customEncodeURIComponent(value);
             siblings.each(function() {
                 const elm = $(this);
-                elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+                elm.attr('href', elm.attr('data-href-template').replace('__fk__', quotedValue));
             });
         } else {
             siblings.removeAttr('href');
@@ -184,6 +186,16 @@
         }
         win.close();
     }
+
+    function customEncodeURIComponent(str) {
+        const unreservedChars = "-_.!~*'()";
+        const regex = new RegExp(`[${unreservedChars}]`, 'g');
+        return encodeURIComponent(str).replace(regex, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+    }
+
+
+
+    window.customEncodeURIComponent = customEncodeURIComponent;
 
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;
