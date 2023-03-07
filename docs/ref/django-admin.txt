@@ -1019,6 +1019,13 @@ By default, the development server doesn't serve any static files for your site
 you want to configure Django to serve static media, read
 :doc:`/howto/static-files/index`.
 
+Serving with ASGI in development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's ``runserver`` command provides a WSGI server. In order to run under
+ASGI you will need to use an :doc:`ASGI server </howto/deployment/asgi/index>`.
+The Django Daphne project provides :ref:`daphne-runserver` that you can use.
+
 ``sendtestemail``
 -----------------
 
