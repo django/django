@@ -533,7 +533,30 @@ class Query(BaseExpression):
         Perform a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
-        return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+        count = Count("*")
+        if self.distinct:
+            if self.distinct_fields:
+                # Only DISTINCT ON fields are relevant to provide an adequate
+                # count, every other fields can be discarded.
+                obj.set_values(self.distinct_fields)
+                obj.distinct_fields = ()
+                # A single non-null DISTINCT ON target can avoid a subquery
+                # pushdown by using COUNT(DISTINCT).
+                if len(obj.select) == 1 and not obj.select[0].target.null:
+                    obj.distinct = False
+                    count = Count(obj.select[0], distinct=True)
+            elif (
+                self.default_cols
+                and not self.extra_select
+                and all(expr.deterministic for expr in self.annotation_select.values())
+            ):
+                # When DISTINCT is used against the default columns of the base
+                # table an equivalent COUNT(DISTINCT pk) can be used as the primary
+                # key already identifies all rows uniquely. This assertion holds true
+                # as long as no selected annotation produces undeterministic results.
+                obj.distinct = False
+                count = Count("pk", distinct=True)
+        return obj.get_aggregation(using, {"__count": count})["__count"]
 
     def has_filters(self):
         return self.where
