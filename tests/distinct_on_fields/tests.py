@@ -98,7 +98,7 @@ class DistinctOnTests(TestCase):
         )
         for qset, expected in qsets:
             self.assertSequenceEqual(qset, expected)
-            self.assertEqual(qset.count(), len(expected))
+            self.assertEqual(qset.all().count(), len(expected))
 
         # Combining queries with non-unique query is not allowed.
         base_qs = Celebrity.objects.all()
