@@ -257,6 +257,16 @@ class WhereNode(tree.Node):
     def is_summary(self):
         return any(child.is_summary for child in self.children)
 
+    @classmethod
+    def _deterministic(cls, obj):
+        if isinstance(obj, tree.Node):
+            return any(cls._deterministic(c) for c in obj.children)
+        return obj.contains_aggregate
+
+    @cached_property
+    def deterministic(self):
+        return self._deterministic(self)
+
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
         if hasattr(expr, "resolve_expression"):

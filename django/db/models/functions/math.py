@@ -157,6 +157,7 @@ class Radians(NumericOutputFieldMixin, Transform):
 class Random(NumericOutputFieldMixin, Func):
     function = "RANDOM"
     arity = 0
+    deterministic = False
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function="RAND", **extra_context)
