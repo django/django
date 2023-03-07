@@ -1304,6 +1304,7 @@ class MigrationAutodetector:
 
     def generate_added_indexes(self):
         for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            dependencies = self._get_dependencies_for_model(app_label, model_name)
             for index in alt_indexes["added_indexes"]:
                 self.add_operation(
                     app_label,
@@ -1311,6 +1312,7 @@ class MigrationAutodetector:
                         model_name=model_name,
                         index=index,
                     ),
+                    dependencies=dependencies,
                 )
 
     def generate_removed_indexes(self):
@@ -1367,6 +1369,7 @@ class MigrationAutodetector:
             app_label,
             model_name,
         ), alt_constraints in self.altered_constraints.items():
+            dependencies = self._get_dependencies_for_model(app_label, model_name)
             for constraint in alt_constraints["added_constraints"]:
                 self.add_operation(
                     app_label,
@@ -1374,6 +1377,7 @@ class MigrationAutodetector:
                         model_name=model_name,
                         constraint=constraint,
                     ),
+                    dependencies=dependencies,
                 )
 
     def generate_removed_constraints(self):
@@ -1423,6 +1427,22 @@ class MigrationAutodetector:
                 model_name,
             )
             dependencies.append((through_app_label, through_object_name, None, True))
+        return dependencies
+
+    def _get_dependencies_for_model(self, app_label, model_name):
+        """Return foreign key dependencies of the given model."""
+        dependencies = []
+        model_state = self.to_state.models[app_label, model_name]
+        for field in model_state.fields.values():
+            if field.is_relation:
+                dependencies.extend(
+                    self._get_dependencies_for_foreign_key(
+                        app_label,
+                        model_name,
+                        field,
+                        self.to_state,
+                    )
+                )
         return dependencies
 
     def _get_altered_foo_together_operations(self, option_name):
