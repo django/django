@@ -991,6 +991,10 @@ class ClientTest(TestCase):
             )
         self.assertEqual(response.content, b"named_temp_file")
 
+    def test_streaming_json(self):
+        response = self.client.get("/streaming_json_response/")
+        self.assertEqual(response.json(), {"key": "value"})
+
 
 @override_settings(
     MIDDLEWARE=["django.middleware.csrf.CsrfViewMiddleware"],

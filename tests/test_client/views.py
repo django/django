@@ -13,6 +13,7 @@ from django.http import (
     HttpResponseNotAllowed,
     HttpResponseNotFound,
     HttpResponseRedirect,
+    StreamingHttpResponse,
 )
 from django.shortcuts import render
 from django.template import Context, Template
@@ -123,6 +124,13 @@ def json_view(request):
     data = json.loads(request.body.decode("utf-8"))
     c = Context({"data": data})
     return HttpResponse(t.render(c))
+
+
+def return_streaming_json_response(request):
+    return StreamingHttpResponse(
+        json.dumps({"key": "value"}),
+        content_type="application/json",
+    )
 
 
 def view_with_header(request):

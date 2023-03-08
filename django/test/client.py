@@ -823,7 +823,7 @@ class ClientMixin:
                     % response.get("Content-Type")
                 )
             response._json = json.loads(
-                response.content.decode(response.charset), **extra
+                response.getvalue().decode(response.charset), **extra
             )
         return response._json
 
