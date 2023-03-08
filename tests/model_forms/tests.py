@@ -21,8 +21,9 @@ from django.forms.models import (
     modelform_factory,
 )
 from django.template import Context, Template
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -369,6 +370,7 @@ class ModelFormBaseTest(TestCase):
         obj = form.save()
         self.assertEqual(obj.name, "")
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_save_blank_null_unique_charfield_saves_null(self):
         form_class = modelform_factory(
             model=NullableUniqueCharFieldModel, fields="__all__"
@@ -907,6 +909,13 @@ class ModelFormBaseTest(TestCase):
         self.assertEqual(m2.date_published, datetime.date(2010, 1, 1))
 
 
+# RemovedInDjango60Warning.
+# It's a temporary workaround for the deprecation period.
+class HttpsURLField(forms.URLField):
+    def __init__(self, **kwargs):
+        super().__init__(assume_scheme="https", **kwargs)
+
+
 class FieldOverridesByFormMetaForm(forms.ModelForm):
     class Meta:
         model = Category
@@ -930,7 +939,7 @@ class FieldOverridesByFormMetaForm(forms.ModelForm):
             }
         }
         field_classes = {
-            "url": forms.URLField,
+            "url": HttpsURLField,
         }
 
 
@@ -2857,6 +2866,7 @@ class ModelOtherFieldTests(SimpleTestCase):
             },
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_url_on_modelform(self):
         "Check basic URL field validation on model forms"
 
@@ -2881,6 +2891,19 @@ class ModelOtherFieldTests(SimpleTestCase):
         )
         self.assertTrue(HomepageForm({"url": "http://example.com/foo/bar"}).is_valid())
 
+    def test_url_modelform_assume_scheme_warning(self):
+        msg = (
+            "The default scheme will be changed from 'http' to 'https' in Django "
+            "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
+            "warning."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+
+            class HomepageForm(forms.ModelForm):
+                class Meta:
+                    model = Homepage
+                    fields = "__all__"
+
     def test_modelform_non_editable_field(self):
         """
         When explicitly including a non-editable field in a ModelForm, the
@@ -2900,23 +2923,27 @@ class ModelOtherFieldTests(SimpleTestCase):
                     model = Article
                     fields = ("headline", "created")
 
-    def test_http_prefixing(self):
+    def test_https_prefixing(self):
         """
-        If the http:// prefix is omitted on form input, the field adds it again.
+        If the https:// prefix is omitted on form input, the field adds it
+        again.
         """
 
         class HomepageForm(forms.ModelForm):
+            # RemovedInDjango60Warning.
+            url = forms.URLField(assume_scheme="https")
+
             class Meta:
                 model = Homepage
                 fields = "__all__"
 
         form = HomepageForm({"url": "example.com"})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["url"], "http://example.com")
+        self.assertEqual(form.cleaned_data["url"], "https://example.com")
 
         form = HomepageForm({"url": "example.com/test"})
         self.assertTrue(form.is_valid())
-        self.assertEqual(form.cleaned_data["url"], "http://example.com/test")
+        self.assertEqual(form.cleaned_data["url"], "https://example.com/test")
 
 
 class OtherModelFormTests(TestCase):

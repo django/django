@@ -1071,8 +1071,18 @@ For each field, we describe the default widget used if you don't specify
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Has the optional arguments ``max_length``, ``min_length``, and
-    ``empty_value`` which work just as they do for :class:`CharField`.
+    Has the optional arguments ``max_length``, ``min_length``, ``empty_value``
+    which work just as they do for :class:`CharField`, and ``assume_scheme``
+    that defaults to ``"http"``.
+
+    .. versionchanged:: 5.0
+
+        The ``assume_scheme`` argument was added.
+
+    .. deprecated:: 5.0
+
+        The default value for ``assume_scheme`` will change from ``"http"`` to
+        ``"https"`` in Django 6.0.
 
 ``UUIDField``
 -------------

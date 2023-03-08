@@ -245,6 +245,9 @@ Forms
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
+* The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
+  specifying a default URL scheme.
+
 Generic Views
 ~~~~~~~~~~~~~
 
@@ -402,6 +405,9 @@ Miscellaneous
   ``get_joining_fields()`` instead.
 
 * The ``ForeignObject.get_reverse_joining_columns()`` method is deprecated.
+
+* The default scheme for ``forms.URLField`` will change from ``"http"`` to
+  ``"https"`` in Django 6.0.
 
 Features removed in 5.0
 =======================
