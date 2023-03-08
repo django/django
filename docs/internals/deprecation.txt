@@ -32,6 +32,9 @@ details on these changes.
 
 * The ``ForeignObject.get_reverse_joining_columns()`` method will be removed.
 
+* The default scheme for ``forms.URLField`` will change from ``"http"`` to
+  ``"https"``.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
