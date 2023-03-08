@@ -1,5 +1,6 @@
-import asyncio
 from unittest import mock
+
+from asgiref.sync import markcoroutinefunction
 
 from django import dispatch
 from django.apps.registry import Apps
@@ -543,8 +544,10 @@ class SyncHandler:
 
 
 class AsyncHandler:
-    _is_coroutine = asyncio.coroutines._is_coroutine
     param = 0
+
+    def __init__(self):
+        markcoroutinefunction(self)
 
     async def __call__(self, **kwargs):
         self.param += 1
