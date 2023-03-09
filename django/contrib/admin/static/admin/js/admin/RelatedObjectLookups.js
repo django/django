@@ -187,14 +187,31 @@
         win.close();
     }
 
-    function customEncodeURIComponent(str) {
-        const unreservedChars = "-_.!~*'()";
-        const regex = new RegExp(`[${unreservedChars}]`, 'g');
-        return encodeURIComponent(str).replace(regex, (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`);
+
+    function customEncodeURIComponent(s) {
+        const QUOTE_MAP = {};
+        const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
+
+        for (let i = 0; i < specialChars.length; i++) {
+            const charCode = specialChars.charCodeAt(i);
+            const encodedChar = '_' + charCode.toString(16).toUpperCase();
+            QUOTE_MAP[charCode] = encodedChar;
+
+        }
+        if (typeof s === 'string') {
+            let result = '';
+            for (let i = 0; i < s.length; i++) {
+                const charCode = s.charCodeAt(i);
+                const encodedChar = QUOTE_MAP[charCode] || s[i];
+                result += encodedChar;
+            }
+            return result;
+        } else {
+            return s;
+        }
+
+
     }
-
-
-
     window.customEncodeURIComponent = customEncodeURIComponent;
 
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
