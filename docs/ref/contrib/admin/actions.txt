@@ -466,3 +466,8 @@ The ``action`` decorator
             queryset.update(is_active=False)
 
     In this case it will add no attributes to the function.
+
+    Action descriptions are %-formatted and may contain ``'%(verbose_name)s'``
+    and ``'%(verbose_name_plural)s'`` placeholders, which are replaced,
+    respectively, by the model's :attr:`~django.db.models.Options.verbose_name`
+    and :attr:`~django.db.models.Options.verbose_name_plural`.
