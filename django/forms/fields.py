@@ -16,6 +16,7 @@ from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.db.models.enums import ChoicesMeta
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -857,6 +858,8 @@ class ChoiceField(Field):
 
     def __init__(self, *, choices=(), **kwargs):
         super().__init__(**kwargs)
+        if isinstance(choices, ChoicesMeta):
+            choices = choices.choices
         self.choices = choices
 
     def __deepcopy__(self, memo):

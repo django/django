@@ -301,11 +301,11 @@ class ValidationTests(SimpleTestCase):
             f.clean("0", None)
 
     def test_enum_choices_cleans_valid_string(self):
-        f = models.IntegerField(choices=self.Choices.choices)
+        f = models.IntegerField(choices=self.Choices)
         self.assertEqual(f.clean("1", None), 1)
 
     def test_enum_choices_invalid_input(self):
-        f = models.IntegerField(choices=self.Choices.choices)
+        f = models.IntegerField(choices=self.Choices)
         with self.assertRaises(ValidationError):
             f.clean("A", None)
         with self.assertRaises(ValidationError):

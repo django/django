@@ -431,13 +431,18 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: choices
 
         Either an :term:`iterable` of 2-tuples to use as choices for this
-        field, :ref:`enumeration <field-choices-enum-types>` choices, or a
+        field, :ref:`enumeration type <field-choices-enum-types>`, or a
         callable that returns such an iterable. This argument accepts the same
         formats as the ``choices`` argument to a model field. See the
         :ref:`model field reference documentation on choices <field-choices>`
         for more details. If the argument is a callable, it is evaluated each
         time the field's form is initialized, in addition to during rendering.
         Defaults to an empty list.
+
+    .. versionchanged:: 5.0
+
+        Support for using :ref:`enumeration types <field-choices-enum-types>`
+        directly in the ``choices`` was added.
 
 ``DateField``
 -------------

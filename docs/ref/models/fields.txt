@@ -210,7 +210,7 @@ choices in a concise way::
 
         year_in_school = models.CharField(
             max_length=2,
-            choices=YearInSchool.choices,
+            choices=YearInSchool,
             default=YearInSchool.FRESHMAN,
         )
 
@@ -235,8 +235,7 @@ modifications:
 * A ``.label`` property is added on values, to return the human-readable name.
 * A number of custom properties are added to the enumeration classes --
   ``.choices``, ``.labels``, ``.values``, and ``.names`` -- to make it easier
-  to access lists of those separate parts of the enumeration. Use ``.choices``
-  as a suitable value to pass to :attr:`~Field.choices` in a field definition.
+  to access lists of those separate parts of the enumeration.
 
   .. warning::
 
@@ -276,7 +275,7 @@ Django provides an ``IntegerChoices`` class. For example::
             HEART = 3
             CLUB = 4
 
-        suit = models.IntegerField(choices=Suit.choices)
+        suit = models.IntegerField(choices=Suit)
 
 It is also possible to make use of the `Enum Functional API
 <https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
@@ -319,6 +318,10 @@ There are some additional caveats to be aware of:
         YES = 1, _("Yes")
 
         __empty__ = _("(Unknown)")
+
+.. versionchanged:: 5.0
+
+    Support for using enumeration types directly in the ``choices`` was added.
 
 ``db_column``
 -------------
