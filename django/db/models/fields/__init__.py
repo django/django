@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.enums import ChoicesMeta
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
@@ -216,6 +217,8 @@ class Field(RegisterLookupMixin):
         self.unique_for_date = unique_for_date
         self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
+        if isinstance(choices, ChoicesMeta):
+            choices = choices.choices
         if isinstance(choices, collections.abc.Iterator):
             choices = list(choices)
         self.choices = choices

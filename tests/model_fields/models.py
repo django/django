@@ -69,11 +69,18 @@ class WhizIterEmpty(models.Model):
 
 
 class Choiceful(models.Model):
+    class Suit(models.IntegerChoices):
+        DIAMOND = 1, "Diamond"
+        SPADE = 2, "Spade"
+        HEART = 3, "Heart"
+        CLUB = 4, "Club"
+
     no_choices = models.IntegerField(null=True)
     empty_choices = models.IntegerField(choices=(), null=True)
     with_choices = models.IntegerField(choices=[(1, "A")], null=True)
     empty_choices_bool = models.BooleanField(choices=())
     empty_choices_text = models.TextField(choices=())
+    choices_from_enum = models.IntegerField(choices=Suit)
 
 
 class BigD(models.Model):

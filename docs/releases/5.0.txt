@@ -167,7 +167,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* :attr:`.ChoiceField.choices` now accepts
+  :ref:`Choices classes <field-choices-enum-types>` directly instead of
+  requiring expansion with the ``choices`` attribute.
 
 Generic Views
 ~~~~~~~~~~~~~
@@ -207,6 +209,10 @@ Models
   :class:`~django.db.models.UniqueConstraint` allows customizing the ``code``
   of ``ValidationError`` raised during
   :ref:`model validation <validating-objects>`.
+
+* :attr:`.Field.choices` now accepts
+  :ref:`Choices classes <field-choices-enum-types>` directly instead of
+  requiring expansion with the ``choices`` attribute.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
