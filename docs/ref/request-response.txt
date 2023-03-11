@@ -1303,8 +1303,11 @@ Attributes
     Note that if you pass a file-like object like ``io.BytesIO``, it's your
     task to ``seek()`` it before passing it to ``FileResponse``.
 
-    The ``Content-Length`` and ``Content-Type`` headers are automatically set
-    when they can be guessed from contents of ``open_file``.
+    The ``Content-Length`` header is automatically set when it can be guessed
+    from the content of ``open_file``.
+
+    The ``Content-Type`` header is automatically set when it can be guessed
+    from the ``filename``, or the name of ``open_file``.
 
 ``FileResponse`` accepts any file-like object with binary content, for example
 a file open in binary mode like so:
