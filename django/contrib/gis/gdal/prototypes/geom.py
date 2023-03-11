@@ -135,5 +135,11 @@ ogr_within = topology_func(lgdal.OGR_G_Within)
 geom_transform = void_output(lgdal.OGR_G_Transform, [c_void_p, c_void_p])
 geom_transform_to = void_output(lgdal.OGR_G_TransformTo, [c_void_p, c_void_p])
 
+# Force transformation from a polygon type to another
+force_to_polygon = geom_output(lgdal.OGR_G_ForceToPolygon, [c_void_p])
+force_to_multi_polygon = geom_output(lgdal.OGR_G_ForceToMultiPolygon, [c_void_p])
+force_to_line = geom_output(lgdal.OGR_G_ForceToLineString, [c_void_p])
+force_to_multi_line = geom_output(lgdal.OGR_G_ForceToMultiLineString, [c_void_p])
+
 # For retrieving the envelope of the geometry.
 get_envelope = env_func(lgdal.OGR_G_GetEnvelope, [c_void_p, POINTER(OGREnvelope)])

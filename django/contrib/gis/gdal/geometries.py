@@ -662,6 +662,14 @@ class Polygon(OGRGeometry):
         return p
 
 
+class CurvePolygon(OGRGeometry):
+    pass
+
+
+class CompoundCurve(OGRGeometry):
+    pass
+
+
 # Geometry Collection base class.
 class GeometryCollection(OGRGeometry):
     "The Geometry Collection class."
@@ -723,6 +731,14 @@ class MultiPolygon(GeometryCollection):
     pass
 
 
+class MultiSurface(GeometryCollection):
+    pass
+
+
+class MultiCurve(GeometryCollection):
+    pass
+
+
 # Class mapping dictionary (using the OGRwkbGeometryType as the key)
 GEO_CLASSES = {
     1: Point,
@@ -732,6 +748,10 @@ GEO_CLASSES = {
     5: MultiLineString,
     6: MultiPolygon,
     7: GeometryCollection,
+    9: CompoundCurve,
+    10: CurvePolygon,
+    11: MultiCurve,
+    12: MultiSurface,
     101: LinearRing,
     1 + OGRGeomType.wkb25bit: Point,
     2 + OGRGeomType.wkb25bit: LineString,
