@@ -106,6 +106,12 @@ Minor features
   now support the optional ``srid`` argument (except for Oracle where it is
   ignored).
 
+* Added GDAL support curved geometries ``CurvePolygon``, ``CompoundCurve``,
+  ``CircularString``, ``MultiSurface``, and ``MultiCurve`` via the new
+  :attr:`.OGRGeometry.has_curve` property, and the
+  :meth:`.OGRGeometry.get_linear_geometry` and
+  :meth:`.OGRGeometry.get_curve_geometry` methods.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
