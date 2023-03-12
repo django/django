@@ -157,17 +157,7 @@ class ConnectionHandler(BaseConnectionHandler):
 
         # Configure default settings.
         for conn in databases.values():
-            conn.setdefault("ATOMIC_REQUESTS", False)
-            conn.setdefault("AUTOCOMMIT", True)
-            conn.setdefault("ENGINE", "django.db.backends.dummy")
-            if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
-                conn["ENGINE"] = "django.db.backends.dummy"
-            conn.setdefault("CONN_MAX_AGE", 0)
-            conn.setdefault("CONN_HEALTH_CHECKS", False)
-            conn.setdefault("OPTIONS", {})
-            conn.setdefault("TIME_ZONE", None)
-            for setting in ["NAME", "USER", "PASSWORD", "HOST", "PORT"]:
-                conn.setdefault(setting, "")
+            self.ensure_defaults(conn)
 
             test_settings = conn.setdefault("TEST", {})
             default_test_settings = [
@@ -181,6 +171,24 @@ class ConnectionHandler(BaseConnectionHandler):
                 test_settings.setdefault(key, value)
         return databases
 
+    @staticmethod
+    def ensure_defaults(conn):
+        """
+        Put the defaults into the settings dictionary for a given connection
+        where no settings is provided.
+        """
+        conn.setdefault("ATOMIC_REQUESTS", False)
+        conn.setdefault("AUTOCOMMIT", True)
+        conn.setdefault("ENGINE", "django.db.backends.dummy")
+        if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
+            conn["ENGINE"] = "django.db.backends.dummy"
+        conn.setdefault("CONN_MAX_AGE", 0)
+        conn.setdefault("CONN_HEALTH_CHECKS", False)
+        conn.setdefault("OPTIONS", {})
+        conn.setdefault("TIME_ZONE", None)
+        for setting in ["NAME", "USER", "PASSWORD", "HOST", "PORT"]:
+            conn.setdefault(setting, "")
+
     @property
     def databases(self):
         # Maintained for backward compatibility as some 3rd party packages have
@@ -190,6 +198,7 @@ class ConnectionHandler(BaseConnectionHandler):
 
     def create_connection(self, alias):
         db = self.settings[alias]
+        self.ensure_defaults(db)
         backend = load_backend(db["ENGINE"])
         return backend.DatabaseWrapper(db, alias)
 

@@ -58,6 +58,17 @@ class ConnectionHandlerTests(SimpleTestCase):
         with self.assertRaisesMessage(ConnectionDoesNotExist, msg):
             conns["nonexistent"]
 
+    def test_ensure_defaults_dynamic_db(self):
+        msg = "No default values set for dynamic connection 'test_dynamic_db'."
+        conns = ConnectionHandler(
+            {
+                DEFAULT_DB_ALIAS: {"ENGINE": "django.db.backends.dummy"},
+            }
+        )
+        conns.settings["test_dynamic_db"] = {"ENGINE": "django.db.backends.dummy"}
+        conns.create_connection("test_dynamic_db")
+        self.assertTrue("TIME_ZONE" in conns.settings["test_dynamic_db"], msg)
+
 
 class DatabaseErrorWrapperTests(TestCase):
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL test")
