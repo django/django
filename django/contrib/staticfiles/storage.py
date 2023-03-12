@@ -353,7 +353,10 @@ class HashedFilesMixin:
                 # ..to apply each replacement pattern to the content
                 if name in adjustable_paths:
                     old_hashed_name = hashed_name
-                    content = original_file.read().decode("utf-8")
+                    try:
+                        content = original_file.read().decode("utf-8")
+                    except UnicodeDecodeError as exc:
+                        yield name, None, exc, False
                     for extension, patterns in self._patterns.items():
                         if matches_patterns(path, (extension,)):
                             for pattern, template in patterns:

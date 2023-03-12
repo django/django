@@ -368,6 +368,18 @@ class TestHashedFiles:
         self.assertEqual("Post-processing 'faulty.css' failed!\n\n", err.getvalue())
         self.assertPostCondition()
 
+    @override_settings(
+        STATICFILES_DIRS=[os.path.join(TEST_ROOT, "project", "nonutf8")],
+        STATICFILES_FINDERS=["django.contrib.staticfiles.finders.FileSystemFinder"],
+    )
+    def test_post_processing_nonutf8(self):
+        finders.get_finder.cache_clear()
+        err = StringIO()
+        with self.assertRaises(UnicodeDecodeError):
+            call_command("collectstatic", interactive=False, verbosity=0, stderr=err)
+        self.assertEqual("Post-processing 'nonutf8.css' failed!\n\n", err.getvalue())
+        self.assertPostCondition()
+
 
 @override_settings(
     STORAGES={
