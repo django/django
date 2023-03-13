@@ -16,12 +16,8 @@ FIRST_DAY_OF_WEEK = 0  # Sunday
 DATE_INPUT_FORMATS = [
     "%d/%m/%Y",  # '25/10/2006'
     "%d/%m/%y",  # '25/10/06'
-    # "%b %d %Y",  # 'Oct 25 2006'
-    # "%b %d, %Y",  # 'Oct 25, 2006'
     "%d %b %Y",  # '25 Oct 2006'
     "%d %b, %Y",  # '25 Oct, 2006'
-    # "%B %d %Y",  # 'October 25 2006'
-    # "%B %d, %Y",  # 'October 25, 2006'
     "%d %B %Y",  # '25 October 2006'
     "%d %B, %Y",  # '25 October, 2006'
 ]
