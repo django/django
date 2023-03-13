@@ -23,7 +23,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When
+from django.db.models.expressions import Case, F, Value, When, Subquery, OuterRef
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
@@ -1557,15 +1557,21 @@ class QuerySet(AltersData):
         if lookups == (None,):
             clone._prefetch_related_lookups = ()
         else:
+            to_annotate = {}
             for lookup in lookups:
                 if isinstance(lookup, Prefetch):
                     lookup = lookup.prefetch_to
+                elif isinstance(lookup, PrefetchEarliest):
+                    to_annotate[lookup.annotate_name()] = lookup.field_subquery(self.model)
+                    lookup = lookup.to_attr or lookup.prefetch_through.replace(LOOKUP_SEP, '_')
                 lookup = lookup.split(LOOKUP_SEP, 1)[0]
                 if lookup in self.query._filtered_relations:
                     raise ValueError(
                         "prefetch_related() is not supported with FilteredRelation."
                     )
             clone._prefetch_related_lookups = clone._prefetch_related_lookups + lookups
+            if to_annotate:
+                clone = clone.annotate(**to_annotate)
         return clone
 
     def annotate(self, *args, **kwargs):
@@ -2131,18 +2137,14 @@ class RawQuerySet:
         return model_fields
 
 
-class Prefetch:
+
+class PrefetchBase:
     def __init__(self, lookup, queryset=None, to_attr=None):
         # `prefetch_through` is the path we traverse to perform the prefetch.
-        self.prefetch_through = lookup
         # `prefetch_to` is the path to the attribute that stores the result.
         self.prefetch_to = lookup
         if queryset is not None and (
-            isinstance(queryset, RawQuerySet)
-            or (
-                hasattr(queryset, "_iterable_class")
-                and not issubclass(queryset._iterable_class, ModelIterable)
-            )
+            isinstance(queryset, RawQuerySet) or (not issubclass(getattr(queryset, '_iterable_class', None), ModelIterable))
         ):
             raise ValueError(
                 "Prefetch querysets cannot use raw(), values(), and values_list()."
@@ -2183,20 +2185,110 @@ class Prefetch:
             return self.queryset
         return None
 
+    def __hash__(self):
+        return hash((self.__class__, self.prefetch_to))
+
+
+class Prefetch(PrefetchBase):
+
     def __eq__(self, other):
         if not isinstance(other, Prefetch):
             return NotImplemented
         return self.prefetch_to == other.prefetch_to
 
-    def __hash__(self):
-        return hash((self.__class__, self.prefetch_to))
+
+class PrefetchEarliest(PrefetchBase):
+    def __init__(self, lookup, to_attr, queryset=None,
+                 ordering=None, join_field='pk'):
+        super().__init__(lookup, queryset, to_attr)
+        if not isinstance(ordering, (type(None), list, tuple)):
+            raise TypeError(
+                'If the ordering is specified, it must be a list or tuple of fields'
+            )
+        self.ordering = ordering
+        if not isinstance(join_field, str):
+            raise TypeError(
+                'The join_field must be string.'
+            )
+        self.join_field = join_field
+
+    def annotate_name(self):
+        return f'_subquery_{id(self)}'
+
+    def get_fallback_queryset(self, model):
+        for item in self.prefetch_through.split(LOOKUP_SEP):
+            if item == 'pk':
+                item = model._meta.pk.name
+            model = model._meta.get_field(item).related_model
+        return model._base_manager.all()
+
+    def reverse_lookup(self, source_model):
+        opts = source_model._meta
+        reverse = []
+        target_field = None
+        for item in self.prefetch_through.split(LOOKUP_SEP):
+            if item == 'pk':
+                item = opts.pk.name
+            relation = opts.get_field(item)
+            if target_field is None:
+                target_field = relation.remote_field.target_field.name
+            opts = relation.related_model._meta
+            from django.db.models import ForeignObjectRel
+            if isinstance(relation, ForeignObjectRel):
+                revrel = relation.field.name
+            else:
+                revrel = relation.related_query_name()
+            reverse.append(revrel)
+
+        return Q((LOOKUP_SEP.join(reversed(reverse)), OuterRef(target_field)))
+
+    def prepare_queryset(self, source_model):
+        queryset = self.queryset or self.get_fallback_queryset(source_model)
+        queryset = queryset.filter(self.reverse_lookup(source_model))
+        if self.ordering is not None:
+            return queryset.order_by(*self.ordering)
+        # if not, it will be ordered by the queryset itself, or the model (hopefully)
+        return queryset
+
+    def sliced_values(self, qs):
+        return qs.values(self.join_field)[:1]
+
+
+    def field_subquery(self, source_model):
+        return Subquery(
+            self.sliced_values(self.prepare_queryset(source_model))
+        )
+
+    def join_in_objects(self, source_model, items):
+        queryset = self.queryset or self.get_fallback_queryset(source_model)
+        join_field = self.join_field
+        # N.B.: the same value might be used by multiple items
+        attribute_name = self.annotate_name()
+        item_pks = {getattr(item, attribute_name) for item in items}
+        result = {
+            getattr(element, join_field): element
+            for element in queryset.filter(Q((
+                f'{self.join_field}__in', item_pks
+            )))
+        }
+        target = self.to_attr or self.prefetch_through
+        for item in items:
+            setattr(item, target, result.get(getattr(item, attribute_name)))
+
+
+
+
+class PrefetchLatest(PrefetchEarliest):
+    def prepare_queryset(self, *args, **kwargs):
+        # reverse the ordering, such that we take the latest instead of the earliest
+        return super().prepare_queryset(*args, **kwargs).reverse()
 
 
 def normalize_prefetch_lookups(lookups, prefix=None):
     """Normalize lookups into Prefetch objects."""
     ret = []
     for lookup in lookups:
-        if not isinstance(lookup, Prefetch):
+        if not isinstance(lookup, PrefetchBase):
             lookup = Prefetch(lookup)
         if prefix:
             lookup.add_prefix(prefix)
@@ -2213,7 +2305,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
         return  # nothing to do
 
     # We need to be able to dynamically add to the list of prefetch_related
-    # lookups that we look up (see below).  So we need some book keeping to
+    # lookups that we look up (see below).  So we need some bookkeeping to
     # ensure we don't do duplicate work.
     done_queries = {}  # dictionary of things like 'foo__bar': [results]
 
@@ -2231,6 +2323,9 @@ def prefetch_related_objects(model_instances, *related_lookups):
                     % lookup.prefetch_to
                 )
 
+            continue
+        if isinstance(lookup, PrefetchEarliest):
+            lookup.join_in_objects(type(model_instances[0]), model_instances)
             continue
 
         # Top level, the list of objects to decorate is the result cache
@@ -2269,7 +2364,7 @@ def prefetch_related_objects(model_instances, *related_lookups):
             if not good_objects:
                 break
 
-            # Descend down tree
+            # Descend down the tree
 
             # We assume that objects retrieved are homogeneous (which is the premise
             # of prefetch_related), so what applies to first object applies to all.
