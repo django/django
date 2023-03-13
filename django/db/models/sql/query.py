@@ -1087,7 +1087,12 @@ class Query(BaseExpression):
         if select:
             self.append_annotation_mask([alias])
         else:
-            self.set_annotation_mask(set(self.annotation_select).difference({alias}))
+            annotation_mask = (
+                value
+                for value in dict.fromkeys(self.annotation_select)
+                if value != alias
+            )
+            self.set_annotation_mask(annotation_mask)
         self.annotations[alias] = annotation
 
     def resolve_expression(self, query, *args, **kwargs):
@@ -2341,12 +2346,12 @@ class Query(BaseExpression):
         if names is None:
             self.annotation_select_mask = None
         else:
-            self.annotation_select_mask = set(names)
+            self.annotation_select_mask = list(dict.fromkeys(names))
         self._annotation_select_cache = None
 
     def append_annotation_mask(self, names):
         if self.annotation_select_mask is not None:
-            self.set_annotation_mask(self.annotation_select_mask.union(names))
+            self.set_annotation_mask((*self.annotation_select_mask, *names))
 
     def set_extra_mask(self, names):
         """
@@ -2423,9 +2428,9 @@ class Query(BaseExpression):
             return {}
         elif self.annotation_select_mask is not None:
             self._annotation_select_cache = {
-                k: v
-                for k, v in self.annotations.items()
-                if k in self.annotation_select_mask
+                k: self.annotations[k]
+                for k in self.annotation_select_mask
+                if k in self.annotations
             }
             return self._annotation_select_cache
         else:
