@@ -130,12 +130,14 @@ class EmailBackend(BaseEmailBackend):
                 # Trying to send would be pointless.
                 return 0
             num_sent = 0
-            for message in email_messages:
-                sent = self._send(message)
-                if sent:
-                    num_sent += 1
-            if new_conn_created:
-                self.close()
+            try:
+                for message in email_messages:
+                    sent = self._send(message)
+                    if sent:
+                        num_sent += 1
+            finally:
+                if new_conn_created:
+                    self.close()
         return num_sent
 
     def _send(self, email_message):
