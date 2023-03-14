@@ -1515,6 +1515,9 @@ If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
 optionally specify the path to a PEM-formatted certificate chain file to use
 for the SSL connection.
 
+Note that the private key can be stored in the same file as the certificate chain.
+In this case, only this setting needs to be passed.
+
 .. setting:: EMAIL_SSL_KEYFILE
 
 ``EMAIL_SSL_KEYFILE``
@@ -1524,7 +1527,8 @@ Default: ``None``
 
 If :setting:`EMAIL_USE_SSL` or :setting:`EMAIL_USE_TLS` is ``True``, you can
 optionally specify the path to a PEM-formatted private key file to use for the
-SSL connection.
+SSL connection. If default, the private key will be taken from file
+specified in :setting:`EMAIL_SSL_CERTFILE`.
 
 Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
 doesn't result in any certificate checking. They're passed to the underlying SSL
