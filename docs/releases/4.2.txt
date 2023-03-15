@@ -202,8 +202,10 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
-  replaces paths to JavaScript modules in ``import`` and ``export`` statements
-  with their hashed counterparts.
+  has experimental support for replacing paths to JavaScript modules in
+  ``import`` and ``export`` statements with their hashed counterparts. If you
+  want to try it, subclass ``ManifestStaticFilesStorage`` and set the
+  ``support_js_module_import_aggregation`` attribute to ``True``.
 
 * The new :attr:`.ManifestStaticFilesStorage.manifest_hash` attribute provides
   a hash over all files in the manifest and changes whenever one of the files

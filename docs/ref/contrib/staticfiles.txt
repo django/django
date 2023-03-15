@@ -300,6 +300,11 @@ method). The regular expressions used to find those paths
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
+
+Subclass ``ManifestStaticFilesStorage`` and set the
+``support_js_module_import_aggregation`` attribute to ``True``, if you want to
+use the experimental regular expressions to cover:
+
 * The `modules import`_ in JavaScript.
 * The `modules aggregation`_ in JavaScript.
 
@@ -342,8 +347,8 @@ argument. For example::
 
 .. versionchanged:: 4.2
 
-    Support for finding paths to JavaScript modules in ``import`` and
-    ``export`` statements was added.
+    Experimental optional support for finding paths to JavaScript modules in
+    ``import`` and ``export`` statements was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
 
