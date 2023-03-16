@@ -194,10 +194,17 @@
 
         for (let i = 0; i < specialChars.length; i++) {
             const charCode = specialChars.charCodeAt(i);
-            const encodedChar = '_' + charCode.toString(16).toUpperCase();
-            QUOTE_MAP[charCode] = encodedChar;
 
+            // "This checks if the current character code is equal to 10 (which corresponds to the line feed character)";
+
+            if (charCode === 10) {
+                QUOTE_MAP[charCode] = '_0A';
+            } else {
+                const encodedChar = '_' + charCode.toString(16).toUpperCase();
+                QUOTE_MAP[charCode] = encodedChar;
+            }
         }
+
         if (typeof s === 'string') {
             let result = '';
             for (let i = 0; i < s.length; i++) {
@@ -211,7 +218,57 @@
         }
 
 
+
+
+
+
+
+
+
+
+
+
+
+        // const QUOTE_MAP = {};
+        // const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
+        //
+        // for (let i = 0; i < specialChars.length; i++) {
+        //     const charCode = specialChars.charCodeAt(i);
+        //     const encodedChar = '_' + charCode.toString(16).toUpperCase();
+        //     QUOTE_MAP[charCode] = encodedChar;
+        // }
+        // QUOTE_MAP[10] = '_0A';
+        //
+        // if (typeof s === 'string') {
+        //     let result = '';
+        //     for (let i = 0; i < s.length; i++) {
+        //         const charCode = s.charCodeAt(i);
+        //         const encodedChar = QUOTE_MAP[charCode] || s[i];
+        //         result += encodedChar;
+        //     }
+        //     return result;
+        // } else {
+        //     return s;
+        // }
+
+
     }
+
+    function quoteSpecialChars(specialCharsList = ['c>h<e%e[s]e_40', 'on/ion?t@w$mw+', 'sa:la"m,i\nw;th=', '?_3A_40', 'qwerttyuiop12345', '?a=b']) {
+
+        const quotedChars = [];
+        for(let i = 0; i < specialCharsList.length; i++) {
+            const charToQuote = specialCharsList[i];
+            const quotedChar = customEncodeURIComponent(charToQuote);
+            quotedChars.push(quotedChar);
+        }
+        return quotedChars;
+    }
+
+
+
+    window.quoteSpecialChars = quoteSpecialChars;
+
     window.customEncodeURIComponent = customEncodeURIComponent;
 
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
