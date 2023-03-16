@@ -9,6 +9,11 @@ QUnit.test('quote value', function(assert) {
 
 });
 
+QUnit.test('quoteSpecialChars', function(assert) {
+    assert.equal(quoteSpecialChars().toString(), ['c_3Eh_3Ce_25e_5Bs_5De_5F40', 'on_2Fion_3Ft_40w_24mw_2B', 'sa_3Ala_22m_2Ci_0Aw_3Bth_3D', '_3F_5F3A_5F40', 'qwerttyuiop12345', '_3Fa_3Db'].toString(), "passed");
+});
+
+
 QUnit.test('updateRelatedObjectLinks properly quotes URL value', function(assert) {
     const $ = django.jQuery;
     const triggeringLink = $('<input class="vForeignKeyRawIdAdminField" type="text" value="_40">');
