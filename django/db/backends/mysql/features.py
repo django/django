@@ -108,6 +108,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests."
                 "test_update_ordered_by_inline_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
+                "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
         }
         if self.connection.mysql_is_mariadb and (

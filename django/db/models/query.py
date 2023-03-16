@@ -1190,11 +1190,18 @@ class QuerySet(AltersData):
         # Inline annotations in order_by(), if possible.
         new_order_by = []
         for col in query.order_by:
-            if annotation := query.annotations.get(col):
+            alias = col
+            descending = False
+            if isinstance(alias, str) and alias.startswith("-"):
+                alias = alias.removeprefix("-")
+                descending = True
+            if annotation := query.annotations.get(alias):
                 if getattr(annotation, "contains_aggregate", False):
                     raise exceptions.FieldError(
                         f"Cannot update when ordering by an aggregate: {annotation}"
                     )
+                if descending:
+                    annotation = annotation.desc()
                 new_order_by.append(annotation)
             else:
                 new_order_by.append(col)
