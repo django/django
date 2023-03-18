@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import sys
+import time
 import uuid
 import zoneinfo
 from types import NoneType
@@ -912,13 +913,18 @@ class WriterTests(SimpleTestCase):
                             ),
                         ),
                     ),
+                    migrations.AddField(
+                        "mymodel",
+                        "myfield2",
+                        models.FloatField(default=time.time),
+                    ),
                 ]
             },
         )
         writer = MigrationWriter(migration)
         output = writer.as_string()
         self.assertIn(
-            "import datetime\nfrom django.db import migrations, models\n",
+            "import datetime\nimport time\nfrom django.db import migrations, models\n",
             output,
         )
 
