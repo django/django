@@ -47,6 +47,34 @@ class StaticFilesStorage(FileSystemStorage):
 class HashedFilesMixin:
     default_template = """url("%(url)s")"""
     max_post_process_passes = 5
+    support_js_module_import_aggregation = False
+    _js_module_import_aggregation_patterns = (
+        "*.js",
+        (
+            (
+                (
+                    r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
+                    r"""\s*from\s*['"](?P<url>[\.\/].*?)["']\s*;)"""
+                ),
+                """import%(import)s from "%(url)s";""",
+            ),
+            (
+                (
+                    r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
+                    r"""\s*from\s*["'](?P<url>[\.\/].*?)["']\s*;)"""
+                ),
+                """export%(exports)s from "%(url)s";""",
+            ),
+            (
+                r"""(?P<matched>import\s*['"](?P<url>[\.\/].*?)["']\s*;)""",
+                """import"%(url)s";""",
+            ),
+            (
+                r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
+                """import("%(url)s")""",
+            ),
+        ),
+    )
     patterns = (
         (
             "*.css",
@@ -72,34 +100,14 @@ class HashedFilesMixin:
                     r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
                 ),
-                (
-                    (
-                        r"""(?P<matched>import(?s:(?P<import>[\s\{].*?))"""
-                        r"""\s*from\s*['"](?P<url>[\.\/].*?)["']\s*;)"""
-                    ),
-                    """import%(import)s from "%(url)s";""",
-                ),
-                (
-                    (
-                        r"""(?P<matched>export(?s:(?P<exports>[\s\{].*?))"""
-                        r"""\s*from\s*["'](?P<url>[\.\/].*?)["']\s*;)"""
-                    ),
-                    """export%(exports)s from "%(url)s";""",
-                ),
-                (
-                    r"""(?P<matched>import\s*['"](?P<url>[\.\/].*?)["']\s*;)""",
-                    """import"%(url)s";""",
-                ),
-                (
-                    r"""(?P<matched>import\(["'](?P<url>.*?)["']\))""",
-                    """import("%(url)s")""",
-                ),
             ),
         ),
     )
     keep_intermediate_files = True
 
     def __init__(self, *args, **kwargs):
+        if self.support_js_module_import_aggregation:
+            self.patterns += (self._js_module_import_aggregation_patterns,)
         super().__init__(*args, **kwargs)
         self._patterns = {}
         self.hashed_files = {}
