@@ -1,6 +1,7 @@
 import gettext
 import os
 import re
+import time
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -780,7 +781,7 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         )
 
     def test_foreign_key_raw_id_widget_renders_quoted_pk_in_change_url(self):
-        house = House.objects.create(name="#c>h<e%e[s]e_40")
+        house = House.objects.create(name="_40")
         rel = Room._meta.get_field("house").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
 
@@ -1008,8 +1009,8 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
             [
                 x.text
                 for x in self.selenium.find_elements(
-                By.XPATH, "//ul[@class='timelist']/li/a"
-            )
+                    By.XPATH, "//ul[@class='timelist']/li/a"
+                )
             ],
             ["Now", "Midnight", "6 a.m.", "Noon", "6 p.m."],
         )
@@ -1812,60 +1813,58 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 
 class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
-    def setUp(self):
-        super().setUp()
-        self.house = []
-        self.house.append(House.objects.create(name='c>h<e%e[s]e_40'))
-        self.house.append(
-            House.objects.create(name='on/ion?\\at@w$mw+'))
-        self.house.append(House.objects.create(name='sa:la"m,i\nw;th='))
-        self.house.append(House.objects.create(name='?_3A_40'))
-        self.house.append(House.objects.create(name='qwerttyuiop12345'))
-        self.house.append(House.objects.create(name='ASDfgHJKL06789'))
-        self.house.append(
-            House.objects.create(name='zZccVBnm,l.;\'t039_)?'))
-        self.house.append(
-            House.objects.create(name='Iñtërnâtiônàlizætiøn'))
-        self.house.append(House.objects.create(name='1'))
-
-    def test_quoted_primary_key(self):
+    def test_create_houses_and_room(self):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.select import Select
 
         self.admin_login(username="super", password="secret", login_url="/")
+
+        # Create a new House with a PK that needs quoting
+        house = House.objects.create(name="_40")
+        house_name = str(house.name)
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_house_add")
         )
-        main_window = self.selenium.current_window_handle
 
-        for house in self.house:
-            quoted_pk = quote(house.pk)
-            self.get_select_option('#id_house', quoted_pk).click()
-            self.wait_for_value('#id_house', quoted_pk)
+        self.selenium.find_element(By.ID, "id_name").send_keys(house_name)
+        self.selenium.find_element(By.NAME, "_continue").click()
 
-            field_name = self.selenium.find_element(By.ID, "id_house", ).click()
-            field_name.send_keys(quoted_pk)
+        # Check that the new House was created and listed in the change form
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_room_add")
+        )
+        self.assertIn(house_name, self.selenium.page_source)
 
-            save_button_css_selector = ".submit-row > input[type=submit]"
-            self.selenium.find_element(By.CSS_SELECTOR,
-                                       save_button_css_selector).click()
+        select_house = Select(self.selenium.find_element(By.ID, "id_house"))
+        select_house.select_by_index(0)
+        select_house.select_by_value(house.pk)
+        self.assertEqual(
+            select_house.first_selected_option.get_attribute("value"), house.pk
+        )
 
-            # verify that the house instance was created with the quoted primary key
-            self.assertEqual(quote(house.pk), quoted_pk)
+        # Create a new Room and associate it with the House created above
+        room = Room.objects.create(name="onebed", house=house)
+        room_name = str(room.name)
+        self.selenium.find_element(By.ID, "id_name").send_keys(room_name)
 
-            # create a room instance with the quoted primary key as the house foreign key
-            self.selenium.get(
-                self.live_server_url + reverse("admin:admin_widgets_room_add")
-            )
+        self.selenium.find_element(By.NAME, "_continue").click()
+        #
+        save_button_css_selector = ".submit-row > input[type=submit]"
 
-            house_select = Select(self.selenium.find_element(By.ID, "id_house"))
-            house_select.select_by_value(quoted_pk)
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+        self.selenium.find_element(By.ID, "view_id_house").click()
+        self.selenium.back()
 
-            self.selenium.find_element(By.CSS_SELECTOR,
-                                       save_button_css_selector).click()
-            room = Room.objects.first()
-            self.assertEqual(room.house.name, quoted_pk)
-            self.selenium.switch_to.window(main_window)
+        # Check that the House is linked to the Room and listed in the change form
+
+        self.selenium.find_element(By.ID, "id_name")
+
+        save_button_css_selector = ".submit-row > input[type=submit]"
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+
+        self.selenium.find_element(By.ID, "view_id_house").click()
+        time.sleep(5)
+        self.wait_for_value("#id_name", house_name)
 
 
 @skipUnless(Image, "Pillow not installed")

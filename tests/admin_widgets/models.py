@@ -223,7 +223,8 @@ class House(models.Model):
 
 
 class Room(models.Model):
+    name = models.CharField(max_length=255)
     house = models.ForeignKey(House, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.house.name
+        return self.name
