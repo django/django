@@ -776,13 +776,12 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         )
 
     def test_foreign_key_raw_id_widget_renders_quoted_pk_in_change_url(self):
-        house = House.objects.create(name="\n")
+        house = House.objects.create(name="_40")
         rel = Room._meta.get_field("house").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
 
         # apply quote function to primary key value
         pk_quoted = quote(str(house.pk))
-        print("pkkkkkkkk", pk_quoted)
 
         # render the widget
         rendered = w.render("test", house.pk, attrs={})
