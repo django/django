@@ -161,7 +161,7 @@ class MemoryStorageTimesTests(unittest.TestCase):
         self.assertTrue(new_modified_time > modified_time)
 
     def test_file_accessed_time(self):
-        """File accessed time should chage after consecutive opening."""
+        """File accessed time should change after consecutive opening."""
         self.storage.save("file.txt", ContentFile("test"))
         accessed_time = self.storage.get_accessed_time("file.txt")
 
