@@ -1827,13 +1827,14 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_room_add")
         )
-        # self.assertIn(house_name, self.selenium.page_source)
+        self.assertIn(house_name, self.selenium.page_source)
 
         select_house = Select(self.selenium.find_element(By.ID, "id_house"))
         select_house.select_by_index(0)
         select_house.select_by_value(quoted_pk)
-        # self.assertEqual(select_house.first_selected_option.get_attribute("value"),
-        #                  quoted_pk)
+        self.assertEqual(
+            select_house.first_selected_option.get_attribute("value"), quoted_pk
+        )
 
         # Create a new Room and associate it with the House created above
         room = Room.objects.create(name="onebed", house=house)
