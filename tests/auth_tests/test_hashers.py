@@ -345,7 +345,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password("", encoded))
         self.assertFalse(check_password("lètmein", encoded))
         self.assertFalse(check_password("lètmeinz", encoded))
-        with self.assertRaisesMessage(ValueError, "Unknown password hashing algorith"):
+        with self.assertRaisesMessage(ValueError, "Unknown password hashing algorithm"):
             identify_hasher(encoded)
         # Assert that the unusable passwords actually contain a random part.
         # This might fail one day due to a hash collision.

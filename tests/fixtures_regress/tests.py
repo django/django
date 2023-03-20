@@ -811,7 +811,7 @@ class NaturalKeyFixtureOnOtherDatabaseTests(TestCase):
 
     def test_natural_key_dependencies(self):
         """
-        Natural keys with foreing keys in dependencies works in a multiple
+        Natural keys with foreign keys in dependencies works in a multiple
         database setup.
         """
         management.call_command(
