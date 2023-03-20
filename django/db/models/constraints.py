@@ -191,6 +191,8 @@ class UniqueConstraint(BaseConstraint):
     ):
         if not name:
             raise ValueError("A unique constraint must be named.")
+        if len(name) > 63:
+            raise ValueError("Name of constraint can not be longer than 63 characters")
         if not expressions and not fields:
             raise ValueError(
                 "At least one field or expression is required to define a "

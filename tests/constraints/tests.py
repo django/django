@@ -1070,3 +1070,24 @@ class UniqueConstraintTests(TestCase):
         msg = "A unique constraint must be named."
         with self.assertRaisesMessage(ValueError, msg):
             models.UniqueConstraint(fields=["field"])
+
+    def test_unique_constraint_name_length_limit(self):
+        """
+        Databases imposes a limit on the length of an identifier.
+        A longer identifier can probably be used, but it might be truncated and might
+        collide with other identifiers
+        """
+        postgres_identifier_limit = 63
+
+        # Using up to the limit should be fine
+        models.UniqueConstraint(
+            fields=["field"],
+            name="x" * postgres_identifier_limit
+        )
+
+        msg = "Name of constraint can not be longer than 63 characters"
+        with self.assertRaisesMessage(ValueError, msg):
+            models.UniqueConstraint(
+                fields=["field"],
+                name="x" * (postgres_identifier_limit + 1)
+            )
