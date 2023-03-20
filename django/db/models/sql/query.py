@@ -699,7 +699,7 @@ class Query(BaseExpression):
         # All concrete fields that are not part of the defer mask must be
         # loaded. If a relational field is encountered it gets added to the
         # mask for it be considered if `select_related` and the cycle continues
-        # by recursively caling this function.
+        # by recursively calling this function.
         for field in opts.concrete_fields:
             field_mask = mask.pop(field.name, None)
             if field_mask is None:

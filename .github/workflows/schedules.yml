@@ -42,5 +42,5 @@ jobs:
                 ref: '${{ matrix.branch }}',
               })
             } else {
-              console.log(`No commits found since ${yesterday} on brach ${{ matrix.branch }}`)
+              console.log(`No commits found since ${yesterday} on branch ${{ matrix.branch }}`)
             }
