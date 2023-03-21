@@ -538,11 +538,11 @@ write our own ``get_context_data()`` to make the
             context["form"] = AuthorInterestForm()
             return context
 
-Then the ``AuthorInterestForm`` is a :class:`FormView`, but we have to bring in
-:class:`~django.views.generic.detail.SingleObjectMixin` so we can find the
-author we're talking about, and we have to remember to set ``template_name`` to
-ensure that form errors will render the same template as ``AuthorDetailView``
-is using on ``GET``::
+Then the ``AuthorInterestFormView`` is a :class:`FormView`, but we have to
+bring in :class:`~django.views.generic.detail.SingleObjectMixin` so we can find
+the author we're talking about, and we have to remember to set
+``template_name`` to ensure that form errors will render the same template as
+``AuthorDetailView`` is using on ``GET``::
 
     from django.http import HttpResponseForbidden
     from django.urls import reverse
