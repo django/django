@@ -116,7 +116,6 @@ class ASGITest(SimpleTestCase):
             "django.contrib.staticfiles.finders.FileSystemFinder",
         ],
     )
-    @ignore_warnings(module="django.http.response")
     async def test_static_file_response(self):
         application = ASGIStaticFilesHandler(get_asgi_application())
         # Construct HTTP request.
