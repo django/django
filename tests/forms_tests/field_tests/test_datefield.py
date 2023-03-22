@@ -149,6 +149,8 @@ class DateFieldTest(SimpleTestCase):
             f.clean("200a-10-25")
         with self.assertRaisesMessage(ValidationError, "'Enter a valid date.'"):
             f.clean("25/10/06")
+        with self.assertRaisesMessage(ValidationError, "'Enter a valid date.'"):
+            f.clean("0-0-0")
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean(None)
 
