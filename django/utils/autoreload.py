@@ -22,6 +22,7 @@ from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
 
 autoreload_started = Signal()
+autoreload_stopping = Signal()
 file_changed = Signal()
 
 DJANGO_AUTORELOAD_ENV = "RUN_MAIN"
@@ -264,6 +265,7 @@ def get_child_arguments():
 
 def trigger_reload(filename):
     logger.info("%s changed, reloading.", filename)
+    autoreload_stopping.send(sender=None)
     sys.exit(3)
 
 
