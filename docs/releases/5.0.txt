@@ -152,7 +152,9 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* :func:`~django.views.decorators.debug.sensitive_variables` and
+  :func:`~django.views.decorators.debug.sensitive_post_parameters` can now be
+  used with asynchronous functions.
 
 File Storage
 ~~~~~~~~~~~~
