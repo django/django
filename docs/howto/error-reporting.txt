@@ -194,6 +194,17 @@ filtered out of error reports in a production environment (that is, where
             def process_info(user):
                 ...
 
+    .. warning::
+
+        Due to the machinery needed to cross the sync/async boundary,
+        :func:`~asgiref.sync.sync_to_async` and
+        :func:`~asgiref.sync.async_to_sync` are **not** compatible with
+        ``sensitive_variables()``.
+
+        If using these adapters with sensitive variables, ensure to audit
+        exception reporting, and consider implementing a :ref:`custom filter
+        <custom-error-reports>` if necessary.
+
 .. function:: sensitive_post_parameters(*parameters)
 
     If one of your views receives an :class:`~django.http.HttpRequest` object
