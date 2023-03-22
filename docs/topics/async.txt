@@ -338,3 +338,17 @@ trigger the thread safety checks:
 Rather, you should encapsulate all database access within a helper function
 that can be called with ``sync_to_async()`` without relying on the connection
 object in the calling code.
+
+Use with exception reporting filters
+------------------------------------
+
+.. warning::
+
+    Due to the machinery needed to cross the sync/async boundary,
+    ``sync_to_async()`` and ``async_to_sync()`` are **not** compatible with
+    :func:`~django.views.decorators.debug.sensitive_variables`, used to mask
+    local variables from exception reports.
+
+    If using these adapters with sensitive variables, ensure to audit exception
+    reporting, and consider implementing a :ref:`custom filter
+    <custom-error-reports>` if necessary.
