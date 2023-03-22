@@ -323,7 +323,10 @@ small performance and memory cost, you can return results as a ``dict`` by
 using something like this::
 
     def dictfetchall(cursor):
-        "Return all rows from a cursor as a dict"
+        """
+        Return all rows from a cursor as a dict.
+        Assume the column names are unique.
+        """
         columns = [col[0] for col in cursor.description]
         return [dict(zip(columns, row)) for row in cursor.fetchall()]
 
@@ -336,10 +339,16 @@ immutable and accessible by field names or indices, which might be useful::
 
 
     def namedtuplefetchall(cursor):
-        "Return all rows from a cursor as a namedtuple"
+        """
+        Return all rows from a cursor as a namedtuple.
+        Assume the column names are unique.
+        """
         desc = cursor.description
         nt_result = namedtuple("Result", [col[0] for col in desc])
         return [nt_result(*row) for row in cursor.fetchall()]
+
+The ``dictfetchall()`` and ``namedtuplefetchall()`` examples assume unique
+column names, since a cursor cannot distinguish columns from different tables.
 
 Here is an example of the difference between the three:
 
