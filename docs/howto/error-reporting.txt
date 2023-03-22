@@ -196,7 +196,7 @@ filtered out of error reports in a production environment (that is, where
 
     .. versionchanged:: 5.0
 
-        :func:`sensitive_variables` can now be used to wrap ``async`` functions.
+        Support for wrapping ``async`` functions was added.
 
 .. function:: sensitive_post_parameters(*parameters)
 
@@ -240,7 +240,7 @@ filtered out of error reports in a production environment (that is, where
 
     .. versionchanged:: 5.0
 
-        :func:`sensitive_post_parameters` can now be used to wrap ``async`` functions.
+        Support for wrapping ``async`` functions was added.
 
 .. _custom-error-reports:
 
