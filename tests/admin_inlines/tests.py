@@ -353,13 +353,13 @@ class TestInline(TestDataMixin, TestCase):
         )
         # The div containing the position field is hidden.
         self.assertInHTML(
-            '<div class="fieldBox field-position hidden">'
+            '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
             '<div class="readonly">0</div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
-            '<div class="fieldBox field-position hidden">'
+            '<div class="flex-container fieldBox field-position hidden">'
             '<label class="inline">Position:</label>'
             '<div class="readonly">1</div></div>',
             response.rendered_content,
@@ -382,14 +382,14 @@ class TestInline(TestDataMixin, TestCase):
         # The whole line containing position field is hidden.
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
-            "<div><label>Position:</label>"
-            '<div class="readonly">0</div></div></div>',
+            '<div><div class="flex-container"><label>Position:</label>'
+            '<div class="readonly">0</div></div></div></div>',
             response.rendered_content,
         )
         self.assertInHTML(
             '<div class="form-row hidden field-position">'
-            "<div><label>Position:</label>"
-            '<div class="readonly">1</div></div></div>',
+            '<div><div class="flex-container"><label>Position:</label>'
+            '<div class="readonly">1</div></div></div></div>',
             response.rendered_content,
         )
 

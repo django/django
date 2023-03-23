@@ -390,10 +390,6 @@ input[type="submit"], button {
         display: none;
     }
 
-    form .form-row p.datetime {
-        width: 100%;
-    }
-
     .datetime input {
         width: 50%;
         max-width: 120px;
@@ -564,13 +560,15 @@ input[type="submit"], button {
 
     .aligned .form-row,
     .aligned .form-row > div {
-        display: flex;
-        flex-wrap: wrap;
         max-width: 100vw;
     }
 
     .aligned .form-row > div {
         width: calc(100vw - 30px);
+    }
+
+    .flex-container {
+        flex-flow: column;
     }
 
     textarea {

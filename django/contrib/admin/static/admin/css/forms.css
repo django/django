@@ -22,9 +22,13 @@ form .form-row p {
     padding-left: 0;
 }
 
-.form-row > div {
+.flex-container {
     display: flex;
     flex-wrap: wrap;
+}
+
+.form-multiline > div {
+    padding-bottom: 10px;
 }
 
 /* FORM LABELS */
@@ -191,7 +195,6 @@ form .aligned table p {
 }
 
 fieldset .fieldBox {
-    float: left;
     margin-right: 20px;
 }
 
