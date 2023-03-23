@@ -143,7 +143,8 @@ form .aligned div.help {
     padding-right: 10px;
 }
 
-form .aligned .checkbox-row + .help {
+form .aligned .checkbox-row + .help,
+form .aligned p.datetime div.help.timezonewarning {
     margin-right: 0;
     padding-right: 0;
 }
