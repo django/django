@@ -8076,11 +8076,13 @@ class TestLabelVisibility(TestCase):
         self.assert_field_visible(response, "second")
 
     def assert_field_visible(self, response, field_name):
-        self.assertContains(response, '<div class="fieldBox field-%s">' % field_name)
+        self.assertContains(
+            response, f'<div class="flex-container fieldBox field-{field_name}">'
+        )
 
     def assert_field_hidden(self, response, field_name):
         self.assertContains(
-            response, '<div class="fieldBox field-%s hidden">' % field_name
+            response, f'<div class="flex-container fieldBox field-{field_name} hidden">'
         )
 
     def assert_fieldline_visible(self, response):

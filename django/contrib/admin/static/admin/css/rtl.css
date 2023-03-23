@@ -170,7 +170,6 @@ form .wide input + div.help {
 }
 
 fieldset .fieldBox {
-    float: right;
     margin-left: 20px;
     margin-right: 0;
 }
