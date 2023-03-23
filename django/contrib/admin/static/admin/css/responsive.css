@@ -652,7 +652,8 @@ input[type="submit"], button {
         padding: 0;
     }
 
-    form .aligned ul {
+    form .aligned ul,
+    form .aligned ul.errorlist {
         margin-left: 0;
         padding-left: 0;
     }
