@@ -12,7 +12,8 @@ from django.db.models import (
 )
 from django.db.models.functions import Mod
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-from django.test.utils import CaptureQueriesContext
+from django.test.utils import CaptureQueriesContext, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Author, Celebrity, ExtraInfo, Number, ReservedName
 
@@ -280,6 +281,8 @@ class QuerySetSetOperationTests(TestCase):
         )
         self.assertCountEqual(qs1.union(qs2), [(1, 0), (0, 2)])
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_union_with_extra_and_values_list(self):
         qs1 = (
             Number.objects.filter(num=1)
@@ -408,6 +411,8 @@ class QuerySetSetOperationTests(TestCase):
             [reserved_name.pk],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_union_multiple_models_with_values_list_and_order_by_extra_select(self):
         reserved_name = ReservedName.objects.create(name="rn1", order=0)
         qs1 = Celebrity.objects.extra(select={"extra_name": "name"})

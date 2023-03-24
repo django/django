@@ -28,8 +28,9 @@ from django.db.models.lookups import (
     LessThan,
     LessThanOrEqual,
 )
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps, register_lookup
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -379,46 +380,48 @@ class LookupTests(TestCase):
                 {"headline": "Article 1", "id": self.a1.id},
             ],
         )
-        # The values() method works with "extra" fields specified in extra(select).
-        self.assertSequenceEqual(
-            Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
-                "id", "id_plus_one"
-            ),
-            [
-                {"id": self.a5.id, "id_plus_one": self.a5.id + 1},
-                {"id": self.a6.id, "id_plus_one": self.a6.id + 1},
-                {"id": self.a4.id, "id_plus_one": self.a4.id + 1},
-                {"id": self.a2.id, "id_plus_one": self.a2.id + 1},
-                {"id": self.a3.id, "id_plus_one": self.a3.id + 1},
-                {"id": self.a7.id, "id_plus_one": self.a7.id + 1},
-                {"id": self.a1.id, "id_plus_one": self.a1.id + 1},
-            ],
-        )
-        data = {
-            "id_plus_one": "id+1",
-            "id_plus_two": "id+2",
-            "id_plus_three": "id+3",
-            "id_plus_four": "id+4",
-            "id_plus_five": "id+5",
-            "id_plus_six": "id+6",
-            "id_plus_seven": "id+7",
-            "id_plus_eight": "id+8",
-        }
-        self.assertSequenceEqual(
-            Article.objects.filter(id=self.a1.id).extra(select=data).values(*data),
-            [
-                {
-                    "id_plus_one": self.a1.id + 1,
-                    "id_plus_two": self.a1.id + 2,
-                    "id_plus_three": self.a1.id + 3,
-                    "id_plus_four": self.a1.id + 4,
-                    "id_plus_five": self.a1.id + 5,
-                    "id_plus_six": self.a1.id + 6,
-                    "id_plus_seven": self.a1.id + 7,
-                    "id_plus_eight": self.a1.id + 8,
-                }
-            ],
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            # The values() method works with "extra" fields specified in extra(select).
+            self.assertSequenceEqual(
+                Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
+                    "id", "id_plus_one"
+                ),
+                [
+                    {"id": self.a5.id, "id_plus_one": self.a5.id + 1},
+                    {"id": self.a6.id, "id_plus_one": self.a6.id + 1},
+                    {"id": self.a4.id, "id_plus_one": self.a4.id + 1},
+                    {"id": self.a2.id, "id_plus_one": self.a2.id + 1},
+                    {"id": self.a3.id, "id_plus_one": self.a3.id + 1},
+                    {"id": self.a7.id, "id_plus_one": self.a7.id + 1},
+                    {"id": self.a1.id, "id_plus_one": self.a1.id + 1},
+                ],
+            )
+            data = {
+                "id_plus_one": "id+1",
+                "id_plus_two": "id+2",
+                "id_plus_three": "id+3",
+                "id_plus_four": "id+4",
+                "id_plus_five": "id+5",
+                "id_plus_six": "id+6",
+                "id_plus_seven": "id+7",
+                "id_plus_eight": "id+8",
+            }
+            self.assertSequenceEqual(
+                Article.objects.filter(id=self.a1.id).extra(select=data).values(*data),
+                [
+                    {
+                        "id_plus_one": self.a1.id + 1,
+                        "id_plus_two": self.a1.id + 2,
+                        "id_plus_three": self.a1.id + 3,
+                        "id_plus_four": self.a1.id + 4,
+                        "id_plus_five": self.a1.id + 5,
+                        "id_plus_six": self.a1.id + 6,
+                        "id_plus_seven": self.a1.id + 7,
+                        "id_plus_eight": self.a1.id + 8,
+                    }
+                ],
+            )
         # You can specify fields from forward and reverse relations, just like filter().
         self.assertSequenceEqual(
             Article.objects.values("headline", "author__name"),
@@ -500,17 +503,19 @@ class LookupTests(TestCase):
                 },
             ],
         )
-        # However, an exception FieldDoesNotExist will be thrown if you specify
-        # a nonexistent field name in values() (a field that is neither in the
-        # model nor in extra(select)).
-        msg = (
-            "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
-            "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
-        )
-        with self.assertRaisesMessage(FieldError, msg):
-            Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
-                "id", "id_plus_two"
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            # However, an exception FieldDoesNotExist will be thrown if you specify
+            # a nonexistent field name in values() (a field that is neither in the
+            # model nor in extra(select)).
+            msg = (
+                "Cannot resolve keyword 'id_plus_two' into field. Choices are: "
+                "author, author_id, headline, id, id_plus_one, pub_date, slug, tag"
             )
+            with self.assertRaisesMessage(FieldError, msg):
+                Article.objects.extra(select={"id_plus_one": "id + 1"}).values(
+                    "id", "id_plus_two"
+                )
         # If you don't specify field names to values(), all are returned.
         self.assertSequenceEqual(
             Article.objects.filter(id=self.a5.id).values(),
@@ -566,48 +571,50 @@ class LookupTests(TestCase):
                 self.a7.id,
             ],
         )
-        self.assertSequenceEqual(
-            Article.objects.extra(select={"id_plus_one": "id+1"})
-            .order_by("id")
-            .values_list("id"),
-            [
-                (self.a1.id,),
-                (self.a2.id,),
-                (self.a3.id,),
-                (self.a4.id,),
-                (self.a5.id,),
-                (self.a6.id,),
-                (self.a7.id,),
-            ],
-        )
-        self.assertSequenceEqual(
-            Article.objects.extra(select={"id_plus_one": "id+1"})
-            .order_by("id")
-            .values_list("id_plus_one", "id"),
-            [
-                (self.a1.id + 1, self.a1.id),
-                (self.a2.id + 1, self.a2.id),
-                (self.a3.id + 1, self.a3.id),
-                (self.a4.id + 1, self.a4.id),
-                (self.a5.id + 1, self.a5.id),
-                (self.a6.id + 1, self.a6.id),
-                (self.a7.id + 1, self.a7.id),
-            ],
-        )
-        self.assertSequenceEqual(
-            Article.objects.extra(select={"id_plus_one": "id+1"})
-            .order_by("id")
-            .values_list("id", "id_plus_one"),
-            [
-                (self.a1.id, self.a1.id + 1),
-                (self.a2.id, self.a2.id + 1),
-                (self.a3.id, self.a3.id + 1),
-                (self.a4.id, self.a4.id + 1),
-                (self.a5.id, self.a5.id + 1),
-                (self.a6.id, self.a6.id + 1),
-                (self.a7.id, self.a7.id + 1),
-            ],
-        )
+        # Entire block can be removed once deprecation period ends.
+        with ignore_warnings(category=RemovedInDjango60Warning):
+            self.assertSequenceEqual(
+                Article.objects.extra(select={"id_plus_one": "id+1"})
+                .order_by("id")
+                .values_list("id"),
+                [
+                    (self.a1.id,),
+                    (self.a2.id,),
+                    (self.a3.id,),
+                    (self.a4.id,),
+                    (self.a5.id,),
+                    (self.a6.id,),
+                    (self.a7.id,),
+                ],
+            )
+            self.assertSequenceEqual(
+                Article.objects.extra(select={"id_plus_one": "id+1"})
+                .order_by("id")
+                .values_list("id_plus_one", "id"),
+                [
+                    (self.a1.id + 1, self.a1.id),
+                    (self.a2.id + 1, self.a2.id),
+                    (self.a3.id + 1, self.a3.id),
+                    (self.a4.id + 1, self.a4.id),
+                    (self.a5.id + 1, self.a5.id),
+                    (self.a6.id + 1, self.a6.id),
+                    (self.a7.id + 1, self.a7.id),
+                ],
+            )
+            self.assertSequenceEqual(
+                Article.objects.extra(select={"id_plus_one": "id+1"})
+                .order_by("id")
+                .values_list("id", "id_plus_one"),
+                [
+                    (self.a1.id, self.a1.id + 1),
+                    (self.a2.id, self.a2.id + 1),
+                    (self.a3.id, self.a3.id + 1),
+                    (self.a4.id, self.a4.id + 1),
+                    (self.a5.id, self.a5.id + 1),
+                    (self.a6.id, self.a6.id + 1),
+                    (self.a7.id, self.a7.id + 1),
+                ],
+            )
         args = ("name", "article__headline", "article__tag__name")
         self.assertSequenceEqual(
             Author.objects.values_list(*args).order_by(*args),

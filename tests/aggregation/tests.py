@@ -44,10 +44,10 @@ from django.db.models.functions import (
     TruncDate,
     TruncHour,
 )
-from django.test import TestCase
-from django.test.testcases import skipUnlessDBFeature
+from django.test import TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import Approximate, CaptureQueriesContext
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Author, Book, Publisher, Store
 
@@ -2139,6 +2139,8 @@ class AggregateTestCase(TestCase):
         with self.assertRaisesMessage(ValueError, msg):
             Author.objects.aggregate(**{crafted_alias: Avg("age")})
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_exists_extra_where_with_aggregate(self):
         qs = Book.objects.annotate(
             count=Count("id"),

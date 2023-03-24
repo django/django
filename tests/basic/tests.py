@@ -455,6 +455,8 @@ class ModelTest(TestCase):
         s = {a10, a11, a12}
         self.assertIn(Article.objects.get(headline="Article 11"), s)
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_method_select_argument_with_dashes_and_values(self):
         # The 'select' argument to extra() supports names with dashes in
         # them, as long as you use values().
@@ -483,6 +485,8 @@ class ModelTest(TestCase):
             ],
         )
 
+    # Entire test can be removed once deprecation period ends.
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_extra_method_select_argument_with_dashes(self):
         # If you use 'select' with extra() and names containing dashes on a
         # query that's *not* a values() query, those extra 'select' values
