@@ -224,7 +224,7 @@ Overriding built-in formset templates
 :attr:`.BaseFormSet.template_name`
 
 To override formset templates, you must use the :class:`TemplatesSetting`
-renderer. Then overriding widget templates works :doc:`the same as
+renderer. Then overriding formset templates works :doc:`the same as
 </howto/overriding-templates>` overriding any other template in your project.
 
 .. _overriding-built-in-form-templates:
@@ -235,7 +235,7 @@ Overriding built-in form templates
 :attr:`.Form.template_name`
 
 To override form templates, you must use the :class:`TemplatesSetting`
-renderer. Then overriding widget templates works :doc:`the same as
+renderer. Then overriding form templates works :doc:`the same as
 </howto/overriding-templates>` overriding any other template in your project.
 
 .. _overriding-built-in-widget-templates:
