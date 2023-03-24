@@ -390,6 +390,20 @@ Validators
   deprecated in favor of the new
   :meth:`~django.core.validators.EmailValidator.validate_domain` method.
 
+Models
+------
+
+* After a long period of consideration the ``select``, ``select_params``,
+  ``where``, ``params``, and ``order_by`` parameters of the
+  :meth:`~django.db.models.query.QuerySet.extra` method are
+  deprecated in favor of :meth:`~django.db.models.query.QuerySet.annotate`,
+  :meth:`~django.db.models.query.QuerySet.filter`, and
+  :meth:`~django.db.models.query.QuerySet.order_by` calls with
+  :class:`~django.db.models.expressions.RawSQL` instances. The ``tables``
+  parameter remains supported for now. Refer to
+  :meth:`~django.db.models.query.QuerySet.extra` admonition and the
+  associated deprecation warning messages for further guidance.
+
 Miscellaneous
 -------------
 

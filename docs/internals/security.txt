@@ -155,13 +155,14 @@ developer's responsibility to safely process user input for these functions.
 For instance, the following is **not considered valid** because ``query`` has
 not been sanitized::
 
+    from django.db.models import RawSQL
     from django.shortcuts import HttpResponse
     from .models import MyModel
 
 
     def my_proof_of_concept(request):
         query = request.GET.get("query", "")
-        q = MyModel.objects.extra(select={"id": query})
+        q = MyModel.objects.annotate(id=RawSQL(query, ()))
         return HttpResponse(q.values())
 
 Some HTTP headers must also be sanitized by a web server or fronting proxy
