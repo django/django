@@ -13,7 +13,7 @@ th {
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink {
+.viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
