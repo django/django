@@ -2135,11 +2135,6 @@ class Query(BaseExpression):
                 # For lookups spanning over relationships, show the error
                 # from the model on which the lookup failed.
                 raise
-            elif name in self.annotations:
-                raise FieldError(
-                    "Cannot select the '%s' alias. Use annotate() to promote "
-                    "it." % name
-                )
             else:
                 names = sorted(
                     [
@@ -2385,7 +2380,17 @@ class Query(BaseExpression):
                         extra_names.append(f)
                     elif f in self.annotation_select:
                         annotation_names.append(f)
+                    elif f in self.annotations:
+                        raise FieldError(
+                            f"Cannot select the '{f}' alias. Use annotate() to "
+                            "promote it."
+                        )
                     else:
+                        # Call `names_to_path` to ensure a FieldError including
+                        # annotations about to be masked as valid choices if
+                        # `f` is not resolvable.
+                        if self.annotation_select:
+                            self.names_to_path(f.split(LOOKUP_SEP), self.model._meta)
                         field_names.append(f)
             self.set_extra_mask(extra_names)
             self.set_annotation_mask(annotation_names)
