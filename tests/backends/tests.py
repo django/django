@@ -19,6 +19,7 @@ from django.db import (
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.signals import connection_created
 from django.db.backends.utils import CursorWrapper
+from django.db.models import Value
 from django.db.models.sql.constants import CURSOR
 from django.test import (
     TestCase,
@@ -84,8 +85,10 @@ class LastExecutedQueryTest(TestCase):
 
     def test_query_encoding(self):
         """last_executed_query() returns a string."""
-        data = RawData.objects.filter(raw_data=b"\x00\x46  \xFE").extra(
-            select={"föö": 1}
+        data = RawData.objects.filter(raw_data=b"\x00\x46  \xFE").annotate(
+            **{
+                "föö": Value(1),
+            }
         )
         sql, params = data.query.sql_with_params()
         with data.query.get_compiler("default").execute_sql(CURSOR) as cursor:
