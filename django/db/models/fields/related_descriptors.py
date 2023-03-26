@@ -76,6 +76,7 @@ from django.db import (
     transaction,
 )
 from django.db.models import Manager, Q, Window, signals
+from django.db.models.expressions import RawSQL
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -1181,11 +1182,11 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             join_table = fk.model._meta.db_table
             connection = connections[queryset.db]
             qn = connection.ops.quote_name
-            queryset = queryset.extra(
-                select={
-                    "_prefetch_related_val_%s"
-                    % f.attname: "%s.%s"
-                    % (qn(join_table), qn(f.column))
+            queryset = queryset.annotate(
+                **{
+                    f"_prefetch_related_val_{f.attname}": RawSQL(
+                        "%s.%s" % (qn(join_table), qn(f.column)), ()
+                    )
                     for f in fk.local_related_fields
                 }
             )
