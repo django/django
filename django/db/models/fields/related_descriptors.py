@@ -74,7 +74,7 @@ from django.db import (
     transaction,
 )
 from django.db.models import Manager, Q, Window, signals
-from django.db.models.expressions import ColPairs
+from django.db.models.expressions import Col, ColPairs
 from django.db.models.fields.tuple_lookups import TupleIn
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
@@ -1220,19 +1220,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             # M2M: need to annotate the query in order to get the primary model
             # that the secondary model was actually related to. We know that
             # there will already be a join on the join table, so we can just
-            # add the select.
+            # reference its columns.
 
             # For non-autocreated 'through' models, can't assume we are
             # dealing with PK values.
             fk = self.through._meta.get_field(self.source_field_name)
             join_table = fk.model._meta.db_table
             connection = connections[queryset.db]
-            qn = connection.ops.quote_name
-            queryset = queryset.extra(
-                select={
-                    "_prefetch_related_val_%s"
-                    % f.attname: "%s.%s"
-                    % (qn(join_table), qn(f.column))
+            queryset = queryset.annotate(
+                **{
+                    f"_prefetch_related_val_{f.attname}": Col(join_table, f)
                     for f in fk.local_related_fields
                 }
             )
