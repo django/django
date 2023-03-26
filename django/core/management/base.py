@@ -152,7 +152,8 @@ class OutputWrapper(TextIOBase):
         if ending and not msg.endswith(ending):
             msg += ending
         style_func = style_func or self.style_func
-        self._out.write(style_func(msg))
+        if hasattr(self._out, 'write'):
+            self._out.write(style_func(msg))
 
 
 class BaseCommand:
