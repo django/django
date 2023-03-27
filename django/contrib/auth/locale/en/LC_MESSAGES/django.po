@@ -77,10 +77,6 @@ msgstr ""
 msgid "Enter the same password as before, for verification."
 msgstr ""
 
-#: contrib/auth/forms.py:152 contrib/auth/models.py:353
-msgid "A user with that username already exists."
-msgstr ""
-
 #: contrib/auth/forms.py:168
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user’s "
@@ -238,6 +234,10 @@ msgstr ""
 
 #: contrib/auth/models.py:349
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgstr ""
+
+#: contrib/auth/models.py:353
+msgid "A user with that username already exists."
 msgstr ""
 
 #: contrib/auth/models.py:356
