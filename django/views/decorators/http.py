@@ -2,6 +2,7 @@
 Decorators for views based on HTTP headers.
 """
 import datetime
+import os
 from functools import wraps
 
 from django.http import HttpResponseNotAllowed
@@ -130,3 +131,58 @@ def etag(etag_func):
 
 def last_modified(last_modified_func):
     return condition(last_modified_func=last_modified_func)
+
+
+def require_files(extension_list, size=0):
+    """
+    The require_files decorator function takes in two parameters: extension_list
+    and size, and returns another function decorator which takes in another
+    function func. The returned function inner performs certain checks on files
+    uploaded through a POST request, including file extension and size limits,
+    and raises appropriate exceptions if the checks fail. If the request method
+    is not POST, it returns an HttpResponseNotAllowed.
+
+    This decorator can be used to ensure that uploaded files meet certain
+    requirements before being processed by a view function. It also make
+    your web application secure by preventing the upload of malicious files.
+    """
+
+    def decorator(func):
+        def inner(request, *args, **kwargs):
+            if request.method == "POST":
+                # Get all uploaded files from the request and store in a list.
+                files = [
+                    file
+                    for files in request.FILES
+                    for file in request.FILES.getlist(files)
+                ]
+                # Iterate through each file and check their extensions.
+                # If extension is not in the allowed extension list, raise a TypeError.
+                for file in files:
+                    extension = os.path.splitext(file.name)[1][1:]
+                    if extension not in extension_list:
+                        raise TypeError("This file type is not accepted.")
+
+                    # Convert the file size from bytes to MB and check file
+                    # size in MB, raise IOError if it exceeds allowed size.
+                    file_size_mb = file.size * 0.000001
+                    if size and file_size_mb > size:
+                        raise IOError("This file exceeds the limit.")
+            else:
+                # If request is not POST, raise a HttpResponseNotAllowed error.
+                response = HttpResponseNotAllowed(request.method)
+                log_response(
+                    "Method Not Allowed (%s): %s",
+                    request.method,
+                    request.path,
+                    response=response,
+                    request=request,
+                )
+
+                return response
+
+            return func(request, *args, **kwargs)
+
+        return inner
+
+    return decorator

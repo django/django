@@ -1,4 +1,5 @@
 from functools import update_wrapper, wraps
+from io import StringIO
 from unittest import TestCase, mock
 
 from django.contrib.admin.views.decorators import staff_member_required
@@ -7,12 +8,15 @@ from django.contrib.auth.decorators import (
     permission_required,
     user_passes_test,
 )
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test import SimpleTestCase
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
+from django.views import View
 from django.views.decorators.cache import cache_control, cache_page, never_cache
 from django.views.decorators.clickjacking import (
     xframe_options_deny,
@@ -21,6 +25,7 @@ from django.views.decorators.clickjacking import (
 )
 from django.views.decorators.http import (
     condition,
+    require_files,
     require_GET,
     require_http_methods,
     require_POST,
@@ -614,3 +619,279 @@ class CacheControlDecoratorTest(SimpleTestCase):
         request = HttpRequest()
         response = MyClass().a_view(HttpRequestProxy(request))
         self.assertEqual(response.headers["Cache-Control"], "a=b")
+
+
+class RequireFilesDecoratorTest(TestCase):
+    """
+    Tests for the require_files decorators.
+    """
+
+    def setUp(self):
+        self.request = HttpRequest()
+        self.request.method = "POST"
+        self.txt_file = InMemoryUploadedFile(
+            StringIO("1"), "", "test.txt", "text/plain", 1, "utf8"
+        )
+        self.pdf_file_large = InMemoryUploadedFile(
+            StringIO("1"), "", "test.pdf", "text/plain", 100_000_00, "utf8"
+        )
+        self.file_docx = InMemoryUploadedFile(
+            StringIO("1"),
+            "",
+            "test.docx",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            100_000_00,
+            "utf8",
+        )
+
+    def run_test_view(
+        self,
+        extension_list,
+        files,
+        file_size=0,
+        invalid_file_size=False,
+        invalid_file_type=False,
+        request_method="POST",
+    ):
+        """
+        This method run_test_view will be called on each test scenarios and
+        check the file validity.
+
+        Parameters:
+            extension_list (list of str): List of file extensions.
+            files (list of File objects): List of files to be uploaded.
+            file_size (int): Maximum allowed file size in MB.
+            invalid_file_type (bool, optional): Whether to test with invalid
+            file type. Defaults to False.
+            invalid_file_size (bool, optional): Whether to test with invalid
+            file size. Defaults to False.
+            request_method (http): Request method type (POST or GET etc).
+            Defaults to Post.
+
+        Raises:
+            TypeError: If an uploaded file has an invalid extension.
+            IOError: If an uploaded file size exceeds the limit.
+            HttpResponseNotAllowed: This error occurs when the client sends a request
+            to the server using an HTTP method that is not allowed.
+        """
+
+        # This is a function-based views for testing the decorator.
+        @require_files(extension_list, file_size)
+        def test_view(request):
+            return HttpResponse()
+
+        class MyView(View):
+            """
+            This is a class-based views for testing the decorator.
+            """
+
+            @method_decorator(require_files(extension_list, file_size), name="dispatch")
+            def post(self, request, *args, **kwargs):
+                return HttpResponse()
+
+            @method_decorator(require_files(extension_list, file_size), name="dispatch")
+            def get(self, request, *args, **kwargs):
+                return HttpResponse()
+
+        self.request.method = request_method
+        self.request.FILES = MultiValueDict({"file": files})
+
+        # This will check if file size is invalid then raise
+        # IOError with a message ('This file exceeds the limit')
+        if invalid_file_size:
+            with self.assertRaises(IOError) as error:
+                test_view(self.request)
+                MyView().post(self.request)
+
+            self.assertEqual(str(error.exception), "This file exceeds the limit.")
+
+        # This condition will verify that @require_files raises a TypeError
+        # with the appropriate error message for invalid file type.
+        elif invalid_file_type:
+            with self.assertRaises(TypeError) as error:
+                test_view(self.request)
+                MyView().post(self.request)
+            self.assertEqual(str(error.exception), "This file type is not accepted.")
+
+        # This will check if method is not POST, then raise 405 error.
+        elif self.request.method != "POST":
+            function_response = test_view(self.request)
+            class_response = MyView().get(self.request)
+            self.assertEqual(function_response.status_code, 405)
+            self.assertEqual(class_response.status_code, 405)
+
+        # If no error then check if it return 200 response.
+        else:
+            function_response = test_view(self.request)
+            class_response = MyView().post(self.request)
+            self.assertEqual(function_response.status_code, 200)
+            self.assertEqual(class_response.status_code, 200)
+
+    def test_valid_file_types(self):
+        """
+        Uploading a file with an accepted extension and size within the limit.
+        """
+        self.run_test_view(["txt", "pdf"], [self.pdf_file_large, self.txt_file], 10)
+
+    def test_invalid_file_types(self):
+        """
+        Uploading a file with an unaccepted extension and size within the limit.
+        We are passing invalid_file_type=True as it will raise error.
+        """
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.pdf_file_large],
+            file_size=1,
+            invalid_file_type=True,
+        )
+
+        self.run_test_view(
+            extension_list=["docx"],
+            files=[self.pdf_file_large],
+            file_size=1,
+            invalid_file_type=True,
+        )
+
+        self.run_test_view(
+            extension_list=["pdf"],
+            files=[self.txt_file],
+            file_size=1,
+            invalid_file_type=True,
+        )
+
+    def test_valid_file_size(self):
+        """
+        Uploads file within 10 MB limit and with valid extension.
+        """
+        self.run_test_view(["pdf", "txt"], [self.pdf_file_large, self.txt_file], 10)
+
+    def test_invalid_file_size(self):
+        """
+        Testing with a file of accepted extension but size exceeding the 1MB limit.
+        Passing invalid_file_size=True to ensure it will raise IOError.
+        """
+
+        self.run_test_view(
+            extension_list=["pdf"],
+            files=[self.pdf_file_large],
+            file_size=1,
+            invalid_file_size=True,
+        )
+        self.run_test_view(
+            extension_list=["pdf", "txt"],
+            files=[self.txt_file, self.pdf_file_large],
+            file_size=1,
+            invalid_file_size=True,
+        )
+
+    def test_with_no_file_size(self):
+        """
+        Uploading a file with an accepted extension but without passing size
+        in decorator.
+        """
+
+        self.run_test_view(
+            extension_list=["pdf", "txt"],
+            files=[self.txt_file, self.pdf_file_large],
+        )
+        self.run_test_view(
+            extension_list=["docx"],
+            files=[self.file_docx],
+        )
+        self.run_test_view(
+            extension_list=["pdf"],
+            files=[self.pdf_file_large],
+        )
+
+    def test_no_file_in_request(self):
+        """
+        Testing the empty file list with the decorator to ensure no errors are raised.
+        """
+        self.run_test_view(extension_list=["pdf", "txt"], files=[], file_size=1)
+        self.run_test_view(extension_list=["txt"], files=[], file_size=1)
+
+    def test_no_file_types_in_decorator(self):
+        # Not uploading any file types.
+        self.run_test_view(extension_list=[], files=[], file_size=2)
+
+        # Need to pass extension_list if files are being passed, else TypeError
+        # error will be raised.
+        self.run_test_view(
+            extension_list=[],
+            files=[self.file_docx],
+            file_size=5,
+            invalid_file_type=True,
+        )
+
+    def test_no_filename(self):
+        """
+        Uploading a file without any name.
+        We had passed invalid_file_type=True as file name is empty(invalid),
+        so it will raise a TypeError in run_test_view method.
+        """
+        empty_name_file = InMemoryUploadedFile(
+            StringIO("1"), "", " ", "text/plain", 1, "utf8"
+        )
+
+        self.run_test_view(
+            extension_list=["pdf"],
+            files=[empty_name_file],
+            file_size=10,
+            invalid_file_type=True,
+        )
+
+    def test_extension_less_file(self):
+        """
+        Uploading a file without any extension.
+        We had passed invalid_file_type=True as file extension is empty(invalid),
+        so it will raise a TypeError.
+        """
+        self.extension_less_file = InMemoryUploadedFile(
+            StringIO("1"), "", "test", "", 100_000_00, "utf8"
+        )
+
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.extension_less_file],
+            file_size=10,
+            invalid_file_type=True,
+        )
+
+    def test_post_request(self):
+        """
+        Uploading a file in POST request.
+        In last we are passing request_method="POST" to make sure it doesn't raises
+        any error.
+        """
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.txt_file],
+            file_size=20,
+            request_method="POST",
+        )
+
+    def test_other_requests(self):
+        """
+        If the request method is not POST and the decorator is applied with
+        request_method="GET, PUT, DELETE, etc", a 405 error will be raised.
+        """
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.txt_file],
+            file_size=20,
+            request_method="GET",
+        )
+
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.txt_file],
+            file_size=20,
+            request_method="DELETE",
+        )
+
+        self.run_test_view(
+            extension_list=["txt"],
+            files=[self.txt_file],
+            file_size=20,
+            request_method="PUT",
+        )
