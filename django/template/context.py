@@ -251,8 +251,9 @@ class RequestContext(Context):
         processors = template.engine.template_context_processors + self._processors
         updates = {}
         for processor in processors:
+            context = processor(self.request)
             try:
-                updates.update(processor(self.request))
+                updates.update(context)
             except TypeError as e:
                 raise TypeError(
                     f"Context processor {processor.__qualname__} didn't return a "
