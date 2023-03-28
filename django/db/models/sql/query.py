@@ -1305,7 +1305,7 @@ class Query(BaseExpression):
         else:
             output_field = lhs.output_field.__class__
             suggested_lookups = difflib.get_close_matches(
-                name, output_field.get_lookups()
+                name, lhs.output_field.get_lookups()
             )
             if suggested_lookups:
                 suggestion = ", perhaps you meant %s?" % " or ".join(suggested_lookups)
