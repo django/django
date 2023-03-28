@@ -60,6 +60,40 @@ class Command(BaseCommand):
         # Set up a dictionary to serve as the environment for the shell.
         imported_objects = {}
 
+        # required imports
+        from django.conf import settings
+        import re
+        installed_apps = getattr(settings, 'INSTALLED_APPS')
+
+        # function to convert string path to class
+        def to_class(path:str):
+            try:
+                from pydoc import locate
+                class_instance = locate(path)
+            except ImportError:
+                print('Module does not exist')
+            return class_instance or None
+
+        # loop through all apps from settings.INSTALLED_APPS
+        # read all models.py files and get all the classes in each file
+        # add model to dictionary and the convert the string to a class
+        s = "class"
+        for app in installed_apps:
+            try:
+                path = str(settings.BASE_DIR) + f'/{app}/models.py'
+                read = open(path).read()
+
+                for model_name in re.findall(f'{s}.*?\(', read):
+                    model_name  = model_name[6:-1]
+                    imported_objects[model_name] = to_class(f"{app}.models.{model_name}")
+            except FileNotFoundError:
+                continue
+
+        # imported_objects = {
+        #     "Post": to_class("uhm.models.Post")
+        # }
+        print("", imported_objects)
+
         # We want to honor both $PYTHONSTARTUP and .pythonrc.py, so follow system
         # conventions and get $PYTHONSTARTUP first then .pythonrc.py.
         if not options["no_startup"]:
