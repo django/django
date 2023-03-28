@@ -745,6 +745,11 @@ You can also refer to fields on related models with reverse relations through
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
 
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values()`` was updated to
+    respect the order of the specified ``*fields`` and ``**expressions``.
+
 ``values_list()``
 ~~~~~~~~~~~~~~~~~
 
@@ -834,6 +839,11 @@ not having any author:
     ``values_list()`` will return ``True``, ``False``, and ``None`` instead of
     ``"true"``, ``"false"``, and ``"null"`` strings for
     :class:`~django.db.models.JSONField` key transforms.
+
+.. versionchanged:: 5.2
+
+    The ``SELECT`` clause generated when using ``values_list()`` was updated to
+    respect the order of the specified ``*fields``.
 
 ``dates()``
 ~~~~~~~~~~~

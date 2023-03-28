@@ -195,7 +195,13 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The ``SELECT`` clause generated when using
+  :meth:`QuerySet.values()<django.db.models.query.QuerySet.values>` and
+  :meth:`~django.db.models.query.QuerySet.values_list` now matches the
+  specified order of the referenced expressions. Previously the order was based
+  of a set of counterintuitive rules which made query combination through
+  methods such as
+  :meth:`QuerySet.union()<django.db.models.query.QuerySet.union>` unpredictable.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
