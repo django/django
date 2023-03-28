@@ -255,8 +255,8 @@ class RequestContext(Context):
                 updates.update(processor(self.request))
             except TypeError as e:
                 raise TypeError(
-                    "Context processor %s didn't return a dictionary."
-                    % processor.__name__
+                    f"Context processor {processor.__qualname__} didn't return a "
+                    f"dictionary."
                 ) from e
 
         self.dicts[self._processors_index] = updates
