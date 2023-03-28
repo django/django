@@ -114,6 +114,12 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_lookup(self, lookup_name):
         return self.field.get_lookup(lookup_name)
 
+    def get_lookups(self):
+        return self.field.get_lookups()
+
+    def get_transform(self, name):
+        return self.field.get_transform(name)
+
     def get_internal_type(self):
         return self.field.get_internal_type()
 
