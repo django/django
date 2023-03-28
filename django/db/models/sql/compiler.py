@@ -247,11 +247,6 @@ class SQLCompiler:
         select = []
         klass_info = None
         annotations = {}
-        select_idx = 0
-        for alias, (sql, params) in self.query.extra_select.items():
-            annotations[alias] = select_idx
-            select.append((RawSQL(sql, params), alias))
-            select_idx += 1
         assert not (self.query.select and self.query.default_cols)
         select_mask = self.query.get_select_mask()
         if self.query.default_cols:
@@ -261,19 +256,39 @@ class SQLCompiler:
             # any model.
             cols = self.query.select
         if cols:
-            select_list = []
-            for col in cols:
-                select_list.append(select_idx)
-                select.append((col, None))
-                select_idx += 1
             klass_info = {
                 "model": self.query.model,
-                "select_fields": select_list,
+                "select_fields": list(
+                    range(
+                        len(self.query.extra_select),
+                        len(self.query.extra_select) + len(cols),
+                    )
+                ),
             }
-        for alias, annotation in self.query.annotation_select.items():
-            annotations[alias] = select_idx
-            select.append((annotation, alias))
-            select_idx += 1
+        selected = []
+        if self.query.selected is None:
+            selected = [
+                *(
+                    (alias, RawSQL(*args))
+                    for alias, args in self.query.extra_select.items()
+                ),
+                *((None, col) for col in cols),
+                *self.query.annotation_select.items(),
+            ]
+        else:
+            for alias, expression in self.query.selected.items():
+                # Reference to an annotation.
+                if isinstance(expression, str):
+                    expression = self.query.annotations[expression]
+                # Reference to a column.
+                elif isinstance(expression, int):
+                    expression = cols[expression]
+                selected.append((alias, expression))
+
+        for select_idx, (alias, expression) in enumerate(selected):
+            if alias:
+                annotations[alias] = select_idx
+            select.append((expression, alias))
 
         if self.query.select_related:
             related_klass_infos = self.get_related_selections(select, select_mask)
