@@ -1997,15 +1997,13 @@ Combined querysets must use the same model.
 AND (``&``)
 ~~~~~~~~~~~
 
-Combines two ``QuerySet``\s using the SQL ``AND`` operator.
+Combines two ``QuerySet``\s using the SQL ``AND`` operator in a manner similar
+to chaining filters.
 
 The following are equivalent::
 
     Model.objects.filter(x=1) & Model.objects.filter(y=2)
-    Model.objects.filter(x=1, y=2)
-    from django.db.models import Q
-
-    Model.objects.filter(Q(x=1) & Q(y=2))
+    Model.objects.filter(x=1).filter(y=2)
 
 SQL equivalent:
 
