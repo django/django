@@ -302,4 +302,4 @@ class RequestContextTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             with request_context.bind_template(Template("")):
-                ...
+                pass
