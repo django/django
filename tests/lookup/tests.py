@@ -19,7 +19,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast, Substr
+from django.db.models.functions import Cast, Length, Substr
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -29,7 +29,7 @@ from django.db.models.lookups import (
     LessThanOrEqual,
 )
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from django.test.utils import isolate_apps, register_lookup
 
 from .models import (
     Article,
@@ -783,6 +783,16 @@ class LookupTests(TestCase):
             "not permitted.",
         ):
             Article.objects.filter(pub_date__gobbledygook="blahblah")
+
+    def test_unsupported_lookups_custom_lookups(self):
+        slug_field = Article._meta.get_field("slug")
+        msg = (
+            "Unsupported lookup 'lengtp' for SlugField or join on the field not "
+            "permitted, perhaps you meant length?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with register_lookup(slug_field, Length):
+                Article.objects.filter(slug__lengtp=20)
 
     def test_relation_nested_lookup_error(self):
         # An invalid nested lookup on a related field raises a useful error.
