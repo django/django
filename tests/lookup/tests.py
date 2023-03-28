@@ -19,7 +19,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast, Length, Substr
+from django.db.models.functions import Abs, Cast, Length, Substr
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -837,6 +837,31 @@ class LookupTests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(articles__foo="bar")
+
+    def test_unsupported_lookup_reverse_foreign_key(self):
+        msg = (
+            "Unsupported lookup 'title' for ManyToOneRel or join on the field not "
+            "permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.filter(article__title="Article 1")
+
+    def test_unsupported_lookup_reverse_foreign_key_custom_lookups(self):
+        msg = (
+            "Unsupported lookup 'abspl' for ManyToOneRel or join on the field not "
+            "permitted, perhaps you meant abspk?"
+        )
+        fk_field = Article._meta.get_field("author")
+        with self.assertRaisesMessage(FieldError, msg):
+            with register_lookup(fk_field, Abs, lookup_name="abspk"):
+                Author.objects.filter(article__abspl=2)
+
+    def test_filter_by_reverse_related_field_transform(self):
+        fk_field = Article._meta.get_field("author")
+        with register_lookup(fk_field, Abs):
+            self.assertSequenceEqual(
+                Author.objects.filter(article__abs=self.a1.pk), [self.au1]
+            )
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for
