@@ -268,3 +268,7 @@ class FunctionalTests(SimpleTestCase):
 
         self.assertEqual(Foo.foo, 456)
         self.assertEqual(Foo().foo, 456)
+
+    def test_lazy_str_cast_mixed_result_types(self):
+        lazy_value = lazy(lambda: [1], str, list)()
+        self.assertEqual(str(lazy_value), "[1]")

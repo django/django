@@ -142,7 +142,7 @@ def lazy(func, *resultclasses):
             return __wrapper__
 
         def __text_cast(self):
-            return func(*self.__args, **self.__kw)
+            return str(func(*self.__args, **self.__kw))
 
         def __bytes_cast(self):
             return bytes(func(*self.__args, **self.__kw))
