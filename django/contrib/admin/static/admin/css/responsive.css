@@ -199,12 +199,6 @@ input[type="submit"], button {
         min-height: 0;
     }
 
-    fieldset .fieldBox {
-        float: none;
-        margin: 0 -10px;
-        padding: 0 10px;
-    }
-
     fieldset .fieldBox + .fieldBox {
         margin-top: 10px;
         padding-top: 10px;
