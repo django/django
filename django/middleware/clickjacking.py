@@ -43,6 +43,6 @@ class XFrameOptionsMiddleware(MiddlewareMixin):
         the X_FRAME_OPTIONS setting, or 'DENY' if not set.
 
         This method can be overridden if needed, allowing it to vary based on
-        the request or response.
+        the request or response..
         """
         return getattr(settings, "X_FRAME_OPTIONS", "DENY").upper()
