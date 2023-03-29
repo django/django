@@ -473,7 +473,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.date`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
@@ -497,7 +497,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.datetime`` object, in addition to ISO 8601 formats.
 
     The field always accepts strings in ISO 8601 formatted dates or similar
@@ -996,7 +996,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.time`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
