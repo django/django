@@ -591,20 +591,15 @@ class SQLCompiler:
                 # generate valid SQL.
                 compiler.elide_empty = False
         parts = ()
+        selected = self.query.selected
         for compiler in compilers:
             try:
                 # If the columns list is limited, then all combined queries
                 # must have the same columns list. Set the selects defined on
                 # the query on all combined queries, if not already set.
-                if not compiler.query.values_select and self.query.values_select:
+                if selected is not None and compiler.query.selected is None:
                     compiler.query = compiler.query.clone()
-                    compiler.query.set_values(
-                        (
-                            *self.query.extra_select,
-                            *self.query.values_select,
-                            *self.query.annotation_select,
-                        )
-                    )
+                    compiler.query.set_values(selected)
                 part_sql, part_args = compiler.as_sql(with_col_aliases=True)
                 if compiler.query.combinator:
                     # Wrap in a subquery if wrapping in parentheses isn't
