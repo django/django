@@ -1,6 +1,7 @@
 import gettext
 import os
 import re
+import time
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -1815,13 +1816,13 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
 
         # Create a new House with a PK that needs quoting
         house = House.objects.create(name="_40")
-        house_name = str(quote(house.name))
-        quoted_pk = quote(str(house.pk))
+        house_name = str(house.name)
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_house_add")
         )
+
         self.selenium.find_element(By.ID, "id_name").send_keys(house_name)
-        self.selenium.find_element(By.NAME, "_save").click()
+        self.selenium.find_element(By.NAME, "_continue").click()
 
         # Check that the new House was created and listed in the change form
         self.selenium.get(
@@ -1831,9 +1832,9 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
 
         select_house = Select(self.selenium.find_element(By.ID, "id_house"))
         select_house.select_by_index(0)
-        select_house.select_by_value(quoted_pk)
+        select_house.select_by_value(house.pk)
         self.assertEqual(
-            select_house.first_selected_option.get_attribute("value"), quoted_pk
+            select_house.first_selected_option.get_attribute("value"), house.pk
         )
 
         # Create a new Room and associate it with the House created above
@@ -1841,26 +1842,24 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         room_name = str(room.name)
         self.selenium.find_element(By.ID, "id_name").send_keys(room_name)
 
-        self.selenium.find_element(By.NAME, "_save").click()
-
-        self.selenium.find_element(By.ID, "id_house").click()
-
+        self.selenium.find_element(By.NAME, "_continue").click()
+        #
         save_button_css_selector = ".submit-row > input[type=submit]"
 
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
         self.selenium.find_element(By.ID, "view_id_house").click()
-
         self.selenium.back()
 
         # Check that the House is linked to the Room and listed in the change form
 
-        self.selenium.find_element(By.ID, "id_house").click()
+        self.selenium.find_element(By.ID, "id_name")
 
         save_button_css_selector = ".submit-row > input[type=submit]"
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+
         self.selenium.find_element(By.ID, "view_id_house").click()
+        time.sleep(5)
         self.wait_for_value("#id_name", house_name)
-        self.selenium.back()
 
 
 @skipUnless(Image, "Pillow not installed")
