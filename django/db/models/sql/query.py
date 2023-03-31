@@ -31,7 +31,7 @@ from django.db.models.expressions import (
 )
 from django.db.models.fields import Field
 from django.db.models.fields.related_lookups import MultiColSource
-from django.db.models.lookups import Lookup
+from django.db.models.lookups import IsNull, Lookup
 from django.db.models.query_utils import (
     Q,
     check_rel_lookup_compatibility,
@@ -1372,12 +1372,24 @@ class Query(BaseExpression):
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
                 raise TypeError("Cannot filter against a non-conditional expression.")
+            pre_joins = self.alias_refcount.copy()
             condition = filter_expr.resolve_expression(
                 self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
             )
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
-            return WhereNode([condition], connector=AND), []
+            used_joins = {
+                k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
+            }
+            require_outer = current_negated or (
+                isinstance(condition, IsNull)
+                and condition.rhs is True
+                and not current_negated
+            )
+            return (
+                WhereNode([condition], connector=AND),
+                () if require_outer else used_joins,
+            )
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
@@ -2003,7 +2015,12 @@ class Query(BaseExpression):
         lookup_class = select_field.get_lookup("exact")
         lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
         query.where.add(lookup, AND)
-        condition, needed_inner = self.build_filter(Exists(query))
+        condition, needed_inner = self.build_filter(
+            Exists(query),
+            branch_negated=True,
+            current_negated=True,
+            can_reuse=can_reuse,
+        )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
