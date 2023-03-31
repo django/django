@@ -1357,6 +1357,9 @@ class LookupQueryingTests(TestCase):
         cls.s1 = Season.objects.create(year=1942, gt=1942)
         cls.s2 = Season.objects.create(year=1842, gt=1942, nulled_text_field="text")
         cls.s3 = Season.objects.create(year=2042, gt=1942)
+        Game.objects.create(season=cls.s1, home="NY", away="Boston")
+        Game.objects.create(season=cls.s1, home="NY", away="Tampa")
+        Game.objects.create(season=cls.s3, home="Boston", away="Tampa")
 
     def test_annotate(self):
         qs = Season.objects.annotate(equal=Exact(F("year"), 1942))
@@ -1526,4 +1529,20 @@ class LookupQueryingTests(TestCase):
                 {"year": 1842, "century": "other"},
                 {"year": 2042, "century": "other"},
             ],
+        )
+
+    def test_multivalued_join_reuse(self):
+        self.assertEqual(
+            Season.objects.get(Exact(F("games__home"), "NY"), games__away="Boston"),
+            self.s1,
+        )
+        self.assertEqual(
+            Season.objects.get(Exact(F("games__home"), "NY") & Q(games__away="Boston")),
+            self.s1,
+        )
+        self.assertEqual(
+            Season.objects.get(
+                Exact(F("games__home"), "NY") & Exact(F("games__away"), "Boston")
+            ),
+            self.s1,
         )
