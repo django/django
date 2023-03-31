@@ -752,7 +752,8 @@ class URLField(CharField):
         "invalid": _("Enter a valid URL."),
     }
     default_validators = [validators.URLValidator()]
-
+    default_protocol = "http"
+    
     def __init__(self, **kwargs):
         super().__init__(strip=True, **kwargs)
 
@@ -774,7 +775,7 @@ class URLField(CharField):
             url_fields = split_url(value)
             if not url_fields[0]:
                 # If no URL scheme given, assume http://
-                url_fields[0] = "http"
+                url_fields[0] = self.default_protocol
             if not url_fields[1]:
                 # Assume that if no domain is provided, that the path segment
                 # contains the domain.
