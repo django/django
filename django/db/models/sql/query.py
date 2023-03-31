@@ -1373,7 +1373,7 @@ class Query(BaseExpression):
             if not getattr(filter_expr, "conditional", False):
                 raise TypeError("Cannot filter against a non-conditional expression.")
             condition = filter_expr.resolve_expression(
-                self, allow_joins=allow_joins, summarize=summarize
+                self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
             )
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
