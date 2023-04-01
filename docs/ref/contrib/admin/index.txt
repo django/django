@@ -3208,6 +3208,32 @@ The presence of the ``admin_password_reset`` named URL will cause a "forgotten
 your password?" link to appear on the default admin log-in page under the
 password box.
 
+Creating custom checks and tests
+-------------------------------
+
+The global variable ``all_sites`` is a weak set of all ``AdminSite`` instances.
+You can iterate through ``all_sites`` to perform custom checks and tests.
+
+In this example, the ``test_all_sites_config`` function iterates over the
+``all_sites`` set and performs tests on each ``AdminSite`` instance to ensure 
+that its configuration properties are not ``None``. If any of the tests fail, 
+an ``AssertionError`` is raised, indicating that the ``AdminSite`` instance
+is not properly configured::
+
+    from django.contrib.admin.sites import AdminSite, all_sites
+
+    def test_all_sites_config():
+        """
+        A custom function that tests the configuration of all `AdminSite` instances
+        """
+
+
+        for site in all_sites:
+            # Test that the `AdminSite` is properly configured
+            assert site.site_title is not None
+            assert site.site_header is not None
+            assert site.index_title is not None
+
 ``LogEntry`` objects
 ====================
 
