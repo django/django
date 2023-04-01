@@ -3218,15 +3218,16 @@ In this example, the ``test_all_sites_config`` function iterates over the
 ``all_sites`` set and performs tests on each ``AdminSite`` instance to ensure 
 that its configuration properties are not ``None``. If any of the tests fail, 
 an ``AssertionError`` is raised, indicating that the ``AdminSite`` instance
-is not properly configured::
+is not properly configured:
 
+.. code-block:: python
     from django.contrib.admin.sites import AdminSite, all_sites
+
 
     def test_all_sites_config():
         """
         A custom function that tests the configuration of all `AdminSite` instances
         """
-
 
         for site in all_sites:
             # Test that the `AdminSite` is properly configured
