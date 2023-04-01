@@ -16,11 +16,25 @@ from django.test import (
     modify_settings,
     override_settings,
 )
+from django.urls import get_script_prefix
 from django.utils.http import http_date
 
 from .urls import sync_waiter, test_filename
 
 TEST_STATIC_ROOT = Path(__file__).parent / "project" / "static"
+
+
+class SetScriptPrefixMiddleware:
+    async_capable = True
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.script_prefix = get_script_prefix()
+
+    async def __call__(self, request):
+        response = await self.get_response(request)
+        response.headers["SCRIPT_PREFIX"] = self.script_prefix
+        return response
 
 
 @override_settings(ROOT_URLCONF="asgi.urls")
@@ -318,3 +332,27 @@ class ASGITest(SimpleTestCase):
         self.assertEqual(len(sync_waiter.active_threads), 2)
 
         sync_waiter.active_threads.clear()
+
+    @override_settings(
+        MIDDLEWARE=["asgi.tests.SetScriptPrefixMiddleware"],
+        FORCE_SCRIPT_NAME="/FORCED_PREFIX/",
+    )
+    async def test_get_asgi_application_force_script_name(self):
+        application = get_asgi_application()
+        # Construct HTTP request.
+        scope = self.async_request_factory._base_scope(path="/")
+        communicator = ApplicationCommunicator(application, scope)
+        await communicator.send_input({"type": "http.request"})
+        # Read the response.
+        response_start = await communicator.receive_output()
+        self.assertEqual(response_start["type"], "http.response.start")
+        self.assertEqual(response_start["status"], 200)
+        self.assertEqual(
+            set(response_start["headers"]),
+            {
+                (b"SCRIPT_PREFIX", b"/FORCED_PREFIX/"),
+                (b"Content-Type", b"text/html; charset=utf-8"),
+            },
+        )
+        # Allow response.close() to finish.
+        await communicator.wait()

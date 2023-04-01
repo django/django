@@ -6,6 +6,18 @@ from django.db import close_old_connections
 from django.http import FileResponse
 from django.test import SimpleTestCase, override_settings
 from django.test.client import RequestFactory
+from django.urls import get_script_prefix
+
+
+class SetScriptPrefixMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.script_prefix = get_script_prefix()
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response.headers["SCRIPT_PREFIX"] = self.script_prefix
+        return response
 
 
 @override_settings(ROOT_URLCONF="wsgi.urls")
@@ -77,6 +89,34 @@ class WSGITest(SimpleTestCase):
         self.assertEqual(response_data["status"], "200 OK")
         self.assertIsInstance(response, FileWrapper)
         self.assertEqual(response.block_size, FileResponse.block_size)
+
+    @override_settings(
+        MIDDLEWARE=["wsgi.tests.SetScriptPrefixMiddleware"],
+        FORCE_SCRIPT_NAME="/FORCED_PREFIX/",
+    )
+    def test_get_wsgi_application_force_script_name(self):
+        application = get_wsgi_application()
+
+        environ = self.request_factory._base_environ(
+            PATH_INFO="/", CONTENT_TYPE="text/html; charset=utf-8", REQUEST_METHOD="GET"
+        )
+
+        response_data = {}
+
+        def start_response(status, headers):
+            response_data["status"] = status
+            response_data["headers"] = headers
+
+        application(environ, start_response)
+
+        self.assertEqual(response_data["status"], "200 OK")
+        self.assertEqual(
+            set(response_data["headers"]),
+            {
+                ("SCRIPT_PREFIX", "/FORCED_PREFIX/"),
+                ("Content-Type", "text/html; charset=utf-8"),
+            },
+        )
 
 
 class GetInternalWSGIApplicationTest(SimpleTestCase):
