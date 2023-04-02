@@ -4,8 +4,8 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Carlos Leite <caduado@gmail.com>, 2019
-# Carlos Leite <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
 # Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
@@ -17,6 +17,7 @@
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # João Paulo Andrade <joaopaulo.a.p@gmail.com>, 2018
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marssal Jr. <marssaljr@gmail.com>, 2022
@@ -34,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-05-25 07:05+0000\n"
-"Last-Translator: Marssal Jr. <marssaljr@gmail.com>, 2022\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Jonas Rodrigues, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -397,14 +398,17 @@ msgid "Change password"
 msgstr "Alterar senha"
 
 msgid "Please correct the error below."
-msgstr "Por favor corrija o erro abaixo "
-
-msgid "Please correct the errors below."
-msgstr "Por favor, corrija os erros abaixo."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor corrija o erro abaixo."
+msgstr[1] "Por favor corrija os erros abaixo."
+msgstr[2] "Por favor corrija os erros abaixo."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Pule o conteúdo principal"
 
 msgid "Welcome,"
 msgstr "Bem-vindo(a),"
@@ -417,6 +421,9 @@ msgstr "Documentação"
 
 msgid "Log out"
 msgstr "Encerrar sessão"
+
+msgid "Breadcrumbs"
+msgstr "Migalhas de pão"
 
 #, python-format
 msgid "Add %(name)s"
@@ -443,6 +450,15 @@ msgstr "Prioridade da ordenação: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Alternar ordenção"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Alternar tema (tema atual: automático)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Alternar tema (tema atual: claro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Alternar tema (tema atual: escuro)"
 
 msgid "Delete"
 msgstr "Apagar"
@@ -556,6 +572,9 @@ msgstr "Esqueceu sua senha ou nome de usuário?"
 msgid "Toggle navigation"
 msgstr "Alternar navegação"
 
+msgid "Sidebar"
+msgstr "Barra Lateral"
+
 msgid "Start typing to filter…"
 msgstr "Comece a digitar para filtrar…"
 
@@ -572,10 +591,10 @@ msgid "Action"
 msgstr "Ação"
 
 msgid "entry"
-msgstr "registro"
-
-msgid "entries"
-msgstr "registros"
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entradas"
+msgstr[2] "entradas"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "

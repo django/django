@@ -12,7 +12,8 @@
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021
+# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023
+# Taichi Taniguchi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
@@ -20,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
-"Last-Translator: Hiroki Sawano, 2022\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -63,6 +64,9 @@ msgstr "ボスニア語"
 
 msgid "Catalan"
 msgstr "カタロニア語"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "中央クルド語 (ソラニー語)"
 
 msgid "Czech"
 msgstr "チェコ語"
@@ -402,6 +406,7 @@ msgstr "この値は %(limit_value)s 以上でなければなりません。"
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
+"この値がステップサイズ %(limit_value)s の倍数であることを確認してください。"
 
 #, python-format
 msgid ""
@@ -508,6 +513,9 @@ msgstr "ブール値 (真: True または偽: False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "文字列 ( %(max_length)s 字まで )"
+
+msgid "String (unlimited)"
+msgstr "文字列 (無制限)"
 
 msgid "Comma-separated integers"
 msgstr "カンマ区切りの整数"
@@ -777,12 +785,12 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] ""
+msgstr[0] "最大で %(num)d 個のフォームを送信してください。"
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] ""
+msgstr[0] "少なくとも %(num)d 個のフォームを送信してください。"
 
 msgid "Order"
 msgstr "並び変え"

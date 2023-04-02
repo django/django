@@ -6,6 +6,7 @@
 # Eduardo Cereto Carvalho, 2011
 # semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Marssal Jr. <marssaljr@gmail.com>, 2022
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2021
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-05-25 07:05+0000\n"
-"Last-Translator: Marssal Jr. <marssaljr@gmail.com>, 2022\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Jonas Rodrigues, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -70,12 +71,23 @@ msgstr ""
 "Esta é a lista de %s disponíveis. Você pode removê-los(as) selecionando-"
 "os(as) abaixo e clicando na seta \"Remover\" entre as duas caixas."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Digite nesta caixa para filtrar a lista de selecionados %s."
+
 msgid "Remove all"
 msgstr "Remover todos"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Clique para remover de uma só vez todos os %s escolhidos."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -268,12 +280,6 @@ msgstr "S"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr ""
-"Você já enviou este formulário. Tem certeza de que deseja reenviar de novo?"
 
 msgid "Show"
 msgstr "Mostrar"
