@@ -6,15 +6,15 @@
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Pablo, 2015
-# Uriel Medina <urimeba511@gmail.com>, 2020
+# Uriel Medina <urimeba511@gmail.com>, 2020,2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2022-01-19 09:22+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020,2023\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -108,13 +108,14 @@ msgstr "Se facilitaron algunas claves desconocidas: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Asegúrese de que este rango es menor o igual que %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
+"Asegúrese de que el límite superior del rango no sea mayor que "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Asegúrese de que este rango es efectivamente mayor o igual que "
+"Asegúrese de que el límite inferior del rango no sea inferior a "
 "%(limit_value)s."

@@ -12,16 +12,16 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015,2021
-# Paolo Melchiorre <paolo@melchiorre.org>, 2022
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -268,12 +268,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificato correttamente."
 msgstr[1] "%(count)s %(name)s modificati correttamente."
+msgstr[2] "%(count)s %(name)s modificati correttamente."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selezionato"
 msgstr[1] "Tutti i %(total_count)s selezionati"
+msgstr[2] "Tutti i %(total_count)s selezionati"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -383,15 +385,18 @@ msgid "Change password"
 msgstr "Modifica password"
 
 msgid "Please correct the error below."
-msgstr "Per favore, correggi l'errore sottostante"
-
-msgid "Please correct the errors below."
-msgstr "Correggi gli errori qui sotto."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Si prega di correggere l'errore sottostante."
+msgstr[1] "Si prega di correggere gli errori sottostanti."
+msgstr[2] "Si prega di correggere gli errori sottostanti."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Inserisci una nuova password per l'utente <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Passa al contenuto principale"
 
 msgid "Welcome,"
 msgstr "Benvenuto,"
@@ -404,6 +409,9 @@ msgstr "Documentazione"
 
 msgid "Log out"
 msgstr "Annulla l'accesso"
+
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
 
 #, python-format
 msgid "Add %(name)s"
@@ -430,6 +438,15 @@ msgstr "Priorità d'ordinamento: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Abilita/disabilita ordinamento"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Cambia tema (tema corrente: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Cambia tema (tema corrente: chiaro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Cambia tema (tema corrente: scuro)"
 
 msgid "Delete"
 msgstr "Cancella"
@@ -543,6 +560,9 @@ msgstr "Hai dimenticato la password o lo username?"
 msgid "Toggle navigation"
 msgstr "Abilita/disabilita navigazione"
 
+msgid "Sidebar"
+msgstr "Barra laterale"
+
 msgid "Start typing to filter…"
 msgstr "Inizia a scrivere per filtrare..."
 
@@ -559,10 +579,10 @@ msgid "Action"
 msgstr "Azione"
 
 msgid "entry"
-msgstr "voce"
-
-msgid "entries"
-msgstr "voci"
+msgid_plural "entries"
+msgstr[0] "voce"
+msgstr[1] "voci"
+msgstr[2] "voci"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -588,6 +608,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s risultato"
 msgstr[1] "%(counter)s risultati"
+msgstr[2] "%(counter)s risultati"
 
 #, python-format
 msgid "%(full_result_count)s total"

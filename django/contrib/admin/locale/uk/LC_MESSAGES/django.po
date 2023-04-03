@@ -7,7 +7,7 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2021
+# Illia Volochii <illia.volochii@gmail.com>, 2021-2023
 # Ivan Dmytrenko <dmitrenko.ivan@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
@@ -22,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Mykola Holovetskyi\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -384,14 +384,18 @@ msgid "Change password"
 msgstr "Змінити пароль"
 
 msgid "Please correct the error below."
-msgstr "Будь ласка, виправіть помилку нижче."
-
-msgid "Please correct the errors below."
-msgstr "Будь ласка, виправте помилки, вказані нижче."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Будь ласка, виправте наведену нижче помилку."
+msgstr[1] "Будь ласка, виправте наведені нижче помилки."
+msgstr[2] "Будь ласка, виправте наведені нижче помилки."
+msgstr[3] "Будь ласка, виправте наведені нижче помилки."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Введіть новий пароль для користувача <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Перейти до основного вмісту"
 
 msgid "Welcome,"
 msgstr "Вітаємо,"
@@ -404,6 +408,9 @@ msgstr "Документація"
 
 msgid "Log out"
 msgstr "Вийти"
+
+msgid "Breadcrumbs"
+msgstr "Навігаційний рядок"
 
 #, python-format
 msgid "Add %(name)s"
@@ -430,6 +437,15 @@ msgstr "Пріорітет сортування: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Сортувати в іншому напрямку"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Перемкнути тему (поточна тема: автоматична)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Перемкнути тему (поточна тема: світла)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Перемкнути тему (поточна тема: темна)"
 
 msgid "Delete"
 msgstr "Видалити"
@@ -542,6 +558,9 @@ msgstr "Забули пароль або ім'я користувача?"
 msgid "Toggle navigation"
 msgstr "Увімкнути навігацію"
 
+msgid "Sidebar"
+msgstr "Бічна панель"
+
 msgid "Start typing to filter…"
 msgstr "Почніть писати для фільтру..."
 
@@ -558,10 +577,11 @@ msgid "Action"
 msgstr "Дія"
 
 msgid "entry"
-msgstr ""
-
-msgid "entries"
-msgstr ""
+msgid_plural "entries"
+msgstr[0] "запис"
+msgstr[1] "записи"
+msgstr[2] "записи"
+msgstr[3] "записи"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -623,7 +643,7 @@ msgstr "Видалити обрану %(model)s"
 
 #, python-format
 msgid "View selected %(model)s"
-msgstr ""
+msgstr "Переглянути обрану %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Дякуємо за час, який був проведений сьогодні на сайті."
