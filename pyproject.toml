@@ -5,3 +5,213 @@ build-backend = 'setuptools.build_meta'
 [tool.black]
 target-version = ['py38']
 force-exclude = 'tests/test_runner_apps/tagged/tests_syntax_error.py'
+
+[tool.ruff]
+target-version = "py38"
+line-length = 98
+select = ["ALL"]
+ignore = [
+    "A001",    # Variable is shadowing a python builtin
+    "A002",    # Argument `format` is shadowing a python builtin
+    "A003",    # Class attribute is shadowing a python builtin
+    "ANN",     # Flake8 Annotations
+    "ARG001",  # Unused function argument
+    "ARG002",  # Unused method argument
+    "ARG003",  # Unused class method argument
+    "ARG004",  # Unused static method argument
+    "ARG005",  # Unused lambda argument
+    "B004",    # Using `hasattr(x, '__call__')` to test if x is callable is unreliable.
+    "B006",    # Do not use mutable data structures for argument defaults
+    "B007",    # Loop control variable `x` not used within loop body
+    "B008",    # Do not perform function call `Value` in argument defaults
+    "B009",    # Do not call `getattr` with a constant attribute value.
+    "B010",    # Do not call `setattr` with a constant attribute value.
+    "B011",    # Do not `assert False` (`python -O` removes these calls), raise `AssertionError()`
+    "B015",    # Pointless comparison.
+    "B017",    # `assertRaises(Exception)` should be considered evil
+    "B019",    # Use of `functools.lru_cache` or `functools.cache` on methods can lead to memory leaks
+    "B020",    # Loop control variable overrides iterable it iterates
+    "B023",    # Function definition does not bind loop variable
+    "B026",    # Star-arg unpacking after a keyword argument is strongly discouraged
+    "B028",    # No explicit keyword argument found
+    "B904",    # Within an `except` clause, raise exceptions with `raise ... from err`
+    "BLE001",  # Do not catch blind exception: `Exception`
+    "C401",    # Unnecessary generator (rewrite as a `set` comprehension)
+    "C408",    # Unnecessary `tuple` call (rewrite as a literal)
+    "C413",    # Unnecessary call around `sorted()`
+    "C416",    # Unnecessary comprehension (rewrite using `list()`)
+    "C417",    # Unnecessary `map` usage (rewrite using a generator expression)
+    "C901",    # This is too complex
+    "COM812",  # Trailing comma missing"
+    "COM818",  # Trailing comma on bare tuple prohibited
+    "D100",    # Missing docstring in public module
+    "D101",    # Missing docstring in public class
+    "D102",    # Missing docstring in public method
+    "D103",    # Missing docstring in public function
+    "D104",    # Missing docstring in public package
+    "D105",    # Missing docstring in magic method
+    "D106",    # Missing docstring in public nested class
+    "D107",    # Missing docstring in `__init__`
+    "D200",    # One-line docstring should fit on one line
+    "D202",    # No blank lines allowed after function docstring
+    "D203",    # 1 blank line required before class docstring
+    "D204",    # 1 blank line required after class docstring
+    "D205",    # 1 blank line required between summary line and description
+    "D208",    # Docstring is over-indented
+    "D209",    # Multi-line docstring closing quotes should be on a separate line
+    "D210",    # No whitespaces allowed surrounding docstring text
+    "D212",    # Multi-line docstring summary should start at the first line
+    "D213",    # Multi-line docstring summary should start at the second line
+    "D214",    # Section is over-indented
+    "D300",    # Use triple double quotes `"""`
+    "D301",    # Use `r"""` if any backslashes in a docstring
+    "D400",    # First line should end with a period
+    "D401",    # First line of docstring should be in imperative mood
+    "D402",    # First line should not be the function's signature
+    "D403",    # First word of the first line should be properly capitalized
+    "D404",    # First word of the docstring should not be "This"
+    "D406",    # Section name should end with a newline
+    "D407",    # Missing dashed underline after section
+    "D412",    # No blank lines allowed between a section header and its content
+    "D415",    # First line should end with a period, question mark, or exclamation point
+    "D417",    # Missing argument descriptions in the docstring
+    "DJ001",   # Avoid using `null=True` on string-based fields such as CharField
+    "DJ006",   # Do not use `exclude` with `ModelForm`, use `fields` instead
+    "DJ007",   # Do not use `__all__` with `ModelForm`, use `fields` instead
+    "DJ008",   # Model does not define `__str__` method
+    "DJ012",   # Order of model's inner classes, methods, and fields does not follow the Django Style Guide
+    "DTZ001",  # The use of `datetime.datetime()` without `tzinfo` argument is not allowed
+    "DTZ002",  # The use of `datetime.datetime.today()` is not allowed
+    "DTZ005",  # The use of `datetime.datetime.now()` without `tz` argument is not allowed
+    "DTZ006",  # The use of `datetime.datetime.fromtimestamp()` without `tz` argument is not allowed
+    "DTZ007",  # Use of `datetime.datetime.strptime()` without %z
+    "DTZ011",  # The use of `datetime.date.today()` is not allowed
+    "DTZ012",  # The use of `datetime.date.fromtimestamp()` is not allowed
+    "EM101",   # Exception must not use a string literal, assign to variable first
+    "EM102",   # Exception must not use an f-string literal, assign to variable first
+    "EM103",   # Exception must not use a `.format()` string directly, assign to variable first
+    "ERA001",  # Found commented-out code
+    "FBT002",  # Boolean default value in function definition
+    "FBT003",  # Boolean positional value in function call
+    "G004",    # Logging statement uses f-string
+    "G201",    # Logging `.exception(...)` should be used instead of `.error(..., exc_info=True)`
+    "I001",    # Import block is un-sorted or un-formatted
+    "ICN001",  # `numpy` should be imported as `np`
+    "INP001",  # File is part of an implicit namespace package. Add an `__init__.py`.
+    "ISC001",  # Implicitly concatenated string literals on one line
+    "ISC003",  # Explicitly concatenated string should be implicitly concatenated
+    "N801",    # Class name should use CapWords convention
+    "N802",    # Function name should be lowercase
+    "N803",    # Argument should be lowercase
+    "N804",    # First argument of a class method should be named `cls`
+    "N805",    # First argument of a method should be named `self`
+    "N806",    # Variable in function should be lowercase
+    "N807",    # Function name should not start and end with `__`
+    "N811",    # Constant imported as non-constant
+    "N812",    # Lowercase imported as non-lowercase
+    "N815",    # Variable in class scope should not be mixedCase
+    "N816",    # Variable in global scope should not be mixedCase
+    "N817",    # CamelCase `Value` imported as acronym `V`
+    "N818",    # Exception name should be named with an Error suffix
+    "N999",    # Invalid module name
+    "PD011",   # Use `.to_numpy()` instead of `.values`
+    "PD901",   # Bad variable name. Be kinder to your future self.
+    "PGH001",  # No builtin `eval()` allowed
+    "PGH004",  # Use specific rule codes when using `noqa`
+    "PIE790",  # Unnecessary `pass` statement
+    "PIE794",  # Class field is defined multiple times
+    "PIE800",  # Unnecessary spread `**`
+    "PIE802",  # Unnecessary list comprehension.
+    "PIE804",  # Unnecessary `dict` kwargs
+    "PIE807",  # Prefer `list` over useless lambda
+    "PIE810",  # Call `endswith` once with a `tuple`
+    "PLC1901", # `value == ""` can be simplified to `not value` as an empty string is falsey
+    "PLE0101", # Explicit return in `__init__`
+    "PLE0605", # Invalid format for `__all__`, must be `tuple` or `list`
+    "PLE2502", # Contains control characters that can permit obfuscated code
+    "PLR0206", # Cannot have defined parameters for properties
+    "PLR1711", # Useless `return` statement at end of function
+    "PLR1722", # Use `sys.exit()` instead of `exit`
+    "PLR2004", # Magic value used in comparison
+    "PLR5501", # Consider using `elif` instead of `else` then `if` to remove one indentation level
+    "PLW0120", # `else` clause on loop without a `break` statement
+    "PLW0602", # Using global but no assignment is done
+    "PLW0603", # Using the global statement to update is discouraged
+    "PLW2901", # `for` loop variable overwritten by assignment target
+    "PT008",   # Use `return_value=` instead of patching with `lambda`
+    "PT009",   # Use a regular `assert` instead of unittest-style
+    "PT015",   # Assertion always fails, replace with `pytest.fail()`
+    "PT019",   # Fixture without value is injected as parameter
+    "PTH",       # Functions can be replaced by pathlib module.
+    "Q000",    # Single quotes found but double quotes preferred
+    "RET501",  # Do not explicitly `return None` in function if it is the only possible return value
+    "RET502",  # Do not implicitly `return None` in function able to return non-`None` value
+    "RET503",  # Missing explicit `return` at the end of function able to return non-`None` value
+    "RET504",  # Unnecessary variable assignment before `return` statement
+    "RET505",  # Unnecessary `elif` after `return` statement
+    "RET506",  # Unnecessary `elif` after `raise` statement
+    "RET507",  # Unnecessary `elif` after `continue` statement
+    "RET508",  # Unnecessary `elif` after `break` statement
+    "RSE102",  # Unnecessary parentheses on raised exception
+    "RUF001",   # String contains ambiguous unicode character
+    "RUF003",  # Comment contains ambiguous unicode character
+    "RUF005",  # Consider ... instead of concatenation
+    "RUF100",  # Unused blanket `noqa` directive
+    "S101",    # Use of `assert` detected
+    "S102",    # Use of `exec` detected
+    "S103",    # `os.chmod` setting a permissive mask `0o222` on file or directory
+    "S104",    # Possible binding to all interfaces
+    "S105",    # Possible hardcoded password
+    "S106",    # Possible hardcoded password
+    "S107",    # Possible hardcoded password
+    "S108",    # Probable insecure usage of temporary file or directory
+    "S110",    # `try`-`except`-`pass` detected, consider logging the exception
+    "S301",    # `pickle` and modules that wrap it can be unsafe
+    "S308",    # Use of `mark_safe` may expose cross-site scripting vulnerabilities
+    "S310",    # Audit URL open for permitted schemes.
+    "S311",    # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "S314",    # Using `xml` to parse untrusted data is known to be vulnerable to XML attacks
+    "S318",    # Using `xml` to parse untrusted data is known to be vulnerable to XML attacks
+    "S319",    # Using `xml` to parse untrusted data is known to be vulnerable to XML attacks;
+    "S324",    # Probable use of insecure hash functions
+    "S608",    # Possible SQL injection vector through string-based query construction
+    "SIM102",  # Use a single `if` statement instead of nested `if` statements
+    "SIM103",  # Return the condition directly
+    "SIM105",  # Use `contextlib.suppress()` instead of try-except-pass
+    "SIM108",  # Use ternary operator
+    "SIM109",  # Use in instead of multiple equality comparisons
+    "SIM114",  # Combine `if` branches using logical `or` operator
+    "SIM115",  # Use context handler for opening files
+    "SIM116",  # Use a dictionary instead of consecutive `if` statements
+    "SIM117",  # Use a single `with` statement with multiple contexts instead of nested `with` statements
+    "SIM118",  # Use `codename in builtin_permissions` instead of `codename in builtin_permissions.keys()`
+    "SIM223",  # Use `False` instead of `... and False`
+    "SIM300",  # Yoda conditions are discouraged
+    "SIM401",  # Use .get(.., ..)` instead of an `if` block
+    "SLF001",  # Private member accessed
+    "T100",    # Import for `pdb` found
+    "T201",    # `print` found
+    "TID252",  # Relative imports from parent modules are banned
+    "TRY002",  # Create your own exception
+    "TRY003",  # Avoid specifying long messages outside the exception class
+    "TRY004",  # Prefer `TypeError` exception for invalid type
+    "TRY200",  # Use `raise from` to specify exception cause
+    "TRY201",  # Use `raise` without specifying exception name
+    "TRY300",  # Consider moving this statement to an `else` block
+    "TRY301",  # Abstract `raise` to an inner function
+    "TRY400",  # Use `logging.exception` instead of `logging.error`
+    "UP012",   # Unnecessary call to `encode` as UTF-8
+    "UP027",   # Replace unpacked list comprehension with a generator expression
+    "UP031",   # Use format specifiers instead of percent format
+    "UP032",   # Use f-string instead of `format` call
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "double"
+docstring-quotes = "double"
+
+[tool.ruff.pylint]
+max-args = 25         # Default 5
+max-returns = 13      # Default 6
+max-branches = 60     # Default 12
+max-statements = 142  # Default 50
