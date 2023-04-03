@@ -6,13 +6,14 @@
 # Liping Wang <lynn.config@gmail.com>, 2016
 # wang zhao <672565116@qq.com>, 2018
 # wolf ice <warwolf7677@163.com>, 2020
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -90,11 +91,10 @@ msgstr "包含未知的键：%(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "请确保该区间内所有值少于或等于 %(limit_value)s 。"
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "确保范围的上限不大于%(limit_value)s。"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "请确保该区间内所有值大于或等于 %(limit_value)s 。"
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "确保范围的下限不小于%(limit_value)s。"

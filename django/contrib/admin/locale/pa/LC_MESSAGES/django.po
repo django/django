@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# A S Alam <alam.yellow@gmail.com>, 2018
+# A S Alam, 2018
+# A S Alam, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Satnam S Virdi <satnam10virdi@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-22 07:21+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: A S Alam, 2022\n"
 "Language-Team: Panjabi (Punjabi) (http://www.transifex.com/django/django/"
 "language/pa/)\n"
 "MIME-Version: 1.0\n"
@@ -71,7 +72,7 @@ msgid "Has date"
 msgstr "ਮਿਤੀ ਹੈ"
 
 msgid "Empty"
-msgstr ""
+msgstr "ਖਾਲੀ"
 
 msgid "Not empty"
 msgstr ""
@@ -233,7 +234,7 @@ msgstr "%s ਬਦਲੋ"
 
 #, python-format
 msgid "View %s"
-msgstr ""
+msgstr "%s ਵੇਖੋ"
 
 msgid "Database error"
 msgstr "ਡਾਟਾਬੇਸ ਗਲਤੀ"
@@ -258,8 +259,9 @@ msgstr ""
 msgid "Change history: %s"
 msgstr "ਅਤੀਤ ਬਦਲੋ: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr ""
@@ -350,14 +352,16 @@ msgid "Change password"
 msgstr "ਪਾਸਵਰਡ ਬਦਲੋ"
 
 msgid "Please correct the error below."
-msgstr ""
-
-msgid "Please correct the errors below."
-msgstr ""
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "ਯੂਜ਼ਰ <strong>%(username)s</strong> ਲਈ ਨਵਾਂ ਪਾਸਵਰਡ ਦਿਓ।"
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "ਜੀ ਆਇਆਂ ਨੂੰ, "
@@ -370,6 +374,9 @@ msgstr "ਡੌਕੂਮੈਂਟੇਸ਼ਨ"
 
 msgid "Log out"
 msgstr "ਲਾਗ ਆਉਟ"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -395,6 +402,15 @@ msgid "Sorting priority: %(priority_number)s"
 msgstr ""
 
 msgid "Toggle sorting"
+msgstr ""
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
 msgstr ""
 
 msgid "Delete"
@@ -490,6 +506,9 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr ""
 
@@ -504,6 +523,11 @@ msgstr "ਯੂਜ਼ਰ"
 
 msgid "Action"
 msgstr "ਕਾਰਵਾਈ"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -557,6 +581,10 @@ msgstr ""
 
 #, python-format
 msgid "Delete selected %(model)s"
+msgstr ""
+
+#, python-format
+msgid "View selected %(model)s"
 msgstr ""
 
 msgid "Thanks for spending some quality time with the web site today."

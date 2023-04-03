@@ -26,14 +26,15 @@
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 考证 李 <likaozheng@gmail.com>, 2020
 # 雨翌 <yumendy@163.com>, 2016
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 # Ronald White <tkliuxing@me.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Huanqun Yang\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -376,14 +377,15 @@ msgid "Change password"
 msgstr "修改密码"
 
 msgid "Please correct the error below."
-msgstr "请更正下列错误。"
-
-msgid "Please correct the errors below."
-msgstr "请更正下列错误。"
+msgid_plural "Please correct the errors below."
+msgstr[0] "请更正以下错误。"
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "为用户 <strong>%(username)s</strong> 输入一个新的密码。"
+
+msgid "Skip to main content"
+msgstr "跳到主要内容"
 
 msgid "Welcome,"
 msgstr "欢迎，"
@@ -396,6 +398,9 @@ msgstr "文档"
 
 msgid "Log out"
 msgstr "注销"
+
+msgid "Breadcrumbs"
+msgstr "面包屑"
 
 #, python-format
 msgid "Add %(name)s"
@@ -422,6 +427,15 @@ msgstr "排序优先级: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "正逆序切换"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "切换主题（当前主题：自动）"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "切换主题（当前主题：浅色）"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "切换主题（当前主题：深色）"
 
 msgid "Delete"
 msgstr "删除"
@@ -529,6 +543,9 @@ msgstr "忘记了您的密码或用户名？"
 msgid "Toggle navigation"
 msgstr "切换导航"
 
+msgid "Sidebar"
+msgstr "侧边栏"
+
 msgid "Start typing to filter…"
 msgstr "开始输入以筛选..."
 
@@ -545,10 +562,8 @@ msgid "Action"
 msgstr "动作"
 
 msgid "entry"
-msgstr "条目"
-
-msgid "entries"
-msgstr "条目"
+msgid_plural "entries"
+msgstr[0] "条目"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "

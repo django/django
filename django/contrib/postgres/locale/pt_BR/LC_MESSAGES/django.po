@@ -2,9 +2,10 @@
 #
 # Translators:
 # Andre Machado <csantos.machado@gmail.com>, 2016
-# Carlos Leite <caduado@gmail.com>, 2016,2019
+# Carlos C. Leite <caduado@gmail.com>, 2016,2019
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
@@ -13,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2022-01-19 09:22+0000\n"
-"Last-Translator: Carlos Leite <caduado@gmail.com>, 2016,2019\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Jonas Rodrigues, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -109,14 +110,14 @@ msgstr "Algumas chaves desconhecidas foram fornecidos: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Certifique-se que o intervalo é completamente menor que  %(limit_value)s."
+"Certifique-se de que o limite superior do intervalo não seja maior que "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Certifique-se que este intervalo é completamente maior ou igual a  "
+"Assegure-se de que o limite inferior do intervalo não seja menor que "
 "%(limit_value)s."

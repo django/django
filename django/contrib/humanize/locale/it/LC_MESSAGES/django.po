@@ -11,14 +11,15 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018
 # Nicola Larosa <transifex@teknico.net>, 2011
 # palmux <palmux@gmail.com>, 2015
+# Paolo Melchiorre <paolo@melchiorre.org>, 2023
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-07 14:40+0200\n"
-"PO-Revision-Date: 2021-11-12 12:01+0000\n"
-"Last-Translator: Davide Targa <davide.targa@gmail.com>\n"
+"PO-Revision-Date: 2023-04-24 18:40+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -90,66 +91,77 @@ msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] "%(value)s milione"
 msgstr[1] "%(value)s milioni"
+msgstr[2] "%(value)s milioni"
 
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
 msgstr[0] "%(value)s miliardo"
 msgstr[1] "%(value)s miliardi"
+msgstr[2] "%(value)s miliardi"
 
 #, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] "%(value)s migliaio di miliardi"
 msgstr[1] "%(value)s migliaia di miliardi"
+msgstr[2] "%(value)s migliaia di miliardi"
 
 #, python-format
 msgid "%(value)s quadrillion"
 msgid_plural "%(value)s quadrillion"
 msgstr[0] "%(value)s milione di miliardi"
 msgstr[1] "%(value)s milioni di miliardi"
+msgstr[2] "%(value)s milioni di miliardi"
 
 #, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
 msgstr[0] "%(value)s miliardo di miliardi"
 msgstr[1] "%(value)s miliardi di miliardi"
+msgstr[2] "%(value)s miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s sextillion"
 msgid_plural "%(value)s sextillion"
 msgstr[0] "%(value)s migliaio di miliardi di miliardi"
 msgstr[1] "%(value)s migliaia di miliardi di miliardi"
+msgstr[2] "%(value)s migliaia di miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
 msgstr[0] "%(value)s milione di miliardi di miliardi"
 msgstr[1] "%(value)s milioni di miliardi di miliardi"
+msgstr[2] "%(value)s milioni di miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s octillion"
 msgid_plural "%(value)s octillion"
 msgstr[0] "%(value)s miliardo di miliardi di miliardi"
 msgstr[1] "%(value)s miliardi di miliardi di miliardi"
+msgstr[2] "%(value)s miliardi di miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
 msgstr[0] "%(value)s migliaio di miliardi di miliardi di miliardi"
 msgstr[1] "%(value)s migliaia di miliardi di miliardi di miliardi"
+msgstr[2] "%(value)s migliaia di miliardi di miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
 msgstr[0] "%(value)s milione di miliardi di miliardi di miliardi"
 msgstr[1] "%(value)s milioni di miliardi di miliardi di miliardi"
+msgstr[2] "%(value)s milioni di miliardi di miliardi di miliardi"
 
 #, python-format
 msgid "%(value)s googol"
 msgid_plural "%(value)s googol"
 msgstr[0] "%(value)s googol"
 msgstr[1] "%(value)s googol"
+msgstr[2] "%(value)s googol"
 
 msgid "one"
 msgstr "uno"
@@ -200,6 +212,7 @@ msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
 msgstr[0] "un ora fa"
 msgstr[1] "%(count)s ore fa"
+msgstr[2] "%(count)s ore fa"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -208,6 +221,7 @@ msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
 msgstr[0] "un minuto fa"
 msgstr[1] "%(count)s minuti fa"
+msgstr[2] "%(count)s minuti fa"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -216,6 +230,7 @@ msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] "un secondo fa"
 msgstr[1] "%(count)s secondi fa"
+msgstr[2] "%(count)s secondi fa"
 
 msgid "now"
 msgstr "adesso"
@@ -227,6 +242,7 @@ msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
 msgstr[0] "tra un secondo"
 msgstr[1] "tra %(count)s secondi"
+msgstr[2] "tra %(count)s secondi"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -235,6 +251,7 @@ msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
 msgstr[0] "tra un minuto"
 msgstr[1] "tra %(count)s minuti"
+msgstr[2] "tra %(count)s minuti"
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
@@ -243,6 +260,7 @@ msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
 msgstr[0] "tra un'ora"
 msgstr[1] "tra %(count)s ore"
+msgstr[2] "tra %(count)s ore"
 
 #. Translators: delta will contain a string like '2 months' or '1 month, 2
 #. weeks'
@@ -257,6 +275,7 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d anno"
 msgstr[1] "%(num)d anni"
+msgstr[2] "%(num)d anni"
 
 #, python-format
 msgctxt "naturaltime-past"
@@ -264,6 +283,7 @@ msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mese"
 msgstr[1] "%(num)d mesi"
+msgstr[2] "%(num)d mesi"
 
 #, python-format
 msgctxt "naturaltime-past"
@@ -271,6 +291,7 @@ msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d settimana"
 msgstr[1] "%(num)d settimane"
+msgstr[2] "%(num)d settimane"
 
 #, python-format
 msgctxt "naturaltime-past"
@@ -278,6 +299,7 @@ msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d giorno"
 msgstr[1] "%(num)d giorni"
+msgstr[2] "%(num)d giorni"
 
 #, python-format
 msgctxt "naturaltime-past"
@@ -285,6 +307,7 @@ msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d ora"
 msgstr[1] "%(num)d ore"
+msgstr[2] "%(num)d ore"
 
 #, python-format
 msgctxt "naturaltime-past"
@@ -292,6 +315,7 @@ msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minuto"
 msgstr[1] "%(num)d minuti"
+msgstr[2] "%(num)d minuti"
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s
 #. from now'
@@ -301,6 +325,7 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d anno"
 msgstr[1] "%(num)d anni"
+msgstr[2] "%(num)d anni"
 
 #, python-format
 msgctxt "naturaltime-future"
@@ -308,6 +333,7 @@ msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mese"
 msgstr[1] "%(num)d mesi"
+msgstr[2] "%(num)d mesi"
 
 #, python-format
 msgctxt "naturaltime-future"
@@ -315,13 +341,15 @@ msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d settimana"
 msgstr[1] "%(num)d settimane"
+msgstr[2] "%(num)d settimane"
 
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] "%(num)d giorni"
+msgstr[0] "%(num)d giorno"
 msgstr[1] "%(num)d giorni"
+msgstr[2] "%(num)d giorni"
 
 #, python-format
 msgctxt "naturaltime-future"
@@ -329,6 +357,7 @@ msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d ora"
 msgstr[1] "%(num)d ore"
+msgstr[2] "%(num)d ore"
 
 #, python-format
 msgctxt "naturaltime-future"
@@ -336,3 +365,4 @@ msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minuto"
 msgstr[1] "%(num)d minuti"
+msgstr[2] "%(num)d minuti"

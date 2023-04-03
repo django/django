@@ -8,8 +8,8 @@
 # Arthur Silva <arxdsilva@gmail.com>, 2017
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
-# Carlos Leite <caduado@gmail.com>, 2020
-# Carlos Leite <caduado@gmail.com>, 2016,2019
+# Carlos C. Leite <caduado@gmail.com>, 2020
+# Carlos C. Leite <caduado@gmail.com>, 2016,2019
 # Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudio Rogerio Carvalho Filho <excriptbrasil@gmail.com>, 2020
 # dudanogueira <dudanogueira@gmail.com>, 2012
@@ -24,6 +24,7 @@
 # Heron Fonsaca, 2022
 # Igor Cavalcante <igorcavlim@gmail.com>, 2017
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
 # Marssal Jr. <marssaljr@gmail.com>, 2022
@@ -40,9 +41,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
-"Last-Translator: Heron Fonsaca, 2022\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Jonas Rodrigues, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -83,6 +84,9 @@ msgstr "Bósnio"
 
 msgid "Catalan"
 msgstr "Catalão"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Curdo Central (Sorâni)"
 
 msgid "Czech"
 msgstr "Tcheco"
@@ -550,6 +554,9 @@ msgstr "Booleano (Verdadeiro ou Falso)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (até %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "String (ilimitado)"
 
 msgid "Comma-separated integers"
 msgstr "Inteiros separados por vírgula"
