@@ -1,8 +1,8 @@
-============================================
-Django 4.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.2 release notes
+========================
 
-*Expected April 2023*
+*April 3, 2023*
 
 Welcome to Django 4.2!
 
