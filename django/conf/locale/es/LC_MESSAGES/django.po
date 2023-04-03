@@ -38,16 +38,16 @@
 # Pablo, 2015
 # Sebastián Magrí, 2013
 # Sebastián Magrí, 2013
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
-"Last-Translator: mpachas <miguel.pachas.garcia@gmail.com>, 2022\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -88,6 +88,9 @@ msgstr "Bosnio"
 
 msgid "Catalan"
 msgstr "Catalán"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurdo central (Sorani)"
 
 msgid "Czech"
 msgstr "Checo"
@@ -554,6 +557,9 @@ msgstr "Booleano (Verdadero o Falso)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Cadena (máximo %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Cadena (ilimitado)"
 
 msgid "Comma-separated integers"
 msgstr "Enteros separados por coma"
@@ -1222,7 +1228,7 @@ msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minutos"
 msgstr[1] "%(num)d minutes"
-msgstr[2] "%(num)d minutes"
+msgstr[2] "%(num)d minutos"
 
 msgid "Forbidden"
 msgstr "Prohibido"

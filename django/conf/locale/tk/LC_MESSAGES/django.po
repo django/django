@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
 "Last-Translator: Resul <resulsaparov@gmail.com>, 2022\n"
 "Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
 "tk/)\n"
@@ -52,6 +52,9 @@ msgstr "Bosniýaça"
 
 msgid "Catalan"
 msgstr "Katalan"
+
+msgid "Central Kurdish (Sorani)"
+msgstr ""
 
 msgid "Czech"
 msgstr "Çehçe"
@@ -392,7 +395,7 @@ msgstr ""
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
-msgstr ""
+msgstr "Bu baha %(limit_value)s-nyň essesi bolmaly."
 
 #, python-format
 msgid ""
@@ -465,7 +468,7 @@ msgstr "%(field_labels)s bilen baglanyşykly %(model_name)s eýýäm bar."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "Çäklendirme “%(name)s” bozuldy."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -508,6 +511,9 @@ msgstr "Boolean (True ýa-da False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Setir (iň köp %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr ""
 
 msgid "Comma-separated integers"
 msgstr "Otur bilen bölünen bitewi sanlar"
@@ -773,6 +779,8 @@ msgid ""
 "ManagementForm data is missing or has been tampered with. Missing fields: "
 "%(field_names)s. You may need to file a bug report if the issue persists."
 msgstr ""
+"ManagementForm maglumatlary ýok ýa-da bozulan. Tapylmadyk meýdança: "
+"%(field_names)s. Mesele dowam etse, \"bug report\" açmaly bolmagyňyz mümkin."
 
 #, python-format
 msgid "Please submit at most %(num)d form."
@@ -1168,6 +1176,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Bu haty görýärsiňiz, sebäbi bu HTTPS sahypasy web brauzeriňiz tarapyndan "
+"iberilmeli \"Referer header\" talap edýär, ýöne hiç biri iberilmedi. Bu "
+"sözbaşy, brauzeriňiziň üçünji şahyslar tarapyndan ogurlanmazlygy üçin "
+"howpsuzlyk sebäpli talap edilýär."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"

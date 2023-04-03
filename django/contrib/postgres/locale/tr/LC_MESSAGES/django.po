@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2019
+# BouRock, 2015-2019,2023
 # BouRock, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-05-12 20:01+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: BouRock, 2015-2019,2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -97,13 +97,13 @@ msgstr "Bazı bilinmeyen anahtarlar verilmiş: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
 msgstr ""
-"Bu aralığın %(limit_value)s değerinden küçük veya eşit olduğundan emin olun."
+"Aralığın üst sınırının %(limit_value)s değerinden büyük olmadığından emin "
+"olun."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Bu aralığın %(limit_value)s değerinden büyük veya eşit olduğundan emin olun."
+"Aralığın alt sınırının %(limit_value)s değerinden az olmadığından emin olun."

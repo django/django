@@ -3,6 +3,7 @@
 # Translators:
 # Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
+# Anders Hovmöller <boxed@killingar.net>, 2023
 # Andreas Pelme <andreas@pelme.se>, 2014
 # d7bcbd5f5cbecdc2b959899620582440, 2011
 # Cybjit <cybjit@gmail.com>, 2012
@@ -20,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:10-0500\n"
-"PO-Revision-Date: 2022-07-25 07:05+0000\n"
-"Last-Translator: Elias Johnstone <eli87as@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Anders Hovmöller <boxed@killingar.net>, 2023\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -373,14 +374,16 @@ msgid "Change password"
 msgstr "Ändra lösenord"
 
 msgid "Please correct the error below."
-msgstr "Vänligen rätta nedanstående fel"
-
-msgid "Please correct the errors below."
-msgstr "Vänligen rätta till felen nedan."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Var god rätta felet nedan."
+msgstr[1] "Vad god rätta felen nedan."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ange nytt lösenord för användare <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Välkommen,"
@@ -393,6 +396,9 @@ msgstr "Dokumentation"
 
 msgid "Log out"
 msgstr "Logga ut"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -419,6 +425,15 @@ msgstr "Sorteringsprioritet: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Ändra sorteringsordning"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Radera"
@@ -532,6 +547,9 @@ msgstr "Har du glömt lösenordet eller användarnamnet?"
 msgid "Toggle navigation"
 msgstr "Växla navigering"
 
+msgid "Sidebar"
+msgstr ""
+
 msgid "Start typing to filter…"
 msgstr "Börja skriv för att filtrera..."
 
@@ -548,10 +566,9 @@ msgid "Action"
 msgstr "Händelse"
 
 msgid "entry"
-msgstr "post"
-
-msgid "entries"
-msgstr "poster"
+msgid_plural "entries"
+msgstr[0] "post"
+msgstr[1] "poster"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
