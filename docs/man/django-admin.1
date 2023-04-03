@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "January 15, 2023" "4.2" "Django"
+.TH "DJANGO-ADMIN" "1" "April 03, 2023" "4.2" "Django"
 .SH NAME
 django-admin \- Utility script for the Django web framework
 .sp
@@ -85,7 +85,7 @@ Run \fBdjango\-admin help <command>\fP to display a description of the given
 command and a list of its available options.
 .SS App names
 .sp
-Many commands take a list of "app names." An "app name" is the basename of
+Many commands take a list of \(dqapp names.\(dq An \(dqapp name\(dq is the basename of
 the package containing your models. For example, if your \fI\%INSTALLED_APPS\fP
 contains the string \fB\(aqmysite.blog\(aq\fP, the app name is \fBblog\fP\&.
 .SS Determining the version
@@ -358,7 +358,7 @@ On MySQL/MariaDB, you can do this with the \fBmysql\fP command\(aqs \fB\-e\fP fl
 .sp
 .nf
 .ft C
-$ django\-admin dbshell \-\- \-e "select user()"
+$ django\-admin dbshell \-\- \-e \(dqselect user()\(dq
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
 | user()               |
 +\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
@@ -386,9 +386,9 @@ command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
 Displays differences between the current settings file and Django\(aqs default
 settings (or another settings file specified by \fI\%\-\-default\fP).
 .sp
-Settings that don\(aqt appear in the defaults are followed by \fB"###"\fP\&. For
+Settings that don\(aqt appear in the defaults are followed by \fB\(dq###\(dq\fP\&. For
 example, the default settings don\(aqt define \fI\%ROOT_URLCONF\fP, so
-\fI\%ROOT_URLCONF\fP is followed by \fB"###"\fP in the output of
+\fI\%ROOT_URLCONF\fP is followed by \fB\(dq###\(dq\fP in the output of
 \fBdiffsettings\fP\&.
 .INDENT 0.0
 .TP
@@ -396,7 +396,7 @@ example, the default settings don\(aqt define \fI\%ROOT_URLCONF\fP, so
 .UNINDENT
 .sp
 Displays all settings, even if they have Django\(aqs default value. Such settings
-are prefixed by \fB"###"\fP\&.
+are prefixed by \fB\(dq###\(dq\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-default MODULE
@@ -1361,6 +1361,11 @@ By default, the development server doesn\(aqt serve any static files for your si
 (such as CSS files, images, things under \fI\%MEDIA_URL\fP and so forth). If
 you want to configure Django to serve static media, read
 \fI\%How to manage static files (e.g. images, JavaScript, CSS)\fP\&.
+.SS Serving with ASGI in development
+.sp
+Django\(aqs \fBrunserver\fP command provides a WSGI server. In order to run under
+ASGI you will need to use an \fI\%ASGI server\fP\&.
+The Django Daphne project provides \fI\%Integration with runserver\fP that you can use.
 .SS \fBsendtestemail\fP
 .INDENT 0.0
 .TP
@@ -1435,7 +1440,7 @@ django\-admin shell \-i bpython
 .UNINDENT
 .UNINDENT
 .sp
-If you have a "rich" shell installed but want to force use of the "plain"
+If you have a \(dqrich\(dq shell installed but want to force use of the \(dqplain\(dq
 Python interpreter, use \fBpython\fP as the interface name, like so:
 .INDENT 0.0
 .INDENT 3.5
@@ -1452,7 +1457,7 @@ django\-admin shell \-i python
 .B \-\-nostartup
 .UNINDENT
 .sp
-Disables reading the startup script for the "plain" Python interpreter. By
+Disables reading the startup script for the \(dqplain\(dq Python interpreter. By
 default, the script pointed to by the \fI\%PYTHONSTARTUP\fP environment
 variable or the \fB~/.pythonrc.py\fP script is read.
 .INDENT 0.0
@@ -1466,7 +1471,7 @@ Lets you pass a command as a string to execute it as Django, like so:
 .sp
 .nf
 .ft C
-django\-admin shell \-\-command="import django; print(django.__version__)"
+django\-admin shell \-\-command=\(dqimport django; print(django.__version__)\(dq
 .ft P
 .fi
 .UNINDENT
@@ -1747,7 +1752,7 @@ contains a docstring explaining a particular feature related
 to template rendering, it might result in an incorrect example.
 .sp
 To work around this problem, you can use the \fI\%templatetag\fP
-template tag to "escape" the various parts of the template syntax.
+template tag to \(dqescape\(dq the various parts of the template syntax.
 .sp
 In addition, to allow Python template files that contain Django template
 language syntax while also preventing packaging systems from trying to
@@ -2097,7 +2102,7 @@ When you\(aqre writing \fI\%unit tests\fP of how your views
 act with certain fixture data, you can use \fBtestserver\fP to interact with
 the views in a web browser, manually.
 .IP \(bu 2
-Let\(aqs say you\(aqre developing your Django application and have a "pristine"
+Let\(aqs say you\(aqre developing your Django application and have a \(dqpristine\(dq
 copy of a database that you\(aqd like to interact with. You can dump your
 database to a \fI\%fixture\fP (using the
 \fI\%dumpdata\fP command, explained above), then use \fBtestserver\fP to run
@@ -2512,9 +2517,9 @@ of its services to color output just like on Unix\-based platforms.
 .UNINDENT
 .sp
 Other modern terminal environments on Windows, that support terminal colors,
-but which are not automatically detected as supported by Django, may "fake" the
+but which are not automatically detected as supported by Django, may \(dqfake\(dq the
 installation of \fBANSICON\fP by setting the appropriate environmental variable,
-\fBANSICON="on"\fP\&.
+\fBANSICON=\(dqon\(dq\fP\&.
 .SS Custom colors
 .sp
 The colors used for syntax highlighting can be customized. Django
@@ -2539,7 +2544,7 @@ would run the following at a command prompt:
 .sp
 .nf
 .ft C
-export DJANGO_COLORS="light"
+export DJANGO_COLORS=\(dqlight\(dq
 .ft P
 .fi
 .UNINDENT
@@ -2641,7 +2646,7 @@ are then separated by a semicolon. For example:
 .sp
 .nf
 .ft C
-export DJANGO_COLORS="error=yellow/blue,blink;notice=magenta"
+export DJANGO_COLORS=\(dqerror=yellow/blue,blink;notice=magenta\(dq
 .ft P
 .fi
 .UNINDENT
@@ -2659,7 +2664,7 @@ palette will be loaded. So:
 .sp
 .nf
 .ft C
-export DJANGO_COLORS="light;error=yellow/blue,blink;notice=magenta"
+export DJANGO_COLORS=\(dqlight;error=yellow/blue,blink;notice=magenta\(dq
 .ft P
 .fi
 .UNINDENT
@@ -2751,9 +2756,9 @@ Examples:
 from django.core import management
 from django.core.management.commands import loaddata
 
-management.call_command(\(aqflush\(aq, verbosity=0, interactive=False)
-management.call_command(\(aqloaddata\(aq, \(aqtest_data\(aq, verbosity=0)
-management.call_command(loaddata.Command(), \(aqtest_data\(aq, verbosity=0)
+management.call_command(\(dqflush\(dq, verbosity=0, interactive=False)
+management.call_command(\(dqloaddata\(dq, \(dqtest_data\(dq, verbosity=0)
+management.call_command(loaddata.Command(), \(dqtest_data\(dq, verbosity=0)
 .ft P
 .fi
 .UNINDENT
@@ -2769,14 +2774,14 @@ Named arguments can be passed by using either one of the following syntaxes:
 .nf
 .ft C
 # Similar to the command line
-management.call_command(\(aqdumpdata\(aq, \(aq\-\-natural\-foreign\(aq)
+management.call_command(\(dqdumpdata\(dq, \(dq\-\-natural\-foreign\(dq)
 
 # Named argument similar to the command line minus the initial dashes and
 # with internal dashes replaced by underscores
-management.call_command(\(aqdumpdata\(aq, natural_foreign=True)
+management.call_command(\(dqdumpdata\(dq, natural_foreign=True)
 
 # \(gause_natural_foreign_keys\(ga is the option destination variable
-management.call_command(\(aqdumpdata\(aq, use_natural_foreign_keys=True)
+management.call_command(\(dqdumpdata\(dq, use_natural_foreign_keys=True)
 .ft P
 .fi
 .UNINDENT
@@ -2795,7 +2800,7 @@ Command options which take multiple options are passed a list:
 .sp
 .nf
 .ft C
-management.call_command(\(aqdumpdata\(aq, exclude=[\(aqcontenttypes\(aq, \(aqauth\(aq])
+management.call_command(\(dqdumpdata\(dq, exclude=[\(dqcontenttypes\(dq, \(dqauth\(dq])
 .ft P
 .fi
 .UNINDENT
@@ -2812,8 +2817,8 @@ support the \fBstdout\fP and \fBstderr\fP options. For example, you could write:
 .sp
 .nf
 .ft C
-with open(\(aq/path/to/command_output\(aq, \(aqw\(aq) as f:
-    management.call_command(\(aqdumpdata\(aq, stdout=f)
+with open(\(dq/path/to/command_output\(dq, \(dqw\(dq) as f:
+    management.call_command(\(dqdumpdata\(dq, stdout=f)
 .ft P
 .fi
 .UNINDENT
