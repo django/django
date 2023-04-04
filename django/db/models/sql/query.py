@@ -702,7 +702,8 @@ class Query(BaseExpression):
         # by recursively calling this function.
         for field in opts.concrete_fields:
             field_mask = mask.pop(field.name, None)
-            if field_mask is None:
+            field_att_mask = mask.pop(field.attname, None)
+            if field_mask is None and field_att_mask is None:
                 select_mask.setdefault(field, {})
             elif field_mask:
                 if not field.is_relation:
