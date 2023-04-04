@@ -33,9 +33,11 @@ class CompositeType:
     @classmethod
     def namedtuple(cls, name, fields):
         fields = tuple(fields)
+        doc_fields = ",".join(fields)
+        repr_fields = ", ".join(f"{name}=%r" for name in fields)
         class_namespace = {
-            "__doc__": name + "(" + ",".join(fields) + ")",
-            "_repr_fmt": "(" + ", ".join(f"{name}=%r" for name in fields) + ")",
+            "__doc__": f"{name}({doc_fields})",
+            "_repr_fmt": "({repr_fields})",
             "__slots__": ("_instance",),
             "_fields": fields,
         }
