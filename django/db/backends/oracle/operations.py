@@ -579,9 +579,7 @@ END;
             return False
         if isinstance(expression, ExpressionWrapper) and expression.conditional:
             return self.tuple_operation(expression.expression)
-        if isinstance(expression, RawSQL) and expression.conditional:
-            return True
-        return True
+        return super().tuple_operation(expression)
 
     def adapt_datefield_value(self, value):
         """

@@ -379,7 +379,7 @@ class TupleExact(Exact):
             lhs = self.lhs.get_source_expressions()
             if len(lhs) != len(self.rhs):
                 raise ValueError(
-                    f"The QuerySet value for an exact lookup must has same "
+                    f"The QuerySet value for an exact lookup must have the same "
                     f"arity for lhs and rhs ({len(lhs)} != {len(self.rhs)})"
                 )
             exprs = [
