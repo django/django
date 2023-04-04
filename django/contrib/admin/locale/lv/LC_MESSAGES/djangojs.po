@@ -1,17 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Edgars Voroboks <edgars.voroboks@gmail.com>, 2020-2021
 # peterisb <pb@sungis.lv>, 2016
+# Pēteris Caune, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Pēteris Caune, 2023\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -31,8 +33,8 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Šis ir saraksts ar pieejamajiem %s. Tev ir jāizvēlas atbilstošās vērtības "
-"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izvēlēties"
-"\", lai pārvietotu starp izvēļu sarakstiem."
+"atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu "
+"\"Izvēlēties\", lai pārvietotu starp izvēļu sarakstiem."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -68,12 +70,23 @@ msgstr ""
 "atzīmējot izvēlēs zemāk esošajā sarakstā un pēc tam spiežot pogu \"Izņemt\", "
 "lai izņemtu no izvēlēto ierakstu saraksta."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Rakstiet šajā laukā, lai filtrētu atlasīto %s sarakstu."
+
 msgid "Remove all"
 msgstr "Izņemt visu"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Izvēlies, lai izņemtu visas %s izvēles vienā reizē."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s atlasītās opcijas nav redzamas"
+msgstr[1] "%s atlasītā opcija nav redzama"
+msgstr[2] "%s atlasītās opcijas nav redzamas"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -265,11 +278,6 @@ msgstr "Pk"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Se"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr "Jūs jau iesniedzāt šo formu. Vai vēlaties to iesniegt vēlreiz?"
 
 msgid "Show"
 msgstr "Parādīt"

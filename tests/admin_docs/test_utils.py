@@ -104,6 +104,22 @@ class TestUtils(AdminDocsSimpleTestCase):
             self.assertEqual(parse_rst(body, ""), "<p>second line</p>\n")
         self.assertEqual(stderr.getvalue(), "")
 
+    def test_parse_rst_view_case_sensitive(self):
+        source = ":view:`myapp.views.Index`"
+        rendered = (
+            '<p><a class="reference external" '
+            'href="/admindocs/views/myapp.views.Index/">myapp.views.Index</a></p>'
+        )
+        self.assertHTMLEqual(parse_rst(source, "view"), rendered)
+
+    def test_parse_rst_template_case_sensitive(self):
+        source = ":template:`Index.html`"
+        rendered = (
+            '<p><a class="reference external" href="/admindocs/templates/Index.html/">'
+            "Index.html</a></p>"
+        )
+        self.assertHTMLEqual(parse_rst(source, "template"), rendered)
+
     def test_publish_parts(self):
         """
         Django shouldn't break the default role for interpreted text

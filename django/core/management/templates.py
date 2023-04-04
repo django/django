@@ -84,7 +84,6 @@ class TemplateCommand(BaseCommand):
         )
 
     def handle(self, app_or_project, name, target=None, **options):
-        self.written_files = []
         self.app_or_project = app_or_project
         self.a_or_an = "an" if app_or_project == "app" else "a"
         self.paths_to_remove = []
@@ -159,7 +158,6 @@ class TemplateCommand(BaseCommand):
         prefix_length = len(template_dir) + 1
 
         for root, dirs, files in os.walk(template_dir):
-
             path_rest = root[prefix_length:]
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
@@ -183,7 +181,7 @@ class TemplateCommand(BaseCommand):
                 )
                 for old_suffix, new_suffix in self.rewrite_template_suffixes:
                     if new_path.endswith(old_suffix):
-                        new_path = new_path[: -len(old_suffix)] + new_suffix
+                        new_path = new_path.removesuffix(old_suffix) + new_suffix
                         break  # Only rewrite once
 
                 if os.path.exists(new_path):
@@ -209,7 +207,6 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.copyfile(old_path, new_path)
 
-                self.written_files.append(new_path)
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s" % new_path)
                 try:
@@ -232,7 +229,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters(self.written_files, **formatter_paths)
+        run_formatters([top_dir], **formatter_paths)
 
     def handle_template(self, template, subdir):
         """
@@ -243,8 +240,7 @@ class TemplateCommand(BaseCommand):
         if template is None:
             return os.path.join(django.__path__[0], "conf", subdir)
         else:
-            if template.startswith("file://"):
-                template = template[7:]
+            template = template.removeprefix("file://")
             expanded_template = os.path.expanduser(template)
             expanded_template = os.path.normpath(expanded_template)
             if os.path.isdir(expanded_template):

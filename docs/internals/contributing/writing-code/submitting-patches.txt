@@ -186,6 +186,7 @@ level:
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     def test_foo(self):
         ...
@@ -195,6 +196,7 @@ level:
     from django.test import ignore_warnings
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     @ignore_warnings(category=RemovedInDjangoXXWarning)
     class MyDeprecatedTests(unittest.TestCase):
         ...
@@ -203,10 +205,12 @@ You can also add a test for the deprecation warning::
 
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
+
     def test_foo_deprecation_warning(self):
-        msg = 'Expected deprecation message'
+        msg = "Expected deprecation message"
         with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
+            ...
 
 Finally, there are a couple of updates to Django's documentation to make:
 
@@ -290,9 +294,9 @@ All code changes
 
 * Does the :doc:`coding style
   </internals/contributing/writing-code/coding-style>` conform to our
-  guidelines? Are there any  ``black``, ``flake8``, or ``isort`` errors? You
-  can install the :ref:`pre-commit <coding-style-pre-commit>` hooks to
-  automatically catch these errors.
+  guidelines? Are there any  ``black``, ``blacken-docs``, ``flake8``, or
+  ``isort`` errors? You can install the :ref:`pre-commit
+  <coding-style-pre-commit>` hooks to automatically catch these errors.
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?

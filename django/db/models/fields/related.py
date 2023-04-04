@@ -344,7 +344,6 @@ class RelatedField(FieldCacheMixin, Field):
         return None
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
@@ -355,7 +354,7 @@ class RelatedField(FieldCacheMixin, Field):
             else:
                 related_name = self.opts.default_related_name
             if related_name:
-                related_name = related_name % {
+                related_name %= {
                     "class": cls.__name__.lower(),
                     "model_name": cls._meta.model_name.lower(),
                     "app_label": cls._meta.app_label.lower(),
@@ -541,7 +540,6 @@ class ForeignObject(RelatedField):
         swappable=True,
         **kwargs,
     ):
-
         if rel is None:
             rel = self.rel_class(
                 self,
@@ -870,7 +868,7 @@ class ForeignObject(RelatedField):
         return self.get_reverse_path_info()
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]
@@ -1073,22 +1071,6 @@ class ForeignKey(ForeignObject):
     def target_field(self):
         return self.foreign_related_fields[0]
 
-    def get_reverse_path_info(self, filtered_relation=None):
-        """Get path from the related model to this field's model."""
-        opts = self.model._meta
-        from_opts = self.remote_field.model._meta
-        return [
-            PathInfo(
-                from_opts=from_opts,
-                to_opts=opts,
-                target_fields=(opts.pk,),
-                join_field=self.remote_field,
-                m2m=not self.unique,
-                direct=False,
-                filtered_relation=filtered_relation,
-            )
-        ]
-
     def validate(self, value, model_instance):
         if self.remote_field.parent_link:
             return
@@ -1192,6 +1174,9 @@ class ForeignKey(ForeignObject):
 
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
+
+    def cast_db_type(self, connection):
+        return self.target_field.cast_db_type(connection=connection)
 
     def db_parameters(self, connection):
         target_db_parameters = self.target_field.db_parameters(connection)
@@ -1457,6 +1442,14 @@ class ManyToManyField(RelatedField):
                     id="fields.W345",
                 )
             )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
+                )
+            )
 
         return warnings
 
@@ -1637,7 +1630,6 @@ class ManyToManyField(RelatedField):
                     (source_field_name, source),
                     (target_field_name, target),
                 ):
-
                     possible_field_names = []
                     for f in through._meta.fields:
                         if (

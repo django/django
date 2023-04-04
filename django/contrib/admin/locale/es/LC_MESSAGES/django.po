@@ -16,16 +16,17 @@
 # Luigy, 2019
 # Marc Garcia <garcia.marc@gmail.com>, 2011
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
+# Miguel Gonzalez <migonzalvar@gmail.com>, 2023
 # Pablo, 2015
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Uriel Medina <urimeba511@gmail.com>, 2020-2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-10 03:53+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Miguel Gonzalez <migonzalvar@gmail.com>, 2023\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -272,12 +273,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s fué modificado con éxito."
 msgstr[1] "%(count)s %(name)s fueron modificados con éxito."
+msgstr[2] "%(count)s %(name)s fueron modificados con éxito."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s seleccionado"
 msgstr[1] "%(total_count)s seleccionados en total"
+msgstr[2] "%(total_count)s seleccionados en total"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -287,8 +290,9 @@ msgstr "seleccionados 0 de %(cnt)s"
 msgid "Change history: %s"
 msgstr "Histórico de modificaciones: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -385,16 +389,19 @@ msgid "Change password"
 msgstr "Cambiar contraseña"
 
 msgid "Please correct the error below."
-msgstr "Por favor corrija el siguiente error."
-
-msgid "Please correct the errors below."
-msgstr "Por favor, corrija los siguientes errores."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor, corrija el siguiente error."
+msgstr[1] "Por favor, corrija los siguientes errores."
+msgstr[2] "Por favor, corrija los siguientes errores."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Introduzca una nueva contraseña para el usuario <strong>%(username)s</"
 "strong>."
+
+msgid "Skip to main content"
+msgstr "Saltar al contenido principal"
 
 msgid "Welcome,"
 msgstr "Bienvenidos,"
@@ -407,6 +414,9 @@ msgstr "Documentación"
 
 msgid "Log out"
 msgstr "Cerrar sesión"
+
+msgid "Breadcrumbs"
+msgstr "Migas de pan"
 
 #, python-format
 msgid "Add %(name)s"
@@ -434,6 +444,15 @@ msgstr "Prioridad de la ordenación: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Activar la ordenación"
 
+msgid "Toggle theme (current theme: auto)"
+msgstr "Cambiar tema (tema actual: automático)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Cambiar tema (tema actual: claro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Cambiar tema (tema actual: oscuro)"
+
 msgid "Delete"
 msgstr "Eliminar"
 
@@ -460,8 +479,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"¿Está seguro de que quiere borrar los %(object_name)s \"%(escaped_object)s"
-"\"? Se borrarán los siguientes objetos relacionados:"
+"¿Está seguro de que quiere borrar los %(object_name)s "
+"\"%(escaped_object)s\"? Se borrarán los siguientes objetos relacionados:"
 
 msgid "Objects"
 msgstr "Objetos"
@@ -546,6 +565,9 @@ msgstr "¿Ha olvidado la contraseña o el nombre de usuario?"
 msgid "Toggle navigation"
 msgstr "Activar navegación"
 
+msgid "Sidebar"
+msgstr "Barra lateral"
+
 msgid "Start typing to filter…"
 msgstr "Empiece a escribir para filtrar…"
 
@@ -560,6 +582,12 @@ msgstr "Usuario"
 
 msgid "Action"
 msgstr "Acción"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entradas"
+msgstr[2] "entradas"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -585,6 +613,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -616,6 +645,10 @@ msgstr "Añadir otro %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Eliminar %(model)s seleccionada/o"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Ver seleccionado %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Gracias por pasar un buen rato con el sitio web hoy."

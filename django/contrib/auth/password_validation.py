@@ -17,7 +17,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_default_password_validators():
     return get_password_validators(settings.AUTH_PASSWORD_VALIDATORS)
 
@@ -221,7 +221,7 @@ class CommonPasswordValidator:
     The password is rejected if it occurs in a provided list of passwords,
     which may be gzipped. The list Django ships with contains 20000 common
     passwords (lowercased and deduplicated), created by Royce Williams:
-    https://gist.github.com/roycewilliams/281ce539915a947a23db17137d91aeb7
+    https://gist.github.com/roycewilliams/226886fd01572964e1431ac8afc999ce
     The password list must be lowercased to match the comparison in validate().
     """
 

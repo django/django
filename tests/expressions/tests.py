@@ -48,6 +48,7 @@ from django.db.models.expressions import (
     Col,
     Combinable,
     CombinedExpression,
+    NegatedExpression,
     RawSQL,
     Ref,
 )
@@ -69,7 +70,6 @@ from django.test.utils import (
     isolate_apps,
     register_lookup,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import SimpleLazyObject
 
 from .models import (
@@ -248,7 +248,7 @@ class BasicExpressionsTests(TestCase):
     def test_update_with_fk(self):
         # ForeignKey can become updated with the value of another ForeignKey.
         self.assertEqual(Company.objects.update(point_of_contact=F("ceo")), 3)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Company.objects.all(),
             ["Joe Smith", "Frank Meyer", "Max Mustermann"],
             lambda c: str(c.point_of_contact),
@@ -259,7 +259,7 @@ class BasicExpressionsTests(TestCase):
         Number.objects.create(integer=1, float=1.0)
         Number.objects.create(integer=2)
         Number.objects.filter(float__isnull=False).update(float=Value(None))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(), [None, None], lambda n: n.float, ordered=False
         )
 
@@ -272,7 +272,7 @@ class BasicExpressionsTests(TestCase):
         )
         c.save()
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Company.objects.filter(ceo__firstname=F("point_of_contact__firstname")),
             ["Foobar Ltd.", "Test GmbH"],
             lambda c: c.name,
@@ -775,6 +775,24 @@ class BasicExpressionsTests(TestCase):
         # contain nested aggregates.
         self.assertNotIn("GROUP BY", sql)
 
+    def test_object_create_with_f_expression_in_subquery(self):
+        Company.objects.create(
+            name="Big company", num_employees=100000, num_chairs=1, ceo=self.max
+        )
+        biggest_company = Company.objects.create(
+            name="Biggest company",
+            num_chairs=1,
+            ceo=self.max,
+            num_employees=Subquery(
+                Company.objects.order_by("-num_employees")
+                .annotate(max_num_employees=Max("num_employees"))
+                .annotate(new_num_employees=F("max_num_employees") + 1)
+                .values("new_num_employees")[:1]
+            ),
+        )
+        biggest_company.refresh_from_db()
+        self.assertEqual(biggest_company.num_employees, 100001)
+
     @skipUnlessDBFeature("supports_over_clause")
     def test_aggregate_rawsql_annotation(self):
         with self.assertNumQueries(1) as ctx:
@@ -1027,7 +1045,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         queryset = SimulationRun.objects.exclude(
             midpoint__range=[F("start__time"), F("end__time")]
         )
-        self.assertQuerysetEqual(queryset, [], ordered=False)
+        self.assertQuerySetEqual(queryset, [], ordered=False)
         for alias in queryset.query.alias_map.values():
             if isinstance(alias, Join):
                 self.assertEqual(alias.join_type, constants.LOUTER)
@@ -1079,7 +1097,7 @@ class IterableLookupInnerExpressionsTests(TestCase):
         the test simple.
         """
         queryset = Company.objects.filter(name__in=[F("num_chairs") + "1)) OR ((1==1"])
-        self.assertQuerysetEqual(queryset, [], ordered=False)
+        self.assertQuerySetEqual(queryset, [], ordered=False)
 
     def test_in_lookup_allows_F_expressions_and_expressions_for_datetimes(self):
         start = datetime.datetime(2016, 2, 3, 15, 0, 0)
@@ -1285,7 +1303,7 @@ class ExpressionsNumericTests(TestCase):
         We can fill a value in all objects with an other value of the
         same object.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(),
             [(-1, -1), (42, 42), (1337, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -1299,7 +1317,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(
             Number.objects.filter(integer__gt=0).update(integer=F("integer") + 1), 2
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.all(),
             [(-1, -1), (43, 42), (1338, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -1314,7 +1332,7 @@ class ExpressionsNumericTests(TestCase):
         self.assertEqual(
             Number.objects.filter(integer__gt=0).update(integer=F("integer") + 1), 2
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Number.objects.exclude(float=F("integer")),
             [(43, 42), (1338, 1337)],
             lambda n: (n.integer, round(n.float)),
@@ -2025,7 +2043,7 @@ class FTimeDeltaTests(TestCase):
             )
             .order_by("name")
         )
-        self.assertQuerysetEqual(over_estimate, ["e3", "e4", "e5"], lambda e: e.name)
+        self.assertQuerySetEqual(over_estimate, ["e3", "e4", "e5"], lambda e: e.name)
 
     def test_duration_with_datetime_microseconds(self):
         delta = datetime.timedelta(microseconds=8999999999999999)
@@ -2042,7 +2060,7 @@ class FTimeDeltaTests(TestCase):
         more_than_4_days = Experiment.objects.filter(
             assigned__lt=F("completed") - Value(datetime.timedelta(days=4))
         )
-        self.assertQuerysetEqual(more_than_4_days, ["e3", "e4", "e5"], lambda e: e.name)
+        self.assertQuerySetEqual(more_than_4_days, ["e3", "e4", "e5"], lambda e: e.name)
 
     def test_negative_timedelta_update(self):
         # subtract 30 seconds, 30 minutes, 2 hours and 2 days
@@ -2416,7 +2434,13 @@ class CombinedExpressionTests(SimpleTestCase):
             (IntegerField, FloatField, FloatField),
             (FloatField, IntegerField, FloatField),
         ]
-        connectors = [Combinable.ADD, Combinable.SUB, Combinable.MUL, Combinable.DIV]
+        connectors = [
+            Combinable.ADD,
+            Combinable.SUB,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+        ]
         for lhs, rhs, combined in tests:
             for connector in connectors:
                 with self.subTest(
@@ -2519,15 +2543,70 @@ class CombinedExpressionTests(SimpleTestCase):
 class ExpressionWrapperTests(SimpleTestCase):
     def test_empty_group_by(self):
         expr = ExpressionWrapper(Value(3), output_field=IntegerField())
-        self.assertEqual(expr.get_group_by_cols(alias=None), [])
+        self.assertEqual(expr.get_group_by_cols(), [])
 
     def test_non_empty_group_by(self):
         value = Value("f")
         value.output_field = None
         expr = ExpressionWrapper(Lower(value), output_field=IntegerField())
-        group_by_cols = expr.get_group_by_cols(alias=None)
+        group_by_cols = expr.get_group_by_cols()
         self.assertEqual(group_by_cols, [expr.expression])
         self.assertEqual(group_by_cols[0].output_field, expr.output_field)
+
+
+class NegatedExpressionTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        ceo = Employee.objects.create(firstname="Joe", lastname="Smith", salary=10)
+        cls.eu_company = Company.objects.create(
+            name="Example Inc.",
+            num_employees=2300,
+            num_chairs=5,
+            ceo=ceo,
+            based_in_eu=True,
+        )
+        cls.non_eu_company = Company.objects.create(
+            name="Foobar Ltd.",
+            num_employees=3,
+            num_chairs=4,
+            ceo=ceo,
+            based_in_eu=False,
+        )
+
+    def test_invert(self):
+        f = F("field")
+        self.assertEqual(~f, NegatedExpression(f))
+        self.assertIsNot(~~f, f)
+        self.assertEqual(~~f, f)
+
+    def test_filter(self):
+        self.assertSequenceEqual(
+            Company.objects.filter(~F("based_in_eu")),
+            [self.non_eu_company],
+        )
+
+        qs = Company.objects.annotate(eu_required=~Value(False))
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=F("eu_required")).order_by("eu_required"),
+            [self.eu_company],
+        )
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=~~F("eu_required")),
+            [self.eu_company],
+        )
+        self.assertSequenceEqual(
+            qs.filter(based_in_eu=~F("eu_required")),
+            [self.non_eu_company],
+        )
+        self.assertSequenceEqual(qs.filter(based_in_eu=~F("based_in_eu")), [])
+
+    def test_values(self):
+        self.assertSequenceEqual(
+            Company.objects.annotate(negated=~F("based_in_eu"))
+            .values_list("name", "negated")
+            .order_by("name"),
+            [("Example Inc.", False), ("Foobar Ltd.", True)],
+        )
 
 
 class OrderByTests(SimpleTestCase):
@@ -2552,18 +2631,12 @@ class OrderByTests(SimpleTestCase):
         )
 
     def test_nulls_false(self):
-        # These tests will catch ValueError in Django 5.0 when passing False to
-        # nulls_first and nulls_last becomes forbidden.
-        # msg = "nulls_first and nulls_last values must be True or None."
-        msg = (
-            "Passing nulls_first=False or nulls_last=False is deprecated, use None "
-            "instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        msg = "nulls_first and nulls_last values must be True or None."
+        with self.assertRaisesMessage(ValueError, msg):
             OrderBy(F("field"), nulls_first=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             OrderBy(F("field"), nulls_last=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             F("field").asc(nulls_first=False)
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
+        with self.assertRaisesMessage(ValueError, msg):
             F("field").desc(nulls_last=False)

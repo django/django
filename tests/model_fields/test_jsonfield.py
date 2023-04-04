@@ -19,6 +19,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     IntegerField,
+    JSONField,
     OuterRef,
     Q,
     Subquery,
@@ -36,6 +37,7 @@ from django.db.models.fields.json import (
 from django.db.models.functions import Cast
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import CustomJSONDecoder, JSONModel, NullableJSONModel, RelatedJSONModel
 
@@ -191,15 +193,40 @@ class TestSaveLoad(TestCase):
         obj.refresh_from_db()
         self.assertIsNone(obj.value)
 
+    def test_ambiguous_str_value_deprecation(self):
+        msg = (
+            "Providing an encoded JSON string via Value() is deprecated. Use Value([], "
+            "output_field=JSONField()) instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
+            obj = NullableJSONModel.objects.create(value=Value("[]"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, [])
+
+    @skipUnlessDBFeature("supports_primitives_in_json_field")
+    def test_value_str_primitives_deprecation(self):
+        msg = (
+            "Providing an encoded JSON string via Value() is deprecated. Use "
+            "Value(None, output_field=JSONField()) instead."
+        )
+        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
+            obj = NullableJSONModel.objects.create(value=Value("null"))
+        obj.refresh_from_db()
+        self.assertIsNone(obj.value)
+        obj = NullableJSONModel.objects.create(value=Value("invalid-json"))
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, "invalid-json")
+
     @skipUnlessDBFeature("supports_primitives_in_json_field")
     def test_json_null_different_from_sql_null(self):
-        json_null = NullableJSONModel.objects.create(value=Value("null"))
+        json_null = NullableJSONModel.objects.create(value=Value(None, JSONField()))
+        NullableJSONModel.objects.update(value=Value(None, JSONField()))
         json_null.refresh_from_db()
         sql_null = NullableJSONModel.objects.create(value=None)
         sql_null.refresh_from_db()
         # 'null' is not equal to NULL in the database.
         self.assertSequenceEqual(
-            NullableJSONModel.objects.filter(value=Value("null")),
+            NullableJSONModel.objects.filter(value=Value(None, JSONField())),
             [json_null],
         )
         self.assertSequenceEqual(
@@ -373,7 +400,7 @@ class TestQuerying(TestCase):
             self.assertSequenceEqual(qs, [self.objs[4]])
         none_val = "" if connection.features.interprets_empty_strings_as_nulls else None
         qs = NullableJSONModel.objects.filter(value__isnull=False)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(value__isnull=False)
             .annotate(key=KT("value__d__1__f"))
             .values("key")
@@ -392,7 +419,7 @@ class TestQuerying(TestCase):
             .annotate(count=Count("value__d__0"))
             .order_by("count")
         )
-        self.assertQuerysetEqual(qs, [0, 1], operator.itemgetter("count"))
+        self.assertQuerySetEqual(qs, [0, 1], operator.itemgetter("count"))
 
     def test_order_grouping_custom_decoder(self):
         NullableJSONModel.objects.create(value_custom={"a": "b"})
@@ -980,7 +1007,7 @@ class TestQuerying(TestCase):
                 False,
             )
         self.assertIn(
-            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"' """,
+            """."value" -> 'test'' = ''"a"'') OR 1 = 1 OR (''d') = '"x"'""",
             queries[0]["sql"],
         )
 

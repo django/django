@@ -5,13 +5,15 @@
 # tadasu <elsee9@me.com>, 2020
 # Goto Hayato <habita.gh@gmail.com>, 2021
 # Goto Hayato <habita.gh@gmail.com>, 2019
+# Hiroki Sawano, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kamiyama Satoshi, 2021
 # Kentaro Matsuzaki <kentaro0919@gmail.com>, 2015
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021
+# Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023
+# Taichi Taniguchi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 # Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
@@ -19,9 +21,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2021-12-25 06:49+0000\n"
-"Last-Translator: Kamiyama Satoshi\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2019,2021,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -62,6 +64,9 @@ msgstr "ボスニア語"
 
 msgid "Catalan"
 msgstr "カタロニア語"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "中央クルド語 (ソラニー語)"
 
 msgid "Czech"
 msgstr "チェコ語"
@@ -401,6 +406,7 @@ msgstr "この値は %(limit_value)s 以上でなければなりません。"
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
+"この値がステップサイズ %(limit_value)s の倍数であることを確認してください。"
 
 #, python-format
 msgid ""
@@ -464,7 +470,7 @@ msgstr "この %(field_labels)s を持った %(model_name)s が既に存在し�
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "制約 “%(name)s” に違反しています。"
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -507,6 +513,9 @@ msgstr "ブール値 (真: True または偽: False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "文字列 ( %(max_length)s 字まで )"
+
+msgid "String (unlimited)"
+msgstr "文字列 (無制限)"
 
 msgid "Comma-separated integers"
 msgstr "カンマ区切りの整数"
@@ -776,12 +785,12 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] ""
+msgstr[0] "最大で %(num)d 個のフォームを送信してください。"
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] ""
+msgstr[0] "少なくとも %(num)d 個のフォームを送信してください。"
 
 msgid "Order"
 msgstr "並び変え"
@@ -1177,8 +1186,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "もし <meta name=\"referrer\" content=\"no-referrer\"> タグを使用しているか "
 "“Referrer-Policy: no-referrer” ヘッダを含んでいる場合は削除してください。"
@@ -1276,13 +1285,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "このページは、設定ファイルで<a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a>が指定され、何もURLが設定されていない時に表示されます。"
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a>が指定され、何もURLが設定されていない時に表示"
+"されます。"
 
 msgid "Django Documentation"
 msgstr "Django ドキュメント"

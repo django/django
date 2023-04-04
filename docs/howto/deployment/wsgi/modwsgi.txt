@@ -85,7 +85,9 @@ should put in this file, and what else you can add to it.
 
     If you get a ``UnicodeEncodeError`` when uploading or writing files with
     file names or content that contains non-ASCII characters, make sure Apache
-    is configured to support UTF-8 encoding::
+    is configured to support UTF-8 encoding:
+
+    .. code-block:: shell
 
         export LANG='en_US.UTF-8'
         export LC_ALL='en_US.UTF-8'
@@ -94,7 +96,9 @@ should put in this file, and what else you can add to it.
 
     Alternatively, if you are :ref:`using mod_wsgi daemon mode<daemon-mode>`
     you can add ``lang`` and ``locale`` options to the ``WSGIDaemonProcess``
-    directive::
+    directive:
+
+    .. code-block:: text
 
         WSGIDaemonProcess example.com lang='en_US.UTF-8' locale='en_US.UTF-8'
 

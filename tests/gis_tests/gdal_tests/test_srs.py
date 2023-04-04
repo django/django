@@ -19,8 +19,6 @@ class TestSRS:
             setattr(self, key, value)
 
 
-WGS84_proj = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs "
-
 # Some Spatial Reference examples
 srlist = (
     TestSRS(
@@ -37,7 +35,11 @@ srlist = (
         ang_name="degree",
         lin_units=1.0,
         ang_units=0.0174532925199,
-        auth={"GEOGCS": ("EPSG", "4326"), "spheroid": ("EPSG", "7030")},
+        auth={
+            None: ("EPSG", "4326"),  # Top-level authority.
+            "GEOGCS": ("EPSG", "4326"),
+            "spheroid": ("EPSG", "7030"),
+        },
         attr=(
             ("DATUM", "WGS_1984"),
             (("SPHEROID", 1), "6378137"),
@@ -66,6 +68,7 @@ srlist = (
         lin_units=1.0,
         ang_units=0.0174532925199,
         auth={
+            None: ("EPSG", "32140"),  # Top-level authority.
             "PROJCS": ("EPSG", "32140"),
             "spheroid": ("EPSG", "7019"),
             "unit": ("EPSG", "9001"),
@@ -99,7 +102,10 @@ srlist = (
         ang_name="Degree",
         lin_units=0.3048006096012192,
         ang_units=0.0174532925199,
-        auth={"PROJCS": (None, None)},
+        auth={
+            None: (None, None),  # Top-level authority.
+            "PROJCS": (None, None),
+        },
         attr=(
             ("PROJCS|GeOgCs|spheroid", "GRS 1980"),
             (("projcs", 9), "UNIT"),
@@ -245,7 +251,7 @@ class SpatialRefTest(SimpleTestCase):
             "+no_defs",
         ]
         srs1 = SpatialReference(srlist[0].wkt)
-        srs2 = SpatialReference(WGS84_proj)
+        srs2 = SpatialReference("+proj=longlat +datum=WGS84 +no_defs")
         self.assertTrue(all(part in proj_parts for part in srs1.proj.split()))
         self.assertTrue(all(part in proj_parts for part in srs2.proj.split()))
 
@@ -388,3 +394,10 @@ class SpatialRefTest(SimpleTestCase):
         self.assertIn('DATUM["D_North_American_1983"', srs.wkt)
         srs.from_esri()
         self.assertIn('DATUM["North_American_Datum_1983"', srs.wkt)
+
+    def test_srid(self):
+        """The srid property returns top-level authority code."""
+        for s in srlist:
+            if hasattr(s, "epsg"):
+                srs = SpatialReference(s.wkt)
+                self.assertEqual(srs.srid, s.epsg)

@@ -207,7 +207,11 @@ Requires core.js and SelectBox.js.
             const selector = document.getElementById(field_id + '_selector_chosen');
             const warning = document.getElementById(field_id + '_list-footer-display-text');
             selector.className = selector.className.replace('selector-chosen--with-filtered', '');
-            warning.textContent = interpolate(gettext('%s selected options not visible'), [count]);
+            warning.textContent = interpolate(ngettext(
+                '%s selected option not visible',
+                '%s selected options not visible',
+                count
+            ), [count]);
             if(count > 0) {
                 selector.className += ' selector-chosen--with-filtered';
             }

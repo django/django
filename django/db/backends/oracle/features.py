@@ -8,6 +8,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
     # BLOB" when grouping by LOBs (#24096).
     allows_group_by_lob = False
+    allows_group_by_select_index = False
     interprets_empty_strings_as_nulls = True
     has_select_for_update = True
     has_select_for_update_nowait = True
@@ -24,6 +25,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partially_nullable_unique_constraints = False
     supports_deferrable_unique_constraints = True
     truncates_names = True
+    supports_comments = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_materialized_views = True
@@ -69,6 +71,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes = False
     can_rename_index = True
     supports_slicing_ordering_in_compound = True
+    requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
     supports_comparing_boolean_expr = False

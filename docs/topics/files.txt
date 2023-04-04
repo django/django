@@ -29,14 +29,17 @@ store a photo::
 
     from django.db import models
 
+
     class Car(models.Model):
         name = models.CharField(max_length=255)
         price = models.DecimalField(max_digits=5, decimal_places=2)
-        photo = models.ImageField(upload_to='cars')
-        specs = models.FileField(upload_to='specs')
+        photo = models.ImageField(upload_to="cars")
+        specs = models.FileField(upload_to="specs")
 
 Any ``Car`` instance will have a ``photo`` attribute that you can use to get at
-the details of the attached photo::
+the details of the attached photo:
+
+.. code-block:: pycon
 
     >>> car = Car.objects.get(name="57 Chevy")
     >>> car.photo
@@ -59,12 +62,14 @@ it has all the methods and attributes described below.
 For example, you can change the file name by setting the file's
 :attr:`~django.core.files.File.name` to a path relative to the file storage's
 location (:setting:`MEDIA_ROOT` if you are using the default
-:class:`~django.core.files.storage.FileSystemStorage`)::
+:class:`~django.core.files.storage.FileSystemStorage`):
+
+.. code-block:: pycon
 
     >>> import os
     >>> from django.conf import settings
     >>> initial_path = car.photo.path
-    >>> car.photo.name = 'cars/chevy_ii.jpg'
+    >>> car.photo.name = "cars/chevy_ii.jpg"
     >>> new_path = settings.MEDIA_ROOT + car.photo.name
     >>> # Move the file on the filesystem
     >>> os.rename(initial_path, new_path)
@@ -74,25 +79,30 @@ location (:setting:`MEDIA_ROOT` if you are using the default
     >>> car.photo.path == new_path
     True
 
-To save an existing file on disk to a :class:`~django.db.models.FileField`::
+To save an existing file on disk to a :class:`~django.db.models.FileField`:
+
+.. code-block:: pycon
 
     >>> from pathlib import Path
     >>> from django.core.files import File
-    >>> path = Path('/some/external/specs.pdf')
-    >>> car = Car.objects.get(name='57 Chevy')
-    >>> with path.open(mode='rb') as f:
+    >>> path = Path("/some/external/specs.pdf")
+    >>> car = Car.objects.get(name="57 Chevy")
+    >>> with path.open(mode="rb") as f:
     ...     car.specs = File(f, name=path.name)
     ...     car.save()
+    ...
 
 .. note::
 
     While :class:`~django.db.models.ImageField` non-image data attributes, such
     as ``height``, ``width``, and ``size`` are available on the instance, the
     underlying image data cannot be used without reopening the image. For
-    example::
+    example:
+
+    .. code-block:: pycon
 
         >>> from PIL import Image
-        >>> car = Car.objects.get(name='57 Chevy')
+        >>> car = Car.objects.get(name="57 Chevy")
         >>> car.photo.width
         191
         >>> car.photo.height
@@ -115,26 +125,30 @@ Most of the time you'll use a ``File`` that Django's given you (i.e. a file
 attached to a model as above, or perhaps an uploaded file).
 
 If you need to construct a ``File`` yourself, the easiest way is to create one
-using a Python built-in ``file`` object::
+using a Python built-in ``file`` object:
+
+.. code-block:: pycon
 
     >>> from django.core.files import File
 
     # Create a Python file object using open()
-    >>> f = open('/path/to/hello.world', 'w')
+    >>> f = open("/path/to/hello.world", "w")
     >>> myfile = File(f)
 
 Now you can use any of the documented attributes and methods
 of the :class:`~django.core.files.File` class.
 
 Be aware that files created in this way are not automatically closed.
-The following approach may be used to close files automatically::
+The following approach may be used to close files automatically:
+
+.. code-block:: pycon
 
     >>> from django.core.files import File
 
     # Create a Python file object using open() and the with statement
-    >>> with open('/path/to/hello.world', 'w') as f:
+    >>> with open("/path/to/hello.world", "w") as f:
     ...     myfile = File(f)
-    ...     myfile.write('Hello World')
+    ...     myfile.write("Hello World")
     ...
     >>> myfile.closed
     True
@@ -144,7 +158,9 @@ The following approach may be used to close files automatically::
 Closing files is especially important when accessing file fields in a loop
 over a large number of objects. If files are not manually closed after
 accessing them, the risk of running out of file descriptors may arise. This
-may lead to the following error::
+may lead to the following error:
+
+.. code-block:: pytb
 
     OSError: [Errno 24] Too many open files
 
@@ -156,9 +172,10 @@ Behind the scenes, Django delegates decisions about how and where to store files
 to a file storage system. This is the object that actually understands things
 like file systems, opening and reading files, etc.
 
-Django's default file storage is given by the :setting:`DEFAULT_FILE_STORAGE`
-setting; if you don't explicitly provide a storage system, this is the one that
-will be used.
+Django's default file storage is
+``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``. If you don't
+explicitly provide a storage system in the ``default`` key of the
+:setting:`STORAGES` setting, this is the one that will be used.
 
 See below for details of the built-in default file storage system, and see
 :doc:`/howto/custom-file-storage` for information on writing your own file
@@ -170,12 +187,14 @@ Storage objects
 Though most of the time you'll want to use a ``File`` object (which delegates to
 the proper storage for that file), you can use file storage systems directly.
 You can create an instance of some custom file storage class, or -- often more
-useful -- you can use the global default storage system::
+useful -- you can use the global default storage system:
+
+.. code-block:: pycon
 
     >>> from django.core.files.base import ContentFile
     >>> from django.core.files.storage import default_storage
 
-    >>> path = default_storage.save('path/to/file', ContentFile(b'new content'))
+    >>> path = default_storage.save("path/to/file", ContentFile(b"new content"))
     >>> path
     'path/to/file'
 
@@ -204,7 +223,8 @@ For example, the following code will store uploaded files under
     from django.core.files.storage import FileSystemStorage
     from django.db import models
 
-    fs = FileSystemStorage(location='/media/photos')
+    fs = FileSystemStorage(location="/media/photos")
+
 
     class Car(models.Model):
         ...
@@ -239,3 +259,16 @@ For example::
 
     class MyModel(models.Model):
         my_file = models.FileField(storage=select_storage)
+
+In order to set a storage defined in the :setting:`STORAGES` setting you can
+use a lambda function::
+
+    from django.core.files.storage import storages
+
+
+    class MyModel(models.Model):
+        upload = models.FileField(storage=lambda: storages["custom_storage"])
+
+.. versionchanged:: 4.2
+
+    Support for ``storages`` was added.

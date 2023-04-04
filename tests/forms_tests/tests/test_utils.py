@@ -2,7 +2,14 @@ import copy
 import json
 
 from django.core.exceptions import ValidationError
-from django.forms.utils import ErrorDict, ErrorList, flatatt
+from django.forms.utils import (
+    ErrorDict,
+    ErrorList,
+    RenderableFieldMixin,
+    RenderableMixin,
+    flatatt,
+    pretty_name,
+)
 from django.test import SimpleTestCase
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy
@@ -245,3 +252,26 @@ class FormsUtilsTestCase(SimpleTestCase):
                 ],
             },
         )
+
+    def test_get_context_must_be_implemented(self):
+        mixin = RenderableMixin()
+        msg = "Subclasses of RenderableMixin must provide a get_context() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            mixin.get_context()
+
+    def test_field_mixin_as_hidden_must_be_implemented(self):
+        mixin = RenderableFieldMixin()
+        msg = "Subclasses of RenderableFieldMixin must provide an as_hidden() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            mixin.as_hidden()
+
+    def test_field_mixin_as_widget_must_be_implemented(self):
+        mixin = RenderableFieldMixin()
+        msg = "Subclasses of RenderableFieldMixin must provide an as_widget() method."
+        with self.assertRaisesMessage(NotImplementedError, msg):
+            mixin.as_widget()
+
+    def test_pretty_name(self):
+        self.assertEqual(pretty_name("john_doe"), "John doe")
+        self.assertEqual(pretty_name(None), "")
+        self.assertEqual(pretty_name(""), "")

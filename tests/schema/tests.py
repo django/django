@@ -13,6 +13,7 @@ from django.db import (
     OperationalError,
     connection,
 )
+from django.db.backends.utils import truncate_name
 from django.db.models import (
     CASCADE,
     PROTECT,
@@ -272,6 +273,27 @@ class SchemaTests(TransactionTestCase):
                 for f in connection.introspection.get_table_description(cursor, table)
                 if f.name == column
             )
+
+    def get_column_comment(self, table, column):
+        with connection.cursor() as cursor:
+            return next(
+                f.comment
+                for f in connection.introspection.get_table_description(cursor, table)
+                if f.name == column
+            )
+
+    def get_table_comment(self, table):
+        with connection.cursor() as cursor:
+            return next(
+                t.comment
+                for t in connection.introspection.get_table_list(cursor)
+                if t.name == table
+            )
+
+    def assert_column_comment_not_exists(self, table, column):
+        with connection.cursor() as cursor:
+            columns = connection.introspection.get_table_description(cursor, table)
+        self.assertFalse(any([c.name == column and c.comment for c in columns]))
 
     def assertIndexOrder(self, table, index, order):
         constraints = self.get_constraints(table)
@@ -706,7 +728,6 @@ class SchemaTests(TransactionTestCase):
         """
 
         class TestTransformField(IntegerField):
-
             # Weird field that saves the count of items in its value
             def get_default(self):
                 return self.default
@@ -1873,6 +1894,57 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(SmallIntegerPK, old_field, new_field, strict=True)
 
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    def test_alter_serial_auto_field_to_bigautofield(self):
+        class SerialAutoField(Model):
+            id = SmallAutoField(primary_key=True)
+
+            class Meta:
+                app_label = "schema"
+
+        table = SerialAutoField._meta.db_table
+        column = SerialAutoField._meta.get_field("id").column
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f'CREATE TABLE "{table}" '
+                f'("{column}" smallserial NOT NULL PRIMARY KEY)'
+            )
+        try:
+            old_field = SerialAutoField._meta.get_field("id")
+            new_field = BigAutoField(primary_key=True)
+            new_field.model = SerialAutoField
+            new_field.set_attributes_from_name("id")
+            with connection.schema_editor() as editor:
+                editor.alter_field(SerialAutoField, old_field, new_field, strict=True)
+            sequence_name = f"{table}_{column}_seq"
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT data_type FROM pg_sequences WHERE sequencename = %s",
+                    [sequence_name],
+                )
+                row = cursor.fetchone()
+                sequence_data_type = row[0] if row and row[0] else None
+                self.assertEqual(sequence_data_type, "bigint")
+            # Rename the column.
+            old_field = new_field
+            new_field = AutoField(primary_key=True)
+            new_field.model = SerialAutoField
+            new_field.set_attributes_from_name("renamed_id")
+            with connection.schema_editor() as editor:
+                editor.alter_field(SerialAutoField, old_field, new_field, strict=True)
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT data_type FROM pg_sequences WHERE sequencename = %s",
+                    [sequence_name],
+                )
+                row = cursor.fetchone()
+                sequence_data_type = row[0] if row and row[0] else None
+                self.assertEqual(sequence_data_type, "integer")
+        finally:
+            with connection.cursor() as cursor:
+                cursor.execute(f'DROP TABLE "{table}"')
+
     def test_alter_int_pk_to_int_unique(self):
         """
         Should be able to rename an IntegerField(primary_key=True) to
@@ -2000,6 +2072,39 @@ class SchemaTests(TransactionTestCase):
         self.assertNotIn("info", columns)
         with self.assertRaises(IntegrityError):
             NoteRename.objects.create(detail_info=None)
+
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
+    @isolate_apps("schema")
+    def test_rename_field_with_check_to_truncated_name(self):
+        class AuthorWithLongColumn(Model):
+            field_with_very_looooooong_name = PositiveIntegerField(null=True)
+
+            class Meta:
+                app_label = "schema"
+
+        self.isolated_local_models = [AuthorWithLongColumn]
+        with connection.schema_editor() as editor:
+            editor.create_model(AuthorWithLongColumn)
+        old_field = AuthorWithLongColumn._meta.get_field(
+            "field_with_very_looooooong_name"
+        )
+        new_field = PositiveIntegerField(null=True)
+        new_field.set_attributes_from_name("renamed_field_with_very_long_name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(AuthorWithLongColumn, old_field, new_field, strict=True)
+
+        new_field_name = truncate_name(
+            new_field.column, connection.ops.max_name_length()
+        )
+        constraints = self.get_constraints(AuthorWithLongColumn._meta.db_table)
+        check_constraints = [
+            name
+            for name, details in constraints.items()
+            if details["columns"] == [new_field_name] and details["check"]
+        ]
+        self.assertEqual(len(check_constraints), 1)
 
     def _test_m2m_create(self, M2MFieldClass):
         """
@@ -2149,8 +2254,25 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(DatabaseError):
             self.column_classes(new_field.remote_field.through)
         # Add the field
-        with connection.schema_editor() as editor:
+        with CaptureQueriesContext(
+            connection
+        ) as ctx, connection.schema_editor() as editor:
             editor.add_field(LocalAuthorWithM2M, new_field)
+        # Table is not rebuilt.
+        self.assertEqual(
+            len(
+                [
+                    query["sql"]
+                    for query in ctx.captured_queries
+                    if "CREATE TABLE" in query["sql"]
+                ]
+            ),
+            1,
+        )
+        self.assertIs(
+            any("DROP TABLE" in query["sql"] for query in ctx.captured_queries),
+            False,
+        )
         # Ensure there is now an m2m table there
         columns = self.column_classes(new_field.remote_field.through)
         self.assertEqual(
@@ -2586,6 +2708,37 @@ class SchemaTests(TransactionTestCase):
         Tag.objects.create(title="foo", slug="foo")
         with self.assertRaises(IntegrityError):
             Tag.objects.create(title="bar", slug="foo")
+
+    def test_remove_ignored_unique_constraint_not_create_fk_index(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+        constraint = UniqueConstraint(
+            "author",
+            condition=Q(title__in=["tHGttG", "tRatEotU"]),
+            name="book_author_condition_uniq",
+        )
+        # Add unique constraint.
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Book, constraint)
+        old_constraints = self.get_constraints_for_column(
+            Book,
+            Book._meta.get_field("author").column,
+        )
+        # Remove unique constraint.
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Book, constraint)
+        new_constraints = self.get_constraints_for_column(
+            Book,
+            Book._meta.get_field("author").column,
+        )
+        # Redundant foreign key index is not added.
+        self.assertEqual(
+            len(old_constraints) - 1
+            if connection.features.supports_partial_indexes
+            else len(old_constraints),
+            len(new_constraints),
+        )
 
     @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
     def test_remove_field_unique_does_not_remove_meta_constraints(self):
@@ -4322,6 +4475,186 @@ class SchemaTests(TransactionTestCase):
             ],
         )
 
+    @skipUnlessDBFeature("supports_comments")
+    def test_add_db_comment_charfield(self):
+        comment = "Custom comment"
+        field = CharField(max_length=255, db_comment=comment)
+        field.set_attributes_from_name("name_with_comment")
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.add_field(Author, field)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name_with_comment"),
+            comment,
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_add_db_comment_and_default_charfield(self):
+        comment = "Custom comment with default"
+        field = CharField(max_length=255, default="Joe Doe", db_comment=comment)
+        field.set_attributes_from_name("name_with_comment_default")
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            Author.objects.create(name="Before adding a new field")
+            editor.add_field(Author, field)
+
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name_with_comment_default"),
+            comment,
+        )
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"SELECT name_with_comment_default FROM {Author._meta.db_table};"
+            )
+            for row in cursor.fetchall():
+                self.assertEqual(row[0], "Joe Doe")
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_alter_db_comment(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        # Add comment.
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment="Custom comment")
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            "Custom comment",
+        )
+        # Alter comment.
+        old_field = new_field
+        new_field = CharField(max_length=255, db_comment="New custom comment")
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            "New custom comment",
+        )
+        # Remove comment.
+        old_field = new_field
+        new_field = CharField(max_length=255)
+        new_field.set_attributes_from_name("name")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertIn(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            [None, ""],
+        )
+
+    @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
+    def test_alter_db_comment_foreign_key(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        comment = "FK custom comment"
+        old_field = Book._meta.get_field("author")
+        new_field = ForeignKey(Author, CASCADE, db_comment=comment)
+        new_field.set_attributes_from_name("author")
+        with connection.schema_editor() as editor:
+            editor.alter_field(Book, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Book._meta.db_table, "author_id"),
+            comment,
+        )
+
+    @skipUnlessDBFeature("supports_comments")
+    def test_alter_field_type_preserve_comment(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        comment = "This is the name."
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_comment=comment)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            comment,
+        )
+        # Changing a field type should preserve the comment.
+        old_field = new_field
+        new_field = CharField(max_length=511, db_comment=comment)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        # Comment is preserved.
+        self.assertEqual(
+            self.get_column_comment(Author._meta.db_table, "name"),
+            comment,
+        )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comment_table(self):
+        class ModelWithDbTableComment(Model):
+            class Meta:
+                app_label = "schema"
+                db_table_comment = "Custom table comment"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithDbTableComment)
+        self.isolated_local_models = [ModelWithDbTableComment]
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            "Custom table comment",
+        )
+        # Alter table comment.
+        old_db_table_comment = ModelWithDbTableComment._meta.db_table_comment
+        with connection.schema_editor() as editor:
+            editor.alter_db_table_comment(
+                ModelWithDbTableComment, old_db_table_comment, "New table comment"
+            )
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            "New table comment",
+        )
+        # Remove table comment.
+        old_db_table_comment = ModelWithDbTableComment._meta.db_table_comment
+        with connection.schema_editor() as editor:
+            editor.alter_db_table_comment(
+                ModelWithDbTableComment, old_db_table_comment, None
+            )
+        self.assertIn(
+            self.get_table_comment(ModelWithDbTableComment._meta.db_table),
+            [None, ""],
+        )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_comments", "supports_foreign_keys")
+    def test_db_comments_from_abstract_model(self):
+        class AbstractModelWithDbComments(Model):
+            name = CharField(
+                max_length=255, db_comment="Custom comment", null=True, blank=True
+            )
+
+            class Meta:
+                app_label = "schema"
+                abstract = True
+                db_table_comment = "Custom table comment"
+
+        class ModelWithDbComments(AbstractModelWithDbComments):
+            pass
+
+        with connection.schema_editor() as editor:
+            editor.create_model(ModelWithDbComments)
+        self.isolated_local_models = [ModelWithDbComments]
+
+        self.assertEqual(
+            self.get_column_comment(ModelWithDbComments._meta.db_table, "name"),
+            "Custom comment",
+        )
+        self.assertEqual(
+            self.get_table_comment(ModelWithDbComments._meta.db_table),
+            "Custom table comment",
+        )
+
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     def test_alter_field_add_index_to_charfield(self):
         # Create the table and verify no initial indexes.
@@ -4881,6 +5214,38 @@ class SchemaTests(TransactionTestCase):
         with connection.schema_editor() as editor:
             editor.alter_field(Author, new_field, old_field, strict=True)
         self.assertIsNone(self.get_column_collation(Author._meta.db_table, "name"))
+
+    @skipUnlessDBFeature("supports_collation_on_charfield")
+    def test_alter_field_type_preserve_db_collation(self):
+        collation = connection.features.test_collations.get("non_default")
+        if not collation:
+            self.skipTest("Language collations are not supported.")
+
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+
+        old_field = Author._meta.get_field("name")
+        new_field = CharField(max_length=255, db_collation=collation)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, old_field, new_field, strict=True)
+        self.assertEqual(
+            self.get_column_collation(Author._meta.db_table, "name"),
+            collation,
+        )
+        # Changing a field type should preserve the collation.
+        old_field = new_field
+        new_field = CharField(max_length=511, db_collation=collation)
+        new_field.set_attributes_from_name("name")
+        new_field.model = Author
+        with connection.schema_editor() as editor:
+            editor.alter_field(Author, new_field, old_field, strict=True)
+        # Collation is preserved.
+        self.assertEqual(
+            self.get_column_collation(Author._meta.db_table, "name"),
+            collation,
+        )
 
     @skipUnlessDBFeature("supports_collation_on_charfield")
     def test_alter_primary_key_db_collation(self):

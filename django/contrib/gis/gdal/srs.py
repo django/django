@@ -28,6 +28,7 @@
 """
 from ctypes import byref, c_char_p, c_int
 from enum import IntEnum
+from types import NoneType
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.error import SRSException
@@ -57,7 +58,7 @@ class SpatialReference(GDALBase):
         EPSG code, a PROJ string, and/or a projection "well known" shorthand
         string (one of 'WGS84', 'WGS72', 'NAD27', 'NAD83').
         """
-        if not isinstance(axis_order, (type(None), AxisOrder)):
+        if not isinstance(axis_order, (NoneType, AxisOrder)):
             raise ValueError(
                 "SpatialReference.axis_order must be an AxisOrder instance."
             )
@@ -158,11 +159,15 @@ class SpatialReference(GDALBase):
 
     def auth_name(self, target):
         "Return the authority name for the given string target node."
-        return capi.get_auth_name(self.ptr, force_bytes(target))
+        return capi.get_auth_name(
+            self.ptr, target if target is None else force_bytes(target)
+        )
 
     def auth_code(self, target):
         "Return the authority code for the given string target node."
-        return capi.get_auth_code(self.ptr, force_bytes(target))
+        return capi.get_auth_code(
+            self.ptr, target if target is None else force_bytes(target)
+        )
 
     def clone(self):
         "Return a clone of this SpatialReference object."
@@ -204,7 +209,7 @@ class SpatialReference(GDALBase):
     def srid(self):
         "Return the SRID of top-level authority, or None if undefined."
         try:
-            return int(self.attr_value("AUTHORITY", 1))
+            return int(self.auth_code(target=None))
         except (TypeError, ValueError):
             return None
 

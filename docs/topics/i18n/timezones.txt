@@ -24,22 +24,15 @@ or under bill your customers by one hour, twice a year, every year. The
 solution to this problem is to use UTC in the code and use local time only when
 interacting with end users.
 
-Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
-True <USE_TZ>` in your settings file.
+Time zone support is enabled by default. To disable it, set :setting:`USE_TZ =
+False <USE_TZ>` in your settings file.
 
-.. note::
+.. versionchanged:: 5.0
 
-    In Django 5.0, time zone support will be enabled by default.
+    In older version, time zone support was disabled by default.
 
 Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
-library from Python 3.9.  The ``backports.zoneinfo`` package is automatically
-installed alongside Django if you are using Python 3.8.
-
-.. note::
-
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes :setting:`USE_TZ = True <USE_TZ>`
-    for convenience.
+library from Python 3.9.
 
 If you're wrestling with a particular problem, start with the :ref:`time zone
 FAQ <time-zones-faq>`.
@@ -172,12 +165,13 @@ Add the following middleware to :setting:`MIDDLEWARE`::
 
     from django.utils import timezone
 
+
     class TimezoneMiddleware:
         def __init__(self, get_response):
             self.get_response = get_response
 
         def __call__(self, request):
-            tzname = request.session.get('django_timezone')
+            tzname = request.session.get("django_timezone")
             if tzname:
                 timezone.activate(zoneinfo.ZoneInfo(tzname))
             else:
@@ -190,17 +184,18 @@ Create a view that can set the current timezone::
 
     # Prepare a map of common locations to timezone choices you wish to offer.
     common_timezones = {
-        'London': 'Europe/London',
-        'Paris': 'Europe/Paris',
-        'New York': 'America/New_York',
+        "London": "Europe/London",
+        "Paris": "Europe/Paris",
+        "New York": "America/New_York",
     }
 
+
     def set_timezone(request):
-        if request.method == 'POST':
-            request.session['django_timezone'] = request.POST['timezone']
-            return redirect('/')
+        if request.method == "POST":
+            request.session["django_timezone"] = request.POST["timezone"]
+            return redirect("/")
         else:
-            return render(request, 'template.html', {'timezones': common_timezones})
+            return render(request, "template.html", {"timezones": common_timezones})
 
 Include a form in ``template.html`` that will ``POST`` to this view:
 
@@ -253,8 +248,6 @@ output for computers rather than for humans. The following filters and tags,
 provided by the ``tz`` template tag library, allow you to control the time zone
 conversions.
 
-.. highlight:: html+django
-
 Template tags
 -------------
 
@@ -270,7 +263,9 @@ This tag has exactly the same effects as the :setting:`USE_TZ` setting as far
 as the template engine is concerned. It allows a more fine grained control of
 conversion.
 
-To activate or deactivate conversion for a template block, use::
+To activate or deactivate conversion for a template block, use:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -295,7 +290,7 @@ To activate or deactivate conversion for a template block, use::
 Sets or unsets the current time zone in the contained block. When the current
 time zone is unset, the default time zone applies.
 
-::
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -313,7 +308,9 @@ time zone is unset, the default time zone applies.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can get the name of the current time zone using the
-``get_current_timezone`` tag::
+``get_current_timezone`` tag:
+
+.. code-block:: html+django
 
     {% get_current_timezone as TIME_ZONE %}
 
@@ -335,7 +332,9 @@ return aware datetimes.
 
 Forces conversion of a single value to the current time zone.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -348,7 +347,9 @@ For example::
 
 Forces conversion of a single value to UTC.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
@@ -364,13 +365,13 @@ Forces conversion of a single value to an arbitrary timezone.
 The argument must be an instance of a :class:`~datetime.tzinfo` subclass or a
 time zone name.
 
-For example::
+For example:
+
+.. code-block:: html+django
 
     {% load tz %}
 
     {{ value|timezone:"Europe/Paris" }}
-
-.. highlight:: python
 
 .. _time-zones-migration-guide:
 
@@ -427,7 +428,9 @@ code: :func:`~django.utils.timezone.now`,
 :func:`~django.utils.timezone.make_naive`.
 
 Finally, in order to help you locate code that needs upgrading, Django raises
-a warning when you attempt to save a naive datetime to the database::
+a warning when you attempt to save a naive datetime to the database:
+
+.. code-block:: pytb
 
     RuntimeWarning: DateTimeField ModelName.field_name received a naive
     datetime (2012-01-01 00:00:00) while time zone support is active.
@@ -436,9 +439,12 @@ During development, you can turn such warnings into exceptions and get a
 traceback by adding the following to your settings file::
 
     import warnings
+
     warnings.filterwarnings(
-        'error', r"DateTimeField .* received a naive datetime",
-        RuntimeWarning, r'django\.db\.models\.fields',
+        "error",
+        r"DateTimeField .* received a naive datetime",
+        RuntimeWarning,
+        r"django\.db\.models\.fields",
     )
 
 Fixtures
@@ -504,11 +510,14 @@ Setup
    their values should be in UTC (or both!).
 
    Finally, our calendar system contains interesting edge cases. For example,
-   you can't always subtract one year directly from a given date::
+   you can't always subtract one year directly from a given date:
+
+   .. code-block:: pycon
 
        >>> import datetime
        >>> def one_year_before(value):  # Wrong example.
        ...     return value.replace(year=value.year - 1)
+       ...
        >>> one_year_before(datetime.datetime(2012, 3, 1, 10, 0))
        datetime.datetime(2011, 3, 1, 10, 0)
        >>> one_year_before(datetime.datetime(2012, 2, 29, 10, 0))
@@ -534,7 +543,9 @@ Troubleshooting
 #. **My application crashes with** ``TypeError: can't compare offset-naive``
    ``and offset-aware datetimes`` **-- what's wrong?**
 
-   Let's reproduce this error by comparing a naive and an aware datetime::
+   Let's reproduce this error by comparing a naive and an aware datetime:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> aware = timezone.now()
@@ -582,7 +593,9 @@ Troubleshooting
    method. You also consider that a :class:`~datetime.date` is a lot like a
    :class:`~datetime.datetime`, except that it's less accurate.
 
-   None of this is true in a time zone aware environment::
+   None of this is true in a time zone aware environment:
+
+   .. code-block:: pycon
 
        >>> import datetime
        >>> import zoneinfo
@@ -620,7 +633,9 @@ Troubleshooting
 
    If you really need to do the conversion yourself, you must ensure the
    datetime is converted to the appropriate time zone first. Usually, this
-   will be the current timezone::
+   will be the current timezone:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> timezone.activate(zoneinfo.ZoneInfo("Asia/Singapore"))
@@ -647,7 +662,9 @@ Usage
    datetime?**
 
    Here you need to create the required ``ZoneInfo`` instance and attach it to
-   the naïve datetime::
+   the naïve datetime:
+
+   .. code-block:: pycon
 
        >>> import zoneinfo
        >>> from django.utils.dateparse import parse_datetime
@@ -670,7 +687,9 @@ Usage
    sufficient.
 
    For the sake of completeness, though, if you really want the local time
-   in the current time zone, here's how you can obtain it::
+   in the current time zone, here's how you can obtain it:
+
+   .. code-block:: pycon
 
        >>> from django.utils import timezone
        >>> timezone.localtime(timezone.now())
@@ -683,5 +702,3 @@ Usage
    :func:`zoneinfo.available_timezones` provides the set of all valid keys for
    IANA time zones available to your system. See the docs for usage
    considerations.
-
-.. _pytz: http://pytz.sourceforge.net/

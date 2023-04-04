@@ -275,16 +275,6 @@ def validate_ipv4_address(value):
         raise ValidationError(
             _("Enter a valid IPv4 address."), code="invalid", params={"value": value}
         )
-    else:
-        # Leading zeros are forbidden to avoid ambiguity with the octal
-        # notation. This restriction is included in Python 3.9.5+.
-        # TODO: Remove when dropping support for PY39.
-        if any(octet != "0" and octet[0] == "0" for octet in value.split(".")):
-            raise ValidationError(
-                _("Enter a valid IPv4 address."),
-                code="invalid",
-                params={"value": value},
-            )
 
 
 def validate_ipv6_address(value):
@@ -486,8 +476,10 @@ class DecimalValidator:
                 self.messages["invalid"], code="invalid", params={"value": value}
             )
         if exponent >= 0:
-            # A positive exponent adds that many trailing zeros.
-            digits = len(digit_tuple) + exponent
+            digits = len(digit_tuple)
+            if digit_tuple != (0,):
+                # A positive exponent adds that many trailing zeros.
+                digits += exponent
             decimals = 0
         else:
             # If the absolute value of the negative exponent is larger than the

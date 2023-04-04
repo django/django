@@ -373,7 +373,7 @@ class BilateralTransformTests(TestCase):
                     Author(name="Ray"),
                 ]
             )
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Author.objects.filter(name__upper__in=["foo", "bar", "doe"]).order_by(
                     "name"
                 ),

@@ -136,6 +136,7 @@ dimensioned
 discoverable
 Disqus
 distro
+django
 djangoproject
 dm
 docstring
@@ -234,6 +235,7 @@ iterable
 iterables
 iteratively
 ize
+Jazzband
 Jinja
 jQuery
 Jupyter
@@ -246,7 +248,6 @@ kilometre
 Koziarski
 kwarg
 kwargs
-Kyngesburye
 Kyrgyz
 latin
 lawrence
@@ -387,7 +388,6 @@ psycopg
 Punycode
 Puthraya
 pyformat
-pysqlite
 pythonic
 qs
 queryset

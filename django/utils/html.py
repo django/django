@@ -193,9 +193,8 @@ def smart_urlquote(url):
 
     def unquote_quote(segment):
         segment = unquote(segment)
-        # Tilde is part of RFC3986 Unreserved Characters
-        # https://tools.ietf.org/html/rfc3986#section-2.3
-        # See also https://bugs.python.org/issue16285
+        # Tilde is part of RFC 3986 Section 2.3 Unreserved Characters,
+        # see also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + "~")
 
     # Handle IDN before quoting.
@@ -344,7 +343,7 @@ class Urlizer:
             # Trim wrapping punctuation.
             for opening, closing in self.wrapping_punctuation:
                 if middle.startswith(opening):
-                    middle = middle[len(opening) :]
+                    middle = middle.removeprefix(opening)
                     lead += opening
                     trimmed_something = True
                 # Keep parentheses at the end only if they're balanced.
@@ -352,7 +351,7 @@ class Urlizer:
                     middle.endswith(closing)
                     and middle.count(closing) == middle.count(opening) + 1
                 ):
-                    middle = middle[: -len(closing)]
+                    middle = middle.removesuffix(closing)
                     trail = closing + trail
                     trimmed_something = True
             # Trim trailing punctuation (after trimming wrapping punctuation,

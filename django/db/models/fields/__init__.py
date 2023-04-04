@@ -14,6 +14,7 @@ from django.conf import settings
 from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
+from django.db.models.enums import ChoicesMeta
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
 from django.utils.datastructures import DictWrapper
@@ -200,6 +201,7 @@ class Field(RegisterLookupMixin):
         auto_created=False,
         validators=(),
         error_messages=None,
+        db_comment=None,
     ):
         self.name = name
         self.verbose_name = verbose_name  # May be set by set_attributes_from_name
@@ -215,12 +217,15 @@ class Field(RegisterLookupMixin):
         self.unique_for_date = unique_for_date
         self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
+        if isinstance(choices, ChoicesMeta):
+            choices = choices.choices
         if isinstance(choices, collections.abc.Iterator):
             choices = list(choices)
         self.choices = choices
         self.help_text = help_text
         self.db_index = db_index
         self.db_column = db_column
+        self.db_comment = db_comment
         self._db_tablespace = db_tablespace
         self.auto_created = auto_created
 
@@ -259,6 +264,7 @@ class Field(RegisterLookupMixin):
             *self._check_field_name(),
             *self._check_choices(),
             *self._check_db_index(),
+            *self._check_db_comment(**kwargs),
             *self._check_null_allowed_for_primary_keys(),
             *self._check_backend_specific_checks(**kwargs),
             *self._check_validators(),
@@ -385,6 +391,28 @@ class Field(RegisterLookupMixin):
         else:
             return []
 
+    def _check_db_comment(self, databases=None, **kwargs):
+        if not self.db_comment or not databases:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in self.model._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"columns (db_comment).",
+                        obj=self,
+                        id="fields.W163",
+                    )
+                )
+        return errors
+
     def _check_null_allowed_for_primary_keys(self):
         if (
             self.primary_key
@@ -411,12 +439,9 @@ class Field(RegisterLookupMixin):
     def _check_backend_specific_checks(self, databases=None, **kwargs):
         if databases is None:
             return []
-        app_label = self.model._meta.app_label
         errors = []
         for alias in databases:
-            if router.allow_migrate(
-                alias, app_label, model_name=self.model._meta.model_name
-            ):
+            if router.allow_migrate_model(alias, self.model):
                 errors.extend(connections[alias].validation.check_field(self, **kwargs))
         return errors
 
@@ -541,6 +566,7 @@ class Field(RegisterLookupMixin):
             "choices": None,
             "help_text": "",
             "db_column": None,
+            "db_comment": None,
             "db_tablespace": None,
             "auto_created": False,
             "validators": [],
@@ -796,9 +822,14 @@ class Field(RegisterLookupMixin):
         # exactly which wacky database column type you want to use.
         data = self.db_type_parameters(connection)
         try:
-            return connection.data_types[self.get_internal_type()] % data
+            column_type = connection.data_types[self.get_internal_type()]
         except KeyError:
             return None
+        else:
+            # column_type is either a single-parameter function or a string.
+            if callable(column_type):
+                return column_type(data)
+            return column_type % data
 
     def rel_db_type(self, connection):
         """
@@ -923,6 +954,8 @@ class Field(RegisterLookupMixin):
 
     def get_db_prep_save(self, value, connection):
         """Return field's value prepared for saving into a database."""
+        if hasattr(value, "as_sql"):
+            return value
         return self.get_db_prep_value(value, connection=connection, prepared=False)
 
     def has_default(self):
@@ -1105,24 +1138,20 @@ class BooleanField(Field):
             defaults = {"form_class": form_class, "required": False}
         return super().formfield(**{**defaults, **kwargs})
 
-    def select_format(self, compiler, sql, params):
-        sql, params = super().select_format(compiler, sql, params)
-        # Filters that match everything are handled as empty strings in the
-        # WHERE clause, but in SELECT or GROUP BY list they must use a
-        # predicate that's always True.
-        if sql == "":
-            sql = "1"
-        return sql, params
-
 
 class CharField(Field):
-    description = _("String (up to %(max_length)s)")
-
     def __init__(self, *args, db_collation=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.db_collation = db_collation
         if self.max_length is not None:
             self.validators.append(validators.MaxLengthValidator(self.max_length))
+
+    @property
+    def description(self):
+        if self.max_length is not None:
+            return _("String (up to %(max_length)s)")
+        else:
+            return _("String (unlimited)")
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
@@ -1134,6 +1163,12 @@ class CharField(Field):
 
     def _check_max_length_attribute(self, **kwargs):
         if self.max_length is None:
+            if (
+                connection.features.supports_unlimited_charfield
+                or "supports_unlimited_charfield"
+                in self.model._meta.required_db_features
+            ):
+                return []
             return [
                 checks.Error(
                     "CharFields must define a 'max_length' attribute.",
@@ -1723,9 +1758,13 @@ class DecimalField(Field):
             )
         return decimal_value
 
-    def get_db_prep_save(self, value, connection):
+    def get_db_prep_value(self, value, connection, prepared=False):
+        if not prepared:
+            value = self.get_prep_value(value)
+        if hasattr(value, "as_sql"):
+            return value
         return connection.ops.adapt_decimalfield_value(
-            self.to_python(value), self.max_digits, self.decimal_places
+            value, self.max_digits, self.decimal_places
         )
 
     def get_prep_value(self, value):
@@ -2023,6 +2062,10 @@ class IntegerField(Field):
             raise e.__class__(
                 "Field '%s' expected a number but got %r." % (self.name, value),
             ) from e
+
+    def get_db_prep_value(self, value, connection, prepared=False):
+        value = super().get_db_prep_value(value, connection, prepared)
+        return connection.ops.adapt_integerfield_value(value, self.get_internal_type())
 
     def get_internal_type(self):
         return "IntegerField"

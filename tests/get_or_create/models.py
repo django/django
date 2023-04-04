@@ -6,6 +6,7 @@ class Person(models.Model):
     last_name = models.CharField(max_length=100)
     birthday = models.DateField()
     defaults = models.TextField()
+    create_defaults = models.TextField()
 
 
 class DefaultPerson(models.Model):
@@ -50,6 +51,10 @@ class Author(models.Model):
     name = models.CharField(max_length=100)
 
 
+class Journalist(Author):
+    specialty = models.CharField(max_length=100)
+
+
 class Book(models.Model):
     name = models.CharField(max_length=100)
     authors = models.ManyToManyField(Author, related_name="books")
@@ -59,3 +64,4 @@ class Book(models.Model):
         related_name="books",
         db_column="publisher_id_column",
     )
+    updated = models.DateTimeField(auto_now=True)

@@ -215,6 +215,12 @@ class URLTranslationTests(URLTestCaseBase):
                     expected_link,
                 )
 
+    def test_locale_not_interepreted_as_regex(self):
+        with translation.override("e("):
+            # Would previously error:
+            # re.error: missing ), unterminated subpattern at position 1
+            reverse("users")
+
 
 class URLNamespaceTests(URLTestCaseBase):
     """
@@ -246,29 +252,39 @@ class URLRedirectTests(URLTestCaseBase):
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/")
 
         response = self.client.get(response.headers["location"])
         self.assertEqual(response.status_code, 200)
 
     def test_en_redirect_wrong_url(self):
-        response = self.client.get("/profiel/registreren/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/profiel/registreren/", headers={"accept-language": "en"}
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_nl_redirect(self):
-        response = self.client.get("/profiel/registreren/", HTTP_ACCEPT_LANGUAGE="nl")
+        response = self.client.get(
+            "/profiel/registreren/", headers={"accept-language": "nl"}
+        )
         self.assertRedirects(response, "/nl/profiel/registreren/")
 
         response = self.client.get(response.headers["location"])
         self.assertEqual(response.status_code, 200)
 
     def test_nl_redirect_wrong_url(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="nl")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "nl"}
+        )
         self.assertEqual(response.status_code, 404)
 
     def test_pt_br_redirect(self):
-        response = self.client.get("/conta/registre-se/", HTTP_ACCEPT_LANGUAGE="pt-br")
+        response = self.client.get(
+            "/conta/registre-se/", headers={"accept-language": "pt-br"}
+        )
         self.assertRedirects(response, "/pt-br/conta/registre-se/")
 
         response = self.client.get(response.headers["location"])
@@ -276,7 +292,9 @@ class URLRedirectTests(URLTestCaseBase):
 
     def test_pl_pl_redirect(self):
         # language from outside of the supported LANGUAGES list
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="pl-pl")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "pl-pl"}
+        )
         self.assertRedirects(response, "/en/account/register/")
 
         response = self.client.get(response.headers["location"])
@@ -289,7 +307,9 @@ class URLRedirectTests(URLTestCaseBase):
         ],
     )
     def test_custom_redirect_class(self):
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/", 301)
 
 
@@ -308,7 +328,9 @@ class URLVaryAcceptLanguageTests(URLTestCaseBase):
         The redirect to a prefixed URL depends on 'Accept-Language' and
         'Cookie', but once prefixed no header is set.
         """
-        response = self.client.get("/account/register/", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get(
+            "/account/register/", headers={"accept-language": "en"}
+        )
         self.assertRedirects(response, "/en/account/register/")
         self.assertEqual(response.get("Vary"), "Accept-Language, Cookie")
 
@@ -324,19 +346,19 @@ class URLRedirectWithoutTrailingSlashTests(URLTestCaseBase):
     """
 
     def test_not_prefixed_redirect(self):
-        response = self.client.get("/not-prefixed", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get("/not-prefixed", headers={"accept-language": "en"})
         self.assertRedirects(response, "/not-prefixed/", 301)
 
     def test_en_redirect(self):
         response = self.client.get(
-            "/account/register", HTTP_ACCEPT_LANGUAGE="en", follow=True
+            "/account/register", headers={"accept-language": "en"}, follow=True
         )
         # We only want one redirect, bypassing CommonMiddleware
         self.assertEqual(response.redirect_chain, [("/en/account/register/", 302)])
         self.assertRedirects(response, "/en/account/register/", 302)
 
         response = self.client.get(
-            "/prefixed.xml", HTTP_ACCEPT_LANGUAGE="en", follow=True
+            "/prefixed.xml", headers={"accept-language": "en"}, follow=True
         )
         self.assertRedirects(response, "/en/prefixed.xml", 302)
 
@@ -349,13 +371,13 @@ class URLRedirectWithoutTrailingSlashSettingTests(URLTestCaseBase):
 
     @override_settings(APPEND_SLASH=False)
     def test_not_prefixed_redirect(self):
-        response = self.client.get("/not-prefixed", HTTP_ACCEPT_LANGUAGE="en")
+        response = self.client.get("/not-prefixed", headers={"accept-language": "en"})
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=False)
     def test_en_redirect(self):
         response = self.client.get(
-            "/account/register-without-slash", HTTP_ACCEPT_LANGUAGE="en"
+            "/account/register-without-slash", headers={"accept-language": "en"}
         )
         self.assertRedirects(response, "/en/account/register-without-slash", 302)
 
@@ -418,7 +440,7 @@ class URLRedirectWithScriptAliasTests(URLTestCaseBase):
         prefix = "/script_prefix"
         with override_script_prefix(prefix):
             response = self.client.get(
-                "/prefixed/", HTTP_ACCEPT_LANGUAGE="en", SCRIPT_NAME=prefix
+                "/prefixed/", headers={"accept-language": "en"}, SCRIPT_NAME=prefix
             )
             self.assertRedirects(
                 response, "%s/en/prefixed/" % prefix, target_status_code=404

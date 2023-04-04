@@ -32,8 +32,6 @@ class ManagementForm(Form):
     as well.
     """
 
-    template_name = "django/forms/div.html"  # RemovedInDjango50Warning.
-
     TOTAL_FORMS = IntegerField(widget=HiddenInput)
     INITIAL_FORMS = IntegerField(widget=HiddenInput)
     # MIN_NUM_FORM_COUNT and MAX_NUM_FORM_COUNT are output with the rest of the
@@ -492,7 +490,9 @@ class BaseFormSet(RenderableFormMixin):
                     required=False,
                     widget=self.get_ordering_widget(),
                 )
-        if self.can_delete and (self.can_delete_extra or index < initial_form_count):
+        if self.can_delete and (
+            self.can_delete_extra or (index is not None and index < initial_form_count)
+        ):
             form.fields[DELETION_FIELD_NAME] = BooleanField(
                 label=_("Delete"),
                 required=False,

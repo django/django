@@ -4,6 +4,8 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
+from asgiref.sync import sync_to_async
+
 import django
 from django.apps import apps
 from django.conf import settings
@@ -46,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -434,18 +436,11 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelStateCacheDescriptor:
-    """
-    Upon first access, replace itself with an empty dictionary on the instance.
-    """
-
-    def __set_name__(self, owner, name):
-        self.attribute_name = name
-
+class ModelStateFieldsCacheDescriptor:
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        res = instance.__dict__[self.attribute_name] = {}
+        res = instance.fields_cache = {}
         return res
 
 
@@ -458,23 +453,10 @@ class ModelState:
     # explicit (non-auto) PKs. This impacts validation only; it has no effect
     # on the actual save.
     adding = True
-    fields_cache = ModelStateCacheDescriptor()
-    related_managers_cache = ModelStateCacheDescriptor()
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if "fields_cache" in state:
-            state["fields_cache"] = self.fields_cache.copy()
-        # Manager instances stored in related_managers_cache won't necessarily
-        # be deserializable if they were dynamically created via an inner
-        # scope, e.g. create_forward_many_to_many_manager() and
-        # create_generic_related_manager().
-        if "related_managers_cache" in state:
-            state["related_managers_cache"] = {}
-        return state
+    fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__
@@ -662,6 +644,7 @@ class Model(metaclass=ModelBase):
         """Hook to allow choosing the attributes to pickle."""
         state = self.__dict__.copy()
         state["_state"] = copy.copy(state["_state"])
+        state["_state"].fields_cache = state["_state"].fields_cache.copy()
         # memoryview cannot be pickled, so cast it to bytes and store
         # separately.
         _memoryview_attrs = []
@@ -783,7 +766,15 @@ class Model(metaclass=ModelBase):
             if field.is_cached(self):
                 field.delete_cached_value(self)
 
+        # Clear cached private relations.
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
+
+    async def arefresh_from_db(self, using=None, fields=None):
+        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
 
     def serializable_value(self, field_name):
         """
@@ -828,15 +819,7 @@ class Model(metaclass=ModelBase):
                 return
 
             update_fields = frozenset(update_fields)
-            field_names = set()
-
-            for field in self._meta.concrete_fields:
-                if not field.primary_key:
-                    field_names.add(field.name)
-
-                    if field.name != field.attname:
-                        field_names.add(field.attname)
-
+            field_names = self._meta._non_pk_concrete_field_names
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -865,6 +848,18 @@ class Model(metaclass=ModelBase):
         )
 
     save.alters_data = True
+
+    async def asave(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        return await sync_to_async(self.save)(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
+
+    asave.alters_data = True
 
     def save_base(
         self,
@@ -1166,6 +1161,14 @@ class Model(metaclass=ModelBase):
         return collector.delete()
 
     delete.alters_data = True
+
+    async def adelete(self, using=None, keep_parents=False):
+        return await sync_to_async(self.delete)(
+            using=using,
+            keep_parents=keep_parents,
+        )
+
+    adelete.alters_data = True
 
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
@@ -1470,7 +1473,10 @@ class Model(metaclass=ModelBase):
                 try:
                     constraint.validate(model_class, self, exclude=exclude, using=using)
                 except ValidationError as e:
-                    if e.code == "unique" and len(constraint.fields) == 1:
+                    if (
+                        getattr(e, "code", None) == "unique"
+                        and len(constraint.fields) == 1
+                    ):
                         errors.setdefault(constraint.fields[0], []).append(e)
                     else:
                         errors = e.update_error_dict(errors)
@@ -1582,6 +1588,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
+                *cls._check_db_table_comment(databases),
             ]
 
         return errors
@@ -1617,6 +1624,29 @@ class Model(metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_db_table_comment(cls, databases):
+        if not cls._meta.db_table_comment:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in cls._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"tables (db_table_comment).",
+                        obj=cls,
+                        id="models.W046",
+                    )
+                )
+        return errors
 
     @classmethod
     def _check_swappable(cls):
@@ -2111,7 +2141,7 @@ class Model(metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f, str) and f != "?")
 
         # Convert "-field" to "field".
-        fields = ((f[1:] if f.startswith("-") else f) for f in fields)
+        fields = (f.removeprefix("-") for f in fields)
 
         # Separate related fields and non-related fields.
         _fields = []

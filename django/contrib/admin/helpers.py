@@ -36,9 +36,6 @@ class ActionForm(forms.Form):
     )
 
 
-checkbox = forms.CheckboxInput({"class": "action-select"}, lambda value: False)
-
-
 class AdminForm:
     def __init__(
         self,
@@ -95,7 +92,7 @@ class AdminForm:
     def media(self):
         media = self.form.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 
@@ -456,7 +453,7 @@ class InlineAdminFormSet:
     def media(self):
         media = self.opts.media + self.formset.media
         for fs in self:
-            media = media + fs.media
+            media += fs.media
         return media
 
 

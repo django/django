@@ -6,7 +6,7 @@ from copy import copy
 from functools import partial
 from http import HTTPStatus
 from importlib import import_module
-from io import BytesIO
+from io import BytesIO, IOBase
 from urllib.parse import unquote_to_bytes, urljoin, urlparse, urlsplit
 
 from asgiref.sync import sync_to_async
@@ -14,11 +14,11 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.handlers.asgi import ASGIRequest
 from django.core.handlers.base import BaseHandler
-from django.core.handlers.wsgi import WSGIRequest
+from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.signals import got_request_exception, request_finished, request_started
 from django.db import close_old_connections
-from django.http import HttpRequest, QueryDict, SimpleCookie
+from django.http import HttpHeaders, HttpRequest, QueryDict, SimpleCookie
 from django.test import signals
 from django.test.utils import ContextList
 from django.urls import resolve
@@ -55,7 +55,7 @@ class RedirectCycleError(Exception):
         self.redirect_chain = last_response.redirect_chain
 
 
-class FakePayload:
+class FakePayload(IOBase):
     """
     A wrapper around BytesIO that restricts what can be read since data from
     the network can't be sought and cannot be read outside of its content
@@ -63,38 +63,48 @@ class FakePayload:
     that wouldn't work in real life.
     """
 
-    def __init__(self, content=None):
+    def __init__(self, initial_bytes=None):
         self.__content = BytesIO()
         self.__len = 0
         self.read_started = False
-        if content is not None:
-            self.write(content)
+        if initial_bytes is not None:
+            self.write(initial_bytes)
 
     def __len__(self):
         return self.__len
 
-    def read(self, num_bytes=None):
+    def read(self, size=-1, /):
         if not self.read_started:
             self.__content.seek(0)
             self.read_started = True
-        if num_bytes is None:
-            num_bytes = self.__len or 0
+        if size == -1 or size is None:
+            size = self.__len
         assert (
-            self.__len >= num_bytes
+            self.__len >= size
         ), "Cannot read more than the available bytes from the HTTP incoming data."
-        content = self.__content.read(num_bytes)
-        self.__len -= num_bytes
+        content = self.__content.read(size)
+        self.__len -= len(content)
         return content
 
-    def write(self, content):
+    def readline(self, size=-1, /):
+        if not self.read_started:
+            self.__content.seek(0)
+            self.read_started = True
+        if size == -1 or size is None:
+            size = self.__len
+        assert (
+            self.__len >= size
+        ), "Cannot read more than the available bytes from the HTTP incoming data."
+        content = self.__content.readline(size)
+        self.__len -= len(content)
+        return content
+
+    def write(self, b, /):
         if self.read_started:
             raise ValueError("Unable to write a payload after it's been read")
-        content = force_bytes(content)
+        content = force_bytes(b)
         self.__content.write(content)
         self.__len += len(content)
-
-    def close(self):
-        pass
 
 
 def closing_iterator_wrapper(iterable, close):
@@ -106,11 +116,21 @@ def closing_iterator_wrapper(iterable, close):
         request_finished.connect(close_old_connections)
 
 
+async def aclosing_iterator_wrapper(iterable, close):
+    try:
+        async for chunk in iterable:
+            yield chunk
+    finally:
+        request_finished.disconnect(close_old_connections)
+        close()  # will fire request_finished
+        request_finished.connect(close_old_connections)
+
+
 def conditional_content_removal(request, response):
     """
     Simulate the behavior of most web servers by removing the content of
     responses for HEAD requests, 1xx, 204, and 304 responses. Ensure
-    compliance with RFC 7230, section 3.3.3.
+    compliance with RFC 9112 Section 6.3.
     """
     if 100 <= response.status_code < 200 or response.status_code in (204, 304):
         if response.streaming:
@@ -164,9 +184,14 @@ class ClientHandler(BaseHandler):
 
         # Emulate a WSGI server by calling the close method on completion.
         if response.streaming:
-            response.streaming_content = closing_iterator_wrapper(
-                response.streaming_content, response.close
-            )
+            if response.is_async:
+                response.streaming_content = aclosing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
+            else:
+                response.streaming_content = closing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
         else:
             request_finished.disconnect(close_old_connections)
             response.close()  # will fire request_finished
@@ -194,11 +219,10 @@ class AsyncClientHandler(BaseHandler):
             body_file = FakePayload("")
 
         request_started.disconnect(close_old_connections)
-        await sync_to_async(request_started.send, thread_sensitive=False)(
-            sender=self.__class__, scope=scope
-        )
+        await request_started.asend(sender=self.__class__, scope=scope)
         request_started.connect(close_old_connections)
-        request = ASGIRequest(scope, body_file)
+        # Wrap FakePayload body_file to allow large read() in test environment.
+        request = ASGIRequest(scope, LimitedStream(body_file, len(body_file)))
         # Sneaky little hack so that we can easily get round
         # CsrfViewMiddleware. This makes life easier, and is probably required
         # for backwards compatibility with external tests against admin views.
@@ -212,12 +236,14 @@ class AsyncClientHandler(BaseHandler):
         response.asgi_request = request
         # Emulate a server by calling the close method on completion.
         if response.streaming:
-            response.streaming_content = await sync_to_async(
-                closing_iterator_wrapper, thread_sensitive=False
-            )(
-                response.streaming_content,
-                response.close,
-            )
+            if response.is_async:
+                response.streaming_content = aclosing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
+            else:
+                response.streaming_content = closing_iterator_wrapper(
+                    response.streaming_content, response.close
+                )
         else:
             request_finished.disconnect(close_old_connections)
             # Will fire request_finished.
@@ -259,7 +285,7 @@ def encode_multipart(boundary, data):
     # Each bit of the multipart form data could be either a form value or a
     # file, or a *list* of form values and/or files. Remember that HTTP field
     # names can be duplicated!
-    for (key, value) in data.items():
+    for key, value in data.items():
         if value is None:
             raise TypeError(
                 "Cannot encode None for key '%s' as POST data. Did you mean "
@@ -345,11 +371,13 @@ class RequestFactory:
     just as if that view had been hooked up using a URLconf.
     """
 
-    def __init__(self, *, json_encoder=DjangoJSONEncoder, **defaults):
+    def __init__(self, *, json_encoder=DjangoJSONEncoder, headers=None, **defaults):
         self.json_encoder = json_encoder
         self.defaults = defaults
         self.cookies = SimpleCookie()
         self.errors = BytesIO()
+        if headers:
+            self.defaults.update(HttpHeaders.to_wsgi_names(headers))
 
     def _base_environ(self, **request):
         """
@@ -421,13 +449,14 @@ class RequestFactory:
         # Refs comment in `get_bytes_from_wsgi()`.
         return path.decode("iso-8859-1")
 
-    def get(self, path, data=None, secure=False, **extra):
+    def get(self, path, data=None, secure=False, *, headers=None, **extra):
         """Construct a GET request."""
         data = {} if data is None else data
         return self.generic(
             "GET",
             path,
             secure=secure,
+            headers=headers,
             **{
                 "QUERY_STRING": urlencode(data, doseq=True),
                 **extra,
@@ -435,32 +464,46 @@ class RequestFactory:
         )
 
     def post(
-        self, path, data=None, content_type=MULTIPART_CONTENT, secure=False, **extra
+        self,
+        path,
+        data=None,
+        content_type=MULTIPART_CONTENT,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
     ):
         """Construct a POST request."""
         data = self._encode_json({} if data is None else data, content_type)
         post_data = self._encode_data(data, content_type)
 
         return self.generic(
-            "POST", path, post_data, content_type, secure=secure, **extra
+            "POST",
+            path,
+            post_data,
+            content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
 
-    def head(self, path, data=None, secure=False, **extra):
+    def head(self, path, data=None, secure=False, *, headers=None, **extra):
         """Construct a HEAD request."""
         data = {} if data is None else data
         return self.generic(
             "HEAD",
             path,
             secure=secure,
+            headers=headers,
             **{
                 "QUERY_STRING": urlencode(data, doseq=True),
                 **extra,
             },
         )
 
-    def trace(self, path, secure=False, **extra):
+    def trace(self, path, secure=False, *, headers=None, **extra):
         """Construct a TRACE request."""
-        return self.generic("TRACE", path, secure=secure, **extra)
+        return self.generic("TRACE", path, secure=secure, headers=headers, **extra)
 
     def options(
         self,
@@ -468,10 +511,14 @@ class RequestFactory:
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         "Construct an OPTIONS request."
-        return self.generic("OPTIONS", path, data, content_type, secure=secure, **extra)
+        return self.generic(
+            "OPTIONS", path, data, content_type, secure=secure, headers=headers, **extra
+        )
 
     def put(
         self,
@@ -479,11 +526,15 @@ class RequestFactory:
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Construct a PUT request."""
         data = self._encode_json(data, content_type)
-        return self.generic("PUT", path, data, content_type, secure=secure, **extra)
+        return self.generic(
+            "PUT", path, data, content_type, secure=secure, headers=headers, **extra
+        )
 
     def patch(
         self,
@@ -491,11 +542,15 @@ class RequestFactory:
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Construct a PATCH request."""
         data = self._encode_json(data, content_type)
-        return self.generic("PATCH", path, data, content_type, secure=secure, **extra)
+        return self.generic(
+            "PATCH", path, data, content_type, secure=secure, headers=headers, **extra
+        )
 
     def delete(
         self,
@@ -503,11 +558,15 @@ class RequestFactory:
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Construct a DELETE request."""
         data = self._encode_json(data, content_type)
-        return self.generic("DELETE", path, data, content_type, secure=secure, **extra)
+        return self.generic(
+            "DELETE", path, data, content_type, secure=secure, headers=headers, **extra
+        )
 
     def generic(
         self,
@@ -516,6 +575,8 @@ class RequestFactory:
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
@@ -535,6 +596,8 @@ class RequestFactory:
                     "wsgi.input": FakePayload(data),
                 }
             )
+        if headers:
+            extra.update(HttpHeaders.to_wsgi_names(headers))
         r.update(extra)
         # If QUERY_STRING is absent or empty, we want to extract it from the URL.
         if not r.get("QUERY_STRING"):
@@ -598,7 +661,10 @@ class AsyncRequestFactory(RequestFactory):
             body_file = request.pop("_body_file")
         else:
             body_file = FakePayload("")
-        return ASGIRequest(self._base_scope(**request), body_file)
+        # Wrap FakePayload body_file to allow large read() in test environment.
+        return ASGIRequest(
+            self._base_scope(**request), LimitedStream(body_file, len(body_file))
+        )
 
     def generic(
         self,
@@ -607,6 +673,8 @@ class AsyncRequestFactory(RequestFactory):
         data="",
         content_type="application/octet-stream",
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Construct an arbitrary HTTP request."""
@@ -632,6 +700,8 @@ class AsyncRequestFactory(RequestFactory):
             s["follow"] = follow
         if query_string := extra.pop("QUERY_STRING", None):
             s["query_string"] = query_string
+        if headers:
+            extra.update(HttpHeaders.to_asgi_names(headers))
         s["headers"] += [
             (key.lower().encode("ascii"), value.encode("latin1"))
             for key, value in extra.items()
@@ -778,13 +848,19 @@ class Client(ClientMixin, RequestFactory):
     """
 
     def __init__(
-        self, enforce_csrf_checks=False, raise_request_exception=True, **defaults
+        self,
+        enforce_csrf_checks=False,
+        raise_request_exception=True,
+        *,
+        headers=None,
+        **defaults,
     ):
-        super().__init__(**defaults)
+        super().__init__(headers=headers, **defaults)
         self.handler = ClientHandler(enforce_csrf_checks)
         self.raise_request_exception = raise_request_exception
         self.exc_info = None
         self.extra = None
+        self.headers = None
 
     def request(self, **request):
         """
@@ -833,12 +909,24 @@ class Client(ClientMixin, RequestFactory):
             self.cookies.update(response.cookies)
         return response
 
-    def get(self, path, data=None, follow=False, secure=False, **extra):
+    def get(
+        self,
+        path,
+        data=None,
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
         """Request a response from the server using GET."""
         self.extra = extra
-        response = super().get(path, data=data, secure=secure, **extra)
+        self.headers = headers
+        response = super().get(path, data=data, secure=secure, headers=headers, **extra)
         if follow:
-            response = self._handle_redirects(response, data=data, **extra)
+            response = self._handle_redirects(
+                response, data=data, headers=headers, **extra
+            )
         return response
 
     def post(
@@ -848,25 +936,47 @@ class Client(ClientMixin, RequestFactory):
         content_type=MULTIPART_CONTENT,
         follow=False,
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Request a response from the server using POST."""
         self.extra = extra
+        self.headers = headers
         response = super().post(
-            path, data=data, content_type=content_type, secure=secure, **extra
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
         if follow:
             response = self._handle_redirects(
-                response, data=data, content_type=content_type, **extra
+                response, data=data, content_type=content_type, headers=headers, **extra
             )
         return response
 
-    def head(self, path, data=None, follow=False, secure=False, **extra):
+    def head(
+        self,
+        path,
+        data=None,
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
         """Request a response from the server using HEAD."""
         self.extra = extra
-        response = super().head(path, data=data, secure=secure, **extra)
+        self.headers = headers
+        response = super().head(
+            path, data=data, secure=secure, headers=headers, **extra
+        )
         if follow:
-            response = self._handle_redirects(response, data=data, **extra)
+            response = self._handle_redirects(
+                response, data=data, headers=headers, **extra
+            )
         return response
 
     def options(
@@ -876,16 +986,24 @@ class Client(ClientMixin, RequestFactory):
         content_type="application/octet-stream",
         follow=False,
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Request a response from the server using OPTIONS."""
         self.extra = extra
+        self.headers = headers
         response = super().options(
-            path, data=data, content_type=content_type, secure=secure, **extra
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
         if follow:
             response = self._handle_redirects(
-                response, data=data, content_type=content_type, **extra
+                response, data=data, content_type=content_type, headers=headers, **extra
             )
         return response
 
@@ -896,16 +1014,24 @@ class Client(ClientMixin, RequestFactory):
         content_type="application/octet-stream",
         follow=False,
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Send a resource to the server using PUT."""
         self.extra = extra
+        self.headers = headers
         response = super().put(
-            path, data=data, content_type=content_type, secure=secure, **extra
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
         if follow:
             response = self._handle_redirects(
-                response, data=data, content_type=content_type, **extra
+                response, data=data, content_type=content_type, headers=headers, **extra
             )
         return response
 
@@ -916,16 +1042,24 @@ class Client(ClientMixin, RequestFactory):
         content_type="application/octet-stream",
         follow=False,
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Send a resource to the server using PATCH."""
         self.extra = extra
+        self.headers = headers
         response = super().patch(
-            path, data=data, content_type=content_type, secure=secure, **extra
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
         if follow:
             response = self._handle_redirects(
-                response, data=data, content_type=content_type, **extra
+                response, data=data, content_type=content_type, headers=headers, **extra
             )
         return response
 
@@ -936,28 +1070,57 @@ class Client(ClientMixin, RequestFactory):
         content_type="application/octet-stream",
         follow=False,
         secure=False,
+        *,
+        headers=None,
         **extra,
     ):
         """Send a DELETE request to the server."""
         self.extra = extra
+        self.headers = headers
         response = super().delete(
-            path, data=data, content_type=content_type, secure=secure, **extra
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
         )
         if follow:
             response = self._handle_redirects(
-                response, data=data, content_type=content_type, **extra
+                response, data=data, content_type=content_type, headers=headers, **extra
             )
         return response
 
-    def trace(self, path, data="", follow=False, secure=False, **extra):
+    def trace(
+        self,
+        path,
+        data="",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
         """Send a TRACE request to the server."""
         self.extra = extra
-        response = super().trace(path, data=data, secure=secure, **extra)
+        self.headers = headers
+        response = super().trace(
+            path, data=data, secure=secure, headers=headers, **extra
+        )
         if follow:
-            response = self._handle_redirects(response, data=data, **extra)
+            response = self._handle_redirects(
+                response, data=data, headers=headers, **extra
+            )
         return response
 
-    def _handle_redirects(self, response, data="", content_type="", **extra):
+    def _handle_redirects(
+        self,
+        response,
+        data="",
+        content_type="",
+        headers=None,
+        **extra,
+    ):
         """
         Follow any redirects by requesting responses from the server using GET.
         """
@@ -983,7 +1146,7 @@ class Client(ClientMixin, RequestFactory):
                 extra["SERVER_PORT"] = str(url.port)
 
             path = url.path
-            # RFC 2616: bare domains without path are treated as the root.
+            # RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
             if not path and url.netloc:
                 path = "/"
             # Prepend the request path to handle relative path redirects
@@ -1006,7 +1169,12 @@ class Client(ClientMixin, RequestFactory):
                 content_type = None
 
             response = request_method(
-                path, data=data, content_type=content_type, follow=False, **extra
+                path,
+                data=data,
+                content_type=content_type,
+                follow=False,
+                headers=headers,
+                **extra,
             )
             response.redirect_chain = redirect_chain
 
@@ -1034,13 +1202,19 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
     """
 
     def __init__(
-        self, enforce_csrf_checks=False, raise_request_exception=True, **defaults
+        self,
+        enforce_csrf_checks=False,
+        raise_request_exception=True,
+        *,
+        headers=None,
+        **defaults,
     ):
-        super().__init__(**defaults)
+        super().__init__(headers=headers, **defaults)
         self.handler = AsyncClientHandler(enforce_csrf_checks)
         self.raise_request_exception = raise_request_exception
         self.exc_info = None
         self.extra = None
+        self.headers = None
 
     async def request(self, **request):
         """

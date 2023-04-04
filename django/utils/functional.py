@@ -1,7 +1,6 @@
 import copy
 import itertools
 import operator
-import warnings
 from functools import total_ordering, wraps
 
 
@@ -23,16 +22,7 @@ class cached_property:
             "__set_name__() on it."
         )
 
-    def __init__(self, func, name=None):
-        from django.utils.deprecation import RemovedInDjango50Warning
-
-        if name is not None:
-            warnings.warn(
-                "The name argument is deprecated as it's unnecessary as of "
-                "Python 3.6.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def __init__(self, func):
         self.real_func = func
         self.__doc__ = getattr(func, "__doc__")
 
@@ -135,9 +125,8 @@ def lazy(func, *resultclasses):
                 raise ValueError(
                     "Cannot call lazy() with both bytes and text return types."
                 )
-            if cls._delegate_text:
-                cls.__str__ = cls.__text_cast
-            elif cls._delegate_bytes:
+
+            if cls._delegate_bytes:
                 cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
@@ -151,20 +140,12 @@ def lazy(func, *resultclasses):
 
             return __wrapper__
 
-        def __text_cast(self):
-            return func(*self.__args, **self.__kw)
-
         def __bytes_cast(self):
             return bytes(func(*self.__args, **self.__kw))
-
-        def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode()
 
         def __cast(self):
             if self._delegate_bytes:
                 return self.__bytes_cast()
-            elif self._delegate_text:
-                return self.__text_cast()
             else:
                 return func(*self.__args, **self.__kw)
 

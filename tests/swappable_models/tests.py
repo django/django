@@ -7,7 +7,6 @@ from .models import Article
 
 
 class SwappableModelTests(TestCase):
-
     # Limit memory usage when calling 'migrate'.
     available_apps = [
         "swappable_models",

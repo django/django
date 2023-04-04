@@ -1,0 +1,759 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Bakhtawar Barzan, 2021
+# kosar tofiq <kosar.belana@gmail.com>, 2020
+# pejar hewrami <gumle@protonmail.com>, 2020
+# Swara <swara09@gmail.com>, 2022
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Swara <swara09@gmail.com>, 2022\n"
+"Language-Team: Central Kurdish (http://www.transifex.com/django/django/"
+"language/ckb/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ckb\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "%(verbose_name_plural)sە هەڵبژێردراوەکان بسڕەوە"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "سەرکەوتووانە %(count)d %(items)sی سڕییەوە."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "ناتوانرێت %(name)s بسڕێتەوە"
+
+msgid "Are you sure?"
+msgstr "ئایا تۆ دڵنیایت؟"
+
+msgid "Administration"
+msgstr "بەڕێوەبەرایەتی"
+
+msgid "All"
+msgstr "هەمووی"
+
+msgid "Yes"
+msgstr "بەڵێ"
+
+msgid "No"
+msgstr "نەخێر"
+
+msgid "Unknown"
+msgstr "نەزانراو"
+
+msgid "Any date"
+msgstr "هەر بەروارێک"
+
+msgid "Today"
+msgstr "ئەمڕۆ"
+
+msgid "Past 7 days"
+msgstr "7 ڕۆژی ڕابردوو"
+
+msgid "This month"
+msgstr "ئەم مانگە"
+
+msgid "This year"
+msgstr "ئەمساڵ"
+
+msgid "No date"
+msgstr "بەروار نییە"
+
+msgid "Has date"
+msgstr "بەرواری هەیە"
+
+msgid "Empty"
+msgstr "بەتاڵ"
+
+msgid "Not empty"
+msgstr "بەتاڵ نییە"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"تکایە %(username)s و تێپەڕەوشە دروستەکە بنوسە بۆ هەژمارێکی ستاف. تێبینی بکە "
+"لەوانەیە هەردوو خانەکە دۆخی هەستیار بێت بۆ پیتەکان."
+
+msgid "Action:"
+msgstr "کردار:"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "زیادکردنی %(verbose_name)sی تر"
+
+msgid "Remove"
+msgstr "لابردن"
+
+msgid "Addition"
+msgstr "خستنەسەر"
+
+msgid "Change"
+msgstr "گۆڕین"
+
+msgid "Deletion"
+msgstr "سڕینەوە"
+
+msgid "action time"
+msgstr "کاتی کردار"
+
+msgid "user"
+msgstr "بەکارهێنەر"
+
+msgid "content type"
+msgstr "جۆری ناوەڕۆک"
+
+msgid "object id"
+msgstr "ناسنامەی ئۆبجێکت"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "نوێنەرایەتی ئۆبجێکت"
+
+msgid "action flag"
+msgstr "ئاڵای کردار"
+
+msgid "change message"
+msgstr "گۆڕینی پەیام"
+
+msgid "log entry"
+msgstr "ڕاپۆرتی تۆمار"
+
+msgid "log entries"
+msgstr "ڕاپۆرتی تۆمارەکان"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "\"%(object)s\"ی زیادکرد."
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "\"%(object)s\"— %(changes)s گۆڕدرا"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "\"%(object)s\" سڕایەوە."
+
+msgid "LogEntry Object"
+msgstr "ئۆبجێکتی ڕاپۆرتی تۆمار"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} \"{object}\" زیادکرا."
+
+msgid "Added."
+msgstr "زیادکرا."
+
+msgid "and"
+msgstr "و"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{fields} بۆ {name} “{object}” گۆڕدرا."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} گۆڕدرا."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” سڕایەوە."
+
+msgid "No fields changed."
+msgstr "هیچ خانەیەک نەگۆڕاوە."
+
+msgid "None"
+msgstr "هیچ"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr ""
+"پەنجە داگرە لەسەر “Control”، یاخود “Command” لەسەر ماک، بۆ هەڵبژاردنی "
+"دانەیەک زیاتر."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” بەسەرکەوتوویی زیادکرا."
+
+msgid "You may edit it again below."
+msgstr "دەگونجێت تۆ دووبارە لەخوارەوە دەستکاری بکەیت."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr ""
+"{name} “{obj}” بەسەرکەوتوویی زیادکرا. دەگونجێت تۆ لە خوارەوە {name}یەکی تر "
+"زیادبکەیت."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr ""
+"{name} “{obj}” بەسەرکەوتوویی گۆڕدرا. دەگونجێت تۆ لە خوارەوە دووبارە دەستکاری "
+"بکەیتەوە."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr ""
+"{name} “{obj}” بەسەرکەوتوویی زیادکرا. دەگونجێت تۆ لە خوارەوە دووبارە "
+"دەستکاری بکەیتەوە."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} “{obj}” بەسەرکەوتوویی گۆڕدرا. دەگونجێت تۆ لە خوارەوە {name}یەکی تر "
+"زیاد بکەیت."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name}ی “{obj}” بەسەرکەوتوویی گۆڕدرا."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"دەبێت بڕگەکان هەڵبژێردرابن تاوەکو کرداریان لەسەر ئەنجام بدەیت. هیچ بڕگەیەک "
+"نەگۆڕدراوە."
+
+msgid "No action selected."
+msgstr "هیچ کردارێک هەڵنەبژێردراوە."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s\"%(obj)s\" بەسەرکەوتوویی سڕدرایەوە."
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr "%(name)s بە ناسنامەی \"%(key)s\" بوونی نییە. لەوانەیە سڕدرابێتەوە؟"
+
+#, python-format
+msgid "Add %s"
+msgstr "زیادکردنی %s"
+
+#, python-format
+msgid "Change %s"
+msgstr "گۆڕینی %s"
+
+#, python-format
+msgid "View %s"
+msgstr "بینینی %s"
+
+msgid "Database error"
+msgstr "هەڵەی بنکەدراوە"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s %(name)s بەسەرکەوتوویی گۆڕدرا."
+msgstr[1] "%(count)s %(name)s بەسەرکەوتوویی گۆڕدران."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "%(total_count)s هەڵبژێردراوە"
+msgstr[1] "هەمووی %(total_count)s هەڵبژێردراون"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "0 لە %(cnt)s هەڵبژێردراوە"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "مێژووی گۆڕین: %s"
+
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(instance)sی %(class_name)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"سڕینەوەی %(instance)sی %(class_name)s پێویستی بە سڕینەوەی ئەم ئۆبجێکتە "
+"پەیوەندیدارە پارێزراوانەیە: %(related_objects)s"
+
+msgid "Django site admin"
+msgstr "بەڕێوەبەری پێگەی جەنگۆ"
+
+msgid "Django administration"
+msgstr "بەڕێوەبەرایەتی جەنگۆ"
+
+msgid "Site administration"
+msgstr "بەڕێوەبەرایەتی پێگە"
+
+msgid "Log in"
+msgstr "چوونەژوورەوە"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "بەڕێوەبەرایەتی %(app)s"
+
+msgid "Page not found"
+msgstr "پەڕە نەدۆزرایەوە"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "داوای لێبوردن ئەکەین، بەڵام ناتوانرێت پەڕەی داواکراو بدۆزرێتەوە."
+
+msgid "Home"
+msgstr "ماڵەوە"
+
+msgid "Server error"
+msgstr "هەڵەی ڕاژەکار"
+
+msgid "Server error (500)"
+msgstr "هەڵەی ڕاژەکار (500)"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "هەڵەی ڕاژەکار <em>(500)</em>"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"هەڵەیەک بوونی هەبووە. ڕاپۆرت دراوە بە پێگەی بەڕێوەبەرایەتی لەڕێی ئیمەیڵەوە و "
+"دەبێت بەزوویی  چاکبکرێت. سوپاس بۆ ئارامگرتنت."
+
+msgid "Run the selected action"
+msgstr "کرداری هەڵبژێردراو جێبەجێ بکە"
+
+msgid "Go"
+msgstr "بڕۆ"
+
+msgid "Click here to select the objects across all pages"
+msgstr "کرتە لێرە بکە بۆ هەڵبژاردنی ئۆبجێکتەکان لە تەواوی هەموو پەڕەکان"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "هەموو %(total_count)s %(module_name)s هەڵبژێرە"
+
+msgid "Clear selection"
+msgstr "پاککردنەوەی هەڵبژاردن"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "مۆدێلەکان لە بەرنامەی %(name)s"
+
+msgid "Add"
+msgstr "زیادکردن"
+
+msgid "View"
+msgstr "بینین"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "تۆ ڕێگەپێدراو نیت بۆ بینین یان دەستکاری هیچ شتێک."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"سەرەتا، ناوی بەکارهێنەر و تێپەڕەوشە بنوسە. پاشان دەتوانیت دەستکاری زیاتری "
+"هەڵبژاردنەکانی بەکارهێنەر بکەیت."
+
+msgid "Enter a username and password."
+msgstr "ناوی بەکارهێنەر و تێپەڕەوشە بنوسە"
+
+msgid "Change password"
+msgstr "گۆڕینی تێپەڕەوشە"
+
+msgid "Please correct the error below."
+msgid_plural "Please correct the errors below."
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "تێپەڕەوشەی نوێ بۆ بەکارهێنەری <strong>%(username)s</strong> بنوسە"
+
+msgid "Skip to main content"
+msgstr ""
+
+msgid "Welcome,"
+msgstr "بەخێربێیت،"
+
+msgid "View site"
+msgstr "بینینی پێگە"
+
+msgid "Documentation"
+msgstr "بەڵگەنامە"
+
+msgid "Log out"
+msgstr "چوونەدەرەوە"
+
+msgid "Breadcrumbs"
+msgstr ""
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "زیادکردنی %(name)s"
+
+msgid "History"
+msgstr "مێژوو"
+
+msgid "View on site"
+msgstr "بینین لەسەر پێگە"
+
+msgid "Filter"
+msgstr "پاڵاوتن"
+
+msgid "Clear all filters"
+msgstr "پاکردنەوەی هەموو پاڵاوتنەکان"
+
+msgid "Remove from sorting"
+msgstr "لابردن لە ڕیزکردن"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "ڕیزکردنی لە پێشینە: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "ڕیزکردنی پێچەوانە"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
+
+msgid "Delete"
+msgstr "سڕینەوە"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"سڕینەوەی %(object_name)s ‘%(escaped_object)s‘ دەبێتە هۆی سڕینەوەی ئۆبجێکتی "
+"پەیوەندیدار، بەڵام هەژمارەکەت ڕێگەپێدراو نییە بۆ سڕینەوەی ئەم جۆرە "
+"ئۆبجێکتانەی تر:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"سڕینەوەی %(object_name)sی ‘%(escaped_object)s‘ پێویستیی بە سڕینەوەی ئەم "
+"ئۆبجێکتە پەیوەندیدارە پارێزراوانەیە:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"ئایا تۆ دڵنیایت کە دەتەوێت %(object_name)sی \"%(escaped_object)s\" بسڕیتەوە؟ "
+"هەموو ئەم ئۆبجێکتە پەیوەندیدارانەش دەسڕێتەوە:"
+
+msgid "Objects"
+msgstr "ئۆبجێکتەکان"
+
+msgid "Yes, I’m sure"
+msgstr "بەڵێ، من دڵنیام"
+
+msgid "No, take me back"
+msgstr "نەخێر، من بگەڕێنەرەوە دواوە"
+
+msgid "Delete multiple objects"
+msgstr "سڕینەوەی چەندین ئۆبجێکت"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"سڕینەوەی %(objects_name)sی هەڵبژێردراو دەبێتە هۆی سڕینەوەی ئۆبجێکتی "
+"پەیوەندیدار، بەڵام هەژمارەکەت ڕێگەپێدراو نییە بۆ سڕینەوەی ئەم جۆرە "
+"ئۆبجێکتانەی تر:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"سڕینەوەی %(objects_name)sی هەڵبژێردراو پێویستیی بە سڕینەوەی ئەم ئۆبجێکتە "
+"پەیوەندیدارە پارێزراوانەیە:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"ئایا تۆ دڵنیایت دەتەوێت %(objects_name)sی هەڵبژێردراو بسڕیتەوە؟ هەموو ئەم "
+"ئۆبجێکت و بڕگە پەیوەندیدارەکانیان دەسڕێنەوە:"
+
+msgid "Delete?"
+msgstr "سڕینەوە؟"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "بەپێی %(filter_title)s"
+
+msgid "Summary"
+msgstr "پوختە"
+
+msgid "Recent actions"
+msgstr "کردارە نوێیەکان"
+
+msgid "My actions"
+msgstr "کردارەکانم"
+
+msgid "None available"
+msgstr "هیچ شتيک بەردەست نییە"
+
+msgid "Unknown content"
+msgstr "ناوەڕۆکی نەزانراو"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"هەڵەیەک هەیە لە دامەزراندنی بنکەدراوەکەت. دڵنیاببەرەوە لەوەی خشتە گونجاوەکان "
+"دروستکراون، دڵنیاببەرەوە بنکەدراوەکە ئەخوێندرێتەوە لەلایەن بەکارهێنەری "
+"گونجاوەوە."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"تۆ ڕەسەنایەتیت هەیە وەکو %(username)s, بەڵام ڕێگەپێدراو نیت بۆ ئەم لاپەڕەیە. "
+"دەتەوێت بە هەژمارێکی تر بچیتەژوورەوە؟"
+
+msgid "Forgotten your password or username?"
+msgstr "تێپەڕەوشە یان ناوی بەکارهێنەرەکەت بیرچۆتەوە؟"
+
+msgid "Toggle navigation"
+msgstr "کردنەوەو داخستنی ڕێنیشاندەر"
+
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr "دەست بکە بە نوسین بۆ پاڵاوتن..."
+
+msgid "Filter navigation items"
+msgstr "بڕگەکانی ڕێنیشاندەر بپاڵێوە"
+
+msgid "Date/time"
+msgstr "بەروار/کات"
+
+msgid "User"
+msgstr "بەکارهێنەر"
+
+msgid "Action"
+msgstr "کردار"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr ""
+"ئەم ئۆبجێکتە مێژووی گۆڕانکاری نییە. ڕەنگە لە ڕێگەی بەڕێەوەبەری ئەم پێگەیەوە "
+"زیادنەکرابێت."
+
+msgid "Show all"
+msgstr "پیشاندانی هەمووی"
+
+msgid "Save"
+msgstr "پاشەکەوتکردن"
+
+msgid "Popup closing…"
+msgstr "پەنجەرەکە دادەخرێت..."
+
+msgid "Search"
+msgstr "گەڕان"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "%(counter)s ئەنجام"
+msgstr[1] "%(counter)s ئەنجام"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "%(full_result_count)sگشتی"
+
+msgid "Save as new"
+msgstr "پاشەکەوتکردن وەک نوێ"
+
+msgid "Save and add another"
+msgstr "پاشەکەوتی بکەو دانەیەکی تر زیاد بکە"
+
+msgid "Save and continue editing"
+msgstr "پاشەکەوتی بکەو بەردەوامبە لە گۆڕنکاری"
+
+msgid "Save and view"
+msgstr "پاشەکەوتی بکەو پیشانی بدە"
+
+msgid "Close"
+msgstr "داخستن"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "هەڵبژێردراوەکان بگۆڕە %(model)s"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "زیادکردنی %(model)sی تر"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "هەڵبژێردراوەکان بسڕەوە %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "سەیری %(model)s هەڵبژێردراوەکان بکە"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "سوپاس بۆ بەسەربردنی هەندێک کاتێکی ئەمڕۆ لەگەڵ ماڵپەڕەکەدا."
+
+msgid "Log in again"
+msgstr "دووبارە چوونەژوورەوە"
+
+msgid "Password change"
+msgstr "گۆڕینی تێپەڕەوشە"
+
+msgid "Your password was changed."
+msgstr "تێپەڕەوشەت گۆڕدرا."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"لەپێناو پاراستندا تکایە تێپەڕەوشە کۆنەکەت بنووسە، پاشان دووجار تێپەڕەوشە "
+"نوێیەکەت بنووسە بۆ ئەوەی بتوانین پشتڕاستی بکەینەوە کە بە دروستی نووسیوتە."
+
+msgid "Change my password"
+msgstr "گۆڕینی تێپەڕەوشەکەم"
+
+msgid "Password reset"
+msgstr "دانانەوەی تێپەڕەوشە"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "تێپەڕەوشەکەت دانرایەوە. لەوانەیە ئێستا بچیتە سەرەوە و بچیتەژوورەوە."
+
+msgid "Password reset confirmation"
+msgstr "دووپاتکردنەوەی دانانەوەی تێپەڕەوشە"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"تکایە دووجار تێپەڕەوشە نوێیەکەت بنوسە، پاشان دەتوانین دڵنیابین کە بە دروستی "
+"نوسراوە."
+
+msgid "New password:"
+msgstr "تێپەڕەوشەی نوێ:"
+
+msgid "Confirm password:"
+msgstr "دووپاتکردنەوەی تێپەڕەوشە:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"بەستەری دانانەوەی تێپەڕەوشە نادروست بوو، لەوانەیە لەبەر ئەوەی پێشتر "
+"بەکارهاتووە. تکایە داوای دانانەوەی تێپەڕەوشەی نوێ بکە."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"ئێمە ڕێنماییەکانمان بۆ دانانی تێپەڕەوشەکەت ئیمەیڵ بۆت ناردووە، ئەگەر "
+"هەژمارێک هەبێت لەگەڵ ئەو ئیمەیڵەی کە نوسیوتە. پێویستە بەم زووانە بەدەستت "
+"بگات."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"ئەگەر تۆ نامەی ئەلیکترۆنیت بەدەست نەگەیشت، ئەوا دڵنیا ببەرەوە کە تۆ ئەو "
+"ناونیشانەت داخڵکردووە کە پێی تۆمار بوویت، وە فۆڵدەری سپامەکەت بپشکنە."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr ""
+"تۆ ئەم نامە ئەلیکترۆنیەت بەدەست گەیشتووە لەبەرئەوەی داواکاری دوبارە "
+"دانانەوەی تێپەڕە ووشەت کردبوو بۆ هەژماری بەکارهێنەرەکەت لە %(site_name)s."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "تکایە بڕۆ بۆ پەڕەی دیاریکراو و تێپەڕەوشەیەکی نوێ هەڵبژێرە:"
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "ناوی بەکارهێنەری تۆ، لە کاتێکدا بیرت چووبێتەوە:"
+
+msgid "Thanks for using our site!"
+msgstr "سوپاس بۆ بەکارهێنانی پێگەکەمان!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "دەستەی %(site_name)s"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"تێپەڕەوشەکەت بیرچووەتەوە؟ ئیمەیڵەکەت لەخوارەوە بنوسە، پاشان ئێمە ئێمەیڵی "
+"ڕێنمایت بۆ دەنێرین بۆ دانانی دانەیەکی نوێ."
+
+msgid "Email address:"
+msgstr "ناونیشانی ئیمەیڵ:"
+
+msgid "Reset my password"
+msgstr "دانانەوەی تێپەڕەوشەکەم"
+
+msgid "All dates"
+msgstr "هەموو بەروارەکان"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s هەڵبژێرە"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "%s هەڵبژێرە بۆ گۆڕین"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s هەڵبژێرە بۆ بینین"
+
+msgid "Date:"
+msgstr "بەروار:"
+
+msgid "Time:"
+msgstr "کات:"
+
+msgid "Lookup"
+msgstr "گەڕان"
+
+msgid "Currently:"
+msgstr "ئێستاکە:"
+
+msgid "Change:"
+msgstr "گۆڕین:"

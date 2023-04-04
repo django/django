@@ -346,6 +346,21 @@ MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
 
+.. fieldlookup:: isempty
+
+``isempty``
+-----------
+
+.. versionadded:: 4.2
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Tests if the geometry is empty.
+
+Example::
+
+    Zipcode.objects.filter(poly__isempty=True)
+
 .. fieldlookup:: isvalid
 
 ``isvalid``
@@ -413,7 +428,7 @@ Geometry example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, "T*T***FF*"))
 
 PostGIS and MariaDB SQL equivalent:
 
@@ -429,8 +444,8 @@ SpatiaLite SQL equivalent:
 
 Raster example::
 
-    Zipcode.objects.filter(poly__relate=(rast, 1, 'T*T***FF*'))
-    Zipcode.objects.filter(rast__2__relate=(rast, 1, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(rast, 1, "T*T***FF*"))
+    Zipcode.objects.filter(rast__2__relate=(rast, 1, "T*T***FF*"))
 
 PostGIS SQL equivalent:
 
@@ -451,7 +466,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, "anyinteract"))
 
 Oracle SQL equivalent:
 
@@ -687,11 +702,13 @@ Distance Lookups
 For an overview on performing distance queries, please refer to
 the :ref:`distance queries introduction <distance-queries>`.
 
-Distance lookups take the following form::
+Distance lookups take the following form:
 
-    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, 'spheroid'])
-    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
-    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
+.. code-block:: text
+
+    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, "spheroid"])
+    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
+    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
 
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
@@ -841,10 +858,12 @@ Keyword Argument       Description
 __ https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
    spatial-concepts.html#GUID-CE10AB14-D5EA-43BA-A647-DAC9EEF41EE6
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.db.models import Extent, Union
-    >>> WorldBorder.objects.aggregate(Extent('mpoly'), Union('mpoly'))
+    >>> WorldBorder.objects.aggregate(Extent("mpoly"), Union("mpoly"))
 
 ``Collect``
 ~~~~~~~~~~~
@@ -871,10 +890,12 @@ Oracle, SpatiaLite
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
-    >>> print(qs['poly__extent'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent("poly"))
+    >>> print(qs["poly__extent"])
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
@@ -888,10 +909,12 @@ Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
 comprising the lower left coordinate and upper right coordinate (each with x, y,
 and z coordinates).
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
-    >>> print(qs['poly__extent3d'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent3D("poly"))
+    >>> print(qs["poly__extent3d"])
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
@@ -905,10 +928,12 @@ SpatiaLite
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(MakeLine('poly'))
-    >>> print(qs['poly__makeline'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(MakeLine("poly"))
+    >>> print(qs["poly__makeline"])
     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
@@ -929,10 +954,14 @@ large querysets.
     If the computation time for using this method is too expensive, consider
     using :class:`Collect` instead.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
-    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(
+    ...     Union(poly)
+    ... )  # A more sensible approach.
 
 .. rubric:: Footnotes
 .. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).

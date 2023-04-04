@@ -11,15 +11,13 @@ from django.utils.duration import duration_iso_string
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_create_column = "ALTER TABLE %(table)s ADD %(column)s %(definition)s"
-    sql_alter_column_type = "MODIFY %(column)s %(type)s"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s"
     sql_alter_column_null = "MODIFY %(column)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s NOT NULL"
     sql_alter_column_default = "MODIFY %(column)s DEFAULT %(default)s"
     sql_alter_column_no_default = "MODIFY %(column)s DEFAULT NULL"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
 
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"
     sql_create_column_inline_fk = (
@@ -169,7 +167,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                         self._create_fk_sql(rel.related_model, rel.field, "_fk")
                     )
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         auto_field_types = {"AutoField", "BigAutoField", "SmallAutoField"}
         # Drop the identity if migrating away from AutoField.
         if (
@@ -178,7 +178,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             and self._is_identity_column(model._meta.db_table, new_field.column)
         ):
             self._drop_identity(model._meta.db_table, new_field.column)
-        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(
+            model, old_field, new_field, new_type, old_collation, new_collation
+        )
 
     def normalize_name(self, name):
         """
@@ -242,11 +244,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
             return cursor.fetchone()[0]
 
-    def _alter_column_collation_sql(
-        self, model, new_field, new_type, new_collation, old_field
-    ):
-        if new_collation is None:
-            new_collation = self._get_default_collation(model._meta.db_table)
-        return super()._alter_column_collation_sql(
-            model, new_field, new_type, new_collation, old_field
-        )
+    def _collate_sql(self, collation, old_collation=None, table_name=None):
+        if collation is None and old_collation is not None:
+            collation = self._get_default_collation(table_name)
+        return super()._collate_sql(collation, old_collation, table_name)

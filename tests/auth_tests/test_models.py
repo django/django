@@ -122,8 +122,8 @@ class UserManagerTestCase(TransactionTestCase):
         self.assertFalse(user.has_usable_password())
 
     def test_create_user_email_domain_normalize_rfc3696(self):
-        # According to https://tools.ietf.org/html/rfc3696#section-3
-        # the "@" symbol can be part of the local part of an email address
+        # According to RFC 3696 Section 3 the "@" symbol can be part of the
+        # local part of an email address.
         returned = UserManager.normalize_email(r"Abc\@DEF@EXAMPLE.com")
         self.assertEqual(returned, r"Abc\@DEF@example.com")
 
@@ -587,5 +587,5 @@ class PermissionTests(TestCase):
     def test_str(self):
         p = Permission.objects.get(codename="view_customemailfield")
         self.assertEqual(
-            str(p), "auth_tests | custom email field | Can view custom email field"
+            str(p), "Auth_Tests | custom email field | Can view custom email field"
         )

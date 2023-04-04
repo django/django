@@ -1,13 +1,10 @@
 from django.db import connection
-from django.test import modify_settings
 
 from . import PostgreSQLTestCase
 from .models import CharFieldModel, TextFieldModel
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class UnaccentTest(PostgreSQLTestCase):
-
     Model = CharFieldModel
 
     @classmethod
@@ -21,7 +18,7 @@ class UnaccentTest(PostgreSQLTestCase):
         )
 
     def test_unaccent(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.Model.objects.filter(field__unaccent="aeO"),
             ["àéÖ", "aeO"],
             transform=lambda instance: instance.field,
@@ -33,13 +30,13 @@ class UnaccentTest(PostgreSQLTestCase):
         Unaccent can be used chained with a lookup (which should be the case
         since unaccent implements the Transform API)
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.Model.objects.filter(field__unaccent__iexact="aeO"),
             ["àéÖ", "aeO", "aeo"],
             transform=lambda instance: instance.field,
             ordered=False,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.Model.objects.filter(field__unaccent__endswith="éÖ"),
             ["àéÖ", "aeO"],
             transform=lambda instance: instance.field,
@@ -54,7 +51,7 @@ class UnaccentTest(PostgreSQLTestCase):
             if disable_conforming_strings:
                 cursor.execute("SET standard_conforming_strings TO off")
             try:
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     self.Model.objects.filter(field__unaccent__endswith="éÖ"),
                     ["àéÖ", "aeO"],
                     transform=lambda instance: instance.field,
@@ -65,7 +62,7 @@ class UnaccentTest(PostgreSQLTestCase):
                     cursor.execute("SET standard_conforming_strings TO on")
 
     def test_unaccent_accentuated_needle(self):
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.Model.objects.filter(field__unaccent="aéÖ"),
             ["àéÖ", "aeO"],
             transform=lambda instance: instance.field,

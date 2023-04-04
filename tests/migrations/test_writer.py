@@ -7,18 +7,11 @@ import os
 import pathlib
 import re
 import sys
+import time
 import uuid
+import zoneinfo
+from types import NoneType
 from unittest import mock
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 import custom_migration_operations.more_operations
 import custom_migration_operations.operations
@@ -29,9 +22,8 @@ from django.core.validators import EmailValidator, RegexValidator
 from django.db import migrations, models
 from django.db.migrations.serializer import BaseSerializer
 from django.db.migrations.writer import MigrationWriter, OperationWriter
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import SimpleLazyObject
 from django.utils.timezone import get_default_timezone, get_fixed_timezone
 from django.utils.translation import gettext_lazy as _
@@ -441,24 +433,20 @@ class WriterTests(SimpleTestCase):
             DateChoices.DATE_1,
             ("datetime.date(1969, 7, 20)", {"import datetime"}),
         )
-        field = models.CharField(default=TextChoices.B, choices=TextChoices.choices)
+        field = models.CharField(default=TextChoices.B, choices=TextChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.CharField(choices=[('A', 'A value'), ('B', 'B value')], "
             "default='B')",
         )
-        field = models.IntegerField(
-            default=IntegerChoices.B, choices=IntegerChoices.choices
-        )
+        field = models.IntegerField(default=IntegerChoices.B, choices=IntegerChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.IntegerField(choices=[(1, 'One'), (2, 'Two')], default=2)",
         )
-        field = models.DateField(
-            default=DateChoices.DATE_2, choices=DateChoices.choices
-        )
+        field = models.DateField(default=DateChoices.DATE_2, choices=DateChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
@@ -573,19 +561,13 @@ class WriterTests(SimpleTestCase):
             datetime.datetime(2014, 1, 1, 1, 1),
             ("datetime.datetime(2014, 1, 1, 1, 1)", {"import datetime"}),
         )
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            from django.utils.timezone import utc
-        for tzinfo in (utc, datetime.timezone.utc):
-            with self.subTest(tzinfo=tzinfo):
-                self.assertSerializedResultEqual(
-                    datetime.datetime(2012, 1, 1, 1, 1, tzinfo=tzinfo),
-                    (
-                        "datetime.datetime"
-                        "(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
-                        {"import datetime"},
-                    ),
-                )
-
+        self.assertSerializedResultEqual(
+            datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc),
+            (
+                "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
+                {"import datetime"},
+            ),
+        )
         self.assertSerializedResultEqual(
             datetime.datetime(
                 2012, 1, 1, 2, 1, tzinfo=zoneinfo.ZoneInfo("Europe/Paris")
@@ -595,16 +577,6 @@ class WriterTests(SimpleTestCase):
                 {"import datetime"},
             ),
         )
-        if pytz:
-            self.assertSerializedResultEqual(
-                pytz.timezone("Europe/Paris").localize(
-                    datetime.datetime(2012, 1, 1, 2, 1)
-                ),
-                (
-                    "datetime.datetime(2012, 1, 1, 1, 1, tzinfo=datetime.timezone.utc)",
-                    {"import datetime"},
-                ),
-            )
 
     def test_serialize_fields(self):
         self.assertSerializedFieldEqual(models.CharField(max_length=255))
@@ -823,7 +795,7 @@ class WriterTests(SimpleTestCase):
         self.assertEqual(result.keywords, value.keywords)
 
     def test_serialize_type_none(self):
-        self.assertSerializedEqual(type(None))
+        self.assertSerializedEqual(NoneType)
 
     def test_serialize_type_model(self):
         self.assertSerializedEqual(models.Model)
@@ -937,13 +909,18 @@ class WriterTests(SimpleTestCase):
                             ),
                         ),
                     ),
+                    migrations.AddField(
+                        "mymodel",
+                        "myfield2",
+                        models.FloatField(default=time.time),
+                    ),
                 ]
             },
         )
         writer = MigrationWriter(migration)
         output = writer.as_string()
         self.assertIn(
-            "import datetime\nfrom django.db import migrations, models\n",
+            "import datetime\nimport time\nfrom django.db import migrations, models\n",
             output,
         )
 

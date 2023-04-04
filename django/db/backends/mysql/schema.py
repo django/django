@@ -4,13 +4,11 @@ from django.db.models.constants import LOOKUP_SEP
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_rename_table = "RENAME TABLE %(old_table)s TO %(new_table)s"
 
     sql_alter_column_null = "MODIFY %(column)s %(type)s NULL"
     sql_alter_column_not_null = "MODIFY %(column)s %(type)s NOT NULL"
-    sql_alter_column_type = "MODIFY %(column)s %(type)s"
-    sql_alter_column_collate = "MODIFY %(column)s %(type)s%(collation)s"
+    sql_alter_column_type = "MODIFY %(column)s %(type)s%(collation)s%(comment)s"
     sql_alter_column_no_default_null = "ALTER COLUMN %(column)s SET DEFAULT NULL"
 
     # No 'CASCADE' which works as a no-op in MySQL but is undocumented
@@ -32,6 +30,9 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_pk = "ALTER TABLE %(table)s DROP PRIMARY KEY"
 
     sql_create_index = "CREATE INDEX %(name)s ON %(table)s (%(columns)s)%(extra)s"
+
+    sql_alter_table_comment = "ALTER TABLE %(table)s COMMENT = %(comment)s"
+    sql_alter_column_comment = None
 
     @property
     def sql_delete_check(self):
@@ -119,7 +120,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             )
 
     def remove_constraint(self, model, constraint):
-        if isinstance(constraint, UniqueConstraint):
+        if (
+            isinstance(constraint, UniqueConstraint)
+            and constraint.create_sql(model, self) is not None
+        ):
             self._create_missing_fk_index(
                 model,
                 fields=constraint.fields,
@@ -218,10 +222,35 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             new_type += " NOT NULL"
         return new_type
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
-        return super()._alter_column_type_sql(model, old_field, new_field, new_type)
+        return super()._alter_column_type_sql(
+            model, old_field, new_field, new_type, old_collation, new_collation
+        )
+
+    def _field_db_check(self, field, field_db_params):
+        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
+            10,
+            5,
+            2,
+        ):
+            return super()._field_db_check(field, field_db_params)
+        # On MySQL and MariaDB < 10.5.2 (no support for
+        # "ALTER TABLE ... RENAME COLUMN" statements), check constraints with
+        # the column name as it requires explicit recreation when the column is
+        # renamed.
+        return field_db_params["check"]
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)
+
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
+        # Comment is alter when altering the column type.
+        return "", []
+
+    def _comment_sql(self, comment):
+        comment_sql = super()._comment_sql(comment)
+        return f" COMMENT {comment_sql}"

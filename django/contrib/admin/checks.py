@@ -727,8 +727,7 @@ class BaseModelAdminChecks:
             # this format would be nice, but it's a little fiddly).
             return []
         else:
-            if field_name.startswith("-"):
-                field_name = field_name[1:]
+            field_name = field_name.removeprefix("-")
             if field_name == "pk":
                 return []
             try:

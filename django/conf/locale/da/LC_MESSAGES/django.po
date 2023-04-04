@@ -3,7 +3,7 @@
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
 # Danni Randeris <danniranderis+djangocore@gmail.com>, 2014
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2022
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2019
 # Finn Gruwier Larsen, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -56,6 +56,9 @@ msgstr "bosnisk"
 
 msgid "Catalan"
 msgstr "catalansk"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Centralkurdisk (Sorani)"
 
 msgid "Czech"
 msgstr "tjekkisk"
@@ -504,6 +507,9 @@ msgstr "Boolsk (enten True eller False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Streng (op til %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Streng (ubegrænset)"
 
 msgid "Comma-separated integers"
 msgstr "Kommaseparerede heltal"
@@ -1189,8 +1195,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Hvis du bruger tagget <meta name=\"referrer\" content=\"no-referrer\"> eller "
 "inkluderer headeren “Referrer-Policy: no-referrer”, så fjern dem venligst. "
@@ -1288,13 +1294,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Du ser denne side fordi du har <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> i din settings-fil og ikke har opsat nogen URL'er."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> i din settings-fil og ikke har opsat nogen "
+"URL'er."
 
 msgid "Django Documentation"
 msgstr "Django-dokumentation"

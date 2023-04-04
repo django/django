@@ -6,18 +6,17 @@ import copy
 import datetime
 import warnings
 from collections import defaultdict
+from graphlib import CycleError, TopologicalSorter
 from itertools import chain
 
 from django.forms.utils import to_current_timezone
 from django.templatetags.static import static
 from django.utils import formats
-from django.utils.datastructures import OrderedSet
 from django.utils.dates import MONTHS
 from django.utils.formats import get_format
 from django.utils.html import format_html, html_safe
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
-from django.utils.topological_sort import CyclicDependencyError, stable_topological_sort
 from django.utils.translation import gettext_lazy as _
 
 from .renderers import get_default_renderer
@@ -151,29 +150,23 @@ class Media:
         in a certain order. In JavaScript you may not be able to reference a
         global or in CSS you might want to override a style.
         """
-        dependency_graph = defaultdict(set)
-        all_items = OrderedSet()
-        for list_ in filter(None, lists):
-            head = list_[0]
-            # The first items depend on nothing but have to be part of the
-            # dependency graph to be included in the result.
-            dependency_graph.setdefault(head, set())
-            for item in list_:
-                all_items.add(item)
-                # No self dependencies
-                if head != item:
-                    dependency_graph[item].add(head)
+        ts = TopologicalSorter()
+        for head, *tail in filter(None, lists):
+            ts.add(head)  # Ensure that the first items are included.
+            for item in tail:
+                if head != item:  # Avoid circular dependency to self.
+                    ts.add(item, head)
                 head = item
         try:
-            return stable_topological_sort(all_items, dependency_graph)
-        except CyclicDependencyError:
+            return list(ts.static_order())
+        except CycleError:
             warnings.warn(
                 "Detected duplicate Media files in an opposite order: {}".format(
                     ", ".join(repr(list_) for list_ in lists)
                 ),
                 MediaOrderConflictWarning,
             )
-            return list(all_items)
+            return list(dict.fromkeys(chain.from_iterable(filter(None, lists))))
 
     def __add__(self, other):
         combined = Media()
@@ -207,7 +200,7 @@ def media_property(cls):
                 else:
                     m = Media()
                     for medium in extend:
-                        m = m + base[medium]
+                        m += base[medium]
                 return m + Media(definition)
             return Media(definition)
         return base
@@ -489,7 +482,6 @@ class ClearableFileInput(FileInput):
         if not self.is_required and CheckboxInput().value_from_datadict(
             data, files, self.clear_checkbox_name(name)
         ):
-
             if upload:
                 # If the user contradicts themselves (uploads a new file AND
                 # checks the "clear" checkbox), we return a unique marker
@@ -945,7 +937,7 @@ class MultiWidget(Widget):
         """
         media = Media()
         for w in self.widgets:
-            media = media + w.media
+            media += w.media
         return media
 
     media = property(_get_media)
@@ -1169,6 +1161,8 @@ class SelectDateWidget(Widget):
                 # Return pseudo-ISO dates with zeros for any unselected values,
                 # e.g. '2017-0-23'.
                 return "%s-%s-%s" % (y or 0, m or 0, d or 0)
+            except OverflowError:
+                return "0-0-0"
             return date_value.strftime(input_format)
         return data.get(name)
 

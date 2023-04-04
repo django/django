@@ -153,10 +153,6 @@ class Template:
         self.source = str(template_string)  # May be lazy.
         self.nodelist = self.compile_nodelist()
 
-    def __iter__(self):
-        for node in self.nodelist:
-            yield from node
-
     def __repr__(self):
         return '<%s template_string="%s...">' % (
             self.__class__.__qualname__,

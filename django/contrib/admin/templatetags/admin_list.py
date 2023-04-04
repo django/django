@@ -1,6 +1,5 @@
 import datetime
 
-from django.conf import settings
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     display_for_field,
@@ -11,6 +10,7 @@ from django.contrib.admin.utils import (
 )
 from django.contrib.admin.views.main import (
     ALL_VAR,
+    IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
     PAGE_VAR,
@@ -97,8 +97,12 @@ def result_headers(cl):
 
             # if the field is the action checkbox: no sorting and special class
             if field_name == "action_checkbox":
+                aria_label = _("Select all objects on this page for an action")
                 yield {
-                    "text": text,
+                    "text": mark_safe(
+                        f'<input type="checkbox" id="action-toggle" '
+                        f'aria-label="{aria_label}">'
+                    ),
                     "class_attrib": mark_safe(' class="action-checkbox-column"'),
                     "sortable": False,
                 }
@@ -357,10 +361,8 @@ def date_hierarchy(cl):
         field = get_fields_from_path(cl.model, field_name)[-1]
         if isinstance(field, models.DateTimeField):
             dates_or_datetimes = "datetimes"
-            qs_kwargs = {"is_dst": True} if settings.USE_DEPRECATED_PYTZ else {}
         else:
             dates_or_datetimes = "dates"
-            qs_kwargs = {}
         year_field = "%s__year" % field_name
         month_field = "%s__month" % field_name
         day_field = "%s__day" % field_name
@@ -401,9 +403,7 @@ def date_hierarchy(cl):
                 ],
             }
         elif year_lookup and month_lookup:
-            days = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "day", **qs_kwargs
-            )
+            days = getattr(cl.queryset, dates_or_datetimes)(field_name, "day")
             return {
                 "show": True,
                 "back": {
@@ -425,9 +425,7 @@ def date_hierarchy(cl):
                 ],
             }
         elif year_lookup:
-            months = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "month", **qs_kwargs
-            )
+            months = getattr(cl.queryset, dates_or_datetimes)(field_name, "month")
             return {
                 "show": True,
                 "back": {"link": link({}), "title": _("All dates")},
@@ -444,9 +442,7 @@ def date_hierarchy(cl):
                 ],
             }
         else:
-            years = getattr(cl.queryset, dates_or_datetimes)(
-                field_name, "year", **qs_kwargs
-            )
+            years = getattr(cl.queryset, dates_or_datetimes)(field_name, "year")
             return {
                 "show": True,
                 "back": None,
@@ -480,6 +476,7 @@ def search_form(cl):
         "show_result_count": cl.result_count != cl.full_result_count,
         "search_var": SEARCH_VAR,
         "is_popup_var": IS_POPUP_VAR,
+        "is_facets_var": IS_FACETS_VAR,
     }
 
 

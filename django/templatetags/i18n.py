@@ -187,7 +187,7 @@ class BlockTranslateNode(Node):
         data = {v: render_value(v) for v in vars}
         context.pop()
         try:
-            result = result % data
+            result %= data
         except (KeyError, ValueError):
             if nested:
                 # Either string is malformed, or it's a bug

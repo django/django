@@ -102,12 +102,12 @@ class OpenLayersWidget(BaseGeometryWidget):
     class Media:
         css = {
             "all": (
-                "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.css",
+                "https://cdn.jsdelivr.net/npm/ol@v7.2.2/ol.css",
                 "gis/css/ol3.css",
             )
         }
         js = (
-            "https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js",
+            "https://cdn.jsdelivr.net/npm/ol@v7.2.2/dist/ol.js",
             "gis/js/OLMapWidget.js",
         )
 

@@ -312,6 +312,19 @@ class CreatesuperuserManagementCommandTestCase(TestCase):
         # created password should be unusable
         self.assertFalse(u.has_usable_password())
 
+    def test_validate_username(self):
+        msg = (
+            "Enter a valid username. This value may contain only letters, numbers, "
+            "and @/./+/-/_ characters."
+        )
+        with self.assertRaisesMessage(CommandError, msg):
+            call_command(
+                "createsuperuser",
+                interactive=False,
+                username="🤠",
+                email="joe@somewhere.org",
+            )
+
     def test_non_ascii_verbose_name(self):
         @mock_inputs(
             {
@@ -1472,3 +1485,22 @@ class CreatePermissionsTests(TestCase):
                 codename=codename,
             ).exists()
         )
+
+
+class DefaultDBRouter:
+    """Route all writes to default."""
+
+    def db_for_write(self, model, **hints):
+        return "default"
+
+
+@override_settings(DATABASE_ROUTERS=[DefaultDBRouter()])
+class CreatePermissionsMultipleDatabasesTests(TestCase):
+    databases = {"default", "other"}
+
+    def test_set_permissions_fk_to_using_parameter(self):
+        Permission.objects.using("other").delete()
+        with self.assertNumQueries(6, using="other") as captured_queries:
+            create_permissions(apps.get_app_config("auth"), verbosity=0, using="other")
+        self.assertIn("INSERT INTO", captured_queries[-1]["sql"].upper())
+        self.assertGreater(Permission.objects.using("other").count(), 0)

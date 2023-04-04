@@ -11,7 +11,7 @@ from django.db.backends.ddl_references import (
     Statement,
     Table,
 )
-from django.db.backends.utils import names_digest, split_identifier
+from django.db.backends.utils import names_digest, split_identifier, truncate_name
 from django.db.models import Deferrable, Index
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
@@ -87,13 +87,12 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_column = "ALTER TABLE %(table)s ADD COLUMN %(column)s %(definition)s"
     sql_alter_column = "ALTER TABLE %(table)s %(changes)s"
-    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s"
+    sql_alter_column_type = "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
     sql_alter_column_null = "ALTER COLUMN %(column)s DROP NOT NULL"
     sql_alter_column_not_null = "ALTER COLUMN %(column)s SET NOT NULL"
     sql_alter_column_default = "ALTER COLUMN %(column)s SET DEFAULT %(default)s"
     sql_alter_column_no_default = "ALTER COLUMN %(column)s DROP DEFAULT"
     sql_alter_column_no_default_null = sql_alter_column_no_default
-    sql_alter_column_collate = "ALTER COLUMN %(column)s TYPE %(type)s%(collation)s"
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s CASCADE"
     sql_rename_column = (
         "ALTER TABLE %(table)s RENAME COLUMN %(old_column)s TO %(new_column)s"
@@ -141,6 +140,9 @@ class BaseDatabaseSchemaEditor:
     sql_delete_pk = sql_delete_constraint
 
     sql_delete_procedure = "DROP PROCEDURE %(procedure)s"
+
+    sql_alter_table_comment = "COMMENT ON TABLE %(table)s IS %(comment)s"
+    sql_alter_column_comment = "COMMENT ON COLUMN %(table)s.%(column)s IS %(comment)s"
 
     def __init__(self, connection, collect_sql=False, atomic=True):
         self.connection = connection
@@ -290,6 +292,8 @@ class BaseDatabaseSchemaEditor:
         yield column_db_type
         if collation := field_db_params.get("collation"):
             yield self._collate_sql(collation)
+        if self.connection.features.supports_comments_inline and field.db_comment:
+            yield self._comment_sql(field.db_comment)
         # Work out nullability.
         null = field.null
         # Include a default value, if requested.
@@ -446,6 +450,23 @@ class BaseDatabaseSchemaEditor:
         # definition.
         self.execute(sql, params or None)
 
+        if self.connection.features.supports_comments:
+            # Add table comment.
+            if model._meta.db_table_comment:
+                self.alter_db_table_comment(model, None, model._meta.db_table_comment)
+            # Add column comments.
+            if not self.connection.features.supports_comments_inline:
+                for field in model._meta.local_fields:
+                    if field.db_comment:
+                        field_db_params = field.db_parameters(
+                            connection=self.connection
+                        )
+                        field_type = field_db_params["type"]
+                        self.execute(
+                            *self._alter_column_comment_sql(
+                                model, field, field_type, field.db_comment
+                            )
+                        )
         # Add any field index and index_together's (deferred as SQLite
         # _remake_table needs it).
         self.deferred_sql.extend(self._model_indexes_sql(model))
@@ -615,6 +636,15 @@ class BaseDatabaseSchemaEditor:
             if isinstance(sql, Statement):
                 sql.rename_table_references(old_db_table, new_db_table)
 
+    def alter_db_table_comment(self, model, old_db_table_comment, new_db_table_comment):
+        self.execute(
+            self.sql_alter_table_comment
+            % {
+                "table": self.quote_name(model._meta.db_table),
+                "comment": self.quote_value(new_db_table_comment or ""),
+            }
+        )
+
     def alter_db_tablespace(self, model, old_db_tablespace, new_db_tablespace):
         """Move a model's table between tablespaces."""
         self.execute(
@@ -694,6 +724,18 @@ class BaseDatabaseSchemaEditor:
                 "changes": changes_sql,
             }
             self.execute(sql, params)
+        # Add field comment, if required.
+        if (
+            field.db_comment
+            and self.connection.features.supports_comments
+            and not self.connection.features.supports_comments_inline
+        ):
+            field_type = db_params["type"]
+            self.execute(
+                *self._alter_column_comment_sql(
+                    model, field, field_type, field.db_comment
+                )
+            )
         # Add an index, if required
         self.deferred_sql.extend(self._field_indexes_sql(model, field))
         # Reset connection if required
@@ -796,6 +838,17 @@ class BaseDatabaseSchemaEditor:
             strict,
         )
 
+    def _field_db_check(self, field, field_db_params):
+        # Always check constraints with the same mocked column name to avoid
+        # recreating constrains when the column is renamed.
+        check_constraints = self.connection.data_type_check_constraints
+        data = field.db_type_parameters(self.connection)
+        data["column"] = "__column_name__"
+        try:
+            return check_constraints[field.get_internal_type()] % data
+        except KeyError:
+            return None
+
     def _alter_field(
         self,
         model,
@@ -814,6 +867,11 @@ class BaseDatabaseSchemaEditor:
             self.connection.features.supports_foreign_keys
             and old_field.remote_field
             and old_field.db_constraint
+            and self._field_should_be_altered(
+                old_field,
+                new_field,
+                ignore={"db_comment"},
+            )
         ):
             fk_names = self._constraint_names(
                 model, [old_field.column], foreign_key=True
@@ -909,7 +967,9 @@ class BaseDatabaseSchemaEditor:
                 # is to look at its name (refs #28053).
                 self.execute(self._delete_index_sql(model, index_name))
         # Change check constraints?
-        if old_db_params["check"] != new_db_params["check"] and old_db_params["check"]:
+        old_db_check = self._field_db_check(old_field, old_db_params)
+        new_db_check = self._field_db_check(new_field, new_db_params)
+        if old_db_check != new_db_check and old_db_check:
             meta_constraint_names = {
                 constraint.name for constraint in model._meta.constraints
             }
@@ -950,17 +1010,18 @@ class BaseDatabaseSchemaEditor:
         # Type suffix change? (e.g. auto increment).
         old_type_suffix = old_field.db_type_suffix(connection=self.connection)
         new_type_suffix = new_field.db_type_suffix(connection=self.connection)
-        # Collation change?
-        if old_collation != new_collation:
-            # Collation change handles also a type change.
-            fragment = self._alter_column_collation_sql(
-                model, new_field, new_type, new_collation, old_field
+        # Type, collation, or comment change?
+        if (
+            old_type != new_type
+            or old_type_suffix != new_type_suffix
+            or old_collation != new_collation
+            or (
+                self.connection.features.supports_comments
+                and old_field.db_comment != new_field.db_comment
             )
-            actions.append(fragment)
-        # Type change?
-        elif (old_type, old_type_suffix) != (new_type, new_type_suffix):
+        ):
             fragment, other_actions = self._alter_column_type_sql(
-                model, old_field, new_field, new_type
+                model, old_field, new_field, new_type, old_collation, new_collation
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
@@ -997,7 +1058,7 @@ class BaseDatabaseSchemaEditor:
             if not four_way_default_alteration:
                 # If we don't have to do a 4-way default alteration we can
                 # directly run a (NOT) NULL alteration
-                actions = actions + null_actions
+                actions += null_actions
             # Combine actions together if we can (e.g. postgres)
             if self.connection.features.supports_combined_alters and actions:
                 sql, params = tuple(zip(*actions))
@@ -1076,20 +1137,14 @@ class BaseDatabaseSchemaEditor:
             rel_collation = rel_db_params.get("collation")
             old_rel_db_params = old_rel.field.db_parameters(connection=self.connection)
             old_rel_collation = old_rel_db_params.get("collation")
-            if old_rel_collation != rel_collation:
-                # Collation change handles also a type change.
-                fragment = self._alter_column_collation_sql(
-                    new_rel.related_model,
-                    new_rel.field,
-                    rel_type,
-                    rel_collation,
-                    old_rel.field,
-                )
-                other_actions = []
-            else:
-                fragment, other_actions = self._alter_column_type_sql(
-                    new_rel.related_model, old_rel.field, new_rel.field, rel_type
-                )
+            fragment, other_actions = self._alter_column_type_sql(
+                new_rel.related_model,
+                old_rel.field,
+                new_rel.field,
+                rel_type,
+                old_rel_collation,
+                rel_collation,
+            )
             self.execute(
                 self.sql_alter_column
                 % {
@@ -1120,7 +1175,7 @@ class BaseDatabaseSchemaEditor:
                         self._create_fk_sql(rel.related_model, rel.field, "_fk")
                     )
         # Does it have check constraints we need to add?
-        if old_db_params["check"] != new_db_params["check"] and new_db_params["check"]:
+        if old_db_check != new_db_check and new_db_check:
             constraint_name = self._create_index_name(
                 model._meta.db_table, [new_field.column], suffix="_check"
             )
@@ -1209,7 +1264,9 @@ class BaseDatabaseSchemaEditor:
             params,
         )
 
-    def _alter_column_type_sql(self, model, old_field, new_field, new_type):
+    def _alter_column_type_sql(
+        self, model, old_field, new_field, new_type, old_collation, new_collation
+    ):
         """
         Hook to specialize column type alteration for different backends,
         for cases when a creation type is different to an alteration type
@@ -1219,32 +1276,53 @@ class BaseDatabaseSchemaEditor:
         an ALTER TABLE statement and a list of extra (sql, params) tuples to
         run once the field is altered.
         """
+        other_actions = []
+        if collate_sql := self._collate_sql(
+            new_collation, old_collation, model._meta.db_table
+        ):
+            collate_sql = f" {collate_sql}"
+        else:
+            collate_sql = ""
+        # Comment change?
+        comment_sql = ""
+        if self.connection.features.supports_comments and not new_field.many_to_many:
+            if old_field.db_comment != new_field.db_comment:
+                # PostgreSQL and Oracle can't execute 'ALTER COLUMN ...' and
+                # 'COMMENT ON ...' at the same time.
+                sql, params = self._alter_column_comment_sql(
+                    model, new_field, new_type, new_field.db_comment
+                )
+                if sql:
+                    other_actions.append((sql, params))
+            if new_field.db_comment:
+                comment_sql = self._comment_sql(new_field.db_comment)
         return (
             (
                 self.sql_alter_column_type
                 % {
                     "column": self.quote_name(new_field.column),
                     "type": new_type,
+                    "collation": collate_sql,
+                    "comment": comment_sql,
                 },
                 [],
             ),
-            [],
+            other_actions,
         )
 
-    def _alter_column_collation_sql(
-        self, model, new_field, new_type, new_collation, old_field
-    ):
+    def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
         return (
-            self.sql_alter_column_collate
+            self.sql_alter_column_comment
             % {
+                "table": self.quote_name(model._meta.db_table),
                 "column": self.quote_name(new_field.column),
-                "type": new_type,
-                "collation": " " + self._collate_sql(new_collation)
-                if new_collation
-                else "",
+                "comment": self._comment_sql(new_db_comment),
             },
             [],
         )
+
+    def _comment_sql(self, comment):
+        return self.quote_value(comment or "")
 
     def _alter_many_to_many(self, model, old_field, new_field, strict):
         """Alter M2Ms to repoint their to= endpoints."""
@@ -1439,16 +1517,18 @@ class BaseDatabaseSchemaEditor:
             output.append(self._create_index_sql(model, fields=[field]))
         return output
 
-    def _field_should_be_altered(self, old_field, new_field):
+    def _field_should_be_altered(self, old_field, new_field, ignore=None):
+        ignore = ignore or set()
         _, old_path, old_args, old_kwargs = old_field.deconstruct()
         _, new_path, new_args, new_kwargs = new_field.deconstruct()
         # Don't alter when:
         # - changing only a field name
         # - changing an attribute that doesn't affect the schema
+        # - changing an attribute in the provided set of ignored attributes
         # - adding only a db_column and the column name is not changed
-        for attr in old_field.non_db_attrs:
+        for attr in ignore.union(old_field.non_db_attrs):
             old_kwargs.pop(attr, None)
-        for attr in new_field.non_db_attrs:
+        for attr in ignore.union(new_field.non_db_attrs):
             new_kwargs.pop(attr, None)
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
@@ -1659,6 +1739,8 @@ class BaseDatabaseSchemaEditor:
         }
 
     def _create_check_sql(self, model, name, check):
+        if not self.connection.features.supports_table_check_constraints:
+            return None
         return Statement(
             self.sql_create_check,
             table=Table(model._meta.db_table, self.quote_name),
@@ -1667,6 +1749,8 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _delete_check_sql(self, model, name):
+        if not self.connection.features.supports_table_check_constraints:
+            return None
         return self._delete_constraint_sql(self.sql_delete_check, model, name)
 
     def _delete_constraint_sql(self, template, model, name):
@@ -1691,7 +1775,11 @@ class BaseDatabaseSchemaEditor:
         """Return all constraint names matching the columns and conditions."""
         if column_names is not None:
             column_names = [
-                self.connection.introspection.identifier_converter(name)
+                self.connection.introspection.identifier_converter(
+                    truncate_name(name, self.connection.ops.max_name_length())
+                )
+                if self.connection.features.truncates_names
+                else self.connection.introspection.identifier_converter(name)
                 for name in column_names
             ]
         with self.connection.cursor() as cursor:
@@ -1745,8 +1833,8 @@ class BaseDatabaseSchemaEditor:
     def _delete_primary_key_sql(self, model, name):
         return self._delete_constraint_sql(self.sql_delete_pk, model, name)
 
-    def _collate_sql(self, collation):
-        return "COLLATE " + self.quote_name(collation)
+    def _collate_sql(self, collation, old_collation=None, table_name=None):
+        return "COLLATE " + self.quote_name(collation) if collation else ""
 
     def remove_procedure(self, procedure_name, param_types=()):
         sql = self.sql_delete_procedure % {

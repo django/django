@@ -79,8 +79,9 @@ databases with Django.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
-  :ref:`PostgreSQL notes <postgresql-notes>` for further details.
+* If you're using PostgreSQL, you'll need the `psycopg`_ or `psycopg2`_
+  package. Refer to the :ref:`PostgreSQL notes <postgresql-notes>` for further
+  details.
 
 * If you're using MySQL or MariaDB, you'll need a :ref:`DB API driver
   <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
@@ -111,6 +112,7 @@ database queries, Django will need permission to create a test database.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
+.. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/

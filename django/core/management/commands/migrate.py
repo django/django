@@ -81,7 +81,10 @@ class Command(BaseCommand):
             "--check",
             action="store_true",
             dest="check_unapplied",
-            help="Exits with a non-zero status if unapplied migrations exist.",
+            help=(
+                "Exits with a non-zero status if unapplied migrations exist and does "
+                "not actually apply migrations."
+            ),
         )
         parser.add_argument(
             "--prune",
@@ -237,23 +240,27 @@ class Command(BaseCommand):
                     self.stdout.write("  No migrations to prune.")
 
         plan = executor.migration_plan(targets)
-        exit_dry = plan and options["check_unapplied"]
 
         if options["plan"]:
             self.stdout.write("Planned operations:", self.style.MIGRATE_LABEL)
             if not plan:
                 self.stdout.write("  No planned migration operations.")
-            for migration, backwards in plan:
-                self.stdout.write(str(migration), self.style.MIGRATE_HEADING)
-                for operation in migration.operations:
-                    message, is_error = self.describe_operation(operation, backwards)
-                    style = self.style.WARNING if is_error else None
-                    self.stdout.write("    " + message, style)
-            if exit_dry:
+            else:
+                for migration, backwards in plan:
+                    self.stdout.write(str(migration), self.style.MIGRATE_HEADING)
+                    for operation in migration.operations:
+                        message, is_error = self.describe_operation(
+                            operation, backwards
+                        )
+                        style = self.style.WARNING if is_error else None
+                        self.stdout.write("    " + message, style)
+                if options["check_unapplied"]:
+                    sys.exit(1)
+            return
+        if options["check_unapplied"]:
+            if plan:
                 sys.exit(1)
             return
-        if exit_dry:
-            sys.exit(1)
         if options["prune"]:
             return
 

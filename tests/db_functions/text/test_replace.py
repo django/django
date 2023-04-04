@@ -15,7 +15,7 @@ class ReplaceTests(TestCase):
         qs = Author.objects.annotate(
             without_middlename=Replace(F("name"), Value("R. R. "), Value("")),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("George R. R. Martin", "George Martin"),
@@ -29,7 +29,7 @@ class ReplaceTests(TestCase):
         qs = Author.objects.annotate(
             same_name=Replace(F("name"), Value("r. r."), Value(""))
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("George R. R. Martin", "George R. R. Martin"),
@@ -45,7 +45,7 @@ class ReplaceTests(TestCase):
                 Concat(Value("Author: "), F("name")), Value("Author: "), Value("")
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("George R. R. Martin", "George R. R. Martin"),
@@ -59,7 +59,7 @@ class ReplaceTests(TestCase):
         Author.objects.update(
             name=Replace(F("name"), Value("R. R. "), Value("")),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.all(),
             [
                 ("George Martin"),
@@ -72,7 +72,7 @@ class ReplaceTests(TestCase):
     def test_replace_with_default_arg(self):
         # The default replacement is an empty string.
         qs = Author.objects.annotate(same_name=Replace(F("name"), Value("R. R. ")))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("George R. R. Martin", "George Martin"),

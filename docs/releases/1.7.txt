@@ -178,15 +178,17 @@ class method can now directly :ref:`create Manager with QuerySet methods
 
     class FoodQuerySet(models.QuerySet):
         def pizzas(self):
-            return self.filter(kind='pizza')
+            return self.filter(kind="pizza")
 
         def vegetarian(self):
             return self.filter(vegetarian=True)
+
 
     class Food(models.Model):
         kind = models.CharField(max_length=50)
         vegetarian = models.BooleanField(default=False)
         objects = FoodQuerySet.as_manager()
+
 
     Food.objects.pizzas().vegetarian()
 
@@ -199,14 +201,16 @@ It is now possible to :ref:`specify a custom manager
     class Blog(models.Model):
         pass
 
+
     class Entry(models.Model):
         blog = models.ForeignKey(Blog)
 
         objects = models.Manager()  # Default Manager
-        entries = EntryManager()    # Custom Manager
+        entries = EntryManager()  # Custom Manager
+
 
     b = Blog.objects.get(id=1)
-    b.entry_set(manager='entries').all()
+    b.entry_set(manager="entries").all()
 
 New system check framework
 --------------------------
@@ -1009,7 +1013,9 @@ Standalone scripts
 If you're using Django in a plain Python script — rather than a management
 command — and you rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment
 variable, you must now explicitly initialize Django at the beginning of your
-script with::
+script with:
+
+.. code-block:: pycon
 
     >>> import django
     >>> django.setup()
@@ -1022,11 +1028,13 @@ WSGI scripts
 Until Django 1.3, the recommended way to create a WSGI application was::
 
     import django.core.handlers.wsgi
+
     application = django.core.handlers.wsgi.WSGIHandler()
 
 In Django 1.4, support for WSGI was improved and the API changed to::
 
     from django.core.wsgi import get_wsgi_application
+
     application = get_wsgi_application()
 
 If you're still using the former style in your WSGI script, you need to
@@ -1134,13 +1142,13 @@ method::
 
     # Old pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
     # New pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self.add_error(None, e)
 
@@ -1150,7 +1158,7 @@ wasn't available before Django 1.7, but you can use the following
 workaround to convert any ``list`` into ``ErrorList``::
 
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
@@ -1195,8 +1203,8 @@ manager will *not* be reset. This was necessary to resolve an inconsistency in
 the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
 
-pytz may be required
---------------------
+``pytz`` may be required
+------------------------
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
 a :exc:`ValueError` when encountering them, you will have to install pytz_. You
@@ -1526,7 +1534,7 @@ for a particular form instance. For example (from Django itself)::
 
     PasswordChangeForm.base_fields = OrderedDict(
         (k, PasswordChangeForm.base_fields[k])
-        for k in ['old_password', 'new_password1', 'new_password2']
+        for k in ["old_password", "new_password1", "new_password2"]
     )
 
 Custom SQL location for models package

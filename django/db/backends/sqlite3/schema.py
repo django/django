@@ -11,7 +11,6 @@ from django.db.transaction import atomic
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
@@ -174,7 +173,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             super().alter_field(model, old_field, new_field, strict=strict)
 
     def _remake_table(
-        self, model, create_field=None, delete_field=None, alter_field=None
+        self, model, create_field=None, delete_field=None, alter_fields=None
     ):
         """
         Shortcut to transform a model from old_model into new_model
@@ -191,6 +190,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           4. Rename the "new__app_model" table to "app_model"
           5. Restore any index of the previous "app_model" table.
         """
+
         # Self-referential fields must be recreated rather than copied from
         # the old model to ensure their remote_field.field_name doesn't refer
         # to an altered field.
@@ -213,15 +213,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
-        if getattr(create_field, "primary_key", False) or (
-            alter_field and getattr(alter_field[1], "primary_key", False)
+        alter_fields = alter_fields or []
+        if getattr(create_field, "primary_key", False) or any(
+            getattr(new_field, "primary_key", False) for _, new_field in alter_fields
         ):
             for name, field in list(body.items()):
-                if field.primary_key and not (
+                if field.primary_key and not any(
                     # Do not remove the old primary key when an altered field
                     # that introduces a primary key is the same field.
-                    alter_field
-                    and name == alter_field[1].name
+                    name == new_field.name
+                    for _, new_field in alter_fields
                 ):
                     field.primary_key = False
                     restore_pk_field = field
@@ -237,7 +238,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                     self.effective_default(create_field),
                 )
         # Add in any altered fields
-        if alter_field:
+        for alter_field in alter_fields:
             old_field, new_field = alter_field
             body.pop(old_field.name, None)
             mapping.pop(old_field.column, None)
@@ -379,7 +380,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def add_field(self, model, field):
         """Create a field on a model."""
-        if (
+        # Special-case implicit M2M tables.
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            self.create_model(field.remote_field.through)
+        elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.
             field.primary_key
@@ -454,7 +458,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 )
             )
         # Alter by remaking table
-        self._remake_table(model, alter_field=(old_field, new_field))
+        self._remake_table(model, alter_fields=[(old_field, new_field)])
         # Rebuild tables with FKs pointing to this field.
         old_collation = old_db_params.get("collation")
         new_collation = new_db_params.get("collation")
@@ -492,18 +496,30 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # propagate this altering.
             self._remake_table(
                 old_field.remote_field.through,
-                alter_field=(
-                    # The field that points to the target model is needed, so
-                    # we can tell alter_field to change it - this is
-                    # m2m_reverse_field_name() (as opposed to m2m_field_name(),
-                    # which points to our model).
-                    old_field.remote_field.through._meta.get_field(
-                        old_field.m2m_reverse_field_name()
+                alter_fields=[
+                    (
+                        # The field that points to the target model is needed,
+                        # so that table can be remade with the new m2m field -
+                        # this is m2m_reverse_field_name().
+                        old_field.remote_field.through._meta.get_field(
+                            old_field.m2m_reverse_field_name()
+                        ),
+                        new_field.remote_field.through._meta.get_field(
+                            new_field.m2m_reverse_field_name()
+                        ),
                     ),
-                    new_field.remote_field.through._meta.get_field(
-                        new_field.m2m_reverse_field_name()
+                    (
+                        # The field that points to the model itself is needed,
+                        # so that table can be remade with the new self field -
+                        # this is m2m_field_name().
+                        old_field.remote_field.through._meta.get_field(
+                            old_field.m2m_field_name()
+                        ),
+                        new_field.remote_field.through._meta.get_field(
+                            new_field.m2m_field_name()
+                        ),
                     ),
-                ),
+                ],
             )
             return
 

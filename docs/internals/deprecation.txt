@@ -7,6 +7,20 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-6.0:
+
+6.0
+---
+
+See the :ref:`Django 5.0 release notes <deprecated-features-5.0>` for more
+details on these changes.
+
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers will be removed.
+
+* Support for passing positional arguments to ``BaseConstraint`` will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
@@ -34,6 +48,22 @@ details on these changes.
 
 * The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
   will be removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method will be removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method will be removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions will be removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` will be removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings will be
+  removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function will be
+  removed.
 
 .. _deprecation-removed-in-5.0:
 

@@ -1,7 +1,7 @@
 import re
 
 from django.core.exceptions import ValidationError
-from django.forms.utils import pretty_name
+from django.forms.utils import RenderableFieldMixin, pretty_name
 from django.forms.widgets import MultiWidget, Textarea, TextInput
 from django.utils.functional import cached_property
 from django.utils.html import format_html, html_safe
@@ -10,8 +10,7 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ("BoundField",)
 
 
-@html_safe
-class BoundField:
+class BoundField(RenderableFieldMixin):
     "A Field plus data"
 
     def __init__(self, form, field, name):
@@ -26,12 +25,7 @@ class BoundField:
         else:
             self.label = self.field.label
         self.help_text = field.help_text or ""
-
-    def __str__(self):
-        """Render this field as an HTML widget."""
-        if self.field.show_hidden_initial:
-            return self.as_widget() + self.as_hidden(only_initial=True)
-        return self.as_widget()
+        self.renderer = form.renderer
 
     @cached_property
     def subwidgets(self):
@@ -81,6 +75,13 @@ class BoundField:
             self.name, self.form.error_class(renderer=self.form.renderer)
         )
 
+    @property
+    def template_name(self):
+        return self.field.template_name or self.form.renderer.field_template_name
+
+    def get_context(self):
+        return {"field": self}
+
     def as_widget(self, widget=None, attrs=None, only_initial=False):
         """
         Render the field by rendering the passed widget, adding any HTML
@@ -96,9 +97,17 @@ class BoundField:
             attrs.setdefault(
                 "id", self.html_initial_id if only_initial else self.auto_id
             )
+        if only_initial and self.html_initial_name in self.form.data:
+            # Propagate the hidden initial value.
+            value = self.form._widget_data_value(
+                self.field.hidden_widget(),
+                self.html_initial_name,
+            )
+        else:
+            value = self.value()
         return widget.render(
             name=self.html_initial_name if only_initial else self.html_name,
-            value=self.value(),
+            value=value,
             attrs=attrs,
             renderer=self.form.renderer,
         )

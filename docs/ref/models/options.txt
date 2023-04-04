@@ -27,7 +27,7 @@ Available ``Meta`` options
     If a model is defined outside of an application in
     :setting:`INSTALLED_APPS`, it must declare which app it belongs to::
 
-        app_label = 'myapp'
+        app_label = "myapp"
 
     If you want to represent a model with the format ``app_label.object_name``
     or ``app_label.model_name`` you can use ``model._meta.label``
@@ -48,7 +48,7 @@ Available ``Meta`` options
 
     The name of the database table to use for the model::
 
-        db_table = 'music_album'
+        db_table = "music_album"
 
 .. _table-names:
 
@@ -90,6 +90,24 @@ Django quotes column and table names behind the scenes.
    Such quoted names can also be used with Django's other supported database
    backends; except for Oracle, however, the quotes have no effect. See the
    :ref:`Oracle notes <oracle-notes>` for more details.
+
+``db_table_comment``
+--------------------
+
+.. versionadded:: 4.2
+
+.. attribute:: Options.db_table_comment
+
+The comment on the database table to use for this model. It is useful for
+documenting database tables for individuals with direct database access who may
+not be looking at your Django code. For example::
+
+    class Answer(models.Model):
+        question = models.ForeignKey(Question, on_delete=models.CASCADE)
+        answer = models.TextField()
+
+        class Meta:
+            db_table_comment = "Question answers"
 
 ``db_tablespace``
 -----------------
@@ -143,7 +161,7 @@ Django quotes column and table names behind the scenes.
         get_latest_by = "order_date"
 
         # Latest by priority descending, order_date ascending.
-        get_latest_by = ['-priority', 'order_date']
+        get_latest_by = ["-priority", "order_date"]
 
     See the :meth:`~django.db.models.query.QuerySet.latest` docs for more.
 
@@ -200,36 +218,44 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Question(models.Model):
             text = models.TextField()
             # ...
+
 
         class Answer(models.Model):
             question = models.ForeignKey(Question, on_delete=models.CASCADE)
             # ...
 
             class Meta:
-                order_with_respect_to = 'question'
+                order_with_respect_to = "question"
 
     When ``order_with_respect_to`` is set, two additional methods are provided to
     retrieve and to set the order of the related objects: ``get_RELATED_order()``
     and ``set_RELATED_order()``, where ``RELATED`` is the lowercased model name. For
     example, assuming that a ``Question`` object has multiple related ``Answer``
     objects, the list returned contains the primary keys of the related ``Answer``
-    objects::
+    objects:
+
+    .. code-block:: pycon
 
         >>> question = Question.objects.get(id=1)
         >>> question.get_answer_order()
         [1, 2, 3]
 
     The order of a ``Question`` object's related ``Answer`` objects can be set by
-    passing in a list of ``Answer`` primary keys::
+    passing in a list of ``Answer`` primary keys:
+
+    .. code-block:: pycon
 
         >>> question.set_answer_order([3, 1, 2])
 
     The related objects also get two methods, ``get_next_in_order()`` and
     ``get_previous_in_order()``, which can be used to access those objects in their
-    proper order. Assuming the ``Answer`` objects are ordered by ``id``::
+    proper order. Assuming the ``Answer`` objects are ordered by ``id``:
+
+    .. code-block:: pycon
 
         >>> answer = Answer.objects.get(id=2)
         >>> answer.get_next_in_order()
@@ -259,7 +285,7 @@ Django quotes column and table names behind the scenes.
 
     The default ordering for the object, for use when obtaining lists of objects::
 
-        ordering = ['-order_date']
+        ordering = ["-order_date"]
 
     This is a tuple or list of strings and/or query expressions. Each string is
     a field name with an optional "-" prefix, which indicates descending order.
@@ -268,22 +294,22 @@ Django quotes column and table names behind the scenes.
 
     For example, to order by a ``pub_date`` field ascending, use this::
 
-        ordering = ['pub_date']
+        ordering = ["pub_date"]
 
     To order by ``pub_date`` descending, use this::
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
     To order by ``pub_date`` descending, then by ``author`` ascending, use this::
 
-        ordering = ['-pub_date', 'author']
+        ordering = ["-pub_date", "author"]
 
     You can also use :doc:`query expressions </ref/models/expressions>`. To
     order by ``author`` ascending and make null values sort last, use this::
 
         from django.db.models import F
 
-        ordering = [F('author').asc(nulls_last=True)]
+        ordering = [F("author").asc(nulls_last=True)]
 
 .. warning::
 
@@ -306,7 +332,7 @@ Django quotes column and table names behind the scenes.
     Add, change, delete, and view permissions are automatically created for each
     model. This example specifies an extra permission, ``can_deliver_pizzas``::
 
-        permissions = [('can_deliver_pizzas', 'Can deliver pizzas')]
+        permissions = [("can_deliver_pizzas", "Can deliver pizzas")]
 
     This is a list or tuple of 2-tuples in the format ``(permission_code,
     human_readable_permission_name)``.
@@ -382,14 +408,15 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Customer(models.Model):
             first_name = models.CharField(max_length=100)
             last_name = models.CharField(max_length=100)
 
             class Meta:
                 indexes = [
-                    models.Index(fields=['last_name', 'first_name']),
-                    models.Index(fields=['first_name'], name='first_name_idx'),
+                    models.Index(fields=["last_name", "first_name"]),
+                    models.Index(fields=["first_name"], name="first_name_idx"),
                 ]
 
 ``unique_together``
@@ -405,7 +432,7 @@ Django quotes column and table names behind the scenes.
 
     Sets of field names that, taken together, must be unique::
 
-        unique_together = [['driver', 'restaurant']]
+        unique_together = [["driver", "restaurant"]]
 
     This is a list of lists that must be unique when considered together.
     It's used in the Django admin and is enforced at the database level (i.e., the
@@ -415,7 +442,7 @@ Django quotes column and table names behind the scenes.
     For convenience, ``unique_together`` can be a single list when dealing with
     a single set of fields::
 
-        unique_together = ['driver', 'restaurant']
+        unique_together = ["driver", "restaurant"]
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
     unique_together. (It's not clear what that would even mean!) If you
@@ -459,12 +486,13 @@ Django quotes column and table names behind the scenes.
 
         from django.db import models
 
+
         class Customer(models.Model):
             age = models.IntegerField()
 
             class Meta:
                 constraints = [
-                    models.CheckConstraint(check=models.Q(age__gte=18), name='age_gte_18'),
+                    models.CheckConstraint(check=models.Q(age__gte=18), name="age_gte_18"),
                 ]
 
 ``verbose_name``

@@ -93,7 +93,6 @@ class MultiColumnFKTests(TestCase):
             self.assertIs(membership.person, self.bob)
 
     def test_query_filters_correctly(self):
-
         # Creating a to valid memberships
         Membership.objects.create(
             membership_country_id=self.usa.id,
@@ -113,14 +112,13 @@ class MultiColumnFKTests(TestCase):
             group_id=self.cia.id,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__name__contains="o"),
             [self.bob.id],
             attrgetter("person_id"),
         )
 
     def test_reverse_query_filters_correctly(self):
-
         timemark = datetime.datetime.now(tz=datetime.timezone.utc).replace(tzinfo=None)
         timedelta = datetime.timedelta(days=1)
 
@@ -146,7 +144,7 @@ class MultiColumnFKTests(TestCase):
             date_joined=timemark + timedelta,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Person.objects.filter(membership__date_joined__gte=timemark),
             ["Jim"],
             attrgetter("name"),
@@ -171,14 +169,14 @@ class MultiColumnFKTests(TestCase):
             group_id=self.cia.id,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__in=[self.george, self.jim]),
             [
                 self.jim.id,
             ],
             attrgetter("person_id"),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Membership.objects.filter(person__in=Person.objects.filter(name="Jim")),
             [
                 self.jim.id,
@@ -281,7 +279,7 @@ class MultiColumnFKTests(TestCase):
 
     def test_m2m_through_forward_returns_valid_members(self):
         # We start out by making sure that the Group 'CIA' has no members.
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -292,13 +290,13 @@ class MultiColumnFKTests(TestCase):
 
         # Bob and Jim should be members of the CIA.
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.cia.members.all(), ["Bob", "Jim"], attrgetter("name")
         )
 
     def test_m2m_through_reverse_returns_valid_members(self):
         # We start out by making sure that Bob is in no groups.
-        self.assertQuerysetEqual(self.bob.groups.all(), [])
+        self.assertQuerySetEqual(self.bob.groups.all(), [])
 
         Membership.objects.create(
             membership_country=self.usa, person=self.bob, group=self.cia
@@ -308,13 +306,13 @@ class MultiColumnFKTests(TestCase):
         )
 
         # Bob should be in the CIA and a Republican
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.bob.groups.all(), ["CIA", "Republican"], attrgetter("name")
         )
 
     def test_m2m_through_forward_ignores_invalid_members(self):
         # We start out by making sure that the Group 'CIA' has no members.
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
         # Something adds jane to group CIA but Jane is in Soviet Union which
         # isn't CIA's country.
@@ -323,11 +321,11 @@ class MultiColumnFKTests(TestCase):
         )
 
         # There should still be no members in CIA
-        self.assertQuerysetEqual(self.cia.members.all(), [])
+        self.assertQuerySetEqual(self.cia.members.all(), [])
 
     def test_m2m_through_reverse_ignores_invalid_members(self):
         # We start out by making sure that Jane has no groups.
-        self.assertQuerysetEqual(self.jane.groups.all(), [])
+        self.assertQuerySetEqual(self.jane.groups.all(), [])
 
         # Something adds jane to group CIA but Jane is in Soviet Union which
         # isn't CIA's country.
@@ -336,10 +334,10 @@ class MultiColumnFKTests(TestCase):
         )
 
         # Jane should still not be in any groups
-        self.assertQuerysetEqual(self.jane.groups.all(), [])
+        self.assertQuerySetEqual(self.jane.groups.all(), [])
 
     def test_m2m_through_on_self_works(self):
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
         Friendship.objects.create(
             from_friend_country=self.jane.person_country,
@@ -348,12 +346,12 @@ class MultiColumnFKTests(TestCase):
             to_friend=self.george,
         )
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             self.jane.friends.all(), ["George"], attrgetter("name")
         )
 
     def test_m2m_through_on_self_ignores_mismatch_columns(self):
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
         # Note that we use ids instead of instances. This is because instances
         # on ForeignObject properties will set all related field off of the
@@ -365,7 +363,7 @@ class MultiColumnFKTests(TestCase):
             from_friend_country_id=self.george.person_country_id,
         )
 
-        self.assertQuerysetEqual(self.jane.friends.all(), [])
+        self.assertQuerySetEqual(self.jane.friends.all(), [])
 
     def test_prefetch_related_m2m_forward_works(self):
         Membership.objects.create(

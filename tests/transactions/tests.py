@@ -226,6 +226,22 @@ class AtomicTests(TransactionTestCase):
             transaction.savepoint_rollback(sid)
         self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
+    @skipUnlessDBFeature("can_release_savepoints")
+    def test_failure_on_exit_transaction(self):
+        with transaction.atomic():
+            with self.assertRaises(DatabaseError):
+                with transaction.atomic():
+                    Reporter.objects.create(last_name="Tintin")
+                    self.assertEqual(len(Reporter.objects.all()), 1)
+                    # Incorrect savepoint id to provoke a database error.
+                    connection.savepoint_ids.append("12")
+            with self.assertRaises(transaction.TransactionManagementError):
+                len(Reporter.objects.all())
+            self.assertIs(connection.needs_rollback, True)
+            if connection.savepoint_ids:
+                connection.savepoint_ids.pop()
+        self.assertSequenceEqual(Reporter.objects.all(), [])
+
 
 class AtomicInsideTransactionTests(AtomicTests):
     """All basic tests for atomic should also pass within an existing transaction."""
@@ -303,7 +319,6 @@ class AtomicMergeTests(TransactionTestCase):
 
 @skipUnlessDBFeature("uses_savepoints")
 class AtomicErrorsTests(TransactionTestCase):
-
     available_apps = ["transactions"]
     forbidden_atomic_msg = "This is forbidden when an 'atomic' block is active."
 
@@ -339,8 +354,11 @@ class AtomicErrorsTests(TransactionTestCase):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             )
-            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, msg
+            ) as cm:
                 r2.save(force_update=True)
+        self.assertIsInstance(cm.exception.__cause__, IntegrityError)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Haddock")
 
     @skipIfDBFeature("atomic_transactions")
@@ -373,7 +391,6 @@ class AtomicErrorsTests(TransactionTestCase):
 @skipUnlessDBFeature("uses_savepoints")
 @skipUnless(connection.vendor == "mysql", "MySQL-specific behaviors")
 class AtomicMySQLTests(TransactionTestCase):
-
     available_apps = ["transactions"]
 
     @skipIf(threading is None, "Test requires threading")
@@ -414,7 +431,6 @@ class AtomicMySQLTests(TransactionTestCase):
 
 
 class AtomicMiscTests(TransactionTestCase):
-
     available_apps = ["transactions"]
 
     def test_wrap_callable_instance(self):
@@ -434,13 +450,10 @@ class AtomicMiscTests(TransactionTestCase):
         # Expect an error when rolling back a savepoint that doesn't exist.
         # Done outside of the transaction block to ensure proper recovery.
         with self.assertRaises(Error):
-
             # Start a plain transaction.
             with transaction.atomic():
-
                 # Swallow the intentional error raised in the sub-transaction.
                 with self.assertRaisesMessage(Exception, "Oops"):
-
                     # Start a sub-transaction with a savepoint.
                     with transaction.atomic():
                         sid = connection.savepoint_ids[-1]
@@ -451,14 +464,11 @@ class AtomicMiscTests(TransactionTestCase):
 
     def test_mark_for_rollback_on_error_in_transaction(self):
         with transaction.atomic(savepoint=False):
-
             # Swallow the intentional error raised.
             with self.assertRaisesMessage(Exception, "Oops"):
-
                 # Wrap in `mark_for_rollback_on_error` to check if the
                 # transaction is marked broken.
                 with transaction.mark_for_rollback_on_error():
-
                     # Ensure that we are still in a good state.
                     self.assertFalse(transaction.get_rollback())
 
@@ -481,11 +491,9 @@ class AtomicMiscTests(TransactionTestCase):
 
         # Swallow the intentional error raised.
         with self.assertRaisesMessage(Exception, "Oops"):
-
             # Wrap in `mark_for_rollback_on_error` to check if the transaction
             # is marked broken.
             with transaction.mark_for_rollback_on_error():
-
                 # Ensure that we are still in a good state.
                 self.assertFalse(transaction.get_connection().needs_rollback)
 
@@ -500,7 +508,6 @@ class AtomicMiscTests(TransactionTestCase):
 
 
 class NonAutocommitTests(TransactionTestCase):
-
     available_apps = []
 
     def setUp(self):

@@ -47,7 +47,7 @@ register lookups on itself or its instances. The two prominent examples are
         Registers a new lookup in the class or class instance. For example::
 
             DateField.register_lookup(YearExact)
-            User._meta.get_field('date_joined').register_lookup(MonthExact)
+            User._meta.get_field("date_joined").register_lookup(MonthExact)
 
         will register ``YearExact`` lookup on ``DateField`` and ``MonthExact``
         lookup on the ``User.date_joined`` (you can use :ref:`Field Access API
@@ -195,11 +195,11 @@ following methods:
     ``<lhs>__<lookup_name>=<rhs>``. Lookups can also be used directly in
     ``QuerySet`` filters::
 
-         Book.objects.filter(LessThan(F('word_count'), 7500))
+         Book.objects.filter(LessThan(F("word_count"), 7500))
 
     …or annotations::
 
-         Book.objects.annotate(is_short_story=LessThan(F('word_count'), 7500))
+         Book.objects.annotate(is_short_story=LessThan(F("word_count"), 7500))
 
     .. attribute:: lhs
 

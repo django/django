@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# HuanCheng Bai白宦成 <xiqingongzi@gmail.com>, 2018
+# HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
 # Fan Xu <xlivevil@aliyun.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kewei Ma <marknv.42@gmail.com>, 2016
@@ -14,13 +14,14 @@
 # spaceoi <zhangzhaoyu@gmail.com>, 2016
 # ced773123cfad7b4e8b79ca80f736af9, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Fan Xu <xlivevil@aliyun.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -73,12 +74,21 @@ msgstr ""
 "这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
 "除”箭头进行删除。"
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "在该框中键入以过滤所选%s的列表。"
+
 msgid "Remove all"
 msgstr "删除全部"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "删除所有已选择的%s。"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -263,11 +273,6 @@ msgstr "F"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr "您已经提交了此表单。确实要再次提交吗？"
 
 msgid "Show"
 msgstr "显示"

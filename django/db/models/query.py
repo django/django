@@ -20,16 +20,19 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import AutoField, DateField, DateTimeField, sql
+from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Ref, Value, When
+from django.db.models.expressions import Case, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
-from django.db.models.utils import create_namedtuple_class, resolve_callables
+from django.db.models.utils import (
+    AltersData,
+    create_namedtuple_class,
+    resolve_callables,
+)
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
@@ -284,7 +287,7 @@ class FlatValuesListIterable(BaseIterable):
             yield row[0]
 
 
-class QuerySet:
+class QuerySet(AltersData):
     """Represent a lazy database lookup for a set of objects."""
 
     def __init__(self, model=None, query=None, using=None, hints=None):
@@ -525,16 +528,9 @@ class QuerySet:
         """
         if chunk_size is None:
             if self._prefetch_related_lookups:
-                # When the deprecation ends, replace with:
-                # raise ValueError(
-                #     'chunk_size must be provided when using '
-                #     'QuerySet.iterator() after prefetch_related().'
-                # )
-                warnings.warn(
-                    "Using QuerySet.iterator() after prefetch_related() "
-                    "without specifying chunk_size is deprecated.",
-                    category=RemovedInDjango50Warning,
-                    stacklevel=2,
+                raise ValueError(
+                    "chunk_size must be provided when using QuerySet.iterator() after "
+                    "prefetch_related()."
                 )
         elif chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
@@ -585,24 +581,7 @@ class QuerySet:
                 raise TypeError("Complex aggregates require an alias")
             kwargs[arg.default_alias] = arg
 
-        query = self.query.chain()
-        for (alias, aggregate_expr) in kwargs.items():
-            query.add_annotation(aggregate_expr, alias, is_summary=True)
-            annotation = query.annotations[alias]
-            if not annotation.contains_aggregate:
-                raise TypeError("%s is not an aggregate expression" % alias)
-            for expr in annotation.get_source_expressions():
-                if (
-                    expr.contains_aggregate
-                    and isinstance(expr, Ref)
-                    and expr.refs in kwargs
-                ):
-                    name = expr.refs
-                    raise exceptions.FieldError(
-                        "Cannot compute %s('%s'): '%s' is an aggregate"
-                        % (annotation.name, name, name)
-                    )
-        return query.get_aggregation(self.db, kwargs)
+        return self.query.chain().get_aggregation(self.db, kwargs)
 
     async def aaggregate(self, *args, **kwargs):
         return await sync_to_async(self.aggregate)(*args, **kwargs)
@@ -716,7 +695,6 @@ class QuerySet:
                     "Unique fields that can trigger the upsert must be provided."
                 )
             # Updating primary keys and non-concrete fields is forbidden.
-            update_fields = [self.model._meta.get_field(name) for name in update_fields]
             if any(not f.concrete or f.many_to_many for f in update_fields):
                 raise ValueError(
                     "bulk_create() can only be used with concrete fields in "
@@ -728,12 +706,6 @@ class QuerySet:
                     "update_fields."
                 )
             if unique_fields:
-                # Primary key is allowed in unique_fields.
-                unique_fields = [
-                    self.model._meta.get_field(name)
-                    for name in unique_fields
-                    if name != "pk"
-                ]
                 if any(not f.concrete or f.many_to_many for f in unique_fields):
                     raise ValueError(
                         "bulk_create() can only be used with concrete fields "
@@ -781,6 +753,15 @@ class QuerySet:
                 raise ValueError("Can't bulk create a multi-table inherited model")
         if not objs:
             return objs
+        opts = self.model._meta
+        if unique_fields:
+            # Primary key is allowed in unique_fields.
+            unique_fields = [
+                self.model._meta.get_field(opts.pk.name if name == "pk" else name)
+                for name in unique_fields
+            ]
+        if update_fields:
+            update_fields = [self.model._meta.get_field(name) for name in update_fields]
         on_conflict = self._check_bulk_create_options(
             ignore_conflicts,
             update_conflicts,
@@ -788,7 +769,6 @@ class QuerySet:
             unique_fields,
         )
         self._for_write = True
-        opts = self.model._meta
         fields = opts.concrete_fields
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
@@ -946,29 +926,55 @@ class QuerySet:
             **kwargs,
         )
 
-    def update_or_create(self, defaults=None, **kwargs):
+    def update_or_create(self, defaults=None, create_defaults=None, **kwargs):
         """
         Look up an object with the given kwargs, updating one with defaults
-        if it exists, otherwise create a new one.
+        if it exists, otherwise create a new one. Optionally, an object can
+        be created with different values than defaults by using
+        create_defaults.
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
-        defaults = defaults or {}
+        if create_defaults is None:
+            update_defaults = create_defaults = defaults or {}
+        else:
+            update_defaults = defaults or {}
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
             # update_or_create() has performed its save.
-            obj, created = self.select_for_update().get_or_create(defaults, **kwargs)
+            obj, created = self.select_for_update().get_or_create(
+                create_defaults, **kwargs
+            )
             if created:
                 return obj, created
-            for k, v in resolve_callables(defaults):
+            for k, v in resolve_callables(update_defaults):
                 setattr(obj, k, v)
-            obj.save(using=self.db)
+
+            update_fields = set(update_defaults)
+            concrete_field_names = self.model._meta._non_pk_concrete_field_names
+            # update_fields does not support non-concrete fields.
+            if concrete_field_names.issuperset(update_fields):
+                # Add fields which are set on pre_save(), e.g. auto_now fields.
+                # This is to maintain backward compatibility as these fields
+                # are not updated unless explicitly specified in the
+                # update_fields list.
+                for field in self.model._meta.local_concrete_fields:
+                    if not (
+                        field.primary_key or field.__class__.pre_save is Field.pre_save
+                    ):
+                        update_fields.add(field.name)
+                        if field.name != field.attname:
+                            update_fields.add(field.attname)
+                obj.save(using=self.db, update_fields=update_fields)
+            else:
+                obj.save(using=self.db)
         return obj, False
 
-    async def aupdate_or_create(self, defaults=None, **kwargs):
+    async def aupdate_or_create(self, defaults=None, create_defaults=None, **kwargs):
         return await sync_to_async(self.update_or_create)(
             defaults=defaults,
+            create_defaults=create_defaults,
             **kwargs,
         )
 
@@ -1102,9 +1108,9 @@ class QuerySet:
                 qs = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset : offset + batch_size]
-                    qs += tuple(self.filter(**{filter_key: batch}).order_by())
+                    qs += tuple(self.filter(**{filter_key: batch}))
             else:
-                qs = self.filter(**{filter_key: id_list}).order_by()
+                qs = self.filter(**{filter_key: id_list})
         else:
             qs = self._chain()
         return {getattr(obj, field_name): obj for obj in qs}
@@ -1184,11 +1190,18 @@ class QuerySet:
         # Inline annotations in order_by(), if possible.
         new_order_by = []
         for col in query.order_by:
-            if annotation := query.annotations.get(col):
+            alias = col
+            descending = False
+            if isinstance(alias, str) and alias.startswith("-"):
+                alias = alias.removeprefix("-")
+                descending = True
+            if annotation := query.annotations.get(alias):
                 if getattr(annotation, "contains_aggregate", False):
                     raise exceptions.FieldError(
                         f"Cannot update when ordering by an aggregate: {annotation}"
                     )
+                if descending:
+                    annotation = annotation.desc()
                 new_order_by.append(annotation)
             else:
                 new_order_by.append(col)
@@ -1366,11 +1379,7 @@ class QuerySet:
             .order_by(("-" if order == "DESC" else "") + "datefield")
         )
 
-    # RemovedInDjango50Warning: when the deprecation ends, remove is_dst
-    # argument.
-    def datetimes(
-        self, field_name, kind, order="ASC", tzinfo=None, is_dst=timezone.NOT_PASSED
-    ):
+    def datetimes(self, field_name, kind, order="ASC", tzinfo=None):
         """
         Return a list of datetime objects representing all available
         datetimes for the given field_name, scoped to 'kind'.
@@ -1394,7 +1403,6 @@ class QuerySet:
                     kind,
                     output_field=DateTimeField(),
                     tzinfo=tzinfo,
-                    is_dst=is_dst,
                 ),
                 plain_field=F(field_name),
             )
@@ -1632,7 +1640,6 @@ class QuerySet:
                 clone.query.add_annotation(
                     annotation,
                     alias,
-                    is_summary=False,
                     select=select,
                 )
         for alias, annotation in clone.query.annotations.items():
@@ -2118,7 +2125,7 @@ class RawQuerySet:
         """
         columns = self.query.get_columns()
         # Adjust any column names which don't match field names
-        for (query_name, model_name) in self.translations.items():
+        for query_name, model_name in self.translations.items():
             # Ignore translations for nonexistent column names
             try:
                 index = columns.index(query_name)

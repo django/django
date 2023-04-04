@@ -1,8 +1,6 @@
 from unittest import mock
 
 from django.test import SimpleTestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, classproperty, lazy
 
 
@@ -107,30 +105,6 @@ class FunctionalTests(SimpleTestCase):
         attrs = ["value", "other", "__foo__"]
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_cached_property_name(self):
-        class Class:
-            def other_value(self):
-                """Here is the docstring..."""
-                return 1, object()
-
-            other = cached_property(other_value, name="other")
-            other2 = cached_property(other_value, name="different_name")
-
-        self.assertCachedPropertyWorks("other", Class)
-        # An explicit name is ignored.
-        obj = Class()
-        obj.other2
-        self.assertFalse(hasattr(obj, "different_name"))
-
-    def test_cached_property_name_deprecation_warning(self):
-        def value(self):
-            return 1
-
-        msg = "The name argument is deprecated as it's unnecessary as of Python 3.6."
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            cached_property(value, name="other_name")
 
     def test_cached_property_auto_name(self):
         """
@@ -258,6 +232,10 @@ class FunctionalTests(SimpleTestCase):
         msg = "Cannot call lazy() with both bytes and text return types."
         with self.assertRaisesMessage(ValueError, msg):
             lazy_obj()
+
+    def test_lazy_str_cast_mixed_result_types(self):
+        lazy_value = lazy(lambda: [1], str, list)()
+        self.assertEqual(str(lazy_value), "[1]")
 
     def test_classproperty_getter(self):
         class Foo:

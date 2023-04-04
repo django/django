@@ -69,17 +69,18 @@ command from any place in the Django source tree:
     $ tox
 
 By default, ``tox`` runs the test suite with the bundled test settings file for
-SQLite, ``black``, ``flake8``, ``isort``, and the documentation spelling
-checker. In addition to the system dependencies noted elsewhere in this
-documentation, the command ``python3`` must be on your path and linked to the
-appropriate version of Python. A list of default environments can be seen as
-follows:
+SQLite, ``black``, ``blacken-docs``, ``flake8``, ``isort``, and the
+documentation spelling checker. In addition to the system dependencies noted
+elsewhere in this documentation, the command ``python3`` must be on your path
+and linked to the appropriate version of Python. A list of default environments
+can be seen as follows:
 
 .. console::
 
     $ tox -l
     py3
     black
+    blacken-docs
     flake8>=3.7.0
     docs
     isort>=5.1.0
@@ -91,14 +92,14 @@ In addition to the default environments, ``tox`` supports running unit tests
 for other versions of Python and other database backends. Since Django's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
-<running-unit-tests-settings>`. For example, to run the tests on Python 3.9
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.10
 using PostgreSQL:
 
 .. console::
 
-    $ tox -e py39-postgres -- --settings=my_postgres_settings
+    $ tox -e py310-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.9 virtual environment, installs Django's
+This command sets up a Python 3.10 virtual environment, installs Django's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -113,14 +114,14 @@ above:
 
 .. code-block:: console
 
-    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py39-postgres
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py310-postgres
 
 Windows users should use:
 
 .. code-block:: doscon
 
     ...\> set DJANGO_SETTINGS_MODULE=my_postgres_settings
-    ...\> tox -e py39-postgres
+    ...\> tox -e py310-postgres
 
 Running the JavaScript tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -277,24 +278,24 @@ If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
 *  aiosmtpd_
-*  argon2-cffi_ 19.1.0+
-*  asgiref_ 3.5.2+ (required)
+*  argon2-cffi_ 19.2.0+
+*  asgiref_ 3.6.0+ (required)
 *  bcrypt_
 *  colorama_
 *  docutils_
 *  geoip2_
-*  jinja2_ 2.7+
+*  jinja2_ 2.11+
 *  numpy_
-*  Pillow_ 6.2.0+
+*  Pillow_ 6.2.1+
 *  PyYAML_
 *  pytz_ (required)
 *  pywatchman_
-*  redis_
+*  redis_ 3.4+
 *  setuptools_
 *  memcached_, plus a :ref:`supported Python binding <memcached>`
 *  gettext_ (:ref:`gettext_on_windows`)
 *  selenium_
-*  sqlparse_ 0.2.2+ (required)
+*  sqlparse_ 0.3.1+ (required)
 *  tblib_ 1.5.0+
 
 You can find these dependencies in `pip requirements files`_ inside the
@@ -396,13 +397,17 @@ Ensure you have the latest point release of a :ref:`supported Python version
 that may cause the test suite to fail or hang.
 
 On **macOS** (High Sierra and newer versions), you might see this message
-logged, after which the tests hang::
+logged, after which the tests hang:
+
+.. code-block:: pytb
 
     objc[42074]: +[__NSPlaceholderDate initialize] may have been in progress in
     another thread when fork() was called.
 
 To avoid this set a ``OBJC_DISABLE_INITIALIZE_FORK_SAFETY`` environment
-variable, for example::
+variable, for example:
+
+.. code-block:: shell
 
     $ OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ./runtests.py
 
@@ -515,8 +520,6 @@ this purpose.
 Tips for writing tests
 ======================
 
-.. highlight:: python
-
 Isolating model registration
 ----------------------------
 
@@ -529,11 +532,13 @@ a temporary ``Apps`` instance. To do this, use the
     from django.test import SimpleTestCase
     from django.test.utils import isolate_apps
 
+
     class TestModelDefinition(SimpleTestCase):
-        @isolate_apps('app_label')
+        @isolate_apps("app_label")
         def test_model_definition(self):
             class TestModel(models.Model):
                 pass
+
             ...
 
 .. admonition:: Setting ``app_label``
@@ -553,8 +558,9 @@ a temporary ``Apps`` instance. To do this, use the
         from django.test import SimpleTestCase
         from django.test.utils import isolate_apps
 
+
         class TestModelDefinition(SimpleTestCase):
-            @isolate_apps('app_label', 'other_app_label')
+            @isolate_apps("app_label", "other_app_label")
             def test_model_definition(self):
                 # This model automatically receives app_label='app_label'
                 class TestModel(models.Model):
@@ -562,5 +568,6 @@ a temporary ``Apps`` instance. To do this, use the
 
                 class OtherAppModel(models.Model):
                     class Meta:
-                        app_label = 'other_app_label'
+                        app_label = "other_app_label"
+
                 ...

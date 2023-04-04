@@ -1,13 +1,10 @@
 import gettext
 import os
 import re
+import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+from unittest import skipUnless
 
 from django import forms
 from django.conf import settings
@@ -38,6 +35,7 @@ from .models import (
     Company,
     Event,
     Honeycomb,
+    Image,
     Individual,
     Inventory,
     Member,
@@ -73,6 +71,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         Helper to call formfield_for_dbfield for a given model and field name
         and verify that the returned formfield is appropriate.
         """
+
         # Override any settings on the model admin
         class MyModelAdmin(admin.ModelAdmin):
             pass
@@ -337,7 +336,6 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
         )
 
     def test_invalid_target_id(self):
-
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post(
@@ -906,7 +904,6 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
-
     available_apps = ["admin_widgets"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -1106,7 +1103,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
             # Test with every locale
             with override_settings(LANGUAGE_CODE=language_code):
-
                 # Open a page that has a date picker widget
                 url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
                 self.selenium.get(self.live_server_url + url)
@@ -1735,7 +1731,12 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value("#id_username", "newuser")
         self.selenium.back()
 
+        # Chrome and Safari don't update related object links when selecting
+        # the same option as previously submitted. As a consequence, the
+        # "pencil" and "eye" buttons remain disable, so select "---------"
+        # first.
         select = Select(self.selenium.find_element(By.ID, "id_user"))
+        select.select_by_index(0)
         select.select_by_value("newuser")
         # Click the Change User button to change it
         self.selenium.find_element(By.ID, "change_id_user").click()
@@ -1767,3 +1768,57 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+
+@skipUnless(Image, "Pillow not installed")
+class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
+    def test_clearablefileinput_widget(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_student_add"),
+        )
+
+        photo_input_id = "id_photo"
+        save_and_edit_button_css_selector = "input[value='Save and continue editing']"
+        tests_files_folder = "%s/files" % os.getcwd()
+        clear_checkbox_id = "photo-clear_id"
+
+        def _submit_and_wait():
+            with self.wait_page_loaded():
+                self.selenium.find_element(
+                    By.CSS_SELECTOR, save_and_edit_button_css_selector
+                ).click()
+
+        # Add a student.
+        title_input = self.selenium.find_element(By.ID, "id_name")
+        title_input.send_keys("Joe Doe")
+        photo_input = self.selenium.find_element(By.ID, photo_input_id)
+        photo_input.send_keys(f"{tests_files_folder}/test.png")
+        _submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "photos/test.png")
+        # Uploading non-image files is not supported by Safari with Selenium,
+        # so upload a broken one instead.
+        photo_input = self.selenium.find_element(By.ID, photo_input_id)
+        photo_input.send_keys(f"{tests_files_folder}/brokenimg.png")
+        _submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            (
+                "Upload a valid image. The file you uploaded was either not an image "
+                "or a corrupted image."
+            ),
+        )
+        # "Currently" with "Clear" checkbox and "Change" still shown.
+        cover_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertIn("Currently", cover_field_row.text)
+        self.assertIn("Change", cover_field_row.text)
+        # "Clear" box works.
+        self.selenium.find_element(By.ID, clear_checkbox_id).click()
+        _submit_and_wait()
+        student.refresh_from_db()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "")

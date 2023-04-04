@@ -104,6 +104,7 @@ class DatabaseCreation(BaseDatabaseCreation):
         elif multiprocessing.get_start_method() == "spawn":
             ondisk_db = sqlite3.connect(target_database_name, uri=True)
             self.connection.connection.backup(ondisk_db)
+            ondisk_db.close()
 
     def _destroy_test_db(self, test_database_name, verbosity):
         if test_database_name and not self.is_in_memory_db(test_database_name):

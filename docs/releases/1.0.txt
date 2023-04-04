@@ -224,8 +224,11 @@ models like the following are **not valid**::
         name = models.CharField(max_length=10)
         other_value = models.IntegerField(unique=True)
 
+
     class Child(Parent):
-        father = models.OneToOneField(Parent, primary_key=True, to_field="other_value", parent_link=True)
+        father = models.OneToOneField(
+            Parent, primary_key=True, to_field="other_value", parent_link=True
+        )
         value = models.IntegerField()
 
 This bug will be fixed in the next release of Django.

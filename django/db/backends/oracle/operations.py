@@ -324,16 +324,16 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if isinstance(params, (tuple, list)):
-            for i, param in enumerate(reversed(params), start=1):
-                param_num = len(params) - i
-                statement = statement.replace(
-                    ":arg%d" % param_num, force_str(param, errors="replace")
-                )
-        elif isinstance(params, dict):
+        if params:
+            if isinstance(params, (tuple, list)):
+                params = {
+                    f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))
+                }
+            elif isinstance(params, dict):
+                params = {f":{key}": val for (key, val) in params.items()}
             for key in sorted(params, key=len, reverse=True):
                 statement = statement.replace(
-                    ":%s" % key, force_str(params[key], errors="replace")
+                    key, force_str(params[key], errors="replace")
                 )
         return statement
 

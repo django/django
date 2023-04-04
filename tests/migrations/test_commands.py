@@ -173,50 +173,56 @@ class MigrateTests(MigrationTestBase):
         for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
-        # Run the migrations to 0001 only
-        call_command("migrate", "migrations", "0001", verbosity=0)
-        call_command("migrate", "migrations", "0001", verbosity=0, database="other")
-        # Make sure the right tables exist
-        self.assertTableExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        # Also check the "other" database
-        self.assertTableNotExists("migrations_author", using="other")
-        self.assertTableExists("migrations_tribble", using="other")
 
-        # Fake a roll-back
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        call_command(
-            "migrate", "migrations", "zero", fake=True, verbosity=0, database="other"
-        )
-        # Make sure the tables still exist
-        self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble", using="other")
-        # Try to run initial migration
-        with self.assertRaises(DatabaseError):
+        try:
+            # Run the migrations to 0001 only
             call_command("migrate", "migrations", "0001", verbosity=0)
-        # Run initial migration with an explicit --fake-initial
-        out = io.StringIO()
-        with mock.patch(
-            "django.core.management.color.supports_color", lambda *args: False
-        ):
+            call_command("migrate", "migrations", "0001", verbosity=0, database="other")
+            # Make sure the right tables exist
+            self.assertTableExists("migrations_author")
+            self.assertTableNotExists("migrations_tribble")
+            # Also check the "other" database
+            self.assertTableNotExists("migrations_author", using="other")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Fake a roll-back
+            call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
             call_command(
                 "migrate",
                 "migrations",
-                "0001",
-                fake_initial=True,
-                stdout=out,
-                verbosity=1,
-            )
-            call_command(
-                "migrate",
-                "migrations",
-                "0001",
-                fake_initial=True,
+                "zero",
+                fake=True,
                 verbosity=0,
                 database="other",
             )
-        self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
-        try:
+            # Make sure the tables still exist
+            self.assertTableExists("migrations_author")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Try to run initial migration
+            with self.assertRaises(DatabaseError):
+                call_command("migrate", "migrations", "0001", verbosity=0)
+            # Run initial migration with an explicit --fake-initial
+            out = io.StringIO()
+            with mock.patch(
+                "django.core.management.color.supports_color", lambda *args: False
+            ):
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    stdout=out,
+                    verbosity=1,
+                )
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    verbosity=0,
+                    database="other",
+                )
+            self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
+
             # Run migrations all the way.
             call_command("migrate", verbosity=0)
             call_command("migrate", verbosity=0, database="other")
@@ -354,6 +360,26 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+        ]
+    )
+    def test_migrate_check_migrated_app(self):
+        out = io.StringIO()
+        try:
+            call_command("migrate", "migrated_app", verbosity=0)
+            call_command(
+                "migrate",
+                "migrated_app",
+                stdout=out,
+                check_unapplied=True,
+            )
+            self.assertEqual(out.getvalue(), "")
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrated_app", "zero", verbosity=0)
 
     @override_settings(
         MIGRATION_MODULES={
@@ -2371,9 +2397,10 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations --check should exit with a non-zero status when
         there are changes to an app requiring migrations.
         """
-        with self.temporary_migration_module():
+        with self.temporary_migration_module() as tmpdir:
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--check", "migrations", verbosity=0)
+            self.assertFalse(os.path.exists(tmpdir))
 
         with self.temporary_migration_module(
             module="migrations.test_migrations_no_changes"

@@ -90,6 +90,8 @@ def post_view(request):
             c = Context()
     else:
         t = Template("Viewing GET page.", name="Empty GET Template")
+        # Used by test_body_read_on_get_data.
+        request.read(200)
         c = Context()
     return HttpResponse(t.render(c))
 
@@ -393,8 +395,7 @@ def django_project_redirect(request):
 
 def no_trailing_slash_external_redirect(request):
     """
-    RFC 2616 3.2.2: A bare domain without any abs_path element should be
-    treated as having the trailing `/`.
+    RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
 
     Use https://testserver, rather than an external domain, in order to allow
     use of follow=True, triggering Client._handle_redirects().

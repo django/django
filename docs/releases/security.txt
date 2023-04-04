@@ -36,6 +36,37 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+February 14, 2023 - :cve:`2023-24580`
+-------------------------------------
+
+Potential denial-of-service vulnerability in file uploads. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/14/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <628b33a854a9c68ec8a0c51f382f304a0044ec92>`
+* Django 4.0 :commit:`(patch) <83f1ea83e4553e211c1c5a0dfc197b66d4e50432>`
+* Django 3.2 :commit:`(patch) <a665ed5179f5bbd3db95ce67286d0192eff041d8>`
+
+February 1, 2023 - :cve:`2023-23969`
+------------------------------------
+
+Potential denial-of-service via ``Accept-Language`` headers. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/01/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d7bd5a56b1ce0576e8e07a8001373576d277942>`
+* Django 4.0 :commit:`(patch) <4452642f193533e288a52c02efb5bbc766a68f95>`
+* Django 3.2 :commit:`(patch) <c7e0151fdf33e1b11d488b6f67b94fdf3a30614a>`
+
+October 4, 2022 - :cve:`2022-41323`
+-----------------------------------
+
+Potential denial-of-service vulnerability in internationalized URLs. `Full
+description
+<https://www.djangoproject.com/weblog/2022/oct/04/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d656ea51d9ea7105c0c0785783ac29d426a7d25>`
+* Django 4.0 :commit:`(patch) <23f0093125ac2e553da6c1b2f9988eb6a3dd2ea1>`
+* Django 3.2 :commit:`(patch) <5b6b257fa7ec37ff27965358800c67e2dd11c924>`
+
 August 3, 2022 - :cve:`2022-36359`
 ----------------------------------
 

@@ -10,6 +10,7 @@ from django.core.exceptions import (
     ImproperlyConfigured,
     ValidationError,
 )
+from django.db.models.utils import AltersData
 from django.forms.fields import ChoiceField, Field
 from django.forms.forms import BaseForm, DeclarativeFieldsMetaclass
 from django.forms.formsets import BaseFormSet, formset_factory
@@ -316,7 +317,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
             missing_fields = none_model_fields.difference(new_class.declared_fields)
             if missing_fields:
                 message = "Unknown field(s) (%s) specified for %s"
-                message = message % (", ".join(missing_fields), opts.model.__name__)
+                message %= (", ".join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
             # Override default model fields with any custom declared ones
             # (plus, include all the other declared fields).
@@ -329,7 +330,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
         return new_class
 
 
-class BaseModelForm(BaseForm):
+class BaseModelForm(BaseForm, AltersData):
     def __init__(
         self,
         data=None,
@@ -644,7 +645,7 @@ def modelform_factory(
 # ModelFormSets ##############################################################
 
 
-class BaseModelFormSet(BaseFormSet):
+class BaseModelFormSet(BaseFormSet, AltersData):
     """
     A ``FormSet`` for editing a queryset and/or adding new objects to it.
     """
@@ -755,7 +756,7 @@ class BaseModelFormSet(BaseFormSet):
         """Save and return a new model instance for the given form."""
         return form.save(commit=commit)
 
-    def save_existing(self, form, instance, commit=True):
+    def save_existing(self, form, obj, commit=True):
         """Save and return an existing model instance for the given form."""
         return form.save(commit=commit)
 

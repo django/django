@@ -1,4 +1,3 @@
-import os
 import re
 from io import StringIO
 from unittest import mock, skipUnless
@@ -129,6 +128,24 @@ class InspectDBTestCase(TestCase):
             "null_json_field = models.JSONField(blank=True, null=True)", output
         )
 
+    @skipUnlessDBFeature("supports_comments")
+    def test_db_comments(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_dbcomment", stdout=out)
+        output = out.getvalue()
+        integer_field_type = connection.features.introspected_field_types[
+            "IntegerField"
+        ]
+        self.assertIn(
+            f"rank = models.{integer_field_type}("
+            f"db_comment=\"'Rank' column comment\")",
+            output,
+        )
+        self.assertIn(
+            "        db_table_comment = 'Custom table comment'",
+            output,
+        )
+
     @skipUnlessDBFeature("supports_collation_on_charfield")
     @skipUnless(test_collation, "Language collations are not supported.")
     def test_char_field_db_collation(self):
@@ -165,6 +182,13 @@ class InspectDBTestCase(TestCase):
                 "null=True)" % test_collation,
                 output,
             )
+
+    @skipUnlessDBFeature("supports_unlimited_charfield")
+    def test_char_field_unlimited(self):
+        out = StringIO()
+        call_command("inspectdb", "inspectdb_charfieldunlimited", stdout=out)
+        output = out.getvalue()
+        self.assertIn("char_field = models.CharField()", output)
 
     def test_number_field_types(self):
         """Test introspection of various Django field types"""
@@ -563,17 +587,17 @@ class InspectDBTransactionalTests(TransactionTestCase):
                 "CREATE SERVER inspectdb_server FOREIGN DATA WRAPPER file_fdw"
             )
             cursor.execute(
-                """\
+                """
                 CREATE FOREIGN TABLE inspectdb_iris_foreign_table (
                     petal_length real,
                     petal_width real,
                     sepal_length real,
                     sepal_width real
                 ) SERVER inspectdb_server OPTIONS (
-                    filename %s
+                    program 'echo 1,2,3,4',
+                    format 'csv'
                 )
-            """,
-                [os.devnull],
+                """
             )
         out = StringIO()
         foreign_table_model = "class InspectdbIrisForeignTable(models.Model):"

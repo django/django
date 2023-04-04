@@ -75,6 +75,20 @@ class MigrationTestBase(TransactionTestCase):
     def assertColumnCollation(self, table, column, collation, using="default"):
         self.assertEqual(self._get_column_collation(table, column, using), collation)
 
+    def _get_table_comment(self, table, using):
+        with connections[using].cursor() as cursor:
+            return next(
+                t.comment
+                for t in connections[using].introspection.get_table_list(cursor)
+                if t.name == table
+            )
+
+    def assertTableComment(self, table, comment, using="default"):
+        self.assertEqual(self._get_table_comment(table, using), comment)
+
+    def assertTableCommentNotExists(self, table, using="default"):
+        self.assertIn(self._get_table_comment(table, using), [None, ""])
+
     def assertIndexExists(
         self, table, columns, value=True, using="default", index_type=None
     ):

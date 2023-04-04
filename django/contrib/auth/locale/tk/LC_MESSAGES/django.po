@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Resulkary <resulsaparov@gmail.com>, 2020
+# Resul <resulsaparov@gmail.com>, 2020
+# Resul <resulsaparov@gmail.com>, 2022
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-07-06 17:52+0000\n"
-"Last-Translator: Resulkary <resulsaparov@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Resul <resulsaparov@gmail.com>, 2022\n"
 "Language-Team: Turkmen (http://www.transifex.com/django/django/language/"
 "tk/)\n"
 "MIME-Version: 1.0\n"
@@ -135,6 +136,9 @@ msgstr "iş faktory"
 
 msgid "checksum"
 msgstr "çek"
+
+msgid "block size"
+msgstr "blok ölçegi"
 
 msgid "name"
 msgstr "at"
@@ -265,11 +269,9 @@ msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s-de paroly täzeden düzüldi"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Dogry ulanyjy adyny giriziň. Bu bahada diňe iňlis harplary, sanlar we @/./"
-"+/-/_ nyşanlary bolup biler."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

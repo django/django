@@ -13,7 +13,11 @@ from django.core.exceptions import (
     TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import (
+    MultiPartParser,
+    MultiPartParserError,
+    TooManyFilesSent,
+)
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -242,9 +246,7 @@ class HttpRequest:
                 # If location starts with '//' but has no netloc, reuse the
                 # schema and netloc from the current request. Strip the double
                 # slashes and continue as if it wasn't specified.
-                if location.startswith("//"):
-                    location = location[2:]
-                location = self._current_scheme_host + location
+                location = self._current_scheme_host + location.removeprefix("//")
             else:
                 # Join the constructed URL with the provided location, which
                 # allows the provided location to apply query strings to the
@@ -384,7 +386,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except MultiPartParserError:
+            except (MultiPartParserError, TooManyFilesSent):
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -456,10 +458,35 @@ class HttpHeaders(CaseInsensitiveMapping):
     @classmethod
     def parse_header_name(cls, header):
         if header.startswith(cls.HTTP_PREFIX):
-            header = header[len(cls.HTTP_PREFIX) :]
+            header = header.removeprefix(cls.HTTP_PREFIX)
         elif header not in cls.UNPREFIXED_HEADERS:
             return None
         return header.replace("_", "-").title()
+
+    @classmethod
+    def to_wsgi_name(cls, header):
+        header = header.replace("-", "_").upper()
+        if header in cls.UNPREFIXED_HEADERS:
+            return header
+        return f"{cls.HTTP_PREFIX}{header}"
+
+    @classmethod
+    def to_asgi_name(cls, header):
+        return header.replace("-", "_").upper()
+
+    @classmethod
+    def to_wsgi_names(cls, headers):
+        return {
+            cls.to_wsgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
+    @classmethod
+    def to_asgi_names(cls, headers):
+        return {
+            cls.to_asgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
 
 
 class QueryDict(MultiValueDict):
@@ -699,7 +726,7 @@ def split_domain_port(host):
     bits = host.rsplit(":", 1)
     domain, port = bits if len(bits) == 2 else (bits[0], "")
     # Remove a trailing dot (if present) from the domain.
-    domain = domain[:-1] if domain.endswith(".") else domain
+    domain = domain.removesuffix(".")
     return domain, port
 
 

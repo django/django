@@ -15,12 +15,14 @@ Multiple object mixins
     * Use the ``page`` parameter in the URLconf. For example, this is what
       your URLconf might look like::
 
-        path('objects/page<int:page>/', PaginatedView.as_view()),
+        path("objects/page<int:page>/", PaginatedView.as_view()),
 
     * Pass the page number via the ``page`` query-string parameter. For
-      example, a URL would look like this::
+      example, a URL would look like this:
 
-        /objects/?page=3
+      .. code-block:: text
+
+          /objects/?page=3
 
     These values and lists are 1-based, not 0-based, so the first page would be
     represented as page ``1``.
@@ -29,7 +31,9 @@ Multiple object mixins
     </topics/pagination>`.
 
     As a special case, you are also permitted to use ``last`` as a value for
-    ``page``::
+    ``page``:
+
+    .. code-block:: text
 
         /objects/?page=last
 

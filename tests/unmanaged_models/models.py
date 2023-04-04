@@ -85,6 +85,7 @@ class Intermediate(models.Model):
 # models shouldn't be automatically created (see #10647).
 #
 
+
 # Firstly, we need some models that will create the tables, purely so that the
 # tables are created. This is a test setup, not a requirement for unmanaged
 # models.

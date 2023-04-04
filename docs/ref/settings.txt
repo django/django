@@ -33,8 +33,8 @@ a model object and return its URL. This is a way of inserting or overriding
 ``get_absolute_url()`` methods on a per-installation basis. Example::
 
     ABSOLUTE_URL_OVERRIDES = {
-        'blogs.blog': lambda o: "/blogs/%s/" % o.slug,
-        'news.story': lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
+        "blogs.blog": lambda o: "/blogs/%s/" % o.slug,
+        "news.story": lambda o: "/stories/%s/%s/" % (o.pub_year, o.slug),
     }
 
 The model name used in this setting should be all lowercase, regardless of the
@@ -54,7 +54,7 @@ people the details of exceptions raised in the request/response cycle.
 
 Each item in the list should be a tuple of (Full name, email address). Example::
 
-    [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+    [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
 .. setting:: ALLOWED_HOSTS
 
@@ -123,8 +123,8 @@ The :setting:`APPEND_SLASH` setting is only used if
 Default::
 
     {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         }
     }
 
@@ -169,7 +169,7 @@ compose a prefix, version and key into a final cache key. The default
 implementation is equivalent to the function::
 
     def make_key(key, key_prefix, version):
-        return ':'.join([key_prefix, str(version), key])
+        return ":".join([key_prefix, str(version), key])
 
 You may use any key function you want, as long as it has the same
 argument signature.
@@ -201,9 +201,9 @@ file system cache, a host and port for a memcache server, or an identifying
 name for a local memory cache. e.g.::
 
     CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
-            'LOCATION': '/var/tmp/django_cache',
+        "default": {
+            "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+            "LOCATION": "/var/tmp/django_cache",
         }
     }
 
@@ -342,22 +342,6 @@ form input <acquiring-csrf-token-from-html>` instead of :ref:`from the cookie
 <acquiring-csrf-token-from-cookie>`.
 
 See :setting:`SESSION_COOKIE_HTTPONLY` for details on ``HttpOnly``.
-
-.. setting:: CSRF_COOKIE_MASKED
-
-``CSRF_COOKIE_MASKED``
-----------------------
-
-.. versionadded:: 4.1
-
-Default: ``False``
-
-Whether to mask the CSRF cookie. See
-:ref:`release notes <csrf-cookie-masked-usage>` for usage details.
-
-.. deprecated:: 4.1
-
-    This transitional setting is deprecated and will be removed in Django 5.0.
 
 .. setting:: CSRF_COOKIE_NAME
 
@@ -508,9 +492,9 @@ The simplest possible settings file is for a single-database setup using
 SQLite. This can be configured using the following::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'mydatabase',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": "mydatabase",
         }
     }
 
@@ -520,13 +504,13 @@ the :setting:`ENGINE <DATABASE-ENGINE>` setting below on how to specify
 other database types. This example is for PostgreSQL::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'mydatabase',
-            'USER': 'mydatabaseuser',
-            'PASSWORD': 'mypassword',
-            'HOST': '127.0.0.1',
-            'PORT': '5432',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "mydatabase",
+            "USER": "mydatabaseuser",
+            "PASSWORD": "mypassword",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
         }
     }
 
@@ -583,7 +567,7 @@ localhost. Not used with SQLite.
 If this value starts with a forward slash (``'/'``) and you're using MySQL,
 MySQL will connect via a Unix socket to the specified socket. For example::
 
-    "HOST": '/var/run/mysql'
+    "HOST": "/var/run/mysql"
 
 If you're using MySQL and this value *doesn't* start with a forward slash, then
 this value is assumed to be the host.
@@ -624,8 +608,6 @@ behavior — and ``None`` for unlimited :ref:`persistent database connections
 
 ``CONN_HEALTH_CHECKS``
 ~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.1
 
 Default: ``False``
 
@@ -755,12 +737,12 @@ creation and use of test databases, see :ref:`the-test-database`.
 Here's an example with a test database configuration::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'USER': 'mydatabaseuser',
-            'NAME': 'mydatabase',
-            'TEST': {
-                'NAME': 'mytestdatabase',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "USER": "mydatabaseuser",
+            "NAME": "mydatabase",
+            "TEST": {
+                "NAME": "mytestdatabase",
             },
         },
     }
@@ -828,7 +810,9 @@ but for all apps.
 Default: ``None``
 
 The alias of the database that this database should mirror during
-testing.
+testing. It depends on transactions and therefore must be used within
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`.
 
 This setting exists to allow for testing of primary/replica
 (referred to as master/slave by some databases)
@@ -850,23 +834,6 @@ tests will use a memory resident database. For all other database engines the
 test database will use the name ``'test_' + DATABASE_NAME``.
 
 See :ref:`the-test-database`.
-
-.. setting:: TEST_SERIALIZE
-
-``SERIALIZE``
-^^^^^^^^^^^^^
-
-Boolean value to control whether or not the default test runner serializes the
-database into an in-memory JSON string before running tests (used to restore
-the database state between tests if you don't have transactions). You can set
-this to ``False`` to speed up creation time if you don't have any test classes
-with :ref:`serialized_rollback=True <test-case-serialized-rollback>`.
-
-.. deprecated:: 4.0
-
-   This setting is deprecated as it can be inferred from the
-   :attr:`~django.test.TestCase.databases` with the
-   :ref:`serialized_rollback <test-case-serialized-rollback>` option enabled.
 
 .. setting:: TEST_TEMPLATE
 
@@ -1095,6 +1062,28 @@ could be used as a denial-of-service attack vector if left unchecked. Since web
 servers don't typically perform deep request inspection, it's not possible to
 perform a similar check at that level.
 
+.. setting:: DATA_UPLOAD_MAX_NUMBER_FILES
+
+``DATA_UPLOAD_MAX_NUMBER_FILES``
+--------------------------------
+
+.. versionadded:: 3.2.18
+
+Default: ``100``
+
+The maximum number of files that may be received via POST in a
+``multipart/form-data`` encoded request before a
+:exc:`~django.core.exceptions.SuspiciousOperation` (``TooManyFiles``) is
+raised. You can set this to ``None`` to disable the check. Applications that
+are expected to receive an unusually large number of file fields should tune
+this setting.
+
+The number of accepted files is correlated to the amount of time and memory
+needed to process the request. Large requests could be used as a
+denial-of-service attack vector if left unchecked. Since web servers don't
+typically perform deep request inspection, it's not possible to perform a
+similar check at that level.
+
 .. setting:: DATABASE_ROUTERS
 
 ``DATABASE_ROUTERS``
@@ -1116,9 +1105,8 @@ database configurations <topics-db-multi-db-routing>`.
 Default: ``'N j, Y'`` (e.g. ``Feb. 4, 2003``)
 
 The default formatting to use for displaying date fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
@@ -1130,17 +1118,17 @@ See also :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_
 Default::
 
     [
-        '%Y-%m-%d',  # '2006-10-25'
-        '%m/%d/%Y',  # '10/25/2006'
-        '%m/%d/%y',  # '10/25/06'
-        '%b %d %Y',  # 'Oct 25 2006'
-        '%b %d, %Y',  # 'Oct 25, 2006'
-        '%d %b %Y',  # '25 Oct 2006'
-        '%d %b, %Y',  # '25 Oct, 2006'
-        '%B %d %Y',  # 'October 25 2006'
-        '%B %d, %Y',  # 'October 25, 2006'
-        '%d %B %Y',  # '25 October 2006'
-        '%d %B, %Y',  # '25 October, 2006'
+        "%Y-%m-%d",  # '2006-10-25'
+        "%m/%d/%Y",  # '10/25/2006'
+        "%m/%d/%y",  # '10/25/06'
+        "%b %d %Y",  # 'Oct 25 2006'
+        "%b %d, %Y",  # 'Oct 25, 2006'
+        "%d %b %Y",  # '25 Oct 2006'
+        "%d %b, %Y",  # '25 Oct, 2006'
+        "%B %d %Y",  # 'October 25 2006'
+        "%B %d, %Y",  # 'October 25, 2006'
+        "%d %B %Y",  # '25 October 2006'
+        "%d %B, %Y",  # '25 October, 2006'
     ]
 
 A list of formats that will be accepted when inputting data on a date field.
@@ -1149,8 +1137,7 @@ format strings use Python's :ref:`datetime module syntax
 <strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
 template filter.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -1162,9 +1149,8 @@ See also :setting:`DATETIME_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 Default: ``'N j, Y, P'`` (e.g. ``Feb. 4, 2003, 4 p.m.``)
 
 The default formatting to use for displaying datetime fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
@@ -1176,15 +1162,15 @@ See also :setting:`DATE_FORMAT`, :setting:`TIME_FORMAT` and :setting:`SHORT_DATE
 Default::
 
     [
-        '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
-        '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
-        '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-        '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
-        '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
-        '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-        '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
-        '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
-        '%m/%d/%y %H:%M',        # '10/25/06 14:30'
+        "%Y-%m-%d %H:%M:%S",  # '2006-10-25 14:30:59'
+        "%Y-%m-%d %H:%M:%S.%f",  # '2006-10-25 14:30:59.000200'
+        "%Y-%m-%d %H:%M",  # '2006-10-25 14:30'
+        "%m/%d/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
+        "%m/%d/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
+        "%m/%d/%Y %H:%M",  # '10/25/2006 14:30'
+        "%m/%d/%y %H:%M:%S",  # '10/25/06 14:30:59'
+        "%m/%d/%y %H:%M:%S.%f",  # '10/25/06 14:30:59.000200'
+        "%m/%d/%y %H:%M",  # '10/25/06 14:30'
     ]
 
 A list of formats that will be accepted when inputting data on a datetime
@@ -1194,8 +1180,7 @@ these format strings use Python's :ref:`datetime module syntax
 template filter. Date-only formats are not included as datetime fields will
 automatically try :setting:`DATE_INPUT_FORMATS` in last resort.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`TIME_INPUT_FORMATS`.
 
@@ -1273,8 +1258,8 @@ Default: ``'.'`` (Dot)
 
 Default decimal separator used when formatting decimal numbers.
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -1355,6 +1340,12 @@ Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
 
 Default file storage class to be used for any file-related operations that don't
 specify a particular storage system. See :doc:`/topics/files`.
+
+.. deprecated:: 4.2
+
+    This setting is deprecated. Starting with Django 4.2, default file storage
+    engine can be configured with the :setting:`STORAGES` setting under the
+    ``default`` key.
 
 .. setting:: DEFAULT_FROM_EMAIL
 
@@ -1559,8 +1550,8 @@ attempt.
 Default::
 
     [
-        'django.core.files.uploadhandler.MemoryFileUploadHandler',
-        'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+        "django.core.files.uploadhandler.MemoryFileUploadHandler",
+        "django.core.files.uploadhandler.TemporaryFileUploadHandler",
     ]
 
 A list of handlers to use for uploading. Changing this setting allows complete
@@ -1665,8 +1656,8 @@ Monday and so on.
 
 Default: ``[]`` (Empty list)
 
-List of directories searched for fixture files, in addition to the
-``fixtures`` directory of each application, in search order.
+List of directories searched for :ref:`fixture <fixtures-explanation>` files,
+in addition to the ``fixtures`` directory of each application, in search order.
 
 Note that these paths should use Unix-style forward slashes, even on Windows.
 
@@ -1716,7 +1707,9 @@ formats defined in this file.
 
 For example, if :setting:`FORMAT_MODULE_PATH` is set to ``mysite.formats``,
 and current language is ``en`` (English), Django will expect a directory tree
-like::
+like:
+
+.. code-block:: text
 
     mysite/
         formats/
@@ -1728,8 +1721,8 @@ like::
 You can also set this setting to a list of Python paths, for example::
 
     FORMAT_MODULE_PATH = [
-        'mysite.formats',
-        'some_app.formats',
+        "mysite.formats",
+        "some_app.formats",
     ]
 
 When Django searches for a certain format, it will go through all given Python
@@ -1984,8 +1977,8 @@ Here's a sample settings file::
     from django.utils.translation import gettext_lazy as _
 
     LANGUAGES = [
-        ('de', _('German')),
-        ('en', _('English')),
+        ("de", _("German")),
+        ("en", _("English")),
     ]
 
 .. setting:: LANGUAGES_BIDI
@@ -2018,8 +2011,8 @@ See :ref:`how-django-discovers-translations`.
 Example::
 
     LOCALE_PATHS = [
-        '/home/www/project/common_files/locale',
-        '/var/local/translations/locale',
+        "/home/www/project/common_files/locale",
+        "/var/local/translations/locale",
     ]
 
 Django will look within each of these paths for the ``<locale_code>/LC_MESSAGES``
@@ -2149,7 +2142,7 @@ the default package name for migration modules is ``migrations``.
 
 Example::
 
-    {'blog': 'blog.db_migrations'}
+    {"blog": "blog.db_migrations"}
 
 In this case, migrations pertaining to the ``blog`` app will be contained in
 the ``blog.db_migrations`` package.
@@ -2183,8 +2176,8 @@ drilldown, the header for a given day displays the day and month. Different
 locales have different formats. For example, U.S. English would say
 "January 1," whereas Spanish might say "1 Enero."
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
-locale-dictated format has higher precedence and will be applied.
+Note that the corresponding locale-dictated format has higher precedence and
+will be applied instead.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`,
@@ -2216,8 +2209,8 @@ Example tuple for ``en_IN``::
 
     NUMBER_GROUPING = (3, 2, 0)
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`THOUSAND_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2302,8 +2295,6 @@ passwords of users and key rotation will not affect them.
 
 ``SECRET_KEY_FALLBACKS``
 ------------------------
-
-.. versionadded:: 4.1
 
 Default: ``[]``
 
@@ -2426,7 +2417,7 @@ Django whether the request came in via HTTPS, and set
 Set a tuple with two elements -- the name of the header to look for and the
 required value. For example::
 
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 This tells Django to trust the ``X-Forwarded-Proto`` header that comes from our
 proxy and that the request is guaranteed to be secure (i.e., it originally came
@@ -2435,11 +2426,6 @@ in via HTTPS) when:
 * the header value is ``'https'``, or
 * its initial, leftmost value is ``'https'`` in the case of a comma-separated
   list of protocols (e.g. ``'https,http,http'``).
-
-.. versionchanged:: 4.1
-
-    Support for a comma-separated list of protocols in the header value was
-    added.
 
 You should *only* set this setting if you control your proxy or have some other
 guarantee that it sets/strips this header appropriately.
@@ -2536,7 +2522,7 @@ A dictionary of modules containing serializer definitions (provided as
 strings), keyed by a string identifier for that serialization type. For
 example, to define a YAML serializer, use::
 
-    SERIALIZATION_MODULES = {'yaml': 'path.to.yaml_serializer'}
+    SERIALIZATION_MODULES = {"yaml": "path.to.yaml_serializer"}
 
 .. setting:: SERVER_EMAIL
 
@@ -2562,9 +2548,9 @@ The email address that error messages come from, such as those sent to
 Default: ``'m/d/Y'`` (e.g. ``12/31/2003``)
 
 An available formatting that can be used for displaying date fields on
-templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
-corresponding locale-dictated format has higher precedence and will be applied.
-See :tfilter:`allowed date format strings <date>`.
+templates. Note that the corresponding locale-dictated format has higher
+precedence and will be applied instead. See
+:tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 
@@ -2576,9 +2562,9 @@ See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATETIME_FORMAT`.
 Default: ``'m/d/Y P'`` (e.g. ``12/31/2003 4 p.m.``)
 
 An available formatting that can be used for displaying datetime fields on
-templates. Note that if :setting:`USE_L10N` is set to ``True``, then the
-corresponding locale-dictated format has higher precedence and will be applied.
-See :tfilter:`allowed date format strings <date>`.
+templates. Note that the corresponding locale-dictated format has higher
+precedence and will be applied instead. See
+:tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`SHORT_DATE_FORMAT`.
 
@@ -2606,6 +2592,58 @@ Silenced checks will not be output to the console.
 
 See also the :doc:`/ref/checks` documentation.
 
+.. setting:: STORAGES
+
+``STORAGES``
+------------
+
+.. versionadded:: 4.2
+
+Default::
+
+    {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+
+A dictionary containing the settings for all storages to be used with Django.
+It is a nested dictionary whose contents map a storage alias to a dictionary
+containing the options for an individual storage.
+
+Storages can have any alias you choose. However, there are two aliases with
+special significance:
+
+* ``default`` for :doc:`managing files </topics/files>`.
+  ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'`` is the
+  default storage engine.
+* ``staticfiles`` for :doc:`managing static files </ref/contrib/staticfiles>`.
+  ``'``:class:`django.contrib.staticfiles.storage.StaticFilesStorage`\ ``'`` is
+  the default storage engine.
+
+The following is an example ``settings.py`` snippet defining a custom file
+storage called ``example``::
+
+    STORAGES = {
+        # ...
+        "example": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+            "OPTIONS": {
+                "location": "/example",
+                "base_url": "/example/",
+            },
+        },
+    }
+
+``OPTIONS`` are passed to the ``BACKEND`` on initialization in ``**kwargs``.
+
+A ready-to-use instance of the storage backends can be retrieved from
+:data:`django.core.files.storage.storages`. Use a key corresponding to the
+backend definition in :setting:`STORAGES`.
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``
@@ -2622,8 +2660,8 @@ Here's a setup that tells the Django template engine to load templates from the
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'APP_DIRS': True,
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "APP_DIRS": True,
         },
     ]
 
@@ -2737,8 +2775,8 @@ Default thousand separator used when formatting numbers. This setting is
 used only when :setting:`USE_THOUSAND_SEPARATOR` is ``True`` and
 :setting:`NUMBER_GROUPING` is greater than ``0``.
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the locale-dictated
-format has higher precedence and will be applied instead.
+Note that the locale-dictated format has higher precedence and will be applied
+instead.
 
 See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 :setting:`USE_THOUSAND_SEPARATOR`.
@@ -2751,9 +2789,8 @@ See also :setting:`NUMBER_GROUPING`, :setting:`DECIMAL_SEPARATOR` and
 Default: ``'P'`` (e.g. ``4 p.m.``)
 
 The default formatting to use for displaying time fields in any part of the
-system. Note that if :setting:`USE_L10N` is set to ``True``, then the
-locale-dictated format has higher precedence and will be applied instead. See
-:tfilter:`allowed date format strings <date>`.
+system. Note that the locale-dictated format has higher precedence and will be
+applied instead. See :tfilter:`allowed date format strings <date>`.
 
 See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 
@@ -2765,9 +2802,9 @@ See also :setting:`DATE_FORMAT` and :setting:`DATETIME_FORMAT`.
 Default::
 
     [
-        '%H:%M:%S',     # '14:30:59'
-        '%H:%M:%S.%f',  # '14:30:59.000200'
-        '%H:%M',        # '14:30'
+        "%H:%M:%S",  # '14:30:59'
+        "%H:%M:%S.%f",  # '14:30:59.000200'
+        "%H:%M",  # '14:30'
     ]
 
 A list of formats that will be accepted when inputting data on a time field.
@@ -2776,8 +2813,7 @@ format strings use Python's :ref:`datetime module syntax
 <strftime-strptime-behavior>`, not the format strings from the :tfilter:`date`
 template filter.
 
-When :setting:`USE_L10N` is ``True``, the locale-dictated format has higher
-precedence and will be applied instead.
+The locale-dictated format has higher precedence and will be applied instead.
 
 See also :setting:`DATE_INPUT_FORMATS` and :setting:`DATETIME_INPUT_FORMATS`.
 
@@ -2823,21 +2859,6 @@ the correct environment.
 
 .. _list of time zones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 
-.. setting:: USE_DEPRECATED_PYTZ
-
-``USE_DEPRECATED_PYTZ``
------------------------
-
-Default: ``False``
-
-A boolean that specifies whether to use ``pytz``, rather than :mod:`zoneinfo`,
-as the default time zone implementation.
-
-.. deprecated:: 4.0
-
-    This transitional setting is deprecated. Support for using ``pytz`` will be
-    removed in Django 5.0.
-
 .. setting:: USE_I18N
 
 ``USE_I18N``
@@ -2850,31 +2871,12 @@ This provides a way to turn it off, for performance. If this is set to
 ``False``, Django will make some optimizations so as not to load the
 translation machinery.
 
-See also :setting:`LANGUAGE_CODE`, :setting:`USE_L10N` and :setting:`USE_TZ`.
+See also :setting:`LANGUAGE_CODE` and :setting:`USE_TZ`.
 
 .. note::
 
     The default :file:`settings.py` file created by :djadmin:`django-admin
     startproject <startproject>` includes ``USE_I18N = True`` for convenience.
-
-.. setting:: USE_L10N
-
-``USE_L10N``
-------------
-
-Default: ``True``
-
-A boolean that specifies if localized formatting of data will be enabled by
-default or not. If this is set to ``True``, e.g. Django will display numbers and
-dates using the format of the current locale.
-
-See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
-
-.. deprecated:: 4.0
-
-    This setting is deprecated. Starting with Django 5.0, localized formatting
-    of data will always be enabled. For example Django will display numbers and
-    dates using the format of the current locale.
 
 .. setting:: USE_THOUSAND_SEPARATOR
 
@@ -2884,10 +2886,9 @@ See also :setting:`LANGUAGE_CODE`, :setting:`USE_I18N` and :setting:`USE_TZ`.
 Default: ``False``
 
 A boolean that specifies whether to display numbers using a thousand separator.
-When set to ``True`` and :setting:`USE_L10N` is also ``True``, Django will
-format numbers using the :setting:`NUMBER_GROUPING` and
-:setting:`THOUSAND_SEPARATOR` settings. These settings may also be dictated by
-the locale, which takes precedence.
+When set to ``True``, Django will format numbers using the
+:setting:`NUMBER_GROUPING` and :setting:`THOUSAND_SEPARATOR` settings. The
+latter two settings may also be dictated by the locale, which takes precedence.
 
 See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 :setting:`THOUSAND_SEPARATOR`.
@@ -2897,11 +2898,7 @@ See also :setting:`DECIMAL_SEPARATOR`, :setting:`NUMBER_GROUPING` and
 ``USE_TZ``
 ----------
 
-Default: ``False``
-
-.. note::
-
-    In Django 5.0, the default value will change from ``False`` to ``True``.
+Default: ``True``
 
 A boolean that specifies if datetimes will be timezone-aware by default or not.
 If this is set to ``True``, Django will use timezone-aware datetimes internally.
@@ -2910,13 +2907,11 @@ When ``USE_TZ`` is False, Django will use naive datetimes in local time, except
 when parsing ISO 8601 formatted strings, where timezone information will always
 be retained if present.
 
-See also :setting:`TIME_ZONE`, :setting:`USE_I18N` and :setting:`USE_L10N`.
+See also :setting:`TIME_ZONE` and :setting:`USE_I18N`.
 
-.. note::
+.. versionchanged:: 5.0
 
-    The default :file:`settings.py` file created by
-    :djadmin:`django-admin startproject <startproject>` includes
-    ``USE_TZ = True`` for convenience.
+    In older versions, the default value is ``False``.
 
 .. setting:: USE_X_FORWARDED_HOST
 
@@ -2979,8 +2974,8 @@ drilldown, the header for a given month displays the month and the year.
 Different locales have different formats. For example, U.S. English would say
 "January 2006," whereas another locale might say "2006/January."
 
-Note that if :setting:`USE_L10N` is set to ``True``, then the corresponding
-locale-dictated format has higher precedence and will be applied.
+Note that the corresponding locale-dictated format has higher precedence and
+will be applied instead.
 
 See :tfilter:`allowed date format strings <date>`. See also
 :setting:`DATE_FORMAT`, :setting:`DATETIME_FORMAT`, :setting:`TIME_FORMAT`
@@ -3099,10 +3094,10 @@ See :ref:`auth_password_storage`.
 Default::
 
     [
-        'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-        'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-        'django.contrib.auth.hashers.Argon2PasswordHasher',
-        'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+        "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+        "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+        "django.contrib.auth.hashers.Argon2PasswordHasher",
+        "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
     ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
@@ -3140,6 +3135,7 @@ framework. See :ref:`message levels <message-level>` for more details.
    avoid the potential for circular imports, e.g.::
 
        from django.contrib.messages import constants as message_constants
+
        MESSAGE_LEVEL = message_constants.DEBUG
 
    If desired, you may specify the numeric values for the constants directly
@@ -3175,11 +3171,11 @@ and :setting:`SESSION_COOKIE_HTTPONLY` when setting their cookies.
 Default::
 
     {
-        messages.DEBUG: 'debug',
-        messages.INFO: 'info',
-        messages.SUCCESS: 'success',
-        messages.WARNING: 'warning',
-        messages.ERROR: 'error',
+        messages.DEBUG: "debug",
+        messages.INFO: "info",
+        messages.SUCCESS: "success",
+        messages.WARNING: "warning",
+        messages.ERROR: "error",
     }
 
 This sets the mapping of message level to message tag, which is typically
@@ -3194,7 +3190,8 @@ to override. See :ref:`message-displaying` above for more details.
    avoid the potential for circular imports, e.g.::
 
        from django.contrib.messages import constants as message_constants
-       MESSAGE_TAGS = {message_constants.INFO: ''}
+
+       MESSAGE_TAGS = {message_constants.INFO: ""}
 
    If desired, you may specify the numeric values for the constants directly
    according to the values in the above :ref:`constants table
@@ -3561,9 +3558,15 @@ The file storage engine to use when collecting static files with the
 :djadmin:`collectstatic` management command.
 
 A ready-to-use instance of the storage backend defined in this setting
-can be found at ``django.contrib.staticfiles.storage.staticfiles_storage``.
+can be found under ``staticfiles`` key in ``django.core.files.storage.storages``.
 
 For an example, see :ref:`staticfiles-from-cdn`.
+
+.. deprecated:: 4.2
+
+    This setting is deprecated. Starting with Django 4.2, static files storage
+    engine can be configured with the :setting:`STORAGES` setting under the
+    ``staticfiles`` key.
 
 .. setting:: STATICFILES_FINDERS
 
@@ -3573,8 +3576,8 @@ For an example, see :ref:`staticfiles-from-cdn`.
 Default::
 
     [
-        'django.contrib.staticfiles.finders.FileSystemFinder',
-        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        "django.contrib.staticfiles.finders.FileSystemFinder",
+        "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     ]
 
 The list of finder backends that know how to find static files in
@@ -3590,8 +3593,8 @@ used.
 One finder is disabled by default:
 ``django.contrib.staticfiles.finders.DefaultStorageFinder``. If added to
 your :setting:`STATICFILES_FINDERS` setting, it will look for static files in
-the default file storage as defined by the :setting:`DEFAULT_FILE_STORAGE`
-setting.
+the default file storage as defined by the ``default`` key in the
+:setting:`STORAGES` setting.
 
 .. note::
 
@@ -3663,6 +3666,7 @@ File uploads
 * :setting:`FILE_UPLOAD_TEMP_DIR`
 * :setting:`MEDIA_ROOT`
 * :setting:`MEDIA_URL`
+* :setting:`STORAGES`
 
 Forms
 -----
@@ -3697,7 +3701,6 @@ Globalization (``i18n``/``l10n``)
 * :setting:`TIME_INPUT_FORMATS`
 * :setting:`TIME_ZONE`
 * :setting:`USE_I18N`
-* :setting:`USE_L10N`
 * :setting:`USE_THOUSAND_SEPARATOR`
 * :setting:`USE_TZ`
 * :setting:`YEAR_MONTH_FORMAT`
@@ -3706,6 +3709,7 @@ HTTP
 ----
 * :setting:`DATA_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`DATA_UPLOAD_MAX_NUMBER_FIELDS`
+* :setting:`DATA_UPLOAD_MAX_NUMBER_FILES`
 * :setting:`DEFAULT_CHARSET`
 * :setting:`DISALLOWED_USER_AGENTS`
 * :setting:`FORCE_SCRIPT_NAME`

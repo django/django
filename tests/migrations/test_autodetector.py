@@ -773,6 +773,14 @@ class AutodetectorTests(BaseAutodetectorTests):
             "verbose_name": "Authi",
         },
     )
+    author_with_db_table_comment = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+        ],
+        {"db_table_comment": "Table comment"},
+    )
     author_with_db_table_options = ModelState(
         "testapp",
         "Author",
@@ -2210,8 +2218,8 @@ class AutodetectorTests(BaseAutodetectorTests):
         # Right number/type of migrations?
         self.assertNumberMigrations(changes, "testapp", 1)
         self.assertOperationTypes(changes, "testapp", 0, ["CreateModel", "CreateModel"])
-        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Publisher")
-        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 0, name="Author")
+        self.assertOperationAttributes(changes, "testapp", 0, 1, name="Publisher")
         self.assertMigrationDependencies(
             changes, "testapp", 0, [("otherapp", "auto_1")]
         )
@@ -2348,6 +2356,58 @@ class AutodetectorTests(BaseAutodetectorTests):
         self.assertOperationAttributes(
             changes, "testapp", 0, 1, name="newauthor", table="author_three"
         )
+
+    def test_alter_db_table_comment_add(self):
+        changes = self.get_changes(
+            [self.author_empty], [self.author_with_db_table_comment]
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="author", table_comment="Table comment"
+        )
+
+    def test_alter_db_table_comment_change(self):
+        author_with_new_db_table_comment = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+            ],
+            {"db_table_comment": "New table comment"},
+        )
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [author_with_new_db_table_comment],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="author",
+            table_comment="New table comment",
+        )
+
+    def test_alter_db_table_comment_remove(self):
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [self.author_empty],
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterModelTableComment"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="author", db_table_comment=None
+        )
+
+    def test_alter_db_table_comment_no_changes(self):
+        changes = self.get_changes(
+            [self.author_with_db_table_comment],
+            [self.author_with_db_table_comment],
+        )
+        self.assertNumberMigrations(changes, "testapp", 0)
 
     def test_identical_regex_doesnt_alter(self):
         from_state = ModelState(
@@ -2658,6 +2718,65 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", constraint=added_constraint
+        )
+
+    def test_add_constraints_with_new_model(self):
+        book_with_unique_title_and_pony = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("title", models.CharField(max_length=200)),
+                ("pony", models.ForeignKey("otherapp.Pony", models.CASCADE)),
+            ],
+            {
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=["title", "pony"],
+                        name="unique_title_pony",
+                    )
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [self.book_with_no_author],
+            [book_with_unique_title_and_pony, self.other_pony],
+        )
+
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["CreateModel", "AddField", "AddConstraint"],
+        )
+
+    def test_add_index_with_new_model(self):
+        book_with_index_title_and_pony = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("title", models.CharField(max_length=200)),
+                ("pony", models.ForeignKey("otherapp.Pony", models.CASCADE)),
+            ],
+            {
+                "indexes": [
+                    models.Index(fields=["title", "pony"], name="index_title_pony"),
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [self.book_with_no_author],
+            [book_with_index_title_and_pony, self.other_pony],
+        )
+
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["CreateModel", "AddField", "AddIndex"],
         )
 
     def test_remove_constraints(self):
@@ -5313,6 +5432,20 @@ class MigrationSuggestNameTests(SimpleTestCase):
 
         migration = Migration("some_migration", "test_app")
         self.assertIs(migration.suggest_name().startswith("auto_"), True)
+
+    def test_operation_with_invalid_chars_in_suggested_name(self):
+        class Migration(migrations.Migration):
+            operations = [
+                migrations.AddConstraint(
+                    "Person",
+                    models.UniqueConstraint(
+                        fields=["name"], name="person.name-*~unique!"
+                    ),
+                ),
+            ]
+
+        migration = Migration("some_migration", "test_app")
+        self.assertEqual(migration.suggest_name(), "person_person_name_unique_")
 
     def test_none_name(self):
         class Migration(migrations.Migration):

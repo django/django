@@ -51,10 +51,7 @@ class Paginator:
         if number < 1:
             raise EmptyPage(_("That page number is less than 1"))
         if number > self.num_pages:
-            if number == 1 and self.allow_empty_first_page:
-                pass
-            else:
-                raise EmptyPage(_("That page contains no results"))
+            raise EmptyPage(_("That page contains no results"))
         return number
 
     def get_page(self, number):

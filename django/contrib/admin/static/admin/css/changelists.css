@@ -90,7 +90,7 @@
 }
 
 #toolbar #searchbar {
-    height: 19px;
+    height: 1.1875rem;
     border: 1px solid var(--border-color);
     padding: 2px 5px;
     margin: 0;
@@ -215,9 +215,9 @@
     color: var(--link-hover-color);
 }
 
-#changelist-filter #changelist-filter-clear a {
+#changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 
@@ -270,7 +270,7 @@
     background: var(--body-bg);
     border-top: none;
     border-bottom: none;
-    line-height: 24px;
+    line-height: 1.5rem;
     color: var(--body-quiet-color);
     width: 100%;
 }
@@ -289,7 +289,7 @@
 
 #changelist .actions select {
     vertical-align: top;
-    height: 24px;
+    height: 1.5rem;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -316,7 +316,7 @@
     background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    height: 24px;
+    height: 1.5rem;
     line-height: 1;
     padding: 4px 8px;
     margin: 0;

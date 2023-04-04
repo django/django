@@ -1,19 +1,10 @@
 import datetime
 import re
 import sys
+import zoneinfo
 from contextlib import contextmanager
 from unittest import SkipTest, skipIf
 from xml.dom.minidom import parseString
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 from django.contrib.auth.models import User
 from django.core import serializers
@@ -31,15 +22,13 @@ from django.test import (
     SimpleTestCase,
     TestCase,
     TransactionTestCase,
-    ignore_warnings,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
 from django.test.utils import requires_tz_support
 from django.urls import reverse
-from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.utils import timezone, translation
 from django.utils.timezone import timedelta
 
 from .forms import (
@@ -78,27 +67,6 @@ except ImportError:
 UTC = datetime.timezone.utc
 EAT = timezone.get_fixed_timezone(180)  # Africa/Nairobi
 ICT = timezone.get_fixed_timezone(420)  # Asia/Bangkok
-
-ZONE_CONSTRUCTORS = (zoneinfo.ZoneInfo,)
-if pytz is not None:
-    ZONE_CONSTRUCTORS += (pytz.timezone,)
-
-
-def get_timezones(key):
-    return [constructor(key) for constructor in ZONE_CONSTRUCTORS]
-
-
-class UTCAliasTests(SimpleTestCase):
-    def test_alias_deprecation_warning(self):
-        msg = (
-            "The django.utils.timezone.utc alias is deprecated. "
-            "Please update your code to use datetime.timezone.utc instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            timezone.utc
-
-    def test_timezone_module_dir_includes_utc(self):
-        self.assertIn("utc", dir(timezone))
 
 
 @contextmanager
@@ -240,19 +208,19 @@ class LegacyDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),
@@ -413,39 +381,17 @@ class NewDatabaseTests(TestCase):
         self.assertEqual(Event.objects.filter(dt__gte=dt2).count(), 1)
         self.assertEqual(Event.objects.filter(dt__gt=dt2).count(), 0)
 
-    def test_query_filter_with_pytz_timezones(self):
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=tz)
-                Event.objects.create(dt=dt)
-                next = dt + datetime.timedelta(seconds=3)
-                prev = dt - datetime.timedelta(seconds=3)
-                self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
-                self.assertEqual(Event.objects.filter(dt__exact=next).count(), 0)
-                self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
-                self.assertEqual(
-                    Event.objects.filter(dt__in=(prev, dt, next)).count(), 1
-                )
-                self.assertEqual(
-                    Event.objects.filter(dt__range=(prev, next)).count(), 1
-                )
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_connection_timezone(self):
-        tests = [
-            (False, None, datetime.timezone),
-            (False, "Africa/Nairobi", zoneinfo.ZoneInfo),
-        ]
-        if pytz is not None:
-            tests += [
-                (True, None, datetime.timezone),
-                (True, "Africa/Nairobi", pytz.BaseTzInfo),
-            ]
-        for use_pytz, connection_tz, expected_type in tests:
-            with self.subTest(use_pytz=use_pytz, connection_tz=connection_tz):
-                with self.settings(USE_DEPRECATED_PYTZ=use_pytz):
-                    with override_database_connection_timezone(connection_tz):
-                        self.assertIsInstance(connection.timezone, expected_type)
+    def test_query_filter_with_timezones(self):
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        dt = datetime.datetime(2011, 9, 1, 12, 20, 30, tzinfo=tz)
+        Event.objects.create(dt=dt)
+        next = dt + datetime.timedelta(seconds=3)
+        prev = dt - datetime.timedelta(seconds=3)
+        self.assertEqual(Event.objects.filter(dt__exact=dt).count(), 1)
+        self.assertEqual(Event.objects.filter(dt__exact=next).count(), 0)
+        self.assertEqual(Event.objects.filter(dt__in=(prev, next)).count(), 0)
+        self.assertEqual(Event.objects.filter(dt__in=(prev, dt, next)).count(), 1)
+        self.assertEqual(Event.objects.filter(dt__range=(prev, next)).count(), 1)
 
     def test_query_convert_timezones(self):
         # Connection timezone is equal to the current timezone, datetime
@@ -536,19 +482,19 @@ class NewDatabaseTests(TestCase):
         )
         morning_min_dt = datetime.datetime(2011, 9, 1, 3, 20, 40, tzinfo=EAT)
         afternoon_min_dt = datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).order_by("dt"),
             [morning_min_dt, afternoon_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__lt=afternoon_min_dt
             ),
             [morning_min_dt],
             transform=lambda d: d.dt,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Session.objects.annotate(dt=Min("events__dt")).filter(
                 dt__gte=afternoon_min_dt
             ),
@@ -767,7 +713,6 @@ class ForcedTimeZoneDatabaseTests(TransactionTestCase):
 
 @override_settings(TIME_ZONE="Africa/Nairobi")
 class SerializationTests(SimpleTestCase):
-
     # Backend-specific notes:
     # - JSON supports only milliseconds, microseconds will be truncated.
     # - PyYAML dumps the UTC offset correctly for timezone-aware datetimes.
@@ -968,18 +913,9 @@ class SerializationTests(SimpleTestCase):
                 self.assertEqual(obj.dt, dt)
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=True
-)
+@translation.override(None)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class TemplateTests(SimpleTestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @requires_tz_support
     def test_localtime_templatetag_and_filters(self):
         """
@@ -1084,16 +1020,15 @@ class TemplateTests(SimpleTestCase):
             )
 
         # Use an IANA timezone as argument
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
-                ctx = Context(
-                    {
-                        "dt": datetime.datetime(2011, 9, 1, 13, 20, 30),
-                        "tz": tz,
-                    }
-                )
-                self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        tpl = Template("{% load tz %}{{ dt|timezone:tz }}")
+        ctx = Context(
+            {
+                "dt": datetime.datetime(2011, 9, 1, 13, 20, 30),
+                "tz": tz,
+            }
+        )
+        self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
     def test_localtime_templatetag_invalid_argument(self):
         with self.assertRaises(TemplateSyntaxError):
@@ -1156,15 +1091,14 @@ class TemplateTests(SimpleTestCase):
         tpl = Template("{% load tz %}{% timezone tz %}{{ dt }}{% endtimezone %}")
 
         # Use a IANA timezone as argument
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                ctx = Context(
-                    {
-                        "dt": datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT),
-                        "tz": tz,
-                    }
-                )
-                self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        ctx = Context(
+            {
+                "dt": datetime.datetime(2011, 9, 1, 13, 20, 30, tzinfo=EAT),
+                "tz": tz,
+            }
+        )
+        self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
 
         # Use a IANA timezone name as argument
         ctx = Context(
@@ -1174,22 +1108,6 @@ class TemplateTests(SimpleTestCase):
             }
         )
         self.assertEqual(tpl.render(ctx), "2011-09-01T12:20:30+02:00")
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_timezone_templatetag_invalid_argument(self):
-        with self.assertRaises(TemplateSyntaxError):
-            Template("{% load tz %}{% timezone %}{% endtimezone %}").render()
-        with self.assertRaises(zoneinfo.ZoneInfoNotFoundError):
-            Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(
-                Context({"tz": "foobar"})
-            )
-        if pytz is not None:
-            with override_settings(USE_DEPRECATED_PYTZ=True), self.assertRaises(
-                pytz.UnknownTimeZoneError
-            ):
-                Template("{% load tz %}{% timezone tz %}{% endtimezone %}").render(
-                    Context({"tz": "foobar"})
-                )
 
     @skipIf(sys.platform == "win32", "Windows uses non-standard time zone names")
     def test_get_current_timezone_templatetag(self):
@@ -1214,16 +1132,12 @@ class TemplateTests(SimpleTestCase):
             self.assertEqual(tpl.render(Context({"tz": ICT})), "+0700")
 
     def test_get_current_timezone_templatetag_with_iana(self):
-        """
-        Test the {% get_current_timezone %} templatetag with pytz.
-        """
         tpl = Template(
             "{% load tz %}{% get_current_timezone as time_zone %}{{ time_zone }}"
         )
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                with timezone.override(tz):
-                    self.assertEqual(tpl.render(Context()), "Europe/Paris")
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        with timezone.override(tz):
+            self.assertEqual(tpl.render(Context()), "Europe/Paris")
 
         tpl = Template(
             "{% load tz %}{% timezone 'Europe/Paris' %}"
@@ -1280,18 +1194,8 @@ class TemplateTests(SimpleTestCase):
             self.assertEqual(tpl.render(Context({})), "+0700")
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=False
-)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=False)
 class LegacyFormsTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     def test_form(self):
         form = EventForm({"dt": "2011-09-01 13:20:30"})
         self.assertTrue(form.is_valid())
@@ -1301,27 +1205,25 @@ class LegacyFormsTests(TestCase):
 
     def test_form_with_non_existent_time(self):
         form = EventForm({"dt": "2011-03-27 02:30:00"})
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                with timezone.override(tz):
-                    # This is a bug.
-                    self.assertTrue(form.is_valid())
-                    self.assertEqual(
-                        form.cleaned_data["dt"],
-                        datetime.datetime(2011, 3, 27, 2, 30, 0),
-                    )
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        with timezone.override(tz):
+            # This is a bug.
+            self.assertTrue(form.is_valid())
+            self.assertEqual(
+                form.cleaned_data["dt"],
+                datetime.datetime(2011, 3, 27, 2, 30, 0),
+            )
 
     def test_form_with_ambiguous_time(self):
         form = EventForm({"dt": "2011-10-30 02:30:00"})
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                with timezone.override(tz):
-                    # This is a bug.
-                    self.assertTrue(form.is_valid())
-                    self.assertEqual(
-                        form.cleaned_data["dt"],
-                        datetime.datetime(2011, 10, 30, 2, 30, 0),
-                    )
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        with timezone.override(tz):
+            # This is a bug.
+            self.assertTrue(form.is_valid())
+            self.assertEqual(
+                form.cleaned_data["dt"],
+                datetime.datetime(2011, 10, 30, 2, 30, 0),
+            )
 
     def test_split_form(self):
         form = EventSplitForm({"dt_0": "2011-09-01", "dt_1": "13:20:30"})
@@ -1336,18 +1238,8 @@ class LegacyFormsTests(TestCase):
         self.assertEqual(e.dt, datetime.datetime(2011, 9, 1, 13, 20, 30))
 
 
-# RemovedInDjango50Warning: When the deprecation ends, remove setUpClass() and
-# USE_L10N=False. The tests should remain because format-related settings will
-# take precedence over locale-dictated formats.
-@override_settings(
-    DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_L10N=False, USE_TZ=True
-)
+@override_settings(DATETIME_FORMAT="c", TIME_ZONE="Africa/Nairobi", USE_TZ=True)
 class NewFormsTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @requires_tz_support
     def test_form(self):
         form = EventForm({"dt": "2011-09-01 13:20:30"})
@@ -1367,32 +1259,30 @@ class NewFormsTests(TestCase):
             )
 
     def test_form_with_non_existent_time(self):
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                with timezone.override(tz):
-                    form = EventForm({"dt": "2011-03-27 02:30:00"})
-                    self.assertFalse(form.is_valid())
-                    self.assertEqual(
-                        form.errors["dt"],
-                        [
-                            "2011-03-27 02:30:00 couldn’t be interpreted in time zone "
-                            "Europe/Paris; it may be ambiguous or it may not exist."
-                        ],
-                    )
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        with timezone.override(tz):
+            form = EventForm({"dt": "2011-03-27 02:30:00"})
+            self.assertFalse(form.is_valid())
+            self.assertEqual(
+                form.errors["dt"],
+                [
+                    "2011-03-27 02:30:00 couldn’t be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ],
+            )
 
     def test_form_with_ambiguous_time(self):
-        for tz in get_timezones("Europe/Paris"):
-            with self.subTest(repr(tz)):
-                with timezone.override(tz):
-                    form = EventForm({"dt": "2011-10-30 02:30:00"})
-                    self.assertFalse(form.is_valid())
-                    self.assertEqual(
-                        form.errors["dt"],
-                        [
-                            "2011-10-30 02:30:00 couldn’t be interpreted in time zone "
-                            "Europe/Paris; it may be ambiguous or it may not exist."
-                        ],
-                    )
+        tz = zoneinfo.ZoneInfo("Europe/Paris")
+        with timezone.override(tz):
+            form = EventForm({"dt": "2011-10-30 02:30:00"})
+            self.assertFalse(form.is_valid())
+            self.assertEqual(
+                form.errors["dt"],
+                [
+                    "2011-10-30 02:30:00 couldn’t be interpreted in time zone "
+                    "Europe/Paris; it may be ambiguous or it may not exist."
+                ],
+            )
 
     @requires_tz_support
     def test_split_form(self):
@@ -1426,19 +1316,14 @@ class NewFormsTests(TestCase):
             self.assertIn("2011-09-01 17:20:30", str(form))
 
 
+@translation.override(None)
 @override_settings(
     DATETIME_FORMAT="c",
     TIME_ZONE="Africa/Nairobi",
-    USE_L10N=False,
     USE_TZ=True,
     ROOT_URLCONF="timezones.urls",
 )
 class AdminTests(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            super().setUpClass()
-
     @classmethod
     def setUpTestData(cls):
         cls.u1 = User.objects.create_user(
@@ -1497,18 +1382,14 @@ class AdminTests(TestCase):
 
     @requires_tz_support
     def test_change_readonly(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         response = self.client.get(
             reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))
         )
         self.assertContains(response, t.created.astimezone(EAT).isoformat())
 
     def test_change_readonly_in_other_timezone(self):
-        Timestamp.objects.create()
-        # re-fetch the object for backends that lose microseconds (MySQL)
-        t = Timestamp.objects.get()
+        t = Timestamp.objects.create()
         with timezone.override(ICT):
             response = self.client.get(
                 reverse("admin_tz:timezones_timestamp_change", args=(t.pk,))

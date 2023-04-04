@@ -1,7 +1,9 @@
+import asyncio
 import logging
 import sys
 import tempfile
 import traceback
+from contextlib import aclosing
 
 from asgiref.sync import ThreadSensitiveContext, sync_to_async
 
@@ -40,9 +42,9 @@ class ASGIRequest(HttpRequest):
         self._read_started = False
         self.resolver_match = None
         self.script_name = self.scope.get("root_path", "")
-        if self.script_name and scope["path"].startswith(self.script_name):
+        if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
-            self.path_info = scope["path"][len(self.script_name) :]
+            self.path_info = scope["path"].removeprefix(self.script_name)
         else:
             self.path_info = scope["path"]
         # The Django path is different from ASGI scope path args, it should
@@ -169,24 +171,56 @@ class ASGIHandler(base.BaseHandler):
             return
         # Request is complete and can be served.
         set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-            sender=self.__class__, scope=scope
-        )
+        await signals.request_started.asend(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
         if request is None:
             body_file.close()
             await self.send_response(error_response, send)
             return
-        # Get the response, using the async mode of BaseHandler.
+        # Try to catch a disconnect while getting response.
+        tasks = [
+            asyncio.create_task(self.run_get_response(request)),
+            asyncio.create_task(self.listen_for_disconnect(receive)),
+        ]
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        done, pending = done.pop(), pending.pop()
+        # Allow views to handle cancellation.
+        pending.cancel()
+        try:
+            await pending
+        except asyncio.CancelledError:
+            # Task re-raised the CancelledError as expected.
+            pass
+        try:
+            response = done.result()
+        except RequestAborted:
+            body_file.close()
+            return
+        except AssertionError:
+            body_file.close()
+            raise
+        # Send the response.
+        await self.send_response(response, send)
+
+    async def listen_for_disconnect(self, receive):
+        """Listen for disconnect from the client."""
+        message = await receive()
+        if message["type"] == "http.disconnect":
+            raise RequestAborted()
+        # This should never happen.
+        assert False, "Invalid ASGI message after request body: %s" % message["type"]
+
+    async def run_get_response(self, request):
+        """Get async response."""
+        # Use the async mode of BaseHandler.
         response = await self.get_response_async(request)
         response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, FileResponse):
             response.block_size = self.chunk_size
-        # Send the response.
-        await self.send_response(response, send)
+        return response
 
     async def read_body(self, receive):
         """Reads an HTTP body from an ASGI connection."""
@@ -263,19 +297,22 @@ class ASGIHandler(base.BaseHandler):
         )
         # Streaming responses need to be pinned to their iterator.
         if response.streaming:
-            # Access `__iter__` and not `streaming_content` directly in case
-            # it has been overridden in a subclass.
-            for part in response:
-                for chunk, _ in self.chunk_bytes(part):
-                    await send(
-                        {
-                            "type": "http.response.body",
-                            "body": chunk,
-                            # Ignore "more" as there may be more parts; instead,
-                            # use an empty final closing message with False.
-                            "more_body": True,
-                        }
-                    )
+            # - Consume via `__aiter__` and not `streaming_content` directly, to
+            #   allow mapping of a sync iterator.
+            # - Use aclosing() when consuming aiter.
+            #   See https://github.com/python/cpython/commit/6e8dcda
+            async with aclosing(aiter(response)) as content:
+                async for part in content:
+                    for chunk, _ in self.chunk_bytes(part):
+                        await send(
+                            {
+                                "type": "http.response.body",
+                                "body": chunk,
+                                # Ignore "more" as there may be more parts; instead,
+                                # use an empty final closing message with False.
+                                "more_body": True,
+                            }
+                        )
             # Final closing message.
             await send({"type": "http.response.body"})
         # Other responses just need chunking.
