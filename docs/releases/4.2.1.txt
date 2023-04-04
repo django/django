@@ -9,4 +9,5 @@ Django 4.2.1 fixes several bugs in 4.2.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.defer()``
+  when deferring fields by attribute names (:ticket:`34458`).
