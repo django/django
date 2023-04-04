@@ -71,8 +71,8 @@ class Command(BaseCommand):
             action="store_true",
             dest="check_changes",
             help=(
-                "Exit with a non-zero status if model changes are missing migrations "
-                "and don't actually write them."
+                "Exit with a non-zero status if model changes are missing migrations. "
+                "Forces --dry-run."
             ),
         )
         parser.add_argument(
@@ -113,7 +113,9 @@ class Command(BaseCommand):
         if self.migration_name and not self.migration_name.isidentifier():
             raise CommandError("The migration name must be a valid Python identifier.")
         self.include_header = options["include_header"]
-        check_changes = options["check_changes"]
+        self.check_changes = options["check_changes"]
+        if self.check_changes:
+            self.dry_run = self.check_changes
         self.scriptable = options["scriptable"]
         self.update = options["update"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
@@ -251,12 +253,12 @@ class Command(BaseCommand):
                 else:
                     self.log("No changes detected")
         else:
-            if check_changes:
-                sys.exit(1)
             if self.update:
                 self.write_to_last_migration_files(changes)
             else:
                 self.write_migration_files(changes)
+            if self.check_changes:
+                sys.exit(1)
 
     def write_to_last_migration_files(self, changes):
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
@@ -345,7 +347,10 @@ class Command(BaseCommand):
                     # Display a relative path if it's below the current working
                     # directory, or an absolute path otherwise.
                     migration_string = self.get_relative_path(writer.path)
-                    self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
+                    if self.check_changes:
+                        self.log("  %s\n" % app_label)
+                    else:
+                        self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
                         self.log("    - %s" % operation.describe())
                     if self.scriptable:
