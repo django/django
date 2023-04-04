@@ -19,6 +19,12 @@ class Child(models.Model):
     age = models.IntegerField(null=True, blank=True)
 
 
+class GrandChild(models.Model):
+    parent = models.ForeignKey(Child, models.SET_NULL, editable=False, null=True)
+    name = models.CharField(max_length=30, blank=True)
+    age = models.IntegerField(null=True, blank=True)
+
+
 class Genre(models.Model):
     name = models.CharField(max_length=20)
 

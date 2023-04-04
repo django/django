@@ -296,10 +296,14 @@ def lookup_field(name, obj, model_admin=None):
             attr = getattr(model_admin, name)
             value = attr(obj)
         else:
-            attr = getattr(obj, name)
+            attr = getattr(obj, name, None)
             if callable(attr):
                 value = attr()
             else:
+                if not attr:
+                    attr = obj
+                    for part in name.split(LOOKUP_SEP):
+                        attr = getattr(attr, part)
                 value = attr
         f = None
     else:
@@ -367,15 +371,18 @@ def label_for_field(name, model, model_admin=None, return_attr=False, form=None)
             elif form and name in form.fields:
                 attr = form.fields[name]
             else:
-                message = "Unable to lookup '%s' on %s" % (
-                    name,
-                    model._meta.object_name,
-                )
-                if model_admin:
-                    message += " or %s" % model_admin.__class__.__name__
-                if form:
-                    message += " or %s" % form.__class__.__name__
-                raise AttributeError(message)
+                try:
+                    attr = get_fields_from_path(model, name)[-1]
+                except (NotRelationField, FieldDoesNotExist):
+                    message = "Unable to lookup '%s' on %s" % (
+                        name,
+                        model._meta.object_name,
+                    )
+                    if model_admin:
+                        message += " or %s" % model_admin.__class__.__name__
+                    if form:
+                        message += " or %s" % form.__class__.__name__
+                    raise AttributeError(message)
 
             if hasattr(attr, "short_description"):
                 label = attr.short_description

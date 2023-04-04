@@ -901,21 +901,24 @@ class ModelAdminChecks(BaseModelAdminChecks):
             try:
                 field = getattr(obj.model, item)
             except AttributeError:
-                return [
-                    checks.Error(
-                        "The value of '%s' refers to '%s', which is not a "
-                        "callable, an attribute of '%s', or an attribute or "
-                        "method on '%s'."
-                        % (
-                            label,
-                            item,
-                            obj.__class__.__name__,
-                            obj.model._meta.label,
-                        ),
-                        obj=obj.__class__,
-                        id="admin.E108",
-                    )
-                ]
+                try:
+                    field = get_fields_from_path(obj.model, item)[-1]
+                except (FieldDoesNotExist, NotRelationField):
+                    return [
+                        checks.Error(
+                            "The value of '%s' refers to '%s', which is not a "
+                            "callable, an attribute, field of '%s', "
+                            "or an attribute or method on '%s'."
+                            % (
+                                label,
+                                item,
+                                obj.__class__.__name__,
+                                obj.model._meta.label,
+                            ),
+                            obj=obj.__class__,
+                            id="admin.E108",
+                        )
+                    ]
         if isinstance(field, models.ManyToManyField):
             return [
                 checks.Error(

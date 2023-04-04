@@ -525,7 +525,7 @@ class ListDisplayTests(CheckTestCase):
             TestModelAdmin,
             ValidationTestModel,
             "The value of 'list_display[0]' refers to 'non_existent_field', "
-            "which is not a callable, an attribute of 'TestModelAdmin', "
+            "which is not a callable, an attribute, field of 'TestModelAdmin', "
             "or an attribute or method on 'modeladmin.ValidationTestModel'.",
             "admin.E108",
         )

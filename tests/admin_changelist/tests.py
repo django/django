@@ -62,6 +62,7 @@ from .models import (
     CustomIdUser,
     Event,
     Genre,
+    GrandChild,
     Group,
     Invitation,
     Membership,
@@ -1612,6 +1613,21 @@ class ChangeListTests(TestCase):
                 self.assertContains(
                     response, f'0 results (<a href="{href}">1 total</a>)'
                 )
+
+    def test_list_display_foreign_field(self):
+        parent = Parent.objects.create(name="I am your father")
+        child = Child.objects.create(name="I am your child", parent=parent)
+        GrandChild.objects.create(name="I am your grandchild", parent=child)
+        request = self.factory.get("/grandchild/")
+        request.user = self.superuser
+
+        class GrandChildAdminCustom(admin.ModelAdmin):
+            list_display = ["parent__name", "parent__parent__name"]
+
+        m = GrandChildAdminCustom(GrandChild, custom_site)
+        response = m.changelist_view(request)
+        self.assertContains(response, parent.name)
+        self.assertContains(response, child.name)
 
 
 class GetAdminLogTests(TestCase):

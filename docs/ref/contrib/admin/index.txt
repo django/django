@@ -565,7 +565,7 @@ subclass::
     If you don't set ``list_display``, the admin site will display a single
     column that displays the ``__str__()`` representation of each object.
 
-    There are four types of values that can be used in ``list_display``. All
+    There are five types of values that can be used in ``list_display``. All
     but the simplest may use the  :func:`~django.contrib.admin.display`
     decorator, which is used to customize how the field is presented:
 
@@ -573,6 +573,11 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["first_name", "last_name"]
+
+    * The name of foreign field, using the ``__`` notation. For example::
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ["city__name"]
 
     * A callable that accepts one argument, the model instance. For example::
 
