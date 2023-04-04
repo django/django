@@ -42,8 +42,13 @@ supports both libraries.
 Support for ``psycopg2`` is likely to be deprecated and removed at some point
 in the future.
 
+Be aware that ``psycopg`` 3 introduces some breaking changes over ``psycopg2``.
+As a consequence, you may need to make some changes to account for
+`differences from psycopg2`_.
+
 .. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg library: https://pypi.org/project/psycopg/
+.. _differences from psycopg2: https://www.psycopg.org/psycopg3/docs/basic/from_pg2.html
 
 Comments on columns and tables
 ------------------------------
