@@ -315,9 +315,9 @@ subclass::
     For more complex layout needs, see the :attr:`~ModelAdmin.fieldsets` option.
 
     The ``fields`` option accepts the same types of values as
-    :attr:`~ModelAdmin.list_display`, except that callables aren't accepted.
-    Names of model and model admin methods will only be used if they're listed
-    in :attr:`~ModelAdmin.readonly_fields`.
+    :attr:`~ModelAdmin.list_display`, except that callables and ``__`` lookups
+    for related fields aren't accepted. Names of model and model admin methods
+    will only be used if they're listed in :attr:`~ModelAdmin.readonly_fields`.
 
     To display multiple fields on the same line, wrap those fields in their own
     tuple. In this example, the ``url`` and ``title`` fields will display on the
@@ -565,7 +565,7 @@ subclass::
     If you don't set ``list_display``, the admin site will display a single
     column that displays the ``__str__()`` representation of each object.
 
-    There are four types of values that can be used in ``list_display``. All
+    There are five types of values that can be used in ``list_display``. All
     but the simplest may use the  :func:`~django.contrib.admin.display`
     decorator, which is used to customize how the field is presented:
 
@@ -573,6 +573,11 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["first_name", "last_name"]
+
+    * The name of a related field, using the ``__`` notation. For example::
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ["city__name"]
 
     * A callable that accepts one argument, the model instance. For example::
 
@@ -613,6 +618,11 @@ subclass::
 
           class PersonAdmin(admin.ModelAdmin):
               list_display = ["name", "decade_born_in"]
+
+    .. versionchanged:: 5.1
+
+        Support for using ``__`` lookups was added, when targeting related
+        fields.
 
     A few special cases to note about ``list_display``:
 
@@ -831,7 +841,7 @@ subclass::
     * Django will try to interpret every element of ``list_display`` in this
       order:
 
-      * A field of the model.
+      * A field of the model or from a related field.
       * A callable.
       * A string representing a ``ModelAdmin`` attribute.
       * A string representing a model attribute.

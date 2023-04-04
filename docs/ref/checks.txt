@@ -726,9 +726,9 @@ with the admin site:
 * **admin.E106**: The value of ``<InlineModelAdmin class>.model`` must be a
   ``Model``.
 * **admin.E107**: The value of ``list_display`` must be a list or tuple.
-* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
-  which is not a callable, an attribute of ``<ModelAdmin class>``, or an
-  attribute or method on ``<model>``.
+* **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``, which
+  is not a callable or attribute of ``<ModelAdmin class>``, or an attribute,
+  method, or field on ``<model>``.
 * **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
   field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
