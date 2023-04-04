@@ -3,6 +3,6 @@ Thanks for downloading Django.
 To install it, make sure you have Python 3.10 or greater installed. Then run
 this command from the command prompt:
 
-    python -m pip install .
+    python3 -m pip install .
 
 For more detailed instructions, see docs/intro/install.txt.
