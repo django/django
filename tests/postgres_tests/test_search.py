@@ -5,7 +5,6 @@ These tests use dialogue from the 1975 film Monty Python and the Holy Grail.
 All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
-from django.db import connection
 from django.db.models import F, Value
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
@@ -607,26 +606,6 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
             searched,
             [self.verse2, self.verse1, self.verse0, short_verse],
         )
-
-
-class SearchVectorIndexTests(PostgreSQLTestCase):
-    def test_search_vector_index(self):
-        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
-        # This test should be moved to test_indexes and use a functional
-        # index instead once support lands (see #26167).
-        query = Line.objects.all().query
-        resolved = SearchVector("id", "dialogue", config="english").resolve_expression(
-            query
-        )
-        compiler = query.get_compiler(connection.alias)
-        sql, params = resolved.as_sql(compiler, connection)
-        # Indexed function must be IMMUTABLE.
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "CREATE INDEX search_vector_index ON %s USING GIN (%s)"
-                % (Line._meta.db_table, sql),
-                params,
-            )
 
 
 class SearchQueryTests(PostgreSQLSimpleTestCase):
