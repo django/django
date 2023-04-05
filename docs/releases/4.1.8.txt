@@ -2,9 +2,9 @@
 Django 4.1.8 release notes
 ==========================
 
-*Expected April 3, 2023*
+*April 5, 2023*
 
-Django 4.1.8 fixes several bugs in 4.1.7.
+Django 4.1.8 fixes a bug in 4.1.7.
 
 Bugfixes
 ========
