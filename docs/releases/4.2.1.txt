@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.defer()``
   when deferring fields by attribute names (:ticket:`34458`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  :class:`~django.contrib.postgres.search.SearchVector` function with ``%``
+  characters (:ticket:`34459`).
