@@ -8,6 +8,7 @@ from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
+from django.utils.version import PY312
 
 
 class Suit(models.IntegerChoices):
@@ -311,7 +312,10 @@ class CustomChoicesTests(SimpleTestCase):
                 pass
 
     def test_uuid_unsupported(self):
-        msg = "UUID objects are immutable"
+        if PY312:
+            msg = "_value_ not set in __new__, unable to create it"
+        else:
+            msg = "UUID objects are immutable"
         with self.assertRaisesMessage(TypeError, msg):
 
             class Identifier(uuid.UUID, models.Choices):
