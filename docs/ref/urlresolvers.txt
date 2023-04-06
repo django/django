@@ -240,3 +240,8 @@ its web server (normally, :func:`~django.urls.reverse` takes care of this for
 you). In that case, you can call ``get_script_prefix()``, which will return
 the script prefix portion of the URL for your Django project. If your Django
 project is at the root of its web server, this is always ``"/"``.
+
+.. warning::
+
+    This function **cannot** be used outside of the request-response cycle
+    since it relies on values initialized during that cycle.
