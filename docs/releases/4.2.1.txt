@@ -18,3 +18,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 that caused aggregation over query that
   uses explicit grouping to group against the wrong columns (:ticket:`34464`).
+
+* Reallowed, following a regression in Django 4.2, setting the
+  ``"cursor_factory"`` option in :setting:`OPTIONS` on PostgreSQL
+  (:ticket:`34466`).
