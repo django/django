@@ -264,7 +264,7 @@ In a case like this, consider something like the following::
     You would get an error when running :djadmin:`django-admin
     compilemessages <compilemessages>`:
 
-    .. code-block: pytb
+    .. code-block:: pytb
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
