@@ -15,3 +15,6 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   :class:`~django.contrib.postgres.search.SearchVector` function with ``%``
   characters (:ticket:`34459`).
+
+* Fixed a regression in Django 4.2 that caused aggregation over query that
+  uses explicit grouping to group against the wrong columns (:ticket:`34464`).

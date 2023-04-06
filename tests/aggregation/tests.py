@@ -36,6 +36,7 @@ from django.db.models.functions import (
     Greatest,
     Least,
     Lower,
+    Mod,
     Now,
     Pi,
     TruncDate,
@@ -2175,3 +2176,9 @@ class AggregateAnnotationPruningTests(TestCase):
         sql = ctx.captured_queries[0]["sql"].lower()
         self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
         self.assertEqual(sql.count("authors_count"), 2)
+
+    def test_referenced_group_by_annotation_kept(self):
+        queryset = Book.objects.values(pages_mod=Mod("pages", 10)).annotate(
+            mod_count=Count("*")
+        )
+        self.assertEqual(queryset.count(), 1)
