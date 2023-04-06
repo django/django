@@ -17,6 +17,7 @@ __all__ = [
     "get_language_from_request",
     "get_language_info",
     "get_language_bidi",
+    "get_supported_language_variant",
     "check_for_language",
     "to_language",
     "to_locale",
