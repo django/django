@@ -74,11 +74,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             for row in cursor.fetchall()
         ]
 
-    def get_table_description(self, cursor, table_name):
+    def get_table_description(self, cursor, table_name, database = False):
         """
         Return a description of the table with the DB-API cursor.description
         interface."
         """
+        schema = database if database else '%%'
+
         json_constraints = {}
         if (
             self.connection.mysql_is_mariadb
@@ -94,9 +96,9 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     c.table_name = %s AND
                     LOWER(c.check_clause) =
                         'json_valid(`' + LOWER(c.constraint_name) + '`)' AND
-                    c.constraint_schema = DATABASE()
+                    c.constraint_schema = %s
                 """,
-                [table_name],
+                [database, table_name],
             )
             json_constraints = {row[0] for row in cursor.fetchall()}
         # A default collation for the given table.
@@ -104,10 +106,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             """
             SELECT  table_collation
             FROM    information_schema.tables
-            WHERE   table_schema = DATABASE()
+            WHERE   table_schema = %s
             AND     table_name = %s
             """,
-            [table_name],
+            [database, table_name],
         )
         row = cursor.fetchone()
         default_column_collation = row[0] if row else ""
@@ -130,15 +132,16 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     ELSE 0
                 END AS is_unsigned
             FROM information_schema.columns
-            WHERE table_name = %s AND table_schema = DATABASE()
+            WHERE table_name = %s
             """,
             [default_column_collation, table_name],
         )
         field_info = {line[0]: InfoLine(*line) for line in cursor.fetchall()}
 
-        cursor.execute(
-            "SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name)
-        )
+        if database:
+            cursor.execute("SELECT * FROM {}.{} LIMIT 1".format(database, table_name))
+        else:
+            cursor.execute("SELECT * FROM %s LIMIT 1" % self.connection.ops.quote_name(table_name))
 
         def to_int(i):
             return int(i) if i is not None else i
@@ -171,12 +174,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     def get_relations(self, cursor, table_name):
         """
-        Return a dictionary of {field_name: (field_name_other_table, other_table)}
+        Return a dictionary of {field_name: (field_name_other_table, other_table, other_database)}
         representing all foreign keys in the given table.
         """
         cursor.execute(
             """
-            SELECT column_name, referenced_column_name, referenced_table_name
+            SELECT column_name, referenced_column_name, referenced_table_name, referenced_table_schema
             FROM information_schema.key_column_usage
             WHERE table_name = %s
                 AND table_schema = DATABASE()
@@ -186,8 +189,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             [table_name],
         )
         return {
-            field_name: (other_field, other_table)
-            for field_name, other_field, other_table in cursor.fetchall()
+            field_name: (other_field, other_table, other_database)
+            for field_name, other_field, other_table, other_database in cursor.fetchall()
         }
 
     def get_storage_engine(self, cursor, table_name):
@@ -223,30 +226,33 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 check_columns.add(token.value[1:-1])
         return check_columns
 
-    def get_constraints(self, cursor, table_name):
+    def get_constraints(self, cursor, table_name, ref_db_name = False):
         """
         Retrieve any constraints or keys (unique, pk, fk, check, index) across
         one or more columns.
         """
         constraints = {}
+        referenced_schema = ref_db_name if ref_db_name else '%%'
         # Get the actual constraint names and columns
-        name_query = """
+        name_query = f"""
             SELECT kc.`constraint_name`, kc.`column_name`,
                 kc.`referenced_table_name`, kc.`referenced_column_name`,
+                kc.`referenced_table_schema`,
                 c.`constraint_type`
             FROM
                 information_schema.key_column_usage AS kc,
                 information_schema.table_constraints AS c
             WHERE
                 kc.table_schema = DATABASE() AND
+                kc.referenced_table_schema = %s AND
                 c.table_schema = kc.table_schema AND
                 c.constraint_name = kc.constraint_name AND
                 c.constraint_type != 'CHECK' AND
                 kc.table_name = %s
             ORDER BY kc.`ordinal_position`
         """
-        cursor.execute(name_query, [table_name])
-        for constraint, column, ref_table, ref_column, kind in cursor.fetchall():
+        cursor.execute(name_query, [referenced_schema, table_name])
+        for constraint, column, ref_table, ref_column, ref_database, kind in cursor.fetchall():
             if constraint not in constraints:
                 constraints[constraint] = {
                     "columns": OrderedSet(),
@@ -254,7 +260,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "unique": kind in {"PRIMARY KEY", "UNIQUE"},
                     "index": False,
                     "check": False,
-                    "foreign_key": (ref_table, ref_column) if ref_column else None,
+                    "foreign_key": (ref_table, ref_column, ref_database) if ref_column or ref_database else None,
                 }
                 if self.connection.features.supports_index_column_ordering:
                     constraints[constraint]["orders"] = []
@@ -263,7 +269,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         if self.connection.features.can_introspect_check_constraints:
             unnamed_constraints_index = 0
             columns = {
-                info.name for info in self.get_table_description(cursor, table_name)
+                info.name for info in self.get_table_description(cursor, table_name, ref_db_name)
             }
             if self.connection.mysql_is_mariadb:
                 type_query = """
@@ -306,9 +312,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     "foreign_key": None,
                 }
         # Now add in the indexes
-        cursor.execute(
-            "SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name)
-        )
+        if referenced_schema and referenced_schema != '%%':
+            cursor.execute("SHOW INDEX FROM {}.{}".format(referenced_schema, table_name))
+        else:
+            cursor.execute("SHOW INDEX FROM %s" % self.connection.ops.quote_name(table_name))
+
+
         for table, non_unique, index, colseq, column, order, type_ in [
             x[:6] + (x[10],) for x in cursor.fetchall()
         ]:
