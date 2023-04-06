@@ -23,7 +23,7 @@ from django.utils.datastructures import MultiValueDict
 from django.utils.functional import cached_property
 from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 from django.utils.regex_helper import _lazy_re_compile, normalize
-from django.utils.translation import get_language
+from django.utils.translation import get_language, get_supported_language_variant
 
 from .converters import get_converter
 from .exceptions import NoReverseMatch, Resolver404
@@ -351,7 +351,8 @@ class LocalePrefixPattern:
     @property
     def language_prefix(self):
         language_code = get_language() or settings.LANGUAGE_CODE
-        if language_code == settings.LANGUAGE_CODE and not self.prefix_default_language:
+        default_language = get_supported_language_variant(settings.LANGUAGE_CODE)
+        if language_code == default_language and not self.prefix_default_language:
             return ""
         else:
             return "%s/" % language_code
