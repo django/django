@@ -1368,7 +1368,7 @@ For example, this statement yields a single ``Q`` object that represents the
 
 This is equivalent to the following SQL ``WHERE`` clause:
 
-.. code-block: sql
+.. code-block:: sql
 
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
