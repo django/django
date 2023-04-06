@@ -25,3 +25,7 @@ Bugfixes
 
 * Enforced UTF-8 client encoding on PostgreSQL, following a regression in
   Django 4.2 (:ticket:`34470`).
+
+* Fixed a regression in Django 4.2 where ``i18n_patterns()`` didn't respect the
+  ``prefix_default_language`` argument when a fallback language of the default
+  language was used (:ticket:`34455`).
