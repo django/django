@@ -453,6 +453,9 @@ class Query(BaseExpression):
                     # filtering against window functions is involved as it
                     # requires complex realising.
                     annotation_mask = set()
+                    if isinstance(self.group_by, tuple):
+                        for expr in self.group_by:
+                            annotation_mask |= expr.get_refs()
                     for aggregate in aggregates.values():
                         annotation_mask |= aggregate.get_refs()
                     inner_query.set_annotation_mask(annotation_mask)
