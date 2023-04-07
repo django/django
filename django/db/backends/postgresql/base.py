@@ -208,7 +208,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {"client_encoding": "UTF8"}
         if settings_dict["NAME"]:
             conn_params = {
                 "dbname": settings_dict["NAME"],
@@ -220,6 +219,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
+        conn_params["client_encoding"] = "UTF8"
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
