@@ -22,3 +22,6 @@ Bugfixes
 * Reallowed, following a regression in Django 4.2, setting the
   ``"cursor_factory"`` option in :setting:`OPTIONS` on PostgreSQL
   (:ticket:`34466`).
+
+* Enforced UTF-8 client encoding on PostgreSQL, following a regression in
+  Django 4.2 (:ticket:`34470`).
