@@ -1235,8 +1235,29 @@ class OneToOneField(ForeignKey):
     description = _("One-to-one relationship")
 
     def __init__(self, to, on_delete, to_field=None, **kwargs):
+        self.has_unique_arg = "unique" in kwargs
         kwargs["unique"] = True
         super().__init__(to, on_delete, to_field=to_field, **kwargs)
+
+    def check(self, **kwargs):
+        return [
+            *super().check(**kwargs),
+            *self._check_ignored_options(**kwargs),
+        ]
+
+    def _check_ignored_options(self, **kwargs):
+        warnings = []
+
+        if self.has_unique_arg:
+            warnings.append(
+                checks.Warning(
+                    "unique has no effect on OneToOneField.",
+                    obj=self,
+                    id="fields.W347",
+                )
+            )
+
+        return warnings
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

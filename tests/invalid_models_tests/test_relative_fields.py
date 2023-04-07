@@ -56,6 +56,25 @@ class RelativeFieldTests(SimpleTestCase):
         field = Model._meta.get_field("foreign_key")
         self.assertEqual(field.check(from_model=Model), [])
 
+    def test_one_to_one_with_useless_options(self):
+        class OtherModel(models.Model):
+            pass
+
+        class Model(models.Model):
+            one_to_one = models.OneToOneField(OtherModel, models.CASCADE, unique=True)
+
+        field = Model._meta.get_field("one_to_one")
+        self.assertEqual(
+            Model.check(),
+            [
+                DjangoWarning(
+                    "unique has no effect on OneToOneField.",
+                    obj=field,
+                    id="fields.W347",
+                ),
+            ],
+        )
+
     def test_many_to_many_to_missing_model(self):
         class Model(models.Model):
             m2m = models.ManyToManyField("Rel2")

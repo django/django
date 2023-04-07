@@ -318,6 +318,7 @@ Related fields
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
 * **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
+* **fields.W347**: ``unique`` has no effect on ``OneToOneField``.
 
 Models
 ------
