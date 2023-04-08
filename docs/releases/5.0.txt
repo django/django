@@ -367,7 +367,9 @@ Utilities
 Validators
 ~~~~~~~~~~
 
-* ...
+* The new ``offset`` argument of
+  :class:`~django.core.validators.StepValueValidator` allows specifying an
+  offset for valid values.
 
 .. _backwards-incompatible-5.0:
 

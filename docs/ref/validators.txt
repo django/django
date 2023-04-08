@@ -340,9 +340,16 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``StepValueValidator``
 ----------------------
 
-.. class:: StepValueValidator(limit_value, message=None)
+.. class:: StepValueValidator(limit_value, message=None, offset=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'step_size'`` if ``value`` is not an integral multiple of
     ``limit_value``, which can be a float, integer or decimal value or a
-    callable.
+    callable. When ``offset`` is set, the validation occurs against
+    ``limit_value`` plus ``offset``. For example, for
+    ``StepValueValidator(3, offset=1.4)`` valid values include ``1.4``,
+    ``4.4``, ``7.4``, ``10.4``, and so on.
+
+    .. versionchanged:: 5.0
+
+        The ``offset`` argument was added.
