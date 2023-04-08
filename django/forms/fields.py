@@ -311,7 +311,8 @@ class IntegerField(Field):
         if min_value is not None:
             self.validators.append(validators.MinValueValidator(min_value))
         if step_size is not None:
-            self.validators.append(validators.StepValueValidator(step_size))
+            self.validators.append(validators.StepValueValidator(step_size,
+                                                                 offset=min_value))
 
     def to_python(self, value):
         """

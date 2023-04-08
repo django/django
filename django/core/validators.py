@@ -1,6 +1,7 @@
 import ipaddress
 import math
 import re
+from decimal import Decimal
 from pathlib import Path
 from urllib.parse import urlsplit, urlunsplit
 
@@ -407,8 +408,12 @@ class StepValueValidator(BaseValidator):
     message = _("Ensure this value is a multiple of step size %(limit_value)s.")
     code = "step_size"
 
+    def __init__(self, limit_value, offset=None, message=None):
+        super().__init__(limit_value, message)
+        self.offset = offset if isinstance(offset, (float, int, Decimal)) else 0
+
     def compare(self, a, b):
-        return not math.isclose(math.remainder(a, b), 0, abs_tol=1e-9)
+        return not math.isclose(math.remainder(a + self.offset, b), 0, abs_tol=1e-9)
 
 
 @deconstructible

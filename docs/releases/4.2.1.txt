@@ -25,3 +25,7 @@ Bugfixes
 
 * Enforced UTF-8 client encoding on PostgreSQL, following a regression in
   Django 4.2 (:ticket:`34470`).
+
+* Fixed bug in ``StepValidator``. ``DecimalField``, ``IntegerField`` and
+  ``FloatField`` do not properly validate, if ``min_value`` is not a multiple
+  of ``step_size``.
