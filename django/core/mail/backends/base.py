@@ -37,8 +37,16 @@ class BaseEmailBackend:
         """
         pass
 
+    async def aopen(self):
+        """See open()."""
+        pass
+
     def close(self):
         """Close a network connection."""
+        pass
+
+    async def aclose(self):
+        """See close()."""
         pass
 
     def __enter__(self):
@@ -52,7 +60,27 @@ class BaseEmailBackend:
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
 
+    async def __aenter__(self):
+        try:
+            await self.aopen()
+        except Exception:
+            await self.aclose()
+            raise
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, traceback):
+        await self.aclose()
+
     def send_messages(self, email_messages):
+        """
+        Send one or more EmailMessage objects and return the number of email
+        messages sent.
+        """
+        raise NotImplementedError(
+            "subclasses of BaseEmailBackend must override send_messages() method"
+        )
+
+    async def asend_messages(self, email_messages):
         """
         Send one or more EmailMessage objects and return the number of email
         messages sent.

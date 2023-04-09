@@ -255,6 +255,13 @@ class EmailMessage:
             self.connection = get_connection(fail_silently=fail_silently)
         return self.connection
 
+    async def aget_connection(self, fail_silently=False):
+        from django.core.mail import aget_connection
+
+        if not self.connection:
+            self.connection = await aget_connection(fail_silently=fail_silently)
+        return self.connection
+
     def message(self):
         encoding = self.encoding or settings.DEFAULT_CHARSET
         msg = SafeMIMEText(self.body, self.content_subtype, encoding)
@@ -296,6 +303,14 @@ class EmailMessage:
             # send to.
             return 0
         return self.get_connection(fail_silently).send_messages([self])
+
+    async def asend(self, fail_silently=False):
+        """Send the email message."""
+        if not self.recipients():
+            # Don't bother creating the network connection if there's nobody to
+            # send to.
+            return 0
+        return await (await self.aget_connection(fail_silently)).asend_messages([self])
 
     def attach(self, filename=None, content=None, mimetype=None):
         """
