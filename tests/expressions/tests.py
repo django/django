@@ -1289,6 +1289,21 @@ class SimpleExpressionTests(SimpleTestCase):
             hash(Expression(TestModel._meta.get_field("other_field"))),
         )
 
+    def test_is_nullable(self):
+        class TestModel(Model):
+            field = IntegerField(null=True)
+            other_field = IntegerField()
+
+        field = TestModel._meta.get_field("field")
+        other_field = TestModel._meta.get_field("other_field")
+
+        self.assertIs(Expression(field).is_nullable(), True)
+        self.assertIs(Expression(other_field).is_nullable(), False)
+        self.assertIs(Concat(field, other_field).is_nullable(), False)
+        self.assertIs(
+            Lower(field).is_nullable(),
+            not connection.features.interprets_empty_strings_as_nulls)
+
 
 class ExpressionsNumericTests(TestCase):
     @classmethod

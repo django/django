@@ -215,6 +215,9 @@ class Now(Func):
     template = "CURRENT_TIMESTAMP"
     output_field = DateTimeField()
 
+    def is_nullable(self, field=None):
+        return False
+
     def as_postgresql(self, compiler, connection, **extra_context):
         # PostgreSQL's CURRENT_TIMESTAMP means "the time at the start of the
         # transaction". Use STATEMENT_TIMESTAMP to be cross-compatible with

@@ -130,6 +130,9 @@ class Pi(NumericOutputFieldMixin, Func):
     function = "PI"
     arity = 0
 
+    def is_nullable(self, field=None):
+        return False
+
     def as_oracle(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler, connection, template=str(math.pi), **extra_context
@@ -157,6 +160,9 @@ class Radians(NumericOutputFieldMixin, Transform):
 class Random(NumericOutputFieldMixin, Func):
     function = "RANDOM"
     arity = 0
+
+    def is_nullable(self, field=None):
+        return False
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(compiler, connection, function="RAND", **extra_context)

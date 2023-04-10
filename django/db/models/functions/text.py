@@ -2,6 +2,7 @@ from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import CharField, IntegerField, TextField
 from django.db.models.functions import Cast, Coalesce
+from django.db.models.functions.comparison import TextFuncMixin
 from django.db.models.lookups import Transform
 
 
@@ -142,8 +143,11 @@ class Concat(Func):
             return ConcatPair(*expressions)
         return ConcatPair(expressions[0], self._paired(expressions[1:]))
 
+    def is_nullable(self, field=None):
+        return False
 
-class Left(Func):
+
+class Left(Func, TextFuncMixin):
     function = "LEFT"
     arity = 2
     output_field = CharField()
@@ -168,7 +172,7 @@ class Left(Func):
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
 
-class Length(Transform):
+class Length(Transform, TextFuncMixin):
     """Return the number of characters in the expression."""
 
     function = "LENGTH"
@@ -181,12 +185,12 @@ class Length(Transform):
         )
 
 
-class Lower(Transform):
+class Lower(Transform, TextFuncMixin):
     function = "LOWER"
     lookup_name = "lower"
 
 
-class LPad(Func):
+class LPad(Func, TextFuncMixin):
     function = "LPAD"
     output_field = CharField()
 
@@ -200,17 +204,17 @@ class LPad(Func):
         super().__init__(expression, length, fill_text, **extra)
 
 
-class LTrim(Transform):
+class LTrim(Transform, TextFuncMixin):
     function = "LTRIM"
     lookup_name = "ltrim"
 
 
-class MD5(OracleHashMixin, Transform):
+class MD5(OracleHashMixin, Transform, TextFuncMixin):
     function = "MD5"
     lookup_name = "md5"
 
 
-class Ord(Transform):
+class Ord(Transform, TextFuncMixin):
     function = "ASCII"
     lookup_name = "ord"
     output_field = IntegerField()
@@ -222,7 +226,7 @@ class Ord(Transform):
         return super().as_sql(compiler, connection, function="UNICODE", **extra_context)
 
 
-class Repeat(Func):
+class Repeat(Func, TextFuncMixin):
     function = "REPEAT"
     output_field = CharField()
 
@@ -242,14 +246,14 @@ class Repeat(Func):
         return rpad.as_sql(compiler, connection, **extra_context)
 
 
-class Replace(Func):
+class Replace(Func, TextFuncMixin):
     function = "REPLACE"
 
     def __init__(self, expression, text, replacement=Value(""), **extra):
         super().__init__(expression, text, replacement, **extra)
 
 
-class Reverse(Transform):
+class Reverse(Transform, TextFuncMixin):
     function = "REVERSE"
     lookup_name = "reverse"
 
@@ -282,17 +286,17 @@ class RPad(LPad):
     function = "RPAD"
 
 
-class RTrim(Transform):
+class RTrim(Transform, TextFuncMixin):
     function = "RTRIM"
     lookup_name = "rtrim"
 
 
-class SHA1(OracleHashMixin, PostgreSQLSHAMixin, Transform):
+class SHA1(OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin):
     function = "SHA1"
     lookup_name = "sha1"
 
 
-class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform):
+class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform, TextFuncMixin):
     function = "SHA224"
     lookup_name = "sha224"
 
@@ -300,22 +304,28 @@ class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform):
         raise NotSupportedError("SHA224 is not supported on Oracle.")
 
 
-class SHA256(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+class SHA256(
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+):
     function = "SHA256"
     lookup_name = "sha256"
 
 
-class SHA384(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+class SHA384(
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+):
     function = "SHA384"
     lookup_name = "sha384"
 
 
-class SHA512(MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform):
+class SHA512(
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+):
     function = "SHA512"
     lookup_name = "sha512"
 
 
-class StrIndex(Func):
+class StrIndex(Func, TextFuncMixin):
     """
     Return a positive integer corresponding to the 1-indexed position of the
     first occurrence of a substring inside another string, or 0 if the
@@ -330,7 +340,7 @@ class StrIndex(Func):
         return super().as_sql(compiler, connection, function="STRPOS", **extra_context)
 
 
-class Substr(Func):
+class Substr(Func, TextFuncMixin):
     function = "SUBSTRING"
     output_field = CharField()
 
@@ -355,11 +365,11 @@ class Substr(Func):
         return super().as_sql(compiler, connection, function="SUBSTR", **extra_context)
 
 
-class Trim(Transform):
+class Trim(Transform, TextFuncMixin):
     function = "TRIM"
     lookup_name = "trim"
 
 
-class Upper(Transform):
+class Upper(Transform, TextFuncMixin):
     function = "UPPER"
     lookup_name = "upper"

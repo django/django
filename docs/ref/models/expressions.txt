@@ -1026,6 +1026,13 @@ calling the appropriate methods on the wrapped expression.
         :py:data:`NotImplemented` which forces the expression to be computed on
         the database.
 
+    .. method:: is_nullable(field=None)
+
+        .. versionadded:: 5.0
+
+        Tells Django that this expression can return nulls. When ``False``,
+        the ORM will avoid adding ``WHERE ... IS NULL`` clauses in negations.
+
     .. method:: resolve_expression(query=None, allow_joins=True, reuse=None, summarize=False, for_save=False)
 
         Provides the chance to do any preprocessing or validation of
