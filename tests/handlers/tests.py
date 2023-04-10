@@ -3,6 +3,7 @@ from django.core.handlers.wsgi import WSGIHandler, WSGIRequest, get_script_name
 from django.core.signals import request_finished, request_started
 from django.db import close_old_connections, connection
 from django.test import (
+    AsyncRequestFactory,
     RequestFactory,
     SimpleTestCase,
     TransactionTestCase,
@@ -327,6 +328,12 @@ class AsyncHandlerRequestTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             await self.async_client.get("/unawaited/")
+
+    @override_settings(FORCE_SCRIPT_NAME="/FORCED_PREFIX/")
+    def test_force_script_name(self):
+        async_request_factory = AsyncRequestFactory()
+        request = async_request_factory.request(**{"path": "/somepath/"})
+        self.assertEqual(request.path, "/FORCED_PREFIX/somepath/")
 
     async def test_sync_streaming(self):
         response = await self.async_client.get("/streaming/")
