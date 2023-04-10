@@ -284,6 +284,12 @@ Models
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
+Pagination
+~~~~~~~~~~
+
+* The new :attr:`django.core.paginator.Paginator.error_messages` argument
+  allows customizing the error messages raised by :meth:`.Paginator.page`.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
