@@ -9,8 +9,8 @@ from uuid import UUID
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import (
-    DatabaseError,
     DEFAULT_DB_ALIAS,
+    DatabaseError,
     NotSupportedError,
     connection,
     connections,

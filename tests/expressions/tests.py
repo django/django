@@ -1302,7 +1302,8 @@ class SimpleExpressionTests(SimpleTestCase):
         self.assertIs(Concat(field, other_field).is_nullable(), False)
         self.assertIs(
             Lower(field).is_nullable(),
-            not connection.features.interprets_empty_strings_as_nulls)
+            not connection.features.interprets_empty_strings_as_nulls,
+        )
 
 
 class ExpressionsNumericTests(TestCase):

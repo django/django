@@ -1,5 +1,5 @@
 """Database functions that do comparisons or type conversions."""
-from django.db import connections, DEFAULT_DB_ALIAS, NotSupportedError
+from django.db import DEFAULT_DB_ALIAS, NotSupportedError, connections
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import TextField
 from django.db.models.fields.json import JSONField
@@ -11,8 +11,11 @@ class TextFuncMixin:
     Text functions should not be considered nullable on databases that
     cannot distinguish between empty strings and nulls.
     """
+
     def is_nullable(self, field=None):
-        return not connections[DEFAULT_DB_ALIAS].features.interprets_empty_strings_as_nulls
+        return not connections[
+            DEFAULT_DB_ALIAS
+        ].features.interprets_empty_strings_as_nulls
 
 
 class Cast(Func):
