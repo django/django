@@ -26,6 +26,15 @@ from django.utils.functional import cached_property
 logger = logging.getLogger("django.request")
 
 
+def get_script_prefix(scope):
+    """
+    Return the script prefix to use from either the scope or a setting.
+    """
+    if settings.FORCE_SCRIPT_NAME:
+        return settings.FORCE_SCRIPT_NAME
+    return scope.get("root_path", "") or ""
+
+
 class ASGIRequest(HttpRequest):
     """
     Custom request subclass that decodes from an ASGI-standard request dict
@@ -41,7 +50,7 @@ class ASGIRequest(HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
-        self.script_name = self.scope.get("root_path", "")
+        self.script_name = get_script_prefix(scope)
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = scope["path"].removeprefix(self.script_name)
@@ -170,7 +179,7 @@ class ASGIHandler(base.BaseHandler):
         except RequestAborted:
             return
         # Request is complete and can be served.
-        set_script_prefix(self.get_script_prefix(scope))
+        set_script_prefix(get_script_prefix(scope))
         await signals.request_started.asend(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
@@ -344,11 +353,3 @@ class ASGIHandler(base.BaseHandler):
                 (position + cls.chunk_size) >= len(data),
             )
             position += cls.chunk_size
-
-    def get_script_prefix(self, scope):
-        """
-        Return the script prefix to use from either the scope or a setting.
-        """
-        if settings.FORCE_SCRIPT_NAME:
-            return settings.FORCE_SCRIPT_NAME
-        return scope.get("root_path", "") or ""
