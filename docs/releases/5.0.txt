@@ -284,9 +284,8 @@ Models
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
-* The ``is_nullable(field)`` method was promoted from
-  :class:`~django.db.models.sql.query.Query` to
-  :class:`~django.db.models.expressions.BaseExpression`.
+* The ``is_nullable(field)`` method was promoted from ``Query`` to
+  ``BaseExpression``.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
