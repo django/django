@@ -42,6 +42,7 @@ class PostgreSQLSHAMixin:
 class Chr(Transform):
     function = "CHR"
     lookup_name = "chr"
+    output_field = CharField()
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(
