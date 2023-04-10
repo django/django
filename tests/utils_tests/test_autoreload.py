@@ -721,11 +721,17 @@ class BaseReloaderTests(ReloaderTests):
 
 
 def skip_unless_watchman_available():
+    return skip("Watchman unavailable")
+
     try:
         autoreload.WatchmanReloader.check_availability()
     except WatchmanUnavailable as e:
         return skip("Watchman unavailable: %s" % e)
     return lambda func: func
+
+
+class WatchfilesTests(ReloaderTests, IntegrationTests):
+    RELOADER_CLS = autoreload.WatchfilesReloader
 
 
 @skip_unless_watchman_available()
