@@ -147,7 +147,7 @@ class Concat(Func):
         return False
 
 
-class Left(Func, TextFuncMixin):
+class Left(TextFuncMixin, Func):
     function = "LEFT"
     arity = 2
     output_field = CharField()
@@ -172,7 +172,7 @@ class Left(Func, TextFuncMixin):
         return self.get_substr().as_sqlite(compiler, connection, **extra_context)
 
 
-class Length(Transform, TextFuncMixin):
+class Length(TextFuncMixin, Transform):
     """Return the number of characters in the expression."""
 
     function = "LENGTH"
@@ -185,12 +185,12 @@ class Length(Transform, TextFuncMixin):
         )
 
 
-class Lower(Transform, TextFuncMixin):
+class Lower(TextFuncMixin, Transform):
     function = "LOWER"
     lookup_name = "lower"
 
 
-class LPad(Func, TextFuncMixin):
+class LPad(TextFuncMixin, Func):
     function = "LPAD"
     output_field = CharField()
 
@@ -204,17 +204,17 @@ class LPad(Func, TextFuncMixin):
         super().__init__(expression, length, fill_text, **extra)
 
 
-class LTrim(Transform, TextFuncMixin):
+class LTrim(TextFuncMixin, Transform):
     function = "LTRIM"
     lookup_name = "ltrim"
 
 
-class MD5(OracleHashMixin, Transform, TextFuncMixin):
+class MD5(OracleHashMixin, TextFuncMixin, Transform):
     function = "MD5"
     lookup_name = "md5"
 
 
-class Ord(Transform, TextFuncMixin):
+class Ord(TextFuncMixin, Transform):
     function = "ASCII"
     lookup_name = "ord"
     output_field = IntegerField()
@@ -226,7 +226,7 @@ class Ord(Transform, TextFuncMixin):
         return super().as_sql(compiler, connection, function="UNICODE", **extra_context)
 
 
-class Repeat(Func, TextFuncMixin):
+class Repeat(TextFuncMixin, Func):
     function = "REPEAT"
     output_field = CharField()
 
@@ -246,14 +246,14 @@ class Repeat(Func, TextFuncMixin):
         return rpad.as_sql(compiler, connection, **extra_context)
 
 
-class Replace(Func, TextFuncMixin):
+class Replace(TextFuncMixin, Func):
     function = "REPLACE"
 
     def __init__(self, expression, text, replacement=Value(""), **extra):
         super().__init__(expression, text, replacement, **extra)
 
 
-class Reverse(Transform, TextFuncMixin):
+class Reverse(TextFuncMixin, Transform):
     function = "REVERSE"
     lookup_name = "reverse"
 
@@ -286,17 +286,17 @@ class RPad(LPad):
     function = "RPAD"
 
 
-class RTrim(Transform, TextFuncMixin):
+class RTrim(TextFuncMixin, Transform):
     function = "RTRIM"
     lookup_name = "rtrim"
 
 
-class SHA1(OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin):
+class SHA1(OracleHashMixin, PostgreSQLSHAMixin, TextFuncMixin, Transform):
     function = "SHA1"
     lookup_name = "sha1"
 
 
-class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform, TextFuncMixin):
+class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, TextFuncMixin, Transform):
     function = "SHA224"
     lookup_name = "sha224"
 
@@ -305,27 +305,27 @@ class SHA224(MySQLSHA2Mixin, PostgreSQLSHAMixin, Transform, TextFuncMixin):
 
 
 class SHA256(
-    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, TextFuncMixin, Transform
 ):
     function = "SHA256"
     lookup_name = "sha256"
 
 
 class SHA384(
-    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, TextFuncMixin, Transform
 ):
     function = "SHA384"
     lookup_name = "sha384"
 
 
 class SHA512(
-    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, Transform, TextFuncMixin
+    MySQLSHA2Mixin, OracleHashMixin, PostgreSQLSHAMixin, TextFuncMixin, Transform
 ):
     function = "SHA512"
     lookup_name = "sha512"
 
 
-class StrIndex(Func, TextFuncMixin):
+class StrIndex(TextFuncMixin, Func):
     """
     Return a positive integer corresponding to the 1-indexed position of the
     first occurrence of a substring inside another string, or 0 if the
@@ -340,7 +340,7 @@ class StrIndex(Func, TextFuncMixin):
         return super().as_sql(compiler, connection, function="STRPOS", **extra_context)
 
 
-class Substr(Func, TextFuncMixin):
+class Substr(TextFuncMixin, Func):
     function = "SUBSTRING"
     output_field = CharField()
 
@@ -365,11 +365,11 @@ class Substr(Func, TextFuncMixin):
         return super().as_sql(compiler, connection, function="SUBSTR", **extra_context)
 
 
-class Trim(Transform, TextFuncMixin):
+class Trim(TextFuncMixin, Transform):
     function = "TRIM"
     lookup_name = "trim"
 
 
-class Upper(Transform, TextFuncMixin):
+class Upper(TextFuncMixin, Transform):
     function = "UPPER"
     lookup_name = "upper"

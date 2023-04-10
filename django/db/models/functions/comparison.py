@@ -114,7 +114,7 @@ class Coalesce(Func):
         return self.as_sql(compiler, connection, **extra_context)
 
 
-class Collate(Func, TextFuncMixin):
+class Collate(TextFuncMixin, Func):
     function = "COLLATE"
     template = "%(expressions)s %(function)s %(collation)s"
     # Inspired from
