@@ -1,4 +1,4 @@
-from django.db.models import IntegerField
+from django.db.models import F, IntegerField
 from django.db.models.functions import Chr, Left, Ord
 from django.test import TestCase
 from django.test.utils import register_lookup
@@ -37,3 +37,13 @@ class ChrTests(TestCase):
                 authors.exclude(name_code_point__chr=Chr(ord("J"))),
                 [self.elena, self.rhonda],
             )
+
+    def test_annotate(self):
+        authors = Author.objects.annotate(
+            first_initial=Left("name", 1),
+            initial_chr=Chr(ord("J")),
+        )
+        self.assertSequenceEqual(
+            authors.filter(first_initial=F("initial_chr")),
+            [self.john],
+        )
