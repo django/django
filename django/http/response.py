@@ -385,7 +385,7 @@ class HttpResponse(HttpResponseBase):
     def __getstate__(self):
         obj_dict = self.__dict__.copy()
         for attr in self.non_picklable_attrs:
-            if attr in obj_dict:
+            if obj_dict.get(attr, None) is not None:
                 del obj_dict[attr]
         return obj_dict
 
