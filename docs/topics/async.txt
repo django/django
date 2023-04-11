@@ -84,6 +84,13 @@ view functions:
 * :func:`~django.views.decorators.cache.cache_control`
 * :func:`~django.views.decorators.cache.never_cache`
 * :func:`~django.views.decorators.common.no_append_slash`
+* :func:`~django.views.decorators.http.condition`
+* :func:`~django.views.decorators.http.etag`
+* :func:`~django.views.decorators.http.last_modified`
+* :func:`~django.views.decorators.http.require_http_methods`
+* :func:`~django.views.decorators.http.require_GET`
+* :func:`~django.views.decorators.http.require_POST`
+* :func:`~django.views.decorators.http.require_safe`
 * ``xframe_options_deny()``
 * ``xframe_options_sameorigin()``
 * ``xframe_options_exempt()``

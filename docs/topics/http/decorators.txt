@@ -33,13 +33,25 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
     Note that request methods should be in uppercase.
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: require_GET()
 
     Decorator to require that a view only accepts the GET method.
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: require_POST()
 
     Decorator to require that a view only accepts the POST method.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 .. function:: require_safe()
 
@@ -54,6 +66,10 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
         requests exactly like GET requests in your views. Since some software,
         such as link checkers, rely on HEAD requests, you might prefer
         using ``require_safe`` instead of ``require_GET``.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 Conditional view processing
 ===========================
@@ -70,6 +86,10 @@ control caching behavior on particular views.
     These decorators can be used to generate ``ETag`` and ``Last-Modified``
     headers; see
     :doc:`conditional view processing </topics/conditional-view-processing>`.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 .. module:: django.views.decorators.gzip
 
