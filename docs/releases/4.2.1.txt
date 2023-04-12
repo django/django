@@ -31,5 +31,5 @@ Bugfixes
   language was used (:ticket:`34455`).
 
 * Fixed a regression in Django 4.2 where creating copies and deep copies of
-  ``HttpRequest`` and its subclasses didn't always work correctly
-  (:ticket:`34482`, :ticket:`34484`).
+  ``HttpRequest``, ``HttpResponse``, and their subclasses didn't always work
+  correctly (:ticket:`34482`, :ticket:`34484`).
