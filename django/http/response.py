@@ -369,30 +369,11 @@ class HttpResponse(HttpResponseBase):
     """
 
     streaming = False
-    non_picklable_attrs = frozenset(
-        [
-            "resolver_match",
-            # Non-picklable attributes added by test clients.
-            "asgi_request",
-            "client",
-            "context",
-            "json",
-            "templates",
-            "wsgi_request",
-        ]
-    )
 
     def __init__(self, content=b"", *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Content is a bytestring. See the `content` property methods.
         self.content = content
-
-    def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        for attr in self.non_picklable_attrs:
-            if attr in obj_dict:
-                del obj_dict[attr]
-        return obj_dict
 
     def __repr__(self):
         return "<%(cls)s status_code=%(status_code)d%(content_type)s>" % {
