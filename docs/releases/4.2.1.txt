@@ -29,3 +29,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 where ``i18n_patterns()`` didn't respect the
   ``prefix_default_language`` argument when a fallback language of the default
   language was used (:ticket:`34455`).
+
+* Fixed a regression in Django 4.2 where creating copies and deep copies of
+  ``HttpRequest`` and its subclasses didn't always work correctly
+  (:ticket:`34482`, :ticket:`34484`).
