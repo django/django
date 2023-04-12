@@ -55,8 +55,6 @@ class HttpRequest:
     _encoding = None
     _upload_handlers = []
 
-    non_picklable_attrs = frozenset(["resolver_match", "_stream"])
-
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
         # Any variable assignment made here should also happen in
@@ -83,21 +81,6 @@ class HttpRequest:
             self.method,
             self.get_full_path(),
         )
-
-    def __getstate__(self):
-        obj_dict = self.__dict__.copy()
-        for attr in self.non_picklable_attrs:
-            if attr in obj_dict:
-                del obj_dict[attr]
-        return obj_dict
-
-    def __deepcopy__(self, memo):
-        obj = copy.copy(self)
-        for attr in self.non_picklable_attrs:
-            if hasattr(self, attr):
-                setattr(obj, attr, copy.deepcopy(getattr(self, attr), memo))
-        memo[id(self)] = obj
-        return obj
 
     @cached_property
     def headers(self):
