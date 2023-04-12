@@ -1,4 +1,4 @@
-import pickle
+import copy
 from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
@@ -232,6 +232,11 @@ class RequestsTests(SimpleTestCase):
         # Since it's impossible to decide the (wrong) encoding of the URL, it's
         # left percent-encoded in the path.
         self.assertEqual(request.path, "/caf%E9/")
+
+    def test_wsgirequest_copy(self):
+        request = WSGIRequest({"REQUEST_METHOD": "get", "wsgi.input": BytesIO(b"")})
+        request_copy = copy.copy(request)
+        self.assertIs(request_copy.environ, request.environ)
 
     def test_limited_stream(self):
         # Read all of a limited stream
@@ -687,19 +692,17 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(UnreadablePostError):
             request.FILES
 
-    def test_pickling_request(self):
+    def test_copy(self):
         request = HttpRequest()
-        request.method = "GET"
-        request.path = "/testpath/"
-        request.META = {
-            "QUERY_STRING": ";some=query&+query=string",
-            "SERVER_NAME": "example.com",
-            "SERVER_PORT": 80,
-        }
-        request.COOKIES = {"post-key": "post-value"}
-        dump = pickle.dumps(request)
-        request_from_pickle = pickle.loads(dump)
-        self.assertEqual(repr(request), repr(request_from_pickle))
+        request_copy = copy.copy(request)
+        self.assertIs(request_copy.resolver_match, request.resolver_match)
+
+    def test_deepcopy(self):
+        request = RequestFactory().get("/")
+        request.session = {}
+        request_copy = copy.deepcopy(request)
+        request.session["key"] = "value"
+        self.assertEqual(request_copy.session, {})
 
 
 class HostValidationTests(SimpleTestCase):

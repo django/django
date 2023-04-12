@@ -373,10 +373,12 @@ class HttpResponse(HttpResponseBase):
         [
             "resolver_match",
             # Non-picklable attributes added by test clients.
+            "asgi_request",
             "client",
             "context",
             "json",
             "templates",
+            "wsgi_request",
         ]
     )
 
