@@ -7,6 +7,22 @@ Django 4.2.1 release notes
 Django 4.2.1 fixes a security issue with severity "low" and several bugs in
 4.2.
 
+CVE-2023-31047: Potential bypass of validation when uploading multiple files using one form field
+=================================================================================================
+
+Uploading multiple files using one form field has never been supported by
+:class:`.forms.FileField` or :class:`.forms.ImageField` as only the last
+uploaded file was validated. Unfortunately, :ref:`uploading_multiple_files`
+topic suggested otherwise.
+
+In order to avoid the vulnerability, :class:`~django.forms.ClearableFileInput`
+and :class:`~django.forms.FileInput` form widgets now raise ``ValueError`` when
+the ``multiple`` HTML attribute is set on them. To prevent the exception and
+keep the old behavior, set ``allow_multiple_selected`` to ``True``.
+
+For more details on using the new attribute and handling of multiple files
+through a single field, see :ref:`uploading_multiple_files`.
+
 Bugfixes
 ========
 
