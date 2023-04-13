@@ -24,22 +24,15 @@ or under bill your customers by one hour, twice a year, every year. The
 solution to this problem is to use UTC in the code and use local time only when
 interacting with end users.
 
-Time zone support is disabled by default. To enable it, set :setting:`USE_TZ =
-True <USE_TZ>` in your settings file.
+Time zone support is enabled by default. To disable it, set :setting:`USE_TZ =
+False <USE_TZ>` in your settings file.
 
-.. note::
+.. versionchanged:: 5.0
 
-    In Django 5.0, time zone support will be enabled by default.
+    In older version, time zone support was disabled by default.
 
 Time zone support uses :mod:`zoneinfo`, which is part of the Python standard
-library from Python 3.9.  The ``backports.zoneinfo`` package is automatically
-installed alongside Django if you are using Python 3.8.
-
-.. note::
-
-    The default :file:`settings.py` file created by :djadmin:`django-admin
-    startproject <startproject>` includes :setting:`USE_TZ = True <USE_TZ>`
-    for convenience.
+library from Python 3.9.
 
 If you're wrestling with a particular problem, start with the :ref:`time zone
 FAQ <time-zones-faq>`.
