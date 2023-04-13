@@ -77,7 +77,8 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
 
     # Get years and months.
     total_months = (now.year - d.year) * 12 + (now.month - d.month)
-    if d.day > now.day or (d.day == now.day and d.time() > now.time()):
+    time_delta = delta - datetime.timedelta(days=delta.days)
+    if d.day > now.day or (d.day == now.day and time_delta.total_seconds() < 0):
         total_months -= 1
     years, months = divmod(total_months, 12)
 
