@@ -139,19 +139,53 @@ a :class:`~django.core.files.File` like object to the
             instance = ModelWithFileField(file_field=content_file)
             instance.save()
 
+.. _uploading_multiple_files:
+
 Uploading multiple files
 ------------------------
 
-If you want to upload multiple files using one form field, set the ``multiple``
-HTML attribute of field's widget:
+..
+    Tests in tests.forms_tests.field_tests.test_filefield.MultipleFileFieldTest
+    should be updated after any changes in the following snippets.
+
+If you want to upload multiple files using one form field, create a subclass
+of the field's widget and set the ``allow_multiple_selected`` attribute on it
+to ``True``.
+
+In order for such files to be all validated by your form (and have the value of
+the field include them all), you will also have to subclass ``FileField``. See
+below for an example.
+
+.. admonition:: Multiple file field
+
+    Django is likely to have a proper multiple file field support at some point
+    in the future.
 
 .. code-block:: python
     :caption: ``forms.py``
 
     from django import forms
 
+    class MultipleFileInput(forms.ClearableFileInput):
+        allow_multiple_selected = True
+
+
+    class MultipleFileField(forms.FileField):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault("widget", MultipleFileInput())
+            super().__init__(*args, **kwargs)
+
+        def clean(self, data, initial=None):
+            single_file_clean = super().clean
+            if isinstance(data, (list, tuple)):
+                result = [single_file_clean(d, initial) for d in data]
+            else:
+                result = single_file_clean(data, initial)
+            return result
+
+
     class FileFieldForm(forms.Form):
-        file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+        file_field = MultipleFileField()
 
 Then override the ``post`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
@@ -171,13 +205,31 @@ uploads:
         def post(self, request, *args, **kwargs):
             form_class = self.get_form_class()
             form = self.get_form(form_class)
-            files = request.FILES.getlist('file_field')
             if form.is_valid():
-                for f in files:
-                    ...  # Do something with each file.
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
+
+        def form_valid(self, form):
+            files = form.cleaned_data["file_field"]
+            for f in files:
+                ...  # Do something with each file.
+            return super().form_valid()
+
+.. warning::
+
+   This will allow you to handle multiple files at the form level only. Be
+   aware that you cannot use it to put multiple files on a single model
+   instance (in a single field), for example, even if the custom widget is used
+   with a form field related to a model ``FileField``.
+
+.. versionchanged:: 3.2.19
+
+   In previous versions, there was no support for the ``allow_multiple_selected``
+   class attribute, and users were advised to create the widget with the HTML
+   attribute ``multiple`` set through the ``attrs`` argument. However, this
+   caused validation of the form field to be applied only to the last file
+   submitted, which could have adverse security implications.
 
 Upload Handlers
 ===============
