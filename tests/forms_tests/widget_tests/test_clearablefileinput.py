@@ -176,3 +176,8 @@ class ClearableFileInputTest(WidgetTest):
         self.assertIs(widget.value_omitted_from_data({}, {}, 'field'), True)
         self.assertIs(widget.value_omitted_from_data({}, {'field': 'x'}, 'field'), False)
         self.assertIs(widget.value_omitted_from_data({'field-clear': 'y'}, {}, 'field'), False)
+
+    def test_multiple_error(self):
+        msg = "ClearableFileInput doesn't support uploading multiple files."
+        with self.assertRaisesMessage(ValueError, msg):
+            ClearableFileInput(attrs={"multiple": True})
