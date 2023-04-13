@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from django import forms
@@ -31,7 +32,9 @@ from django.core.paginator import InvalidPage
 from django.db.models import Exists, F, Field, ManyToOneRel, OrderBy, OuterRef
 from django.db.models.expressions import Combinable
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.http import urlencode
+from django.utils.inspect import func_supports_parameter
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
@@ -174,9 +177,19 @@ class ChangeList:
         may_have_duplicates = False
         has_active_filters = False
 
+        supports_request = func_supports_parameter(
+            self.model_admin.lookup_allowed, "request"
+        )
+        if not supports_request:
+            warnings.warn(
+                f"`request` must be added to the signature of "
+                f"{self.model_admin.__class__.__qualname__}.lookup_allowed().",
+                RemovedInDjango60Warning,
+            )
         for key, value_list in lookup_params.items():
             for value in value_list:
-                if not self.model_admin.lookup_allowed(key, value):
+                params = (key, value, request) if supports_request else (key, value)
+                if not self.model_admin.lookup_allowed(*params):
                     raise DisallowedModelAdminLookup(f"Filtering by {key} not allowed")
 
         filter_specs = []
