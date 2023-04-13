@@ -18,7 +18,8 @@ try:
     TSTZRANGE_OID = types["tstzrange"].oid
 
     def mogrify(sql, params, connection):
-        return ClientCursor(connection.connection).mogrify(sql, params)
+        with connection.cursor() as cursor:
+            return ClientCursor(cursor.connection).mogrify(sql, params)
 
     # Adapters.
     class BaseTzLoader(TimestamptzLoader):

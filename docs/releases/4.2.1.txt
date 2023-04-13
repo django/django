@@ -37,3 +37,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 where ``timesince`` and ``timeuntil``
   template filters returned incorrect results for a datetime with a non-UTC
   timezone when a time difference is less than 1 day (:ticket:`34483`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  :class:`~django.contrib.postgres.search.SearchHeadline` function with
+  ``psycopg`` 3 (:ticket:`34486`).
