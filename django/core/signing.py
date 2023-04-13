@@ -243,7 +243,7 @@ class Signer:
     def unsign_object(self, signed_obj, serializer=JSONSerializer, **kwargs):
         # Signer.unsign() returns str but base64 and zlib compression operate
         # on bytes.
-        base64d = self.unsign(signed_obj, **kwargs).encode()
+        base64d = signed_obj.encode()
         decompress = base64d[:1] == b"."
         if decompress:
             # It's compressed; uncompress it first.
@@ -251,7 +251,8 @@ class Signer:
         data = b64_decode(base64d)
         if decompress:
             data = zlib.decompress(data)
-        return serializer().loads(data)
+        hash, serialized_data = data.split(b':', 1)
+        return serializer().loads(serialized_data)
 
 
 class TimestampSigner(Signer):

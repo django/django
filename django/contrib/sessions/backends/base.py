@@ -62,7 +62,7 @@ class SessionBase:
 
     @property
     def key_salt(self):
-        return "django.contrib.sessions." + self.__class__.__qualname__
+        return "django.contrib.sessions" + self.__class__.__qualname__
 
     def get(self, key, default=None):
         return self._session.get(key, default)
