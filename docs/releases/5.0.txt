@@ -387,6 +387,10 @@ Miscellaneous
   :class:`~django.db.models.BaseConstraint` is deprecated in favor of
   keyword-only arguments.
 
+* ``request`` is added to the signature of :meth:`.ModelAdmin.lookup_allowed`.
+  Support for ``ModelAdmin`` subclasses that do not accept this argument is
+  deprecated.
+
 Features removed in 5.0
 =======================
 

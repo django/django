@@ -1845,7 +1845,7 @@ templates used by the :class:`ModelAdmin` views:
                 kwargs["formset"] = MyAdminFormSet
                 return super().get_changelist_formset(request, **kwargs)
 
-.. method:: ModelAdmin.lookup_allowed(lookup, value)
+.. method:: ModelAdmin.lookup_allowed(lookup, value, request)
 
     The objects in the changelist page can be filtered with lookups from the
     URL's query string. This is how :attr:`list_filter` works, for example. The
@@ -1855,10 +1855,11 @@ templates used by the :class:`ModelAdmin` views:
     unauthorized data exposure.
 
     The ``lookup_allowed()`` method is given a lookup path from the query string
-    (e.g. ``'user__email'``) and the corresponding value
-    (e.g. ``'user@example.com'``), and returns a boolean indicating whether
-    filtering the changelist's ``QuerySet`` using the parameters is permitted.
-    If ``lookup_allowed()`` returns ``False``, ``DisallowedModelAdminLookup``
+    (e.g. ``'user__email'``), the corresponding value
+    (e.g. ``'user@example.com'``), and the request, and returns a boolean
+    indicating whether filtering the changelist's ``QuerySet`` using the
+    parameters is permitted. If ``lookup_allowed()`` returns ``False``,
+    ``DisallowedModelAdminLookup``
     (subclass of :exc:`~django.core.exceptions.SuspiciousOperation`) is raised.
 
     By default, ``lookup_allowed()`` allows access to a model's local fields,
@@ -1869,6 +1870,10 @@ templates used by the :class:`ModelAdmin` views:
 
     Override this method to customize the lookups permitted for your
     :class:`~django.contrib.admin.ModelAdmin` subclass.
+
+    .. versionchanged:: 5.0
+
+        The ``request`` argument was added.
 
 .. method:: ModelAdmin.has_view_permission(request, obj=None)
 

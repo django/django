@@ -21,6 +21,9 @@ details on these changes.
 * Support for passing positional arguments to ``BaseConstraint`` will be
   removed.
 
+* ``request`` will be required in the signature of
+  ``ModelAdmin.lookup_allowed()`` subclasses.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
