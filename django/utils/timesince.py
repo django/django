@@ -63,7 +63,11 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
     if now and not isinstance(now, datetime.datetime):
         now = datetime.datetime(now.year, now.month, now.day)
 
-    now = now or datetime.datetime.now(datetime.timezone.utc if is_aware(d) else None)
+    # Compared datetimes must be in the same time zone.
+    if not now:
+        now = datetime.datetime.now(d.tzinfo if is_aware(d) else None)
+    elif is_aware(now) and is_aware(d):
+        now = now.astimezone(d.tzinfo)
 
     if reversed:
         d, now = now, d
@@ -77,8 +81,7 @@ def timesince(d, now=None, reversed=False, time_strings=None, depth=2):
 
     # Get years and months.
     total_months = (now.year - d.year) * 12 + (now.month - d.month)
-    time_delta = delta - datetime.timedelta(days=delta.days)
-    if d.day > now.day or (d.day == now.day and time_delta.total_seconds() < 0):
+    if d.day > now.day or (d.day == now.day and d.time() > now.time()):
         total_months -= 1
     years, months = divmod(total_months, 12)
 
