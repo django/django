@@ -61,6 +61,22 @@ def _get_queryset(klass):
     return klass
 
 
+def _validate_klass_or_error(klass, attr, error_message):
+    """
+    Return a QuerySet or Manager.
+    Validate attribute in any class
+    """
+    queryset = _get_queryset(klass)
+
+    if not hasattr(queryset, attr):
+        klass__name = (
+            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        )
+        raise ValueError(f"{error_message}, not '{klass__name}'.")
+
+    return queryset
+
+
 def get_object_or_404(klass, *args, **kwargs):
     """
     Use get() to return an object, or raise an Http404 exception if the object
@@ -72,15 +88,11 @@ def get_object_or_404(klass, *args, **kwargs):
     Like with QuerySet.get(), MultipleObjectsReturned is raised if more than
     one object is found.
     """
-    queryset = _get_queryset(klass)
-    if not hasattr(queryset, "get"):
-        klass__name = (
-            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        )
-        raise ValueError(
-            "First argument to get_object_or_404() must be a Model, Manager, "
-            "or QuerySet, not '%s'." % klass__name
-        )
+    queryset = _validate_klass_or_error(
+        klass,
+        "get",
+        "First argument to get_object_or_404() must be a Model, Manager, or QuerySet",
+    )
     try:
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
@@ -97,15 +109,11 @@ def get_list_or_404(klass, *args, **kwargs):
     klass may be a Model, Manager, or QuerySet object. All other passed
     arguments and keyword arguments are used in the filter() query.
     """
-    queryset = _get_queryset(klass)
-    if not hasattr(queryset, "filter"):
-        klass__name = (
-            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
-        )
-        raise ValueError(
-            "First argument to get_list_or_404() must be a Model, Manager, or "
-            "QuerySet, not '%s'." % klass__name
-        )
+    queryset = _validate_klass_or_error(
+        klass,
+        "filter",
+        "First argument to get_list_or_404() must be a Model, Manager, or QuerySet",
+    )
     obj_list = list(queryset.filter(*args, **kwargs))
     if not obj_list:
         raise Http404(
