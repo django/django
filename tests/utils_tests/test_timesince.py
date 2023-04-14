@@ -1,5 +1,9 @@
 import datetime
-import zoneinfo
+
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 from django.test import TestCase
 from django.test.utils import override_settings, requires_tz_support
