@@ -2824,6 +2824,10 @@ linked to the document in ``{% block dark-mode-vars %}``.
     See :ref:`customizing-adminsite` for an example of customizing the
     :class:`AdminSite` class.
 
+.. data:: django.contrib.admin.sites.all_sites
+
+    A :class:`~weakref.WeakSet` contains all admin site instances.
+
 ``AdminSite`` attributes
 ------------------------
 
