@@ -349,6 +349,7 @@ class AbstractUser(AbstractBaseUser, PermissionsMixin):
             "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
         ),
         validators=[username_validator],
+        db_index=True,
         error_messages={
             "unique": _("A user with that username already exists."),
         },
