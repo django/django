@@ -2,10 +2,8 @@
 How to use Django with Daphne
 =============================
 
-Daphne_ is a pure-Python ASGI server for UNIX, maintained by members of the
-Django project. It acts as the reference server for ASGI.
-
-.. _Daphne: https://pypi.org/project/daphne/
+:pypi:`Daphne <daphne>` is a pure-Python ASGI server for UNIX, maintained by
+members of the Django project. It acts as the reference server for ASGI.
 
 Installing Daphne
 ===================

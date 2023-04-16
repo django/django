@@ -20,8 +20,8 @@ participating in a March Madness contest.
 Install ReportLab
 =================
 
-The ReportLab library is `available on PyPI`_. A `user guide`_ (not
-coincidentally, a PDF file) is also available for download.
+The ReportLab library is :pypi:`available on PyPI <reportlab>`. A `user guide`_
+(not coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
 .. console::
@@ -36,7 +36,6 @@ Test your installation by importing it in the Python interactive interpreter:
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _available on PyPI: https://pypi.org/project/reportlab/
 .. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view

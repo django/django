@@ -1356,8 +1356,7 @@ implementation details see :ref:`using-the-views`.
         difference between the duration of a reset request for an existing
         email address and the duration of a reset request for a nonexistent
         email address. To reduce the overhead, you can use a 3rd party package
-        that allows to send emails asynchronously, e.g. `django-mailer
-        <https://pypi.org/project/django-mailer/>`_.
+        that allows to send emails asynchronously, e.g. :pypi:`django-mailer`.
 
     **Attributes:**
 

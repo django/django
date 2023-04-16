@@ -211,7 +211,7 @@ documentation:
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
 
-* All Python code blocks should be formatted using the `blacken-docs`_
+* All Python code blocks should be formatted using the :pypi:`blacken-docs`
   auto-formatter. This will be run by ``pre-commit`` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
@@ -264,9 +264,7 @@ documentation:
 .. versionchanged:: 4.2
 
     All Python code blocks in the Django documentation were reformatted with
-    `blacken-docs`_.
-
-.. _blacken-docs: https://pypi.org/project/blacken-docs/
+    :pypi:`blacken-docs`.
 
 Django-specific markup
 ======================
@@ -536,8 +534,7 @@ Spelling check
 ==============
 
 Before you commit your docs, it's a good idea to run the spelling checker.
-You'll need to install `sphinxcontrib-spelling
-<https://pypi.org/project/sphinxcontrib-spelling/>`_ first. Then from the
+You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
 ``docs`` directory, run ``make spelling``. Wrong words (if any) along with the
 file and line number where they occur will be saved to
 ``_build/spelling/output.txt``.

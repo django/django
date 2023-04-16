@@ -257,12 +257,10 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
-* `Pillow`_ is now the preferred image manipulation library to use with Django.
-  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
-  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
-
-.. _`Pillow`: https://pypi.org/project/Pillow/
-.. _`PIL`: https://pypi.org/project/PIL/
+* :pypi:`Pillow` is now the preferred image manipulation library to use with
+  Django. :pypi:`PIL` is pending deprecation (support to be removed in Django
+  1.8). To upgrade, you should **first** uninstall PIL, **then** install
+  Pillow.
 
 * :class:`~django.forms.ModelForm` accepts several new ``Meta``
   options.

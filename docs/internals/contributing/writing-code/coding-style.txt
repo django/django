@@ -45,12 +45,12 @@ Python style
 
 * Unless otherwise specified, follow :pep:`8`.
 
-  Use `flake8`_ to check for problems in this area. Note that our ``setup.cfg``
-  file contains some excluded files (deprecated modules we don't care about
-  cleaning up and some third-party code that Django vendors) as well as some
-  excluded errors that we don't consider as gross violations. Remember that
-  :pep:`8` is only a guide, so respect the style of the surrounding code as a
-  primary goal.
+  Use :pypi:`flake8` to check for problems in this area. Note that our
+  ``setup.cfg`` file contains some excluded files (deprecated modules we don't
+  care about cleaning up and some third-party code that Django vendors) as well
+  as some excluded errors that we don't consider as gross violations. Remember
+  that :pep:`8` is only a guide, so respect the style of the surrounding code
+  as a primary goal.
 
   An exception to :pep:`8` is our rules on line lengths. Don't limit lines of
   code to 79 characters if it means the code looks significantly uglier or is
@@ -352,8 +352,8 @@ Miscellaneous
   documentation </topics/i18n/index>` for details.
 
 * Remove ``import`` statements that are no longer used when you change code.
-  `flake8`_ will identify these imports for you. If an unused import needs to
-  remain for backwards-compatibility, mark the end of with ``# NOQA`` to
+  :pypi:`flake8` will identify these imports for you. If an unused import needs
+  to remain for backwards-compatibility, mark the end of with ``# NOQA`` to
   silence the flake8 warning.
 
 * Systematically remove all trailing whitespaces from your code as those
@@ -376,4 +376,3 @@ For details about the JavaScript code style used by Django, see
 
 .. _black: https://black.readthedocs.io/en/stable/
 .. _editorconfig: https://editorconfig.org/
-.. _flake8: https://pypi.org/project/flake8/
