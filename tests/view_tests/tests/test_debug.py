@@ -1,3 +1,4 @@
+
 import importlib
 import inspect
 import os
@@ -1961,3 +1962,45 @@ class DecoratorsTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(TypeError, msg):
             MyClass().a_view(HttpRequest())
+
+
+class DecoratorTest(SimpleTestCase):
+    def test_sensitive_post_parameters_decorator(self):
+        class DemoClass:
+            @sensitive_post_parameters("password")
+            def my_view(request):
+                return HttpResponse("Hello, world!")
+
+            my_view = sensitive_post_parameters("password")(my_view)
+
+        print(DemoClass.my_view.__name__)
+
+        # Create a mock request object
+        request_factory = RequestFactory()
+        request = request_factory.post(
+            "/my_view/", {"username": "foo", "password": "bar"}
+        )
+
+        # Make a request to the view with sensitive post parameters
+        DemoClass.my_view(request)
+
+        # create an instance of the class
+        demo = DemoClass()
+
+        # Check that the request object has been marked with the sensitive
+        # post parameters
+        self.assertIn("password", request.sensitive_post_parameters)
+
+        # Check that the sensitive_post_parameters_wrapper function is defined and
+        # has the sensitive_post_parameters attribute
+        self.assertTrue(hasattr(demo.my_view, "sensitive_post_parameters_wrapper"))
+        self.assertTrue(
+            hasattr(
+                demo.my_view.sensitive_post_parameters_wrapper,
+                "sensitive_post_parameters",
+            )
+        )
+        self.assertEqual(
+            demo.my_view.sensitive_post_parameters_wrapper.sensitive_post_parameters,
+            ["password"],
+        )

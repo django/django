@@ -179,8 +179,11 @@ class BaseHandler:
         """
         response = None
         callback, callback_args, callback_kwargs = self.resolve_request(request)
+        # Mark the request with sensitive_post_parameters if applied.
+        if hasattr(callback, "sensitive_post_parameters"):
+            request.sensitive_post_parameters = callback.sensitive_post_parameters
 
-        # Apply view middleware
+        # Apply view middlewarec;
         for middleware_method in self._view_middleware:
             response = middleware_method(
                 request, callback, callback_args, callback_kwargs
@@ -233,6 +236,10 @@ class BaseHandler:
         """
         response = None
         callback, callback_args, callback_kwargs = self.resolve_request(request)
+
+        # Mark the request with sensitive_post_parameters if applied.
+        if hasattr(callback, "sensitive_post_parameters"):
+            request.sensitive_post_parameters = callback.sensitive_post_parameters
 
         # Apply view middleware.
         for middleware_method in self._view_middleware:
