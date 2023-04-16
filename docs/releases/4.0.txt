@@ -109,11 +109,9 @@ Redis cache backend
 -------------------
 
 The new ``django.core.cache.backends.redis.RedisCache`` cache backend provides
-built-in support for caching with Redis. `redis-py`_ 3.0.0 or higher is
-required. For more details, see the :ref:`documentation on caching with Redis
-in Django <redis>`.
-
-.. _`redis-py`: https://pypi.org/project/redis/
+built-in support for caching with Redis. :pypi:`redis-py <redis>` 3.0.0 or
+higher is required. For more details, see the :ref:`documentation on caching
+with Redis in Django <redis>`.
 
 Template based form rendering
 -----------------------------

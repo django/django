@@ -64,13 +64,11 @@ upgrade instructions in older versions of the documentation.
 Security enhancements
 ---------------------
 
-Several features of the django-secure_ third-party library have been
+Several features of the :pypi:`django-secure` third-party library have been
 integrated into Django. :class:`django.middleware.security.SecurityMiddleware`
 provides several security enhancements to the request/response cycle. The new
 :option:`check --deploy` option allows you to check your production settings
 file for ways to increase the security of your site.
-
-.. _django-secure: https://pypi.org/project/django-secure/
 
 New PostgreSQL specific functionality
 -------------------------------------
@@ -1506,9 +1504,7 @@ in your project.
 The ``django.utils.checksums`` module has been deprecated and will be removed
 in Django 1.10. The functionality it provided (validating checksum using the
 Luhn algorithm) was undocumented and not used in Django. The module has been
-moved to the `django-localflavor`_ package (version 1.1+).
-
-.. _django-localflavor: https://pypi.org/project/django-localflavor/
+moved to the :pypi:`django-localflavor` package (version 1.1+).
 
 ``InlineAdminForm.original_content_type_id``
 --------------------------------------------

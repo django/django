@@ -497,7 +497,7 @@ Django 3.0, we're removing these APIs at this time.
   Python 3.
 
 * ``django.utils.six`` - Remove usage of this vendored library or switch to
-  `six <https://pypi.org/project/six/>`_.
+  :pypi:`six`.
 
 * ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
   ``six.python_2_unicode_compatible()``.

@@ -78,10 +78,7 @@ database or filesystem usage.
 
 After installing Memcached itself, you'll need to install a Memcached
 binding. There are several Python Memcached bindings available; the
-two supported by Django are `pylibmc`_ and `pymemcache`_.
-
-.. _`pylibmc`: https://pypi.org/project/pylibmc/
-.. _`pymemcache`: https://pypi.org/project/pymemcache/
+two supported by Django are :pypi:`pylibmc` and :pypi:`pymemcache`.
 
 To use Memcached with Django:
 
@@ -180,11 +177,8 @@ need a Redis server running either locally or on a remote machine.
 __ https://redis.io/
 
 After setting up the Redis server, you'll need to install Python bindings for
-Redis. `redis-py`_ is the binding supported natively by Django. Installing the
-additional `hiredis-py`_ package is also recommended.
-
-.. _`redis-py`: https://pypi.org/project/redis/
-.. _`hiredis-py`: https://pypi.org/project/hiredis/
+Redis. :pypi:`redis-py <redis>` is the binding supported natively by Django.
+Installing the :pypi:`hiredis-py <hiredis>` package is also recommended.
 
 To use Redis as your cache backend with Django:
 

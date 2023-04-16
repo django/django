@@ -715,12 +715,10 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  * On Linux systems, if pyinotify_ is installed, the development server will
-    reload immediately when a file is changed. Previously, it polled the
+  * On Linux systems, if :pypi:`pyinotify` is installed, the development server
+    will reload immediately when a file is changed. Previously, it polled the
     filesystem for changes every second. That caused a small delay before
     reloads and reduced battery life on laptops.
-
-    .. _pyinotify: https://pypi.org/project/pyinotify/
 
   * In addition, the development server automatically reloads when a
     translation file is updated, i.e. after running
@@ -735,14 +733,12 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
-* Initial SQL data now works better if the sqlparse_ Python library is
+* Initial SQL data now works better if the :pypi:`sqlparse` Python library is
   installed.
 
   Note that it's deprecated in favor of the
   :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
   which benefits from the improved behavior.
-
-.. _sqlparse: https://pypi.org/project/sqlparse/
 
 Models
 ~~~~~~
@@ -1207,11 +1203,9 @@ details.
 ------------------------
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
-a :exc:`ValueError` when encountering them, you will have to install pytz_. You
-may be affected by this problem if you use Django's time zone-related date
-formats or :mod:`django.contrib.syndication`.
-
-.. _pytz: https://pypi.org/project/pytz/
+a :exc:`ValueError` when encountering them, you will have to install
+:pypi:`pytz`. You may be affected by this problem if you use Django's time
+zone-related date formats or :mod:`django.contrib.syndication`.
 
 ``remove()`` and ``clear()`` methods of related managers
 --------------------------------------------------------

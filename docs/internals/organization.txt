@@ -109,15 +109,15 @@ Role
 ----
 
 Releasers_ are a small set of people who have the authority to upload packaged
-releases of Django to the `Python Package Index`_, and to the
+releases of Django to the :pypi:`Python Package Index <Django>` and to the
 `djangoproject.com`_ website.
 
 Prerogatives
 ------------
 
 Releasers_ :doc:`build Django releases </internals/howto-release-django>` and
-upload them to the `Python Package Index`_, and to the `djangoproject.com`_
-website.
+upload them to the :pypi:`Python Package Index <Django>` and to the
+`djangoproject.com`_ website.
 
 Membership
 ----------
@@ -155,7 +155,6 @@ Otherwise, a Releaser may be removed by:
   of the Django Software Foundation.
 - A vote of the steering council.
 
-.. _`Python Package Index`: https://pypi.org/project/Django/
 .. _djangoproject.com: https://www.djangoproject.com/download/
 
 .. _steering-council:

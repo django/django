@@ -579,8 +579,7 @@ It's automatically installed along with Django.
 
 Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
 commonly used and is questionably useful. If you want to automatically detect
-the timezone based on the system timezone, you can use `tzlocal
-<https://pypi.org/project/tzlocal/>`_::
+the timezone based on the system timezone, you can use :pypi:`tzlocal`::
 
     from tzlocal import get_localzone
 

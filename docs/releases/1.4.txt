@@ -599,9 +599,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   for more information.
 
 * The :djadmin:`makemessages` command uses a new and more accurate lexer,
-  `JsLex`_, for extracting translatable strings from JavaScript files.
-
-.. _JsLex: https://pypi.org/project/jslex/
+  :pypi:`JsLex <jslex>`, for extracting translatable strings from JavaScript
+  files.
 
 * The :ttag:`trans` template tag now takes an optional ``as`` argument to
   be able to retrieve a translation string without displaying it but setting

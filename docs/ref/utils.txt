@@ -698,8 +698,8 @@ escaping HTML.
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
     the return value will be ``"Joel is a slug"``.
 
-    If you are looking for a more robust solution, take a look at the `bleach
-    <https://pypi.org/project/bleach/>`_ Python library.
+    If you are looking for a more robust solution, take a look at the
+    :pypi:`bleach` Python package.
 
 .. function:: html_safe()
 

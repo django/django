@@ -448,12 +448,11 @@ MySQL DB API Drivers
 MySQL has a couple drivers that implement the Python Database API described in
 :pep:`249`:
 
-- `mysqlclient`_ is a native driver. It's **the recommended choice**.
+- :pypi:`mysqlclient` is a native driver. It's **the recommended choice**.
 - `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
   require the MySQL client library or any Python modules outside the standard
   library.
 
-.. _mysqlclient: https://pypi.org/project/mysqlclient/
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python/
 
 These drivers are thread-safe and provide connection pooling.
@@ -1176,21 +1175,14 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `CockroachDB`_
-* `Firebird`_
-* `Google Cloud Spanner`_
-* `Microsoft SQL Server`_
-* `TiDB`_
-* `YugabyteDB`_
+* :pypi:`CockroachDB <django-cockroachdb>`
+* :pypi:`Firebird <django-firebird>`
+* :pypi:`Google Cloud Spanner <django-google-spanner>`
+* :pypi:`Microsoft SQL Server <mssql-django>`
+* :pypi:`TiDB <django-tidb>`
+* :pypi:`YugabyteDB <django-yugabytedb>`
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
-
-.. _CockroachDB: https://pypi.org/project/django-cockroachdb/
-.. _Firebird: https://pypi.org/project/django-firebird/
-.. _Google Cloud Spanner: https://pypi.org/project/django-google-spanner/
-.. _Microsoft SQL Server: https://pypi.org/project/mssql-django/
-.. _TiDB: https://pypi.org/project/django-tidb/
-.. _YugabyteDB: https://pypi.org/project/django-yugabytedb/

@@ -251,7 +251,7 @@ Running the Selenium tests
 --------------------------
 
 Some tests require Selenium and a web browser. To run these tests, you must
-install the selenium_ package and run the tests with the
+install the :pypi:`selenium` package and run the tests with the
 ``--selenium=<BROWSERS>`` option. For example, if you have Firefox and Google
 Chrome installed:
 
@@ -277,28 +277,31 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-*  aiosmtpd_
-*  argon2-cffi_ 19.2.0+
-*  asgiref_ 3.6.0+ (required)
-*  bcrypt_
-*  colorama_
-*  docutils_
-*  geoip2_
-*  jinja2_ 2.11+
-*  numpy_
-*  Pillow_ 6.2.1+
-*  PyYAML_
-*  pytz_ (required)
-*  pywatchman_
-*  redis_ 3.4+
-*  setuptools_
-*  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  gettext_ (:ref:`gettext_on_windows`)
-*  selenium_
-*  sqlparse_ 0.3.1+ (required)
-*  tblib_ 1.5.0+
+* :pypi:`aiosmtpd`
+* :pypi:`argon2-cffi` 19.2.0+
+* :pypi:`asgiref` 3.6.0+ (required)
+* :pypi:`bcrypt`
+* :pypi:`colorama`
+* :pypi:`docutils`
+* :pypi:`geoip2`
+* :pypi:`Jinja2` 2.11+
+* :pypi:`numpy`
+* :pypi:`Pillow` 6.2.1+
+* :pypi:`PyYAML`
+* :pypi:`pytz` (required)
+* :pypi:`pywatchman`
+* :pypi:`redis` 3.4+
+* :pypi:`setuptools`
+* :pypi:`memcached`, plus a `supported Python binding
+  <https://memcached.org/>`_
+* `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
+  (:ref:`gettext_on_windows`)
+* :pypi:`selenium`
+* :pypi:`sqlparse` 0.3.1+ (required)
+* :pypi:`tblib` 1.5.0+
 
-You can find these dependencies in `pip requirements files`_ inside the
+You can find these dependencies in `pip requirements files
+<https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so:
 
@@ -324,31 +327,8 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-To run some of the autoreload tests, you'll need to install the Watchman_
-service.
-
-.. _aiosmtpd: https://pypi.org/project/aiosmtpd/
-.. _argon2-cffi: https://pypi.org/project/argon2-cffi/
-.. _asgiref: https://pypi.org/project/asgiref/
-.. _bcrypt: https://pypi.org/project/bcrypt/
-.. _colorama: https://pypi.org/project/colorama/
-.. _docutils: https://pypi.org/project/docutils/
-.. _geoip2: https://pypi.org/project/geoip2/
-.. _jinja2: https://pypi.org/project/Jinja2/
-.. _numpy: https://pypi.org/project/numpy/
-.. _Pillow: https://pypi.org/project/Pillow/
-.. _PyYAML: https://pyyaml.org/wiki/PyYAML
-.. _pytz: https://pypi.org/project/pytz/
-.. _pywatchman: https://pypi.org/project/pywatchman/
-.. _redis: https://pypi.org/project/redis/
-.. _setuptools: https://pypi.org/project/setuptools/
-.. _memcached: https://memcached.org/
-.. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: https://pypi.org/project/selenium/
-.. _sqlparse: https://pypi.org/project/sqlparse/
-.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
-.. _tblib: https://pypi.org/project/tblib/
-.. _Watchman: https://facebook.github.io/watchman/
+To run some of the autoreload tests, you'll need to install the
+`Watchman <https://facebook.github.io/watchman/>`_ service.
 
 Code coverage
 -------------
