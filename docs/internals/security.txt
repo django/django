@@ -121,9 +121,10 @@ On the day of disclosure, we will take the following steps:
 
 #. Apply the relevant patch(es) to Django's codebase.
 
-#. Issue the relevant release(s), by placing new packages on `the
-   Python Package Index`_ and on the Django website, and tagging the
-   new release(s) in Django's git repository.
+#. Issue the relevant release(s), by placing new packages on the :pypi:`Python
+   Package Index <Django>` and on the `djangoproject.com website
+   <https://www.djangoproject.com/download/>`_, and tagging the new release(s)
+   in Django's git repository.
 
 #. Post a public entry on `the official Django development blog`_,
    describing the issue and its resolution in detail, pointing to the
@@ -133,7 +134,6 @@ On the day of disclosure, we will take the following steps:
 #. Post a notice to the |django-announce| and oss-security@lists.openwall.com
    mailing lists that links to the blog post.
 
-.. _the Python Package Index: https://pypi.org/
 .. _the official Django development blog: https://www.djangoproject.com/weblog/
 
 If a reported issue is believed to be particularly time-sensitive --

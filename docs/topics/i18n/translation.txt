@@ -415,8 +415,7 @@ Working with lazy translation objects
 The result of a ``gettext_lazy()`` call can be used wherever you would use a
 string (a :class:`str` object) in other Django code, but it may not work with
 arbitrary Python code. For example, the following won't work because the
-`requests <https://pypi.org/project/requests/>`_ library doesn't handle
-``gettext_lazy`` objects::
+:pypi:`requests` library doesn't handle ``gettext_lazy`` objects::
 
     body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
     requests.post("https://example.com/send", data={"body": body})

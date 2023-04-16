@@ -37,10 +37,8 @@ after a database transaction is successfully committed. This is useful for
 tasks such as sending notification emails, creating queued tasks, or
 invalidating caches.
 
-This functionality from the `django-transaction-hooks`_ package has been
+This functionality from the :pypi:`django-transaction-hooks` package has been
 integrated into Django.
-
-.. _django-transaction-hooks: https://pypi.org/project/django-transaction-hooks/
 
 Password validation
 -------------------

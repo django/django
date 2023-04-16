@@ -214,11 +214,9 @@ context, or vice-versa. For this there are two adapter functions, from the
 are used to transition between the calling styles while preserving
 compatibility.
 
-These adapter functions are widely used in Django. The `asgiref`_ package
+These adapter functions are widely used in Django. The :pypi:`asgiref` package
 itself is part of the Django project, and it is automatically installed as a
 dependency when you install Django with ``pip``.
-
-.. _asgiref: https://pypi.org/project/asgiref/
 
 ``async_to_sync()``
 -------------------

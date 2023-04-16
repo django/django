@@ -873,7 +873,7 @@ important part of testing applications, so it's strongly recommended to check
 the coverage of your tests.
 
 Django can be easily integrated with `coverage.py`_, a tool for measuring code
-coverage of Python programs. First, `install coverage.py`_. Next, run the
+coverage of Python programs. First, install :pypi:`coverage`. Next, run the
 following from your project folder containing ``manage.py``:
 
 .. code-block:: shell
@@ -894,4 +894,3 @@ For more options like annotated HTML listings detailing missed lines, see the
 `coverage.py`_ docs.
 
 .. _coverage.py: https://coverage.readthedocs.io/
-.. _install coverage.py: https://pypi.org/project/coverage/

@@ -112,8 +112,8 @@ for more details or learn how to :doc:`manage static files
 Python 2.7 introduced some major changes to the ``unittest`` library,
 adding some extremely useful features. To ensure that every Django
 project can benefit from these new features, Django ships with a copy
-of unittest2_, a copy of the Python 2.7 ``unittest`` library, backported
-for Python 2.4 compatibility.
+of :pypi:`unittest2`, a copy of the Python 2.7 ``unittest`` library,
+backported for Python 2.4 compatibility.
 
 To access this library, Django provides the ``django.utils.unittest``
 module alias. If you are using Python 2.7, or you have installed
@@ -131,8 +131,6 @@ wherever you would have historically used::
 
 If you want to continue to use the base ``unittest`` library, you can --
 you just won't get any of the nice new ``unittest2`` features.
-
-.. _unittest2: https://pypi.org/project/unittest2/
 
 Transaction context managers
 ----------------------------

@@ -143,11 +143,9 @@ Functional indexes are added to models using the
 ----------------------
 
 The new ``django.core.cache.backends.memcached.PyMemcacheCache`` cache backend
-allows using the pymemcache_ library for memcached. ``pymemcache`` 3.4.0 or
-higher is required. For more details, see the :doc:`documentation on caching in
-Django </topics/cache>`.
-
-.. _pymemcache: https://pypi.org/project/pymemcache/
+allows using the :pypi:`pymemcache` library for memcached. ``pymemcache`` 3.4.0
+or higher is required. For more details, see the :doc:`documentation on caching
+in Django </topics/cache>`.
 
 New decorators for the admin site
 ---------------------------------

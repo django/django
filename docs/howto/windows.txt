@@ -40,12 +40,10 @@ matches the version you installed by executing:
 About ``pip``
 =============
 
-`pip`_ is a package manager for Python and is included by default with the
+:pypi:`pip` is a package manager for Python and is included by default with the
 Python installer. It helps to install and uninstall Python packages
 (such as Django!). For the rest of the installation, we'll use ``pip`` to
 install Python packages from the command line.
-
-.. _pip: https://pypi.org/project/pip/
 
 .. _virtualenvironment:
 
@@ -106,16 +104,14 @@ terminal. In modern terminals this should work for both CMD and PowerShell. If
 for some reason this needs to be disabled, set the environmental variable
 :envvar:`DJANGO_COLORS` to ``nocolor``.
 
-On older Windows versions, or legacy terminals, colorama_ must be installed to
-enable syntax coloring:
+On older Windows versions, or legacy terminals, :pypi:`colorama` must be
+installed to enable syntax coloring:
 
 .. code-block:: doscon
 
     ...\> py -m pip install colorama
 
 See :ref:`syntax-coloring` for more information on color settings.
-
-.. _colorama: https://pypi.org/project/colorama/
 
 Common pitfalls
 ===============

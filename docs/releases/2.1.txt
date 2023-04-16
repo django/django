@@ -408,8 +408,8 @@ Miscellaneous
   suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
   your code to also account for any custom lookups that have been registered.
 
-* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use `bcrypt
-  <https://pypi.org/project/bcrypt/>`_ instead.
+* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use
+  :pypi:`bcrypt` instead.
 
 .. _deprecated-features-2.1:
 
