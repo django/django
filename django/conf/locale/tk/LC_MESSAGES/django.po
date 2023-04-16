@@ -4,6 +4,7 @@
 # Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020-2021
 # Resul <resulsaparov@gmail.com>, 2020
 # Resul <resulsaparov@gmail.com>, 2022
+# Toýly SAZAKOW <Sazakow@gmail.com>, 2023
 # Welbeck Garli <welbeckgrlyw@gmail.com>, 2020
 msgid ""
 msgstr ""
@@ -27,16 +28,16 @@ msgid "Arabic"
 msgstr "Arapça"
 
 msgid "Algerian Arabic"
-msgstr "Alžir Arapçasy"
+msgstr "Alžir arapçasy"
 
 msgid "Asturian"
 msgstr "Asturian"
 
 msgid "Azerbaijani"
-msgstr "Azeri Türkçesi"
+msgstr "Azeri türkçesi"
 
 msgid "Bulgarian"
-msgstr "Bolgar"
+msgstr "Bolgarça"
 
 msgid "Belarusian"
 msgstr "Belarusça"
@@ -54,7 +55,7 @@ msgid "Catalan"
 msgstr "Katalan"
 
 msgid "Central Kurdish (Sorani)"
-msgstr ""
+msgstr "Merkezi kürt (Sorani)"
 
 msgid "Czech"
 msgstr "Çehçe"
@@ -78,10 +79,10 @@ msgid "English"
 msgstr "Iňlisçe"
 
 msgid "Australian English"
-msgstr "Awstraliýa Iňlisçesi"
+msgstr "Awstraliýa iňlisçesi"
 
 msgid "British English"
-msgstr "Britan Iňlisçesi"
+msgstr "Britan iňlisçesi"
 
 msgid "Esperanto"
 msgstr "Esperanto"
@@ -90,19 +91,19 @@ msgid "Spanish"
 msgstr "Ispança"
 
 msgid "Argentinian Spanish"
-msgstr "Argentina Ispançasy"
+msgstr "Argentina ispançasy"
 
 msgid "Colombian Spanish"
-msgstr "Kolumbiýa Ispançasy"
+msgstr "Kolumbiýa ispançasy"
 
 msgid "Mexican Spanish"
-msgstr "Meksika Ispançasy"
+msgstr "Meksika ispançasy"
 
 msgid "Nicaraguan Spanish"
-msgstr "Nikaragua Ispançasy"
+msgstr "Nikaragua ispançasy"
 
 msgid "Venezuelan Spanish"
-msgstr "Wenezuela Ispançasy"
+msgstr "Wenezuela ispançasy"
 
 msgid "Estonian"
 msgstr "Estonça"
@@ -141,7 +142,7 @@ msgid "Croatian"
 msgstr "Horwatça"
 
 msgid "Upper Sorbian"
-msgstr "Ýokarky Sorbian"
+msgstr "Ýokarky sorbian"
 
 msgid "Hungarian"
 msgstr "Wengerçe"
@@ -219,7 +220,7 @@ msgid "Burmese"
 msgstr "Birma"
 
 msgid "Norwegian Bokmål"
-msgstr "Norwegiýa Bokmaly"
+msgstr "Norwegiýa bokmaly"
 
 msgid "Nepali"
 msgstr "Nepali"
@@ -228,7 +229,7 @@ msgid "Dutch"
 msgstr "Gollandça"
 
 msgid "Norwegian Nynorsk"
-msgstr "Norwegiýa Nynorskçasy"
+msgstr "Norwegiýa nynorskçasy"
 
 msgid "Ossetic"
 msgstr "Osetikçe"
@@ -243,7 +244,7 @@ msgid "Portuguese"
 msgstr "Portugalça"
 
 msgid "Brazilian Portuguese"
-msgstr "Braziliýa Portugalçasy"
+msgstr "Braziliýa portugalçasy"
 
 msgid "Romanian"
 msgstr "Rumynça"
@@ -264,7 +265,7 @@ msgid "Serbian"
 msgstr "Serbçe"
 
 msgid "Serbian Latin"
-msgstr "Serb Latynçasy"
+msgstr "Serb latynçasy"
 
 msgid "Swedish"
 msgstr "Şwedçe"
@@ -309,19 +310,19 @@ msgid "Vietnamese"
 msgstr "Wýetnamça"
 
 msgid "Simplified Chinese"
-msgstr "Ýönekeýleşdirilen Hytaýça"
+msgstr "Ýönekeýleşdirilen hytaýça"
 
 msgid "Traditional Chinese"
-msgstr "Adaty Hytaýça"
+msgstr "Adaty hytaýça"
 
 msgid "Messages"
 msgstr "Habarlar"
 
 msgid "Site Maps"
-msgstr "Saýt Kartalary"
+msgstr "Saýt kartalary"
 
 msgid "Static Files"
-msgstr "Statik Faýllar"
+msgstr "Statik faýllar"
 
 msgid "Syndication"
 msgstr "Syndikasiýa"
@@ -356,14 +357,14 @@ msgstr "Dogry e-poçta salgysyny giriziň."
 msgid ""
 "Enter a valid “slug” consisting of letters, numbers, underscores or hyphens."
 msgstr ""
-"Harplardan, sanlardan, aşaky çyzyklardan ýa-da defislerden ybarat dogry "
+"Harplardan, sanlardan, aşaky çyzyklardan ýa-da çyzyjaklardan ybarat dogry "
 "“slug” giriziň."
 
 msgid ""
 "Enter a valid “slug” consisting of Unicode letters, numbers, underscores, or "
 "hyphens."
 msgstr ""
-"Unikod harplaryndan, sanlardan, aşaky çyzyklardan ýa-da defislerden ybarat "
+"Ýunikod harplaryndan, sanlardan, aşaky çyzyklardan ýa-da çyzyjaklardan ybarat "
 "dogry “slug” giriziň."
 
 msgid "Enter a valid IPv4 address."
@@ -373,7 +374,7 @@ msgid "Enter a valid IPv6 address."
 msgstr "Dogry IPv6 salgysyny giriziň."
 
 msgid "Enter a valid IPv4 or IPv6 address."
-msgstr "Dogry IPv4 ýa-da IPv6 adresi giriziň."
+msgstr "Dogry IPv4 ýa-da IPv6 salgyny giriziň."
 
 msgid "Enter only digits separated by commas."
 msgstr "Diňe otur bilen aýrylan sanlary giriziň."
@@ -381,7 +382,7 @@ msgstr "Diňe otur bilen aýrylan sanlary giriziň."
 #, python-format
 msgid "Ensure this value is %(limit_value)s (it is %(show_value)s)."
 msgstr ""
-"%(limit_value)s bahasynyň dogry bolmagyny üpjün ediň (şuwagt %(show_value)s)."
+"%(limit_value)s bahasynyň dogry bolmagyny üpjün ediň (şu wagt %(show_value)s)."
 
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
@@ -408,7 +409,7 @@ msgstr[0] ""
 "Bu maglumatda iň az %(limit_value)d harp bardygyna göz ýetiriň (munda "
 "%(show_value)d bar)."
 msgstr[1] ""
-"Bu maglumatda azyndan %(limit_value)d nyşanyň bolmagyny üpjün ediň (şuwagt "
+"Bu maglumatda azyndan %(limit_value)d nyşanyň bolmagyny üpjün ediň (şu wagt "
 "%(show_value)d sany bar)."
 
 #, python-format
@@ -419,10 +420,10 @@ msgid_plural ""
 "Ensure this value has at most %(limit_value)d characters (it has "
 "%(show_value)d)."
 msgstr[0] ""
-"Bu maglumatda köpünden %(limit_value)d harp bardygyna göz ýetiriň (bunda "
+"Bu maglumatda köpünden %(limit_value)d harp bardygyna göz ýetiriň (munda "
 "%(show_value)d bar)"
 msgstr[1] ""
-"Bu maglumatda iň köp %(limit_value)d nyşanyň bolmagyny üpjün ediň (şuwagt "
+"Bu maglumatda iň köp %(limit_value)d nyşanyň bolmagyny üpjün ediň (şu wagt "
 "%(show_value)d sany bar)"
 
 msgid "Enter a number."
@@ -513,7 +514,7 @@ msgid "String (up to %(max_length)s)"
 msgstr "Setir (iň köp %(max_length)s)"
 
 msgid "String (unlimited)"
-msgstr ""
+msgstr "Setir (çäklendirilmedik)"
 
 msgid "Comma-separated integers"
 msgstr "Otur bilen bölünen bitewi sanlar"
@@ -574,7 +575,7 @@ msgid "Duration"
 msgstr "Dowamlylyk"
 
 msgid "Email address"
-msgstr "Email adres"
+msgstr "E-poçta salgy"
 
 msgid "File path"
 msgstr "Faýl ýoly"
@@ -680,18 +681,18 @@ msgid "Foreign Key (type determined by related field)"
 msgstr "Daşary açary (baglanyşykly meýdança bilen kesgitlenýär)"
 
 msgid "One-to-one relationship"
-msgstr "Bire-bir gatnaşyk"
+msgstr "Bire-bir baglanyşyk"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr "%(from)s-%(to)s gatnaşyk"
+msgstr "%(from)s-%(to)s baglanyşyk"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "%(from)s-%(to)s gatnaşyklar"
+msgstr "%(from)s-%(to)s baglanyşyklar"
 
 msgid "Many-to-many relationship"
-msgstr "Köp-köp gatnaşyk"
+msgstr "Köpe-köp baglanyşyk"
 
 #. Translators: If found as last label character, these punctuation
 #. characters will prevent the default label_suffix to be appended to the
@@ -735,14 +736,14 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
-"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjin ediň (şuwagt "
+"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjün ediň (şu wagt "
 "%(length)d sany bar)."
 msgstr[1] ""
-"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjin ediň (şuwagt "
+"Bu faýl adynyň iň köp %(max)d nyşanynyň bolmagyny üpjün ediň (şu wagt "
 "%(length)d sany bar)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
-msgstr "Bir faýl iberiň ýa-da arassala gutyjygyny belläň, ikisini bile däl."
+msgstr "Bir faýl iberiň ýa-da arassala gutujygyny belläň, ikisini bile däl."
 
 msgid ""
 "Upload a valid image. The file you uploaded was either not an image or a "
@@ -1318,4 +1319,4 @@ msgid "Django Community"
 msgstr "Django jemgyýeti"
 
 msgid "Connect, get help, or contribute"
-msgstr "Birikiň, kömek alyň ýa-da goşant goşuň"
+msgstr "Birigiň, kömek alyň ýa-da goşant goşuň"
