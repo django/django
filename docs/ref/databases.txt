@@ -1179,6 +1179,7 @@ by 3rd parties that allow you to use other databases with Django:
 * :pypi:`Firebird <django-firebird>`
 * :pypi:`Google Cloud Spanner <django-google-spanner>`
 * :pypi:`Microsoft SQL Server <mssql-django>`
+* :pypi:`Snowflake <django-snowflake>`
 * :pypi:`TiDB <django-tidb>`
 * :pypi:`YugabyteDB <django-yugabytedb>`
 
