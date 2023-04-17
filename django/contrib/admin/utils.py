@@ -19,6 +19,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
 
+# NOTE: There is a QUOTE_MAP JavaScript equivalent to this one in:
+# django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
 UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
@@ -90,6 +92,8 @@ def quote(s):
     Similar to urllib.parse.quote(), except that the quoting is slightly
     different so that it doesn't get automatically unquoted by the web browser.
     """
+    # There is a `customEncodeURIComponent` JavaScript equivalent to this one in:
+    # django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
     return s.translate(QUOTE_MAP) if isinstance(s, str) else s
 
 

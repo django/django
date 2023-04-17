@@ -349,6 +349,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
             response = self.client.post(
                 reverse("admin:admin_widgets_event_add"), {"main_band": test_str}
             )
+
             self.assertContains(
                 response,
                 "Select a valid choice. That choice is not one of the available "
@@ -769,7 +770,6 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         expected_url = "/admin_widgets/house/%s/change/" % quote(house.pk)
 
         self.assertIn(expected_url, rendered)
-
         self.assertHTMLEqual(
             w.render("test", house.pk, attrs={}),
             '<input class="vForeignKeyRawIdAdminField" name="test" type="text" '
