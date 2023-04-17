@@ -86,7 +86,7 @@ class HashedFilesMixin:
                 ),
                 (
                     (
-                        r"(?m)(?P<matched>)^(/\*#[ \t]"
+                        r"(?m)^(?P<matched>/\*#[ \t]"
                         r"(?-i:sourceMappingURL)=(?P<url>.*)[ \t]*\*/)$"
                     ),
                     "/*# sourceMappingURL=%(url)s */",
@@ -97,7 +97,7 @@ class HashedFilesMixin:
             "*.js",
             (
                 (
-                    r"(?m)(?P<matched>)^(//# (?-i:sourceMappingURL)=(?P<url>.*))$",
+                    r"(?m)^(?P<matched>//# (?-i:sourceMappingURL)=(?P<url>.*))$",
                     "//# sourceMappingURL=%(url)s",
                 ),
             ),
