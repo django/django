@@ -7,7 +7,7 @@ from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 from django.conf import STATICFILES_STORAGE_ALIAS, settings
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousFileOperation
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage, storages
 from django.utils.functional import LazyObject
@@ -224,11 +224,6 @@ class HashedFilesMixin:
             if re.match(r"^[a-z]+:", url):
                 return matched
 
-            # Ignore absolute URLs that don't point to a static file (dynamic
-            # CSS / JS?). Note that STATIC_URL cannot be empty.
-            if url.startswith("/") and not url.startswith(settings.STATIC_URL):
-                return matched
-
             # Strip off the fragment so a path-like fragment won't interfere.
             url_path, fragment = urldefrag(url)
 
@@ -236,26 +231,41 @@ class HashedFilesMixin:
             if not url_path:
                 return matched
 
+            absolute_url_without_static_url = False
             if url_path.startswith("/"):
-                # Otherwise the condition above would have returned prematurely.
-                assert url_path.startswith(settings.STATIC_URL)
-                target_name = url_path.removeprefix(settings.STATIC_URL)
+                if url_path.startswith(settings.STATIC_URL):
+                    target_name = url_path[len(settings.STATIC_URL):]
+                else:
+                    target_name = url_path[1:]
+                    absolute_url_without_static_url = True
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
                 source_name = name if os.sep == "/" else name.replace(os.sep, "/")
                 target_name = posixpath.join(posixpath.dirname(source_name), url_path)
 
-            # Determine the hashed name of the target file with the storage backend.
-            hashed_url = self._url(
-                self._stored_name,
-                unquote(target_name),
-                force=True,
-                hashed_files=hashed_files,
-            )
+            try:
+                # Determine the hashed name of the target file with the storage backend.
+                hashed_url = self._url(
+                    self._stored_name,
+                    unquote(target_name),
+                    force=True,
+                    hashed_files=hashed_files,
+                )
+            except (ValueError, SuspiciousFileOperation):
+                # Ignore absolute URLs that don't point to a static file (dynamic
+                # CSS / JS?). Note that STATIC_URL cannot be empty.
+                if url.startswith("/") and not url.startswith(settings.STATIC_URL):
+                    return matched
+                else:
+                    raise
 
             transformed_url = "/".join(
                 url_path.split("/")[:-1] + hashed_url.split("/")[-1:]
             )
+
+            # Prepend with correct static_url if absolute but missing the static_url.
+            if absolute_url_without_static_url:
+                transformed_url = settings.STATIC_URL + transformed_url.lstrip('/')
 
             # Restore the fragment that was stripped off earlier.
             if fragment:
