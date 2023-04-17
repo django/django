@@ -234,7 +234,7 @@ class HashedFilesMixin:
             absolute_url_without_static_url = False
             if url_path.startswith("/"):
                 if url_path.startswith(settings.STATIC_URL):
-                    target_name = url_path[len(settings.STATIC_URL):]
+                    target_name = url_path[len(settings.STATIC_URL) :]
                 else:
                     target_name = url_path[1:]
                     absolute_url_without_static_url = True
@@ -265,7 +265,7 @@ class HashedFilesMixin:
 
             # Prepend with correct static_url if absolute but missing the static_url.
             if absolute_url_without_static_url:
-                transformed_url = settings.STATIC_URL + transformed_url.lstrip('/')
+                transformed_url = settings.STATIC_URL + transformed_url.lstrip("/")
 
             # Restore the fragment that was stripped off earlier.
             if fragment:
