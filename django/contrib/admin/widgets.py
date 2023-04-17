@@ -197,11 +197,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                     obj._meta.app_label,
                     obj._meta.object_name.lower(),
                 ),
-                args=(
-                    quote(
-                        obj.pk,
-                    ),
-                ),
+                args=(quote(obj.pk),),
             )
         except NoReverseMatch:
             url = ""  # Admin not registered for target model.
@@ -262,7 +258,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         self.choices = widget.choices
         self.widget = widget
         self.rel = rel
-
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:

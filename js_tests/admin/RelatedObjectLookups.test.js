@@ -9,6 +9,16 @@ QUnit.test('quote value', function(assert) {
 
 });
 
+function quoteSpecialChars(specialCharsList = ['c>h<e%e[s]e_40', 'on/ion?t@w$mw+', 'sa:la"m,i\nw;th=', '?_3A_40', 'qwerttyuiop12345', '?a=b']) {
+    const quotedChars = [];
+    for(let i = 0; i < specialCharsList.length; i++) {
+        const charToQuote = specialCharsList[i];
+        const quotedChar = customEncodeURIComponent(charToQuote);
+        quotedChars.push(quotedChar);
+    }
+    return quotedChars;
+}
+
 QUnit.test('quoteSpecialChars', function(assert) {
     assert.equal(quoteSpecialChars().toString(), ['c_3Eh_3Ce_25e_5Bs_5De_5F40', 'on_2Fion_3Ft_40w_24mw_2B', 'sa_3Ala_22m_2Ci_0Aw_3Bth_3D', '_3F_5F3A_5F40', 'qwerttyuiop12345', '_3Fa_3Db'].toString(), "passed");
 });

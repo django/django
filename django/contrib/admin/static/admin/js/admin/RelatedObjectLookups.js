@@ -76,7 +76,6 @@
         }
         const value = $this.val();
         if (value) {
-
             const quotedValue = customEncodeURIComponent(value);
             siblings.each(function() {
                 const elm = $(this);
@@ -189,14 +188,15 @@
 
 
     function customEncodeURIComponent(s) {
+        // Ensure that primary key values do not confuse the admin URLs by
+        // escaping problematic characters.
+        // This is the JavaScript equivalent to django.contrib.admin.utils.quote().
         const QUOTE_MAP = {};
         const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
 
         for (let i = 0; i < specialChars.length; i++) {
             const charCode = specialChars.charCodeAt(i);
-
-            // "This checks if the current character code is equal to 10 (which corresponds to the line feed character)";
-
+            // Line feed \n character
             if (charCode === 10) {
                 QUOTE_MAP[charCode] = '_0A';
             } else {
@@ -220,20 +220,9 @@
 
     }
 
-    function quoteSpecialChars(specialCharsList = ['c>h<e%e[s]e_40', 'on/ion?t@w$mw+', 'sa:la"m,i\nw;th=', '?_3A_40', 'qwerttyuiop12345', '?a=b']) {
-
-        const quotedChars = [];
-        for(let i = 0; i < specialCharsList.length; i++) {
-            const charToQuote = specialCharsList[i];
-            const quotedChar = customEncodeURIComponent(charToQuote);
-            quotedChars.push(quotedChar);
-        }
-        return quotedChars;
-    }
 
 
 
-    window.quoteSpecialChars = quoteSpecialChars;
 
     window.customEncodeURIComponent = customEncodeURIComponent;
 
