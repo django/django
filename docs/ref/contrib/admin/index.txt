@@ -2012,6 +2012,29 @@ templates used by the :class:`ModelAdmin` views:
         def get_changeform_initial_data(self, request):
             return {"name": "custom_initial_value"}
 
+.. method:: ModelAdmin.is_change_form_valid(request, form, formsets, add)
+
+    .. versionadded:: 5.0
+
+    A hook for customizing the validation of the change form as a whole.
+    By default, it return True.
+    You have access to the request, the form, the formsets and a boolean add.
+
+    This method should return a boolean value::
+
+        def is_change_form_valid(self, request, form, formsets, add):
+
+            has_special_name_in_form = form.cleaned_data["name"] == "Special name"
+            has_special_name_in_formset = any(
+                formset.cleaned_data["related_name"] == "Special name" for formset in formsets
+            )
+            if has_special_name_in_form and has_special_name_in_formset:
+                # add an error to the form to inform the user
+                form.add_error(None, 'Can not have "Special name" as a name and a related name')
+                return False
+            return True
+
+
 .. method:: ModelAdmin.get_deleted_objects(objs, request)
 
     A hook for customizing the deletion process of the :meth:`delete_view` and

@@ -123,6 +123,8 @@ Minor features
   parameters.
 
 * ``XRegExp`` is upgraded from version 3.2.0 to 5.1.1.
+* The new :meth:`.ModelAdmin.is_change_form_valid` method provides
+  a hook for compound form/formset validation.
 
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

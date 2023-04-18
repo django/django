@@ -8234,6 +8234,40 @@ class AdminViewOnSiteTests(TestCase):
             ],
         )
 
+    def test_change_view_whole_form_validation(self):
+        """
+        Issue #12780
+        Verifying that is_change_form_valid hook is called.
+        """
+        pwdc = ParentWithDependentChildren.objects.create(
+            some_required_info=6, family_name="Foo"
+        )
+        # The validation should fail because we're not allowing the name 'Foo' to have
+        # depends, asserting that is_change_form_valid is called and have access to
+        # the form and to formsets.
+
+        post_data = {
+            "family_name": "Foo",
+            "some_required_info": "4",
+            "dependentchild_set-TOTAL_FORMS": "1",
+            "dependentchild_set-INITIAL_FORMS": "0",
+            "dependentchild_set-MAX_NUM_FORMS": "1",
+            "dependentchild_set-0-id": "",
+            "dependentchild_set-0-parent": str(pwdc.id),
+            "dependentchild_set-0-family_name": "Foo",
+        }
+        response = self.client.post(
+            reverse(
+                "admin:admin_views_parentwithdependentchildren_change", args=(pwdc.id,)
+            ),
+            post_data,
+        )
+        self.assertFormError(
+            response.context["adminform"],
+            "family_name",
+            ["The name 'Foo' with depends is not allowed is this test case."],
+        )
+
     def test_check(self):
         "The view_on_site value is either a boolean or a callable"
         try:

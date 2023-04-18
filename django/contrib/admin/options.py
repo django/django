@@ -1815,7 +1815,9 @@ class ModelAdmin(BaseModelAdmin):
                 new_object = self.save_form(request, form, change=not add)
             else:
                 new_object = form.instance
-            if all_valid(formsets) and form_validated:
+            all_formsets_valid = all_valid(formsets)
+            change_form_valid = self.is_change_form_valid(request, form, formsets, add)
+            if all_formsets_valid and form_validated and change_form_valid:
                 self.save_model(request, new_object, form, not add)
                 self.save_related(request, form, formsets, not add)
                 change_message = self.construct_change_message(
@@ -1902,6 +1904,13 @@ class ModelAdmin(BaseModelAdmin):
         return self.render_change_form(
             request, context, add=add, change=not add, obj=obj, form_url=form_url
         )
+
+    def is_change_form_valid(self, request, form, formsets, add):
+        """
+        Hook for doing extra form validation. Return True if valid, False
+        otherwise. Called in response to a POST request.
+        """
+        return True
 
     def add_view(self, request, form_url="", extra_context=None):
         return self.changeform_view(request, None, form_url, extra_context)

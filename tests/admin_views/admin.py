@@ -1023,6 +1023,15 @@ class DependentChildInline(admin.TabularInline):
 class ParentWithDependentChildrenAdmin(admin.ModelAdmin):
     inlines = [DependentChildInline]
 
+    def is_change_form_valid(self, request, form, formsets, add):
+        if form.cleaned_data.get("family_name") == "Foo" and len(formsets) > 0:
+            form.add_error(
+                "family_name",
+                "The name 'Foo' with depends is not allowed is this test case.",
+            )
+            return False
+        return True
+
 
 # Tests for ticket 11277 ----------------------------------
 
