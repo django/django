@@ -7,7 +7,7 @@ import { testConst as alias } from "./module_test.js";
 import { firstConst, secondConst } from "./module_test.js";
 import {
     firstVar1 as firstVarAlias,
-    $second_var_2 as secondVarAlias,
+    $second_var_2 as secondVarAlias
 } from "./module_test.js";
 import relativeModule from "../nested/js/nested.js";
 
@@ -19,5 +19,5 @@ export * from "./module_test.js";
 export { testConst } from "./module_test.js";
 export {
     firstVar as firstVarAlias,
-    secondVar as secondVarAlias,
+    secondVar as secondVarAlias
 } from "./module_test.js";
