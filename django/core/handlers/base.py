@@ -240,7 +240,6 @@ class BaseHandler:
         # Mark the request with sensitive_post_parameters if applied.
         if hasattr(callback, "sensitive_post_parameters"):
             request.sensitive_post_parameters = callback.sensitive_post_parameters
-
         # Apply view middleware.
         for middleware_method in self._view_middleware:
             response = await middleware_method(
