@@ -391,6 +391,14 @@ Miscellaneous
   Support for ``ModelAdmin`` subclasses that do not accept this argument is
   deprecated.
 
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` is deprecated. Starting with Django 6.0,
+  ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+  ``get_joining_columns()``. Subclasses should implement
+  ``get_joining_fields()`` instead.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method is deprecated.
+
 Features removed in 5.0
 =======================
 
