@@ -64,12 +64,14 @@ class CharLink(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.CharField(max_length=100)
     content_object = GenericForeignKey()
+    value = models.CharField(max_length=250)
 
 
 class TextLink(models.Model):
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.TextField()
     content_object = GenericForeignKey()
+    value = models.CharField(max_length=250)
 
 
 class OddRelation1(models.Model):
