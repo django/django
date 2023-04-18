@@ -129,6 +129,15 @@ class TestHashedFiles:
             self.assertIn(b"/static/cached/img/relative.acae32e4532b.png", content)
         self.assertPostCondition()
 
+    def test_adding_static_url(self):
+        relpath = self.hashed_file_path("cached/absolute_no_static.css")
+        self.assertEqual(relpath, "cached/absolute_no_static.3aa61bcbb5df.css")
+        with storage.staticfiles_storage.open(relpath) as relfile:
+            content = relfile.read()
+            self.assertIn(b"/static/styles_root.401f2509a628.css", content)
+            self.assertIn(b"/static/cached/img/relative.acae32e4532b.png", content)
+        self.assertPostCondition()
+
     def test_template_tag_absolute_root(self):
         """
         Like test_template_tag_absolute, but for a file in STATIC_ROOT (#26249).
@@ -619,7 +628,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_module_import(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.d452b360c77b.js")
+        self.assertEqual(relpath, "cached/module.cb3c6fa62fa1.js")
         tests = [
             # Relative imports.
             b'import testConst from "./module_test.477bbebe77f0.js";',
@@ -636,7 +645,7 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
             b'import { testConst as alias } from "./module_test.477bbebe77f0.js";',
             b"import {\n"
             b"    firstVar1 as firstVarAlias,\n"
-            b"    $second_var_2 as secondVarAlias,\n"
+            b"    $second_var_2 as secondVarAlias\n"
             b'} from "./module_test.477bbebe77f0.js";',
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:
@@ -647,13 +656,13 @@ class TestCollectionJSModuleImportAggregationManifestStorage(CollectionTestCase)
 
     def test_aggregating_modules(self):
         relpath = self.hashed_file_path("cached/module.js")
-        self.assertEqual(relpath, "cached/module.d452b360c77b.js")
+        self.assertEqual(relpath, "cached/module.cb3c6fa62fa1.js")
         tests = [
             b'export * from "./module_test.477bbebe77f0.js";',
             b'export { testConst } from "./module_test.477bbebe77f0.js";',
             b"export {\n"
             b"    firstVar as firstVarAlias,\n"
-            b"    secondVar as secondVarAlias,\n"
+            b"    secondVar as secondVarAlias\n"
             b'} from "./module_test.477bbebe77f0.js";',
         ]
         with storage.staticfiles_storage.open(relpath) as relfile:

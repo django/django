@@ -1,0 +1,4 @@
+@import url("/styles_root.css");
+button {
+    background: #d3d6d8 url(/cached/img/relative.png);
+}
