@@ -61,7 +61,15 @@ class Join:
         self.join_type = join_type
         # A list of 2-tuples to use in the ON clause of the JOIN.
         # Each 2-tuple will create one join condition in the ON clause.
-        self.join_cols = join_field.get_joining_columns()
+        if hasattr(join_field, "get_joining_fields"):
+            self.join_fields = join_field.get_joining_fields()
+            self.join_cols = tuple(
+                (lhs_field.column, rhs_field.column)
+                for lhs_field, rhs_field in self.join_fields
+            )
+        else:
+            self.join_fields = None
+            self.join_cols = join_field.get_joining_columns()
         # Along which field (or ForeignObjectRel in the reverse join case)
         self.join_field = join_field
         # Is this join nullabled?
@@ -78,18 +86,21 @@ class Join:
         params = []
         qn = compiler.quote_name_unless_alias
         qn2 = connection.ops.quote_name
-
         # Add a join condition for each pair of joining columns.
-        for lhs_col, rhs_col in self.join_cols:
-            join_conditions.append(
-                "%s.%s = %s.%s"
-                % (
-                    qn(self.parent_alias),
-                    qn2(lhs_col),
-                    qn(self.table_alias),
-                    qn2(rhs_col),
+        join_fields = self.join_fields or self.join_cols
+        for lhs, rhs in join_fields:
+            if isinstance(lhs, str):
+                lhs_full_name = "%s.%s" % (qn(self.parent_alias), qn2(lhs))
+                rhs_full_name = "%s.%s" % (qn(self.table_alias), qn2(rhs))
+            else:
+                lhs, rhs = connection.ops.prepare_join_on_clause(
+                    self.parent_alias, lhs, self.table_alias, rhs
                 )
-            )
+                lhs_sql, lhs_params = compiler.compile(lhs)
+                lhs_full_name = lhs_sql % lhs_params
+                rhs_sql, rhs_params = compiler.compile(rhs)
+                rhs_full_name = rhs_sql % rhs_params
+            join_conditions.append(f"{lhs_full_name} = {rhs_full_name}")
 
         # Add a single condition inside parentheses for whatever
         # get_extra_restriction() returns.

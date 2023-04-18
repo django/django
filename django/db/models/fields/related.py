@@ -785,6 +785,14 @@ class ForeignObject(RelatedField):
     def get_reverse_joining_columns(self):
         return self.get_joining_columns(reverse_join=True)
 
+    def get_joining_fields(self, reverse_join=False):
+        return tuple(
+            self.reverse_related_fields if reverse_join else self.related_fields
+        )
+
+    def get_reverse_joining_fields(self):
+        return self.get_joining_fields(reverse_join=True)
+
     def get_extra_descriptor_filter(self, instance):
         """
         Return an extra filter condition for related object fetching when

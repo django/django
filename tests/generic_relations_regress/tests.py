@@ -72,6 +72,20 @@ class GenericRelationTests(TestCase):
         TextLink.objects.create(content_object=oddrel)
         oddrel.delete()
 
+    def test_charlink_filter(self):
+        oddrel = OddRelation1.objects.create(name="clink")
+        CharLink.objects.create(content_object=oddrel, value="value")
+        self.assertSequenceEqual(
+            OddRelation1.objects.filter(clinks__value="value"), [oddrel]
+        )
+
+    def test_textlink_filter(self):
+        oddrel = OddRelation2.objects.create(name="clink")
+        TextLink.objects.create(content_object=oddrel, value="value")
+        self.assertSequenceEqual(
+            OddRelation2.objects.filter(tlinks__value="value"), [oddrel]
+        )
+
     def test_coerce_object_id_remote_field_cache_persistence(self):
         restaurant = Restaurant.objects.create()
         CharLink.objects.create(content_object=restaurant)

@@ -195,6 +195,9 @@ class ForeignObjectRel(FieldCacheMixin):
     def get_joining_columns(self):
         return self.field.get_reverse_joining_columns()
 
+    def get_joining_fields(self):
+        return self.field.get_reverse_joining_fields()
+
     def get_extra_restriction(self, alias, related_alias):
         return self.field.get_extra_restriction(related_alias, alias)
 
