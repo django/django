@@ -8,8 +8,10 @@ in the ``remote_field`` attribute of the field.
 They also act as reverse fields for the purposes of the Meta API because
 they're the closest concept currently available.
 """
+import warnings
 
 from django.core import exceptions
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -193,6 +195,11 @@ class ForeignObjectRel(FieldCacheMixin):
         return bool(self.related_name) and self.related_name[-1] == "+"
 
     def get_joining_columns(self):
+        warnings.warn(
+            "ForeignObjectRel.get_joining_columns() is deprecated. Use "
+            "get_joining_fields() instead.",
+            RemovedInDjango60Warning,
+        )
         return self.field.get_reverse_joining_columns()
 
     def get_joining_fields(self):

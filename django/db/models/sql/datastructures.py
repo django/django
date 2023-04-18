@@ -2,8 +2,11 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+import warnings
+
 from django.core.exceptions import FullResultSet
 from django.db.models.sql.constants import INNER, LOUTER
+from django.utils.deprecation import RemovedInDjango60Warning
 
 
 class MultiJoin(Exception):
@@ -68,6 +71,11 @@ class Join:
                 for lhs_field, rhs_field in self.join_fields
             )
         else:
+            warnings.warn(
+                "The usage of get_joining_columns() in Join is deprecated. Implement "
+                "get_joining_fields() instead.",
+                RemovedInDjango60Warning,
+            )
             self.join_fields = None
             self.join_cols = join_field.get_joining_columns()
         # Along which field (or ForeignObjectRel in the reverse join case)
@@ -87,9 +95,13 @@ class Join:
         qn = compiler.quote_name_unless_alias
         qn2 = connection.ops.quote_name
         # Add a join condition for each pair of joining columns.
+        # RemovedInDjango60Warning: when the depraction ends, replace with:
+        # for lhs, rhs in self.join_field:
         join_fields = self.join_fields or self.join_cols
         for lhs, rhs in join_fields:
             if isinstance(lhs, str):
+                # RemovedInDjango60Warning: when the depraction ends, remove
+                # the branch for strings.
                 lhs_full_name = "%s.%s" % (qn(self.parent_alias), qn2(lhs))
                 rhs_full_name = "%s.%s" % (qn(self.table_alias), qn2(rhs))
             else:
