@@ -1,4 +1,3 @@
-
 from functools import wraps
 
 from django.http import HttpRequest
@@ -91,6 +90,7 @@ def sensitive_post_parameters(*parameters):
             else:
                 request.sensitive_post_parameters = "__ALL__"
             return view(request, *args, **kwargs)
+
         # Mark the wrapped view itself in case of middleware errors.
         sensitive_post_parameters_wrapper.sensitive_post_parameters = (
             parameters or "__ALL__"
