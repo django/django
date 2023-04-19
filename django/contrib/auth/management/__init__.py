@@ -3,12 +3,16 @@ Creates permissions for all installed apps that need permissions.
 """
 import getpass
 import unicodedata
+import logging
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
 from django.contrib.contenttypes.management import create_contenttypes
 from django.core import exceptions
 from django.db import DEFAULT_DB_ALIAS, router
+
+
+logger = logging.getLogger(__name__)
 
 
 def _get_all_permissions(opts):
@@ -108,7 +112,7 @@ def create_permissions(
     Permission.objects.using(using).bulk_create(perms)
     if verbosity >= 2:
         for perm in perms:
-            print("Adding permission '%s'" % perm)
+            logger.debug("Adding permission '%s'", perm)
 
 
 def get_system_username():
