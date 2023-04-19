@@ -234,9 +234,9 @@ class HashedFilesMixin:
             absolute_url_without_static_url = False
             if url_path.startswith("/"):
                 if url_path.startswith(settings.STATIC_URL):
-                    target_name = url_path[len(settings.STATIC_URL) :]
+                    target_name = url_path.removeprefix(settings.STATIC_URL)
                 else:
-                    target_name = url_path[1:]
+                    target_name = url_path.removeprefix('/')
                     absolute_url_without_static_url = True
             else:
                 # We're using the posixpath module to mix paths and URLs conveniently.
