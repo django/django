@@ -11,8 +11,8 @@ def safe_join(base, *paths):
     Join one or more path components to the base path component intelligently.
     Return a normalized, absolute version of the final path.
 
-    Raise ValueError if the final path isn't located inside of the base path
-    component.
+    Raise SuspiciousFileOperation if the final path isn't located inside of the
+    base path component.
     """
     final_path = abspath(join(base, *paths))
     base_path = abspath(base)
