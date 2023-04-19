@@ -163,16 +163,6 @@ def lazy(func, *resultclasses):
         def __mod__(self, other):
             return self.__cast() % other
 
-    def __promise__(method_name):
-        # Builds a wrapper around some method.
-        def __wrapper__(self, *args, **kw):
-            # Automatically triggers the evaluation of a lazy value and
-            # applies the given method of the result type.
-            res = func(*self._args, **self._kw)
-            return getattr(res, method_name)(*args, **kw)
-
-        return __wrapper__
-
     # Add wrappers for all methods from resultclasses which haven't been
     # wrapped explicitly above.
     for resultclass in resultclasses:
@@ -182,8 +172,16 @@ def lazy(func, *resultclasses):
                 # the correct implementation when called.
                 if hasattr(__proxy__, method_name):
                     continue
-                meth = __promise__(method_name)
-                setattr(__proxy__, method_name, meth)
+
+                # Builds a wrapper around some method. Pass method_name to
+                # avoid issues due to late binding.
+                def __wrapper__(self, *args, __method_name=method_name, **kw):
+                    # Automatically triggers the evaluation of a lazy value and
+                    # applies the given method of the result type.
+                    result = func(*self._args, **self._kw)
+                    return getattr(result, __method_name)(*args, **kw)
+
+                setattr(__proxy__, method_name, __wrapper__)
 
     @wraps(func)
     def __wrapper__(*args, **kw):
