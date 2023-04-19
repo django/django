@@ -3822,7 +3822,7 @@ documentation to learn how to create your aggregates.
     currently emulates these features using a text field. Attempts to use
     aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
-.. admonition:: Note
+.. admonition:: Empty queryset
 
     Aggregation functions return ``None`` when used with an empty
     ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``

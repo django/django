@@ -396,7 +396,7 @@ here's what Django will look for:
 
 When Django finds a template that exists, it stops looking.
 
-.. admonition:: Tip
+.. admonition:: Use ``django.template.loader.select_template()`` for more flexibility
 
     You can use :func:`~django.template.loader.select_template()` for flexible
     template loading. For example, if you've written a news story and want
