@@ -1265,13 +1265,15 @@ Python native format: dictionaries, lists, strings, numbers, booleans and
 
     Defaults to ``json.JSONDecoder``.
 
-If you give the field a :attr:`~django.db.models.Field.default`, ensure it's an
-immutable object, such as a ``str``, or a callable object that returns a fresh
-mutable object each time, such as ``dict`` or a function. Providing a mutable
-default object like ``default={}`` or ``default=[]`` shares the one object
-between all model instances.
-
 To query ``JSONField`` in the database, see :ref:`querying-jsonfield`.
+
+.. admonition:: Default value
+
+    If you give the field a :attr:`~django.db.models.Field.default`, ensure
+    it's a callable such as the :py:class:`dict` class or a function that
+    returns a fresh object each time. Incorrectly using a mutable object like
+    ``default={}`` or ``default=[]`` creates a mutable default that is shared
+    between all instances.
 
 .. admonition:: Indexing
 
