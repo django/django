@@ -201,7 +201,7 @@ level:
     class MyDeprecatedTests(unittest.TestCase):
         ...
 
-You can also add a test for the deprecation warning::
+You should also add a test for the deprecation warning::
 
     from django.utils.deprecation import RemovedInDjangoXXWarning
 
@@ -211,6 +211,30 @@ You can also add a test for the deprecation warning::
         with self.assertWarnsMessage(RemovedInDjangoXXWarning, msg):
             # invoke deprecated behavior
             ...
+
+It's important to include a ``RemovedInDjangoXXWarning`` comment above code
+which has no warning reference, but will need to be changed or removed when the
+deprecation ends. This could include hooks which have been added to keep the
+previous behavior, or standalone items that are unnecessary or unused when the
+deprecation ends. For example::
+
+    import warnings
+    from django.utils.deprecation import RemovedInDjangoXXWarning
+
+
+    # RemovedInDjangoXXWarning.
+    def old_private_helper():
+        # Helper function that is only used in foo().
+        pass
+
+
+    def foo():
+        warnings.warn(
+            "foo() is deprecated.",
+            category=RemovedInDjangoXXWarning,
+        )
+        old_private_helper()
+        ...
 
 Finally, there are a couple of updates to Django's documentation to make:
 
