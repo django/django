@@ -2,8 +2,8 @@
 Creates permissions for all installed apps that need permissions.
 """
 import getpass
-import unicodedata
 import logging
+import unicodedata
 
 from django.apps import apps as global_apps
 from django.contrib.auth import get_permission_codename
