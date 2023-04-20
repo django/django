@@ -17,7 +17,8 @@ class FakeFieldFile:
 
 
 class ClearableFileInputTest(WidgetTest):
-    widget = ClearableFileInput()
+    def setUp(self):
+        self.widget = ClearableFileInput()
 
     def test_clear_input_renders(self):
         """
@@ -148,6 +149,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertIs(value, False)
+        self.assertIs(self.widget.checked, True)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """
@@ -164,6 +166,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertEqual(value, field)
+        self.assertIs(widget.checked, True)
 
     def test_html_does_not_mask_exceptions(self):
         """

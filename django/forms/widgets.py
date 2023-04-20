@@ -433,6 +433,7 @@ class ClearableFileInput(FileInput):
     initial_text = _("Currently")
     input_text = _("Change")
     template_name = "django/forms/widgets/clearable_file_input.html"
+    checked = False
 
     def clear_checkbox_name(self, name):
         """
@@ -475,10 +476,12 @@ class ClearableFileInput(FileInput):
             }
         )
         context["widget"]["attrs"].setdefault("disabled", False)
+        context["widget"]["attrs"]["checked"] = self.checked
         return context
 
     def value_from_datadict(self, data, files, name):
         upload = super().value_from_datadict(data, files, name)
+        self.checked = self.clear_checkbox_name(name) in data
         if not self.is_required and CheckboxInput().value_from_datadict(
             data, files, self.clear_checkbox_name(name)
         ):
