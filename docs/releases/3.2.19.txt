@@ -1,0 +1,9 @@
+===========================
+Django 3.2.19 release notes
+===========================
+
+*May 3, 2023*
+
+Django 3.2.19 fixes a security issue with severity "low" in 3.2.18.
+
+...

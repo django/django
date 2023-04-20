@@ -1,0 +1,9 @@
+==========================
+Django 4.1.9 release notes
+==========================
+
+*May 3, 2023*
+
+Django 4.1.9 fixes a security issue with severity "low" in 4.1.8.
+
+...

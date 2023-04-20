@@ -2,9 +2,10 @@
 Django 4.2.1 release notes
 ==========================
 
-*Expected May 1, 2023*
+*May 3, 2023*
 
-Django 4.2.1 fixes several bugs in 4.2.
+Django 4.2.1 fixes a security issue with severity "low" and several bugs in
+4.2.
 
 Bugfixes
 ========
