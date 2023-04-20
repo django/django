@@ -403,8 +403,11 @@ class FilteredRelation:
         self.alias = None
         if not isinstance(condition, Q):
             raise ValueError("condition argument must be a Q() instance.")
+        # .condition and .resolved_condition have to be stored independently
+        # as the former must remain unchanged for Join.__eq__ to remain stable
+        # and reusable even once their .filtered_relation are resolved.
         self.condition = condition
-        self.path = []
+        self.resolved_condition = None
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -418,18 +421,22 @@ class FilteredRelation:
     def clone(self):
         clone = FilteredRelation(self.relation_name, condition=self.condition)
         clone.alias = self.alias
-        clone.path = self.path[:]
+        if (resolved_condition := self.resolved_condition) is not None:
+            clone.resolved_condition = resolved_condition.clone()
         return clone
 
-    def resolve_expression(self, *args, **kwargs):
-        """
-        QuerySet.annotate() only accepts expression-like arguments
-        (with a resolve_expression() method).
-        """
-        raise NotImplementedError("FilteredRelation.resolve_expression() is unused.")
+    def relabeled_clone(self, change_map):
+        clone = self.clone()
+        if resolved_condition := clone.resolved_condition:
+            clone.resolved_condition = resolved_condition.relabeled_clone(change_map)
+        return clone
+
+    def resolve_expression(self, query, reuse, *args, **kwargs):
+        clone = self.clone()
+        clone.resolved_condition = query.build_filtered_relation_q(
+            self.condition, reuse=reuse
+        )
+        return clone
 
     def as_sql(self, compiler, connection):
-        # Resolve the condition in Join.filtered_relation.
-        query = compiler.query
-        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
-        return compiler.compile(where)
+        return compiler.compile(self.resolved_condition)
