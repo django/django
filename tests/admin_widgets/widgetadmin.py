@@ -1,8 +1,21 @@
 from django.contrib import admin
 
 from .models import (
-    Advisor, Album, Band, Bee, Car, CarTire, Event, Inventory, Member, Profile,
-    School, User,
+    Advisor,
+    Album,
+    Band,
+    Bee,
+    Car,
+    CarTire,
+    Event,
+    Inventory,
+    Member,
+    Profile,
+    ReleaseEvent,
+    School,
+    Student,
+    User,
+    VideoStream,
 )
 
 
@@ -11,8 +24,8 @@ class WidgetAdmin(admin.AdminSite):
 
 
 class CarAdmin(admin.ModelAdmin):
-    list_display = ['make', 'model', 'owner']
-    list_editable = ['owner']
+    list_display = ["make", "model", "owner"]
+    list_editable = ["owner"]
 
 
 class CarTireAdmin(admin.ModelAdmin):
@@ -24,20 +37,23 @@ class CarTireAdmin(admin.ModelAdmin):
 
 
 class EventAdmin(admin.ModelAdmin):
-    raw_id_fields = ['main_band', 'supporting_bands']
+    raw_id_fields = ["main_band", "supporting_bands"]
 
 
 class AlbumAdmin(admin.ModelAdmin):
-    fields = ('name', 'cover_art',)
-    readonly_fields = ('cover_art',)
+    fields = (
+        "name",
+        "cover_art",
+    )
+    readonly_fields = ("cover_art",)
 
 
 class SchoolAdmin(admin.ModelAdmin):
-    filter_vertical = ('students',)
-    filter_horizontal = ('alumni',)
+    filter_vertical = ("students",)
+    filter_horizontal = ("alumni",)
 
 
-site = WidgetAdmin(name='widget-admin')
+site = WidgetAdmin(name="widget-admin")
 
 site.register(User)
 site.register(Car, CarAdmin)
@@ -47,6 +63,8 @@ site.register(Member)
 site.register(Band)
 site.register(Event, EventAdmin)
 site.register(Album, AlbumAdmin)
+site.register(ReleaseEvent, search_fields=["name"])
+site.register(VideoStream, autocomplete_fields=["release_event"])
 
 site.register(Inventory)
 
@@ -55,5 +73,6 @@ site.register(Bee)
 site.register(Advisor)
 
 site.register(School, SchoolAdmin)
+site.register(Student)
 
 site.register(Profile)

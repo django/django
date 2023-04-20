@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2014
 # Paras Nath Chaudhary <opnchaudhary@gmail.com>, 2012
 # Sagar Chalise <chalisesagar@gmail.com>, 2011-2012,2015,2018
@@ -9,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-27 22:40+0200\n"
-"PO-Revision-Date: 2019-11-05 00:38+0000\n"
-"Last-Translator: Ramiro Morales\n"
+"POT-Creation-Date: 2020-05-19 20:23+0200\n"
+"PO-Revision-Date: 2020-07-14 21:42+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Nepali (http://www.transifex.com/django/django/language/ne/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -24,6 +25,9 @@ msgstr "अफ्रिकन"
 
 msgid "Arabic"
 msgstr "अरबिक"
+
+msgid "Algerian Arabic"
+msgstr ""
 
 msgid "Asturian"
 msgstr "अस्टुरियन"
@@ -140,13 +144,16 @@ msgid "Hungarian"
 msgstr "हन्गेरियन"
 
 msgid "Armenian"
-msgstr ""
+msgstr "अर्मेनियन"
 
 msgid "Interlingua"
 msgstr "ईन्टरलिन्गुवा"
 
 msgid "Indonesian"
 msgstr "इन्डोनेसियाली"
+
+msgid "Igbo"
+msgstr ""
 
 msgid "Ido"
 msgstr "आइडु"
@@ -177,6 +184,9 @@ msgstr "कन्नड"
 
 msgid "Korean"
 msgstr "कोरियाली"
+
+msgid "Kyrgyz"
+msgstr ""
 
 msgid "Luxembourgish"
 msgstr "लक्जेमबर्गेली"
@@ -262,8 +272,14 @@ msgstr "तामिल"
 msgid "Telugu"
 msgstr "तेलुगु"
 
+msgid "Tajik"
+msgstr ""
+
 msgid "Thai"
 msgstr "थाई"
+
+msgid "Turkmen"
+msgstr ""
 
 msgid "Turkish"
 msgstr "टर्किस"
@@ -281,7 +297,7 @@ msgid "Urdu"
 msgstr "उर्दु"
 
 msgid "Uzbek"
-msgstr ""
+msgstr "उज्बेक"
 
 msgid "Vietnamese"
 msgstr "भियतनामी"
@@ -552,6 +568,9 @@ msgstr ""
 msgid "Boolean (Either True, False or None)"
 msgstr "बुलियन (True, False अथवा None)"
 
+msgid "Positive big integer"
+msgstr ""
+
 msgid "Positive integer"
 msgstr "सकारात्मक पूर्णांक"
 
@@ -601,6 +620,12 @@ msgstr "फाइल"
 
 msgid "Image"
 msgstr "चित्र"
+
+msgid "A JSON object"
+msgstr ""
+
+msgid "Value must be valid JSON."
+msgstr ""
 
 #, python-format
 msgid "%(model)s instance with %(field)s %(value)r does not exist."
@@ -694,6 +719,9 @@ msgstr "पुरा मान राख्नु होस ।"
 msgid "Enter a valid UUID."
 msgstr "उपयुक्त UUID राख्नु होस ।"
 
+msgid "Enter a valid JSON."
+msgstr ""
+
 #. Translators: This is the default suffix added to form field labels
 msgid ":"
 msgstr ":"
@@ -776,17 +804,9 @@ msgstr "हुन्छ"
 msgid "No"
 msgstr "होइन"
 
-msgid "Year"
-msgstr ""
-
-msgid "Month"
-msgstr ""
-
-msgid "Day"
-msgstr ""
-
+#. Translators: Please do not add spaces around commas.
 msgid "yes,no,maybe"
-msgstr "हो, होइन, सायद"
+msgstr "हो,होइन,सायद"
 
 #, python-format
 msgid "%(size)d byte"
@@ -1048,7 +1068,7 @@ msgstr "यो उपयुक्त IPv6 ठेगाना होइन ।"
 #, python-format
 msgctxt "String to return when truncating text"
 msgid "%(truncated_text)s…"
-msgstr ""
+msgstr "%(truncated_text)s…"
 
 msgid "or"
 msgstr "अथवा"
@@ -1092,9 +1112,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d मिनट"
 msgstr[1] "%d मिनटहरु"
-
-msgid "0 minutes"
-msgstr "० मिनट"
 
 msgid "Forbidden"
 msgstr "निषेधित"

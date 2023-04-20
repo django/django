@@ -3,13 +3,14 @@
 # Translators:
 # Carles Barrobés <carles@barrobes.com>, 2012,2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manel Clos <manelclos@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-04-28 20:05+0000\n"
+"Last-Translator: Manel Clos <manelclos@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -35,9 +36,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "L'objecte del tipus de contingut %(ct_id)s no té un model associat"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
 msgstr "L'objecte %(obj_id)s del tipus de contingut %(ct_id)s no existeix"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
-msgstr "Els objectes %(ct_name)s no tenen un mètode get_absolute_url()"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
+msgstr "Els objectes %(ct_name)s no tenen el mètode get_absolute_url()"

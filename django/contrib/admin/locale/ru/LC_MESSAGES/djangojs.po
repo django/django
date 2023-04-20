@@ -1,29 +1,32 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Claude Paroz <claude@2xlibre.net>, 2020
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # Eugene <eugene.mechanism@gmail.com>, 2012
 # Eugene <eugene.mechanism@gmail.com>, 2016
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015
+# Panasoft, 2021
+# Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022
 # Андрей Щуров <shurov9009@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Eugene <eugene.mechanism@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, 2012,2014-2015,2022\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -92,8 +95,8 @@ msgstr ""
 "вы запустите действие, несохраненные изменения будут потеряны."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Вы выбрали действие, но еще не сохранили изменения, внесенные в некоторых "
@@ -101,13 +104,13 @@ msgstr ""
 "сохранения вам придется запустить действие еще раз."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Вы выбрали действие и не внесли изменений в данные. Возможно, вы хотели "
 "воспользоваться кнопкой \"Выполнить\", а не кнопкой \"Сохранить\". Если это "
-"так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования. "
+"так, то нажмите \"Отмена\", чтобы вернуться в интерфейс редактирования."
 
 msgid "Now"
 msgstr "Сейчас"
@@ -201,6 +204,54 @@ msgstr "Ноябрь"
 msgid "December"
 msgstr "Декабрь"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Янв"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Фев"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Мар"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Апр"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Июн"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Июл"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Авг"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Сен"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Окт"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Ноя"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Дек"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "В"
@@ -228,6 +279,12 @@ msgstr "П"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "С"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Вы уже отправили эту форму. Вы уверены, что хотите отправить её ещё раз?"
 
 msgid "Show"
 msgstr "Показать"

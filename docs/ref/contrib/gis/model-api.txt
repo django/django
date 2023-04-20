@@ -11,9 +11,11 @@ of a `Digital Elevation Model`__ as our examples::
 
     from django.contrib.gis.db import models
 
+
     class Zipcode(models.Model):
         code = models.CharField(max_length=5)
         poly = models.PolygonField()
+
 
     class Elevation(models.Model):
         name = models.CharField(max_length=100)
@@ -123,7 +125,7 @@ corresponds to the projection system that will be used to interpret the data
 in the spatial database. [#fnsrid]_  Projection systems give the context to the
 coordinates that specify a location.  Although the details of `geodesy`__ are
 beyond the scope of this documentation, the general problem is that the earth
-is spherical and representations of the earth (e.g., paper maps, Web maps)
+is spherical and representations of the earth (e.g., paper maps, web maps)
 are not.
 
 Most people are familiar with using latitude and longitude to reference a
@@ -165,8 +167,8 @@ Additional Resources:
 
 __ https://en.wikipedia.org/wiki/Geodesy
 __ https://en.wikipedia.org/wiki/Great_circle
-__ http://www.spatialreference.org/ref/epsg/2796/
-__ http://spatialreference.org/
+__ https://spatialreference.org/ref/epsg/2796/
+__ https://spatialreference.org/
 __ https://web.archive.org/web/20080302095452/http://welcome.warnercnr.colostate.edu/class_info/nr502/lg3/datums_coordinates/spcs.html
 
 ``spatial_index``
@@ -254,18 +256,18 @@ geography column to a geometry type in the query::
     from django.contrib.gis.db.models import PointField
     from django.db.models.functions import Cast
 
-    Zipcode.objects.annotate(
-        geom=Cast('geography_field', PointField())
-    ).filter(geom__within=poly)
+    Zipcode.objects.annotate(geom=Cast("geography_field", PointField())).filter(
+        geom__within=poly
+    )
 
 For more information, the PostGIS documentation contains a helpful section on
 determining `when to use geography data type over geometry data type
 <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_GeographyVSGeometry>`_.
 
 .. rubric:: Footnotes
-.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.opengeospatial.org/standards/sfs>`_.
+.. [#fnogc] OpenGIS Consortium, Inc., `Simple Feature Specification For SQL <https://www.ogc.org/standards/sfs>`_.
 .. [#fnogcsrid] *See id.* at Ch. 2.3.8, p. 39 (Geometry Values and Spatial Reference Systems).
-.. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <http://www.epsg.org>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
+.. [#fnsrid] Typically, SRID integer corresponds to an EPSG (`European Petroleum Survey Group <https://epsg.org/>`_) identifier.  However, it may also be associated with custom projections defined in spatial database's spatial reference systems table.
 .. [#fnthematic] Terry A. Slocum, Robert B. McMaster, Fritz C. Kessler, & Hugh H. Howard, *Thematic Cartography and Geographic Visualization* (Prentice Hall, 2nd edition), at Ch. 7.1.3.
 .. [#fndist] This limitation does not apply to PostGIS.
 .. [#fngeography] Please refer to the `PostGIS Geography Type <https://postgis.net/docs/using_postgis_dbmanagement.html#PostGIS_Geography>`_ documentation for more details.

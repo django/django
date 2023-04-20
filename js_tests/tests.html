@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Django JavaScript Tests</title>
-    <link rel="stylesheet" href="./qunit/qunit.css">
+    <link rel="stylesheet" href="../node_modules/qunit/qunit/qunit.css">
 </head>
 <body>
 
@@ -11,24 +11,29 @@
     <div id="qunit-fixture">
     </div>
     <script type="text/html" id="result-table">
-        <table id="result_list">
-            <tr>
-                <th>
-                   <input type="checkbox" id="action-toggle">
-                </th>
-            </tr>
-            <tr>
-                <td class="action-checkbox">
-                    <input class="action-select" type="checkbox" value="618">
-                </td>
-            </tr>
-        </table>
+        <form id="changelist-form">
+            <button type="submit" class="button" name="index" value="0">Go</button>
+            <span class="action-counter" data-actions-icnt="100"></span>
+            <table id="result_list">
+                <tr>
+                    <th>
+                       <input type="checkbox" id="action-toggle" aria-label="Select all objects on this page for an action">
+                    </th>
+                </tr>
+                <tr>
+                    <td class="action-checkbox">
+                        <input class="action-select" type="checkbox" value="618">
+                    </td>
+                </tr>
+            </table>
+            <input type="submit" name="_save" value="Save">
+        </form>
     </script>
     <script type="text/html" id="tabular-formset">
         <input id="id_first-TOTAL_FORMS" value="1">
         <input id="id_first-MAX_NUM_FORMS" value="">
         <table class="inline">
-            <tr id="first-0" class="form-row row1">
+            <tr id="first-0" class="form-row">
                 <td class="field-test_field">
                     <input id="id_first-0-test_field">
                 </td>
@@ -47,7 +52,7 @@
                 <input id="id_second-MAX_NUM_FORMS" value="">
                 <input id="id_second-MIN_NUM_FORMS" value="">
                 <table class="inline">
-                    <tr id="second-0" class="form-row has_original row1">
+                    <tr id="second-0" class="form-row has_original">
                         <td class="field-test_field">
                             <input id="id_second-0-test_field">
                         </td>
@@ -62,7 +67,7 @@
                         </ul>
                       </td>
                     </tr>
-                    <tr id="second-1" class="form-row row2">
+                    <tr id="second-1" class="form-row">
                         <td class="field-test_field">
                             <input id="id_second-1-test_field">
                         </td>
@@ -78,8 +83,35 @@
             </div>
         </div>
     </script>
+    <script type="text/html" id="nav-sidebar-filter">
+      <nav class="sticky" id="nav-sidebar">
+        <input type="search" id="nav-filter"
+               placeholder="Start typing to filter..."
+               aria-label="Filter navigation items">
+        <div class="app-auth module current-app">
+          <table>
+            <caption>
+              <a href="/admin/auth/" class="section"
+                 title="Models in the Authentication and Authorization application">
+                    Authentication and Authorization
+              </a>
+            </caption>
+            <tbody>
+            <tr class="model-group">
+              <th scope="row"><a href="/admin/auth/group/">Groups</a></th>
+              <td><a href="/admin/auth/group/add/" class="addlink">Add</a></td>
+            </tr>
+            <tr class="model-user current-model">
+              <th scope="row"><a href="/admin/auth/user/" aria-current="page">Users</a></th>
+              <td><a href="/admin/auth/user/add/" class="addlink">Add</a></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </nav>
+    </script>
 
-    <script src="./qunit/qunit.js"></script>
+    <script src="../node_modules/qunit/qunit/qunit.js"></script>
 
     <script src='../django/contrib/admin/static/admin/js/vendor/xregexp/xregexp.min.js'></script>
     <script src='../django/contrib/admin/static/admin/js/vendor/jquery/jquery.min.js'></script>
@@ -89,8 +121,10 @@
     <script src='../django/contrib/admin/static/admin/js/core.js' data-cover></script>
     <script src='./admin/core.test.js'></script>
 
+    <script src='../django/contrib/admin/static/admin/js/nav_sidebar.js' data-cover></script>
+    <script src='./admin/navigation.test.js'></script>
+
     <script src='../django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js' data-cover></script>
-    <script src='./admin/RelatedObjectLookups.test.js'></script>
 
     <script src='./admin/DateTimeShortcuts.test.js'></script>
     <script src='../django/contrib/admin/static/admin/js/calendar.js' data-cover></script>
@@ -123,7 +157,7 @@
         <textarea id="id_multipolygon" name="multipolygon" class="vSerializedField required"
                   style="display:none;" rows="10" cols="150"></textarea>
     </div>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/ol3/4.6.5/ol.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/ol@v7.2.2/dist/ol.js'></script>
     <script src='../django/contrib/gis/static/gis/js/OLMapWidget.js' data-cover></script>
     <script src='./gis/mapwidget.test.js'></script>
 

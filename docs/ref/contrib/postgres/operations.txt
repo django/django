@@ -22,19 +22,19 @@ For example::
 
     from django.contrib.postgres.operations import HStoreExtension
 
+
     class Migration(migrations.Migration):
         ...
 
-        operations = [
-            HStoreExtension(),
-            ...
-        ]
+        operations = [HStoreExtension(), ...]
 
-Creating the extension requires a database user with superuser privileges.
-If the Django database user doesn't have superuser privileges, you'll have
-to create the extension outside of Django migrations with a user that has
-the appropriate privileges. In that case, connect to your Django database and
-run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
+The operation skips adding the extension if it already exists.
+
+For most extensions, this requires a database user with superuser privileges.
+If the Django database user doesn't have the appropriate privileges, you'll
+have to create the extension outside of Django migrations with a user that has
+them. In that case, connect to your Django database and run the query
+``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. currentmodule:: django.contrib.postgres.operations
 
@@ -43,7 +43,8 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. class:: CreateExtension(name)
 
-    An ``Operation`` subclass which installs PostgreSQL extensions.
+    An ``Operation`` subclass which installs a PostgreSQL extension. For common
+    extensions, use one of the more specific subclasses below.
 
     .. attribute:: name
 
@@ -54,23 +55,21 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
 .. class:: BloomExtension()
 
-    .. versionadded:: 3.1
-
-    Install the ``bloom`` extension.
+    Installs the ``bloom`` extension.
 
 ``BtreeGinExtension``
 =====================
 
 .. class:: BtreeGinExtension()
 
-    Install the ``btree_gin`` extension.
+    Installs the ``btree_gin`` extension.
 
 ``BtreeGistExtension``
 ======================
 
 .. class:: BtreeGistExtension()
 
-    Install the ``btree_gist`` extension.
+    Installs the ``btree_gist`` extension.
 
 ``CITextExtension``
 ===================
@@ -108,10 +107,52 @@ run the query ``CREATE EXTENSION IF NOT EXISTS hstore;``.
 
     Installs the ``unaccent`` extension.
 
-Index concurrent operations
-===========================
+.. _manage-postgresql-collations:
 
-.. versionadded:: 3.0
+Managing collations using migrations
+====================================
+
+If you need to filter or order a column using a particular collation that your
+operating system provides but PostgreSQL does not, you can manage collations in
+your database using a migration file. These collations can then be used with
+the ``db_collation`` parameter on :class:`~django.db.models.CharField`,
+:class:`~django.db.models.TextField`, and their subclasses.
+
+For example, to create a collation for German phone book ordering::
+
+    from django.contrib.postgres.operations import CreateCollation
+
+
+    class Migration(migrations.Migration):
+        ...
+
+        operations = [
+            CreateCollation(
+                "case_insensitive",
+                provider="icu",
+                locale="und-u-ks-level2",
+                deterministic=False,
+            ),
+            ...,
+        ]
+
+.. class:: CreateCollation(name, locale, *, provider='libc', deterministic=True)
+
+    Creates a collation with the given ``name``, ``locale`` and ``provider``.
+
+    Set the ``deterministic`` parameter to ``False`` to create a
+    non-deterministic collation, such as for case-insensitive filtering.
+
+.. class:: RemoveCollation(name, locale, *, provider='libc', deterministic=True)
+
+    Removes the collations named ``name``.
+
+    When reversed this is creating a collation with the provided ``locale``,
+    ``provider``, and ``deterministic`` arguments. Therefore, ``locale`` is
+    required to make this operation reversible.
+
+Concurrent index operations
+===========================
 
 PostgreSQL supports the ``CONCURRENTLY`` option to ``CREATE INDEX`` and
 ``DROP INDEX`` statements to add and remove indexes without locking out writes.
@@ -137,3 +178,37 @@ database.
 
     The ``CONCURRENTLY`` option is not supported inside a transaction (see
     :ref:`non-atomic migration <non-atomic-migrations>`).
+
+Adding constraints without enforcing validation
+===============================================
+
+PostgreSQL supports the ``NOT VALID`` option with the ``ADD CONSTRAINT``
+statement to add check constraints without enforcing validation on existing
+rows. This option is useful if you want to skip the potentially lengthy scan of
+the table to verify that all existing rows satisfy the constraint.
+
+To validate check constraints created with the ``NOT VALID`` option at a later
+point of time, use the
+:class:`~django.contrib.postgres.operations.ValidateConstraint` operation.
+
+See `the PostgreSQL documentation <https://www.postgresql.org/docs/current/
+sql-altertable.html#SQL-ALTERTABLE-NOTES>`__ for more details.
+
+.. class:: AddConstraintNotValid(model_name, constraint)
+
+    Like :class:`~django.db.migrations.operations.AddConstraint`, but avoids
+    validating the constraint on existing rows.
+
+.. class:: ValidateConstraint(model_name, name)
+
+    Scans through the table and validates the given check constraint on
+    existing rows.
+
+.. note::
+
+    ``AddConstraintNotValid`` and ``ValidateConstraint`` operations should be
+    performed in two separate migrations. Performing both operations in the
+    same atomic migration has the same effect as
+    :class:`~django.db.migrations.operations.AddConstraint`, whereas performing
+    them in a single non-atomic migration, may leave your database in an
+    inconsistent state if the ``ValidateConstraint`` operation fails.

@@ -1,16 +1,17 @@
 import pkgutil
 from importlib import import_module
-from pathlib import Path
-
-from asgiref.local import Local
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+
+# For backwards compatibility with Django < 3.2
+from django.utils.connection import ConnectionDoesNotExist  # NOQA: F401
+from django.utils.connection import BaseConnectionHandler
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
-DEFAULT_DB_ALIAS = 'default'
-DJANGO_VERSION_PICKLE_KEY = '_django_version'
+DEFAULT_DB_ALIAS = "default"
+DJANGO_VERSION_PICKLE_KEY = "_django_version"
 
 
 class Error(Exception):
@@ -70,15 +71,15 @@ class DatabaseErrorWrapper:
         if exc_type is None:
             return
         for dj_exc_type in (
-                DataError,
-                OperationalError,
-                IntegrityError,
-                InternalError,
-                ProgrammingError,
-                NotSupportedError,
-                DatabaseError,
-                InterfaceError,
-                Error,
+            DataError,
+            OperationalError,
+            IntegrityError,
+            InternalError,
+            ProgrammingError,
+            NotSupportedError,
+            DatabaseError,
+            InterfaceError,
+            Error,
         ):
             db_exc_type = getattr(self.wrapper.Database, dj_exc_type.__name__)
             if issubclass(exc_type, db_exc_type):
@@ -95,6 +96,7 @@ class DatabaseErrorWrapper:
         def inner(*args, **kwargs):
             with self:
                 return func(*args, **kwargs)
+
         return inner
 
 
@@ -104,24 +106,28 @@ def load_backend(backend_name):
     backend name, or raise an error if it doesn't exist.
     """
     # This backend was renamed in Django 1.9.
-    if backend_name == 'django.db.backends.postgresql_psycopg2':
-        backend_name = 'django.db.backends.postgresql'
+    if backend_name == "django.db.backends.postgresql_psycopg2":
+        backend_name = "django.db.backends.postgresql"
 
     try:
-        return import_module('%s.base' % backend_name)
+        return import_module("%s.base" % backend_name)
     except ImportError as e_user:
         # The database backend wasn't found. Display a helpful error message
         # listing all built-in database backends.
-        backend_dir = str(Path(__file__).parent / 'backends')
+        import django.db.backends
+
         builtin_backends = [
-            name for _, name, ispkg in pkgutil.iter_modules([backend_dir])
-            if ispkg and name not in {'base', 'dummy', 'postgresql_psycopg2'}
+            name
+            for _, name, ispkg in pkgutil.iter_modules(django.db.backends.__path__)
+            if ispkg and name not in {"base", "dummy"}
         ]
-        if backend_name not in ['django.db.backends.%s' % b for b in builtin_backends]:
+        if backend_name not in ["django.db.backends.%s" % b for b in builtin_backends]:
             backend_reprs = map(repr, sorted(builtin_backends))
             raise ImproperlyConfigured(
-                "%r isn't an available database backend.\n"
-                "Try using 'django.db.backends.XXX', where XXX is one of:\n"
+                "%r isn't an available database backend or couldn't be "
+                "imported. Check the above exception. To use one of the "
+                "built-in backends, use 'django.db.backends.XXX', where XXX "
+                "is one of:\n"
                 "    %s" % (backend_name, ", ".join(backend_reprs))
             ) from e_user
         else:
@@ -129,112 +135,63 @@ def load_backend(backend_name):
             raise
 
 
-class ConnectionDoesNotExist(Exception):
-    pass
+class ConnectionHandler(BaseConnectionHandler):
+    settings_name = "DATABASES"
+    # Connections needs to still be an actual thread local, as it's truly
+    # thread-critical. Database backends should use @async_unsafe to protect
+    # their code from async contexts, but this will give those contexts
+    # separate connections in case it's needed as well. There's no cleanup
+    # after async contexts, though, so we don't allow that if we can help it.
+    thread_critical = True
 
+    def configure_settings(self, databases):
+        databases = super().configure_settings(databases)
+        if databases == {}:
+            databases[DEFAULT_DB_ALIAS] = {"ENGINE": "django.db.backends.dummy"}
+        elif DEFAULT_DB_ALIAS not in databases:
+            raise ImproperlyConfigured(
+                f"You must define a '{DEFAULT_DB_ALIAS}' database."
+            )
+        elif databases[DEFAULT_DB_ALIAS] == {}:
+            databases[DEFAULT_DB_ALIAS]["ENGINE"] = "django.db.backends.dummy"
 
-class ConnectionHandler:
-    def __init__(self, databases=None):
-        """
-        databases is an optional dictionary of database definitions (structured
-        like settings.DATABASES).
-        """
-        self._databases = databases
-        # Connections needs to still be an actual thread local, as it's truly
-        # thread-critical. Database backends should use @async_unsafe to protect
-        # their code from async contexts, but this will give those contexts
-        # separate connections in case it's needed as well. There's no cleanup
-        # after async contexts, though, so we don't allow that if we can help it.
-        self._connections = Local(thread_critical=True)
+        # Configure default settings.
+        for conn in databases.values():
+            conn.setdefault("ATOMIC_REQUESTS", False)
+            conn.setdefault("AUTOCOMMIT", True)
+            conn.setdefault("ENGINE", "django.db.backends.dummy")
+            if conn["ENGINE"] == "django.db.backends." or not conn["ENGINE"]:
+                conn["ENGINE"] = "django.db.backends.dummy"
+            conn.setdefault("CONN_MAX_AGE", 0)
+            conn.setdefault("CONN_HEALTH_CHECKS", False)
+            conn.setdefault("OPTIONS", {})
+            conn.setdefault("TIME_ZONE", None)
+            for setting in ["NAME", "USER", "PASSWORD", "HOST", "PORT"]:
+                conn.setdefault(setting, "")
 
-    @cached_property
+            test_settings = conn.setdefault("TEST", {})
+            default_test_settings = [
+                ("CHARSET", None),
+                ("COLLATION", None),
+                ("MIGRATE", True),
+                ("MIRROR", None),
+                ("NAME", None),
+            ]
+            for key, value in default_test_settings:
+                test_settings.setdefault(key, value)
+        return databases
+
+    @property
     def databases(self):
-        if self._databases is None:
-            self._databases = settings.DATABASES
-        if self._databases == {}:
-            self._databases = {
-                DEFAULT_DB_ALIAS: {
-                    'ENGINE': 'django.db.backends.dummy',
-                },
-            }
-        if DEFAULT_DB_ALIAS not in self._databases:
-            raise ImproperlyConfigured("You must define a '%s' database." % DEFAULT_DB_ALIAS)
-        if self._databases[DEFAULT_DB_ALIAS] == {}:
-            self._databases[DEFAULT_DB_ALIAS]['ENGINE'] = 'django.db.backends.dummy'
-        return self._databases
+        # Maintained for backward compatibility as some 3rd party packages have
+        # made use of this private API in the past. It is no longer used within
+        # Django itself.
+        return self.settings
 
-    def ensure_defaults(self, alias):
-        """
-        Put the defaults into the settings dictionary for a given connection
-        where no settings is provided.
-        """
-        try:
-            conn = self.databases[alias]
-        except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
-
-        conn.setdefault('ATOMIC_REQUESTS', False)
-        conn.setdefault('AUTOCOMMIT', True)
-        conn.setdefault('ENGINE', 'django.db.backends.dummy')
-        if conn['ENGINE'] == 'django.db.backends.' or not conn['ENGINE']:
-            conn['ENGINE'] = 'django.db.backends.dummy'
-        conn.setdefault('CONN_MAX_AGE', 0)
-        conn.setdefault('OPTIONS', {})
-        conn.setdefault('TIME_ZONE', None)
-        for setting in ['NAME', 'USER', 'PASSWORD', 'HOST', 'PORT']:
-            conn.setdefault(setting, '')
-
-    def prepare_test_settings(self, alias):
-        """
-        Make sure the test settings are available in the 'TEST' sub-dictionary.
-        """
-        try:
-            conn = self.databases[alias]
-        except KeyError:
-            raise ConnectionDoesNotExist("The connection %s doesn't exist" % alias)
-
-        test_settings = conn.setdefault('TEST', {})
-        default_test_settings = [
-            ('CHARSET', None),
-            ('COLLATION', None),
-            ('MIGRATE', True),
-            ('MIRROR', None),
-            ('NAME', None),
-        ]
-        for key, value in default_test_settings:
-            test_settings.setdefault(key, value)
-
-    def __getitem__(self, alias):
-        if hasattr(self._connections, alias):
-            return getattr(self._connections, alias)
-
-        self.ensure_defaults(alias)
-        self.prepare_test_settings(alias)
-        db = self.databases[alias]
-        backend = load_backend(db['ENGINE'])
-        conn = backend.DatabaseWrapper(db, alias)
-        setattr(self._connections, alias, conn)
-        return conn
-
-    def __setitem__(self, key, value):
-        setattr(self._connections, key, value)
-
-    def __delitem__(self, key):
-        delattr(self._connections, key)
-
-    def __iter__(self):
-        return iter(self.databases)
-
-    def all(self):
-        return [self[alias] for alias in self]
-
-    def close_all(self):
-        for alias in self:
-            try:
-                connection = getattr(self._connections, alias)
-            except AttributeError:
-                continue
-            connection.close()
+    def create_connection(self, alias):
+        db = self.settings[alias]
+        backend = load_backend(db["ENGINE"])
+        return backend.DatabaseWrapper(db, alias)
 
 
 class ConnectionRouter:
@@ -270,14 +227,15 @@ class ConnectionRouter:
                     chosen_db = method(model, **hints)
                     if chosen_db:
                         return chosen_db
-            instance = hints.get('instance')
+            instance = hints.get("instance")
             if instance is not None and instance._state.db:
                 return instance._state.db
             return DEFAULT_DB_ALIAS
+
         return _route_db
 
-    db_for_read = _router_func('db_for_read')
-    db_for_write = _router_func('db_for_write')
+    db_for_read = _router_func("db_for_read")
+    db_for_write = _router_func("db_for_write")
 
     def allow_relation(self, obj1, obj2, **hints):
         for router in self.routers:

@@ -2,7 +2,6 @@ from django.template import Template, TemplateDoesNotExist
 
 
 class Loader:
-
     def __init__(self, engine):
         self.engine = engine
 
@@ -17,17 +16,20 @@ class Loader:
 
         for origin in self.get_template_sources(template_name):
             if skip is not None and origin in skip:
-                tried.append((origin, 'Skipped'))
+                tried.append((origin, "Skipped to avoid recursion"))
                 continue
 
             try:
                 contents = self.get_contents(origin)
             except TemplateDoesNotExist:
-                tried.append((origin, 'Source does not exist'))
+                tried.append((origin, "Source does not exist"))
                 continue
             else:
                 return Template(
-                    contents, origin, origin.template_name, self.engine,
+                    contents,
+                    origin,
+                    origin.template_name,
+                    self.engine,
                 )
 
         raise TemplateDoesNotExist(template_name, tried=tried)
@@ -38,7 +40,7 @@ class Loader:
         template name.
         """
         raise NotImplementedError(
-            'subclasses of Loader must provide a get_template_sources() method'
+            "subclasses of Loader must provide a get_template_sources() method"
         )
 
     def reset(self):

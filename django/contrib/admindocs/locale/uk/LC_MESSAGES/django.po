@@ -3,7 +3,8 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
-# Денис Подлесный <haos616@gmail.com>, 2016
+# Denis Podlesniy <haos616@gmail.com>, 2016
+# Illia Volochii <illia.volochii@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2016
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-01-20 00:21+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -110,10 +111,10 @@ msgstr "Будь ласка, встановіть docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"Система адміністраторською документації вимагає Python бібліотеку <a href="
+"Система адміністративної документації вимагає Python-бібліотеку <a href="
 "\"%(link)s\">docutils</a>."
 
 #, python-format
@@ -165,13 +166,13 @@ msgid "Template: %(name)s"
 msgstr "Шаблон: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "Шаблон: «%(name)s»"
+msgid "Template: <q>%(name)s</q>"
+msgstr "Шаблон: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "Шляхи для пошуку шаблону «%(name)s»:"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "Шлях для пошуку шаблону <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(не існує)"

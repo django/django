@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Igor Jerosimić, 2019
+# Igor Jerosimić, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2019-06-27 19:06+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-21 20:47+0000\n"
 "Last-Translator: Igor Jerosimić\n"
 "Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
 "language/sr@latin/)\n"
@@ -27,8 +27,10 @@ msgid "The base GIS field."
 msgstr "Osnovno GIS polje."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Osnovno geometrijsko polje -- mapira na OpenGIS tip specifikacije."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Osnovno geometrijsko polje -- mapira tip geometrije po \"OpenGIS\" "
+"specifikaciji."
 
 msgid "Point"
 msgstr "Tačka"
@@ -52,7 +54,7 @@ msgid "Geometry collection"
 msgstr "Kolekcija geopmetrijskih oblika"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Prošireno zbirno polje"
 
 msgid "Raster Field"
 msgstr "Rastersko polje"
@@ -84,5 +86,5 @@ msgid "No feeds are registered."
 msgstr "Nema registrovanih fidova."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slag „%r“ nije registrovan."
+msgid "Slug %r isn’t registered."
+msgstr "Slag %r nije registrovan."

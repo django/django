@@ -1,36 +1,34 @@
 import enum
+from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
 
-__all__ = ['Choices', 'IntegerChoices', 'TextChoices']
+__all__ = ["Choices", "IntegerChoices", "TextChoices"]
 
 
 class ChoicesMeta(enum.EnumMeta):
     """A metaclass for creating a enum choices."""
 
-    def __new__(metacls, classname, bases, classdict):
+    def __new__(metacls, classname, bases, classdict, **kwds):
         labels = []
         for key in classdict._member_names:
             value = classdict[key]
             if (
-                isinstance(value, (list, tuple)) and
-                len(value) > 1 and
-                isinstance(value[-1], (Promise, str))
+                isinstance(value, (list, tuple))
+                and len(value) > 1
+                and isinstance(value[-1], (Promise, str))
             ):
                 *value, label = value
                 value = tuple(value)
             else:
-                label = key.replace('_', ' ').title()
+                label = key.replace("_", " ").title()
             labels.append(label)
             # Use dict.__setitem__() to suppress defenses against double
             # assignment in enum's classdict.
             dict.__setitem__(classdict, key, value)
-        cls = super().__new__(metacls, classname, bases, classdict)
-        cls._value2label_map_ = dict(zip(cls._value2member_map_, labels))
-        # Add a label property to instances of enum which uses the enum member
-        # that is passed in as "self" as the value to use when looking up the
-        # label in the choices.
-        cls.label = property(lambda self: cls._value2label_map_.get(self.value))
+        cls = super().__new__(metacls, classname, bases, classdict, **kwds)
+        for member, label in zip(cls.__members__.values(), labels):
+            member._label_ = label
         return enum.unique(cls)
 
     def __contains__(cls, member):
@@ -41,12 +39,12 @@ class ChoicesMeta(enum.EnumMeta):
 
     @property
     def names(cls):
-        empty = ['__empty__'] if hasattr(cls, '__empty__') else []
+        empty = ["__empty__"] if hasattr(cls, "__empty__") else []
         return empty + [member.name for member in cls]
 
     @property
     def choices(cls):
-        empty = [(None, cls.__empty__)] if hasattr(cls, '__empty__') else []
+        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         return empty + [(member.value, member.label) for member in cls]
 
     @property
@@ -61,6 +59,14 @@ class ChoicesMeta(enum.EnumMeta):
 class Choices(enum.Enum, metaclass=ChoicesMeta):
     """Class for creating enumerated choices."""
 
+    @DynamicClassAttribute
+    def label(self):
+        return self._label_
+
+    @property
+    def do_not_call_in_templates(self):
+        return True
+
     def __str__(self):
         """
         Use value when cast to str, so that Choices set as model instance
@@ -68,9 +74,14 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
         """
         return str(self.value)
 
+    # A similar format was proposed for Python 3.10.
+    def __repr__(self):
+        return f"{self.__class__.__qualname__}.{self._name_}"
+
 
 class IntegerChoices(int, Choices):
     """Class for creating enumerated integer choices."""
+
     pass
 
 

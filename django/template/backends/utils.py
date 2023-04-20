@@ -7,7 +7,8 @@ from django.utils.safestring import SafeString
 def csrf_input(request):
     return format_html(
         '<input type="hidden" name="csrfmiddlewaretoken" value="{}">',
-        get_token(request))
+        get_token(request),
+    )
 
 
 csrf_input_lazy = lazy(csrf_input, SafeString, str)

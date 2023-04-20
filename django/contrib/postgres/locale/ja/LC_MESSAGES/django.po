@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Shinya Okano <tokibito@gmail.com>, 2015-2018
+# Shinya Okano <tokibito@gmail.com>, 2015-2018,2023
+# Takuya N <takninnovationresearch@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-23 03:28+0000\n"
-"Last-Translator: Shinya Okano <tokibito@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2015-2018,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -31,24 +32,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "文字列と文字列/NULLのマップ"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" の値は文字列または NULL ではありません。"
-
-msgid "A JSON object"
-msgstr "JSONオブジェクト"
-
-msgid "Value must be valid JSON."
-msgstr "JSONとして正しい値にしてください。"
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "“%(key)s” の値は文字列または NULL ではありません。"
 
 msgid "Could not load JSON data."
 msgstr "JSONデータを読み込めませんでした。"
 
 msgid "Input must be a JSON dictionary."
 msgstr "JSON辞書を入力しなければなりません。"
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' は正しいJSONにしなければなりません。"
 
 msgid "Enter two valid values."
 msgstr "2つの値を正しく入力してください。"
@@ -100,11 +91,10 @@ msgstr "いくつかの不明なキーがあります: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "この範囲が完全に%(limit_value)s以下であることを確認してください。"
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "範囲の上限が%(limit_value)sを超えないようにしてください。"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "この範囲が完全に%(limit_value)s以上であることを確認してください。"
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "範囲の下限が%(limit_value)sより小さくならないようにしてください。"

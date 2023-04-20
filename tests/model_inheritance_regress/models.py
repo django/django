@@ -8,34 +8,24 @@ class Place(models.Model):
     address = models.CharField(max_length=80)
 
     class Meta:
-        ordering = ('name',)
-
-    def __str__(self):
-        return "%s the place" % self.name
+        ordering = ("name",)
 
 
 class Restaurant(Place):
     serves_hot_dogs = models.BooleanField(default=False)
     serves_pizza = models.BooleanField(default=False)
 
-    def __str__(self):
-        return "%s the restaurant" % self.name
-
 
 class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
-    def __str__(self):
-        return "%s the italian restaurant" % self.name
-
 
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
-    parent = models.OneToOneField(Place, models.CASCADE, primary_key=True, parent_link=True)
+    parent = models.OneToOneField(
+        Place, models.CASCADE, primary_key=True, parent_link=True
+    )
     capacity = models.IntegerField()
-
-    def __str__(self):
-        return "%s the parking lot" % self.name
 
 
 class ParkingLot3(Place):
@@ -64,12 +54,11 @@ class Supplier(models.Model):
     name = models.CharField(max_length=50)
     restaurant = models.ForeignKey(Restaurant, models.CASCADE)
 
-    def __str__(self):
-        return self.name
-
 
 class Wholesaler(Supplier):
-    retailer = models.ForeignKey(Supplier, models.CASCADE, related_name='wholesale_supplier')
+    retailer = models.ForeignKey(
+        Supplier, models.CASCADE, related_name="wholesale_supplier"
+    )
 
 
 class Parent(models.Model):
@@ -82,7 +71,7 @@ class Child(Parent):
 
 class SelfRefParent(models.Model):
     parent_data = models.IntegerField()
-    self_data = models.ForeignKey('self', models.SET_NULL, null=True)
+    self_data = models.ForeignKey("self", models.SET_NULL, null=True)
 
 
 class SelfRefChild(SelfRefParent):
@@ -94,10 +83,7 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
 
     class Meta:
-        ordering = ('-pub_date', 'headline')
-
-    def __str__(self):
-        return self.headline
+        ordering = ("-pub_date", "headline")
 
 
 class ArticleWithAuthor(Article):
@@ -126,17 +112,10 @@ class QualityControl(Evaluation):
 class BaseM(models.Model):
     base_name = models.CharField(max_length=100)
 
-    def __str__(self):
-        return self.base_name
-
 
 class DerivedM(BaseM):
     customPK = models.IntegerField(primary_key=True)
     derived_name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return "PK = %d, base_name = %s, derived_name = %s" % (
-            self.customPK, self.base_name, self.derived_name)
 
 
 class AuditBase(models.Model):
@@ -144,7 +123,7 @@ class AuditBase(models.Model):
 
     class Meta:
         abstract = True
-        verbose_name_plural = 'Audits'
+        verbose_name_plural = "Audits"
 
 
 class CertificationAudit(AuditBase):
@@ -161,10 +140,7 @@ class Person(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
+        ordering = ("name",)
 
 
 class AbstractEvent(models.Model):
@@ -173,10 +149,7 @@ class AbstractEvent(models.Model):
 
     class Meta:
         abstract = True
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
+        ordering = ("name",)
 
 
 class BirthdayParty(AbstractEvent):

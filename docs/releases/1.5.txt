@@ -155,7 +155,9 @@ Caching of related model instances
 ----------------------------------
 
 When traversing relations, the ORM will avoid re-fetching objects that were
-previously loaded. For example, with the tutorial's models::
+previously loaded. For example, with the tutorial's models:
+
+.. code-block:: pycon
 
     >>> first_poll = Poll.objects.all()[0]
     >>> first_choice = first_poll.choice_set.all()[0]
@@ -263,7 +265,7 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :djadmin:`dumpdata` management command outputs one row at a time,
   preventing out-of-memory errors when dumping large datasets.
 
-* In the localflavor for Canada, "pq" was added to the acceptable codes for
+* In the localflavor for Canada, ``pq`` was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
 * The :ref:`receiver <connecting-receiver-functions>` decorator is now able to
@@ -304,9 +306,9 @@ Django 1.5 also includes several smaller improvements worth noting:
 
 * It's not required any more to have ``404.html`` and ``500.html`` templates in
   the root templates directory. Django will output some basic error messages for
-  both situations when those templates are not found. Of course, it's still
-  recommended as good practice to provide those templates in order to present
-  pretty error pages to the user.
+  both situations when those templates are not found. It's still recommended as
+  good practice to provide those templates in order to present pretty error
+  pages to the user.
 
 * :mod:`django.contrib.auth` provides a new signal that is emitted
   whenever a user fails to login successfully. See
@@ -403,7 +405,9 @@ Context in year and month archive class-based views
 provide a ``date_list`` sorted in ascending order in the context, like their
 function-based predecessors, but it actually was in descending order. In 1.5,
 the documented order was restored. You may want to add (or remove) the
-``reversed`` keyword when you're iterating on ``date_list`` in a template::
+``reversed`` keyword when you're iterating on ``date_list`` in a template:
+
+.. code-block:: html+django
 
     {% for date in date_list reversed %}
 
@@ -424,11 +428,11 @@ Non-form data in HTTP requests
 :attr:`request.POST <django.http.HttpRequest.POST>` will no longer include data
 posted via HTTP requests with non form-specific content-types in the header.
 In prior versions, data posted with content-types other than
-``multipart/form-data`` or ``application/x-www-form-urlencoded`` would still
-end up represented in the :attr:`request.POST <django.http.HttpRequest.POST>`
-attribute. Developers wishing to access the raw POST data for these cases,
-should use the :attr:`request.body <django.http.HttpRequest.body>` attribute
-instead.
+:mimetype:`multipart/form-data` or
+:mimetype:`application/x-www-form-urlencoded` would still end up represented in
+the :attr:`request.POST <django.http.HttpRequest.POST>` attribute. Developers
+wishing to access the raw POST data for these cases, should use the
+:attr:`request.body <django.http.HttpRequest.body>` attribute instead.
 
 :data:`~django.core.signals.request_finished` signal
 ----------------------------------------------------
@@ -485,10 +489,10 @@ in some circumstances.
 JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
-- A system version of ``simplejson``, if one was available (ie. ``import
+- A system version of ``simplejson``, if one was available (i.e. ``import
   simplejson`` works), if it was more recent than Django's built-in copy or it
   had the C speedups, or
-- The :mod:`json` module from the standard library, if it was available (ie.
+- The :mod:`json` module from the standard library, if it was available (i.e.
   Python 2.6 or greater), or
 - A built-in copy of version 2.0.7 of ``simplejson``.
 
@@ -499,7 +503,7 @@ There are no known incompatibilities between Django's copy of version 2.0.7 and
 Python's copy of version 2.0.9. However, there are some incompatibilities
 between other versions of ``simplejson``:
 
-- While the ``simplejson`` API is documented as always returning unicode
+- While the ``simplejson`` API is documented as always returning Unicode
   strings, the optional C implementation can return a bytestring. This was
   fixed in Python 2.7.
 - ``simplejson.JSONEncoder`` gained a ``namedtuple_as_object`` keyword
@@ -615,8 +619,8 @@ database state behind or unit tests that rely on some form of state being
 preserved after the execution of other tests. Such tests are already very
 fragile, and must now be changed to be able to run independently.
 
-`cleaned_data` dictionary kept for invalid forms
-------------------------------------------------
+``cleaned_data`` dictionary kept for invalid forms
+--------------------------------------------------
 
 The :attr:`~django.forms.Form.cleaned_data` dictionary is now always present
 after form validation. When the form doesn't validate, it contains only the

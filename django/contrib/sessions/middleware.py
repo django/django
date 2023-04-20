@@ -3,15 +3,15 @@ from importlib import import_module
 
 from django.conf import settings
 from django.contrib.sessions.backends.base import UpdateError
-from django.core.exceptions import SuspiciousOperation
+from django.contrib.sessions.exceptions import SessionInterrupted
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
 
 
 class SessionMiddleware(MiddlewareMixin):
-    def __init__(self, get_response=None):
-        self.get_response = get_response
+    def __init__(self, get_response):
+        super().__init__(get_response)
         engine = import_module(settings.SESSION_ENGINE)
         self.SessionStore = engine.SessionStore
 
@@ -38,11 +38,12 @@ class SessionMiddleware(MiddlewareMixin):
                 settings.SESSION_COOKIE_NAME,
                 path=settings.SESSION_COOKIE_PATH,
                 domain=settings.SESSION_COOKIE_DOMAIN,
+                samesite=settings.SESSION_COOKIE_SAMESITE,
             )
-            patch_vary_headers(response, ('Cookie',))
+            patch_vary_headers(response, ("Cookie",))
         else:
             if accessed:
-                patch_vary_headers(response, ('Cookie',))
+                patch_vary_headers(response, ("Cookie",))
             if (modified or settings.SESSION_SAVE_EVERY_REQUEST) and not empty:
                 if request.session.get_expire_at_browser_close():
                     max_age = None
@@ -52,20 +53,22 @@ class SessionMiddleware(MiddlewareMixin):
                     expires_time = time.time() + max_age
                     expires = http_date(expires_time)
                 # Save the session data and refresh the client cookie.
-                # Skip session save for 500 responses, refs #3881.
-                if response.status_code != 500:
+                # Skip session save for 5xx responses.
+                if response.status_code < 500:
                     try:
                         request.session.save()
                     except UpdateError:
-                        raise SuspiciousOperation(
+                        raise SessionInterrupted(
                             "The request's session was deleted before the "
                             "request completed. The user may have logged "
                             "out in a concurrent request, for example."
                         )
                     response.set_cookie(
                         settings.SESSION_COOKIE_NAME,
-                        request.session.session_key, max_age=max_age,
-                        expires=expires, domain=settings.SESSION_COOKIE_DOMAIN,
+                        request.session.session_key,
+                        max_age=max_age,
+                        expires=expires,
+                        domain=settings.SESSION_COOKIE_DOMAIN,
                         path=settings.SESSION_COOKIE_PATH,
                         secure=settings.SESSION_COOKIE_SECURE or None,
                         httponly=settings.SESSION_COOKIE_HTTPONLY or None,

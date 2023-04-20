@@ -3,17 +3,18 @@
 # Translators:
 # Oleksandr Chernihov <o.chernihov@gmail.com>, 2014
 # Boryslav Larin <brabadu@gmail.com>, 2011
-# Денис Подлесный <haos616@gmail.com>, 2016
+# Denis Podlesniy <haos616@gmail.com>, 2016
+# Illia Volochii <illia.volochii@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
-# panasoft <cc072aa3@opayq.com>, 2016
+# Panasoft, 2016
 # Sergey Lysach <sergikoff88@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Денис Подлесный <haos616@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-10-21 18:50+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -92,20 +93,16 @@ msgstr ""
 "незбережені зміни буде втрачено."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Ви обрали дію, але не зберегли зміни в окремих полях. Будь ласка, натисніть "
-"ОК, щоб зберегти. Вам доведеться повторно запустити дію."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Ви обрали дію і не зробили жодних змін у полях. Ви, напевно, шукаєте кнопку "
-"\"Виконати\", а не \"Зберегти\"."
 
 msgid "Now"
 msgstr "Зараз"
@@ -194,6 +191,54 @@ msgstr "листопада"
 
 msgid "December"
 msgstr "грудня"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Січ."
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Лют."
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Берез."
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Квіт."
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Трав."
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Черв."
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Лип."
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Серп."
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Верес."
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Жовт."
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Листоп."
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Груд."
 
 msgctxt "one letter Sunday"
 msgid "S"

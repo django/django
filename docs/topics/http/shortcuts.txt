@@ -64,22 +64,29 @@ MIME type :mimetype:`application/xhtml+xml`::
 
     from django.shortcuts import render
 
+
     def my_view(request):
         # View code here...
-        return render(request, 'myapp/index.html', {
-            'foo': 'bar',
-        }, content_type='application/xhtml+xml')
+        return render(
+            request,
+            "myapp/index.html",
+            {
+                "foo": "bar",
+            },
+            content_type="application/xhtml+xml",
+        )
 
 This example is equivalent to::
 
     from django.http import HttpResponse
     from django.template import loader
 
+
     def my_view(request):
         # View code here...
-        t = loader.get_template('myapp/index.html')
-        c = {'foo': 'bar'}
-        return HttpResponse(t.render(c, request), content_type='application/xhtml+xml')
+        t = loader.get_template("myapp/index.html")
+        c = {"foo": "bar"}
+        return HttpResponse(t.render(c, request), content_type="application/xhtml+xml")
 
 ``redirect()``
 ==============
@@ -114,6 +121,7 @@ You can use the :func:`redirect` function in a number of ways.
 
         from django.shortcuts import redirect
 
+
         def my_view(request):
             ...
             obj = MyModel.objects.get(...)
@@ -125,19 +133,21 @@ You can use the :func:`redirect` function in a number of ways.
 
         def my_view(request):
             ...
-            return redirect('some-view-name', foo='bar')
+            return redirect("some-view-name", foo="bar")
 
-#. By passing a hardcoded URL to redirect to::
-
-        def my_view(request):
-            ...
-            return redirect('/some/url/')
-
-   This also works with full URLs::
+#. By passing a hardcoded URL to redirect to:
+   ::
 
         def my_view(request):
             ...
-            return redirect('https://example.com/')
+            return redirect("/some/url/")
+
+   This also works with full URLs:
+   ::
+
+        def my_view(request):
+            ...
+            return redirect("https://example.com/")
 
 By default, :func:`redirect` returns a temporary redirect. All of the above
 forms accept a ``permanent`` argument; if set to ``True`` a permanent redirect
@@ -157,14 +167,17 @@ will be returned::
    but it raises :class:`~django.http.Http404` instead of the model's
    :class:`~django.db.models.Model.DoesNotExist` exception.
 
-Required arguments
-------------------
+Arguments
+---------
 
 ``klass``
     A :class:`~django.db.models.Model` class,
     a :class:`~django.db.models.Manager`,
     or a :class:`~django.db.models.query.QuerySet` instance from which to get
     the object.
+
+``*args``
+    :class:`Q objects <django.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -178,12 +191,14 @@ The following example gets the object with the primary key of 1 from
 
     from django.shortcuts import get_object_or_404
 
+
     def my_view(request):
         obj = get_object_or_404(MyModel, pk=1)
 
 This example is equivalent to::
 
     from django.http import Http404
+
 
     def my_view(request):
         try:
@@ -195,12 +210,12 @@ The most common use case is to pass a :class:`~django.db.models.Model`, as
 shown above. However, you can also pass a
 :class:`~django.db.models.query.QuerySet` instance::
 
-    queryset = Book.objects.filter(title__startswith='M')
+    queryset = Book.objects.filter(title__startswith="M")
     get_object_or_404(queryset, pk=1)
 
 The above example is a bit contrived since it's equivalent to doing::
 
-    get_object_or_404(Book, title__startswith='M', pk=1)
+    get_object_or_404(Book, title__startswith="M", pk=1)
 
 but it can be useful if you are passed the ``queryset`` variable from somewhere
 else.
@@ -209,13 +224,13 @@ Finally, you can also use a :class:`~django.db.models.Manager`. This is useful
 for example if you have a
 :ref:`custom manager<custom-managers>`::
 
-    get_object_or_404(Book.dahl_objects, title='Matilda')
+    get_object_or_404(Book.dahl_objects, title="Matilda")
 
 You can also use
 :class:`related managers<django.db.models.fields.related.RelatedManager>`::
 
-    author = Author.objects.get(name='Roald Dahl')
-    get_object_or_404(author.book_set, title='Matilda')
+    author = Author.objects.get(name="Roald Dahl")
+    get_object_or_404(author.book_set, title="Matilda")
 
 Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
@@ -230,13 +245,16 @@ will be raised if more than one object is found.
    given model manager cast to a list, raising :class:`~django.http.Http404` if
    the resulting list is empty.
 
-Required arguments
-------------------
+Arguments
+---------
 
 ``klass``
     A :class:`~django.db.models.Model`, :class:`~django.db.models.Manager` or
     :class:`~django.db.models.query.QuerySet` instance from which to get the
     list.
+
+``*args``
+    :class:`Q objects <django.db.models.Q>`.
 
 ``**kwargs``
     Lookup parameters, which should be in the format accepted by ``get()`` and
@@ -249,12 +267,14 @@ The following example gets all published objects from ``MyModel``::
 
     from django.shortcuts import get_list_or_404
 
+
     def my_view(request):
         my_objects = get_list_or_404(MyModel, published=True)
 
 This example is equivalent to::
 
     from django.http import Http404
+
 
     def my_view(request):
         my_objects = list(MyModel.objects.filter(published=True))

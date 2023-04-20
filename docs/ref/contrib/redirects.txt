@@ -74,6 +74,26 @@ Via the Python API
     Redirects are represented by a standard :doc:`Django model </topics/db/models>`,
     which lives in :source:`django/contrib/redirects/models.py`. You can access
     redirect objects via the :doc:`Django database API </topics/db/queries>`.
+    For example:
+
+    .. code-block:: pycon
+
+        >>> from django.conf import settings
+        >>> from django.contrib.redirects.models import Redirect
+        >>> # Add a new redirect.
+        >>> redirect = Redirect.objects.create(
+        ...     site_id=1,
+        ...     old_path="/contact-us/",
+        ...     new_path="/contact/",
+        ... )
+        >>> # Change a redirect.
+        >>> redirect.new_path = "/contact-details/"
+        >>> redirect.save()
+        >>> redirect
+        <Redirect: /contact-us/ ---> /contact-details/>
+        >>> # Delete a redirect.
+        >>> Redirect.objects.filter(site_id=1, old_path="/contact-us/").delete()
+        (1, {'redirects.Redirect': 1})
 
 Middleware
 ==========

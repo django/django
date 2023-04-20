@@ -4,14 +4,16 @@
 # eallik <eallik@gmail.com>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin <martinpajuste@gmail.com>, 2021
+# Martin <martinpajuste@gmail.com>, 2016,2020
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: Martin Pajuste <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-03-22 11:55+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -86,20 +88,35 @@ msgstr ""
 "toimingu, lähevad salvestamata muudatused kaotsi."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Valisid toimingu, kuid pole salvestanud muudatusi lahtrites. Salvestamiseks "
-"palun vajuta OK. Pead toimingu uuesti käivitama."
+"Valisite toimingu, kuid pole salvestanud muudatusi lahtrites. Salvestamiseks "
+"palun vajutage OK. Peate toimingu uuesti käivitama."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Valisid toimingu, kuid sa pole ühtegi lahtrit muutnud. Tõenäoliselt peaksid "
-"vajutama 'Mine' mitte 'Salvesta' nuppu."
+"Valisite toimingu, kuid ei muutnud ühtegi lahtrit. Tõenäoliselt otsite Mine "
+"mitte Salvesta nuppu."
+
+msgid "Now"
+msgstr "Praegu"
+
+msgid "Midnight"
+msgstr "Kesköö"
+
+msgid "6 a.m."
+msgstr "6 hommikul"
+
+msgid "Noon"
+msgstr "Keskpäev"
+
+msgid "6 p.m."
+msgstr "6 õhtul"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -113,26 +130,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Märkus: Olete %s tund serveri ajast maas."
 msgstr[1] "Märkus: Olete %s tundi serveri ajast maas."
 
-msgid "Now"
-msgstr "Praegu"
-
 msgid "Choose a Time"
 msgstr "Vali aeg"
 
 msgid "Choose a time"
 msgstr "Vali aeg"
-
-msgid "Midnight"
-msgstr "Kesköö"
-
-msgid "6 a.m."
-msgstr "6 hommikul"
-
-msgid "Noon"
-msgstr "Keskpäev"
-
-msgid "6 p.m."
-msgstr "6 õhtul"
 
 msgid "Cancel"
 msgstr "Tühista"
@@ -184,6 +186,54 @@ msgstr "november"
 
 msgid "December"
 msgstr "detsember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jaan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "veebr"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "märts"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "juuni"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "juuli"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "sept"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dets"
 
 msgctxt "one letter Sunday"
 msgid "S"

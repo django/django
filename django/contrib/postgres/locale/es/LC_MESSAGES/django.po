@@ -2,18 +2,19 @@
 #
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2015,2017
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 # Ignacio José Lizarán Rus <ilizaran@gmail.com>, 2019
 # Igor Támara <igor@tamarapatino.org>, 2015
 # Pablo, 2015
+# Uriel Medina <urimeba511@gmail.com>, 2020,2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2019-02-19 08:46+0000\n"
-"Last-Translator: Ignacio José Lizarán Rus <ilizaran@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020,2023\n"
 "Language-Team: Spanish (http://www.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
@@ -36,24 +37,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Mapa de cadenas a cadenas/nulos"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "El valor de \"%(key)s\" no es ni una cadena ni un nulo"
-
-msgid "A JSON object"
-msgstr "Un objeto JSON"
-
-msgid "Value must be valid JSON."
-msgstr "El valor debe ser un JSON válido."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "El valor de “%(key)s” no es una cadena ni es nulo."
 
 msgid "Could not load JSON data."
 msgstr "No se pududieron cargar los datos JSON."
 
 msgid "Input must be a JSON dictionary."
 msgstr "La entrada debe ser un diccionario JSON"
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "El valor \"%(value)s\" debe ser un JSON válido."
 
 msgid "Enter two valid values."
 msgstr "Introduzca dos valores válidos."
@@ -86,6 +77,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La lista contiene %(show_value)d elementos, no debería contener más de "
 "%(limit_value)d."
+msgstr[2] ""
+"La lista contiene %(show_value)d elementos, no debería contener más de "
+"%(limit_value)d."
 
 #, python-format
 msgid ""
@@ -100,6 +94,9 @@ msgstr[0] ""
 msgstr[1] ""
 "La lista contiene %(show_value)d elementos, no debería contener menos de "
 "%(limit_value)d."
+msgstr[2] ""
+"La lista contiene %(show_value)d elementos, no debería contener menos de "
+"%(limit_value)d."
 
 #, python-format
 msgid "Some keys were missing: %(keys)s"
@@ -111,13 +108,14 @@ msgstr "Se facilitaron algunas claves desconocidas: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Asegúrese de que este rango es menor o igual que %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr ""
+"Asegúrese de que el límite superior del rango no sea mayor que "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
 msgstr ""
-"Asegúrese de que este rango es efectivamente mayor o igual que "
+"Asegúrese de que el límite inferior del rango no sea inferior a "
 "%(limit_value)s."

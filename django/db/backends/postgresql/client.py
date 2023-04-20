@@ -1,54 +1,64 @@
-import os
 import signal
-import subprocess
 
 from django.db.backends.base.client import BaseDatabaseClient
 
 
 class DatabaseClient(BaseDatabaseClient):
-    executable_name = 'psql'
+    executable_name = "psql"
 
     @classmethod
-    def runshell_db(cls, conn_params):
+    def settings_to_cmd_args_env(cls, settings_dict, parameters):
         args = [cls.executable_name]
+        options = settings_dict.get("OPTIONS", {})
 
-        host = conn_params.get('host', '')
-        port = conn_params.get('port', '')
-        dbname = conn_params.get('database', '')
-        user = conn_params.get('user', '')
-        passwd = conn_params.get('password', '')
-        sslmode = conn_params.get('sslmode', '')
-        sslrootcert = conn_params.get('sslrootcert', '')
-        sslcert = conn_params.get('sslcert', '')
-        sslkey = conn_params.get('sslkey', '')
+        host = settings_dict.get("HOST")
+        port = settings_dict.get("PORT")
+        dbname = settings_dict.get("NAME")
+        user = settings_dict.get("USER")
+        passwd = settings_dict.get("PASSWORD")
+        passfile = options.get("passfile")
+        service = options.get("service")
+        sslmode = options.get("sslmode")
+        sslrootcert = options.get("sslrootcert")
+        sslcert = options.get("sslcert")
+        sslkey = options.get("sslkey")
 
+        if not dbname and not service:
+            # Connect to the default 'postgres' db.
+            dbname = "postgres"
         if user:
-            args += ['-U', user]
+            args += ["-U", user]
         if host:
-            args += ['-h', host]
+            args += ["-h", host]
         if port:
-            args += ['-p', str(port)]
-        args += [dbname]
+            args += ["-p", str(port)]
+        args.extend(parameters)
+        if dbname:
+            args += [dbname]
 
-        sigint_handler = signal.getsignal(signal.SIGINT)
-        subprocess_env = os.environ.copy()
+        env = {}
         if passwd:
-            subprocess_env['PGPASSWORD'] = str(passwd)
+            env["PGPASSWORD"] = str(passwd)
+        if service:
+            env["PGSERVICE"] = str(service)
         if sslmode:
-            subprocess_env['PGSSLMODE'] = str(sslmode)
+            env["PGSSLMODE"] = str(sslmode)
         if sslrootcert:
-            subprocess_env['PGSSLROOTCERT'] = str(sslrootcert)
+            env["PGSSLROOTCERT"] = str(sslrootcert)
         if sslcert:
-            subprocess_env['PGSSLCERT'] = str(sslcert)
+            env["PGSSLCERT"] = str(sslcert)
         if sslkey:
-            subprocess_env['PGSSLKEY'] = str(sslkey)
+            env["PGSSLKEY"] = str(sslkey)
+        if passfile:
+            env["PGPASSFILE"] = str(passfile)
+        return args, (env or None)
+
+    def runshell(self, parameters):
+        sigint_handler = signal.getsignal(signal.SIGINT)
         try:
             # Allow SIGINT to pass to psql to abort queries.
             signal.signal(signal.SIGINT, signal.SIG_IGN)
-            subprocess.run(args, check=True, env=subprocess_env)
+            super().runshell(parameters)
         finally:
             # Restore the original SIGINT handler.
             signal.signal(signal.SIGINT, sigint_handler)
-
-    def runshell(self):
-        DatabaseClient.runshell_db(self.connection.get_connection_params())

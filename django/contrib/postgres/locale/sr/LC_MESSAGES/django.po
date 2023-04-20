@@ -2,21 +2,22 @@
 #
 # Translators:
 # Branko Kokanovic <branko@kokanovic.org>, 2018
+# Igor Jerosimić, 2020,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-07-04 19:55+0000\n"
-"Last-Translator: Branko Kokanovic <branko@kokanovic.org>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Igor Jerosimić, 2020,2023\n"
 "Language-Team: Serbian (http://www.transifex.com/django/django/language/"
 "sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sr\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "PostgreSQL extensions"
 msgstr "PostgreSQL екстензије"
@@ -32,24 +33,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Мапа знаковних ниски на знаковне ниске/null-ове"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Вредност кључа \"%(key)s\" није знаковна ниска или null."
-
-msgid "A JSON object"
-msgstr "JSON објекат"
-
-msgid "Value must be valid JSON."
-msgstr "Вредност мора бити исправни JSON."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Вредност “%(key)s” није знаковни низ или null."
 
 msgid "Could not load JSON data."
 msgstr "Не могу да учитам JSON податке."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Улазна вредност мора бити JSON dict."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' вредност мора бити исправни JSON."
 
 msgid "Enter two valid values."
 msgstr "Унесите две исправне вредности."
@@ -113,11 +104,10 @@ msgstr "Дати су неки непознати кључеви: %(keys)s"
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr "Овај опсег мора бити укупно мањи или једнак %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "Осигурајте да горња граница опсега није већа од %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr "Овај опсег мора бити укупно већи или једнак %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "Осигурајте да доња граница опсега није мања од %(limit_value)s."

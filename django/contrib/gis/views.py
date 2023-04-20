@@ -7,14 +7,16 @@ def feed(request, url, feed_dict=None):
     if not feed_dict:
         raise Http404(_("No feeds are registered."))
 
-    slug = url.partition('/')[0]
+    slug = url.partition("/")[0]
     try:
         f = feed_dict[slug]
     except KeyError:
-        raise Http404(_('Slug %r isn’t registered.') % slug)
+        raise Http404(_("Slug %r isn’t registered.") % slug)
 
     instance = f()
-    instance.feed_url = getattr(f, 'feed_url', None) or request.path
-    instance.title_template = f.title_template or ('feeds/%s_title.html' % slug)
-    instance.description_template = f.description_template or ('feeds/%s_description.html' % slug)
+    instance.feed_url = getattr(f, "feed_url", None) or request.path
+    instance.title_template = f.title_template or ("feeds/%s_title.html" % slug)
+    instance.description_template = f.description_template or (
+        "feeds/%s_description.html" % slug
+    )
     return instance(request)

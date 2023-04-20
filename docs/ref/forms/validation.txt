@@ -120,22 +120,22 @@ following guidelines:
 * Provide a descriptive error ``code`` to the constructor::
 
       # Good
-      ValidationError(_('Invalid value'), code='invalid')
+      ValidationError(_("Invalid value"), code="invalid")
 
       # Bad
-      ValidationError(_('Invalid value'))
+      ValidationError(_("Invalid value"))
 
 * Don't coerce variables into the message; use placeholders and the ``params``
   argument of the constructor::
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
-          params={'value': '42'},
+          _("Invalid value: %(value)s"),
+          params={"value": "42"},
       )
 
       # Bad
-      ValidationError(_('Invalid value: %s') % value)
+      ValidationError(_("Invalid value: %s") % value)
 
 * Use mapping keys instead of positional formatting. This enables putting
   the variables in any order or omitting them altogether when rewriting the
@@ -143,30 +143,30 @@ following guidelines:
 
       # Good
       ValidationError(
-          _('Invalid value: %(value)s'),
-          params={'value': '42'},
+          _("Invalid value: %(value)s"),
+          params={"value": "42"},
       )
 
       # Bad
       ValidationError(
-          _('Invalid value: %s'),
-          params=('42',),
+          _("Invalid value: %s"),
+          params=("42",),
       )
 
 * Wrap the message with ``gettext`` to enable translation::
 
       # Good
-      ValidationError(_('Invalid value'))
+      ValidationError(_("Invalid value"))
 
       # Bad
-      ValidationError('Invalid value')
+      ValidationError("Invalid value")
 
 Putting it all together::
 
     raise ValidationError(
-        _('Invalid value: %(value)s'),
-        code='invalid',
-        params={'value': '42'},
+        _("Invalid value: %(value)s"),
+        code="invalid",
+        params={"value": "42"},
     )
 
 Following these guidelines is particularly necessary if you write reusable
@@ -176,7 +176,7 @@ While not recommended, if you are at the end of the validation chain
 (i.e. your form ``clean()`` method) and you know you will *never* need
 to override your error message you can still opt for the less verbose::
 
-    ValidationError(_('Invalid value: %s') % value)
+    ValidationError(_("Invalid value: %s") % value)
 
 The :meth:`Form.errors.as_data() <django.forms.Form.errors.as_data()>` and
 :meth:`Form.errors.as_json() <django.forms.Form.errors.as_json()>` methods
@@ -194,16 +194,20 @@ As above, it is recommended to pass a list of ``ValidationError`` instances
 with ``code``\s and ``params`` but a list of strings will also work::
 
     # Good
-    raise ValidationError([
-        ValidationError(_('Error 1'), code='error1'),
-        ValidationError(_('Error 2'), code='error2'),
-    ])
+    raise ValidationError(
+        [
+            ValidationError(_("Error 1"), code="error1"),
+            ValidationError(_("Error 2"), code="error2"),
+        ]
+    )
 
     # Bad
-    raise ValidationError([
-        _('Error 1'),
-        _('Error 2'),
-    ])
+    raise ValidationError(
+        [
+            _("Error 1"),
+            _("Error 2"),
+        ]
+    )
 
 Using validation in practice
 ============================
@@ -231,6 +235,7 @@ at Django's ``SlugField``::
 
     from django.core import validators
     from django.forms import CharField
+
 
     class SlugField(CharField):
         default_validators = [validators.validate_slug]
@@ -262,13 +267,14 @@ containing comma-separated email addresses. The full class looks like this::
     from django import forms
     from django.core.validators import validate_email
 
+
     class MultiEmailField(forms.Field):
         def to_python(self, value):
             """Normalize data to a list of strings."""
             # Return an empty list if no input was given.
             if not value:
                 return []
-            return value.split(',')
+            return value.split(",")
 
         def validate(self, value):
             """Check if value consists only of valid emails."""
@@ -305,15 +311,17 @@ don't want to put it into the general ``MultiEmailField`` class. Instead, we
 write a cleaning method that operates on the ``recipients`` field, like so::
 
     from django import forms
+    from django.core.exceptions import ValidationError
+
 
     class ContactForm(forms.Form):
         # Everything as before.
         ...
 
         def clean_recipients(self):
-            data = self.cleaned_data['recipients']
+            data = self.cleaned_data["recipients"]
             if "fred@example.com" not in data:
-                raise forms.ValidationError("You have forgotten about Fred!")
+                raise ValidationError("You have forgotten about Fred!")
 
             # Always return a value to use as the new cleaned data, even if
             # this method didn't change it.
@@ -346,6 +354,8 @@ an error, you can raise a ``ValidationError`` from the ``clean()`` method. For
 example::
 
     from django import forms
+    from django.core.exceptions import ValidationError
+
 
     class ContactForm(forms.Form):
         # Everything as before.
@@ -359,13 +369,14 @@ example::
             if cc_myself and subject:
                 # Only do something if both fields are valid so far.
                 if "help" not in subject:
-                    raise forms.ValidationError(
-                        "Did not send for 'help' in the subject despite "
-                        "CC'ing yourself."
+                    raise ValidationError(
+                        "Did not send for 'help' in the subject despite " "CC'ing yourself."
                     )
 
 In this code, if the validation error is raised, the form will display an
-error message at the top of the form (normally) describing the problem.
+error message at the top of the form (normally) describing the problem. Such
+errors are non-field errors, which are displayed in the template with
+``{{ form.non_field_errors }}``.
 
 The call to ``super().clean()`` in the example code ensures that any validation
 logic in parent classes is maintained. If your form inherits another that
@@ -388,6 +399,7 @@ work out what works effectively in your particular situation. Our new code
 
     from django import forms
 
+
     class ContactForm(forms.Form):
         # Everything as before.
         ...
@@ -399,8 +411,8 @@ work out what works effectively in your particular situation. Our new code
 
             if cc_myself and subject and "help" not in subject:
                 msg = "Must put 'help' in subject when cc'ing yourself."
-                self.add_error('cc_myself', msg)
-                self.add_error('subject', msg)
+                self.add_error("cc_myself", msg)
+                self.add_error("subject", msg)
 
 The second argument of ``add_error()`` can be a string, or preferably an
 instance of ``ValidationError``. See :ref:`raising-validation-error` for more

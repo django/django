@@ -5,30 +5,32 @@ from django.forms import ModelChoiceField
 from django.test import TestCase, override_settings
 from django.utils import translation
 
-from .models import Album, Band
+from .models import Album, Band, ReleaseEvent, VideoStream
 
 
 class AlbumForm(forms.ModelForm):
     class Meta:
         model = Album
-        fields = ['band', 'featuring']
+        fields = ["band", "featuring"]
         widgets = {
-            'band': AutocompleteSelect(
-                Album._meta.get_field('band').remote_field,
+            "band": AutocompleteSelect(
+                Album._meta.get_field("band"),
                 admin.site,
-                attrs={'class': 'my-class'},
+                attrs={"class": "my-class"},
             ),
-            'featuring': AutocompleteSelect(
-                Album._meta.get_field('featuring').remote_field,
+            "featuring": AutocompleteSelect(
+                Album._meta.get_field("featuring"),
                 admin.site,
-            )
+            ),
         }
 
 
 class NotRequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
+        widget=AutocompleteSelect(
+            Album._meta.get_field("band").remote_field, admin.site
+        ),
         required=False,
     )
 
@@ -36,65 +38,94 @@ class NotRequiredBandForm(forms.Form):
 class RequiredBandForm(forms.Form):
     band = ModelChoiceField(
         queryset=Album.objects.all(),
-        widget=AutocompleteSelect(Album._meta.get_field('band').remote_field, admin.site),
+        widget=AutocompleteSelect(
+            Album._meta.get_field("band").remote_field, admin.site
+        ),
         required=True,
     )
 
 
-@override_settings(ROOT_URLCONF='admin_widgets.urls')
+class VideoStreamForm(forms.ModelForm):
+    class Meta:
+        model = VideoStream
+        fields = ["release_event"]
+        widgets = {
+            "release_event": AutocompleteSelect(
+                VideoStream._meta.get_field("release_event"),
+                admin.site,
+            ),
+        }
+
+
+@override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AutocompleteMixinTests(TestCase):
     empty_option = '<option value=""></option>'
     maxDiff = 1000
 
     def test_build_attrs(self):
         form = AlbumForm()
-        attrs = form['band'].field.widget.get_context(name='my_field', value=None, attrs={})['widget']['attrs']
-        self.assertEqual(attrs, {
-            'class': 'my-class admin-autocomplete',
-            'data-ajax--cache': 'true',
-            'data-ajax--delay': 250,
-            'data-ajax--type': 'GET',
-            'data-ajax--url': '/admin_widgets/band/autocomplete/',
-            'data-theme': 'admin-autocomplete',
-            'data-allow-clear': 'false',
-            'data-placeholder': ''
-        })
+        attrs = form["band"].field.widget.get_context(
+            name="my_field", value=None, attrs={}
+        )["widget"]["attrs"]
+        self.assertEqual(
+            attrs,
+            {
+                "class": "my-class admin-autocomplete",
+                "data-ajax--cache": "true",
+                "data-ajax--delay": 250,
+                "data-ajax--type": "GET",
+                "data-ajax--url": "/autocomplete/",
+                "data-theme": "admin-autocomplete",
+                "data-allow-clear": "false",
+                "data-app-label": "admin_widgets",
+                "data-field-name": "band",
+                "data-model-name": "album",
+                "data-placeholder": "",
+                "lang": "en",
+            },
+        )
 
     def test_build_attrs_no_custom_class(self):
         form = AlbumForm()
-        attrs = form['featuring'].field.widget.get_context(name='name', value=None, attrs={})['widget']['attrs']
-        self.assertEqual(attrs['class'], 'admin-autocomplete')
+        attrs = form["featuring"].field.widget.get_context(
+            name="name", value=None, attrs={}
+        )["widget"]["attrs"]
+        self.assertEqual(attrs["class"], "admin-autocomplete")
 
     def test_build_attrs_not_required_field(self):
         form = NotRequiredBandForm()
-        attrs = form['band'].field.widget.build_attrs({})
-        self.assertJSONEqual(attrs['data-allow-clear'], True)
+        attrs = form["band"].field.widget.build_attrs({})
+        self.assertJSONEqual(attrs["data-allow-clear"], True)
 
     def test_build_attrs_required_field(self):
         form = RequiredBandForm()
-        attrs = form['band'].field.widget.build_attrs({})
-        self.assertJSONEqual(attrs['data-allow-clear'], False)
+        attrs = form["band"].field.widget.build_attrs({})
+        self.assertJSONEqual(attrs["data-allow-clear"], False)
 
     def test_get_url(self):
-        rel = Album._meta.get_field('band').remote_field
+        rel = Album._meta.get_field("band")
         w = AutocompleteSelect(rel, admin.site)
         url = w.get_url()
-        self.assertEqual(url, '/admin_widgets/band/autocomplete/')
+        self.assertEqual(url, "/autocomplete/")
 
     def test_render_options(self):
-        beatles = Band.objects.create(name='The Beatles', style='rock')
-        who = Band.objects.create(name='The Who', style='rock')
+        beatles = Band.objects.create(name="The Beatles", style="rock")
+        who = Band.objects.create(name="The Who", style="rock")
         # With 'band', a ForeignKey.
-        form = AlbumForm(initial={'band': beatles.pk})
+        form = AlbumForm(initial={"band": beatles.uuid})
         output = form.as_table()
-        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.pk
-        option = '<option value="%s">The Who</option>' % who.pk
+        selected_option = (
+            '<option value="%s" selected>The Beatles</option>' % beatles.uuid
+        )
+        option = '<option value="%s">The Who</option>' % who.uuid
         self.assertIn(selected_option, output)
         self.assertNotIn(option, output)
         # With 'featuring', a ManyToManyField.
-        form = AlbumForm(initial={'featuring': [beatles.pk, who.pk]})
+        form = AlbumForm(initial={"featuring": [beatles.pk, who.pk]})
         output = form.as_table()
-        selected_option = '<option value="%s" selected>The Beatles</option>' % beatles.pk
+        selected_option = (
+            '<option value="%s" selected>The Beatles</option>' % beatles.pk
+        )
         option = '<option value="%s" selected>The Who</option>' % who.pk
         self.assertIn(selected_option, output)
         self.assertIn(option, output)
@@ -111,33 +142,57 @@ class AutocompleteMixinTests(TestCase):
         output = form.as_table()
         self.assertNotIn(self.empty_option, output)
 
+    def test_render_options_fk_as_pk(self):
+        beatles = Band.objects.create(name="The Beatles", style="rock")
+        rubber_soul = Album.objects.create(name="Rubber Soul", band=beatles)
+        release_event = ReleaseEvent.objects.create(
+            name="Test Target", album=rubber_soul
+        )
+        form = VideoStreamForm(initial={"release_event": release_event.pk})
+        output = form.as_table()
+        selected_option = (
+            '<option value="%s" selected>Test Target</option>' % release_event.pk
+        )
+        self.assertIn(selected_option, output)
+
     def test_media(self):
-        rel = Album._meta.get_field('band').remote_field
+        rel = Album._meta.get_field("band").remote_field
         base_files = (
-            'admin/js/vendor/jquery/jquery.min.js',
-            'admin/js/vendor/select2/select2.full.min.js',
+            "admin/js/vendor/jquery/jquery.min.js",
+            "admin/js/vendor/select2/select2.full.min.js",
             # Language file is inserted here.
-            'admin/js/jquery.init.js',
-            'admin/js/autocomplete.js',
+            "admin/js/jquery.init.js",
+            "admin/js/autocomplete.js",
         )
         languages = (
-            ('de', 'de'),
+            ("de", "de"),
+            # Subsequent language codes are used when the language code is not
+            # supported.
+            ("de-at", "de"),
+            ("de-ch-1901", "de"),
+            ("en-latn-us", "en"),
+            ("nl-nl-x-informal", "nl"),
+            ("zh-hans-HK", "zh-CN"),
             # Language with code 00 does not exist.
-            ('00', None),
+            ("00", None),
             # Language files are case sensitive.
-            ('sr-cyrl', 'sr-Cyrl'),
-            ('zh-hans', 'zh-CN'),
-            ('zh-hant', 'zh-TW'),
+            ("sr-cyrl", "sr-Cyrl"),
+            ("zh-hans", "zh-CN"),
+            ("zh-hant", "zh-TW"),
+            (None, None),
         )
         for lang, select_lang in languages:
             with self.subTest(lang=lang):
                 if select_lang:
                     expected_files = (
-                        base_files[:2] +
-                        (('admin/js/vendor/select2/i18n/%s.js' % select_lang),) +
-                        base_files[2:]
+                        base_files[:2]
+                        + (("admin/js/vendor/select2/i18n/%s.js" % select_lang),)
+                        + base_files[2:]
                     )
                 else:
                     expected_files = base_files
                 with translation.override(lang):
-                    self.assertEqual(AutocompleteSelect(rel, admin.site).media._js, list(expected_files))
+                    self.assertEqual(
+                        AutocompleteSelect(rel, admin.site).media._js,
+                        list(expected_files),
+                    )

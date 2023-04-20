@@ -11,21 +11,20 @@ class cached_property:
 
     A cached property can be made out of an existing method:
     (e.g. ``url = cached_property(get_absolute_url)``).
-    The optional ``name`` argument is obsolete as of Python 3.6 and will be
-    deprecated in Django 4.0 (#30127).
     """
+
     name = None
 
     @staticmethod
     def func(instance):
         raise TypeError(
-            'Cannot use cached_property instance without calling '
-            '__set_name__() on it.'
+            "Cannot use cached_property instance without calling "
+            "__set_name__() on it."
         )
 
-    def __init__(self, func, name=None):
+    def __init__(self, func):
         self.real_func = func
-        self.__doc__ = getattr(func, '__doc__')
+        self.__doc__ = getattr(func, "__doc__")
 
     def __set_name__(self, owner, name):
         if self.name is None:
@@ -50,6 +49,11 @@ class cached_property:
 
 
 class classproperty:
+    """
+    Decorator that converts a method with a single cls argument into a property
+    that can be accessed directly from the class.
+    """
+
     def __init__(self, method=None):
         self.fget = method
 
@@ -66,6 +70,7 @@ class Promise:
     Base class for the proxy class created in the closure of the lazy function.
     It's used to recognize promises in code.
     """
+
     pass
 
 
@@ -84,6 +89,7 @@ def lazy(func, *resultclasses):
         called on the result of that function. The function is not evaluated
         until one of the methods on the result is called.
         """
+
         __prepared = False
 
         def __init__(self, args, kw):
@@ -96,7 +102,7 @@ def lazy(func, *resultclasses):
         def __reduce__(self):
             return (
                 _lazy_proxy_unpickle,
-                (func, self.__args, self.__kw) + resultclasses
+                (func, self.__args, self.__kw) + resultclasses,
             )
 
         def __repr__(self):
@@ -115,11 +121,12 @@ def lazy(func, *resultclasses):
                         setattr(cls, method_name, meth)
             cls._delegate_bytes = bytes in resultclasses
             cls._delegate_text = str in resultclasses
-            assert not (cls._delegate_bytes and cls._delegate_text), (
-                "Cannot call lazy() with both bytes and text return types.")
-            if cls._delegate_text:
-                cls.__str__ = cls.__text_cast
-            elif cls._delegate_bytes:
+            if cls._delegate_bytes and cls._delegate_text:
+                raise ValueError(
+                    "Cannot call lazy() with both bytes and text return types."
+                )
+
+            if cls._delegate_bytes:
                 cls.__bytes__ = cls.__bytes_cast
 
         @classmethod
@@ -130,22 +137,15 @@ def lazy(func, *resultclasses):
                 # applies the given magic method of the result type.
                 res = func(*self.__args, **self.__kw)
                 return getattr(res, method_name)(*args, **kw)
-            return __wrapper__
 
-        def __text_cast(self):
-            return func(*self.__args, **self.__kw)
+            return __wrapper__
 
         def __bytes_cast(self):
             return bytes(func(*self.__args, **self.__kw))
 
-        def __bytes_cast_encoded(self):
-            return func(*self.__args, **self.__kw).encode()
-
         def __cast(self):
             if self._delegate_bytes:
                 return self.__bytes_cast()
-            elif self._delegate_text:
-                return self.__text_cast()
             else:
                 return func(*self.__args, **self.__kw)
 
@@ -171,6 +171,12 @@ def lazy(func, *resultclasses):
             if self._delegate_text:
                 return str(self) % rhs
             return self.__cast() % rhs
+
+        def __add__(self, other):
+            return self.__cast() + other
+
+        def __radd__(self, other):
+            return other + self.__cast()
 
         def __deepcopy__(self, memo):
             # Instances of this class are effectively immutable. It's just a
@@ -213,10 +219,15 @@ def keep_lazy(*resultclasses):
 
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if any(isinstance(arg, Promise) for arg in itertools.chain(args, kwargs.values())):
+            if any(
+                isinstance(arg, Promise)
+                for arg in itertools.chain(args, kwargs.values())
+            ):
                 return lazy_func(*args, **kwargs)
             return func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
@@ -232,9 +243,12 @@ empty = object()
 
 def new_method_proxy(func):
     def inner(self, *args):
-        if self._wrapped is empty:
+        if (_wrapped := self._wrapped) is empty:
             self._setup()
-        return func(self._wrapped, *args)
+            _wrapped = self._wrapped
+        return func(_wrapped, *args)
+
+    inner._mask_wrapped = False
     return inner
 
 
@@ -254,6 +268,17 @@ class LazyObject:
         # Note: if a subclass overrides __init__(), it will likely need to
         # override __copy__() and __deepcopy__() as well.
         self._wrapped = empty
+
+    def __getattribute__(self, name):
+        if name == "_wrapped":
+            # Avoid recursion when getting wrapped object.
+            return super().__getattribute__(name)
+        value = super().__getattribute__(name)
+        # If attribute is a proxy method, raise an AttributeError to call
+        # __getattr__() and use the wrapped object method.
+        if not getattr(value, "_mask_wrapped", True):
+            raise AttributeError
+        return value
 
     __getattr__ = new_method_proxy(getattr)
 
@@ -277,7 +302,9 @@ class LazyObject:
         """
         Must be implemented by subclasses to initialize the wrapped object.
         """
-        raise NotImplementedError('subclasses of LazyObject must provide a _setup() method')
+        raise NotImplementedError(
+            "subclasses of LazyObject must provide a _setup() method"
+        )
 
     # Because we have messed with __class__ below, we confuse pickle as to what
     # class we are pickling. We're going to have to initialize the wrapped
@@ -356,6 +383,7 @@ class SimpleLazyObject(LazyObject):
     Designed for compound objects of unknown type. For builtins or objects of
     known type, use django.utils.functional.lazy.
     """
+
     def __init__(self, func):
         """
         Pass in a callable that returns the object to be wrapped.
@@ -365,7 +393,7 @@ class SimpleLazyObject(LazyObject):
         callable can be safely run more than once and will return the same
         value.
         """
-        self.__dict__['_setupfunc'] = func
+        self.__dict__["_setupfunc"] = func
         super().__init__()
 
     def _setup(self):
@@ -378,7 +406,7 @@ class SimpleLazyObject(LazyObject):
             repr_attr = self._setupfunc
         else:
             repr_attr = self._wrapped
-        return '<%s: %r>' % (type(self).__name__, repr_attr)
+        return "<%s: %r>" % (type(self).__name__, repr_attr)
 
     def __copy__(self):
         if self._wrapped is empty:
@@ -397,6 +425,12 @@ class SimpleLazyObject(LazyObject):
             memo[id(self)] = result
             return result
         return copy.deepcopy(self._wrapped, memo)
+
+    __add__ = new_method_proxy(operator.add)
+
+    @new_method_proxy
+    def __radd__(self, other):
+        return other + self
 
 
 def partition(predicate, values):

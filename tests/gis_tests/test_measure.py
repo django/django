@@ -46,7 +46,7 @@ class DistanceTest(unittest.TestCase):
     def test_access_invalid(self):
         "Testing access in invalid units"
         d = D(m=100)
-        self.assertFalse(hasattr(d, 'banana'))
+        self.assertFalse(hasattr(d, "banana"))
 
     def test_addition(self):
         "Test addition & subtraction"
@@ -109,13 +109,13 @@ class DistanceTest(unittest.TestCase):
         d2 = D(km=1)
 
         d3 = d1 + d2
-        self.assertEqual(d3._default_unit, 'm')
+        self.assertEqual(d3._default_unit, "m")
         d4 = d2 + d1
-        self.assertEqual(d4._default_unit, 'km')
+        self.assertEqual(d4._default_unit, "km")
         d5 = d1 * 2
-        self.assertEqual(d5._default_unit, 'm')
+        self.assertEqual(d5._default_unit, "m")
         d6 = d1 / 2
-        self.assertEqual(d6._default_unit, 'm')
+        self.assertEqual(d6._default_unit, "m")
 
     def test_comparisons(self):
         "Testing comparisons"
@@ -133,10 +133,10 @@ class DistanceTest(unittest.TestCase):
         d1 = D(m=100)
         d2 = D(km=3.5)
 
-        self.assertEqual(str(d1), '100.0 m')
-        self.assertEqual(str(d2), '3.5 km')
-        self.assertEqual(repr(d1), 'Distance(m=100.0)')
-        self.assertEqual(repr(d2), 'Distance(km=3.5)')
+        self.assertEqual(str(d1), "100.0 m")
+        self.assertEqual(str(d2), "3.5 km")
+        self.assertEqual(repr(d1), "Distance(m=100.0)")
+        self.assertEqual(repr(d2), "Distance(km=3.5)")
 
     def test_furlong(self):
         d = D(m=201.168)
@@ -144,12 +144,26 @@ class DistanceTest(unittest.TestCase):
 
     def test_unit_att_name(self):
         "Testing the `unit_attname` class method"
-        unit_tuple = [('Yard', 'yd'), ('Nautical Mile', 'nm'), ('German legal metre', 'german_m'),
-                      ('Indian yard', 'indian_yd'), ('Chain (Sears)', 'chain_sears'), ('Chain', 'chain'),
-                      ('Furrow Long', 'furlong')]
+        unit_tuple = [
+            ("Yard", "yd"),
+            ("Nautical Mile", "nm"),
+            ("German legal metre", "german_m"),
+            ("Indian yard", "indian_yd"),
+            ("Chain (Sears)", "chain_sears"),
+            ("Chain", "chain"),
+            ("Furrow Long", "furlong"),
+        ]
         for nm, att in unit_tuple:
             with self.subTest(nm=nm):
                 self.assertEqual(att, D.unit_attname(nm))
+
+    def test_hash(self):
+        d1 = D(m=99)
+        d2 = D(m=100)
+        d3 = D(km=0.1)
+        self.assertEqual(hash(d2), hash(d3))
+        self.assertNotEqual(hash(d1), hash(d2))
+        self.assertNotEqual(hash(d1), hash(d3))
 
 
 class AreaTest(unittest.TestCase):
@@ -180,7 +194,7 @@ class AreaTest(unittest.TestCase):
     def test_access_invalid_a(self):
         "Testing access in invalid units"
         a = A(sq_m=100)
-        self.assertFalse(hasattr(a, 'banana'))
+        self.assertFalse(hasattr(a, "banana"))
 
     def test_addition(self):
         "Test addition & subtraction"
@@ -243,13 +257,13 @@ class AreaTest(unittest.TestCase):
         a2 = A(sq_km=1)
 
         a3 = a1 + a2
-        self.assertEqual(a3._default_unit, 'sq_m')
+        self.assertEqual(a3._default_unit, "sq_m")
         a4 = a2 + a1
-        self.assertEqual(a4._default_unit, 'sq_km')
+        self.assertEqual(a4._default_unit, "sq_km")
         a5 = a1 * 2
-        self.assertEqual(a5._default_unit, 'sq_m')
+        self.assertEqual(a5._default_unit, "sq_m")
         a6 = a1 / 2
-        self.assertEqual(a6._default_unit, 'sq_m')
+        self.assertEqual(a6._default_unit, "sq_m")
 
     def test_comparisons(self):
         "Testing comparisons"
@@ -267,22 +281,15 @@ class AreaTest(unittest.TestCase):
         a1 = A(sq_m=100)
         a2 = A(sq_km=3.5)
 
-        self.assertEqual(str(a1), '100.0 sq_m')
-        self.assertEqual(str(a2), '3.5 sq_km')
-        self.assertEqual(repr(a1), 'Area(sq_m=100.0)')
-        self.assertEqual(repr(a2), 'Area(sq_km=3.5)')
+        self.assertEqual(str(a1), "100.0 sq_m")
+        self.assertEqual(str(a2), "3.5 sq_km")
+        self.assertEqual(repr(a1), "Area(sq_m=100.0)")
+        self.assertEqual(repr(a2), "Area(sq_km=3.5)")
 
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DistanceTest))
-    s.addTest(unittest.makeSuite(AreaTest))
-    return s
-
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-
-if __name__ == "__main__":
-    run()
+    def test_hash(self):
+        a1 = A(sq_m=100)
+        a2 = A(sq_m=1000000)
+        a3 = A(sq_km=1)
+        self.assertEqual(hash(a2), hash(a3))
+        self.assertNotEqual(hash(a1), hash(a2))
+        self.assertNotEqual(hash(a1), hash(a3))

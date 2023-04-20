@@ -1,12 +1,17 @@
 from contextlib import ContextDecorator, contextmanager
 
 from django.db import (
-    DEFAULT_DB_ALIAS, DatabaseError, Error, ProgrammingError, connections,
+    DEFAULT_DB_ALIAS,
+    DatabaseError,
+    Error,
+    ProgrammingError,
+    connections,
 )
 
 
 class TransactionManagementError(ProgrammingError):
     """Transaction management is used improperly."""
+
     pass
 
 
@@ -113,24 +118,26 @@ def mark_for_rollback_on_error(using=None):
     """
     try:
         yield
-    except Exception:
+    except Exception as exc:
         connection = get_connection(using)
         if connection.in_atomic_block:
             connection.needs_rollback = True
+            connection.rollback_exc = exc
         raise
 
 
-def on_commit(func, using=None):
+def on_commit(func, using=None, robust=False):
     """
     Register `func` to be called when the current transaction is committed.
     If the current transaction is rolled back, `func` will not be called.
     """
-    get_connection(using).on_commit(func)
+    get_connection(using).on_commit(func, robust)
 
 
 #################################
 # Decorators / context managers #
 #################################
+
 
 class Atomic(ContextDecorator):
     """
@@ -158,16 +165,32 @@ class Atomic(ContextDecorator):
 
     Since database connections are thread-local, this is thread-safe.
 
+    An atomic block can be tagged as durable. In this case, raise a
+    RuntimeError if it's nested within another atomic block. This guarantees
+    that database changes in a durable block are committed to the database when
+    the block exists without error.
+
     This is a private API.
     """
 
-    def __init__(self, using, savepoint):
+    def __init__(self, using, savepoint, durable):
         self.using = using
         self.savepoint = savepoint
+        self.durable = durable
+        self._from_testcase = False
 
     def __enter__(self):
         connection = get_connection(self.using)
 
+        if (
+            self.durable
+            and connection.atomic_blocks
+            and not connection.atomic_blocks[-1]._from_testcase
+        ):
+            raise RuntimeError(
+                "A durable atomic block cannot be nested within another "
+                "atomic block."
+            )
         if not connection.in_atomic_block:
             # Reset state when entering an outermost atomic block.
             connection.commit_on_exit = True
@@ -190,11 +213,19 @@ class Atomic(ContextDecorator):
             else:
                 connection.savepoint_ids.append(None)
         else:
-            connection.set_autocommit(False, force_begin_transaction_with_broken_autocommit=True)
+            connection.set_autocommit(
+                False, force_begin_transaction_with_broken_autocommit=True
+            )
             connection.in_atomic_block = True
+
+        if connection.in_atomic_block:
+            connection.atomic_blocks.append(self)
 
     def __exit__(self, exc_type, exc_value, traceback):
         connection = get_connection(self.using)
+
+        if connection.in_atomic_block:
+            connection.atomic_blocks.pop()
 
         if connection.savepoint_ids:
             sid = connection.savepoint_ids.pop()
@@ -282,14 +313,14 @@ class Atomic(ContextDecorator):
                     connection.in_atomic_block = False
 
 
-def atomic(using=None, savepoint=True):
+def atomic(using=None, savepoint=True, durable=False):
     # Bare decorator: @atomic -- although the first argument is called
     # `using`, it's actually the function being decorated.
     if callable(using):
-        return Atomic(DEFAULT_DB_ALIAS, savepoint)(using)
+        return Atomic(DEFAULT_DB_ALIAS, savepoint, durable)(using)
     # Decorator: @atomic(...) or context manager: with atomic(...): ...
     else:
-        return Atomic(using, savepoint)
+        return Atomic(using, savepoint, durable)
 
 
 def _non_atomic_requests(view, using):

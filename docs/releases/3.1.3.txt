@@ -1,0 +1,62 @@
+==========================
+Django 3.1.3 release notes
+==========================
+
+*November 2, 2020*
+
+Django 3.1.3 fixes several bugs in 3.1.2 and adds compatibility with Python
+3.9.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.1.2 that caused the incorrect height of the
+  admin changelist search bar (:ticket:`32072`).
+
+* Fixed a regression in Django 3.1.2 that caused the incorrect width of the
+  admin changelist search bar on a filtered page (:ticket:`32091`).
+
+* Fixed displaying Unicode characters in
+  :class:`forms.JSONField <django.forms.JSONField>` and read-only
+  :class:`models.JSONField <django.db.models.JSONField>` values in the admin
+  (:ticket:`32080`).
+
+* Fixed a regression in Django 3.1 that caused a crash of
+  :class:`~django.contrib.postgres.aggregates.ArrayAgg` and
+  :class:`~django.contrib.postgres.aggregates.StringAgg` with ``ordering``
+  on key transforms for :class:`~django.db.models.JSONField` (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 that caused a crash of ``__in`` lookup when
+  using key transforms for :class:`~django.db.models.JSONField` in the lookup
+  value (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 that caused a crash of
+  :class:`~django.db.models.ExpressionWrapper` with key transforms for
+  :class:`~django.db.models.JSONField` (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 that caused a migrations crash on PostgreSQL
+  when adding an
+  :class:`~django.contrib.postgres.constraints.ExclusionConstraint` with key
+  transforms for :class:`~django.db.models.JSONField` in ``expressions``
+  (:ticket:`32096`).
+
+* Fixed a regression in Django 3.1 where
+  :exc:`ProtectedError.protected_objects <django.db.models.ProtectedError>` and
+  :exc:`RestrictedError.restricted_objects <django.db.models.RestrictedError>`
+  attributes returned iterators instead of :py:class:`set` of objects
+  (:ticket:`32107`).
+
+* Fixed a regression in Django 3.1.2 that caused incorrect form input layout on
+  small screens in the admin change form view (:ticket:`32069`).
+
+* Fixed a regression in Django 3.1 that invalidated pre-Django 3.1 password
+  reset tokens (:ticket:`32130`).
+
+* Added support for ``asgiref`` 3.3 (:ticket:`32128`).
+
+* Fixed a regression in Django 3.1 that caused incorrect textarea layout on
+  medium-sized screens in the admin change form view with the sidebar open
+  (:ticket:`32127`).
+
+* Fixed a regression in Django 3.0.7 that didn't use ``Subquery()`` aliases in
+  the ``GROUP BY`` clause (:ticket:`32152`).

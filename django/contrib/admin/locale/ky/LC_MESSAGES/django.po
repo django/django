@@ -1,0 +1,711 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Belek <abylov.belek@gmail.com>, 2016
+# Chyngyz Monokbaev <monokbaev@gmail.com>, 2016
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-11-27 14:12+0000\n"
+"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
+"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ky\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Тандалган %(verbose_name_plural)s элементтерин өчүрүү"
+
+#, python-format
+msgid "Successfully deleted %(count)d %(items)s."
+msgstr "%(count)d %(items)s ийгиликтүү өчүрүлдү."
+
+#, python-format
+msgid "Cannot delete %(name)s"
+msgstr "%(name)s өчүрүү мүмкүн эмес"
+
+msgid "Are you sure?"
+msgstr "Чечимиңиз аныкпы?"
+
+msgid "Administration"
+msgstr "Башкаруу"
+
+msgid "All"
+msgstr "Баары"
+
+msgid "Yes"
+msgstr "Ооба"
+
+msgid "No"
+msgstr "Жок"
+
+msgid "Unknown"
+msgstr "Такталбаган"
+
+msgid "Any date"
+msgstr "Кааалаган бир күн"
+
+msgid "Today"
+msgstr "Бүгүн"
+
+msgid "Past 7 days"
+msgstr "Өткөн 7 күн"
+
+msgid "This month"
+msgstr "Бул айда"
+
+msgid "This year"
+msgstr "Бул жылда"
+
+msgid "No date"
+msgstr "Күн белгиленген эмес"
+
+msgid "Has date"
+msgstr "Күн белгиленген"
+
+msgid "Empty"
+msgstr "Бош"
+
+msgid "Not empty"
+msgstr "Бош эмес"
+
+#, python-format
+msgid ""
+"Please enter the correct %(username)s and password for a staff account. Note "
+"that both fields may be case-sensitive."
+msgstr ""
+"Сураныч  кызматкердин %(username)s жана сыр сөзүн туура жазыңыз.  Эки "
+"талаага тең баш тамга же кичүү тамга менен жазганыңыз маанилүү экенин эске "
+"тутуңуз."
+
+msgid "Action:"
+msgstr "Аракет"
+
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr "Дагы %(verbose_name)s кошуу"
+
+msgid "Remove"
+msgstr "Алып таштоо"
+
+msgid "Addition"
+msgstr "Кошумча"
+
+msgid "Change"
+msgstr "Өзгөртүү"
+
+msgid "Deletion"
+msgstr "Өчүрүү"
+
+msgid "action time"
+msgstr "аракет убактысы"
+
+msgid "user"
+msgstr "колдонуучу"
+
+msgid "content type"
+msgstr "Контент тиби"
+
+msgid "object id"
+msgstr "объекттин id-си"
+
+#. Translators: 'repr' means representation
+#. (https://docs.python.org/library/functions.html#repr)
+msgid "object repr"
+msgstr "объекттин repr-и"
+
+msgid "action flag"
+msgstr "аракет белгиси"
+
+msgid "change message"
+msgstr "билдирүүнү өзгөртүү"
+
+msgid "log entry"
+msgstr "Жазуу журналы"
+
+msgid "log entries"
+msgstr "Жазуу журналдары"
+
+#, python-format
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” кошулду"
+
+#, python-format
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” — %(changes)s өзгөрдү"
+
+#, python-format
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s.” өчүрүлдү"
+
+msgid "LogEntry Object"
+msgstr "LogEntry обектиси"
+
+#, python-brace-format
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” кошулду"
+
+msgid "Added."
+msgstr "Кошулду."
+
+msgid "and"
+msgstr "жана"
+
+#, python-brace-format
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}” үчүн {fields} өзгөртүлдү."
+
+#, python-brace-format
+msgid "Changed {fields}."
+msgstr "{fields} өзгөртүлдү."
+
+#, python-brace-format
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” өчүрүлдү."
+
+msgid "No fields changed."
+msgstr "Эч бир талаа өзгөртүлгөн жок"
+
+msgid "None"
+msgstr "Эчбир"
+
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
+msgstr "Көбүрөөк тандоо үчүн “CTRL”, же макбук үчүн “Cmd” кармап туруңуз."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} \"{obj}\" ийгиликтүү кошулду."
+
+msgid "You may edit it again below."
+msgstr "Сиз муну төмөндө кайра өзгөртүшүңүз мүмкүн."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} \"{obj}\" ийгиликтүү кошулду. Сиз башка {name} кошо аласыз."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” ийгиликтүү өзгөрдү. Сиз аны төмөндө өзгөртө аласыз."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "{name} “{obj}” ийгиликтүү кошулду. Сиз аны төмөндө өзгөртө аласыз."
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
+"below."
+msgstr ""
+"{name} “{obj}” ийгиликтүү өзгөрдү. Төмөндө башка {name} кошсоңуз болот."
+
+#, python-brace-format
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} \"{obj}\" ийгиликтүү өзгөрдү."
+
+msgid ""
+"Items must be selected in order to perform actions on them. No items have "
+"been changed."
+msgstr ""
+"Нерселердин үстүнөн аракет кылуудан мурда алар тандалуусу керек. Эч "
+"нерсеөзгөргөн жок."
+
+msgid "No action selected."
+msgstr "Аракет тандалган жок."
+
+#, python-format
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s \"%(obj)s\" ийгиликтүү өчүрүлдү"
+
+#, python-format
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
+msgstr ""
+"ID си %(key)s\" болгон %(name)s табылган жок. Ал өчүрүлгөн болуп жүрбөсүн?"
+
+#, python-format
+msgid "Add %s"
+msgstr "%s кошуу"
+
+#, python-format
+msgid "Change %s"
+msgstr "%s өзгөртүү"
+
+#, python-format
+msgid "View %s"
+msgstr "%s көрүү"
+
+msgid "Database error"
+msgstr "Берилиштер базасында ката"
+
+#, python-format
+msgid "%(count)s %(name)s was changed successfully."
+msgid_plural "%(count)s %(name)s were changed successfully."
+msgstr[0] "%(count)s%(name)s ийгиликтүү өзгөртүлдү."
+
+#, python-format
+msgid "%(total_count)s selected"
+msgid_plural "All %(total_count)s selected"
+msgstr[0] "Бүт %(total_count)s тандалды"
+
+#, python-format
+msgid "0 of %(cnt)s selected"
+msgstr "%(cnt)s нерседен эчтемке тандалган жок"
+
+#, python-format
+msgid "Change history: %s"
+msgstr "%s тарыхын өзгөртүү"
+
+#. Translators: Model verbose name and instance representation,
+#. suitable to be an item in a list.
+#, python-format
+msgid "%(class_name)s %(instance)s"
+msgstr "%(class_name)s %(instance)s"
+
+#, python-format
+msgid ""
+"Deleting %(class_name)s %(instance)s would require deleting the following "
+"protected related objects: %(related_objects)s"
+msgstr ""
+"%(class_name)s %(instance)s өчүрүлүүсү үчүн %(related_objects)s да "
+"өчүрүлүүсү талап кылынат."
+
+msgid "Django site admin"
+msgstr "Жанго башкарма сайты"
+
+msgid "Django administration"
+msgstr "Жанго башкармасы"
+
+msgid "Site administration"
+msgstr "Сайт башкармасы"
+
+msgid "Log in"
+msgstr "Кирүү"
+
+#, python-format
+msgid "%(app)s administration"
+msgstr "%(app)s башкармасы"
+
+msgid "Page not found"
+msgstr "Барак табылган жок"
+
+msgid "We’re sorry, but the requested page could not be found."
+msgstr "Кечирим сурайбыз, сиз сураган барак табылбады."
+
+msgid "Home"
+msgstr "Башкы"
+
+msgid "Server error"
+msgstr "Сервер катасы"
+
+msgid "Server error (500)"
+msgstr "Сервер (500) катасы"
+
+msgid "Server Error <em>(500)</em>"
+msgstr "Сервер <em>(500)</em> катасы"
+
+msgid ""
+"There’s been an error. It’s been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Ката кетти. Сайт башкармасына экат менен кайрылсаңыз тез арада маселе "
+"чечилиши мүмкүн. Түшүнгөнүңүз үчүн рахмат."
+
+msgid "Run the selected action"
+msgstr "Тандалган аракетти иштетиңиз"
+
+msgid "Go"
+msgstr "Жөнө"
+
+msgid "Click here to select the objects across all pages"
+msgstr "Барак боюнча бүт обекттерди тандоо үчүн чыкылдатыңыз"
+
+#, python-format
+msgid "Select all %(total_count)s %(module_name)s"
+msgstr "Бүт %(total_count)s %(module_name)s тандаңыз"
+
+msgid "Clear selection"
+msgstr "Тандоону бошотуу"
+
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s колдонмосундагы моделдер"
+
+msgid "Add"
+msgstr "Кошуу"
+
+msgid "View"
+msgstr "Көрүү"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Сиз эчнерсени көрүүгө же өзгөртүүгө жеткиңиз жок."
+
+msgid ""
+"First, enter a username and password. Then, you’ll be able to edit more user "
+"options."
+msgstr ""
+"Оболу колдонуучу атыңызды жана сырсөздү териңиз. Ошондо гана башка "
+"маалыматтарын өзгөртө аласыз."
+
+msgid "Enter a username and password."
+msgstr "колдонуучу атыңызды жана сырсөз киргизиңиз."
+
+msgid "Change password"
+msgstr "Сырсөз өзгөртүү"
+
+msgid "Please correct the error below."
+msgstr "Төмөнкү катаны оңдоңуз."
+
+msgid "Please correct the errors below."
+msgstr "Төмөнкү каталарды оңдоңуз"
+
+#, python-format
+msgid "Enter a new password for the user <strong>%(username)s</strong>."
+msgstr "<strong>%(username)s</strong> үчүн жаңы сырсөз териңиз."
+
+msgid "Welcome,"
+msgstr "Кош келиңиз,"
+
+msgid "View site"
+msgstr "Сайтты ачуу"
+
+msgid "Documentation"
+msgstr "Түшүндүрмө"
+
+msgid "Log out"
+msgstr "Чыгуу"
+
+#, python-format
+msgid "Add %(name)s"
+msgstr "%(name)s кошуу"
+
+msgid "History"
+msgstr "Тарых"
+
+msgid "View on site"
+msgstr "Сайтта көрүү"
+
+msgid "Filter"
+msgstr "Чыпкалоо"
+
+msgid "Clear all filters"
+msgstr "Бүт чыпкаларды алып салуу"
+
+msgid "Remove from sorting"
+msgstr "Ирээттөөдөн алып салуу"
+
+#, python-format
+msgid "Sorting priority: %(priority_number)s"
+msgstr "Ирээттөө абзелдүүлүгү: %(priority_number)s"
+
+msgid "Toggle sorting"
+msgstr "Ирээтти алмаштыруу"
+
+msgid "Delete"
+msgstr "Өчүрүү"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would result in deleting "
+"related objects, but your account doesn't have permission to delete the "
+"following types of objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s  өчүрүү үчүн башка байланышкан "
+"обекттерди өчүрүү да талап кылынат. Бирок сиздин буга жеткиңиз жок:"
+
+#, python-format
+msgid ""
+"Deleting the %(object_name)s '%(escaped_object)s' would require deleting the "
+"following protected related objects:"
+msgstr ""
+"%(object_name)s '%(escaped_object)s  өчүрүү үчүн башка байланышкан "
+"обекттерди өчүрүү да талап кылат:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
+"All of the following related items will be deleted:"
+msgstr ""
+"Сиз чындап эле %(object_name)s \"%(escaped_object)s\" өчүрүүнү каалайсызбы? "
+"Бүт байланышкан нерселер өчүрүлөт:"
+
+msgid "Objects"
+msgstr "Обекттер"
+
+msgid "Yes, I’m sure"
+msgstr "Ооба, мен чындап эле"
+
+msgid "No, take me back"
+msgstr "Жок, мени аркага кайтар"
+
+msgid "Delete multiple objects"
+msgstr "обекттерди өчүр"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would result in deleting related "
+"objects, but your account doesn't have permission to delete the following "
+"types of objects:"
+msgstr ""
+"%(objects_name)s өчүрүү үчүн башка байланышкан обекттерди өчүрүү да талап "
+"кылат. Бирок сиздин буга жеткиңиз жок:"
+
+#, python-format
+msgid ""
+"Deleting the selected %(objects_name)s would require deleting the following "
+"protected related objects:"
+msgstr ""
+"%(objects_name)s өчүрүү үчүн башка байланышкан обекттерди өчүрүү да талап "
+"кылат:"
+
+#, python-format
+msgid ""
+"Are you sure you want to delete the selected %(objects_name)s? All of the "
+"following objects and their related items will be deleted:"
+msgstr ""
+"чындап эле %(objects_name)s өчүрүүнү каалайсызбы? Бүт байланышкан нерселер "
+"өчүрүлөт:"
+
+msgid "Delete?"
+msgstr "Өчүрөлүбү?"
+
+#, python-format
+msgid " By %(filter_title)s "
+msgstr "%(filter_title)s боюнча"
+
+msgid "Summary"
+msgstr "Жалпысынан"
+
+msgid "Recent actions"
+msgstr "Акыркы аракеттер"
+
+msgid "My actions"
+msgstr "Менин аракеттерим"
+
+msgid "None available"
+msgstr "Мүмкүн эмес"
+
+msgid "Unknown content"
+msgstr "Белгисиз мазмун"
+
+msgid ""
+"Something’s wrong with your database installation. Make sure the appropriate "
+"database tables have been created, and make sure the database is readable by "
+"the appropriate user."
+msgstr ""
+"Сиздин базаңызды орнотуу боюнча ката кетти. Керектүү база жадыбалдары "
+"түзүлгөндүгүн жана тиешелүү колдонуучунун жеткиси барлыгын текшериңиз."
+
+#, python-format
+msgid ""
+"You are authenticated as %(username)s, but are not authorized to access this "
+"page. Would you like to login to a different account?"
+msgstr ""
+"Сиз %(username)s катары киргенсиз, бирок сиздин бул баракка жеткиңиз жок. "
+"Сиз башка колдонуучу катары киресизби?"
+
+msgid "Forgotten your password or username?"
+msgstr "Колдонуучу атыңыз же сырсөздү унутуп калдыңызбы?"
+
+msgid "Toggle navigation"
+msgstr "Навигацияны алмаштыруу"
+
+msgid "Start typing to filter…"
+msgstr "чыпкалоо үчүн жазып башта"
+
+msgid "Filter navigation items"
+msgstr "Навигация элементтерин чыпкалоо"
+
+msgid "Date/time"
+msgstr "Күн/убакыт"
+
+msgid "User"
+msgstr "Колдонуучу"
+
+msgid "Action"
+msgstr "Аракет"
+
+msgid ""
+"This object doesn’t have a change history. It probably wasn’t added via this "
+"admin site."
+msgstr "Бул обекттин өзгөрүү тарыхы жок."
+
+msgid "Show all"
+msgstr "Баарын көрсөтүү"
+
+msgid "Save"
+msgstr "Сактоо"
+
+msgid "Popup closing…"
+msgstr "Жалтаң жабылуу..."
+
+msgid "Search"
+msgstr "Издөө"
+
+#, python-format
+msgid "%(counter)s result"
+msgid_plural "%(counter)s results"
+msgstr[0] "жыйынтыгы:%(counter)s"
+
+#, python-format
+msgid "%(full_result_count)s total"
+msgstr "жалпысынан %(full_result_count)s"
+
+msgid "Save as new"
+msgstr "Жаңы катары сактоо"
+
+msgid "Save and add another"
+msgstr "Сакта жана башкасын кош"
+
+msgid "Save and continue editing"
+msgstr "Сакта жана өзгөртүүнү улант"
+
+msgid "Save and view"
+msgstr "Сактап туруп көрүү"
+
+msgid "Close"
+msgstr "Жабуу"
+
+#, python-format
+msgid "Change selected %(model)s"
+msgstr "Тандалган %(model)s өзгөртүү"
+
+#, python-format
+msgid "Add another %(model)s"
+msgstr "Башка %(model)s кошуу"
+
+#, python-format
+msgid "Delete selected %(model)s"
+msgstr "Тандалган %(model)s обеттерин өчүрүү"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Сайтта бираз убакыт өткөргөн үчүн ыраазычылык."
+
+msgid "Log in again"
+msgstr "Кайрадан кирүү"
+
+msgid "Password change"
+msgstr "Сырсөз өзгөрт"
+
+msgid "Your password was changed."
+msgstr "Сиздин сырсөз өзгөрдү."
+
+msgid ""
+"Please enter your old password, for security’s sake, and then enter your new "
+"password twice so we can verify you typed it in correctly."
+msgstr ""
+"Коопсуздуктан улам эски сырсөздү териңиз, жана биз коошкондугун текшерүү "
+"үчүн жаңы сырсөздү эки жолу териңиз."
+
+msgid "Change my password"
+msgstr "Сырсөздү өзгөрт"
+
+msgid "Password reset"
+msgstr "Сырсөздү кыйратуу"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+"Сиздин сырсөз орнотулду. Эми сиз алдыга карай жылып, кирүү аткарсаңыз болот."
+
+msgid "Password reset confirmation"
+msgstr "Сырсөздү кыйратуу тастыктамасы"
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Тууралыгын жана коошкондугун текшере алышыбыз үчүн сырсөздү эки жолу териңиз."
+
+msgid "New password:"
+msgstr "Жаңы сырсөз"
+
+msgid "Confirm password:"
+msgstr "Сырсөз тастыктоосу:"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Сырсөз кыйратуу шилтемеси жараксыз, мурдатан эле колдонулган болушу мүмкүн. "
+"Башка шилтеме сурап көрүңүз."
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Сырсөз тууралуу сизге кат жөнөттүк. Эгер мындай аккаунт бар болсо аны тез "
+"арада ала аласыз."
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Эгер сиз екат албасаңыз даректин тууралыган текшериңиз жана спам папкасын "
+"текшериңиз."
+
+#, python-format
+msgid ""
+"You're receiving this email because you requested a password reset for your "
+"user account at %(site_name)s."
+msgstr "Сиз %(site_name)s боюнча сырсөз сураган үчүн бул экат келди."
+
+msgid "Please go to the following page and choose a new password:"
+msgstr "Төмөнкү баракка кириңиз да жаңы сырсөз тандаңыз."
+
+msgid "Your username, in case you’ve forgotten:"
+msgstr "Сиздин колдонуучу атыңыз, унутуп калсаңыз керек болот."
+
+msgid "Thanks for using our site!"
+msgstr "Биздин сайтты колдонгонуңуз үчүн рахмат!"
+
+#, python-format
+msgid "The %(site_name)s team"
+msgstr "%(site_name)s жамааты"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr "Сырсөз унуттуңузбу? едарек териңиз сизге сырсөз боюнча экат жөнөтөбүз."
+
+msgid "Email address:"
+msgstr "едарек:"
+
+msgid "Reset my password"
+msgstr "Сырсөзүмдү кыйрат"
+
+msgid "All dates"
+msgstr "Бүт күндөр"
+
+#, python-format
+msgid "Select %s"
+msgstr "%s тандоо"
+
+#, python-format
+msgid "Select %s to change"
+msgstr "%s обекттерин өзгөртүү үчүн тандоо"
+
+#, python-format
+msgid "Select %s to view"
+msgstr "%s обекттерин көрүү үчүн тандоо"
+
+msgid "Date:"
+msgstr "Күн:"
+
+msgid "Time:"
+msgstr "Убак:"
+
+msgid "Lookup"
+msgstr "Көз чаптыруу"
+
+msgid "Currently:"
+msgstr "Азыркы:"
+
+msgid "Change:"
+msgstr "Өзгөртүү:"

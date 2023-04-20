@@ -38,7 +38,7 @@ Bugfixes
   adds a ``get_absolute_url()`` method to any model that appears in
   ``ABSOLUTE_URL_OVERRIDES`` but doesn't define ``get_absolute_url()``.
 
-* Avoided masking some `ImportError` exceptions during application loading
+* Avoided masking some ``ImportError`` exceptions during application loading
   (:ticket:`22920`).
 
 * Empty ``index_together`` or ``unique_together`` model options no longer
@@ -71,8 +71,8 @@ Bugfixes
 * Made ``migrations.RunSQL`` no longer require percent sign escaping. This is
   now consistent with ``cursor.execute()`` (:ticket:`23426`).
 
-* Made the :setting:`SERIALIZE <TEST_SERIALIZE>` entry in the
-  :setting:`TEST <DATABASE-TEST>` dictionary usable (:ticket:`23421`).
+* Made the ``SERIALIZE`` entry in the :setting:`TEST <DATABASE-TEST>`
+  dictionary usable (:ticket:`23421`).
 
 * Fixed bug in migrations that prevented foreign key constraints to unmanaged
   models with a custom primary key (:ticket:`23415`).
@@ -83,7 +83,7 @@ Bugfixes
 * Added ``SchemaEditor`` for Oracle GIS backend so that spatial metadata and
   indexes will be created for apps with migrations (:ticket:`23537`).
 
-* Coerced the ``related_name`` model field option to unicode during migration
+* Coerced the ``related_name`` model field option to Unicode during migration
   generation to generate migrations that work with both Python 2 and 3
   (:ticket:`23455`).
 

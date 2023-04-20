@@ -1,15 +1,16 @@
 import re
 
 from django.contrib.auth.views import (
-    INTERNAL_RESET_SESSION_TOKEN, PasswordResetConfirmView,
+    INTERNAL_RESET_SESSION_TOKEN,
+    PasswordResetConfirmView,
 )
 from django.test import Client
 
 
 def extract_token_from_url(url):
-    token_search = re.search(r'/reset/.*/(.+?)/', url)
+    token_search = re.search(r"/reset/.*/(.+?)/", url)
     if token_search:
-        return token_search.group(1)
+        return token_search[1]
 
 
 class PasswordResetConfirmClient(Client):
@@ -22,6 +23,7 @@ class PasswordResetConfirmClient(Client):
     >>> client = PasswordResetConfirmClient()
     >>> client.get('/reset/bla/my-token/')
     """
+
     reset_url_token = PasswordResetConfirmView.reset_url_token
 
     def _get_password_reset_confirm_redirect_url(self, url):

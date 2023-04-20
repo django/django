@@ -1,9 +1,9 @@
-====================================
-Authentication using ``REMOTE_USER``
-====================================
+=========================================
+How to authenticate using ``REMOTE_USER``
+=========================================
 
 This document describes how to make use of external authentication sources
-(where the Web server sets the ``REMOTE_USER`` environment variable) in your
+(where the web server sets the ``REMOTE_USER`` environment variable) in your
 Django applications.  This type of authentication solution is typically seen on
 intranet sites, with single sign-on solutions such as IIS and Integrated
 Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
@@ -12,10 +12,10 @@ Windows Authentication or Apache and `mod_authnz_ldap`_, `CAS`_, `Cosign`_,
 .. _mod_authnz_ldap: https://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html
 .. _CAS: https://www.apereo.org/projects/cas
 .. _Cosign: http://weblogin.org
-.. _WebAuth: https://www.stanford.edu/services/webauth/
+.. _WebAuth: https://uit.stanford.edu/service/authentication
 .. _mod_auth_sspi: https://sourceforge.net/projects/mod-auth-sspi
 
-When the Web server takes care of authentication it typically sets the
+When the web server takes care of authentication it typically sets the
 ``REMOTE_USER`` environment variable for use in the underlying application.  In
 Django, ``REMOTE_USER`` is made available in the :attr:`request.META
 <django.http.HttpRequest.META>` attribute.  Django can be configured to make
@@ -33,10 +33,10 @@ First, you must add the
 :class:`django.contrib.auth.middleware.AuthenticationMiddleware`::
 
     MIDDLEWARE = [
-        '...',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.auth.middleware.RemoteUserMiddleware',
-        '...',
+        "...",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.auth.middleware.RemoteUserMiddleware",
+        "...",
     ]
 
 Next, you must replace the :class:`~django.contrib.auth.backends.ModelBackend`
@@ -44,7 +44,7 @@ with :class:`~django.contrib.auth.backends.RemoteUserBackend` in the
 :setting:`AUTHENTICATION_BACKENDS` setting::
 
     AUTHENTICATION_BACKENDS = [
-        'django.contrib.auth.backends.RemoteUserBackend',
+        "django.contrib.auth.backends.RemoteUserBackend",
     ]
 
 With this setup, ``RemoteUserMiddleware`` will detect the username in
@@ -81,8 +81,9 @@ If your authentication mechanism uses a custom HTTP header and not
 
     from django.contrib.auth.middleware import RemoteUserMiddleware
 
+
     class CustomHeaderMiddleware(RemoteUserMiddleware):
-        header = 'HTTP_AUTHUSER'
+        header = "HTTP_AUTHUSER"
 
 .. warning::
 

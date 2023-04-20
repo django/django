@@ -2,16 +2,17 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2016,2019
+# Carlos C. Leite <caduado@gmail.com>, 2016,2019
 # semente, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-09 16:05+0000\n"
-"Last-Translator: Carlos E C Leite - Cadu <caduado@gmail.com>\n"
+"PO-Revision-Date: 2021-01-17 06:36+0000\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -38,8 +39,8 @@ msgstr "Objeto do tipo de conteúdo %(ct_id)s não tem nenhum model associado"
 
 #, python-format
 msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
-msgstr "O objeto %(obj_id)s do Content Type %(ct_id)s não existe."
+msgstr "O objeto %(obj_id)s do tipo de conteúdo %(ct_id)s não existe."
 
 #, python-format
 msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
-msgstr "os objetos %(ct_name)s não tem o método get_absolute_url()."
+msgstr "os objetos %(ct_name)s não têm o método get_absolute_url()."

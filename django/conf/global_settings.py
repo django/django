@@ -21,8 +21,8 @@ DEBUG = False
 # on a live site.
 DEBUG_PROPAGATE_EXCEPTIONS = False
 
-# People who get code error notifications.
-# In the format [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
+# People who get code error notifications. In the format
+# [('Full Name', 'email@example.com'), ('Full Name', 'anotheremail@example.com')]
 ADMINS = []
 
 # List of IP addresses, as strings, that:
@@ -38,113 +38,119 @@ ALLOWED_HOSTS = []
 # https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 # systems may support all possibilities). When USE_TZ is True, this is
 # interpreted as the default user time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = "America/Chicago"
 
 # If you set this to True, Django will use timezone-aware datetimes.
-USE_TZ = False
+USE_TZ = True
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
 # Languages we provide translations for, out of the box.
 LANGUAGES = [
-    ('af', gettext_noop('Afrikaans')),
-    ('ar', gettext_noop('Arabic')),
-    ('ar-dz', gettext_noop('Algerian Arabic')),
-    ('ast', gettext_noop('Asturian')),
-    ('az', gettext_noop('Azerbaijani')),
-    ('bg', gettext_noop('Bulgarian')),
-    ('be', gettext_noop('Belarusian')),
-    ('bn', gettext_noop('Bengali')),
-    ('br', gettext_noop('Breton')),
-    ('bs', gettext_noop('Bosnian')),
-    ('ca', gettext_noop('Catalan')),
-    ('cs', gettext_noop('Czech')),
-    ('cy', gettext_noop('Welsh')),
-    ('da', gettext_noop('Danish')),
-    ('de', gettext_noop('German')),
-    ('dsb', gettext_noop('Lower Sorbian')),
-    ('el', gettext_noop('Greek')),
-    ('en', gettext_noop('English')),
-    ('en-au', gettext_noop('Australian English')),
-    ('en-gb', gettext_noop('British English')),
-    ('eo', gettext_noop('Esperanto')),
-    ('es', gettext_noop('Spanish')),
-    ('es-ar', gettext_noop('Argentinian Spanish')),
-    ('es-co', gettext_noop('Colombian Spanish')),
-    ('es-mx', gettext_noop('Mexican Spanish')),
-    ('es-ni', gettext_noop('Nicaraguan Spanish')),
-    ('es-ve', gettext_noop('Venezuelan Spanish')),
-    ('et', gettext_noop('Estonian')),
-    ('eu', gettext_noop('Basque')),
-    ('fa', gettext_noop('Persian')),
-    ('fi', gettext_noop('Finnish')),
-    ('fr', gettext_noop('French')),
-    ('fy', gettext_noop('Frisian')),
-    ('ga', gettext_noop('Irish')),
-    ('gd', gettext_noop('Scottish Gaelic')),
-    ('gl', gettext_noop('Galician')),
-    ('he', gettext_noop('Hebrew')),
-    ('hi', gettext_noop('Hindi')),
-    ('hr', gettext_noop('Croatian')),
-    ('hsb', gettext_noop('Upper Sorbian')),
-    ('hu', gettext_noop('Hungarian')),
-    ('hy', gettext_noop('Armenian')),
-    ('ia', gettext_noop('Interlingua')),
-    ('id', gettext_noop('Indonesian')),
-    ('io', gettext_noop('Ido')),
-    ('is', gettext_noop('Icelandic')),
-    ('it', gettext_noop('Italian')),
-    ('ja', gettext_noop('Japanese')),
-    ('ka', gettext_noop('Georgian')),
-    ('kab', gettext_noop('Kabyle')),
-    ('kk', gettext_noop('Kazakh')),
-    ('km', gettext_noop('Khmer')),
-    ('kn', gettext_noop('Kannada')),
-    ('ko', gettext_noop('Korean')),
-    ('lb', gettext_noop('Luxembourgish')),
-    ('lt', gettext_noop('Lithuanian')),
-    ('lv', gettext_noop('Latvian')),
-    ('mk', gettext_noop('Macedonian')),
-    ('ml', gettext_noop('Malayalam')),
-    ('mn', gettext_noop('Mongolian')),
-    ('mr', gettext_noop('Marathi')),
-    ('my', gettext_noop('Burmese')),
-    ('nb', gettext_noop('Norwegian Bokmål')),
-    ('ne', gettext_noop('Nepali')),
-    ('nl', gettext_noop('Dutch')),
-    ('nn', gettext_noop('Norwegian Nynorsk')),
-    ('os', gettext_noop('Ossetic')),
-    ('pa', gettext_noop('Punjabi')),
-    ('pl', gettext_noop('Polish')),
-    ('pt', gettext_noop('Portuguese')),
-    ('pt-br', gettext_noop('Brazilian Portuguese')),
-    ('ro', gettext_noop('Romanian')),
-    ('ru', gettext_noop('Russian')),
-    ('sk', gettext_noop('Slovak')),
-    ('sl', gettext_noop('Slovenian')),
-    ('sq', gettext_noop('Albanian')),
-    ('sr', gettext_noop('Serbian')),
-    ('sr-latn', gettext_noop('Serbian Latin')),
-    ('sv', gettext_noop('Swedish')),
-    ('sw', gettext_noop('Swahili')),
-    ('ta', gettext_noop('Tamil')),
-    ('te', gettext_noop('Telugu')),
-    ('th', gettext_noop('Thai')),
-    ('tr', gettext_noop('Turkish')),
-    ('tt', gettext_noop('Tatar')),
-    ('udm', gettext_noop('Udmurt')),
-    ('uk', gettext_noop('Ukrainian')),
-    ('ur', gettext_noop('Urdu')),
-    ('uz', gettext_noop('Uzbek')),
-    ('vi', gettext_noop('Vietnamese')),
-    ('zh-hans', gettext_noop('Simplified Chinese')),
-    ('zh-hant', gettext_noop('Traditional Chinese')),
+    ("af", gettext_noop("Afrikaans")),
+    ("ar", gettext_noop("Arabic")),
+    ("ar-dz", gettext_noop("Algerian Arabic")),
+    ("ast", gettext_noop("Asturian")),
+    ("az", gettext_noop("Azerbaijani")),
+    ("bg", gettext_noop("Bulgarian")),
+    ("be", gettext_noop("Belarusian")),
+    ("bn", gettext_noop("Bengali")),
+    ("br", gettext_noop("Breton")),
+    ("bs", gettext_noop("Bosnian")),
+    ("ca", gettext_noop("Catalan")),
+    ("ckb", gettext_noop("Central Kurdish (Sorani)")),
+    ("cs", gettext_noop("Czech")),
+    ("cy", gettext_noop("Welsh")),
+    ("da", gettext_noop("Danish")),
+    ("de", gettext_noop("German")),
+    ("dsb", gettext_noop("Lower Sorbian")),
+    ("el", gettext_noop("Greek")),
+    ("en", gettext_noop("English")),
+    ("en-au", gettext_noop("Australian English")),
+    ("en-gb", gettext_noop("British English")),
+    ("eo", gettext_noop("Esperanto")),
+    ("es", gettext_noop("Spanish")),
+    ("es-ar", gettext_noop("Argentinian Spanish")),
+    ("es-co", gettext_noop("Colombian Spanish")),
+    ("es-mx", gettext_noop("Mexican Spanish")),
+    ("es-ni", gettext_noop("Nicaraguan Spanish")),
+    ("es-ve", gettext_noop("Venezuelan Spanish")),
+    ("et", gettext_noop("Estonian")),
+    ("eu", gettext_noop("Basque")),
+    ("fa", gettext_noop("Persian")),
+    ("fi", gettext_noop("Finnish")),
+    ("fr", gettext_noop("French")),
+    ("fy", gettext_noop("Frisian")),
+    ("ga", gettext_noop("Irish")),
+    ("gd", gettext_noop("Scottish Gaelic")),
+    ("gl", gettext_noop("Galician")),
+    ("he", gettext_noop("Hebrew")),
+    ("hi", gettext_noop("Hindi")),
+    ("hr", gettext_noop("Croatian")),
+    ("hsb", gettext_noop("Upper Sorbian")),
+    ("hu", gettext_noop("Hungarian")),
+    ("hy", gettext_noop("Armenian")),
+    ("ia", gettext_noop("Interlingua")),
+    ("id", gettext_noop("Indonesian")),
+    ("ig", gettext_noop("Igbo")),
+    ("io", gettext_noop("Ido")),
+    ("is", gettext_noop("Icelandic")),
+    ("it", gettext_noop("Italian")),
+    ("ja", gettext_noop("Japanese")),
+    ("ka", gettext_noop("Georgian")),
+    ("kab", gettext_noop("Kabyle")),
+    ("kk", gettext_noop("Kazakh")),
+    ("km", gettext_noop("Khmer")),
+    ("kn", gettext_noop("Kannada")),
+    ("ko", gettext_noop("Korean")),
+    ("ky", gettext_noop("Kyrgyz")),
+    ("lb", gettext_noop("Luxembourgish")),
+    ("lt", gettext_noop("Lithuanian")),
+    ("lv", gettext_noop("Latvian")),
+    ("mk", gettext_noop("Macedonian")),
+    ("ml", gettext_noop("Malayalam")),
+    ("mn", gettext_noop("Mongolian")),
+    ("mr", gettext_noop("Marathi")),
+    ("ms", gettext_noop("Malay")),
+    ("my", gettext_noop("Burmese")),
+    ("nb", gettext_noop("Norwegian Bokmål")),
+    ("ne", gettext_noop("Nepali")),
+    ("nl", gettext_noop("Dutch")),
+    ("nn", gettext_noop("Norwegian Nynorsk")),
+    ("os", gettext_noop("Ossetic")),
+    ("pa", gettext_noop("Punjabi")),
+    ("pl", gettext_noop("Polish")),
+    ("pt", gettext_noop("Portuguese")),
+    ("pt-br", gettext_noop("Brazilian Portuguese")),
+    ("ro", gettext_noop("Romanian")),
+    ("ru", gettext_noop("Russian")),
+    ("sk", gettext_noop("Slovak")),
+    ("sl", gettext_noop("Slovenian")),
+    ("sq", gettext_noop("Albanian")),
+    ("sr", gettext_noop("Serbian")),
+    ("sr-latn", gettext_noop("Serbian Latin")),
+    ("sv", gettext_noop("Swedish")),
+    ("sw", gettext_noop("Swahili")),
+    ("ta", gettext_noop("Tamil")),
+    ("te", gettext_noop("Telugu")),
+    ("tg", gettext_noop("Tajik")),
+    ("th", gettext_noop("Thai")),
+    ("tk", gettext_noop("Turkmen")),
+    ("tr", gettext_noop("Turkish")),
+    ("tt", gettext_noop("Tatar")),
+    ("udm", gettext_noop("Udmurt")),
+    ("uk", gettext_noop("Ukrainian")),
+    ("ur", gettext_noop("Urdu")),
+    ("uz", gettext_noop("Uzbek")),
+    ("vi", gettext_noop("Vietnamese")),
+    ("zh-hans", gettext_noop("Simplified Chinese")),
+    ("zh-hant", gettext_noop("Traditional Chinese")),
 ]
 
 # Languages using BiDi (right-to-left) layout
-LANGUAGES_BIDI = ["he", "ar", "ar-dz", "fa", "ur"]
+LANGUAGES_BIDI = ["he", "ar", "ar-dz", "ckb", "fa", "ur"]
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -152,18 +158,13 @@ USE_I18N = True
 LOCALE_PATHS = []
 
 # Settings for language cookie
-LANGUAGE_COOKIE_NAME = 'django_language'
+LANGUAGE_COOKIE_NAME = "django_language"
 LANGUAGE_COOKIE_AGE = None
 LANGUAGE_COOKIE_DOMAIN = None
-LANGUAGE_COOKIE_PATH = '/'
+LANGUAGE_COOKIE_PATH = "/"
 LANGUAGE_COOKIE_SECURE = False
 LANGUAGE_COOKIE_HTTPONLY = False
 LANGUAGE_COOKIE_SAMESITE = None
-
-
-# If you set this to True, Django will format dates, numbers and calendars
-# according to user current locale.
-USE_L10N = False
 
 # Not-necessarily-technical managers of the site. They get broken link
 # notifications and other various emails.
@@ -171,10 +172,10 @@ MANAGERS = ADMINS
 
 # Default charset to use for all HttpResponse objects, if a MIME type isn't
 # manually specified. It's used to construct the Content-Type header.
-DEFAULT_CHARSET = 'utf-8'
+DEFAULT_CHARSET = "utf-8"
 
 # Email address that error messages come from.
-SERVER_EMAIL = 'root@localhost'
+SERVER_EMAIL = "root@localhost"
 
 # Database connection info. If left empty, will default to the dummy backend.
 DATABASES = {}
@@ -186,10 +187,10 @@ DATABASE_ROUTERS = []
 # The default is to use the SMTP backend.
 # Third-party backends can be specified by providing a Python path
 # to a module that defines an EmailBackend class.
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
 # Host for sending email.
-EMAIL_HOST = 'localhost'
+EMAIL_HOST = "localhost"
 
 # Port for sending email.
 EMAIL_PORT = 25
@@ -198,8 +199,8 @@ EMAIL_PORT = 25
 EMAIL_USE_LOCALTIME = False
 
 # Optional SMTP authentication information for EMAIL_HOST.
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = False
 EMAIL_SSL_CERTFILE = None
@@ -212,15 +213,15 @@ INSTALLED_APPS = []
 TEMPLATES = []
 
 # Default form rendering class.
-FORM_RENDERER = 'django.forms.renderers.DjangoTemplates'
+FORM_RENDERER = "django.forms.renderers.DjangoTemplates"
 
 # Default email address to use for various automated correspondence from
 # the site managers.
-DEFAULT_FROM_EMAIL = 'webmaster@localhost'
+DEFAULT_FROM_EMAIL = "webmaster@localhost"
 
 # Subject-line prefix for email messages send with django.core.mail.mail_admins
 # or ...mail_managers.  Make sure to include the trailing space.
-EMAIL_SUBJECT_PREFIX = '[Django] '
+EMAIL_SUBJECT_PREFIX = "[Django] "
 
 # Whether to append trailing slashes to URLs.
 APPEND_SLASH = True
@@ -260,18 +261,31 @@ IGNORABLE_404_URLS = []
 # A secret key for this particular Django installation. Used in secret-key
 # hashing algorithms. Set this in your settings, or Django will complain
 # loudly.
-SECRET_KEY = ''
+SECRET_KEY = ""
+
+# List of secret keys used to verify the validity of signatures. This allows
+# secret key rotation.
+SECRET_KEY_FALLBACKS = []
 
 # Default file storage mechanism that holds media.
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = ""
 
 # URL that handles the media served from MEDIA_ROOT.
 # Examples: "http://example.com/media/", "http://media.example.com/"
-MEDIA_URL = ''
+MEDIA_URL = ""
 
 # Absolute path to the directory static files should be collected to.
 # Example: "/var/www/example.com/static/"
@@ -283,8 +297,8 @@ STATIC_URL = None
 
 # List of upload handler classes to be applied in order.
 FILE_UPLOAD_HANDLERS = [
-    'django.core.files.uploadhandler.MemoryFileUploadHandler',
-    'django.core.files.uploadhandler.TemporaryFileUploadHandler',
+    "django.core.files.uploadhandler.MemoryFileUploadHandler",
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
 
 # Maximum size, in bytes, of a request before it will be streamed to the
@@ -299,13 +313,18 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
 # SuspiciousOperation (TooManyFieldsSent) is raised.
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
 
+# Maximum number of files encoded in a multipart upload that will be read
+# before a SuspiciousOperation (TooManyFilesSent) is raised.
+DATA_UPLOAD_MAX_NUMBER_FILES = 100
+
 # Directory in which upload streamed files will be temporarily saved. A value of
 # `None` will make Django use the operating system's default temporary directory
 # (i.e. "/tmp" on *nix systems).
 FILE_UPLOAD_TEMP_DIR = None
 
 # The numeric mode to set newly-uploaded files to. The value should be a mode
-# you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.
+# you'd pass directly to os.chmod; see
+# https://docs.python.org/library/os.html#files-and-directories.
 FILE_UPLOAD_PERMISSIONS = 0o644
 
 # The numeric mode to assign to newly-created directories, when uploading files.
@@ -321,45 +340,51 @@ FORMAT_MODULE_PATH = None
 
 # Default formatting for date objects. See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATE_FORMAT = 'N j, Y'
+DATE_FORMAT = "N j, Y"
 
 # Default formatting for datetime objects. See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-DATETIME_FORMAT = 'N j, Y, P'
+DATETIME_FORMAT = "N j, Y, P"
 
 # Default formatting for time objects. See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-TIME_FORMAT = 'P'
+TIME_FORMAT = "P"
 
 # Default formatting for date objects when only the year and month are relevant.
 # See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-YEAR_MONTH_FORMAT = 'F Y'
+YEAR_MONTH_FORMAT = "F Y"
 
 # Default formatting for date objects when only the month and day are relevant.
 # See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-MONTH_DAY_FORMAT = 'F j'
+MONTH_DAY_FORMAT = "F j"
 
 # Default short formatting for date objects. See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-SHORT_DATE_FORMAT = 'm/d/Y'
+SHORT_DATE_FORMAT = "m/d/Y"
 
 # Default short formatting for datetime objects.
 # See all available format strings here:
 # https://docs.djangoproject.com/en/dev/ref/templates/builtins/#date
-SHORT_DATETIME_FORMAT = 'm/d/Y P'
+SHORT_DATETIME_FORMAT = "m/d/Y P"
 
 # Default formats to be used when parsing dates from input boxes, in order
 # See all available format string here:
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
 DATE_INPUT_FORMATS = [
-    '%Y-%m-%d', '%m/%d/%Y', '%m/%d/%y',  # '2006-10-25', '10/25/2006', '10/25/06'
-    '%b %d %Y', '%b %d, %Y',             # 'Oct 25 2006', 'Oct 25, 2006'
-    '%d %b %Y', '%d %b, %Y',             # '25 Oct 2006', '25 Oct, 2006'
-    '%B %d %Y', '%B %d, %Y',             # 'October 25 2006', 'October 25, 2006'
-    '%d %B %Y', '%d %B, %Y',             # '25 October 2006', '25 October, 2006'
+    "%Y-%m-%d",  # '2006-10-25'
+    "%m/%d/%Y",  # '10/25/2006'
+    "%m/%d/%y",  # '10/25/06'
+    "%b %d %Y",  # 'Oct 25 2006'
+    "%b %d, %Y",  # 'Oct 25, 2006'
+    "%d %b %Y",  # '25 Oct 2006'
+    "%d %b, %Y",  # '25 Oct, 2006'
+    "%B %d %Y",  # 'October 25 2006'
+    "%B %d, %Y",  # 'October 25, 2006'
+    "%d %B %Y",  # '25 October 2006'
+    "%d %B, %Y",  # '25 October, 2006'
 ]
 
 # Default formats to be used when parsing times from input boxes, in order
@@ -367,9 +392,9 @@ DATE_INPUT_FORMATS = [
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
 TIME_INPUT_FORMATS = [
-    '%H:%M:%S',     # '14:30:59'
-    '%H:%M:%S.%f',  # '14:30:59.000200'
-    '%H:%M',        # '14:30'
+    "%H:%M:%S",  # '14:30:59'
+    "%H:%M:%S.%f",  # '14:30:59.000200'
+    "%H:%M",  # '14:30'
 ]
 
 # Default formats to be used when parsing dates and times from input boxes,
@@ -378,18 +403,15 @@ TIME_INPUT_FORMATS = [
 # https://docs.python.org/library/datetime.html#strftime-behavior
 # * Note that these format strings are different from the ones to display dates
 DATETIME_INPUT_FORMATS = [
-    '%Y-%m-%d %H:%M:%S',     # '2006-10-25 14:30:59'
-    '%Y-%m-%d %H:%M:%S.%f',  # '2006-10-25 14:30:59.000200'
-    '%Y-%m-%d %H:%M',        # '2006-10-25 14:30'
-    '%Y-%m-%d',              # '2006-10-25'
-    '%m/%d/%Y %H:%M:%S',     # '10/25/2006 14:30:59'
-    '%m/%d/%Y %H:%M:%S.%f',  # '10/25/2006 14:30:59.000200'
-    '%m/%d/%Y %H:%M',        # '10/25/2006 14:30'
-    '%m/%d/%Y',              # '10/25/2006'
-    '%m/%d/%y %H:%M:%S',     # '10/25/06 14:30:59'
-    '%m/%d/%y %H:%M:%S.%f',  # '10/25/06 14:30:59.000200'
-    '%m/%d/%y %H:%M',        # '10/25/06 14:30'
-    '%m/%d/%y',              # '10/25/06'
+    "%Y-%m-%d %H:%M:%S",  # '2006-10-25 14:30:59'
+    "%Y-%m-%d %H:%M:%S.%f",  # '2006-10-25 14:30:59.000200'
+    "%Y-%m-%d %H:%M",  # '2006-10-25 14:30'
+    "%m/%d/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
+    "%m/%d/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
+    "%m/%d/%Y %H:%M",  # '10/25/2006 14:30'
+    "%m/%d/%y %H:%M:%S",  # '10/25/06 14:30:59'
+    "%m/%d/%y %H:%M:%S.%f",  # '10/25/06 14:30:59.000200'
+    "%m/%d/%y %H:%M",  # '10/25/06 14:30'
 ]
 
 # First day of week, to be used on calendars
@@ -397,7 +419,7 @@ DATETIME_INPUT_FORMATS = [
 FIRST_DAY_OF_WEEK = 0
 
 # Decimal separator symbol
-DECIMAL_SEPARATOR = '.'
+DECIMAL_SEPARATOR = "."
 
 # Boolean that sets whether to add thousand separator when formatting numbers
 USE_THOUSAND_SEPARATOR = False
@@ -407,14 +429,17 @@ USE_THOUSAND_SEPARATOR = False
 NUMBER_GROUPING = 0
 
 # Thousand separator symbol
-THOUSAND_SEPARATOR = ','
+THOUSAND_SEPARATOR = ","
 
 # The tablespaces to use for each model when not specified otherwise.
-DEFAULT_TABLESPACE = ''
-DEFAULT_INDEX_TABLESPACE = ''
+DEFAULT_TABLESPACE = ""
+DEFAULT_INDEX_TABLESPACE = ""
+
+# Default primary key field type.
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 # Default X-Frame-Options header value
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = "DENY"
 
 USE_X_FORWARDED_HOST = False
 USE_X_FORWARDED_PORT = False
@@ -449,9 +474,9 @@ MIDDLEWARE = []
 ############
 
 # Cache to store session data if using the cache session backend.
-SESSION_CACHE_ALIAS = 'default'
+SESSION_CACHE_ALIAS = "default"
 # Cookie name. This can be whatever you want.
-SESSION_COOKIE_NAME = 'sessionid'
+SESSION_COOKIE_NAME = "sessionid"
 # Age of cookie, in seconds (default: 2 weeks).
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7 * 2
 # A string like "example.com", or None for standard domain cookie.
@@ -459,23 +484,23 @@ SESSION_COOKIE_DOMAIN = None
 # Whether the session cookie should be secure (https:// only).
 SESSION_COOKIE_SECURE = False
 # The path of the session cookie.
-SESSION_COOKIE_PATH = '/'
+SESSION_COOKIE_PATH = "/"
 # Whether to use the HttpOnly flag.
 SESSION_COOKIE_HTTPONLY = True
 # Whether to set the flag restricting cookie leaks on cross-site requests.
-# This can be 'Lax', 'Strict', or None to disable the flag.
-SESSION_COOKIE_SAMESITE = 'Lax'
+# This can be 'Lax', 'Strict', 'None', or False to disable the flag.
+SESSION_COOKIE_SAMESITE = "Lax"
 # Whether to save the session data on every request.
 SESSION_SAVE_EVERY_REQUEST = False
-# Whether a user's session cookie expires when the Web browser is closed.
+# Whether a user's session cookie expires when the web browser is closed.
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 # The module to store session data
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 # Directory to store session files if using the file session module. If None,
 # the backend will use a sensible default.
 SESSION_FILE_PATH = None
 # class to serialize session data
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
+SESSION_SERIALIZER = "django.contrib.sessions.serializers.JSONSerializer"
 
 #########
 # CACHE #
@@ -483,43 +508,40 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 # The cache backends to use.
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
-CACHE_MIDDLEWARE_KEY_PREFIX = ''
+CACHE_MIDDLEWARE_KEY_PREFIX = ""
 CACHE_MIDDLEWARE_SECONDS = 600
-CACHE_MIDDLEWARE_ALIAS = 'default'
+CACHE_MIDDLEWARE_ALIAS = "default"
 
 ##################
 # AUTHENTICATION #
 ##################
 
-AUTH_USER_MODEL = 'auth.User'
+AUTH_USER_MODEL = "auth.User"
 
-AUTHENTICATION_BACKENDS = ['django.contrib.auth.backends.ModelBackend']
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = "/accounts/login/"
 
-LOGIN_REDIRECT_URL = '/accounts/profile/'
+LOGIN_REDIRECT_URL = "/accounts/profile/"
 
 LOGOUT_REDIRECT_URL = None
 
-# The number of days a password reset link is valid for
-PASSWORD_RESET_TIMEOUT_DAYS = 3
-
-# The minimum number of seconds a password reset link is valid for
-# (default: 3 days).
+# The number of seconds a password reset link is valid for (default: 3 days).
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 24 * 3
 
 # the first hasher in this list is the preferred algorithm.  any
 # password using different algorithms will be converted automatically
 # upon login
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
 AUTH_PASSWORD_VALIDATORS = []
@@ -528,7 +550,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # SIGNING #
 ###########
 
-SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
+SIGNING_BACKEND = "django.core.signing.TimestampSigner"
 
 ########
 # CSRF #
@@ -536,17 +558,17 @@ SIGNING_BACKEND = 'django.core.signing.TimestampSigner'
 
 # Dotted path to callable to be used as view when a request is
 # rejected by the CSRF middleware.
-CSRF_FAILURE_VIEW = 'django.views.csrf.csrf_failure'
+CSRF_FAILURE_VIEW = "django.views.csrf.csrf_failure"
 
 # Settings for CSRF cookie.
-CSRF_COOKIE_NAME = 'csrftoken'
+CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52
 CSRF_COOKIE_DOMAIN = None
-CSRF_COOKIE_PATH = '/'
+CSRF_COOKIE_PATH = "/"
 CSRF_COOKIE_SECURE = False
 CSRF_COOKIE_HTTPONLY = False
-CSRF_COOKIE_SAMESITE = 'Lax'
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN"
 CSRF_TRUSTED_ORIGINS = []
 CSRF_USE_SESSIONS = False
 
@@ -555,7 +577,7 @@ CSRF_USE_SESSIONS = False
 ############
 
 # Class to use as messages backend
-MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+MESSAGE_STORAGE = "django.contrib.messages.storage.fallback.FallbackStorage"
 
 # Default values of MESSAGE_LEVEL and MESSAGE_TAGS are defined within
 # django.contrib.messages to avoid imports in this settings file.
@@ -565,21 +587,25 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
 ###########
 
 # The callable to use to configure logging
-LOGGING_CONFIG = 'logging.config.dictConfig'
+LOGGING_CONFIG = "logging.config.dictConfig"
 
 # Custom logging configuration.
 LOGGING = {}
 
+# Default exception reporter class used in case none has been
+# specifically assigned to the HttpRequest instance.
+DEFAULT_EXCEPTION_REPORTER = "django.views.debug.ExceptionReporter"
+
 # Default exception reporter filter class used in case none has been
 # specifically assigned to the HttpRequest instance.
-DEFAULT_EXCEPTION_REPORTER_FILTER = 'django.views.debug.SafeExceptionReporterFilter'
+DEFAULT_EXCEPTION_REPORTER_FILTER = "django.views.debug.SafeExceptionReporterFilter"
 
 ###########
 # TESTING #
 ###########
 
 # The name of the class to use to run the test suite
-TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
 
 # Apps that don't need to be serialized at test database creation time
 # (only apps with migrations are to start with)
@@ -600,13 +626,13 @@ FIXTURE_DIRS = []
 STATICFILES_DIRS = []
 
 # The default file storage backend used during the build process
-STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = [
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 ]
 
@@ -630,12 +656,12 @@ SILENCED_SYSTEM_CHECKS = []
 #######################
 # SECURITY MIDDLEWARE #
 #######################
-SECURE_BROWSER_XSS_FILTER = False
 SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin"
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False
 SECURE_HSTS_SECONDS = 0
 SECURE_REDIRECT_EXEMPT = []
-SECURE_REFERRER_POLICY = None
+SECURE_REFERRER_POLICY = "same-origin"
 SECURE_SSL_HOST = None
 SECURE_SSL_REDIRECT = False

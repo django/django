@@ -4,7 +4,7 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
-    <script src="{% static 'admin/js/cancel.js' %}"></script>
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation{% endblock %}
@@ -21,24 +21,21 @@
 
 {% block content %}
 {% if perms_lacking %}
+  {% block delete_forbidden %}
     <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in perms_lacking %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul id="deleted-objects">{{ perms_lacking|unordered_list }}</ul>
+  {% endblock %}
 {% elif protected %}
+  {% block delete_protected %}
     <p>{% blocktranslate with escaped_object=object %}Deleting the {{ object_name }} '{{ escaped_object }}' would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in protected %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul id="deleted-objects">{{ protected|unordered_list }}</ul>
+  {% endblock %}
 {% else %}
+  {% block delete_confirm %}
     <p>{% blocktranslate with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}
     <h2>{% translate "Objects" %}</h2>
-    <ul>{{ deleted_objects|unordered_list }}</ul>
+    <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
     <form method="post">{% csrf_token %}
     <div>
     <input type="hidden" name="post" value="yes">
@@ -48,5 +45,6 @@
     <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
     </div>
     </form>
+  {% endblock %}
 {% endif %}
-{% endblock %}
+{% endblock content %}

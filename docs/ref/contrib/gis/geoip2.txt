@@ -9,29 +9,36 @@ The :class:`GeoIP2` object is a wrapper for the `MaxMind geoip2 Python
 library`__. [#]_
 
 In order to perform IP-based geolocation, the :class:`GeoIP2` object requires
-the `geoip2 Python library`__ and the GeoIP `Country` and/or `City` `datasets
-in binary format`__ (the CSV files will not work!). Grab the
-``GeoLite2-Country.mmdb.gz`` and ``GeoLite2-City.mmdb.gz`` files and unzip them
-in a directory corresponding to the :setting:`GEOIP_PATH` setting.
+the :pypi:`geoip2` Python package and the GeoIP ``Country`` and/or ``City``
+datasets in binary format (the CSV files will not work!), downloaded from e.g.
+`MaxMind`__ or `DB-IP`__ websites. Grab the ``GeoLite2-Country.mmdb.gz`` and
+``GeoLite2-City.mmdb.gz`` files and unzip them in a directory corresponding to
+the :setting:`GEOIP_PATH` setting.
 
 Additionally, it is recommended to install the `libmaxminddb C library`__, so
 that ``geoip2`` can leverage the C library's faster speed.
 
 __ https://geoip2.readthedocs.io/
-__ https://pypi.org/project/geoip2/
-__ https://dev.maxmind.com/geoip/geoip2/geolite2/
-__ https://github.com/maxmind/libmaxminddb
+__ https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
+__ https://db-ip.com/db/lite.php
+__ https://github.com/maxmind/libmaxminddb/
+
+.. versionchanged:: 4.2
+
+    Support for ``.mmdb`` files downloaded from DB-IP was added.
 
 Example
 =======
 
-Here is an example of its usage::
+Here is an example of its usage:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geoip2 import GeoIP2
     >>> g = GeoIP2()
-    >>> g.country('google.com')
+    >>> g.country("google.com")
     {'country_code': 'US', 'country_name': 'United States'}
-    >>> g.city('72.14.207.99')
+    >>> g.city("72.14.207.99")
     {'city': 'Mountain View',
     'continent_code': 'NA',
     'continent_name': 'North America',
@@ -44,11 +51,11 @@ Here is an example of its usage::
     'postal_code': '94043',
     'region': 'CA',
     'time_zone': 'America/Los_Angeles'}
-    >>> g.lat_lon('salon.com')
+    >>> g.lat_lon("salon.com")
     (39.0437, -77.4875)
-    >>> g.lon_lat('uh.edu')
+    >>> g.lon_lat("uh.edu")
     (-95.4342, 29.834)
-    >>> g.geos('24.124.1.80').wkt
+    >>> g.geos("24.124.1.80").wkt
     'POINT (-97 38)'
 
 API Reference
@@ -85,10 +92,6 @@ Keyword Arguments    Description
                      ``GeoLite2-City.mmdb``. Setting this keyword overrides
                      the :setting:`GEOIP_CITY` setting.
 ===================  =======================================================
-
-.. versionchanged:: 3.0
-
-    Support for :class:`pathlib.Path` ``path`` was added.
 
 Methods
 =======
@@ -158,10 +161,6 @@ Settings
 A string or :class:`pathlib.Path` specifying the directory where the GeoIP data
 files are located. This setting is *required* unless manually specified
 with ``path`` keyword when initializing the :class:`GeoIP2` object.
-
-.. versionchanged:: 3.0
-
-    Support for :class:`pathlib.Path` was added.
 
 .. setting:: GEOIP_COUNTRY
 

@@ -49,10 +49,10 @@ My "list_filter" contains a ManyToManyField, but the filter doesn't display.
 ============================================================================
 
 Django won't bother displaying the filter for a ``ManyToManyField`` if there
-are fewer than two related objects.
+are no related objects.
 
 For example, if your :attr:`~django.contrib.admin.ModelAdmin.list_filter`
-includes :doc:`sites </ref/contrib/sites>`, and there's only one site in your
+includes :doc:`sites </ref/contrib/sites>`, and there are no sites in your
 database, it won't display a "Site" filter. In that case, filtering by site
 would be meaningless.
 
@@ -94,14 +94,18 @@ presentation by editing the CSS stylesheet and/or associated image files. The
 site is built using semantic HTML and plenty of CSS hooks, so any changes you'd
 like to make should be possible by editing the stylesheet.
 
+.. _admin-browser-support:
+
 What browsers are supported for using the admin?
 ================================================
 
-The admin provides a fully-functional experience to `YUI's A-grade`_ browsers,
-with the notable exception of IE6, which is not supported.
+The admin provides a fully-functional experience to the recent versions of
+modern, web standards compliant browsers. On desktop this means Chrome, Edge,
+Firefox, Opera, Safari, and others.
 
-There *may* be minor stylistic differences between supported browsers—for
-example, some browsers may not support rounded corners. These are considered
-acceptable variations in rendering.
+On mobile and tablet devices, the admin provides a responsive experience for
+web standards compliant browsers. This includes the major browsers on both
+Android and iOS.
 
-.. _YUI's A-grade: https://github.com/yui/yui3/wiki/Graded-Browser-Support
+Depending on feature support, there *may* be minor stylistic differences
+between browsers. These are considered acceptable variations in rendering.

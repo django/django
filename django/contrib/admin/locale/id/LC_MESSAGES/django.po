@@ -2,21 +2,21 @@
 #
 # Translators:
 # Claude Paroz <claude@2xlibre.net>, 2014
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2019
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2019,2021-2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # M Asep Indrayana <me@drayanaindra.com>, 2015
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016,2020
 # rodin <romihardiyanto@gmail.com>, 2011-2013
 # rodin <romihardiyanto@gmail.com>, 2013-2017
-# sage <laymonage@gmail.com>, 2019
+# sag᠎e <laymonage@gmail.com>, 2019
 # Sutrisno Efendi <kangfend@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-18 13:06+0000\n"
-"Last-Translator: sage <laymonage@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +24,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: id\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Hapus %(verbose_name_plural)s yang dipilih"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -35,10 +39,6 @@ msgstr "Tidak dapat menghapus %(name)s"
 
 msgid "Are you sure?"
 msgstr "Yakin?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Hapus %(verbose_name_plural)s yang dipilih"
 
 msgid "Administration"
 msgstr "Administrasi"
@@ -75,6 +75,12 @@ msgstr "Tidak ada tanggal"
 
 msgid "Has date"
 msgstr "Ada tanggal"
+
+msgid "Empty"
+msgstr "Kosong"
+
+msgid "Not empty"
+msgstr "Tidak kosong"
 
 #, python-format
 msgid ""
@@ -265,8 +271,9 @@ msgstr "0 dari %(cnt)s dipilih"
 msgid "Change history: %s"
 msgstr "Ubah riwayat: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -336,6 +343,19 @@ msgstr "Pilih seluruh %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Bersihkan pilihan"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Model pada aplikasi %(name)s"
+
+msgid "Add"
+msgstr "Tambah"
+
+msgid "View"
+msgstr "Lihat"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Anda tidak memiliki izin untuk melihat atau mengedit apa pun."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -383,6 +403,9 @@ msgstr "Lihat di situs"
 
 msgid "Filter"
 msgstr "Filter"
+
+msgid "Clear all filters"
+msgstr "Hapus semua penyaringan"
 
 msgid "Remove from sorting"
 msgstr "Dihapus dari pengurutan"
@@ -461,9 +484,6 @@ msgstr ""
 "Yakin akan menghapus %(objects_name)s terpilih? Semua objek berikut beserta "
 "objek terkait juga akan dihapus:"
 
-msgid "View"
-msgstr "Lihat"
-
 msgid "Delete?"
 msgstr "Hapus?"
 
@@ -473,16 +493,6 @@ msgstr " Berdasarkan %(filter_title)s "
 
 msgid "Summary"
 msgstr "Ringkasan"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Model pada aplikasi %(name)s"
-
-msgid "Add"
-msgstr "Tambah"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Anda tidak memiliki izin untuk melihat atau mengedit apa pun."
 
 msgid "Recent actions"
 msgstr "Tindakan terbaru"
@@ -515,6 +525,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Lupa nama pengguna atau sandi?"
 
+msgid "Toggle navigation"
+msgstr "Alihkan navigasi"
+
+msgid "Start typing to filter…"
+msgstr "Mulai mengetik untuk menyaring..."
+
+msgid "Filter navigation items"
+msgstr "Navigasi pencarian barang"
+
 msgid "Date/time"
 msgstr "Tanggal/waktu"
 
@@ -523,6 +542,12 @@ msgstr "Pengguna"
 
 msgid "Action"
 msgstr "Aksi"
+
+msgid "entry"
+msgstr "masukan"
+
+msgid "entries"
+msgstr "masukan"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -579,8 +604,14 @@ msgstr "Tambahkan %(model)s yang lain"
 msgid "Delete selected %(model)s"
 msgstr "Hapus %(model)s yang dipilih"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Terima kasih telah menggunakan situs ini hari ini."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Menampilkan %(model)s terpilih"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Terima kasih untuk meluangkan waktu berkualitas dengan jaringan situs hari "
+"ini."
 
 msgid "Log in again"
 msgstr "Masuk kembali"

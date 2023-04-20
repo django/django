@@ -71,6 +71,10 @@ method from the handler which takes care of applying :ref:`view middleware
 applying :ref:`template-response <template-response-middleware>` and
 :ref:`exception <exception-middleware>` middleware.
 
+Middleware can either support only synchronous Python (the default), only
+asynchronous Python, or both. See :ref:`async-middleware` for details of how to
+advertise what you support, and know what kind of request you are getting.
+
 Middleware can live anywhere on your Python path.
 
 ``__init__(get_response)``
@@ -84,7 +88,7 @@ caveats:
   so you can't define ``__init__()`` as requiring any other arguments.
 
 * Unlike the ``__call__()`` method which is called once per request,
-  ``__init__()`` is called only *once*, when the Web server starts.
+  ``__init__()`` is called only *once*, when the web server starts.
 
 Marking middleware as unused
 ----------------------------
@@ -107,13 +111,13 @@ example, here's the default value created by :djadmin:`django-admin
 startproject <startproject>`::
 
     MIDDLEWARE = [
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
+        "django.middleware.security.SecurityMiddleware",
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.common.CommonMiddleware",
+        "django.middleware.csrf.CsrfViewMiddleware",
+        "django.contrib.auth.middleware.AuthenticationMiddleware",
+        "django.contrib.messages.middleware.MessageMiddleware",
+        "django.middleware.clickjacking.XFrameOptionsMiddleware",
     ]
 
 A Django installation doesn't require any middleware — :setting:`MIDDLEWARE`
@@ -263,6 +267,16 @@ must test for streaming responses and adjust their behavior accordingly::
             for chunk in content:
                 yield alter_content(chunk)
 
+:class:`~django.http.StreamingHttpResponse` allows both synchronous and
+asynchronous iterators. The wrapping function must match. Check
+:attr:`StreamingHttpResponse.is_async
+<django.http.StreamingHttpResponse.is_async>` if your middleware needs to
+support both types of iterator.
+
+..  versionchanged:: 4.2
+
+    Support for streaming responses with asynchronous iterators was added.
+
 Exception handling
 ==================
 
@@ -282,6 +296,104 @@ if the very next middleware in the chain raises an
 that exception; instead it will get an :class:`~django.http.HttpResponse`
 object with a :attr:`~django.http.HttpResponse.status_code` of 404.
 
+You can set :setting:`DEBUG_PROPAGATE_EXCEPTIONS` to ``True`` to skip this
+conversion and propagate exceptions upward.
+
+.. _async-middleware:
+
+Asynchronous support
+====================
+
+Middleware can support any combination of synchronous and asynchronous
+requests. Django will adapt requests to fit the middleware's requirements if it
+cannot support both, but at a performance penalty.
+
+By default, Django assumes that your middleware is capable of handling only
+synchronous requests. To change these assumptions, set the following attributes
+on your middleware factory function or class:
+
+* ``sync_capable`` is a boolean indicating if the middleware can handle
+  synchronous requests. Defaults to ``True``.
+
+* ``async_capable`` is a boolean indicating if the middleware can handle
+  asynchronous requests. Defaults to ``False``.
+
+If your middleware has both ``sync_capable = True`` and
+``async_capable = True``, then Django will pass it the request without
+converting it. In this case, you can work out if your middleware will receive
+async requests by checking if the ``get_response`` object you are passed is a
+coroutine function, using ``asgiref.sync.iscoroutinefunction``.
+
+The ``django.utils.decorators`` module contains
+:func:`~django.utils.decorators.sync_only_middleware`,
+:func:`~django.utils.decorators.async_only_middleware`, and
+:func:`~django.utils.decorators.sync_and_async_middleware` decorators that
+allow you to apply these flags to middleware factory functions.
+
+The returned callable must match the sync or async nature of the
+``get_response`` method. If you have an asynchronous ``get_response``, you must
+return a coroutine function (``async def``).
+
+``process_view``, ``process_template_response`` and ``process_exception``
+methods, if they are provided, should also be adapted to match the sync/async
+mode. However, Django will individually adapt them as required if you do not,
+at an additional performance penalty.
+
+Here's an example of how to create a middleware function that supports both::
+
+    from asgiref.sync import iscoroutinefunction
+    from django.utils.decorators import sync_and_async_middleware
+
+
+    @sync_and_async_middleware
+    def simple_middleware(get_response):
+        # One-time configuration and initialization goes here.
+        if iscoroutinefunction(get_response):
+
+            async def middleware(request):
+                # Do something here!
+                response = await get_response(request)
+                return response
+
+        else:
+
+            def middleware(request):
+                # Do something here!
+                response = get_response(request)
+                return response
+
+        return middleware
+
+.. note::
+
+    If you declare a hybrid middleware that supports both synchronous and
+    asynchronous calls, the kind of call you get may not match the underlying
+    view. Django will optimize the middleware call stack to have as few
+    sync/async transitions as possible.
+
+    Thus, even if you are wrapping an async view, you may be called in sync
+    mode if there is other, synchronous middleware between you and the view.
+
+When using an asynchronous class-based middleware, you must ensure that
+instances are correctly marked as coroutine functions::
+
+    from asgiref.sync import iscoroutinefunction, markcoroutinefunction
+
+
+    class AsyncMiddleware:
+        async_capable = True
+        sync_capable = False
+
+        def __init__(self, get_response):
+            self.get_response = get_response
+            if iscoroutinefunction(self.get_response):
+                markcoroutinefunction(self)
+
+        async def __call__(self, request):
+            response = await self.get_response(request)
+            # Some logic ...
+            return response
+
 .. _upgrading-middleware:
 
 Upgrading pre-Django 1.10-style middleware
@@ -292,11 +404,11 @@ Upgrading pre-Django 1.10-style middleware
 
 Django provides ``django.utils.deprecation.MiddlewareMixin`` to ease creating
 middleware classes that are compatible with both :setting:`MIDDLEWARE` and the
-old ``MIDDLEWARE_CLASSES``. All middleware classes included with Django
-are compatible with both settings.
+old ``MIDDLEWARE_CLASSES``, and support synchronous and asynchronous requests.
+All middleware classes included with Django are compatible with both settings.
 
-The mixin provides an ``__init__()`` method that accepts an optional
-``get_response`` argument and stores it in ``self.get_response``.
+The mixin provides an ``__init__()`` method that requires a ``get_response``
+argument and stores it in ``self.get_response``.
 
 The ``__call__()`` method:
 

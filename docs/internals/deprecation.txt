@@ -7,6 +7,207 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-6.0:
+
+6.0
+---
+
+See the :ref:`Django 5.0 release notes <deprecated-features-5.0>` for more
+details on these changes.
+
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers will be removed.
+
+* Support for passing positional arguments to ``BaseConstraint`` will be
+  removed.
+
+* ``request`` will be required in the signature of
+  ``ModelAdmin.lookup_allowed()`` subclasses.
+
+* The ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+  ``get_joining_columns()``.
+
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` will be removed.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method will be removed.
+
+.. _deprecation-removed-in-5.1:
+
+5.1
+---
+
+See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
+details on these changes.
+
+* The ``BaseUserManager.make_random_password()`` method will be removed.
+
+* The model's ``Meta.index_together`` option will be removed.
+
+* The ``length_is`` template filter will be removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` will be removed. Stub fields
+  will remain for compatibility with historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin will be removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
+  will be removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method will be removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method will be removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions will be removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` will be removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings will be
+  removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function will be
+  removed.
+
+.. _deprecation-removed-in-5.0:
+
+5.0
+---
+
+See the :ref:`Django 4.0 release notes <deprecated-features-4.0>` for more
+details on these changes.
+
+* The ``SERIALIZE`` test setting will be removed.
+
+* The undocumented ``django.utils.baseconv`` module will be removed.
+
+* The undocumented ``django.utils.datetime_safe`` module will be removed.
+
+* The default value of the ``USE_TZ`` setting will change from ``False`` to
+  ``True``.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request will change from ``'http'`` to ``'https'``.
+
+* The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
+  ``DiscoverRunner.run_tests()`` will be removed.
+
+* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+  ``StringAgg`` aggregates will return ``None`` when there are no rows instead
+  of ``[]``, ``[]``, and ``''`` respectively.
+
+* The ``USE_L10N`` setting will be removed.
+
+* The ``USE_DEPRECATED_PYTZ`` transitional setting will be removed.
+
+* Support for ``pytz`` timezones will be removed.
+
+* The ``is_dst`` argument will be removed from:
+
+  * ``QuerySet.datetimes()``
+  * ``django.utils.timezone.make_aware()``
+  * ``django.db.models.functions.Trunc()``
+  * ``django.db.models.functions.TruncSecond()``
+  * ``django.db.models.functions.TruncMinute()``
+  * ``django.db.models.functions.TruncHour()``
+  * ``django.db.models.functions.TruncDay()``
+  * ``django.db.models.functions.TruncWeek()``
+  * ``django.db.models.functions.TruncMonth()``
+  * ``django.db.models.functions.TruncQuarter()``
+  * ``django.db.models.functions.TruncYear()``
+
+* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+  will be removed.
+
+* The undocumented ``BaseForm._html_output()`` method will be removed.
+
+* The ability to return a ``str``, rather than a ``SafeString``, when rendering
+  an ``ErrorDict`` and ``ErrorList`` will be removed.
+
+See the :ref:`Django 4.1 release notes <deprecated-features-4.1>` for more
+details on these changes.
+
+* The ``SitemapIndexItem.__str__()`` method will be removed.
+
+* The ``CSRF_COOKIE_MASKED`` transitional setting will be removed.
+
+* The ``name`` argument of ``django.utils.functional.cached_property()`` will
+  be removed.
+
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` will be removed.
+
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will be
+  removed.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` will be removed.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument will no longer be
+  allowed.
+
+* Passing unsaved model instances to related filters will no longer be allowed.
+
+* ``created=True`` will be required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` will be removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` will be
+  removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` will no
+  longer be allowed.
+
+* The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
+
+* The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates will be removed.
+
+* The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
+  ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
+  expression will be removed.
+
+.. _deprecation-removed-in-4.1:
+
+4.1
+---
+
+See the :ref:`Django 3.2 release notes <deprecated-features-3.2>` for more
+details on these changes.
+
+* Support for assigning objects which don't support creating deep copies with
+  ``copy.deepcopy()`` to class attributes in ``TestCase.setUpTestData()`` will
+  be removed.
+
+* ``BaseCommand.requires_system_checks`` won't support boolean values.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  ``django.core.validators.EmailValidator`` will be removed.
+
+* The ``default_app_config`` module variable will be removed.
+
+* ``TransactionTestCase.assertQuerysetEqual()`` will no longer automatically
+  call ``repr()`` on a queryset when compared to string values.
+
+* ``django.core.cache.backends.memcached.MemcachedCache`` will be removed.
+
+* Support for the pre-Django 3.2 format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
 .. _deprecation-removed-in-4.0:
 
 4.0
@@ -34,6 +235,9 @@ details on these changes.
 
 * ``django.utils.http.is_safe_url()`` will be removed.
 
+See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
+details on these changes.
+
 * The ``PASSWORD_RESET_TIMEOUT_DAYS`` setting will be removed.
 
 * The undocumented usage of the :lookup:`isnull` lookup with non-boolean values
@@ -44,8 +248,56 @@ details on these changes.
 
 * The ``django-admin.py`` entry point will be removed.
 
-See the :ref:`Django 3.1 release notes <deprecated-features-3.1>` for more
-details on these changes.
+* The ``HttpRequest.is_ajax()`` method will be removed.
+
+* Support for the pre-Django 3.1 encoding format of cookies values used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` will be removed.
+
+* Support for the pre-Django 3.1 password reset tokens in the admin site (that
+  use the SHA-1 hashing algorithm) will be removed.
+
+* Support for the pre-Django 3.1 encoding format of sessions will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.Signer`` signatures
+  (encoded with the SHA-1 algorithm) will be removed.
+
+* Support for the pre-Django 3.1 ``django.core.signing.dumps()`` signatures
+  (encoded with the SHA-1 algorithm) in ``django.core.signing.loads()`` will be
+  removed.
+
+* Support for the pre-Django 3.1 user sessions (that use the SHA-1 algorithm)
+  will be removed.
+
+* The ``get_response`` argument for
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` will be required and
+  won't accept ``None``.
+
+* The ``providing_args`` argument for ``django.dispatch.Signal`` will be
+  removed.
+
+* The ``length`` argument for ``django.utils.crypto.get_random_string()`` will
+  be required.
+
+* The ``list`` message for ``ModelMultipleChoiceField`` will be removed.
+
+* Support for passing raw column aliases to ``QuerySet.order_by()`` will be
+  removed.
+
+* The model ``NullBooleanField`` will be removed. A stub field will remain for
+  compatibility with historical migrations.
+
+* ``django.conf.urls.url()`` will be removed.
+
+* The model ``django.contrib.postgres.fields.JSONField`` will be removed. A
+  stub field will remain for compatibility with historical migrations.
+
+* ``django.contrib.postgres.forms.JSONField``,
+  ``django.contrib.postgres.fields.jsonb.KeyTransform``, and
+  ``django.contrib.postgres.fields.jsonb.KeyTextTransform`` will be removed.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags will be removed.
+
+* The ``DEFAULT_HASHING_ALGORITHM`` transitional setting will be removed.
 
 .. _deprecation-removed-in-3.1:
 
@@ -634,7 +886,7 @@ details on these changes.
 * Database test settings as independent entries in the database settings,
   prefixed by ``TEST_``, will no longer be supported.
 
-* The `cache_choices` option to :class:`~django.forms.ModelChoiceField` and
+* The ``cache_choices`` option to :class:`~django.forms.ModelChoiceField` and
   :class:`~django.forms.ModelMultipleChoiceField` will be removed.
 
 * The default value of the
@@ -798,8 +1050,8 @@ details on these changes.
   supports base36 encoded user IDs
   (``django.contrib.auth.views.password_reset_confirm_uidb36``) will be
   removed. If your site has been running Django 1.6 for more than
-  :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect. If
-  not, then any password reset links generated before you upgrade to Django 1.7
+  ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect. If not,
+  then any password reset links generated before you upgrade to Django 1.7
   won't work after the upgrade.
 
 * The ``django.utils.encoding.StrAndUnicode`` mix-in will be removed.
@@ -992,7 +1244,7 @@ details on these changes.
 * The ``django.contrib.gis.db.backend`` module will be removed in favor
   of the specific backends.
 
-* ``SMTPConnection`` will be removed in favor of a generic Email backend API.
+* ``SMTPConnection`` will be removed in favor of a generic email backend API.
 
 * The many to many SQL generation functions on the database backends
   will be removed.

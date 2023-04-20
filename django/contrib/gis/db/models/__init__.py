@@ -5,14 +5,26 @@ import django.contrib.gis.db.models.lookups  # NOQA
 from django.contrib.gis.db.models.aggregates import *  # NOQA
 from django.contrib.gis.db.models.aggregates import __all__ as aggregates_all
 from django.contrib.gis.db.models.fields import (
-    GeometryCollectionField, GeometryField, LineStringField,
-    MultiLineStringField, MultiPointField, MultiPolygonField, PointField,
-    PolygonField, RasterField,
+    GeometryCollectionField,
+    GeometryField,
+    LineStringField,
+    MultiLineStringField,
+    MultiPointField,
+    MultiPolygonField,
+    PointField,
+    PolygonField,
+    RasterField,
 )
 
 __all__ = models_all + aggregates_all
 __all__ += [
-    'GeometryCollectionField', 'GeometryField', 'LineStringField',
-    'MultiLineStringField', 'MultiPointField', 'MultiPolygonField', 'PointField',
-    'PolygonField', 'RasterField',
+    "GeometryCollectionField",
+    "GeometryField",
+    "LineStringField",
+    "MultiLineStringField",
+    "MultiPointField",
+    "MultiPolygonField",
+    "PointField",
+    "PolygonField",
+    "RasterField",
 ]

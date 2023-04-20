@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -13,9 +14,14 @@ class Article(models.Model):
     """
     A simple Article model for testing
     """
+
     site = models.ForeignKey(Site, models.CASCADE, related_name="admin_articles")
     title = models.CharField(max_length=100)
-    hist = models.CharField(max_length=100, verbose_name=_("History"))
+    hist = models.CharField(
+        max_length=100,
+        verbose_name=_("History"),
+        help_text=_("History help text"),
+    )
     created = models.DateTimeField(null=True)
 
     def __str__(self):
@@ -24,9 +30,9 @@ class Article(models.Model):
     def test_from_model(self):
         return "nothing"
 
+    @admin.display(description="not What you Expect")
     def test_from_model_with_override(self):
         return "nothing"
-    test_from_model_with_override.short_description = "not What you Expect"
 
 
 class ArticleProxy(Article):
@@ -36,7 +42,7 @@ class ArticleProxy(Article):
 
 class Count(models.Model):
     num = models.PositiveSmallIntegerField()
-    parent = models.ForeignKey('self', models.CASCADE, null=True)
+    parent = models.ForeignKey("self", models.CASCADE, null=True)
 
     def __str__(self):
         return str(self.num)
@@ -47,7 +53,7 @@ class Event(models.Model):
 
 
 class Location(models.Model):
-    event = models.OneToOneField(Event, models.CASCADE, verbose_name='awesome event')
+    event = models.OneToOneField(Event, models.CASCADE, verbose_name="awesome event")
 
 
 class Guest(models.Model):
@@ -71,7 +77,7 @@ class VehicleMixin(Vehicle):
         Vehicle,
         models.CASCADE,
         parent_link=True,
-        related_name='vehicle_%(app_label)s_%(class)s',
+        related_name="vehicle_%(app_label)s_%(class)s",
     )
 
     class Meta:

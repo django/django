@@ -2,16 +2,18 @@
   "name": "Django",
   "private": true,
   "scripts": {
-    "pretest": "eslint django/ js_tests/admin/ js_tests/gis/",
+    "pretest": "eslint .",
     "test": "grunt test --verbose"
   },
   "engines": {
-    "npm": ">=1.3.0 <3.0.0"
+    "npm": ">=1.3.0"
   },
   "devDependencies": {
-    "eslint": "^4.18.2",
-    "grunt": "^1.0.1",
-    "grunt-cli": "^1.2.0",
-    "grunt-contrib-qunit": "^1.2.0"
+    "eslint": "^8.36.0",
+    "puppeteer": "^19.8.2",
+    "grunt": "^1.6.1",
+    "grunt-cli": "^1.4.3",
+    "grunt-contrib-qunit": "^7.0.0",
+    "qunit": "^2.19.4"
   }
 }

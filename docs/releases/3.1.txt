@@ -1,8 +1,8 @@
-============================================
-Django 3.1 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 3.1 release notes
+========================
 
-*Expected August 2020*
+*August 4, 2020*
 
 Welcome to Django 3.1!
 
@@ -19,13 +19,107 @@ project.
 Python compatibility
 ====================
 
-Django 3.1 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.1 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.1.3). We **highly
+recommend** and only officially support the latest release of each series.
 
 .. _whats-new-3.1:
 
 What's new in Django 3.1
 ========================
+
+Asynchronous views and middleware support
+-----------------------------------------
+
+Django now supports a fully asynchronous request path, including:
+
+* :ref:`Asynchronous views <async-views>`
+* :ref:`Asynchronous middleware <async-middleware>`
+* :ref:`Asynchronous tests and test client <async-tests>`
+
+To get started with async views, you need to declare a view using
+``async def``::
+
+    async def my_view(request):
+        await asyncio.sleep(0.5)
+        return HttpResponse("Hello, async world!")
+
+All asynchronous features are supported whether you are running under WSGI or
+ASGI mode. However, there will be performance penalties using async code in
+WSGI mode. You can read more about the specifics in :doc:`/topics/async`
+documentation.
+
+You are free to mix async and sync views, middleware, and tests as much as you
+want. Django will ensure that you always end up with the right execution
+context. We expect most projects will keep the majority of their views
+synchronous, and only have a select few running in async mode - but it is
+entirely your choice.
+
+Django's ORM, cache layer, and other pieces of code that do long-running
+network calls do not yet support async access. We expect to add support for
+them in upcoming releases. Async views are ideal, however, if you are doing a
+lot of API or HTTP calls inside your view, you can now natively do all those
+HTTP calls in parallel to considerably speed up your view's execution.
+
+Asynchronous support should be entirely backwards-compatible and we have tried
+to ensure that it has no speed regressions for your existing, synchronous code.
+It should have no noticeable effect on any existing Django projects.
+
+JSONField for all supported database backends
+---------------------------------------------
+
+Django now includes :class:`.models.JSONField` and
+:class:`forms.JSONField <django.forms.JSONField>` that can be used on all
+supported database backends. Both fields support the use of custom JSON
+encoders and decoders. The model field supports the introspection,
+:ref:`lookups, and transforms <querying-jsonfield>` that were previously
+PostgreSQL-only::
+
+    from django.db import models
+
+
+    class ContactInfo(models.Model):
+        data = models.JSONField()
+
+
+    ContactInfo.objects.create(
+        data={
+            "name": "John",
+            "cities": ["London", "Cambridge"],
+            "pets": {"dogs": ["Rufus", "Meg"]},
+        }
+    )
+    ContactInfo.objects.filter(
+        data__name="John",
+        data__pets__has_key="dogs",
+        data__cities__contains="London",
+    ).delete()
+
+If your project uses ``django.contrib.postgres.fields.JSONField``, plus the
+related form field and transforms, you should adjust to use the new fields,
+and generate and apply a database migration. For now, the old fields and
+transforms are left as a reference to the new ones and are :ref:`deprecated as
+of this release <deprecated-jsonfield>`.
+
+.. _default-hashing-algorithm-usage:
+
+``DEFAULT_HASHING_ALGORITHM`` settings
+--------------------------------------
+
+The new ``DEFAULT_HASHING_ALGORITHM`` transitional setting allows specifying
+the default hashing algorithm to use for encoding cookies, password reset
+tokens in the admin site, user sessions, and signatures created by
+:class:`django.core.signing.Signer` and :meth:`django.core.signing.dumps`.
+
+Support for SHA-256 was added in Django 3.1. If you are upgrading multiple
+instances of the same project to Django 3.1, you should set
+``DEFAULT_HASHING_ALGORITHM`` to ``'sha1'`` during the transition, in order to
+allow compatibility with the older versions of Django. Note that this requires
+Django 3.1.1+. Once the transition to 3.1 is complete you can stop overriding
+``DEFAULT_HASHING_ALGORITHM``.
+
+This setting is deprecated as of this release, because support for tokens,
+cookies, sessions, and signatures that use SHA-1 algorithm will be removed in
+Django 4.0.
 
 Minor features
 --------------
@@ -37,10 +131,26 @@ Minor features
   :attr:`.ModelAdmin.list_filter` allows filtering on empty values (empty
   strings and nulls) in the admin changelist view.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Filters in the right sidebar of the admin changelist view now contain a link
+  to clear all filters.
 
-* ...
+* The admin now has a sidebar on larger screens for easier navigation. It is
+  enabled by default but can be disabled by using a custom ``AdminSite`` and
+  setting :attr:`.AdminSite.enable_nav_sidebar` to ``False``.
+
+  Rendering the sidebar requires access to the current request in order to set
+  CSS and ARIA role affordances. This requires using
+  ``'django.template.context_processors.request'`` in the
+  ``'context_processors'`` option of :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+* Initially empty ``extra`` inlines can now be removed, in the same way as
+  dynamically created ones.
+
+* ``XRegExp`` is upgraded from version 2.0.0 to 3.2.0.
+
+* jQuery is upgraded from version 3.4.1 to 3.5.1.
+
+* Select2 library is upgraded from version 4.0.7 to 4.0.13.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,15 +158,24 @@ Minor features
 * The default iteration count for the PBKDF2 password hasher is increased from
   180,000 to 216,000.
 
-* Added the :setting:`PASSWORD_RESET_TIMEOUT` setting to define the minimum
-  number of seconds a password reset link is valid for. This is encouraged
-  instead of deprecated ``PASSWORD_RESET_TIMEOUT_DAYS``, which will be removed
+* The new :setting:`PASSWORD_RESET_TIMEOUT` setting allows defining the number
+  of seconds a password reset link is valid for. This is encouraged instead of
+  the deprecated ``PASSWORD_RESET_TIMEOUT_DAYS`` setting, which will be removed
   in Django 4.0.
+
+* The password reset mechanism now uses the SHA-256 hashing algorithm. Support
+  for tokens that use the old hashing algorithm remains until Django 4.0.
+
+* :meth:`.AbstractBaseUser.get_session_auth_hash` now uses the SHA-256 hashing
+  algorithm. Support for user sessions that use the old hashing algorithm
+  remains until Django 4.0.
 
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`remove_stale_contenttypes --include-stale-apps` option
+  allows removing stale content types from previously installed apps that have
+  been removed from :setting:`INSTALLED_APPS`.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -71,10 +190,12 @@ Minor features
 * Added the :class:`~django.contrib.gis.db.models.functions.AsWKB` and
   :class:`~django.contrib.gis.db.models.functions.AsWKT` functions.
 
-:mod:`django.contrib.messages`
+* Added support for PostGIS 3 and GDAL 3.
+
+:mod:`django.contrib.humanize`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :tfilter:`intword` template filter now supports negative integers.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -89,8 +210,9 @@ Minor features
   :class:`~django.contrib.postgres.fields.RangeField`.
 
 * The new :lookup:`rangefield.lower_inc`, :lookup:`rangefield.lower_inf`,
-  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` allows
-  querying :class:`~django.contrib.postgres.fields.RangeField` by a bound type.
+  :lookup:`rangefield.upper_inc`, and :lookup:`rangefield.upper_inf` lookups
+  allow querying :class:`~django.contrib.postgres.fields.RangeField` by a bound
+  type.
 
 * :lookup:`rangefield.contained_by` now supports
   :class:`~django.db.models.SmallAutoField`,
@@ -102,10 +224,24 @@ Minor features
 * :class:`~django.contrib.postgres.search.SearchQuery` now supports
   ``'websearch'`` search type on PostgreSQL 11+.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* :class:`SearchQuery.value <django.contrib.postgres.search.SearchQuery>` now
+  supports query expressions.
 
-* ...
+* The new :class:`~django.contrib.postgres.search.SearchHeadline` class allows
+  highlighting search results.
+
+* :lookup:`search` lookup now supports query expressions.
+
+* The new ``cover_density`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows ranking by cover
+  density.
+
+* The new ``normalization`` parameter of
+  :class:`~django.contrib.postgres.search.SearchRank` allows rank
+  normalization.
+
+* The new :attr:`.ExclusionConstraint.deferrable` attribute allows creating
+  deferrable exclusion constraints.
 
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -114,25 +250,10 @@ Minor features
   value to explicitly state that the cookie is sent with all same-site and
   cross-site requests.
 
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 :mod:`django.contrib.staticfiles`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * The :setting:`STATICFILES_DIRS` setting now supports :class:`pathlib.Path`.
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Cache
 ~~~~~
@@ -158,16 +279,34 @@ Email
 * The :setting:`EMAIL_FILE_PATH` setting, used by the :ref:`file email backend
   <topic-email-file-backend>`, now supports :class:`pathlib.Path`.
 
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* :class:`django.views.debug.SafeExceptionReporterFilter` now filters sensitive
+  values from ``request.META`` in exception reports.
+
+* The new :attr:`.SafeExceptionReporterFilter.cleansed_substitute` and
+  :attr:`.SafeExceptionReporterFilter.hidden_settings` attributes allow
+  customization of sensitive settings and ``request.META`` filtering in
+  exception reports.
+
+* The technical 404 debug view now respects
+  :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` when applying settings
+  filtering.
+
+* The new :setting:`DEFAULT_EXCEPTION_REPORTER` allows providing a
+  :class:`django.views.debug.ExceptionReporter` subclass to customize exception
+  report generation. See :ref:`custom-error-reports` for details.
+
 File Storage
 ~~~~~~~~~~~~
 
 * ``FileSystemStorage.save()`` method now supports :class:`pathlib.Path`.
 
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
+* :class:`~django.db.models.FileField` and
+  :class:`~django.db.models.ImageField` now accept a callable for ``storage``.
+  This allows you to modify the used storage at runtime, selecting different
+  storages for different environments, for example.
 
 Forms
 ~~~~~
@@ -180,13 +319,20 @@ Forms
   details.
 
 * :class:`django.forms.DateTimeField` now accepts dates in a subset of ISO 8601
-  datetime formats, including optional timezone (e.g. ``2019-10-10T06:47``,
-  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``).
+  datetime formats, including optional timezone, e.g. ``2019-10-10T06:47``,
+  ``2019-10-10T06:47:23+04:00``, or ``2019-10-10T06:47:23Z``. The timezone will
+  always be retained if provided, with timezone-aware datetimes being returned
+  even when :setting:`USE_TZ` is ``False``.
 
-Generic Views
-~~~~~~~~~~~~~
+  Additionally, ``DateTimeField`` now uses ``DATE_INPUT_FORMATS`` in addition
+  to ``DATETIME_INPUT_FORMATS`` when converting a field input to a ``datetime``
+  value.
 
-* ...
+* :attr:`.MultiWidget.widgets` now accepts a dictionary which allows
+  customizing subwidget ``name`` attributes.
+
+* The new :attr:`.BoundField.widget_type` property can be used to dynamically
+  adjust form rendering based upon the widget type.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
@@ -195,23 +341,29 @@ Internationalization
   (string) value to explicitly state that the cookie is sent with all same-site
   and cross-site requests.
 
-* Added support and translations for the Algerian Arabic language.
-
-Logging
-~~~~~~~
-
-* ...
+* Added support and translations for the Algerian Arabic, Igbo, Kyrgyz, Tajik,
+  and Turkmen languages.
 
 Management Commands
 ~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :option:`check --database` option allows specifying database aliases
+  for running the ``database`` system checks. Previously these checks were
+  enabled for all configured :setting:`DATABASES` by passing the ``database``
+  tag to the command.
 
-Migrations
-~~~~~~~~~~
+* The new :option:`migrate --check` option makes the command exit with a
+  non-zero status when unapplied migrations are detected.
 
-* Migrations are now loaded also from directories without ``__init__.py``
-  files.
+* The new ``returncode`` argument for
+  :attr:`~django.core.management.CommandError` allows customizing the exit
+  status for management commands.
+
+* The new :option:`dbshell -- ARGUMENTS <dbshell -->` option allows passing
+  extra arguments to the command-line client for the database.
+
+* The :djadmin:`flush` and :djadmin:`sqlflush` commands now include SQL to
+  reset sequences on SQLite.
 
 Models
 ~~~~~~
@@ -242,6 +394,26 @@ Models
   :meth:`~.RelatedManager.set` methods now accept callables as values in the
   ``through_defaults`` argument.
 
+* The new ``is_dst``  parameter of the :meth:`.QuerySet.datetimes` determines
+  the treatment of nonexistent and ambiguous datetimes.
+
+* The new :class:`~django.db.models.F` expression ``bitxor()`` method allows
+  :ref:`bitwise XOR operation <using-f-expressions-in-filters>`.
+
+* :meth:`.QuerySet.bulk_create` now sets the primary key on objects when using
+  MariaDB 10.5+.
+
+* The ``DatabaseOperations.sql_flush()`` method now generates more efficient
+  SQL on MySQL by using ``DELETE`` instead of ``TRUNCATE`` statements for
+  tables which don't require resetting sequences.
+
+* SQLite functions are now marked as :py:meth:`deterministic
+  <sqlite3.Connection.create_function>` on Python 3.8+. This allows using them
+  in check constraints and partial indexes.
+
+* The new :attr:`.UniqueConstraint.deferrable` attribute allows creating
+  deferrable unique constraints.
+
 Pagination
 ~~~~~~~~~~
 
@@ -258,15 +430,30 @@ Requests and Responses
   now allow using ``samesite='None'`` (string) to explicitly state that the
   cookie is sent with all same-site and cross-site requests.
 
-Serialization
-~~~~~~~~~~~~~
+* The new :meth:`.HttpRequest.accepts` method returns whether the request
+  accepts the given MIME type according to the ``Accept`` HTTP header.
 
-* ...
+.. _whats-new-security-3.1:
 
-Signals
-~~~~~~~
+Security
+~~~~~~~~
 
-* ...
+* The :setting:`SECURE_REFERRER_POLICY` setting now defaults to
+  ``'same-origin'``. With this configured,
+  :class:`~django.middleware.security.SecurityMiddleware` sets the
+  :ref:`referrer-policy` header to ``same-origin`` on all responses that do not
+  already have it. This prevents the ``Referer`` header being sent to other
+  origins. If you need the previous behavior, explicitly set
+  :setting:`SECURE_REFERRER_POLICY` to ``None``.
+
+* The default algorithm of :class:`django.core.signing.Signer`,
+  :meth:`django.core.signing.loads`, and :meth:`django.core.signing.dumps` is
+  changed to the SHA-256. Support for signatures made with the old SHA-1
+  algorithm remains until Django 4.0.
+
+  Also, the new ``algorithm`` parameter of the
+  :class:`~django.core.signing.Signer` allows customizing the hashing
+  algorithm.
 
 Templates
 ~~~~~~~~~
@@ -275,6 +462,8 @@ Templates
   introduced for internationalization in template code. The older :ttag:`trans`
   and :ttag:`blocktrans` template tags aliases continue to work, and will be
   retained for the foreseeable future.
+
+* The :ttag:`include` template tag now accepts iterables of template names.
 
 Tests
 ~~~~~
@@ -289,10 +478,20 @@ Tests
 * Django test runner now supports a :option:`test --buffer` option to discard
   output for passing tests.
 
+* :class:`~django.test.runner.DiscoverRunner` now skips running the system
+  checks on databases not :ref:`referenced by tests<testing-multi-db>`.
+
+* :class:`~django.test.TransactionTestCase` teardown is now faster on MySQL
+  due to :djadmin:`flush` command improvements. As a side effect the latter
+  doesn't automatically reset sequences on teardown anymore. Enable
+  :attr:`.TransactionTestCase.reset_sequences` if your tests require this
+  feature.
+
 URLs
 ~~~~
 
-* ...
+* :ref:`Path converters <registering-custom-path-converters>` can now raise
+  ``ValueError`` in ``to_url()`` to indicate no match when reversing URLs.
 
 Utilities
 ~~~~~~~~~
@@ -307,11 +506,6 @@ Utilities
   :func:`~django.utils.dateparse.parse_duration`, and
   :func:`~django.utils.dateparse.parse_time` now support comma separators for
   milliseconds.
-
-Validators
-~~~~~~~~~~
-
-* ...
 
 Miscellaneous
 ~~~~~~~~~~~~~
@@ -345,11 +539,79 @@ backends.
   on databases that support time zones. Previously, it was ``None`` on
   databases that support time zones.
 
+* ``connection._nodb_connection`` property is changed to the
+  ``connection._nodb_cursor()`` method and now returns a context manager that
+  yields a cursor and automatically closes the cursor and connection upon
+  exiting the ``with`` statement.
+
+* ``DatabaseClient.runshell()`` now requires an additional ``parameters``
+  argument as a list of extra arguments to pass on to the command-line client.
+
+* The ``sequences`` positional argument of ``DatabaseOperations.sql_flush()``
+  is replaced by the boolean keyword-only argument ``reset_sequences``. If
+  ``True``, the sequences of the truncated tables will be reset.
+
+* The ``allow_cascade`` argument of ``DatabaseOperations.sql_flush()`` is now a
+  keyword-only argument.
+
+* The ``using`` positional argument of
+  ``DatabaseOperations.execute_sql_flush()`` is removed. The method now uses
+  the database of the called instance.
+
+* Third-party database backends must implement support for ``JSONField`` or set
+  ``DatabaseFeatures.supports_json_field`` to ``False``. If storing primitives
+  is not supported, set ``DatabaseFeatures.supports_primitives_in_json_field``
+  to ``False``. If there is a true datatype for JSON, set
+  ``DatabaseFeatures.has_native_json_field`` to ``True``. If
+  :lookup:`jsonfield.contains` and :lookup:`jsonfield.contained_by` are not
+  supported, set ``DatabaseFeatures.supports_json_field_contains`` to
+  ``False``.
+
+* Third party database backends must implement introspection for ``JSONField``
+  or set ``can_introspect_json_field`` to ``False``.
+
 Dropped support for MariaDB 10.1
 --------------------------------
 
 Upstream support for MariaDB 10.1 ends in October 2020. Django 3.1 supports
 MariaDB 10.2 and higher.
+
+``contrib.admin`` browser support
+---------------------------------
+
+The admin no longer supports the legacy Internet Explorer browser. See
+:ref:`the admin FAQ <admin-browser-support>` for details on supported browsers.
+
+:attr:`AbstractUser.first_name <django.contrib.auth.models.User.first_name>` ``max_length`` increased to 150
+------------------------------------------------------------------------------------------------------------
+
+A migration for :attr:`django.contrib.auth.models.User.first_name` is included.
+If you have a custom user model inheriting from ``AbstractUser``, you'll need
+to generate and apply a database migration for your user model.
+
+If you want to preserve the 30 character limit for first names, use a custom
+form::
+
+    from django import forms
+    from django.contrib.auth.forms import UserChangeForm
+
+
+    class MyUserChangeForm(UserChangeForm):
+        first_name = forms.CharField(max_length=30, required=False)
+
+If you wish to keep this restriction in the admin when editing users, set
+``UserAdmin.form`` to use this form::
+
+    from django.contrib.auth.admin import UserAdmin
+    from django.contrib.auth.models import User
+
+
+    class MyUserAdmin(UserAdmin):
+        form = MyUserChangeForm
+
+
+    admin.site.unregister(User)
+    admin.site.register(User, MyUserAdmin)
 
 Miscellaneous
 -------------
@@ -359,6 +621,11 @@ Miscellaneous
   from the keys generated by older versions of Django. After upgrading to
   Django 3.1, the first request to any previously cached template fragment will
   be a cache miss.
+
+* The logic behind the decision to return a redirection fallback or a 204 HTTP
+  response from the :func:`~django.views.i18n.set_language` view is now based
+  on the ``Accept`` HTTP header instead of the ``X-Requested-With`` HTTP header
+  presence.
 
 * The compatibility imports of ``django.core.exceptions.EmptyResultSet`` in
   ``django.db.models.query``, ``django.db.models.sql``, and
@@ -386,8 +653,8 @@ Miscellaneous
   ``ETag`` header to responses with an empty
   :attr:`~django.http.HttpResponse.content`.
 
-* ``django.utils.decorators.classproperty()`` decorator is moved to
-  ``django.utils.functional.classproperty()``.
+* ``django.utils.decorators.classproperty()`` decorator is made public and
+  moved to :class:`django.utils.functional.classproperty()`.
 
 * :tfilter:`floatformat` template filter now outputs (positive) ``0`` for
   negative numbers which round to zero.
@@ -401,10 +668,101 @@ Miscellaneous
   Group Specification, i.e. values between 69 and 99 are mapped to the previous
   century, and values between 0 and 68 are mapped to the current century.
 
+* Date-only formats are removed from the default list for
+  :setting:`DATETIME_INPUT_FORMATS`.
+
+* The :class:`~django.forms.FileInput` widget no longer renders with the
+  ``required`` HTML attribute when initial data exists.
+
+* The undocumented ``django.views.debug.ExceptionReporterFilter`` class is
+  removed. As per the :ref:`custom-error-reports` documentation, classes to be
+  used with :setting:`DEFAULT_EXCEPTION_REPORTER_FILTER` need to inherit from
+  :class:`django.views.debug.SafeExceptionReporterFilter`.
+
+* The cache timeout set by :func:`~django.views.decorators.cache.cache_page`
+  decorator now takes precedence over the ``max-age`` directive from the
+  ``Cache-Control`` header.
+
+* Providing a non-local remote field in the :attr:`.ForeignKey.to_field`
+  argument now raises :class:`~django.core.exceptions.FieldError`.
+
+* :setting:`SECURE_REFERRER_POLICY` now defaults to ``'same-origin'``. See the
+  *What's New* :ref:`Security section <whats-new-security-3.1>` above for more
+  details.
+
+* :djadmin:`check` management command now runs the ``database`` system checks
+  only for database aliases specified using :option:`check --database` option.
+
+* :djadmin:`migrate` management command now runs the ``database`` system checks
+  only for a database to migrate.
+
+* The admin CSS classes ``row1`` and ``row2`` are removed in favor of
+  ``:nth-child(odd)`` and ``:nth-child(even)`` pseudo-classes.
+
+* The :func:`~django.contrib.auth.hashers.make_password` function now requires
+  its argument to be a string or bytes. Other types should be explicitly cast
+  to one of these.
+
+* The undocumented ``version`` parameter to the
+  :class:`~django.contrib.gis.db.models.functions.AsKML` function is removed.
+
+* :ref:`JSON and YAML serializers <serialization-formats>`, used by
+  :djadmin:`dumpdata`, now dump all data with Unicode by default. If you need
+  the previous behavior, pass ``ensure_ascii=True`` to JSON serializer, or
+  ``allow_unicode=False`` to YAML serializer.
+
+* The auto-reloader no longer monitors changes in built-in Django translation
+  files.
+
+* The minimum supported version of ``mysqlclient`` is increased from 1.3.13 to
+  1.4.0.
+
+* The undocumented ``django.contrib.postgres.forms.InvalidJSONInput`` and
+  ``django.contrib.postgres.forms.JSONString`` are moved to
+  ``django.forms.fields``.
+
+* The undocumented ``django.contrib.postgres.fields.jsonb.JsonAdapter`` class
+  is removed.
+
+* The :ttag:`{% localize off %} <localize>` tag and :tfilter:`unlocalize`
+  filter no longer respect :setting:`DECIMAL_SEPARATOR` setting.
+
+* The minimum supported version of ``asgiref`` is increased from 3.2 to
+  3.2.10.
+
+* The :doc:`Media </topics/forms/media>` class now renders ``<script>`` tags
+  without the ``type`` attribute to follow `WHATWG recommendations
+  <https://html.spec.whatwg.org/multipage/scripting.html#the-script-element>`_.
+
+* :class:`~django.forms.ModelChoiceIterator`, used by
+  :class:`~django.forms.ModelChoiceField` and
+  :class:`~django.forms.ModelMultipleChoiceField`, now yields 2-tuple choices
+  containing :class:`~django.forms.ModelChoiceIteratorValue` instances as the
+  first ``value`` element in each choice. In most cases this proxies
+  transparently, but if you need the ``field`` value itself, use the
+  :attr:`.ModelChoiceIteratorValue.value` attribute instead.
+
 .. _deprecated-features-3.1:
 
 Features deprecated in 3.1
 ==========================
+
+.. _deprecated-jsonfield:
+
+PostgreSQL ``JSONField``
+------------------------
+
+``django.contrib.postgres.fields.JSONField`` and
+``django.contrib.postgres.forms.JSONField`` are deprecated in favor of
+:class:`.models.JSONField` and
+:class:`forms.JSONField <django.forms.JSONField>`.
+
+The undocumented ``django.contrib.postgres.fields.jsonb.KeyTransform`` and
+``django.contrib.postgres.fields.jsonb.KeyTextTransform`` are also deprecated
+in favor of the transforms in ``django.db.models.fields.json``.
+
+The new ``JSONField``\s, ``KeyTransform``, and ``KeyTextTransform`` can be used
+on all supported database backends.
 
 Miscellaneous
 -------------
@@ -422,6 +780,60 @@ Miscellaneous
 
 * The ``django-admin.py`` entry point is deprecated in favor of
   ``django-admin``.
+
+* The ``HttpRequest.is_ajax()`` method is deprecated as it relied on a
+  jQuery-specific way of signifying AJAX calls, while current usage tends to
+  use the JavaScript `Fetch API
+  <https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API>`_. Depending on
+  your use case, you can either write your own AJAX detection method, or use
+  the new :meth:`.HttpRequest.accepts` method if your code depends on the
+  client ``Accept`` HTTP header.
+
+  If you are writing your own AJAX detection method, ``request.is_ajax()`` can
+  be reproduced exactly as
+  ``request.headers.get('x-requested-with') == 'XMLHttpRequest'``.
+
+* Passing ``None`` as the first argument to
+  ``django.utils.deprecation.MiddlewareMixin.__init__()`` is deprecated.
+
+* The encoding format of cookies values used by
+  :class:`~django.contrib.messages.storage.cookie.CookieStorage` is different
+  from the format generated by older versions of Django. Support for the old
+  format remains until Django 4.0.
+
+* The encoding format of sessions is different from the format generated by
+  older versions of Django. Support for the old format remains until Django
+  4.0.
+
+* The purely documentational ``providing_args`` argument for
+  :class:`~django.dispatch.Signal` is deprecated. If you rely on this
+  argument as documentation, you can move the text to a code comment or
+  docstring.
+
+* Calling ``django.utils.crypto.get_random_string()`` without a ``length``
+  argument is deprecated.
+
+* The ``list`` message for :class:`~django.forms.ModelMultipleChoiceField` is
+  deprecated in favor of ``invalid_list``.
+
+* Passing raw column aliases to :meth:`.QuerySet.order_by` is deprecated. The
+  same result can be achieved by passing aliases in a
+  :class:`~django.db.models.expressions.RawSQL` instead beforehand.
+
+* The ``NullBooleanField`` model field is deprecated in favor of
+  ``BooleanField(null=True)``.
+
+* ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
+  deprecated.
+
+* The ``{% ifequal %}`` and ``{% ifnotequal %}`` template tags are deprecated
+  in favor of :ttag:`{% if %}<if>`. ``{% if %}`` covers all use cases, but if
+  you need to continue using these tags, they can be extracted from Django to a
+  module and included as a built-in tag in the :class:`'builtins'
+  <django.template.backends.django.DjangoTemplates>` option in
+  :setting:`OPTIONS <TEMPLATES-OPTIONS>`.
+
+* ``DEFAULT_HASHING_ALGORITHM`` transitional setting is deprecated.
 
 .. _removed-features-3.1:
 

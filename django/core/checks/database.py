@@ -4,8 +4,11 @@ from . import Tags, register
 
 
 @register(Tags.database)
-def check_database_backends(*args, **kwargs):
+def check_database_backends(databases=None, **kwargs):
+    if databases is None:
+        return []
     issues = []
-    for conn in connections.all():
+    for alias in databases:
+        conn = connections[alias]
         issues.extend(conn.validation.check(**kwargs))
     return issues

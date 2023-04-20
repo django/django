@@ -16,7 +16,8 @@ Simple mixins
         :meth:`~django.views.generic.base.View.as_view`. Example usage::
 
             from django.views.generic import TemplateView
-            TemplateView.as_view(extra_context={'title': 'Custom Title'})
+
+            TemplateView.as_view(extra_context={"title": "Custom Title"})
 
     **Methods**
 
@@ -27,7 +28,7 @@ Simple mixins
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['number'] = random.randrange(1, 100)
+                context["number"] = random.randrange(1, 100)
                 return context
 
         The template context of all class-based generic views include a
@@ -102,5 +103,5 @@ Simple mixins
         Returns a list of template names to search for when rendering the
         template. The first template that is found will be used.
 
-        If :attr:`template_name` is specified, the default implementation will
-        return a list containing :attr:`template_name` (if it is specified).
+        The default implementation will return a list containing
+        :attr:`template_name` (if it is specified).

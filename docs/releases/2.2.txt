@@ -15,16 +15,17 @@ want to be aware of when upgrading from Django 2.1 or earlier. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 2.2 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.11, will end in April 2020.
+Django 2.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.11, will
+end in April 2020.
 
 Python compatibility
 ====================
 
-Django 2.2 supports Python 3.5, 3.6, 3.7, and 3.8 (as of 2.2.8). We
-**highly recommend** and only officially support the latest release of each
-series.
+Django 2.2 supports Python 3.5, 3.6, 3.7, 3.8 (as of 2.2.8), and 3.9 (as of
+2.2.17). We **highly recommend** and only officially support the latest release
+of each series.
 
 .. _whats-new-2.2:
 
@@ -99,7 +100,7 @@ Generic Views
 
 * The new :meth:`View.setup <django.views.generic.base.View.setup>` hook
   initializes view attributes before calling
-  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to setup
+  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to set up
   instance attributes for reuse in child classes.
 
 Internationalization
@@ -297,11 +298,13 @@ For example, in older versions of Django::
 
     from django.contrib import admin
 
+
     class BaseAdmin(admin.ModelAdmin):
-        actions = ['a']
+        actions = ["a"]
+
 
     class SubAdmin(BaseAdmin):
-        actions = ['b']
+        actions = ["b"]
 
 ``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
@@ -309,7 +312,7 @@ Now ``actions`` follows standard Python inheritance. To get the same result as
 before::
 
     class SubAdmin(BaseAdmin):
-        actions = BaseAdmin.actions + ['b']
+        actions = BaseAdmin.actions + ["b"]
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -330,9 +333,9 @@ change shouldn't have an impact on your tests unless you've customized
 ``sqlparse`` is required dependency
 -----------------------------------
 
-To simplify a few parts of Django's database handling, `sqlparse
-<https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
-automatically installed along with Django.
+To simplify a few parts of Django's database handling, :pypi:`sqlparse 0.2.2+
+<sqlparse>` is now a required dependency. It's automatically installed along
+with Django.
 
 ``cached_property`` aliases
 ---------------------------
@@ -341,8 +344,8 @@ In usage like::
 
     from django.utils.functional import cached_property
 
-    class A:
 
+    class A:
         @cached_property
         def base(self):
             return ...
@@ -357,11 +360,11 @@ Use this instead::
 
     import operator
 
-    class A:
 
+    class A:
         ...
 
-        alias = property(operator.attrgetter('base'))
+        alias = property(operator.attrgetter("base"))
 
 Permissions for proxy models
 ----------------------------
@@ -458,7 +461,7 @@ Miscellaneous
   :func:`~django.contrib.sitemaps.ping_google` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
-* :djadmin:`runserver` no longer supports `pyinotify` (replaced by Watchman).
+* :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).
 
 * The :class:`~django.db.models.Avg`, :class:`~django.db.models.StdDev`, and
   :class:`~django.db.models.Variance` aggregate functions now return a
@@ -473,6 +476,14 @@ Miscellaneous
 
 * Providing an integer in the ``key`` argument of the :meth:`.cache.delete` or
   :meth:`.cache.get` now raises :exc:`ValueError`.
+
+* Plural equations for some languages are changed, because the latest versions
+  from Transifex are incorporated.
+
+  .. note::
+
+    The ability to handle ``.po`` files containing different plural equations
+    for the same language was added in Django 2.2.12.
 
 .. _deprecated-features-2.2:
 

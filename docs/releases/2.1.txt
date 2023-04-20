@@ -189,8 +189,8 @@ Models
   now support using field transforms.
 
 * :class:`~django.db.models.BooleanField` can now be ``null=True``. This is
-  encouraged instead of :class:`~django.db.models.NullBooleanField`, which will
-  likely be deprecated in the future.
+  encouraged instead of ``NullBooleanField``, which will likely be deprecated
+  in the future.
 
 * The new :meth:`.QuerySet.explain` method displays the database's execution
   plan of a queryset's query.
@@ -247,7 +247,7 @@ backends.
   ``allow_sliced_subqueries_with_in``.
 
 * ``DatabaseOperations.distinct_sql()`` now requires an additional ``params``
-  argument and returns a tuple of SQL and parameters instead of a SQL string.
+  argument and returns a tuple of SQL and parameters instead of an SQL string.
 
 * ``DatabaseFeatures.introspected_boolean_field_type`` is changed from a method
   to a property.
@@ -279,8 +279,9 @@ was added in Django 1.6), you might have some passwords that use the
 You can check if that's the case like this::
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    User.objects.filter(password__startswith='bcrypt$$')
+    User.objects.filter(password__startswith="bcrypt$$")
 
 If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
@@ -373,7 +374,7 @@ Miscellaneous
 * Since migrations are now loaded from ``.pyc`` files, you might need to delete
   them if you're working in a mixed Python 2 and Python 3 environment.
 
-* Using ``None`` as a :class:`~django.contrib.postgres.fields.JSONField` lookup
+* Using ``None`` as a ``django.contrib.postgres.fields.JSONField`` lookup
   value now matches objects that have the specified key and a null value rather
   than objects that don't have the key.
 
@@ -407,8 +408,8 @@ Miscellaneous
   suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
   your code to also account for any custom lookups that have been registered.
 
-* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use `bcrypt
-  <https://pypi.org/project/bcrypt/>`_ instead.
+* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use
+  :pypi:`bcrypt` instead.
 
 .. _deprecated-features-2.1:
 

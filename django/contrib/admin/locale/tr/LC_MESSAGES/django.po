@@ -1,22 +1,23 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2019
+# BouRock, 2015-2023
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@protonmail.com>, 2013
+# Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Cihan Okyay <cihan.okyay@linux.org.tr>, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Mesut Can Gürle <mesutcang@gmail.com>, 2013
 # Murat Sahin <martinamca@gmail.com>, 2011
+# Yigit Guler <yigit@hipo.biz>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 07:45+0000\n"
-"Last-Translator: BouRock\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: BouRock, 2015-2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -24,6 +25,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Seçili %(verbose_name_plural)s nesnelerini sil"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -35,10 +40,6 @@ msgstr "%(name)s silinemiyor"
 
 msgid "Are you sure?"
 msgstr "Emin misiniz?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Seçili %(verbose_name_plural)s nesnelerini sil"
 
 msgid "Administration"
 msgstr "Yönetim"
@@ -75,6 +76,12 @@ msgstr "Tarih yok"
 
 msgid "Has date"
 msgstr "Tarih var"
+
+msgid "Empty"
+msgstr "Boş"
+
+msgid "Not empty"
+msgstr "Boş değil"
 
 #, python-format
 msgid ""
@@ -270,8 +277,9 @@ msgstr "0 / %(cnt)s nesne seçildi"
 msgid "Change history: %s"
 msgstr "Değişiklik geçmişi: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -323,7 +331,7 @@ msgid ""
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "Bir hata oluştu. Site yöneticilerine e-posta yoluyla bildirildi ve kısa süre "
-"içinde düzeltilmelidir. Sabrınız için teşekkür ederiz."
+"içinde düzeltilecektir. Sabrınız için teşekkür ederiz."
 
 msgid "Run the selected action"
 msgstr "Seçilen eylemi çalıştır"
@@ -341,6 +349,19 @@ msgstr "Tüm %(total_count)s %(module_name)s nesnelerini seç"
 msgid "Clear selection"
 msgstr "Seçimi temizle"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s uygulamasındaki modeller"
+
+msgid "Add"
+msgstr "Ekle"
+
+msgid "View"
+msgstr "Göster"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -355,14 +376,16 @@ msgid "Change password"
 msgstr "Parolayı değiştir"
 
 msgid "Please correct the error below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
-
-msgid "Please correct the errors below."
-msgstr "Lütfen aşağıdaki hataları düzeltin."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Lütfen aşağıdaki hatayı düzeltin."
+msgstr[1] "Lütfen aşağıdaki hataları düzeltin."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "<strong>%(username)s</strong> kullanıcısı için yeni bir parola girin."
+
+msgid "Skip to main content"
+msgstr "Ana içeriğe atla"
 
 msgid "Welcome,"
 msgstr "Hoş Geldiniz,"
@@ -375,6 +398,9 @@ msgstr "Belgeler"
 
 msgid "Log out"
 msgstr "Oturumu kapat"
+
+msgid "Breadcrumbs"
+msgstr "İçerik haritaları"
 
 #, python-format
 msgid "Add %(name)s"
@@ -389,6 +415,9 @@ msgstr "Sitede görüntüle"
 msgid "Filter"
 msgstr "Süz"
 
+msgid "Clear all filters"
+msgstr "Tüm süzgeçleri temizle"
+
 msgid "Remove from sorting"
 msgstr "Sıralamadan kaldır"
 
@@ -398,6 +427,15 @@ msgstr "Sıralama önceliği: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sıralamayı değiştir"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Temayı değiştir (şu anki tema: otomatik)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Temayı değiştir (şu anki tema: açık)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Temayı değiştir (şu anki tema: koyu)"
 
 msgid "Delete"
 msgstr "Sil"
@@ -466,9 +504,6 @@ msgstr ""
 "Seçilen %(objects_name)s nesnelerini silmek istediğinize emin misiniz? "
 "Aşağıdaki nesnelerin tümü ve onların ilgili öğeleri silinecektir:"
 
-msgid "View"
-msgstr "Göster"
-
 msgid "Delete?"
 msgstr "Silinsin mi?"
 
@@ -478,16 +513,6 @@ msgstr " %(filter_title)s süzgecine göre"
 
 msgid "Summary"
 msgstr "Özet"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s uygulamasındaki modeller"
-
-msgid "Add"
-msgstr "Ekle"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Hiçbir şeyi düzenlemek ve göstermek için izne sahip değilsiniz."
 
 msgid "Recent actions"
 msgstr "Son eylemler"
@@ -521,6 +546,18 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Kullanıcı adınızı veya parolanızı mı unuttunuz?"
 
+msgid "Toggle navigation"
+msgstr "Gezinmeyi aç/kapat"
+
+msgid "Sidebar"
+msgstr "Kenar çubuğu"
+
+msgid "Start typing to filter…"
+msgstr "Süzmek için yazmaya başlayın..."
+
+msgid "Filter navigation items"
+msgstr "Gezinti öğelerini süz"
+
 msgid "Date/time"
 msgstr "Tarih/saat"
 
@@ -529,6 +566,11 @@ msgstr "Kullanıcı"
 
 msgid "Action"
 msgstr "Eylem"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "giriş"
+msgstr[1] "giriş"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -586,9 +628,12 @@ msgstr "Başka bir %(model)s ekle"
 msgid "Delete selected %(model)s"
 msgstr "Seçilen %(model)s sil"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
-"Bugün Web sitesinde biraz güzel zaman geçirdiğiniz için teşekkür ederiz."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Seçilen %(model)s görüntüle"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Bugün web sitesine ayırdığınız kaliteli zaman için teşekkür ederiz."
 
 msgid "Log in again"
 msgstr "Tekrar oturum aç"

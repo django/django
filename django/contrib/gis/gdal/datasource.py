@@ -34,6 +34,7 @@
               val = field.value
 """
 from ctypes import byref
+from pathlib import Path
 
 from django.contrib.gis.gdal.base import GDALBase
 from django.contrib.gis.gdal.driver import Driver
@@ -43,26 +44,26 @@ from django.contrib.gis.gdal.prototypes import ds as capi
 from django.utils.encoding import force_bytes, force_str
 
 
-# For more information, see the OGR C API source code:
-#  https://www.gdal.org/ogr__api_8h.html
+# For more information, see the OGR C API documentation:
+#  https://gdal.org/api/vector_c_api.html
 #
 # The OGR_DS_* routines are relevant here.
 class DataSource(GDALBase):
     "Wraps an OGR Data Source object."
     destructor = capi.destroy_ds
 
-    def __init__(self, ds_input, ds_driver=False, write=False, encoding='utf-8'):
+    def __init__(self, ds_input, ds_driver=False, write=False, encoding="utf-8"):
         # The write flag.
         if write:
             self._write = 1
         else:
             self._write = 0
-        # See also https://trac.osgeo.org/gdal/wiki/rfc23_ogr_unicode
+        # See also https://gdal.org/development/rfc/rfc23_ogr_unicode.html
         self.encoding = encoding
 
         Driver.ensure_registered()
 
-        if isinstance(ds_input, str):
+        if isinstance(ds_input, (str, Path)):
             # The data source driver is a void pointer.
             ds_driver = Driver.ptr_type()
             try:
@@ -72,10 +73,12 @@ class DataSource(GDALBase):
                 # Making the error message more clear rather than something
                 # like "Invalid pointer returned from OGROpen".
                 raise GDALException('Could not open the datasource at "%s"' % ds_input)
-        elif isinstance(ds_input, self.ptr_type) and isinstance(ds_driver, Driver.ptr_type):
+        elif isinstance(ds_input, self.ptr_type) and isinstance(
+            ds_driver, Driver.ptr_type
+        ):
             ds = ds_input
         else:
-            raise GDALException('Invalid data source input type: %s' % type(ds_input))
+            raise GDALException("Invalid data source input type: %s" % type(ds_input))
 
         if ds:
             self.ptr = ds
@@ -90,14 +93,17 @@ class DataSource(GDALBase):
             try:
                 layer = capi.get_layer_by_name(self.ptr, force_bytes(index))
             except GDALException:
-                raise IndexError('Invalid OGR layer name given: %s.' % index)
+                raise IndexError("Invalid OGR layer name given: %s." % index)
         elif isinstance(index, int):
             if 0 <= index < self.layer_count:
                 layer = capi.get_layer(self._ptr, index)
             else:
-                raise IndexError('Index out of range when accessing layers in a datasource: %s.' % index)
+                raise IndexError(
+                    "Index out of range when accessing layers in a datasource: %s."
+                    % index
+                )
         else:
-            raise TypeError('Invalid index type: %s' % type(index))
+            raise TypeError("Invalid index type: %s" % type(index))
         return Layer(layer, self)
 
     def __len__(self):
@@ -106,7 +112,7 @@ class DataSource(GDALBase):
 
     def __str__(self):
         "Return OGR GetName and Driver for the Data Source."
-        return '%s (%s)' % (self.name, self.driver)
+        return "%s (%s)" % (self.name, self.driver)
 
     @property
     def layer_count(self):

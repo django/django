@@ -1,7 +1,8 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Денис Подлесный <haos616@gmail.com>, 2016
+# Denis Podlesniy <haos616@gmail.com>, 2016
+# Illia Volochii <illia.volochii@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2016
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
@@ -12,17 +13,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-01-19 23:54+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: uk\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "GIS"
 msgstr "ГІС"
@@ -31,8 +34,9 @@ msgid "The base GIS field."
 msgstr "Базове GIS поле."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr "Базове Geometry поле -- карти з OpenGIS Специфікацією Geometry типу."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr ""
+"Базове поле Geometry, яке відповідає типу Geometry із специфікації OpenGIS"
 
 msgid "Point"
 msgstr "Точка"
@@ -88,5 +92,5 @@ msgid "No feeds are registered."
 msgstr "Немає зареєстрованих підписок."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Слаг %r не зареєстрований."

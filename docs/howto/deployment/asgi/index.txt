@@ -17,6 +17,7 @@ Django includes getting-started documentation for the following ASGI servers:
    :maxdepth: 1
 
    daphne
+   hypercorn
    uvicorn
 
 The ``application`` object
@@ -68,4 +69,5 @@ To apply ASGI middleware, or to embed Django in another ASGI application, you
 can wrap Django's ``application`` object in the ``asgi.py`` file. For example::
 
     from some_asgi_library import AmazingMiddleware
+
     application = AmazingMiddleware(application)

@@ -1,24 +1,25 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Andrej Marsetič, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
-# zejn <zejn@kiberpipa.org>, 2016
-# zejn <zejn@kiberpipa.org>, 2011-2012
+# zejn <zelo.zejn+transifex@gmail.com>, 2016
+# zejn <zelo.zejn+transifex@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Primož Verdnik <primoz.verdnik@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Andrej Marsetič, 2022\n"
 "Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sl\n"
-"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || n"
-"%100==4 ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 0 : n%100==2 ? 1 : n%100==3 || "
+"n%100==4 ? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -64,12 +65,24 @@ msgstr ""
 "To je seznam možnih %s. Odvečne lahko odstranite z izbiro v okvirju in "
 "klikom na puščico \"Odstrani\" med okvirjema."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
 msgid "Remove all"
 msgstr "Odstrani vse"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kliknite za odstranitev vseh %s hkrati."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -86,21 +99,31 @@ msgstr ""
 "primeru nadaljevanja bodo neshranjene spremembe trajno izgubljene."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Izbrali ste dejanje, vendar niste shranili sprememb na posameznih poljih. "
-"Kliknite na 'V redu', da boste shranili. Dejanje boste morali ponovno "
-"izvesti."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Izbrali ste dejanje, vendar niste naredili nobenih sprememb na posameznih "
-"poljih. Verjetno iščete gumb Pojdi namesto Shrani."
+
+msgid "Now"
+msgstr "Takoj"
+
+msgid "Midnight"
+msgstr "Polnoč"
+
+msgid "6 a.m."
+msgstr "Ob 6h"
+
+msgid "Noon"
+msgstr "Opoldne"
+
+msgid "6 p.m."
+msgstr "Ob 18h"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -118,26 +141,11 @@ msgstr[1] "Opomba: glede na čas na strežniku ste %s uri zadaj."
 msgstr[2] "Opomba: glede na čas na strežniku ste %s ure zadaj."
 msgstr[3] "Opomba: glede na čas na strežniku ste %s ur zadaj."
 
-msgid "Now"
-msgstr "Takoj"
-
 msgid "Choose a Time"
 msgstr "Izberite čas"
 
 msgid "Choose a time"
 msgstr "Izbor časa"
-
-msgid "Midnight"
-msgstr "Polnoč"
-
-msgid "6 a.m."
-msgstr "Ob 6h"
-
-msgid "Noon"
-msgstr "Opoldne"
-
-msgid "6 p.m."
-msgstr "Ob 18h"
 
 msgid "Cancel"
 msgstr "Prekliči"
@@ -189,6 +197,54 @@ msgstr "november"
 
 msgid "December"
 msgstr "december"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

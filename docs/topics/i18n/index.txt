@@ -13,7 +13,7 @@ Internationalization and localization
 Overview
 ========
 
-The goal of internationalization and localization is to allow a single Web
+The goal of internationalization and localization is to allow a single web
 application to offer its content in languages and formats tailored to the
 audience.
 
@@ -25,7 +25,7 @@ Essentially, Django does two things:
 
 * It allows developers and template authors to specify which parts of their apps
   should be translated or formatted for local languages and cultures.
-* It uses these hooks to localize Web apps for particular users according to
+* It uses these hooks to localize web apps for particular users according to
   their preferences.
 
 Translation depends on the target language, and formatting usually depends on
@@ -54,10 +54,9 @@ More details can be found in the `W3C Web Internationalization FAQ`_, the `Wikip
 
 .. warning::
 
-    Translation and formatting are controlled by :setting:`USE_I18N` and
-    :setting:`USE_L10N` settings respectively. However, both features involve
-    internationalization and localization. The names of the settings are an
-    unfortunate result of Django's history.
+    Translation is controlled by the :setting:`USE_I18N` setting. However, it
+    involves internationalization and localization. The name of the setting is
+    an unfortunate result of Django's history.
 
 Here are some other terms that will help us to handle a common language:
 
@@ -66,9 +65,10 @@ Here are some other terms that will help us to handle a common language:
     locale name
       A locale name, either a language specification of the form ``ll`` or a
       combined language and country specification of the form ``ll_CC``.
-      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``. The language part is
-      always in lowercase and the country part in upper case. The separator is
-      an underscore.
+      Examples: ``it``, ``de_AT``, ``es``, ``pt_BR``, ``sr_Latn``. The language
+      part is always in lowercase. The country part is in titlecase if it has
+      more than 2 characters, otherwise it's in uppercase. The separator is an
+      underscore.
 
     language code
       Represents the name of a language. Browsers send the names of the

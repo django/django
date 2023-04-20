@@ -15,7 +15,8 @@ A Django project can be configured with one or several template engines (or
 even zero if you don't use templates). Django ships built-in backends for its
 own template system, creatively called the Django template language (DTL), and
 for the popular alternative Jinja2_. Backends for other template languages may
-be available from third-parties.
+be available from third-parties. You can also write your own custom backend,
+see :doc:`Custom template backend </howto/custom-template-backend>`
 
 Django defines a standard API for loading and rendering templates regardless
 of the backend. Loading consists of finding the template for a given identifier
@@ -43,6 +44,194 @@ namespace.
     since template authors can do things like perform XSS attacks and access
     properties of template variables that may contain sensitive information.
 
+.. _template-language-intro:
+
+The Django template language
+============================
+
+Syntax
+------
+
+.. admonition:: About this section
+
+    This is an overview of the Django template language's syntax. For details
+    see the :doc:`language syntax reference </ref/templates/language>`.
+
+A Django template is a text document or a Python string marked-up using the
+Django template language. Some constructs are recognized and interpreted by the
+template engine. The main ones are variables and tags.
+
+A template is rendered with a context. Rendering replaces variables with their
+values, which are looked up in the context, and executes tags. Everything else
+is output as is.
+
+The syntax of the Django template language involves four constructs.
+
+Variables
+~~~~~~~~~
+
+A variable outputs a value from the context, which is a dict-like object
+mapping keys to values.
+
+Variables are surrounded by ``{{`` and ``}}`` like this:
+
+.. code-block:: html+django
+
+    My first name is {{ first_name }}. My last name is {{ last_name }}.
+
+With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this template
+renders to:
+
+.. code-block:: html+django
+
+    My first name is John. My last name is Doe.
+
+Dictionary lookup, attribute lookup and list-index lookups are implemented with
+a dot notation:
+
+.. code-block:: html+django
+
+    {{ my_dict.key }}
+    {{ my_object.attribute }}
+    {{ my_list.0 }}
+
+If a variable resolves to a callable, the template system will call it with no
+arguments and use its result instead of the callable.
+
+Tags
+~~~~
+
+Tags provide arbitrary logic in the rendering process.
+
+This definition is deliberately vague. For example, a tag can output content,
+serve as a control structure e.g. an "if" statement or a "for" loop, grab
+content from a database, or even enable access to other template tags.
+
+Tags are surrounded by ``{%`` and ``%}`` like this:
+
+.. code-block:: html+django
+
+    {% csrf_token %}
+
+Most tags accept arguments:
+
+.. code-block:: html+django
+
+    {% cycle 'odd' 'even' %}
+
+Some tags require beginning and ending tags:
+
+.. code-block:: html+django
+
+    {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
+
+A :ref:`reference of built-in tags <ref-templates-builtins-tags>` is
+available as well as :ref:`instructions for writing custom tags
+<howto-writing-custom-template-tags>`.
+
+Filters
+~~~~~~~
+
+Filters transform the values of variables and tag arguments.
+
+They look like this:
+
+.. code-block:: html+django
+
+     {{ django|title }}
+
+With a context of ``{'django': 'the web framework for perfectionists with
+deadlines'}``, this template renders to:
+
+.. code-block:: html+django
+
+    The Web Framework For Perfectionists With Deadlines
+
+Some filters take an argument:
+
+.. code-block:: html+django
+
+    {{ my_date|date:"Y-m-d" }}
+
+A :ref:`reference of built-in filters <ref-templates-builtins-filters>` is
+available as well as :ref:`instructions for writing custom filters
+<howto-writing-custom-template-filters>`.
+
+Comments
+~~~~~~~~
+
+Comments look like this:
+
+.. code-block:: html+django
+
+    {# this won't be rendered #}
+
+A :ttag:`{% comment %} <comment>` tag provides multi-line comments.
+
+Components
+----------
+
+.. admonition:: About this section
+
+    This is an overview of the Django template language's APIs. For details
+    see the :doc:`API reference </ref/templates/api>`.
+
+Engine
+~~~~~~
+
+:class:`django.template.Engine` encapsulates an instance of the Django
+template system. The main reason for instantiating an
+:class:`~django.template.Engine` directly is to use the Django template
+language outside of a Django project.
+
+:class:`django.template.backends.django.DjangoTemplates` is a thin wrapper
+adapting :class:`django.template.Engine` to Django's template backend API.
+
+Template
+~~~~~~~~
+
+:class:`django.template.Template` represents a compiled template. Templates are
+obtained with :meth:`.Engine.get_template` or :meth:`.Engine.from_string`.
+
+Likewise ``django.template.backends.django.Template`` is a thin wrapper
+adapting :class:`django.template.Template` to the common template API.
+
+Context
+~~~~~~~
+
+:class:`django.template.Context` holds some metadata in addition to the context
+data. It is passed to :meth:`.Template.render` for rendering a template.
+
+:class:`django.template.RequestContext` is a subclass of
+:class:`~django.template.Context` that stores the current
+:class:`~django.http.HttpRequest` and runs template context processors.
+
+The common API doesn't have an equivalent concept. Context data is passed in a
+plain :class:`dict` and the current :class:`~django.http.HttpRequest` is passed
+separately if needed.
+
+Loaders
+~~~~~~~
+
+Template loaders are responsible for locating templates, loading them, and
+returning :class:`~django.template.Template` objects.
+
+Django provides several :ref:`built-in template loaders <template-loaders>`
+and supports :ref:`custom template loaders <custom-template-loaders>`.
+
+Context processors
+~~~~~~~~~~~~~~~~~~
+
+Context processors are functions that receive the current
+:class:`~django.http.HttpRequest` as an argument and return a :class:`dict` of
+data to be added to the rendering context.
+
+Their main use is to add common data shared by all templates to the context
+without repeating code in every view.
+
+Django provides many :ref:`built-in context processors <context-processors>`,
+and you can implement your own additional context processors, too.
+
 .. _template-engines:
 
 Support for template engines
@@ -58,10 +247,10 @@ more useful value::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'APP_DIRS': True,
-            'OPTIONS': {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": True,
+            "OPTIONS": {
                 # ... some options here ...
             },
         },
@@ -88,10 +277,10 @@ backend with different options. In that case you should define a unique
 
 :setting:`OPTIONS <TEMPLATES-OPTIONS>` contains backend-specific settings.
 
+.. _template-loading:
+
 Usage
 -----
-
-.. _template-loading:
 
 .. module:: django.template.loader
 
@@ -174,16 +363,16 @@ Here's an example of the search algorithm. For this example the
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                '/home/html/example.com',
-                '/home/html/default',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [
+                "/home/html/example.com",
+                "/home/html/default",
             ],
         },
         {
-            'BACKEND': 'django.template.backends.jinja2.Jinja2',
-            'DIRS': [
-                '/home/html/jinja2',
+            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "DIRS": [
+                "/home/html/jinja2",
             ],
         },
     ]
@@ -227,7 +416,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
-    get_template('news/story_detail.html')
+    get_template("news/story_detail.html")
 
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
@@ -266,7 +455,8 @@ templates, Django provides a shortcut function which automates the process.
     Usage example::
 
         from django.template.loader import render_to_string
-        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
+        rendered = render_to_string("my_template.html", {"foo": "bar"})
 
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
@@ -280,7 +470,7 @@ Finally, you can use configured engines directly:
 
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
         template = django_engine.from_string("Hello {{ name }}!")
 
     The lookup key — ``'django'`` in this example — is the engine's
@@ -357,10 +547,10 @@ applications. This generic name was kept for backwards-compatibility.
   tag modules to register with the template engine. This can be used to add
   new libraries or provide alternate labels for existing ones. For example::
 
-      OPTIONS={
-          'libraries': {
-              'myapp_tags': 'path.to.myapp.tags',
-              'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+      OPTIONS = {
+          "libraries": {
+              "myapp_tags": "path.to.myapp.tags",
+              "admin.urls": "django.contrib.admin.templatetags.admin_urls",
           },
       }
 
@@ -370,8 +560,8 @@ applications. This generic name was kept for backwards-compatibility.
 * ``'builtins'``: A list of dotted Python paths of template tag modules to
   add to :doc:`built-ins </ref/templates/builtins>`. For example::
 
-      OPTIONS={
-          'builtins': ['myapp.builtins'],
+      OPTIONS = {
+          "builtins": ["myapp.builtins"],
       }
 
   Tags and filters from built-in libraries can be used without first calling
@@ -459,10 +649,12 @@ For example, you can create ``myproject/jinja2.py`` with this content::
 
     def environment(**options):
         env = Environment(**options)
-        env.globals.update({
-            'static': static,
-            'url': reverse,
-        })
+        env.globals.update(
+            {
+                "static": static,
+                "url": reverse,
+            }
+        )
         return env
 
 and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.
@@ -483,348 +675,4 @@ templates, as shown in the example above. Jinja2's global namespace removes the
 need for template context processors. The Django template language doesn't have
 an equivalent of Jinja2 tests.
 
-Custom backends
----------------
-
-Here's how to implement a custom template backend in order to use another
-template system. A template backend is a class that inherits
-``django.template.backends.base.BaseEngine``. It must implement
-``get_template()`` and optionally ``from_string()``. Here's an example for a
-fictional ``foobar`` template library::
-
-    from django.template import TemplateDoesNotExist, TemplateSyntaxError
-    from django.template.backends.base import BaseEngine
-    from django.template.backends.utils import csrf_input_lazy, csrf_token_lazy
-
-    import foobar
-
-
-    class FooBar(BaseEngine):
-
-        # Name of the subdirectory containing the templates for this engine
-        # inside an installed application.
-        app_dirname = 'foobar'
-
-        def __init__(self, params):
-            params = params.copy()
-            options = params.pop('OPTIONS').copy()
-            super().__init__(params)
-
-            self.engine = foobar.Engine(**options)
-
-        def from_string(self, template_code):
-            try:
-                return Template(self.engine.from_string(template_code))
-            except foobar.TemplateCompilationFailed as exc:
-                raise TemplateSyntaxError(exc.args)
-
-        def get_template(self, template_name):
-            try:
-                return Template(self.engine.get_template(template_name))
-            except foobar.TemplateNotFound as exc:
-                raise TemplateDoesNotExist(exc.args, backend=self)
-            except foobar.TemplateCompilationFailed as exc:
-                raise TemplateSyntaxError(exc.args)
-
-
-    class Template:
-
-        def __init__(self, template):
-            self.template = template
-
-        def render(self, context=None, request=None):
-            if context is None:
-                context = {}
-            if request is not None:
-                context['request'] = request
-                context['csrf_input'] = csrf_input_lazy(request)
-                context['csrf_token'] = csrf_token_lazy(request)
-            return self.template.render(context)
-
-See `DEP 182`_ for more information.
-
-.. _template-debug-integration:
-
-Debug integration for custom engines
-------------------------------------
-
-The Django debug page has hooks to provide detailed information when a template
-error arises. Custom template engines can use these hooks to enhance the
-traceback information that appears to users. The following hooks are available:
-
-.. _template-postmortem:
-
-Template postmortem
-~~~~~~~~~~~~~~~~~~~
-
-The postmortem appears when :exc:`~django.template.TemplateDoesNotExist` is
-raised. It lists the template engines and loaders that were used when trying
-to find a given template. For example, if two Django engines are configured,
-the postmortem will appear like:
-
-.. image:: _images/postmortem.png
-
-Custom engines can populate the postmortem by passing the ``backend`` and
-``tried`` arguments when raising :exc:`~django.template.TemplateDoesNotExist`.
-Backends that use the postmortem :ref:`should specify an origin
-<template-origin-api>` on the template object.
-
-Contextual line information
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If an error happens during template parsing or rendering, Django can display
-the line the error happened on. For example:
-
-.. image:: _images/template-lines.png
-
-Custom engines can populate this information by setting a ``template_debug``
-attribute on exceptions raised during parsing and rendering. This attribute
-is a :class:`dict` with the following values:
-
-* ``'name'``: The name of the template in which the exception occurred.
-
-* ``'message'``: The exception message.
-
-* ``'source_lines'``: The lines before, after, and including the line the
-  exception occurred on. This is for context, so it shouldn't contain more than
-  20 lines or so.
-
-* ``'line'``: The line number on which the exception occurred.
-
-* ``'before'``: The content on the error line before the token that raised the
-  error.
-
-* ``'during'``: The token that raised the error.
-
-* ``'after'``: The content on the error line after the token that raised the
-  error.
-
-* ``'total'``: The number of lines in ``source_lines``.
-
-* ``'top'``: The line number where ``source_lines`` starts.
-
-* ``'bottom'``: The line number where ``source_lines`` ends.
-
-Given the above template error, ``template_debug`` would look like::
-
-    {
-        'name': '/path/to/template.html',
-        'message': "Invalid block tag: 'syntax'",
-        'source_lines': [
-            (1, 'some\n'),
-            (2, 'lines\n'),
-            (3, 'before\n'),
-            (4, 'Hello {% syntax error %} {{ world }}\n'),
-            (5, 'some\n'),
-            (6, 'lines\n'),
-            (7, 'after\n'),
-            (8, ''),
-        ],
-        'line': 4,
-        'before': 'Hello ',
-        'during': '{% syntax error %}',
-        'after': ' {{ world }}\n',
-        'total': 9,
-        'bottom': 9,
-        'top': 1,
-    }
-
-.. _template-origin-api:
-
-Origin API and 3rd-party integration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Django templates have an :class:`~django.template.base.Origin` object available
-through the ``template.origin`` attribute. This enables debug information to be
-displayed in the :ref:`template postmortem <template-postmortem>`, as well as
-in 3rd-party libraries, like the `Django Debug Toolbar`_.
-
-Custom engines can provide their own ``template.origin`` information by
-creating an object that specifies the following attributes:
-
-* ``'name'``: The full path to the template.
-
-* ``'template_name'``: The relative path to the template as passed into the
-  the template loading methods.
-
-* ``'loader_name'``: An optional string identifying the function or class used
-  to load the template, e.g. ``django.template.loaders.filesystem.Loader``.
-
-.. currentmodule:: django.template
-
-.. _template-language-intro:
-
-The Django template language
-============================
-
-.. highlightlang:: html+django
-
-Syntax
-------
-
-.. admonition:: About this section
-
-    This is an overview of the Django template language's syntax. For details
-    see the :doc:`language syntax reference </ref/templates/language>`.
-
-A Django template is a text document or a Python string marked-up using the
-Django template language. Some constructs are recognized and interpreted by the
-template engine. The main ones are variables and tags.
-
-A template is rendered with a context. Rendering replaces variables with their
-values, which are looked up in the context, and executes tags. Everything else
-is output as is.
-
-The syntax of the Django template language involves four constructs.
-
-Variables
-~~~~~~~~~
-
-A variable outputs a value from the context, which is a dict-like object
-mapping keys to values.
-
-Variables are surrounded by ``{{`` and ``}}`` like this::
-
-    My first name is {{ first_name }}. My last name is {{ last_name }}.
-
-With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this
-template renders to::
-
-    My first name is John. My last name is Doe.
-
-Dictionary lookup, attribute lookup and list-index lookups are implemented
-with a dot notation::
-
-    {{ my_dict.key }}
-    {{ my_object.attribute }}
-    {{ my_list.0 }}
-
-If a variable resolves to a callable, the template system will call it with no
-arguments and use its result instead of the callable.
-
-Tags
-~~~~
-
-Tags provide arbitrary logic in the rendering process.
-
-This definition is deliberately vague. For example, a tag can output content,
-serve as a control structure e.g. an "if" statement or a "for" loop, grab
-content from a database, or even enable access to other template tags.
-
-Tags are surrounded by ``{%`` and ``%}`` like this::
-
-    {% csrf_token %}
-
-Most tags accept arguments::
-
-    {% cycle 'odd' 'even' %}
-
-Some tags require beginning and ending tags::
-
-    {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
-
-A :ref:`reference of built-in tags <ref-templates-builtins-tags>` is
-available as well as :ref:`instructions for writing custom tags
-<howto-writing-custom-template-tags>`.
-
-Filters
-~~~~~~~
-
-Filters transform the values of variables and tag arguments.
-
-They look like this::
-
-     {{ django|title }}
-
-With a context of ``{'django': 'the web framework for perfectionists with
-deadlines'}``, this template renders to::
-
-    The Web Framework For Perfectionists With Deadlines
-
-Some filters take an argument::
-
-    {{ my_date|date:"Y-m-d" }}
-
-A :ref:`reference of built-in filters <ref-templates-builtins-filters>` is
-available as well as :ref:`instructions for writing custom filters
-<howto-writing-custom-template-filters>`.
-
-Comments
-~~~~~~~~
-
-Comments look like this::
-
-    {# this won't be rendered #}
-
-A :ttag:`{% comment %} <comment>` tag provides multi-line comments.
-
-Components
-----------
-
-.. admonition:: About this section
-
-    This is an overview of the Django template language's APIs. For details
-    see the :doc:`API reference </ref/templates/api>`.
-
-Engine
-~~~~~~
-
-:class:`django.template.Engine` encapsulates an instance of the Django
-template system. The main reason for instantiating an
-:class:`~django.template.Engine` directly is to use the Django template
-language outside of a Django project.
-
-:class:`django.template.backends.django.DjangoTemplates` is a thin wrapper
-adapting :class:`django.template.Engine` to Django's template backend API.
-
-Template
-~~~~~~~~
-
-:class:`django.template.Template` represents a compiled template.
-Templates are obtained with :meth:`Engine.get_template()
-<django.template.Engine.get_template>` or :meth:`Engine.from_string()
-<django.template.Engine.from_string>`
-
-Likewise ``django.template.backends.django.Template`` is a thin wrapper
-adapting :class:`django.template.Template` to the common template API.
-
-Context
-~~~~~~~
-
-:class:`django.template.Context` holds some metadata in addition to the
-context data. It is passed to :meth:`Template.render()
-<django.template.Template.render>` for rendering a template.
-
-:class:`django.template.RequestContext` is a subclass of
-:class:`~django.template.Context` that stores the current
-:class:`~django.http.HttpRequest` and runs template context processors.
-
-The common API doesn't have an equivalent concept. Context data is passed in a
-plain :class:`dict` and the current :class:`~django.http.HttpRequest` is passed
-separately if needed.
-
-Loaders
-~~~~~~~
-
-Template loaders are responsible for locating templates, loading them, and
-returning :class:`~django.template.Template` objects.
-
-Django provides several :ref:`built-in template loaders <template-loaders>`
-and supports :ref:`custom template loaders <custom-template-loaders>`.
-
-Context processors
-~~~~~~~~~~~~~~~~~~
-
-Context processors are functions that receive the current
-:class:`~django.http.HttpRequest` as an argument and return a :class:`dict` of
-data to be added to the rendering context.
-
-Their main use is to add common data shared by all templates to the context
-without repeating code in every view.
-
-Django provides many :ref:`built-in context processors <context-processors>`,
-and you can implement your own additional context processors, too.
-
-.. _Jinja2: http://jinja.pocoo.org/
-.. _DEP 182: https://github.com/django/deps/blob/master/final/0182-multiple-template-engines.rst
-.. _Django Debug Toolbar: https://github.com/jazzband/django-debug-toolbar
+.. _Jinja2: https://jinja.palletsprojects.com/

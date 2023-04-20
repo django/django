@@ -2,23 +2,23 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -64,12 +64,24 @@ msgstr ""
 "Сьпіс абраных %s. Каб нешта прыбраць, пазначце патрэбнае ў полі ніжэй і "
 "пстрыкніце па стрэлцы «Прыбраць» між двума палямі."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Друкуйце ў гэтым полі, каб прасеяць спіс выбраных %s."
+
 msgid "Remove all"
 msgstr "Прыбраць усё"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Каб прыбраць усе %s, пстрыкніце тут."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s абраная можнасьць нябачна"
+msgstr[1] "%s абраныя можнасьці нябачны"
+msgstr[2] "%s абраныя можнасьці нябачны"
+msgstr[3] "%s абраныя можнасьці нябачны"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -86,16 +98,16 @@ msgstr ""
 "незахаванае страціцца."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Абралі дзеяньне, але не захавалі зьмены ў пэўных палях. Каб захаваць, "
+"Абралі дзеяньне, але не захавалі зьмены ў пэўных палях. Каб захаваць, "
 "націсьніце «Добра». Дзеяньне потым трэба будзе запусьціць нанова."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Абралі дзеяньне, а ў палях нічога не зьмянялі. Мажліва, вы хацелі націснуць "
@@ -188,6 +200,54 @@ msgstr "Лістапад"
 
 msgid "December"
 msgstr "Снежань"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Сту"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Лют"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Сак"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Кра"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Чэр"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Ліп"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Жні"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Вер"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Кас"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Ліс"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Сне"
 
 msgctxt "one letter Sunday"
 msgid "S"

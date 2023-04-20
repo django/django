@@ -4,17 +4,24 @@ import time
 from unittest import skipIf, skipUnless
 
 from django.db import (
-    DatabaseError, Error, IntegrityError, OperationalError, connection,
+    DatabaseError,
+    Error,
+    IntegrityError,
+    OperationalError,
+    connection,
     transaction,
 )
 from django.test import (
-    TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature,
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 
 from .models import Reporter
 
 
-@skipUnlessDBFeature('uses_savepoints')
+@skipUnlessDBFeature("uses_savepoints")
 class AtomicTests(TransactionTestCase):
     """
     Tests for the atomic decorator and context manager.
@@ -27,70 +34,73 @@ class AtomicTests(TransactionTestCase):
     syntax and the bulk of the tests use the context manager syntax.
     """
 
-    available_apps = ['transactions']
+    available_apps = ["transactions"]
 
     def test_decorator_syntax_commit(self):
         @transaction.atomic
         def make_reporter():
-            Reporter.objects.create(first_name="Tintin")
-        make_reporter()
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+            return Reporter.objects.create(first_name="Tintin")
+
+        reporter = make_reporter()
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
     def test_decorator_syntax_rollback(self):
         @transaction.atomic
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
+
         with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_alternate_decorator_syntax_commit(self):
         @transaction.atomic()
         def make_reporter():
-            Reporter.objects.create(first_name="Tintin")
-        make_reporter()
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+            return Reporter.objects.create(first_name="Tintin")
+
+        reporter = make_reporter()
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
     def test_alternate_decorator_syntax_rollback(self):
         @transaction.atomic()
         def make_reporter():
             Reporter.objects.create(first_name="Haddock")
             raise Exception("Oops, that's his last name")
+
         with self.assertRaisesMessage(Exception, "Oops"):
             make_reporter()
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_commit(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+            reporter = Reporter.objects.create(first_name="Tintin")
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
     def test_rollback(self):
         with self.assertRaisesMessage(Exception, "Oops"):
             with transaction.atomic():
                 Reporter.objects.create(first_name="Haddock")
                 raise Exception("Oops, that's his last name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_nested_commit_commit(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
+            reporter1 = Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
-                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(
-            Reporter.objects.all(),
-            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
-        )
+                reporter2 = Reporter.objects.create(
+                    first_name="Archibald", last_name="Haddock"
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
 
     def test_nested_commit_rollback(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
+            reporter = Reporter.objects.create(first_name="Tintin")
             with self.assertRaisesMessage(Exception, "Oops"):
                 with transaction.atomic():
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
     def test_nested_rollback_commit(self):
         with self.assertRaisesMessage(Exception, "Oops"):
@@ -99,7 +109,7 @@ class AtomicTests(TransactionTestCase):
                 with transaction.atomic():
                     Reporter.objects.create(last_name="Haddock")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_nested_rollback_rollback(self):
         with self.assertRaisesMessage(Exception, "Oops"):
@@ -110,17 +120,16 @@ class AtomicTests(TransactionTestCase):
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_merged_commit_commit(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
+            reporter1 = Reporter.objects.create(first_name="Tintin")
             with transaction.atomic(savepoint=False):
-                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(
-            Reporter.objects.all(),
-            ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>']
-        )
+                reporter2 = Reporter.objects.create(
+                    first_name="Archibald", last_name="Haddock"
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
 
     def test_merged_commit_rollback(self):
         with transaction.atomic():
@@ -130,7 +139,7 @@ class AtomicTests(TransactionTestCase):
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
         # Writes in the outer block are rolled back too.
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_commit(self):
         with self.assertRaisesMessage(Exception, "Oops"):
@@ -139,7 +148,7 @@ class AtomicTests(TransactionTestCase):
                 with transaction.atomic(savepoint=False):
                     Reporter.objects.create(last_name="Haddock")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_merged_rollback_rollback(self):
         with self.assertRaisesMessage(Exception, "Oops"):
@@ -150,25 +159,27 @@ class AtomicTests(TransactionTestCase):
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_reuse_commit_commit(self):
         atomic = transaction.atomic()
         with atomic:
-            Reporter.objects.create(first_name="Tintin")
+            reporter1 = Reporter.objects.create(first_name="Tintin")
             with atomic:
-                Reporter.objects.create(first_name="Archibald", last_name="Haddock")
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Archibald Haddock>', '<Reporter: Tintin>'])
+                reporter2 = Reporter.objects.create(
+                    first_name="Archibald", last_name="Haddock"
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
 
     def test_reuse_commit_rollback(self):
         atomic = transaction.atomic()
         with atomic:
-            Reporter.objects.create(first_name="Tintin")
+            reporter = Reporter.objects.create(first_name="Tintin")
             with self.assertRaisesMessage(Exception, "Oops"):
                 with atomic:
                     Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
     def test_reuse_rollback_commit(self):
         atomic = transaction.atomic()
@@ -178,7 +189,7 @@ class AtomicTests(TransactionTestCase):
                 with atomic:
                     Reporter.objects.create(last_name="Haddock")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_reuse_rollback_rollback(self):
         atomic = transaction.atomic()
@@ -190,7 +201,7 @@ class AtomicTests(TransactionTestCase):
                         Reporter.objects.create(first_name="Haddock")
                     raise Exception("Oops, that's his last name")
                 raise Exception("Oops, that's his first name")
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_force_rollback(self):
         with transaction.atomic():
@@ -198,23 +209,38 @@ class AtomicTests(TransactionTestCase):
             # atomic block shouldn't rollback, but force it.
             self.assertFalse(transaction.get_rollback())
             transaction.set_rollback(True)
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_prevent_rollback(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
+            reporter = Reporter.objects.create(first_name="Tintin")
             sid = transaction.savepoint()
             # trigger a database error inside an inner atomic without savepoint
             with self.assertRaises(DatabaseError):
                 with transaction.atomic(savepoint=False):
                     with connection.cursor() as cursor:
-                        cursor.execute(
-                            "SELECT no_such_col FROM transactions_reporter")
+                        cursor.execute("SELECT no_such_col FROM transactions_reporter")
             # prevent atomic from rolling back since we're recovering manually
             self.assertTrue(transaction.get_rollback())
             transaction.set_rollback(False)
             transaction.savepoint_rollback(sid)
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
+
+    @skipUnlessDBFeature("can_release_savepoints")
+    def test_failure_on_exit_transaction(self):
+        with transaction.atomic():
+            with self.assertRaises(DatabaseError):
+                with transaction.atomic():
+                    Reporter.objects.create(last_name="Tintin")
+                    self.assertEqual(len(Reporter.objects.all()), 1)
+                    # Incorrect savepoint id to provoke a database error.
+                    connection.savepoint_ids.append("12")
+            with self.assertRaises(transaction.TransactionManagementError):
+                len(Reporter.objects.all())
+            self.assertIs(connection.needs_rollback, True)
+            if connection.savepoint_ids:
+                connection.savepoint_ids.pop()
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
 
 class AtomicInsideTransactionTests(AtomicTests):
@@ -241,11 +267,11 @@ class AtomicWithoutAutocommitTests(AtomicTests):
         transaction.set_autocommit(True)
 
 
-@skipUnlessDBFeature('uses_savepoints')
+@skipUnlessDBFeature("uses_savepoints")
 class AtomicMergeTests(TransactionTestCase):
     """Test merging transactions with savepoint=False."""
 
-    available_apps = ['transactions']
+    available_apps = ["transactions"]
 
     def test_merged_outer_rollback(self):
         with transaction.atomic():
@@ -269,11 +295,11 @@ class AtomicMergeTests(TransactionTestCase):
             self.assertEqual(Reporter.objects.count(), 3)
             transaction.set_rollback(True)
         # The first block has a savepoint and must roll back.
-        self.assertQuerysetEqual(Reporter.objects.all(), [])
+        self.assertSequenceEqual(Reporter.objects.all(), [])
 
     def test_merged_inner_savepoint_rollback(self):
         with transaction.atomic():
-            Reporter.objects.create(first_name="Tintin")
+            reporter = Reporter.objects.create(first_name="Tintin")
             with transaction.atomic():
                 Reporter.objects.create(first_name="Archibald", last_name="Haddock")
                 with self.assertRaisesMessage(Exception, "Oops"):
@@ -288,28 +314,33 @@ class AtomicMergeTests(TransactionTestCase):
                 transaction.set_rollback(True)
             # The second block has a savepoint and must roll back.
             self.assertEqual(Reporter.objects.count(), 1)
-        self.assertQuerysetEqual(Reporter.objects.all(), ['<Reporter: Tintin>'])
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter])
 
 
-@skipUnlessDBFeature('uses_savepoints')
+@skipUnlessDBFeature("uses_savepoints")
 class AtomicErrorsTests(TransactionTestCase):
-
-    available_apps = ['transactions']
+    available_apps = ["transactions"]
     forbidden_atomic_msg = "This is forbidden when an 'atomic' block is active."
 
     def test_atomic_prevents_setting_autocommit(self):
         autocommit = transaction.get_autocommit()
         with transaction.atomic():
-            with self.assertRaisesMessage(transaction.TransactionManagementError, self.forbidden_atomic_msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, self.forbidden_atomic_msg
+            ):
                 transaction.set_autocommit(not autocommit)
         # Make sure autocommit wasn't changed.
         self.assertEqual(connection.autocommit, autocommit)
 
     def test_atomic_prevents_calling_transaction_methods(self):
         with transaction.atomic():
-            with self.assertRaisesMessage(transaction.TransactionManagementError, self.forbidden_atomic_msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, self.forbidden_atomic_msg
+            ):
                 transaction.commit()
-            with self.assertRaisesMessage(transaction.TransactionManagementError, self.forbidden_atomic_msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, self.forbidden_atomic_msg
+            ):
                 transaction.rollback()
 
     def test_atomic_prevents_queries_in_broken_transaction(self):
@@ -323,11 +354,14 @@ class AtomicErrorsTests(TransactionTestCase):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             )
-            with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
+            with self.assertRaisesMessage(
+                transaction.TransactionManagementError, msg
+            ) as cm:
                 r2.save(force_update=True)
+        self.assertIsInstance(cm.exception.__cause__, IntegrityError)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Haddock")
 
-    @skipIfDBFeature('atomic_transactions')
+    @skipIfDBFeature("atomic_transactions")
     def test_atomic_allows_queries_after_fixing_transaction(self):
         r1 = Reporter.objects.create(first_name="Archibald", last_name="Haddock")
         with transaction.atomic():
@@ -339,7 +373,7 @@ class AtomicErrorsTests(TransactionTestCase):
             r2.save(force_update=True)
         self.assertEqual(Reporter.objects.get(pk=r1.pk).last_name, "Calculus")
 
-    @skipUnlessDBFeature('test_db_allows_multiple_connections')
+    @skipUnlessDBFeature("test_db_allows_multiple_connections")
     def test_atomic_prevents_queries_in_broken_transaction_after_client_close(self):
         with transaction.atomic():
             Reporter.objects.create(first_name="Archibald", last_name="Haddock")
@@ -354,10 +388,10 @@ class AtomicErrorsTests(TransactionTestCase):
         self.assertEqual(Reporter.objects.count(), 0)
 
 
-@skipUnless(connection.vendor == 'mysql', "MySQL-specific behaviors")
+@skipUnlessDBFeature("uses_savepoints")
+@skipUnless(connection.vendor == "mysql", "MySQL-specific behaviors")
 class AtomicMySQLTests(TransactionTestCase):
-
-    available_apps = ['transactions']
+    available_apps = ["transactions"]
 
     @skipIf(threading is None, "Test requires threading")
     def test_implicit_savepoint_rollback(self):
@@ -381,7 +415,7 @@ class AtomicMySQLTests(TransactionTestCase):
         other_thread = threading.Thread(target=other_thread)
         other_thread.start()
 
-        with self.assertRaisesMessage(OperationalError, 'Deadlock found'):
+        with self.assertRaisesMessage(OperationalError, "Deadlock found"):
             # Double atomic to enter a transaction and create a savepoint.
             with transaction.atomic():
                 with transaction.atomic():
@@ -397,8 +431,7 @@ class AtomicMySQLTests(TransactionTestCase):
 
 
 class AtomicMiscTests(TransactionTestCase):
-
-    available_apps = ['transactions']
+    available_apps = ["transactions"]
 
     def test_wrap_callable_instance(self):
         """#20028 -- Atomic must support wrapping callable instances."""
@@ -410,20 +443,17 @@ class AtomicMiscTests(TransactionTestCase):
         # Must not raise an exception
         transaction.atomic(Callable())
 
-    @skipUnlessDBFeature('can_release_savepoints')
+    @skipUnlessDBFeature("can_release_savepoints")
     def test_atomic_does_not_leak_savepoints_on_failure(self):
         """#23074 -- Savepoints must be released after rollback."""
 
         # Expect an error when rolling back a savepoint that doesn't exist.
         # Done outside of the transaction block to ensure proper recovery.
         with self.assertRaises(Error):
-
             # Start a plain transaction.
             with transaction.atomic():
-
                 # Swallow the intentional error raised in the sub-transaction.
                 with self.assertRaisesMessage(Exception, "Oops"):
-
                     # Start a sub-transaction with a savepoint.
                     with transaction.atomic():
                         sid = connection.savepoint_ids[-1]
@@ -434,19 +464,17 @@ class AtomicMiscTests(TransactionTestCase):
 
     def test_mark_for_rollback_on_error_in_transaction(self):
         with transaction.atomic(savepoint=False):
-
             # Swallow the intentional error raised.
             with self.assertRaisesMessage(Exception, "Oops"):
-
-                # Wrap in `mark_for_rollback_on_error` to check if the transaction is marked broken.
+                # Wrap in `mark_for_rollback_on_error` to check if the
+                # transaction is marked broken.
                 with transaction.mark_for_rollback_on_error():
-
                     # Ensure that we are still in a good state.
                     self.assertFalse(transaction.get_rollback())
 
                     raise Exception("Oops")
 
-                # Ensure that `mark_for_rollback_on_error` marked the transaction as broken …
+                # mark_for_rollback_on_error marked the transaction as broken …
                 self.assertTrue(transaction.get_rollback())
 
             # … and further queries fail.
@@ -454,7 +482,8 @@ class AtomicMiscTests(TransactionTestCase):
             with self.assertRaisesMessage(transaction.TransactionManagementError, msg):
                 Reporter.objects.create()
 
-        # Transaction errors are reset at the end of an transaction, so this should just work.
+        # Transaction errors are reset at the end of an transaction, so this
+        # should just work.
         Reporter.objects.create()
 
     def test_mark_for_rollback_on_error_in_autocommit(self):
@@ -462,10 +491,9 @@ class AtomicMiscTests(TransactionTestCase):
 
         # Swallow the intentional error raised.
         with self.assertRaisesMessage(Exception, "Oops"):
-
-            # Wrap in `mark_for_rollback_on_error` to check if the transaction is marked broken.
+            # Wrap in `mark_for_rollback_on_error` to check if the transaction
+            # is marked broken.
             with transaction.mark_for_rollback_on_error():
-
                 # Ensure that we are still in a good state.
                 self.assertFalse(transaction.get_connection().needs_rollback)
 
@@ -480,17 +508,22 @@ class AtomicMiscTests(TransactionTestCase):
 
 
 class NonAutocommitTests(TransactionTestCase):
-
     available_apps = []
+
+    def setUp(self):
+        transaction.set_autocommit(False)
+
+    def tearDown(self):
+        transaction.rollback()
+        transaction.set_autocommit(True)
 
     def test_orm_query_after_error_and_rollback(self):
         """
         ORM queries are allowed after an error and a rollback in non-autocommit
         mode (#27504).
         """
-        transaction.set_autocommit(False)
-        r1 = Reporter.objects.create(first_name='Archibald', last_name='Haddock')
-        r2 = Reporter(first_name='Cuthbert', last_name='Calculus', id=r1.id)
+        r1 = Reporter.objects.create(first_name="Archibald", last_name="Haddock")
+        r2 = Reporter(first_name="Cuthbert", last_name="Calculus", id=r1.id)
         with self.assertRaises(IntegrityError):
             r2.save(force_insert=True)
         transaction.rollback()
@@ -498,9 +531,53 @@ class NonAutocommitTests(TransactionTestCase):
 
     def test_orm_query_without_autocommit(self):
         """#24921 -- ORM queries must be possible after set_autocommit(False)."""
-        transaction.set_autocommit(False)
-        try:
-            Reporter.objects.create(first_name="Tintin")
-        finally:
-            transaction.rollback()
-            transaction.set_autocommit(True)
+        Reporter.objects.create(first_name="Tintin")
+
+
+class DurableTestsBase:
+    available_apps = ["transactions"]
+
+    def test_commit(self):
+        with transaction.atomic(durable=True):
+            reporter = Reporter.objects.create(first_name="Tintin")
+        self.assertEqual(Reporter.objects.get(), reporter)
+
+    def test_nested_outer_durable(self):
+        with transaction.atomic(durable=True):
+            reporter1 = Reporter.objects.create(first_name="Tintin")
+            with transaction.atomic():
+                reporter2 = Reporter.objects.create(
+                    first_name="Archibald",
+                    last_name="Haddock",
+                )
+        self.assertSequenceEqual(Reporter.objects.all(), [reporter2, reporter1])
+
+    def test_nested_both_durable(self):
+        msg = "A durable atomic block cannot be nested within another atomic block."
+        with transaction.atomic(durable=True):
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass
+
+    def test_nested_inner_durable(self):
+        msg = "A durable atomic block cannot be nested within another atomic block."
+        with transaction.atomic():
+            with self.assertRaisesMessage(RuntimeError, msg):
+                with transaction.atomic(durable=True):
+                    pass
+
+    def test_sequence_of_durables(self):
+        with transaction.atomic(durable=True):
+            reporter = Reporter.objects.create(first_name="Tintin 1")
+        self.assertEqual(Reporter.objects.get(first_name="Tintin 1"), reporter)
+        with transaction.atomic(durable=True):
+            reporter = Reporter.objects.create(first_name="Tintin 2")
+        self.assertEqual(Reporter.objects.get(first_name="Tintin 2"), reporter)
+
+
+class DurableTransactionTests(DurableTestsBase, TransactionTestCase):
+    pass
+
+
+class DurableTests(DurableTestsBase, TestCase):
+    pass

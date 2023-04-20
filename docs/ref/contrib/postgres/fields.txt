@@ -16,8 +16,7 @@ Indexes such as :class:`~django.contrib.postgres.indexes.GinIndex` and
 :class:`~django.contrib.postgres.indexes.GistIndex` are better suited, though
 the index choice is dependent on the queries that you're using. Generally, GiST
 may be a good choice for the :ref:`range fields <range-fields>` and
-:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField` and
-:class:`JSONField`.
+:class:`HStoreField`, and GIN may be helpful for :class:`ArrayField`.
 
 ``ArrayField``
 ==============
@@ -48,13 +47,16 @@ may be a good choice for the :ref:`range fields <range-fields>` and
         with the exception of those handling relational data
         (:class:`~django.db.models.ForeignKey`,
         :class:`~django.db.models.OneToOneField` and
-        :class:`~django.db.models.ManyToManyField`).
+        :class:`~django.db.models.ManyToManyField`) and file fields (
+        :class:`~django.db.models.FileField` and
+        :class:`~django.db.models.ImageField`).
 
         It is possible to nest array fields - you can specify an instance of
         ``ArrayField`` as the ``base_field``. For example::
 
             from django.contrib.postgres.fields import ArrayField
             from django.db import models
+
 
             class ChessBoard(models.Model):
                 board = ArrayField(
@@ -79,26 +81,32 @@ may be a good choice for the :ref:`range fields <range-fields>` and
 
 .. note::
 
-    When nesting ``ArrayField``, whether you use the `size` parameter or not,
+    When nesting ``ArrayField``, whether you use the ``size`` parameter or not,
     PostgreSQL requires that the arrays are rectangular::
 
         from django.contrib.postgres.fields import ArrayField
         from django.db import models
 
+
         class Board(models.Model):
             pieces = ArrayField(ArrayField(models.IntegerField()))
 
+
         # Valid
-        Board(pieces=[
-            [2, 3],
-            [2, 1],
-        ])
+        Board(
+            pieces=[
+                [2, 3],
+                [2, 1],
+            ]
+        )
 
         # Not valid
-        Board(pieces=[
-            [2, 3],
-            [2],
-        ])
+        Board(
+            pieces=[
+                [2, 3],
+                [2],
+            ]
+        )
 
     If irregular shapes are required, then the underlying field should be made
     nullable and the values padded with ``None``.
@@ -111,6 +119,7 @@ We will use the following example model::
 
     from django.contrib.postgres.fields import ArrayField
     from django.db import models
+
 
     class Post(models.Model):
         name = models.CharField(max_length=200)
@@ -126,19 +135,21 @@ We will use the following example model::
 
 The :lookup:`contains` lookup is overridden on :class:`ArrayField`. The
 returned objects will be those where the values passed are a subset of the
-data. It uses the SQL operator ``@>``. For example::
+data. It uses the SQL operator ``@>``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__contains=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__contains=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contains=['django'])
+    >>> Post.objects.filter(tags__contains=["django"])
     <QuerySet [<Post: First post>, <Post: Third post>]>
 
-    >>> Post.objects.filter(tags__contains=['django', 'thoughts'])
+    >>> Post.objects.filter(tags__contains=["django", "thoughts"])
     <QuerySet [<Post: First post>]>
 
 .. fieldlookup:: arrayfield.contained_by
@@ -148,16 +159,18 @@ data. It uses the SQL operator ``@>``. For example::
 
 This is the inverse of the :lookup:`contains <arrayfield.contains>` lookup -
 the objects returned will be those where the data is a subset of the values
-passed. It uses the SQL operator ``<@``. For example::
+passed. It uses the SQL operator ``<@``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__contained_by=["thoughts", "django"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__contained_by=['thoughts', 'django', 'tutorial'])
+    >>> Post.objects.filter(tags__contained_by=["thoughts", "django", "tutorial"])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
 .. fieldlookup:: arrayfield.overlap
@@ -166,28 +179,40 @@ passed. It uses the SQL operator ``<@``. For example::
 ~~~~~~~~~~~
 
 Returns objects where the data shares any results with the values passed. Uses
-the SQL operator ``&&``. For example::
+the SQL operator ``&&``. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['tutorial', 'django'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__overlap=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts", "tutorial"])
+    >>> Post.objects.create(name="Third post", tags=["tutorial", "django"])
+
+    >>> Post.objects.filter(tags__overlap=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__overlap=['thoughts', 'tutorial'])
+    >>> Post.objects.filter(tags__overlap=["thoughts", "tutorial"])
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
+
+    >>> Post.objects.filter(tags__overlap=Post.objects.values_list("tags"))
+    <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
+
+.. versionchanged:: 4.2
+
+    Support for ``QuerySet.values()`` and ``values_list()`` as a right-hand
+    side was added.
 
 .. fieldlookup:: arrayfield.len
 
 ``len``
 ~~~~~~~
 
-Returns the length of the array. The lookups available afterwards are those
-available for :class:`~django.db.models.IntegerField`. For example::
+Returns the length of the array. The lookups available afterward are those
+available for :class:`~django.db.models.IntegerField`. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+.. code-block:: pycon
+
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
 
     >>> Post.objects.filter(tags__len=1)
     <QuerySet [<Post: Second post>]>
@@ -200,18 +225,20 @@ Index transforms
 Index transforms index into the array. Any non-negative integer can be used.
 There are no errors if it exceeds the :attr:`size <ArrayField.size>` of the
 array. The lookups available after the transform are those from the
-:attr:`base_field <ArrayField.base_field>`. For example::
+:attr:`base_field <ArrayField.base_field>`. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__0='thoughts')
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+
+    >>> Post.objects.filter(tags__0="thoughts")
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__1__iexact='Django')
+    >>> Post.objects.filter(tags__1__iexact="Django")
     <QuerySet [<Post: First post>]>
 
-    >>> Post.objects.filter(tags__276='javascript')
+    >>> Post.objects.filter(tags__276="javascript")
     <QuerySet []>
 
 .. note::
@@ -227,16 +254,18 @@ Slice transforms
 
 Slice transforms take a slice of the array. Any two non-negative integers can
 be used, separated by a single underscore. The lookups available after the
-transform do not change. For example::
+transform do not change. For example:
 
-    >>> Post.objects.create(name='First post', tags=['thoughts', 'django'])
-    >>> Post.objects.create(name='Second post', tags=['thoughts'])
-    >>> Post.objects.create(name='Third post', tags=['django', 'python', 'thoughts'])
+.. code-block:: pycon
 
-    >>> Post.objects.filter(tags__0_1=['thoughts'])
+    >>> Post.objects.create(name="First post", tags=["thoughts", "django"])
+    >>> Post.objects.create(name="Second post", tags=["thoughts"])
+    >>> Post.objects.create(name="Third post", tags=["django", "python", "thoughts"])
+
+    >>> Post.objects.filter(tags__0_1=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
-    >>> Post.objects.filter(tags__0_2__contains=['thoughts'])
+    >>> Post.objects.filter(tags__0_2__contains=["thoughts"])
     <QuerySet [<Post: First post>, <Post: Second post>]>
 
 .. note::
@@ -258,11 +287,13 @@ transform do not change. For example::
 
 .. class:: CIText(**options)
 
+    .. deprecated:: 4.2
+
     A mixin to create case-insensitive text fields backed by the citext_ type.
     Read about `the performance considerations`_ prior to using it.
 
     To use ``citext``, use the :class:`.CITextExtension` operation to
-    :ref:`setup the citext extension <create-postgresql-extensions>` in
+    :ref:`set up the citext extension <create-postgresql-extensions>` in
     PostgreSQL before the first ``CreateModel`` migration operation.
 
     If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
@@ -273,8 +304,28 @@ transform do not change. For example::
     Several fields that use the mixin are provided:
 
 .. class:: CICharField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CICharField`` is deprecated in favor of
+        ``CharField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CIEmailField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CIEmailField`` is deprecated in favor of
+        ``EmailField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
+
 .. class:: CITextField(**options)
+
+    .. deprecated:: 4.2
+
+        ``CITextField`` is deprecated in favor of
+        ``TextField(db_collation="…")`` with a case-insensitive
+        non-deterministic collation.
 
     These fields subclass :class:`~django.db.models.CharField`,
     :class:`~django.db.models.EmailField`, and
@@ -284,7 +335,17 @@ transform do not change. For example::
     similar to PostgreSQL's ``text`` type.
 
     .. _citext: https://www.postgresql.org/docs/current/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.17.7
+    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.19.9
+
+.. admonition:: Case-insensitive collations
+
+    It's preferable to use non-deterministic collations instead of the
+    ``citext`` extension. You can create them using the
+    :class:`~django.contrib.postgres.operations.CreateCollation` migration
+    operation. For more details, see :ref:`manage-postgresql-collations` and
+    the PostgreSQL documentation about `non-deterministic collations`_.
+
+    .. _non-deterministic collations: https://www.postgresql.org/docs/current/collation.html#COLLATION-NONDETERMINISTIC
 
 ``HStoreField``
 ===============
@@ -298,7 +359,7 @@ transform do not change. For example::
     To use this field, you'll need to:
 
     #. Add ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`.
-    #. :ref:`Setup the hstore extension <create-postgresql-extensions>` in
+    #. :ref:`Set up the hstore extension <create-postgresql-extensions>` in
        PostgreSQL.
 
     You'll see an error like ``can't adapt type 'dict'`` if you skip the first
@@ -321,6 +382,7 @@ We will use the following example model::
     from django.contrib.postgres.fields import HStoreField
     from django.db import models
 
+
     class Dog(models.Model):
         name = models.CharField(max_length=200)
         data = HStoreField()
@@ -333,21 +395,41 @@ We will use the following example model::
 Key lookups
 ~~~~~~~~~~~
 
-To query based on a given key, you can use that key as the lookup name::
+To query based on a given key, you can use that key as the lookup name:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__breed='collie')
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie"})
+
+    >>> Dog.objects.filter(data__breed="collie")
     <QuerySet [<Dog: Meg>]>
 
-You can chain other lookups after key lookups::
+You can chain other lookups after key lookups:
 
-    >>> Dog.objects.filter(data__breed__contains='l')
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(data__breed__contains="l")
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
+
+or use ``F()`` expressions to annotate a key value. For example:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import F
+    >>> rufus = Dog.objects.annotate(breed=F("data__breed"))[0]
+    >>> rufus.breed
+    'labrador'
 
 If the key you wish to query by clashes with the name of another lookup, you
 need to use the :lookup:`hstorefield.contains` lookup instead.
+
+.. note::
+
+    Key transforms can also be chained with: :lookup:`contains`,
+    :lookup:`icontains`, :lookup:`endswith`, :lookup:`iendswith`,
+    :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
+    and :lookup:`istartswith` lookups.
 
 .. warning::
 
@@ -364,16 +446,18 @@ need to use the :lookup:`hstorefield.contains` lookup instead.
 The :lookup:`contains` lookup is overridden on
 :class:`~django.contrib.postgres.fields.HStoreField`. The returned objects are
 those where the given ``dict`` of key-value pairs are all contained in the
-field. It uses the SQL operator ``@>``. For example::
+field. It uses the SQL operator ``@>``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__contains={'owner': 'Bob'})
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
-    >>> Dog.objects.filter(data__contains={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.contained_by
@@ -384,16 +468,18 @@ field. It uses the SQL operator ``@>``. For example::
 This is the inverse of the :lookup:`contains <hstorefield.contains>` lookup -
 the objects returned will be those where the key-value pairs on the object are
 a subset of those in the value passed. It uses the SQL operator ``<@``. For
-example::
+example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
 
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
 
 .. fieldlookup:: hstorefield.has_key
@@ -402,12 +488,14 @@ example::
 ~~~~~~~~~~~
 
 Returns objects where the given key is in the data. Uses the SQL operator
-``?``. For example::
+``?``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_key='owner')
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__has_key="owner")
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_any_keys
@@ -416,13 +504,15 @@ Returns objects where the given key is in the data. Uses the SQL operator
 ~~~~~~~~~~~~~~~~
 
 Returns objects where any of the given keys are in the data. Uses the SQL
-operator ``?|``. For example::
+operator ``?|``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'owner': 'Bob'})
-    >>> Dog.objects.create(name='Fred', data={})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_any_keys=['owner', 'breed'])
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"owner": "Bob"})
+    >>> Dog.objects.create(name="Fred", data={})
+
+    >>> Dog.objects.filter(data__has_any_keys=["owner", "breed"])
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.has_keys
@@ -431,12 +521,14 @@ operator ``?|``. For example::
 ~~~~~~~~~~~~
 
 Returns objects where all of the given keys are in the data. Uses the SQL operator
-``?&``. For example::
+``?&``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__has_keys=['breed', 'owner'])
+    >>> Dog.objects.create(name="Rufus", data={})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__has_keys=["breed", "owner"])
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.keys
@@ -448,12 +540,14 @@ Returns objects where the array of keys is the given value. Note that the order
 is not guaranteed to be reliable, so this transform is mainly useful for using
 in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``akeys()``. For example::
+``akeys()``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'toy': 'bone'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__keys__overlap=['breed', 'toy'])
+    >>> Dog.objects.create(name="Rufus", data={"toy": "bone"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__keys__overlap=["breed", "toy"])
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. fieldlookup:: hstorefield.values
@@ -465,148 +559,15 @@ Returns objects where the array of values is the given value. Note that the
 order is not guaranteed to be reliable, so this transform is mainly useful for
 using in conjunction with lookups on
 :class:`~django.contrib.postgres.fields.ArrayField`. Uses the SQL function
-``avalues()``. For example::
+``avals()``. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+.. code-block:: pycon
 
-    >>> Dog.objects.filter(data__values__contains=['collie'])
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
+
+    >>> Dog.objects.filter(data__values__contains=["collie"])
     <QuerySet [<Dog: Meg>]>
-
-``JSONField``
-=============
-
-.. class:: JSONField(encoder=None, **options)
-
-    A field for storing JSON encoded data. In Python the data is represented in
-    its Python native format: dictionaries, lists, strings, numbers, booleans
-    and ``None``.
-
-    .. attribute:: encoder
-
-        An optional JSON-encoding class to serialize data types not supported
-        by the standard JSON serializer (``datetime``, ``uuid``, etc.). For
-        example, you can use the
-        :class:`~django.core.serializers.json.DjangoJSONEncoder` class or any
-        other :py:class:`json.JSONEncoder` subclass.
-
-        When the value is retrieved from the database, it will be in the format
-        chosen by the custom encoder (most often a string), so you'll need to
-        take extra steps to convert the value back to the initial data type
-        (:meth:`Model.from_db() <django.db.models.Model.from_db>` and
-        :meth:`Field.from_db_value() <django.db.models.Field.from_db_value>`
-        are two possible hooks for that purpose). Your deserialization may need
-        to account for the fact that you can't be certain of the input type.
-        For example, you run the risk of returning a ``datetime`` that was
-        actually a string that just happened to be in the same format chosen
-        for ``datetime``\s.
-
-    If you give the field a :attr:`~django.db.models.Field.default`, ensure
-    it's a callable such as ``dict`` (for an empty default) or a callable that
-    returns a dict (such as a function). Incorrectly using ``default={}``
-    creates a mutable default that is shared between all instances of
-    ``JSONField``.
-
-.. note::
-
-    PostgreSQL has two native JSON based data types: ``json`` and ``jsonb``.
-    The main difference between them is how they are stored and how they can be
-    queried. PostgreSQL's ``json`` field is stored as the original string
-    representation of the JSON and must be decoded on the fly when queried
-    based on keys. The ``jsonb`` field is stored based on the actual structure
-    of the JSON which allows indexing. The trade-off is a small additional cost
-    on writing to the ``jsonb`` field. ``JSONField`` uses ``jsonb``.
-
-Querying ``JSONField``
-----------------------
-
-We will use the following example model::
-
-    from django.contrib.postgres.fields import JSONField
-    from django.db import models
-
-    class Dog(models.Model):
-        name = models.CharField(max_length=200)
-        data = JSONField()
-
-        def __str__(self):
-            return self.name
-
-.. fieldlookup:: jsonfield.key
-
-Key, index, and path lookups
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To query based on a given dictionary key, use that key as the lookup name::
-
-    >>> Dog.objects.create(name='Rufus', data={
-    ...     'breed': 'labrador',
-    ...     'owner': {
-    ...         'name': 'Bob',
-    ...         'other_pets': [{
-    ...             'name': 'Fishy',
-    ...         }],
-    ...     },
-    ... })
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
-
-    >>> Dog.objects.filter(data__breed='collie')
-    <QuerySet [<Dog: Meg>]>
-
-Multiple keys can be chained together to form a path lookup::
-
-    >>> Dog.objects.filter(data__owner__name='Bob')
-    <QuerySet [<Dog: Rufus>]>
-
-If the key is an integer, it will be interpreted as an index lookup in an
-array::
-
-    >>> Dog.objects.filter(data__owner__other_pets__0__name='Fishy')
-    <QuerySet [<Dog: Rufus>]>
-
-If the key you wish to query by clashes with the name of another lookup, use
-the :lookup:`jsonfield.contains` lookup instead.
-
-If only one key or index is used, the SQL operator ``->`` is used. If multiple
-operators are used then the ``#>`` operator is used.
-
-To query for ``null`` in JSON data, use ``None`` as a value::
-
-    >>> Dog.objects.filter(data__owner=None)
-    <QuerySet [<Dog: Meg>]>
-
-To query for missing keys, use the ``isnull`` lookup::
-
-    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
-    >>> Dog.objects.filter(data__owner__isnull=True)
-    <QuerySet [<Dog: Shep>]>
-
-.. warning::
-
-    Since any string could be a key in a JSON object, any lookup other than
-    those listed below will be interpreted as a key lookup. No errors are
-    raised. Be extra careful for typing mistakes, and always check your queries
-    work as you intend.
-
-Containment and key operations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. fieldlookup:: jsonfield.contains
-.. fieldlookup:: jsonfield.contained_by
-.. fieldlookup:: jsonfield.has_key
-.. fieldlookup:: jsonfield.has_any_keys
-.. fieldlookup:: jsonfield.has_keys
-
-:class:`~django.contrib.postgres.fields.JSONField` shares lookups relating to
-containment and keys with :class:`~django.contrib.postgres.fields.HStoreField`.
-
-- :lookup:`contains <hstorefield.contains>` (accepts any JSON rather than
-  just a dictionary of strings)
-- :lookup:`contained_by <hstorefield.contained_by>` (accepts any JSON
-  rather than just a dictionary of strings)
-- :lookup:`has_key <hstorefield.has_key>`
-- :lookup:`has_any_keys <hstorefield.has_any_keys>`
-- :lookup:`has_keys <hstorefield.has_keys>`
 
 .. _range-fields:
 
@@ -618,10 +579,13 @@ PostgreSQL. These fields are used to store a range of values; for example the
 start and end timestamps of an event, or the range of ages an activity is
 suitable for.
 
-All of the range fields translate to :ref:`psycopg2 Range objects
-<psycopg2:adapt-range>` in Python, but also accept tuples as input if no bounds
+All of the range fields translate to :ref:`psycopg Range objects
+<psycopg:adapt-range>` in Python, but also accept tuples as input if no bounds
 information is necessary. The default is lower bound included, upper bound
-excluded; that is, ``[)``.
+excluded, that is ``[)`` (see the PostgreSQL documentation for details about
+`different bounds`_). The default bounds can be changed for non-discrete range
+fields (:class:`.DateTimeRangeField` and :class:`.DecimalRangeField`) by using
+the ``default_bounds`` argument.
 
 ``IntegerRangeField``
 ---------------------
@@ -630,12 +594,12 @@ excluded; that is, ``[)``.
 
     Stores a range of integers. Based on an
     :class:`~django.db.models.IntegerField`. Represented by an ``int4range`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 ``BigIntegerRangeField``
 ------------------------
@@ -644,32 +608,48 @@ excluded; that is, ``[)``.
 
     Stores a range of large integers. Based on a
     :class:`~django.db.models.BigIntegerField`. Represented by an ``int8range``
-    in the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    in the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 ``DecimalRangeField``
 ---------------------
 
-.. class:: DecimalRangeField(**options)
+.. class:: DecimalRangeField(default_bounds='[)', **options)
 
     Stores a range of floating point values. Based on a
     :class:`~django.db.models.DecimalField`. Represented by a ``numrange`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.NumericRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.NumericRange`` in Python.
+
+    .. attribute:: DecimalRangeField.default_bounds
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        ``django.db.backends.postgresql.psycopg_any.NumericRange`` inputs.
 
 ``DateTimeRangeField``
 ----------------------
 
-.. class:: DateTimeRangeField(**options)
+.. class:: DateTimeRangeField(default_bounds='[)', **options)
 
     Stores a range of timestamps. Based on a
     :class:`~django.db.models.DateTimeField`. Represented by a ``tstzrange`` in
-    the database and a :class:`~psycopg2:psycopg2.extras.DateTimeTZRange` in
-    Python.
+    the database and a
+    ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange`` in Python.
+
+    .. attribute:: DateTimeRangeField.default_bounds
+
+        Optional. The value of ``bounds`` for list and tuple inputs. The
+        default is lower bound included, upper bound excluded, that is ``[)``
+        (see the PostgreSQL documentation for details about
+        `different bounds`_). ``default_bounds`` is not used for
+        ``django.db.backends.postgresql.psycopg_any.DateTimeTZRange`` inputs.
 
 ``DateRangeField``
 ------------------
@@ -678,11 +658,12 @@ excluded; that is, ``[)``.
 
     Stores a range of dates. Based on a
     :class:`~django.db.models.DateField`. Represented by a ``daterange`` in the
-    database and a :class:`~psycopg2:psycopg2.extras.DateRange` in Python.
+    database and a ``django.db.backends.postgresql.psycopg_any.DateRange`` in
+    Python.
 
     Regardless of the bounds specified when saving the data, PostgreSQL always
     returns a range in a canonical form that includes the lower bound and
-    excludes the upper bound; that is ``[)``.
+    excludes the upper bound, that is ``[)``.
 
 Querying Range Fields
 ---------------------
@@ -694,6 +675,7 @@ model::
     from django.contrib.postgres.fields import IntegerRangeField
     from django.db import models
 
+
     class Event(models.Model):
         name = models.CharField(max_length=200)
         ages = IntegerRangeField()
@@ -702,17 +684,21 @@ model::
         def __str__(self):
             return self.name
 
-We will also use the following example objects::
+We will also use the following example objects:
+
+.. code-block:: pycon
 
     >>> import datetime
     >>> from django.utils import timezone
     >>> now = timezone.now()
-    >>> Event.objects.create(name='Soft play', ages=(0, 10), start=now)
-    >>> Event.objects.create(name='Pub trip', ages=(21, None), start=now - datetime.timedelta(days=1))
+    >>> Event.objects.create(name="Soft play", ages=(0, 10), start=now)
+    >>> Event.objects.create(
+    ...     name="Pub trip", ages=(21, None), start=now - datetime.timedelta(days=1)
+    ... )
 
 and ``NumericRange``:
 
-    >>> from psycopg2.extras import NumericRange
+    >>> from django.db.backends.postgresql.psycopg_any import NumericRange
 
 Containment functions
 ~~~~~~~~~~~~~~~~~~~~~
@@ -745,22 +731,18 @@ The ``contained_by`` lookup is also available on the non-range field types:
 :class:`~django.db.models.BigIntegerField`,
 :class:`~django.db.models.DecimalField`, :class:`~django.db.models.FloatField`,
 :class:`~django.db.models.DateField`, and
-:class:`~django.db.models.DateTimeField`. For example::
+:class:`~django.db.models.DateTimeField`. For example:
 
-    >>> from psycopg2.extras import DateTimeTZRange
-    >>> Event.objects.filter(start__contained_by=DateTimeTZRange(
-    ...     timezone.now() - datetime.timedelta(hours=1),
-    ...     timezone.now() + datetime.timedelta(hours=1),
+.. code-block:: pycon
+
+    >>> from django.db.backends.postgresql.psycopg_any import DateTimeTZRange
+    >>> Event.objects.filter(
+    ...     start__contained_by=DateTimeTZRange(
+    ...         timezone.now() - datetime.timedelta(hours=1),
+    ...         timezone.now() + datetime.timedelta(hours=1),
+    ...     ),
     ... )
     <QuerySet [<Event: Soft play>]>
-
-.. versionchanged:: 3.1
-
-    Support for :class:`~django.db.models.SmallAutoField`,
-    :class:`~django.db.models.AutoField`,
-    :class:`~django.db.models.BigAutoField`,
-    :class:`~django.db.models.SmallIntegerField`, and
-    :class:`~django.db.models.DecimalField` was added.
 
 .. fieldlookup:: rangefield.overlap
 
@@ -840,8 +822,7 @@ The returned ranges share a bound with the passed range.
 Querying using the bounds
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are three transforms available for use in queries. You can extract the
-lower or upper bound, or query based on emptiness.
+Range fields support several extra lookups.
 
 .. fieldlookup:: rangefield.startswith
 
@@ -881,8 +862,6 @@ Returned objects are empty ranges. Can be chained to valid lookups for a
 ``lower_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive lower bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -894,8 +873,6 @@ boolean value passed. Can be chained to valid lookups for a
 
 ``lower_inf``
 ^^^^^^^^^^^^^
-
-.. versionadded:: 3.1
 
 Returns objects that have unbounded (infinite) or bounded lower bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
@@ -909,8 +886,6 @@ depending on the boolean value passed. Can be chained to valid lookups for a
 ``upper_inc``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have inclusive or exclusive upper bounds, depending on the
 boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -923,8 +898,6 @@ boolean value passed. Can be chained to valid lookups for a
 ``upper_inf``
 ^^^^^^^^^^^^^
 
-.. versionadded:: 3.1
-
 Returns objects that have unbounded (infinite) or bounded upper bound,
 depending on the boolean value passed. Can be chained to valid lookups for a
 :class:`~django.db.models.BooleanField`.
@@ -936,9 +909,9 @@ Defining your own range types
 -----------------------------
 
 PostgreSQL allows the definition of custom range types. Django's model and form
-field implementations use base classes below, and psycopg2 provides a
-:func:`~psycopg2:psycopg2.extras.register_range` to allow use of custom range
-types.
+field implementations use base classes below, and ``psycopg`` provides a
+:func:`~psycopg:psycopg.types.range.register_range` to allow use of custom
+range types.
 
 .. class:: RangeField(**options)
 
@@ -950,7 +923,7 @@ types.
 
     .. attribute:: range_type
 
-        The psycopg2 range type to use.
+        The range type to use.
 
     .. attribute:: form_field
 
@@ -967,12 +940,10 @@ types.
 
     .. attribute:: range_type
 
-        The psycopg2 range type to use.
+        The range type to use.
 
 Range operators
 ---------------
-
-.. versionadded:: 3.0
 
 .. class:: RangeOperators
 
@@ -986,21 +957,19 @@ corresponding lookups.
 .. code-block:: python
 
     class RangeOperators:
-        EQUAL = '='
-        NOT_EQUAL = '<>'
-        CONTAINS = '@>'
-        CONTAINED_BY = '<@'
-        OVERLAPS = '&&'
-        FULLY_LT = '<<'
-        FULLY_GT = '>>'
-        NOT_LT = '&>'
-        NOT_GT = '&<'
-        ADJACENT_TO = '-|-'
+        EQUAL = "="
+        NOT_EQUAL = "<>"
+        CONTAINS = "@>"
+        CONTAINED_BY = "<@"
+        OVERLAPS = "&&"
+        FULLY_LT = "<<"
+        FULLY_GT = ">>"
+        NOT_LT = "&>"
+        NOT_GT = "&<"
+        ADJACENT_TO = "-|-"
 
 RangeBoundary() expressions
 ---------------------------
-
-.. versionadded:: 3.0
 
 .. class:: RangeBoundary(inclusive_lower=True, inclusive_upper=False)
 
@@ -1019,3 +988,5 @@ used with a custom range functions that expected boundaries, for example to
 define :class:`~django.contrib.postgres.constraints.ExclusionConstraint`. See
 `the PostgreSQL documentation for the full details <https://www.postgresql.org/
 docs/current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_.
+
+.. _different bounds: https://www.postgresql.org/docs/current/rangetypes.html#RANGETYPES-IO

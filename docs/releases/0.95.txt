@@ -71,9 +71,9 @@ The new features and changes introduced in 0.95 include:
   URLconfs/views on their own. Previously, the framework required that a
   database be configured, regardless of whether you actually used it.
 
-* It's now more explicit and natural to override save() and delete()
-  methods on models, rather than needing to hook into the pre_save() and
-  post_save() method hooks.
+* It's now more explicit and natural to override ``save()`` and ``delete()``
+  methods on models, rather than needing to hook into the ``pre_save()`` and
+  ``post_save()`` method hooks.
 
 * Individual pieces of the framework now can be configured without
   requiring the setting of an environment variable. This permits use of,
@@ -109,12 +109,12 @@ many common questions appear with some regularity, and any particular problem
 may already have been answered.
 
 Finally, for those who prefer the more immediate feedback offered by IRC,
-there's a `#django` channel on irc.freenode.net that is regularly populated
-by Django users and developers from around the world. Friendly people are
-usually available at any hour of the day -- to help, or just to chat.
+there's a ``#django`` channel on ``irc.libera.chat`` that is regularly
+populated by Django users and developers from around the world. Friendly people
+are usually available at any hour of the day -- to help, or just to chat.
 
 .. _Django website: https://www.djangoproject.com/
-.. _django-users: https://groups.google.com/group/django-users
+.. _django-users: https://groups.google.com/g/django-users
 
 Thanks for using Django!
 

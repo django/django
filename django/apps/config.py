@@ -1,10 +1,13 @@
+import inspect
 import os
 from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import module_has_submodule
+from django.utils.functional import cached_property
+from django.utils.module_loading import import_string, module_has_submodule
 
-MODELS_MODULE_NAME = 'models'
+APPS_MODULE_NAME = "apps"
+MODELS_MODULE_NAME = "models"
 
 
 class AppConfig:
@@ -27,16 +30,20 @@ class AppConfig:
 
         # Last component of the Python path to the application e.g. 'admin'.
         # This value must be unique across a Django project.
-        if not hasattr(self, 'label'):
+        if not hasattr(self, "label"):
             self.label = app_name.rpartition(".")[2]
+        if not self.label.isidentifier():
+            raise ImproperlyConfigured(
+                "The app label '%s' is not a valid Python identifier." % self.label
+            )
 
         # Human-readable name for the application e.g. "Admin".
-        if not hasattr(self, 'verbose_name'):
+        if not hasattr(self, "verbose_name"):
             self.verbose_name = self.label.title()
 
         # Filesystem path to the application directory e.g.
         # '/path/to/django/contrib/admin'.
-        if not hasattr(self, 'path'):
+        if not hasattr(self, "path"):
             self.path = self._path_from_module(app_module)
 
         # Module containing models e.g. <module 'django.contrib.admin.models'
@@ -49,17 +56,26 @@ class AppConfig:
         self.models = None
 
     def __repr__(self):
-        return '<%s: %s>' % (self.__class__.__name__, self.label)
+        return "<%s: %s>" % (self.__class__.__name__, self.label)
+
+    @cached_property
+    def default_auto_field(self):
+        from django.conf import settings
+
+        return settings.DEFAULT_AUTO_FIELD
+
+    @property
+    def _is_default_auto_field_overridden(self):
+        return self.__class__.default_auto_field is not AppConfig.default_auto_field
 
     def _path_from_module(self, module):
         """Attempt to determine app's filesystem path from its module."""
         # See #21874 for extended discussion of the behavior of this method in
         # various cases.
-        # Convert paths to list because Python's _NamespacePath doesn't support
-        # indexing.
-        paths = list(getattr(module, '__path__', []))
+        # Convert to list because __path__ may not support indexing.
+        paths = list(getattr(module, "__path__", []))
         if len(paths) != 1:
-            filename = getattr(module, '__file__', None)
+            filename = getattr(module, "__file__", None)
             if filename is not None:
                 paths = [os.path.dirname(filename)]
             else:
@@ -70,12 +86,14 @@ class AppConfig:
             raise ImproperlyConfigured(
                 "The app module %r has multiple filesystem locations (%r); "
                 "you must configure this app with an AppConfig subclass "
-                "with a 'path' class attribute." % (module, paths))
+                "with a 'path' class attribute." % (module, paths)
+            )
         elif not paths:
             raise ImproperlyConfigured(
                 "The app module %r has no filesystem location, "
                 "you must configure this app with an AppConfig subclass "
-                "with a 'path' class attribute." % (module,))
+                "with a 'path' class attribute." % module
+            )
         return paths[0]
 
     @classmethod
@@ -83,86 +101,125 @@ class AppConfig:
         """
         Factory that creates an app config from an entry in INSTALLED_APPS.
         """
+        # create() eventually returns app_config_class(app_name, app_module).
+        app_config_class = None
+        app_name = None
+        app_module = None
+
+        # If import_module succeeds, entry points to the app module.
         try:
-            # If import_module succeeds, entry is a path to an app module,
-            # which may specify an app config class with default_app_config.
-            # Otherwise, entry is a path to an app config class or an error.
-            module = import_module(entry)
-
-        except ImportError:
-            # Track that importing as an app module failed. If importing as an
-            # app config class fails too, we'll trigger the ImportError again.
-            module = None
-
-            mod_path, _, cls_name = entry.rpartition('.')
-
-            # Raise the original exception when entry cannot be a path to an
-            # app config class.
-            if not mod_path:
-                raise
-
+            app_module = import_module(entry)
+        except Exception:
+            pass
         else:
-            try:
-                # If this works, the app module specifies an app config class.
-                entry = module.default_app_config
-            except AttributeError:
-                # Otherwise, it simply uses the default app config class.
-                return cls(entry, module)
-            else:
-                mod_path, _, cls_name = entry.rpartition('.')
+            # If app_module has an apps submodule that defines a single
+            # AppConfig subclass, use it automatically.
+            # To prevent this, an AppConfig subclass can declare a class
+            # variable default = False.
+            # If the apps module defines more than one AppConfig subclass,
+            # the default one can declare default = True.
+            if module_has_submodule(app_module, APPS_MODULE_NAME):
+                mod_path = "%s.%s" % (entry, APPS_MODULE_NAME)
+                mod = import_module(mod_path)
+                # Check if there's exactly one AppConfig candidate,
+                # excluding those that explicitly define default = False.
+                app_configs = [
+                    (name, candidate)
+                    for name, candidate in inspect.getmembers(mod, inspect.isclass)
+                    if (
+                        issubclass(candidate, cls)
+                        and candidate is not cls
+                        and getattr(candidate, "default", True)
+                    )
+                ]
+                if len(app_configs) == 1:
+                    app_config_class = app_configs[0][1]
+                else:
+                    # Check if there's exactly one AppConfig subclass,
+                    # among those that explicitly define default = True.
+                    app_configs = [
+                        (name, candidate)
+                        for name, candidate in app_configs
+                        if getattr(candidate, "default", False)
+                    ]
+                    if len(app_configs) > 1:
+                        candidates = [repr(name) for name, _ in app_configs]
+                        raise RuntimeError(
+                            "%r declares more than one default AppConfig: "
+                            "%s." % (mod_path, ", ".join(candidates))
+                        )
+                    elif len(app_configs) == 1:
+                        app_config_class = app_configs[0][1]
 
-        # If we're reaching this point, we must attempt to load the app config
-        # class located at <mod_path>.<cls_name>
-        mod = import_module(mod_path)
-        try:
-            cls = getattr(mod, cls_name)
-        except AttributeError:
-            if module is None:
-                # If importing as an app module failed, check if the module
-                # contains any valid AppConfigs and show them as choices.
-                # Otherwise, that error probably contains the most informative
-                # traceback, so trigger it again.
-                candidates = sorted(
-                    repr(name) for name, candidate in mod.__dict__.items()
-                    if isinstance(candidate, type) and
-                    issubclass(candidate, AppConfig) and
-                    candidate is not AppConfig
+            # Use the default app config class if we didn't find anything.
+            if app_config_class is None:
+                app_config_class = cls
+                app_name = entry
+
+        # If import_string succeeds, entry is an app config class.
+        if app_config_class is None:
+            try:
+                app_config_class = import_string(entry)
+            except Exception:
+                pass
+        # If both import_module and import_string failed, it means that entry
+        # doesn't have a valid value.
+        if app_module is None and app_config_class is None:
+            # If the last component of entry starts with an uppercase letter,
+            # then it was likely intended to be an app config class; if not,
+            # an app module. Provide a nice error message in both cases.
+            mod_path, _, cls_name = entry.rpartition(".")
+            if mod_path and cls_name[0].isupper():
+                # We could simply re-trigger the string import exception, but
+                # we're going the extra mile and providing a better error
+                # message for typos in INSTALLED_APPS.
+                # This may raise ImportError, which is the best exception
+                # possible if the module at mod_path cannot be imported.
+                mod = import_module(mod_path)
+                candidates = [
+                    repr(name)
+                    for name, candidate in inspect.getmembers(mod, inspect.isclass)
+                    if issubclass(candidate, cls) and candidate is not cls
+                ]
+                msg = "Module '%s' does not contain a '%s' class." % (
+                    mod_path,
+                    cls_name,
                 )
                 if candidates:
-                    raise ImproperlyConfigured(
-                        "'%s' does not contain a class '%s'. Choices are: %s."
-                        % (mod_path, cls_name, ', '.join(candidates))
-                    )
-                import_module(entry)
+                    msg += " Choices are: %s." % ", ".join(candidates)
+                raise ImportError(msg)
             else:
-                raise
+                # Re-trigger the module import exception.
+                import_module(entry)
 
         # Check for obvious errors. (This check prevents duck typing, but
         # it could be removed if it became a problem in practice.)
-        if not issubclass(cls, AppConfig):
-            raise ImproperlyConfigured(
-                "'%s' isn't a subclass of AppConfig." % entry)
+        if not issubclass(app_config_class, AppConfig):
+            raise ImproperlyConfigured("'%s' isn't a subclass of AppConfig." % entry)
 
         # Obtain app name here rather than in AppClass.__init__ to keep
         # all error checking for entries in INSTALLED_APPS in one place.
-        try:
-            app_name = cls.name
-        except AttributeError:
-            raise ImproperlyConfigured(
-                "'%s' must supply a name attribute." % entry)
+        if app_name is None:
+            try:
+                app_name = app_config_class.name
+            except AttributeError:
+                raise ImproperlyConfigured("'%s' must supply a name attribute." % entry)
 
         # Ensure app_name points to a valid module.
         try:
             app_module = import_module(app_name)
         except ImportError:
             raise ImproperlyConfigured(
-                "Cannot import '%s'. Check that '%s.%s.name' is correct." % (
-                    app_name, mod_path, cls_name,
+                "Cannot import '%s'. Check that '%s.%s.name' is correct."
+                % (
+                    app_name,
+                    app_config_class.__module__,
+                    app_config_class.__qualname__,
                 )
             )
 
         # Entry is a path to an app config class.
-        return cls(app_name, app_module)
+        return app_config_class(app_name, app_module)
 
     def get_model(self, model_name, require_ready=True):
         """
@@ -178,7 +235,8 @@ class AppConfig:
             return self.models[model_name.lower()]
         except KeyError:
             raise LookupError(
-                "App '%s' doesn't have a '%s' model." % (self.label, model_name))
+                "App '%s' doesn't have a '%s' model." % (self.label, model_name)
+            )
 
     def get_models(self, include_auto_created=False, include_swapped=False):
         """
@@ -207,7 +265,7 @@ class AppConfig:
         self.models = self.apps.all_models[self.label]
 
         if module_has_submodule(self.module, MODELS_MODULE_NAME):
-            models_module_name = '%s.%s' % (self.name, MODELS_MODULE_NAME)
+            models_module_name = "%s.%s" % (self.name, MODELS_MODULE_NAME)
             self.models_module = import_module(models_module_name)
 
     def ready(self):

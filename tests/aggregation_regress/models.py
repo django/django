@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -8,25 +6,19 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-    friends = models.ManyToManyField('self', blank=True)
-
-    def __str__(self):
-        return self.name
+    friends = models.ManyToManyField("self", blank=True)
 
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
 
-    def __str__(self):
-        return self.name
-
 
 class ItemTag(models.Model):
     tag = models.CharField(max_length=100)
     content_type = models.ForeignKey(ContentType, models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey("content_type", "object_id")
 
 
 class Book(models.Model):
@@ -36,16 +28,13 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
     tags = GenericRelation(ItemTag)
 
     class Meta:
-        ordering = ('name',)
-
-    def __str__(self):
-        return self.name
+        ordering = ("name",)
 
 
 class Store(models.Model):
@@ -54,19 +43,18 @@ class Store(models.Model):
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
 
-    def __str__(self):
-        return self.name
-
 
 class Entries(models.Model):
-    EntryID = models.AutoField(primary_key=True, db_column='Entry ID')
+    EntryID = models.AutoField(primary_key=True, db_column="Entry ID")
     Entry = models.CharField(unique=True, max_length=50)
     Exclude = models.BooleanField(default=False)
 
 
 class Clues(models.Model):
     ID = models.AutoField(primary_key=True)
-    EntryID = models.ForeignKey(Entries, models.CASCADE, verbose_name='Entry', db_column='Entry ID')
+    EntryID = models.ForeignKey(
+        Entries, models.CASCADE, verbose_name="Entry", db_column="Entry ID"
+    )
     Clue = models.CharField(max_length=150)
 
 
@@ -80,9 +68,6 @@ class WithManualPK(models.Model):
 
 class HardbackBook(Book):
     weight = models.FloatField()
-
-    def __str__(self):
-        return "%s (hardback): %s" % (self.name, self.weight)
 
 
 # Models for ticket #21150
@@ -101,4 +86,52 @@ class Charlie(models.Model):
 
 class SelfRefFK(models.Model):
     name = models.CharField(max_length=50)
-    parent = models.ForeignKey('self', models.SET_NULL, null=True, blank=True, related_name='children')
+    parent = models.ForeignKey(
+        "self", models.SET_NULL, null=True, blank=True, related_name="children"
+    )
+
+
+class AuthorProxy(Author):
+    class Meta:
+        proxy = True
+
+
+class Recipe(models.Model):
+    name = models.CharField(max_length=20)
+    author = models.ForeignKey(AuthorProxy, models.CASCADE)
+    tasters = models.ManyToManyField(AuthorProxy, related_name="recipes")
+
+
+class RecipeProxy(Recipe):
+    class Meta:
+        proxy = True
+
+
+class AuthorUnmanaged(models.Model):
+    age = models.IntegerField()
+
+    class Meta:
+        db_table = Author._meta.db_table
+        managed = False
+
+
+class RecipeTasterUnmanaged(models.Model):
+    recipe = models.ForeignKey("RecipeUnmanaged", models.CASCADE)
+    author = models.ForeignKey(
+        AuthorUnmanaged, models.CASCADE, db_column="authorproxy_id"
+    )
+
+    class Meta:
+        managed = False
+        db_table = Recipe.tasters.through._meta.db_table
+
+
+class RecipeUnmanaged(models.Model):
+    author = models.ForeignKey(AuthorUnmanaged, models.CASCADE)
+    tasters = models.ManyToManyField(
+        AuthorUnmanaged, through=RecipeTasterUnmanaged, related_name="+"
+    )
+
+    class Meta:
+        managed = False
+        db_table = Recipe._meta.db_table

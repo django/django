@@ -32,12 +32,10 @@ support foreign key constraints.
 
 If you are writing or maintaining a third-party database backend for Django,
 you will need to provide a ``SchemaEditor`` implementation in order to work with
-1.7's migration functionality - however, as long as your database is relatively
-standard in its use of SQL and relational design, you should be able to
-subclass one of the built-in Django ``SchemaEditor`` classes and tweak the
-syntax a little. Also note that there are a few new database features that
-migrations will look for: ``can_rollback_ddl``
-and ``supports_combined_alters`` are the most important.
+Django's migration functionality - however, as long as your database is
+relatively standard in its use of SQL and relational design, you should be able
+to subclass one of the built-in Django ``SchemaEditor`` classes and tweak the
+syntax a little.
 
 Methods
 =======
@@ -45,7 +43,7 @@ Methods
 ``execute()``
 -------------
 
-.. method:: BaseDatabaseSchemaEditor.execute(sql, params=[])
+.. method:: BaseDatabaseSchemaEditor.execute(sql, params=())
 
 Executes the SQL statement passed in, with parameters if supplied. This
 is a wrapper around the normal database cursors that allows capture of the SQL
@@ -80,6 +78,13 @@ Adds ``index`` to ``model``’s table.
 .. method:: BaseDatabaseSchemaEditor.remove_index(model, index)
 
 Removes ``index`` from ``model``’s table.
+
+``rename_index()``
+------------------
+
+.. method:: BaseDatabaseSchemaEditor.rename_index(model, old_index, new_index)
+
+Renames ``old_index`` from ``model``’s table to ``new_index``.
 
 ``add_constraint()``
 --------------------
@@ -119,6 +124,15 @@ value.
 .. method:: BaseDatabaseSchemaEditor.alter_db_table(model, old_db_table, new_db_table)
 
 Renames the model's table from ``old_db_table`` to ``new_db_table``.
+
+``alter_db_table_comment()``
+----------------------------
+
+.. versionadded:: 4.2
+
+.. method:: BaseDatabaseSchemaEditor.alter_db_table_comment(model, old_db_table_comment, new_db_table_comment)
+
+Change the ``model``’s table comment to ``new_db_table_comment``.
 
 ``alter_db_tablespace()``
 -------------------------
@@ -176,7 +190,7 @@ without losing data, and so it will refuse to do it. Instead,
 If the database has the ``supports_combined_alters``, Django will try and
 do as many of these in a single database call as possible; otherwise, it will
 issue a separate ALTER statement for each change, but will not issue ALTERs
-where no change is required (as South often did).
+where no change is required.
 
 Attributes
 ==========

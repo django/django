@@ -66,6 +66,7 @@ Examples:
 * ``1000000`` becomes ``1.0 million``.
 * ``1200000`` becomes ``1.2 million``.
 * ``1200000000`` becomes ``1.2 billion``.
+* ``-1200000000`` becomes ``-1.2 billion``.
 
 Values up to 10^100 (Googol) are supported.
 
@@ -75,11 +76,7 @@ e.g. with the ``'de'`` language:
 * ``1000000`` becomes ``'1,0 Million'``.
 * ``1200000`` becomes ``'1,2 Millionen'``.
 * ``1200000000`` becomes ``'1,2 Milliarden'``.
-
-.. versionchanged:: 3.0
-
-    All numeric values are now translated as plural, except ``1.0`` which is
-    translated as a singular phrase. This may be incorrect for some languages.
+* ``-1200000000`` becomes ``'-1,2 Milliarden'``.
 
 .. templatefilter:: naturalday
 

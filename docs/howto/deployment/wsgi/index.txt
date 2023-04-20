@@ -70,14 +70,15 @@ If this variable isn't set, the default :file:`wsgi.py` sets it to
 Applying WSGI middleware
 ========================
 
-To apply `WSGI middleware`_ you can wrap the application object. For instance
-you could add these lines at the bottom of :file:`wsgi.py`::
+To apply :pep:`WSGI middleware
+<3333#middleware-components-that-play-both-sides>` you can wrap the application
+object. For instance you could add these lines at the bottom of
+:file:`wsgi.py`::
 
     from helloworld.wsgi import HelloWorldApplication
+
     application = HelloWorldApplication(application)
 
 You could also replace the Django WSGI application with a custom WSGI
 application that later delegates to the Django WSGI application, if you want
 to combine a Django application with a WSGI application of another framework.
-
-.. _`WSGI middleware`: https://www.python.org/dev/peps/pep-3333/#middleware-components-that-play-both-sides

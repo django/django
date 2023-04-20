@@ -12,10 +12,13 @@ topic guide </topics/auth/index>`.
 ``User`` model
 ==============
 
+.. class:: models.User
+
 Fields
 ------
 
 .. class:: models.User
+    :noindex:
 
     :class:`~django.contrib.auth.models.User` objects have the following
     fields:
@@ -32,17 +35,9 @@ Fields
         ``max_length=191`` because MySQL can only create unique indexes with
         191 characters in that case by default.
 
-        .. admonition:: Usernames and Unicode
-
-            Django originally accepted only ASCII letters and numbers in
-            usernames. Although it wasn't a deliberate choice, Unicode
-            characters have always been accepted when using Python 3. Django
-            1.10 officially added Unicode support in usernames, keeping the
-            ASCII-only behavior on Python 2.
-
     .. attribute:: first_name
 
-        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 30
+        Optional (:attr:`blank=True <django.db.models.Field.blank>`). 150
         characters or fewer.
 
     .. attribute:: last_name
@@ -115,6 +110,7 @@ Attributes
 ----------
 
 .. class:: models.User
+    :noindex:
 
     .. attribute:: is_authenticated
 
@@ -140,6 +136,7 @@ Methods
 -------
 
 .. class:: models.User
+    :noindex:
 
     .. method:: get_username()
 
@@ -192,8 +189,6 @@ Methods
         been called for this user.
 
     .. method:: get_user_permissions(obj=None)
-
-        .. versionadded:: 3.0
 
         Returns a set of permission strings that the user has directly.
 
@@ -287,13 +282,7 @@ Manager methods
         Same as :meth:`create_user`, but sets :attr:`~models.User.is_staff` and
         :attr:`~models.User.is_superuser` to ``True``.
 
-        .. versionchanged:: 3.0
-
-            The ``email`` and ``password`` parameters were made optional.
-
     .. method:: with_perm(perm, is_active=True, include_superusers=True, backend=None, obj=None)
-
-        .. versionadded:: 3.0
 
         Returns users that have the given permission ``perm`` either in the
         ``"<app label>.<permission codename>"`` format or as a
@@ -345,7 +334,7 @@ Manager methods
 
 In practice, you probably won't need to use
 :class:`~django.contrib.auth.models.AnonymousUser` objects on your own, but
-they're used by Web requests, as explained in the next section.
+they're used by web requests, as explained in the next section.
 
 ``Permission`` model
 ====================
@@ -359,6 +348,7 @@ Fields
 fields:
 
 .. class:: models.Permission
+    :noindex:
 
     .. attribute:: name
 
@@ -390,6 +380,7 @@ Fields
 :class:`~django.contrib.auth.models.Group` objects have the following fields:
 
 .. class:: models.Group
+    :noindex:
 
     .. attribute:: name
 
@@ -428,7 +419,7 @@ Login and logout signals
 The auth framework uses the following :doc:`signals </topics/signals>` that
 can be used for notification when a user logs in or out.
 
-.. function:: user_logged_in
+.. data:: user_logged_in
 
     Sent when a user logs in successfully.
 
@@ -443,7 +434,7 @@ can be used for notification when a user logs in or out.
     ``user``
         The user instance that just logged in.
 
-.. function:: user_logged_out
+.. data:: user_logged_out
 
     Sent when the logout method is called.
 
@@ -458,7 +449,7 @@ can be used for notification when a user logs in or out.
         The user instance that just logged out or ``None`` if the
         user was not authenticated.
 
-.. function:: user_login_failed
+.. data:: user_login_failed
 
     Sent when the user failed to login successfully
 
@@ -495,8 +486,6 @@ Available authentication backends
 The following backends are available in :mod:`django.contrib.auth.backends`:
 
 .. class:: BaseBackend
-
-    .. versionadded:: 3.0
 
     A base class that provides default implementations for all required
     methods. By default, it will reject any user and provide no permissions.
@@ -600,8 +589,6 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
 
     .. method:: with_perm(perm, is_active=True, include_superusers=True, obj=None)
 
-        .. versionadded:: 3.0
-
         Returns all active users who have the permission ``perm`` either in
         the form of ``"<app label>.<permission codename>"`` or a
         :class:`~django.contrib.auth.models.Permission` instance. Returns an
@@ -662,12 +649,18 @@ The following backends are available in :mod:`django.contrib.auth.backends`:
         information) prior to using it to get or create a user object. Returns
         the cleaned username.
 
-    .. method:: configure_user(request, user)
+    .. method:: configure_user(request, user, created=True)
 
-        Configures a newly created user.  This method is called immediately
-        after a new user is created, and can be used to perform custom setup
-        actions, such as setting the user's groups based on attributes in an
-        LDAP directory. Returns the user object.
+        Configures the user on each authentication attempt. This method is
+        called immediately after fetching or creating the user being
+        authenticated, and can be used to perform custom setup actions, such as
+        setting the user's groups based on attributes in an LDAP directory.
+        Returns the user object.
+
+        The setup can be performed either once when the user is created
+        (``created`` is ``True``) or on existing users (``created`` is
+        ``False``) as a way of synchronizing attributes between the remote and
+        the local systems.
 
         ``request`` is an :class:`~django.http.HttpRequest` and may be ``None``
         if it wasn't provided to :func:`~django.contrib.auth.authenticate`
@@ -702,10 +695,17 @@ Utility functions
     ``get_user()`` method to retrieve the user model instance and then verifies
     the session by calling the user model's
     :meth:`~django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash`
-    method.
+    method. If the verification fails and :setting:`SECRET_KEY_FALLBACKS` are
+    provided, it verifies the session against each fallback key using
+    :meth:`~django.contrib.auth.models.AbstractBaseUser.\
+    get_session_auth_fallback_hash`.
 
     Returns an instance of :class:`~django.contrib.auth.models.AnonymousUser`
     if the authentication backend stored in the session is no longer in
     :setting:`AUTHENTICATION_BACKENDS`, if a user isn't returned by the
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
+
+    .. versionchanged:: 4.1.8
+
+        Fallback verification with :setting:`SECRET_KEY_FALLBACKS` was added.

@@ -28,6 +28,7 @@ BUILTIN_SERIALIZERS = {
     "python": "django.core.serializers.python",
     "json": "django.core.serializers.json",
     "yaml": "django.core.serializers.pyyaml",
+    "jsonl": "django.core.serializers.jsonl",
 }
 
 _serializers = {}
@@ -41,6 +42,7 @@ class BadSerializer:
     is an error raised in the process of creating a serializer it will be
     raised and passed along to the caller when the serializer is used.
     """
+
     internal_use_only = False
 
     def __init__(self, exception):
@@ -71,10 +73,14 @@ def register_serializer(format, serializer_module, serializers=None):
     except ImportError as exc:
         bad_serializer = BadSerializer(exc)
 
-        module = type('BadSerializerModule', (), {
-            'Deserializer': bad_serializer,
-            'Serializer': bad_serializer,
-        })
+        module = type(
+            "BadSerializerModule",
+            (),
+            {
+                "Deserializer": bad_serializer,
+                "Serializer": bad_serializer,
+            },
+        )
 
     if serializers is None:
         _serializers[format] = module
@@ -152,16 +158,21 @@ def _load_serializers():
         register_serializer(format, BUILTIN_SERIALIZERS[format], serializers)
     if hasattr(settings, "SERIALIZATION_MODULES"):
         for format in settings.SERIALIZATION_MODULES:
-            register_serializer(format, settings.SERIALIZATION_MODULES[format], serializers)
+            register_serializer(
+                format, settings.SERIALIZATION_MODULES[format], serializers
+            )
     _serializers = serializers
 
 
-def sort_dependencies(app_list):
+def sort_dependencies(app_list, allow_cycles=False):
     """Sort a list of (app_config, models) pairs into a single list of models.
 
     The single list of models is sorted so that any model with a natural key
     is serialized before a normal model, and any model with a natural key
     dependency has it's dependencies serialized first.
+
+    If allow_cycles is True, return the best-effort ordering that will respect
+    most of dependencies but ignore some of them to break the cycles.
     """
     # Process the list of models, and get the list of dependencies
     model_dependencies = []
@@ -173,8 +184,8 @@ def sort_dependencies(app_list):
         for model in model_list:
             models.add(model)
             # Add any explicitly defined dependencies
-            if hasattr(model, 'natural_key'):
-                deps = getattr(model.natural_key, 'dependencies', [])
+            if hasattr(model, "natural_key"):
+                deps = getattr(model.natural_key, "dependencies", [])
                 if deps:
                     deps = [apps.get_model(dep) for dep in deps]
             else:
@@ -185,7 +196,7 @@ def sort_dependencies(app_list):
             for field in model._meta.fields:
                 if field.remote_field:
                     rel_model = field.remote_field.model
-                    if hasattr(rel_model, 'natural_key') and rel_model != model:
+                    if hasattr(rel_model, "natural_key") and rel_model != model:
                         deps.append(rel_model)
             # Also add a dependency for any simple M2M relation with a model
             # that defines a natural key.  M2M relations with explicit through
@@ -193,7 +204,7 @@ def sort_dependencies(app_list):
             for field in model._meta.many_to_many:
                 if field.remote_field.through._meta.auto_created:
                     rel_model = field.remote_field.model
-                    if hasattr(rel_model, 'natural_key') and rel_model != model:
+                    if hasattr(rel_model, "natural_key") and rel_model != model:
                         deps.append(rel_model)
             model_dependencies.append((model, deps))
 
@@ -222,13 +233,22 @@ def sort_dependencies(app_list):
             else:
                 skipped.append((model, deps))
         if not changed:
-            raise RuntimeError(
-                "Can't resolve dependencies for %s in serialized app list." %
-                ', '.join(
-                    '%s.%s' % (model._meta.app_label, model._meta.object_name)
-                    for model, deps in sorted(skipped, key=lambda obj: obj[0].__name__)
+            if allow_cycles:
+                # If cycles are allowed, add the last skipped model and ignore
+                # its dependencies. This could be improved by some graph
+                # analysis to ignore as few dependencies as possible.
+                model, _ = skipped.pop()
+                model_list.append(model)
+            else:
+                raise RuntimeError(
+                    "Can't resolve dependencies for %s in serialized app list."
+                    % ", ".join(
+                        model._meta.label
+                        for model, deps in sorted(
+                            skipped, key=lambda obj: obj[0].__name__
+                        )
+                    ),
                 )
-            )
         model_dependencies = skipped
 
     return model_list

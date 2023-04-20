@@ -1,16 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2011-2012
-# Baptiste Darthenay <baptiste+transifex@darthenay.fr>, 2014-2015,2017,2019
-# Robin van der Vliet <info@robinvandervliet.nl>, 2019
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2011-2012
+# Batist D 🐍 <baptiste+transifex@darthenay.fr>, 2014-2015,2017,2019
+# Matthieu Desplantes <matmututu@gmail.com>, 2021
+# Meiyer <interdist+translations@gmail.com>, 2022
+# Robin van der Vliet <info@robinvandervliet.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-04 21:33+0000\n"
-"Last-Translator: Robin van der Vliet <info@robinvandervliet.nl>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2022-04-24 19:03+0000\n"
+"Last-Translator: Meiyer <interdist+translations@gmail.com>, 2022\n"
 "Language-Team: Esperanto (http://www.transifex.com/django/django/language/"
 "eo/)\n"
 "MIME-Version: 1.0\n"
@@ -29,25 +31,26 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"Ekzemplo: '/pri/kontakto/'. Certigu, ke estas kondukaj kaj sekvaj strekoj."
+"Ekzemple: “/about/contact/”. Certigu, ke estas suprenstrekoj komence kaj "
+"fine."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr ""
-"Ĉi tiu valoro devus enhavi sole leterojn, nombrojn, punktojn, substrekoj, "
-"haltostrekoj, oblikvoj aŭ tildoj."
+"Ĉi tiu valoro devus enhavi sole literojn, ciferojn, punktojn, substrekojn, "
+"haltostrekojn, oblikvajn strekojn, aŭ tildojn."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Ekzemple: “/pri-ni/kontakto”. Certiĝu, ke ekas per oblikva streko."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Ekzemple: “/about/contact”. Certigu, ke estas suprenstreko komence."
 
 msgid "URL is missing a leading slash."
-msgstr "La streka signo \"/\" ne ĉeestas en komenco de ĉeno."
+msgstr "La strek-signo ‘/’ ne ĉeestas en la komenco de URL."
 
 msgid "URL is missing a trailing slash."
-msgstr "La streka signo \"/\" ne ĉeestas en fino de ĉeno."
+msgstr "La strek-signo ‘/’ ne ĉeestas en la fino de URL."
 
 #, python-format
 msgid "Flatpage with url %(url)s already exists for site %(site)s"
@@ -60,24 +63,25 @@ msgid "content"
 msgstr "enhavo"
 
 msgid "enable comments"
-msgstr "ebligu rimarkoj"
+msgstr "ebligi rimarkojn"
 
 msgid "template name"
-msgstr "ŝablono nomo"
+msgstr "nomo de ŝablono"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Ekzemplo: 'flatpages/contact_page.html'. Se ĉi tiu ne provizas, la sistemo "
-"uzos 'flatpages/default.html'."
+"Ekzemple: “flatpages/contact_page.html”. Se la ŝablono ne estas indikita, "
+"estos uzata “flatpages/default.html”."
 
 msgid "registration required"
-msgstr "registrado postulita"
+msgstr "registriĝo postulita"
 
 msgid "If this is checked, only logged-in users will be able to view the page."
 msgstr ""
-"Se ĉi tio estus elektita, nur ensalutitaj uzantoj povus rigardi la paĝon."
+"Kiam la marko-butono estas elektita, nur ensalutintaj uzantoj povas rigardi "
+"la paĝon."
 
 msgid "sites"
 msgstr "retejoj"

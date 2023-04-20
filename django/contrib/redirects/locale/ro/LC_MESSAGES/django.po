@@ -2,15 +2,16 @@
 #
 # Translators:
 # Daniel Ursache-Dogariu, 2011
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-09 17:42+0200\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Razvan Stefanescu <razvan.stefanescu@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-15 11:20+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -24,27 +25,27 @@ msgid "Redirects"
 msgstr "Redirecționări"
 
 msgid "site"
-msgstr "pagină"
+msgstr "site"
 
 msgid "redirect from"
 msgstr "redirecționat de la "
 
 msgid ""
-"This should be an absolute path, excluding the domain name. Example: '/"
-"events/search/'."
+"This should be an absolute path, excluding the domain name. Example: “/"
+"events/search/”."
 msgstr ""
-"Aceasta ar trebui să fie o cale absolută, excluzând numele de domeniu. "
-"Exemplu: '/evenimente/cautare/'."
+"Trebuie sa fie o cale absoluta, exeptand numele domeniului. Exemplu: “/"
+"events/search/”."
 
 msgid "redirect to"
 msgstr "redirecționat către"
 
 msgid ""
 "This can be either an absolute path (as above) or a full URL starting with "
-"'http://'."
+"“http://”."
 msgstr ""
-"Aceasta poate fi o cale absolută (ca mai sus) sau un URL complet, începând "
-"cu 'http://'."
+"Poate fi cale absolută (ca mai sus) sau link URL complet, începând cu "
+"“http://”."
 
 msgid "redirect"
 msgstr "redirecționare"

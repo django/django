@@ -1,0 +1,506 @@
+============================================
+Django 5.0 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected December 2023*
+
+Welcome to Django 5.0!
+
+These release notes cover the :ref:`new features <whats-new-5.0>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.0>` you'll
+want to be aware of when upgrading from Django 4.2 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.0>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 5.0 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
+only officially support the latest release of each series.
+
+The Django 4.2.x series is the last to support Python 3.8 and 3.9.
+
+Third-party library support for older version of Django
+=======================================================
+
+Following the release of Django 5.0, we suggest that third-party app authors
+drop support for all versions of Django prior to 4.2. At that time, you should
+be able to run your package's tests using ``python -Wd`` so that deprecation
+warnings appear. After making the deprecation warning fixes, your app should be
+compatible with Django 5.0.
+
+.. _whats-new-5.0:
+
+What's new in Django 5.0
+========================
+
+Facet filters in the admin
+--------------------------
+
+Facet counts are now shown for applied filters in the admin changelist when
+toggled on via the UI. This behavior can be changed via the new
+:attr:`.ModelAdmin.show_facets` attribute. For more information see
+:ref:`facet-filters`.
+
+Simplified templates for form field rendering
+---------------------------------------------
+
+Django 5.0 introduces the concept of a field group, and field group templates.
+This simplifies rendering of the related elements of a Django form field such
+as its label, widget, help text, and errors.
+
+For example, the template below:
+
+.. code-block:: html+django
+
+    <form>
+    ...
+    <div>
+      {{ form.name.label }}
+      {% if form.name.help_text %}
+        <div class="helptext">{{ form.name.help_text|safe }}</div>
+      {% endif %}
+      {{ form.name.errors }}
+      {{ form.name }}
+      <div class="row">
+        <div class="col">
+          {{ form.email.label }}
+          {% if form.email.help_text %}
+            <div class="helptext">{{ form.email.help_text|safe }}</div>
+          {% endif %}
+          {{ form.email.errors }}
+          {{ form.email }}
+        </div>
+        <div class="col">
+          {{ form.password.label }}
+          {% if form.password.help_text %}
+            <div class="helptext">{{ form.password.help_text|safe }}</div>
+          {% endif %}
+          {{ form.password.errors }}
+          {{ form.password }}
+        </div>
+      </div>
+    </div>
+    ...
+    </form>
+
+Can now be simplified to:
+
+.. code-block:: html+django
+
+    <form>
+    ...
+    <div>
+      {{ form.name.as_field_group }}
+      <div class="row">
+        <div class="col">{{ form.email.as_field_group }}</div>
+        <div class="col">{{ form.password.as_field_group }}</div>
+      </div>
+    </div>
+    ...
+    </form>
+
+:meth:`~django.forms.BoundField.as_field_group` renders fields with the
+``"django/forms/field.html"`` template by default and can be customized on a
+per-project, per-field, or per-request basis. See
+:ref:`reusable-field-group-templates`.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :meth:`.AdminSite.get_log_entries` method allows customizing the
+  queryset for the site's listed log entries.
+
+* The ``django.contrib.admin.AllValuesFieldListFilter``,
+  ``ChoicesFieldListFilter``, ``RelatedFieldListFilter``, and
+  ``RelatedOnlyFieldListFilter`` admin filters now handle multi-valued query
+  parameters.
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  600,000 to 720,000.
+
+* ``AuthenticationMiddleware`` now adds an :meth:`.HttpRequest.auser`
+  asynchronous method that returns the currently logged-in user.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new
+  :class:`ClosestPoint() <django.contrib.gis.db.models.functions.ClosestPoint>`
+  function returns a 2-dimensional point on the geometry that is closest to
+  another geometry.
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :attr:`~.ExclusionConstraint.violation_error_code` attribute of
+  :class:`~django.contrib.postgres.constraints.ExclusionConstraint` allows
+  customizing the ``code`` of ``ValidationError`` raised during
+  :ref:`model validation <validating-objects>`.
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* Under ASGI, ``http.disconnect`` events are now handled. This allows views to
+  perform any necessary cleanup if a client disconnects before the response is
+  generated. See :ref:`async-handling-disconnect` for more details.
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* :attr:`.ChoiceField.choices` now accepts
+  :ref:`Choices classes <field-choices-enum-types>` directly instead of
+  requiring expansion with the ``choices`` attribute.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* The new ``create_defaults`` argument of :meth:`.QuerySet.update_or_create`
+  and :meth:`.QuerySet.aupdate_or_create` methods allows specifying a different
+  field values for the create operation.
+
+* The new ``violation_error_code`` attribute of
+  :class:`~django.db.models.BaseConstraint`,
+  :class:`~django.db.models.CheckConstraint`, and
+  :class:`~django.db.models.UniqueConstraint` allows customizing the ``code``
+  of ``ValidationError`` raised during
+  :ref:`model validation <validating-objects>`.
+
+* :attr:`.Field.choices` now accepts
+  :ref:`Choices classes <field-choices-enum-types>` directly instead of
+  requiring expansion with the ``choices`` attribute.
+
+Pagination
+~~~~~~~~~~
+
+* The new :attr:`django.core.paginator.Paginator.error_messages` argument
+  allows customizing the error messages raised by :meth:`.Paginator.page`.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* The new :meth:`.Signal.asend` and :meth:`.Signal.asend_robust` methods allow
+  asynchronous signal dispatch. Signal receivers may be synchronous or
+  asynchronous, and will be automatically adapted to the correct calling style.
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.0:
+
+Backwards incompatible changes in 5.0
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
+-----------------------------------------------------------------------------------------
+
+:meth:`.QuerySet.update_or_create` now supports the parameter
+``create_defaults``. As a consequence, any models that have a field named
+``create_defaults`` that are used with an ``update_or_create()`` should specify
+the field in the lookup with ``create_defaults__exact``.
+
+Miscellaneous
+-------------
+
+* The ``instance`` argument of the undocumented
+  ``BaseModelFormSet.save_existing()`` method is renamed to ``obj``.
+
+* The undocumented ``django.contrib.admin.helpers.checkbox`` is removed.
+
+* Integer fields are now validated as 64-bit integers on SQLite to match the
+  behavior of ``sqlite3``.
+
+* The undocumented ``Query.annotation_select_mask`` attribute is changed from a
+  set of strings to an ordered list of strings.
+
+.. _deprecated-features-5.0:
+
+Features deprecated in 5.0
+==========================
+
+Miscellaneous
+-------------
+
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers are deprecated.
+
+* Passing positional arguments  ``name`` and ``violation_error_message`` to
+  :class:`~django.db.models.BaseConstraint` is deprecated in favor of
+  keyword-only arguments.
+
+* ``request`` is added to the signature of :meth:`.ModelAdmin.lookup_allowed`.
+  Support for ``ModelAdmin`` subclasses that do not accept this argument is
+  deprecated.
+
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` is deprecated. Starting with Django 6.0,
+  ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+  ``get_joining_columns()``. Subclasses should implement
+  ``get_joining_fields()`` instead.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method is deprecated.
+
+Features removed in 5.0
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 5.0.
+
+See :ref:`deprecated-features-4.0` for details on these changes, including how
+to remove usage of these features.
+
+* The ``SERIALIZE`` test setting is removed.
+
+* The undocumented ``django.utils.baseconv`` module is removed.
+
+* The undocumented ``django.utils.datetime_safe`` module is removed.
+
+* The default value of the ``USE_TZ`` setting is changed from ``False`` to
+  ``True``.
+
+* The default sitemap protocol for sitemaps built outside the context of a
+  request is changed from ``'http'`` to ``'https'``.
+
+* The ``extra_tests`` argument for ``DiscoverRunner.build_suite()`` and
+  ``DiscoverRunner.run_tests()`` is removed.
+
+* The ``django.contrib.postgres.aggregates.ArrayAgg``, ``JSONBAgg``, and
+  ``StringAgg`` aggregates no longer return ``[]``, ``[]``, and ``''``,
+  respectively, when there are no rows.
+
+* The ``USE_L10N`` setting is removed.
+
+* The ``USE_DEPRECATED_PYTZ`` transitional setting is removed.
+
+* Support for ``pytz`` timezones is removed.
+
+* The ``is_dst`` argument is removed from:
+
+  * ``QuerySet.datetimes()``
+  * ``django.utils.timezone.make_aware()``
+  * ``django.db.models.functions.Trunc()``
+  * ``django.db.models.functions.TruncSecond()``
+  * ``django.db.models.functions.TruncMinute()``
+  * ``django.db.models.functions.TruncHour()``
+  * ``django.db.models.functions.TruncDay()``
+  * ``django.db.models.functions.TruncWeek()``
+  * ``django.db.models.functions.TruncMonth()``
+  * ``django.db.models.functions.TruncQuarter()``
+  * ``django.db.models.functions.TruncYear()``
+
+* The ``django.contrib.gis.admin.GeoModelAdmin`` and ``OSMGeoAdmin`` classes
+  are removed.
+
+* The undocumented ``BaseForm._html_output()`` method is removed.
+
+* The ability to return a ``str``, rather than a ``SafeString``, when rendering
+  an ``ErrorDict`` and ``ErrorList`` is removed.
+
+See :ref:`deprecated-features-4.1` for details on these changes, including how
+to remove usage of these features.
+
+* The ``SitemapIndexItem.__str__()`` method is removed.
+
+* The ``CSRF_COOKIE_MASKED`` transitional setting is removed.
+
+* The ``name`` argument of ``django.utils.functional.cached_property()`` is
+  removed.
+
+* The ``opclasses`` argument of
+  ``django.contrib.postgres.constraints.ExclusionConstraint`` is removed.
+
+* The undocumented ability to pass ``errors=None`` to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormsetError()`` is removed.
+
+* ``django.contrib.sessions.serializers.PickleSerializer`` is removed.
+
+* The usage of ``QuerySet.iterator()`` on a queryset that prefetches related
+  objects without providing the ``chunk_size`` argument is no longer allowed.
+
+* Passing unsaved model instances to related filters is no longer allowed.
+
+* ``created=True`` is required in the signature of
+  ``RemoteUserBackend.configure_user()`` subclasses.
+
+* Support for logging out via ``GET`` requests in the
+  ``django.contrib.auth.views.LogoutView`` and
+  ``django.contrib.auth.views.logout_then_login()`` is removed.
+
+* The ``django.utils.timezone.utc`` alias to ``datetime.timezone.utc`` is
+  removed.
+
+* Passing a response object and a form/formset name to
+  ``SimpleTestCase.assertFormError()`` and ``assertFormSetError()`` is no
+  longer allowed.
+
+* The ``django.contrib.gis.admin.OpenLayersWidget`` is removed.
+
++ The ``django.contrib.auth.hashers.CryptPasswordHasher`` is removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates are removed.
+
+* The default form and formset rendering style is changed to the div-based.
+
+* Passing ``nulls_first=False`` or ``nulls_last=False`` to ``Expression.asc()``
+  and ``Expression.desc()`` methods, and the ``OrderBy`` expression is no
+  longer allowed.

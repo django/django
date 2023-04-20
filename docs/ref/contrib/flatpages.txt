@@ -9,7 +9,7 @@ Django comes with an optional "flatpages" application. It lets you store "flat"
 HTML content in a database and handles the management for you via Django's
 admin interface and a Python API.
 
-A flatpage is a object with a URL, title and content. Use it for one-off,
+A flatpage is an object with a URL, title and content. Use it for one-off,
 special-case pages, such as "About" or "Privacy Policy" pages, that you want to
 store in a database but for which you don't want to develop a custom Django
 application.
@@ -42,7 +42,7 @@ Then either:
 3. Add an entry in your URLconf. For example::
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 or:
@@ -69,7 +69,7 @@ There are several ways to include the flat pages in your URLconf. You can
 dedicate a particular path to flat pages::
 
     urlpatterns = [
-        path('pages/', include('django.contrib.flatpages.urls')),
+        path("pages/", include("django.contrib.flatpages.urls")),
     ]
 
 You can also set it up as a "catchall" pattern. In this case, it is important
@@ -79,7 +79,7 @@ to place the pattern at the end of the other urlpatterns::
 
     # Your other patterns here
     urlpatterns += [
-        path('<path:url>', views.flatpage),
+        re_path(r"^(?P<url>.*/)$", views.flatpage),
     ]
 
 .. warning::
@@ -95,8 +95,8 @@ tag::
     from django.contrib.flatpages import views
 
     urlpatterns += [
-        path('about-us/', views.flatpage, {'url': '/about-us/'}, name='about'),
-        path('license/', views.flatpage, {'url': '/license/'}, name='license'),
+        path("about-us/", views.flatpage, {"url": "/about-us/"}, name="about"),
+        path("license/", views.flatpage, {"url": "/license/"}, name="license"),
     ]
 
 Using the middleware
@@ -183,19 +183,24 @@ registering a custom ``ModelAdmin`` for ``FlatPage``::
     from django.contrib.flatpages.models import FlatPage
     from django.utils.translation import gettext_lazy as _
 
+
     # Define a new FlatPageAdmin
     class FlatPageAdmin(FlatPageAdmin):
-        fieldsets = (
-            (None, {'fields': ('url', 'title', 'content', 'sites')}),
-            (_('Advanced options'), {
-                'classes': ('collapse',),
-                'fields': (
-                    'enable_comments',
-                    'registration_required',
-                    'template_name',
-                ),
-            }),
-        )
+        fieldsets = [
+            (None, {"fields": ["url", "title", "content", "sites"]}),
+            (
+                _("Advanced options"),
+                {
+                    "classes": ["collapse"],
+                    "fields": [
+                        "enable_comments",
+                        "registration_required",
+                        "template_name",
+                    ],
+                },
+            ),
+        ]
+
 
     # Re-register FlatPageAdmin
     admin.site.unregister(FlatPage)
@@ -344,9 +349,11 @@ Here's an example of a URLconf using :class:`FlatPageSitemap`::
 
     urlpatterns = [
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-            {'sitemaps': {'flatpages': FlatPageSitemap}},
-            name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"flatpages": FlatPageSitemap}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]

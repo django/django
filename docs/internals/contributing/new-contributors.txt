@@ -5,10 +5,16 @@ Advice for new contributors
 New contributor and not sure what to do? Want to help but just don't know how
 to get started? This is the section for you.
 
-.. admonition:: Basic tools and workflow
+.. admonition:: Get up and running!
 
     If you are new to contributing to Django, the :doc:`/intro/contributing`
     tutorial will give you an introduction to the tools and the workflow.
+
+This page contains more general advice on ways you can contribute to Django,
+and how to approach that.
+
+If you are looking for a reference on the details of making code contributions,
+see the :doc:`/internals/contributing/writing-code/index` documentation.
 
 First steps
 ===========
@@ -132,25 +138,20 @@ some advice to make your work on Django more useful and rewarding.
   writing the very first tests for that feature, not that you get a pass from
   writing tests altogether.
 
+* **Be patient**
+
+  It's not always easy for your ticket or your patch to be reviewed quickly.
+  This isn't personal. There are a lot of tickets and pull requests to get
+  through.
+
+  Keeping your patch up to date is important. Review the ticket on Trac to
+  ensure that the *Needs tests*, *Needs documentation*, and *Patch needs
+  improvement* flags are unchecked once you've addressed all review comments.
+
+  Remember that Django has an eight-month release cycle, so there's plenty of
+  time for your patch to be reviewed.
+
+  Finally, a well-timed reminder can help. See :ref:`contributing code FAQ
+  <new-contributors-faq>` for ideas here.
+
 .. _easy pickings: https://code.djangoproject.com/query?status=!closed&easy=1
-
-.. _new-contributors-faq:
-
-FAQ
-===
-
-1. **This ticket I care about has been ignored for days/weeks/months! What can
-   I do to get it committed?**
-
-   First off, it's not personal. Django is entirely developed by volunteers
-   (except the Django fellow), and sometimes folks just don't have time. The
-   best thing to do is to send a gentle reminder to the |django-developers|
-   mailing list asking for review on the ticket, or to bring it up in the
-   `#django-dev` IRC channel.
-
-2. **I'm sure my ticket is absolutely 100% perfect, can I mark it as RFC
-   myself?**
-
-   Short answer: No. It's always better to get another set of eyes on a
-   ticket. If you're having trouble getting that second set of eyes, see
-   question 1, above.

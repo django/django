@@ -1,17 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bashar Al-Abdulhadi, 2015-2016
+# Bashar Al-Abdulhadi, 2015-2016,2021
 # Bashar Al-Abdulhadi, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Muaaz Alsaied, 2020
 # Ossama Khayat <okhayat@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-10-15 21:25+0000\n"
+"Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/django/django/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -97,9 +98,10 @@ msgstr "الرجاء تثبيت docutils"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
-msgstr "نظام توثيقات المشرف مكتبة بايثون <a href=\"%(link)s\">docutils</a>."
+msgstr ""
+"نظام توثيقات المشرف يتطلب مكتبة بايثون <a href=\"%(link)s\">docutils</a>."
 
 #, python-format
 msgid ""
@@ -132,7 +134,7 @@ msgid "Arguments"
 msgstr "مُعطيات"
 
 msgid "Back to Model documentation"
-msgstr ""
+msgstr "العودة إلى وثائق الموديول"
 
 msgid "Model documentation"
 msgstr "وثائق الموديول"
@@ -148,13 +150,13 @@ msgid "Template: %(name)s"
 msgstr "قالب: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "قالب: \"%(name)s\""
+msgid "Template: <q>%(name)s</q>"
+msgstr "قالب: <q>%(name)s</q>"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
-msgstr "البحث عن مسار القالب \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
+msgstr "البحث عن مسار القالب <q>%(name)s</q>:"
 
 msgid "(does not exist)"
 msgstr "(غير موجود)"
@@ -207,10 +209,10 @@ msgid "Templates:"
 msgstr "القوالب:"
 
 msgid "Back to View documentation"
-msgstr ""
+msgstr "العودة إلى وثائق الفيو"
 
 msgid "View documentation"
-msgstr "عرض الوثائق"
+msgstr "وثائق الفيو"
 
 msgid "Jump to namespace"
 msgstr "القفز إلى مساحة الاسم"

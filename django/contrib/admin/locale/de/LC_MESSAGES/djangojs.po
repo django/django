@@ -2,15 +2,17 @@
 #
 # Translators:
 # André Hagenbruch, 2011-2012
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
-# Jannis, 2016
+# Florian Apolloner <florian@apolloner.eu>, 2020-2023
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016,2023
+# jnns, 2016
+# Markus Holtermann <info@markusholtermann.eu>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011,2013-2016,2023\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -28,7 +30,7 @@ msgid ""
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
 "Dies ist die Liste der verfügbaren %s. Einfach im unten stehenden Feld "
-"markieren und mithilfe des \"Auswählen\"-Pfeils auswählen."
+"markieren und mithilfe des „Auswählen“-Pfeils auswählen."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
@@ -62,7 +64,12 @@ msgid ""
 "box below and then clicking the \"Remove\" arrow between the two boxes."
 msgstr ""
 "Dies ist die Liste der ausgewählten %s. Einfach im unten stehenden Feld "
-"markieren und mithilfe des \"Entfernen\"-Pfeils wieder entfernen."
+"markieren und mithilfe des „Entfernen“-Pfeils wieder entfernen."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+"In diesem Feld tippen, um die Liste der ausgewählten %s einzuschränken."
 
 msgid "Remove all"
 msgstr "Alle entfernen"
@@ -70,6 +77,12 @@ msgstr "Alle entfernen"
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klicken, um alle ausgewählten %s auf einmal zu entfernen."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s ausgewählte Option nicht sichtbar"
+msgstr[1] "%s ausgewählte Optionen nicht sichtbar"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -85,22 +98,37 @@ msgstr ""
 "verwerfen?"
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Sie haben eine Aktion ausgewählt, aber ihre vorgenommenen Änderungen nicht "
+"Sie haben eine Aktion ausgewählt, aber Ihre vorgenommenen Änderungen nicht "
 "gespeichert. Klicken Sie OK, um dennoch zu speichern. Danach müssen Sie die "
 "Aktion erneut ausführen."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Sie haben eine Aktion ausgewählt, aber keine Änderungen an bearbeitbaren "
-"Feldern vorgenommen. Sie wollten wahrscheinlich auf \"Ausführen\" und nicht "
-"auf \"Speichern\" klicken."
+"Feldern vorgenommen. Sie wollten wahrscheinlich auf „Ausführen“ und nicht "
+"auf „Speichern“ klicken."
+
+msgid "Now"
+msgstr "Jetzt"
+
+msgid "Midnight"
+msgstr "Mitternacht"
+
+msgid "6 a.m."
+msgstr "6 Uhr"
+
+msgid "Noon"
+msgstr "Mittag"
+
+msgid "6 p.m."
+msgstr "18 Uhr"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -114,26 +142,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Achtung: Sie sind %s Stunde hinter der Serverzeit."
 msgstr[1] "Achtung: Sie sind %s Stunden hinter der Serverzeit."
 
-msgid "Now"
-msgstr "Jetzt"
-
 msgid "Choose a Time"
 msgstr "Uhrzeit wählen"
 
 msgid "Choose a time"
 msgstr "Uhrzeit"
-
-msgid "Midnight"
-msgstr "Mitternacht"
-
-msgid "6 a.m."
-msgstr "6 Uhr"
-
-msgid "Noon"
-msgstr "Mittag"
-
-msgid "6 p.m."
-msgstr "18 Uhr"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -185,6 +198,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "Dezember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mrz"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dez"
 
 msgctxt "one letter Sunday"
 msgid "S"

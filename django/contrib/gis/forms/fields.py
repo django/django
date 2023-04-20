@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.gis.gdal import GDALException
 from django.contrib.gis.geos import GEOSException, GEOSGeometry
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from .widgets import OpenLayersWidget
@@ -12,15 +13,18 @@ class GeometryField(forms.Field):
     accepted by GEOSGeometry is accepted by this form.  By default,
     this includes WKT, HEXEWKB, WKB (in a buffer), and GeoJSON.
     """
+
     widget = OpenLayersWidget
-    geom_type = 'GEOMETRY'
+    geom_type = "GEOMETRY"
 
     default_error_messages = {
-        'required': _('No geometry value provided.'),
-        'invalid_geom': _('Invalid geometry value.'),
-        'invalid_geom_type': _('Invalid geometry type.'),
-        'transform_error': _('An error occurred when transforming the geometry '
-                             'to the SRID of the geometry form field.'),
+        "required": _("No geometry value provided."),
+        "invalid_geom": _("Invalid geometry value."),
+        "invalid_geom_type": _("Invalid geometry type."),
+        "transform_error": _(
+            "An error occurred when transforming the geometry "
+            "to the SRID of the geometry form field."
+        ),
     }
 
     def __init__(self, *, srid=None, geom_type=None, **kwargs):
@@ -28,7 +32,7 @@ class GeometryField(forms.Field):
         if geom_type is not None:
             self.geom_type = geom_type
         super().__init__(**kwargs)
-        self.widget.attrs['geom_type'] = self.geom_type
+        self.widget.attrs["geom_type"] = self.geom_type
 
     def to_python(self, value):
         """Transform the value to a Geometry object."""
@@ -36,7 +40,7 @@ class GeometryField(forms.Field):
             return None
 
         if not isinstance(value, GEOSGeometry):
-            if hasattr(self.widget, 'deserialize'):
+            if hasattr(self.widget, "deserialize"):
                 try:
                     value = self.widget.deserialize(value)
                 except GDALException:
@@ -47,7 +51,9 @@ class GeometryField(forms.Field):
                 except (GEOSException, ValueError, TypeError):
                     value = None
             if value is None:
-                raise forms.ValidationError(self.error_messages['invalid_geom'], code='invalid_geom')
+                raise ValidationError(
+                    self.error_messages["invalid_geom"], code="invalid_geom"
+                )
 
         # Try to set the srid
         if not value.srid:
@@ -70,26 +76,32 @@ class GeometryField(forms.Field):
 
         # Ensuring that the geometry is of the correct type (indicated
         # using the OGC string label).
-        if str(geom.geom_type).upper() != self.geom_type and not self.geom_type == 'GEOMETRY':
-            raise forms.ValidationError(self.error_messages['invalid_geom_type'], code='invalid_geom_type')
+        if (
+            str(geom.geom_type).upper() != self.geom_type
+            and self.geom_type != "GEOMETRY"
+        ):
+            raise ValidationError(
+                self.error_messages["invalid_geom_type"], code="invalid_geom_type"
+            )
 
         # Transforming the geometry if the SRID was set.
         if self.srid and self.srid != -1 and self.srid != geom.srid:
             try:
                 geom.transform(self.srid)
             except GEOSException:
-                raise forms.ValidationError(
-                    self.error_messages['transform_error'], code='transform_error')
+                raise ValidationError(
+                    self.error_messages["transform_error"], code="transform_error"
+                )
 
         return geom
 
     def has_changed(self, initial, data):
-        """ Compare geographic value of data with its initial value. """
+        """Compare geographic value of data with its initial value."""
 
         try:
             data = self.to_python(data)
             initial = self.to_python(initial)
-        except forms.ValidationError:
+        except ValidationError:
             return True
 
         # Only do a geographic comparison if both values are available
@@ -105,28 +117,28 @@ class GeometryField(forms.Field):
 
 
 class GeometryCollectionField(GeometryField):
-    geom_type = 'GEOMETRYCOLLECTION'
+    geom_type = "GEOMETRYCOLLECTION"
 
 
 class PointField(GeometryField):
-    geom_type = 'POINT'
+    geom_type = "POINT"
 
 
 class MultiPointField(GeometryField):
-    geom_type = 'MULTIPOINT'
+    geom_type = "MULTIPOINT"
 
 
 class LineStringField(GeometryField):
-    geom_type = 'LINESTRING'
+    geom_type = "LINESTRING"
 
 
 class MultiLineStringField(GeometryField):
-    geom_type = 'MULTILINESTRING'
+    geom_type = "MULTILINESTRING"
 
 
 class PolygonField(GeometryField):
-    geom_type = 'POLYGON'
+    geom_type = "POLYGON"
 
 
 class MultiPolygonField(GeometryField):
-    geom_type = 'MULTIPOLYGON'
+    geom_type = "MULTIPOLYGON"

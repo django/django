@@ -1,0 +1,50 @@
+==========================
+Django 3.0.7 release notes
+==========================
+
+*June 3, 2020*
+
+Django 3.0.7 fixes two security issues and several bugs in 3.0.6.
+
+CVE-2020-13254: Potential data leakage via malformed memcached keys
+===================================================================
+
+In cases where a memcached backend does not perform key validation, passing
+malformed cache keys could result in a key collision, and potential data
+leakage. In order to avoid this vulnerability, key validation is added to the
+memcached cache backends.
+
+CVE-2020-13596: Possible XSS via admin ``ForeignKeyRawIdWidget``
+================================================================
+
+Query parameters for the admin ``ForeignKeyRawIdWidget`` were not properly URL
+encoded, posing an XSS attack vector. ``ForeignKeyRawIdWidget`` now
+ensures query parameters are correctly URL encoded.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.0 by restoring the ability to use field
+  lookups in ``Meta.ordering`` (:ticket:`31538`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and a
+  subquery annotation (:ticket:`31566`).
+
+* Fixed a regression in Django 3.0 where aggregates used wrong annotations when
+  a queryset has multiple subqueries annotations (:ticket:`31568`).
+
+* Fixed a regression in Django 3.0 where ``QuerySet.values()`` and
+  ``values_list()`` crashed if a queryset contained an aggregation and an
+  ``Exists()`` annotation on Oracle (:ticket:`31584`).
+
+* Fixed a regression in Django 3.0 where all resolved ``Subquery()``
+  expressions were considered equal (:ticket:`31607`).
+
+* Fixed a regression in Django 3.0.5 that affected translation loading for apps
+  providing translations for territorial language variants as well as a generic
+  language, where the project has different plural equations for the language
+  (:ticket:`31570`).
+
+* Tracking a jQuery security release, upgraded the version of jQuery used by
+  the admin from 3.4.1 to 3.5.1.

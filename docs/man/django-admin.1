@@ -1,8 +1,5 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "DJANGO-ADMIN" "1" "September 10, 2019" "3.0" "Django"
-.SH NAME
-django-admin \- Utility script for the Django Web framework
 .
 .nr rst2man-indent-level 0
 .
@@ -30,29 +27,26 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
+.TH "DJANGO-ADMIN" "1" "January 15, 2023" "4.2" "Django"
+.SH NAME
+django-admin \- Utility script for the Django web framework
 .sp
 \fBdjango\-admin\fP is Django\(aqs command\-line utility for administrative tasks.
 This document outlines all it can do.
 .sp
 In addition, \fBmanage.py\fP is automatically created in each Django project. It
 does the same thing as \fBdjango\-admin\fP but also sets the
-\fBDJANGO_SETTINGS_MODULE\fP environment variable so that it points to your
+\fI\%DJANGO_SETTINGS_MODULE\fP environment variable so that it points to your
 project\(aqs \fBsettings.py\fP file.
 .sp
 The \fBdjango\-admin\fP script should be on your system path if you installed
-Django via its \fBsetup.py\fP utility. If it\(aqs not on your path, you can find it
-in \fBsite\-packages/django/bin\fP within your Python installation. Consider
-symlinking it from some place on your path, such as \fB/usr/local/bin\fP\&.
-.sp
-For Windows users, who do not have symlinking functionality available, you can
-copy \fBdjango\-admin.exe\fP to a location on your existing path or edit the
-\fBPATH\fP settings (under \fBSettings \- Control Panel \- System \- Advanced \-
-Environment...\fP) to point to its installed location.
+Django via \fBpip\fP\&. If it\(aqs not in your path, ensure you have your virtual
+environment activated.
 .sp
 Generally, when working on a single Django project, it\(aqs easier to use
 \fBmanage.py\fP than \fBdjango\-admin\fP\&. If you need to switch between multiple
 Django settings files, use \fBdjango\-admin\fP with
-\fBDJANGO_SETTINGS_MODULE\fP or the \fI\%\-\-settings\fP command line
+\fI\%DJANGO_SETTINGS_MODULE\fP or the \fI\%\-\-settings\fP command line
 option.
 .sp
 The command\-line examples throughout this document use \fBdjango\-admin\fP to
@@ -92,7 +86,7 @@ command and a list of its available options.
 .SS App names
 .sp
 Many commands take a list of "app names." An "app name" is the basename of
-the package containing your models. For example, if your \fBINSTALLED_APPS\fP
+the package containing your models. For example, if your \fI\%INSTALLED_APPS\fP
 contains the string \fB\(aqmysite.blog\(aq\fP, the app name is \fBblog\fP\&.
 .SS Determining the version
 .INDENT 0.0
@@ -117,8 +111,8 @@ The output follows the schema described in \fI\%PEP 440\fP:
 .UNINDENT
 .SS Displaying debug output
 .sp
-Use \fI\%\-\-verbosity\fP to specify the amount of notification and debug
-information that \fBdjango\-admin\fP prints to the console.
+Use \fI\%\-\-verbosity\fP, where it is supported, to specify the amount of
+notification and debug information that \fBdjango\-admin\fP prints to the console.
 .SH AVAILABLE COMMANDS
 .SS \fBcheck\fP
 .INDENT 0.0
@@ -126,7 +120,7 @@ information that \fBdjango\-admin\fP prints to the console.
 .B django\-admin check [app_label [app_label ...]]
 .UNINDENT
 .sp
-Uses the system check framework to inspect the entire
+Uses the \fI\%system check framework\fP to inspect the entire
 Django project for common problems.
 .sp
 By default, all apps will be checked. You can check a subset of apps by
@@ -141,15 +135,13 @@ django\-admin check auth admin myapp
 .fi
 .UNINDENT
 .UNINDENT
-.sp
-If you do not specify any app, all apps will be checked.
 .INDENT 0.0
 .TP
 .B \-\-tag TAGS, \-t TAGS
 .UNINDENT
 .sp
 The system check framework performs many different types of checks that are
-categorized with tags\&. You can use these
+\fI\%categorized with tags\fP\&. You can use these
 tags to restrict the checks performed to just those in a particular category.
 For example, to perform only models and compatibility checks, run:
 .INDENT 0.0
@@ -162,6 +154,24 @@ django\-admin check \-\-tag models \-\-tag compatibility
 .fi
 .UNINDENT
 .UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-database DATABASE
+.UNINDENT
+.sp
+Specifies the database to run checks requiring database access:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+django\-admin check \-\-database default \-\-database other
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+By default, these checks will not be run.
 .INDENT 0.0
 .TP
 .B \-\-list\-tags
@@ -178,8 +188,8 @@ Activates some additional checks that are only relevant in a deployment setting.
 You can use this option in your local development environment, but since your
 local development settings module may not have many of your production settings,
 you will probably want to point the \fBcheck\fP command at a different settings
-module, either by setting the \fBDJANGO_SETTINGS_MODULE\fP environment variable,
-or by passing the \fB\-\-settings\fP option:
+module, either by setting the \fI\%DJANGO_SETTINGS_MODULE\fP environment
+variable, or by passing the \fB\-\-settings\fP option:
 .INDENT 0.0
 .INDENT 3.5
 .sp
@@ -208,7 +218,7 @@ status. Default is \fBERROR\fP\&.
 .UNINDENT
 .sp
 Compiles \fB\&.po\fP files created by \fI\%makemessages\fP to \fB\&.mo\fP files for
-use with the built\-in gettext support. See /topics/i18n/index\&.
+use with the built\-in gettext support. See \fI\%Internationalization and localization\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-locale LOCALE, \-l LOCALE
@@ -227,7 +237,7 @@ are excluded.
 .B \-\-use\-fuzzy, \-f
 .UNINDENT
 .sp
-Includes fuzzy translations into compiled files.
+Includes \fI\%fuzzy translations\fP into compiled files.
 .sp
 Example usage:
 .INDENT 0.0
@@ -252,8 +262,6 @@ django\-admin compilemessages \-x pt_BR \-x fr
 .B \-\-ignore PATTERN, \-i PATTERN
 .UNINDENT
 .sp
-
-.sp
 Ignores directories matching the given \fI\%glob\fP\-style pattern. Use
 multiple times to ignore more.
 .sp
@@ -275,7 +283,7 @@ django\-admin compilemessages \-\-ignore=cache \-\-ignore=outdated/*/locale
 .UNINDENT
 .sp
 Creates the cache tables for use with the database cache backend using the
-information from your settings file. See /topics/cache for more
+information from your settings file. See \fI\%Django\(aqs cache framework\fP for more
 information.
 .INDENT 0.0
 .TP
@@ -298,8 +306,8 @@ customize it or use the migrations framework.
 .UNINDENT
 .sp
 Runs the command\-line client for the database engine specified in your
-\fBENGINE\fP setting, with the connection parameters
-specified in your \fBUSER\fP, \fBPASSWORD\fP, etc., settings.
+\fI\%ENGINE\fP setting, with the connection parameters
+specified in your \fI\%USER\fP, \fI\%PASSWORD\fP, etc., settings.
 .INDENT 0.0
 .IP \(bu 2
 For PostgreSQL, this runs the \fBpsql\fP command\-line client.
@@ -321,6 +329,54 @@ program manually.
 .UNINDENT
 .sp
 Specifies the database onto which to open a shell. Defaults to \fBdefault\fP\&.
+.INDENT 0.0
+.TP
+.B \-\- ARGUMENTS
+.UNINDENT
+.sp
+Any arguments following a \fB\-\-\fP divider will be passed on to the underlying
+command\-line client. For example, with PostgreSQL you can use the \fBpsql\fP
+command\(aqs \fB\-c\fP flag to execute a raw SQL query directly:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ django\-admin dbshell \-\- \-c \(aqselect current_user\(aq
+ current_user
+\-\-\-\-\-\-\-\-\-\-\-\-\-\-
+ postgres
+(1 row)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+On MySQL/MariaDB, you can do this with the \fBmysql\fP command\(aqs \fB\-e\fP flag:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+$ django\-admin dbshell \-\- \-e "select user()"
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+| user()               |
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+| djangonaut@localhost |
++\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-+
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Be aware that not all options set in the \fI\%OPTIONS\fP part of your
+database configuration in \fI\%DATABASES\fP are passed to the
+command\-line client, e.g. \fB\(aqisolation_level\(aq\fP\&.
+.UNINDENT
+.UNINDENT
 .SS \fBdiffsettings\fP
 .INDENT 0.0
 .TP
@@ -331,8 +387,8 @@ Displays differences between the current settings file and Django\(aqs default
 settings (or another settings file specified by \fI\%\-\-default\fP).
 .sp
 Settings that don\(aqt appear in the defaults are followed by \fB"###"\fP\&. For
-example, the default settings don\(aqt define \fBROOT_URLCONF\fP, so
-\fBROOT_URLCONF\fP is followed by \fB"###"\fP in the output of
+example, the default settings don\(aqt define \fI\%ROOT_URLCONF\fP, so
+\fI\%ROOT_URLCONF\fP is followed by \fB"###"\fP in the output of
 \fBdiffsettings\fP\&.
 .INDENT 0.0
 .TP
@@ -371,8 +427,13 @@ If no application name is provided, all installed applications will be dumped.
 .sp
 The output of \fBdumpdata\fP can be used as input for \fI\%loaddata\fP\&.
 .sp
+When result of \fBdumpdata\fP is saved as a file, it can serve as a
+\fI\%fixture\fP for
+\fI\%tests\fP or as an
+\fI\%initial data\fP\&.
+.sp
 Note that \fBdumpdata\fP uses the default manager on the model for selecting the
-records to dump. If you\(aqre using a custom manager as
+records to dump. If you\(aqre using a \fI\%custom manager\fP as
 the default manager and it filters some of the available records, not all of the
 objects will be dumped.
 .INDENT 0.0
@@ -388,7 +449,7 @@ or modified by a custom manager.
 .UNINDENT
 .sp
 Specifies the serialization format of the output. Defaults to JSON. Supported
-formats are listed in serialization\-formats\&.
+formats are listed in \fI\%Serialization formats\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-indent INDENT
@@ -402,9 +463,9 @@ Specifies the number of indentation spaces to use in the output. Defaults to
 .UNINDENT
 .sp
 Prevents specific applications or models (specified in the form of
-\fBapp_label.ModelName\fP) from being dumped. If you specify a model name, the
-output will be restricted to that model, rather than the entire application.
-You can also mix application names and model names.
+\fBapp_label.ModelName\fP) from being dumped. If you specify a model name, then
+only that model will be excluded, rather than the entire application. You can
+also mix application names and model names.
 .sp
 If you want to exclude multiple applications, pass \fB\-\-exclude\fP more than
 once:
@@ -433,7 +494,7 @@ Uses the \fBnatural_key()\fP model method to serialize any foreign key and
 many\-to\-many relationship to objects of the type that defines the method. If
 you\(aqre dumping \fBcontrib.auth\fP \fBPermission\fP objects or
 \fBcontrib.contenttypes\fP \fBContentType\fP objects, you should probably use this
-flag. See the natural keys
+flag. See the \fI\%natural keys\fP
 documentation for more details on this and the next option.
 .INDENT 0.0
 .TP
@@ -460,6 +521,21 @@ standard output.
 .sp
 When this option is set and \fB\-\-verbosity\fP is greater than 0 (the default), a
 progress bar is shown in the terminal.
+.SS Fixtures compression
+.sp
+The output file can be compressed with one of the \fBbz2\fP, \fBgz\fP, \fBlzma\fP, or
+\fBxz\fP formats by ending the filename with the corresponding extension.
+For example, to output the data as a compressed JSON file:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+django\-admin dumpdata \-o mydata.json.gz
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
 .SS \fBflush\fP
 .INDENT 0.0
 .TP
@@ -469,7 +545,7 @@ progress bar is shown in the terminal.
 Removes all data from the database and re\-executes any post\-synchronization
 handlers. The table of which migrations have been applied is not cleared.
 .sp
-If you would rather start from an empty database and re\-run all migrations, you
+If you would rather start from an empty database and rerun all migrations, you
 should drop and recreate the database and then run \fI\%migrate\fP instead.
 .INDENT 0.0
 .TP
@@ -490,7 +566,7 @@ Specifies the database to flush. Defaults to \fBdefault\fP\&.
 .UNINDENT
 .sp
 Introspects the database tables in the database pointed\-to by the
-\fBNAME\fP setting and outputs a Django model module (a \fBmodels.py\fP
+\fI\%NAME\fP setting and outputs a Django model module (a \fBmodels.py\fP
 file) to standard output.
 .sp
 You may choose what tables or views to inspect by passing their names as
@@ -511,7 +587,7 @@ If \fBinspectdb\fP cannot map a column\(aqs type to a model field type, it\(aqll
 use \fBTextField\fP and will insert the Python comment
 \fB\(aqThis field type is a guess.\(aq\fP next to the field in the generated
 model. The recognized fields may depend on apps listed in
-\fBINSTALLED_APPS\fP\&. For example, \fBdjango.contrib.postgres\fP adds
+\fI\%INSTALLED_APPS\fP\&. For example, \fI\%django.contrib.postgres\fP adds
 recognition for several PostgreSQL\-specific field types.
 .IP \(bu 2
 If the database column name is a Python reserved word (such as
@@ -530,7 +606,7 @@ customizations. In particular, you\(aqll need to rearrange models\(aq order, so 
 models that refer to other models are ordered properly.
 .sp
 Django doesn\(aqt create database defaults when a
-\fBdefault\fP is specified on a model field.
+\fI\%default\fP is specified on a model field.
 Similarly, database defaults aren\(aqt translated to model field defaults or
 detected in any fashion by \fBinspectdb\fP\&.
 .sp
@@ -538,7 +614,7 @@ By default, \fBinspectdb\fP creates unmanaged models. That is, \fBmanaged = Fals
 in the model\(aqs \fBMeta\fP class tells Django not to manage each table\(aqs creation,
 modification, and deletion. If you do want to allow Django to manage the
 table\(aqs lifecycle, you\(aqll need to change the
-\fBmanaged\fP option to \fBTrue\fP (or remove
+\fI\%managed\fP option to \fBTrue\fP (or remove
 it because \fBTrue\fP is its default value).
 .SS Database\-specific notes
 .SS Oracle
@@ -558,9 +634,6 @@ Models are created for materialized views if
 Models are created for partition tables if
 \fI\%\-\-include\-partitions\fP is used.
 .UNINDENT
-.sp
-Support for foreign tables and materialized views was added.
-
 .INDENT 0.0
 .TP
 .B \-\-database DATABASE
@@ -571,8 +644,6 @@ Specifies the database to introspect. Defaults to \fBdefault\fP\&.
 .TP
 .B \-\-include\-partitions
 .UNINDENT
-.sp
-
 .sp
 If this option is provided, models are also created for partitions.
 .sp
@@ -589,7 +660,8 @@ If this option is provided, models are also created for database views.
 .B django\-admin loaddata fixture [fixture ...]
 .UNINDENT
 .sp
-Searches for and loads the contents of the named fixture into the database.
+Searches for and loads the contents of the named
+\fI\%fixture\fP into the database.
 .INDENT 0.0
 .TP
 .B \-\-database DATABASE
@@ -615,7 +687,7 @@ Specifies a single app to look for fixtures in rather than looking in all apps.
 .B \-\-format FORMAT
 .UNINDENT
 .sp
-Specifies the serialization format (e.g.,
+Specifies the \fI\%serialization format\fP (e.g.,
 \fBjson\fP or \fBxml\fP) for fixtures \fI\%read from stdin\fP\&.
 .INDENT 0.0
 .TP
@@ -625,183 +697,6 @@ Specifies the serialization format (e.g.,
 Excludes loading the fixtures from the given applications and/or models (in the
 form of \fBapp_label\fP or \fBapp_label.ModelName\fP). Use the option multiple
 times to exclude more than one app or model.
-.SS What\(aqs a "fixture"?
-.sp
-A \fIfixture\fP is a collection of files that contain the serialized contents of
-the database. Each fixture has a unique name, and the files that comprise the
-fixture can be distributed over multiple directories, in multiple applications.
-.sp
-Django will search in three locations for fixtures:
-.INDENT 0.0
-.IP 1. 3
-In the \fBfixtures\fP directory of every installed application
-.IP 2. 3
-In any directory named in the \fBFIXTURE_DIRS\fP setting
-.IP 3. 3
-In the literal path named by the fixture
-.UNINDENT
-.sp
-Django will load any and all fixtures it finds in these locations that match
-the provided fixture names.
-.sp
-If the named fixture has a file extension, only fixtures of that type
-will be loaded. For example:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-django\-admin loaddata mydata.json
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-would only load JSON fixtures called \fBmydata\fP\&. The fixture extension
-must correspond to the registered name of a
-serializer (e.g., \fBjson\fP or \fBxml\fP).
-.sp
-If you omit the extensions, Django will search all available fixture types
-for a matching fixture. For example:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-django\-admin loaddata mydata
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-would look for any fixture of any fixture type called \fBmydata\fP\&. If a fixture
-directory contained \fBmydata.json\fP, that fixture would be loaded
-as a JSON fixture.
-.sp
-The fixtures that are named can include directory components. These
-directories will be included in the search path. For example:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-django\-admin loaddata foo/bar/mydata.json
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-would search \fB<app_label>/fixtures/foo/bar/mydata.json\fP for each installed
-application,  \fB<dirname>/foo/bar/mydata.json\fP for each directory in
-\fBFIXTURE_DIRS\fP, and the literal path \fBfoo/bar/mydata.json\fP\&.
-.sp
-When fixture files are processed, the data is saved to the database as is.
-Model defined \fBsave()\fP methods are not called, and
-any \fBpre_save\fP or
-\fBpost_save\fP signals will be called with
-\fBraw=True\fP since the instance only contains attributes that are local to the
-model. You may, for example, want to disable handlers that access
-related fields that aren\(aqt present during fixture loading and would otherwise
-raise an exception:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-from django.db.models.signals import post_save
-from .models import MyModel
-
-def my_handler(**kwargs):
-    # disable the handler during fixture loading
-    if kwargs[\(aqraw\(aq]:
-        return
-    ...
-
-post_save.connect(my_handler, sender=MyModel)
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-You could also write a decorator to encapsulate this logic:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-from functools import wraps
-
-def disable_for_loaddata(signal_handler):
-    """
-    Decorator that turns off signal handlers when loading fixture data.
-    """
-    @wraps(signal_handler)
-    def wrapper(*args, **kwargs):
-        if kwargs[\(aqraw\(aq]:
-            return
-        signal_handler(*args, **kwargs)
-    return wrapper
-
-@disable_for_loaddata
-def my_handler(**kwargs):
-    ...
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-Just be aware that this logic will disable the signals whenever fixtures are
-deserialized, not just during \fBloaddata\fP\&.
-.sp
-Note that the order in which fixture files are processed is undefined. However,
-all fixture data is installed as a single transaction, so data in
-one fixture can reference data in another fixture. If the database backend
-supports row\-level constraints, these constraints will be checked at the
-end of the transaction.
-.sp
-The \fI\%dumpdata\fP command can be used to generate input for \fBloaddata\fP\&.
-.SS Compressed fixtures
-.sp
-Fixtures may be compressed in \fBzip\fP, \fBgz\fP, or \fBbz2\fP format. For example:
-.INDENT 0.0
-.INDENT 3.5
-.sp
-.nf
-.ft C
-django\-admin loaddata mydata.json
-.ft P
-.fi
-.UNINDENT
-.UNINDENT
-.sp
-would look for any of \fBmydata.json\fP, \fBmydata.json.zip\fP,
-\fBmydata.json.gz\fP, or \fBmydata.json.bz2\fP\&. The first file contained within a
-zip\-compressed archive is used.
-.sp
-Note that if two fixtures with the same name but different
-fixture type are discovered (for example, if \fBmydata.json\fP and
-\fBmydata.xml.gz\fP were found in the same fixture directory), fixture
-installation will be aborted, and any data installed in the call to
-\fBloaddata\fP will be removed from the database.
-.INDENT 0.0
-.INDENT 3.5
-.IP "MySQL with MyISAM and fixtures"
-.sp
-The MyISAM storage engine of MySQL doesn\(aqt support transactions or
-constraints, so if you use MyISAM, you won\(aqt get validation of fixture
-data, or a rollback if multiple transaction files are found.
-.UNINDENT
-.UNINDENT
-.SS Database\-specific fixtures
-.sp
-If you\(aqre in a multi\-database setup, you might have fixture data that
-you want to load onto one database, but not onto another. In this
-situation, you can add a database identifier into the names of your fixtures.
-.sp
-For example, if your \fBDATABASES\fP setting has a \(aqmaster\(aq database
-defined, name the fixture \fBmydata.master.json\fP or
-\fBmydata.master.json.gz\fP and the fixture will only be loaded when you
-specify you want to load data into the \fBmaster\fP database.
 .SS Loading fixtures from \fBstdin\fP
 .sp
 You can use a dash as the fixture name to load input from \fBsys.stdin\fP\&. For
@@ -818,7 +713,7 @@ django\-admin loaddata \-\-format=json \-
 .UNINDENT
 .sp
 When reading from \fBstdin\fP, the \fI\%\-\-format\fP option
-is required to specify the serialization format
+is required to specify the \fI\%serialization format\fP
 of the input (e.g., \fBjson\fP or \fBxml\fP).
 .sp
 Loading from \fBstdin\fP is useful with standard input and output redirections.
@@ -833,6 +728,15 @@ django\-admin dumpdata \-\-format=json \-\-database=test app_label.ModelName | d
 .fi
 .UNINDENT
 .UNINDENT
+.sp
+The \fI\%dumpdata\fP command can be used to generate input for \fBloaddata\fP\&.
+.sp
+\fBSEE ALSO:\fP
+.INDENT 0.0
+.INDENT 3.5
+For more detail about fixtures see the \fI\%Fixtures\fP topic.
+.UNINDENT
+.UNINDENT
 .SS \fBmakemessages\fP
 .INDENT 0.0
 .TP
@@ -844,11 +748,11 @@ strings marked for translation. It creates (or updates) a message file in the
 conf/locale (in the Django tree) or locale (for project and application)
 directory. After making changes to the messages files you need to compile them
 with \fI\%compilemessages\fP for use with the builtin gettext support. See
-the i18n documentation for details.
+the \fI\%i18n documentation\fP for details.
 .sp
 This command doesn\(aqt require configured settings. However, when settings aren\(aqt
-configured, the command can\(aqt ignore the \fBMEDIA_ROOT\fP and
-\fBSTATIC_ROOT\fP directories or include \fBLOCALE_PATHS\fP\&.
+configured, the command can\(aqt ignore the \fI\%MEDIA_ROOT\fP and
+\fI\%STATIC_ROOT\fP directories or include \fI\%LOCALE_PATHS\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-all, \-a
@@ -1020,7 +924,7 @@ language files from being created.
 \fBSEE ALSO:\fP
 .INDENT 0.0
 .INDENT 3.5
-See customizing\-makemessages for instructions on how to customize
+See \fI\%Customizing the makemessages command\fP for instructions on how to customize
 the keywords that \fI\%makemessages\fP passes to \fBxgettext\fP\&.
 .UNINDENT
 .UNINDENT
@@ -1032,7 +936,7 @@ the keywords that \fI\%makemessages\fP passes to \fBxgettext\fP\&.
 .sp
 Creates new migrations based on the changes detected to your models.
 Migrations, their relationship with apps and more are covered in depth in
-the migrations documentation\&.
+\fI\%the migrations documentation\fP\&.
 .sp
 Providing one or more app names as arguments will limit the migrations created
 to the app(s) specified and any dependencies needed (the table at the other end
@@ -1082,8 +986,6 @@ name must be a valid Python \fI\%identifier\fP\&.
 .B \-\-no\-header
 .UNINDENT
 .sp
-
-.sp
 Generate migration files without Django version and timestamp header.
 .INDENT 0.0
 .TP
@@ -1092,6 +994,28 @@ Generate migration files without Django version and timestamp header.
 .sp
 Makes \fBmakemigrations\fP exit with a non\-zero status when model changes without
 migrations are detected.
+.sp
+In older versions, the missing migrations were also created when using the
+\fB\-\-check\fP option.
+
+.INDENT 0.0
+.TP
+.B \-\-scriptable
+.UNINDENT
+.sp
+
+.sp
+Diverts log output and input prompts to \fBstderr\fP, writing only paths of
+generated migration files to \fBstdout\fP\&.
+.INDENT 0.0
+.TP
+.B \-\-update
+.UNINDENT
+.sp
+
+.sp
+Merges model changes into the latest migration and optimize the resulting
+operations.
 .SS \fBmigrate\fP
 .INDENT 0.0
 .TP
@@ -1100,7 +1024,7 @@ migrations are detected.
 .sp
 Synchronizes the database state with the current set of models and migrations.
 Migrations, their relationship with apps and more are covered in depth in
-the migrations documentation\&.
+\fI\%the migrations documentation\fP\&.
 .sp
 The behavior of this command changes depending on the arguments provided:
 .INDENT 0.0
@@ -1114,8 +1038,19 @@ to dependencies.
 \fB<app_label> <migrationname>\fP: Brings the database schema to a state where
 the named migration is applied, but no later migrations in the same app are
 applied. This may involve unapplying migrations if you have previously
-migrated past the named migration. Use the name \fBzero\fP to unapply all
+migrated past the named migration. You can use a prefix of the migration
+name, e.g. \fB0001\fP, as long as it\(aqs unique for the given app name. Use the
+name \fBzero\fP to migrate all the way back i.e. to revert all applied
 migrations for an app.
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+When unapplying migrations, all dependent migrations will also be
+unapplied, regardless of \fB<app_label>\fP\&. You can use \fB\-\-plan\fP to check
+which migrations will be unapplied.
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1143,7 +1078,7 @@ run correctly.
 .sp
 Allows Django to skip an app\(aqs initial migration if all database tables with
 the names of all models created by all
-\fBCreateModel\fP operations in that
+\fI\%CreateModel\fP operations in that
 migration already exist. This option is intended for use when first running
 migrations against a database that preexisted the use of migrations. This
 option does not, however, check for matching database schema beyond matching
@@ -1153,8 +1088,6 @@ schema matches what is recorded in your initial migration.
 .TP
 .B \-\-plan
 .UNINDENT
-.sp
-
 .sp
 Shows the migration operations that will be performed for the given \fBmigrate\fP
 command.
@@ -1173,13 +1106,49 @@ with hundreds of models.
 .sp
 Suppresses all user prompts. An example prompt is asking about removing stale
 content types.
+.INDENT 0.0
+.TP
+.B \-\-check
+.UNINDENT
+.sp
+Makes \fBmigrate\fP exit with a non\-zero status when unapplied migrations are
+detected.
+.INDENT 0.0
+.TP
+.B \-\-prune
+.UNINDENT
+.sp
+
+.sp
+Deletes nonexistent migrations from the \fBdjango_migrations\fP table. This is
+useful when migration files replaced by a squashed migration have been removed.
+See \fI\%Squashing migrations\fP for more details.
+.SS \fBoptimizemigration\fP
+.sp
+
+.INDENT 0.0
+.TP
+.B django\-admin optimizemigration app_label migration_name
+.UNINDENT
+.sp
+Optimizes the operations for the named migration and overrides the existing
+file. If the migration contains functions that must be manually copied, the
+command creates a new migration file suffixed with \fB_optimized\fP that is meant
+to replace the named migration.
+.INDENT 0.0
+.TP
+.B \-\-check
+.UNINDENT
+.sp
+Makes \fBoptimizemigration\fP exit with a non\-zero status when a migration can be
+optimized.
 .SS \fBrunserver\fP
 .INDENT 0.0
 .TP
 .B django\-admin runserver [addrport]
 .UNINDENT
 .sp
-Starts a lightweight development Web server on the local machine. By default,
+Starts a lightweight development web server on the local machine. By default,
 the server runs on port 8000 on the IP address \fB127.0.0.1\fP\&. You can pass in an
 IP address and port number explicitly.
 .sp
@@ -1188,11 +1157,11 @@ might not have access to start a port on a low port number. Low port numbers
 are reserved for the superuser (root).
 .sp
 This server uses the WSGI application object specified by the
-\fBWSGI_APPLICATION\fP setting.
+\fI\%WSGI_APPLICATION\fP setting.
 .sp
 DO NOT USE THIS SERVER IN A PRODUCTION SETTING. It has not gone through
 security audits or performance tests. (And that\(aqs how it\(aqs gonna stay. We\(aqre in
-the business of making Web frameworks, not Web servers, so improving this
+the business of making web frameworks, not web servers, so improving this
 server to be able to handle a production environment is outside the scope of
 Django.)
 .sp
@@ -1220,39 +1189,41 @@ on how to do this.
 .INDENT 0.0
 .INDENT 3.5
 .IP "Watchman timeout"
+.INDENT 0.0
+.TP
+.B DJANGO_WATCHMAN_TIMEOUT
+.UNINDENT
 .sp
 The default timeout of \fBWatchman\fP client is 5 seconds. You can change it
-by setting the \fBDJANGO_WATCHMAN_TIMEOUT\fP environment variable.
+by setting the \fI\%DJANGO_WATCHMAN_TIMEOUT\fP environment variable.
 .UNINDENT
 .UNINDENT
-.sp
-Watchman support replaced support for \fIpyinotify\fP\&.
-
 .sp
 When you start the server, and each time you change Python code while the
 server is running, the system check framework will check your entire Django
 project for some common errors (see the \fI\%check\fP command). If any
-errors are found, they will be printed to standard output.
+errors are found, they will be printed to standard output. You can use the
+\fB\-\-skip\-checks\fP option to skip running system checks.
 .sp
 You can run as many concurrent servers as you want, as long as they\(aqre on
 separate ports by executing \fBdjango\-admin runserver\fP more than once.
 .sp
 Note that the default IP address, \fB127.0.0.1\fP, is not accessible from other
 machines on your network. To make your development server viewable to other
-machines on the network, use its own IP address (e.g. \fB192.168.2.1\fP) or
-\fB0.0.0.0\fP or \fB::\fP (with IPv6 enabled).
+machines on the network, use its own IP address (e.g. \fB192.168.2.1\fP), \fB0\fP
+(shortcut for \fB0.0.0.0\fP), \fB0.0.0.0\fP, or \fB::\fP (with IPv6 enabled).
 .sp
 You can provide an IPv6 address surrounded by brackets
 (e.g. \fB[200a::1]:8000\fP). This will automatically enable IPv6 support.
 .sp
 A hostname containing ASCII\-only characters can also be used.
 .sp
-If the staticfiles contrib app is enabled
+If the \fI\%staticfiles\fP contrib app is enabled
 (default in new projects) the \fI\%runserver\fP command will be overridden
-with its own runserver command.
+with its own \fI\%runserver\fP command.
 .sp
 Logging of each request and response of the server is sent to the
-django\-server\-logger logger.
+\fI\%django.server\fP logger.
 .INDENT 0.0
 .TP
 .B \-\-noreload
@@ -1387,9 +1358,9 @@ django\-admin runserver \-6 localhost:8000
 .SS Serving static files with the development server
 .sp
 By default, the development server doesn\(aqt serve any static files for your site
-(such as CSS files, images, things under \fBMEDIA_URL\fP and so forth). If
+(such as CSS files, images, things under \fI\%MEDIA_URL\fP and so forth). If
 you want to configure Django to serve static media, read
-/howto/static\-files/index\&.
+\fI\%How to manage static files (e.g. images, JavaScript, CSS)\fP\&.
 .SS \fBsendtestemail\fP
 .INDENT 0.0
 .TP
@@ -1416,15 +1387,15 @@ together:
 .B \-\-managers
 .UNINDENT
 .sp
-Mails the email addresses specified in \fBMANAGERS\fP using
-\fBmail_managers()\fP\&.
+Mails the email addresses specified in \fI\%MANAGERS\fP using
+\fI\%mail_managers()\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-admins
 .UNINDENT
 .sp
-Mails the email addresses specified in \fBADMINS\fP using
-\fBmail_admins()\fP\&.
+Mails the email addresses specified in \fI\%ADMINS\fP using
+\fI\%mail_admins()\fP\&.
 .SS \fBshell\fP
 .INDENT 0.0
 .TP
@@ -1539,9 +1510,6 @@ Apps without migrations are also listed, but have \fB(no migrations)\fP printed
 under them.
 .sp
 This is the default output format.
-.sp
-Output of the applied datetimes at verbosity 2 and above was added.
-
 .INDENT 0.0
 .TP
 .B \-\-plan, \-p
@@ -1625,12 +1593,12 @@ Specifies the database for which to print the SQL. Defaults to \fBdefault\fP\&.
 Squashes the migrations for \fBapp_label\fP up to and including \fBmigration_name\fP
 down into fewer migrations, if possible. The resulting squashed migrations
 can live alongside the unsquashed ones safely. For more information,
-please read migration\-squashing\&.
+please read \fI\%Squashing migrations\fP\&.
 .sp
 When \fBstart_migration_name\fP is given, Django will only include migrations
 starting from and including this migration. This helps to mitigate the
-squashing limitation of \fBRunPython\fP and
-\fBdjango.db.migrations.operations.RunSQL\fP migration operations.
+squashing limitation of \fI\%RunPython\fP and
+\fI\%django.db.migrations.operations.RunSQL\fP migration operations.
 .INDENT 0.0
 .TP
 .B \-\-no\-optimize
@@ -1658,8 +1626,6 @@ first and last migration, with \fB_squashed_\fP in between.
 .TP
 .B \-\-no\-header
 .UNINDENT
-.sp
-
 .sp
 Generate squashed migration file without Django version and timestamp header.
 .SS \fBstartapp\fP
@@ -1724,15 +1690,11 @@ zip files, you can use a URL like:
 .sp
 .nf
 .ft C
-django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/master.zip myapp
+django\-admin startapp \-\-template=https://github.com/githubuser/django\-app\-template/archive/main.zip myapp
 .ft P
 .fi
 .UNINDENT
 .UNINDENT
-.sp
-Support for XZ archives (\fB\&.tar.xz\fP, \fB\&.txz\fP) and LZMA archives
-(\fB\&.tar.lzma\fP, \fB\&.tlz\fP) was added.
-
 .INDENT 0.0
 .TP
 .B \-\-extension EXTENSIONS, \-e EXTENSIONS
@@ -1748,8 +1710,16 @@ template engine. Defaults to \fBpy\fP\&.
 Specifies which files in the app template (in addition to those matching
 \fB\-\-extension\fP) should be rendered with the template engine. Defaults to an
 empty list.
+.INDENT 0.0
+.TP
+.B \-\-exclude DIRECTORIES, \-x DIRECTORIES
+.UNINDENT
 .sp
-The \fBtemplate context\fP used for all matching
+Specifies which directories in the app template should be excluded, in addition
+to \fB\&.git\fP and \fB__pycache__\fP\&. If this option is not provided, directories
+named \fB__pycache__\fP or starting with \fB\&.\fP will be excluded.
+.sp
+The \fI\%template context\fP used for all matching
 files is:
 .INDENT 0.0
 .IP \(bu 2
@@ -1776,13 +1746,27 @@ stray template variables contained. For example, if one of the Python files
 contains a docstring explaining a particular feature related
 to template rendering, it might result in an incorrect example.
 .sp
-To work around this problem, you can use the \fBtemplatetag\fP
+To work around this problem, you can use the \fI\%templatetag\fP
 template tag to "escape" the various parts of the template syntax.
 .sp
 In addition, to allow Python template files that contain Django template
 language syntax while also preventing packaging systems from trying to
 byte\-compile invalid \fB*.py\fP files, template files ending with \fB\&.py\-tpl\fP
 will be renamed to \fB\&.py\fP\&.
+.UNINDENT
+.UNINDENT
+.sp
+\fBWARNING:\fP
+.INDENT 0.0
+.INDENT 3.5
+The contents of custom app (or project) templates should always be
+audited before use: Such templates define code that will become
+part of your project, and this means that such code will be trusted
+as much as any app you install, or code you write yourself.
+Further, even rendering the templates is, effectively, executing
+code that was provided as input to the management command. The
+Django template language may provide wide access into the system,
+so make sure any custom template you use is worthy of your trust.
 .UNINDENT
 .UNINDENT
 .SS \fBstartproject\fP
@@ -1839,8 +1823,16 @@ the template engine. Defaults to \fBpy\fP\&.
 Specifies which files in the project template (in addition to those matching
 \fB\-\-extension\fP) should be rendered with the template engine. Defaults to an
 empty list.
+.INDENT 0.0
+.TP
+.B \-\-exclude DIRECTORIES, \-x DIRECTORIES
+.UNINDENT
 .sp
-The \fBtemplate context\fP used is:
+Specifies which directories in the project template should be excluded, in
+addition to \fB\&.git\fP and \fB__pycache__\fP\&. If this option is not provided,
+directories named \fB__pycache__\fP or starting with \fB\&.\fP will be excluded.
+.sp
+The \fI\%template context\fP used is:
 .INDENT 0.0
 .IP \(bu 2
 Any option passed to the \fBstartproject\fP command (among the command\(aqs
@@ -1850,22 +1842,23 @@ supported options)
 .IP \(bu 2
 \fBproject_directory\fP \-\- the full path of the newly created project
 .IP \(bu 2
-\fBsecret_key\fP \-\- a random key for the \fBSECRET_KEY\fP setting
+\fBsecret_key\fP \-\- a random key for the \fI\%SECRET_KEY\fP setting
 .IP \(bu 2
 \fBdocs_version\fP \-\- the version of the documentation: \fB\(aqdev\(aq\fP or \fB\(aq1.x\(aq\fP
 .IP \(bu 2
 \fBdjango_version\fP \-\- the version of Django, e.g. \fB\(aq2.0.3\(aq\fP
 .UNINDENT
 .sp
-Please also see the \fI\%rendering warning\fP as mentioned
-for \fI\%startapp\fP\&.
+Please also see the \fI\%rendering warning\fP and
+\fI\%trusted code warning\fP as mentioned for
+\fI\%startapp\fP\&.
 .SS \fBtest\fP
 .INDENT 0.0
 .TP
 .B django\-admin test [test_label [test_label ...]]
 .UNINDENT
 .sp
-Runs tests for all installed apps. See /topics/testing/index for more
+Runs tests for all installed apps. See \fI\%Testing in Django\fP for more
 information.
 .INDENT 0.0
 .TP
@@ -1879,7 +1872,7 @@ Stops running tests and reports the failure immediately after a test fails.
 .UNINDENT
 .sp
 Controls the test runner class that is used to execute tests. This value
-overrides the value provided by the \fBTEST_RUNNER\fP setting.
+overrides the value provided by the \fI\%TEST_RUNNER\fP setting.
 .INDENT 0.0
 .TP
 .B \-\-noinput, \-\-no\-input
@@ -1891,7 +1884,7 @@ existing test database.
 .sp
 The \fBtest\fP command receives options on behalf of the specified
 \fI\%\-\-testrunner\fP\&. These are the options of the default test runner:
-\fBDiscoverRunner\fP\&.
+\fI\%DiscoverRunner\fP\&.
 .INDENT 0.0
 .TP
 .B \-\-keepdb
@@ -1901,42 +1894,67 @@ Preserves the test database between test runs. This has the advantage of
 skipping both the create and destroy actions which can greatly decrease the
 time to run tests, especially those in a large test suite. If the test database
 does not exist, it will be created on the first run and then preserved for each
-subsequent run. Any unapplied migrations will also be applied to the test
-database before running the test suite.
+subsequent run. Unless the \fI\%MIGRATE\fP test setting is
+\fBFalse\fP, any unapplied migrations will also be applied to the test database
+before running the test suite.
+.INDENT 0.0
+.TP
+.B \-\-shuffle [SEED]
+.UNINDENT
+.sp
+Randomizes the order of tests before running them. This can help detect tests
+that aren\(aqt properly isolated. The test order generated by this option is a
+deterministic function of the integer seed given. When no seed is passed, a
+seed is chosen randomly and printed to the console. To repeat a particular test
+order, pass a seed. The test orders generated by this option preserve Django\(aqs
+\fI\%guarantees on test order\fP\&. They also keep tests grouped
+by test case class.
+.sp
+The shuffled orderings also have a special consistency property useful when
+narrowing down isolation issues. Namely, for a given seed and when running a
+subset of tests, the new order will be the original shuffling restricted to the
+smaller set. Similarly, when adding tests while keeping the seed the same, the
+order of the original tests will be the same in the new order.
 .INDENT 0.0
 .TP
 .B \-\-reverse, \-r
 .UNINDENT
 .sp
 Sorts test cases in the opposite execution order. This may help in debugging
-the side effects of tests that aren\(aqt properly isolated. Grouping by test
-class is preserved when using this option.
+the side effects of tests that aren\(aqt properly isolated. \fI\%Grouping by test
+class\fP is preserved when using this option. This can be used
+in conjunction with \fB\-\-shuffle\fP to reverse the order for a particular seed.
 .INDENT 0.0
 .TP
 .B \-\-debug\-mode
 .UNINDENT
 .sp
-Sets the \fBDEBUG\fP setting to \fBTrue\fP prior to running tests. This may
+Sets the \fI\%DEBUG\fP setting to \fBTrue\fP prior to running tests. This may
 help troubleshoot test failures.
 .INDENT 0.0
 .TP
 .B \-\-debug\-sql, \-d
 .UNINDENT
 .sp
-Enables SQL logging for failing tests. If
+Enables \fI\%SQL logging\fP for failing tests. If
 \fB\-\-verbosity\fP is \fB2\fP, then queries in passing tests are also output.
 .INDENT 0.0
 .TP
 .B \-\-parallel [N]
 .UNINDENT
+.INDENT 0.0
+.TP
+.B DJANGO_TEST_PROCESSES
+.UNINDENT
 .sp
 Runs tests in separate parallel processes. Since modern processors have
 multiple cores, this allows running tests significantly faster.
 .sp
-By default \fB\-\-parallel\fP runs one process per core according to
-\fI\%multiprocessing.cpu_count()\fP\&. You can adjust the number of processes
-either by providing it as the option\(aqs value, e.g. \fB\-\-parallel=4\fP, or by
-setting the \fBDJANGO_TEST_PROCESSES\fP environment variable.
+Using \fB\-\-parallel\fP without a value, or with the value \fBauto\fP, runs one test
+process per core according to \fI\%multiprocessing.cpu_count()\fP\&. You can
+override this by passing the desired number of processes, e.g.
+\fB\-\-parallel 4\fP, or by setting the \fI\%DJANGO_TEST_PROCESSES\fP environment
+variable.
 .sp
 Django distributes test cases — \fI\%unittest.TestCase\fP subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django
@@ -1945,6 +1963,15 @@ will reduce the number of processes accordingly.
 Each process gets its own database. You must ensure that different test cases
 don\(aqt access the same resources. For instance, test cases that touch the
 filesystem should create a temporary directory for their own use.
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+If you have test classes that cannot be run in parallel, you can use
+\fBSerializeMixin\fP to run them sequentially. See \fI\%Enforce running test
+classes sequentially\fP\&.
+.UNINDENT
+.UNINDENT
 .sp
 This option requires the third\-party \fBtblib\fP package to display tracebacks
 correctly:
@@ -1984,40 +2011,52 @@ in order to exchange them between processes. See
 .B \-\-tag TAGS
 .UNINDENT
 .sp
-Runs only tests marked with the specified tags\&.
+Runs only tests \fI\%marked with the specified tags\fP\&.
 May be specified multiple times and combined with \fI\%test \-\-exclude\-tag\fP\&.
+.sp
+Tests that fail to load are always considered matching.
 .INDENT 0.0
 .TP
 .B \-\-exclude\-tag EXCLUDE_TAGS
 .UNINDENT
 .sp
-Excludes tests marked with the specified tags\&.
+Excludes tests \fI\%marked with the specified tags\fP\&.
 May be specified multiple times and combined with \fI\%test \-\-tag\fP\&.
 .INDENT 0.0
 .TP
 .B \-k TEST_NAME_PATTERNS
 .UNINDENT
 .sp
-
-.sp
 Runs test methods and classes matching test name patterns, in the same way as
 \fI\%unittest\(aqs \-k option\fP\&. Can be specified multiple times.
-.INDENT 0.0
-.INDENT 3.5
-.IP "Python 3.7 and later"
-.sp
-This feature is only available for Python 3.7 and later.
-.UNINDENT
-.UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-pdb
 .UNINDENT
 .sp
-
-.sp
 Spawns a \fBpdb\fP debugger at each test error or failure. If you have it
 installed, \fBipdb\fP is used instead.
+.INDENT 0.0
+.TP
+.B \-\-buffer, \-b
+.UNINDENT
+.sp
+Discards output (\fBstdout\fP and \fBstderr\fP) for passing tests, in the same way
+as \fI\%unittest\(aqs \-\-buffer option\fP\&.
+.INDENT 0.0
+.TP
+.B \-\-no\-faulthandler
+.UNINDENT
+.sp
+Django automatically calls \fI\%faulthandler.enable()\fP when starting the
+tests, which allows it to print a traceback if the interpreter crashes. Pass
+\fB\-\-no\-faulthandler\fP to disable this behavior.
+.INDENT 0.0
+.TP
+.B \-\-timing
+.UNINDENT
+.sp
+Outputs timings, including database setup and total run time.
 .SS \fBtestserver\fP
 .INDENT 0.0
 .TP
@@ -2042,7 +2081,7 @@ django\-admin testserver mydata.json
 \&...would perform the following steps:
 .INDENT 0.0
 .IP 1. 3
-Create a test database, as described in the\-test\-database\&.
+Create a test database, as described in \fI\%The test database\fP\&.
 .IP 2. 3
 Populate the test database with fixture data from the given fixtures.
 (For more on fixtures, see the documentation for \fI\%loaddata\fP above.)
@@ -2054,17 +2093,17 @@ this newly created test database instead of your production database.
 This is useful in a number of ways:
 .INDENT 0.0
 .IP \(bu 2
-When you\(aqre writing unit tests of how your views
+When you\(aqre writing \fI\%unit tests\fP of how your views
 act with certain fixture data, you can use \fBtestserver\fP to interact with
-the views in a Web browser, manually.
+the views in a web browser, manually.
 .IP \(bu 2
 Let\(aqs say you\(aqre developing your Django application and have a "pristine"
 copy of a database that you\(aqd like to interact with. You can dump your
-database to a fixture (using the \fI\%dumpdata\fP command, explained
-above), then use \fBtestserver\fP to run your Web application with that data.
-With this arrangement, you have the flexibility of messing up your data
-in any way, knowing that whatever data changes you\(aqre making are only
-being made to a test database.
+database to a \fI\%fixture\fP (using the
+\fI\%dumpdata\fP command, explained above), then use \fBtestserver\fP to run
+your web application with that data.  With this arrangement, you have the
+flexibility of messing up your data in any way, knowing that whatever data
+changes you\(aqre making are only being made to a test database.
 .UNINDENT
 .sp
 Note that this server does \fInot\fP automatically detect changes to your Python
@@ -2119,8 +2158,8 @@ existing test database.
 .SH COMMANDS PROVIDED BY APPLICATIONS
 .sp
 Some commands are only available when the \fBdjango.contrib\fP application that
-implements them has been
-\fBenabled\fP\&. This section describes them grouped by
+\fI\%implements\fP them has been
+\fI\%enabled\fP\&. This section describes them grouped by
 their application.
 .SS \fBdjango.contrib.auth\fP
 .SS \fBchangepassword\fP
@@ -2129,7 +2168,7 @@ their application.
 .B django\-admin changepassword [<username>]
 .UNINDENT
 .sp
-This command is only available if Django\(aqs authentication system (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Django\(aqs \fI\%authentication system\fP (\fBdjango.contrib.auth\fP) is installed.
 .sp
 Allows changing a user\(aqs password. It prompts you to enter a new password twice
 for the given user. If the entries are identical, this immediately becomes the
@@ -2158,8 +2197,12 @@ django\-admin changepassword ringo
 .TP
 .B django\-admin createsuperuser
 .UNINDENT
+.INDENT 0.0
+.TP
+.B DJANGO_SUPERUSER_PASSWORD
+.UNINDENT
 .sp
-This command is only available if Django\(aqs authentication system (\fBdjango.contrib.auth\fP) is installed.
+This command is only available if Django\(aqs \fI\%authentication system\fP (\fBdjango.contrib.auth\fP) is installed.
 .sp
 Creates a superuser account (a user who has all permissions). This is
 useful if you need to create an initial superuser account or if you need to
@@ -2167,21 +2210,17 @@ programmatically generate superuser accounts for your site(s).
 .sp
 When run interactively, this command will prompt for a password for
 the new superuser account. When run non\-interactively, you can provide
-a password by setting the \fBDJANGO_SUPERUSER_PASSWORD\fP environment variable.
-Otherwise, no password will be set, and the superuser account will not be able
-to log in until a password has been manually set for it.
+a password by setting the \fI\%DJANGO_SUPERUSER_PASSWORD\fP environment
+variable. Otherwise, no password will be set, and the superuser account will
+not be able to log in until a password has been manually set for it.
 .sp
 In non\-interactive mode, the
-\fBUSERNAME_FIELD\fP and required
+\fI\%USERNAME_FIELD\fP and required
 fields (listed in
-\fBREQUIRED_FIELDS\fP) fall back to
+\fI\%REQUIRED_FIELDS\fP) fall back to
 \fBDJANGO_SUPERUSER_<uppercase_field_name>\fP environment variables, unless they
 are overridden by a command line argument. For example, to provide an \fBemail\fP
 field, you can use \fBDJANGO_SUPERUSER_EMAIL\fP environment variable.
-.sp
-Support for using \fBDJANGO_SUPERUSER_PASSWORD\fP and
-\fBDJANGO_SUPERUSER_<uppercase_field_name>\fP environment variables was added.
-
 .INDENT 0.0
 .TP
 .B \-\-noinput, \-\-no\-input
@@ -2213,7 +2252,7 @@ You can subclass the management command and override \fBget_input_data()\fP if y
 want to customize data input and validation. Consult the source code for
 details on the existing implementation and the method\(aqs parameters. For example,
 it could be useful if you have a \fBForeignKey\fP in
-\fBREQUIRED_FIELDS\fP and want to
+\fI\%REQUIRED_FIELDS\fP and want to
 allow creating an instance instead of entering the primary key of an existing
 instance.
 .SS \fBdjango.contrib.contenttypes\fP
@@ -2223,7 +2262,7 @@ instance.
 .B django\-admin remove_stale_contenttypes
 .UNINDENT
 .sp
-This command is only available if Django\(aqs contenttypes app (\fBdjango.contrib.contenttypes\fP) is installed.
+This command is only available if Django\(aqs \fI\%contenttypes app\fP (\fI\%django.contrib.contenttypes\fP) is installed.
 .sp
 Deletes stale content types (from deleted models) in your database. Any objects
 that depend on the deleted content types will also be deleted. A list of
@@ -2235,13 +2274,20 @@ the deletion.
 .UNINDENT
 .sp
 Specifies the database to use. Defaults to \fBdefault\fP\&.
+.INDENT 0.0
+.TP
+.B \-\-include\-stale\-apps
+.UNINDENT
+.sp
+Deletes stale content types including ones from previously installed apps that
+have been removed from \fI\%INSTALLED_APPS\fP\&. Defaults to \fBFalse\fP\&.
 .SS \fBdjango.contrib.gis\fP
 .SS \fBogrinspect\fP
 .sp
-This command is only available if GeoDjango
+This command is only available if \fI\%GeoDjango\fP
 (\fBdjango.contrib.gis\fP) is installed.
 .sp
-Please refer to its \fBdescription\fP in the GeoDjango
+Please refer to its \fI\%description\fP in the GeoDjango
 documentation.
 .SS \fBdjango.contrib.sessions\fP
 .SS \fBclearsessions\fP
@@ -2254,33 +2300,33 @@ Can be run as a cron job or directly to clean out expired sessions.
 .SS \fBdjango.contrib.sitemaps\fP
 .SS \fBping_google\fP
 .sp
-This command is only available if the Sitemaps framework (\fBdjango.contrib.sitemaps\fP) is installed.
+This command is only available if the \fI\%Sitemaps framework\fP (\fBdjango.contrib.sitemaps\fP) is installed.
 .sp
-Please refer to its \fBdescription\fP in the Sitemaps
+Please refer to its \fI\%description\fP in the Sitemaps
 documentation.
 .SS \fBdjango.contrib.staticfiles\fP
 .SS \fBcollectstatic\fP
 .sp
-This command is only available if the static files application (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the \fI\%static files application\fP (\fBdjango.contrib.staticfiles\fP) is installed.
 .sp
-Please refer to its \fBdescription\fP in the
-staticfiles documentation.
+Please refer to its \fI\%description\fP in the
+\fI\%staticfiles\fP documentation.
 .SS \fBfindstatic\fP
 .sp
-This command is only available if the static files application (\fBdjango.contrib.staticfiles\fP) is installed.
+This command is only available if the \fI\%static files application\fP (\fBdjango.contrib.staticfiles\fP) is installed.
 .sp
-Please refer to its \fBdescription\fP in the staticfiles documentation.
+Please refer to its \fI\%description\fP in the \fI\%staticfiles\fP documentation.
 .SH DEFAULT OPTIONS
 .sp
 Although some commands may allow their own custom options, every command
-allows for the following options:
+allows for the following options by default:
 .INDENT 0.0
 .TP
 .B \-\-pythonpath PYTHONPATH
 .UNINDENT
 .sp
 Adds the given filesystem path to the Python \fI\%import search path\fP\&. If this
-isn\(aqt provided, \fBdjango\-admin\fP will use the \fBPYTHONPATH\fP environment
+isn\(aqt provided, \fBdjango\-admin\fP will use the \fI\%PYTHONPATH\fP environment
 variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it takes care of setting
@@ -2304,7 +2350,8 @@ django\-admin migrate \-\-pythonpath=\(aq/home/djangoprojects/myproject\(aq
 .sp
 Specifies the settings module to use. The settings module should be in Python
 package syntax, e.g. \fBmysite.settings\fP\&. If this isn\(aqt provided,
-\fBdjango\-admin\fP will use the \fBDJANGO_SETTINGS_MODULE\fP environment variable.
+\fBdjango\-admin\fP will use the \fI\%DJANGO_SETTINGS_MODULE\fP environment
+variable.
 .sp
 This option is unnecessary in \fBmanage.py\fP, because it uses
 \fBsettings.py\fP from the current project by default.
@@ -2325,9 +2372,11 @@ django\-admin migrate \-\-settings=mysite.settings
 .B \-\-traceback
 .UNINDENT
 .sp
-Displays a full stack trace when a \fBCommandError\fP
+Displays a full stack trace when a \fI\%CommandError\fP
 is raised. By default, \fBdjango\-admin\fP will show an error message when a
 \fBCommandError\fP occurs and a full stack trace for any other exception.
+.sp
+This option is ignored by \fI\%runserver\fP\&.
 .sp
 Example usage:
 .INDENT 0.0
@@ -2357,6 +2406,8 @@ should print to the console.
 .IP \(bu 2
 \fB3\fP means \fIvery\fP verbose output.
 .UNINDENT
+.sp
+This option is ignored by \fI\%runserver\fP\&.
 .sp
 Example usage:
 .INDENT 0.0
@@ -2394,8 +2445,6 @@ django\-admin runserver \-\-no\-color
 .B \-\-force\-color
 .UNINDENT
 .sp
-
-.sp
 Forces colorization of the command output if it would otherwise be disabled
 as discussed in \fI\%Syntax coloring\fP\&. For example, you may want to pipe
 colored output to another command.
@@ -2404,12 +2453,10 @@ colored output to another command.
 .B \-\-skip\-checks
 .UNINDENT
 .sp
-
-.sp
 Skips running system checks prior to running the command. This option is only
 available if the
-\fBrequires_system_checks\fP command
-attribute is set to \fBTrue\fP\&.
+\fI\%requires_system_checks\fP command
+attribute is not an empty list or tuple.
 .sp
 Example usage:
 .INDENT 0.0
@@ -2424,16 +2471,51 @@ django\-admin migrate \-\-skip\-checks
 .UNINDENT
 .SH EXTRA NICETIES
 .SS Syntax coloring
+.INDENT 0.0
+.TP
+.B DJANGO_COLORS
+.UNINDENT
 .sp
 The \fBdjango\-admin\fP / \fBmanage.py\fP commands will use pretty
 color\-coded output if your terminal supports ANSI\-colored output. It
 won\(aqt use the color codes if you\(aqre piping the command\(aqs output to
 another program unless the \fI\%\-\-force\-color\fP option is used.
+.SS Windows support
 .sp
-Under Windows, the native console doesn\(aqt support ANSI escape sequences so by
-default there is no color output. But you can install the \fI\%ANSICON\fP
-third\-party tool, the Django commands will detect its presence and will make
-use of its services to color output just like on Unix\-based platforms.
+On Windows 10, the \fI\%Windows Terminal\fP application, \fI\%VS Code\fP, and PowerShell
+(where virtual terminal processing is enabled) allow colored output, and are
+supported by default.
+.sp
+Under Windows, the legacy \fBcmd.exe\fP native console doesn\(aqt support ANSI
+escape sequences so by default there is no color output. In this case either of
+two third\-party libraries are needed:
+.INDENT 0.0
+.IP \(bu 2
+Install \fI\%colorama\fP, a Python package that translates ANSI color codes into
+Windows API calls. Django commands will detect its presence and will make use
+of its services to color output just like on Unix\-based platforms.
+\fBcolorama\fP can be installed via pip:
+.INDENT 2.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+\&...\e> py \-m pip install colorama
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.IP \(bu 2
+Install \fI\%ANSICON\fP, a third\-party tool that allows \fBcmd.exe\fP to process
+ANSI color codes. Django commands will detect its presence and will make use
+of its services to color output just like on Unix\-based platforms.
+.UNINDENT
+.sp
+Other modern terminal environments on Windows, that support terminal colors,
+but which are not automatically detected as supported by Django, may "fake" the
+installation of \fBANSICON\fP by setting the appropriate environmental variable,
+\fBANSICON="on"\fP\&.
+.SS Custom colors
 .sp
 The colors used for syntax highlighting can be customized. Django
 ships with three color palettes:
@@ -2448,7 +2530,7 @@ background.
 \fBnocolor\fP, which disables syntax highlighting.
 .UNINDENT
 .sp
-You select a palette by setting a \fBDJANGO_COLORS\fP environment
+You select a palette by setting a \fI\%DJANGO_COLORS\fP environment
 variable to specify the palette you want to use. For example, to
 specify the \fBlight\fP palette under a Unix or OS/X BASH shell, you
 would run the following at a command prompt:
@@ -2589,7 +2671,7 @@ overridden as specified.
 .SS Bash completion
 .sp
 If you use the Bash shell, consider installing the Django bash completion
-script, which lives in \fBextras/django_bash_completion\fP in the Django source
+script, which lives in \fI\%extras/django_bash_completion\fP in the Django source
 distribution. It enables tab\-completion of \fBdjango\-admin\fP and
 \fBmanage.py\fP commands, so you can, for instance...
 .INDENT 0.0
@@ -2602,7 +2684,40 @@ Type \fBsql\fP, then [TAB], to see all available options whose names start
 with \fBsql\fP\&.
 .UNINDENT
 .sp
-See /howto/custom\-management\-commands for how to add customized actions.
+See \fI\%How to create custom django\-admin commands\fP for how to add customized actions.
+.SS Black formatting
+.sp
+
+.sp
+The Python files created by \fI\%startproject\fP, \fI\%startapp\fP,
+\fI\%optimizemigration\fP, \fI\%makemigrations\fP, and
+\fI\%squashmigrations\fP are formatted using the \fBblack\fP command if it is
+present on your \fBPATH\fP\&.
+.sp
+If you have \fBblack\fP globally installed, but do not wish it used for the
+current project, you can set the \fBPATH\fP explicitly:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+PATH=path/to/venv/bin django\-admin makemigrations
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+For commands using \fBstdout\fP you can pipe the output to \fBblack\fP if needed:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+django\-admin inspectdb | black \-
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .TP
 .B django.core.management.call_command(name, *args, **options)

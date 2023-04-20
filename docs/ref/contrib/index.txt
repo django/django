@@ -4,9 +4,9 @@
 
 Django aims to follow Python's :ref:`"batteries included" philosophy
 <tut-batteries-included>`. It ships with a variety of extra, optional tools
-that solve common Web-development problems.
+that solve common web development problems.
 
-This code lives in ``django/contrib`` in the Django distribution. This document
+This code lives in :source:`django/contrib` in the Django distribution. This document
 gives a rundown of the packages in ``contrib``, along with any dependencies
 those packages have.
 
@@ -15,7 +15,7 @@ those packages have.
     For most of these add-ons -- specifically, the add-ons that include either
     models or template tags -- you'll need to add the package name (e.g.,
     ``'django.contrib.redirects'``) to your :setting:`INSTALLED_APPS` setting
-    and re-run ``manage.py migrate``.
+    and rerun ``manage.py migrate``.
 
 .. toctree::
    :maxdepth: 1

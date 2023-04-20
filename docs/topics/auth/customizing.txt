@@ -58,13 +58,13 @@ classes can be anywhere on your Python path.
 
 By default, :setting:`AUTHENTICATION_BACKENDS` is set to::
 
-    ['django.contrib.auth.backends.ModelBackend']
+    ["django.contrib.auth.backends.ModelBackend"]
 
 That's the basic authentication backend that checks the Django users database
 and queries the built-in permissions. It does not provide protection against
 brute force attacks via any rate limiting mechanism. You may either implement
 your own rate limiting mechanism in a custom auth backend, or use the
-mechanisms provided by most Web servers.
+mechanisms provided by most web servers.
 
 The order of :setting:`AUTHENTICATION_BACKENDS` matters, so if the same
 username and password is valid in multiple backends, Django will stop
@@ -77,7 +77,7 @@ backends that follow.
 .. note::
 
     Once a user has authenticated, Django stores which backend was used to
-    authenticate the user in the user's session, and re-uses the same backend
+    authenticate the user in the user's session, and reuses the same backend
     for the duration of that session whenever access to the currently
     authenticated user is needed. This effectively means that authentication
     sources are cached on a per-session basis, so if you change
@@ -102,6 +102,7 @@ keyword arguments. Most of the time, it'll look like this::
 
     from django.contrib.auth.backends import BaseBackend
 
+
     class MyBackend(BaseBackend):
         def authenticate(self, request, username=None, password=None):
             # Check the username/password and return a user.
@@ -110,6 +111,7 @@ keyword arguments. Most of the time, it'll look like this::
 But it could also authenticate a token, like so::
 
     from django.contrib.auth.backends import BaseBackend
+
 
     class MyBackend(BaseBackend):
         def authenticate(self, request, token=None):
@@ -140,6 +142,7 @@ object the first time a user authenticates::
     from django.contrib.auth.hashers import check_password
     from django.contrib.auth.models import User
 
+
     class SettingsBackend(BaseBackend):
         """
         Authenticate against the settings ADMIN_LOGIN and ADMIN_PASSWORD.
@@ -151,7 +154,7 @@ object the first time a user authenticates::
         """
 
         def authenticate(self, request, username=None, password=None):
-            login_valid = (settings.ADMIN_LOGIN == username)
+            login_valid = settings.ADMIN_LOGIN == username
             pwd_valid = check_password(password, settings.ADMIN_PASSWORD)
             if login_valid and pwd_valid:
                 try:
@@ -201,6 +204,7 @@ A backend could implement permissions for the magic admin like this::
 
     from django.contrib.auth.backends import BaseBackend
 
+
     class MagicAdminBackend(BaseBackend):
         def has_perm(self, user_obj, perm, obj=None):
             return user_obj.username == settings.ADMIN_LOGIN
@@ -229,7 +233,7 @@ Django's permission framework does not have a place to store permissions for
 anonymous users. However, the user object passed to an authentication backend
 may be an :class:`django.contrib.auth.models.AnonymousUser` object, allowing
 the backend to specify custom authorization behavior for anonymous users. This
-is especially useful for the authors of re-usable apps, who can delegate all
+is especially useful for the authors of reusable apps, who can delegate all
 questions of authorization to the auth backend, rather than needing settings,
 for example, to control anonymous access.
 
@@ -280,6 +284,7 @@ can or cannot do with ``Task`` instances, specific to your application::
 
     class Task(models.Model):
         ...
+
         class Meta:
             permissions = [
                 ("change_task_status", "Can change the status of tasks"),
@@ -294,7 +299,7 @@ is trying to access the functionality provided by the application (changing the
 status of tasks or closing tasks.) Continuing the above example, the following
 checks if a user may close tasks::
 
-    user.has_perm('app.close_task')
+    user.has_perm("app.close_task")
 
 .. _extending-user:
 
@@ -317,15 +322,18 @@ you might create an Employee model::
 
     from django.contrib.auth.models import User
 
+
     class Employee(models.Model):
         user = models.OneToOneField(User, on_delete=models.CASCADE)
         department = models.CharField(max_length=100)
 
 Assuming an existing Employee Fred Smith who has both a User and Employee
 model, you can access the related information using Django's standard related
-model conventions::
+model conventions:
 
-    >>> u = User.objects.get(username='fsmith')
+.. code-block:: pycon
+
+    >>> u = User.objects.get(username="fsmith")
     >>> freds_department = u.employee.department
 
 To add a profile model's fields to the user page in the admin, define an
@@ -340,16 +348,19 @@ add it to a ``UserAdmin`` class which is registered with the
 
     from my_user_profile_app.models import Employee
 
+
     # Define an inline admin descriptor for Employee model
     # which acts a bit like a singleton
     class EmployeeInline(admin.StackedInline):
         model = Employee
         can_delete = False
-        verbose_name_plural = 'employee'
+        verbose_name_plural = "employee"
+
 
     # Define a new User admin
     class UserAdmin(BaseUserAdmin):
-        inlines = (EmployeeInline,)
+        inlines = [EmployeeInline]
+
 
     # Re-register UserAdmin
     admin.site.unregister(User)
@@ -380,11 +391,11 @@ address as your identification token instead of a username.
 Django allows you to override the default user model by providing a value for
 the :setting:`AUTH_USER_MODEL` setting that references a custom model::
 
-     AUTH_USER_MODEL = 'myapp.MyUser'
+     AUTH_USER_MODEL = "myapp.MyUser"
 
-This dotted pair describes the name of the Django app (which must be in your
-:setting:`INSTALLED_APPS`), and the name of the Django model that you wish to
-use as your user model.
+This dotted pair describes the :attr:`~django.apps.AppConfig.label` of the
+Django app (which must be in your :setting:`INSTALLED_APPS`), and the name of
+the Django model that you wish to use as your user model.
 
 Using a custom user model when starting a project
 -------------------------------------------------
@@ -395,6 +406,7 @@ is sufficient for you. This model behaves identically to the default user
 model, but you'll be able to customize it in the future if the need arises::
 
     from django.contrib.auth.models import AbstractUser
+
 
     class User(AbstractUser):
         pass
@@ -469,6 +481,7 @@ different user model.
         from django.conf import settings
         from django.db import models
 
+
         class Article(models.Model):
             author = models.ForeignKey(
                 settings.AUTH_USER_MODEL,
@@ -481,8 +494,10 @@ different user model.
         from django.conf import settings
         from django.db.models.signals import post_save
 
+
         def post_save_receiver(sender, instance, created, **kwargs):
             pass
+
 
         post_save.connect(post_save_receiver, sender=settings.AUTH_USER_MODEL)
 
@@ -503,11 +518,13 @@ different user model.
         from django.core.signals import setting_changed
         from django.dispatch import receiver
 
+
         @receiver(setting_changed)
-        def user_model_swapped(**kwargs):
-            if kwargs['setting'] == 'AUTH_USER_MODEL':
+        def user_model_swapped(*, setting, **kwargs):
+            if setting == "AUTH_USER_MODEL":
                 apps.clear_cache()
                 from myapp import some_module
+
                 some_module.UserModel = get_user_model()
 
 .. _specifying-custom-user-model:
@@ -548,7 +565,7 @@ password resets. You must then provide some key implementation details:
         A string describing the name of the field on the user model that is
         used as the unique identifier. This will usually be a username of some
         kind, but it can also be an email address, or any other unique
-        identifier. The field *must* be unique (i.e., have ``unique=True`` set
+        identifier. The field *must* be unique (e.g. have ``unique=True`` set
         in its definition), unless you use a custom authentication backend that
         can support non-unique usernames.
 
@@ -558,7 +575,7 @@ password resets. You must then provide some key implementation details:
             class MyUser(AbstractBaseUser):
                 identifier = models.CharField(max_length=40, unique=True)
                 ...
-                USERNAME_FIELD = 'identifier'
+                USERNAME_FIELD = "identifier"
 
     .. attribute:: EMAIL_FIELD
 
@@ -577,14 +594,6 @@ password resets. You must then provide some key implementation details:
         ``REQUIRED_FIELDS`` has no effect in other parts of Django, like
         creating a user in the admin.
 
-        .. versionadded:: 3.0
-
-            :attr:`REQUIRED_FIELDS` now supports
-            :class:`~django.db.models.ManyToManyField`\s without a custom
-            through model. Since there is no way to pass model instances during
-            the :djadmin:`createsuperuser` prompt, expect the user to enter IDs
-            of existing instances of the class to which the model is related.
-
         For example, here is the partial definition for a user model that
         defines two required fields - a date of birth and height::
 
@@ -593,7 +602,7 @@ password resets. You must then provide some key implementation details:
                 date_of_birth = models.DateField()
                 height = models.FloatField()
                 ...
-                REQUIRED_FIELDS = ['date_of_birth', 'height']
+                REQUIRED_FIELDS = ["date_of_birth", "height"]
 
         .. note::
 
@@ -713,6 +722,13 @@ The following attributes and methods are available on any subclass of
         Returns an HMAC of the password field. Used for
         :ref:`session-invalidation-on-password-change`.
 
+    .. method:: models.AbstractBaseUser.get_session_auth_fallback_hash()
+
+        .. versionadded:: 4.1.8
+
+        Yields the HMAC of the password field using
+        :setting:`SECRET_KEY_FALLBACKS`. Used by ``get_user()``.
+
 :class:`~models.AbstractUser` subclasses :class:`~models.AbstractBaseUser`:
 
 .. class:: models.AbstractUser
@@ -780,6 +796,8 @@ utility methods:
 
     .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
 
+        .. deprecated:: 4.2
+
         Returns a random password with the given length and given string of
         allowed characters. Note that the default value of ``allowed_chars``
         doesn't contain letters that can cause user confusion, including:
@@ -795,11 +813,10 @@ Extending Django's default ``User``
 If you're entirely happy with Django's :class:`~django.contrib.auth.models.User`
 model, but you want to add some additional profile information, you could
 subclass :class:`django.contrib.auth.models.AbstractUser` and add your custom
-profile fields, although we'd recommend a separate model as described in the
-"Model design considerations" note of :ref:`specifying-custom-user-model`.
-``AbstractUser`` provides the full implementation of the default
-:class:`~django.contrib.auth.models.User` as an :ref:`abstract model
-<abstract-base-classes>`.
+profile fields, although we'd recommend a separate model as described in
+:ref:`specifying-custom-user-model`. ``AbstractUser`` provides the full
+implementation of the default :class:`~django.contrib.auth.models.User` as an
+:ref:`abstract model <abstract-base-classes>`.
 
 .. _custom-users-and-the-built-in-auth-forms:
 
@@ -841,11 +858,16 @@ extend these forms in this manner::
     from django.contrib.auth.forms import UserCreationForm
     from myapp.models import CustomUser
 
-    class CustomUserCreationForm(UserCreationForm):
 
+    class CustomUserCreationForm(UserCreationForm):
         class Meta(UserCreationForm.Meta):
             model = CustomUser
-            fields = UserCreationForm.Meta.fields + ('custom_field',)
+            fields = UserCreationForm.Meta.fields + ("custom_field",)
+
+.. versionchanged:: 4.2
+
+    In older versions, :class:`~django.contrib.auth.forms.UserCreationForm`
+    didn't save many-to-many form fields for a custom user model.
 
 Custom users and :mod:`django.contrib.admin`
 --------------------------------------------
@@ -855,6 +877,7 @@ must define some additional attributes and methods. These methods allow the
 admin to control access of the user to admin content:
 
 .. class:: models.CustomUser
+    :noindex:
 
 .. attribute:: is_staff
 
@@ -896,14 +919,11 @@ custom user class.
 
         from django.contrib.auth.admin import UserAdmin
 
+
         class CustomUserAdmin(UserAdmin):
             ...
-            fieldsets = UserAdmin.fieldsets + (
-                (None, {'fields': ('custom_field',)}),
-            )
-            add_fieldsets = UserAdmin.add_fieldsets + (
-                (None, {'fields': ('custom_field',)}),
-            )
+            fieldsets = UserAdmin.fieldsets + ((None, {"fields": ["custom_field"]}),)
+            add_fieldsets = UserAdmin.add_fieldsets + ((None, {"fields": ["custom_field"]}),)
 
     See :ref:`a full example <custom-users-admin-full-example>` for more
     details.
@@ -928,8 +948,6 @@ methods and attributes:
         explicitly assigning them.
 
     .. method:: models.PermissionsMixin.get_user_permissions(obj=None)
-
-        .. versionadded:: 3.0
 
         Returns a set of permission strings that the user has directly.
 
@@ -1019,9 +1037,7 @@ This code would all live in a ``models.py`` file for a custom
 authentication app::
 
     from django.db import models
-    from django.contrib.auth.models import (
-        BaseUserManager, AbstractBaseUser
-    )
+    from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
     class MyUserManager(BaseUserManager):
@@ -1031,7 +1047,7 @@ authentication app::
             birth and password.
             """
             if not email:
-                raise ValueError('Users must have an email address')
+                raise ValueError("Users must have an email address")
 
             user = self.model(
                 email=self.normalize_email(email),
@@ -1059,7 +1075,7 @@ authentication app::
 
     class MyUser(AbstractBaseUser):
         email = models.EmailField(
-            verbose_name='email address',
+            verbose_name="email address",
             max_length=255,
             unique=True,
         )
@@ -1069,8 +1085,8 @@ authentication app::
 
         objects = MyUserManager()
 
-        USERNAME_FIELD = 'email'
-        REQUIRED_FIELDS = ['date_of_birth']
+        USERNAME_FIELD = "email"
+        REQUIRED_FIELDS = ["date_of_birth"]
 
         def __str__(self):
             return self.email
@@ -1099,6 +1115,7 @@ code would be required in the app's ``admin.py`` file::
     from django.contrib.auth.models import Group
     from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
     from django.contrib.auth.forms import ReadOnlyPasswordHashField
+    from django.core.exceptions import ValidationError
 
     from customauth.models import MyUser
 
@@ -1106,19 +1123,22 @@ code would be required in the app's ``admin.py`` file::
     class UserCreationForm(forms.ModelForm):
         """A form for creating new users. Includes all the required
         fields, plus a repeated password."""
-        password1 = forms.CharField(label='Password', widget=forms.PasswordInput)
-        password2 = forms.CharField(label='Password confirmation', widget=forms.PasswordInput)
+
+        password1 = forms.CharField(label="Password", widget=forms.PasswordInput)
+        password2 = forms.CharField(
+            label="Password confirmation", widget=forms.PasswordInput
+        )
 
         class Meta:
             model = MyUser
-            fields = ('email', 'date_of_birth')
+            fields = ["email", "date_of_birth"]
 
         def clean_password2(self):
             # Check that the two password entries match
             password1 = self.cleaned_data.get("password1")
             password2 = self.cleaned_data.get("password2")
             if password1 and password2 and password1 != password2:
-                raise forms.ValidationError("Passwords don't match")
+                raise ValidationError("Passwords don't match")
             return password2
 
         def save(self, commit=True):
@@ -1133,19 +1153,14 @@ code would be required in the app's ``admin.py`` file::
     class UserChangeForm(forms.ModelForm):
         """A form for updating users. Includes all the fields on
         the user, but replaces the password field with admin's
-        password hash display field.
+        disabled password hash display field.
         """
+
         password = ReadOnlyPasswordHashField()
 
         class Meta:
             model = MyUser
-            fields = ('email', 'password', 'date_of_birth', 'is_active', 'is_admin')
-
-        def clean_password(self):
-            # Regardless of what the user provides, return the initial value.
-            # This is done here, rather than on the field, because the
-            # field does not have access to the initial value
-            return self.initial["password"]
+            fields = ["email", "password", "date_of_birth", "is_active", "is_admin"]
 
 
     class UserAdmin(BaseUserAdmin):
@@ -1156,24 +1171,27 @@ code would be required in the app's ``admin.py`` file::
         # The fields to be used in displaying the User model.
         # These override the definitions on the base UserAdmin
         # that reference specific fields on auth.User.
-        list_display = ('email', 'date_of_birth', 'is_admin')
-        list_filter = ('is_admin',)
-        fieldsets = (
-            (None, {'fields': ('email', 'password')}),
-            ('Personal info', {'fields': ('date_of_birth',)}),
-            ('Permissions', {'fields': ('is_admin',)}),
-        )
+        list_display = ["email", "date_of_birth", "is_admin"]
+        list_filter = ["is_admin"]
+        fieldsets = [
+            (None, {"fields": ["email", "password"]}),
+            ("Personal info", {"fields": ["date_of_birth"]}),
+            ("Permissions", {"fields": ["is_admin"]}),
+        ]
         # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
         # overrides get_fieldsets to use this attribute when creating a user.
-        add_fieldsets = (
-            (None, {
-                'classes': ('wide',),
-                'fields': ('email', 'date_of_birth', 'password1', 'password2'),
-            }),
-        )
-        search_fields = ('email',)
-        ordering = ('email',)
-        filter_horizontal = ()
+        add_fieldsets = [
+            (
+                None,
+                {
+                    "classes": ["wide"],
+                    "fields": ["email", "date_of_birth", "password1", "password2"],
+                },
+            ),
+        ]
+        search_fields = ["email"]
+        ordering = ["email"]
+        filter_horizontal = []
 
 
     # Now register the new UserAdmin...
@@ -1185,4 +1203,4 @@ code would be required in the app's ``admin.py`` file::
 Finally, specify the custom model as the default user model for your project
 using the :setting:`AUTH_USER_MODEL` setting in your ``settings.py``::
 
-    AUTH_USER_MODEL = 'customauth.MyUser'
+    AUTH_USER_MODEL = "customauth.MyUser"

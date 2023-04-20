@@ -2,22 +2,24 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Juraj Bubniak <translations@jbub.eu>, 2012
+# 18f25ad6fa9930fc67cb11aca9d16a27, 2012
 # Marian Andre <marian@andre.sk>, 2015,2017
 # Martin Tóth <ezimir@gmail.com>, 2017
+# Štefan Lučivjanský <stefan.lucivjansky@gmail.com>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Marian Andre <marian@andre.sk>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-04-04 00:03+0000\n"
+"Last-Translator: Štefan Lučivjanský <stefan.lucivjansky@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sk\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "GIS"
 msgstr "GIS"
@@ -26,9 +28,8 @@ msgid "The base GIS field."
 msgstr "Základné GIS pole."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr ""
-"Základné pole Geometry -- mapuje na typ OpenGIS Specification Geometry."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr "Základné pole Geometry — mapuje na typ OpenGIS Specification Geometry."
 
 msgid "Point"
 msgstr "Bod"
@@ -84,5 +85,5 @@ msgid "No feeds are registered."
 msgstr "Žiadne kanály nie sú registrované."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "Identifikátor %r nie je registrovaný."

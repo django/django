@@ -10,7 +10,7 @@ for basic file handling in Django.
 The ``File`` class
 ==================
 
-.. class:: File(file_object)
+.. class:: File(file_object, name=None)
 
     The :class:`File` class is a thin wrapper around a Python
     :py:term:`file object` with some Django-specific additions.
@@ -91,7 +91,7 @@ The ``File`` class
 The ``ContentFile`` class
 =========================
 
-.. class:: ContentFile(File)
+.. class:: ContentFile(content, name=None)
 
     The ``ContentFile`` class inherits from :class:`~django.core.files.File`,
     but unlike :class:`~django.core.files.File` it operates on string content
@@ -107,7 +107,7 @@ The ``ContentFile`` class
 The ``ImageFile`` class
 =======================
 
-.. class:: ImageFile(file_object)
+.. class:: ImageFile(file_object, name=None)
 
     Django provides a built-in class specifically for images.
     :class:`django.core.files.images.ImageFile` inherits all the attributes
@@ -137,12 +137,16 @@ below) will also have a couple of extra methods:
     to point to it. If ``save`` is ``True``, the model's ``save()`` method will
     be called once the file is saved. That is, these two lines::
 
-        >>> car.photo.save('myphoto.jpg', content, save=False)
+    .. code-block:: pycon
+
+        >>> car.photo.save("myphoto.jpg", content, save=False)
         >>> car.save()
 
-    are equivalent to::
+    are equivalent to:
 
-        >>> car.photo.save('myphoto.jpg', content, save=True)
+    .. code-block:: pycon
+
+        >>> car.photo.save("myphoto.jpg", content, save=True)
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as

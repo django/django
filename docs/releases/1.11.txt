@@ -15,9 +15,10 @@ want to be aware of when upgrading from Django 1.10 or older versions. We've
 See the :doc:`/howto/upgrade-version` guide if you're updating an existing
 project.
 
-Django 1.11 is designated as a :term:`long-term support release`. It will
-receive security updates for at least three years after its release. Support
-for the previous LTS, Django 1.8, will end in April 2018.
+Django 1.11 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 1.8, will
+end in April 2018.
 
 Python compatibility
 ====================
@@ -185,8 +186,8 @@ Minor features
 
 * PostGIS migrations can now change field dimensions.
 
-* Added the ability to pass the `size`, `shape`, and `offset` parameter when
-  creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
+* Added the ability to pass the ``size``, ``shape``, and ``offset`` parameters
+  when creating :class:`~django.contrib.gis.gdal.GDALRaster` objects.
 
 * Added SpatiaLite support for the
   :class:`~django.contrib.gis.db.models.functions.IsValid` function,
@@ -210,15 +211,15 @@ Minor features
   :class:`~django.contrib.postgres.indexes.BrinIndex` classes allow
   creating ``GIN`` and ``BRIN`` indexes in the database.
 
-* :class:`~django.contrib.postgres.fields.JSONField` accepts a new ``encoder``
+* ``django.contrib.postgres.fields.JSONField`` accepts a new ``encoder``
   parameter to specify a custom class to encode data types not supported by the
   standard encoder.
 
-* The new :class:`~django.contrib.postgres.fields.CIText` mixin and
+* The new ``CIText`` mixin and
   :class:`~django.contrib.postgres.operations.CITextExtension` migration
   operation allow using PostgreSQL's ``citext`` extension for case-insensitive
-  lookups. Three fields are provided: :class:`.CICharField`,
-  :class:`.CIEmailField`, and :class:`.CITextField`.
+  lookups. Three fields are provided: ``CICharField``, ``CIEmailField``, and
+  ``CITextField``.
 
 * The new :class:`~django.contrib.postgres.aggregates.JSONBAgg` allows
   aggregating values as a JSON array.
@@ -255,10 +256,11 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses :ref:`server-side cursors
-  <psycopg2:server-side-cursors>` on PostgreSQL. This feature transfers some of
-  the worker memory load (used to hold query results) to the database and might
-  increase database memory usage.
+* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+  This feature transfers some of the worker memory load (used to hold query
+  results) to the database and might increase database memory usage.
+
+  .. _server-side cursors: https://www.psycopg.org/docs/usage.html#server-side-cursors
 
 * Added MySQL support for the ``'isolation_level'`` option in
   :setting:`OPTIONS` to allow specifying the :ref:`transaction isolation level
@@ -274,8 +276,8 @@ Email
   headers in the local time zone rather than in UTC.
 
 * ``EmailMessage.attach()`` and ``attach_file()`` now fall back to MIME type
-  ``application/octet-stream`` when binary content that can't be decoded as
-  UTF-8 is specified for a ``text/*`` attachment.
+  :mimetype:`application/octet-stream` when binary content that can't be
+  decoded as UTF-8 is specified for a :mimetype:`text/*` attachment.
 
 File Storage
 ~~~~~~~~~~~~
@@ -287,8 +289,10 @@ File Storage
 Forms
 ~~~~~
 
-* The new :attr:`CharField.empty_value <django.forms.CharField.empty_value>`
-  attribute allows specifying the Python value to use to represent "empty".
+* The new ``empty_value`` attribute on :class:`~django.forms.CharField`,
+  :class:`~django.forms.EmailField`, :class:`~django.forms.RegexField`,
+  :class:`~django.forms.SlugField`, and :class:`~django.forms.URLField` allows
+  specifying the Python value to use to represent "empty".
 
 * The new :meth:`Form.get_initial_for_field()
   <django.forms.Form.get_initial_for_field>` method returns initial data for a
@@ -575,8 +579,7 @@ It's automatically installed along with Django.
 
 Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
 commonly used and is questionably useful. If you want to automatically detect
-the timezone based on the system timezone, you can use `tzlocal
-<https://pypi.org/project/tzlocal/>`_::
+the timezone based on the system timezone, you can use :pypi:`tzlocal`::
 
     from tzlocal import get_localzone
 
@@ -584,7 +587,7 @@ the timezone based on the system timezone, you can use `tzlocal
 
 This works similar to ``settings.TIME_ZONE = None`` except that it also sets
 ``os.environ['TZ']``. `Let us know
-<https://groups.google.com/d/topic/django-developers/OAV3FChfuPM/discussion>`__
+<https://groups.google.com/g/django-developers/c/OAV3FChfuPM/discussion>`__
 if there's a use case where you find you can't adapt your code to set a
 ``TIME_ZONE``.
 
@@ -644,8 +647,8 @@ Server-side cursors on PostgreSQL
 ---------------------------------
 
 The change to make :meth:`.QuerySet.iterator()` use server-side cursors on
-PostgreSQL prevents running Django with `pgBouncer` in transaction pooling
-mode. To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
+PostgreSQL prevents running Django with PgBouncer in transaction pooling mode.
+To reallow that, use the :setting:`DISABLE_SERVER_SIDE_CURSORS
 <DATABASE-DISABLE_SERVER_SIDE_CURSORS>` setting (added in Django 1.11.1) in
 :setting:`DATABASES`.
 
@@ -738,7 +741,7 @@ Miscellaneous
   to allow including lists inside help text.
 
 * :class:`~django.middleware.http.ConditionalGetMiddleware` no longer sets the
-  ``Date`` header as Web servers set that header. It also no longer sets the
+  ``Date`` header as web servers set that header. It also no longer sets the
   ``Content-Length`` header as this is now done by
   :class:`~django.middleware.common.CommonMiddleware`.
 
@@ -796,23 +799,25 @@ Use :func:`django.urls.reverse` instead. For example::
 
     from django.db import models
 
+
     class MyModel(models.Model):
         ...
 
         @models.permalink
         def url(self):
-            return ('guitarist_detail', [self.slug])
+            return ("guitarist_detail", [self.slug])
 
 becomes::
 
     from django.db import models
     from django.urls import reverse
 
+
     class MyModel(models.Model):
         ...
 
         def url(self):
-            return reverse('guitarist_detail', args=[self.slug])
+            return reverse("guitarist_detail", args=[self.slug])
 
 Miscellaneous
 -------------

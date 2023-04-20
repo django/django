@@ -2,17 +2,17 @@
 FAQ: Using Django
 =================
 
-Why do I get an error about importing DJANGO_SETTINGS_MODULE?
-=============================================================
+Why do I get an error about importing :envvar:`DJANGO_SETTINGS_MODULE`?
+=======================================================================
 
 Make sure that:
 
-* The environment variable DJANGO_SETTINGS_MODULE is set to a
-  fully-qualified Python module (i.e. "mysite.settings").
+* The environment variable :envvar:`DJANGO_SETTINGS_MODULE` is set to a
+  fully-qualified Python module (i.e. ``mysite.settings``).
 
 * Said module is on ``sys.path`` (``import mysite.settings`` should work).
 
-* The module doesn't contain syntax errors (of course).
+* The module doesn't contain syntax errors.
 
 I can't stand your template language. Do I have to use it?
 ==========================================================
@@ -42,7 +42,7 @@ Using a :class:`~django.db.models.FileField` or an
    the full path to a directory where you'd like Django to store uploaded
    files. (For performance, these files are not stored in the database.)
    Define :setting:`MEDIA_URL` as the base public URL of that directory.
-   Make sure that this directory is writable by the Web server's user
+   Make sure that this directory is writable by the web server's user
    account.
 
 #. Add the :class:`~django.db.models.FileField` or

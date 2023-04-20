@@ -3,41 +3,51 @@ This module allows importing AbstractBaseUser even when django.contrib.auth is
 not in INSTALLED_APPS.
 """
 import unicodedata
+import warnings
 
+from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
-    check_password, is_password_usable, make_password,
+    check_password,
+    is_password_usable,
+    make_password,
 )
 from django.db import models
 from django.utils.crypto import get_random_string, salted_hmac
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.translation import gettext_lazy as _
 
 
 class BaseUserManager(models.Manager):
-
     @classmethod
     def normalize_email(cls, email):
         """
         Normalize the email address by lowercasing the domain part of it.
         """
-        email = email or ''
+        email = email or ""
         try:
-            email_name, domain_part = email.strip().rsplit('@', 1)
+            email_name, domain_part = email.strip().rsplit("@", 1)
         except ValueError:
             pass
         else:
-            email = email_name + '@' + domain_part.lower()
+            email = email_name + "@" + domain_part.lower()
         return email
 
-    def make_random_password(self, length=10,
-                             allowed_chars='abcdefghjkmnpqrstuvwxyz'
-                                           'ABCDEFGHJKLMNPQRSTUVWXYZ'
-                                           '23456789'):
+    def make_random_password(
+        self,
+        length=10,
+        allowed_chars="abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789",
+    ):
         """
         Generate a random password with the given length and given
         allowed_chars. The default value of allowed_chars does not have "I" or
         "O" or letters and digits that look similar -- just to avoid confusion.
         """
+        warnings.warn(
+            "BaseUserManager.make_random_password() is deprecated.",
+            category=RemovedInDjango51Warning,
+            stacklevel=2,
+        )
         return get_random_string(length, allowed_chars)
 
     def get_by_natural_key(self, username):
@@ -45,8 +55,8 @@ class BaseUserManager(models.Manager):
 
 
 class AbstractBaseUser(models.Model):
-    password = models.CharField(_('password'), max_length=128)
-    last_login = models.DateTimeField(_('last login'), blank=True, null=True)
+    password = models.CharField(_("password"), max_length=128)
+    last_login = models.DateTimeField(_("last login"), blank=True, null=True)
 
     is_active = True
 
@@ -103,11 +113,13 @@ class AbstractBaseUser(models.Model):
         Return a boolean of whether the raw_password was correct. Handles
         hashing formats behind the scenes.
         """
+
         def setter(raw_password):
             self.set_password(raw_password)
             # Password hash upgrades shouldn't be considered password changes.
             self._password = None
             self.save(update_fields=["password"])
+
         return check_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
@@ -124,16 +136,32 @@ class AbstractBaseUser(models.Model):
         """
         Return an HMAC of the password field.
         """
+        return self._get_session_auth_hash()
+
+    def get_session_auth_fallback_hash(self):
+        for fallback_secret in settings.SECRET_KEY_FALLBACKS:
+            yield self._get_session_auth_hash(secret=fallback_secret)
+
+    def _get_session_auth_hash(self, secret=None):
         key_salt = "django.contrib.auth.models.AbstractBaseUser.get_session_auth_hash"
-        return salted_hmac(key_salt, self.password).hexdigest()
+        return salted_hmac(
+            key_salt,
+            self.password,
+            secret=secret,
+            algorithm="sha256",
+        ).hexdigest()
 
     @classmethod
     def get_email_field_name(cls):
         try:
             return cls.EMAIL_FIELD
         except AttributeError:
-            return 'email'
+            return "email"
 
     @classmethod
     def normalize_username(cls, username):
-        return unicodedata.normalize('NFKC', username) if isinstance(username, str) else username
+        return (
+            unicodedata.normalize("NFKC", username)
+            if isinstance(username, str)
+            else username
+        )

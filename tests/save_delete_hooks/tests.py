@@ -8,23 +8,30 @@ class SaveDeleteHookTests(TestCase):
         p = Person(first_name="John", last_name="Smith")
         self.assertEqual(p.data, [])
         p.save()
-        self.assertEqual(p.data, [
-            "Before save",
-            "After save",
-        ])
+        self.assertEqual(
+            p.data,
+            [
+                "Before save",
+                "After save",
+            ],
+        )
 
-        self.assertQuerysetEqual(
-            Person.objects.all(), [
+        self.assertQuerySetEqual(
+            Person.objects.all(),
+            [
                 "John Smith",
             ],
-            str
+            str,
         )
 
         p.delete()
-        self.assertEqual(p.data, [
-            "Before save",
-            "After save",
-            "Before deletion",
-            "After deletion",
-        ])
-        self.assertQuerysetEqual(Person.objects.all(), [])
+        self.assertEqual(
+            p.data,
+            [
+                "Before save",
+                "After save",
+                "Before deletion",
+                "After deletion",
+            ],
+        )
+        self.assertQuerySetEqual(Person.objects.all(), [])

@@ -1,0 +1,40 @@
+==========================
+Django 3.2.5 release notes
+==========================
+
+*July 1, 2021*
+
+Django 3.2.5 fixes a security issue with severity "high" and several bugs in
+3.2.4. Also, the latest string translations from Transifex are incorporated.
+
+CVE-2021-35042: Potential SQL injection via unsanitized ``QuerySet.order_by()`` input
+=====================================================================================
+
+Unsanitized user input passed to ``QuerySet.order_by()`` could bypass intended
+column reference validation in path marked for deprecation resulting in a
+potential SQL injection even if a deprecation warning is emitted.
+
+As a mitigation the strict column reference validation was restored for the
+duration of the deprecation period. This regression appeared in 3.1 as a side
+effect of fixing :ticket:`31426`.
+
+The issue is not present in the main branch as the deprecated path has been
+removed.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2 that caused a crash of
+  ``QuerySet.values_list(…, named=True)`` after ``prefetch_related()``
+  (:ticket:`32812`).
+
+* Fixed a bug in Django 3.2 that caused a migration crash on MySQL 8.0.13+ when
+  altering ``BinaryField``, ``JSONField``, or ``TextField`` to non-nullable
+  (:ticket:`32503`).
+
+* Fixed a regression in Django 3.2 that caused a migration crash on MySQL
+  8.0.13+ when adding nullable ``BinaryField``, ``JSONField``, or ``TextField``
+  with a default value (:ticket:`32832`).
+
+* Fixed a bug in Django 3.2 where a system check would crash on a model with an
+  invalid ``app_label`` (:ticket:`32863`).

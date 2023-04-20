@@ -7,15 +7,16 @@
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
+# wolf ice <warwolf7677@163.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 # 航 柯 <korhang@163.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2018-10-15 08:06+0000\n"
-"Last-Translator: 航 柯 <korhang@163.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-03-04 03:38+0000\n"
+"Last-Translator: wolf ice <warwolf7677@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -31,8 +32,8 @@ msgid "The base GIS field."
 msgstr "基础 GIS 字段。"
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
-msgstr "基础 Geometry 字段 -- 映射到 OpenGIS 规范几何类型。"
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
+msgstr "基本几何字段—映射到OpenGIS规范几何类型。"
 
 msgid "Point"
 msgstr "点"
@@ -88,5 +89,5 @@ msgid "No feeds are registered."
 msgstr "没有已注册的源。"
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Slug %r 没有注册."
+msgid "Slug %r isn’t registered."
+msgstr "字段 %r没被注册"

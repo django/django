@@ -4,35 +4,40 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # Bruce de Sá <contato@publidex.com.br>, 2019
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2019
-# Carlos E C Leite - Cadu <caduado@gmail.com>, 2019
-# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Carlos C. Leite <caduado@gmail.com>, 2019
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # Elyézer Rezende <elyezermr@gmail.com>, 2013
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # Fabio Cerqueira <fabio@cerqueira.me>, 2019
-# Xico Petry <xico.petry@gmail.com>, 2016
+# Francisco Petry Rauber <xico.petry@gmail.com>, 2016
 # Gladson <gladsonbrito@gmail.com>, 2013
 # Guilherme Ferreira <guilherme@uft.edu.br>, 2017
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # João Paulo Andrade <joaopaulo.a.p@gmail.com>, 2018
+# Jonas Rodrigues, 2023
 # Lucas Infante <maccinza@gmail.com>, 2015
 # Luiz Boaretto <lboaretto@gmail.com>, 2017
+# Marssal Jr. <marssaljr@gmail.com>, 2022
 # Marcelo Moro Brondani <mbrondani@inf.ufsm.br>, 2018
 # Marco Rougeth <marco@rougeth.com>, 2015
 # Otávio Reis <otaviocha@gmail.com>, 2018
 # Raysa Dutra, 2016
 # R.J Lelis <renatojlelis@gmail.com>, 2019
+# Samuel Nogueira Bacelar <samuelnbacelar@hotmail.com>, 2020
 # Sergio Garcia <sergio@ginx.com.br>, 2015
+# Tomaz Marcelino Cunha Neto <tomazmcn@gmail.com>, 2022
 # Vinícius Damaceno <lvdamaceno@gmail.com>, 2019
+# Vinícius Muniz de Melo <viniciusdesk@icloud.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-14 16:27+0000\n"
-"Last-Translator: R.J Lelis <renatojlelis@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Jonas Rodrigues, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -40,6 +45,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Remover %(verbose_name_plural)s selecionados"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -51,10 +60,6 @@ msgstr "Não é possível excluir %(name)s "
 
 msgid "Are you sure?"
 msgstr "Tem certeza?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Remover %(verbose_name_plural)s selecionados"
 
 msgid "Administration"
 msgstr "Administração"
@@ -91,6 +96,12 @@ msgstr "Sem data"
 
 msgid "Has date"
 msgstr "Tem data"
+
+msgid "Empty"
+msgstr "Vazio"
+
+msgid "Not empty"
+msgstr "Não está vazio"
 
 #, python-format
 msgid ""
@@ -150,7 +161,7 @@ msgstr "entradas de log"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr "Adicionado “%(object)s”. "
+msgstr "Adicionado “%(object)s”."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -271,12 +282,14 @@ msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s modificado com sucesso."
 msgstr[1] "%(count)s %(name)s modificados com sucesso."
+msgstr[2] "%(count)s %(name)s modificados com sucesso."
 
 #, python-format
 msgid "%(total_count)s selected"
 msgid_plural "All %(total_count)s selected"
 msgstr[0] "%(total_count)s selecionado"
 msgstr[1] "Todos %(total_count)s selecionados"
+msgstr[2] "Todos %(total_count)s selecionados"
 
 #, python-format
 msgid "0 of %(cnt)s selected"
@@ -286,8 +299,9 @@ msgstr "0 de %(cnt)s selecionados"
 msgid "Change history: %s"
 msgstr "Histórico de modificações: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -357,6 +371,19 @@ msgstr "Selecionar todos %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpar seleção"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modelos na aplicação %(name)s"
+
+msgid "Add"
+msgstr "Adicionar"
+
+msgid "View"
+msgstr "Visualizar"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "Você não tem permissão para ver ou editar nada."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -371,14 +398,17 @@ msgid "Change password"
 msgstr "Alterar senha"
 
 msgid "Please correct the error below."
-msgstr "Por favor corrija o erro abaixo "
-
-msgid "Please correct the errors below."
-msgstr "Por favor, corrija os erros abaixo."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Por favor corrija o erro abaixo."
+msgstr[1] "Por favor corrija os erros abaixo."
+msgstr[2] "Por favor corrija os erros abaixo."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Informe uma nova senha para o usuário <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Pule o conteúdo principal"
 
 msgid "Welcome,"
 msgstr "Bem-vindo(a),"
@@ -391,6 +421,9 @@ msgstr "Documentação"
 
 msgid "Log out"
 msgstr "Encerrar sessão"
+
+msgid "Breadcrumbs"
+msgstr "Migalhas de pão"
 
 #, python-format
 msgid "Add %(name)s"
@@ -405,6 +438,9 @@ msgstr "Ver no site"
 msgid "Filter"
 msgstr "Filtro"
 
+msgid "Clear all filters"
+msgstr "Limpar todos os filtros"
+
 msgid "Remove from sorting"
 msgstr "Remover da ordenação"
 
@@ -414,6 +450,15 @@ msgstr "Prioridade da ordenação: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Alternar ordenção"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Alternar tema (tema atual: automático)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Alternar tema (tema atual: claro)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Alternar tema (tema atual: escuro)"
 
 msgid "Delete"
 msgstr "Apagar"
@@ -482,9 +527,6 @@ msgstr ""
 "Tem certeza de que deseja apagar o %(objects_name)s selecionado? Todos os "
 "seguintes objetos e seus itens relacionados serão removidos:"
 
-msgid "View"
-msgstr "Visualizar"
-
 msgid "Delete?"
 msgstr "Apagar?"
 
@@ -494,16 +536,6 @@ msgstr "Por %(filter_title)s "
 
 msgid "Summary"
 msgstr "Resumo"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modelos na aplicação %(name)s"
-
-msgid "Add"
-msgstr "Adicionar"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "Você não tem permissão para ver ou editar nada."
 
 msgid "Recent actions"
 msgstr "Ações recentes"
@@ -537,6 +569,18 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Esqueceu sua senha ou nome de usuário?"
 
+msgid "Toggle navigation"
+msgstr "Alternar navegação"
+
+msgid "Sidebar"
+msgstr "Barra Lateral"
+
+msgid "Start typing to filter…"
+msgstr "Comece a digitar para filtrar…"
+
+msgid "Filter navigation items"
+msgstr "Filtrar itens de navegação"
+
 msgid "Date/time"
 msgstr "Data/hora"
 
@@ -545,6 +589,12 @@ msgstr "Usuário"
 
 msgid "Action"
 msgstr "Ação"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "entrada"
+msgstr[1] "entradas"
+msgstr[2] "entradas"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -570,6 +620,7 @@ msgid "%(counter)s result"
 msgid_plural "%(counter)s results"
 msgstr[0] "%(counter)s resultado"
 msgstr[1] "%(counter)s resultados"
+msgstr[2] "%(counter)s resultados"
 
 #, python-format
 msgid "%(full_result_count)s total"
@@ -602,8 +653,12 @@ msgstr "Adicionar outro %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Excluir %(model)s selecionado"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Obrigado por visitar nosso Web site hoje."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Visualizar %(model)s selecionados"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Obrigado por passar algum tempo de qualidade com o site hoje."
 
 msgid "Log in again"
 msgstr "Acessar novamente"

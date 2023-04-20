@@ -2,33 +2,33 @@
 How to install Django on Windows
 ================================
 
-.. highlight:: doscon
+This document will guide you through installing Python 3.11 and Django on
+Windows. It also provides instructions for setting up a virtual environment,
+which makes it easier to work on Python projects. This is meant as a beginner's
+guide for users working on Django projects and does not reflect how Django
+should be installed when developing patches for Django itself.
 
-This document will guide you through installing Python 3.7 and Django on
-Windows. It also provides instructions for installing `virtualenv`_ and
-`virtualenvwrapper`_, which make it easier to work on Python projects. This is
-meant as a beginner's guide for users working on Django projects and does not
-reflect how Django should be installed when developing patches for Django
-itself.
-
-The steps in this guide have been tested with Windows 7, 8, and 10. In other
+The steps in this guide have been tested with Windows 10. In other
 versions, the steps would be similar. You will need to be familiar with using
 the Windows command prompt.
+
+.. _install_python_windows:
 
 Install Python
 ==============
 
 Django is a Python web framework, thus requiring Python to be installed on your
-machine. At the time of writing, Python 3.7 is the latest version.
+machine. At the time of writing, Python 3.11 is the latest version.
 
-To install Python on your machine go to https://python.org/downloads/. The
+To install Python on your machine go to https://www.python.org/downloads/. The
 website should offer you a download button for the latest Python version.
-Download the executable installer and run it. Check the boxes next to ``Install
-launcher for all users (recommended)`` and ``Add Python 3.7 to PATH`` then
-click ``Install Now``.
+Download the executable installer and run it. Check the boxes next to "Install
+launcher for all users (recommended)" then click "Install Now".
 
 After installation, open the command prompt and check that the Python version
-matches the version you installed by executing::
+matches the version you installed by executing:
+
+.. code-block:: doscon
 
     ...\> py --version
 
@@ -39,40 +39,41 @@ matches the version you installed by executing::
 About ``pip``
 =============
 
-`pip`_ is a package manage for Python. It makes installing and uninstalling
-Python packages (such as Django!) very easy. For the rest of the installation,
-we'll use ``pip`` to install Python packages from the command line.
+:pypi:`pip` is a package manager for Python and is included by default with the
+Python installer. It helps to install and uninstall Python packages
+(such as Django!). For the rest of the installation, we'll use ``pip`` to
+install Python packages from the command line.
 
-To install pip on your machine, go to
-https://pip.pypa.io/en/latest/installing/, and follow the ``Installing with
-get-pip.py`` instructions.
+.. _virtualenvironment:
 
-.. _pip: https://pypi.org/project/pip/
+Setting up a virtual environment
+================================
 
-.. _virtualenvwrapper-win:
+It is best practice to provide a dedicated environment for each Django project
+you create. There are many options to manage environments and packages within
+the Python ecosystem, some of which are recommended in the `Python
+documentation <https://packaging.python.org/guides/tool-recommendations/>`_.
+Python itself comes with :doc:`venv <python:tutorial/venv>` for managing
+environments which we will use for this guide.
 
-Install ``virtualenv`` and ``virtualenvwrapper``
-================================================
+To create a virtual environment for your project, open a new command prompt,
+navigate to the folder where you want to create your project and then enter the
+following:
 
-`virtualenv`_ and `virtualenvwrapper`_ provide a dedicated environment for
-each Django project you create. While not mandatory, this is considered a best
-practice and will save you time in the future when you're ready to deploy your
-project. To do this, run::
+.. code-block:: doscon
 
-    ...\> py -m pip install virtualenvwrapper-win
+    ...\> py -m venv project-name
 
-Then create a virtual environment for your project::
+This will create a folder called 'project-name' if it does not already exist
+and set up the virtual environment. To activate the environment, run:
 
-    ...\> mkvirtualenv myproject
+.. code-block:: doscon
 
-The virtual environment will be activated automatically and you'll see
-"(myproject)" next to the command prompt to designate that. If you start a new
-command prompt, you'll need to activate the environment again using::
+    ...\> project-name\Scripts\activate.bat
 
-    ...\> workon myproject
-
-.. _virtualenv: https://pypi.org/project/virtualenv/
-.. _virtualenvwrapper: https://pypi.org/project/virtualenvwrapper-win/
+The virtual environment will be activated and you'll see "(project-name)" next
+to the command prompt to designate that. Each time you start a new command
+prompt, you'll need to activate the environment again.
 
 Install Django
 ==============
@@ -80,7 +81,9 @@ Install Django
 Django can be installed easily using ``pip`` within your virtual environment.
 
 In the command prompt, ensure your virtual environment is active, and execute
-the following command::
+the following command:
+
+.. code-block:: doscon
 
     ...\> py -m pip install Django
 
@@ -91,6 +94,23 @@ by executing ``django-admin --version`` in the command prompt.
 
 See :ref:`database-installation` for information on database installation
 with Django.
+
+Colored terminal output
+=======================
+
+A quality-of-life feature adds colored (rather than monochrome) output to the
+terminal. In modern terminals this should work for both CMD and PowerShell. If
+for some reason this needs to be disabled, set the environmental variable
+:envvar:`DJANGO_COLORS` to ``nocolor``.
+
+On older Windows versions, or legacy terminals, :pypi:`colorama` must be
+installed to enable syntax coloring:
+
+.. code-block:: doscon
+
+    ...\> py -m pip install colorama
+
+See :ref:`syntax-coloring` for more information on color settings.
 
 Common pitfalls
 ===============
@@ -103,7 +123,17 @@ Common pitfalls
 
 * If you are connecting to the internet behind a proxy, there might be problems
   in running the command ``py -m pip install Django``. Set the environment
-  variables for proxy configuration in the command prompt as follows::
+  variables for proxy configuration in the command prompt as follows:
+
+  .. code-block:: doscon
 
     ...\> set http_proxy=http://username:password@proxyserver:proxyport
     ...\> set https_proxy=https://username:password@proxyserver:proxyport
+
+* In general, Django assumes that ``UTF-8`` encoding is used for I/O. This may
+  cause problems if your system is set to use a different encoding. Recent
+  versions of Python allow setting the :envvar:`PYTHONUTF8` environment
+  variable in order to force a ``UTF-8`` encoding. Windows 10 also provides a
+  system-wide setting by checking ``Use Unicode UTF-8 for worldwide language
+  support`` in :menuselection:`Language --> Administrative Language Settings
+  --> Change system locale` in system settings.

@@ -3,12 +3,13 @@
 # Translators:
 # GunChleoc, 2015-2016
 # GunChleoc, 2015
+# GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-22 17:29+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-07-15 10:43+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -89,8 +90,8 @@ msgstr ""
 "shàbhaladh air chall."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Thagh thu gnìomh ach cha do shàbhail thu na dh’atharraich thu ann an "
@@ -98,8 +99,8 @@ msgstr ""
 "tu an gnìomh a ruith a-rithist."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Thagh thu gnìomh agus cha do rinn thu atharrachadh air ran fa leth sam bith. "
@@ -201,6 +202,54 @@ msgstr "An t-Samhain"
 
 msgid "December"
 msgstr "An Dùbhlachd"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Faoi"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Gearr"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Màrt"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Gibl"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Cèit"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Ògmh"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Iuch"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Lùna"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sult"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Dàmh"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Samh"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dùbh"
 
 msgctxt "one letter Sunday"
 msgid "S"

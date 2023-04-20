@@ -1,23 +1,27 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>, 2018
+# HuanCheng Bai白宦成（Bestony） <xiqingongzi@gmail.com>, 2018
+# Fan Xu <xlivevil@aliyun.com>, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kewei Ma <marknv.42@gmail.com>, 2016
 # Lele Long <schemacs@gmail.com>, 2011,2015
 # Liping Wang <lynn.config@gmail.com>, 2016
+# matthew Yip <yymmatthew@gmail.com>, 2020
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # slene <vslene@gmail.com>, 2011
+# Veoco <one@nomox.cn>, 2021
 # spaceoi <zhangzhaoyu@gmail.com>, 2016
-# Ziang Song <songziang@gmail.com>, 2012
+# ced773123cfad7b4e8b79ca80f736af9, 2012
 # Kevin Sze <leiarix@gmail.com>, 2012
+# 高乐喆 <gaolezhe@outlook.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2018-01-14 07:41+0000\n"
-"Last-Translator: Bai HuanCheng (Bestony) <xiqingongzi@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: 高乐喆 <gaolezhe@outlook.com>, 2023\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -70,12 +74,21 @@ msgstr ""
 "这是选中的 %s 的列表。你可以在选择框下面进行选择，然后点击两选框之间的“删"
 "除”箭头进行删除。"
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "在该框中键入以过滤所选%s的列表。"
+
 msgid "Remove all"
 msgstr "删除全部"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "删除所有已选择的%s。"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -88,20 +101,20 @@ msgstr ""
 "你尚未保存一个可编辑栏位的变更. 如果你进行别的动作, 未保存的变更将会丢失."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"你已选则执行一个动作, 但有一个可编辑栏位的变更尚未保存. 请点选确定进行保存. "
-"再重新执行该动作."
+"你已经选择一个动作，但是你没有保存你单独修改的地方。请点击OK保存。你需要再重"
+"新跑这个动作。"
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"你已选则执行一个动作, 但可编辑栏位沒有任何改变. 你应该尝试 '去' 按钮, 而不是 "
-"'保存' 按钮."
+"你已经选择一个动作，但是没有单独修改任何一处。你可以选择'Go'按键而不"
+"是'Save'按键。"
 
 msgid "Now"
 msgstr "现在"
@@ -183,6 +196,54 @@ msgid "November"
 msgstr "十一月"
 
 msgid "December"
+msgstr "十二月"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "一月"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "二月"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "三月"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "四月"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "五月"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "六月"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "七月"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "八月"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "九月"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "十月"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "十一月"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
 msgstr "十二月"
 
 msgctxt "one letter Sunday"

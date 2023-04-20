@@ -61,6 +61,18 @@ Adds a few conveniences for perfectionists:
   indexer would treat them as separate URLs -- so it's best practice to
   normalize URLs.
 
+  If necessary, individual views may be excluded from the ``APPEND_SLASH``
+  behavior using the :func:`~django.views.decorators.common.no_append_slash`
+  decorator::
+
+    from django.views.decorators.common import no_append_slash
+
+
+    @no_append_slash
+    def sensitive_fbv(request, *args, **kwargs):
+        """View to be excluded from APPEND_SLASH."""
+        return HttpResponse()
+
 * Sets the ``Content-Length`` header for non-streaming responses.
 
 .. attribute:: CommonMiddleware.response_redirect_class
@@ -82,18 +94,33 @@ GZip middleware
 
 .. class:: GZipMiddleware
 
-.. warning::
+    .. attribute:: max_random_bytes
 
-    Security researchers recently revealed that when compression techniques
-    (including ``GZipMiddleware``) are used on a website, the site may become
-    exposed to a number of possible attacks. Before using ``GZipMiddleware`` on
-    your site, you should consider very carefully whether you are subject to
-    these attacks. If you're in *any* doubt about whether you're affected, you
-    should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
-    paper (PDF)`_ and `breachattack.com`_.
+        Defaults to 100. Subclass ``GZipMiddleware`` and override the attribute
+        to change the maximum number of random bytes that is included with
+        compressed responses.
 
-    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: http://breachattack.com
+.. note::
+
+    Security researchers revealed that when compression techniques (including
+    ``GZipMiddleware``) are used on a website, the site may become exposed to a
+    number of possible attacks.
+
+    To mitigate attacks, Django implements a technique called *Heal The Breach
+    (HTB)*. It adds up to 100 bytes (see
+    :attr:`.max_random_bytes`) of random bytes to each response
+    to make the attacks less effective.
+
+    For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
+    the `Heal The Breach (HTB) paper`_.
+
+    .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
+    .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
+
+.. versionchanged:: 4.2
+
+    Mitigation for the BREACH attack was added.
 
 The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
@@ -111,7 +138,7 @@ It will NOT compress content if any of the following are true:
   containing ``gzip``.
 
 If the response has an ``ETag`` header, the ETag is made weak to comply with
-:rfc:`7232#section-2.1`.
+:rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
@@ -169,7 +196,7 @@ Security middleware
 
 .. warning::
     If your deployment situation allows, it's usually a good idea to have your
-    front-end Web server perform the functionality provided by the
+    front-end web server perform the functionality provided by the
     ``SecurityMiddleware``. That way, if there are requests that aren't served
     by Django (such as static media or user-uploaded files), they will have
     the same protections as requests to your Django application.
@@ -180,8 +207,8 @@ The ``django.middleware.security.SecurityMiddleware`` provides several security
 enhancements to the request/response cycle. Each one can be independently
 enabled or disabled with a setting.
 
-* :setting:`SECURE_BROWSER_XSS_FILTER`
 * :setting:`SECURE_CONTENT_TYPE_NOSNIFF`
+* :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY`
 * :setting:`SECURE_HSTS_INCLUDE_SUBDOMAINS`
 * :setting:`SECURE_HSTS_PRELOAD`
 * :setting:`SECURE_HSTS_SECONDS`
@@ -206,7 +233,7 @@ you set the :setting:`SECURE_HSTS_SECONDS` setting to a non-zero integer value.
 
 When enabling HSTS, it's a good idea to first use a small value for testing,
 for example, :setting:`SECURE_HSTS_SECONDS = 3600<SECURE_HSTS_SECONDS>` for one
-hour. Each time a Web browser sees the HSTS header from your site, it will
+hour. Each time a web browser sees the HSTS header from your site, it will
 refuse to communicate non-securely (using HTTP) with your domain for the given
 period of time. Once you confirm that all assets are served securely on your
 site (i.e. HSTS didn't break anything), it's a good idea to increase this value
@@ -247,8 +274,6 @@ __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Se
 Referrer Policy
 ~~~~~~~~~~~~~~~
 
-.. versionadded:: 3.0
-
 Browsers use `the Referer header`__ as a way to send information to a site
 about how users got there. When a user clicks a link, the browser will send the
 full URL of the linking page as the referrer. While this can be useful for some
@@ -288,10 +313,11 @@ for:
 
 .. warning::
     When your site is served via HTTPS, :ref:`Django's CSRF protection system
-    <using-csrf>` requires the ``Referer`` header to be present, so completely
-    disabling the ``Referer`` header will interfere with CSRF protection. To
-    gain most of the benefits of disabling ``Referer`` headers while also
-    keeping CSRF protection, consider enabling only same-origin referrers.
+    <how-csrf-works>` requires the ``Referer`` header to be present, so
+    completely disabling the ``Referer`` header will interfere with CSRF
+    protection. To gain most of the benefits of disabling ``Referer`` headers
+    while also keeping CSRF protection, consider enabling only same-origin
+    referrers.
 
 ``SecurityMiddleware`` can set the ``Referrer-Policy`` header for you, based on
 the :setting:`SECURE_REFERRER_POLICY` setting (note spelling: browsers send a
@@ -340,6 +366,41 @@ this setting are:
 
     __ https://w3c.github.io/webappsec-referrer-policy/#unknown-policy-values
 
+.. _cross-origin-opener-policy:
+
+Cross-Origin Opener Policy
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some browsers have the ability to isolate top-level windows from other
+documents by putting them in a separate browsing context group based on the
+value of the `Cross-Origin Opener Policy`__ (COOP) header. If a document that
+is isolated in this way opens a cross-origin popup window, the popup’s
+``window.opener`` property will be ``null``. Isolating windows using COOP is a
+defense-in-depth protection against cross-origin attacks, especially those like
+Spectre which allowed exfiltration of data loaded into a shared browsing
+context.
+
+__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy
+
+``SecurityMiddleware`` can set the ``Cross-Origin-Opener-Policy`` header for
+you, based on the :setting:`SECURE_CROSS_ORIGIN_OPENER_POLICY` setting. The
+valid values for this setting are:
+
+``same-origin``
+    Isolates the browsing context exclusively to same-origin documents.
+    Cross-origin documents are not loaded in the same browsing context. This
+    is the default and most secure option.
+
+``same-origin-allow-popups``
+    Isolates the browsing context to same-origin documents or those which
+    either don't set COOP or which opt out of isolation by setting a COOP of
+    ``unsafe-none``.
+
+``unsafe-none``
+    Allows the document to be added to its opener's browsing context group
+    unless the opener itself has a COOP of ``same-origin`` or
+    ``same-origin-allow-popups``.
+
 .. _x-content-type-options:
 
 ``X-Content-Type-Options: nosniff``
@@ -362,40 +423,13 @@ is ``True``.
 
 Note that in most deployment situations where Django isn't involved in serving
 user-uploaded files, this setting won't help you. For example, if your
-:setting:`MEDIA_URL` is served directly by your front-end Web server (nginx,
+:setting:`MEDIA_URL` is served directly by your front-end web server (nginx,
 Apache, etc.) then you'd want to set this header there. On the other hand, if
 you are using Django to do something like require authorization in order to
-download files and you cannot set the header using your Web server, this
+download files and you cannot set the header using your web server, this
 setting will be useful.
 
 __ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-
-.. _x-xss-protection:
-
-``X-XSS-Protection: 1; mode=block``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Some browsers have the ability to block content that appears to be an `XSS
-attack`_. They work by looking for JavaScript content in the GET or POST
-parameters of a page. If the JavaScript is replayed in the server's response,
-the page is blocked from rendering and an error page is shown instead.
-
-The `X-XSS-Protection header`__ is used to control the operation of the
-XSS filter.
-
-To enable the XSS filter in the browser, and force it to always block
-suspected XSS attacks, you can pass the ``X-XSS-Protection: 1; mode=block``
-header. ``SecurityMiddleware`` will do this for all responses if the
-:setting:`SECURE_BROWSER_XSS_FILTER` setting is ``True``.
-
-.. warning::
-    The browser XSS filter is a useful defense measure, but must not be
-    relied upon exclusively. It cannot detect all XSS attacks and not all
-    browsers support the header. Ensure you are still :ref:`validating and
-    sanitizing <cross-site-scripting>` all input to prevent XSS attacks.
-
-.. _XSS attack: https://en.wikipedia.org/wiki/Cross-site_scripting
-__ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 
 .. _ssl-redirect:
 
@@ -429,7 +463,7 @@ in the :setting:`SECURE_REDIRECT_EXEMPT` setting.
     Django can't seem to tell when a request actually is already secure, you
     may need to set the :setting:`SECURE_PROXY_SSL_HEADER` setting.
 
-.. _nginx: https://nginx.org
+.. _nginx: https://nginx.org/
 
 Session middleware
 ------------------
@@ -462,17 +496,17 @@ Authentication middleware
 .. class:: AuthenticationMiddleware
 
 Adds the ``user`` attribute, representing the currently-logged-in user, to
-every incoming ``HttpRequest`` object. See :ref:`Authentication in Web requests
+every incoming ``HttpRequest`` object. See :ref:`Authentication in web requests
 <auth-web-requests>`.
 
 .. class:: RemoteUserMiddleware
 
-Middleware for utilizing Web server provided authentication. See
+Middleware for utilizing web server provided authentication. See
 :doc:`/howto/auth-remote-user` for usage details.
 
 .. class:: PersistentRemoteUserMiddleware
 
-Middleware for utilizing Web server provided authentication when enabled only
+Middleware for utilizing web server provided authentication when enabled only
 on the login page. See :ref:`persistent-remote-user-middleware-howto` for usage
 details.
 

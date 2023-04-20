@@ -19,8 +19,8 @@ Who's this tutorial for?
 
 .. seealso::
 
-    If you are looking for a reference on how to submit patches, see the
-    :doc:`/internals/contributing/writing-code/submitting-patches`
+    If you are looking for a reference on the details of making code
+    contributions, see the :doc:`/internals/contributing/writing-code/index`
     documentation.
 
 For this tutorial, we expect that you have at least a basic understanding of
@@ -41,11 +41,11 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-developers| or drop by `#django-dev on irc.freenode.net`__ to
+    to |django-developers| or drop by `#django-dev on irc.libera.chat`__ to
     chat with other Django users who might be able to help.
 
 __ https://diveinto.org/python3/table-of-contents.html
-__ irc://irc.freenode.net/django-dev
+__ https://web.libera.chat/#django-dev
 
 What does this tutorial cover?
 ------------------------------
@@ -77,8 +77,7 @@ probably got the answers.
 
 .. admonition:: For Windows users
 
-    When installing Python on Windows, make sure you check the option "Add
-    python.exe to Path", so that it is always available on the command line.
+    See :ref:`install_python_windows` on Windows docs for additional guidance.
 
 Code of Conduct
 ===============
@@ -152,8 +151,7 @@ If the ``source`` command is not available, you can try using a dot instead:
     $ . ~/.virtualenvs/djangodev/bin/activate
 
 You have to activate the virtual environment whenever you open a new
-terminal window. virtualenvwrapper__ is a useful tool for making this
-more convenient.
+terminal window.
 
 .. admonition:: For Windows users
 
@@ -162,15 +160,6 @@ more convenient.
     .. code-block:: doscon
 
         ...\> %HOMEPATH%\.virtualenvs\djangodev\Scripts\activate.bat
-
-    or you can install :ref:`a Windows version of virtualenvwrapper
-    <virtualenvwrapper-win>` and then use:
-
-    .. code-block:: doscon
-
-        ...\> workon djangodev
-
-__ https://virtualenvwrapper.readthedocs.io/en/latest/
 
 The name of the currently activated virtual environment is displayed on the
 command line to help you keep track of which one you are using. Anything you
@@ -210,8 +199,8 @@ work and haven't broken other parts of Django. If you've never run Django's test
 suite before, it's a good idea to run it once beforehand to get familiar with
 its output.
 
-Before running the test suite, install its dependencies by ``cd``-ing into the
-Django ``tests/`` directory and then running:
+Before running the test suite, enter the Django ``tests/`` directory using the
+``cd tests`` command, and install test dependencies by running:
 
 .. console::
 
@@ -219,7 +208,7 @@ Django ``tests/`` directory and then running:
 
 If you encounter an error during the installation, your system might be missing
 a dependency for one or more of the Python packages. Consult the failing
-package's documentation or search the Web with the error message that you
+package's documentation or search the web with the error message that you
 encounter.
 
 Now we are ready to run the test suite. If you're using GNU/Linux, macOS, or
@@ -230,7 +219,8 @@ some other flavor of Unix, run:
     $ ./runtests.py
 
 Now sit back and relax. Django's entire test suite has thousands of tests, and
-it takes at least a few minutes run, depending on the speed of your computer.
+it takes at least a few minutes to run, depending on the speed of your
+computer.
 
 While Django's test suite is running, you'll see a stream of characters
 representing the status of each test as it completes. ``E`` indicates that an
@@ -253,12 +243,12 @@ to Django's code, the entire test suite **should** pass. If you get failures or
 errors make sure you've followed all of the previous steps properly. See
 :ref:`running-unit-tests` for more information.
 
-Note that the latest Django master may not always be stable. When developing
-against master, you can check `Django's continuous integration builds`__ to
-determine if the failures are specific to your machine or if they are also
-present in Django's official builds. If you click to view a particular build,
-you can view the "Configuration Matrix" which shows failures broken down by
-Python version and database backend.
+Note that the latest Django "main" branch may not always be stable. When
+developing against "main", you can check `Django's continuous integration
+builds`__ to determine if the failures are specific to your machine or if they
+are also present in Django's official builds. If you click to view a particular
+build, you can view the "Configuration Matrix" which shows failures broken down
+by Python version and database backend.
 
 __ https://djangoci.com
 
@@ -324,7 +314,7 @@ Writing a test for ticket #99999
 --------------------------------
 
 In order to resolve this ticket, we'll add a ``make_toast()`` function to the
-top-level ``django`` module. First we are going to write a test that tries to
+``django.shortcuts`` module. First we are going to write a test that tries to
 use the function and check that its output looks correct.
 
 Navigate to Django's ``tests/shortcuts/`` folder and create a new file
@@ -336,7 +326,7 @@ Navigate to Django's ``tests/shortcuts/`` folder and create a new file
 
     class MakeToastTests(SimpleTestCase):
         def test_make_toast(self):
-            self.assertEqual(make_toast(), 'toast')
+            self.assertEqual(make_toast(), "toast")
 
 This test checks that the ``make_toast()`` returns ``'toast'``.
 
@@ -353,7 +343,7 @@ This test checks that the ``make_toast()`` returns ``'toast'``.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the Python :mod:`unittest` documentation.
 
-__ https://www.diveinto.org/python3/unit-testing.html
+__ https://diveinto.org/python3/unit-testing.html
 
 Running your new test
 ---------------------
@@ -367,7 +357,9 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
     $ ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error::
+method we added, with this error:
+
+.. code-block:: pytb
 
     ImportError: cannot import name 'make_toast' from 'django.shortcuts'
 
@@ -383,7 +375,7 @@ Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
 bottom, add::
 
     def make_toast():
-        return 'toast'
+        return "toast"
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django
@@ -417,10 +409,14 @@ Writing Documentation
 
 This is a new feature, so it should be documented. Open the file
 ``docs/topics/http/shortcuts.txt`` and add the following at the end of the
-file::
+file:
+
+.. code-block:: rst
 
     ``make_toast()``
     ================
+
+    .. function:: make_toast()
 
     .. versionadded:: 2.2
 
@@ -429,7 +425,9 @@ file::
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
 latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
-Add a note under the "Minor Features" header::
+Add a note under the "Minor Features" header:
+
+.. code-block:: rst
 
     :mod:`django.shortcuts`
     ~~~~~~~~~~~~~~~~~~~~~~~

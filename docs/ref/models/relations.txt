@@ -14,21 +14,25 @@ Related objects reference
 
             from django.db import models
 
-            class Reporter(models.Model):
+
+            class Blog(models.Model):
                 # ...
                 pass
 
-            class Article(models.Model):
-                reporter = models.ForeignKey(Reporter, on_delete=models.CASCADE)
+
+            class Entry(models.Model):
+                blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True)
 
       In the above example, the methods below will be available on
-      the manager ``reporter.article_set``.
+      the manager ``blog.entry_set``.
 
-    * Both sides of a :class:`~django.db.models.ManyToManyField` relation::
+    * Both sides of a :class:`~django.db.models.ManyToManyField` relation
+      ::
 
             class Topping(models.Model):
                 # ...
                 pass
+
 
             class Pizza(models.Model):
                 toppings = models.ManyToManyField(Topping)
@@ -37,14 +41,19 @@ Related objects reference
       ``topping.pizza_set`` and on ``pizza.toppings``.
 
     .. method:: add(*objs, bulk=True, through_defaults=None)
+    .. method:: aadd(*objs, bulk=True, through_defaults=None)
+
+        *Asynchronous version*: ``aadd``
 
         Adds the specified model objects to the related object set.
 
-        Example::
+        Example:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry.objects.get(id=234)
-            >>> b.entry_set.add(e) # Associates Entry e with Blog b.
+            >>> b.entry_set.add(e)  # Associates Entry e with Blog b.
 
         In the example above, in the case of a
         :class:`~django.db.models.ForeignKey` relationship,
@@ -66,8 +75,8 @@ Related objects reference
         Using ``add()`` on a relation that already exists won't duplicate the
         relation, but it will still trigger signals.
 
-        ``add()`` also accepts the field the relation points to as an argument.
-        The above example can be rewritten as ``b.entry_set.add(234)``.
+        For many-to-many relationships ``add()`` accepts either model instances
+        or field values, normally primary keys, as the ``*objs`` argument.
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
@@ -75,33 +84,33 @@ Related objects reference
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
 
-        .. versionchanged:: 3.1
+        .. versionchanged:: 4.2
 
-            ``through_defaults`` values can now be callables.
+            ``aadd()`` method was added.
 
     .. method:: create(through_defaults=None, **kwargs)
+    .. method:: acreate(through_defaults=None, **kwargs)
+
+        *Asynchronous version*: ``acreate``
 
         Creates a new object, saves it and puts it in the related object set.
-        Returns the newly created object::
+        Returns the newly created object:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = b.entry_set.create(
-            ...     headline='Hello',
-            ...     body_text='Hi',
-            ...     pub_date=datetime.date(2005, 1, 1)
+            ...     headline="Hello", body_text="Hi", pub_date=datetime.date(2005, 1, 1)
             ... )
 
             # No need to call e.save() at this point -- it's already been saved.
 
-        This is equivalent to (but simpler than)::
+        This is equivalent to (but simpler than):
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
-            >>> e = Entry(
-            ...     blog=b,
-            ...     headline='Hello',
-            ...     body_text='Hi',
-            ...     pub_date=datetime.date(2005, 1, 1)
-            ... )
+            >>> e = Entry(blog=b, headline="Hello", body_text="Hi", pub_date=datetime.date(2005, 1, 1))
             >>> e.save(force_insert=True)
 
         Note that there's no need to specify the keyword argument of the model
@@ -114,17 +123,18 @@ Related objects reference
         needed. You can use callables as values in the ``through_defaults``
         dictionary.
 
-        .. versionchanged:: 3.1
-
-            ``through_defaults`` values can now be callables.
-
     .. method:: remove(*objs, bulk=True)
+    .. method:: aremove(*objs, bulk=True)
 
-        Removes the specified model objects from the related object set::
+        *Asynchronous version*: ``aremove``
+
+        Removes the specified model objects from the related object set:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> e = Entry.objects.get(id=234)
-            >>> b.entry_set.remove(e) # Disassociates Entry e from Blog b.
+            >>> b.entry_set.remove(e)  # Disassociates Entry e from Blog b.
 
         Similar to :meth:`add()`, ``e.save()`` is called in the example above
         to perform the update. Using ``remove()`` with a many-to-many
@@ -134,9 +144,9 @@ Related objects reference
         :data:`~django.db.models.signals.m2m_changed` signal if you wish to
         execute custom code when a relationship is deleted.
 
-        Similarly to :meth:`add()`, ``remove()`` also accepts the field the
-        relation points to as an argument. The above example can be rewritten
-        as ``b.entry_set.remove(234)``.
+        For many-to-many relationships ``remove()`` accepts either model
+        instances or field values, normally primary keys, as the ``*objs``
+        argument.
 
         For :class:`~django.db.models.ForeignKey` objects, this method only
         exists if ``null=True``. If the related field can't be set to ``None``
@@ -158,9 +168,18 @@ Related objects reference
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
 
-    .. method:: clear(bulk=True)
+        .. versionchanged:: 4.2
 
-        Removes all objects from the related object set::
+            ``aremove()`` method was added.
+
+    .. method:: clear(bulk=True)
+    .. method:: aclear(bulk=True)
+
+        *Asynchronous version*: ``aclear``
+
+        Removes all objects from the related object set:
+
+        .. code-block:: pycon
 
             >>> b = Blog.objects.get(id=1)
             >>> b.entry_set.clear()
@@ -175,9 +194,18 @@ Related objects reference
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
 
-    .. method:: set(objs, bulk=True, clear=False, through_defaults=None)
+        .. versionchanged:: 4.2
 
-        Replace the set of related objects::
+            ``aclear()`` method was added.
+
+    .. method:: set(objs, bulk=True, clear=False, through_defaults=None)
+    .. method:: aset(objs, bulk=True, clear=False, through_defaults=None)
+
+        *Asynchronous version*: ``aset``
+
+        Replace the set of related objects:
+
+        .. code-block:: pycon
 
             >>> new_list = [obj1, obj2, obj3]
             >>> e.related_set.set(new_list)
@@ -198,9 +226,9 @@ Related objects reference
         race conditions. For instance, new objects may be added to the database
         in between the call to ``clear()`` and the call to ``add()``.
 
-        Similarly to :meth:`add()`, ``set()`` also accepts the field the
-        relation points to as an argument. The above example can be rewritten
-        as ``e.related_set.set([obj1.pk, obj2.pk, obj3.pk])``.
+        For many-to-many relationships ``set()`` accepts a list of either model
+        instances or field values, normally primary keys, as the ``objs``
+        argument.
 
         Use the ``through_defaults`` argument to specify values for the new
         :ref:`intermediate model <intermediary-manytomany>` instance(s), if
@@ -208,17 +236,19 @@ Related objects reference
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
 
-        .. versionchanged:: 3.1
+        .. versionchanged:: 4.2
 
-            ``through_defaults`` values can now be callables.
+            ``aset()`` method was added.
 
     .. note::
 
-       Note that ``add()``, ``create()``, ``remove()``, ``clear()``, and
-       ``set()`` all apply database changes immediately for all types of
-       related fields. In other words, there is no need to call ``save()``
-       on either end of the relationship.
+       Note that ``add()``, ``aadd()``, ``create()``, ``acreate()``,
+       ``remove()``, ``aremove()``, ``clear()``, ``aclear()``, ``set()``, and
+       ``aset()`` all apply database changes immediately for all types of
+       related fields. In other words, there is no need to call
+       ``save()``/``asave()`` on either end of the relationship.
 
        If you use :meth:`~django.db.models.query.QuerySet.prefetch_related`,
-       the ``add()``, ``remove()``, ``clear()``, and ``set()`` methods clear
-       the prefetched cache.
+       the ``add()``, ``aadd()``, ``remove()``, ``aremove()``, ``clear()``,
+       ``aclear()``, ``set()``, and ``aset()`` methods clear the prefetched
+       cache.

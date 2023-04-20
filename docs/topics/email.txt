@@ -20,10 +20,10 @@ In two lines::
     from django.core.mail import send_mail
 
     send_mail(
-        'Subject here',
-        'Here is the message.',
-        'from@example.com',
-        ['to@example.com'],
+        "Subject here",
+        "Here is the message.",
+        "from@example.com",
+        ["to@example.com"],
         fail_silently=False,
     )
 
@@ -51,7 +51,8 @@ are required.
 
 * ``subject``: A string.
 * ``message``: A string.
-* ``from_email``: A string.
+* ``from_email``: A string. If ``None``, Django will use the value of the
+  :setting:`DEFAULT_FROM_EMAIL` setting.
 * ``recipient_list``: A list of strings, each an email address. Each
   member of ``recipient_list`` will see the other recipients in the "To:"
   field of the email message.
@@ -100,8 +101,18 @@ For example, the following code would send two different messages to
 two different sets of recipients; however, only one connection to the
 mail server would be opened::
 
-    message1 = ('Subject here', 'Here is the message', 'from@example.com', ['first@example.com', 'other@example.com'])
-    message2 = ('Another Subject', 'Here is another message', 'from@example.com', ['second@test.com'])
+    message1 = (
+        "Subject here",
+        "Here is the message",
+        "from@example.com",
+        ["first@example.com", "other@example.com"],
+    )
+    message2 = (
+        "Another Subject",
+        "Here is another message",
+        "from@example.com",
+        ["second@test.com"],
+    )
     send_mass_mail((message1, message2), fail_silently=False)
 
 The return value will be the number of successfully delivered messages.
@@ -153,18 +164,18 @@ This sends a single email to john@example.com and jane@example.com, with them
 both appearing in the "To:"::
 
     send_mail(
-        'Subject',
-        'Message.',
-        'from@example.com',
-        ['john@example.com', 'jane@example.com'],
+        "Subject",
+        "Message.",
+        "from@example.com",
+        ["john@example.com", "jane@example.com"],
     )
 
 This sends a message to john@example.com and jane@example.com, with them both
 receiving a separate email::
 
     datatuple = (
-        ('Subject', 'Message.', 'from@example.com', ['john@example.com']),
-        ('Subject', 'Message.', 'from@example.com', ['jane@example.com']),
+        ("Subject", "Message.", "from@example.com", ["john@example.com"]),
+        ("Subject", "Message.", "from@example.com", ["jane@example.com"]),
     )
     send_mass_mail(datatuple)
 
@@ -193,22 +204,23 @@ from the request's POST data, sends that to admin@example.com and redirects to
     from django.core.mail import BadHeaderError, send_mail
     from django.http import HttpResponse, HttpResponseRedirect
 
+
     def send_email(request):
-        subject = request.POST.get('subject', '')
-        message = request.POST.get('message', '')
-        from_email = request.POST.get('from_email', '')
+        subject = request.POST.get("subject", "")
+        message = request.POST.get("message", "")
+        from_email = request.POST.get("from_email", "")
         if subject and message and from_email:
             try:
-                send_mail(subject, message, from_email, ['admin@example.com'])
+                send_mail(subject, message, from_email, ["admin@example.com"])
             except BadHeaderError:
-                return HttpResponse('Invalid header found.')
-            return HttpResponseRedirect('/contact/thanks/')
+                return HttpResponse("Invalid header found.")
+            return HttpResponseRedirect("/contact/thanks/")
         else:
             # In reality we'd use a form class
             # to get proper validation errors.
-            return HttpResponse('Make sure all fields are entered and valid.')
+            return HttpResponse("Make sure all fields are entered and valid.")
 
-.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection
+.. _Header injection: http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html
 
 .. _emailmessage-and-smtpconnection:
 
@@ -289,13 +301,13 @@ For example::
     from django.core.mail import EmailMessage
 
     email = EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com', 'to2@example.com'],
-        ['bcc@example.com'],
-        reply_to=['another@example.com'],
-        headers={'Message-ID': 'foo'},
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com", "to2@example.com"],
+        ["bcc@example.com"],
+        reply_to=["another@example.com"],
+        headers={"Message-ID": "foo"},
     )
 
 The class has the following methods:
@@ -305,7 +317,8 @@ The class has the following methods:
   Otherwise, an instance of the default backend will be instantiated and
   used. If the keyword argument ``fail_silently`` is ``True``, exceptions
   raised while sending the message will be quashed. An empty list of
-  recipients will not raise an exception.
+  recipients will not raise an exception. It will return ``1`` if the message
+  was sent successfully, otherwise ``0``.
 
 * ``message()`` constructs a ``django.core.mail.SafeMIMEText`` object (a
   subclass of Python's :class:`~email.mime.text.MIMEText` class) or a
@@ -338,17 +351,18 @@ The class has the following methods:
 
     For example::
 
-       message.attach('design.png', img_data, 'image/png')
+       message.attach("design.png", img_data, "image/png")
 
-    If you specify a ``mimetype`` of ``message/rfc822``, it will also accept
-    :class:`django.core.mail.EmailMessage` and :py:class:`email.message.Message`.
+    If you specify a ``mimetype`` of :mimetype:`message/rfc822`, it will also
+    accept :class:`django.core.mail.EmailMessage` and
+    :py:class:`email.message.Message`.
 
-    For a ``mimetype`` starting with ``text/``, content is expected to be a
-    string. Binary data will be decoded using UTF-8, and if that fails, the
-    MIME type will be changed to ``application/octet-stream`` and the data will
-    be attached unchanged.
+    For a ``mimetype`` starting with :mimetype:`text/`, content is expected to
+    be a string. Binary data will be decoded using UTF-8, and if that fails,
+    the MIME type will be changed to :mimetype:`application/octet-stream` and
+    the data will be attached unchanged.
 
-    In addition, ``message/rfc822`` attachments will no longer be
+    In addition, :mimetype:`message/rfc822` attachments will no longer be
     base64-encoded in violation of :rfc:`2046#section-5.2.1`, which can cause
     issues with displaying the attachments in `Evolution`__ and `Thunderbird`__.
 
@@ -360,9 +374,9 @@ The class has the following methods:
   the MIME type to use for the attachment. If the MIME type is omitted, it
   will be guessed from the filename. You can use it like this::
 
-    message.attach_file('/images/weather_map.png')
+    message.attach_file("/images/weather_map.png")
 
-  For MIME types starting with ``text/``, binary data is handled as in
+  For MIME types starting with :mimetype:`text/`, binary data is handled as in
   ``attach()``.
 
 Sending alternative content types
@@ -380,9 +394,9 @@ To send a text and HTML combination, you could write::
 
     from django.core.mail import EmailMultiAlternatives
 
-    subject, from_email, to = 'hello', 'from@example.com', 'to@example.com'
-    text_content = 'This is an important message.'
-    html_content = '<p>This is an <strong>important</strong> message.</p>'
+    subject, from_email, to = "hello", "from@example.com", "to@example.com"
+    text_content = "This is an important message."
+    html_content = "<p>This is an <strong>important</strong> message.</p>"
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(html_content, "text/html")
     msg.send()
@@ -417,7 +431,7 @@ The email backend class has the following methods:
 * ``send_messages(email_messages)`` sends a list of
   :class:`~django.core.mail.EmailMessage` objects. If the connection is
   not open, this call will implicitly open the connection, and close the
-  connection afterwards. If the connection is already open, it will be
+  connection afterward. If the connection is already open, it will be
   left open after mail has been sent.
 
 It can also be used as a context manager, which will automatically call
@@ -427,11 +441,17 @@ It can also be used as a context manager, which will automatically call
 
     with mail.get_connection() as connection:
         mail.EmailMessage(
-            subject1, body1, from1, [to1],
+            subject1,
+            body1,
+            from1,
+            [to1],
             connection=connection,
         ).send()
         mail.EmailMessage(
-            subject2, body2, from2, [to2],
+            subject2,
+            body2,
+            from2,
+            [to2],
             connection=connection,
         ).send()
 
@@ -486,7 +506,7 @@ SMTP backend
     The SMTP backend is the default configuration inherited by Django. If you
     want to specify it explicitly, put the following in your settings::
 
-        EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+        EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 
     If unspecified, the default ``timeout`` will be the one provided by
     :func:`socket.getdefaulttimeout()`, which defaults to ``None`` (no timeout).
@@ -503,7 +523,7 @@ providing the ``stream`` keyword argument when constructing the connection.
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -521,15 +541,11 @@ the ``file_path`` keyword when creating a connection with
 
 To specify this backend, put the following in your settings::
 
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+    EMAIL_BACKEND = "django.core.mail.backends.filebased.EmailBackend"
+    EMAIL_FILE_PATH = "/tmp/app-messages"  # change this to a proper location
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
-
-.. versionchanged:: 3.1
-
-    Support for :class:`pathlib.Path` was added.
 
 .. _topic-email-memory-backend:
 
@@ -544,10 +560,13 @@ be sent.
 
 To specify this backend, put the following in your settings::
 
-  EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+  EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development and testing.
+
+Django's test runner :ref:`automatically uses this backend for testing
+<topics-testing-email>`.
 
 .. _topic-email-dummy-backend:
 
@@ -557,7 +576,7 @@ Dummy backend
 As the name suggests the dummy backend does nothing with your messages. To
 specify this backend, put the following in your settings::
 
-   EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
+   EMAIL_BACKEND = "django.core.mail.backends.dummy.EmailBackend"
 
 This backend is not intended for use in production -- it is provided as a
 convenience that can be used during development.
@@ -602,7 +621,8 @@ some periodic email you wish to send out, you could send these emails using
 a single call to send_messages::
 
     from django.core import mail
-    connection = mail.get_connection()   # Use default email connection
+
+    connection = mail.get_connection()  # Use default email connection
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -615,6 +635,7 @@ manually open or close the connection if it is already open, so if you
 manually open the connection, you can control when it is closed. For example::
 
     from django.core import mail
+
     connection = mail.get_connection()
 
     # Manually open the connection
@@ -622,26 +643,26 @@ manually open the connection, you can control when it is closed. For example::
 
     # Construct an email message that uses the connection
     email1 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to1@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to1@example.com"],
         connection=connection,
     )
-    email1.send() # Send the email
+    email1.send()  # Send the email
 
     # Construct two more messages
     email2 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to2@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to2@example.com"],
     )
     email3 = mail.EmailMessage(
-        'Hello',
-        'Body goes here',
-        'from@example.com',
-        ['to3@example.com'],
+        "Hello",
+        "Body goes here",
+        "from@example.com",
+        ["to3@example.com"],
     )
 
     # Send the two emails in a single call -
@@ -662,7 +683,7 @@ and that those emails will contain the correct content.
 
 The easiest way to configure email for local development is to use the
 :ref:`console <topic-email-console-backend>` email backend. This backend
-redirects all email to stdout, allowing you to inspect the content of mail.
+redirects all email to ``stdout``, allowing you to inspect the content of mail.
 
 The :ref:`file <topic-email-file-backend>` email backend can also be useful
 during development -- this backend dumps the contents of every SMTP connection
@@ -670,15 +691,21 @@ to a file that can be inspected at your leisure.
 
 Another approach is to use a "dumb" SMTP server that receives the emails
 locally and displays them to the terminal, but does not actually send
-anything. Python has a built-in way to accomplish this with a single command::
+anything. The `aiosmtpd`_ package provides a way to accomplish this:
 
-    python -m smtpd -n -c DebuggingServer localhost:1025
+.. code-block:: shell
 
-This command will start a minimal SMTP server listening on port 1025 of
+    python -m pip install aiosmtpd
+
+    python -m aiosmtpd -n -l localhost:8025
+
+This command will start a minimal SMTP server listening on port 8025 of
 localhost. This server prints to standard output all email headers and the
 email body. You then only need to set the :setting:`EMAIL_HOST` and
 :setting:`EMAIL_PORT` accordingly. For a more detailed discussion of SMTP
-server options, see the Python documentation for the :mod:`smtpd` module.
+server options, see the documentation of the `aiosmtpd`_ module.
+
+.. _aiosmtpd: https://aiosmtpd.readthedocs.io/en/latest/
 
 For information about unit-testing the sending of emails in your application,
 see the :ref:`topics-testing-email` section of the testing documentation.

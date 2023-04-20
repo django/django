@@ -31,7 +31,7 @@ Django releases, which you can browse online.
 
 The Git repository includes several `branches`_:
 
-* ``master`` contains the main in-development code which will become
+* ``main`` contains the main in-development code which will become
   the next packaged release of Django. This is where most development
   activity is focused.
 
@@ -50,16 +50,20 @@ website can be found at `github.com/django/djangoproject.com
 <https://github.com/django/djangoproject.com>`_.
 
 .. _Git: https://git-scm.com/
-.. _documentation: https://git-scm.com/documentation
+.. _documentation: https://git-scm.com/doc
 .. _branches: https://github.com/django/django/branches
 .. _tags: https://github.com/django/django/tags
 
-The master branch
-=================
+The main branch
+===============
 
 If you'd like to try out the in-development code for the next release of
 Django, or if you'd like to contribute to Django by fixing bugs or developing
-new features, you'll want to get the code from the master branch.
+new features, you'll want to get the code from the main branch.
+
+.. note::
+
+   Prior to March 2021, the main branch was called ``master``.
 
 Note that this will get *all* of Django: in addition to the top-level
 ``django`` module containing Python code, you'll also get a copy of Django's
@@ -142,7 +146,7 @@ Archived feature-development work
     designed.
 
 Feature-development branches tend by their nature to be temporary. Some
-produce successful features which are merged back into Django's master to
+produce successful features which are merged back into Django's main branch to
 become part of an official release, but others do not; in either case, there
 comes a time when the branch is no longer being actively worked on by any
 developer. At this point the branch is considered closed.

@@ -11,6 +11,34 @@ reference guides </ref/models/index>`.
 Attributes
 ==========
 
+``DoesNotExist``
+----------------
+
+.. exception:: Model.DoesNotExist
+
+    This exception is raised by the ORM when an expected object is not found.
+    For example, :meth:`.QuerySet.get` will raise it when no object is found
+    for the given lookups.
+
+    Django provides a ``DoesNotExist`` exception as an attribute of each model
+    class to identify the class of object that could not be found, allowing you
+    to catch exceptions for a particular model class. The exception is a
+    subclass of :exc:`django.core.exceptions.ObjectDoesNotExist`.
+
+``MultipleObjectsReturned``
+---------------------------
+
+.. exception:: Model.MultipleObjectsReturned
+
+    This exception is raised by :meth:`.QuerySet.get` when multiple objects are
+    found for the given lookups.
+
+    Django provides a ``MultipleObjectsReturned`` exception as an attribute of
+    each model class to identify the class of object for which multiple objects
+    were found, allowing you to catch exceptions for a particular model class.
+    The exception is a subclass of
+    :exc:`django.core.exceptions.MultipleObjectsReturned`.
+
 ``objects``
 -----------
 
@@ -26,6 +54,7 @@ Attributes
     not appear. Consider the following example::
 
         from django.db import models
+
 
         class Person(models.Model):
             # Add manager with another name

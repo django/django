@@ -11,25 +11,34 @@ class UpperTests(SimpleTestCase):
     so it's not safe for non-escaping purposes.
     """
 
-    @setup({'upper01': '{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}'})
+    @setup(
+        {
+            "upper01": (
+                "{% autoescape off %}{{ a|upper }} {{ b|upper }}{% endautoescape %}"
+            )
+        }
+    )
     def test_upper01(self):
-        output = self.engine.render_to_string('upper01', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
-        self.assertEqual(output, 'A & B A &AMP; B')
+        output = self.engine.render_to_string(
+            "upper01", {"a": "a & b", "b": mark_safe("a &amp; b")}
+        )
+        self.assertEqual(output, "A & B A &AMP; B")
 
-    @setup({'upper02': '{{ a|upper }} {{ b|upper }}'})
+    @setup({"upper02": "{{ a|upper }} {{ b|upper }}"})
     def test_upper02(self):
-        output = self.engine.render_to_string('upper02', {'a': 'a & b', 'b': mark_safe('a &amp; b')})
-        self.assertEqual(output, 'A &amp; B A &amp;AMP; B')
+        output = self.engine.render_to_string(
+            "upper02", {"a": "a & b", "b": mark_safe("a &amp; b")}
+        )
+        self.assertEqual(output, "A &amp; B A &amp;AMP; B")
 
 
 class FunctionTests(SimpleTestCase):
-
     def test_upper(self):
-        self.assertEqual(upper('Mixed case input'), 'MIXED CASE INPUT')
+        self.assertEqual(upper("Mixed case input"), "MIXED CASE INPUT")
 
     def test_unicode(self):
         # lowercase e umlaut
-        self.assertEqual(upper('\xeb'), '\xcb')
+        self.assertEqual(upper("\xeb"), "\xcb")
 
     def test_non_string_input(self):
-        self.assertEqual(upper(123), '123')
+        self.assertEqual(upper(123), "123")

@@ -27,8 +27,9 @@ class attribute of type ``models.Manager()`` on that model. For example::
 
     from django.db import models
 
+
     class Person(models.Model):
-        #...
+        # ...
         people = models.Manager()
 
 Using this example model, ``Person.objects`` will generate an
@@ -55,47 +56,35 @@ functionality to your models. (For "row-level" functionality -- i.e., functions
 that act on a single instance of a model object -- use :ref:`Model methods
 <model-methods>`, not custom ``Manager`` methods.)
 
-A custom ``Manager`` method can return anything you want. It doesn't have to
-return a ``QuerySet``.
-
-For example, this custom ``Manager`` offers a method ``with_counts()``, which
-returns a list of all ``OpinionPoll`` objects, each with an extra
-``num_responses`` attribute that is the result of an aggregate query::
+For example, this custom ``Manager`` adds a method ``with_counts()``::
 
     from django.db import models
+    from django.db.models.functions import Coalesce
+
 
     class PollManager(models.Manager):
         def with_counts(self):
-            from django.db import connection
-            with connection.cursor() as cursor:
-                cursor.execute("""
-                    SELECT p.id, p.question, p.poll_date, COUNT(*)
-                    FROM polls_opinionpoll p, polls_response r
-                    WHERE p.id = r.poll_id
-                    GROUP BY p.id, p.question, p.poll_date
-                    ORDER BY p.poll_date DESC""")
-                result_list = []
-                for row in cursor.fetchall():
-                    p = self.model(id=row[0], question=row[1], poll_date=row[2])
-                    p.num_responses = row[3]
-                    result_list.append(p)
-            return result_list
+            return self.annotate(num_responses=Coalesce(models.Count("response"), 0))
+
 
     class OpinionPoll(models.Model):
         question = models.CharField(max_length=200)
-        poll_date = models.DateField()
         objects = PollManager()
+
 
     class Response(models.Model):
         poll = models.ForeignKey(OpinionPoll, on_delete=models.CASCADE)
-        person_name = models.CharField(max_length=50)
-        response = models.TextField()
+        # ...
 
-With this example, you'd use ``OpinionPoll.objects.with_counts()`` to return
-that list of ``OpinionPoll`` objects with ``num_responses`` attributes.
+With this example, you'd use ``OpinionPoll.objects.with_counts()`` to get a
+``QuerySet`` of ``OpinionPoll`` objects with the extra ``num_responses``
+attribute attached.
 
-Another thing to note about this example is that ``Manager`` methods can
-access ``self.model`` to get the model class to which they're attached.
+A custom ``Manager`` method can return anything you want. It doesn't have to
+return a ``QuerySet``.
+
+Another thing to note is that ``Manager`` methods can access ``self.model`` to
+get the model class to which they're attached.
 
 Modifying a manager's initial ``QuerySet``
 ------------------------------------------
@@ -104,6 +93,7 @@ A ``Manager``’s base ``QuerySet`` returns all objects in the system. For
 example, using this model::
 
     from django.db import models
+
 
     class Book(models.Model):
         title = models.CharField(max_length=100)
@@ -121,26 +111,27 @@ all objects, and one that returns only the books by Roald Dahl::
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(author='Roald Dahl')
+            return super().get_queryset().filter(author="Roald Dahl")
+
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
 
-        objects = models.Manager() # The default manager.
-        dahl_objects = DahlBookManager() # The Dahl-specific manager.
+        objects = models.Manager()  # The default manager.
+        dahl_objects = DahlBookManager()  # The Dahl-specific manager.
 
 With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
 Roald Dahl.
 
-Of course, because ``get_queryset()`` returns a ``QuerySet`` object, you can
-use ``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it.
-So these statements are all legal::
+Because ``get_queryset()`` returns a ``QuerySet`` object, you can use
+``filter()``, ``exclude()`` and all the other ``QuerySet`` methods on it. So
+these statements are all legal::
 
     Book.dahl_objects.all()
-    Book.dahl_objects.filter(title='Matilda')
+    Book.dahl_objects.filter(title="Matilda")
     Book.dahl_objects.count()
 
 This example also pointed out another interesting technique: using multiple
@@ -152,16 +143,20 @@ For example::
 
     class AuthorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='A')
+            return super().get_queryset().filter(role="A")
+
 
     class EditorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='E')
+            return super().get_queryset().filter(role="E")
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -214,11 +209,13 @@ appropriate for your circumstances, you can tell Django which class to use by
 setting :attr:`Meta.base_manager_name
 <django.db.models.Options.base_manager_name>`.
 
-Base managers aren't used when querying on related models. For example, if the
-``Question`` model :ref:`from the tutorial <creating-models>` had a ``deleted``
-field and a base manager that filters out instances with ``deleted=True``, a
-queryset like ``Choice.objects.filter(question__name__startswith='What')``
-would include choices related to deleted questions.
+Base managers aren't used when querying on related models, or when
+:ref:`accessing a one-to-many or many-to-many relationship
+<backwards-related-objects>`. For example, if the ``Question`` model
+:ref:`from the tutorial <creating-models>` had a ``deleted`` field and a base
+manager that filters out instances with ``deleted=True``, a queryset like
+``Choice.objects.filter(question__name__startswith='What')`` would include
+choices related to deleted questions.
 
 Don't filter away any results in this type of manager subclass
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -242,10 +239,11 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
 
     class PersonQuerySet(models.QuerySet):
         def authors(self):
-            return self.filter(role='A')
+            return self.filter(role="A")
 
         def editors(self):
-            return self.filter(role='E')
+            return self.filter(role="E")
+
 
     class PersonManager(models.Manager):
         def get_queryset(self):
@@ -257,10 +255,13 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
         def editors(self):
             return self.get_queryset().editors()
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from
@@ -310,11 +311,13 @@ For example::
         # Available only on QuerySet.
         def opted_out_public_method(self):
             return
+
         opted_out_public_method.queryset_only = True
 
         # Available on both Manager and QuerySet.
         def _opted_in_private_method(self):
             return
+
         _opted_in_private_method.queryset_only = False
 
 ``from_queryset()``
@@ -327,23 +330,26 @@ For advanced usage you might want both a custom ``Manager`` and a custom
 returns a *subclass* of your base ``Manager`` with a copy of the custom
 ``QuerySet`` methods::
 
-    class BaseManager(models.Manager):
+    class CustomManager(models.Manager):
         def manager_only_method(self):
             return
+
 
     class CustomQuerySet(models.QuerySet):
         def manager_and_queryset_method(self):
             return
 
+
     class MyModel(models.Model):
-        objects = BaseManager.from_queryset(CustomQuerySet)()
+        objects = CustomManager.from_queryset(CustomQuerySet)()
 
 You may also store the generated class into a variable::
 
-    CustomManager = BaseManager.from_queryset(CustomQuerySet)
+    MyManager = CustomManager.from_queryset(CustomQuerySet)
+
 
     class MyModel(models.Model):
-        objects = CustomManager()
+        objects = MyManager()
 
 .. _custom-managers-and-inheritance:
 
@@ -410,6 +416,7 @@ it into the inheritance hierarchy *after* the defaults::
         class Meta:
             abstract = True
 
+
     class ChildC(AbstractBase, ExtraManager):
         # ...
         # Default manager is CustomManager, but OtherManager is
@@ -436,7 +443,9 @@ Implementation concerns
 
 Whatever features you add to your custom ``Manager``, it must be
 possible to make a shallow copy of a ``Manager`` instance; i.e., the
-following code must work::
+following code must work:
+
+.. code-block:: pycon
 
     >>> import copy
     >>> manager = MyManager()

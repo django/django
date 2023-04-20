@@ -10,14 +10,15 @@
 # Nick Mavrakis <mavrakis.n@gmail.com>, 2018
 # Pãnoș <panos.laganakos@gmail.com>, 2014
 # Pãnoș <panos.laganakos@gmail.com>, 2016
+# Serafeim Papastefanos <spapas@gmail.com>, 2021
 # Yorgos Pagles <y.pagles@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-09-22 09:59+0000\n"
-"Last-Translator: Nick Mavrakis <mavrakis.n@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-22 09:22+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Greek (http://www.transifex.com/django/django/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -60,8 +61,8 @@ msgstr "Δεν έχει τεθεί συνθηματικό."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Μη έγκυρη μορφή συνθηματικού ή άγνωστος αλγόριθμος hashing."
 
-msgid "The two password fields didn't match."
-msgstr "Τα δύο πεδία συνθηματικού δεν ταιριάζουν."
+msgid "The two password fields didn’t match."
+msgstr "Τα δύο πεδία κωδικών δεν ταιριάζουν."
 
 msgid "Password"
 msgstr "Συνθηματικό"
@@ -73,7 +74,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Εισάγετε το ίδιο συνθηματικό όπως πρίν, για επιβεβαίωση."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Οι ακατέργαστοι κωδικοί δεν αποθηκεύονται, οπότε δεν υπάρχει τρόπος να δείτε "
@@ -141,6 +142,9 @@ msgstr "work factor"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr ""
 
 msgid "name"
 msgstr "όνομα"
@@ -257,21 +261,21 @@ msgstr[1] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Το συνθηματικό μοιάζει πολύ με το %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Το συνθηματικό σας δεν μπορεί να μοιάζει τόσο με άλλα προσωπικά σας στοιχεία."
+"Ο κωδικός σας δεν μπορεί να μοιάζει τόσο με τα άλλα προσωπικά σας στοιχεία."
 
 msgid "This password is too common."
 msgstr "Πολύ κοινό συνθηματικό."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Το συνθηματικό δεν μπορεί να είναι τόσο συνηθισμένο."
+msgid "Your password can’t be a commonly used password."
+msgstr "Ο κωδικός σας δεν μπορεί να είναι τόσο συνηθισμένος."
 
 msgid "This password is entirely numeric."
 msgstr "Αυτό το συνθηματικό αποτελείται μόνο απο αριθμούς."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Το συνθηματικό σας δεν μπορεί να ειναι αποκλειστικά αριθμητικό."
+msgid "Your password can’t be entirely numeric."
+msgstr "Ο κωδικός σας δε μπορεί να αποτελείται μόνον από αριθμούς."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

@@ -2,10 +2,11 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # amcorreia <mutley.sandro@gmail.com>, 2018
 # Camilo B. Moreira <camilo.moreira@fatec.sp.gov.br>, 2017
 # Carlos Leite <caduado@gmail.com>, 2016
-# Filipe Cifali Stangler <cifali.filipe@gmail.com>, 2016
+# Filipe Cifali <cifali.filipe@gmail.com>, 2016
 # Claudemiro Alves Feitosa Neto <dimiro1@gmail.com>, 2015
 # dudanogueira <dudanogueira@gmail.com>, 2012
 # dudanogueira <dudanogueira@gmail.com>, 2014
@@ -14,16 +15,18 @@
 # Fábio C. Barrionuevo da Luz <bnafta@gmail.com>, 2015
 # gilberto dos santos alves <gsavix@gmail.com>, 2013
 # semente, 2012
+# Guilherme, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2022
 # Sandro <sandrossv@hotmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-11-22 10:47+0000\n"
-"Last-Translator: amcorreia <mutley.sandro@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-04-25 08:09+0000\n"
+"Last-Translator: Guilherme, 2022\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -67,8 +70,8 @@ msgstr "Nenhuma senha definida."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Formato de senha inválido ou algoritmo de hash desconhecido."
 
-msgid "The two password fields didn't match."
-msgstr "Os dois campos de senha não combinam."
+msgid "The two password fields didn’t match."
+msgstr "Os dois campos de senha não correspondem."
 
 msgid "Password"
 msgstr "Senha"
@@ -80,11 +83,12 @@ msgid "Enter the same password as before, for verification."
 msgstr "Informe a mesma senha informada anteriormente, para verificação."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Senhas brutas não são armazenadas, então não é possível ver a senha deste "
-"usuário, mas você pode trocá-la usando <a href=\"{}\">este formulário</a>."
+"Senhas brutas não são armazenadas, então não há como visualizar a senha "
+"desse usuário, porém você pode mudar a senha usando <a href=\"{}\">esse "
+"form</a>."
 
 #, python-format
 msgid ""
@@ -148,6 +152,9 @@ msgstr "fator de trabalho"
 
 msgid "checksum"
 msgstr "checksum"
+
+msgid "block size"
+msgstr "tamanho de bloco"
 
 msgid "name"
 msgstr "nome"
@@ -250,31 +257,36 @@ msgstr[0] ""
 msgstr[1] ""
 "Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
 "caracteres."
+msgstr[2] ""
+"Esta senha é muito curta. Ela precisa conter pelo menos %(min_length)d "
+"caracteres."
 
 #, python-format
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
 msgstr[1] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
+msgstr[2] "Sua senha precisa conter pelo menos %(min_length)d caracteres."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "A senha é muito parecida com %(verbose_name)s"
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Sua senha não pode ser tão parecida com suas outras informações pessoais."
+"Sua senha não pode ser muito parecida com o resto das suas informações "
+"pessoais."
 
 msgid "This password is too common."
 msgstr "Esta senha é muito comum."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Sua senha não pode ser uma senha habitualmente utilizada."
+msgid "Your password can’t be a commonly used password."
+msgstr "Sua senha não pode ser uma senha comumente utilizada."
 
 msgid "This password is entirely numeric."
 msgstr "Esta senha é inteiramente numérica."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Sua senha não pode ser inteiramente numérica."
 
 #, python-format

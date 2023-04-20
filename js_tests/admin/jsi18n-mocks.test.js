@@ -1,6 +1,7 @@
-(function(globals) {
-    'use strict';
-    var django = globals.django || (globals.django = {});
+'use strict';
+{
+    const globals = this;
+    const django = globals.django;
 
     django.pluralidx = function(count) { return (count === 1) ? 0 : 1; };
 
@@ -69,7 +70,7 @@
     };
 
     django.get_format = function(format_type) {
-        var value = django.formats[format_type];
+        const value = django.formats[format_type];
         if (typeof value === 'undefined') {
             return format_type;
         } else {
@@ -86,5 +87,4 @@
     globals.npgettext = django.npgettext;
     globals.interpolate = django.interpolate;
     globals.get_format = django.get_format;
-
-}(this));
+};

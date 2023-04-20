@@ -23,8 +23,7 @@ class LocMemCache(BaseCache):
         self._lock = _locks.setdefault(name, Lock())
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         pickled = pickle.dumps(value, self.pickle_protocol)
         with self._lock:
             if self._has_expired(key):
@@ -33,8 +32,7 @@ class LocMemCache(BaseCache):
             return False
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         with self._lock:
             if self._has_expired(key):
                 self._delete(key)
@@ -51,14 +49,13 @@ class LocMemCache(BaseCache):
         self._expire_info[key] = self.get_backend_timeout(timeout)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         pickled = pickle.dumps(value, self.pickle_protocol)
         with self._lock:
             self._set(key, pickled, timeout)
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         with self._lock:
             if self._has_expired(key):
                 return False
@@ -66,8 +63,7 @@ class LocMemCache(BaseCache):
             return True
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         with self._lock:
             if self._has_expired(key):
                 self._delete(key)
@@ -81,8 +77,7 @@ class LocMemCache(BaseCache):
         return new_value
 
     def has_key(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         with self._lock:
             if self._has_expired(key):
                 self._delete(key)
@@ -112,8 +107,7 @@ class LocMemCache(BaseCache):
         return True
 
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
-        self.validate_key(key)
+        key = self.make_and_validate_key(key, version=version)
         with self._lock:
             return self._delete(key)
 

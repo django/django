@@ -180,7 +180,8 @@ Date-based mixins
 
         The :func:`~time.strftime` format to use when parsing the week. By
         default, this is ``'%U'``, which means the week starts on Sunday. Set
-        it to ``'%W'`` if your week starts on Monday.
+        it to ``'%W'`` or ``'%V'`` (ISO 8601 week) if your week starts on
+        Monday.
 
     .. attribute:: week
 

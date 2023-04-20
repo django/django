@@ -1,18 +1,18 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# BouRock, 2015-2016,2019
+# BouRock, 2015-2016,2019-2023
 # BouRock, 2014
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2011
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-09-17 07:46+0000\n"
-"Last-Translator: BouRock\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: BouRock, 2015-2016,2019-2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -66,12 +66,22 @@ msgstr ""
 "ondan sonra iki kutu arasındaki \"Kaldır\" okuna tıklayarak "
 "kaldırabilirsiniz."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Seçilen %s listesini süzmek için bu kutu içine yazın."
+
 msgid "Remove all"
 msgstr "Tümünü kaldır"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Bir kerede tüm seçilen %s kaldırılması için tıklayın."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s seçilen seçenek görünür değil"
+msgstr[1] "%s seçilen seçenek görünür değil"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -86,20 +96,20 @@ msgstr ""
 "bir eylem çalıştırırsanız, kaydedilmemiş değişiklikleriniz kaybolacaktır."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"Bir eylem seçtiniz, fakat henüz bireysel alanlara değişikliklerinizi "
-"kaydetmediniz. Kaydetmek için lütfen TAMAM düğmesine tıklayın. Eylemi "
-"yeniden çalıştırmanız gerekecek."
+"Bir eylem seçtiniz, ancak değişikliklerinizi tek tek alanlara kaydetmediniz. "
+"Kaydetmek için lütfen TAMAM düğmesine tıklayın. Eylemi yeniden çalıştırmanız "
+"gerekecek."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"Bir eylem seçtiniz, fakat bireysel alanlar üzerinde hiçbir değişiklik "
+"Bir eylem seçtiniz, ancak tek tek alanlarda herhangi bir değişiklik "
 "yapmadınız. Muhtemelen Kaydet düğmesi yerine Git düğmesini arıyorsunuz."
 
 msgid "Now"
@@ -185,6 +195,54 @@ msgstr "Kasım"
 
 msgid "December"
 msgstr "Aralık"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Oca"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Şub"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Nis"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "May"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Haz"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Tem"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Ağu"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Eyl"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Eki"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Kas"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Ara"
 
 msgctxt "one letter Sunday"
 msgid "S"

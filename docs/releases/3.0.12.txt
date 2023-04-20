@@ -1,0 +1,15 @@
+===========================
+Django 3.0.12 release notes
+===========================
+
+*February 1, 2021*
+
+Django 3.0.12 fixes a security issue with severity "low" in 3.0.11.
+
+CVE-2021-3281: Potential directory-traversal via ``archive.extract()``
+======================================================================
+
+The ``django.utils.archive.extract()`` function, used by
+:option:`startapp --template` and :option:`startproject --template`, allowed
+directory-traversal via an archive with absolute paths or relative paths with
+dot segments.

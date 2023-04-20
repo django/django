@@ -1,6 +1,6 @@
-================================
-Custom template tags and filters
-================================
+==============================================
+How to create custom template tags and filters
+==============================================
 
 Django's template language comes with a wide variety of :doc:`built-in
 tags and filters </ref/templates/builtins>` designed to address the
@@ -35,7 +35,9 @@ later, so be careful to pick a name that won't clash with custom tags and
 filters in another app.
 
 For example, if your custom tags/filters are in a file called
-``poll_extras.py``, your app layout might look like this::
+``poll_extras.py``, your app layout might look like this:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -79,8 +81,8 @@ an application.
 .. admonition:: Behind the scenes
 
     For a ton of examples, read the source code for Django's default filters
-    and tags. They're in ``django/template/defaultfilters.py`` and
-    ``django/template/defaulttags.py``, respectively.
+    and tags. They're in :source:`django/template/defaultfilters.py` and
+    :source:`django/template/defaulttags.py`, respectively.
 
     For more information on the :ttag:`load` tag, read its documentation.
 
@@ -109,7 +111,7 @@ Here's an example filter definition::
 
     def cut(value, arg):
         """Removes all values of arg from the given string"""
-        return value.replace(arg, '')
+        return value.replace(arg, "")
 
 And here's an example of how that filter would be used:
 
@@ -120,7 +122,7 @@ And here's an example of how that filter would be used:
 Most filters don't take arguments. In this case, leave the argument out of your
 function::
 
-    def lower(value): # Only one argument.
+    def lower(value):  # Only one argument.
         """Converts a string into all lowercase"""
         return value.lower()
 
@@ -132,8 +134,8 @@ Registering custom filters
 Once you've written your filter definition, you need to register it with
 your ``Library`` instance, to make it available to Django's template language::
 
-    register.filter('cut', cut)
-    register.filter('lower', lower)
+    register.filter("cut", cut)
+    register.filter("lower", lower)
 
 The ``Library.filter()`` method takes two arguments:
 
@@ -143,9 +145,10 @@ The ``Library.filter()`` method takes two arguments:
 
 You can use ``register.filter()`` as a decorator instead::
 
-    @register.filter(name='cut')
+    @register.filter(name="cut")
     def cut(value, arg):
-        return value.replace(arg, '')
+        return value.replace(arg, "")
+
 
     @register.filter
     def lower(value):
@@ -172,6 +175,7 @@ convert an object to its string value before being passed to your function::
     from django.template.defaultfilters import stringfilter
 
     register = template.Library()
+
 
     @register.filter
     @stringfilter
@@ -240,7 +244,7 @@ Template filter code falls into one of two situations:
 
        @register.filter(is_safe=True)
        def add_xx(value):
-           return '%sxx' % value
+           return "%sxx" % value
 
    When this filter is used in a template where auto-escaping is enabled,
    Django will escape the output whenever the input is not already marked
@@ -298,6 +302,7 @@ Template filter code falls into one of two situations:
 
       register = template.Library()
 
+
       @register.filter(needs_autoescape=True)
       def initial_letter_filter(text, autoescape=True):
           first, other = text[0], text[1:]
@@ -305,7 +310,7 @@ Template filter code falls into one of two situations:
               esc = conditional_escape
           else:
               esc = lambda x: x
-          result = '<strong>%s</strong>%s' % (esc(first), esc(other))
+          result = "<strong>%s</strong>%s" % (esc(first), esc(other))
           return mark_safe(result)
 
    The ``needs_autoescape`` flag and the ``autoescape`` keyword argument mean
@@ -343,12 +348,10 @@ Template filter code falls into one of two situations:
 
         from django.template.defaultfilters import linebreaksbr, urlize
 
+
         @register.filter(needs_autoescape=True)
         def urlize_and_linebreaks(text, autoescape=True):
-            return linebreaksbr(
-                urlize(text, autoescape=autoescape),
-                autoescape=autoescape
-            )
+            return linebreaksbr(urlize(text, autoescape=autoescape), autoescape=autoescape)
 
     Then:
 
@@ -376,7 +379,7 @@ objects, you'll usually register it with the ``expects_localtime`` flag set to
         try:
             return 9 <= value.hour < 17
         except AttributeError:
-            return ''
+            return ""
 
 When this flag is set, if the first argument to your filter is a time zone
 aware datetime, Django will convert it to the current time zone before passing
@@ -419,6 +422,7 @@ Our ``current_time`` function could thus be written like this::
 
     register = template.Library()
 
+
     @register.simple_tag
     def current_time(format_string):
         return datetime.datetime.now().strftime(format_string)
@@ -448,7 +452,7 @@ If your template tag needs to access the current context, you can use the
 
     @register.simple_tag(takes_context=True)
     def current_time(context, format_string):
-        timezone = context['timezone']
+        timezone = context["timezone"]
         return your_get_current_time_method(timezone, format_string)
 
 Note that the first argument *must* be called ``context``.
@@ -458,9 +462,10 @@ on :ref:`inclusion tags<howto-custom-template-tags-inclusion-tags>`.
 
 If you need to rename your tag, you can provide a custom name for it::
 
-    register.simple_tag(lambda x: x - 1, name='minusone')
+    register.simple_tag(lambda x: x - 1, name="minusone")
 
-    @register.simple_tag(name='minustwo')
+
+    @register.simple_tag(name="minustwo")
     def some_function(value):
         return value - 2
 
@@ -469,8 +474,8 @@ arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
+        warning = kwargs["warning"]
+        profile = kwargs["profile"]
         ...
         return ...
 
@@ -535,7 +540,7 @@ for the template fragment. Example::
 
     def show_results(poll):
         choices = poll.choice_set.all()
-        return {'choices': choices}
+        return {"choices": choices}
 
 Next, create the template used to render the tag's output. This template is a
 fixed feature of the tag: the tag writer specifies it, not the template
@@ -555,7 +560,7 @@ in a file called ``results.html`` in a directory that's searched by the
 template loader, we'd register the tag like this::
 
     # Here, register is a django.template.Library instance, as before
-    @register.inclusion_tag('results.html')
+    @register.inclusion_tag("results.html")
     def show_results(poll):
         ...
 
@@ -563,7 +568,8 @@ Alternatively it is possible to register the inclusion tag using a
 :class:`django.template.Template` instance::
 
     from django.template.loader import get_template
-    t = get_template('results.html')
+
+    t = get_template("results.html")
     register.inclusion_tag(t)(show_results)
 
 ...when first creating the function.
@@ -579,11 +585,11 @@ For example, say you're writing an inclusion tag that will always be used in a
 context that contains ``home_link`` and ``home_title`` variables that point
 back to the main page. Here's what the Python function would look like::
 
-    @register.inclusion_tag('link.html', takes_context=True)
+    @register.inclusion_tag("link.html", takes_context=True)
     def jump_link(context):
         return {
-            'link': context['home_link'],
-            'title': context['home_title'],
+            "link": context["home_link"],
+            "title": context["home_title"],
         }
 
 Note that the first parameter to the function *must* be called ``context``.
@@ -613,10 +619,10 @@ only difference between this case and the previous ``inclusion_tag`` example.
 ``inclusion_tag`` functions may accept any number of positional or keyword
 arguments. For example::
 
-    @register.inclusion_tag('my_template.html')
+    @register.inclusion_tag("my_template.html")
     def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
+        warning = kwargs["warning"]
+        profile = kwargs["profile"]
         ...
         return ...
 
@@ -675,6 +681,7 @@ The parser for this function should grab the parameter and create a ``Node``
 object::
 
     from django import template
+
 
     def do_current_time(parser, token):
         try:
@@ -735,6 +742,7 @@ Continuing the above example, we need to define ``CurrentTimeNode``::
     import datetime
     from django import template
 
+
     class CurrentTimeNode(template.Node):
         def __init__(self, format_string):
             self.format_string = format_string
@@ -772,7 +780,7 @@ auto-escaping filters (with the exception of
 are still a couple of things you should keep in mind when writing a template
 tag.
 
-If the ``render()`` function of your template stores the result in a context
+If the ``render()`` method of your template tag stores the result in a context
 variable (rather than returning the result in a string), it should take care
 to call ``mark_safe()`` if appropriate. When the variable is ultimately
 rendered, it will be affected by the auto-escape setting in effect at the
@@ -786,17 +794,18 @@ The ``__init__`` method for the ``Context`` class takes a parameter called
 
     from django.template import Context
 
+
     def render(self, context):
         # ...
-        new_context = Context({'var': obj}, autoescape=context.autoescape)
+        new_context = Context({"var": obj}, autoescape=context.autoescape)
         # ... Do something with new_context ...
 
 This is not a very common situation, but it's useful if you're rendering a
 template yourself. For example::
 
     def render(self, context):
-        t = context.template.engine.get_template('small_fragment.html')
-        return t.render(Context({'var': obj}, autoescape=context.autoescape))
+        t = context.template.engine.get_template("small_fragment.html")
+        return t.render(Context({"var": obj}, autoescape=context.autoescape))
 
 If we had neglected to pass in the current ``context.autoescape`` value to our
 new ``Context`` in this example, the results would have *always* been
@@ -831,6 +840,7 @@ A naive implementation of ``CycleNode`` might look something like this::
 
     import itertools
     from django import template
+
 
     class CycleNode(template.Node):
         def __init__(self, cyclevars):
@@ -895,7 +905,7 @@ Finally, register the tag with your module's ``Library`` instance, as explained
 in :ref:`writing custom template tags<howto-writing-custom-template-tags>`
 above. Example::
 
-    register.tag('current_time', do_current_time)
+    register.tag("current_time", do_current_time)
 
 The ``tag()`` method takes two arguments:
 
@@ -909,6 +919,7 @@ As with filter registration, it is also possible to use this as a decorator::
     @register.tag(name="current_time")
     def do_current_time(parser, token):
         ...
+
 
     @register.tag
     def shout(parser, token):
@@ -947,6 +958,7 @@ Now your tag should begin to look like this::
 
     from django import template
 
+
     def do_format_time(parser, token):
         try:
             # split_contents() knows not to split quoted strings.
@@ -978,7 +990,7 @@ be resolved, and then call ``variable.resolve(context)``. So, for example::
                 actual_date = self.date_to_be_formatted.resolve(context)
                 return actual_date.strftime(self.format_string)
             except template.VariableDoesNotExist:
-                return ''
+                return ""
 
 Variable resolution will throw a ``VariableDoesNotExist`` exception if it
 cannot resolve the string passed to it in the current context of the page.
@@ -998,12 +1010,14 @@ outputting it::
     import datetime
     from django import template
 
+
     class CurrentTimeNode2(template.Node):
         def __init__(self, format_string):
             self.format_string = format_string
+
         def render(self, context):
-            context['current_time'] = datetime.datetime.now().strftime(self.format_string)
-            return ''
+            context["current_time"] = datetime.datetime.now().strftime(self.format_string)
+            return ""
 
 Note that ``render()`` returns the empty string. ``render()`` should always
 return string output. If all the template tag does is set a variable,
@@ -1039,13 +1053,16 @@ class, like so::
 
     import re
 
+
     class CurrentTimeNode3(template.Node):
         def __init__(self, format_string, var_name):
             self.format_string = format_string
             self.var_name = var_name
+
         def render(self, context):
             context[self.var_name] = datetime.datetime.now().strftime(self.format_string)
-            return ''
+            return ""
+
 
     def do_current_time(parser, token):
         # This version uses a regular expression to parse tag contents.
@@ -1056,7 +1073,7 @@ class, like so::
             raise template.TemplateSyntaxError(
                 "%r tag requires arguments" % token.contents.split()[0]
             )
-        m = re.search(r'(.*?) as (\w+)', arg)
+        m = re.search(r"(.*?) as (\w+)", arg)
         if not m:
             raise template.TemplateSyntaxError("%r tag had invalid arguments" % tag_name)
         format_string, var_name = m.groups()
@@ -1085,13 +1102,14 @@ compilation function.
 Here's how a simplified ``{% comment %}`` tag might be implemented::
 
     def do_comment(parser, token):
-        nodelist = parser.parse(('endcomment',))
+        nodelist = parser.parse(("endcomment",))
         parser.delete_first_token()
         return CommentNode()
 
+
     class CommentNode(template.Node):
         def render(self, context):
-            return ''
+            return ""
 
 .. note::
     The actual implementation of :ttag:`{% comment %}<comment>` is slightly
@@ -1138,13 +1156,15 @@ As in the previous example, we'll use ``parser.parse()``. But this time, we
 pass the resulting ``nodelist`` to the ``Node``::
 
     def do_upper(parser, token):
-        nodelist = parser.parse(('endupper',))
+        nodelist = parser.parse(("endupper",))
         parser.delete_first_token()
         return UpperNode(nodelist)
+
 
     class UpperNode(template.Node):
         def __init__(self, nodelist):
             self.nodelist = nodelist
+
         def render(self, context):
             output = self.nodelist.render(context)
             return output.upper()
@@ -1153,5 +1173,5 @@ The only new concept here is the ``self.nodelist.render(context)`` in
 ``UpperNode.render()``.
 
 For more examples of complex rendering, see the source code of
-:ttag:`{% for %}<for>` in ``django/template/defaulttags.py`` and
-:ttag:`{% if %}<if>` in ``django/template/smartif.py``.
+:ttag:`{% for %}<for>` in :source:`django/template/defaulttags.py` and
+:ttag:`{% if %}<if>` in :source:`django/template/smartif.py`.

@@ -4,7 +4,7 @@
 {% block extrahead %}
     {{ block.super }}
     {{ media }}
-    <script src="{% static 'admin/js/cancel.js' %}"></script>
+    <script src="{% static 'admin/js/cancel.js' %}" async></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} delete-confirmation delete-selected-confirmation{% endblock %}
@@ -21,18 +21,10 @@
 {% block content %}
 {% if perms_lacking %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in perms_lacking %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul>{{ perms_lacking|unordered_list }}</ul>
 {% elif protected %}
     <p>{% blocktranslate %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktranslate %}</p>
-    <ul>
-    {% for obj in protected %}
-        <li>{{ obj }}</li>
-    {% endfor %}
-    </ul>
+    <ul>{{ protected|unordered_list }}</ul>
 {% else %}
     <p>{% blocktranslate %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktranslate %}</p>
     {% include "admin/includes/object_delete_summary.html" %}

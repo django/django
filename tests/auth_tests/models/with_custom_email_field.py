@@ -15,10 +15,10 @@ class CustomEmailFieldUserManager(BaseUserManager):
 class CustomEmailField(AbstractBaseUser):
     username = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    email_address = models.EmailField()
+    email_address = models.EmailField(null=True)
     is_active = models.BooleanField(default=True)
 
-    EMAIL_FIELD = 'email_address'
-    USERNAME_FIELD = 'username'
+    EMAIL_FIELD = "email_address"
+    USERNAME_FIELD = "username"
 
     objects = CustomEmailFieldUserManager()

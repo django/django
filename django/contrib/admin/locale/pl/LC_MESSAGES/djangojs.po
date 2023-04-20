@@ -2,27 +2,30 @@
 #
 # Translators:
 # angularcircle, 2011
+# Darek505, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
-# konryd <inactive+konryd@transifex.com>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016,2018
+# 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
+# Maciej Olko <maciej.olko@gmail.com>, 2016,2018,2020
+# Maciej Olko <maciej.olko@gmail.com>, 2023
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023
 # Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2018-12-21 22:38+0000\n"
-"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
-"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -68,12 +71,24 @@ msgstr ""
 "To lista wybranych %s. Aby usunąć, zaznacz pozycje wybrane do usunięcia i "
 "kliknij strzałkę „Usuń” pomiędzy listami."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Wpisz coś tutaj, aby wyfiltrować listę wybranych %s."
+
 msgid "Remove all"
 msgstr "Usuń wszystkie"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kliknij, aby usunąć jednocześnie wszystkie wybrane %s."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s wybrana opcja jest ukryta"
+msgstr[1] "%s wybrane opcje są ukryte"
+msgstr[2] "%s wybranych opcji jest ukrytych"
+msgstr[3] "%s wybranych opcji jest ukrytych"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -90,16 +105,16 @@ msgstr ""
 "te zostaną utracone."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Wybrano akcję, lecz część zmian w polach nie została zachowana. Kliknij OK, "
 "aby zapisać. Aby wykonać akcję, należy ją ponownie uruchomić."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Wybrano akcję, lecz nie dokonano żadnych zmian w polach. Prawdopodobnie "
@@ -208,6 +223,54 @@ msgstr "Listopad"
 
 msgid "December"
 msgstr "Grudzień"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Sty"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Lut"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mar"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Kwi"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Maj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Cze"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Lip"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Sie"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Wrz"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Paź"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Lis"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Gru"
 
 msgctxt "one letter Sunday"
 msgid "S"

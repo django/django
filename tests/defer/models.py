@@ -44,3 +44,17 @@ class RefreshPrimaryProxy(Primary):
             if fields.intersection(deferred_fields):
                 fields = fields.union(deferred_fields)
         super().refresh_from_db(using, fields, **kwargs)
+
+
+class ShadowParent(models.Model):
+    """
+    ShadowParent declares a scalar, rather than a field. When this is
+    overridden, the field value, rather than the scalar value must still be
+    used when the field is deferred.
+    """
+
+    name = "aphrodite"
+
+
+class ShadowChild(ShadowParent):
+    name = models.CharField(default="adonis", max_length=6)

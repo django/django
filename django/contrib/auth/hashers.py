@@ -3,6 +3,7 @@ import binascii
 import functools
 import hashlib
 import importlib
+import math
 import warnings
 
 from django.conf import settings
@@ -10,13 +11,19 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.signals import setting_changed
 from django.dispatch import receiver
 from django.utils.crypto import (
-    constant_time_compare, get_random_string, pbkdf2,
+    RANDOM_STRING_CHARS,
+    constant_time_compare,
+    get_random_string,
+    pbkdf2,
 )
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
-UNUSABLE_PASSWORD_PREFIX = '!'  # This will never be a valid encoded hash
-UNUSABLE_PASSWORD_SUFFIX_LENGTH = 40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
+UNUSABLE_PASSWORD_PREFIX = "!"  # This will never be a valid encoded hash
+UNUSABLE_PASSWORD_SUFFIX_LENGTH = (
+    40  # number of random chars to add after UNUSABLE_PASSWORD_PREFIX
+)
 
 
 def is_password_usable(encoded):
@@ -27,7 +34,7 @@ def is_password_usable(encoded):
     return encoded is None or not encoded.startswith(UNUSABLE_PASSWORD_PREFIX)
 
 
-def check_password(password, encoded, setter=None, preferred='default'):
+def check_password(password, encoded, setter=None, preferred="default"):
     """
     Return a boolean of whether the raw password matches the three
     part encoded digest.
@@ -61,7 +68,7 @@ def check_password(password, encoded, setter=None, preferred='default'):
     return is_correct
 
 
-def make_password(password, salt=None, hasher='default'):
+def make_password(password, salt=None, hasher="default"):
     """
     Turn a plain-text password into a hash for database storage
 
@@ -71,48 +78,55 @@ def make_password(password, salt=None, hasher='default'):
     access to staff or superuser accounts. See ticket #20079 for more info.
     """
     if password is None:
-        return UNUSABLE_PASSWORD_PREFIX + get_random_string(UNUSABLE_PASSWORD_SUFFIX_LENGTH)
+        return UNUSABLE_PASSWORD_PREFIX + get_random_string(
+            UNUSABLE_PASSWORD_SUFFIX_LENGTH
+        )
+    if not isinstance(password, (bytes, str)):
+        raise TypeError(
+            "Password must be a string or bytes, got %s." % type(password).__qualname__
+        )
     hasher = get_hasher(hasher)
     salt = salt or hasher.salt()
     return hasher.encode(password, salt)
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_hashers():
     hashers = []
     for hasher_path in settings.PASSWORD_HASHERS:
         hasher_cls = import_string(hasher_path)
         hasher = hasher_cls()
-        if not getattr(hasher, 'algorithm'):
-            raise ImproperlyConfigured("hasher doesn't specify an "
-                                       "algorithm name: %s" % hasher_path)
+        if not getattr(hasher, "algorithm"):
+            raise ImproperlyConfigured(
+                "hasher doesn't specify an algorithm name: %s" % hasher_path
+            )
         hashers.append(hasher)
     return hashers
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_hashers_by_algorithm():
     return {hasher.algorithm: hasher for hasher in get_hashers()}
 
 
 @receiver(setting_changed)
-def reset_hashers(**kwargs):
-    if kwargs['setting'] == 'PASSWORD_HASHERS':
+def reset_hashers(*, setting, **kwargs):
+    if setting == "PASSWORD_HASHERS":
         get_hashers.cache_clear()
         get_hashers_by_algorithm.cache_clear()
 
 
-def get_hasher(algorithm='default'):
+def get_hasher(algorithm="default"):
     """
     Return an instance of a loaded password hasher.
 
     If algorithm is 'default', return the default hasher. Lazily import hashers
     specified in the project's settings file if needed.
     """
-    if hasattr(algorithm, 'algorithm'):
+    if hasattr(algorithm, "algorithm"):
         return algorithm
 
-    elif algorithm == 'default':
+    elif algorithm == "default":
         return get_hashers()[0]
 
     else:
@@ -120,9 +134,11 @@ def get_hasher(algorithm='default'):
         try:
             return hashers[algorithm]
         except KeyError:
-            raise ValueError("Unknown password hashing algorithm '%s'. "
-                             "Did you specify it in the PASSWORD_HASHERS "
-                             "setting?" % algorithm)
+            raise ValueError(
+                "Unknown password hashing algorithm '%s'. "
+                "Did you specify it in the PASSWORD_HASHERS "
+                "setting?" % algorithm
+            )
 
 
 def identify_hasher(encoded):
@@ -135,14 +151,15 @@ def identify_hasher(encoded):
     """
     # Ancient versions of Django created plain MD5 passwords and accepted
     # MD5 passwords with an empty salt.
-    if ((len(encoded) == 32 and '$' not in encoded) or
-            (len(encoded) == 37 and encoded.startswith('md5$$'))):
-        algorithm = 'unsalted_md5'
+    if (len(encoded) == 32 and "$" not in encoded) or (
+        len(encoded) == 37 and encoded.startswith("md5$$")
+    ):
+        algorithm = "unsalted_md5"
     # Ancient versions of Django accepted SHA1 passwords with an empty salt.
-    elif len(encoded) == 46 and encoded.startswith('sha1$$'):
-        algorithm = 'unsalted_sha1'
+    elif len(encoded) == 46 and encoded.startswith("sha1$$"):
+        algorithm = "unsalted_sha1"
     else:
-        algorithm = encoded.split('$', 1)[0]
+        algorithm = encoded.split("$", 1)[0]
     return get_hasher(algorithm)
 
 
@@ -156,6 +173,11 @@ def mask_hash(hash, show=6, char="*"):
     return masked
 
 
+def must_update_salt(salt, expected_entropy):
+    # Each character in the salt provides log_2(len(alphabet)) bits of entropy.
+    return len(salt) * math.log2(len(RANDOM_STRING_CHARS)) < expected_entropy
+
+
 class BasePasswordHasher:
     """
     Abstract base class for password hashers
@@ -165,8 +187,10 @@ class BasePasswordHasher:
 
     PasswordHasher objects are immutable.
     """
+
     algorithm = None
     library = None
+    salt_entropy = 128
 
     def _load_library(self):
         if self.library is not None:
@@ -177,19 +201,36 @@ class BasePasswordHasher:
             try:
                 module = importlib.import_module(mod_path)
             except ImportError as e:
-                raise ValueError("Couldn't load %r algorithm library: %s" %
-                                 (self.__class__.__name__, e))
+                raise ValueError(
+                    "Couldn't load %r algorithm library: %s"
+                    % (self.__class__.__name__, e)
+                )
             return module
-        raise ValueError("Hasher %r doesn't specify a library attribute" %
-                         self.__class__.__name__)
+        raise ValueError(
+            "Hasher %r doesn't specify a library attribute" % self.__class__.__name__
+        )
 
     def salt(self):
-        """Generate a cryptographically secure nonce salt in ASCII."""
-        return get_random_string()
+        """
+        Generate a cryptographically secure nonce salt in ASCII with an entropy
+        of at least `salt_entropy` bits.
+        """
+        # Each character in the salt provides
+        # log_2(len(alphabet)) bits of entropy.
+        char_count = math.ceil(self.salt_entropy / math.log2(len(RANDOM_STRING_CHARS)))
+        return get_random_string(char_count, allowed_chars=RANDOM_STRING_CHARS)
 
     def verify(self, password, encoded):
         """Check if the given password is correct."""
-        raise NotImplementedError('subclasses of BasePasswordHasher must provide a verify() method')
+        raise NotImplementedError(
+            "subclasses of BasePasswordHasher must provide a verify() method"
+        )
+
+    def _check_encode_args(self, password, salt):
+        if password is None:
+            raise TypeError("password must be provided.")
+        if not salt or "$" in salt:
+            raise ValueError("salt must be provided and cannot contain $.")
 
     def encode(self, password, salt):
         """
@@ -198,7 +239,21 @@ class BasePasswordHasher:
         The result is normally formatted as "algorithm$salt$hash" and
         must be fewer than 128 characters.
         """
-        raise NotImplementedError('subclasses of BasePasswordHasher must provide an encode() method')
+        raise NotImplementedError(
+            "subclasses of BasePasswordHasher must provide an encode() method"
+        )
+
+    def decode(self, encoded):
+        """
+        Return a decoded database value.
+
+        The result is a dictionary and should contain `algorithm`, `hash`, and
+        `salt`. Extra keys can be algorithm specific like `iterations` or
+        `work_factor`.
+        """
+        raise NotImplementedError(
+            "subclasses of BasePasswordHasher must provide a decode() method."
+        )
 
     def safe_summary(self, encoded):
         """
@@ -207,7 +262,9 @@ class BasePasswordHasher:
         The result is a dictionary and will be used where the password field
         must be displayed to construct a safe representation of the password.
         """
-        raise NotImplementedError('subclasses of BasePasswordHasher must provide a safe_summary() method')
+        raise NotImplementedError(
+            "subclasses of BasePasswordHasher must provide a safe_summary() method"
+        )
 
     def must_update(self, encoded):
         return False
@@ -223,7 +280,9 @@ class BasePasswordHasher:
         for any hasher that has a work factor. If not, this method should be
         defined as a no-op to silence the warning.
         """
-        warnings.warn('subclasses of BasePasswordHasher should provide a harden_runtime() method')
+        warnings.warn(
+            "subclasses of BasePasswordHasher should provide a harden_runtime() method"
+        )
 
 
 class PBKDF2PasswordHasher(BasePasswordHasher):
@@ -234,43 +293,52 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     The result is a 64 byte binary string.  Iterations may be changed
     safely but you must rename the algorithm if you change SHA256.
     """
+
     algorithm = "pbkdf2_sha256"
-    iterations = 216000
+    iterations = 720000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         iterations = iterations or self.iterations
         hash = pbkdf2(password, salt, iterations, digest=self.digest)
-        hash = base64.b64encode(hash).decode('ascii').strip()
+        hash = base64.b64encode(hash).decode("ascii").strip()
         return "%s$%d$%s$%s" % (self.algorithm, iterations, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
+    def decode(self, encoded):
+        algorithm, iterations, salt, hash = encoded.split("$", 3)
         assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt, int(iterations))
+        return {
+            "algorithm": algorithm,
+            "hash": hash,
+            "iterations": int(iterations),
+            "salt": salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded["salt"], decoded["iterations"])
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('iterations'): iterations,
-            _('salt'): mask_hash(salt),
-            _('hash'): mask_hash(hash),
+            _("algorithm"): decoded["algorithm"],
+            _("iterations"): decoded["iterations"],
+            _("salt"): mask_hash(decoded["salt"]),
+            _("hash"): mask_hash(decoded["hash"]),
         }
 
     def must_update(self, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        return int(iterations) != self.iterations
+        decoded = self.decode(encoded)
+        update_salt = must_update_salt(decoded["salt"], self.salt_entropy)
+        return (decoded["iterations"] != self.iterations) or update_salt
 
     def harden_runtime(self, password, encoded):
-        algorithm, iterations, salt, hash = encoded.split('$', 3)
-        extra_iterations = self.iterations - int(iterations)
+        decoded = self.decode(encoded)
+        extra_iterations = self.iterations - decoded["iterations"]
         if extra_iterations > 0:
-            self.encode(password, salt, extra_iterations)
+            self.encode(password, decoded["salt"], extra_iterations)
 
 
 class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
@@ -280,6 +348,7 @@ class PBKDF2SHA1PasswordHasher(PBKDF2PasswordHasher):
     implementations of PBKDF2, such as openssl's
     PKCS5_PBKDF2_HMAC_SHA1().
     """
+
     algorithm = "pbkdf2_sha1"
     digest = hashlib.sha1
 
@@ -292,96 +361,97 @@ class Argon2PasswordHasher(BasePasswordHasher):
     (https://password-hashing.net). It requires the argon2-cffi library which
     depends on native C code and might cause portability issues.
     """
-    algorithm = 'argon2'
-    library = 'argon2'
+
+    algorithm = "argon2"
+    library = "argon2"
 
     time_cost = 2
-    memory_cost = 512
-    parallelism = 2
+    memory_cost = 102400
+    parallelism = 8
 
     def encode(self, password, salt):
         argon2 = self._load_library()
+        params = self.params()
         data = argon2.low_level.hash_secret(
             password.encode(),
             salt.encode(),
-            time_cost=self.time_cost,
-            memory_cost=self.memory_cost,
-            parallelism=self.parallelism,
-            hash_len=argon2.DEFAULT_HASH_LENGTH,
-            type=argon2.low_level.Type.I,
+            time_cost=params.time_cost,
+            memory_cost=params.memory_cost,
+            parallelism=params.parallelism,
+            hash_len=params.hash_len,
+            type=params.type,
         )
-        return self.algorithm + data.decode('ascii')
+        return self.algorithm + data.decode("ascii")
+
+    def decode(self, encoded):
+        argon2 = self._load_library()
+        algorithm, rest = encoded.split("$", 1)
+        assert algorithm == self.algorithm
+        params = argon2.extract_parameters("$" + rest)
+        variety, *_, b64salt, hash = rest.split("$")
+        # Add padding.
+        b64salt += "=" * (-len(b64salt) % 4)
+        salt = base64.b64decode(b64salt).decode("latin1")
+        return {
+            "algorithm": algorithm,
+            "hash": hash,
+            "memory_cost": params.memory_cost,
+            "parallelism": params.parallelism,
+            "salt": salt,
+            "time_cost": params.time_cost,
+            "variety": variety,
+            "version": params.version,
+            "params": params,
+        }
 
     def verify(self, password, encoded):
         argon2 = self._load_library()
-        algorithm, rest = encoded.split('$', 1)
+        algorithm, rest = encoded.split("$", 1)
         assert algorithm == self.algorithm
         try:
-            return argon2.low_level.verify_secret(
-                ('$' + rest).encode('ascii'),
-                password.encode(),
-                type=argon2.low_level.Type.I,
-            )
+            return argon2.PasswordHasher().verify("$" + rest, password)
         except argon2.exceptions.VerificationError:
             return False
 
     def safe_summary(self, encoded):
-        (algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data) = self._decode(encoded)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('variety'): variety,
-            _('version'): version,
-            _('memory cost'): memory_cost,
-            _('time cost'): time_cost,
-            _('parallelism'): parallelism,
-            _('salt'): mask_hash(salt),
-            _('hash'): mask_hash(data),
+            _("algorithm"): decoded["algorithm"],
+            _("variety"): decoded["variety"],
+            _("version"): decoded["version"],
+            _("memory cost"): decoded["memory_cost"],
+            _("time cost"): decoded["time_cost"],
+            _("parallelism"): decoded["parallelism"],
+            _("salt"): mask_hash(decoded["salt"]),
+            _("hash"): mask_hash(decoded["hash"]),
         }
 
     def must_update(self, encoded):
-        (algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data) = self._decode(encoded)
-        assert algorithm == self.algorithm
-        argon2 = self._load_library()
-        return (
-            argon2.low_level.ARGON2_VERSION != version or
-            self.time_cost != time_cost or
-            self.memory_cost != memory_cost or
-            self.parallelism != parallelism
-        )
+        decoded = self.decode(encoded)
+        current_params = decoded["params"]
+        new_params = self.params()
+        # Set salt_len to the salt_len of the current parameters because salt
+        # is explicitly passed to argon2.
+        new_params.salt_len = current_params.salt_len
+        update_salt = must_update_salt(decoded["salt"], self.salt_entropy)
+        return (current_params != new_params) or update_salt
 
     def harden_runtime(self, password, encoded):
         # The runtime for Argon2 is too complicated to implement a sensible
         # hardening algorithm.
         pass
 
-    def _decode(self, encoded):
-        """
-        Split an encoded hash and return: (
-            algorithm, variety, version, time_cost, memory_cost,
-            parallelism, salt, data,
-        ).
-        """
-        bits = encoded.split('$')
-        if len(bits) == 5:
-            # Argon2 < 1.3
-            algorithm, variety, raw_params, salt, data = bits
-            version = 0x10
-        else:
-            assert len(bits) == 6
-            algorithm, variety, raw_version, raw_params, salt, data = bits
-            assert raw_version.startswith('v=')
-            version = int(raw_version[len('v='):])
-        params = dict(bit.split('=', 1) for bit in raw_params.split(','))
-        assert len(params) == 3 and all(x in params for x in ('t', 'm', 'p'))
-        time_cost = int(params['t'])
-        memory_cost = int(params['m'])
-        parallelism = int(params['p'])
-        return (
-            algorithm, variety, version, time_cost, memory_cost, parallelism,
-            salt, data,
+    def params(self):
+        argon2 = self._load_library()
+        # salt_len is a noop, because we provide our own salt.
+        return argon2.Parameters(
+            type=argon2.low_level.Type.ID,
+            version=argon2.low_level.ARGON2_VERSION,
+            salt_len=argon2.DEFAULT_RANDOM_SALT_LENGTH,
+            hash_len=argon2.DEFAULT_HASH_LENGTH,
+            time_cost=self.time_cost,
+            memory_cost=self.memory_cost,
+            parallelism=self.parallelism,
         )
 
 
@@ -394,6 +464,7 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
     this library depends on native C code and might cause portability
     issues.
     """
+
     algorithm = "bcrypt_sha256"
     digest = hashlib.sha256
     library = ("bcrypt", "bcrypt")
@@ -413,37 +484,46 @@ class BCryptSHA256PasswordHasher(BasePasswordHasher):
             password = binascii.hexlify(self.digest(password).digest())
 
         data = bcrypt.hashpw(password, salt)
-        return "%s$%s" % (self.algorithm, data.decode('ascii'))
+        return "%s$%s" % (self.algorithm, data.decode("ascii"))
+
+    def decode(self, encoded):
+        algorithm, empty, algostr, work_factor, data = encoded.split("$", 4)
+        assert algorithm == self.algorithm
+        return {
+            "algorithm": algorithm,
+            "algostr": algostr,
+            "checksum": data[22:],
+            "salt": data[:22],
+            "work_factor": int(work_factor),
+        }
 
     def verify(self, password, encoded):
-        algorithm, data = encoded.split('$', 1)
+        algorithm, data = encoded.split("$", 1)
         assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, data.encode('ascii'))
+        encoded_2 = self.encode(password, data.encode("ascii"))
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        algorithm, empty, algostr, work_factor, data = encoded.split('$', 4)
-        assert algorithm == self.algorithm
-        salt, checksum = data[:22], data[22:]
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('work factor'): work_factor,
-            _('salt'): mask_hash(salt),
-            _('checksum'): mask_hash(checksum),
+            _("algorithm"): decoded["algorithm"],
+            _("work factor"): decoded["work_factor"],
+            _("salt"): mask_hash(decoded["salt"]),
+            _("checksum"): mask_hash(decoded["checksum"]),
         }
 
     def must_update(self, encoded):
-        algorithm, empty, algostr, rounds, data = encoded.split('$', 4)
-        return int(rounds) != self.rounds
+        decoded = self.decode(encoded)
+        return decoded["work_factor"] != self.rounds
 
     def harden_runtime(self, password, encoded):
-        _, data = encoded.split('$', 1)
+        _, data = encoded.split("$", 1)
         salt = data[:29]  # Length of the salt in bcrypt.
-        rounds = data.split('$')[2]
+        rounds = data.split("$")[2]
         # work factor is logarithmic, adding one doubles the load.
-        diff = 2**(self.rounds - int(rounds)) - 1
+        diff = 2 ** (self.rounds - int(rounds)) - 1
         while diff > 0:
-            self.encode(password, salt.encode('ascii'))
+            self.encode(password, salt.encode("ascii"))
             diff -= 1
 
 
@@ -460,36 +540,135 @@ class BCryptPasswordHasher(BCryptSHA256PasswordHasher):
     bcrypt's 72 bytes password truncation. Most use cases should prefer the
     BCryptSHA256PasswordHasher.
     """
+
     algorithm = "bcrypt"
     digest = None
 
 
+class ScryptPasswordHasher(BasePasswordHasher):
+    """
+    Secure password hashing using the Scrypt algorithm.
+    """
+
+    algorithm = "scrypt"
+    block_size = 8
+    maxmem = 0
+    parallelism = 1
+    work_factor = 2**14
+
+    def encode(self, password, salt, n=None, r=None, p=None):
+        self._check_encode_args(password, salt)
+        n = n or self.work_factor
+        r = r or self.block_size
+        p = p or self.parallelism
+        hash_ = hashlib.scrypt(
+            password.encode(),
+            salt=salt.encode(),
+            n=n,
+            r=r,
+            p=p,
+            maxmem=self.maxmem,
+            dklen=64,
+        )
+        hash_ = base64.b64encode(hash_).decode("ascii").strip()
+        return "%s$%d$%s$%d$%d$%s" % (self.algorithm, n, salt, r, p, hash_)
+
+    def decode(self, encoded):
+        algorithm, work_factor, salt, block_size, parallelism, hash_ = encoded.split(
+            "$", 6
+        )
+        assert algorithm == self.algorithm
+        return {
+            "algorithm": algorithm,
+            "work_factor": int(work_factor),
+            "salt": salt,
+            "block_size": int(block_size),
+            "parallelism": int(parallelism),
+            "hash": hash_,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(
+            password,
+            decoded["salt"],
+            decoded["work_factor"],
+            decoded["block_size"],
+            decoded["parallelism"],
+        )
+        return constant_time_compare(encoded, encoded_2)
+
+    def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
+        return {
+            _("algorithm"): decoded["algorithm"],
+            _("work factor"): decoded["work_factor"],
+            _("block size"): decoded["block_size"],
+            _("parallelism"): decoded["parallelism"],
+            _("salt"): mask_hash(decoded["salt"]),
+            _("hash"): mask_hash(decoded["hash"]),
+        }
+
+    def must_update(self, encoded):
+        decoded = self.decode(encoded)
+        return (
+            decoded["work_factor"] != self.work_factor
+            or decoded["block_size"] != self.block_size
+            or decoded["parallelism"] != self.parallelism
+        )
+
+    def harden_runtime(self, password, encoded):
+        # The runtime for Scrypt is too complicated to implement a sensible
+        # hardening algorithm.
+        pass
+
+
+# RemovedInDjango51Warning.
 class SHA1PasswordHasher(BasePasswordHasher):
     """
     The SHA1 password hashing algorithm (not recommended)
     """
+
     algorithm = "sha1"
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.SHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
     def encode(self, password, salt):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         hash = hashlib.sha1((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
+    def decode(self, encoded):
+        algorithm, salt, hash = encoded.split("$", 2)
         assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt)
+        return {
+            "algorithm": algorithm,
+            "hash": hash,
+            "salt": salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded["salt"])
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('salt'): mask_hash(salt, show=2),
-            _('hash'): mask_hash(hash),
+            _("algorithm"): decoded["algorithm"],
+            _("salt"): mask_hash(decoded["salt"], show=2),
+            _("hash"): mask_hash(decoded["hash"]),
         }
+
+    def must_update(self, encoded):
+        decoded = self.decode(encoded)
+        return must_update_salt(decoded["salt"], self.salt_entropy)
 
     def harden_runtime(self, password, encoded):
         pass
@@ -499,33 +678,45 @@ class MD5PasswordHasher(BasePasswordHasher):
     """
     The Salted MD5 password hashing algorithm (not recommended)
     """
+
     algorithm = "md5"
 
     def encode(self, password, salt):
-        assert password is not None
-        assert salt and '$' not in salt
+        self._check_encode_args(password, salt)
         hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
-    def verify(self, password, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
+    def decode(self, encoded):
+        algorithm, salt, hash = encoded.split("$", 2)
         assert algorithm == self.algorithm
-        encoded_2 = self.encode(password, salt)
+        return {
+            "algorithm": algorithm,
+            "hash": hash,
+            "salt": salt,
+        }
+
+    def verify(self, password, encoded):
+        decoded = self.decode(encoded)
+        encoded_2 = self.encode(password, decoded["salt"])
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        algorithm, salt, hash = encoded.split('$', 2)
-        assert algorithm == self.algorithm
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): algorithm,
-            _('salt'): mask_hash(salt, show=2),
-            _('hash'): mask_hash(hash),
+            _("algorithm"): decoded["algorithm"],
+            _("salt"): mask_hash(decoded["salt"], show=2),
+            _("hash"): mask_hash(decoded["hash"]),
         }
+
+    def must_update(self, encoded):
+        decoded = self.decode(encoded)
+        return must_update_salt(decoded["salt"], self.salt_entropy)
 
     def harden_runtime(self, password, encoded):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     """
     Very insecure algorithm that you should *never* use; store SHA1 hashes
@@ -535,32 +726,50 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     hashes. Some older Django installs still have these values lingering
     around so we need to handle and upgrade them properly.
     """
+
     algorithm = "unsalted_sha1"
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
     def salt(self):
-        return ''
+        return ""
 
     def encode(self, password, salt):
-        assert salt == ''
+        if salt != "":
+            raise ValueError("salt must be empty.")
         hash = hashlib.sha1(password.encode()).hexdigest()
-        return 'sha1$$%s' % hash
+        return "sha1$$%s" % hash
+
+    def decode(self, encoded):
+        assert encoded.startswith("sha1$$")
+        return {
+            "algorithm": self.algorithm,
+            "hash": encoded[6:],
+            "salt": None,
+        }
 
     def verify(self, password, encoded):
-        encoded_2 = self.encode(password, '')
+        encoded_2 = self.encode(password, "")
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
-        assert encoded.startswith('sha1$$')
-        hash = encoded[6:]
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): self.algorithm,
-            _('hash'): mask_hash(hash),
+            _("algorithm"): decoded["algorithm"],
+            _("hash"): mask_hash(decoded["hash"]),
         }
 
     def harden_runtime(self, password, encoded):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
     Incredibly insecure algorithm that you should *never* use; stores unsalted
@@ -572,64 +781,43 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     these values lingering around so we need to handle and upgrade them
     properly.
     """
+
     algorithm = "unsalted_md5"
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
     def salt(self):
-        return ''
+        return ""
 
     def encode(self, password, salt):
-        assert salt == ''
+        if salt != "":
+            raise ValueError("salt must be empty.")
         return hashlib.md5(password.encode()).hexdigest()
 
+    def decode(self, encoded):
+        return {
+            "algorithm": self.algorithm,
+            "hash": encoded,
+            "salt": None,
+        }
+
     def verify(self, password, encoded):
-        if len(encoded) == 37 and encoded.startswith('md5$$'):
-            encoded = encoded[5:]
-        encoded_2 = self.encode(password, '')
+        if len(encoded) == 37:
+            encoded = encoded.removeprefix("md5$$")
+        encoded_2 = self.encode(password, "")
         return constant_time_compare(encoded, encoded_2)
 
     def safe_summary(self, encoded):
+        decoded = self.decode(encoded)
         return {
-            _('algorithm'): self.algorithm,
-            _('hash'): mask_hash(encoded, show=3),
-        }
-
-    def harden_runtime(self, password, encoded):
-        pass
-
-
-class CryptPasswordHasher(BasePasswordHasher):
-    """
-    Password hashing using UNIX crypt (not recommended)
-
-    The crypt module is not supported on all platforms.
-    """
-    algorithm = "crypt"
-    library = "crypt"
-
-    def salt(self):
-        return get_random_string(2)
-
-    def encode(self, password, salt):
-        crypt = self._load_library()
-        assert len(salt) == 2
-        data = crypt.crypt(password, salt)
-        assert data is not None  # A platform like OpenBSD with a dummy crypt module.
-        # we don't need to store the salt, but Django used to do this
-        return "%s$%s$%s" % (self.algorithm, '', data)
-
-    def verify(self, password, encoded):
-        crypt = self._load_library()
-        algorithm, salt, data = encoded.split('$', 2)
-        assert algorithm == self.algorithm
-        return constant_time_compare(data, crypt.crypt(password, data))
-
-    def safe_summary(self, encoded):
-        algorithm, salt, data = encoded.split('$', 2)
-        assert algorithm == self.algorithm
-        return {
-            _('algorithm'): algorithm,
-            _('salt'): salt,
-            _('hash'): mask_hash(data, show=3),
+            _("algorithm"): decoded["algorithm"],
+            _("hash"): mask_hash(decoded["hash"], show=3),
         }
 
     def harden_runtime(self, password, encoded):

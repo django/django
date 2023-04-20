@@ -3,6 +3,7 @@ Models for testing various aspects of the djang.contrib.admindocs app
 """
 
 from django.db import models
+from django.utils.functional import cached_property
 
 
 class Company(models.Model):
@@ -35,10 +36,11 @@ class Person(models.Model):
 
     .. include:: admin_docs/evilfile.txt
     """
+
     first_name = models.CharField(max_length=200, help_text="The person's first name")
     last_name = models.CharField(max_length=200, help_text="The person's last name")
     company = models.ForeignKey(Company, models.CASCADE, help_text="place of work")
-    family = models.ForeignKey(Family, models.SET_NULL, related_name='+', null=True)
+    family = models.ForeignKey(Family, models.SET_NULL, related_name="+", null=True)
     groups = models.ManyToManyField(Group, help_text="has membership")
 
     def _get_full_name(self):
@@ -54,9 +56,13 @@ class Person(models.Model):
 
     @property
     def a_property(self):
-        return 'a_property'
+        return "a_property"
 
-    def suffix_company_name(self, suffix='ltd'):
+    @cached_property
+    def a_cached_property(self):
+        return "a_cached_property"
+
+    def suffix_company_name(self, suffix="ltd"):
         return self.company.name + suffix
 
     def add_image(self):

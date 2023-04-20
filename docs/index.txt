@@ -22,7 +22,8 @@ Are you new to Django or to programming? This is the place to start!
   :doc:`Part 4: Forms and generic views <intro/tutorial04>` |
   :doc:`Part 5: Testing <intro/tutorial05>` |
   :doc:`Part 6: Static files <intro/tutorial06>` |
-  :doc:`Part 7: Customizing the admin site <intro/tutorial07>`
+  :doc:`Part 7: Customizing the admin site <intro/tutorial07>` |
+  :doc:`Part 8: Adding third-party packages <intro/tutorial08>`
 
 * **Advanced Tutorials:**
   :doc:`How to write reusable apps <intro/reusable-apps>` |
@@ -38,16 +39,11 @@ Having trouble? We'd like to help!
 * Looking for specific information? Try the :ref:`genindex`, :ref:`modindex` or
   the :doc:`detailed table of contents <contents>`.
 
-* Search for information in the archives of the |django-users| mailing list, or
-  `post a question`_.
-
-* Ask a question in the `#django IRC channel`_.
+* Not found anything? See :doc:`faq/help` for information on getting support
+  and asking questions to the community.
 
 * Report bugs with Django in our `ticket tracker`_.
 
-.. _archives: https://groups.google.com/group/django-users/
-.. _post a question: https://groups.google.com/d/forum/django-users
-.. _#django IRC channel: irc://irc.freenode.net/django
 .. _ticket tracker: https://code.djangoproject.com/
 
 How the documentation is organized
@@ -57,7 +53,7 @@ Django has a lot of documentation. A high-level overview of how it's organized
 will help you know where to look for certain things:
 
 * :doc:`Tutorials </intro/index>` take you by the hand through a series of
-  steps to create a Web application. Start here if you're new to Django or Web
+  steps to create a web application. Start here if you're new to Django or web
   application development. Also look at the ":ref:`index-first-steps`".
 
 * :doc:`Topic guides </topics/index>` discuss key topics and concepts at a
@@ -75,7 +71,7 @@ The model layer
 ===============
 
 Django provides an abstraction layer (the "models") for structuring and
-manipulating the data of your Web application. Learn more about it below:
+manipulating the data of your web application. Learn more about it below:
 
 * **Models:**
   :doc:`Introduction to models <topics/db/models>` |
@@ -110,8 +106,7 @@ manipulating the data of your Web application. Learn more about it below:
   :doc:`Custom lookups <howto/custom-lookups>` |
   :doc:`Query Expressions <ref/models/expressions>` |
   :doc:`Conditional Expressions <ref/models/conditional-expressions>` |
-  :doc:`Database Functions <ref/models/database-functions>` |
-  :doc:`Asynchronous Support <topics/async>`
+  :doc:`Database Functions <ref/models/database-functions>`
 
 * **Other:**
   :doc:`Supported databases <ref/databases>` |
@@ -131,7 +126,8 @@ to know about views via the links below:
   :doc:`URLconfs <topics/http/urls>` |
   :doc:`View functions <topics/http/views>` |
   :doc:`Shortcuts <topics/http/shortcuts>` |
-  :doc:`Decorators <topics/http/decorators>`
+  :doc:`Decorators <topics/http/decorators>` |
+  :doc:`Asynchronous Support <topics/async>`
 
 * **Reference:**
   :doc:`Built-in Views <ref/views>` |
@@ -178,7 +174,8 @@ designers and how it can be extended by programmers:
 
 * **For programmers:**
   :doc:`Template API <ref/templates/api>` |
-  :doc:`Custom tags and filters <howto/custom-template-tags>`
+  :doc:`Custom tags and filters <howto/custom-template-tags>` |
+  :doc:`Custom template backend <howto/custom-template-backend>`
 
 Forms
 =====
@@ -245,7 +242,7 @@ most popular features:
 Security
 ========
 
-Security is a topic of paramount importance in the development of Web
+Security is a topic of paramount importance in the development of web
 applications and Django provides multiple protection tools and mechanisms:
 
 * :doc:`Security overview <topics/security>`
@@ -265,7 +262,7 @@ regions:
 * :doc:`Overview <topics/i18n/index>` |
   :doc:`Internationalization <topics/i18n/translation>` |
   :ref:`Localization <how-to-create-language-files>` |
-  :doc:`Localized Web UI formatting and form input <topics/i18n/formatting>`
+  :doc:`Localized web UI formatting and form input <topics/i18n/formatting>`
 * :doc:`Time zones </topics/i18n/timezones>`
 
 Performance and optimization
@@ -280,13 +277,13 @@ Geographic framework
 ====================
 
 :doc:`GeoDjango <ref/contrib/gis/index>` intends to be a world-class geographic
-Web framework. Its goal is to make it as easy as possible to build GIS Web
+web framework. Its goal is to make it as easy as possible to build GIS web
 applications and harness the power of spatially enabled data.
 
-Common Web application tools
+Common web application tools
 ============================
 
-Django offers multiple tools commonly needed in the development of Web
+Django offers multiple tools commonly needed in the development of web
 applications:
 
 * **Authentication:**
@@ -333,7 +330,7 @@ you can contribute:
   :doc:`Team organization <internals/organization>` |
   :doc:`The Django source code repository <internals/git>` |
   :doc:`Security policies <internals/security>` |
-  :doc:`Mailing lists <internals/mailing-lists>`
+  :doc:`Mailing lists and Forum<internals/mailing-lists>`
 
 * **Design philosophies:**
   :doc:`Overview <misc/design-philosophies>`

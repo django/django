@@ -1,1 +1,1 @@
-cx_oracle >= 6.0
+cx_oracle >= 7.0

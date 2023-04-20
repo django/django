@@ -1,16 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Eugene MechanisM <eugene@mechanism.pro>, 2012
+# Eugene <eugene.mechanism@gmail.com>, 2012
+# crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Алексей Борискин <sun.void@gmail.com>, 2012,2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-01-17 11:07+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Eugene MechanisM <eugene@mechanism.pro>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-14 18:22+0000\n"
+"Last-Translator: crazyzubr <hjcnbckfd@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
@@ -38,11 +39,9 @@ msgid "Content type %(ct_id)s object has no associated model"
 msgstr "Тип содержимого %(ct_id)s не имеет связанной модели"
 
 #, python-format
-msgid "Content type %(ct_id)s object %(obj_id)s doesn't exist"
-msgstr ""
-"Объект с идентификатором %(obj_id)s, имеющий тип содержимого %(ct_id)s, не "
-"существует"
+msgid "Content type %(ct_id)s object %(obj_id)s doesn’t exist"
+msgstr "Объекта типа %(ct_id)s с идентификатором %(obj_id)s не существует"
 
 #, python-format
-msgid "%(ct_name)s objects don't have a get_absolute_url() method"
+msgid "%(ct_name)s objects don’t have a get_absolute_url() method"
 msgstr "Объекты типа \"%(ct_name)s\" не имеют метода get_absolute_url()"

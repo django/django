@@ -10,7 +10,7 @@ Writing validators
 
 A validator is a callable that takes a value and raises a
 :exc:`~django.core.exceptions.ValidationError` if it doesn't meet some
-criteria. Validators can be useful for re-using validation logic between
+criteria. Validators can be useful for reusing validation logic between
 different types of fields.
 
 For example, here's a validator that only allows even numbers::
@@ -18,17 +18,19 @@ For example, here's a validator that only allows even numbers::
     from django.core.exceptions import ValidationError
     from django.utils.translation import gettext_lazy as _
 
+
     def validate_even(value):
         if value % 2 != 0:
             raise ValidationError(
-                _('%(value)s is not an even number'),
-                params={'value': value},
+                _("%(value)s is not an even number"),
+                params={"value": value},
             )
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
 
     from django.db import models
+
 
     class MyModel(models.Model):
         even_field = models.IntegerField(validators=[validate_even])
@@ -37,6 +39,7 @@ Because values are converted to Python before validators are run, you can even
 use the same validator with forms::
 
     from django import forms
+
 
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
@@ -83,16 +86,21 @@ to, or in lieu of custom ``field.clean()`` methods.
         :attr:`regex` must be a regular expression string, or
         :exc:`TypeError` is raised.
 
+    A :class:`RegexValidator` searches the provided ``value`` for a given
+    regular expression with :func:`re.search`. By default, raises a
+    :exc:`~django.core.exceptions.ValidationError` with :attr:`message` and
+    :attr:`code` if a match **is not** found. Its behavior can be inverted by
+    setting :attr:`inverse_match` to ``True``, in which case the
+    :exc:`~django.core.exceptions.ValidationError` is raised when a match
+    **is** found.
+
     .. attribute:: regex
 
         The regular expression pattern to search for within the provided
-        ``value``, or a pre-compiled regular expression. By default, raises a
-        :exc:`~django.core.exceptions.ValidationError` with :attr:`message`
-        and :attr:`code` if a match is not found. That standard behavior can
-        be reversed by setting :attr:`inverse_match` to ``True``, in which case
-        the :exc:`~django.core.exceptions.ValidationError` is raised when a
-        match **is** found. By default, matches any string (including an empty
-        string).
+        ``value``, using :func:`re.search`. This may be a string or a
+        pre-compiled regular expression created with :func:`re.compile`.
+        Defaults to the empty string, which will be found in every possible
+        ``value``.
 
     .. attribute:: message
 
@@ -111,19 +119,19 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: flags
 
-        The flags used when compiling the regular expression string
-        :attr:`regex`. If :attr:`regex` is a pre-compiled regular expression,
-        and :attr:`flags` is overridden, :exc:`TypeError` is raised. Defaults
-        to ``0``.
+        The :ref:`regex flags <python:contents-of-module-re>` used when
+        compiling the regular expression string :attr:`regex`. If :attr:`regex`
+        is a pre-compiled regular expression, and :attr:`flags` is overridden,
+        :exc:`TypeError` is raised. Defaults to ``0``.
 
 ``EmailValidator``
 ------------------
 
-.. class:: EmailValidator(message=None, code=None, whitelist=None)
+.. class:: EmailValidator(message=None, code=None, allowlist=None)
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
-    :param whitelist: If not ``None``, overrides :attr:`whitelist`.
+    :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
     .. attribute:: message
 
@@ -136,25 +144,26 @@ to, or in lieu of custom ``field.clean()`` methods.
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"invalid"``.
 
-    .. attribute:: whitelist
+    .. attribute:: allowlist
 
-        Whitelist of email domains to allow. By default, a regular expression
-        (the ``domain_regex`` attribute) is used to validate whatever appears
-        after the @ sign. However, if that string appears in the whitelist, this
-        validation is bypassed. If not provided, the default whitelist is
-        ``['localhost']``. Other domains that don't contain a dot won't pass
-        validation, so you'd need to whitelist them as necessary.
+        Allowlist of email domains. By default, a regular expression (the
+        ``domain_regex`` attribute) is used to validate whatever appears after
+        the ``@`` sign. However, if that string appears in the ``allowlist``,
+        this validation is bypassed. If not provided, the default ``allowlist``
+        is ``['localhost']``. Other domains that don't contain a dot won't pass
+        validation, so you'd need to add them to the ``allowlist`` as
+        necessary.
 
 ``URLValidator``
 ----------------
 
 .. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
-    A :class:`RegexValidator` that ensures a value looks like a URL, and raises
-    an error code of ``'invalid'`` if it doesn't.
+    A :class:`RegexValidator` subclass that ensures a value looks like a URL,
+    and raises an error code of ``'invalid'`` if it doesn't.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
-    IPv6 addresses (:rfc:`3986#section-3.2.2`) and unicode domains are both
+    IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both
     supported.
 
     In addition to the optional arguments of its parent :class:`RegexValidator`
@@ -312,7 +321,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: ProhibitNullCharactersValidator(message=None, code=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
-    contains one or more nulls characters (``'\x00'``).
+    contains one or more null characters (``'\x00'``).
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -327,3 +336,13 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"null_characters_not_allowed"``.
+
+``StepValueValidator``
+----------------------
+
+.. class:: StepValueValidator(limit_value, message=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'step_size'`` if ``value`` is not an integral multiple of
+    ``limit_value``, which can be a float, integer or decimal value or a
+    callable.

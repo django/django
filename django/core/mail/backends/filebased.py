@@ -5,9 +5,7 @@ import os
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.mail.backends.console import (
-    EmailBackend as ConsoleEmailBackend,
-)
+from django.core.mail.backends.console import EmailBackend as ConsoleEmailBackend
 
 
 class EmailBackend(ConsoleEmailBackend):
@@ -16,31 +14,35 @@ class EmailBackend(ConsoleEmailBackend):
         if file_path is not None:
             self.file_path = file_path
         else:
-            self.file_path = getattr(settings, 'EMAIL_FILE_PATH', None)
+            self.file_path = getattr(settings, "EMAIL_FILE_PATH", None)
         self.file_path = os.path.abspath(self.file_path)
         try:
             os.makedirs(self.file_path, exist_ok=True)
         except FileExistsError:
             raise ImproperlyConfigured(
-                'Path for saving email messages exists, but is not a directory: %s' % self.file_path
+                "Path for saving email messages exists, but is not a directory: %s"
+                % self.file_path
             )
         except OSError as err:
             raise ImproperlyConfigured(
-                'Could not create directory for saving email messages: %s (%s)' % (self.file_path, err)
+                "Could not create directory for saving email messages: %s (%s)"
+                % (self.file_path, err)
             )
         # Make sure that self.file_path is writable.
         if not os.access(self.file_path, os.W_OK):
-            raise ImproperlyConfigured('Could not write to directory: %s' % self.file_path)
+            raise ImproperlyConfigured(
+                "Could not write to directory: %s" % self.file_path
+            )
         # Finally, call super().
         # Since we're using the console-based backend as a base,
         # force the stream to be None, so we don't default to stdout
-        kwargs['stream'] = None
+        kwargs["stream"] = None
         super().__init__(*args, **kwargs)
 
     def write_message(self, message):
-        self.stream.write(message.message().as_bytes() + b'\n')
-        self.stream.write(b'-' * 79)
-        self.stream.write(b'\n')
+        self.stream.write(message.message().as_bytes() + b"\n")
+        self.stream.write(b"-" * 79)
+        self.stream.write(b"\n")
 
     def _get_filename(self):
         """Return a unique file name."""
@@ -52,7 +54,7 @@ class EmailBackend(ConsoleEmailBackend):
 
     def open(self):
         if self.stream is None:
-            self.stream = open(self._get_filename(), 'ab')
+            self.stream = open(self._get_filename(), "ab")
             return True
         return False
 

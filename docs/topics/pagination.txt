@@ -10,18 +10,20 @@ The ``Paginator`` class
 
 Under the hood, all methods of pagination use the
 :class:`~django.core.paginator.Paginator` class. It does all the heavy lifting
-of actually splitting a ``QuerySet`` into parts and handing them over to other
-components.
+of actually splitting a ``QuerySet`` into :class:`~django.core.paginator.Page`
+objects.
 
 Example
 =======
 
 Give :class:`~django.core.paginator.Paginator` a list of objects, plus the
 number of items you'd like to have on each page, and it gives you methods for
-accessing the items for each page::
+accessing the items for each page:
+
+.. code-block:: pycon
 
     >>> from django.core.paginator import Paginator
-    >>> objects = ['john', 'paul', 'george', 'ringo']
+    >>> objects = ["john", "paul", "george", "ringo"]
     >>> p = Paginator(objects, 2)
 
     >>> p.count
@@ -54,9 +56,9 @@ accessing the items for each page::
     EmptyPage: That page contains no results
     >>> page2.previous_page_number()
     1
-    >>> page2.start_index() # The 1-based index of the first item on this page
+    >>> page2.start_index()  # The 1-based index of the first item on this page
     3
-    >>> page2.end_index() # The 1-based index of the last item on this page
+    >>> page2.end_index()  # The 1-based index of the last item on this page
     4
 
     >>> p.page(0)
@@ -78,56 +80,32 @@ accessing the items for each page::
     objects such as Django's ``QuerySet`` to use a more efficient ``count()``
     method when available.
 
+.. _paginating-a-list-view:
+
 Paginating a ``ListView``
 =========================
 
 :class:`django.views.generic.list.ListView` provides a builtin way to paginate
-the displayed list. You can do this by adding
+the displayed list. You can do this by adding a
 :attr:`~django.views.generic.list.MultipleObjectMixin.paginate_by` attribute to
 your view class, for example::
 
     from django.views.generic import ListView
 
-    from myapp.models import Contacts
+    from myapp.models import Contact
 
-    class ContactsList(ListView):
+
+    class ContactListView(ListView):
         paginate_by = 2
-        model = Contacts
+        model = Contact
 
-The only thing your users will be missing is a way to navigate to the next or
-previous page. To achieve this, add links to the next and previous page, like
-shown in the below example ``list.html``.
-
-.. _using-paginator-in-view:
-
-Using ``Paginator`` in a view
-=============================
-
-Here's a slightly more complex example using
-:class:`~django.core.paginator.Paginator` in a view to paginate a queryset. We
-give both the view and the accompanying template to show how you can display
-the results. This example assumes you have a ``Contacts`` model that has
-already been imported.
-
-The view function looks like this::
-
-    from django.core.paginator import Paginator
-    from django.shortcuts import render
-
-    def listing(request):
-        contact_list = Contacts.objects.all()
-        paginator = Paginator(contact_list, 25) # Show 25 contacts per page
-
-        page = request.GET.get('page')
-        contacts = paginator.get_page(page)
-        return render(request, 'list.html', {'contacts': contacts})
-
-In the template :file:`list.html`, you'll want to include navigation between
-pages along with any interesting information from the objects themselves:
+This limits the number of objects per page and adds a ``paginator`` and
+``page_obj`` to the ``context``. To allow your users to navigate between pages,
+add links to the next and previous page, in your template like this:
 
 .. code-block:: html+django
 
-    {% for contact in contacts %}
+    {% for contact in page_obj %}
         {# Each "contact" is a Contact model object. #}
         {{ contact.full_name|upper }}<br>
         ...
@@ -135,18 +113,43 @@ pages along with any interesting information from the objects themselves:
 
     <div class="pagination">
         <span class="step-links">
-            {% if contacts.has_previous %}
+            {% if page_obj.has_previous %}
                 <a href="?page=1">&laquo; first</a>
-                <a href="?page={{ contacts.previous_page_number }}">previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}">previous</a>
             {% endif %}
 
             <span class="current">
-                Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
             </span>
 
-            {% if contacts.has_next %}
-                <a href="?page={{ contacts.next_page_number }}">next</a>
-                <a href="?page={{ contacts.paginator.num_pages }}">last &raquo;</a>
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
             {% endif %}
         </span>
     </div>
+
+.. _using-paginator-in-view:
+
+Using ``Paginator`` in a view function
+======================================
+
+Here's an example using :class:`~django.core.paginator.Paginator` in a view
+function to paginate a queryset::
+
+    from django.core.paginator import Paginator
+    from django.shortcuts import render
+
+    from myapp.models import Contact
+
+
+    def listing(request):
+        contact_list = Contact.objects.all()
+        paginator = Paginator(contact_list, 25)  # Show 25 contacts per page.
+
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        return render(request, "list.html", {"page_obj": page_obj})
+
+In the template :file:`list.html`, you can include navigation between pages in
+the same way as in the template for the ``ListView`` above.

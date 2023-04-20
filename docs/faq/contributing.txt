@@ -2,6 +2,8 @@
 FAQ: Contributing code
 ======================
 
+.. _new-contributors-faq:
+
 How can I get started contributing code to Django?
 ==================================================
 
@@ -55,16 +57,16 @@ Gentle IRC reminders can also work -- again, strategically timed if possible.
 During a bug sprint would be a very good time, for example.
 
 Another way to get traction is to pull several related tickets together. When
-the someone sits down to review a bug in an area they haven't touched for
+someone sits down to review a bug in an area they haven't touched for
 a while, it can take a few minutes to remember all the fine details of how
 that area of code works. If you collect several minor bug fixes together into
 a similarly themed group, you make an attractive target, as the cost of coming
 up to speed on an area of code can be spread over multiple tickets.
 
 Please refrain from emailing anyone personally or repeatedly raising the same
-issue over and over. This sort of behavior will not gain you any additional
-attention -- certainly not the attention that you need in order to get your
-issue addressed.
+issue over and over again. This sort of behavior will not gain you any
+additional attention -- certainly not the attention that you need in order to
+get your issue addressed.
 
 But I've reminded you several times and you keep ignoring my patch!
 ===================================================================
@@ -79,10 +81,10 @@ people that will likely be affected by a given bug. Bugs that have the
 potential to affect many people will generally get priority over those that
 are edge cases.
 
-Another reason that bugs might be ignored for while is if the bug is a symptom
-of a larger problem. While we can spend time writing, testing and applying
-lots of little patches, sometimes the right solution is to rebuild. If a
-rebuild or refactor of a particular component has been proposed or is
+Another reason that a bug might be ignored for a while is if the bug is a
+symptom of a larger problem. While we can spend time writing, testing and
+applying lots of little patches, sometimes the right solution is to rebuild. If
+a rebuild or refactor of a particular component has been proposed or is
 underway, you may find that bugs affecting that component will not get as much
 attention. Again, this is a matter of prioritizing scarce resources. By
 concentrating on the rebuild, we can close all the little bugs at once, and
@@ -97,3 +99,9 @@ entire community, instead of prioritizing the impact on one particular user.
 This doesn't mean that we think your problem is unimportant -- just that in the
 limited time we have available, we will always err on the side of making 10
 people happy rather than making a single person happy.
+
+I'm sure my ticket is absolutely 100% perfect, can I mark it as "Ready For Checkin" myself?
+===========================================================================================
+
+Sorry, no. It's always better to get another set of eyes on a ticket. If
+you're having trouble getting that second set of eyes, see questions above.

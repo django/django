@@ -2,26 +2,115 @@
     DJANGO Admin styles
 */
 
-@import url(fonts.css);
+/* VARIABLE DEFINITIONS */
+html[data-theme="light"],
+:root {
+    --primary: #79aec8;
+    --secondary: #417690;
+    --accent: #f5dd5d;
+    --primary-fg: #fff;
+
+    --body-fg: #333;
+    --body-bg: #fff;
+    --body-quiet-color: #666;
+    --body-loud-color: #000;
+
+    --header-color: #ffc;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--secondary);
+    --header-link-color: var(--primary-fg);
+
+    --breadcrumbs-fg: #c4dce8;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary);
+
+    --link-fg: #417893;
+    --link-hover-color: #036;
+    --link-selected-fg: #5b80b2;
+
+    --hairline-color: #e8e8e8;
+    --border-color: #ccc;
+
+    --error-fg: #ba2121;
+
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
+
+    --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
+    --selected-bg: #e4e4e4; /* E.g. selected table cells */
+    --selected-row: #ffc;
+
+    --button-fg: #fff;
+    --button-bg: var(--primary);
+    --button-hover-bg: #609ab6;
+    --default-button-bg: var(--secondary);
+    --default-button-hover-bg: #205067;
+    --close-button-bg: #747474;
+    --close-button-hover-bg: #333;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
+
+    --object-tools-fg: var(--button-fg);
+    --object-tools-bg: var(--close-button-bg);
+    --object-tools-hover-bg: var(--close-button-hover-bg);
+
+    --font-family-primary:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        system-ui,
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+    --font-family-monospace:
+        ui-monospace,
+        Menlo,
+        Monaco,
+        "Cascadia Mono",
+        "Segoe UI Mono",
+        "Roboto Mono",
+        "Oxygen Mono",
+        "Ubuntu Monospace",
+        "Source Code Pro",
+        "Fira Mono",
+        "Droid Sans Mono",
+        "Courier New",
+        monospace,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+html, body {
+    height: 100%;
+}
 
 body {
     margin: 0;
     padding: 0;
-    font-size: 14px;
-    font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-    color: #333;
-    background: #fff;
+    font-size: 0.875rem;
+    font-family: var(--font-family-primary);
+    color: var(--body-fg);
+    background: var(--body-bg);
 }
 
 /* LINKS */
 
 a:link, a:visited {
-    color: #447e9b;
+    color: var(--link-fg);
     text-decoration: none;
+    transition: color 0.15s, background 0.15s;
 }
 
 a:focus, a:hover {
-    color: #036;
+    color: var(--link-hover-color);
 }
 
 a:focus {
@@ -33,7 +122,7 @@ a img {
 }
 
 a.section:link, a.section:visited {
-    color: #fff;
+    color: var(--header-link-color);
     text-decoration: none;
 }
 
@@ -59,12 +148,12 @@ h1,h2,h3,h4,h5 {
 h1 {
     margin: 0 0 20px;
     font-weight: 300;
-    font-size: 20px;
-    color: #666;
+    font-size: 1.25rem;
+    color: var(--body-quiet-color);
 }
 
 h2 {
-    font-size: 16px;
+    font-size: 1rem;
     margin: 1em 0 .5em 0;
 }
 
@@ -74,27 +163,27 @@ h2.subhead {
 }
 
 h3 {
-    font-size: 14px;
+    font-size: 0.875rem;
     margin: .8em 0 .3em 0;
-    color: #666;
+    color: var(--body-quiet-color);
     font-weight: bold;
 }
 
 h4 {
-    font-size: 12px;
+    font-size: 0.75rem;
     margin: 1em 0 .8em 0;
     padding-bottom: 3px;
 }
 
 h5 {
-    font-size: 10px;
+    font-size: 0.625rem;
     margin: 1.5em 0 .5em 0;
-    color: #666;
+    color: var(--body-quiet-color);
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-ul li {
+ul > li {
     list-style-type: square;
     padding: 1px 0;
 }
@@ -104,8 +193,8 @@ li ul {
 }
 
 li, dt, dd {
-    font-size: 13px;
-    line-height: 20px;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
 }
 
 dt {
@@ -124,13 +213,14 @@ form {
 
 fieldset {
     margin: 0;
+    min-width: 0;
     padding: 0;
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
 }
 
 blockquote {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: #777;
     margin-left: 2px;
     padding-left: 10px;
@@ -138,14 +228,15 @@ blockquote {
 }
 
 code, pre {
-    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
-    color: #666;
-    font-size: 12px;
+    font-family: var(--font-family-monospace);
+    color: var(--body-quiet-color);
+    font-size: 0.75rem;
+    overflow-x: auto;
 }
 
 pre.literal-block {
     margin: 10px;
-    background: #eee;
+    background: var(--darkened-bg);
     padding: 6px 8px;
 }
 
@@ -155,41 +246,28 @@ code strong {
 
 hr {
     clear: both;
-    color: #eee;
-    background-color: #eee;
+    color: var(--hairline-color);
+    background-color: var(--hairline-color);
     height: 1px;
     border: none;
     margin: 0;
     padding: 0;
-    font-size: 1px;
     line-height: 1px;
 }
 
 /* TEXT STYLES & MODIFIERS */
 
 .small {
-    font-size: 11px;
-}
-
-.tiny {
-    font-size: 10px;
-}
-
-p.tiny {
-    margin-top: -2px;
+    font-size: 0.6875rem;
 }
 
 .mini {
-    font-size: 10px;
-}
-
-p.mini {
-    margin-top: -3px;
+    font-size: 0.625rem;
 }
 
 .help, p.help, form p.help, div.help, form div.help, div.help li {
-    font-size: 11px;
-    color: #999;
+    font-size: 0.6875rem;
+    color: var(--body-quiet-color);
 }
 
 div.help ul {
@@ -205,54 +283,35 @@ p img, h1 img, h2 img, h3 img, h4 img, td img {
 }
 
 .quiet, a.quiet:link, a.quiet:visited {
-    color: #999;
+    color: var(--body-quiet-color);
     font-weight: normal;
-}
-
-.float-right {
-    float: right;
-}
-
-.float-left {
-    float: left;
 }
 
 .clear {
     clear: both;
 }
 
-.align-left {
-    text-align: left;
-}
-
-.align-right {
-    text-align: right;
-}
-
-.example {
-    margin: 10px 0;
-    padding: 5px 10px;
-    background: #efefef;
-}
-
 .nowrap {
     white-space: nowrap;
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* TABLES */
 
 table {
     border-collapse: collapse;
-    border-color: #ccc;
+    border-color: var(--border-color);
 }
 
 td, th {
-    font-size: 13px;
-    line-height: 16px;
-    border-bottom: 1px solid #eee;
+    font-size: 0.8125rem;
+    line-height: 1rem;
+    border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
-    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
 }
 
 th {
@@ -262,37 +321,37 @@ th {
 
 thead th,
 tfoot td {
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 5px 10px;
-    font-size: 11px;
-    background: #fff;
+    font-size: 0.6875rem;
+    background: var(--body-bg);
     border: none;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
+    border-bottom: 1px solid var(--hairline-color);
 }
 
 tfoot td {
     border-bottom: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--hairline-color);
 }
 
 thead th.required {
-    color: #000;
+    color: var(--body-loud-color);
 }
 
 tr.alt {
-    background: #f6f6f6;
+    background: var(--darkened-bg);
 }
 
-.row1, .row-form-errors {
-    background: #fff;
+tr:nth-child(odd), .row-form-errors {
+    background: var(--body-bg);
 }
 
-.row2,
-.row2 .errorlist,
-.row1 + .row-form-errors,
-.row1 + .row-form-errors .errorlist {
-    background: #f9f9f9;
+tr:nth-child(even),
+tr:nth-child(even) .errorlist,
+tr:nth-child(odd) + .row-form-errors,
+tr:nth-child(odd) + .row-form-errors .errorlist {
+    background: var(--darkened-bg);
 }
 
 /* SORTABLE TABLES */
@@ -301,15 +360,15 @@ thead th {
     padding: 5px 10px;
     line-height: normal;
     text-transform: uppercase;
-    background: #f6f6f6;
+    background: var(--darkened-bg);
 }
 
 thead th a:link, thead th a:visited {
-    color: #666;
+    color: var(--body-quiet-color);
 }
 
 thead th.sorted {
-    background: #eee;
+    background: var(--selected-bg);
 }
 
 thead th.sorted .text {
@@ -328,7 +387,7 @@ table thead th .text a {
 }
 
 table thead th .text a:focus, table thead th .text a:hover {
-    background: #eee;
+    background: var(--selected-bg);
 }
 
 thead th.sorted a.sortremove {
@@ -374,13 +433,13 @@ table thead th.sorted .sortoptions a.sortremove:after {
     top: -6px;
     left: 3px;
     font-weight: 200;
-    font-size: 18px;
-    color: #999;
+    font-size: 1.125rem;
+    color: var(--body-quiet-color);
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus:after,
 table thead th.sorted .sortoptions a.sortremove:hover:after {
-    color: #447e9b;
+    color: var(--link-fg);
 }
 
 table thead th.sorted .sortoptions a.sortremove:focus,
@@ -413,9 +472,9 @@ input, textarea, select, .form-row p, form .button {
     margin: 2px 0;
     padding: 2px 3px;
     vertical-align: middle;
-    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    font-family: var(--font-family-primary);
     font-weight: normal;
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 .form-row div.help {
     padding: 2px 3px;
@@ -427,20 +486,22 @@ textarea {
 
 input[type=text], input[type=password], input[type=email], input[type=url],
 input[type=number], input[type=tel], textarea, select, .vTextField {
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     padding: 5px 6px;
     margin-top: 0;
+    color: var(--body-fg);
+    background-color: var(--body-bg);
 }
 
 input[type=text]:focus, input[type=password]:focus, input[type=email]:focus,
 input[type=url]:focus, input[type=number]:focus, input[type=tel]:focus,
 textarea:focus, select:focus, .vTextField:focus {
-    border-color: #999;
+    border-color: var(--body-quiet-color);
 }
 
 select {
-    height: 30px;
+    height: 1.875rem;
 }
 
 select[multiple] {
@@ -452,12 +513,13 @@ select[multiple] {
 /* FORM BUTTONS */
 
 .button, input[type=submit], input[type=button], .submit-row input, a.button {
-    background: #79aec8;
+    background: var(--button-bg);
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
-    color: #fff;
+    color: var(--button-fg);
     cursor: pointer;
+    transition: background 0.15s;
 }
 
 a.button {
@@ -467,7 +529,7 @@ a.button {
 .button:active, input[type=submit]:active, input[type=button]:active,
 .button:focus, input[type=submit]:focus, input[type=button]:focus,
 .button:hover, input[type=submit]:hover, input[type=button]:hover {
-    background: #609ab6;
+    background: var(--button-hover-bg);
 }
 
 .button[disabled], input[type=submit][disabled], input[type=button][disabled] {
@@ -475,16 +537,15 @@ a.button {
 }
 
 .button.default, input[type=submit].default, .submit-row input.default {
-    float: right;
     border: none;
     font-weight: 400;
-    background: #417690;
+    background: var(--default-button-bg);
 }
 
 .button.default:active, input[type=submit].default:active,
 .button.default:focus, input[type=submit].default:focus,
 .button.default:hover, input[type=submit].default:hover {
-    background: #205067;
+    background: var(--default-button-hover-bg);
 }
 
 .button[disabled].default,
@@ -499,7 +560,7 @@ input[type=button][disabled].default {
 .module {
     border: none;
     margin-bottom: 30px;
-    background: #fff;
+    background: var(--body-bg);
 }
 
 .module p, .module ul, .module h3, .module h4, .module dl, .module pre {
@@ -523,15 +584,15 @@ input[type=button][disabled].default {
     margin: 0;
     padding: 8px;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 0.8125rem;
     text-align: left;
-    background: #79aec8;
-    color: #fff;
+    background: var(--primary);
+    color: var(--header-link-color);
 }
 
 .module caption,
 .inline-group h2 {
-    font-size: 12px;
+    font-size: 0.75rem;
     letter-spacing: 0.5px;
     text-transform: uppercase;
 }
@@ -550,48 +611,51 @@ ul.messagelist {
 ul.messagelist li {
     display: block;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 0.8125rem;
     padding: 10px 10px 10px 65px;
     margin: 0 0 10px 0;
-    background: #dfd url(../img/icon-yes.svg) 40px 12px no-repeat;
+    background: var(--message-success-bg) url(../img/icon-yes.svg) 40px 12px no-repeat;
     background-size: 16px auto;
-    color: #333;
+    color: var(--body-fg);
+    word-break: break-word;
 }
 
 ul.messagelist li.warning {
-    background: #ffc url(../img/icon-alert.svg) 40px 14px no-repeat;
+    background: var(--message-warning-bg) url(../img/icon-alert.svg) 40px 14px no-repeat;
     background-size: 14px auto;
 }
 
 ul.messagelist li.error {
-    background: #ffefef url(../img/icon-no.svg) 40px 12px no-repeat;
+    background: var(--message-error-bg) url(../img/icon-no.svg) 40px 12px no-repeat;
     background-size: 16px auto;
 }
 
 .errornote {
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 700;
     display: block;
     padding: 10px 12px;
     margin: 0 0 10px 0;
-    color: #ba2121;
-    border: 1px solid #ba2121;
+    color: var(--error-fg);
+    border: 1px solid var(--error-fg);
     border-radius: 4px;
-    background-color: #fff;
+    background-color: var(--body-bg);
     background-position: 5px 12px;
+    overflow-wrap: break-word;
 }
 
 ul.errorlist {
     margin: 0 0 4px;
     padding: 0;
-    color: #ba2121;
-    background: #fff;
+    color: var(--error-fg);
+    background: var(--body-bg);
 }
 
 ul.errorlist li {
-    font-size: 13px;
+    font-size: 0.8125rem;
     display: block;
     margin-bottom: 4px;
+    overflow-wrap: break-word;
 }
 
 ul.errorlist li:first-child {
@@ -615,7 +679,7 @@ td ul.errorlist li {
 .form-row.errors {
     margin: 0;
     border: none;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--hairline-color);
     background: none;
 }
 
@@ -623,46 +687,32 @@ td ul.errorlist li {
     padding-left: 0;
 }
 
-.errors input, .errors select, .errors textarea {
-    border: 1px solid #ba2121;
-}
-
-div.system-message {
-    background: #ffc;
-    margin: 10px;
-    padding: 6px 8px;
-    font-size: .8em;
-}
-
-div.system-message p.system-message-title {
-    padding: 4px 5px 4px 25px;
-    margin: 0;
-    color: #c11;
-    background: #ffefef url(../img/icon-no.svg) 5px 5px no-repeat;
+.errors input, .errors select, .errors textarea,
+td ul.errorlist + input, td ul.errorlist + select, td ul.errorlist + textarea {
+    border: 1px solid var(--error-fg);
 }
 
 .description {
-    font-size: 12px;
+    font-size: 0.75rem;
     padding: 5px 0 0 12px;
 }
 
 /* BREADCRUMBS */
 
 div.breadcrumbs {
-    background: #79aec8;
+    background: var(--breadcrumbs-bg);
     padding: 10px 40px;
     border: none;
-    font-size: 14px;
-    color: #c4dce8;
+    color: var(--breadcrumbs-fg);
     text-align: left;
 }
 
 div.breadcrumbs a {
-    color: #fff;
+    color: var(--breadcrumbs-link-fg);
 }
 
 div.breadcrumbs a:focus, div.breadcrumbs a:hover {
-    color: #c4dce8;
+    color: var(--breadcrumbs-fg);
 }
 
 /* ACTION ICONS */
@@ -670,6 +720,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 .viewlink, .inlineviewlink {
     padding-left: 16px;
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
+}
+
+.hidelink {
+    padding-left: 16px;
+    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
 }
 
 .addlink {
@@ -688,18 +743,18 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
 }
 
 a.deletelink:link, a.deletelink:visited {
-    color: #CC3434;
+    color: #CC3434; /* XXX Probably unused? */
 }
 
 a.deletelink:focus, a.deletelink:hover {
-    color: #993333;
+    color: #993333; /* XXX Probably unused? */
     text-decoration: none;
 }
 
 /* OBJECT TOOLS */
 
 .object-tools {
-    font-size: 10px;
+    font-size: 0.625rem;
     font-weight: bold;
     padding-left: 0;
     float: right;
@@ -707,19 +762,11 @@ a.deletelink:focus, a.deletelink:hover {
     margin-top: -48px;
 }
 
-.form-row .object-tools {
-    margin-top: 5px;
-    margin-bottom: 5px;
-    float: none;
-    height: 2em;
-    padding-left: 3.5em;
-}
-
 .object-tools li {
     display: block;
     float: left;
     margin-left: 5px;
-    height: 16px;
+    height: 1rem;
 }
 
 .object-tools a {
@@ -730,29 +777,29 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     padding: 3px 12px;
-    background: #999;
+    background: var(--object-tools-bg);
+    color: var(--object-tools-fg);
     font-weight: 400;
-    font-size: 11px;
+    font-size: 0.6875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #fff;
 }
 
 .object-tools a:focus, .object-tools a:hover {
-    background-color: #417690;
+    background-color: var(--object-tools-hover-bg);
 }
 
 .object-tools a:focus{
     text-decoration: none;
 }
 
-.object-tools a.viewsitelink, .object-tools a.golink,.object-tools a.addlink {
+.object-tools a.viewsitelink, .object-tools a.addlink {
     background-repeat: no-repeat;
     background-position: right 7px center;
     padding-right: 26px;
 }
 
-.object-tools a.viewsitelink, .object-tools a.golink {
+.object-tools a.viewsitelink {
     background-image: url(../img/tooltag-arrowright.svg);
 }
 
@@ -762,12 +809,19 @@ a.deletelink:focus, a.deletelink:hover {
 
 /* OBJECT HISTORY */
 
-table#change-history {
+#change-history table {
     width: 100%;
 }
 
-table#change-history tbody th {
+#change-history table tbody th {
     width: 16em;
+}
+
+#change-history .paginator {
+    color: var(--body-quiet-color);
+    border-bottom: 1px solid var(--hairline-color);
+    background: var(--body-bg);
+    overflow: hidden;
 }
 
 /* PAGE STRUCTURE */
@@ -777,6 +831,37 @@ table#change-history tbody th {
     width: 100%;
     min-width: 980px;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+#container > div {
+    flex-shrink: 0;
+}
+
+#container > .main {
+    display: flex;
+    flex: 1 0 auto;
+}
+
+.main > .content {
+    flex:  1 0;
+    max-width: 100%;
+}
+
+.skip-to-content-link {
+    position: absolute;
+    top: -999px;
+    margin: 5px;
+    padding: 5px;
+    background: var(--body-bg);
+    z-index: 1;
+}
+
+.skip-to-content-link:focus {
+    left: 0px;
+    top: 0px;
 }
 
 #content {
@@ -837,13 +922,13 @@ table#change-history tbody th {
     justify-content: space-between;
     align-items: center;
     padding: 10px 40px;
-    background: #417690;
-    color: #ffc;
+    background: var(--header-bg);
+    color: var(--header-color);
     overflow: hidden;
 }
 
-#header a:link, #header a:visited {
-    color: #fff;
+#header a:link, #header a:visited, #logout-form button {
+    color: var(--header-link-color);
 }
 
 #header a:focus , #header a:hover {
@@ -851,58 +936,77 @@ table#change-history tbody th {
 }
 
 #branding {
-    float: left;
+    display: flex;
 }
 
 #branding h1 {
     padding: 0;
-    margin: 0 20px 0 0;
+    margin: 0;
+    margin-inline-end: 20px;
     font-weight: 300;
-    font-size: 24px;
-    color: #f5dd5d;
+    font-size: 1.5rem;
+    color: var(--header-branding-color);
 }
 
-#branding h1, #branding h1 a:link, #branding h1 a:visited {
-    color: #f5dd5d;
+#branding h1 a:link, #branding h1 a:visited {
+    color: var(--accent);
 }
 
 #branding h2 {
     padding: 0 10px;
-    font-size: 14px;
+    font-size: 0.875rem;
     margin: -8px 0 8px 0;
     font-weight: normal;
-    color: #ffc;
+    color: var(--header-color);
 }
 
 #branding a:hover {
     text-decoration: none;
 }
 
+#logout-form {
+    display: inline;
+}
+
+#logout-form button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font-family-primary);
+}
+
 #user-tools {
     float: right;
-    padding: 0;
     margin: 0 0 0 20px;
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
     text-align: right;
 }
 
-#user-tools a {
+#user-tools, #logout-form button{
+    padding: 0;
+    font-weight: 300;
+    font-size: 0.6875rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+#user-tools a, #logout-form button {
     border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
-#user-tools a:focus, #user-tools a:hover {
+#user-tools a:focus, #user-tools a:hover,
+#logout-form button:active, #logout-form button:hover {
     text-decoration: none;
-    border-bottom-color: #79aec8;
-    color: #79aec8;
+    border-bottom: 0;
+}
+
+#logout-form button:active, #logout-form button:hover {
+    margin-bottom: 1px;
 }
 
 /* SIDEBAR */
 
 #content-related {
-    background: #f8f8f8;
+    background: var(--darkened-bg);
 }
 
 #content-related .module {
@@ -910,14 +1014,13 @@ table#change-history tbody th {
 }
 
 #content-related h3 {
-    font-size: 14px;
-    color: #666;
+    color: var(--body-quiet-color);
     padding: 0 16px;
     margin: 0 0 16px;
 }
 
 #content-related h4 {
-    font-size: 13px;
+    font-size: 0.8125rem;
 }
 
 #content-related p {
@@ -940,40 +1043,40 @@ table#change-history tbody th {
     background: none;
     padding: 16px;
     margin-bottom: 16px;
-    border-bottom: 1px solid #eaeaea;
-    font-size: 18px;
-    color: #333;
+    border-bottom: 1px solid var(--hairline-color);
+    font-size: 1.125rem;
+    color: var(--body-fg);
 }
 
 .delete-confirmation form input[type="submit"] {
-    background: #ba2121;
+    background: var(--delete-button-bg);
     border-radius: 4px;
     padding: 10px 15px;
-    color: #fff;
+    color: var(--button-fg);
 }
 
 .delete-confirmation form input[type="submit"]:active,
 .delete-confirmation form input[type="submit"]:focus,
 .delete-confirmation form input[type="submit"]:hover {
-    background: #a41515;
+    background: var(--delete-button-hover-bg);
 }
 
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 15px;
-    line-height: 15px;
-    background: #ddd;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     border-radius: 4px;
     padding: 10px 15px;
-    color: #333;
+    color: var(--button-fg);
+    background: var(--close-button-bg);
     margin: 0 0 0 10px;
 }
 
 .delete-confirmation form .cancel-link:active,
 .delete-confirmation form .cancel-link:focus,
 .delete-confirmation form .cancel-link:hover {
-    background: #ccc;
+    background: var(--close-button-hover-bg);
 }
 
 /* POPUP */
@@ -987,4 +1090,54 @@ table#change-history tbody th {
 
 .popup #header {
     padding: 10px 20px;
+}
+
+/* PAGINATOR */
+
+.paginator {
+    font-size: 0.8125rem;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 22px;
+    margin: 0;
+    border-top: 1px solid var(--hairline-color);
+    width: 100%;
+}
+
+.paginator a:link, .paginator a:visited {
+    padding: 2px 6px;
+    background: var(--button-bg);
+    text-decoration: none;
+    color: var(--button-fg);
+}
+
+.paginator a.showall {
+    border: none;
+    background: none;
+    color: var(--link-fg);
+}
+
+.paginator a.showall:focus, .paginator a.showall:hover {
+    background: none;
+    color: var(--link-hover-color);
+}
+
+.paginator .end {
+    margin-right: 6px;
+}
+
+.paginator .this-page {
+    padding: 2px 6px;
+    font-weight: bold;
+    font-size: 0.8125rem;
+    vertical-align: top;
+}
+
+.paginator a:focus, .paginator a:hover {
+    color: white;
+    background: var(--link-hover-color);
+}
+
+.base-svgs {
+    display: none;
 }

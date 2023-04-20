@@ -12,16 +12,15 @@ def shrink_tail(x, y):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     operations = [
         migrations.CreateModel(
-            'Salamander',
+            "Salamander",
             [
-                ('id', models.AutoField(primary_key=True)),
-                ('tail', models.IntegerField(default=0)),
-                ('silly_field', models.BooleanField(default=False)),
+                ("id", models.AutoField(primary_key=True)),
+                ("tail", models.IntegerField(default=0)),
+                ("silly_field", models.BooleanField(default=False)),
             ],
         ),
         migrations.RunPython(grow_tail, shrink_tail),

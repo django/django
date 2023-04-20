@@ -1,27 +1,52 @@
-from django.contrib.admin.decorators import register
+from django.contrib.admin.decorators import action, display, register
 from django.contrib.admin.filters import (
-    AllValuesFieldListFilter, BooleanFieldListFilter, ChoicesFieldListFilter,
-    DateFieldListFilter, EmptyFieldListFilter, FieldListFilter, ListFilter,
-    RelatedFieldListFilter, RelatedOnlyFieldListFilter, SimpleListFilter,
+    AllValuesFieldListFilter,
+    BooleanFieldListFilter,
+    ChoicesFieldListFilter,
+    DateFieldListFilter,
+    EmptyFieldListFilter,
+    FieldListFilter,
+    ListFilter,
+    RelatedFieldListFilter,
+    RelatedOnlyFieldListFilter,
+    SimpleListFilter,
 )
 from django.contrib.admin.options import (
-    HORIZONTAL, VERTICAL, ModelAdmin, StackedInline, TabularInline,
+    HORIZONTAL,
+    VERTICAL,
+    ModelAdmin,
+    ShowFacets,
+    StackedInline,
+    TabularInline,
 )
 from django.contrib.admin.sites import AdminSite, site
 from django.utils.module_loading import autodiscover_modules
 
 __all__ = [
-    "register", "ModelAdmin", "HORIZONTAL", "VERTICAL", "StackedInline",
-    "TabularInline", "AdminSite", "site", "ListFilter", "SimpleListFilter",
-    "FieldListFilter", "BooleanFieldListFilter", "RelatedFieldListFilter",
-    "ChoicesFieldListFilter", "DateFieldListFilter",
-    "AllValuesFieldListFilter", "EmptyFieldListFilter",
-    "RelatedOnlyFieldListFilter", "autodiscover",
+    "action",
+    "display",
+    "register",
+    "ModelAdmin",
+    "HORIZONTAL",
+    "VERTICAL",
+    "StackedInline",
+    "TabularInline",
+    "AdminSite",
+    "site",
+    "ListFilter",
+    "SimpleListFilter",
+    "FieldListFilter",
+    "BooleanFieldListFilter",
+    "RelatedFieldListFilter",
+    "ChoicesFieldListFilter",
+    "DateFieldListFilter",
+    "AllValuesFieldListFilter",
+    "EmptyFieldListFilter",
+    "RelatedOnlyFieldListFilter",
+    "ShowFacets",
+    "autodiscover",
 ]
 
 
 def autodiscover():
-    autodiscover_modules('admin', register_to=site)
-
-
-default_app_config = 'django.contrib.admin.apps.AdminConfig'
+    autodiscover_modules("admin", register_to=site)

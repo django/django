@@ -1,12 +1,12 @@
 """
 Decorators for views based on HTTP headers.
 """
-
-from calendar import timegm
+import datetime
 from functools import wraps
 
 from django.http import HttpResponseNotAllowed
 from django.middleware.http import ConditionalGetMiddleware
+from django.utils import timezone
 from django.utils.cache import get_conditional_response
 from django.utils.decorators import decorator_from_middleware
 from django.utils.http import http_date, quote_etag
@@ -26,19 +26,24 @@ def require_http_methods(request_method_list):
 
     Note that request methods should be in uppercase.
     """
+
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
             if request.method not in request_method_list:
                 response = HttpResponseNotAllowed(request_method_list)
                 log_response(
-                    'Method Not Allowed (%s): %s', request.method, request.path,
+                    "Method Not Allowed (%s): %s",
+                    request.method,
+                    request.path,
                     response=response,
                     request=request,
                 )
                 return response
             return func(request, *args, **kwargs)
+
         return inner
+
     return decorator
 
 
@@ -49,7 +54,9 @@ require_POST = require_http_methods(["POST"])
 require_POST.__doc__ = "Decorator to require that a view only accepts the POST method."
 
 require_safe = require_http_methods(["GET", "HEAD"])
-require_safe.__doc__ = "Decorator to require that a view only accepts safe methods: GET and HEAD."
+require_safe.__doc__ = (
+    "Decorator to require that a view only accepts safe methods: GET and HEAD."
+)
 
 
 def condition(etag_func=None, last_modified_func=None):
@@ -74,6 +81,7 @@ def condition(etag_func=None, last_modified_func=None):
     will add the generated ETag and Last-Modified headers to the response if
     the headers aren't already set and if the request's method is safe.
     """
+
     def decorator(func):
         @wraps(func)
         def inner(request, *args, **kwargs):
@@ -82,7 +90,9 @@ def condition(etag_func=None, last_modified_func=None):
                 if last_modified_func:
                     dt = last_modified_func(request, *args, **kwargs)
                     if dt:
-                        return timegm(dt.utctimetuple())
+                        if not timezone.is_aware(dt):
+                            dt = timezone.make_aware(dt, datetime.timezone.utc)
+                        return int(dt.timestamp())
 
             # The value from etag_func() could be quoted or unquoted.
             res_etag = etag_func(request, *args, **kwargs) if etag_func else None
@@ -100,15 +110,16 @@ def condition(etag_func=None, last_modified_func=None):
 
             # Set relevant headers on the response if they don't already exist
             # and if the request method is safe.
-            if request.method in ('GET', 'HEAD'):
-                if res_last_modified and not response.has_header('Last-Modified'):
-                    response['Last-Modified'] = http_date(res_last_modified)
+            if request.method in ("GET", "HEAD"):
+                if res_last_modified and not response.has_header("Last-Modified"):
+                    response.headers["Last-Modified"] = http_date(res_last_modified)
                 if res_etag:
-                    response.setdefault('ETag', res_etag)
+                    response.headers.setdefault("ETag", res_etag)
 
             return response
 
         return inner
+
     return decorator
 
 

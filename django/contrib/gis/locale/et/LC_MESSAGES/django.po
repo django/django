@@ -6,13 +6,14 @@
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
 # Martin Pajuste <martinpajuste@gmail.com>, 2015
+# Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-19 16:40+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2019-12-28 02:37+0000\n"
+"Last-Translator: Ragnar Rebase <rrebase@gmail.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -28,7 +29,7 @@ msgid "The base GIS field."
 msgstr "Baas GIS väli."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
 "Baas Geomeetria väli -- ühildub OpenGIS Spetsifikatsiooni Geomeetria tüübiga."
 
@@ -86,5 +87,5 @@ msgid "No feeds are registered."
 msgstr "Ühtegi voogu pole registreeritud."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "Nälk %r ei ole registreeritud."
+msgid "Slug %r isn’t registered."
+msgstr "Nälk %r ei ole registeeritud."

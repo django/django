@@ -17,7 +17,7 @@ class IntegerUsernameUser(AbstractBaseUser):
     username = models.IntegerField()
     password = models.CharField(max_length=255)
 
-    USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['username', 'password']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = ["username", "password"]
 
     objects = IntegerUsernameUserManager()

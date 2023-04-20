@@ -156,11 +156,6 @@ MySQL       ``ST_Contains(poly, geom)``
 SpatiaLite  ``Contains(poly, geom)``
 ==========  ============================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRContains`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: contains_properly
 
 ``contains_properly``
@@ -251,10 +246,6 @@ MySQL       ``ST_Crosses(poly, geom)``
 SpatiaLite  ``Crosses(poly, geom)``
 ==========  ==========================
 
-.. versionchanged:: 3.0
-
-    MySQL support was added.
-
 .. fieldlookup:: disjoint
 
 ``disjoint``
@@ -278,11 +269,6 @@ MariaDB     ``ST_Disjoint(poly, geom)``
 MySQL       ``ST_Disjoint(poly, geom)``
 SpatiaLite  ``Disjoint(poly, geom)``
 ==========  =================================================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRDisjoint`` and operates only on bounding
-    boxes.
 
 .. fieldlookup:: equals
 
@@ -308,12 +294,8 @@ MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: exact
+    :noindex:
 .. fieldlookup:: same_as
 
 ``exact``, ``same_as``
@@ -340,11 +322,6 @@ MySQL       ``ST_Equals(poly, geom)``
 SpatiaLite  ``Equals(poly, geom)``
 ==========  =================================================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBREquals`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: intersects
 
 ``intersects``
@@ -369,18 +346,28 @@ MySQL       ``ST_Intersects(poly, geom)``
 SpatiaLite  ``Intersects(poly, geom)``
 ==========  =================================================
 
-.. versionchanged:: 3.0
+.. fieldlookup:: isempty
 
-    In older versions, MySQL uses ``MBRIntersects`` and operates only on
-    bounding boxes.
+``isempty``
+-----------
+
+.. versionadded:: 4.2
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Tests if the geometry is empty.
+
+Example::
+
+    Zipcode.objects.filter(poly__isempty=True)
 
 .. fieldlookup:: isvalid
 
 ``isvalid``
 -----------
 
-*Availability*: MySQL (≥ 5.7.5), `PostGIS
-<https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
+*Availability*: MySQL, `PostGIS <https://postgis.net/docs/ST_IsValid.html>`__,
+Oracle, SpatiaLite
 
 Tests if the geometry is valid.
 
@@ -415,11 +402,6 @@ MySQL       ``ST_Overlaps(poly, geom)``
 SpatiaLite  ``Overlaps(poly, geom)``
 ==========  ============================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBROverlaps`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: relate
 
 ``relate``
@@ -446,7 +428,7 @@ Geometry example::
 
     # A tuple lookup parameter is used to specify the geometry and
     # the intersection pattern (the pattern here is for 'contains').
-    Zipcode.objects.filter(poly__relate=(geom, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(geom, "T*T***FF*"))
 
 PostGIS and MariaDB SQL equivalent:
 
@@ -462,8 +444,8 @@ SpatiaLite SQL equivalent:
 
 Raster example::
 
-    Zipcode.objects.filter(poly__relate=(rast, 1, 'T*T***FF*'))
-    Zipcode.objects.filter(rast__2__relate=(rast, 1, 'T*T***FF*'))
+    Zipcode.objects.filter(poly__relate=(rast, 1, "T*T***FF*"))
+    Zipcode.objects.filter(rast__2__relate=(rast, 1, "T*T***FF*"))
 
 PostGIS SQL equivalent:
 
@@ -471,10 +453,6 @@ PostGIS SQL equivalent:
 
     SELECT ... WHERE ST_Relate(poly, ST_Polygon(rast, 1), 'T*T***FF*')
     SELECT ... WHERE ST_Relate(ST_Polygon(rast, 2), ST_Polygon(rast, 1), 'T*T***FF*')
-
-.. versionchanged:: 3.1
-
-    MariaDB support was added.
 
 Oracle
 ~~~~~~
@@ -488,7 +466,7 @@ strings are case-insensitive.
 
 Example::
 
-    Zipcode.objects.filter(poly__relate=(geom, 'anyinteract'))
+    Zipcode.objects.filter(poly__relate=(geom, "anyinteract"))
 
 Oracle SQL equivalent:
 
@@ -520,11 +498,6 @@ Oracle      ``SDO_TOUCH(poly, geom)``
 SpatiaLite  ``Touches(poly, geom)``
 ==========  ==========================
 
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRTouches`` and operates only on bounding
-    boxes.
-
 .. fieldlookup:: within
 
 ``within``
@@ -548,11 +521,6 @@ MySQL       ``ST_Within(poly, geom)``
 Oracle      ``SDO_INSIDE(poly, geom)``
 SpatiaLite  ``Within(poly, geom)``
 ==========  ==========================
-
-.. versionchanged:: 3.0
-
-    In older versions, MySQL uses ``MBRWithin`` and operates only on bounding
-    boxes.
 
 .. fieldlookup:: left
 
@@ -734,18 +702,20 @@ Distance Lookups
 For an overview on performing distance queries, please refer to
 the :ref:`distance queries introduction <distance-queries>`.
 
-Distance lookups take the following form::
+Distance lookups take the following form:
 
-    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, 'spheroid'])
-    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
-    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, 'spheroid'])
+.. code-block:: text
+
+    <field>__<distance lookup>=(<geometry/raster>, <distance value>[, "spheroid"])
+    <field>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
+    <field>__<band_index>__<distance lookup>=(<raster>, <band_index>, <distance value>[, "spheroid"])
 
 The value passed into a distance lookup is a tuple; the first two
 values are mandatory, and are the geometry to calculate distances to,
 and a distance value (either a number in units of the field, a
-:class:`~django.contrib.gis.measure.Distance` object, or a `query expression
-<ref/models/expressions>`). To pass a band index to the lookup, use a 3-tuple
-where the second entry is the band index.
+:class:`~django.contrib.gis.measure.Distance` object, or a :doc:`query
+expression </ref/models/expressions>`). To pass a band index to the lookup, use
+a 3-tuple where the second entry is the band index.
 
 On every distance lookup except :lookup:`dwithin`, an optional element,
 ``'spheroid'``, may be included to use the more accurate spheroid distance
@@ -885,13 +855,15 @@ Keyword Argument       Description
                        details.
 =====================  =====================================================
 
-__ https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+__ https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
    spatial-concepts.html#GUID-CE10AB14-D5EA-43BA-A647-DAC9EEF41EE6
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.db.models import Extent, Union
-    >>> WorldBorder.objects.aggregate(Extent('mpoly'), Union('mpoly'))
+    >>> WorldBorder.objects.aggregate(Extent("mpoly"), Union("mpoly"))
 
 ``Collect``
 ~~~~~~~~~~~
@@ -918,10 +890,12 @@ Oracle, SpatiaLite
 Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
 comprising the lower left coordinate and the upper right coordinate.
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent('poly'))
-    >>> print(qs['poly__extent'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent("poly"))
+    >>> print(qs["poly__extent"])
     (-96.8016128540039, 29.7633724212646, -95.3631439208984, 32.782058715820)
 
 ``Extent3D``
@@ -935,10 +909,12 @@ Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
 comprising the lower left coordinate and upper right coordinate (each with x, y,
 and z coordinates).
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(Extent3D('poly'))
-    >>> print(qs['poly__extent3d'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(Extent3D("poly"))
+    >>> print(qs["poly__extent3d"])
     (-96.8016128540039, 29.7633724212646, 0, -95.3631439208984, 32.782058715820, 0)
 
 ``MakeLine``
@@ -952,10 +928,12 @@ SpatiaLite
 Returns a ``LineString`` constructed from the point field geometries in the
 ``QuerySet``. Currently, ordering the queryset has no effect.
 
-Example::
+Example:
 
-    >>> qs = City.objects.filter(name__in=('Houston', 'Dallas')).aggregate(MakeLine('poly'))
-    >>> print(qs['poly__makeline'])
+.. code-block:: pycon
+
+    >>> qs = City.objects.filter(name__in=("Houston", "Dallas")).aggregate(MakeLine("poly"))
+    >>> print(qs["poly__makeline"])
     LINESTRING (-95.3631510000000020 29.7633739999999989, -96.8016109999999941 32.7820570000000018)
 
 ``Union``
@@ -976,13 +954,17 @@ large querysets.
     If the computation time for using this method is too expensive, consider
     using :class:`Collect` instead.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> u = Zipcode.objects.aggregate(Union(poly))  # This may take a long time.
-    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(Union(poly))  # A more sensible approach.
+    >>> u = Zipcode.objects.filter(poly__within=bbox).aggregate(
+    ...     Union(poly)
+    ... )  # A more sensible approach.
 
 .. rubric:: Footnotes
-.. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <http://www.opengis.org/docs/99-049.pdf>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
+.. [#fnde9im] *See* `OpenGIS Simple Feature Specification For SQL <https://portal.ogc.org/files/?artifact_id=829>`_, at Ch. 2.1.13.2, p. 2-13 (The Dimensionally Extended Nine-Intersection Model).
 .. [#fnsdorelate] *See* `SDO_RELATE documentation <https://docs.oracle.com/en/
    database/oracle/oracle-database/18/spatl/spatial-operators-reference.html#
    GUID-97C17C18-F05E-49B4-BE11-E89B972E2A02>`_, from the Oracle Spatial and

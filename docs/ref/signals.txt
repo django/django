@@ -24,6 +24,14 @@ model system.
 
 .. warning::
 
+    Signals can make your code harder to maintain. Consider implementing a
+    helper method on a :ref:`custom manager <custom-managers>`, to
+    both update your models and perform additional logic, or else
+    :ref:`overriding model methods <overriding-model-methods>` before using
+    model signals.
+
+.. warning::
+
     Many of these signals are sent by various model methods like
     ``__init__()`` or :meth:`~django.db.models.Model.save` that you can
     override in your own code.
@@ -80,7 +88,7 @@ Argument    Value
             arguments passed to ``__init__()``)
 
 ``kwargs``  ``{'question_text': "What's new?",``
-            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)}``
+            ``'pub_date': datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)}``
 ==========  ===============================================================
 
 ``post_init``
@@ -101,10 +109,10 @@ Arguments sent with this signal:
 
     .. note::
 
-        ``instance._state`` isn't set before sending the ``post_init`` signal,
-        so ``_state`` attributes always have their default values. For example,
-        ``_state.db`` is ``None`` and cannot be used to check an ``instance``
-        database.
+        :attr:`instance._state <django.db.models.Model._state>` isn't set
+        before sending the ``post_init`` signal, so ``_state`` attributes
+        always have their default values. For example, ``_state.db`` is
+        ``None``.
 
 .. warning::
 
@@ -131,9 +139,9 @@ Arguments sent with this signal:
 
 ``raw``
     A boolean; ``True`` if the model is saved exactly as presented
-    (i.e. when loading a fixture). One should not query/modify other
-    records in the database as the database might not be in a
-    consistent state yet.
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
 
 ``using``
     The database alias being used.
@@ -164,9 +172,9 @@ Arguments sent with this signal:
 
 ``raw``
     A boolean; ``True`` if the model is saved exactly as presented
-    (i.e. when loading a fixture). One should not query/modify other
-    records in the database as the database might not be in a
-    consistent state yet.
+    (i.e. when loading a :ref:`fixture <fixtures-explanation>`). One should not
+    query/modify other records in the database as the database might not be in
+    a consistent state yet.
 
 ``using``
     The database alias being used.
@@ -195,6 +203,11 @@ Arguments sent with this signal:
 ``using``
     The database alias being used.
 
+``origin``
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
+
 ``post_delete``
 ---------------
 
@@ -218,6 +231,11 @@ Arguments sent with this signal:
 
 ``using``
     The database alias being used.
+
+``origin``
+
+    The origin of the deletion being the instance of a ``Model`` or
+    ``QuerySet`` class.
 
 ``m2m_changed``
 ---------------
@@ -293,6 +311,7 @@ like this::
         # ...
         pass
 
+
     class Pizza(models.Model):
         # ...
         toppings = models.ManyToManyField(Topping)
@@ -301,13 +320,17 @@ If we connected a handler like this::
 
     from django.db.models.signals import m2m_changed
 
+
     def toppings_changed(sender, **kwargs):
         # Do something
         pass
 
+
     m2m_changed.connect(toppings_changed, sender=Pizza.toppings.through)
 
-and then did something like this::
+and then did something like this:
+
+.. code-block:: pycon
 
     >>> p = Pizza.objects.create(...)
     >>> t = Topping.objects.create(...)
@@ -337,7 +360,9 @@ Argument        Value
 ``using``       ``"default"`` (since the default router sends writes here)
 ==============  ============================================================
 
-And if we would then do something like this::
+And if we would then do something like this:
+
+.. code-block:: pycon
 
     >>> t.pizza_set.remove(p)
 
@@ -371,7 +396,7 @@ Argument        Value
 .. data:: django.db.models.signals.class_prepared
    :module:
 
-Sent whenever a model class has been "prepared" -- that is, once model has
+Sent whenever a model class has been "prepared" -- that is, once a model has
 been defined and registered with Django's model system. Django uses this
 signal internally; it's not generally used in third-party applications.
 
@@ -410,7 +435,7 @@ Arguments sent with this signal:
     Same as ``sender``.
 
 ``verbosity``
-    Indicates how much information manage.py is printing on screen. See
+    Indicates how much information ``manage.py`` is printing on screen. See
     the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`pre_migrate` should adjust what they
@@ -423,6 +448,9 @@ Arguments sent with this signal:
 
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
+
+``stdout``
+    A stream-like object where verbose output should be redirected.
 
 ``using``
     The alias of database on which a command will operate.
@@ -464,7 +492,7 @@ Arguments sent with this signal:
     Same as ``sender``.
 
 ``verbosity``
-    Indicates how much information manage.py is printing on screen. See
+    Indicates how much information ``manage.py`` is printing on screen. See
     the :option:`--verbosity` flag for details.
 
     Functions which listen for :data:`post_migrate` should adjust what they
@@ -477,6 +505,9 @@ Arguments sent with this signal:
 
     For example, the :mod:`django.contrib.auth` app only prompts to create a
     superuser when ``interactive`` is ``True``.
+
+``stdout``
+    A stream-like object where verbose output should be redirected.
 
 ``using``
     The database alias used for synchronization. Defaults to the ``default``
@@ -501,9 +532,11 @@ For example, you could register a callback in an
     from django.apps import AppConfig
     from django.db.models.signals import post_migrate
 
+
     def my_callback(sender, **kwargs):
         # Your specific logic here
         pass
+
 
     class MyAppConfig(AppConfig):
         ...
@@ -527,6 +560,12 @@ Request/response signals
    :synopsis: Core signals sent by the request/response system.
 
 Signals sent by the core framework when processing a request.
+
+.. warning::
+
+    Signals can make your code harder to maintain. Consider :doc:`using a
+    middleware </topics/http/middleware>` before using request/response
+    signals.
 
 ``request_started``
 -------------------

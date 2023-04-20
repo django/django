@@ -100,6 +100,7 @@ Detail Views
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -113,7 +114,7 @@ Detail Views
 
 * :meth:`~django.views.generic.base.View.as_view`
 * :meth:`~django.views.generic.base.View.dispatch`
-* ``get()``
+* :meth:`~django.views.generic.detail.BaseDetailView.get`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data`
 * :meth:`~django.views.generic.detail.SingleObjectMixin.get_object`
 * ``head()``
@@ -213,6 +214,7 @@ Editing views
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -258,6 +260,7 @@ Editing views
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
 * :attr:`~django.views.generic.edit.FormMixin.prefix` [:meth:`~django.views.generic.edit.FormMixin.get_prefix`]
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -299,6 +302,7 @@ Editing views
 * :attr:`~django.views.generic.base.View.http_method_names`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.model`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]
@@ -624,6 +628,7 @@ Date-based views
 * :attr:`~django.views.generic.dates.MonthMixin.month` [:meth:`~django.views.generic.dates.MonthMixin.get_month`]
 * :attr:`~django.views.generic.dates.MonthMixin.month_format` [:meth:`~django.views.generic.dates.MonthMixin.get_month_format`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.pk_url_kwarg`
+* :attr:`~django.views.generic.detail.SingleObjectMixin.query_pk_and_slug`
 * :attr:`~django.views.generic.detail.SingleObjectMixin.queryset` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_queryset`]
 * :attr:`~django.views.generic.base.TemplateResponseMixin.response_class` [:meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response`]
 * :attr:`~django.views.generic.detail.SingleObjectMixin.slug_field` [:meth:`~django.views.generic.detail.SingleObjectMixin.get_slug_field`]

@@ -1,10 +1,14 @@
 "Memcached cache backend"
 
-import pickle
 import re
 import time
 
-from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
+from django.core.cache.backends.base import (
+    DEFAULT_TIMEOUT,
+    BaseCache,
+    InvalidCacheKey,
+    memcache_key_warnings,
+)
 from django.utils.functional import cached_property
 
 
@@ -12,28 +16,28 @@ class BaseMemcachedCache(BaseCache):
     def __init__(self, server, params, library, value_not_found_exception):
         super().__init__(params)
         if isinstance(server, str):
-            self._servers = re.split('[;,]', server)
+            self._servers = re.split("[;,]", server)
         else:
             self._servers = server
 
-        # The exception type to catch from the underlying library for a key
-        # that was not found. This is a ValueError for python-memcache,
-        # pylibmc.NotFound for pylibmc, and cmemcache will return None without
-        # raising an exception.
+        # Exception type raised by the underlying client library for a
+        # nonexistent key.
         self.LibraryValueNotFoundException = value_not_found_exception
 
         self._lib = library
-        self._options = params.get('OPTIONS') or {}
+        self._class = library.Client
+        self._options = params.get("OPTIONS") or {}
 
     @property
+    def client_servers(self):
+        return self._servers
+
+    @cached_property
     def _cache(self):
         """
         Implement transparent thread-safe access to a memcached client.
         """
-        if getattr(self, '_client', None) is None:
-            self._client = self._lib.Client(self._servers, **self._options)
-
-        return self._client
+        return self._class(self.client_servers, **self._options)
 
     def get_backend_timeout(self, timeout=DEFAULT_TIMEOUT):
         """
@@ -63,25 +67,32 @@ class BaseMemcachedCache(BaseCache):
         return int(timeout)
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         return self._cache.add(key, value, self.get_backend_timeout(timeout))
 
     def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         return self._cache.get(key, default)
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         if not self._cache.set(key, value, self.get_backend_timeout(timeout)):
-            # make sure the key doesn't keep its old value in case of failure to set (memcached's 1MB limit)
+            # Make sure the key doesn't keep its old value in case of failure
+            # to set (memcached's 1MB limit).
             self._cache.delete(key)
 
+    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
+        key = self.make_and_validate_key(key, version=version)
+        return bool(self._cache.touch(key, self.get_backend_timeout(timeout)))
+
     def delete(self, key, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         return bool(self._cache.delete(key))
 
     def get_many(self, keys, version=None):
-        key_map = {self.make_key(key, version=version): key for key in keys}
+        key_map = {
+            self.make_and_validate_key(key, version=version): key for key in keys
+        }
         ret = self._cache.get_multi(key_map.keys())
         return {key_map[k]: v for k, v in ret.items()}
 
@@ -90,35 +101,16 @@ class BaseMemcachedCache(BaseCache):
         self._cache.disconnect_all()
 
     def incr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        # memcached doesn't support a negative delta
-        if delta < 0:
-            return self._cache.decr(key, -delta)
+        key = self.make_and_validate_key(key, version=version)
         try:
-            val = self._cache.incr(key, delta)
-
-        # python-memcache responds to incr on nonexistent keys by
-        # raising a ValueError, pylibmc by raising a pylibmc.NotFound
-        # and Cmemcache returns None. In all cases,
-        # we should raise a ValueError though.
-        except self.LibraryValueNotFoundException:
-            val = None
-        if val is None:
-            raise ValueError("Key '%s' not found" % key)
-        return val
-
-    def decr(self, key, delta=1, version=None):
-        key = self.make_key(key, version=version)
-        # memcached doesn't support a negative delta
-        if delta < 0:
-            return self._cache.incr(key, -delta)
-        try:
-            val = self._cache.decr(key, delta)
-
-        # python-memcache responds to incr on nonexistent keys by
-        # raising a ValueError, pylibmc by raising a pylibmc.NotFound
-        # and Cmemcache returns None. In all cases,
-        # we should raise a ValueError though.
+            # Memcached doesn't support negative delta.
+            if delta < 0:
+                val = self._cache.decr(key, -delta)
+            else:
+                val = self._cache.incr(key, delta)
+        # Normalize an exception raised by the underlying client library to
+        # ValueError in the event of a nonexistent key when calling
+        # incr()/decr().
         except self.LibraryValueNotFoundException:
             val = None
         if val is None:
@@ -129,67 +121,45 @@ class BaseMemcachedCache(BaseCache):
         safe_data = {}
         original_keys = {}
         for key, value in data.items():
-            safe_key = self.make_key(key, version=version)
+            safe_key = self.make_and_validate_key(key, version=version)
             safe_data[safe_key] = value
             original_keys[safe_key] = key
-        failed_keys = self._cache.set_multi(safe_data, self.get_backend_timeout(timeout))
+        failed_keys = self._cache.set_multi(
+            safe_data, self.get_backend_timeout(timeout)
+        )
         return [original_keys[k] for k in failed_keys]
 
     def delete_many(self, keys, version=None):
-        self._cache.delete_multi(self.make_key(key, version=version) for key in keys)
+        keys = [self.make_and_validate_key(key, version=version) for key in keys]
+        self._cache.delete_multi(keys)
 
     def clear(self):
         self._cache.flush_all()
 
-
-class MemcachedCache(BaseMemcachedCache):
-    "An implementation of a cache binding using python-memcached"
-    def __init__(self, server, params):
-        import memcache
-        super().__init__(server, params, library=memcache, value_not_found_exception=ValueError)
-
-    @property
-    def _cache(self):
-        if getattr(self, '_client', None) is None:
-            client_kwargs = {'pickleProtocol': pickle.HIGHEST_PROTOCOL}
-            client_kwargs.update(self._options)
-            self._client = self._lib.Client(self._servers, **client_kwargs)
-        return self._client
-
-    def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
-        return self._cache.touch(key, self.get_backend_timeout(timeout)) != 0
-
-    def get(self, key, default=None, version=None):
-        key = self.make_key(key, version=version)
-        val = self._cache.get(key)
-        # python-memcached doesn't support default values in get().
-        # https://github.com/linsomniac/python-memcached/issues/159
-        # Remove this method if that issue is fixed.
-        if val is None:
-            return default
-        return val
-
-    def delete(self, key, version=None):
-        # python-memcached's delete() returns True when key doesn't exist.
-        # https://github.com/linsomniac/python-memcached/issues/170
-        # Call _deletetouch() without the NOT_FOUND in expected results.
-        key = self.make_key(key, version=version)
-        return bool(self._cache._deletetouch([b'DELETED'], 'delete', key))
+    def validate_key(self, key):
+        for warning in memcache_key_warnings(key):
+            raise InvalidCacheKey(warning)
 
 
 class PyLibMCCache(BaseMemcachedCache):
     "An implementation of a cache binding using pylibmc"
+
     def __init__(self, server, params):
         import pylibmc
-        super().__init__(server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound)
 
-    @cached_property
-    def _cache(self):
-        return self._lib.Client(self._servers, **self._options)
+        super().__init__(
+            server, params, library=pylibmc, value_not_found_exception=pylibmc.NotFound
+        )
+
+    @property
+    def client_servers(self):
+        output = []
+        for server in self._servers:
+            output.append(server.removeprefix("unix:"))
+        return output
 
     def touch(self, key, timeout=DEFAULT_TIMEOUT, version=None):
-        key = self.make_key(key, version=version)
+        key = self.make_and_validate_key(key, version=version)
         if timeout == 0:
             return self._cache.delete(key)
         return self._cache.touch(key, self.get_backend_timeout(timeout))
@@ -198,3 +168,21 @@ class PyLibMCCache(BaseMemcachedCache):
         # libmemcached manages its own connections. Don't call disconnect_all()
         # as it resets the failover state and creates unnecessary reconnects.
         pass
+
+
+class PyMemcacheCache(BaseMemcachedCache):
+    """An implementation of a cache binding using pymemcache."""
+
+    def __init__(self, server, params):
+        import pymemcache.serde
+
+        super().__init__(
+            server, params, library=pymemcache, value_not_found_exception=KeyError
+        )
+        self._class = self._lib.HashClient
+        self._options = {
+            "allow_unicode_keys": True,
+            "default_noreply": False,
+            "serde": pymemcache.serde.pickle_serde,
+            **self._options,
+        }

@@ -1,6 +1,5 @@
 from django.apps import apps as global_apps
-from django.db import DEFAULT_DB_ALIAS, migrations, router, transaction
-from django.db.utils import IntegrityError
+from django.db import DEFAULT_DB_ALIAS, IntegrityError, migrations, router, transaction
 
 
 class RenameContentType(migrations.RunPython):
@@ -11,20 +10,22 @@ class RenameContentType(migrations.RunPython):
         super().__init__(self.rename_forward, self.rename_backward)
 
     def _rename(self, apps, schema_editor, old_model, new_model):
-        ContentType = apps.get_model('contenttypes', 'ContentType')
+        ContentType = apps.get_model("contenttypes", "ContentType")
         db = schema_editor.connection.alias
         if not router.allow_migrate_model(db, ContentType):
             return
 
         try:
-            content_type = ContentType.objects.db_manager(db).get_by_natural_key(self.app_label, old_model)
+            content_type = ContentType.objects.db_manager(db).get_by_natural_key(
+                self.app_label, old_model
+            )
         except ContentType.DoesNotExist:
             pass
         else:
             content_type.model = new_model
             try:
                 with transaction.atomic(using=db):
-                    content_type.save(using=db, update_fields={'model'})
+                    content_type.save(using=db, update_fields={"model"})
             except IntegrityError:
                 # Gracefully fallback if a stale content type causes a
                 # conflict as remove_stale_contenttypes will take care of
@@ -42,7 +43,9 @@ class RenameContentType(migrations.RunPython):
         self._rename(apps, schema_editor, self.new_model, self.old_model)
 
 
-def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEFAULT_DB_ALIAS, **kwargs):
+def inject_rename_contenttypes_operations(
+    plan=None, apps=global_apps, using=DEFAULT_DB_ALIAS, **kwargs
+):
     """
     Insert a `RenameContentType` operation after every planned `RenameModel`
     operation.
@@ -52,7 +55,7 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
 
     # Determine whether or not the ContentType model is available.
     try:
-        ContentType = apps.get_model('contenttypes', 'ContentType')
+        ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         available = False
     else:
@@ -61,7 +64,7 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
         available = True
 
     for migration, backward in plan:
-        if (migration.app_label, migration.name) == ('contenttypes', '0001_initial'):
+        if (migration.app_label, migration.name) == ("contenttypes", "0001_initial"):
             # There's no point in going forward if the initial contenttypes
             # migration is unapplied as the ContentType model will be
             # unavailable from this point.
@@ -77,7 +80,9 @@ def inject_rename_contenttypes_operations(plan=None, apps=global_apps, using=DEF
         for index, operation in enumerate(migration.operations):
             if isinstance(operation, migrations.RenameModel):
                 operation = RenameContentType(
-                    migration.app_label, operation.old_name_lower, operation.new_name_lower
+                    migration.app_label,
+                    operation.old_name_lower,
+                    operation.new_name_lower,
                 )
                 inserts.append((index + 1, operation))
         for inserted, (index, operation) in enumerate(inserts):
@@ -94,14 +99,18 @@ def get_contenttypes_and_models(app_config, using, ContentType):
         ct.model: ct
         for ct in ContentType.objects.using(using).filter(app_label=app_config.label)
     }
-    app_models = {
-        model._meta.model_name: model
-        for model in app_config.get_models()
-    }
+    app_models = {model._meta.model_name: model for model in app_config.get_models()}
     return content_types, app_models
 
 
-def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, apps=global_apps, **kwargs):
+def create_contenttypes(
+    app_config,
+    verbosity=2,
+    interactive=True,
+    using=DEFAULT_DB_ALIAS,
+    apps=global_apps,
+    **kwargs,
+):
     """
     Create content types for models in the given app.
     """
@@ -111,11 +120,13 @@ def create_contenttypes(app_config, verbosity=2, interactive=True, using=DEFAULT
     app_label = app_config.label
     try:
         app_config = apps.get_app_config(app_label)
-        ContentType = apps.get_model('contenttypes', 'ContentType')
+        ContentType = apps.get_model("contenttypes", "ContentType")
     except LookupError:
         return
 
-    content_types, app_models = get_contenttypes_and_models(app_config, using, ContentType)
+    content_types, app_models = get_contenttypes_and_models(
+        app_config, using, ContentType
+    )
 
     if not app_models:
         return

@@ -4,16 +4,17 @@
 # Bogdan Mateescu, 2018
 # Daniel Ursache-Dogariu, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Eugenol Man <neatusebastian@gmail.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Răzvan Ionescu <ionescu77@gmail.com>, 2015
+# razvan ionescu <ionescu77@gmail.com>, 2015
 # Razvan Stefanescu <razvan.stefanescu@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-02-28 17:47+0000\n"
-"Last-Translator: Bogdan Mateescu\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-07-15 11:11+0000\n"
+"Last-Translator: Eugenol Man <neatusebastian@gmail.com>\n"
 "Language-Team: Romanian (http://www.transifex.com/django/django/language/"
 "ro/)\n"
 "MIME-Version: 1.0\n"
@@ -59,8 +60,8 @@ msgid "Invalid password format or unknown hashing algorithm."
 msgstr ""
 "Parolă nu are formatarea corectă sau algoritmul de criptare nu este cunoscut."
 
-msgid "The two password fields didn't match."
-msgstr "Cele două câmpuri pentru parole nu coincid."
+msgid "The two password fields didn’t match."
+msgstr "Cele două parole nu corespund."
 
 msgid "Password"
 msgstr "Parolă"
@@ -72,12 +73,11 @@ msgid "Enter the same password as before, for verification."
 msgstr "Introduceți parola precedentă pentru confirmare."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
-"Parolele nu sunt stocate în forma lor brută, astfel încât nu există nici o "
-"modalitate de a vedea parola acestui utilizator, însă puteţi schimba parola "
-"folosind <a href=\"{}\">acest formular</a>."
+"Parolele nu sunt salvate în clar așa că nu poți vedea parola. O poți schimba "
+"<a href=\"{}\">de aici</a>."
 
 #, python-format
 msgid ""
@@ -260,22 +260,22 @@ msgstr[2] "Parola trebuie să conțină cel puțin %(min_length)d de caractere."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Parola este prea asemănătoare cu %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
-"Se recomandă ca parola să nu conțină elemente similare cu datele de "
-"identificare personală."
+"Nu este recomandabil ca parola sa fie asemănătoare cu celelalte date "
+"personale."
 
 msgid "This password is too common."
 msgstr "Această parolă este prea răspândită."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Parola Dvs. nu poate fi o parolă folosită în mod uzual."
+msgid "Your password can’t be a commonly used password."
+msgstr "Parola nu poate fi atât de comună. "
 
 msgid "This password is entirely numeric."
 msgstr "Acestă parolă este compusă exclusiv din elemente numerice."
 
-msgid "Your password can't be entirely numeric."
-msgstr "Parola Dvs. nu poate fi alcătuită exclusiv din elemente numerice."
+msgid "Your password can’t be entirely numeric."
+msgstr "Parola nu poate fi doar cu numere."
 
 #, python-format
 msgid "Password reset on %(site_name)s"

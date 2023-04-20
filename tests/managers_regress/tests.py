@@ -4,53 +4,61 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.test.utils import isolate_apps
 
 from .models import (
-    AbstractBase1, AbstractBase2, AbstractBase3, Child1, Child2, Child3,
-    Child4, Child5, Child6, Child7, RelatedModel, RelationModel,
+    AbstractBase1,
+    AbstractBase2,
+    AbstractBase3,
+    Child1,
+    Child2,
+    Child3,
+    Child4,
+    Child5,
+    Child6,
+    Child7,
+    RelatedModel,
+    RelationModel,
 )
 
 
 class ManagersRegressionTests(TestCase):
     def test_managers(self):
-        Child1.objects.create(name='fred', data='a1')
-        Child1.objects.create(name='barney', data='a2')
-        Child2.objects.create(name='fred', data='b1', value=1)
-        Child2.objects.create(name='barney', data='b2', value=42)
-        Child3.objects.create(name='fred', data='c1', comment='yes')
-        Child3.objects.create(name='barney', data='c2', comment='no')
-        Child4.objects.create(name='fred', data='d1')
-        Child4.objects.create(name='barney', data='d2')
-        Child5.objects.create(name='fred', comment='yes')
-        Child5.objects.create(name='barney', comment='no')
-        Child6.objects.create(name='fred', data='f1', value=42)
-        Child6.objects.create(name='barney', data='f2', value=42)
-        Child7.objects.create(name='fred')
-        Child7.objects.create(name='barney')
+        a1 = Child1.objects.create(name="fred", data="a1")
+        a2 = Child1.objects.create(name="barney", data="a2")
+        b1 = Child2.objects.create(name="fred", data="b1", value=1)
+        b2 = Child2.objects.create(name="barney", data="b2", value=42)
+        c1 = Child3.objects.create(name="fred", data="c1", comment="yes")
+        c2 = Child3.objects.create(name="barney", data="c2", comment="no")
+        d1 = Child4.objects.create(name="fred", data="d1")
+        d2 = Child4.objects.create(name="barney", data="d2")
+        fred1 = Child5.objects.create(name="fred", comment="yes")
+        Child5.objects.create(name="barney", comment="no")
+        f1 = Child6.objects.create(name="fred", data="f1", value=42)
+        f2 = Child6.objects.create(name="barney", data="f2", value=42)
+        fred2 = Child7.objects.create(name="fred")
+        barney = Child7.objects.create(name="barney")
 
-        self.assertQuerysetEqual(Child1.manager1.all(), ["<Child1: a1>"])
-        self.assertQuerysetEqual(Child1.manager2.all(), ["<Child1: a2>"])
-        self.assertQuerysetEqual(Child1._default_manager.all(), ["<Child1: a1>"])
+        self.assertSequenceEqual(Child1.manager1.all(), [a1])
+        self.assertSequenceEqual(Child1.manager2.all(), [a2])
+        self.assertSequenceEqual(Child1._default_manager.all(), [a1])
 
-        self.assertQuerysetEqual(Child2._default_manager.all(), ["<Child2: b1>"])
-        self.assertQuerysetEqual(Child2.restricted.all(), ["<Child2: b2>"])
+        self.assertSequenceEqual(Child2._default_manager.all(), [b1])
+        self.assertSequenceEqual(Child2.restricted.all(), [b2])
 
-        self.assertQuerysetEqual(Child3._default_manager.all(), ["<Child3: c1>"])
-        self.assertQuerysetEqual(Child3.manager1.all(), ["<Child3: c1>"])
-        self.assertQuerysetEqual(Child3.manager2.all(), ["<Child3: c2>"])
+        self.assertSequenceEqual(Child3._default_manager.all(), [c1])
+        self.assertSequenceEqual(Child3.manager1.all(), [c1])
+        self.assertSequenceEqual(Child3.manager2.all(), [c2])
 
         # Since Child6 inherits from Child4, the corresponding rows from f1 and
         # f2 also appear here. This is the expected result.
-        self.assertQuerysetEqual(Child4._default_manager.order_by('data'), [
-            "<Child4: d1>",
-            "<Child4: d2>",
-            "<Child4: f1>",
-            "<Child4: f2>",
-        ])
-        self.assertQuerysetEqual(Child4.manager1.all(), ["<Child4: d1>", "<Child4: f1>"], ordered=False)
-        self.assertQuerysetEqual(Child5._default_manager.all(), ["<Child5: fred>"])
-        self.assertQuerysetEqual(Child6._default_manager.all(), ["<Child6: f1>", "<Child6: f2>"], ordered=False)
-        self.assertQuerysetEqual(
-            Child7._default_manager.order_by('name'),
-            ["<Child7: barney>", "<Child7: fred>"]
+        self.assertSequenceEqual(
+            Child4._default_manager.order_by("data"),
+            [d1, d2, f1.child4_ptr, f2.child4_ptr],
+        )
+        self.assertCountEqual(Child4.manager1.all(), [d1, f1.child4_ptr])
+        self.assertCountEqual(Child5._default_manager.all(), [fred1])
+        self.assertCountEqual(Child6._default_manager.all(), [f1, f2])
+        self.assertSequenceEqual(
+            Child7._default_manager.order_by("name"),
+            [barney, fred2],
         )
 
     def test_abstract_manager(self):
@@ -80,12 +88,12 @@ class ManagersRegressionTests(TestCase):
         with self.assertRaisesMessage(AttributeError, msg):
             AbstractBase1.objects.all()
 
-    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
-    @isolate_apps('managers_regress')
+    @override_settings(TEST_SWAPPABLE_MODEL="managers_regress.Parent")
+    @isolate_apps("managers_regress")
     def test_swappable_manager(self):
         class SwappableModel(models.Model):
             class Meta:
-                swappable = 'TEST_SWAPPABLE_MODEL'
+                swappable = "TEST_SWAPPABLE_MODEL"
 
         # Accessing the manager on a swappable model should
         # raise an attribute error with a helpful message
@@ -96,14 +104,14 @@ class ManagersRegressionTests(TestCase):
         with self.assertRaisesMessage(AttributeError, msg):
             SwappableModel.objects.all()
 
-    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
-    @isolate_apps('managers_regress')
+    @override_settings(TEST_SWAPPABLE_MODEL="managers_regress.Parent")
+    @isolate_apps("managers_regress")
     def test_custom_swappable_manager(self):
         class SwappableModel(models.Model):
             stuff = models.Manager()
 
             class Meta:
-                swappable = 'TEST_SWAPPABLE_MODEL'
+                swappable = "TEST_SWAPPABLE_MODEL"
 
         # Accessing the manager on a swappable model with an
         # explicit manager should raise an attribute error with a
@@ -115,14 +123,14 @@ class ManagersRegressionTests(TestCase):
         with self.assertRaisesMessage(AttributeError, msg):
             SwappableModel.stuff.all()
 
-    @override_settings(TEST_SWAPPABLE_MODEL='managers_regress.Parent')
-    @isolate_apps('managers_regress')
+    @override_settings(TEST_SWAPPABLE_MODEL="managers_regress.Parent")
+    @isolate_apps("managers_regress")
     def test_explicit_swappable_manager(self):
         class SwappableModel(models.Model):
             objects = models.Manager()
 
             class Meta:
-                swappable = 'TEST_SWAPPABLE_MODEL'
+                swappable = "TEST_SWAPPABLE_MODEL"
 
         # Accessing the manager on a swappable model with an
         # explicit manager should raise an attribute error with a
@@ -143,11 +151,14 @@ class ManagersRegressionTests(TestCase):
         relation.save()
         relation.m2m.add(related)
 
-        t = Template('{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}{{ related.test_m2m.all.0 }}')
+        t = Template(
+            "{{ related.test_fk.all.0 }}{{ related.test_gfk.all.0 }}"
+            "{{ related.test_m2m.all.0 }}"
+        )
 
         self.assertEqual(
-            t.render(Context({'related': related})),
-            ''.join([str(relation.pk)] * 3),
+            t.render(Context({"related": related})),
+            "".join([str(relation.pk)] * 3),
         )
 
     def test_field_can_be_called_exact(self):
@@ -159,7 +170,7 @@ class ManagersRegressionTests(TestCase):
         self.assertEqual(related.test_fk.get(), relation)
 
 
-@isolate_apps('managers_regress')
+@isolate_apps("managers_regress")
 class TestManagerInheritance(SimpleTestCase):
     def test_implicit_inheritance(self):
         class CustomManager(models.Manager):
@@ -205,7 +216,7 @@ class TestManagerInheritance(SimpleTestCase):
             custom_manager = CustomManager()
 
             class Meta:
-                default_manager_name = 'custom_manager'
+                default_manager_name = "custom_manager"
                 abstract = True
 
         class PlainModel(models.Model):
@@ -213,7 +224,7 @@ class TestManagerInheritance(SimpleTestCase):
             custom_manager = CustomManager()
 
             class Meta:
-                default_manager_name = 'custom_manager'
+                default_manager_name = "custom_manager"
 
         self.assertIsInstance(PlainModel._default_manager, CustomManager)
 
@@ -242,7 +253,7 @@ class TestManagerInheritance(SimpleTestCase):
             custom_manager = CustomManager()
 
             class Meta:
-                base_manager_name = 'custom_manager'
+                base_manager_name = "custom_manager"
                 abstract = True
 
         class PlainModel(models.Model):
@@ -250,7 +261,7 @@ class TestManagerInheritance(SimpleTestCase):
             custom_manager = CustomManager()
 
             class Meta:
-                base_manager_name = 'custom_manager'
+                base_manager_name = "custom_manager"
 
         self.assertIsInstance(PlainModel._base_manager, CustomManager)
 
@@ -284,4 +295,9 @@ class TestManagerInheritance(SimpleTestCase):
             custom_manager = CustomManager()
 
         self.assertEqual(TestModel._meta.managers, (TestModel.custom_manager,))
-        self.assertEqual(TestModel._meta.managers_map, {'custom_manager': TestModel.custom_manager})
+        self.assertEqual(
+            TestModel._meta.managers_map, {"custom_manager": TestModel.custom_manager}
+        )
+
+    def test_manager_class_getitem(self):
+        self.assertIs(models.Manager[Child1], models.Manager)

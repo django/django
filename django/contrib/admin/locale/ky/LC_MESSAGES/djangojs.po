@@ -1,0 +1,260 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020-2021
+# Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>, 2020
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-02 11:44+0000\n"
+"Last-Translator: Soyuzbek Orozbek uulu <soyuzbek196.kg@gmail.com>\n"
+"Language-Team: Kyrgyz (http://www.transifex.com/django/django/language/ky/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ky\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "%s даана жеткиликтүү"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Бул жеткиликтүү тизмеси %s даана . Сиз төмөндө кутудан кээ бирлерин \"Тандоо"
+"\" баскычын басуу менен тандап алсаңыз болот."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr "Жеткиликтүү %s даана тизмесин чыпкалоо үчүн төмөнкү кутуга жазыңыз."
+
+msgid "Filter"
+msgstr "Чыпкалоо"
+
+msgid "Choose all"
+msgstr "Баарын тандоо"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Бүт %s даананы заматта тандоо үчүн чыкылдатыңыз."
+
+msgid "Choose"
+msgstr "Тандоо"
+
+msgid "Remove"
+msgstr "Алып таштоо"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "%s даана тандалды"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Бул тандалган %s даана. Сиз алардын каалаганын төмөндө кутудан \"Өчүр\" "
+"баскычын басуу менен өчүрө аласыз."
+
+msgid "Remove all"
+msgstr "Баарын алып ташта"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Тандалган %s  даананын баарын өчүрүү үчүн басыңыз"
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)sнерседен %(sel)sтандалды"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Сиз өзүнчө аймактарда сакталбаган өзгөртүүлөргө ээсиз. Эгер сиз бул аракетти "
+"жасасаңыз сакталбаган өзгөрүүлөр текке кетет."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+"Сиз аракетти тандадыңыз бирок өзүнчө аймактарды сактай элексиз. Сактоо үчүн "
+"ОК ту басыңыз. Сиз аракетти кайталашыңыз керек."
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+"Сиз аракетти тандадыңыз жана өзүнчө аймактарда өзгөртүү киргизген жоксуз. "
+"Сиз Сактоонун ордуна Жөнө баскычын басууңуз керек."
+
+msgid "Now"
+msgstr "Азыр"
+
+msgid "Midnight"
+msgstr "Түнүчү"
+
+msgid "6 a.m."
+msgstr "саарлап саат 6"
+
+msgid "Noon"
+msgstr "Түш"
+
+msgid "6 p.m."
+msgstr "Кэч саат 6"
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Эскертүү: Сиз серверден %s саат алдыда жүрөсүз."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Эскертүү: Сиз серверден %s саат аркада жүрөсүз."
+
+msgid "Choose a Time"
+msgstr "Толук убак танда"
+
+msgid "Choose a time"
+msgstr "Кыска убак танда"
+
+msgid "Cancel"
+msgstr "Жокко чыгар"
+
+msgid "Today"
+msgstr "Бүгүн"
+
+msgid "Choose a Date"
+msgstr "Күн танда"
+
+msgid "Yesterday"
+msgstr "Кечээ"
+
+msgid "Tomorrow"
+msgstr "Эртең"
+
+msgid "January"
+msgstr "Январь"
+
+msgid "February"
+msgstr "Февраль"
+
+msgid "March"
+msgstr "Март"
+
+msgid "April"
+msgstr "Апрель"
+
+msgid "May"
+msgstr "Май"
+
+msgid "June"
+msgstr "Июнь"
+
+msgid "July"
+msgstr "Июль"
+
+msgid "August"
+msgstr "Август"
+
+msgid "September"
+msgstr "Сентябрь"
+
+msgid "October"
+msgstr "Октябрь"
+
+msgid "November"
+msgstr "Ноябрь"
+
+msgid "December"
+msgstr "Декабрь"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Янв"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Фев"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Мар"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Апр"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Май"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Июн"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Июл"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Авг"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Сен"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Окт"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Ноя"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Дек"
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Жек"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Дүй"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Шей"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Шар"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Бей"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "Жума"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Ише"
+
+msgid "Show"
+msgstr "Көрсөт"
+
+msgid "Hide"
+msgstr "Жашыр"

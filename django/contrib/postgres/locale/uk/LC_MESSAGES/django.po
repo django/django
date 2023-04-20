@@ -2,18 +2,19 @@
 #
 # Translators:
 # Andriy Sokolovskiy <me@asokolovskiy.com>, 2015
-# Денис Подлесный <haos616@gmail.com>, 2016
+# Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2017
+# Illia Volochii <illia.volochii@gmail.com>, 2021,2023
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015-2016
-# Taras Korzhak <taras.korzhak96@gmail.com>, 2018
+# tarasyyyk <taras.korzhak96@gmail.com>, 2018
 # Zoriana Zaiats, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-08-24 20:08+0000\n"
-"Last-Translator: Taras Korzhak <taras.korzhak96@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-19 09:22+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021,2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgstr ""
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "PostgreSQL extensions"
-msgstr "Розширення  PostgreSQL"
+msgstr "Розширення PostgreSQL"
 
 #, python-format
 msgid "Item %(nth)s in the array did not validate:"
@@ -39,24 +40,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Асоціативний масив із рядків у рядки/обнулення"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "Значення від \"%(key)s\" не є рядком чи null."
-
-msgid "A JSON object"
-msgstr "Об'єкт JSON"
-
-msgid "Value must be valid JSON."
-msgstr "Значення повинне бути корректним JSON."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr "Значення “%(key)s” не є рядком чи null."
 
 msgid "Could not load JSON data."
 msgstr "Не вдалося завантажити JSON-дані."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Значення повинне бути JSON-словником."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "Значення '%(value)s' повинне бути корректним JSON."
 
 msgid "Enter two valid values."
 msgstr "Введіть два корректних значення."
@@ -126,13 +117,10 @@ msgstr "Були надані наступні невідомі ключі: %(ke
 
 #, python-format
 msgid ""
-"Ensure that this range is completely less than or equal to %(limit_value)s."
-msgstr ""
-"Переконайтеся, що цей діапазон цілком менше чи дорівнює %(limit_value)s."
+"Ensure that the upper bound of the range is not greater than %(limit_value)s."
+msgstr "Переконайтеся, що верхня межа діапазону не перевищує %(limit_value)s."
 
 #, python-format
 msgid ""
-"Ensure that this range is completely greater than or equal to "
-"%(limit_value)s."
-msgstr ""
-"Переконайтеся, що цей діапазон повністю більший чи дорівнює %(limit_value)s."
+"Ensure that the lower bound of the range is not less than %(limit_value)s."
+msgstr "Переконайтеся, що нижня межа діапазону не менша ніж %(limit_value)s."

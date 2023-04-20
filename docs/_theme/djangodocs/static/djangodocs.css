@@ -43,12 +43,13 @@ div.nav { margin: 0; font-size: 11px; text-align: right; color: #487858;}
 
 /*** basic styles ***/
 dd { margin-left:15px; }
-h1,h2,h3,h4,h5 { margin-top:1em; font-family:"Trebuchet MS",sans-serif; font-weight:normal; }
+h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12 { margin-top:1em; font-family:"Trebuchet MS",sans-serif; font-weight:normal; }
 h1 { font-size:218%; margin-top:0.6em; margin-bottom:.4em; line-height:1.1em; }
 h2 { font-size:175%; margin-bottom:.6em; line-height:1.2em; color:#092e20; }
 h3 { font-size:150%; font-weight:bold; margin-bottom:.2em; color:#487858; }
 h4 { font-size:125%; font-weight:bold; margin-top:1.5em; margin-bottom:3px; }
 h5 { font-size:110%; font-weight:bold; margin-top:1em; margin-bottom:3px; }
+h6,h7,h8,h9,h10,h11,h12 { font-weight:bold; margin-bottom:3px; }
 div.figure { text-align: center; }
 div.figure p.caption { font-size:1em; margin-top:0; margin-bottom:1.5em; color: #555;}
 hr { color:#ccc; background-color:#ccc; height:1px; border:0; }
@@ -102,6 +103,7 @@ dt .literal, table .literal { background:none; }
 #bd a.reference { text-decoration: none; }
 #bd a.reference tt.literal { border-bottom: 1px #234f32 dotted; }
 div.code-block-caption { color: white; background-color: #234F32; margin: 0; padding: 2px 5px; width: 100%; font-family: monospace; font-size: small; line-height: 1.3em; }
+div.code-block-caption .literal {color: white; }
 div.literal-block-wrapper pre { margin-top: 0; }
 
 /* Restore colors of pygments hyperlinked code */
@@ -124,8 +126,9 @@ div.versionadded span.title, div.versionchanged span.title, span.versionmodified
 div.versionadded, div.versionchanged, div.deprecated { color:#555; }
 
 /*** p-links ***/
-a.headerlink { color: #c60f0f; font-size: 0.8em; padding: 0 4px 0 4px; text-decoration: none; visibility: hidden; }
-h1:hover > a.headerlink, h2:hover > a.headerlink, h3:hover > a.headerlink, h4:hover > a.headerlink, h5:hover > a.headerlink, h6:hover > a.headerlink, dt:hover > a.headerlink { visibility: visible; }
+a.headerlink { color: #c60f0f; font-size: 0.8em; margin-left: 4px; opacity: 0; text-decoration: none; }
+h1:hover > a.headerlink, h2:hover > a.headerlink, h3:hover > a.headerlink, h4:hover > a.headerlink, h5:hover > a.headerlink, h6:hover > a.headerlink, dt:hover > a.headerlink { opacity: 1; }
+a.headerlink:focus { opacity: 1; }
 
 /*** index ***/
 table.indextable td { text-align: left; vertical-align: top;}

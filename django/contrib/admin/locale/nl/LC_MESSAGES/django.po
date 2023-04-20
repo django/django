@@ -7,18 +7,18 @@
 # Harro van der Klauw <hvdklauw@gmail.com>, 2012
 # Ilja Maas <iljamaas@dreamsolution.nl>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Jeffrey Gelens <jeffrey@noppo.pro>, 2011-2012
+# 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012
 # dokterbob <mathijs@mathijsfietst.nl>, 2015
-# Meteor 0id, 2019
-# Sander Steffann <inactive+steffann@transifex.com>, 2014-2015
+# Meteor0id, 2019-2020
+# 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2014-2015
 # Tino de Bruijn <tinodb@gmail.com>, 2011
-# Tonnes <tonnes.mb@gmail.com>, 2017,2019
+# Tonnes <tonnes.mb@gmail.com>, 2017,2019-2020,2022
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 08:08+0000\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
 "Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -26,6 +26,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Geselecteerde %(verbose_name_plural)s verwijderen"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -37,10 +41,6 @@ msgstr "%(name)s kan niet worden verwijderd "
 
 msgid "Are you sure?"
 msgstr "Weet u het zeker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Geselecteerde %(verbose_name_plural)s verwijderen"
 
 msgid "Administration"
 msgstr "Beheer"
@@ -77,6 +77,12 @@ msgstr "Geen datum"
 
 msgid "Has date"
 msgstr "Heeft datum"
+
+msgid "Empty"
+msgstr "Leeg"
+
+msgid "Not empty"
+msgstr "Niet leeg"
 
 #, python-format
 msgid ""
@@ -274,8 +280,9 @@ msgstr "0 van de %(cnt)s geselecteerd"
 msgid "Change history: %s"
 msgstr "Wijzigingsgeschiedenis: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -346,6 +353,19 @@ msgstr "Alle %(total_count)s %(module_name)s selecteren"
 msgid "Clear selection"
 msgstr "Selectie wissen"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "Modellen in de %(name)s-toepassing"
+
+msgid "Add"
+msgstr "Toevoegen"
+
+msgid "View"
+msgstr "Weergeven"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "U hebt geen rechten om iets te bekijken of te bewerken."
+
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
@@ -395,6 +415,9 @@ msgstr "Weergeven op website"
 msgid "Filter"
 msgstr "Filter"
 
+msgid "Clear all filters"
+msgstr "Alle filters wissen"
+
 msgid "Remove from sorting"
 msgstr "Verwijderen uit sortering"
 
@@ -414,9 +437,9 @@ msgid ""
 "related objects, but your account doesn't have permission to delete the "
 "following types of objects:"
 msgstr ""
-"Het verwijderen van %(object_name)s '%(escaped_object)s' zal ook "
-"gerelateerde objecten verwijderen. U hebt echter geen rechten om de volgende "
-"typen objecten te verwijderen:"
+"Het verwijderen van %(object_name)s '%(escaped_object)s' zou ook "
+"gerelateerde objecten verwijderen, maar uw account heeft geen rechten om de "
+"volgende typen objecten te verwijderen:"
 
 #, python-format
 msgid ""
@@ -452,9 +475,9 @@ msgid ""
 "objects, but your account doesn't have permission to delete the following "
 "types of objects:"
 msgstr ""
-"Het verwijderen van de geselecteerde %(objects_name)s vereist het "
-"verwijderen van gerelateerde objecten, maar uw account heeft geen "
-"toestemming om de volgende soorten objecten te verwijderen:"
+"Het verwijderen van de geselecteerde %(objects_name)s zou ook gerelateerde "
+"objecten verwijderen, maar uw account heeft geen rechten om de volgende "
+"typen objecten te verwijderen:"
 
 #, python-format
 msgid ""
@@ -472,9 +495,6 @@ msgstr ""
 "Weet u zeker dat u de geselecteerde %(objects_name)s wilt verwijderen? Alle "
 "volgende objecten en hun aanverwante items zullen worden verwijderd:"
 
-msgid "View"
-msgstr "Weergeven"
-
 msgid "Delete?"
 msgstr "Verwijderen?"
 
@@ -484,16 +504,6 @@ msgstr " Op %(filter_title)s "
 
 msgid "Summary"
 msgstr "Samenvatting"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "Modellen in de %(name)s-toepassing"
-
-msgid "Add"
-msgstr "Toevoegen"
-
-msgid "You don’t have permission to view or edit anything."
-msgstr "U hebt geen rechten om iets te bekijken of te bewerken."
 
 msgid "Recent actions"
 msgstr "Recente acties"
@@ -527,6 +537,15 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "Wachtwoord of gebruikersnaam vergeten?"
 
+msgid "Toggle navigation"
+msgstr "Navigatie aan/uit"
+
+msgid "Start typing to filter…"
+msgstr "Begin met typen om te filteren…"
+
+msgid "Filter navigation items"
+msgstr "Navigatie-items filteren"
+
 msgid "Date/time"
 msgstr "Datum/tijd"
 
@@ -535,6 +554,12 @@ msgstr "Gebruiker"
 
 msgid "Action"
 msgstr "Actie"
+
+msgid "entry"
+msgstr "vermelding"
+
+msgid "entries"
+msgstr "vermeldingen"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -592,8 +617,12 @@ msgstr "Nog een %(model)s toevoegen"
 msgid "Delete selected %(model)s"
 msgstr "Geselecteerde %(model)s verwijderen"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Bedankt voor de aanwezigheid op de site vandaag."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Geselecteerde %(model)s weergeven"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Bedankt voor het vandaag wat tijd besteden aan de website."
 
 msgid "Log in again"
 msgstr "Opnieuw aanmelden"

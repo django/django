@@ -74,7 +74,7 @@ Persistent database connections
 -------------------------------
 
 Django now supports reusing the same database connection for several requests.
-This avoids the overhead of re-establishing a connection at the beginning of
+This avoids the overhead of reestablishing a connection at the beginning of
 each request. For backwards compatibility, this feature is disabled by
 default. See :ref:`persistent-database-connections` for details.
 
@@ -162,10 +162,10 @@ Minor features
 * The ``HttpOnly`` flag can be set on the CSRF cookie with
   :setting:`CSRF_COOKIE_HTTPONLY`.
 
-* The :meth:`~django.test.TransactionTestCase.assertQuerysetEqual` now checks
+* The ``assertQuerysetEqual()`` now checks
   for undefined order and raises :exc:`ValueError` if undefined
   order is spotted. The order is seen as undefined if the given ``QuerySet``
-  isn't ordered and there are more than one ordered values to compare against.
+  isn't ordered and there is more than one ordered value to compare against.
 
 * Added :meth:`~django.db.models.query.QuerySet.earliest` for symmetry with
   :meth:`~django.db.models.query.QuerySet.latest`.
@@ -173,7 +173,7 @@ Minor features
 * In addition to :lookup:`year`, :lookup:`month` and :lookup:`day`, the ORM
   now supports :lookup:`hour`, :lookup:`minute` and :lookup:`second` lookups.
 
-* Django now wraps all PEP-249 exceptions.
+* Django now wraps all :pep:`249` exceptions.
 
 * The default widgets for :class:`~django.forms.EmailField`,
   :class:`~django.forms.URLField`, :class:`~django.forms.IntegerField`,
@@ -257,12 +257,10 @@ Minor features
 * Added ``BCryptSHA256PasswordHasher`` to resolve the password truncation issue
   with bcrypt.
 
-* `Pillow`_ is now the preferred image manipulation library to use with Django.
-  `PIL`_ is pending deprecation (support to be removed in Django 1.8).
-  To upgrade, you should **first** uninstall PIL, **then** install Pillow.
-
-.. _`Pillow`: https://pypi.org/project/Pillow/
-.. _`PIL`: https://pypi.org/project/PIL/
+* :pypi:`Pillow` is now the preferred image manipulation library to use with
+  Django. :pypi:`PIL` is pending deprecation (support to be removed in Django
+  1.8). To upgrade, you should **first** uninstall PIL, **then** install
+  Pillow.
 
 * :class:`~django.forms.ModelForm` accepts several new ``Meta``
   options.
@@ -321,7 +319,7 @@ Minor features
 
 * The :class:`~django.test.SimpleTestCase` class includes a new assertion
   helper for testing formset errors:
-  :meth:`~django.test.SimpleTestCase.assertFormsetError`.
+  ``django.test.SimpleTestCase.assertFormsetError()``.
 
 * The list of related fields added to a
   :class:`~django.db.models.query.QuerySet` by
@@ -460,14 +458,18 @@ explicitly import the User model in your test module::
 
     from django.contrib.auth.tests.custom_user import CustomUser
 
-    @override_settings(AUTH_USER_MODEL='auth.CustomUser')
+
+    @override_settings(AUTH_USER_MODEL="auth.CustomUser")
     class CustomUserFeatureTests(TestCase):
         def test_something(self):
-            # Test code here ...
+            # Test code here
+            ...
 
 This import forces the custom user model to be registered. Without this import,
 the test will be unable to swap in the custom user model, and you will get an
-error reporting::
+error reporting:
+
+.. code-block:: pytb
 
     ImproperlyConfigured: AUTH_USER_MODEL refers to model 'auth.CustomUser' that has not been installed
 
@@ -731,7 +733,7 @@ Admin views ``_changelist_filters`` GET parameter
 -------------------------------------------------
 
 To achieve preserving and restoring list view filters, admin views now
-pass around the `_changelist_filters` GET parameter. It's important that you
+pass around the ``_changelist_filters`` GET parameter. It's important that you
 account for that change if you have custom admin templates or if your tests
 rely on the previous URLs. If you want to revert to the original behavior you
 can set the
@@ -756,7 +758,7 @@ A temporary shim for ``django.contrib.auth.views.password_reset_confirm()``
 that will allow password reset links generated prior to Django 1.6 to continue
 to work has been added to provide backwards compatibility; this will be removed
 in Django 1.7. Thus, as long as your site has been running Django 1.6 for more
-than :setting:`PASSWORD_RESET_TIMEOUT_DAYS`, this change will have no effect.
+than ``PASSWORD_RESET_TIMEOUT_DAYS``, this change will have no effect.
 If not (for example, if you upgrade directly from Django 1.5 to Django 1.7),
 then any password reset links generated before you upgrade to Django 1.7 or
 later won't work after the upgrade.
@@ -768,15 +770,19 @@ match the ``uidb64`` pattern.
 
 For example::
 
-    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
-        name='password_reset_confirm'),
+    url(
+        r"^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm",
+        name="password_reset_confirm",
+    ),
 
 becomes::
 
-    url(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm',
-        name='password_reset_confirm'),
+    url(
+        r"^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm",
+        name="password_reset_confirm",
+    ),
 
 You may also want to add the shim to support the old style reset links. Using
 the example above, you would modify the existing url by replacing
@@ -784,11 +790,13 @@ the example above, you would modify the existing url by replacing
 ``django.contrib.auth.views.password_reset_confirm_uidb36`` and also remove
 the ``name`` argument so it doesn't conflict with the new url::
 
-    url(r'^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$',
-        'django.contrib.auth.views.password_reset_confirm_uidb36'),
+    url(
+        r"^reset/(?P<uidb36>[0-9A-Za-z]+)-(?P<token>.+)/$",
+        "django.contrib.auth.views.password_reset_confirm_uidb36",
+    ),
 
 You can remove this URL pattern after your app has been deployed with Django
-1.6 for :setting:`PASSWORD_RESET_TIMEOUT_DAYS`.
+1.6 for ``PASSWORD_RESET_TIMEOUT_DAYS``.
 
 Default session serialization switched to JSON
 ----------------------------------------------
@@ -797,7 +805,7 @@ Historically, :mod:`django.contrib.sessions` used :mod:`pickle` to serialize
 session data before storing it in the backend. If you're using the :ref:`signed
 cookie session backend<cookie-session-backend>` and :setting:`SECRET_KEY` is
 known by an attacker (there isn't an inherent vulnerability in Django that
-would cause it to leak), the attacker could insert a string into his session
+would cause it to leak), the attacker could insert a string into their session
 which, when unpickled, executes arbitrary code on the server. The technique for
 doing so is simple and easily available on the internet. Although the cookie
 session storage signs the cookie-stored data to prevent tampering, a
@@ -916,15 +924,19 @@ Miscellaneous
 * :ref:`Authentication views <built-in-auth-views>` are now reversed by name,
   not their locations in ``django.contrib.auth.views``. If you are using the
   views without a ``name``, you should update your ``urlpatterns`` to use
-  :meth:`~django.conf.urls.url` with the ``name`` parameter. For example::
+  ``django.conf.urls.url()`` with the ``name`` parameter. For example::
 
-    (r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete')
+    (r"^reset/done/$", "django.contrib.auth.views.password_reset_complete")
 
   becomes::
 
-    url(r'^reset/done/$', 'django.contrib.auth.views.password_reset_complete', name='password_reset_complete')
+    url(
+        r"^reset/done/$",
+        "django.contrib.auth.views.password_reset_complete",
+        name="password_reset_complete",
+    )
 
-* :class:`~django.views.generic.base.RedirectView` now has a `pattern_name`
+* :class:`~django.views.generic.base.RedirectView` now has a ``pattern_name``
   attribute which allows it to choose the target by reversing the URL.
 
 * In Django 1.4 and 1.5, a blank string was unintentionally not considered to
@@ -946,7 +958,7 @@ Miscellaneous
   with ``localhost`` as the domain.
 
 * The new :option:`makemessages --keep-pot` option prevents deleting the
-  temporary .pot file generated before creating the .po file.
+  temporary ``.pot`` file generated before creating the ``.po`` file.
 
 * The undocumented ``django.core.servers.basehttp.WSGIServerException`` has
   been removed. Use ``socket.error`` provided by the standard library instead.
@@ -1010,11 +1022,15 @@ Django 1.6 starts a process to correct this inconsistency. The ``future``
 template library provides alternate implementations of :ttag:`cycle` and
 :ttag:`firstof` that autoescape their inputs. If you're using these tags,
 you're encouraged to include the following line at the top of your templates to
-enable the new behavior::
+enable the new behavior:
+
+.. code-block:: html+django
 
     {% load cycle from future %}
 
-or::
+or:
+
+.. code-block:: html+django
 
     {% load firstof from future %}
 
@@ -1043,7 +1059,7 @@ occasions, such as:
 This makes the cache effectively work on a per-session basis regardless of the
 ``CACHE_MIDDLEWARE_ANONYMOUS_ONLY`` setting.
 
-__ https://www.google.com/analytics/
+__ https://marketingplatform.google.com/about/analytics/
 
 ``SEND_BROKEN_LINK_EMAILS`` setting
 -----------------------------------
@@ -1096,7 +1112,7 @@ you should rename the method and conditionally add an alias with the old name::
 
     class CustomManager(models.Manager):
         def get_queryset(self):
-            pass # ...
+            pass  # ...
 
         if django.VERSION < (1, 6):
             get_query_set = get_queryset
@@ -1107,10 +1123,12 @@ you should rename the method and conditionally add an alias with the old name::
 If you are writing a library that needs to call the ``get_queryset`` method and
 must support old Django versions, you should write::
 
-    get_queryset = (some_manager.get_query_set
-                    if hasattr(some_manager, 'get_query_set')
-                    else some_manager.get_queryset)
-    return get_queryset() # etc
+    get_queryset = (
+        some_manager.get_query_set
+        if hasattr(some_manager, "get_query_set")
+        else some_manager.get_queryset
+    )
+    return get_queryset()  # etc
 
 In the general case of a custom manager that both implements its own
 ``get_queryset`` method and calls that method, and needs to work with older Django
@@ -1119,18 +1137,18 @@ a ``get_queryset_compat`` method as below and use it internally to your manager:
 
     class YourCustomManager(models.Manager):
         def get_queryset(self):
-            return YourCustomQuerySet() # for example
+            return YourCustomQuerySet()  # for example
 
         if django.VERSION < (1, 6):
             get_query_set = get_queryset
 
-        def active(self): # for example
+        def active(self):  # for example
             return self.get_queryset_compat().filter(active=True)
 
         def get_queryset_compat(self):
-            get_queryset = (self.get_query_set
-                            if hasattr(self, 'get_query_set')
-                            else self.get_queryset)
+            get_queryset = (
+                self.get_query_set if hasattr(self, "get_query_set") else self.get_queryset
+            )
             return get_queryset()
 
 This helps to minimize the changes that are needed, but also works correctly in
@@ -1149,11 +1167,14 @@ and you should now use the new location.
 The URLconf ``django.conf.urls.shortcut`` was also deprecated. If you're
 including it in an URLconf, simply replace::
 
-    (r'^prefix/', include('django.conf.urls.shortcut')),
+    (r"^prefix/", include("django.conf.urls.shortcut")),
 
 with::
 
-    (r'^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$', 'django.contrib.contenttypes.views.shortcut'),
+    (
+        r"^prefix/(?P<content_type_id>\d+)/(?P<object_id>.*)/$",
+        "django.contrib.contenttypes.views.shortcut",
+    ),
 
 ``ModelForm`` without ``fields`` or ``exclude``
 -----------------------------------------------

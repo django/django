@@ -60,11 +60,11 @@ sure you've configured your cache; see the :doc:`cache documentation
 
 .. warning::
 
-    You should only use cache-based sessions if you're using the Memcached
-    cache backend. The local-memory cache backend doesn't retain data long
-    enough to be a good choice, and it'll be faster to use file or database
-    sessions directly instead of sending everything through the file or
-    database cache backends. Additionally, the local-memory cache backend is
+    You should only use cache-based sessions if you're using the Memcached or
+    Redis cache backend. The local-memory cache backend doesn't retain data
+    long enough to be a good choice, and it'll be faster to use file or
+    database sessions directly instead of sending everything through the file
+    or database cache backends. Additionally, the local-memory cache backend is
     NOT multi-process safe, therefore probably not a good choice for production
     environments.
 
@@ -72,28 +72,27 @@ If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
-Once your cache is configured, you've got two choices for how to store data in
-the cache:
+Once your cache is configured, you have to choose between a database-backed
+cache or a non-persistent cache.
 
-* Set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cache"`` for a simple caching session
-  store. Session data will be stored directly in your cache. However, session
-  data may not be persistent: cached data can be evicted if the cache fills
-  up or if the cache server is restarted.
+The cached database backend (``cached_db``) uses a write-through cache --
+session writes are applied to both the cache and the database. Session reads
+use the cache, or the database if the data has been evicted from the cache. To
+use this backend, set :setting:`SESSION_ENGINE` to
+``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
+instructions for the `using database-backed sessions`_.
 
-* For persistent, cached data, set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cached_db"``. This uses a
-  write-through cache -- every write to the cache will also be written to
-  the database. Session reads only use the database if the data is not
-  already in the cache.
+The cache backend (``cache``) stores session data only in your cache. This is
+faster because it avoids database persistence, but you will have to consider
+what happens when cache data is evicted. Eviction can occur if the cache fills
+up or the cache server is restarted, and it will mean session data is lost,
+including logging out users. To use this backend, set :setting:`SESSION_ENGINE`
+to ``"django.contrib.sessions.backends.cache"``.
 
-Both session stores are quite fast, but the simple cache is faster because it
-disregards persistence. In most cases, the ``cached_db`` backend will be fast
-enough, but if you need that last bit of performance, and are willing to let
-session data be expunged from time to time, the ``cache`` backend is for you.
-
-If you use the ``cached_db`` session backend, you also need to follow the
-configuration instructions for the `using database-backed sessions`_.
+The cache backend can be made persistent by using a persistent cache, such as
+Redis with appropriate configuration. But unless your cache is definitely
+configured for sufficient persistence, opt for the cached database backend.
+This avoids edge cases caused by unreliable data storage in production.
 
 Using file-based sessions
 -------------------------
@@ -103,7 +102,7 @@ To use file-based sessions, set the :setting:`SESSION_ENGINE` setting to
 
 You might also want to set the :setting:`SESSION_FILE_PATH` setting (which
 defaults to output from ``tempfile.gettempdir()``, most likely ``/tmp``) to
-control where Django stores session files. Be sure to check that your Web
+control where Django stores session files. Be sure to check that your web
 server has permissions to read and write to this location.
 
 .. _cookie-session-backend:
@@ -123,18 +122,6 @@ and the :setting:`SECRET_KEY` setting.
 
 .. warning::
 
-    **If the SECRET_KEY is not kept secret and you are using the**
-    :class:`~django.contrib.sessions.serializers.PickleSerializer`, **this can
-    lead to arbitrary remote code execution.**
-
-    An attacker in possession of the :setting:`SECRET_KEY` can not only
-    generate falsified session data, which your site will trust, but also
-    remotely execute arbitrary code, as the data is serialized using pickle.
-
-    If you use cookie-based sessions, pay extra care that your secret key is
-    always kept completely secret, for any system which might be remotely
-    accessible.
-
     **The session data is signed but not encrypted**
 
     When using the cookies backend the session data can be read by the client.
@@ -144,7 +131,8 @@ and the :setting:`SECRET_KEY` setting.
     tampered with. The same invalidation happens if the client storing the
     cookie (e.g. your user's browser) can't store all of the session cookie and
     drops data. Even though Django compresses the data, it's still entirely
-    possible to exceed the `common limit of 4096 bytes`_ per cookie.
+    possible to exceed the :rfc:`common limit of 4096 bytes <2965#section-5.3>`
+    per cookie.
 
     **No freshness guarantee**
 
@@ -163,11 +151,9 @@ and the :setting:`SECRET_KEY` setting.
 
     **Performance**
 
-    Finally, the size of a cookie can have an impact on the `speed of your site`_.
+    Finally, the size of a cookie can have an impact on the speed of your site.
 
-.. _`common limit of 4096 bytes`: https://tools.ietf.org/html/rfc2965#section-5.3
 .. _`replay attacks`: https://en.wikipedia.org/wiki/Replay_attack
-.. _`speed of your site`: https://yuiblog.com/blog/2007/03/01/performance-research-part-3/
 
 Using sessions in views
 =======================
@@ -246,10 +232,8 @@ You can edit it multiple times.
 
     .. method:: get_session_cookie_age()
 
-      .. versionadded:: 3.0
-
-      Returns the age of session cookies, in seconds. Defaults to
-      :setting:`SESSION_COOKIE_AGE`.
+      Returns the value of the setting :setting:`SESSION_COOKIE_AGE`. This can
+      be overridden in a custom session backend.
 
     .. method:: set_expiry(value)
 
@@ -261,13 +245,11 @@ You can edit it multiple times.
         ``request.session.set_expiry(300)`` would make the session expire
         in 5 minutes.
 
-      * If ``value`` is a ``datetime`` or ``timedelta`` object, the
-        session will expire at that specific date/time. Note that ``datetime``
-        and ``timedelta`` values are only serializable if you are using the
-        :class:`~django.contrib.sessions.serializers.PickleSerializer`.
+      * If ``value`` is a ``datetime`` or ``timedelta`` object, the session
+        will expire at that specific date/time.
 
       * If ``value`` is ``0``, the user's session cookie will expire
-        when the user's Web browser is closed.
+        when the user's web browser is closed.
 
       * If ``value`` is ``None``, the session reverts to using the global
         session expiry policy.
@@ -291,18 +273,33 @@ You can edit it multiple times.
         ``None``. Defaults to the value stored in the session by
         :meth:`set_expiry`, if there is one, or ``None``.
 
+      .. note::
+
+        This method is used by session backends to determine the session expiry
+        age in seconds when saving the session. It is not really intended for
+        usage outside of that context.
+
+        In particular, while it is **possible** to determine the remaining
+        lifetime of a session **just when** you have the correct
+        ``modification`` value **and** the ``expiry`` is set as a ``datetime``
+        object, where you do have the ``modification`` value, it is more
+        straight-forward to calculate the expiry by-hand::
+
+            expires_at = modification + timedelta(seconds=settings.SESSION_COOKIE_AGE)
+
     .. method:: get_expiry_date()
 
       Returns the date this session will expire. For sessions with no custom
       expiration (or those set to expire at browser close), this will equal the
       date :setting:`SESSION_COOKIE_AGE` seconds from now.
 
-      This function accepts the same keyword arguments as :meth:`get_expiry_age`.
+      This function accepts the same keyword arguments as
+      :meth:`get_expiry_age`, and similar notes on usage apply.
 
     .. method:: get_expire_at_browser_close()
 
       Returns either ``True`` or ``False``, depending on whether the user's
-      session cookie will expire when the user's Web browser is closed.
+      session cookie will expire when the user's web browser is closed.
 
     .. method:: clear_expired()
 
@@ -328,11 +325,12 @@ cookie backend*.
 
 For example, here's an attack scenario if you use :mod:`pickle` to serialize
 session data. If you're using the :ref:`signed cookie session backend
-<cookie-session-backend>` and :setting:`SECRET_KEY` is known by an attacker
-(there isn't an inherent vulnerability in Django that would cause it to leak),
-the attacker could insert a string into their session which, when unpickled,
-executes arbitrary code on the server. The technique for doing so is simple and
-easily available on the internet. Although the cookie session storage signs the
+<cookie-session-backend>` and :setting:`SECRET_KEY` (or any key of
+:setting:`SECRET_KEY_FALLBACKS`) is known by an attacker (there isn't an
+inherent vulnerability in Django that would cause it to leak), the attacker
+could insert a string into their session which, when unpickled, executes
+arbitrary code on the server. The technique for doing so is simple and easily
+available on the internet. Although the cookie session storage signs the
 cookie-stored data to prevent tampering, a :setting:`SECRET_KEY` leak
 immediately escalates to a remote code execution vulnerability.
 
@@ -345,14 +343,16 @@ Bundled serializers
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
-    keys in ``request.session`` won't work as expected::
+    keys in ``request.session`` won't work as expected:
+
+    .. code-block:: pycon
 
         >>> # initial assignment
-        >>> request.session[0] = 'bar'
+        >>> request.session[0] = "bar"
         >>> # subsequent requests following serialization & deserialization
         >>> # of session data
         >>> request.session[0]  # KeyError
-        >>> request.session['0']
+        >>> request.session["0"]
         'bar'
 
     Similarly, data that can't be encoded in JSON, such as non-UTF8 bytes like
@@ -361,25 +361,18 @@ Bundled serializers
     See the :ref:`custom-serializers` section for more details on limitations
     of JSON serialization.
 
-.. class:: serializers.PickleSerializer
-
-    Supports arbitrary Python objects, but, as described above, can lead to a
-    remote code execution vulnerability if :setting:`SECRET_KEY` becomes known
-    by an attacker.
-
 .. _custom-serializers:
 
 Write your own serializer
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Note that unlike :class:`~django.contrib.sessions.serializers.PickleSerializer`,
-the :class:`~django.contrib.sessions.serializers.JSONSerializer` cannot handle
-arbitrary Python data types. As is often the case, there is a trade-off between
-convenience and security. If you wish to store more advanced data types
-including ``datetime`` and ``Decimal`` in JSON backed sessions, you will need
-to write a custom serializer (or convert such values to a JSON serializable
-object before storing them in ``request.session``). While serializing these
-values is often straightforward
+Note that the :class:`~django.contrib.sessions.serializers.JSONSerializer`
+cannot handle arbitrary Python data types. As is often the case, there is a
+trade-off between convenience and security. If you wish to store more advanced
+data types including ``datetime`` and ``Decimal`` in JSON backed sessions, you
+will need to write a custom serializer (or convert such values to a JSON
+serializable object before storing them in ``request.session``). While
+serializing these values is often straightforward
 (:class:`~django.core.serializers.json.DjangoJSONEncoder` may be helpful),
 writing a decoder that can reliably get back the same thing that you put in is
 more fragile. For example, you run the risk of returning a ``datetime`` that
@@ -409,19 +402,19 @@ This simplistic view sets a ``has_commented`` variable to ``True`` after a user
 posts a comment. It doesn't let a user post a comment more than once::
 
     def post_comment(request, new_comment):
-        if request.session.get('has_commented', False):
+        if request.session.get("has_commented", False):
             return HttpResponse("You've already commented.")
         c = comments.Comment(comment=new_comment)
         c.save()
-        request.session['has_commented'] = True
-        return HttpResponse('Thanks for your comment!')
+        request.session["has_commented"] = True
+        return HttpResponse("Thanks for your comment!")
 
 This simplistic view logs in a "member" of the site::
 
     def login(request):
-        m = Member.objects.get(username=request.POST['username'])
-        if m.password == request.POST['password']:
-            request.session['member_id'] = m.id
+        m = Member.objects.get(username=request.POST["username"])
+        if m.check_password(request.POST["password"]):
+            request.session["member_id"] = m.id
             return HttpResponse("You're logged in.")
         else:
             return HttpResponse("Your username and password didn't match.")
@@ -430,7 +423,7 @@ This simplistic view logs in a "member" of the site::
 
     def logout(request):
         try:
-            del request.session['member_id']
+            del request.session["member_id"]
         except KeyError:
             pass
         return HttpResponse("You're logged out.")
@@ -463,15 +456,16 @@ Here's a typical usage example::
     from django.http import HttpResponse
     from django.shortcuts import render
 
+
     def login(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render(request, 'foo/login_form.html')
+        return render(request, "foo/login_form.html")
 
 Using sessions out of views
 ===========================
@@ -483,21 +477,25 @@ Using sessions out of views
     you should consider importing ``SessionStore`` from the session engine
     designated by :setting:`SESSION_ENGINE`, as below:
 
+    .. code-block:: pycon
+
       >>> from importlib import import_module
       >>> from django.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
-An API is available to manipulate session data outside of a view::
+An API is available to manipulate session data outside of a view:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
-    >>> s['last_login'] = 1376587691
+    >>> s["last_login"] = 1376587691
     >>> s.create()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
-    >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
-    >>> s['last_login']
+    >>> s = SessionStore(session_key="2b1189a188b44ad18c35e113ac6ceead")
+    >>> s["last_login"]
     1376587691
 
 ``SessionStore.create()`` is designed to create a new session (i.e. one not
@@ -509,18 +507,22 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
-``django/contrib/sessions/models.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+:source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
+access sessions using the normal Django database API:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk="2b1189a188b44ad18c35e113ac6ceead")
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
 Note that you'll need to call
 :meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
-format::
+format:
+
+.. code-block:: pycon
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
@@ -535,17 +537,17 @@ modified -- that is if any of its dictionary values have been assigned or
 deleted::
 
     # Session is modified.
-    request.session['foo'] = 'bar'
+    request.session["foo"] = "bar"
 
     # Session is modified.
-    del request.session['foo']
+    del request.session["foo"]
 
     # Session is modified.
-    request.session['foo'] = {}
+    request.session["foo"] = {}
 
     # Gotcha: Session is NOT modified, because this alters
     # request.session['foo'] instead of request.session.
-    request.session['foo']['bar'] = 'baz'
+    request.session["foo"]["bar"] = "baz"
 
 In the last case of the above example, we can tell the session object
 explicitly that it has been modified by setting the ``modified`` attribute on
@@ -592,12 +594,14 @@ of ``request.session`` as described above in `using sessions in views`_.
 .. note::
 
     Some browsers (Chrome, for example) provide settings that allow users to
-    continue browsing sessions after closing and re-opening the browser. In
+    continue browsing sessions after closing and reopening the browser. In
     some cases, this can interfere with the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting and prevent sessions
     from expiring on browser close. Please be aware of this while testing
     Django applications which have the
     :setting:`SESSION_EXPIRE_AT_BROWSER_CLOSE` setting enabled.
+
+.. _clearing-the-session-store:
 
 Clearing the session store
 ==========================
@@ -667,10 +671,7 @@ Technical details
 =================
 
 * The session dictionary accepts any :mod:`json` serializable value when using
-  :class:`~django.contrib.sessions.serializers.JSONSerializer` or any
-  picklable Python object when using
-  :class:`~django.contrib.sessions.serializers.PickleSerializer`. See the
-  :mod:`pickle` module for more information.
+  :class:`~django.contrib.sessions.serializers.JSONSerializer`.
 
 * Session data is stored in a database table named ``django_session`` .
 
@@ -804,12 +805,14 @@ to query the database for all active sessions for an account)::
     from django.contrib.sessions.base_session import AbstractBaseSession
     from django.db import models
 
+
     class CustomSession(AbstractBaseSession):
         account_id = models.IntegerField(null=True, db_index=True)
 
         @classmethod
         def get_session_store_class(cls):
             return SessionStore
+
 
     class SessionStore(DBStore):
         @classmethod
@@ -819,7 +822,7 @@ to query the database for all active sessions for an account)::
         def create_model_instance(self, data):
             obj = super().create_model_instance(data)
             try:
-                account_id = int(data.get('_auth_user_id'))
+                account_id = int(data.get("_auth_user_id"))
             except (ValueError, TypeError):
                 account_id = None
             obj.account_id = account_id
@@ -830,7 +833,7 @@ a custom one based on ``cached_db``, you should override the cache key prefix
 in order to prevent a namespace clash::
 
     class SessionStore(CachedDBStore):
-        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+        cache_key_prefix = "mysessions.custom_cached_db_backend"
 
         # ...
 

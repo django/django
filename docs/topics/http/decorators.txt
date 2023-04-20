@@ -24,6 +24,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
         from django.views.decorators.http import require_http_methods
 
+
         @require_http_methods(["GET", "POST"])
         def my_view(request):
             # I can assume now that only GET or POST requests make it this far
@@ -118,10 +119,23 @@ client-side caching.
 
 .. function:: never_cache(view_func)
 
+    This decorator adds an ``Expires`` header to the current date/time.
+
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
 
-    .. versionchanged:: 3.0
+    Each header is only added if it isn't already set.
 
-        ``private`` directive was added.
+.. module:: django.views.decorators.common
+
+Common
+======
+
+The decorators in :mod:`django.views.decorators.common` allow per-view
+customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
+
+.. function:: no_append_slash()
+
+    This decorator allows individual views to be excluded from
+    :setting:`APPEND_SLASH` URL normalization.

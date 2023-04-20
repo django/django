@@ -10,7 +10,6 @@ class TestPoint:
 
 
 class EnvelopeTest(unittest.TestCase):
-
     def setUp(self):
         self.e = Envelope(0, 0, 5, 5)
 
@@ -18,7 +17,7 @@ class EnvelopeTest(unittest.TestCase):
         "Testing Envelope initialization."
         e1 = Envelope((0, 0, 5, 5))
         Envelope(0, 0, 5, 5)
-        Envelope(0, '0', '5', 5)  # Thanks to ww for this
+        Envelope(0, "0", "5", 5)  # Thanks to ww for this
         Envelope(e1._envelope)
         with self.assertRaises(GDALException):
             Envelope((5, 5, 0, 0))
@@ -29,9 +28,9 @@ class EnvelopeTest(unittest.TestCase):
         with self.assertRaises(GDALException):
             Envelope(())
         with self.assertRaises(ValueError):
-            Envelope(0, 'a', 5, 5)
+            Envelope(0, "a", 5, 5)
         with self.assertRaises(TypeError):
-            Envelope('foo')
+            Envelope("foo")
         with self.assertRaises(GDALException):
             Envelope((1, 1, 0, 0))
         # Shouldn't raise an exception for min_x == max_x or min_y == max_y
@@ -47,8 +46,8 @@ class EnvelopeTest(unittest.TestCase):
         self.assertEqual((0, 0), e.ll)
         self.assertEqual((2, 3), e.ur)
         self.assertEqual((0, 0, 2, 3), e.tuple)
-        self.assertEqual('POLYGON((0.0 0.0,0.0 3.0,2.0 3.0,2.0 0.0,0.0 0.0))', e.wkt)
-        self.assertEqual('(0.0, 0.0, 2.0, 3.0)', str(e))
+        self.assertEqual("POLYGON((0.0 0.0,0.0 3.0,2.0 3.0,2.0 0.0,0.0 0.0))", e.wkt)
+        self.assertEqual("(0.0, 0.0, 2.0, 3.0)", str(e))
 
     def test03_equivalence(self):
         "Testing Envelope equivalence."

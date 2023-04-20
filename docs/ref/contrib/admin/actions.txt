@@ -48,10 +48,11 @@ news application with an ``Article`` model::
     from django.db import models
 
     STATUS_CHOICES = [
-        ('d', 'Draft'),
-        ('p', 'Published'),
-        ('w', 'Withdrawn'),
+        ("d", "Draft"),
+        ("p", "Published"),
+        ("w", "Withdrawn"),
     ]
+
 
     class Article(models.Model):
         title = models.CharField(max_length=100)
@@ -83,7 +84,7 @@ Our publish-these-articles function won't need the :class:`ModelAdmin` or the
 request object, but we will use the queryset::
 
     def make_published(modeladmin, request, queryset):
-        queryset.update(status='p')
+        queryset.update(status="p")
 
 .. note::
 
@@ -99,18 +100,26 @@ That's actually all there is to writing an action! However, we'll take one
 more optional-but-useful step and give the action a "nice" title in the admin.
 By default, this action would appear in the action list as "Make published" --
 the function name, with underscores replaced by spaces. That's fine, but we
-can provide a better, more human-friendly name by giving the
-``make_published`` function a ``short_description`` attribute::
+can provide a better, more human-friendly name by using the
+:func:`~django.contrib.admin.action` decorator on the ``make_published``
+function::
 
+    from django.contrib import admin
+
+    ...
+
+
+    @admin.action(description="Mark selected stories as published")
     def make_published(modeladmin, request, queryset):
-        queryset.update(status='p')
-    make_published.short_description = "Mark selected stories as published"
+        queryset.update(status="p")
 
 .. note::
 
-    This might look familiar; the admin's ``list_display`` option uses the
-    same technique to provide human-readable descriptions for callback
-    functions registered there, too.
+    This might look familiar; the admin's
+    :attr:`~django.contrib.admin.ModelAdmin.list_display` option uses a similar
+    technique with the :func:`~django.contrib.admin.display` decorator to
+    provide human-readable descriptions for callback functions registered
+    there, too.
 
 Adding actions to the :class:`ModelAdmin`
 -----------------------------------------
@@ -122,14 +131,17 @@ the action and its registration would look like::
     from django.contrib import admin
     from myapp.models import Article
 
+
+    @admin.action(description="Mark selected stories as published")
     def make_published(modeladmin, request, queryset):
-        queryset.update(status='p')
-    make_published.short_description = "Mark selected stories as published"
+        queryset.update(status="p")
+
 
     class ArticleAdmin(admin.ModelAdmin):
-        list_display = ['title', 'status']
-        ordering = ['title']
+        list_display = ["title", "status"]
+        ordering = ["title"]
         actions = [make_published]
+
 
     admin.site.register(Article, ArticleAdmin)
 
@@ -169,11 +181,11 @@ You can do it like this::
     class ArticleAdmin(admin.ModelAdmin):
         ...
 
-        actions = ['make_published']
+        actions = ["make_published"]
 
+        @admin.action(description="Mark selected stories as published")
         def make_published(self, request, queryset):
-            queryset.update(status='p')
-        make_published.short_description = "Mark selected stories as published"
+            queryset.update(status="p")
 
 Notice first that we've moved ``make_published`` into a method and renamed the
 ``modeladmin`` parameter to ``self``, and second that we've now put the string
@@ -186,19 +198,28 @@ provided by the admin.
 
 .. _custom-admin-action:
 
-For example, we can use ``self`` to flash a message to the user informing her
+For example, we can use ``self`` to flash a message to the user informing them
 that the action was successful::
+
+    from django.contrib import messages
+    from django.utils.translation import ngettext
+
 
     class ArticleAdmin(admin.ModelAdmin):
         ...
 
         def make_published(self, request, queryset):
-            rows_updated = queryset.update(status='p')
-            if rows_updated == 1:
-                message_bit = "1 story was"
-            else:
-                message_bit = "%s stories were" % rows_updated
-            self.message_user(request, "%s successfully marked as published." % message_bit)
+            updated = queryset.update(status="p")
+            self.message_user(
+                request,
+                ngettext(
+                    "%d story was successfully marked as published.",
+                    "%d stories were successfully marked as published.",
+                    updated,
+                )
+                % updated,
+                messages.SUCCESS,
+            )
 
 This make the action match what the admin itself does after successfully
 performing an action:
@@ -214,12 +235,13 @@ will need to return intermediate pages. For example, the built-in delete action
 asks for confirmation before deleting the selected objects.
 
 To provide an intermediary page, return an :class:`~django.http.HttpResponse`
-(or subclass) from your action. For example, you might write a export function
+(or subclass) from your action. For example, you might write an export function
 that uses Django's :doc:`serialization functions </topics/serialization>` to
 dump some selected objects as JSON::
 
     from django.core import serializers
     from django.http import HttpResponse
+
 
     def export_as_json(modeladmin, request, queryset):
         response = HttpResponse(content_type="application/json")
@@ -239,13 +261,17 @@ that redirects to your custom export view::
     from django.contrib.contenttypes.models import ContentType
     from django.http import HttpResponseRedirect
 
+
     def export_selected_objects(modeladmin, request, queryset):
-        selected = queryset.values_list('pk', flat=True)
+        selected = queryset.values_list("pk", flat=True)
         ct = ContentType.objects.get_for_model(queryset.model)
-        return HttpResponseRedirect('/export/?ct=%s&ids=%s' % (
-            ct.pk,
-            ','.join(str(pk) for pk in selected),
-        ))
+        return HttpResponseRedirect(
+            "/export/?ct=%s&ids=%s"
+            % (
+                ct.pk,
+                ",".join(str(pk) for pk in selected),
+            )
+        )
 
 As you can see, the action is rather short; all the complex logic would belong
 in your export view. This would need to deal with objects of any type, hence
@@ -275,7 +301,7 @@ Making actions available site-wide
     <disabling-admin-actions>` -- by passing a second argument to
     :meth:`AdminSite.add_action()`::
 
-        admin.site.add_action(export_selected_objects, 'export_selected')
+        admin.site.add_action(export_selected_objects, "export_selected")
 
 .. _disabling-admin-actions:
 
@@ -297,25 +323,27 @@ Disabling a site-wide action
     For example, you can use this method to remove the built-in "delete selected
     objects" action::
 
-        admin.site.disable_action('delete_selected')
+        admin.site.disable_action("delete_selected")
 
     Once you've done the above, that action will no longer be available
     site-wide.
 
-    If, however, you need to re-enable a globally-disabled action for one
+    If, however, you need to reenable a globally-disabled action for one
     particular model, list it explicitly in your ``ModelAdmin.actions`` list::
 
         # Globally disable delete selected
-        admin.site.disable_action('delete_selected')
+        admin.site.disable_action("delete_selected")
+
 
         # This ModelAdmin will not have delete_selected available
         class SomeModelAdmin(admin.ModelAdmin):
-            actions = ['some_other_action']
+            actions = ["some_other_action"]
             ...
+
 
         # This one will
         class AnotherModelAdmin(admin.ModelAdmin):
-            actions = ['delete_selected', 'a_third_action']
+            actions = ["delete_selected", "a_third_action"]
             ...
 
 
@@ -350,9 +378,9 @@ Conditionally enabling or disabling actions
 
             def get_actions(self, request):
                 actions = super().get_actions(request)
-                if request.user.username[0].upper() != 'J':
-                    if 'delete_selected' in actions:
-                        del actions['delete_selected']
+                if request.user.username[0].upper() != "J":
+                    if "delete_selected" in actions:
+                        del actions["delete_selected"]
                 return actions
 
 .. _admin-action-permissions:
@@ -361,20 +389,20 @@ Setting permissions for actions
 -------------------------------
 
 Actions may limit their availability to users with specific permissions by
-setting an ``allowed_permissions`` attribute on the action function::
+wrapping the action function with the :func:`~django.contrib.admin.action`
+decorator and passing the ``permissions`` argument::
 
+    @admin.action(permissions=["change"])
     def make_published(modeladmin, request, queryset):
-        queryset.update(status='p')
-    make_published.allowed_permissions = ('change',)
+        queryset.update(status="p")
 
 The ``make_published()`` action will only be available to users that pass the
 :meth:`.ModelAdmin.has_change_permission` check.
 
-If ``allowed_permissions`` has more than one permission, the action will be
-available as long as the user passes at least one of the checks.
+If ``permissions`` has more than one permission, the action will be available
+as long as the user passes at least one of the checks.
 
-Available values for ``allowed_permissions`` and the corresponding method
-checks are:
+Available values for ``permissions`` and the corresponding method checks are:
 
 - ``'add'``: :meth:`.ModelAdmin.has_add_permission`
 - ``'change'``: :meth:`.ModelAdmin.has_change_permission`
@@ -389,15 +417,57 @@ For example::
     from django.contrib import admin
     from django.contrib.auth import get_permission_codename
 
-    class ArticleAdmin(admin.ModelAdmin):
-        actions = ['make_published']
 
+    class ArticleAdmin(admin.ModelAdmin):
+        actions = ["make_published"]
+
+        @admin.action(permissions=["publish"])
         def make_published(self, request, queryset):
-            queryset.update(status='p')
-        make_published.allowed_permissions = ('publish',)
+            queryset.update(status="p")
 
         def has_publish_permission(self, request):
             """Does the user have the publish permission?"""
             opts = self.opts
-            codename = get_permission_codename('publish', opts)
-            return request.user.has_perm('%s.%s' % (opts.app_label, codename))
+            codename = get_permission_codename("publish", opts)
+            return request.user.has_perm("%s.%s" % (opts.app_label, codename))
+
+The ``action`` decorator
+========================
+
+.. function:: action(*, permissions=None, description=None)
+
+    This decorator can be used for setting specific attributes on custom action
+    functions that can be used with
+    :attr:`~django.contrib.admin.ModelAdmin.actions`::
+
+        @admin.action(
+            permissions=["publish"],
+            description="Mark selected stories as published",
+        )
+        def make_published(self, request, queryset):
+            queryset.update(status="p")
+
+    This is equivalent to setting some attributes (with the original, longer
+    names) on the function directly::
+
+        def make_published(self, request, queryset):
+            queryset.update(status="p")
+
+
+        make_published.allowed_permissions = ["publish"]
+        make_published.short_description = "Mark selected stories as published"
+
+    Use of this decorator is not compulsory to make an action function, but it
+    can be useful to use it without arguments as a marker in your source to
+    identify the purpose of the function::
+
+        @admin.action
+        def make_inactive(self, request, queryset):
+            queryset.update(is_active=False)
+
+    In this case it will add no attributes to the function.
+
+    Action descriptions are %-formatted and may contain ``'%(verbose_name)s'``
+    and ``'%(verbose_name_plural)s'`` placeholders, which are replaced,
+    respectively, by the model's :attr:`~django.db.models.Options.verbose_name`
+    and :attr:`~django.db.models.Options.verbose_name_plural`.

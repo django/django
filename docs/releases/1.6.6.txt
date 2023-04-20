@@ -84,7 +84,7 @@ Bugfixes
 * Fixed the "ORA-01843: not a valid month" errors when using Unicode
   with older versions of Oracle server (:ticket:`20292`).
 
-* Restored bug fix for sending unicode email with Python 2.6.5 and below
+* Restored bug fix for sending Unicode email with Python 2.6.5 and below
   (:ticket:`19107`).
 
 * Prevented ``UnicodeDecodeError`` in ``runserver`` with non-UTF-8 and

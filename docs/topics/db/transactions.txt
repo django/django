@@ -78,11 +78,13 @@ still possible to prevent views from running in a transaction.
 
         from django.db import transaction
 
+
         @transaction.non_atomic_requests
         def my_view(request):
             do_stuff()
 
-        @transaction.non_atomic_requests(using='other')
+
+        @transaction.non_atomic_requests(using="other")
         def my_other_view(request):
             do_stuff_on_the_other_database()
 
@@ -93,7 +95,7 @@ Controlling transactions explicitly
 
 Django provides a single API to control database transactions.
 
-.. function:: atomic(using=None, savepoint=True)
+.. function:: atomic(using=None, savepoint=True, durable=False)
 
     Atomicity is the defining property of database transactions. ``atomic``
     allows us to create a block of code within which the atomicity on the
@@ -105,9 +107,16 @@ Django provides a single API to control database transactions.
     completes successfully, its effects can still be rolled back if an
     exception is raised in the outer block at a later point.
 
+    It is sometimes useful to ensure an ``atomic`` block is always the
+    outermost ``atomic`` block, ensuring that any database changes are
+    committed when the block is exited without errors. This is known as
+    durability and can be achieved by setting ``durable=True``. If the
+    ``atomic`` block is nested within another it raises a ``RuntimeError``.
+
     ``atomic`` is usable both as a :py:term:`decorator`::
 
         from django.db import transaction
+
 
         @transaction.atomic
         def viewfunc(request):
@@ -117,6 +126,7 @@ Django provides a single API to control database transactions.
     and as a :py:term:`context manager`::
 
         from django.db import transaction
+
 
         def viewfunc(request):
             # This code executes in autocommit mode (Django's default).
@@ -130,6 +140,7 @@ Django provides a single API to control database transactions.
     integrity errors::
 
         from django.db import IntegrityError, transaction
+
 
         @transaction.atomic
         def viewfunc(request):
@@ -146,10 +157,10 @@ Django provides a single API to control database transactions.
     In this example, even if ``generate_relationships()`` causes a database
     error by breaking an integrity constraint, you can execute queries in
     ``add_children()``, and the changes from ``create_parent()`` are still
-    there. Note that any operations attempted in ``generate_relationships()``
-    will already have been rolled back safely when ``handle_exception()`` is
-    called, so the exception handler can also operate on the database if
-    necessary.
+    there and bound to the same transaction. Note that any operations attempted
+    in ``generate_relationships()`` will already have been rolled back safely
+    when ``handle_exception()`` is called, so the exception handler can also
+    operate on the database if necessary.
 
     .. admonition:: Avoid catching exceptions inside ``atomic``!
 
@@ -279,38 +290,51 @@ Performing actions after commit
 
 Sometimes you need to perform an action related to the current database
 transaction, but only if the transaction successfully commits. Examples might
-include a `Celery`_ task, an email notification, or a cache invalidation.
+include a background task, an email notification, or a cache invalidation.
 
-.. _Celery: http://www.celeryproject.org/
+:func:`on_commit` allows you to register callbacks that will be executed after
+the open transaction is successfully committed:
 
-Django provides the :func:`on_commit` function to register callback functions
-that should be executed after a transaction is successfully committed:
+.. function:: on_commit(func, using=None, robust=False)
 
-.. function:: on_commit(func, using=None)
-
-Pass any function (that takes no arguments) to :func:`on_commit`::
+Pass a function, or any callable, to :func:`on_commit`::
 
     from django.db import transaction
 
-    def do_something():
-        pass  # send a mail, invalidate a cache, fire off a Celery task, etc.
 
-    transaction.on_commit(do_something)
+    def send_welcome_email():
+        ...
 
-You can also wrap your function in a lambda::
 
-    transaction.on_commit(lambda: some_celery_task.delay('arg1'))
+    transaction.on_commit(send_welcome_email)
 
-The function you pass in will be called immediately after a hypothetical
-database write made where ``on_commit()`` is called would be successfully
-committed.
+Callbacks will not be passed any arguments, but you can bind them with
+:func:`functools.partial`::
 
-If you call ``on_commit()`` while there isn't an active transaction, the
-callback will be executed immediately.
+    from functools import partial
 
-If that hypothetical database write is instead rolled back (typically when an
-unhandled exception is raised in an :func:`atomic` block), your function will
-be discarded and never called.
+    for user in users:
+        transaction.on_commit(partial(send_invite_email, user=user))
+
+Callbacks are called after the open transaction is successfully committed. If
+the transaction is instead rolled back (typically when an unhandled exception
+is raised in an :func:`atomic` block), the callback will be discarded, and
+never called.
+
+If you call ``on_commit()`` while there isn't an open transaction,
+the callback will be executed immediately.
+
+It's sometimes useful to register callbacks that can fail. Passing
+``robust=True`` allows the next callbacks to be executed even if the current
+one throws an exception. All errors derived from Python's ``Exception`` class
+are caught and logged to the ``django.db.backends.base`` logger.
+
+You can use :meth:`.TestCase.captureOnCommitCallbacks` to test callbacks
+registered with :func:`on_commit`.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Savepoints
 ----------
@@ -353,10 +377,14 @@ registered.
 Exception handling
 ------------------
 
-If one on-commit function within a given transaction raises an uncaught
-exception, no later registered functions in that same transaction will run.
-This is, of course, the same behavior as if you'd executed the functions
-sequentially yourself without :func:`on_commit`.
+If one on-commit function registered with ``robust=False`` within a given
+transaction raises an uncaught exception, no later registered functions in that
+same transaction will run. This is the same behavior as if you'd executed the
+functions sequentially yourself without :func:`on_commit`.
+
+.. versionchanged:: 4.2
+
+    The ``robust`` argument was added.
 
 Timing of execution
 -------------------
@@ -364,13 +392,13 @@ Timing of execution
 Your callbacks are executed *after* a successful commit, so a failure in a
 callback will not cause the transaction to roll back. They are executed
 conditionally upon the success of the transaction, but they are not *part* of
-the transaction. For the intended use cases (mail notifications, Celery tasks,
-etc.), this should be fine. If it's not (if your follow-up action is so
+the transaction. For the intended use cases (mail notifications, background
+tasks, etc.), this should be fine. If it's not (if your follow-up action is so
 critical that its failure should mean the failure of the transaction itself),
 then you don't want to use the :func:`on_commit` hook. Instead, you may want
-`two-phase commit`_ such as the `psycopg Two-Phase Commit protocol support`_
-and the `optional Two-Phase Commit Extensions in the Python DB-API
-specification`_.
+`two-phase commit`_ such as the :ref:`psycopg Two-Phase Commit protocol support
+<psycopg:two-phase-commit>` and the :pep:`optional Two-Phase Commit Extensions
+in the Python DB-API specification <249#optional-two-phase-commit-extensions>`.
 
 Callbacks are not run until autocommit is restored on the connection following
 the commit (because otherwise any queries done in a callback would open an
@@ -387,8 +415,6 @@ autocommit is disabled and you are not within an atomic block will result in an
 error.
 
 .. _two-phase commit: https://en.wikipedia.org/wiki/Two-phase_commit_protocol
-.. _psycopg Two-Phase Commit protocol support: http://initd.org/psycopg/docs/usage.html#tpc
-.. _optional Two-Phase Commit Extensions in the Python DB-API specification: https://www.python.org/dev/peps/pep-0249/#optional-two-phase-commit-extensions
 
 Use in tests
 ------------
@@ -396,9 +422,19 @@ Use in tests
 Django's :class:`~django.test.TestCase` class wraps each test in a transaction
 and rolls back that transaction after each test, in order to provide test
 isolation. This means that no transaction is ever actually committed, thus your
-:func:`on_commit` callbacks will never be run. If you need to test the results
-of an :func:`on_commit` callback, use a
-:class:`~django.test.TransactionTestCase` instead.
+:func:`on_commit` callbacks will never be run.
+
+You can overcome this limitation by using
+:meth:`.TestCase.captureOnCommitCallbacks`. This captures your
+:func:`on_commit` callbacks in a list, allowing you to make assertions on them,
+or emulate the transaction committing by calling them.
+
+Another way to overcome the limitation is to use
+:class:`~django.test.TransactionTestCase` instead of
+:class:`~django.test.TestCase`. This will mean your transactions are committed,
+and the callbacks will run. However
+:class:`~django.test.TransactionTestCase` flushes the database between tests,
+which is significantly slower than :class:`~django.test.TestCase`\'s isolation.
 
 Why no rollback hook?
 ---------------------
@@ -536,10 +572,10 @@ The following example demonstrates the use of savepoints::
 
     from django.db import transaction
 
+
     # open a transaction
     @transaction.atomic
     def viewfunc(request):
-
         a.save()
         # transaction now contains a.save()
 
@@ -590,7 +626,7 @@ When autocommit is enabled, savepoints don't make sense. When it's disabled,
 commits before any statement other than ``SELECT``, ``INSERT``, ``UPDATE``,
 ``DELETE`` and ``REPLACE``.) This bug has two consequences:
 
-- The low level APIs for savepoints are only usable inside a transaction ie.
+- The low level APIs for savepoints are only usable inside a transaction i.e.
   inside an :func:`atomic` block.
 - It's impossible to use :func:`atomic` when autocommit is turned off.
 
@@ -608,7 +644,7 @@ function in autocommit mode: statements will be executed and committed as soon
 as they're called. If your MySQL setup *does* support transactions, Django
 will handle transactions as explained in this document.
 
-.. _information on MySQL transactions: https://dev.mysql.com/doc/refman/en/sql-syntax-transactions.html
+.. _information on MySQL transactions: https://dev.mysql.com/doc/refman/en/sql-transactional-statements.html
 
 Handling exceptions within PostgreSQL transactions
 --------------------------------------------------
@@ -634,12 +670,12 @@ Transaction rollback
 
 The first option is to roll back the entire transaction. For example::
 
-    a.save() # Succeeds, but may be undone by transaction rollback
+    a.save()  # Succeeds, but may be undone by transaction rollback
     try:
-        b.save() # Could throw exception
+        b.save()  # Could throw exception
     except IntegrityError:
         transaction.rollback()
-    c.save() # Succeeds, but a.save() may have been undone
+    c.save()  # Succeeds, but a.save() may have been undone
 
 Calling ``transaction.rollback()`` rolls back the entire transaction. Any
 uncommitted database operations will be lost. In this example, the changes
@@ -655,14 +691,14 @@ fail, you can set or update the savepoint; that way, if the operation fails,
 you can roll back the single offending operation, rather than the entire
 transaction. For example::
 
-    a.save() # Succeeds, and never undone by savepoint rollback
+    a.save()  # Succeeds, and never undone by savepoint rollback
     sid = transaction.savepoint()
     try:
-        b.save() # Could throw exception
+        b.save()  # Could throw exception
         transaction.savepoint_commit(sid)
     except IntegrityError:
         transaction.savepoint_rollback(sid)
-    c.save() # Succeeds, and a.save() is never undone
+    c.save()  # Succeeds, and a.save() is never undone
 
 In this example, ``a.save()`` will not be undone in the case where
 ``b.save()`` raises an exception.

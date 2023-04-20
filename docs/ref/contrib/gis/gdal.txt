@@ -21,7 +21,7 @@ to raster (image) data.
     Although the module is named ``gdal``, GeoDjango only supports some of the
     capabilities of OGR and GDAL's raster features at this time.
 
-__ https://www.gdal.org/
+__ https://gdal.org/
 __ https://gdal.org/user/vector_data_model.html
 
 Overview
@@ -36,10 +36,12 @@ The GDAL/OGR tools described here are designed to help you read in
 your geospatial data, in order for most of them to be useful you have
 to have some data to work with.  If you're starting out and don't yet
 have any data of your own to use, GeoDjango tests contain a number of
-data sets that you can use for testing. You can download them here::
+data sets that you can use for testing. You can download them here:
 
-    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
-    $ wget https://raw.githubusercontent.com/django/django/master/tests/gis_tests/data/rasters/raster.tif
+.. code-block:: shell
+
+    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/cities/cities.{shp,prj,shx,dbf}
+    $ wget https://raw.githubusercontent.com/django/django/main/tests/gis_tests/data/rasters/raster.tif
 
 Vector Data Source Objects
 ==========================
@@ -75,13 +77,15 @@ each feature in that layer.
     Once you've created your ``DataSource``, you can find out how many layers
     of data it contains by accessing the :attr:`layer_count` property, or
     (equivalently) by using the ``len()`` function. For information on
-    accessing the layers of data themselves, see the next section::
+    accessing the layers of data themselves, see the next section:
+
+    .. code-block:: pycon
 
         >>> from django.contrib.gis.gdal import DataSource
-        >>> ds = DataSource('/path/to/your/cities.shp')
+        >>> ds = DataSource("/path/to/your/cities.shp")
         >>> ds.name
         '/path/to/your/cities.shp'
-        >>> ds.layer_count                  # This file only contains one layer
+        >>> ds.layer_count  # This file only contains one layer
         1
 
     .. attribute:: layer_count
@@ -110,7 +114,9 @@ __ https://gdal.org/drivers/vector/
     Typically, all the features in a given layer have the same geometry type.
     The :attr:`geom_type` property of a layer is an :class:`OGRGeomType` that
     identifies the feature type. We can use it to print out some basic
-    information about each layer in a :class:`DataSource`::
+    information about each layer in a :class:`DataSource`:
+
+    .. code-block:: pycon
 
         >>> for layer in ds:
         ...     print('Layer "%s": %i %ss' % (layer.name, len(layer), layer.geom_type.name))
@@ -120,7 +126,9 @@ __ https://gdal.org/drivers/vector/
     The example output is from the cities data source, loaded above, which
     evidently contains one layer, called ``"cities"``, which contains three
     point features. For simplicity, the examples below assume that you've
-    stored that layer in the variable ``layer``::
+    stored that layer in the variable ``layer``:
+
+    .. code-block:: pycon
 
         >>> layer = ds[0]
 
@@ -128,19 +136,25 @@ __ https://gdal.org/drivers/vector/
 
     Returns the name of this layer in the data source.
 
+    .. code-block:: pycon
+
         >>> layer.name
         'cities'
 
     .. attribute:: num_feat
 
-    Returns the number of features in the layer. Same as ``len(layer)``::
+    Returns the number of features in the layer. Same as ``len(layer)``:
+
+    .. code-block:: pycon
 
         >>> layer.num_feat
         3
 
     .. attribute:: geom_type
 
-    Returns the geometry type of the layer, as an :class:`OGRGeomType` object::
+    Returns the geometry type of the layer, as an :class:`OGRGeomType` object:
+
+    .. code-block:: pycon
 
         >>> layer.geom_type.name
         'Point'
@@ -148,14 +162,18 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: num_fields
 
     Returns the number of fields in the layer, i.e the number of fields of
-    data associated with each feature in the layer::
+    data associated with each feature in the layer:
+
+    .. code-block:: pycon
 
         >>> layer.num_fields
         4
 
     .. attribute:: fields
 
-    Returns a list of the names of each of the fields in this layer::
+    Returns a list of the names of each of the fields in this layer:
+
+    .. code-block:: pycon
 
         >>> layer.fields
         ['Name', 'Population', 'Density', 'Created']
@@ -163,7 +181,9 @@ __ https://gdal.org/drivers/vector/
     .. attribute field_types
 
     Returns a list of the data types of each of the fields in this layer. These
-    are subclasses of ``Field``, discussed below::
+    are subclasses of ``Field``, discussed below:
+
+    .. code-block:: pycon
 
         >>> [ft.__name__ for ft in layer.field_types]
         ['OFTString', 'OFTReal', 'OFTReal', 'OFTDate']
@@ -171,7 +191,9 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: field_widths
 
     Returns a list of the maximum field widths for each of the fields in this
-    layer::
+    layer:
+
+    .. code-block:: pycon
 
         >>> layer.field_widths
         [80, 11, 24, 10]
@@ -179,14 +201,18 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: field_precisions
 
     Returns a list of the numeric precisions for each of the fields in this
-    layer. This is meaningless (and set to zero) for non-numeric fields::
+    layer. This is meaningless (and set to zero) for non-numeric fields:
+
+    .. code-block:: pycon
 
         >>> layer.field_precisions
         [0, 0, 15, 0]
 
     .. attribute:: extent
 
-    Returns the spatial extent of this layer, as an :class:`Envelope` object::
+    Returns the spatial extent of this layer, as an :class:`Envelope` object:
+
+    .. code-block:: pycon
 
         >>> layer.extent.tuple
         (-104.609252, 29.763374, -95.23506, 38.971823)
@@ -194,7 +220,9 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: srs
 
     Property that returns the :class:`SpatialReference` associated with this
-    layer::
+    layer:
+
+    .. code-block:: pycon
 
         >>> print(layer.srs)
         GEOGCS["GCS_WGS_1984",
@@ -212,19 +240,21 @@ __ https://gdal.org/drivers/vector/
     layer. A spatial filter can only be set with an :class:`OGRGeometry`
     instance, a 4-tuple extent, or ``None``. When set with something other than
     ``None``, only features that intersect the filter will be returned when
-    iterating over the layer::
+    iterating over the layer:
+
+    .. code-block:: pycon
 
         >>> print(layer.spatial_filter)
         None
         >>> print(len(layer))
         3
-        >>> [feat.get('Name') for feat in layer]
+        >>> [feat.get("Name") for feat in layer]
         ['Pueblo', 'Lawrence', 'Houston']
-        >>> ks_extent = (-102.051, 36.99, -94.59, 40.00) # Extent for state of Kansas
+        >>> ks_extent = (-102.051, 36.99, -94.59, 40.00)  # Extent for state of Kansas
         >>> layer.spatial_filter = ks_extent
         >>> len(layer)
         1
-        >>> [feat.get('Name') for feat in layer]
+        >>> [feat.get("Name") for feat in layer]
         ['Lawrence']
         >>> layer.spatial_filter = None
         >>> len(layer)
@@ -233,9 +263,11 @@ __ https://gdal.org/drivers/vector/
     .. method:: get_fields()
 
     A method that returns a list of the values of a given field for each
-    feature in the layer::
+    feature in the layer:
 
-        >>> layer.get_fields('Name')
+    .. code-block:: pycon
+
+        >>> layer.get_fields("Name")
         ['Pueblo', 'Lawrence', 'Houston']
 
     .. method:: get_geoms(geos=False)
@@ -243,7 +275,9 @@ __ https://gdal.org/drivers/vector/
     A method that returns a list containing the geometry of each feature in the
     layer. If the optional argument ``geos`` is set to ``True`` then the
     geometries are converted to :class:`~django.contrib.gis.geos.GEOSGeometry`
-    objects. Otherwise, they are returned as :class:`OGRGeometry` objects::
+    objects. Otherwise, they are returned as :class:`OGRGeometry` objects:
+
+    .. code-block:: pycon
 
         >>> [pt.tuple for pt in layer.get_geoms()]
         [(-104.609252, 38.255001), (-95.23506, 38.971823), (-95.363151, 29.763374)]
@@ -273,7 +307,9 @@ __ https://gdal.org/drivers/vector/
 
     .. attribute:: geom
 
-    Returns the geometry for this feature, as an ``OGRGeometry`` object::
+    Returns the geometry for this feature, as an ``OGRGeometry`` object:
+
+    .. code-block:: pycon
 
         >>> city.geom.tuple
         (-104.609252, 38.255001)
@@ -281,9 +317,11 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: get
 
     A method that returns the value of the given field (specified by name)
-    for this feature, **not** a ``Field`` wrapper object::
+    for this feature, **not** a ``Field`` wrapper object:
 
-        >>> city.get('Population')
+    .. code-block:: pycon
+
+        >>> city.get("Population")
         102121
 
     .. attribute:: geom_type
@@ -309,7 +347,9 @@ __ https://gdal.org/drivers/vector/
 
     .. attribute:: fid
 
-    Returns the feature identifier within the layer::
+    Returns the feature identifier within the layer:
+
+    .. code-block:: pycon
 
         >>> city.fid
         0
@@ -317,7 +357,9 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: layer_name
 
     Returns the name of the :class:`Layer` that the feature came from. This
-    will be the same for all features in a given layer::
+    will be the same for all features in a given layer:
+
+    .. code-block:: pycon
 
         >>> city.layer_name
         'cities'
@@ -325,9 +367,11 @@ __ https://gdal.org/drivers/vector/
     .. attribute:: index
 
     A method that returns the index of the given field name. This will be the
-    same for all features in a given layer::
+    same for all features in a given layer:
 
-        >>> city.index('Population')
+    .. code-block:: pycon
+
+        >>> city.index("Population")
         1
 
 ``Field``
@@ -337,76 +381,96 @@ __ https://gdal.org/drivers/vector/
 
     .. attribute:: name
 
-    Returns the name of this field::
+    Returns the name of this field:
 
-        >>> city['Name'].name
+    .. code-block:: pycon
+
+        >>> city["Name"].name
         'Name'
 
     .. attribute:: type
 
     Returns the OGR type of this field, as an integer. The ``FIELD_CLASSES``
-    dictionary maps these values onto subclasses of ``Field``::
+    dictionary maps these values onto subclasses of ``Field``:
 
-        >>> city['Density'].type
+    .. code-block:: pycon
+
+        >>> city["Density"].type
         2
 
     .. attribute:: type_name
 
-    Returns a string with the name of the data type of this field::
+    Returns a string with the name of the data type of this field:
 
-        >>> city['Name'].type_name
+    .. code-block:: pycon
+
+        >>> city["Name"].type_name
         'String'
 
     .. attribute:: value
 
     Returns the value of this field. The ``Field`` class itself returns the
     value as a string, but each subclass returns the value in the most
-    appropriate form::
+    appropriate form:
 
-        >>> city['Population'].value
+    .. code-block:: pycon
+
+        >>> city["Population"].value
         102121
 
     .. attribute:: width
 
-    Returns the width of this field::
+    Returns the width of this field:
 
-        >>> city['Name'].width
+    .. code-block:: pycon
+
+        >>> city["Name"].width
         80
 
     .. attribute:: precision
 
     Returns the numeric precision of this field. This is meaningless (and set
-    to zero) for non-numeric fields::
+    to zero) for non-numeric fields:
 
-        >>> city['Density'].precision
+    .. code-block:: pycon
+
+        >>> city["Density"].precision
         15
 
     .. method:: as_double()
 
-    Returns the value of the field as a double (float)::
+    Returns the value of the field as a double (float):
 
-        >>> city['Density'].as_double()
+    .. code-block:: pycon
+
+        >>> city["Density"].as_double()
         874.7
 
     .. method:: as_int()
 
-    Returns the value of the field as an integer::
+    Returns the value of the field as an integer:
 
-        >>> city['Population'].as_int()
+    .. code-block:: pycon
+
+        >>> city["Population"].as_int()
         102121
 
     .. method:: as_string()
 
-    Returns the value of the field as a string::
+    Returns the value of the field as a string:
 
-        >>> city['Name'].as_string()
+    .. code-block:: pycon
+
+        >>> city["Name"].as_string()
         'Pueblo'
 
     .. method:: as_datetime()
 
-    Returns the value of the field as a tuple of date and time components::
+    Returns the value of the field as a tuple of date and time components:
 
-        >>> city['Created'].as_datetime()
+    .. code-block:: pycon
+
+        >>> city["Created"].as_datetime()
         (c_long(1999), c_long(5), c_long(23), c_long(0), c_long(0), c_long(0), c_long(0))
 
 ``Driver``
@@ -432,10 +496,12 @@ OGR Geometries
 around OGR's internal geometry representation. Thus, they allow for more
 efficient access to data when using :class:`DataSource`. Unlike its GEOS
 counterpart, :class:`OGRGeometry` supports spatial reference systems and
-coordinate transformation::
+coordinate transformation:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import OGRGeometry
-    >>> polygon = OGRGeometry('POLYGON((0 0, 5 0, 5 5, 0 5))')
+    >>> polygon = OGRGeometry("POLYGON((0 0, 5 0, 5 5, 0 5))")
 
 .. class:: OGRGeometry(geom_input, srs=None)
 
@@ -478,7 +544,9 @@ coordinate transformation::
     .. attribute:: dimension
 
     Returns the number of coordinated dimensions of the geometry, i.e. 0
-    for points, 1 for lines, and so forth::
+    for points, 1 for lines, and so forth:
+
+    .. code-block:: pycon
 
         >> polygon.dimension
         2
@@ -490,14 +558,18 @@ coordinate transformation::
 
     .. attribute:: geom_count
 
-    Returns the number of elements in this geometry::
+    Returns the number of elements in this geometry:
+
+    .. code-block:: pycon
 
         >>> polygon.geom_count
         1
 
     .. attribute:: point_count
 
-    Returns the number of points used to describe this geometry::
+    Returns the number of points used to describe this geometry:
+
+    .. code-block:: pycon
 
         >>> polygon.point_count
         4
@@ -516,7 +588,9 @@ coordinate transformation::
 
     .. attribute:: geom_name
 
-    Returns the name of the type of this geometry::
+    Returns the name of the type of this geometry:
+
+    .. code-block:: pycon
 
         >>> polygon.geom_name
         'POLYGON'
@@ -524,7 +598,9 @@ coordinate transformation::
     .. attribute:: area
 
     Returns the area of this geometry, or 0 for geometries that do not contain
-    an area::
+    an area:
+
+    .. code-block:: pycon
 
         >>> polygon.area
         25.0
@@ -536,7 +612,9 @@ coordinate transformation::
     .. attribute:: extent
 
     Returns the envelope of this geometry as a 4-tuple, instead of as an
-    :class:`Envelope` object::
+    :class:`Envelope` object:
+
+    .. code-block:: pycon
 
         >>> point.extent
         (0.0, 0.0, 5.0, 5.0)
@@ -547,7 +625,9 @@ coordinate transformation::
     ``None`` if no spatial reference system has been assigned to it.
     If assigned, accessing this property returns a :class:`SpatialReference`
     object.  It may be set with another :class:`SpatialReference` object,
-    or any input that :class:`SpatialReference` accepts. Example::
+    or any input that :class:`SpatialReference` accepts. Example:
+
+    .. code-block:: pycon
 
         >>> city.geom.srs.name
         'GCS_WGS_1984'
@@ -566,23 +646,29 @@ coordinate transformation::
 
     .. attribute:: gml
 
-    Returns a string representation of this geometry in GML format::
+    Returns a string representation of this geometry in GML format:
 
-        >>> OGRGeometry('POINT(1 2)').gml
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT(1 2)").gml
         '<gml:Point><gml:coordinates>1,2</gml:coordinates></gml:Point>'
 
     .. attribute:: hex
 
-    Returns a string representation of this geometry in HEX WKB format::
+    Returns a string representation of this geometry in HEX WKB format:
 
-        >>> OGRGeometry('POINT(1 2)').hex
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT(1 2)").hex
         '0101000000000000000000F03F0000000000000040'
 
     .. attribute:: json
 
-    Returns a string representation of this geometry in JSON format::
+    Returns a string representation of this geometry in JSON format:
 
-        >>> OGRGeometry('POINT(1 2)').json
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT(1 2)").json
         '{ "type": "Point", "coordinates": [ 1.000000, 2.000000 ] }'
 
     .. attribute:: kml
@@ -592,9 +678,11 @@ coordinate transformation::
     .. attribute:: wkb_size
 
     Returns the size of the WKB buffer needed to hold a WKB representation
-    of this geometry::
+    of this geometry:
 
-        >>> OGRGeometry('POINT(1 2)').wkb_size
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT(1 2)").wkb_size
         21
 
     .. attribute:: wkb
@@ -616,9 +704,11 @@ coordinate transformation::
     .. method:: close_rings()
 
     If there are any rings within this geometry that have not been closed,
-    this routine will do so by adding the starting point to the end::
+    this routine will do so by adding the starting point to the end:
 
-        >>> triangle = OGRGeometry('LINEARRING (0 0,0 1,1 0)')
+    .. code-block:: pycon
+
+        >>> triangle = OGRGeometry("LINEARRING (0 0,0 1,1 0)")
         >>> triangle.close_rings()
         >>> triangle.wkt
         'LINEARRING (0 0,0 1,1 0,0 0)'
@@ -628,7 +718,7 @@ coordinate transformation::
     Transforms this geometry to a different spatial reference system. May take
     a :class:`CoordTransform` object, a :class:`SpatialReference` object, or
     any other input accepted by :class:`SpatialReference` (including spatial
-    reference WKT and PROJ.4 strings, or an integer SRID).
+    reference WKT and PROJ strings, or an integer SRID).
 
     By default nothing is returned and the geometry is transformed in-place.
     However, if the ``clone`` keyword is set to ``True`` then a transformed
@@ -706,11 +796,13 @@ coordinate transformation::
     .. attribute:: tuple
 
     Returns the coordinates of a point geometry as a tuple, the
-    coordinates of a line geometry as a tuple of tuples, and so forth::
+    coordinates of a line geometry as a tuple of tuples, and so forth:
 
-        >>> OGRGeometry('POINT (1 2)').tuple
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT (1 2)").tuple
         (1.0, 2.0)
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').tuple
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").tuple
         ((1.0, 2.0), (3.0, 4.0))
 
     .. attribute:: coords
@@ -721,48 +813,60 @@ coordinate transformation::
 
     .. attribute:: x
 
-    Returns the X coordinate of this point::
+    Returns the X coordinate of this point:
 
-        >>> OGRGeometry('POINT (1 2)').x
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT (1 2)").x
         1.0
 
     .. attribute:: y
 
-    Returns the Y coordinate of this point::
+    Returns the Y coordinate of this point:
 
-        >>> OGRGeometry('POINT (1 2)').y
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT (1 2)").y
         2.0
 
     .. attribute:: z
 
     Returns the Z coordinate of this point, or ``None`` if the point does not
-    have a Z coordinate::
+    have a Z coordinate:
 
-        >>> OGRGeometry('POINT (1 2 3)').z
+    .. code-block:: pycon
+
+        >>> OGRGeometry("POINT (1 2 3)").z
         3.0
 
 .. class:: LineString
 
     .. attribute:: x
 
-    Returns a list of X coordinates in this line::
+    Returns a list of X coordinates in this line:
 
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').x
+    .. code-block:: pycon
+
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").x
         [1.0, 3.0]
 
     .. attribute:: y
 
-    Returns a list of Y coordinates in this line::
+    Returns a list of Y coordinates in this line:
 
-        >>> OGRGeometry('LINESTRING (1 2,3 4)').y
+    .. code-block:: pycon
+
+        >>> OGRGeometry("LINESTRING (1 2,3 4)").y
         [2.0, 4.0]
 
     .. attribute:: z
 
     Returns a list of Z coordinates in this line, or ``None`` if the line does
-    not have Z coordinates::
+    not have Z coordinates:
 
-        >>> OGRGeometry('LINESTRING (1 2 3,4 5 6)').z
+    .. code-block:: pycon
+
+        >>> OGRGeometry("LINESTRING (1 2 3,4 5 6)").z
         [3.0, 6.0]
 
 
@@ -794,25 +898,31 @@ coordinate transformation::
 .. class:: OGRGeomType(type_input)
 
     This class allows for the representation of an OGR geometry type
-    in any of several ways::
+    in any of several ways:
+
+    .. code-block:: pycon
 
         >>> from django.contrib.gis.gdal import OGRGeomType
-        >>> gt1 = OGRGeomType(3)             # Using an integer for the type
-        >>> gt2 = OGRGeomType('Polygon')     # Using a string
-        >>> gt3 = OGRGeomType('POLYGON')     # It's case-insensitive
-        >>> print(gt1 == 3, gt1 == 'Polygon') # Equivalence works w/non-OGRGeomType objects
+        >>> gt1 = OGRGeomType(3)  # Using an integer for the type
+        >>> gt2 = OGRGeomType("Polygon")  # Using a string
+        >>> gt3 = OGRGeomType("POLYGON")  # It's case-insensitive
+        >>> print(gt1 == 3, gt1 == "Polygon")  # Equivalence works w/non-OGRGeomType objects
         True True
 
     .. attribute:: name
 
-    Returns a short-hand string form of the OGR Geometry type::
+    Returns a short-hand string form of the OGR Geometry type:
+
+    .. code-block:: pycon
 
         >>> gt1.name
         'Polygon'
 
     .. attribute:: num
 
-    Returns the number corresponding to the OGR geometry type::
+    Returns the number corresponding to the OGR geometry type:
+
+    .. code-block:: pycon
 
         >>> gt1.num
         3
@@ -820,7 +930,9 @@ coordinate transformation::
     .. attribute:: django
 
     Returns the Django field type (a subclass of GeometryField) to use for
-    storing this OGR type, or ``None`` if there is no appropriate Django type::
+    storing this OGR type, or ``None`` if there is no appropriate Django type:
+
+    .. code-block:: pycon
 
         >>> gt1.django
         'PolygonField'
@@ -881,49 +993,55 @@ Coordinate System Objects
 
     * OGC Well Known Text (WKT) (a string)
     * EPSG code (integer or string)
-    * PROJ.4 string
+    * PROJ string
     * A shorthand string for well-known standards (``'WGS84'``, ``'WGS72'``,
       ``'NAD27'``, ``'NAD83'``)
 
-    Example::
+    Example:
 
-        >>> wgs84 = SpatialReference('WGS84') # shorthand string
-        >>> wgs84 = SpatialReference(4326) # EPSG code
-        >>> wgs84 = SpatialReference('EPSG:4326') # EPSG string
-        >>> proj4 = '+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs '
-        >>> wgs84 = SpatialReference(proj4) # PROJ.4 string
-        >>> wgs84 = SpatialReference("""GEOGCS["WGS 84",
-        DATUM["WGS_1984",
-             SPHEROID["WGS 84",6378137,298.257223563,
-                 AUTHORITY["EPSG","7030"]],
-             AUTHORITY["EPSG","6326"]],
-         PRIMEM["Greenwich",0,
-             AUTHORITY["EPSG","8901"]],
-         UNIT["degree",0.01745329251994328,
-             AUTHORITY["EPSG","9122"]],
-         AUTHORITY["EPSG","4326"]]""") # OGC WKT
+    .. code-block:: pycon
+
+        >>> wgs84 = SpatialReference("WGS84")  # shorthand string
+        >>> wgs84 = SpatialReference(4326)  # EPSG code
+        >>> wgs84 = SpatialReference("EPSG:4326")  # EPSG string
+        >>> proj = "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs "
+        >>> wgs84 = SpatialReference(proj)  # PROJ string
+        >>> wgs84 = SpatialReference(
+        ...     """GEOGCS["WGS 84",
+        ... DATUM["WGS_1984",
+        ...      SPHEROID["WGS 84",6378137,298.257223563,
+        ...          AUTHORITY["EPSG","7030"]],
+        ...      AUTHORITY["EPSG","6326"]],
+        ... PRIMEM["Greenwich",0,
+        ...      AUTHORITY["EPSG","8901"]],
+        ... UNIT["degree",0.01745329251994328,
+        ...      AUTHORITY["EPSG","9122"]],
+        ... AUTHORITY["EPSG","4326"]]"""
+        ... )  # OGC WKT
 
     .. method:: __getitem__(target)
 
     Returns the value of the given string attribute node, ``None`` if the node
     doesn't exist. Can also take a tuple as a parameter, (target, child), where
-    child is the index of the attribute in the WKT. For example::
+    child is the index of the attribute in the WKT. For example:
 
-        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]')
-        >>> srs = SpatialReference(wkt) # could also use 'WGS84', or 4326
-        >>> print(srs['GEOGCS'])
+    .. code-block:: pycon
+
+        >>> wkt = 'GEOGCS["WGS 84", DATUM["WGS_1984, ... AUTHORITY["EPSG","4326"]]'
+        >>> srs = SpatialReference(wkt)  # could also use 'WGS84', or 4326
+        >>> print(srs["GEOGCS"])
         WGS 84
-        >>> print(srs['DATUM'])
+        >>> print(srs["DATUM"])
         WGS_1984
-        >>> print(srs['AUTHORITY'])
+        >>> print(srs["AUTHORITY"])
         EPSG
-        >>> print(srs['AUTHORITY', 1]) # The authority value
+        >>> print(srs["AUTHORITY", 1])  # The authority value
         4326
-        >>> print(srs['TOWGS84', 4]) # the fourth value in this wkt
+        >>> print(srs["TOWGS84", 4])  # the fourth value in this wkt
         0
-        >>> print(srs['UNIT|AUTHORITY']) # For the units authority, have to use the pipe symbol.
+        >>> print(srs["UNIT|AUTHORITY"])  # For the units authority, have to use the pipe symbol.
         EPSG
-        >>> print(srs['UNIT|AUTHORITY', 1]) # The authority value for the units
+        >>> print(srs["UNIT|AUTHORITY", 1])  # The authority value for the units
         9122
 
     .. method:: attr_value(target, index=0)
@@ -967,7 +1085,7 @@ Coordinate System Objects
 
     .. method:: import_proj(proj)
 
-    Import spatial reference from PROJ.4 string.
+    Import spatial reference from PROJ string.
 
     .. method:: import_user_input(user_input)
 
@@ -1050,7 +1168,7 @@ Coordinate System Objects
 
     .. attribute:: proj
 
-    Returns the PROJ.4 representation for this spatial reference.
+    Returns the PROJ representation for this spatial reference.
 
     .. attribute:: proj4
 
@@ -1068,12 +1186,15 @@ Coordinate System Objects
 Represents a coordinate system transform. It is initialized with two
 :class:`SpatialReference`, representing the source and target coordinate
 systems, respectively. These objects should be used when performing the same
-coordinate transformation repeatedly on different geometries::
+coordinate transformation repeatedly on different geometries:
 
-    >>> ct = CoordTransform(SpatialReference('WGS84'), SpatialReference('NAD83'))
+.. code-block:: pycon
+
+    >>> ct = CoordTransform(SpatialReference("WGS84"), SpatialReference("NAD83"))
     >>> for feat in layer:
-    ...     geom = feat.geom # getting clone of feature geometry
-    ...     geom.transform(ct) # transforming
+    ...     geom = feat.geom  # getting clone of feature geometry
+    ...     geom.transform(ct)  # transforming
+    ...
 
 .. _raster-data-source-objects:
 
@@ -1107,9 +1228,10 @@ blue.
     raster should be opened in write mode. For newly-created rasters, the second
     parameter is ignored and the new raster is always created in write mode.
 
-    The first parameter can take three forms: a string representing a file
-    path, a dictionary with values defining a new raster, or a bytes object
-    representing a raster file.
+    The first parameter can take three forms: a string or
+    :class:`~pathlib.Path` representing a file path (filesystem or GDAL virtual
+    filesystem), a dictionary with values defining a new raster, or a bytes
+    object representing a raster file.
 
     If the input is a file path, the raster is opened from there. If the input
     is raw data in a dictionary, the parameters ``width``, ``height``, and
@@ -1159,6 +1281,10 @@ blue.
         True
         >>> rst.name  # Stored in a random path in the vsimem filesystem.
         '/vsimem/da300bdb-129d-49a8-b336-e410a9428dad'
+
+    .. versionchanged:: 4.2
+
+        Support for :class:`pathlib.Path` ``ds_input`` was added.
 
     .. attribute:: name
 
@@ -1243,8 +1369,8 @@ blue.
         tuple of six coefficients which map pixel/line coordinates into
         georeferenced space using the following relationship::
 
-            Xgeo = GT(0) + Xpixel*GT(1) + Yline*GT(2)
-            Ygeo = GT(3) + Xpixel*GT(4) + Yline*GT(5)
+            Xgeo = GT(0) + Xpixel * GT(1) + Yline * GT(2)
+            Ygeo = GT(3) + Xpixel * GT(4) + Yline * GT(5)
 
         The same values can be retrieved by accessing the :attr:`origin`
         (indices 0 and 3), :attr:`scale` (indices 1 and 5) and :attr:`skew`
@@ -1368,14 +1494,16 @@ blue.
                    [ 19.,  21.,  23.],
                    [ 31.,  33.,  35.]], dtype=float32)
 
-    .. method:: transform(srid, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
+    .. method:: transform(srs, driver=None, name=None, resampling='NearestNeighbour', max_error=0.0)
 
-        Returns a transformed version of this raster with the specified SRID.
+        Transforms this raster to a different spatial reference system
+        (``srs``), which may be a :class:`SpatialReference` object, or any
+        other input accepted by :class:`SpatialReference` (including spatial
+        reference WKT and PROJ strings, or an integer SRID).
 
-        This function transforms the current raster into a new spatial reference
-        system that can be specified with an ``srid``. It calculates the bounds
-        and scale of the current raster in the new spatial reference system and
-        warps the raster using the :attr:`~GDALRaster.warp` function.
+        It calculates the bounds and scale of the current raster in the new
+        spatial reference system and warps the raster using the
+        :attr:`~GDALRaster.warp` function.
 
         By default, the driver of the source raster is used and the name of the
         raster is the original name appended with
@@ -1394,7 +1522,8 @@ blue.
             ...     "scale": [100, -100],
             ...     "bands": [{"data": range(36), "nodata_value": 99}]
             ... })
-            >>> target = rst.transform(4326)
+            >>> target_srs = SpatialReference(4326)
+            >>> target = rst.transform(target_srs)
             >>> target.origin
             [-82.98492744885776, 27.601924753080144]
 
@@ -1514,8 +1643,7 @@ blue.
         to mark pixels that are not valid data. Such pixels should generally not
         be displayed, nor contribute to analysis operations.
 
-        To delete an existing "no data" value, set this property to ``None``
-        (requires GDAL ≥ 2.1).
+        To delete an existing "no data" value, set this property to ``None``.
 
     .. method:: datatype(as_string=False)
 
@@ -1629,7 +1757,7 @@ Examples of using the different keys when creating rasters can be found in the
 documentation of the corresponding attributes and methods of the
 :class:`GDALRaster` and :class:`GDALBand` classes.
 
-__ http://geojson.org
+__ https://geojson.org/
 
 The ``ds_input`` dictionary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1714,23 +1842,27 @@ Key               Default  Usage
 
     The following example uses some of the options available for the
     `GTiff driver`__. The result is a compressed signed byte raster with an
-    internal tiling scheme. The internal tiles have a block size of 23 by 23::
+    internal tiling scheme. The internal tiles have a block size of 23 by 23:
 
-        >>> GDALRaster({
-        ...    'driver': 'GTiff',
-        ...    'name': '/path/to/new/file.tif',
-        ...    'srid': 4326,
-        ...    'width': 255,
-        ...    'height': 255,
-        ...    'nr_of_bands': 1,
-        ...    'papsz_options': {
-        ...        'compress': 'packbits',
-        ...        'pixeltype': 'signedbyte',
-        ...        'tiled': 'yes',
-        ...        'blockxsize': 23,
-        ...        'blockysize': 23,
-        ...    }
-        ... })
+    .. code-block:: pycon
+
+        >>> GDALRaster(
+        ...     {
+        ...         "driver": "GTiff",
+        ...         "name": "/path/to/new/file.tif",
+        ...         "srid": 4326,
+        ...         "width": 255,
+        ...         "height": 255,
+        ...         "nr_of_bands": 1,
+        ...         "papsz_options": {
+        ...             "compress": "packbits",
+        ...             "pixeltype": "signedbyte",
+        ...             "tiled": "yes",
+        ...             "blockxsize": 23,
+        ...             "blockysize": 23,
+        ...         },
+        ...     }
+        ... )
 
 __ https://gdal.org/drivers/raster/gtiff.html
 
@@ -1761,6 +1893,13 @@ Key              Default                           Usage
 Using GDAL's Virtual Filesystem
 -------------------------------
 
+GDAL can access files stored in the filesystem, but also supports virtual
+filesystems to abstract accessing other kind of files, such as compressed,
+encrypted, or remote files.
+
+Using memory-based Virtual Filesystem
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 GDAL has an internal memory-based filesystem, which allows treating blocks of
 memory as files. It can be used to read and write :class:`GDALRaster` objects
 to and from binary file buffers.
@@ -1773,11 +1912,13 @@ from a remote storage or returned from a view without being written to disk.
 ``/vsimem/``.
 
 Input provided as ``bytes`` has to be a full binary representation of a file.
-For instance::
+For instance:
+
+.. code-block:: pycon
 
     # Read a raster as a file object from a remote source.
     >>> from urllib.request import urlopen
-    >>> dat = urlopen('http://example.com/raster.tif').read()
+    >>> dat = urlopen("http://example.com/raster.tif").read()
     # Instantiate a raster from the bytes object.
     >>> rst = GDALRaster(dat)
     # The name starts with /vsimem/, indicating that the raster lives in the
@@ -1793,18 +1934,73 @@ dictionary representation and provide a ``name`` argument that starts with
 of the raster.
 
 Here's how to create a raster and return it as a file in an
-:class:`~django.http.HttpResponse`::
+:class:`~django.http.HttpResponse`:
+
+.. code-block:: pycon
 
     >>> from django.http import HttpResponse
-    >>> rst = GDALRaster({
-    ...     'name': '/vsimem/temporarymemfile',
-    ...     'driver': 'tif',
-    ...     'width': 6, 'height': 6, 'srid': 3086,
-    ...     'origin': [500000, 400000],
-    ...     'scale': [100, -100],
-    ...     'bands': [{'data': range(36), 'nodata_value': 99}]
-    ... })
-    >>> HttpResponse(rast.vsi_buffer, 'image/tiff')
+    >>> rst = GDALRaster(
+    ...     {
+    ...         "name": "/vsimem/temporarymemfile",
+    ...         "driver": "tif",
+    ...         "width": 6,
+    ...         "height": 6,
+    ...         "srid": 3086,
+    ...         "origin": [500000, 400000],
+    ...         "scale": [100, -100],
+    ...         "bands": [{"data": range(36), "nodata_value": 99}],
+    ...     }
+    ... )
+    >>> HttpResponse(rast.vsi_buffer, "image/tiff")
+
+Using other Virtual Filesystems
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Depending on the local build of GDAL other virtual filesystems may be
+supported. You can use them by prepending the provided path with the
+appropriate ``/vsi*/`` prefix. See the `GDAL Virtual Filesystems
+documentation`_ for more details.
+
+.. warning:
+
+    Rasters with names starting with `/vsi*/` will be treated as rasters from
+    the GDAL virtual filesystems. Django doesn't perform any extra validation.
+
+Compressed rasters
+^^^^^^^^^^^^^^^^^^
+
+Instead decompressing the file and instantiating the resulting raster, GDAL can
+directly access compressed files using the ``/vsizip/``, ``/vsigzip/``, or
+``/vsitar/`` virtual filesystems:
+
+.. code-block:: pycon
+
+   >>> from django.contrib.gis.gdal import GDALRaster
+   >>> rst = GDALRaster("/vsizip/path/to/your/file.zip/path/to/raster.tif")
+   >>> rst = GDALRaster("/vsigzip/path/to/your/file.gz")
+   >>> rst = GDALRaster("/vsitar/path/to/your/file.tar/path/to/raster.tif")
+
+Network rasters
+^^^^^^^^^^^^^^^
+
+GDAL can support online resources and storage providers transparently. As long
+as it's built with such capabilities.
+
+To access a public raster file with no authentication, you can use
+``/vsicurl/``:
+
+.. code-block:: pycon
+
+   >>> from django.contrib.gis.gdal import GDALRaster
+   >>> rst = GDALRaster("/vsicurl/https://example.com/raster.tif")
+   >>> rst.name
+   '/vsicurl/https://example.com/raster.tif'
+
+For commercial storage providers (e.g. ``/vsis3/``) the system should be
+previously configured for authentication and possibly other settings (see the
+`GDAL Virtual Filesystems documentation`_ for available options).
+
+.. _`GDAL Virtual Filesystems documentation`: https://gdal.org/user/virtual_file_systems.html
 
 Settings
 ========

@@ -1,0 +1,16 @@
+[
+  {
+    "model": "fixtures.circulara",
+    "fields": {
+      "key": "x",
+      "obj": ["y"]
+    }
+  },
+  {
+    "model": "fixtures.circularb",
+    "fields": {
+      "key": "y",
+      "obj": ["x"]
+    }
+  }
+]

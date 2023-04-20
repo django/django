@@ -18,9 +18,9 @@ MRO is an acronym for Method Resolution Order.
 
 .. class:: django.views.generic.base.View
 
-    The master class-based base view. All other class-based views inherit from
-    this base class. It isn't strictly a generic view and thus can also be
-    imported from ``django.views``.
+    The base view class. All other class-based views inherit from this base
+    class. It isn't strictly a generic view and thus can also be imported from
+    ``django.views``.
 
     **Method Flowchart**
 
@@ -34,10 +34,10 @@ MRO is an acronym for Method Resolution Order.
         from django.http import HttpResponse
         from django.views import View
 
-        class MyView(View):
 
+        class MyView(View):
             def get(self, request, *args, **kwargs):
-                return HttpResponse('Hello, World!')
+                return HttpResponse("Hello, World!")
 
     **Example urls.py**::
 
@@ -46,7 +46,7 @@ MRO is an acronym for Method Resolution Order.
         from myapp.views import MyView
 
         urlpatterns = [
-            path('mine/', MyView.as_view(), name='my-view'),
+            path("mine/", MyView.as_view(), name="my-view"),
         ]
 
     **Attributes**
@@ -57,7 +57,7 @@ MRO is an acronym for Method Resolution Order.
 
         Default::
 
-            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+            ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
 
     **Methods**
 
@@ -77,6 +77,12 @@ MRO is an acronym for Method Resolution Order.
         <how-django-processes-a-request>` to the ``args`` and ``kwargs``
         attributes, respectively. Then :meth:`dispatch` is called.
 
+        If a ``View`` subclass defines asynchronous (``async def``) method
+        handlers, ``as_view()`` will mark the returned callable as a coroutine
+        function. An ``ImproperlyConfigured`` exception will be raised if both
+        asynchronous (``async def``) and synchronous (``def``) handlers are
+        defined on a single view-class.
+
     .. method:: setup(request, *args, **kwargs)
 
         Performs key view initialization prior to :meth:`dispatch`.
@@ -86,7 +92,7 @@ MRO is an acronym for Method Resolution Order.
     .. method:: dispatch(request, *args, **kwargs)
 
         The ``view`` part of the view -- the method that accepts a ``request``
-        argument plus arguments, and returns a HTTP response.
+        argument plus arguments, and returns an HTTP response.
 
         The default implementation will inspect the HTTP method and attempt to
         delegate to a method that matches the HTTP method; a ``GET`` will be
@@ -99,7 +105,7 @@ MRO is an acronym for Method Resolution Order.
 
     .. method:: http_method_not_allowed(request, *args, **kwargs)
 
-        If the view was called with a HTTP method it doesn't support, this
+        If the view was called with an HTTP method it doesn't support, this
         method is called instead.
 
         The default implementation returns ``HttpResponseNotAllowed`` with a
@@ -111,6 +117,9 @@ MRO is an acronym for Method Resolution Order.
         response with the ``Allow`` header containing a list of the view's
         allowed HTTP method names.
 
+        If the other HTTP methods handlers on the class are asynchronous
+        (``async def``) then the response will be wrapped in a coroutine
+        function for use with ``await``.
 
 ``TemplateView``
 ================
@@ -141,13 +150,13 @@ MRO is an acronym for Method Resolution Order.
 
         from articles.models import Article
 
-        class HomePageView(TemplateView):
 
+        class HomePageView(TemplateView):
             template_name = "home.html"
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['latest_articles'] = Article.objects.all()[:5]
+                context["latest_articles"] = Article.objects.all()[:5]
                 return context
 
     **Example urls.py**::
@@ -157,7 +166,7 @@ MRO is an acronym for Method Resolution Order.
         from myapp.views import HomePageView
 
         urlpatterns = [
-            path('', HomePageView.as_view(), name='home'),
+            path("", HomePageView.as_view(), name="home"),
         ]
 
     **Context**
@@ -204,14 +213,14 @@ MRO is an acronym for Method Resolution Order.
 
         from articles.models import Article
 
-        class ArticleCounterRedirectView(RedirectView):
 
+        class ArticleCounterRedirectView(RedirectView):
             permanent = False
             query_string = True
-            pattern_name = 'article-detail'
+            pattern_name = "article-detail"
 
             def get_redirect_url(self, *args, **kwargs):
-                article = get_object_or_404(Article, pk=kwargs['pk'])
+                article = get_object_or_404(Article, pk=kwargs["pk"])
                 article.update_counter()
                 return super().get_redirect_url(*args, **kwargs)
 
@@ -220,12 +229,20 @@ MRO is an acronym for Method Resolution Order.
         from django.urls import path
         from django.views.generic.base import RedirectView
 
-        from article.views import ArticleCounterRedirectView, ArticleDetail
+        from article.views import ArticleCounterRedirectView, ArticleDetailView
 
         urlpatterns = [
-            path('counter/<int:pk>/', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            path('details/<int:pk>/', ArticleDetail.as_view(), name='article-detail'),
-            path('go-to-django/', RedirectView.as_view(url='https://djangoproject.com'), name='go-to-django'),
+            path(
+                "counter/<int:pk>/",
+                ArticleCounterRedirectView.as_view(),
+                name="article-counter",
+            ),
+            path("details/<int:pk>/", ArticleDetailView.as_view(), name="article-detail"),
+            path(
+                "go-to-django/",
+                RedirectView.as_view(url="https://www.djangoproject.com/"),
+                name="go-to-django",
+            ),
         ]
 
     **Attributes**
@@ -259,6 +276,10 @@ MRO is an acronym for Method Resolution Order.
     .. method:: get_redirect_url(*args, **kwargs)
 
         Constructs the target URL for redirection.
+
+        The ``args`` and ``kwargs`` arguments are positional and/or keyword
+        arguments :ref:`captured from the URL pattern
+        <how-django-processes-a-request>`, respectively.
 
         The default implementation uses :attr:`url` as a starting
         string and performs expansion of ``%`` named parameters in that string

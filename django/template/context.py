@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from copy import copy
 
 # Hard-coded processor for easier use of CSRF protection.
-_builtin_context_processors = ('django.template.context_processors.csrf',)
+_builtin_context_processors = ("django.template.context_processors.csrf",)
 
 
 class ContextPopException(Exception):
@@ -29,7 +29,7 @@ class BaseContext:
         self._reset_dicts(dict_)
 
     def _reset_dicts(self, value=None):
-        builtins = {'True': True, 'False': False, 'None': None}
+        builtins = {"True": True, "False": False, "None": None}
         self.dicts = [builtins]
         if value is not None:
             self.dicts.append(value)
@@ -132,6 +132,7 @@ class BaseContext:
 
 class Context(BaseContext):
     "A stack container for variable context"
+
     def __init__(self, dict_=None, autoescape=True, use_l10n=None, use_tz=None):
         self.autoescape = autoescape
         self.use_l10n = use_l10n
@@ -160,8 +161,8 @@ class Context(BaseContext):
 
     def update(self, other_dict):
         "Push other_dict to the stack of dictionaries in the Context"
-        if not hasattr(other_dict, '__getitem__'):
-            raise TypeError('other_dict must be a mapping (dictionary-like) object.')
+        if not hasattr(other_dict, "__getitem__"):
+            raise TypeError("other_dict must be a mapping (dictionary-like) object.")
         if isinstance(other_dict, BaseContext):
             other_dict = other_dict.dicts[1:].pop()
         return ContextDict(self, other_dict)
@@ -182,6 +183,7 @@ class RenderContext(BaseContext):
     rendering of other templates as they would if they were stored in the normal
     template context.
     """
+
     template = None
 
     def __iter__(self):
@@ -217,7 +219,16 @@ class RequestContext(Context):
     Additional processors can be specified as a list of callables
     using the "processors" keyword argument.
     """
-    def __init__(self, request, dict_=None, processors=None, use_l10n=None, use_tz=None, autoescape=True):
+
+    def __init__(
+        self,
+        request,
+        dict_=None,
+        processors=None,
+        use_l10n=None,
+        use_tz=None,
+        autoescape=True,
+    ):
         super().__init__(dict_, use_l10n=use_l10n, use_tz=use_tz, autoescape=autoescape)
         self.request = request
         self._processors = () if processors is None else tuple(processors)
@@ -237,11 +248,18 @@ class RequestContext(Context):
 
         self.template = template
         # Set context processors according to the template engine's settings.
-        processors = (template.engine.template_context_processors +
-                      self._processors)
+        processors = template.engine.template_context_processors + self._processors
         updates = {}
         for processor in processors:
-            updates.update(processor(self.request))
+            context = processor(self.request)
+            try:
+                updates.update(context)
+            except TypeError as e:
+                raise TypeError(
+                    f"Context processor {processor.__qualname__} didn't return a "
+                    "dictionary."
+                ) from e
+
         self.dicts[self._processors_index] = updates
 
         try:
@@ -255,7 +273,7 @@ class RequestContext(Context):
         new_context = super().new(values)
         # This is for backwards-compatibility: RequestContexts created via
         # Context.new don't include values from context processors.
-        if hasattr(new_context, '_processors_index'):
+        if hasattr(new_context, "_processors_index"):
             del new_context._processors_index
         return new_context
 
@@ -265,7 +283,9 @@ def make_context(context, request=None, **kwargs):
     Create a suitable Context from a plain dict and optionally an HttpRequest.
     """
     if context is not None and not isinstance(context, dict):
-        raise TypeError('context must be a dict rather than %s.' % context.__class__.__name__)
+        raise TypeError(
+            "context must be a dict rather than %s." % context.__class__.__name__
+        )
     if request is None:
         context = Context(context, **kwargs)
     else:

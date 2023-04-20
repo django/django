@@ -1,0 +1,261 @@
+# This file is distributed under the same license as the Django package.
+#
+# Translators:
+# Nuriddin Islamov, 2021
+# Otabek Umurzakov <umurzakov.otabek.1999@gmail.com>, 2019
+msgid ""
+msgstr ""
+"Project-Id-Version: django\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-12-15 16:52+0000\n"
+"Last-Translator: Nuriddin Islamov\n"
+"Language-Team: Uzbek (http://www.transifex.com/django/django/language/uz/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: uz\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#, javascript-format
+msgid "Available %s"
+msgstr "Mavjud %s"
+
+#, javascript-format
+msgid ""
+"This is the list of available %s. You may choose some by selecting them in "
+"the box below and then clicking the \"Choose\" arrow between the two boxes."
+msgstr ""
+"Bu mavjud %s ro'yxati. Siz ulardan ba'zilarini quyidagi maydonchada "
+"belgilab, so'ng ikkala maydonlar orasidagi \"Tanlash\" ko'rsatkichiga bosish "
+"orqali tanlashingiz mumkin."
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+"Mavjud bo'lgan %s larni ro'yxatini filtrlash uchun ushbu maydonchaga "
+"kiriting."
+
+msgid "Filter"
+msgstr "Filtrlash"
+
+msgid "Choose all"
+msgstr "Barchasini tanlash"
+
+#, javascript-format
+msgid "Click to choose all %s at once."
+msgstr "Barcha %s larni birdan tanlash uchun bosing."
+
+msgid "Choose"
+msgstr "Tanlash"
+
+msgid "Remove"
+msgstr "O'chirish"
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr "Tanlangan %s"
+
+#, javascript-format
+msgid ""
+"This is the list of chosen %s. You may remove some by selecting them in the "
+"box below and then clicking the \"Remove\" arrow between the two boxes."
+msgstr ""
+"Bu tanlangan %s ro'yxati. Siz ulardan ba'zilarini quyidagi maydonchada "
+"belgilab, so'ng ikkala maydonlar orasidagi \"O'chirish\" ko'rsatkichiga "
+"bosish orqali o'chirishingiz mumkin."
+
+msgid "Remove all"
+msgstr "Barchasini o'chirish"
+
+#, javascript-format
+msgid "Click to remove all chosen %s at once."
+msgstr "Barcha tanlangan %s larni birdan o'chirib tashlash uchun bosing."
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] "%(cnt)s dan %(sel)s tanlandi"
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+"Siz alohida tahrirlash mumkin bo'lgan maydonlarda saqlanmagan "
+"o‘zgarishlaringiz mavjud. Agar siz harakatni ishga tushirsangiz, saqlanmagan "
+"o'zgarishlaringiz yo'qotiladi."
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+msgid "Now"
+msgstr "Hozir"
+
+msgid "Midnight"
+msgstr "Yarim tun"
+
+msgid "6 a.m."
+msgstr "6 t.o."
+
+msgid "Noon"
+msgstr "Kun o'rtasi"
+
+msgid "6 p.m."
+msgstr "6 t.k."
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] "Eslatma: Siz server vaqtidan %s soat oldindasiz."
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] "Eslatma: Siz server vaqtidan %s soat orqadasiz."
+
+msgid "Choose a Time"
+msgstr "Vaqtni tanlang"
+
+msgid "Choose a time"
+msgstr "Vaqtni tanlang"
+
+msgid "Cancel"
+msgstr "Bekor qilish"
+
+msgid "Today"
+msgstr "Bugun"
+
+msgid "Choose a Date"
+msgstr "Sanani tanlang"
+
+msgid "Yesterday"
+msgstr "Kecha"
+
+msgid "Tomorrow"
+msgstr "Ertaga"
+
+msgid "January"
+msgstr "Yanvar"
+
+msgid "February"
+msgstr "Fevral"
+
+msgid "March"
+msgstr "Mart"
+
+msgid "April"
+msgstr "Aprel"
+
+msgid "May"
+msgstr "May"
+
+msgid "June"
+msgstr "Iyun"
+
+msgid "July"
+msgstr "Iyul"
+
+msgid "August"
+msgstr "Avgust"
+
+msgid "September"
+msgstr "Sentabr"
+
+msgid "October"
+msgstr "Oktabr"
+
+msgid "November"
+msgstr "Noyabr"
+
+msgid "December"
+msgstr "Dekabr"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr "Ya"
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr "Du"
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr "Se"
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr "Ch"
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr "Pa"
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr "Ju"
+
+msgctxt "one letter Saturday"
+msgid "S"
+msgstr "Sh"
+
+msgid "Show"
+msgstr "Ko'rsatish"
+
+msgid "Hide"
+msgstr "Bekitish"

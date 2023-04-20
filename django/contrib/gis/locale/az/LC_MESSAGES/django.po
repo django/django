@@ -2,13 +2,13 @@
 #
 # Translators:
 # Ali Ismayilov <ali@ismailov.info>, 2011
-# Emin Mastizada <emin@linux.com>, 2018
+# Emin Mastizada <emin@linux.com>, 2018,2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2018-04-27 17:21+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-01-12 07:23+0000\n"
 "Last-Translator: Emin Mastizada <emin@linux.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
@@ -25,9 +25,9 @@ msgid "The base GIS field."
 msgstr "Təməl GIS sahəsi (field)."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
-"Təməl Həndəsə sahəsi -- OpenGIS Specification Geometry növünə işarətlənir."
+"Təməl Həndəsə sahəsi — OpenGIS Specification Geometry növünə işarətlənir."
 
 msgid "Point"
 msgstr "Nöqtə"
@@ -84,5 +84,5 @@ msgid "No feeds are registered."
 msgstr "Qeyd edilmiş axın yoxdur."
 
 #, python-format
-msgid "Slug %r isn't registered."
+msgid "Slug %r isn’t registered."
 msgstr "%r slug-ı qeyd edilməyib."

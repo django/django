@@ -81,18 +81,22 @@ Understand cached attributes
 
 As well as caching of the whole ``QuerySet``, there is caching of the result of
 attributes on ORM objects. In general, attributes that are not callable will be
-cached. For example, assuming the :ref:`example Weblog models
-<queryset-model-example>`::
+cached. For example, assuming the :ref:`example blog models
+<queryset-model-example>`:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=1)
-  >>> entry.blog   # Blog object is retrieved at this point
-  >>> entry.blog   # cached version, no DB access
+  >>> entry.blog  # Blog object is retrieved at this point
+  >>> entry.blog  # cached version, no DB access
 
-But in general, callable attributes cause DB lookups every time::
+But in general, callable attributes cause DB lookups every time:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=1)
-  >>> entry.authors.all()   # query performed
-  >>> entry.authors.all()   # query performed again
+  >>> entry.authors.all()  # query performed
+  >>> entry.authors.all()  # query performed again
 
 Be careful when reading template code - the template system does not allow use
 of parentheses, but will call callables automatically, hiding the above
@@ -164,17 +168,23 @@ First, the query will be quicker because of the underlying database index.
 Also, the query could run much slower if multiple objects match the lookup;
 having a unique constraint on the column guarantees this will never happen.
 
-So using the :ref:`example Weblog models <queryset-model-example>`::
+So using the :ref:`example blog models <queryset-model-example>`:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(id=10)
 
 will be quicker than:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(headline="News Item Title")
 
 because ``id`` is indexed by the database and is guaranteed to be unique.
 
 Doing the following is potentially quite slow:
+
+.. code-block:: pycon
 
   >>> entry = Entry.objects.get(headline__startswith="News")
 
@@ -234,11 +244,17 @@ them. Note that if you *do* use them, the ORM will have to go and get them in
 a separate query, making this a pessimization if you use it inappropriately.
 
 Don't be too aggressive in deferring fields without profiling as the database
-has to read most of the non-text, non-VARCHAR data from the disk for a single
-row in the results, even if it ends up only using a few columns. The
+has to read most of the non-text, non-``VARCHAR`` data from the disk for a
+single row in the results, even if it ends up only using a few columns. The
 ``defer()`` and ``only()`` methods are most useful when you can avoid loading a
 lot of text data or for fields that might take a lot of processing to convert
 back to Python. As always, profile first, then optimize.
+
+Use ``QuerySet.contains(obj)``
+------------------------------
+
+...if you only want to find out if ``obj`` is in the queryset, rather than
+``if obj in queryset``.
 
 Use ``QuerySet.count()``
 ------------------------
@@ -255,52 +271,52 @@ But:
 
 .. _overuse_of_count_and_exists:
 
-Don't overuse ``count()`` and ``exists()``
-------------------------------------------
+Don't overuse ``contains()``, ``count()``, and ``exists()``
+-----------------------------------------------------------
 
 If you are going to need other data from the QuerySet, evaluate it immediately.
 
-For example, assuming an Email model that has a ``body`` attribute and a
-many-to-many relation to User, the following template code is optimal:
+For example, assuming a ``Group`` model that has a many-to-many relation to
+``User``, the following code is optimal::
 
-.. code-block:: html+django
+    members = group.members.all()
 
-   {% if display_inbox %}
-     {% with emails=user.emails.all %}
-       {% if emails %}
-         <p>You have {{ emails|length }} email(s)</p>
-         {% for email in emails %}
-           <p>{{ email.body }}</p>
-         {% endfor %}
-       {% else %}
-         <p>No messages today.</p>
-       {% endif %}
-     {% endwith %}
-   {% endif %}
+    if display_group_members:
+        if members:
+            if current_user in members:
+                print("You and", len(members) - 1, "other users are members of this group.")
+            else:
+                print("There are", len(members), "members in this group.")
 
+            for member in members:
+                print(member.username)
+        else:
+            print("There are no members in this group.")
 
 It is optimal because:
 
-#. Since QuerySets are lazy, this does no database queries if 'display_inbox'
-   is False.
+#. Since QuerySets are lazy, this does no database queries if
+   ``display_group_members`` is ``False``.
 
-#. Use of :ttag:`with` means that we store ``user.emails.all`` in a variable
-   for later use, allowing its cache to be re-used.
+#. Storing ``group.members.all()`` in the ``members`` variable allows its
+   result cache to be reused.
 
-#. The line ``{% if emails %}`` causes ``QuerySet.__bool__()`` to be called,
-   which causes the ``user.emails.all()`` query to be run on the database, and
-   at the least the first line to be turned into an ORM object. If there aren't
-   any results, it will return False, otherwise True.
+#. The line ``if members:`` causes ``QuerySet.__bool__()`` to be called, which
+   causes the ``group.members.all()`` query to be run on the database. If there
+   aren't any results, it will return ``False``, otherwise ``True``.
 
-#. The use of ``{{ emails|length }}`` calls ``QuerySet.__len__()``, filling
-   out the rest of the cache without doing another query.
+#. The line ``if current_user in members:`` checks if the user is in the result
+   cache, so no additional database queries are issued.
 
-#. The :ttag:`for` loop iterates over the already filled cache.
+#. The use of ``len(members)`` calls ``QuerySet.__len__()``, reusing the result
+   cache, so again, no database queries are issued.
+
+#. The ``for member`` loop iterates over the result cache.
 
 In total, this code does either one or zero database queries. The only
-deliberate optimization performed is the use of the :ttag:`with` tag. Using
-``QuerySet.exists()`` or ``QuerySet.count()`` at any point would cause
-additional queries.
+deliberate optimization performed is using the ``members`` variable. Using
+``QuerySet.exists()`` for the ``if``, ``QuerySet.contains()`` for the ``in``,
+or ``QuerySet.count()`` for the count would each cause additional queries.
 
 Use ``QuerySet.update()`` and ``delete()``
 ------------------------------------------
@@ -351,15 +367,17 @@ When creating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_create()` method to reduce the
 number of SQL queries. For example::
 
-    Entry.objects.bulk_create([
-        Entry(headline='This is a test'),
-        Entry(headline='This is only a test'),
-    ])
+    Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
 
 ...is preferable to::
 
-    Entry.objects.create(headline='This is a test')
-    Entry.objects.create(headline='This is only a test')
+    Entry.objects.create(headline="This is a test")
+    Entry.objects.create(headline="This is only a test")
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_create>`, so make sure it's appropriate
@@ -372,23 +390,25 @@ When updating objects, where possible, use the
 :meth:`~django.db.models.query.QuerySet.bulk_update()` method to reduce the
 number of SQL queries. Given a list or queryset of objects::
 
-    entries = Entry.objects.bulk_create([
-        Entry(headline='This is a test'),
-        Entry(headline='This is only a test'),
-    ])
+    entries = Entry.objects.bulk_create(
+        [
+            Entry(headline="This is a test"),
+            Entry(headline="This is only a test"),
+        ]
+    )
 
 The following example::
 
-    entries[0].headline = 'This is not a test'
-    entries[1].headline = 'This is no longer a test'
-    Entry.objects.bulk_update(entries, ['headline'])
+    entries[0].headline = "This is not a test"
+    entries[1].headline = "This is no longer a test"
+    Entry.objects.bulk_update(entries, ["headline"])
 
 ...is preferable to::
 
-    entries[0].headline = 'This is not a test'
-    entries.save()
-    entries[1].headline = 'This is no longer a test'
-    entries.save()
+    entries[0].headline = "This is not a test"
+    entries[0].save()
+    entries[1].headline = "This is no longer a test"
+    entries[1].save()
 
 Note that there are a number of :meth:`caveats to this method
 <django.db.models.query.QuerySet.bulk_update>`, so make sure it's appropriate
@@ -418,11 +438,14 @@ When inserting different pairs of objects into
 number of SQL queries. For example::
 
     PizzaToppingRelationship = Pizza.toppings.through
-    PizzaToppingRelationship.objects.bulk_create([
-        PizzaToppingRelationship(pizza=my_pizza, topping=pepperoni),
-        PizzaToppingRelationship(pizza=your_pizza, topping=pepperoni),
-        PizzaToppingRelationship(pizza=your_pizza, topping=mushroom),
-    ], ignore_conflicts=True)
+    PizzaToppingRelationship.objects.bulk_create(
+        [
+            PizzaToppingRelationship(pizza=my_pizza, topping=pepperoni),
+            PizzaToppingRelationship(pizza=your_pizza, topping=pepperoni),
+            PizzaToppingRelationship(pizza=your_pizza, topping=mushroom),
+        ],
+        ignore_conflicts=True,
+    )
 
 ...is preferable to::
 
@@ -459,11 +482,12 @@ When removing different pairs of objects from :class:`ManyToManyFields
 the number of SQL queries. For example::
 
     from django.db.models import Q
+
     PizzaToppingRelationship = Pizza.toppings.through
     PizzaToppingRelationship.objects.filter(
-        Q(pizza=my_pizza, topping=pepperoni) |
-        Q(pizza=your_pizza, topping=pepperoni) |
-        Q(pizza=your_pizza, topping=mushroom)
+        Q(pizza=my_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=pepperoni)
+        | Q(pizza=your_pizza, topping=mushroom)
     ).delete()
 
 ...is preferable to::

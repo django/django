@@ -1,19 +1,26 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# akiyoko <ayokose@gmail.com>, 2020
 # Claude Paroz <claude@2xlibre.net>, 2016
+# Goto Hayato <habita.gh@gmail.com>, 2019
+# Hiroki Sawano, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Masaya, 2023
 # Shinichi Katsumata <shinichi.katsumata@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2012-2018
+# Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023
+# Taichi Taniguchi, 2022
+# Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
+# Takuya N <takninnovationresearch@gmail.com>, 2020
 # Tetsuya Morimoto <tetsuya.morimoto@gmail.com>, 2011
 # 上田慶祐 <kei.mokusyun@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-19 07:00+0000\n"
-"Last-Translator: Shinichi Katsumata <shinichi.katsumata@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012-2018,2021,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -21,6 +28,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ja\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "選択された %(verbose_name_plural)s の削除"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -32,10 +43,6 @@ msgstr "%(name)s が削除できません"
 
 msgid "Are you sure?"
 msgstr "よろしいですか？"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "選択された %(verbose_name_plural)s の削除"
 
 msgid "Administration"
 msgstr "管理"
@@ -72,6 +79,12 @@ msgstr "日付なし"
 
 msgid "Has date"
 msgstr "日付あり"
+
+msgid "Empty"
+msgstr "空"
+
+msgid "Not empty"
+msgstr "空でない"
 
 #, python-format
 msgid ""
@@ -130,23 +143,23 @@ msgid "log entries"
 msgstr "ログエントリー"
 
 #, python-format
-msgid "Added \"%(object)s\"."
-msgstr "\"%(object)s\" を追加しました。"
+msgid "Added “%(object)s”."
+msgstr "“%(object)s” を追加しました。"
 
 #, python-format
-msgid "Changed \"%(object)s\" - %(changes)s"
-msgstr "\"%(object)s\" を変更しました - %(changes)s"
+msgid "Changed “%(object)s” — %(changes)s"
+msgstr "“%(object)s” を変更しました — %(changes)s"
 
 #, python-format
-msgid "Deleted \"%(object)s.\""
-msgstr "\"%(object)s\"を削除しました。"
+msgid "Deleted “%(object)s.”"
+msgstr "“%(object)s” を削除しました。"
 
 msgid "LogEntry Object"
 msgstr "ログエントリー オブジェクト"
 
 #, python-brace-format
-msgid "Added {name} \"{object}\"."
-msgstr "{name} \"{object}\" を追加しました。"
+msgid "Added {name} “{object}”."
+msgstr "{name} “{object}” を追加しました。"
 
 msgid "Added."
 msgstr "追加されました。"
@@ -155,16 +168,16 @@ msgid "and"
 msgstr "と"
 
 #, python-brace-format
-msgid "Changed {fields} for {name} \"{object}\"."
-msgstr "{name} \"{object}\" の {fields} を変更しました。"
+msgid "Changed {fields} for {name} “{object}”."
+msgstr "{name} “{object}” の {fields} を変更しました。"
 
 #, python-brace-format
 msgid "Changed {fields}."
 msgstr "{fields} を変更しました。"
 
 #, python-brace-format
-msgid "Deleted {name} \"{object}\"."
-msgstr "{name} \"{object}\" を削除しました。"
+msgid "Deleted {name} “{object}”."
+msgstr "{name} “{object}” を削除しました。"
 
 msgid "No fields changed."
 msgstr "変更はありませんでした。"
@@ -172,44 +185,41 @@ msgstr "変更はありませんでした。"
 msgid "None"
 msgstr "None"
 
-msgid ""
-"Hold down \"Control\", or \"Command\" on a Mac, to select more than one."
+msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
-"複数選択するときには Control キーを押したまま選択してください。Mac では "
+"複数選択するときには Control キーを押したまま選択してください。Mac は "
 "Command キーを使ってください"
 
 #, python-brace-format
-msgid "The {name} \"{obj}\" was added successfully."
-msgstr "{name} \"{obj}\" を追加しました。"
+msgid "The {name} “{obj}” was added successfully."
+msgstr "{name} “{obj}” を追加しました。"
 
 msgid "You may edit it again below."
 msgstr "以下で再度編集できます。"
 
 #, python-brace-format
 msgid ""
-"The {name} \"{obj}\" was added successfully. You may add another {name} "
+"The {name} “{obj}” was added successfully. You may add another {name} below."
+msgstr "{name} “{obj}” を追加しました。別の {name} を以下から追加できます。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may edit it again below."
+msgstr "{name} “{obj}” を変更しました。以下から再度編集できます。"
+
+#, python-brace-format
+msgid "The {name} “{obj}” was added successfully. You may edit it again below."
+msgstr "{name} “{obj}” を追加しました。続けて編集できます。"
+
+#, python-brace-format
+msgid ""
+"The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr "{name} \"{obj}\" を追加しました。 別の {name} を以下から追加できます。"
+msgstr "{name} “{obj}” を変更しました。 別の {name} を以下から追加できます。"
 
 #, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" を変更しました。 以下から再度編集できます。"
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was added successfully. You may edit it again below."
-msgstr "{name} \"{obj}\" を追加しました。続けて編集できます。"
-
-#, python-brace-format
-msgid ""
-"The {name} \"{obj}\" was changed successfully. You may add another {name} "
-"below."
-msgstr "{name} \"{obj}\" を変更しました。 別の {name} を以下から追加できます。"
-
-#, python-brace-format
-msgid "The {name} \"{obj}\" was changed successfully."
-msgstr "{name} \"{obj}\" を変更しました。"
+msgid "The {name} “{obj}” was changed successfully."
+msgstr "{name} “{obj}” を変更しました。"
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -221,13 +231,13 @@ msgid "No action selected."
 msgstr "操作が選択されていません。"
 
 #, python-format
-msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr "%(name)s \"%(obj)s\" を削除しました。"
+msgid "The %(name)s “%(obj)s” was deleted successfully."
+msgstr "%(name)s “%(obj)s” を削除しました。"
 
 #, python-format
-msgid "%(name)s with ID \"%(key)s\" doesn't exist. Perhaps it was deleted?"
+msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
 msgstr ""
-"ID \"%(key)s\" の%(name)sは見つかりませんでした。削除された可能性があります。"
+"ID “%(key)s” の%(name)sは見つかりませんでした。削除された可能性があります。"
 
 #, python-format
 msgid "Add %s"
@@ -262,8 +272,9 @@ msgstr "%(cnt)s個の内ひとつも選択されていません"
 msgid "Change history: %s"
 msgstr "変更履歴: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -295,7 +306,7 @@ msgstr "%(app)s 管理"
 msgid "Page not found"
 msgstr "ページが見つかりません"
 
-msgid "We're sorry, but the requested page could not be found."
+msgid "We’re sorry, but the requested page could not be found."
 msgstr "申し訳ありませんが、お探しのページは見つかりませんでした。"
 
 msgid "Home"
@@ -311,7 +322,7 @@ msgid "Server Error <em>(500)</em>"
 msgstr "サーバーエラー <em>(500)</em>"
 
 msgid ""
-"There's been an error. It's been reported to the site administrators via "
+"There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
 "エラーが発生しました。サイト管理者にメールで報告されたので、修正されるまでし"
@@ -333,8 +344,21 @@ msgstr "%(total_count)s個ある%(module_name)s を全て選択"
 msgid "Clear selection"
 msgstr "選択を解除"
 
+#, python-format
+msgid "Models in the %(name)s application"
+msgstr "%(name)s アプリケーション内のモデル"
+
+msgid "Add"
+msgstr "追加"
+
+msgid "View"
+msgstr "表示"
+
+msgid "You don’t have permission to view or edit anything."
+msgstr "表示または変更のためのパーミッションがありません。"
+
 msgid ""
-"First, enter a username and password. Then, you'll be able to edit more user "
+"First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
 "まずユーザー名とパスワードを登録してください。その後詳細情報が編集可能になり"
@@ -347,15 +371,16 @@ msgid "Change password"
 msgstr "パスワードの変更"
 
 msgid "Please correct the error below."
-msgstr "下記のエラーを修正してください。"
-
-msgid "Please correct the errors below."
-msgstr "下記のエラーを修正してください。"
+msgid_plural "Please correct the errors below."
+msgstr[0] "下記のエラーを修正してください。"
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "<strong>%(username)s</strong>さんの新しいパスワードを入力してください。"
+
+msgid "Skip to main content"
+msgstr "スキップしてメインコンテンツへ"
 
 msgid "Welcome,"
 msgstr "ようこそ"
@@ -368,6 +393,9 @@ msgstr "ドキュメント"
 
 msgid "Log out"
 msgstr "ログアウト"
+
+msgid "Breadcrumbs"
+msgstr "パンくずリスト"
 
 #, python-format
 msgid "Add %(name)s"
@@ -382,6 +410,9 @@ msgstr "サイト上で表示"
 msgid "Filter"
 msgstr "フィルター"
 
+msgid "Clear all filters"
+msgstr "全てのフィルターを解除"
+
 msgid "Remove from sorting"
 msgstr "ソート条件から外します"
 
@@ -391,6 +422,15 @@ msgstr "ソート優先順位: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "昇順降順を切り替えます"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "テーマを切り替え (現在のテーマ: 自動)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "テーマを切り替え (現在のテーマ: ライト)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "テーマを切り替え (現在のテーマ: ダーク)"
 
 msgid "Delete"
 msgstr "削除"
@@ -424,8 +464,8 @@ msgstr ""
 msgid "Objects"
 msgstr "オブジェクト"
 
-msgid "Yes, I'm sure"
-msgstr "はい"
+msgid "Yes, I’m sure"
+msgstr "はい、大丈夫です"
 
 msgid "No, take me back"
 msgstr "戻る"
@@ -458,9 +498,6 @@ msgstr ""
 "本当に選択した %(objects_name)s を削除しますか？ 以下の全てのオブジェクトと関"
 "連する要素が削除されます:"
 
-msgid "View"
-msgstr "表示"
-
 msgid "Delete?"
 msgstr "削除しますか?"
 
@@ -470,16 +507,6 @@ msgstr "%(filter_title)s で絞り込む"
 
 msgid "Summary"
 msgstr "概要"
-
-#, python-format
-msgid "Models in the %(name)s application"
-msgstr "%(name)s アプリケーション内のモデル"
-
-msgid "Add"
-msgstr "追加"
-
-msgid "You don't have permission to view or edit anything."
-msgstr "表示または変更のためのパーミッションがありません。"
 
 msgid "Recent actions"
 msgstr "最近行った操作"
@@ -494,12 +521,12 @@ msgid "Unknown content"
 msgstr "不明なコンテント"
 
 msgid ""
-"Something's wrong with your database installation. Make sure the appropriate "
+"Something’s wrong with your database installation. Make sure the appropriate "
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
-"データベースの設定に問題があるようです。適切なテーブルが作られていること、適"
-"切なユーザーでデータベースのデータを読み込めることを確認してください。"
+"データベースのインストールに問題があります。適切なデータベーステーブルが作ら"
+"れているか、適切なユーザーがデータベースを読み込み可能かを確認してください。"
 
 #, python-format
 msgid ""
@@ -512,6 +539,18 @@ msgstr ""
 msgid "Forgotten your password or username?"
 msgstr "パスワードまたはユーザー名を忘れましたか？"
 
+msgid "Toggle navigation"
+msgstr "ナビゲーションを切り替えます"
+
+msgid "Sidebar"
+msgstr "サイドバー"
+
+msgid "Start typing to filter…"
+msgstr "絞り込みの入力..."
+
+msgid "Filter navigation items"
+msgstr "ナビゲーション項目の絞り込み"
+
 msgid "Date/time"
 msgstr "日付/時刻"
 
@@ -521,8 +560,12 @@ msgstr "ユーザー"
 msgid "Action"
 msgstr "操作"
 
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "エントリー"
+
 msgid ""
-"This object doesn't have a change history. It probably wasn't added via this "
+"This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
 "このオブジェクトには変更履歴がありません。おそらくこの管理サイトで追加したも"
@@ -576,7 +619,11 @@ msgstr "%(model)s の追加"
 msgid "Delete selected %(model)s"
 msgstr "選択された %(model)s を削除"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "選択された %(model)s を表示"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "ご利用ありがとうございました。"
 
 msgid "Log in again"
@@ -589,7 +636,7 @@ msgid "Your password was changed."
 msgstr "あなたのパスワードは変更されました"
 
 msgid ""
-"Please enter your old password, for security's sake, and then enter your new "
+"Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
 "セキュリティ上の理由から元のパスワードの入力が必要です。新しいパスワードは正"
@@ -626,14 +673,14 @@ msgstr ""
 "す。もう一度パスワードリセットしてください。"
 
 msgid ""
-"We've emailed you instructions for setting your password, if an account "
+"We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
 "入力されたメールアドレスを持つアカウントが存在する場合、パスワードを設定する"
-"ためのメールを送信しました。すぐに受け取る必要があります。"
+"ためのメールを送信しました。すぐに届くはずです。"
 
 msgid ""
-"If you don't receive an email, please make sure you've entered the address "
+"If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
 "メールが届かない場合は、登録したメールアドレスを入力したか確認し、スパムフォ"
@@ -650,8 +697,8 @@ msgstr ""
 msgid "Please go to the following page and choose a new password:"
 msgstr "次のページで新しいパスワードを選んでください:"
 
-msgid "Your username, in case you've forgotten:"
-msgstr "あなたのユーザー名 (念のため):"
+msgid "Your username, in case you’ve forgotten:"
+msgstr "あなたのユーザー名 (もし忘れていたら):"
 
 msgid "Thanks for using our site!"
 msgstr "ご利用ありがとうございました！"
@@ -661,7 +708,7 @@ msgid "The %(site_name)s team"
 msgstr " %(site_name)s チーム"
 
 msgid ""
-"Forgotten your password? Enter your email address below, and we'll email "
+"Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
 "パスワードを忘れましたか? メールアドレスを以下に入力すると、新しいパスワード"

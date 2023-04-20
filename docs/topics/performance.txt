@@ -76,7 +76,7 @@ insight into your site's overall performance, including aspects that can't be
 adequately measured from within Django environment. Examples include:
 
 * `Yahoo's Yslow <http://yslow.org/>`_
-* `Google PageSpeed <https://developers.google.com/speed/pagespeed/>`_
+* `Google PageSpeed <https://developers.google.com/speed/>`_
 
 There are also several paid-for services that perform a similar analysis,
 including some that are Django-aware and can integrate with your codebase to
@@ -120,9 +120,13 @@ do them faster than the template language can::
     # of the Python objects
     len(my_bicycles)
 
-    # Django template filter
-    # slower still, because it will have to count them in Python anyway,
-    # and because of template language overheads
+.. code-block:: html+django
+
+    <!--
+    Django template filter
+    slower still, because it will have to count them in Python anyway,
+    and because of template language overheads
+    -->
     {{ my_bicycles|length }}
 
 Generally speaking, the most appropriate level for the job is the lowest-level
@@ -166,7 +170,7 @@ produce, or even an entire site.
 
 Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
-final steps towards producing well-performing code, not a shortcut.
+final steps toward producing well-performing code, not a shortcut.
 
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------
@@ -378,8 +382,8 @@ adequate. However, if the bottlenecks in your Django project seem to lie in the
 template system and you have exhausted other opportunities to remedy this, a
 third-party alternative may be the answer.
 
-`Jinja2 <http://jinja.pocoo.org/docs/>`_ can offer performance improvements,
-particularly when it comes to speed.
+Jinja2_ can offer performance improvements, particularly when it comes to
+speed.
 
 Alternative template systems vary in the extent to which they share Django's
 templating language.
@@ -410,15 +414,15 @@ performance gains for your application to outweigh the potential risks.
 
 With these caveats in mind, you should be aware of:
 
-`PyPy <https://pypy.org/>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+`PyPy <https://www.pypy.org/>`_
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-`PyPy <https://pypy.org/>`_ is an implementation of Python in Python itself
+`PyPy <https://www.pypy.org/>`_ is an implementation of Python in Python itself
 (the 'standard' Python implementation is in C). PyPy can offer substantial
 performance gains, typically for heavyweight applications.
 
 A key aim of the PyPy project is `compatibility
-<https://pypy.org/compat.html>`_ with existing Python APIs and libraries.
+<https://www.pypy.org/compat.html>`_ with existing Python APIs and libraries.
 Django is compatible, but you will need to check the compatibility of other
 libraries you rely on.
 
@@ -428,3 +432,5 @@ C implementations of Python libraries
 Some Python libraries are also implemented in C, and can be much faster. They
 aim to offer the same APIs. Note that compatibility issues and behavior
 differences are not unknown (and not always immediately evident).
+
+.. _Jinja2: https://jinja.palletsprojects.com/

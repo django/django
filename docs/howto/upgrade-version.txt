@@ -1,6 +1,6 @@
-===================================
-Upgrading Django to a newer version
-===================================
+========================================
+How to upgrade Django to a newer version
+========================================
 
 While it can be a complex process at times, upgrading to the latest Django
 version has several benefits:
@@ -21,7 +21,7 @@ Required Reading
 If it's your first time doing an upgrade, it is useful to read the :doc:`guide
 on the different release processes </internals/release-process>`.
 
-Afterwards, you should familiarize yourself with the changes that were made in
+Afterward, you should familiarize yourself with the changes that were made in
 the new Django version(s):
 
 * Read the :doc:`release notes </releases/index>` for each 'final' release from
@@ -33,10 +33,11 @@ the new Django version(s):
 Pay particular attention to backwards incompatible changes to get a clear idea
 of what will be needed for a successful upgrade.
 
-If you're upgrading through more than one feature version (e.g. A.B to A.B+2),
+If you're upgrading through more than one feature version (e.g. 2.0 to 2.2),
 it's usually easier to upgrade through each feature release incrementally
-(A.B to A.B+1 to A.B+2) rather than to make all the changes for each feature
-release at once. For each feature release, use the latest patch release (A.B.C).
+(2.0 to 2.1 to 2.2) rather than to make all the changes for each feature
+release at once. For each feature release, use the latest patch release (e.g.
+for 2.1, use 2.1.15).
 
 The same incremental upgrade approach is recommended when upgrading from one
 LTS to the next.
@@ -68,7 +69,7 @@ environment variable. For example, to show warnings while running tests:
 
 If you're not using the Django test runner, you may need to also ensure that
 any console output is not captured which would hide deprecation warnings. For
-example, if you use `pytest <https://pytest.org/>`__:
+example, if you use `pytest <https://docs.pytest.org/>`__:
 
 .. code-block:: console
 
@@ -86,8 +87,9 @@ Installation
 ============
 
 Once you're ready, it is time to :doc:`install the new Django version
-</topics/install>`. If you are using virtualenv_ and it is a major upgrade, you
-might want to set up a new environment with all the dependencies first.
+</topics/install>`. If you are using a :mod:`virtual environment <venv>` and it
+is a major upgrade, you might want to set up a new environment with all the
+dependencies first.
 
 If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
 
@@ -96,7 +98,6 @@ If you installed Django with pip_, you can use the ``--upgrade`` or ``-U`` flag:
    $ python -m pip install -U Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
 
 Testing
 =======

@@ -1,6 +1,6 @@
-====================================================
-Managing static files (e.g. images, JavaScript, CSS)
-====================================================
+=========================================================
+How to manage static files (e.g. images, JavaScript, CSS)
+=========================================================
 
 Websites generally need to serve additional files such as images, JavaScript,
 or CSS. In Django, we refer to these files as "static files".  Django provides
@@ -16,17 +16,18 @@ Configuring static files
 
 #. In your settings file, define :setting:`STATIC_URL`, for example::
 
-      STATIC_URL = '/static/'
+      STATIC_URL = "static/"
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
-   the given relative path using the configured :setting:`STATICFILES_STORAGE`.
+   the given relative path using the configured ``staticfiles``
+   :setting:`STORAGES` alias.
 
    .. _staticfiles-in-templates:
 
    .. code-block:: html+django
 
         {% load static %}
-        <img src="{% static "my_app/example.jpg" %}" alt="My image">
+        <img src="{% static 'my_app/example.jpg' %}" alt="My image">
 
 #. Store your static files in a folder called ``static`` in your app. For
    example ``my_app/static/my_app/example.jpg``.
@@ -53,7 +54,7 @@ settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
         BASE_DIR / "static",
-        '/var/www/static/',
+        "/var/www/static/",
     ]
 
 See the documentation for the :setting:`STATICFILES_FINDERS` setting for
@@ -71,6 +72,9 @@ details on how ``staticfiles`` finds your files.
     by putting those static files inside *another* directory named for the
     application itself.
 
+    You can namespace static assets in :setting:`STATICFILES_DIRS` by
+    specifying :ref:`prefixes <staticfiles-dirs-prefixes>`.
+
 .. _serving-static-files-in-development:
 
 Serving static files during development
@@ -85,8 +89,8 @@ to ``True``. If you don't have ``django.contrib.staticfiles`` in
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
-For example, if your :setting:`STATIC_URL` is defined as ``/static/``, you can do
-this by adding the following snippet to your urls.py::
+For example, if your :setting:`STATIC_URL` is defined as ``static/``, you can
+do this by adding the following snippet to your ``urls.py``::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -98,12 +102,16 @@ this by adding the following snippet to your urls.py::
 .. note::
 
     This helper function works only in debug mode and only if
-    the given prefix is local (e.g. ``/static/``) and not a URL (e.g.
+    the given prefix is local (e.g. ``static/``) and not a URL (e.g.
     ``http://static.example.com/``).
 
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
+
+    Finally, static files are served via a wrapper at the WSGI application
+    layer. As a consequence, static files requests do not pass through the
+    normal :doc:`middleware chain </topics/http/middleware>`.
 
 .. _serving-uploaded-files-in-development:
 
@@ -116,8 +124,8 @@ During development, you can serve user-uploaded media files from
 This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
-For example, if your :setting:`MEDIA_URL` is defined as ``/media/``, you can do
-this by adding the following snippet to your urls.py::
+For example, if your :setting:`MEDIA_URL` is defined as ``media/``, you can do
+this by adding the following snippet to your :setting:`ROOT_URLCONF`::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -129,7 +137,7 @@ this by adding the following snippet to your urls.py::
 .. note::
 
     This helper function works only in debug mode and only if
-    the given prefix is local (e.g. ``/media/``) and not a URL (e.g.
+    the given prefix is local (e.g. ``media/``) and not a URL (e.g.
     ``http://media.example.com/``).
 
 .. _staticfiles-testing-support:
@@ -164,7 +172,9 @@ for gathering static files in a single directory so you can serve them easily.
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-#. Run the :djadmin:`collectstatic` management command::
+#. Run the :djadmin:`collectstatic` management command:
+
+   .. code-block:: shell
 
        $ python manage.py collectstatic
 

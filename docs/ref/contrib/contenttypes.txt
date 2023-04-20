@@ -121,20 +121,24 @@ model it represents, or to retrieve objects from that model:
 
 For example, we could look up the
 :class:`~django.contrib.contenttypes.models.ContentType` for the
-:class:`~django.contrib.auth.models.User` model::
+:class:`~django.contrib.auth.models.User` model:
+
+.. code-block:: pycon
 
     >>> from django.contrib.contenttypes.models import ContentType
-    >>> user_type = ContentType.objects.get(app_label='auth', model='user')
+    >>> user_type = ContentType.objects.get(app_label="auth", model="user")
     >>> user_type
     <ContentType: user>
 
 And then use it to query for a particular
 :class:`~django.contrib.auth.models.User`, or to get access
-to the ``User`` model class::
+to the ``User`` model class:
+
+.. code-block:: pycon
 
     >>> user_type.model_class()
     <class 'django.contrib.auth.models.User'>
-    >>> user_type.get_object_for_this_type(username='Guido')
+    >>> user_type.get_object_for_this_type(username="Guido")
     <User: Guido>
 
 Together,
@@ -219,7 +223,9 @@ The :meth:`~ContentTypeManager.get_for_model()` method is especially
 useful when you know you need to work with a
 :class:`ContentType <django.contrib.contenttypes.models.ContentType>` but don't
 want to go to the trouble of obtaining the model's metadata to perform a manual
-lookup::
+lookup:
+
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
     >>> ContentType.objects.get_for_model(User)
@@ -246,14 +252,20 @@ For example, it could be used for a tagging system like so::
     from django.contrib.contenttypes.models import ContentType
     from django.db import models
 
+
     class TaggedItem(models.Model):
         tag = models.SlugField()
         content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
         object_id = models.PositiveIntegerField()
-        content_object = GenericForeignKey('content_type', 'object_id')
+        content_object = GenericForeignKey("content_type", "object_id")
 
         def __str__(self):
             return self.tag
+
+        class Meta:
+            indexes = [
+                models.Index(fields=["content_type", "object_id"]),
+            ]
 
 A normal :class:`~django.db.models.ForeignKey` can only "point
 to" one other model, which means that if the ``TaggedItem`` model used a
@@ -284,6 +296,14 @@ model:
        are the default field names
        :class:`~django.contrib.contenttypes.fields.GenericForeignKey` will
        look for.
+
+    Unlike for the :class:`~django.db.models.ForeignKey`, a database index is
+    *not* automatically created on the
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, so it's
+    recommended that you use
+    :attr:`Meta.indexes <django.db.models.Options.indexes>` to add your own
+    multiple column index. This behavior :ticket:`may change <23435>` in the
+    future.
 
     .. attribute:: GenericForeignKey.for_concrete_model
 
@@ -327,18 +347,22 @@ This will enable an API similar to the one used for a normal
 :class:`~django.db.models.ForeignKey`;
 each ``TaggedItem`` will have a ``content_object`` field that returns the
 object it's related to, and you can also assign to that field or use it when
-creating a ``TaggedItem``::
+creating a ``TaggedItem``:
+
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> guido = User.objects.get(username='Guido')
-    >>> t = TaggedItem(content_object=guido, tag='bdfl')
+    >>> guido = User.objects.get(username="Guido")
+    >>> t = TaggedItem(content_object=guido, tag="bdfl")
     >>> t.save()
     >>> t.content_object
     <User: Guido>
 
 If the related object is deleted, the ``content_type`` and ``object_id`` fields
 remain set to their original values and the ``GenericForeignKey`` returns
-``None``::
+``None``:
+
+.. code-block:: pycon
 
     >>> guido.delete()
     >>> t.content_object  # returns None
@@ -347,7 +371,9 @@ Due to the way :class:`~django.contrib.contenttypes.fields.GenericForeignKey`
 is implemented, you cannot use such fields directly with filters (``filter()``
 and ``exclude()``, for example) via the database API. Because a
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey` isn't a
-normal field object, these examples will *not* work::
+normal field object, these examples will *not* work:
+
+.. code-block:: pycon
 
     # This will fail
     >>> TaggedItem.objects.filter(content_object=guido)
@@ -375,38 +401,81 @@ a "reverse" generic relationship to enable an additional API. For example::
     from django.contrib.contenttypes.fields import GenericRelation
     from django.db import models
 
+
     class Bookmark(models.Model):
         url = models.URLField()
         tags = GenericRelation(TaggedItem)
 
 ``Bookmark`` instances will each have a ``tags`` attribute, which can
-be used to retrieve their associated ``TaggedItems``::
+be used to retrieve their associated ``TaggedItems``:
 
-    >>> b = Bookmark(url='https://www.djangoproject.com/')
+.. code-block:: pycon
+
+    >>> b = Bookmark(url="https://www.djangoproject.com/")
     >>> b.save()
-    >>> t1 = TaggedItem(content_object=b, tag='django')
+    >>> t1 = TaggedItem(content_object=b, tag="django")
     >>> t1.save()
-    >>> t2 = TaggedItem(content_object=b, tag='python')
+    >>> t2 = TaggedItem(content_object=b, tag="python")
     >>> t2.save()
     >>> b.tags.all()
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
+You can also use ``add()``, ``create()``, or ``set()`` to create
+relationships:
+
+.. code-block:: pycon
+
+    >>> t3 = TaggedItem(tag="Web development")
+    >>> b.tags.add(t3, bulk=False)
+    >>> b.tags.create(tag="Web framework")
+    <TaggedItem: Web framework>
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: python>, <TaggedItem: Web development>, <TaggedItem: Web framework>]>
+    >>> b.tags.set([t1, t3])
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>, <TaggedItem: Web development>]>
+
+The ``remove()`` call will bulk delete the specified model objects:
+
+.. code-block:: pycon
+
+    >>> b.tags.remove(t3)
+    >>> b.tags.all()
+    <QuerySet [<TaggedItem: django>]>
+    >>> TaggedItem.objects.all()
+    <QuerySet [<TaggedItem: django>]>
+
+The ``clear()`` method can be used to bulk delete all related objects for an
+instance:
+
+.. code-block:: pycon
+
+    >>> b.tags.clear()
+    >>> b.tags.all()
+    <QuerySet []>
+    >>> TaggedItem.objects.all()
+    <QuerySet []>
+
 Defining :class:`~django.contrib.contenttypes.fields.GenericRelation` with
 ``related_query_name`` set allows querying from the related object::
 
-    tags = GenericRelation(TaggedItem, related_query_name='bookmark')
+    tags = GenericRelation(TaggedItem, related_query_name="bookmark")
 
 This enables filtering, ordering, and other query operations on ``Bookmark``
-from ``TaggedItem``::
+from ``TaggedItem``:
+
+.. code-block:: pycon
 
     >>> # Get all tags belonging to bookmarks containing `django` in the url
-    >>> TaggedItem.objects.filter(bookmark__url__contains='django')
+    >>> TaggedItem.objects.filter(bookmark__url__contains="django")
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
 
-Of course, if you don't add the ``related_query_name``, you can do the
-same types of lookups manually::
+If you don't add the ``related_query_name``, you can do the same types of
+lookups manually:
 
-    >>> bookmarks = Bookmark.objects.filter(url__contains='django')
+.. code-block:: pycon
+
+    >>> bookmarks = Bookmark.objects.filter(url__contains="django")
     >>> bookmark_type = ContentType.objects.get_for_model(Bookmark)
     >>> TaggedItem.objects.filter(content_type__pk=bookmark_type.id, object_id__in=bookmarks)
     <QuerySet [<TaggedItem: django>, <TaggedItem: python>]>
@@ -424,8 +493,8 @@ referred to above used fields named ``content_type_fk`` and
 
     tags = GenericRelation(
         TaggedItem,
-        content_type_field='content_type_fk',
-        object_id_field='object_primary_key',
+        content_type_field="content_type_fk",
+        object_id_field="object_primary_key",
     )
 
 Note also, that if you delete an object that has a
@@ -448,9 +517,11 @@ Generic relations and aggregation
 
 :doc:`Django's database aggregation API </topics/db/aggregation>` works with a
 :class:`~django.contrib.contenttypes.fields.GenericRelation`. For example, you
-can find out how many tags all the bookmarks have::
+can find out how many tags all the bookmarks have:
 
-    >>> Bookmark.objects.aggregate(Count('tags'))
+.. code-block:: pycon
+
+    >>> Bookmark.objects.aggregate(Count("tags"))
     {'tags__count': 3}
 
 .. module:: django.contrib.contenttypes.forms
@@ -466,7 +537,7 @@ The :mod:`django.contrib.contenttypes.forms` module provides:
 
 .. class:: BaseGenericInlineFormSet
 
-.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False)
+.. function:: generic_inlineformset_factory(model, form=ModelForm, formset=BaseGenericInlineFormSet, ct_field="content_type", fk_field="object_id", fields=None, exclude=None, extra=3, can_order=False, can_delete=True, max_num=None, formfield_callback=None, validate_max=False, for_concrete_model=True, min_num=None, validate_min=False, absolute_max=None, can_delete_extra=True)
 
     Returns a ``GenericInlineFormSet`` using
     :func:`~django.forms.models.modelformset_factory`.

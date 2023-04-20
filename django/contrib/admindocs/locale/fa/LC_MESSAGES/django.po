@@ -1,19 +1,20 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Ali Nikneshan <ali@nikneshan.com>, 2011-2012
+# Ali Nikneshan <ali@nikneshan.com>, 2011-2012,2020
 # Ali Vakilzade <ali.vakilzade@gmail.com>, 2015
 # Eric Hamiter <ehamiter@gmail.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Pouya Abbassi, 2016
+# rahim agh <rahim.aghareb@gmail.com>, 2021
 # Reza Mohammadi <reza@teeleh.ir>, 2013-2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-03 06:13+0000\n"
+"Last-Translator: rahim agh <rahim.aghareb@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/django/django/language/"
 "fa/)\n"
 "MIME-Version: 1.0\n"
@@ -102,10 +103,10 @@ msgstr "لطفاً docutils نصب کنید"
 
 #, python-format
 msgid ""
-"The admin documentation system requires Python's <a href=\"%(link)s"
+"The admin documentation system requires Python’s <a href=\"%(link)s"
 "\">docutils</a> library."
 msgstr ""
-"سیستم مستندات ادمین نیازمند کتابخانه‌ی <a href=\"%(link)s\">docutils</a> "
+"سیستم مستندات مدیر نیازمند کتابخانه‌ی <a href=\"%(link)s\">docutils</a> "
 "پایتون است."
 
 #, python-format
@@ -157,12 +158,12 @@ msgid "Template: %(name)s"
 msgstr "قالب: %(name)s"
 
 #, python-format
-msgid "Template: \"%(name)s\""
-msgstr "قالب: «%(name)s»"
+msgid "Template: <q>%(name)s</q>"
+msgstr "قالب: %(name)s"
 
 #. Translators: Search is not a verb here, it qualifies path (a search path)
 #, python-format
-msgid "Search path for template \"%(name)s\":"
+msgid "Search path for template <q>%(name)s</q>:"
 msgstr "مسیر جستجو برای قالب \"%(name)s\":"
 
 msgid "(does not exist)"

@@ -58,7 +58,8 @@ Bugfixes
 
 * Increased the default timeout when using ``Watchman`` to 5 seconds to prevent
   falling back to ``StatReloader`` on larger projects and made it customizable
-  via the ``DJANGO_WATCHMAN_TIMEOUT`` environment variable (:ticket:`30361`).
+  via the :envvar:`DJANGO_WATCHMAN_TIMEOUT` environment variable
+  (:ticket:`30361`).
 
 * Fixed a regression in Django 2.2 that caused a crash when migrating
   permissions for proxy models if the target permissions already existed. For

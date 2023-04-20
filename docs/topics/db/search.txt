@@ -17,9 +17,11 @@ Standard textual queries
 ------------------------
 
 Text-based fields have a selection of matching operations. For example, you may
-wish to allow lookup up an author like so::
+wish to allow lookup up an author like so:
 
-    >>> Author.objects.filter(name__contains='Terry')
+.. code-block:: pycon
+
+    >>> Author.objects.filter(name__contains="Terry")
     [<Author: Terry Gilliam>, <Author: Terry Jones>]
 
 This is a very fragile solution as it requires the user to know an exact
@@ -47,9 +49,11 @@ demonstrate the kind of functionality databases may have.
 
 In the above example, we determined that a case insensitive lookup would be
 more useful. When dealing with non-English names, a further improvement is to
-use :lookup:`unaccented comparison <unaccent>`::
+use :lookup:`unaccented comparison <unaccent>`:
 
-    >>> Author.objects.filter(name__unaccent__icontains='Helen')
+.. code-block:: pycon
+
+    >>> Author.objects.filter(name__unaccent__icontains="Helen")
     [<Author: Helen Mirren>, <Author: Helena Bonham Carter>, <Author: Hélène Joy>]
 
 This shows another issue, where we are matching against a different spelling of
@@ -58,16 +62,18 @@ will pick up ``Helena`` or ``Hélène``, but not the reverse. Another option
 would be to use a :lookup:`trigram_similar` comparison, which compares
 sequences of letters.
 
-For example::
+For example:
 
-    >>> Author.objects.filter(name__unaccent__lower__trigram_similar='Hélène')
+.. code-block:: pycon
+
+    >>> Author.objects.filter(name__unaccent__lower__trigram_similar="Hélène")
     [<Author: Helen Mirren>, <Author: Hélène Joy>]
 
 Now we have a different problem - the longer name of "Helena Bonham Carter"
 doesn't show up as it is much longer. Trigram searches consider all
 combinations of three letters, and compares how many appear in both search and
-source strings. For the longer name, there are more combinations which appear
-in the source string so it is no longer considered a close match.
+source strings. For the longer name, there are more combinations that don't
+appear in the source string, so it is no longer considered a close match.
 
 The correct choice of comparison functions here depends on your particular data
 set, for example the language(s) used and the type of text being searched. All
@@ -98,7 +104,7 @@ can then look it up in the database. There are a variety of third-party
 libraries which are designed to help with this process.
 
 .. _Elastic: https://www.elastic.co/
-.. _Solr: https://lucene.apache.org/solr/
+.. _Solr: https://solr.apache.org/
 
 PostgreSQL support
 ~~~~~~~~~~~~~~~~~~
@@ -110,16 +116,20 @@ as categorization.
 
 The :mod:`django.contrib.postgres` module provides some helpers to make these
 queries. For example, a query might select all the blog entries which mention
-"cheese"::
+"cheese":
 
-    >>> Entry.objects.filter(body_text__search='cheese')
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(body_text__search="cheese")
     [<Entry: Cheese on Toast recipes>, <Entry: Pizza recipes>]
 
-You can also filter on a combination of fields and on related models::
+You can also filter on a combination of fields and on related models:
+
+.. code-block:: pycon
 
     >>> Entry.objects.annotate(
-    ...     search=SearchVector('blog__tagline', 'body_text'),
-    ... ).filter(search='cheese')
+    ...     search=SearchVector("blog__tagline", "body_text"),
+    ... ).filter(search="cheese")
     [
         <Entry: Cheese on Toast recipes>,
         <Entry: Pizza Recipes>,

@@ -6,10 +6,10 @@ Django uses Trac_ for managing the work on the code base. Trac is a
 community-tended garden of the bugs people have found and the features people
 would like to see added. As in any garden, sometimes there are weeds to be
 pulled and sometimes there are flowers and vegetables that need picking. We need
-your help to sort out one from the other, and in the end we all benefit
+your help to sort out one from the other, and in the end, we all benefit
 together.
 
-Like all gardens, we can aspire to perfection but in reality there's no such
+Like all gardens, we can aspire to perfection, but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
 In a community garden there are also helpful people who -- with the best of
 intentions -- fertilize the weeds and poison the roses. It's the job of the
@@ -55,7 +55,7 @@ Since a picture is worth a thousand words, let's start there:
 
 We've got two roles in this diagram:
 
-* Committers: people with commit access who are responsible for making the
+* Mergers: people with commit access who are responsible for making the
   final decision to merge a patch.
 
 * Ticket triagers: anyone in the Django community who chooses to
@@ -84,7 +84,8 @@ By way of example, here we see the lifecycle of an average ticket:
 
 * Daisy reviews the pull request and marks the ticket as "Ready for checkin".
 
-* Jacob, a committer, reviews the pull request and merges it.
+* Jacob, a :ref:`merger <mergers-team>`, reviews the pull request and merges
+  it.
 
 Some tickets require much less feedback than this, but then again some tickets
 require much much more.
@@ -142,16 +143,18 @@ Ready For Checkin
 
 The ticket was reviewed by any member of the community other than the person
 who supplied the patch and found to meet all the requirements for a
-commit-ready patch. A committer now needs to give the patch a final
-review prior to being committed. See the
-:ref:`New contributors' FAQ<new-contributors-faq>` for "My ticket has been in
-RFC forever! What should I do?"
+commit-ready patch. A :ref:`merger <mergers-team>` now needs to give the patch
+a final review prior to being committed.
+
+There are a lot of pull requests. It can take a while for your patch to get
+reviewed. See the :ref:`contributing code FAQ<new-contributors-faq>` for some
+ideas here.
 
 Someday/Maybe
 -------------
 
 This stage isn't shown on the diagram. It's used sparingly to keep track of
-high-level ideas or long term feature requests.
+high-level ideas or long-term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -224,7 +227,7 @@ easier to find.
 Severity
 --------
 
-The *severity* attribute is used to identify blockers, that is, issues which
+The *severity* attribute is used to identify blockers, that is, issues that
 should get fixed before releasing the next version of Django. Typically those
 issues are bugs causing regressions from earlier versions or potentially
 causing severe data losses. This attribute is quite rarely used and the vast
@@ -253,7 +256,7 @@ Keywords
 --------
 
 With this field you may label a ticket with multiple keywords. This can be
-useful, for example, to group several tickets of a same theme. Keywords can
+useful, for example, to group several tickets on the same theme. Keywords can
 either be comma or space separated. Keyword search finds the keyword string
 anywhere in the keywords. For example, clicking on a ticket with the keyword
 "form" will yield similar tickets tagged with keywords containing strings such
@@ -268,8 +271,8 @@ When a ticket has completed its useful lifecycle, it's time for it to be
 closed. Closing a ticket is a big responsibility, though. You have to be sure
 that the issue is really resolved, and you need to keep in mind that the
 reporter of the ticket may not be happy to have their ticket closed (unless
-it's fixed, of course). If you're not certain about closing a ticket, leave a
-comment with your thoughts instead.
+it's fixed!). If you're not certain about closing a ticket, leave a comment
+with your thoughts instead.
 
 If you do close a ticket, you should always make sure of the following:
 
@@ -303,7 +306,7 @@ A ticket can be resolved in a number of ways:
       submit support queries as tickets).
 
 * wontfix
-      Used when a someone decides that the request isn't appropriate for
+      Used when someone decides that the request isn't appropriate for
       consideration in Django. Sometimes a ticket is closed as "wontfix" with a
       request for the reporter to start a discussion on the |django-developers|
       mailing list if they feel differently from the rationale provided by the
@@ -390,7 +393,7 @@ However, we do ask the following of all general community members working in
 the ticket database:
 
 * Please **don't** promote your own tickets to "Ready for checkin". You
-  may mark other people's tickets which you've reviewed as "Ready for
+  may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
   review a patch that you submit.
 
@@ -410,8 +413,6 @@ the ticket database:
 Bisecting a regression
 ======================
 
-.. highlight:: console
-
 A regression is a bug that's present in some newer version of Django but not in
 an older one. An extremely helpful piece of information is the commit that
 introduced the regression. Knowing the commit that caused the change in
@@ -420,13 +421,17 @@ inadvertent side-effect. Here's how you can determine this.
 
 Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
-written the test and confirmed that it fails on the latest master, put it in a
-separate file that you can run standalone. For our example, we'll pretend we
-created ``tests/migrations/test_regression.py``, which can be run with::
+written the test and confirmed that it fails on the latest main branch, put it
+in a separate file that you can run standalone. For our example, we'll pretend
+we created ``tests/migrations/test_regression.py``, which can be run with:
+
+.. code-block:: shell
 
     $ ./runtests.py migrations.test_regression
 
-Next, we mark the current point in history as being "bad" since the test fails::
+Next, we mark the current point in history as being "bad" since the test fails:
+
+.. code-block:: shell
 
     $ git bisect bad
     You need to start by "git bisect start"
@@ -434,17 +439,21 @@ Next, we mark the current point in history as being "bad" since the test fails::
 
 Now, we need to find a point in git history before the regression was
 introduced (i.e. a point where the test passes). Use something like
-``git checkout HEAD~100`` to checkout an earlier revision (100 commits earlier,
+``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
 in this case). Check if the test fails. If so, mark that point as "bad"
-(``git bisect bad``), then checkout an earlier revision and recheck. Once you
-find a revision where your test passes, mark it as "good"::
+(``git bisect bad``), then check out an earlier revision and recheck. Once you
+find a revision where your test passes, mark it as "good":
+
+.. code-block:: shell
 
     $ git bisect good
     Bisecting: X revisions left to test after this (roughly Y steps)
     ...
 
 Now we're ready for the fun part: using ``git bisect run`` to automate the rest
-of the process::
+of the process:
+
+.. code-block:: shell
 
     $ git bisect run tests/runtests.py migrations.test_regression
 

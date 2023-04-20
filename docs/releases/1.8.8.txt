@@ -13,7 +13,7 @@ intentionally after that, but we won't test subsequent releases against Python
 much value in providing security updates for a version of Python that could be
 insecure. To read more about the decision and to let us know if this will be
 problematic for you, please read the `django-developers thread
-<https://groups.google.com/d/topic/django-developers/eMu5UQpUdWs/discussion>`_.
+<https://groups.google.com/g/django-developers/c/eMu5UQpUdWs/discussion>`_.
 
 Bugfixes
 ========

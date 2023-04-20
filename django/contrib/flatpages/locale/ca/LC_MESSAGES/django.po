@@ -5,14 +5,15 @@
 # Carles Barrobés <carles@barrobes.com>, 2012,2014
 # Gil Obradors Via <gil.obradors@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Manel Clos <manelclos@gmail.com>, 2020
 # Roger Pons <rogerpons@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-01-29 07:52+0000\n"
-"Last-Translator: Gil Obradors Via <gil.obradors@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-04-28 20:26+0000\n"
+"Last-Translator: Manel Clos <manelclos@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +32,7 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
 "Exemple: '/about/contact/'. Assegureu-vos de posar les barres al principi i "
 "al final."
@@ -43,8 +44,9 @@ msgstr ""
 "Aquest valor sols pot contenir lletres, nombres, punts, subratllats, guions, "
 "barres o accents."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Exemple: '/quanta/contacte'. Assegura l'última barra inversa"
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr ""
+"Exemple: '/about/contact/'. Assegureu-vos de posar la barra al principi."
 
 msgid "URL is missing a leading slash."
 msgstr "La URL no comença amb \"/\"."
@@ -69,8 +71,8 @@ msgid "template name"
 msgstr "nom de la plantilla"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 "Exemple: 'flatpages/contact_page.html'. Si no es proporciona, el sistema "
 "utilitzarà 'flatpages/default.html'."

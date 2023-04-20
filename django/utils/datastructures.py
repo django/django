@@ -25,6 +25,9 @@ class OrderedSet:
     def __iter__(self):
         return iter(self.dict)
 
+    def __reversed__(self):
+        return reversed(self.dict)
+
     def __contains__(self, item):
         return item in self.dict
 
@@ -33,6 +36,10 @@ class OrderedSet:
 
     def __len__(self):
         return len(self.dict)
+
+    def __repr__(self):
+        data = repr(list(self.dict)) if self.dict else ""
+        return f"{self.__class__.__qualname__}({data})"
 
 
 class MultiValueDictKeyError(KeyError):
@@ -58,9 +65,10 @@ class MultiValueDict(dict):
     >>> d.setlist('lastname', ['Holovaty', 'Willison'])
 
     This class exists to solve the irritating problem raised by cgi.parse_qs,
-    which returns a list for every key, even though most Web forms submit
+    which returns a list for every key, even though most web forms submit
     single name-value pairs.
     """
+
     def __init__(self, key_to_list_mapping=()):
         super().__init__(key_to_list_mapping)
 
@@ -85,24 +93,22 @@ class MultiValueDict(dict):
         super().__setitem__(key, [value])
 
     def __copy__(self):
-        return self.__class__([
-            (k, v[:])
-            for k, v in self.lists()
-        ])
+        return self.__class__([(k, v[:]) for k, v in self.lists()])
 
     def __deepcopy__(self, memo):
         result = self.__class__()
         memo[id(self)] = result
         for key, value in dict.items(self):
-            dict.__setitem__(result, copy.deepcopy(key, memo),
-                             copy.deepcopy(value, memo))
+            dict.__setitem__(
+                result, copy.deepcopy(key, memo), copy.deepcopy(value, memo)
+            )
         return result
 
     def __getstate__(self):
-        return {**self.__dict__, '_data': {k: self._getlist(k) for k in self}}
+        return {**self.__dict__, "_data": {k: self._getlist(k) for k in self}}
 
     def __setstate__(self, obj_dict):
-        data = obj_dict.pop('_data', {})
+        data = obj_dict.pop("_data", {})
         for k, v in data.items():
             self.setlist(k, v)
         self.__dict__.update(obj_dict)
@@ -194,16 +200,15 @@ class MultiValueDict(dict):
         if len(args) > 1:
             raise TypeError("update expected at most 1 argument, got %d" % len(args))
         if args:
-            other_dict = args[0]
-            if isinstance(other_dict, MultiValueDict):
-                for key, value_list in other_dict.lists():
+            arg = args[0]
+            if isinstance(arg, MultiValueDict):
+                for key, value_list in arg.lists():
                     self.setlistdefault(key).extend(value_list)
             else:
-                try:
-                    for key, value in other_dict.items():
-                        self.setlistdefault(key).append(value)
-                except TypeError:
-                    raise ValueError("MultiValueDict.update() takes either a MultiValueDict or dictionary")
+                if isinstance(arg, Mapping):
+                    arg = arg.items()
+                for key, value in arg:
+                    self.setlistdefault(key).append(value)
         for key, value in kwargs.items():
             self.setlistdefault(key).append(value)
 
@@ -225,16 +230,13 @@ class ImmutableList(tuple):
         AttributeError: You cannot mutate this.
     """
 
-    def __new__(cls, *args, warning='ImmutableList object is immutable.', **kwargs):
+    def __new__(cls, *args, warning="ImmutableList object is immutable.", **kwargs):
         self = tuple.__new__(cls, *args, **kwargs)
         self.warning = warning
         return self
 
-    def complain(self, *wargs, **kwargs):
-        if isinstance(self.warning, Exception):
-            raise self.warning
-        else:
-            raise AttributeError(self.warning)
+    def complain(self, *args, **kwargs):
+        raise AttributeError(self.warning)
 
     # All list mutation functions complain.
     __delitem__ = complain
@@ -261,6 +263,7 @@ class DictWrapper(dict):
     Used by the SQL construction code to ensure that values are correctly
     quoted before being used.
     """
+
     def __init__(self, data, func, prefix):
         super().__init__(data)
         self.func = func
@@ -273,24 +276,11 @@ class DictWrapper(dict):
         before returning, otherwise return the raw value.
         """
         use_func = key.startswith(self.prefix)
-        if use_func:
-            key = key[len(self.prefix):]
+        key = key.removeprefix(self.prefix)
         value = super().__getitem__(key)
         if use_func:
             return self.func(value)
         return value
-
-
-def _destruct_iterable_mapping_values(data):
-    for i, elem in enumerate(data):
-        if len(elem) != 2:
-            raise ValueError(
-                'dictionary update sequence element #{} has '
-                'length {}; 2 is required.'.format(i, len(elem))
-            )
-        if not isinstance(elem[0], str):
-            raise ValueError('Element key %r invalid, only strings are allowed' % elem[0])
-        yield tuple(elem)
 
 
 class CaseInsensitiveMapping(Mapping):
@@ -312,9 +302,7 @@ class CaseInsensitiveMapping(Mapping):
     """
 
     def __init__(self, data):
-        if not isinstance(data, Mapping):
-            data = {k: v for k, v in _destruct_iterable_mapping_values(data)}
-        self._store = {k.lower(): (k, v) for k, v in data.items()}
+        self._store = {k.lower(): (k, v) for k, v in self._unpack_items(data)}
 
     def __getitem__(self, key):
         return self._store[key.lower()][1]
@@ -325,9 +313,7 @@ class CaseInsensitiveMapping(Mapping):
     def __eq__(self, other):
         return isinstance(other, Mapping) and {
             k.lower(): v for k, v in self.items()
-        } == {
-            k.lower(): v for k, v in other.items()
-        }
+        } == {k.lower(): v for k, v in other.items()}
 
     def __iter__(self):
         return (original_key for original_key, value in self._store.values())
@@ -337,3 +323,23 @@ class CaseInsensitiveMapping(Mapping):
 
     def copy(self):
         return self
+
+    @staticmethod
+    def _unpack_items(data):
+        # Explicitly test for dict first as the common case for performance,
+        # avoiding abc's __instancecheck__ and _abc_instancecheck for the
+        # general Mapping case.
+        if isinstance(data, (dict, Mapping)):
+            yield from data.items()
+            return
+        for i, elem in enumerate(data):
+            if len(elem) != 2:
+                raise ValueError(
+                    "dictionary update sequence element #{} has length {}; "
+                    "2 is required.".format(i, len(elem))
+                )
+            if not isinstance(elem[0], str):
+                raise ValueError(
+                    "Element key %r invalid, only strings are allowed" % elem[0]
+                )
+            yield elem

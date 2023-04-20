@@ -2,7 +2,7 @@
 Getting started
 ===============
 
-New to Django? Or to Web development in general? Well, you came to the right
+New to Django? Or to web development in general? Well, you came to the right
 place: read this material to quickly get up and running.
 
 .. toctree::
@@ -17,6 +17,7 @@ place: read this material to quickly get up and running.
    tutorial05
    tutorial06
    tutorial07
+   tutorial08
    reusable-apps
    whatsnext
    contributing
@@ -34,7 +35,7 @@ place: read this material to quickly get up and running.
     Python quickly, we recommend `Dive Into Python`_. If that's not quite your
     style, there are many other `books about Python`_.
 
-    .. _python: https://python.org/
+    .. _python: https://www.python.org/
     .. _list of Python resources for non-programmers: https://wiki.python.org/moin/BeginnersGuide/NonProgrammers
     .. _Dive Into Python: https://diveinto.org/python3/table-of-contents.html
     .. _books about Python: https://wiki.python.org/moin/PythonBooks

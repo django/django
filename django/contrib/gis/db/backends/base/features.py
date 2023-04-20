@@ -1,6 +1,6 @@
 import re
 
-from django.contrib.gis.db.models import aggregates
+from django.contrib.gis.db import models
 
 
 class BaseSpatialFeatures:
@@ -14,6 +14,8 @@ class BaseSpatialFeatures:
     # Does the backend introspect GeometryField to its subtypes?
     supports_geometry_field_introspection = True
 
+    # Does the database have a geography type?
+    supports_geography = False
     # Does the backend support storing 3D geometries?
     supports_3d_storage = False
     # Reference implementation of 3D functions is:
@@ -33,9 +35,6 @@ class BaseSpatialFeatures:
     # Is the database able to count vertices on polygons (with `num_points`)?
     supports_num_points_poly = True
 
-    # The following properties indicate if the database backend support
-    # certain lookups (dwithin, left and right, relate, ...)
-    supports_left_right_lookups = False
     # Does the backend support expressions for specifying distance in the
     # dwithin lookup?
     supports_dwithin_distance_expr = True
@@ -46,17 +45,30 @@ class BaseSpatialFeatures:
     # Does the database support a unique index on geometry fields?
     supports_geometry_field_unique_index = True
 
+    # Can SchemaEditor alter geometry fields?
+    can_alter_geometry_field = True
+
+    # Do the database functions/aggregates support the tolerance parameter?
+    supports_tolerance_parameter = False
+
+    # Set of options that AsGeoJSON() doesn't support.
+    unsupported_geojson_options = {}
+
+    # Does Intersection() return None (rather than an empty GeometryCollection)
+    # for empty results?
+    empty_intersection_returns_none = True
+
     @property
     def supports_bbcontains_lookup(self):
-        return 'bbcontains' in self.connection.ops.gis_operators
+        return "bbcontains" in self.connection.ops.gis_operators
 
     @property
     def supports_contained_lookup(self):
-        return 'contained' in self.connection.ops.gis_operators
+        return "contained" in self.connection.ops.gis_operators
 
     @property
     def supports_crosses_lookup(self):
-        return 'crosses' in self.connection.ops.gis_operators
+        return "crosses" in self.connection.ops.gis_operators
 
     @property
     def supports_distances_lookups(self):
@@ -64,11 +76,11 @@ class BaseSpatialFeatures:
 
     @property
     def supports_dwithin_lookup(self):
-        return 'dwithin' in self.connection.ops.gis_operators
+        return "dwithin" in self.connection.ops.gis_operators
 
     @property
     def supports_relate_lookup(self):
-        return 'relate' in self.connection.ops.gis_operators
+        return "relate" in self.connection.ops.gis_operators
 
     @property
     def supports_isvalid_lookup(self):
@@ -77,23 +89,23 @@ class BaseSpatialFeatures:
     # Is the aggregate supported by the database?
     @property
     def supports_collect_aggr(self):
-        return aggregates.Collect not in self.connection.ops.disallowed_aggregates
+        return models.Collect not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_extent_aggr(self):
-        return aggregates.Extent not in self.connection.ops.disallowed_aggregates
+        return models.Extent not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_make_line_aggr(self):
-        return aggregates.MakeLine not in self.connection.ops.disallowed_aggregates
+        return models.MakeLine not in self.connection.ops.disallowed_aggregates
 
     @property
     def supports_union_aggr(self):
-        return aggregates.Union not in self.connection.ops.disallowed_aggregates
+        return models.Union not in self.connection.ops.disallowed_aggregates
 
     def __getattr__(self, name):
-        m = re.match(r'has_(\w*)_function$', name)
+        m = re.match(r"has_(\w*)_function$", name)
         if m:
-            func_name = m.group(1)
+            func_name = m[1]
             return func_name not in self.connection.ops.unsupported_functions
         raise AttributeError

@@ -1,6 +1,6 @@
-====================
-Overriding templates
-====================
+=========================
+How to override templates
+=========================
 
 In your project, you might want to override a template in another Django
 application, whether it be a third-party application or a contrib application
@@ -29,20 +29,20 @@ called ``blog``, which provides the templates ``blog/post.html`` and
 
     from pathlib import Path
 
-    BASE_DIR = Path(__file__).resolve(strict=True).parents[1]
+    BASE_DIR = Path(__file__).resolve().parent.parent
 
     INSTALLED_APPS = [
         ...,
-        'blog',
+        "blog",
         ...,
     ]
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [BASE_DIR / 'templates'],
-            'APP_DIRS': True,
-            ...
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [BASE_DIR / "templates"],
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -77,9 +77,9 @@ First, make sure your template settings are checking inside app directories::
 
     TEMPLATES = [
         {
-            ...,
-            'APP_DIRS': True,
-            ...
+            # ...
+            "APP_DIRS": True,
+            # ...
         },
     ]
 
@@ -97,3 +97,43 @@ then your directory structure will look like:
 
 With :setting:`APP_DIRS<TEMPLATES-APP_DIRS>` set to ``True``, the template
 loader will look in the app's templates directory and find the templates.
+
+.. _extending_an_overridden_template:
+
+Extending an overridden template
+================================
+
+With your template loaders configured, you can extend a template using the
+:ttag:`{% extends %}<extends>` template tag whilst at the same time overriding
+it. This can allow you to make small customizations without needing to
+reimplement the entire template.
+
+For example, you can use this technique to add a custom logo to the
+``admin/base_site.html`` template:
+
+    .. code-block:: html+django
+       :caption: ``templates/admin/base_site.html``
+
+        {% extends "admin/base_site.html" %}
+
+        {% block branding %}
+            <img src="link/to/logo.png" alt="logo">
+            {{ block.super }}
+        {% endblock %}
+
+Key points to note:
+
+* The example creates a file at ``templates/admin/base_site.html`` that uses
+  the configured project-level ``templates`` directory to override
+  ``admin/base_site.html``.
+* The new template extends ``admin/base_site.html``, which is the same template
+  as is being overridden.
+* The template replaces just the ``branding`` block, adding a custom logo, and
+  using ``block.super`` to retain the prior content.
+* The rest of the template is inherited unchanged from
+  ``admin/base_site.html``.
+
+This technique works because the template loader does not consider the already
+loaded override template (at ``templates/admin/base_site.html``) when
+resolving the ``extends`` tag. Combined with ``block.super`` it is a powerful
+technique to make small customizations.

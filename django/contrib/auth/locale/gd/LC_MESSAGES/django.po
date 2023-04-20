@@ -1,14 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# GunChleoc, 2015-2017
+# GunChleoc, 2015-2017,2021
+# GunChleoc, 2015
 # GunChleoc, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-10-04 18:25+0000\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-10-27 12:55+0000\n"
 "Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/django/django/"
 "language/gd/)\n"
@@ -56,7 +57,7 @@ msgstr ""
 "Tha fòrmat mì-dhligheach air an fhacal-fhaire no chan aithne dhuinn algairim "
 "a’ hais."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Cha robh an dà fhacal-faire co-ionnann."
 
 msgid "Password"
@@ -69,7 +70,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Cuir an t-aon fhacal-faire a-steach a-rithist gus a dhearbhadh."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Cha dèid faclan-faire amh a shàbhaladh ’s mar sin chan eil dòigh ann gus "
@@ -139,6 +140,9 @@ msgstr "factar obrachaidh"
 
 msgid "checksum"
 msgstr "àireamh dhearbhaidh"
+
+msgid "block size"
+msgstr "meud nam blocaichean"
 
 msgid "name"
 msgstr "ainm"
@@ -271,7 +275,7 @@ msgstr[3] ""
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Tha am facal-faire agad ro choltach ri %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr ""
 "Chan fhaod am facal-faire agad a bhith ro choltach ris an fhiosrachadh "
 "phearsanta eile agad."
@@ -279,14 +283,14 @@ msgstr ""
 msgid "This password is too common."
 msgstr "Tha am facal-faire seo ro chumanta."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr ""
 "Chan fhaod thu facal-faire a chleachdadh a chleachd mòran daoine mar-thà."
 
 msgid "This password is entirely numeric."
-msgstr "Chan eil ach àireamhan san fhacal-fhaire seo.ac"
+msgstr "Chan eil ach àireamhan san fhacal-fhaire seo."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr ""
 "Feumaidh caractaran a bhith san fhacal-fhaire agad nach eil ’nan àireamhan."
 

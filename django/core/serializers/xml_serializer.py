@@ -1,7 +1,7 @@
 """
 XML serializer.
 """
-
+import json
 from xml.dom import pulldom
 from xml.sax import handler
 from xml.sax.expatreader import ExpatParser as _ExpatParser
@@ -11,23 +11,25 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.serializers import base
 from django.db import DEFAULT_DB_ALIAS, models
-from django.utils.xmlutils import (
-    SimplerXMLGenerator, UnserializableContentError,
-)
+from django.utils.xmlutils import SimplerXMLGenerator, UnserializableContentError
 
 
 class Serializer(base.Serializer):
     """Serialize a QuerySet to XML."""
 
     def indent(self, level):
-        if self.options.get('indent') is not None:
-            self.xml.ignorableWhitespace('\n' + ' ' * self.options.get('indent') * level)
+        if self.options.get("indent") is not None:
+            self.xml.ignorableWhitespace(
+                "\n" + " " * self.options.get("indent") * level
+            )
 
     def start_serialization(self):
         """
         Start serialization -- open the XML document and the root element.
         """
-        self.xml = SimplerXMLGenerator(self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET))
+        self.xml = SimplerXMLGenerator(
+            self.stream, self.options.get("encoding", settings.DEFAULT_CHARSET)
+        )
         self.xml.startDocument()
         self.xml.startElement("django-objects", {"version": "1.0"})
 
@@ -44,14 +46,16 @@ class Serializer(base.Serializer):
         Called as each object is handled.
         """
         if not hasattr(obj, "_meta"):
-            raise base.SerializationError("Non-model object (%s) encountered during serialization" % type(obj))
+            raise base.SerializationError(
+                "Non-model object (%s) encountered during serialization" % type(obj)
+            )
 
         self.indent(1)
-        attrs = {'model': str(obj._meta)}
-        if not self.use_natural_primary_keys or not hasattr(obj, 'natural_key'):
+        attrs = {"model": str(obj._meta)}
+        if not self.use_natural_primary_keys or not hasattr(obj, "natural_key"):
             obj_pk = obj.pk
             if obj_pk is not None:
-                attrs['pk'] = str(obj_pk)
+                attrs["pk"] = str(obj_pk)
 
         self.xml.startElement("object", attrs)
 
@@ -68,18 +72,28 @@ class Serializer(base.Serializer):
         ManyToManyFields).
         """
         self.indent(2)
-        self.xml.startElement('field', {
-            'name': field.name,
-            'type': field.get_internal_type(),
-        })
+        self.xml.startElement(
+            "field",
+            {
+                "name": field.name,
+                "type": field.get_internal_type(),
+            },
+        )
 
         # Get a "string version" of the object's data.
         if getattr(obj, field.name) is not None:
+            value = field.value_to_string(obj)
+            if field.get_internal_type() == "JSONField":
+                # Dump value since JSONField.value_to_string() doesn't output
+                # strings.
+                value = json.dumps(value, cls=field.encoder)
             try:
-                self.xml.characters(field.value_to_string(obj))
+                self.xml.characters(value)
             except UnserializableContentError:
-                raise ValueError("%s.%s (pk:%s) contains unserializable characters" % (
-                    obj.__class__.__name__, field.name, obj.pk))
+                raise ValueError(
+                    "%s.%s (pk:%s) contains unserializable characters"
+                    % (obj.__class__.__name__, field.name, obj.pk)
+                )
         else:
             self.xml.addQuickElement("None")
 
@@ -93,7 +107,9 @@ class Serializer(base.Serializer):
         self._start_relational_field(field)
         related_att = getattr(obj, field.get_attname())
         if related_att is not None:
-            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(
+                field.remote_field.model, "natural_key"
+            ):
                 related = getattr(obj, field.name)
                 # If related object has a natural key, use it
                 related = related.natural_key()
@@ -116,7 +132,9 @@ class Serializer(base.Serializer):
         """
         if field.remote_field.through._meta.auto_created:
             self._start_relational_field(field)
-            if self.use_natural_foreign_keys and hasattr(field.remote_field.model, 'natural_key'):
+            if self.use_natural_foreign_keys and hasattr(
+                field.remote_field.model, "natural_key"
+            ):
                 # If the objects in the m2m have a natural key, use it
                 def handle_m2m(value):
                     natural = value.natural_key()
@@ -127,12 +145,23 @@ class Serializer(base.Serializer):
                         self.xml.characters(str(key_value))
                         self.xml.endElement("natural")
                     self.xml.endElement("object")
+
+                def queryset_iterator(obj, field):
+                    return getattr(obj, field.name).iterator()
+
             else:
+
                 def handle_m2m(value):
-                    self.xml.addQuickElement("object", attrs={
-                        'pk': str(value.pk)
-                    })
-            for relobj in getattr(obj, field.name).iterator():
+                    self.xml.addQuickElement("object", attrs={"pk": str(value.pk)})
+
+                def queryset_iterator(obj, field):
+                    return getattr(obj, field.name).only("pk").iterator()
+
+            m2m_iter = getattr(obj, "_prefetched_objects_cache", {}).get(
+                field.name,
+                queryset_iterator(obj, field),
+            )
+            for relobj in m2m_iter:
                 handle_m2m(relobj)
 
             self.xml.endElement("field")
@@ -140,19 +169,29 @@ class Serializer(base.Serializer):
     def _start_relational_field(self, field):
         """Output the <field> element for relational fields."""
         self.indent(2)
-        self.xml.startElement('field', {
-            'name': field.name,
-            'rel': field.remote_field.__class__.__name__,
-            'to': str(field.remote_field.model._meta),
-        })
+        self.xml.startElement(
+            "field",
+            {
+                "name": field.name,
+                "rel": field.remote_field.__class__.__name__,
+                "to": str(field.remote_field.model._meta),
+            },
+        )
 
 
 class Deserializer(base.Deserializer):
     """Deserialize XML."""
 
-    def __init__(self, stream_or_string, *, using=DEFAULT_DB_ALIAS, ignorenonexistent=False, **options):
+    def __init__(
+        self,
+        stream_or_string,
+        *,
+        using=DEFAULT_DB_ALIAS,
+        ignorenonexistent=False,
+        **options,
+    ):
         super().__init__(stream_or_string, **options)
-        self.handle_forward_references = options.pop('handle_forward_references', False)
+        self.handle_forward_references = options.pop("handle_forward_references", False)
         self.event_stream = pulldom.parse(self.stream, self._make_parser())
         self.db = using
         self.ignore = ignorenonexistent
@@ -176,9 +215,10 @@ class Deserializer(base.Deserializer):
 
         # Start building a data dictionary from the object.
         data = {}
-        if node.hasAttribute('pk'):
+        if node.hasAttribute("pk"):
             data[Model._meta.pk.attname] = Model._meta.pk.to_python(
-                node.getAttribute('pk'))
+                node.getAttribute("pk")
+            )
 
         # Also start building a dict of m2m data (this is saved as
         # {m2m_accessor_attribute : [list_of_related_objects]})
@@ -192,7 +232,9 @@ class Deserializer(base.Deserializer):
             # sensing a pattern here?)
             field_name = field_node.getAttribute("name")
             if not field_name:
-                raise base.DeserializationError("<field> node is missing the 'name' attribute")
+                raise base.DeserializationError(
+                    "<field> node is missing the 'name' attribute"
+                )
 
             # Get the field from the Model. This will raise a
             # FieldDoesNotExist if, well, the field doesn't exist, which will
@@ -202,32 +244,39 @@ class Deserializer(base.Deserializer):
             field = Model._meta.get_field(field_name)
 
             # As is usually the case, relation fields get the special treatment.
-            if field.remote_field and isinstance(field.remote_field, models.ManyToManyRel):
+            if field.remote_field and isinstance(
+                field.remote_field, models.ManyToManyRel
+            ):
                 value = self._handle_m2m_field_node(field_node, field)
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
                         [
                             getInnerText(nat_node).strip()
-                            for nat_node in obj_node.getElementsByTagName('natural')
+                            for nat_node in obj_node.getElementsByTagName("natural")
                         ]
-                        for obj_node in field_node.getElementsByTagName('object')
+                        for obj_node in field_node.getElementsByTagName("object")
                     ]
                 else:
                     m2m_data[field.name] = value
-            elif field.remote_field and isinstance(field.remote_field, models.ManyToOneRel):
+            elif field.remote_field and isinstance(
+                field.remote_field, models.ManyToOneRel
+            ):
                 value = self._handle_fk_field_node(field_node, field)
                 if value == base.DEFER_FIELD:
                     deferred_fields[field] = [
                         getInnerText(k).strip()
-                        for k in field_node.getElementsByTagName('natural')
+                        for k in field_node.getElementsByTagName("natural")
                     ]
                 else:
                     data[field.attname] = value
             else:
-                if field_node.getElementsByTagName('None'):
+                if field_node.getElementsByTagName("None"):
                     value = None
                 else:
                     value = field.to_python(getInnerText(field_node).strip())
+                    # Load value since JSONField.to_python() outputs strings.
+                    if field.get_internal_type() == "JSONField":
+                        value = json.loads(value, cls=field.decoder)
                 data[field.name] = value
 
         obj = base.build_instance(Model, data, self.db)
@@ -240,17 +289,19 @@ class Deserializer(base.Deserializer):
         Handle a <field> node for a ForeignKey
         """
         # Check if there is a child node named 'None', returning None if so.
-        if node.getElementsByTagName('None'):
+        if node.getElementsByTagName("None"):
             return None
         else:
             model = field.remote_field.model
-            if hasattr(model._default_manager, 'get_by_natural_key'):
-                keys = node.getElementsByTagName('natural')
+            if hasattr(model._default_manager, "get_by_natural_key"):
+                keys = node.getElementsByTagName("natural")
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
                     try:
-                        obj = model._default_manager.db_manager(self.db).get_by_natural_key(*field_value)
+                        obj = model._default_manager.db_manager(
+                            self.db
+                        ).get_by_natural_key(*field_value)
                     except ObjectDoesNotExist:
                         if self.handle_forward_references:
                             return base.DEFER_FIELD
@@ -264,11 +315,15 @@ class Deserializer(base.Deserializer):
                 else:
                     # Otherwise, treat like a normal PK
                     field_value = getInnerText(node).strip()
-                    obj_pk = model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                    obj_pk = model._meta.get_field(
+                        field.remote_field.field_name
+                    ).to_python(field_value)
                 return obj_pk
             else:
                 field_value = getInnerText(node).strip()
-                return model._meta.get_field(field.remote_field.field_name).to_python(field_value)
+                return model._meta.get_field(field.remote_field.field_name).to_python(
+                    field_value
+                )
 
     def _handle_m2m_field_node(self, node, field):
         """
@@ -276,23 +331,31 @@ class Deserializer(base.Deserializer):
         """
         model = field.remote_field.model
         default_manager = model._default_manager
-        if hasattr(default_manager, 'get_by_natural_key'):
+        if hasattr(default_manager, "get_by_natural_key"):
+
             def m2m_convert(n):
-                keys = n.getElementsByTagName('natural')
+                keys = n.getElementsByTagName("natural")
                 if keys:
                     # If there are 'natural' subelements, it must be a natural key
                     field_value = [getInnerText(k).strip() for k in keys]
-                    obj_pk = default_manager.db_manager(self.db).get_by_natural_key(*field_value).pk
+                    obj_pk = (
+                        default_manager.db_manager(self.db)
+                        .get_by_natural_key(*field_value)
+                        .pk
+                    )
                 else:
                     # Otherwise, treat like a normal PK value.
-                    obj_pk = model._meta.pk.to_python(n.getAttribute('pk'))
+                    obj_pk = model._meta.pk.to_python(n.getAttribute("pk"))
                 return obj_pk
+
         else:
+
             def m2m_convert(n):
-                return model._meta.pk.to_python(n.getAttribute('pk'))
+                return model._meta.pk.to_python(n.getAttribute("pk"))
+
         values = []
         try:
-            for c in node.getElementsByTagName('object'):
+            for c in node.getElementsByTagName("object"):
                 values.append(m2m_convert(c))
         except Exception as e:
             if isinstance(e, ObjectDoesNotExist) and self.handle_forward_references:
@@ -311,13 +374,15 @@ class Deserializer(base.Deserializer):
         if not model_identifier:
             raise base.DeserializationError(
                 "<%s> node is missing the required '%s' attribute"
-                % (node.nodeName, attr))
+                % (node.nodeName, attr)
+            )
         try:
             return apps.get_model(model_identifier)
         except (LookupError, TypeError):
             raise base.DeserializationError(
                 "<%s> node has invalid model identifier: '%s'"
-                % (node.nodeName, model_identifier))
+                % (node.nodeName, model_identifier)
+            )
 
 
 def getInnerText(node):
@@ -325,7 +390,10 @@ def getInnerText(node):
     # inspired by https://mail.python.org/pipermail/xml-sig/2005-March/011022.html
     inner_text = []
     for child in node.childNodes:
-        if child.nodeType == child.TEXT_NODE or child.nodeType == child.CDATA_SECTION_NODE:
+        if (
+            child.nodeType == child.TEXT_NODE
+            or child.nodeType == child.CDATA_SECTION_NODE
+        ):
             inner_text.append(child.data)
         elif child.nodeType == child.ELEMENT_NODE:
             inner_text.extend(getInnerText(child))
@@ -343,6 +411,7 @@ class DefusedExpatParser(_ExpatParser):
 
     Forbid DTDs, external entity references
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setFeature(handler.feature_external_ges, False)
@@ -351,8 +420,9 @@ class DefusedExpatParser(_ExpatParser):
     def start_doctype_decl(self, name, sysid, pubid, has_internal_subset):
         raise DTDForbidden(name, sysid, pubid)
 
-    def entity_decl(self, name, is_parameter_entity, value, base,
-                    sysid, pubid, notation_name):
+    def entity_decl(
+        self, name, is_parameter_entity, value, base, sysid, pubid, notation_name
+    ):
         raise EntitiesForbidden(name, value, base, sysid, pubid, notation_name)
 
     def unparsed_entity_decl(self, name, base, sysid, pubid, notation_name):
@@ -373,12 +443,14 @@ class DefusedExpatParser(_ExpatParser):
 
 class DefusedXmlException(ValueError):
     """Base exception."""
+
     def __repr__(self):
         return str(self)
 
 
 class DTDForbidden(DefusedXmlException):
     """Document type definition is forbidden."""
+
     def __init__(self, name, sysid, pubid):
         super().__init__()
         self.name = name
@@ -392,6 +464,7 @@ class DTDForbidden(DefusedXmlException):
 
 class EntitiesForbidden(DefusedXmlException):
     """Entity definition is forbidden."""
+
     def __init__(self, name, value, base, sysid, pubid, notation_name):
         super().__init__()
         self.name = name
@@ -408,6 +481,7 @@ class EntitiesForbidden(DefusedXmlException):
 
 class ExternalReferenceForbidden(DefusedXmlException):
     """Resolving an external reference is forbidden."""
+
     def __init__(self, context, base, sysid, pubid):
         super().__init__()
         self.context = context

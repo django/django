@@ -1,31 +1,23 @@
 from pathlib import Path
-from subprocess import CompletedProcess
-from unittest import mock, skipUnless
 
-from django.db import connection
 from django.db.backends.sqlite3.client import DatabaseClient
 from django.test import SimpleTestCase
 
 
-@skipUnless(connection.vendor == 'sqlite', 'SQLite tests.')
 class SqliteDbshellCommandTestCase(SimpleTestCase):
-    def _run_dbshell(self):
-        """Run runshell command and capture its arguments."""
-        def _mock_subprocess_run(*args, **kwargs):
-            self.subprocess_args = list(*args)
-            return CompletedProcess(self.subprocess_args, 0)
-
-        client = DatabaseClient(connection)
-        with mock.patch('subprocess.run', new=_mock_subprocess_run):
-            client.runshell()
-        return self.subprocess_args
+    def settings_to_cmd_args_env(self, settings_dict, parameters=None):
+        if parameters is None:
+            parameters = []
+        return DatabaseClient.settings_to_cmd_args_env(settings_dict, parameters)
 
     def test_path_name(self):
-        with mock.patch.dict(
-            connection.settings_dict,
-            {'NAME': Path('test.db.sqlite3')},
-        ):
-            self.assertEqual(
-                self._run_dbshell(),
-                ['sqlite3', 'test.db.sqlite3'],
-            )
+        self.assertEqual(
+            self.settings_to_cmd_args_env({"NAME": Path("test.db.sqlite3")}),
+            (["sqlite3", Path("test.db.sqlite3")], None),
+        )
+
+    def test_parameters(self):
+        self.assertEqual(
+            self.settings_to_cmd_args_env({"NAME": "test.db.sqlite3"}, ["-help"]),
+            (["sqlite3", "test.db.sqlite3", "-help"], None),
+        )

@@ -11,7 +11,8 @@ included.
 Bug fixes
 =========
 
-* Fixed ``BCryptSHA256PasswordHasher`` with py-bcrypt and Python 3 (#21398).
+* Fixed ``BCryptSHA256PasswordHasher`` with ``py-bcrypt`` and Python 3
+  (#21398).
 * Fixed a regression that prevented a ``ForeignKey`` with a hidden reverse
   manager (``related_name`` ending with '+') from being used as a lookup for
   ``prefetch_related`` (#21410).
@@ -25,7 +26,7 @@ Bug fixes
 * Added missing ``to_python`` method for ``ModelMultipleChoiceField`` which
   is required in Django 1.6 to properly detect changes from initial values
   (#21568).
-* Fixed ``django.contrib.humanize`` translations where the unicode sequence
+* Fixed ``django.contrib.humanize`` translations where the Unicode sequence
   for the non-breaking space was returned verbatim (#21415).
 * Fixed :djadmin:`loaddata` error when fixture file name contained any dots
   not related to file extensions (#21457) or when fixture path was relative

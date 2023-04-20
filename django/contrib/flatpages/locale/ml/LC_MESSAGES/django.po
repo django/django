@@ -2,15 +2,15 @@
 #
 # Translators:
 # Aby Thomas <abyzthomas@gmail.com>, 2014
-# Hrishikesh <hrishi.kb@gmail.com>, 2019
+# Hrishikesh <hrishi.kb@gmail.com>, 2019-2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Rajeesh Nair <rajeeshrnair@gmail.com>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-04 08:19+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-05-13 21:22+0000\n"
 "Last-Translator: Hrishikesh <hrishi.kb@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/django/django/language/"
 "ml/)\n"
@@ -30,9 +30,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
 msgstr ""
-"ഉദാഹരണം: '/about/contact/'.  തുടക്കത്തിലും അവസാനവും സ്ലാഷുകൾ ഉണ്ടെന്ന് ഉറപ്പുവരുത്തുക."
+"ഉദാഹരണം: “/about/contact/”.  തുടക്കത്തിലും അവസാനവും സ്ലാഷുകൾ ഉണ്ടെന്ന് ഉറപ്പുവരുത്തുക."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -41,8 +41,8 @@ msgstr ""
 "ഇതിൽ അക്ഷരങ്ങൾ, നമ്പറുകൾ, കുത്തുകൾ, അണ്ടർസ്കോറുകൾ, ഡാഷുകൾ, സ്ലാഷുകൾ അതുമല്ലെങ്കിൽ ടിൽഡുകൾ "
 "എന്നിവ മാത്രമേ അനുവദിക്കുള്ളൂ."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "ഉദാഹരണം:  '/about/contact'.  തുടക്കത്തിൽ ഒരു സ്ലാഷ് ഉണ്ടെന്ന് ഉറപ്പുവരുത്തുക."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "ഉദാഹരണം: “/about/contact”.  തുടക്കത്തിൽ ഒരു സ്ലാഷ് ഉണ്ടെന്ന് ഉറപ്പുവരുത്തുക."
 
 msgid "URL is missing a leading slash."
 msgstr "URLന്റെ മുന്‍വശത്ത് ഒരു സ്ലാഷിന്റെ കുറവുണ്ട്."
@@ -67,8 +67,8 @@ msgid "template name"
 msgstr "ടെമ്പ്ലേറ്റിന്റെ പേര്"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
 "ഉദാ: 'flatpages/contact_page.html'. ഇതു നല്കിയില്ലെങ്കില്‍, പകരമായി 'flatpages/"
 "default.html' ആയിരിക്കും ഉപയോഗിക്കുക."

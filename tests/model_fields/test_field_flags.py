@@ -1,17 +1,11 @@
 from django import test
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db import models
-from django.db.models.fields.related import (
-    ForeignKey, ForeignObject, ForeignObjectRel, ManyToManyField, ManyToOneRel,
-    OneToOneField,
-)
 
 from .models import AllFieldsModel
 
 NON_CONCRETE_FIELDS = (
-    ForeignObject,
+    models.ForeignObject,
     GenericForeignKey,
     GenericRelation,
 )
@@ -23,52 +17,52 @@ NON_EDITABLE_FIELDS = (
 )
 
 RELATION_FIELDS = (
-    ForeignKey,
-    ForeignObject,
-    ManyToManyField,
-    OneToOneField,
+    models.ForeignKey,
+    models.ForeignObject,
+    models.ManyToManyField,
+    models.OneToOneField,
     GenericForeignKey,
     GenericRelation,
 )
 
 MANY_TO_MANY_CLASSES = {
-    ManyToManyField,
+    models.ManyToManyField,
 }
 
 MANY_TO_ONE_CLASSES = {
-    ForeignObject,
-    ForeignKey,
+    models.ForeignObject,
+    models.ForeignKey,
     GenericForeignKey,
 }
 
 ONE_TO_MANY_CLASSES = {
-    ForeignObjectRel,
-    ManyToOneRel,
+    models.ForeignObjectRel,
+    models.ManyToOneRel,
     GenericRelation,
 }
 
 ONE_TO_ONE_CLASSES = {
-    OneToOneField,
+    models.OneToOneField,
 }
 
 FLAG_PROPERTIES = (
-    'concrete',
-    'editable',
-    'is_relation',
-    'model',
-    'hidden',
-    'one_to_many',
-    'many_to_one',
-    'many_to_many',
-    'one_to_one',
-    'related_model',
+    "concrete",
+    "editable",
+    "is_relation",
+    "model",
+    "hidden",
+    "one_to_many",
+    "many_to_one",
+    "many_to_many",
+    "one_to_one",
+    "related_model",
 )
 
 FLAG_PROPERTIES_FOR_RELATIONS = (
-    'one_to_many',
-    'many_to_one',
-    'many_to_many',
-    'one_to_one',
+    "one_to_many",
+    "many_to_one",
+    "many_to_many",
+    "one_to_one",
 )
 
 
@@ -103,7 +97,10 @@ class FieldFlagsTests(test.SimpleTestCase):
 
     def test_each_object_should_have_auto_created(self):
         self.assertTrue(
-            all(f.auto_created.__class__ == bool for f in self.fields_and_reverse_objects)
+            all(
+                f.auto_created.__class__ == bool
+                for f in self.fields_and_reverse_objects
+            )
         )
 
     def test_non_concrete_fields(self):
@@ -134,7 +131,10 @@ class FieldFlagsTests(test.SimpleTestCase):
     def test_all_field_types_should_have_flags(self):
         for field in self.fields_and_reverse_objects:
             for flag in FLAG_PROPERTIES:
-                self.assertTrue(hasattr(field, flag), "Field %s does not have flag %s" % (field, flag))
+                self.assertTrue(
+                    hasattr(field, flag),
+                    "Field %s does not have flag %s" % (field, flag),
+                )
             if field.is_relation:
                 true_cardinality_flags = sum(
                     getattr(field, flag) is True
@@ -146,8 +146,7 @@ class FieldFlagsTests(test.SimpleTestCase):
 
     def test_cardinality_m2m(self):
         m2m_type_fields = [
-            f for f in self.all_fields
-            if f.is_relation and f.many_to_many
+            f for f in self.all_fields if f.is_relation and f.many_to_many
         ]
         # Test classes are what we expect
         self.assertEqual(MANY_TO_MANY_CLASSES, {f.__class__ for f in m2m_type_fields})
@@ -161,7 +160,8 @@ class FieldFlagsTests(test.SimpleTestCase):
 
     def test_cardinality_o2m(self):
         o2m_type_fields = [
-            f for f in self.fields_and_reverse_objects
+            f
+            for f in self.fields_and_reverse_objects
             if f.is_relation and f.one_to_many
         ]
         # Test classes are what we expect
@@ -175,7 +175,8 @@ class FieldFlagsTests(test.SimpleTestCase):
 
     def test_cardinality_m2o(self):
         m2o_type_fields = [
-            f for f in self.fields_and_reverse_objects
+            f
+            for f in self.fields_and_reverse_objects
             if f.is_relation and f.many_to_one
         ]
         # Test classes are what we expect
@@ -183,28 +184,25 @@ class FieldFlagsTests(test.SimpleTestCase):
 
         # Ensure all m2o reverses are o2m
         for obj in m2o_type_fields:
-            if hasattr(obj, 'field'):
+            if hasattr(obj, "field"):
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.is_relation and reverse_field.one_to_many)
 
     def test_cardinality_o2o(self):
-        o2o_type_fields = [
-            f for f in self.all_fields
-            if f.is_relation and f.one_to_one
-        ]
+        o2o_type_fields = [f for f in self.all_fields if f.is_relation and f.one_to_one]
         # Test classes are what we expect
         self.assertEqual(ONE_TO_ONE_CLASSES, {f.__class__ for f in o2o_type_fields})
 
         # Ensure all o2o reverses are o2o
         for obj in o2o_type_fields:
-            if hasattr(obj, 'field'):
+            if hasattr(obj, "field"):
                 reverse_field = obj.field
                 self.assertTrue(reverse_field.is_relation and reverse_field.one_to_one)
 
     def test_hidden_flag(self):
         incl_hidden = set(AllFieldsModel._meta.get_fields(include_hidden=True))
         no_hidden = set(AllFieldsModel._meta.get_fields())
-        fields_that_should_be_hidden = (incl_hidden - no_hidden)
+        fields_that_should_be_hidden = incl_hidden - no_hidden
         for f in incl_hidden:
             self.assertEqual(f in fields_that_should_be_hidden, f.hidden)
 
@@ -219,5 +217,5 @@ class FieldFlagsTests(test.SimpleTestCase):
     def test_null(self):
         # null isn't well defined for a ManyToManyField, but changing it to
         # True causes backwards compatibility problems (#25320).
-        self.assertFalse(AllFieldsModel._meta.get_field('m2m').null)
-        self.assertTrue(AllFieldsModel._meta.get_field('reverse2').null)
+        self.assertFalse(AllFieldsModel._meta.get_field("m2m").null)
+        self.assertTrue(AllFieldsModel._meta.get_field("reverse2").null)

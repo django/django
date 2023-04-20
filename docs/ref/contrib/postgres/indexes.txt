@@ -10,9 +10,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BloomIndex``
 ==============
 
-.. class:: BloomIndex(length=None, columns=(), **options)
-
-    .. versionadded:: 3.1
+.. class:: BloomIndex(*expressions, length=None, columns=(), **options)
 
     Creates a bloom_ index.
 
@@ -33,7 +31,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BrinIndex``
 =============
 
-.. class:: BrinIndex(autosummarize=None, pages_per_range=None, **options)
+.. class:: BrinIndex(*expressions, autosummarize=None, pages_per_range=None, **options)
 
     Creates a `BRIN index
     <https://www.postgresql.org/docs/current/brin-intro.html>`_.
@@ -48,7 +46,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``BTreeIndex``
 ==============
 
-.. class:: BTreeIndex(fillfactor=None, **options)
+.. class:: BTreeIndex(*expressions, fillfactor=None, **options)
 
     Creates a B-Tree index.
 
@@ -60,7 +58,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``GinIndex``
 ============
 
-.. class:: GinIndex(fastupdate=None, gin_pending_list_limit=None, **options)
+.. class:: GinIndex(*expressions, fastupdate=None, gin_pending_list_limit=None, **options)
 
     Creates a `gin index <https://www.postgresql.org/docs/current/gin.html>`_.
 
@@ -75,9 +73,9 @@ available from the ``django.contrib.postgres.indexes`` module.
     Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
     Update Technique`_ that's enabled by default in PostgreSQL.
 
-    Provide an integer number of bytes to the gin_pending_list_limit_ parameter
-    to tune the maximum size of the GIN pending list which is used when
-    ``fastupdate`` is enabled.
+    Provide an integer number of kilobytes to the gin_pending_list_limit_
+    parameter to tune the maximum size of the GIN pending list which is used
+    when ``fastupdate`` is enabled.
 
     .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/gin-implementation.html#GIN-FAST-UPDATE
     .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT
@@ -85,7 +83,7 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``GistIndex``
 =============
 
-.. class:: GistIndex(buffering=None, fillfactor=None, **options)
+.. class:: GistIndex(*expressions, buffering=None, fillfactor=None, **options)
 
     Creates a `GiST index
     <https://www.postgresql.org/docs/current/gist.html>`_. These indexes are
@@ -115,24 +113,19 @@ available from the ``django.contrib.postgres.indexes`` module.
 ``HashIndex``
 =============
 
-.. class:: HashIndex(fillfactor=None, **options)
+.. class:: HashIndex(*expressions, fillfactor=None, **options)
 
     Creates a hash index.
 
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
-    .. admonition:: Use this index only on PostgreSQL 10 and later
-
-        Hash indexes have been available in PostgreSQL for a long time, but
-        they suffer from a number of data integrity issues in older versions.
-
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
 ``SpGistIndex``
 ===============
 
-.. class:: SpGistIndex(fillfactor=None, **options)
+.. class:: SpGistIndex(*expressions, fillfactor=None, **options)
 
     Creates an `SP-GiST index
     <https://www.postgresql.org/docs/current/spgist.html>`_.
@@ -141,3 +134,44 @@ available from the ``django.contrib.postgres.indexes`` module.
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
+
+``OpClass()`` expressions
+=========================
+
+.. class:: OpClass(expression, name)
+
+    An ``OpClass()`` expression represents the ``expression`` with a custom
+    `operator class`_ that can be used to define functional indexes, functional
+    unique constraints, or exclusion constraints. To use it, you need to add
+    ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`. Set the
+    ``name`` parameter to the name of the `operator class`_.
+
+    For example::
+
+        Index(
+            OpClass(Lower("username"), name="varchar_pattern_ops"),
+            name="lower_username_idx",
+        )
+
+    creates an index on ``Lower('username')`` using ``varchar_pattern_ops``.
+    ::
+
+        UniqueConstraint(
+            OpClass(Upper("description"), name="text_pattern_ops"),
+            name="upper_description_unique",
+        )
+
+    creates a unique constraint on ``Upper('description')`` using
+    ``text_pattern_ops``.
+    ::
+
+        ExclusionConstraint(
+            name="exclude_overlapping_ops",
+            expressions=[
+                (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
+            ],
+        )
+
+    creates an exclusion constraint on ``circle`` using ``circle_ops``.
+
+    .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html

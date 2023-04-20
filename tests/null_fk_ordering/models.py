@@ -18,10 +18,7 @@ class Article(models.Model):
     author = models.ForeignKey(Author, models.SET_NULL, null=True)
 
     class Meta:
-        ordering = ['author__name']
-
-    def __str__(self):
-        return 'Article titled: %s' % self.title
+        ordering = ["author__name"]
 
 
 # These following 4 models represent a far more complex ordering case.
@@ -38,16 +35,10 @@ class Post(models.Model):
     forum = models.ForeignKey(Forum, models.SET_NULL, null=True)
     title = models.CharField(max_length=32)
 
-    def __str__(self):
-        return self.title
-
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, models.SET_NULL, null=True)
     comment_text = models.CharField(max_length=250)
 
     class Meta:
-        ordering = ['post__forum__system_info__system_name', 'comment_text']
-
-    def __str__(self):
-        return self.comment_text
+        ordering = ["post__forum__system_info__system_name", "comment_text"]

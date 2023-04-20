@@ -5,18 +5,40 @@ FAQ: Getting Help
 How do I do X? Why doesn't Y work? Where can I go to get help?
 ==============================================================
 
-If this FAQ doesn't contain an answer to your question, you might want to
-try the |django-users| mailing list. Feel free to ask any question related
-to installing, using, or debugging Django.
+First, please check if your question is answered on the :doc:`FAQ
+</faq/index>`. Also, search for answers using your favorite search engine, and
+in `the forum`_.
 
-If you prefer IRC, the `#django IRC channel`_ on the Freenode IRC network is an
-active community of helpful individuals who may be able to solve your problem.
+.. _`the forum`: https://forum.djangoproject.com/
 
-.. _`#django IRC channel`: irc://irc.freenode.net/django
+If you can't find an answer, please take a few minutes to formulate your
+question well. Explaining the problems you are facing clearly will help others
+help you. See the StackOverflow guide on `asking good questions`_.
+
+.. _`asking good questions`: https://stackoverflow.com/help/how-to-ask
+
+Then, please post it in one of the following channels:
+
+* The Django Forum section `"Using Django"`_. This is for web-based
+  discussions.
+* The |django-users| mailing list. This is for email-based discussions.
+* The `#django IRC channel`_ on the Libera.Chat IRC network. This is for
+  chat-based discussions. If you're new to IRC, see the `Libera.Chat
+  documentation`_ for different ways to connect.
+
+.. _`"Using Django"`: https://forum.djangoproject.com/c/users/6
+.. _#django IRC channel: https://web.libera.chat/#django
+.. _Libera.Chat documentation: https://libera.chat/guides/connect
+
+In all these channels please abide by the `Django Code of Conduct`_. In
+summary, being friendly and patient, considerate, respectful, and careful in
+your choice of words.
+
+.. _Django Code of Conduct: https://www.djangoproject.com/conduct/
 
 .. _message-does-not-appear-on-django-users:
 
-Why hasn't my message appeared on `django-users`?
+Why hasn't my message appeared on *django-users*?
 =================================================
 
 |django-users| has a lot of subscribers. This is good for the community, as
@@ -30,23 +52,25 @@ that spammers get caught, but it also means that your first question to the
 list might take a little longer to get answered. We apologize for any
 inconvenience that this policy may cause.
 
-Nobody on `django-users` answered my question! What should I do?
-================================================================
+Nobody answered my question! What should I do?
+==============================================
 
 Try making your question more specific, or provide a better example of your
 problem.
 
-As with most open-source mailing lists, the folks on |django-users| are
-volunteers. If nobody has answered your question, it may be because nobody
-knows the answer, it may be because nobody can understand the question, or it
-may be that everybody that can help is busy. One thing you might try is to ask
-the question on IRC -- visit the `#django IRC channel`_ on the Freenode IRC
-network.
+As with most open-source projects, the folks on these channels are volunteers.
+If nobody has answered your question, it may be because nobody knows the
+answer, it may be because nobody can understand the question, or it may be that
+everybody that can help is busy.
 
-You might notice we have a second mailing list, called |django-developers| --
-but please don't email support questions to this mailing list. This list is
-for discussion of the development of Django itself. Asking a tech support
-question there is considered quite impolite.
+You can also try asking on a different channel. But please don't post your
+question in all three channels in quick succession.
+
+You might notice we have a second mailing list, called |django-developers|.
+This list is for discussion of the development of Django itself. Please don't
+email support questions to this mailing list. Asking a tech support question
+there is considered impolite, and you will likely be directed to ask on
+|django-users|.
 
 I think I've found a bug! What should I do?
 ===========================================
@@ -62,10 +86,8 @@ to security@djangoproject.com. This is a private list only open to long-time,
 highly trusted Django developers, and its archives are not publicly readable.
 
 Due to the sensitive nature of security issues, we ask that if you think you
-have found a security problem, *please* don't send a message to one of the
-public mailing lists. Django has a
+have found a security problem, *please* don't post a message on the forum, IRC,
+or one of the public mailing lists. Django has a
 :ref:`policy for handling security issues <reporting-security-issues>`;
 while a defect is outstanding, we would like to minimize any damage that
 could be inflicted through public knowledge of that defect.
-
-.. _`policy for handling security issues`: ../contributing/#reporting-security-issues

@@ -1,17 +1,26 @@
+.. _logging-explanation:
+
 =======
 Logging
 =======
 
-.. module:: django.utils.log
-   :synopsis: Logging tools for Django applications
+.. seealso::
 
-A quick logging primer
-======================
+    * :ref:`logging-how-to`
+    * :ref:`Django logging reference <logging-ref>`
 
-Django uses Python's builtin :mod:`logging` module to perform system logging.
-The usage of this module is discussed in detail in Python's own documentation.
-However, if you've never used Python's logging framework (or even if you have),
-here's a quick primer.
+Python programmers will often use ``print()`` in their code as a quick and
+convenient debugging tool. Using the logging framework is only a little more
+effort than that, but it's much more elegant and flexible. As well as being
+useful for debugging, logging can also provide you with more - and better
+structured - information about the state and health of your application.
+
+Overview
+========
+
+Django uses and extends Python's builtin :mod:`logging` module to perform
+system logging. This module is discussed in detail in Python's own
+documentation; this section provides a quick overview.
 
 The cast of players
 -------------------
@@ -28,8 +37,8 @@ A Python logging configuration consists of four parts:
 Loggers
 ~~~~~~~
 
-A logger is the entry point into the logging system. Each logger is
-a named bucket to which messages can be written for processing.
+A *logger* is the entry point into the logging system. Each logger is a named
+bucket to which messages can be written for processing.
 
 A logger is configured to have a *log level*. This log level describes
 the severity of the messages that the logger will handle. Python
@@ -68,7 +77,7 @@ it is passed to a *Handler*.
 Handlers
 ~~~~~~~~
 
-The handler is the engine that determines what happens to each message
+The *handler* is the engine that determines what happens to each message
 in a logger. It describes a particular logging behavior, such as
 writing a message to the screen, to a file, or to a network socket.
 
@@ -89,7 +98,7 @@ file for later analysis.
 Filters
 ~~~~~~~
 
-A filter is used to provide additional control over which log records
+A *filter* is used to provide additional control over which log records
 are passed from logger to handler.
 
 By default, any log message that meets log level requirements will be
@@ -111,96 +120,51 @@ can be used in a chain to perform multiple filtering actions.
 Formatters
 ~~~~~~~~~~
 
-Ultimately, a log record needs to be rendered as text. Formatters
+Ultimately, a log record needs to be rendered as text. *Formatters*
 describe the exact format of that text. A formatter usually consists
 of a Python formatting string containing
 :ref:`LogRecord attributes <python:logrecord-attributes>`; however,
 you can also write custom formatters to implement specific formatting behavior.
 
-Using logging
-=============
+.. _logging-security-implications:
 
-Once you have configured your loggers, handlers, filters and
-formatters, you need to place logging calls into your code. Using the
-logging framework works like this::
+Security implications
+=====================
 
-    # import the logging library
-    import logging
+The logging system handles potentially sensitive information. For example, the
+log record may contain information about a web request or a stack trace, while
+some of the data you collect in your own loggers may also have security
+implications. You need to be sure you know:
 
-    # Get an instance of a logger
-    logger = logging.getLogger(__name__)
+* what information is collected
+* where it will subsequently be stored
+* how it will be transferred
+* who might have access to it.
 
-    def my_view(request, arg1, arg):
-        ...
-        if bad_mojo:
-            # Log an error message
-            logger.error('Something went wrong!')
+To help control the collection of sensitive information, you can explicitly
+designate certain sensitive information to be filtered out of error reports --
+read more about how to :ref:`filter error reports <filtering-error-reports>`.
 
-And that's it! Every time the ``bad_mojo`` condition is activated, an
-error log record will be written.
+``AdminEmailHandler``
+---------------------
 
-Naming loggers
---------------
+The built-in :class:`~django.utils.log.AdminEmailHandler` deserves a mention in
+the context of security. If its ``include_html`` option is enabled, the email
+message it sends will contain a full traceback, with names and values of local
+variables at each level of the stack, plus the values of your Django settings
+(in other words, the same level of detail that is exposed in a web page when
+:setting:`DEBUG` is ``True``).
 
-The call to :func:`logging.getLogger()` obtains (creating, if
-necessary) an instance of a logger. The logger instance is identified
-by a name. This name is used to identify the logger for configuration
-purposes.
-
-By convention, the logger name is usually ``__name__``, the name of
-the Python module that contains the logger. This allows you to filter
-and handle logging calls on a per-module basis. However, if you have
-some other way of organizing your logging messages, you can provide
-any dot-separated name to identify your logger::
-
-    # Get an instance of a specific named logger
-    logger = logging.getLogger('project.interesting.stuff')
-
-The dotted paths of logger names define a hierarchy. The
-``project.interesting`` logger is considered to be a parent of the
-``project.interesting.stuff`` logger; the ``project`` logger
-is a parent of the ``project.interesting`` logger.
-
-Why is the hierarchy important? Well, because loggers can be set to
-*propagate* their logging calls to their parents. In this way, you can
-define a single set of handlers at the root of a logger tree, and
-capture all logging calls in the subtree of loggers. A logging handler
-defined in the ``project`` namespace will catch all logging messages
-issued on the ``project.interesting`` and
-``project.interesting.stuff`` loggers.
-
-This propagation can be controlled on a per-logger basis. If
-you don't want a particular logger to propagate to its parents, you
-can turn off this behavior.
-
-Making logging calls
---------------------
-
-The logger instance contains an entry method for each of the default
-log levels:
-
-* ``logger.debug()``
-* ``logger.info()``
-* ``logger.warning()``
-* ``logger.error()``
-* ``logger.critical()``
-
-There are two other logging calls available:
-
-* ``logger.log()``: Manually emits a logging message with a
-  specific log level.
-
-* ``logger.exception()``: Creates an ``ERROR`` level logging
-  message wrapping the current exception stack frame.
+It's generally not considered a good idea to send such potentially sensitive
+information over email. Consider instead using one of the many third-party
+services to which detailed logs can be sent to get the best of multiple worlds
+-- the rich information of full tracebacks, clear management of who is notified
+and has access to the information, and so on.
 
 .. _configuring-logging:
 
 Configuring logging
 ===================
-
-Of course, it isn't enough to just put logging calls into your code.
-You also need to configure the loggers, handlers, filters and
-formatters to ensure that logging output is output in a useful way.
 
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
@@ -208,7 +172,7 @@ By default, Django uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
-dictionary of logging settings. These settings describes the loggers,
+dictionary of logging settings. These settings describe the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
@@ -239,27 +203,92 @@ The full documentation for :ref:`dictConfig format <logging-config-dictschema>`
 is the best source of information about logging configuration dictionaries.
 However, to give you a taste of what is possible, here are several examples.
 
-First, here's a configuration which writes all logging from the
-:ref:`django-logger` logger to a local file:
+To begin, here's a small configuration that will allow you to output all log
+messages to the console:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
+
+    import os
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/path/to/django/debug.log',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
+        },
+    }
+
+This configures the parent ``root`` logger to send messages with the
+``WARNING`` level and higher to the console handler. By adjusting the level to
+``INFO`` or ``DEBUG`` you can display more messages. This may be useful during
+development.
+
+Next we can add more fine-grained logging. Here's an example of how to make the
+logging system print more messages from just the :ref:`django-logger` named
+logger:
+
+.. code-block:: python
+    :caption: ``settings.py``
+
+    import os
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+            },
+        },
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
+            },
+        },
+    }
+
+By default, this config sends messages from the ``django`` logger of level
+``INFO`` or higher to the console. This is the same level as Django's default
+logging config, except that the default config only displays log records when
+``DEBUG=True``. Django does not log many such ``INFO`` level messages. With
+this config, however, you can also set the environment variable
+``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
+verbose as it includes all database queries.
+
+You don't have to log to the console. Here's a configuration which writes all
+logging from the :ref:`django-logger` named logger to a local file:
+
+.. code-block:: python
+    :caption: ``settings.py``
+
+    LOGGING = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "file": {
+                "level": "DEBUG",
+                "class": "logging.FileHandler",
+                "filename": "/path/to/django/debug.log",
+            },
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": "DEBUG",
+                "propagate": True,
             },
         },
     }
@@ -267,93 +296,62 @@ First, here's a configuration which writes all logging from the
 If you use this example, be sure to change the ``'filename'`` path to a
 location that's writable by the user that's running the Django application.
 
-Second, here's an example of how to make the logging system print Django's
-logging to the console. It may be useful during local development.
-
-By default, this config only sends messages of level ``INFO`` or higher to the
-console (same as Django's default logging config, except that the default only
-displays log records when ``DEBUG=True``). Django does not log many such
-messages. With this config, however, you can also set the environment variable
-``DJANGO_LOG_LEVEL=DEBUG`` to see all of Django's debug logging which is very
-verbose as it includes all database queries:
-
-.. code-block:: python
-    :caption: settings.py
-
-    import os
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-            },
-        },
-    }
-
 Finally, here's an example of a fairly complex logging setup:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+                "style": "{",
             },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
-            },
-        },
-        'filters': {
-            'special': {
-                '()': 'project.logging.SpecialFilter',
-                'foo': 'bar',
-            },
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
             },
         },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
-                'formatter': 'simple'
+        "filters": {
+            "special": {
+                "()": "project.logging.SpecialFilter",
+                "foo": "bar",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'filters': ['special']
-            }
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'propagate': True,
+        "handlers": {
+            "console": {
+                "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
+                "formatter": "simple",
             },
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': False,
+            "mail_admins": {
+                "level": "ERROR",
+                "class": "django.utils.log.AdminEmailHandler",
+                "filters": ["special"],
             },
-            'myproject.custom': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
-                'filters': ['special']
-            }
-        }
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "propagate": True,
+            },
+            "django.request": {
+                "handlers": ["mail_admins"],
+                "level": "ERROR",
+                "propagate": False,
+            },
+            "myproject.custom": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
+                "filters": ["special"],
+            },
+        },
     }
 
 This logging configuration does the following things:
@@ -392,9 +390,9 @@ This logging configuration does the following things:
     (or higher) message to ``sys.stderr``. This handler uses the ``simple``
     output format.
 
-  * ``mail_admins``, an :class:`AdminEmailHandler`, which emails any ``ERROR``
-    (or higher) message to the site :setting:`ADMINS`. This handler uses the
-    ``special`` filter.
+  * ``mail_admins``, an :class:`~django.utils.log.AdminEmailHandler`, which
+    emails any ``ERROR`` (or higher) message to the site :setting:`ADMINS`.
+    This handler uses the ``special`` filter.
 
 * Configures three loggers:
 
@@ -435,339 +433,27 @@ If you don't want to configure logging at all (or you want to manually
 configure logging using your own approach), you can set
 :setting:`LOGGING_CONFIG` to ``None``. This will disable the
 configuration process for :ref:`Django's default logging
-<default-logging-configuration>`. Here's an example that disables Django's
-logging configuration and then manually configures logging:
-
-.. code-block:: python
-    :caption: settings.py
-
-    LOGGING_CONFIG = None
-
-    import logging.config
-    logging.config.dictConfig(...)
+<default-logging-configuration>`.
 
 Setting :setting:`LOGGING_CONFIG` to ``None`` only means that the automatic
 configuration process is disabled, not logging itself. If you disable the
 configuration process, Django will still make logging calls, falling back to
 whatever default logging behavior is defined.
 
-Django's logging extensions
-===========================
+Here's an example that disables Django's logging configuration and then
+manually configures logging:
 
-Django provides a number of utilities to handle the unique
-requirements of logging in Web server environment.
+.. code-block:: python
+    :caption: ``settings.py``
 
-Loggers
--------
+    LOGGING_CONFIG = None
 
-Django provides several built-in loggers.
+    import logging.config
 
-.. _django-logger:
+    logging.config.dictConfig(...)
 
-``django``
-~~~~~~~~~~
-
-The catch-all logger for messages in the  ``django`` hierarchy. No messages are
-posted using this name but instead using one of the loggers below.
-
-.. _django-request-logger:
-
-``django.request``
-~~~~~~~~~~~~~~~~~~
-
-Log messages related to the handling of requests. 5XX responses are
-raised as ``ERROR`` messages; 4XX responses are raised as ``WARNING``
-messages. Requests that are logged to the ``django.security`` logger aren't
-logged to ``django.request``.
-
-Messages to this logger have the following extra context:
-
-* ``status_code``: The HTTP response code associated with the
-  request.
-
-* ``request``: The request object that generated the logging
-  message.
-
-.. _django-server-logger:
-
-``django.server``
-~~~~~~~~~~~~~~~~~
-
-Log messages related to the handling of requests received by the server invoked
-by the :djadmin:`runserver` command. HTTP 5XX responses are logged as ``ERROR``
-messages, 4XX responses are logged as ``WARNING`` messages, and everything else
-is logged as ``INFO``.
-
-Messages to this logger have the following extra context:
-
-* ``status_code``: The HTTP response code associated with the request.
-
-* ``request``: The request object that generated the logging message.
-
-.. _django-template-logger:
-
-``django.template``
-~~~~~~~~~~~~~~~~~~~
-
-Log messages related to the rendering of templates.
-
-* Missing context variables are logged as ``DEBUG`` messages.
-
-.. _django-db-logger:
-
-``django.db.backends``
-~~~~~~~~~~~~~~~~~~~~~~
-
-Messages relating to the interaction of code with the database. For example,
-every application-level SQL statement executed by a request is logged at the
-``DEBUG`` level to this logger.
-
-Messages to this logger have the following extra context:
-
-* ``duration``: The time taken to execute the SQL statement.
-* ``sql``: The SQL statement that was executed.
-* ``params``: The parameters that were used in the SQL call.
-
-For performance reasons, SQL logging is only enabled when
-``settings.DEBUG`` is set to ``True``, regardless of the logging
-level or handlers that are installed.
-
-This logging does not include framework-level initialization (e.g.
-``SET TIMEZONE``) or transaction management queries (e.g. ``BEGIN``,
-``COMMIT``, and ``ROLLBACK``). Turn on query logging in your database if you
-wish to view all database queries.
-
-.. _django-security-logger:
-
-``django.security.*``
-~~~~~~~~~~~~~~~~~~~~~~
-
-The security loggers will receive messages on any occurrence of
-:exc:`~django.core.exceptions.SuspiciousOperation` and other security-related
-errors. There is a sub-logger for each subtype of security error, including all
-``SuspiciousOperation``\s. The level of the log event depends on where the
-exception is handled.  Most occurrences are logged as a warning, while
-any ``SuspiciousOperation`` that reaches the WSGI handler will be logged as an
-error. For example, when an HTTP ``Host`` header is included in a request from
-a client that does not match :setting:`ALLOWED_HOSTS`, Django will return a 400
-response, and an error message will be logged to the
-``django.security.DisallowedHost`` logger.
-
-These log events will reach the ``django`` logger by default, which mails error
-events to admins when ``DEBUG=False``. Requests resulting in a 400 response due
-to a ``SuspiciousOperation`` will not be logged to the ``django.request``
-logger, but only to the ``django.security`` logger.
-
-To silence a particular type of ``SuspiciousOperation``, you can override that
-specific logger following this example::
-
-    'handlers': {
-        'null': {
-            'class': 'logging.NullHandler',
-        },
-    },
-    'loggers': {
-        'django.security.DisallowedHost': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-    },
-
-Other ``django.security`` loggers not based on ``SuspiciousOperation`` are:
-
-* ``django.security.csrf``: For :ref:`CSRF failures <csrf-rejected-requests>`.
-
-``django.db.backends.schema``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Logs the SQL queries that are executed during schema changes to the database by
-the :doc:`migrations framework </topics/migrations>`. Note that it won't log the
-queries executed by :class:`~django.db.migrations.operations.RunPython`.
-Messages to this logger have ``params`` and ``sql`` in their extra context (but
-unlike ``django.db.backends``, not duration). The values have the same meaning
-as explained in :ref:`django-db-logger`.
-
-Handlers
---------
-
-Django provides one log handler in addition to those provided by the
-Python logging module.
-
-.. class:: AdminEmailHandler(include_html=False, email_backend=None, reporter_class=None)
-
-    This handler sends an email to the site :setting:`ADMINS` for each log
-    message it receives.
-
-    If the log record contains a ``request`` attribute, the full details
-    of the request will be included in the email. The email subject will
-    include the phrase "internal IP" if the client's IP address is in the
-    :setting:`INTERNAL_IPS` setting; if not, it will include "EXTERNAL IP".
-
-    If the log record contains stack trace information, that stack
-    trace will be included in the email.
-
-    The ``include_html`` argument of ``AdminEmailHandler`` is used to
-    control whether the traceback email includes an HTML attachment
-    containing the full content of the debug Web page that would have been
-    produced if :setting:`DEBUG` were ``True``. To set this value in your
-    configuration, include it in the handler definition for
-    ``django.utils.log.AdminEmailHandler``, like this::
-
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-            }
-        },
-
-    Note that this HTML version of the email contains a full traceback,
-    with names and values of local variables at each level of the stack, plus
-    the values of your Django settings. This information is potentially very
-    sensitive, and you may not want to send it over email. Consider using
-    something such as `Sentry`_ to get the best of both worlds -- the
-    rich information of full tracebacks plus the security of *not* sending the
-    information over email. You may also explicitly designate certain
-    sensitive information to be filtered out of error reports -- learn more on
-    :ref:`Filtering error reports<filtering-error-reports>`.
-
-    By setting the ``email_backend`` argument of ``AdminEmailHandler``, the
-    :ref:`email backend <topic-email-backends>` that is being used by the
-    handler can be overridden, like this::
-
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'email_backend': 'django.core.mail.backends.filebased.EmailBackend',
-            }
-        },
-
-    By default, an instance of the email backend specified in
-    :setting:`EMAIL_BACKEND` will be used.
-
-    The ``reporter_class`` argument of ``AdminEmailHandler`` allows providing
-    an ``django.views.debug.ExceptionReporter`` subclass to customize the
-    traceback text sent in the email body. You provide a string import path to
-    the class you wish to use, like this::
-
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-                'reporter_class': 'somepackage.error_reporter.CustomErrorReporter'
-            }
-        },
-
-    .. versionadded:: 3.0
-
-        The ``reporter_class`` argument was added.
-
-    .. method:: send_mail(subject, message, *args, **kwargs)
-
-        Sends emails to admin users. To customize this behavior, you can
-        subclass the :class:`~django.utils.log.AdminEmailHandler` class and
-        override this method.
-
-.. _Sentry: https://pypi.org/project/sentry/
-
-Filters
--------
-
-Django provides some log filters in addition to those provided by the Python
-logging module.
-
-.. class:: CallbackFilter(callback)
-
-    This filter accepts a callback function (which should accept a single
-    argument, the record to be logged), and calls it for each record that
-    passes through the filter. Handling of that record will not proceed if the
-    callback returns False.
-
-    For instance, to filter out :exc:`~django.http.UnreadablePostError`
-    (raised when a user cancels an upload) from the admin emails, you would
-    create a filter function::
-
-        from django.http import UnreadablePostError
-
-        def skip_unreadable_post(record):
-            if record.exc_info:
-                exc_type, exc_value = record.exc_info[:2]
-                if isinstance(exc_value, UnreadablePostError):
-                    return False
-            return True
-
-    and then add it to your logging config::
-
-        'filters': {
-            'skip_unreadable_posts': {
-                '()': 'django.utils.log.CallbackFilter',
-                'callback': skip_unreadable_post,
-            }
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['skip_unreadable_posts'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            }
-        },
-
-.. class:: RequireDebugFalse()
-
-    This filter will only pass on records when settings.DEBUG is False.
-
-    This filter is used as follows in the default :setting:`LOGGING`
-    configuration to ensure that the :class:`AdminEmailHandler` only sends
-    error emails to admins when :setting:`DEBUG` is ``False``::
-
-        'filters': {
-            'require_debug_false': {
-                '()': 'django.utils.log.RequireDebugFalse',
-            }
-        },
-        'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'filters': ['require_debug_false'],
-                'class': 'django.utils.log.AdminEmailHandler'
-            }
-        },
-
-.. class:: RequireDebugTrue()
-
-    This filter is similar to :class:`RequireDebugFalse`, except that records are
-    passed only when :setting:`DEBUG` is ``True``.
-
-.. _default-logging-configuration:
-
-Django's default logging configuration
-======================================
-
-By default, Django configures the following logging:
-
-When :setting:`DEBUG` is ``True``:
-
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``) at the ``INFO`` level or higher to the console.
-
-When :setting:`DEBUG` is ``False``:
-
-* The ``django`` logger sends messages in the ``django`` hierarchy (except
-  ``django.server``)  with ``ERROR`` or ``CRITICAL`` level to
-  :class:`AdminEmailHandler`.
-
-Independent of the value of :setting:`DEBUG`:
-
-* The :ref:`django-server-logger` logger sends messages at the ``INFO`` level
-  or higher to the console.
-
-All loggers except :ref:`django-server-logger` propagate logging to their
-parents, up to the root ``django`` logger. The ``console`` and ``mail_admins``
-handlers are attached to the root logger to provide the behavior described
-above.
-
-See also :ref:`Configuring logging <configuring-logging>` to learn how you can
-complement or replace this default logging configuration defined in
-:source:`django/utils/log.py`.
+Note that the default configuration process only calls
+:setting:`LOGGING_CONFIG` once settings are fully-loaded. In contrast, manually
+configuring the logging in your settings file will load your logging config
+immediately. As such, your logging config must appear *after* any settings on
+which it depends.

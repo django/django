@@ -1,5 +1,4 @@
 /* global QUnit */
-/* eslint global-strict: 0, strict: 0 */
 'use strict';
 
 QUnit.module('admin.core');
@@ -41,35 +40,46 @@ QUnit.test('Date.getTwoDigitSecond', function(assert) {
     assert.equal(new Date(2014, 6, 1, 0, 0, 20).getTwoDigitSecond(), '20', '12:00:20 am is 20');
 });
 
+QUnit.test('Date.getAbbrevMonthName', function(assert) {
+    assert.equal(new Date(2020, 0, 26).getAbbrevMonthName(), 'Jan', 'jan 26');
+    assert.equal(new Date(2020, 9, 26).getAbbrevMonthName(), 'Oct', 'oct 26');
+});
+
+QUnit.test('Date.getFullMonthName', function(assert) {
+    assert.equal(new Date(2020, 0, 26).getFullMonthName(), 'January', 'jan 26');
+    assert.equal(new Date(2020, 9, 26).getFullMonthName(), 'October', 'oct 26');
+});
+
 QUnit.test('Date.strftime', function(assert) {
-    var date = new Date(2014, 6, 1, 11, 0, 5);
+    const date = new Date(2014, 6, 1, 11, 0, 5);
     assert.equal(date.strftime('%Y-%m-%d %H:%M:%S'), '2014-07-01 11:00:05');
     assert.equal(date.strftime('%B %d, %Y'), 'July 01, 2014');
+    assert.equal(date.strftime('%b %d, %Y'), 'Jul 01, 2014');
 });
 
 QUnit.test('String.strptime', function(assert) {
     // Use UTC functions for extracting dates since the calendar uses them as
     // well. Month numbering starts with 0 (January).
-    var firstParsedDate = '1988-02-26'.strptime('%Y-%m-%d');
+    const firstParsedDate = '1988-02-26'.strptime('%Y-%m-%d');
     assert.equal(firstParsedDate.getUTCDate(), 26);
     assert.equal(firstParsedDate.getUTCMonth(), 1);
     assert.equal(firstParsedDate.getUTCFullYear(), 1988);
 
     // A %y value in the range of [69, 99] is in the previous century.
-    var secondParsedDate = '26/02/88'.strptime('%d/%m/%y');
+    const secondParsedDate = '26/02/88'.strptime('%d/%m/%y');
     assert.equal(secondParsedDate.getUTCDate(), 26);
     assert.equal(secondParsedDate.getUTCMonth(), 1);
     assert.equal(secondParsedDate.getUTCFullYear(), 1988);
 
-    var format = django.get_format('DATE_INPUT_FORMATS')[0];
-    var thirdParsedDate = '1983-11-20'.strptime(format);
+    const format = django.get_format('DATE_INPUT_FORMATS')[0];
+    const thirdParsedDate = '1983-11-20'.strptime(format);
 
     assert.equal(thirdParsedDate.getUTCDate(), 20);
     assert.equal(thirdParsedDate.getUTCMonth(), 10);
     assert.equal(thirdParsedDate.getUTCFullYear(), 1983);
 
     // A %y value in the range of [00, 68] is in the current century.
-    var fourthParsedDate = '27/09/68'.strptime('%d/%m/%y');
+    const fourthParsedDate = '27/09/68'.strptime('%d/%m/%y');
     assert.equal(fourthParsedDate.getUTCDate(), 27);
     assert.equal(fourthParsedDate.getUTCMonth(), 8);
     assert.equal(fourthParsedDate.getUTCFullYear(), 2068);
@@ -80,10 +90,9 @@ QUnit.test('String.strptime', function(assert) {
     // Feb 26, 1988 00:00:00 EEST is Feb 25, 21:00:00 UTC.
 
     // Checking timezones from GMT+0100 to GMT+1200
-    var i, tz, date;
-    for (i = 1; i <= 12; i++) {
-        tz = i > 9 ? '' + i : '0' + i;
-        date = new Date(Date.parse('Feb 26, 1988 00:00:00 GMT+' + tz + '00'));
+    for (let i = 1; i <= 12; i++) {
+        const tz = i > 9 ? '' + i : '0' + i;
+        const date = new Date(Date.parse('Feb 26, 1988 00:00:00 GMT+' + tz + '00'));
         assert.notEqual(date.getUTCDate(), 26);
         assert.equal(date.getUTCDate(), 25);
         assert.equal(date.getUTCMonth(), 1);
@@ -91,9 +100,9 @@ QUnit.test('String.strptime', function(assert) {
     }
 
     // Checking timezones from GMT+0000 to GMT-1100
-    for (i = 0; i <= 11; i++) {
-        tz = i > 9 ? '' + i : '0' + i;
-        date = new Date(Date.parse('Feb 26, 1988 00:00:00 GMT-' + tz + '00'));
+    for (let i = 0; i <= 11; i++) {
+        const tz = i > 9 ? '' + i : '0' + i;
+        const date = new Date(Date.parse('Feb 26, 1988 00:00:00 GMT-' + tz + '00'));
         assert.equal(date.getUTCDate(), 26);
         assert.equal(date.getUTCMonth(), 1);
         assert.equal(date.getUTCFullYear(), 1988);

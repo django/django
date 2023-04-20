@@ -4,18 +4,12 @@ from django.db import models
 class Author(models.Model):
     name = models.CharField(max_length=100)
     age = models.IntegerField()
-    friends = models.ManyToManyField('self', blank=True)
-
-    def __str__(self):
-        return self.name
+    friends = models.ManyToManyField("self", blank=True)
 
 
 class Publisher(models.Model):
     name = models.CharField(max_length=255)
     num_awards = models.IntegerField()
-
-    def __str__(self):
-        return self.name
 
 
 class Book(models.Model):
@@ -25,12 +19,9 @@ class Book(models.Model):
     rating = models.FloatField()
     price = models.DecimalField(decimal_places=2, max_digits=6)
     authors = models.ManyToManyField(Author)
-    contact = models.ForeignKey(Author, models.CASCADE, related_name='book_contact_set')
+    contact = models.ForeignKey(Author, models.CASCADE, related_name="book_contact_set")
     publisher = models.ForeignKey(Publisher, models.CASCADE)
     pubdate = models.DateField()
-
-    def __str__(self):
-        return self.name
 
 
 class Store(models.Model):
@@ -38,17 +29,11 @@ class Store(models.Model):
     books = models.ManyToManyField(Book)
     original_opening = models.DateTimeField()
     friday_night_closing = models.TimeField()
-    area = models.IntegerField(null=True, db_column='surface')
-
-    def __str__(self):
-        return self.name
+    area = models.IntegerField(null=True, db_column="surface")
 
 
 class DepartmentStore(Store):
     chain = models.CharField(max_length=255)
-
-    def __str__(self):
-        return '%s - %s ' % (self.chain, self.name)
 
 
 class Employee(models.Model):
@@ -62,9 +47,6 @@ class Employee(models.Model):
     age = models.IntegerField()
     salary = models.DecimalField(max_digits=8, decimal_places=2)
 
-    def __str__(self):
-        return '%s %s' % (self.first_name, self.last_name)
-
 
 class Company(models.Model):
     name = models.CharField(max_length=200)
@@ -72,15 +54,7 @@ class Company(models.Model):
     ticker_name = models.CharField(max_length=10, null=True, blank=True)
     description = models.CharField(max_length=200, null=True, blank=True)
 
-    def __str__(self):
-        return 'Company(name=%s, motto=%s, ticker_name=%s, description=%s)' % (
-            self.name, self.motto, self.ticker_name, self.description,
-        )
-
 
 class Ticket(models.Model):
     active_at = models.DateTimeField()
     duration = models.DurationField()
-
-    def __str__(self):
-        return '{} - {}'.format(self.active_at, self.duration)

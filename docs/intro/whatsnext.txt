@@ -36,7 +36,7 @@ Django's main documentation is broken up into "chunks" designed to fill
 different needs:
 
 * The :doc:`introductory material </intro/index>` is designed for people new
-  to Django -- or to Web development in general. It doesn't cover anything
+  to Django -- or to web development in general. It doesn't cover anything
   in depth, but instead gives a high-level overview of how developing in
   Django "feels".
 
@@ -106,7 +106,7 @@ Where to get it
 You can read Django documentation in several ways. They are, in order of
 preference:
 
-On the Web
+On the web
 ----------
 
 The most recent version of the Django documentation lives at
@@ -127,7 +127,7 @@ particular Django setup, try the |django-users| mailing list or the `#django
 IRC channel`_ instead.
 
 .. _ticket system: https://code.djangoproject.com/
-.. _#django IRC channel: irc://irc.freenode.net/django
+.. _#django IRC channel: https://web.libera.chat/#django
 
 In plain text
 -------------
@@ -139,7 +139,7 @@ If you're using an official release of Django, the zipped package (tarball) of
 the code includes a ``docs/`` directory, which contains all the documentation
 for that release.
 
-If you're using the development version of Django (aka the master branch), the
+If you're using the development version of Django (aka the main branch), the
 ``docs/`` directory contains all of the documentation. You can update your
 Git checkout to get the latest changes.
 
@@ -183,7 +183,7 @@ You can get a local copy of the HTML documentation following a few steps:
 
 * The HTML documentation will be placed in ``docs/_build/html``.
 
-__ http://sphinx-doc.org/
+__ https://www.sphinx-doc.org/
 __ https://www.gnu.org/software/make/
 
 .. _differences-between-doc-versions:
@@ -191,16 +191,16 @@ __ https://www.gnu.org/software/make/
 Differences between versions
 ============================
 
-The text documentation in the master branch of the Git repository contains the
+The text documentation in the main branch of the Git repository contains the
 "latest and greatest" changes and additions. These changes include
 documentation of new features targeted for Django's next :term:`feature
-release`. For that reason, it's worth pointing out our policy to highlight
-recent changes and additions to Django.
+release <Feature release>`. For that reason, it's worth pointing out our policy
+to highlight recent changes and additions to Django.
 
 We follow this policy:
 
 * The development documentation at https://docs.djangoproject.com/en/dev/ is
-  from the master branch. These docs correspond to the latest feature release,
+  from the main branch. These docs correspond to the latest feature release,
   plus whatever features have been added/changed in the framework since then.
 
 * As we add features to Django's development version, we update the
@@ -211,12 +211,12 @@ We follow this policy:
   been released yet, or "New in version X.Y" for released versions.
 
 * Documentation fixes and improvements may be backported to the last release
-  branch, at the discretion of the committer, however, once a version of
-  Django is :ref:`no longer supported<supported-versions-policy>`, that version
-  of the docs won't get any further updates.
+  branch, at the discretion of the merger, however, once a version of Django is
+  :ref:`no longer supported<supported-versions-policy>`, that version of the
+  docs won't get any further updates.
 
-* The `main documentation Web page`_ includes links to documentation for
+* The `main documentation web page`_ includes links to documentation for
   previous versions. Be sure you are using the version of the docs
   corresponding to the version of Django you are using!
 
-.. _main documentation Web page: https://docs.djangoproject.com/en/dev/
+.. _main documentation web page: https://docs.djangoproject.com/en/dev/

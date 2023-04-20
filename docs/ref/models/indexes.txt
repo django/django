@@ -21,9 +21,52 @@ options`_.
 ``Index`` options
 =================
 
-.. class:: Index(fields=(), name=None, db_tablespace=None, opclasses=(), condition=None)
+.. class:: Index(*expressions, fields=(), name=None, db_tablespace=None, opclasses=(), condition=None, include=None)
 
     Creates an index (B-Tree) in the database.
+
+``expressions``
+---------------
+
+.. attribute:: Index.expressions
+
+Positional argument ``*expressions`` allows creating functional indexes on
+expressions and database functions.
+
+For example::
+
+    Index(Lower("title").desc(), "pub_date", name="lower_title_date_idx")
+
+creates an index on the lowercased value of the ``title`` field in descending
+order and the ``pub_date`` field in the default ascending order.
+
+Another example::
+
+    Index(F("height") * F("weight"), Round("weight"), name="calc_idx")
+
+creates an index on the result of multiplying fields ``height`` and ``weight``
+and the ``weight`` rounded to the nearest integer.
+
+:attr:`Index.name` is required when using ``*expressions``.
+
+.. admonition:: Restrictions on Oracle
+
+    Oracle requires functions referenced in an index to be marked as
+    ``DETERMINISTIC``. Django doesn't validate this but Oracle will error. This
+    means that functions such as
+    :class:`Random() <django.db.models.functions.Random>` aren't accepted.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL requires functions and operators referenced in an index to be
+    marked as ``IMMUTABLE``. Django doesn't validate this but PostgreSQL will
+    error. This means that functions such as
+    :class:`Concat() <django.db.models.functions.Concat>` aren't accepted.
+
+.. admonition:: MySQL and MariaDB
+
+    Functional indexes are ignored with MySQL < 8.0.13 and MariaDB as neither
+    supports them.
 
 ``fields``
 ----------
@@ -37,8 +80,12 @@ define an index with a descending order for a column, add a hyphen before the
 field's name.
 
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
-``(headline, pub_date DESC)``. Index ordering isn't supported on MySQL. In that
-case, a descending index is created as a normal index.
+``(headline, pub_date DESC)``.
+
+.. admonition:: MySQL and MariaDB
+
+    Index ordering isn't supported on MySQL < 8.0.1 and MariaDB < 10.8. In that
+    case, a descending index is created as a normal index.
 
 ``name``
 --------
@@ -60,10 +107,6 @@ than 30 characters and shouldn't start with a number (0-9) or underscore (_).
     replaced, respectively, by the lowercased app label and class name of the
     concrete model. For example ``Index(fields=['title'],
     name='%(app_label)s_%(class)s_title_index')``.
-
-.. versionchanged:: 3.0
-
-    Interpolation of  ``'%(app_label)s'`` and ``'%(class)s'`` was added.
 
 ``db_tablespace``
 -----------------
@@ -134,10 +177,46 @@ indexes records with more than 400 pages.
 .. admonition:: Oracle
 
     Oracle does not support partial indexes. Instead, partial indexes can be
-    emulated using functional indexes. Use a :doc:`migration
-    </topics/migrations>` to add the index using :class:`.RunSQL`.
+    emulated by using functional indexes together with
+    :class:`~django.db.models.expressions.Case` expressions.
 
 .. admonition:: MySQL and MariaDB
 
     The ``condition`` argument is ignored with MySQL and MariaDB as neither
     supports conditional indexes.
+
+``include``
+-----------
+
+.. attribute:: Index.include
+
+A list or tuple of the names of the fields to be included in the covering index
+as non-key columns. This allows index-only scans to be used for queries that
+select only included fields (:attr:`~Index.include`) and filter only by indexed
+fields (:attr:`~Index.fields`).
+
+For example::
+
+    Index(name="covering_index", fields=["headline"], include=["pub_date"])
+
+will allow filtering on ``headline``, also selecting ``pub_date``, while
+fetching data only from the index.
+
+Using ``include`` will produce a smaller index than using a multiple column
+index but with the drawback that non-key columns can not be used for sorting or
+filtering.
+
+``include`` is ignored for databases besides PostgreSQL.
+
+:attr:`Index.name` is required when using ``include``.
+
+See the PostgreSQL documentation for more details about `covering indexes`_.
+
+.. admonition:: Restrictions on PostgreSQL
+
+    PostgreSQL supports covering B-Tree and :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`. PostgreSQL 14+ also supports
+    covering :class:`SP-GiST indexes
+    <django.contrib.postgres.indexes.SpGistIndex>`.
+
+.. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

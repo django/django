@@ -19,7 +19,7 @@ many projects they are typically the most commonly used views.
 
     * :class:`django.views.generic.detail.SingleObjectTemplateResponseMixin`
     * :class:`django.views.generic.base.TemplateResponseMixin`
-    * ``django.views.generic.detail.BaseDetailView``
+    * :class:`django.views.generic.detail.BaseDetailView`
     * :class:`django.views.generic.detail.SingleObjectMixin`
     * :class:`django.views.generic.base.View`
 
@@ -34,7 +34,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_object()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.detail.SingleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.detail.BaseDetailView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example myapp/views.py**::
@@ -44,13 +44,13 @@ many projects they are typically the most commonly used views.
 
         from articles.models import Article
 
-        class ArticleDetailView(DetailView):
 
+        class ArticleDetailView(DetailView):
             model = Article
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['now'] = timezone.now()
+                context["now"] = timezone.now()
                 return context
 
     **Example myapp/urls.py**::
@@ -60,7 +60,7 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleDetailView
 
         urlpatterns = [
-            path('<slug:slug>/', ArticleDetailView.as_view(), name='article-detail'),
+            path("<slug:slug>/", ArticleDetailView.as_view(), name="article-detail"),
         ]
 
     **Example myapp/article_detail.html**:
@@ -72,6 +72,26 @@ many projects they are typically the most commonly used views.
         <p>Reporter: {{ object.reporter }}</p>
         <p>Published: {{ object.pub_date|date }}</p>
         <p>Date: {{ now|date }}</p>
+
+.. class:: django.views.generic.detail.BaseDetailView
+
+    A base view for displaying a single object. It is not intended to be used
+    directly, but rather as a parent class of the
+    :class:`django.views.generic.detail.DetailView` or other views representing
+    details of a single object.
+
+    **Ancestors (MRO)**
+
+    This view inherits methods and attributes from the following views:
+
+    * :class:`django.views.generic.detail.SingleObjectMixin`
+    * :class:`django.views.generic.base.View`
+
+    **Methods**
+
+    .. method:: get(request, *args, **kwargs)
+
+        Adds ``object`` to the context.
 
 ``ListView``
 ============
@@ -103,7 +123,7 @@ many projects they are typically the most commonly used views.
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_object_name()`
     #. :meth:`~django.views.generic.list.MultipleObjectMixin.get_context_data()`
-    #. ``get()``
+    #. :meth:`~django.views.generic.list.BaseListView.get`
     #. :meth:`~django.views.generic.base.TemplateResponseMixin.render_to_response()`
 
     **Example views.py**::
@@ -113,14 +133,14 @@ many projects they are typically the most commonly used views.
 
         from articles.models import Article
 
-        class ArticleListView(ListView):
 
+        class ArticleListView(ListView):
             model = Article
             paginate_by = 100  # if pagination is desired
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['now'] = timezone.now()
+                context["now"] = timezone.now()
                 return context
 
     **Example myapp/urls.py**::
@@ -130,7 +150,7 @@ many projects they are typically the most commonly used views.
         from article.views import ArticleListView
 
         urlpatterns = [
-            path('', ArticleListView.as_view(), name='article-list'),
+            path("", ArticleListView.as_view(), name="article-list"),
         ]
 
     **Example myapp/article_list.html**:
@@ -147,8 +167,7 @@ many projects they are typically the most commonly used views.
         </ul>
 
     If you're using pagination, you can adapt the :ref:`example template from
-    the pagination docs <using-paginator-in-view>`. Change instances of
-    ``contacts`` in that example template to ``page_obj``.
+    the pagination docs <paginating-a-list-view>`.
 
 .. class:: django.views.generic.list.BaseListView
 

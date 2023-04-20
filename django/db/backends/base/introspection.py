@@ -1,14 +1,19 @@
 from collections import namedtuple
 
 # Structure returned by DatabaseIntrospection.get_table_list()
-TableInfo = namedtuple('TableInfo', ['name', 'type'])
+TableInfo = namedtuple("TableInfo", ["name", "type"])
 
 # Structure returned by the DB-API cursor.description interface (PEP 249)
-FieldInfo = namedtuple('FieldInfo', 'name type_code display_size internal_size precision scale null_ok default')
+FieldInfo = namedtuple(
+    "FieldInfo",
+    "name type_code display_size internal_size precision scale null_ok "
+    "default collation",
+)
 
 
 class BaseDatabaseIntrospection:
     """Encapsulate backend-specific introspection utilities."""
+
     data_types_reverse = {}
 
     def __init__(self, connection):
@@ -39,9 +44,14 @@ class BaseDatabaseIntrospection:
         the database's ORDER BY here to avoid subtle differences in sorting
         order between databases.
         """
+
         def get_names(cursor):
-            return sorted(ti.name for ti in self.get_table_list(cursor)
-                          if include_views or ti.type == 't')
+            return sorted(
+                ti.name
+                for ti in self.get_table_list(cursor)
+                if include_views or ti.type == "t"
+            )
+
         if cursor is None:
             with self.connection.cursor() as cursor:
                 return get_names(cursor)
@@ -52,11 +62,25 @@ class BaseDatabaseIntrospection:
         Return an unsorted list of TableInfo named tuples of all tables and
         views that exist in the database.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_table_list() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseIntrospection may require a get_table_list() "
+            "method"
+        )
+
+    def get_table_description(self, cursor, table_name):
+        """
+        Return a description of the table with the DB-API cursor.description
+        interface.
+        """
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseIntrospection may require a "
+            "get_table_description() method."
+        )
 
     def get_migratable_models(self):
         from django.apps import apps
         from django.db import router
+
         return (
             model
             for app_config in apps.get_app_configs()
@@ -77,16 +101,15 @@ class BaseDatabaseIntrospection:
                 continue
             tables.add(model._meta.db_table)
             tables.update(
-                f.m2m_db_table() for f in model._meta.local_many_to_many
+                f.m2m_db_table()
+                for f in model._meta.local_many_to_many
                 if f.remote_field.through._meta.managed
             )
         tables = list(tables)
         if only_existing:
             existing_tables = set(self.table_names(include_views=include_views))
             tables = [
-                t
-                for t in tables
-                if self.identifier_converter(t) in existing_tables
+                t for t in tables if self.identifier_converter(t) in existing_tables
             ]
         return tables
 
@@ -97,7 +120,8 @@ class BaseDatabaseIntrospection:
         """
         tables = set(map(self.identifier_converter, tables))
         return {
-            m for m in self.get_migratable_models()
+            m
+            for m in self.get_migratable_models()
             if self.identifier_converter(m._meta.db_table) in tables
         }
 
@@ -113,13 +137,19 @@ class BaseDatabaseIntrospection:
                     continue
                 if model._meta.swapped:
                     continue
-                sequence_list.extend(self.get_sequences(cursor, model._meta.db_table, model._meta.local_fields))
+                sequence_list.extend(
+                    self.get_sequences(
+                        cursor, model._meta.db_table, model._meta.local_fields
+                    )
+                )
                 for f in model._meta.local_many_to_many:
                     # If this is an m2m using an intermediate table,
                     # we don't need to reset the sequence.
                     if f.remote_field.through._meta.auto_created:
                         sequence = self.get_sequences(cursor, f.m2m_db_table())
-                        sequence_list.extend(sequence or [{'table': f.m2m_db_table(), 'column': None}])
+                        sequence_list.extend(
+                            sequence or [{"table": f.m2m_db_table(), "column": None}]
+                        )
         return sequence_list
 
     def get_sequences(self, cursor, table_name, table_fields=()):
@@ -128,23 +158,33 @@ class BaseDatabaseIntrospection:
         is a dict: {'table': <table_name>, 'column': <column_name>}. An optional
         'name' key can be added if the backend supports named sequences.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_sequences() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseIntrospection may require a get_sequences() "
+            "method"
+        )
 
-    def get_key_columns(self, cursor, table_name):
+    def get_relations(self, cursor, table_name):
         """
-        Backends can override this to return a list of:
-            (column_name, referenced_table_name, referenced_column_name)
-        for all key columns in given table.
+        Return a dictionary of {field_name: (field_name_other_table, other_table)}
+        representing all foreign keys in the given table.
         """
-        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_key_columns() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseIntrospection may require a "
+            "get_relations() method."
+        )
 
     def get_primary_key_column(self, cursor, table_name):
         """
         Return the name of the primary key column for the given table.
         """
+        columns = self.get_primary_key_columns(cursor, table_name)
+        return columns[0] if columns else None
+
+    def get_primary_key_columns(self, cursor, table_name):
+        """Return a list of primary key columns for the given table."""
         for constraint in self.get_constraints(cursor, table_name).values():
-            if constraint['primary_key']:
-                return constraint['columns'][0]
+            if constraint["primary_key"]:
+                return constraint["columns"]
         return None
 
     def get_constraints(self, cursor, table_name):
@@ -166,4 +206,7 @@ class BaseDatabaseIntrospection:
         Some backends may return special constraint names that don't exist
         if they don't name constraints of a certain type (e.g. SQLite)
         """
-        raise NotImplementedError('subclasses of BaseDatabaseIntrospection may require a get_constraints() method')
+        raise NotImplementedError(
+            "subclasses of BaseDatabaseIntrospection may require a get_constraints() "
+            "method"
+        )

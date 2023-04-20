@@ -116,6 +116,8 @@ A more generic example:
   LTS to LTS upgrades).
 * Z.0: Drop deprecation shims added in Y.0 and Y.1.
 
+See also the :ref:`deprecating-a-feature` guide.
+
 .. _supported-versions-policy:
 
 Supported versions
@@ -126,10 +128,10 @@ varying levels. See `the supported versions section
 <https://www.djangoproject.com/download/#supported-versions>`_ of the download
 page for the current state of support for each version.
 
-* The current development master will get new features and bug fixes
+* The current development branch ``main`` will get new features and bug fixes
   requiring non-trivial refactoring.
 
-* Patches applied to the master branch must also be applied to the last feature
+* Patches applied to the main branch must also be applied to the last feature
   release branch, to be released in the next patch release of that feature
   series, when they fix critical problems:
 
@@ -141,14 +143,15 @@ page for the current state of support for each version.
 
   * Major functionality bugs in new features of the latest stable release.
 
-  * Regressions from older versions of Django.
+  * Regressions from older versions of Django introduced in the current release
+    series.
 
   The rule of thumb is that fixes will be backported to the last feature
   release for bugs that would have prevented a release in the first place
   (release blockers).
 
-* Security fixes and data loss bugs will be applied to the current master, the
-  last two feature release branches, and any other supported long-term
+* Security fixes and data loss bugs will be applied to the current main branch,
+  the last two feature release branches, and any other supported long-term
   support release branches.
 
 * Documentation fixes generally will be more freely backported to the last
@@ -159,17 +162,18 @@ page for the current state of support for each version.
 As a concrete example, consider a moment in time halfway between the release of
 Django 5.1 and 5.2. At this point in time:
 
-* Features will be added to development master, to be released as Django 5.2.
+* Features will be added to the development main branch, to be released as
+  Django 5.2.
 
 * Critical bug fixes will be applied to the ``stable/5.1.x`` branch, and
   released as 5.1.1, 5.1.2, etc.
 
 * Security fixes and bug fixes for data loss issues will be applied to
-  ``master`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
+  ``main`` and to the ``stable/5.1.x``, ``stable/5.0.x``, and
   ``stable/4.2.x`` (LTS) branches. They will trigger the release of ``5.1.1``,
   ``5.0.5``, ``4.2.8``, etc.
 
-* Documentation fixes will be applied to master, and, if easily backported, to
+* Documentation fixes will be applied to main, and, if easily backported, to
   the latest stable branch, ``5.1.x``.
 
 .. _release-process:
@@ -209,7 +213,7 @@ At the end of phase two, any unfinished features will be postponed until the
 next release.
 
 Phase two will culminate with an alpha release. At this point, the
-``stable/A.B.x`` branch will be forked from ``master``.
+``stable/A.B.x`` branch will be forked from ``main``.
 
 Phase three: bugfixes
 ~~~~~~~~~~~~~~~~~~~~~
@@ -222,11 +226,11 @@ The release candidate marks the string freeze, and it happens at least two
 weeks before the final release. After this point, new translatable strings
 must not be added.
 
-During this phase, committers will be more and more conservative with
-backports, to avoid introducing regressions. After the release candidate, only
-release blockers and documentation fixes should be backported.
+During this phase, mergers will be more and more conservative with backports,
+to avoid introducing regressions. After the release candidate, only release
+blockers and documentation fixes should be backported.
 
-In parallel to this phase, ``master`` can receive new features, to be released
+In parallel to this phase, ``main`` can receive new features, to be released
 in the ``A.B+1`` cycle.
 
 Bug-fix releases
@@ -236,7 +240,7 @@ After a feature release (e.g. A.B), the previous release will go into bugfix
 mode.
 
 The branch for the previous feature release (e.g. ``stable/A.B-1.x``) will
-include bugfixes. Critical bugs fixed on master must *also* be fixed on the
+include bugfixes. Critical bugs fixed on main must *also* be fixed on the
 bugfix branch; this means that commits need to cleanly separate bug fixes from
-feature additions. The developer who commits a fix to master will be
+feature additions. The developer who commits a fix to main will be
 responsible for also applying the fix to the current bugfix branch.

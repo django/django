@@ -32,10 +32,8 @@ class Comment(models.Model):
     comment_text = models.CharField(max_length=250)
 
     class Meta:
-        ordering = ('comment_text',)
+        ordering = ("comment_text",)
 
-    def __str__(self):
-        return self.comment_text
 
 # Ticket 15823
 
@@ -49,6 +47,6 @@ class PropertyValue(models.Model):
 
 
 class Property(models.Model):
-    item = models.ForeignKey(Item, models.CASCADE, related_name='props')
+    item = models.ForeignKey(Item, models.CASCADE, related_name="props")
     key = models.CharField(max_length=100)
     value = models.ForeignKey(PropertyValue, models.SET_NULL, null=True)

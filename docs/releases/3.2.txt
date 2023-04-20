@@ -1,0 +1,791 @@
+========================
+Django 3.2 release notes
+========================
+
+*April 6, 2021*
+
+Welcome to Django 3.2!
+
+These release notes cover the :ref:`new features <whats-new-3.2>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-3.2>` you'll
+want to be aware of when upgrading from Django 3.1 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-3.2>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Django 3.2 is designated as a :term:`long-term support release
+<Long-term support release>`. It will receive security updates for at least
+three years after its release. Support for the previous LTS, Django 2.2, will
+end in April 2022.
+
+Python compatibility
+====================
+
+Django 3.2 supports Python 3.6, 3.7, 3.8, 3.9, and 3.10 (as of 3.2.9). We
+**highly recommend** and only officially support the latest release of each
+series.
+
+.. _whats-new-3.2:
+
+What's new in Django 3.2
+========================
+
+Automatic :class:`~django.apps.AppConfig` discovery
+---------------------------------------------------
+
+Most pluggable applications define an :class:`~django.apps.AppConfig` subclass
+in an ``apps.py`` submodule. Many define a ``default_app_config`` variable
+pointing to this class in their ``__init__.py``.
+
+When the ``apps.py`` submodule exists and defines a single
+:class:`~django.apps.AppConfig` subclass, Django now uses that configuration
+automatically, so you can remove ``default_app_config``.
+
+``default_app_config`` made it possible to declare only the application's path
+in :setting:`INSTALLED_APPS` (e.g. ``'django.contrib.admin'``) rather than the
+app config's path (e.g. ``'django.contrib.admin.apps.AdminConfig'``). It was
+introduced for backwards-compatibility with the former style, with the intent
+to switch the ecosystem to the latter, but the switch didn't happen.
+
+With automatic ``AppConfig`` discovery, ``default_app_config`` is no longer
+needed. As a consequence, it's deprecated.
+
+See :ref:`configuring-applications-ref` for full details.
+
+Customizing type of auto-created primary keys
+---------------------------------------------
+
+When defining a model, if no field in a model is defined with
+:attr:`primary_key=True <django.db.models.Field.primary_key>` an implicit
+primary key is added. The type of this implicit primary key can now be
+controlled via the :setting:`DEFAULT_AUTO_FIELD` setting and
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+attribute. No more needing to override primary keys in all models.
+
+Maintaining the historical behavior, the default value for
+:setting:`DEFAULT_AUTO_FIELD` is :class:`~django.db.models.AutoField`. Starting
+with 3.2 new projects are generated with :setting:`DEFAULT_AUTO_FIELD` set to
+:class:`~django.db.models.BigAutoField`. Also, new apps are generated with
+:attr:`AppConfig.default_auto_field <django.apps.AppConfig.default_auto_field>`
+set to :class:`~django.db.models.BigAutoField`. In a future Django release the
+default value of :setting:`DEFAULT_AUTO_FIELD` will be changed to
+:class:`~django.db.models.BigAutoField`.
+
+To avoid unwanted migrations in the future, either explicitly set
+:setting:`DEFAULT_AUTO_FIELD` to :class:`~django.db.models.AutoField`::
+
+    DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+or configure it on a per-app basis::
+
+    from django.apps import AppConfig
+
+
+    class MyAppConfig(AppConfig):
+        default_auto_field = "django.db.models.AutoField"
+        name = "my_app"
+
+or on a per-model basis::
+
+    from django.db import models
+
+
+    class MyModel(models.Model):
+        id = models.AutoField(primary_key=True)
+
+In anticipation of the changing default, a system check will provide a warning
+if you do not have an explicit setting for :setting:`DEFAULT_AUTO_FIELD`.
+
+When changing the value of :setting:`DEFAULT_AUTO_FIELD`, migrations for the
+primary key of existing auto-created through tables cannot be generated
+currently. See the :setting:`DEFAULT_AUTO_FIELD` docs for details on migrating
+such tables.
+
+.. _new_functional_indexes:
+
+Functional indexes
+------------------
+
+The new :attr:`*expressions <django.db.models.Index.expressions>` positional
+argument of :class:`Index() <django.db.models.Index>` enables creating
+functional indexes on expressions and database functions. For example::
+
+    from django.db import models
+    from django.db.models import F, Index, Value
+    from django.db.models.functions import Lower, Upper
+
+
+    class MyModel(models.Model):
+        first_name = models.CharField(max_length=255)
+        last_name = models.CharField(max_length=255)
+        height = models.IntegerField()
+        weight = models.IntegerField()
+
+        class Meta:
+            indexes = [
+                Index(
+                    Lower("first_name"),
+                    Upper("last_name").desc(),
+                    name="first_last_name_idx",
+                ),
+                Index(
+                    F("height") / (F("weight") + Value(5)),
+                    name="calc_idx",
+                ),
+            ]
+
+Functional indexes are added to models using the
+:attr:`Meta.indexes <django.db.models.Options.indexes>` option.
+
+``pymemcache`` support
+----------------------
+
+The new ``django.core.cache.backends.memcached.PyMemcacheCache`` cache backend
+allows using the :pypi:`pymemcache` library for memcached. ``pymemcache`` 3.4.0
+or higher is required. For more details, see the :doc:`documentation on caching
+in Django </topics/cache>`.
+
+New decorators for the admin site
+---------------------------------
+
+The new :func:`~django.contrib.admin.display` decorator allows for easily
+adding options to custom display functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.list_display` or
+:attr:`~django.contrib.admin.ModelAdmin.readonly_fields`.
+
+Likewise, the new :func:`~django.contrib.admin.action` decorator allows for
+easily adding options to action functions that can be used with
+:attr:`~django.contrib.admin.ModelAdmin.actions`.
+
+Using the ``@display`` decorator has the advantage that it is now
+possible to use the ``@property`` decorator when needing to specify attributes
+on the custom method. Prior to this it was necessary to use the ``property()``
+function instead after assigning the required attributes to the method.
+
+Using decorators has the advantage that these options are more discoverable as
+they can be suggested by completion utilities in code editors. They are merely
+a convenience and still set the same attributes on the functions under the
+hood.
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* :attr:`.ModelAdmin.search_fields` now allows searching against quoted phrases
+  with spaces.
+
+* Read-only related fields are now rendered as navigable links if target models
+  are registered in the admin.
+
+* The admin now supports theming, and includes a dark theme that is enabled
+  according to browser settings. See :ref:`admin-theming` for more details.
+
+* :attr:`.ModelAdmin.autocomplete_fields` now respects
+  :attr:`ForeignKey.to_field <django.db.models.ForeignKey.to_field>` and
+  :attr:`ForeignKey.limit_choices_to
+  <django.db.models.ForeignKey.limit_choices_to>` when searching a related
+  model.
+
+* The admin now installs a final catch-all view that redirects unauthenticated
+  users to the login page, regardless of whether the URL is otherwise valid.
+  This protects against a potential model enumeration privacy issue.
+
+  Although not recommended, you may set the new
+  :attr:`.AdminSite.final_catch_all_view` to ``False`` to disable the
+  catch-all view.
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  216,000 to 260,000.
+
+* The default variant for the Argon2 password hasher is changed to Argon2id.
+  ``memory_cost`` and ``parallelism`` are increased to 102,400 and 8
+  respectively to match the ``argon2-cffi`` defaults.
+
+  Increasing the ``memory_cost`` pushes the required memory from 512 KB to 100
+  MB. This is still rather conservative but can lead to problems in memory
+  constrained environments. If this is the case, the existing hasher can be
+  subclassed to override the defaults.
+
+* The default salt entropy for the Argon2, MD5, PBKDF2, SHA-1 password hashers
+  is increased from 71 to 128 bits.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``absolute_max`` argument for
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  allows customizing the maximum number of forms that can be instantiated when
+  supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
+
+* The new ``can_delete_extra`` argument for
+  :func:`~django.contrib.contenttypes.forms.generic_inlineformset_factory`
+  allows removal of the option to delete extra forms. See
+  :attr:`~.BaseFormSet.can_delete_extra` for more information.
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The :meth:`.GDALRaster.transform` method now supports
+  :class:`~django.contrib.gis.gdal.SpatialReference`.
+
+* The :class:`~django.contrib.gis.gdal.DataSource` class now supports
+  :class:`pathlib.Path`.
+
+* The :class:`~django.contrib.gis.utils.LayerMapping` class now supports
+  :class:`pathlib.Path`.
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :attr:`.ExclusionConstraint.include` attribute allows creating
+  covering exclusion constraints on PostgreSQL 12+.
+
+* The new ``ExclusionConstraint.opclasses`` attribute allows setting PostgreSQL
+  operator classes.
+
+* The new :attr:`.JSONBAgg.ordering` attribute determines the ordering of the
+  aggregated elements.
+
+* The new :attr:`.JSONBAgg.distinct` attribute determines if aggregated values
+  will be distinct.
+
+* The :class:`~django.contrib.postgres.operations.CreateExtension` operation
+  now checks that the extension already exists in the database and skips the
+  migration if so.
+
+* The new :class:`~django.contrib.postgres.operations.CreateCollation` and
+  :class:`~django.contrib.postgres.operations.RemoveCollation` operations
+  allow creating and dropping collations on PostgreSQL. See
+  :ref:`manage-postgresql-collations` for more details.
+
+* Lookups for :class:`~django.contrib.postgres.fields.ArrayField` now allow
+  (non-nested) arrays containing expressions as right-hand sides.
+
+* The new :class:`OpClass() <django.contrib.postgres.indexes.OpClass>`
+  expression allows creating functional indexes on expressions with a custom
+  operator class. See :ref:`new_functional_indexes` for more details.
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :class:`~django.contrib.sitemaps.Sitemap` attributes
+  :attr:`~django.contrib.sitemaps.Sitemap.alternates`,
+  :attr:`~django.contrib.sitemaps.Sitemap.languages` and
+  :attr:`~django.contrib.sitemaps.Sitemap.x_default` allow
+  generating sitemap *alternates* to localized versions of your pages.
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new ``item_comments`` hook allows specifying a comments URL per feed
+  item.
+
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* Third-party database backends can now skip or mark as expected failures
+  tests in Django's test suite using the new
+  ``DatabaseFeatures.django_test_skips`` and
+  ``django_test_expected_failures`` attributes.
+
+Decorators
+~~~~~~~~~~
+
+* The new :func:`~django.views.decorators.common.no_append_slash` decorator
+  allows individual views to be excluded from :setting:`APPEND_SLASH` URL
+  normalization.
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* Custom :class:`~django.views.debug.ExceptionReporter` subclasses can now
+  define the :attr:`~django.views.debug.ExceptionReporter.html_template_path`
+  and :attr:`~django.views.debug.ExceptionReporter.text_template_path`
+  properties to override the templates used to render exception reports.
+
+File Uploads
+~~~~~~~~~~~~
+
+* The new :meth:`FileUploadHandler.upload_interrupted()
+  <django.core.files.uploadhandler.FileUploadHandler.upload_interrupted>`
+  callback allows handling interrupted uploads.
+
+Forms
+~~~~~
+
+* The new ``absolute_max`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  customizing the maximum number of forms that can be instantiated when
+  supplying ``POST`` data. See :ref:`formsets-absolute-max` for more details.
+
+* The new ``can_delete_extra`` argument for :func:`.formset_factory`,
+  :func:`.inlineformset_factory`, and :func:`.modelformset_factory` allows
+  removal of the option to delete extra forms. See
+  :attr:`~.BaseFormSet.can_delete_extra` for more information.
+
+* :class:`~django.forms.formsets.BaseFormSet` now reports a user facing error,
+  rather than raising an exception, when the management form is missing or has
+  been tampered with. To customize this error message, pass the
+  ``error_messages`` argument with the key ``'missing_management_form'`` when
+  instantiating the formset.
+
+Generic Views
+~~~~~~~~~~~~~
+
+* The ``week_format`` attributes of
+  :class:`~django.views.generic.dates.WeekMixin` and
+  :class:`~django.views.generic.dates.WeekArchiveView` now support the
+  ``'%V'`` ISO 8601 week format.
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* :djadmin:`loaddata` now supports fixtures stored in XZ archives (``.xz``) and
+  LZMA archives (``.lzma``).
+
+* :djadmin:`dumpdata` now can compress data in the ``bz2``, ``gz``, ``lzma``,
+  or ``xz`` formats.
+
+* :djadmin:`makemigrations` can now be called without an active database
+  connection. In that case, check for a consistent migration history is
+  skipped.
+
+* :attr:`.BaseCommand.requires_system_checks` now supports specifying a list of
+  tags. System checks registered in the chosen tags will be checked for errors
+  prior to executing the command. In previous versions, either all or none
+  of the system checks were performed.
+
+* Support for colored terminal output on Windows is updated. Various modern
+  terminal environments are automatically detected, and the options for
+  enabling support in other cases are improved. See :ref:`syntax-coloring` for
+  more details.
+
+Migrations
+~~~~~~~~~~
+
+* The new ``Operation.migration_name_fragment`` property allows providing a
+  filename fragment that will be used to name a migration containing only that
+  operation.
+
+* Migrations now support serialization of pure and concrete path objects from
+  :mod:`pathlib`, and :class:`os.PathLike` instances.
+
+Models
+~~~~~~
+
+* The new ``no_key`` parameter for :meth:`.QuerySet.select_for_update()`,
+  supported on PostgreSQL, allows acquiring weaker locks that don't block the
+  creation of rows that reference locked rows through a foreign key.
+
+* :class:`When() <django.db.models.expressions.When>` expression now allows
+  using the ``condition`` argument with ``lookups``.
+
+* The new :attr:`.Index.include` and :attr:`.UniqueConstraint.include`
+  attributes allow creating covering indexes and covering unique constraints on
+  PostgreSQL 11+.
+
+* The new :attr:`.UniqueConstraint.opclasses` attribute allows setting
+  PostgreSQL operator classes.
+
+* The :meth:`.QuerySet.update` method now respects the ``order_by()`` clause on
+  MySQL and MariaDB.
+
+* :class:`FilteredRelation() <django.db.models.FilteredRelation>` now supports
+  nested relations.
+
+* The ``of`` argument of :meth:`.QuerySet.select_for_update()` is now allowed
+  on MySQL 8.0.1+.
+
+* :class:`Value() <django.db.models.Value>` expression now
+  automatically resolves its ``output_field`` to the appropriate
+  :class:`Field <django.db.models.Field>` subclass based on the type of
+  its provided ``value`` for :py:class:`bool`, :py:class:`bytes`,
+  :py:class:`float`, :py:class:`int`, :py:class:`str`,
+  :py:class:`datetime.date`, :py:class:`datetime.datetime`,
+  :py:class:`datetime.time`, :py:class:`datetime.timedelta`,
+  :py:class:`decimal.Decimal`, and :py:class:`uuid.UUID` instances. As a
+  consequence, resolving an ``output_field`` for database functions and
+  combined expressions may now crash with mixed types when using ``Value()``.
+  You will need to explicitly set the ``output_field`` in such cases.
+
+* The new :meth:`.QuerySet.alias` method allows creating reusable aliases for
+  expressions that don't need to be selected but are used for filtering,
+  ordering, or as a part of complex expressions.
+
+* The new :class:`~django.db.models.functions.Collate` function allows
+  filtering and ordering by specified database collations.
+
+* The ``field_name`` argument of :meth:`.QuerySet.in_bulk()` now accepts
+  distinct fields if there's only one field specified in
+  :meth:`.QuerySet.distinct`.
+
+* The new ``tzinfo`` parameter of the
+  :class:`~django.db.models.functions.TruncDate` and
+  :class:`~django.db.models.functions.TruncTime` database functions allows
+  truncating datetimes in a specific timezone.
+
+* The new ``db_collation`` argument for
+  :attr:`CharField <django.db.models.CharField.db_collation>` and
+  :attr:`TextField <django.db.models.TextField.db_collation>` allows setting a
+  database collation for the field.
+
+* Added the :class:`~django.db.models.functions.Random` database function.
+
+* :ref:`aggregation-functions`, :class:`F() <django.db.models.F>`,
+  :class:`OuterRef() <django.db.models.OuterRef>`, and other expressions now
+  allow using transforms. See :ref:`using-transforms-in-expressions` for
+  details.
+
+* The new ``durable`` argument for :func:`~django.db.transaction.atomic`
+  guarantees that changes made in the atomic block will be committed if the
+  block exits without errors. A nested atomic block marked as durable will
+  raise a ``RuntimeError``.
+
+* Added the :class:`~django.db.models.functions.JSONObject` database function.
+
+Pagination
+~~~~~~~~~~
+
+* The new :meth:`django.core.paginator.Paginator.get_elided_page_range` method
+  allows generating a page range with some of the values elided. If there are a
+  large number of pages, this can be helpful for generating a reasonable number
+  of page links in a template.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Response headers are now stored in :attr:`.HttpResponse.headers`. This can be
+  used instead of the original dict-like interface of ``HttpResponse`` objects.
+  Both interfaces will continue to be supported. See
+  :ref:`setting-header-fields` for details.
+
+* The new ``headers`` parameter of :class:`~django.http.HttpResponse`,
+  :class:`~django.template.response.SimpleTemplateResponse`, and
+  :class:`~django.template.response.TemplateResponse` allows setting response
+  :attr:`~django.http.HttpResponse.headers` on instantiation.
+
+Security
+~~~~~~~~
+
+* The :setting:`SECRET_KEY` setting is now checked for a valid value upon first
+  access, rather than when settings are first loaded. This enables running
+  management commands that do not rely on the ``SECRET_KEY`` without needing to
+  provide a value. As a consequence of this, calling
+  :func:`~django.conf.settings.configure` without providing a valid
+  ``SECRET_KEY``, and then going on to access ``settings.SECRET_KEY`` will now
+  raise an :exc:`~django.core.exceptions.ImproperlyConfigured` exception.
+
+* The new ``Signer.sign_object()`` and ``Signer.unsign_object()`` methods allow
+  signing complex data structures. See :ref:`signing-complex-data` for more
+  details.
+
+  Also, :func:`signing.dumps() <django.core.signing.dumps>` and
+  :func:`~django.core.signing.loads` become shortcuts for
+  :meth:`.TimestampSigner.sign_object` and
+  :meth:`~.TimestampSigner.unsign_object`.
+
+Serialization
+~~~~~~~~~~~~~
+
+* The new :ref:`JSONL <serialization-formats-jsonl>` serializer allows using
+  the JSON Lines format with :djadmin:`dumpdata` and :djadmin:`loaddata`. This
+  can be useful for populating large databases because data is loaded line by
+  line into memory, rather than being loaded all at once.
+
+Signals
+~~~~~~~
+
+* :meth:`Signal.send_robust() <django.dispatch.Signal.send_robust>` now logs
+  exceptions.
+
+Templates
+~~~~~~~~~
+
+* :tfilter:`floatformat` template filter now allows using the ``g`` suffix to
+  force grouping by the :setting:`THOUSAND_SEPARATOR` for the active locale.
+
+* Templates cached with :ref:`Cached template loaders<template-loaders>` are
+  now correctly reloaded in development.
+
+Tests
+~~~~~
+
+* Objects assigned to class attributes in :meth:`.TestCase.setUpTestData` are
+  now isolated for each test method. Such objects are now required to support
+  creating deep copies with :py:func:`copy.deepcopy`. Assigning objects which
+  don't support ``deepcopy()`` is deprecated and will be removed in Django 4.1.
+
+* :class:`~django.test.runner.DiscoverRunner` now enables
+  :py:mod:`faulthandler` by default. This can be disabled by using the
+  :option:`test --no-faulthandler` option.
+
+* :class:`~django.test.runner.DiscoverRunner` and the
+  :djadmin:`test` management command can now track timings, including database
+  setup and total run time. This can be enabled by using the :option:`test
+  --timing` option.
+
+* :class:`~django.test.Client` now preserves the request query string when
+  following 307 and 308 redirects.
+
+* The new :meth:`.TestCase.captureOnCommitCallbacks` method captures callback
+  functions passed to :func:`transaction.on_commit()
+  <django.db.transaction.on_commit>` in a list. This allows you to test such
+  callbacks without using the slower :class:`.TransactionTestCase`.
+
+* :meth:`TransactionTestCase.assertQuerysetEqual()
+  <django.test.TransactionTestCase.assertQuerySetEqual>` now supports direct
+  comparison against another queryset rather than being restricted to
+  comparison against a list of string representations of objects when using the
+  default value for the ``transform`` argument.
+
+Utilities
+~~~~~~~~~
+
+* The new ``depth`` parameter of ``django.utils.timesince.timesince()`` and
+  ``django.utils.timesince.timeuntil()`` functions allows specifying the number
+  of adjacent time units to return.
+
+Validators
+~~~~~~~~~~
+
+* Built-in validators now include the provided value in the ``params`` argument
+  of a raised :exc:`~django.core.exceptions.ValidationError`. This allows
+  custom error messages to use the ``%(value)s`` placeholder.
+
+* The :class:`.ValidationError` equality operator now ignores ``messages`` and
+  ``params`` ordering.
+
+.. _backwards-incompatible-3.2:
+
+Backwards incompatible changes in 3.2
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* The new ``DatabaseFeatures.introspected_field_types`` property replaces these
+  features:
+
+  * ``can_introspect_autofield``
+  * ``can_introspect_big_integer_field``
+  * ``can_introspect_binary_field``
+  * ``can_introspect_decimal_field``
+  * ``can_introspect_duration_field``
+  * ``can_introspect_ip_address_field``
+  * ``can_introspect_positive_integer_field``
+  * ``can_introspect_small_integer_field``
+  * ``can_introspect_time_field``
+  * ``introspected_big_auto_field_type``
+  * ``introspected_small_auto_field_type``
+  * ``introspected_boolean_field_type``
+
+* To enable support for covering indexes (:attr:`.Index.include`) and covering
+  unique constraints (:attr:`.UniqueConstraint.include`), set
+  ``DatabaseFeatures.supports_covering_indexes`` to ``True``.
+
+* Third-party database backends must implement support for column database
+  collations on ``CharField``\s and ``TextField``\s or set
+  ``DatabaseFeatures.supports_collation_on_charfield`` and
+  ``DatabaseFeatures.supports_collation_on_textfield`` to ``False``. If
+  non-deterministic collations are not supported, set
+  ``supports_non_deterministic_collations`` to ``False``.
+
+* ``DatabaseOperations.random_function_sql()`` is removed in favor of the new
+  :class:`~django.db.models.functions.Random` database function.
+
+* ``DatabaseOperations.date_trunc_sql()`` and
+  ``DatabaseOperations.time_trunc_sql()`` now take the optional ``tzname``
+  argument in order to truncate in a specific timezone.
+
+* ``DatabaseClient.runshell()`` now gets arguments and an optional dictionary
+  with environment variables to the underlying command-line client from
+  ``DatabaseClient.settings_to_cmd_args_env()`` method. Third-party database
+  backends must implement ``DatabaseClient.settings_to_cmd_args_env()`` or
+  override ``DatabaseClient.runshell()``.
+
+* Third-party database backends must implement support for functional indexes
+  (:attr:`.Index.expressions`) or set
+  ``DatabaseFeatures.supports_expression_indexes`` to ``False``. If ``COLLATE``
+  is not a part of the ``CREATE INDEX`` statement, set
+  ``DatabaseFeatures.collate_as_index_expression`` to ``True``.
+
+:mod:`django.contrib.admin`
+---------------------------
+
+* Pagination links in the admin are now 1-indexed instead of 0-indexed, i.e.
+  the query string for the first page is ``?p=1`` instead of ``?p=0``.
+
+* The new admin catch-all view will break URL patterns routed after the admin
+  URLs and matching the admin URL prefix. You can either adjust your URL
+  ordering or, if necessary, set :attr:`AdminSite.final_catch_all_view
+  <django.contrib.admin.AdminSite.final_catch_all_view>` to ``False``,
+  disabling the catch-all view. See :ref:`whats-new-3.2` for more details.
+
+* Minified JavaScript files are no longer included with the admin. If you
+  require these files to be minified, consider using a third party app or
+  external build tool. The minified vendored JavaScript files packaged with the
+  admin (e.g. :ref:`jquery.min.js <contrib-admin-jquery>`) are still included.
+
+* :attr:`.ModelAdmin.prepopulated_fields` no longer strips English stop words,
+  such as ``'a'`` or ``'an'``.
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.2 is removed.
+
+* The Oracle backend now clones polygons (and geometry collections containing
+  polygons) before reorienting them and saving them to the database. They are
+  no longer mutated in place. You might notice this if you use the polygons
+  after a model is saved.
+
+Dropped support for PostgreSQL 9.5
+----------------------------------
+
+Upstream support for PostgreSQL 9.5 ends in February 2021. Django 3.2 supports
+PostgreSQL 9.6 and higher.
+
+Dropped support for MySQL 5.6
+-----------------------------
+
+The end of upstream support for MySQL 5.6 is April 2021. Django 3.2 supports
+MySQL 5.7 and higher.
+
+Miscellaneous
+-------------
+
+* Django now supports non-``pytz`` time zones, such as Python 3.9+'s
+  :mod:`zoneinfo` module and its backport.
+
+* The undocumented ``SpatiaLiteOperations.proj4_version()`` method is renamed
+  to ``proj_version()``.
+
+* :func:`~django.utils.text.slugify` now removes leading and trailing dashes
+  and underscores.
+
+* The :tfilter:`intcomma` and :tfilter:`intword` template filters no longer
+  depend on the ``USE_L10N`` setting.
+
+* Support for ``argon2-cffi`` < 19.1.0 is removed.
+
+* The cache keys no longer includes the language when internationalization is
+  disabled (``USE_I18N = False``) and localization is enabled
+  (``USE_L10N = True``). After upgrading to Django 3.2 in such configurations,
+  the first request to any previously cached value will be a cache miss.
+
+* ``ForeignKey.validate()`` now uses
+  :attr:`~django.db.models.Model._base_manager` rather than
+  :attr:`~django.db.models.Model._default_manager` to check that related
+  instances exist.
+
+* When an application defines an :class:`~django.apps.AppConfig` subclass in
+  an ``apps.py`` submodule, Django now uses this configuration automatically,
+  even if it isn't enabled with ``default_app_config``. Set ``default = False``
+  in the :class:`~django.apps.AppConfig` subclass if you need to prevent this
+  behavior. See :ref:`whats-new-3.2` for more details.
+
+* Instantiating an abstract model now raises ``TypeError``.
+
+* Keyword arguments to :func:`~django.test.utils.setup_databases` are now
+  keyword-only.
+
+* The undocumented ``django.utils.http.limited_parse_qsl()`` function is
+  removed. Please use :func:`urllib.parse.parse_qsl` instead.
+
+* ``django.test.utils.TestContextDecorator`` now uses
+  :py:meth:`~unittest.TestCase.addCleanup` so that cleanups registered in the
+  :py:meth:`~unittest.TestCase.setUp` method are called before
+  ``TestContextDecorator.disable()``.
+
+* ``SessionMiddleware`` now raises a
+  :exc:`~django.contrib.sessions.exceptions.SessionInterrupted` exception
+  instead of :exc:`~django.core.exceptions.SuspiciousOperation` when a session
+  is destroyed in a concurrent request.
+
+* The :class:`django.db.models.Field` equality operator now correctly
+  distinguishes inherited field instances across models. Additionally, the
+  ordering of such fields is now defined.
+
+* The undocumented ``django.core.files.locks.lock()`` function now returns
+  ``False`` if the file cannot be locked, instead of raising
+  :exc:`BlockingIOError`.
+
+* The password reset mechanism now invalidates tokens when the user email is
+  changed.
+
+* :djadmin:`makemessages` command no longer processes invalid locales specified
+  using :option:`makemessages --locale` option, when they contain hyphens
+  (``'-'``).
+
+* The ``django.contrib.auth.forms.ReadOnlyPasswordHashField`` form field is now
+  :attr:`~django.forms.Field.disabled` by default. Therefore
+  ``UserChangeForm.clean_password()`` is no longer required to return the
+  initial value.
+
+* The ``cache.get_many()``, ``get_or_set()``, ``has_key()``, ``incr()``,
+  ``decr()``, ``incr_version()``, and ``decr_version()`` cache operations now
+  correctly handle ``None`` stored in the cache, in the same way as any other
+  value, instead of behaving as though the key didn't exist.
+
+  Due to a ``python-memcached`` limitation, the previous behavior is kept for
+  the deprecated ``MemcachedCache`` backend.
+
+* The minimum supported version of SQLite is increased from 3.8.3 to 3.9.0.
+
+* :class:`~django.contrib.messages.storage.cookie.CookieStorage` now stores
+  messages in the :rfc:`6265` compliant format. Support for cookies that use
+  the old format remains until Django 4.1.
+
+* The minimum supported version of ``asgiref`` is increased from 3.2.10 to
+  3.3.2.
+
+.. _deprecated-features-3.2:
+
+Features deprecated in 3.2
+==========================
+
+Miscellaneous
+-------------
+
+* Assigning objects which don't support creating deep copies with
+  :py:func:`copy.deepcopy` to class attributes in
+  :meth:`.TestCase.setUpTestData` is deprecated.
+
+* Using a boolean value in :attr:`.BaseCommand.requires_system_checks` is
+  deprecated. Use ``'__all__'`` instead of ``True``, and ``[]`` (an empty list)
+  instead of ``False``.
+
+* The ``whitelist`` argument and ``domain_whitelist`` attribute of
+  :class:`~django.core.validators.EmailValidator` are deprecated. Use
+  ``allowlist`` instead of ``whitelist``, and ``domain_allowlist`` instead of
+  ``domain_whitelist``. You may need to rename ``whitelist`` in existing
+  migrations.
+
+* The ``default_app_config`` application configuration variable is deprecated,
+  due to the now automatic ``AppConfig`` discovery. See :ref:`whats-new-3.2`
+  for more details.
+
+* Automatically calling ``repr()`` on a queryset in
+  ``TransactionTestCase.assertQuerysetEqual()``, when compared to string
+  values, is deprecated. If you need the previous behavior, explicitly set
+  ``transform`` to ``repr``.
+
+* The ``django.core.cache.backends.memcached.MemcachedCache`` backend is
+  deprecated as ``python-memcached`` has some problems and seems to be
+  unmaintained. Use ``django.core.cache.backends.memcached.PyMemcacheCache``
+  or ``django.core.cache.backends.memcached.PyLibMCCache`` instead.
+
+* The format of messages used by
+  ``django.contrib.messages.storage.cookie.CookieStorage`` is different from
+  the format generated by older versions of Django. Support for the old format
+  remains until Django 4.1.

@@ -88,6 +88,17 @@ lose any data in the old table.
 Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
+``AlterModelTableComment``
+--------------------------
+
+.. versionadded:: 4.2
+
+.. class:: AlterModelTableComment(name, table_comment)
+
+Changes the model's table comment (the
+:attr:`~django.db.models.Options.db_table_comment` option on the ``Meta``
+subclass).
+
 ``AlterUniqueTogether``
 -----------------------
 
@@ -102,9 +113,17 @@ subclass).
 
 .. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
-subclass).
+Changes the model's set of custom indexes (the ``index_together`` option on the
+``Meta`` subclass).
+
+.. warning::
+
+    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    migration files. For backward compatibility reasons, it's still part of the
+    public API, and there's no plan to deprecate or remove it, but it should
+    not be used for new migrations. Use
+    :class:`~django.db.migrations.operations.AddIndex` and
+    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
@@ -173,10 +192,10 @@ defaults and always applies them in the Django ORM code.
 Removes a field from a model.
 
 Bear in mind that when reversed, this is actually adding a field to a model.
-The operation is reversible (apart from any data loss, which of course is
-irreversible) if the field is nullable or if it has a default value that can be
-used to populate the recreated column. If the field is not nullable and does
-not have a default value, the operation is irreversible.
+The operation is reversible (apart from any data loss, which is irreversible)
+if the field is nullable or if it has a default value that can be used to
+populate the recreated column. If the field is not nullable and does not have a
+default value, the operation is irreversible.
 
 ``AlterField``
 --------------
@@ -222,6 +241,20 @@ Creates an index in the database table for the model with ``model_name``.
 
 Removes the index named ``name`` from the model with ``model_name``.
 
+``RenameIndex``
+---------------
+
+.. class:: RenameIndex(model_name, new_name, old_name=None, old_fields=None)
+
+Renames an index in the database table for the model with ``model_name``.
+Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
+is an iterable of the strings, often corresponding to fields of
+:attr:`~django.db.models.Options.index_together`.
+
+On databases that don't support an index renaming statement (SQLite and MariaDB
+< 10.5.2), the operation will drop and recreate the index, which can be
+expensive.
+
 ``AddConstraint``
 -----------------
 
@@ -246,12 +279,17 @@ Special Operations
 .. class:: RunSQL(sql, reverse_sql=None, state_operations=None, hints=None, elidable=False)
 
 Allows running of arbitrary SQL on the database - useful for more advanced
-features of database backends that Django doesn't support directly, like
-partial indexes.
+features of database backends that Django doesn't support directly.
 
 ``sql``, and ``reverse_sql`` if provided, should be strings of SQL to run on
 the database. On most database backends (all but PostgreSQL), Django will
 split the SQL into individual statements prior to executing them.
+
+.. warning::
+
+    On PostgreSQL and SQLite, only use ``BEGIN`` or ``COMMIT`` in your SQL in
+    :ref:`non-atomic migrations <non-atomic-migrations>`, to avoid breaking
+    Django's transaction state.
 
 You can also pass a list of strings or 2-tuples. The latter is used for passing
 queries and parameters in the same way as :ref:`cursor.execute()
@@ -259,32 +297,36 @@ queries and parameters in the same way as :ref:`cursor.execute()
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
     migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
-    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
 
-The ``reverse_sql`` queries are executed when the migration is unapplied, so
-you can reverse the changes done in the forwards queries::
+The ``reverse_sql`` queries are executed when the migration is unapplied. They
+should undo what is done by the ``sql`` queries. For example, to undo the above
+insertion with a deletion::
 
     migrations.RunSQL(
-        [("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
-        [("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+        sql=[("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])],
+        reverse_sql=[("DELETE FROM musician where name=%s;", ["Reinhardt"])],
     )
 
-The ``state_operations`` argument is so you can supply operations that are
-equivalent to the SQL in terms of project state; for example, if you are
+If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
+irreversible.
+
+The ``state_operations`` argument allows you to supply operations that are
+equivalent to the SQL in terms of project state. For example, if you are
 manually creating a column, you should pass in a list containing an ``AddField``
 operation here so that the autodetector still has an up-to-date state of the
-model (otherwise, when you next run ``makemigrations``, it won't see any
-operation that adds that field and so will try to run it again). For example::
+model. If you don't, when you next run ``makemigrations``, it won't see any
+operation that adds that field and so will try to run it again. For example::
 
     migrations.RunSQL(
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
         state_operations=[
             migrations.AddField(
-                'musician',
-                'name',
+                "musician",
+                "name",
                 models.CharField(max_length=255),
             ),
         ],
@@ -318,7 +360,8 @@ instance of :class:`SchemaEditor
 
 The ``reverse_code`` argument is called when unapplying migrations. This
 callable should undo what is done in the ``code`` callable so that the
-migration is reversible.
+migration is reversible. If ``reverse_code`` is ``None`` (the default), the
+``RunPython`` operation is irreversible.
 
 The optional ``hints`` argument will be passed as ``**hints`` to the
 :meth:`allow_migrate` method of database routers to assist them in making a
@@ -334,15 +377,19 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
 
     from django.db import migrations
 
+
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.using(db_alias).bulk_create([
-            Country(name="USA", code="us"),
-            Country(name="France", code="fr"),
-        ])
+        Country.objects.using(db_alias).bulk_create(
+            [
+                Country(name="USA", code="us"),
+                Country(name="France", code="fr"),
+            ]
+        )
+
 
     def reverse_func(apps, schema_editor):
         # forwards_func() creates two Country instances,
@@ -352,8 +399,8 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
         Country.objects.using(db_alias).filter(name="USA", code="us").delete()
         Country.objects.using(db_alias).filter(name="France", code="fr").delete()
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = []
 
         operations = [
@@ -364,15 +411,6 @@ This is generally the operation you would use to create
 :ref:`data migrations <data-migrations>`, run
 custom data updates and alterations, and anything else you need access to an
 ORM and/or Python code for.
-
-If you're upgrading from South, this is basically the South pattern as an
-operation - one or two methods for forwards and backwards, with an ORM and
-schema operations available. Most of the time, you should be able to translate
-the ``orm.Model`` or ``orm["appname", "Model"]`` references from South directly
-into ``apps.get_model("appname", "Model")`` references here and leave most of
-the rest of the code unchanged for data migrations. However, ``apps`` will only
-have references to models in the current app unless migrations in other apps
-are added to the migration's dependencies.
 
 Much like :class:`RunSQL`, ensure that if you change schema inside here you're
 either doing it outside the scope of the Django model system (e.g. triggers)
@@ -420,12 +458,24 @@ if ``atomic=True`` is passed to the ``RunPython`` operation.
 
 .. class:: SeparateDatabaseAndState(database_operations=None, state_operations=None)
 
-A highly specialized operation that let you mix and match the database
+A highly specialized operation that lets you mix and match the database
 (schema-changing) and state (autodetector-powering) aspects of operations.
 
-It accepts two lists of operations, and when asked to apply state will use the
-state list, and when asked to apply changes to the database will use the database
-list. Do not use this operation unless you're very sure you know what you're doing.
+It accepts two lists of operations. When asked to apply state, it will use the
+``state_operations`` list (this is a generalized version of :class:`RunSQL`'s
+``state_operations`` argument). When asked to apply changes to the database, it
+will use the ``database_operations`` list.
+
+If the actual state of the database and Django's view of the state get out of
+sync, this can break the migration framework, even leading to data loss. It's
+worth exercising caution and checking your database and state operations
+carefully. You can use :djadmin:`sqlmigrate` and :djadmin:`dbshell` to check
+your database operations. You can use :djadmin:`makemigrations`, especially
+with :option:`--dry-run<makemigrations --dry-run>`, to check your state
+operations.
+
+For an example using ``SeparateDatabaseAndState``, see
+:ref:`changing-a-manytomanyfield-to-use-a-through-model`.
 
 .. _writing-your-own-migration-operation:
 
@@ -438,8 +488,8 @@ structure of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
-    class MyCustomOperation(Operation):
 
+    class MyCustomOperation(Operation):
         # If this is False, it means that this operation will be ignored by
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
@@ -470,6 +520,12 @@ structure of an ``Operation`` looks like this::
         def describe(self):
             # This is used to describe what the operation does in console output.
             return "Custom Operation"
+
+        @property
+        def migration_name_fragment(self):
+            # Optional. A filename part suitable for automatically naming a
+            # migration containing this operation, or None if not applicable.
+            return "custom_operation_%s_%s" % (self.arg1, self.arg2)
 
 You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they cover
@@ -522,8 +578,8 @@ state changes, all it does is run one command::
 
     from django.db.migrations.operations.base import Operation
 
-    class LoadExtension(Operation):
 
+    class LoadExtension(Operation):
         reversible = True
 
         def __init__(self, name):
@@ -540,3 +596,7 @@ state changes, all it does is run one command::
 
         def describe(self):
             return "Creates extension %s" % self.name
+
+        @property
+        def migration_name_fragment(self):
+            return "create_extension_%s" % self.name

@@ -3,17 +3,17 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # jensadne <jensadne@pvv.ntnu.no>, 2014
-# Jon <jon@kolonial.no>, 2015-2016
-# Jon <jon@kolonial.no>, 2017
-# Jon <jon@kolonial.no>, 2013
+# Jon, 2015-2016
+# Jon, 2017,2020,2022
+# Jon, 2013
 # Sigurd Gartmann <sigurdga-transifex@sigurdga.no>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2017-11-27 12:34+0000\n"
-"Last-Translator: Jon <jon@kolonial.no>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Jon, 2017,2020,2022\n"
 "Language-Team: Norwegian Bokmål (http://www.transifex.com/django/django/"
 "language/nb/)\n"
 "MIME-Version: 1.0\n"
@@ -57,7 +57,7 @@ msgstr "Passord ikke satt."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ugyldig passordformat eller ukjent hash-algoritme."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "De to passordfeltene er ikke like."
 
 msgid "Password"
@@ -70,7 +70,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Skriv inn det samme passordet som tidligere, for verifisering."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Selve passordet lagres ikke, så det finnes ingen måte å se denne brukerens "
@@ -137,6 +137,9 @@ msgstr "arbeidsfaktor"
 
 msgid "checksum"
 msgstr "sjekksum"
+
+msgid "block size"
+msgstr "blokkstørrelse"
 
 msgid "name"
 msgstr "navn"
@@ -243,19 +246,19 @@ msgstr[1] "Passordet ditt må bestå av minst %(min_length)d tegn."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Passordet er for likt %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Passordet ditt kan ikke være for likt dine andre personopplysninger."
 
 msgid "This password is too common."
 msgstr "Dette passordet er for vanlig."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Passordet ditt kan ikke være et ofte brukt passord."
 
 msgid "This password is entirely numeric."
 msgstr "Dette passordet inneholder bare tall."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Passordet ditt kan ikke inneholde bare tall."
 
 #, python-format
@@ -263,11 +266,9 @@ msgid "Password reset on %(site_name)s"
 msgstr "Passord-nullstilling på %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Oppgi et gyldig brukernavn. Denne verdien kan kun inneholde bokstaver, tall "
-"og @/./+/-/_"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

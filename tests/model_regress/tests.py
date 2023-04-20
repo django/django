@@ -1,3 +1,4 @@
+import copy
 import datetime
 from operator import attrgetter
 
@@ -9,7 +10,14 @@ from django.test.utils import isolate_apps
 from django.utils.timezone import get_fixed_timezone
 
 from .models import (
-    Article, Department, Event, Model1, Model2, Model3, NonAutoPK, Party,
+    Article,
+    Department,
+    Event,
+    Model1,
+    Model2,
+    Model3,
+    NonAutoPK,
+    Party,
     Worker,
 )
 
@@ -55,7 +63,7 @@ class ModelTests(TestCase):
 
         # Empty strings should be returned as string
         a = Article.objects.get(pk=a.pk)
-        self.assertEqual(a.misc_data, '')
+        self.assertEqual(a.misc_data, "")
 
     def test_long_textfield(self):
         # TextFields can hold more than 4000 characters (this was broken in
@@ -63,7 +71,7 @@ class ModelTests(TestCase):
         a = Article.objects.create(
             headline="Really, really big",
             pub_date=datetime.datetime.now(),
-            article_text="ABCDE" * 1000
+            article_text="ABCDE" * 1000,
         )
         a = Article.objects.get(pk=a.pk)
         self.assertEqual(len(a.article_text), 5000)
@@ -74,7 +82,7 @@ class ModelTests(TestCase):
         a = Article.objects.create(
             headline="Really, really big",
             pub_date=datetime.datetime.now(),
-            article_text='\u05d0\u05d1\u05d2' * 1000
+            article_text="\u05d0\u05d1\u05d2" * 1000,
         )
         a = Article.objects.get(pk=a.pk)
         self.assertEqual(len(a.article_text), 3000)
@@ -85,65 +93,69 @@ class ModelTests(TestCase):
         Party.objects.create(when=datetime.datetime(1998, 12, 31))
         Party.objects.create(when=datetime.datetime(1999, 1, 1))
         Party.objects.create(when=datetime.datetime(1, 3, 3))
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__month=2), []
+        self.assertQuerySetEqual(Party.objects.filter(when__month=2), [])
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__month=1),
+            [datetime.date(1999, 1, 1)],
+            attrgetter("when"),
         )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__month=1), [
-                datetime.date(1999, 1, 1)
-            ],
-            attrgetter("when")
-        )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__month=12), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__month=12),
+            [
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
             attrgetter("when"),
-            ordered=False
+            ordered=False,
         )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__year=1998), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__year=1998),
+            [
                 datetime.date(1998, 12, 31),
             ],
-            attrgetter("when")
+            attrgetter("when"),
         )
         # Regression test for #8510
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__day="31"), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__day="31"),
+            [
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
             attrgetter("when"),
-            ordered=False
+            ordered=False,
         )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__month="12"), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__month="12"),
+            [
                 datetime.date(1999, 12, 31),
                 datetime.date(1998, 12, 31),
             ],
             attrgetter("when"),
-            ordered=False
+            ordered=False,
         )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__year="1998"), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__year="1998"),
+            [
                 datetime.date(1998, 12, 31),
             ],
-            attrgetter("when")
+            attrgetter("when"),
         )
 
         # Regression test for #18969
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__year=1), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__year=1),
+            [
                 datetime.date(1, 3, 3),
             ],
-            attrgetter("when")
+            attrgetter("when"),
         )
-        self.assertQuerysetEqual(
-            Party.objects.filter(when__year='1'), [
+        self.assertQuerySetEqual(
+            Party.objects.filter(when__year="1"),
+            [
                 datetime.date(1, 3, 3),
             ],
-            attrgetter("when")
+            attrgetter("when"),
         )
 
     def test_date_filter_null(self):
@@ -153,11 +165,10 @@ class ModelTests(TestCase):
         Party.objects.create()
         p = Party.objects.filter(when__month=1)[0]
         self.assertEqual(p.when, datetime.date(1999, 1, 1))
-        self.assertQuerysetEqual(
-            Party.objects.filter(pk=p.pk).dates("when", "month"), [
-                1
-            ],
-            attrgetter("month")
+        self.assertQuerySetEqual(
+            Party.objects.filter(pk=p.pk).dates("when", "month"),
+            [1],
+            attrgetter("month"),
         )
 
     def test_get_next_prev_by_field(self):
@@ -175,7 +186,7 @@ class ModelTests(TestCase):
         )
 
     def test_get_next_prev_by_field_unsaved(self):
-        msg = 'get_next/get_previous cannot be used on unsaved objects.'
+        msg = "get_next/get_previous cannot be used on unsaved objects."
         with self.assertRaisesMessage(ValueError, msg):
             Event().get_next_by_when()
         with self.assertRaisesMessage(ValueError, msg):
@@ -201,13 +212,12 @@ class ModelTests(TestCase):
         obj.pub_date = dt2
         obj.save()
         self.assertEqual(
-            Article.objects.filter(headline="A headline").update(pub_date=dt1),
-            1
+            Article.objects.filter(headline="A headline").update(pub_date=dt1), 1
         )
 
     def test_chained_fks(self):
         """
-        Regression for #18432: Chained foreign keys with to_field produce incorrect query
+        Chained foreign keys with to_field produce incorrect query.
         """
 
         m1 = Model1.objects.create(pkey=1000)
@@ -218,16 +228,17 @@ class ModelTests(TestCase):
         m3 = Model3.objects.get(model2=1000)
         m3.model2
 
-    @isolate_apps('model_regress')
+    @isolate_apps("model_regress")
     def test_metaclass_can_access_attribute_dict(self):
         """
         Model metaclasses have access to the class attribute dict in
         __init__() (#30254).
         """
+
         class HorseBase(models.base.ModelBase):
             def __init__(cls, name, bases, attrs):
                 super().__init__(name, bases, attrs)
-                cls.horns = (1 if 'magic' in attrs else 0)
+                cls.horns = 1 if "magic" in attrs else 0
 
         class Horse(models.Model, metaclass=HorseBase):
             name = models.CharField(max_length=255)
@@ -253,6 +264,20 @@ class EvaluateMethodTest(TestCase):
         """
         You can filter by objects that have an 'evaluate' attr
         """
-        dept = Department.objects.create(pk=1, name='abc')
-        dept.evaluate = 'abc'
+        dept = Department.objects.create(pk=1, name="abc")
+        dept.evaluate = "abc"
         Worker.objects.filter(department=dept)
+
+
+class ModelFieldsCacheTest(TestCase):
+    def test_fields_cache_reset_on_copy(self):
+        department1 = Department.objects.create(id=1, name="department1")
+        department2 = Department.objects.create(id=2, name="department2")
+        worker1 = Worker.objects.create(name="worker", department=department1)
+        worker2 = copy.copy(worker1)
+
+        self.assertEqual(worker2.department, department1)
+        # Changing related fields doesn't mutate the base object.
+        worker2.department = department2
+        self.assertEqual(worker2.department, department2)
+        self.assertEqual(worker1.department, department1)

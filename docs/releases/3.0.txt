@@ -19,8 +19,8 @@ project.
 Python compatibility
 ====================
 
-Django 3.0 supports Python 3.6, 3.7, and 3.8. We **highly recommend** and only
-officially support the latest release of each series.
+Django 3.0 supports Python 3.6, 3.7, 3.8, and 3.9 (as of 3.0.11). We **highly
+recommend** and only officially support the latest release of each series.
 
 The Django 2.2.x series is the last to support Python 3.5.
 
@@ -53,6 +53,11 @@ support for running as an `ASGI <https://asgi.readthedocs.io/>`_ application.
 This is in addition to our existing WSGI support. Django intends to support
 both for the foreseeable future. Async features will only be available to
 applications that run under ASGI, however.
+
+At this stage async support only applies to the outer ASGI application.
+Internally everything remains synchronous. Asynchronous middleware, views, etc.
+are not yet supported. You can, however, use ASGI middleware around Django's
+application, allowing you to combine Django with other ASGI frameworks.
 
 There is no need to switch your applications over unless you want to start
 experimenting with asynchronous code, but we have
@@ -330,9 +335,8 @@ Security
   uses frames of itself, you will need to explicitly set ``X_FRAME_OPTIONS =
   'SAMEORIGIN'`` for them to continue working.
 
-* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` setting now defaults to ``True``. With
-  the enabled :setting:`SECURE_CONTENT_TYPE_NOSNIFF`, the
-  :class:`~django.middleware.security.SecurityMiddleware` sets the
+* :setting:`SECURE_CONTENT_TYPE_NOSNIFF` now defaults to ``True``. With this
+  enabled, :class:`~django.middleware.security.SecurityMiddleware` sets the
   :ref:`x-content-type-options` header on all responses that do not already
   have it.
 
@@ -388,10 +392,12 @@ existing row will result in an ``IntegrityError``.
 
 In order to update an existing model for a specific primary key value, use the
 :meth:`~django.db.models.query.QuerySet.update_or_create` method or
-``QuerySet.filter(pk=…).update(…)`` instead. For example::
+``QuerySet.filter(pk=…).update(…)`` instead. For example:
 
-    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={'name': 'new name'})
-    >>> MyModel.objects.filter(pk=existing_pk).update(name='new name')
+.. code-block:: pycon
+
+    >>> MyModel.objects.update_or_create(pk=existing_pk, defaults={"name": "new name"})
+    >>> MyModel.objects.filter(pk=existing_pk).update(name="new name")
 
 Database backend API
 --------------------
@@ -491,13 +497,14 @@ Django 3.0, we're removing these APIs at this time.
   Python 3.
 
 * ``django.utils.six`` - Remove usage of this vendored library or switch to
-  `six <https://pypi.org/project/six/>`_.
+  :pypi:`six`.
 
 * ``django.utils.encoding.python_2_unicode_compatible()`` - Alias of
   ``six.python_2_unicode_compatible()``.
 
 * ``django.utils.functional.curry()`` - Use :func:`functools.partial` or
-  :class:`functools.partialmethod`. See :commit:`5b1c389603a353625ae1603`.
+  :class:`functools.partialmethod`. See
+  :commit:`5b1c389603a353625ae1603ba345147356336afb`.
 
 * ``django.utils.safestring.SafeBytes`` - Unused since Django 2.0.
 
@@ -509,7 +516,7 @@ In older versions, the :setting:`FILE_UPLOAD_PERMISSIONS` setting defaults to
 uploaded files having different permissions depending on their size and which
 upload handler is used.
 
-``FILE_UPLOAD_PERMISSION`` now defaults to ``0o644`` to avoid this
+``FILE_UPLOAD_PERMISSIONS`` now defaults to ``0o644`` to avoid this
 inconsistency.
 
 New default values for security settings
@@ -554,7 +561,7 @@ Miscellaneous
 
 * Assigning a value to a model's :class:`~django.db.models.ForeignKey` or
   :class:`~django.db.models.OneToOneField` ``'_id'`` attribute now unsets the
-  corresponding field. Accessing the field afterwards will result in a query.
+  corresponding field. Accessing the field afterward will result in a query.
 
 * :func:`~django.utils.cache.patch_vary_headers` now handles an asterisk
   ``'*'`` according to :rfc:`7231#section-7.1.4`, i.e. if a list of header
@@ -566,8 +573,6 @@ Miscellaneous
 
 * ``alias=None`` is added to the signature of
   :meth:`.Expression.get_group_by_cols`.
-
-* Support for ``sqlparse`` < 0.2.2 is removed.
 
 * ``RegexPattern``, used by :func:`~django.urls.re_path`, no longer returns
   keyword arguments with ``None`` values to be passed to the view for the

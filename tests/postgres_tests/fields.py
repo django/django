@@ -7,40 +7,55 @@ import enum
 from django.db import models
 
 try:
+    from django.contrib.postgres.fields import CICharField  # RemovedInDjango51Warning.
+    from django.contrib.postgres.fields import CIEmailField  # RemovedInDjango51Warning.
+    from django.contrib.postgres.fields import CITextField  # RemovedInDjango51Warning.
     from django.contrib.postgres.fields import (
-        ArrayField, BigIntegerRangeField, CICharField, CIEmailField,
-        CITextField, DateRangeField, DateTimeRangeField, DecimalRangeField,
-        HStoreField, IntegerRangeField, JSONField,
+        ArrayField,
+        BigIntegerRangeField,
+        DateRangeField,
+        DateTimeRangeField,
+        DecimalRangeField,
+        HStoreField,
+        IntegerRangeField,
     )
-    from django.contrib.postgres.search import SearchVectorField
+    from django.contrib.postgres.search import SearchVector, SearchVectorField
 except ImportError:
+
     class DummyArrayField(models.Field):
         def __init__(self, base_field, size=None, **kwargs):
             super().__init__(**kwargs)
 
         def deconstruct(self):
             name, path, args, kwargs = super().deconstruct()
-            kwargs.update({
-                'base_field': '',
-                'size': 1,
-            })
+            kwargs.update(
+                {
+                    "base_field": "",
+                    "size": 1,
+                }
+            )
             return name, path, args, kwargs
 
-    class DummyJSONField(models.Field):
-        def __init__(self, encoder=None, **kwargs):
+    class DummyContinuousRangeField(models.Field):
+        def __init__(self, *args, default_bounds="[)", **kwargs):
             super().__init__(**kwargs)
+
+        def deconstruct(self):
+            name, path, args, kwargs = super().deconstruct()
+            kwargs["default_bounds"] = "[)"
+            return name, path, args, kwargs
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
-    CICharField = models.Field
-    CIEmailField = models.Field
-    CITextField = models.Field
+    CICharField = models.Field  # RemovedInDjango51Warning.
+    CIEmailField = models.Field  # RemovedInDjango51Warning.
+    CITextField = models.Field  # RemovedInDjango51Warning.
     DateRangeField = models.Field
-    DateTimeRangeField = models.Field
-    DecimalRangeField = models.Field
+    DateTimeRangeField = DummyContinuousRangeField
+    DecimalRangeField = DummyContinuousRangeField
     HStoreField = models.Field
     IntegerRangeField = models.Field
-    JSONField = DummyJSONField
+    SearchVector = models.Expression
     SearchVectorField = models.Field
 
 

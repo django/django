@@ -4,20 +4,14 @@ from django.db import models
 class Building(models.Model):
     name = models.CharField(max_length=10)
 
-    def __str__(self):
-        return "Building: %s" % self.name
-
 
 class Device(models.Model):
-    building = models.ForeignKey('Building', models.CASCADE)
+    building = models.ForeignKey("Building", models.CASCADE)
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return "device '%s' in building %s" % (self.name, self.building)
 
 
 class Port(models.Model):
-    device = models.ForeignKey('Device', models.CASCADE)
+    device = models.ForeignKey("Device", models.CASCADE)
     port_number = models.CharField(max_length=10)
 
     def __str__(self):
@@ -28,18 +22,16 @@ class Connection(models.Model):
     start = models.ForeignKey(
         Port,
         models.CASCADE,
-        related_name='connection_start',
+        related_name="connection_start",
         unique=True,
     )
     end = models.ForeignKey(
         Port,
         models.CASCADE,
-        related_name='connection_end',
+        related_name="connection_end",
         unique=True,
     )
 
-    def __str__(self):
-        return "%s to %s" % (self.start, self.end)
 
 # Another non-tree hierarchy that exercises code paths similar to the above
 # example, but in a slightly different configuration.
@@ -69,6 +61,7 @@ class Enrollment(models.Model):
     std = models.ForeignKey(Student, models.CASCADE)
     cls = models.ForeignKey(Class, models.CASCADE)
 
+
 # Models for testing bug #8036.
 
 
@@ -94,14 +87,12 @@ class Client(models.Model):
 class SpecialClient(Client):
     value = models.IntegerField()
 
+
 # Some model inheritance exercises
 
 
 class Parent(models.Model):
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.name
 
 
 class Child(Parent):
@@ -115,14 +106,12 @@ class Item(models.Model):
     def __str__(self):
         return self.name
 
+
 # Models for testing bug #19870.
 
 
 class Fowl(models.Model):
     name = models.CharField(max_length=10)
-
-    def __str__(self):
-        return self.name
 
 
 class Hen(Fowl):

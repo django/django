@@ -2,16 +2,18 @@
 #
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Juraj Bubniak <translations@jbub.eu>, 2012-2014
+# 18f25ad6fa9930fc67cb11aca9d16a27, 2012-2014
 # Marian Andre <marian@andre.sk>, 2015,2017
 # Martin Tóth <ezimir@gmail.com>, 2017-2018
+# Peter Kuma, 2021
+# Richard von Kellner, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2018-05-03 06:50+0000\n"
-"Last-Translator: Martin Tóth <ezimir@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2021-09-30 09:28+0000\n"
+"Last-Translator: Richard von Kellner\n"
 "Language-Team: Slovak (http://www.transifex.com/django/django/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -55,7 +57,7 @@ msgstr "Žiadne heslo."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Neplatný formát hesla alebo neznámy hašovací algoritmus."
 
-msgid "The two password fields didn't match."
+msgid "The two password fields didn’t match."
 msgstr "Heslo a jeho potvrdenie sa nezhodujú."
 
 msgid "Password"
@@ -68,7 +70,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Kvôli overeniu, znovu zadajte rovnaké heslo."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Heslá v pôvodnom tvare nie sú ukladané, takže neexistuje spôsob zobraziť "
@@ -136,6 +138,9 @@ msgstr "faktor práce"
 
 msgid "checksum"
 msgstr "kontrolný súčet"
+
+msgid "block size"
+msgstr "veľkosť bloku"
 
 msgid "name"
 msgstr "meno"
@@ -251,19 +256,19 @@ msgstr[3] "Vaše heslo musí obsahovať aspoň %(min_length)d znakov."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Heslo sa príliš podobá na %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
+msgid "Your password can’t be too similar to your other personal information."
 msgstr "Vaše heslo sa nesmie príliš podobať na ostatné osobné informácie."
 
 msgid "This password is too common."
 msgstr "Toto heslo je používané príliš často."
 
-msgid "Your password can't be a commonly used password."
-msgstr "Vaše heslo nemôže byť jedno z často používaných."
+msgid "Your password can’t be a commonly used password."
+msgstr "Vaše heslo nemôže byť jedno z často používaných hesiel."
 
 msgid "This password is entirely numeric."
 msgstr "Toto heslo pozostáva iba z číslic."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Vaše heslo nemôže pozostávať iba z číslic."
 
 #, python-format

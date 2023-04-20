@@ -11,29 +11,30 @@ from io import StringIO
 import yaml
 
 from django.core.serializers.base import DeserializationError
-from django.core.serializers.python import (
-    Deserializer as PythonDeserializer, Serializer as PythonSerializer,
-)
+from django.core.serializers.python import Deserializer as PythonDeserializer
+from django.core.serializers.python import Serializer as PythonSerializer
 from django.db import models
 
 # Use the C (faster) implementation if possible
 try:
-    from yaml import CSafeLoader as SafeLoader
     from yaml import CSafeDumper as SafeDumper
+    from yaml import CSafeLoader as SafeLoader
 except ImportError:
-    from yaml import SafeLoader, SafeDumper
+    from yaml import SafeDumper, SafeLoader
 
 
 class DjangoSafeDumper(SafeDumper):
     def represent_decimal(self, data):
-        return self.represent_scalar('tag:yaml.org,2002:str', str(data))
+        return self.represent_scalar("tag:yaml.org,2002:str", str(data))
 
     def represent_ordered_dict(self, data):
-        return self.represent_mapping('tag:yaml.org,2002:map', data.items())
+        return self.represent_mapping("tag:yaml.org,2002:map", data.items())
 
 
 DjangoSafeDumper.add_representer(decimal.Decimal, DjangoSafeDumper.represent_decimal)
-DjangoSafeDumper.add_representer(collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict)
+DjangoSafeDumper.add_representer(
+    collections.OrderedDict, DjangoSafeDumper.represent_ordered_dict
+)
 # Workaround to represent dictionaries in insertion order.
 # See https://github.com/yaml/pyyaml/pull/143.
 DjangoSafeDumper.add_representer(dict, DjangoSafeDumper.represent_ordered_dict)
@@ -57,6 +58,7 @@ class Serializer(PythonSerializer):
             super().handle_field(obj, field)
 
     def end_serialization(self):
+        self.options.setdefault("allow_unicode", True)
         yaml.dump(self.objects, self.stream, Dumper=DjangoSafeDumper, **self.options)
 
     def getvalue(self):

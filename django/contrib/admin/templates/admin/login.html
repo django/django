@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 {% load i18n static %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/login.css" %}">
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
 {{ form.media }}
 {% endblock %}
 
@@ -11,14 +11,16 @@
 
 {% block nav-global %}{% endblock %}
 
+{% block nav-sidebar %}{% endblock %}
+
 {% block content_title %}{% endblock %}
 
-{% block breadcrumbs %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
 
 {% block content %}
 {% if form.errors and not form.non_field_errors %}
 <p class="errornote">
-{% if form.errors.items|length == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+{% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
 </p>
 {% endif %}
 
@@ -58,7 +60,7 @@
   </div>
   {% endif %}
   <div class="submit-row">
-    <label>&nbsp;</label><input type="submit" value="{% translate 'Log in' %}">
+    <input type="submit" value="{% translate 'Log in' %}">
   </div>
 </form>
 

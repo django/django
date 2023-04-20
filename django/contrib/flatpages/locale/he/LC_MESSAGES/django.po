@@ -1,15 +1,15 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Alex Gaynor <inactive+Alex@transifex.com>, 2011
+# 534b44a19bf18d20b71ecc4eb77c572f_db336e9 <f8268c65f822ec11a3a2e5d482cd7ead_175>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Meir Kriheli <mkriheli@gmail.com>, 2012,2014-2015,2019
+# Meir Kriheli <mkriheli@gmail.com>, 2012,2014-2015,2019-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-03-19 16:25+0000\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-08-02 13:26+0000\n"
 "Last-Translator: Meir Kriheli <mkriheli@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/django/django/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -29,9 +29,8 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr ""
-"לדוגמא: '/about/contact/'. יש לוודא הימצאות הקווים הנטויים בהתחלה ובסוף."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr "דוגמה: “/about/contact/”. יש לוודא שמכיל קווים נטויים בהתחלה ובסוף."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -40,8 +39,8 @@ msgstr ""
 "הערך הזאת חייב להכיל רק אותיות, מספרים, נקודות, מקפים, קווים תחתונים, חתכים "
 "או סימני טילדה בלבד."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "לדוגמה:‏ '‎/about/contact'. יש לוודא הימצאות הקו הנטוי בהתחלה."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "דוגמה: “‎/about/contact”. יש לוודא שמכיל קו נטוי בהתחלה."
 
 msgid "URL is missing a leading slash."
 msgstr "חסר קו נטוי בתחילת URL."
@@ -66,11 +65,11 @@ msgid "template name"
 msgstr "שם תבנית"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"דוגמא: 'flatpages/contact_page.html'. אם לא צויין, המערכת תשתמש ב-'flatpages/"
-"default.html'."
+"דוגמה: “flatpages/contact_page.html”. אם לא צוין, המערכת תשתמש ב־“flatpages/"
+"default.html”."
 
 msgid "registration required"
 msgstr "הרשמה נדרשת"

@@ -6,7 +6,7 @@ Welcome to Django 1.0!
 
 We've been looking forward to this moment for over three years, and it's finally
 here. Django 1.0 represents the largest milestone in Django's development to
-date: a Web framework that a group of perfectionists can truly be proud of.
+date: a web framework that a group of perfectionists can truly be proud of.
 
 Django 1.0 represents over three years of community development as an Open
 Source project. Django's received contributions from hundreds of developers,
@@ -73,8 +73,8 @@ You'll know that you're looking at something new or changed.
 
 The other major highlights of Django 1.0 are:
 
-Re-factored admin application
------------------------------
+Refactored admin application
+----------------------------
 
 The Django administrative interface (``django.contrib.admin``) has been
 completely refactored; admin definitions are now completely decoupled from model
@@ -132,7 +132,7 @@ will be merged into the main Django documentation shortly. Huge thanks go to
 Justin Bronn, Jeremy Dunck, Brett Hoerner and Travis Pinney for their efforts in
 creating and completing this feature.
 
-See http://geodjango.org/ for details.
+See :doc:`GeoDjango </ref/contrib/gis/index>` for details.
 
 .. _Geographic Information Systems: https://en.wikipedia.org/wiki/Geographic_information_system
 
@@ -154,7 +154,7 @@ Django's codebase has been refactored to remove incompatibilities with
 on the Java Virtual Machine. Django is now compatible with the forthcoming
 Jython 2.5 release.
 
-.. _Jython: http://www.jython.org/
+.. _Jython: https://www.jython.org/
 
 Generic relations in forms and admin
 ------------------------------------
@@ -203,7 +203,7 @@ present in Django. These include imports of the form library from
 ``django.newforms`` (now located simply at ``django.forms``), the
 ``form_for_model`` and ``form_for_instance`` helper functions (which have been
 replaced by ``ModelForm``) and a number of deprecated features which were
-replaced by the dispatcher, file-uploading and file-storage refactorings
+replaced by the dispatcher, file-uploading and file-storage refactoring
 introduced in the Django 1.0 alpha releases.
 
 Known issues
@@ -224,8 +224,11 @@ models like the following are **not valid**::
         name = models.CharField(max_length=10)
         other_value = models.IntegerField(unique=True)
 
+
     class Child(Parent):
-        father = models.OneToOneField(Parent, primary_key=True, to_field="other_value", parent_link=True)
+        father = models.OneToOneField(
+            Parent, primary_key=True, to_field="other_value", parent_link=True
+        )
         value = models.IntegerField()
 
 This bug will be fixed in the next release of Django.

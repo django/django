@@ -10,7 +10,7 @@ class DummyStorage:
     def __init__(self):
         self.store = []
 
-    def add(self, level, message, extra_tags=''):
+    def add(self, level, message, extra_tags=""):
         self.store.append(message)
 
 
@@ -22,7 +22,7 @@ class ApiTests(SimpleTestCase):
         self.storage = DummyStorage()
 
     def test_ok(self):
-        msg = 'some message'
+        msg = "some message"
         self.request._messages = self.storage
         messages.add_message(self.request, messages.DEBUG, msg)
         self.assertIn(msg, self.storage.store)
@@ -31,17 +31,22 @@ class ApiTests(SimpleTestCase):
         msg = "add_message() argument must be an HttpRequest object, not 'NoneType'."
         self.request._messages = self.storage
         with self.assertRaisesMessage(TypeError, msg):
-            messages.add_message(None, messages.DEBUG, 'some message')
+            messages.add_message(None, messages.DEBUG, "some message")
         self.assertEqual(self.storage.store, [])
 
     def test_middleware_missing(self):
-        msg = 'You cannot add messages without installing django.contrib.messages.middleware.MessageMiddleware'
+        msg = (
+            "You cannot add messages without installing "
+            "django.contrib.messages.middleware.MessageMiddleware"
+        )
         with self.assertRaisesMessage(messages.MessageFailure, msg):
-            messages.add_message(self.request, messages.DEBUG, 'some message')
+            messages.add_message(self.request, messages.DEBUG, "some message")
         self.assertEqual(self.storage.store, [])
 
     def test_middleware_missing_silently(self):
-        messages.add_message(self.request, messages.DEBUG, 'some message', fail_silently=True)
+        messages.add_message(
+            self.request, messages.DEBUG, "some message", fail_silently=True
+        )
         self.assertEqual(self.storage.store, [])
 
 
@@ -61,6 +66,7 @@ class CustomRequestApiTests(ApiTests):
     add_message() should use ducktyping to allow request wrappers such as the
     one in Django REST framework.
     """
+
     def setUp(self):
         super().setUp()
         self.request = CustomRequest(self.request)

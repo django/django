@@ -15,22 +15,22 @@ def shortcut(request, content_type_id, object_id):
         content_type = ContentType.objects.get(pk=content_type_id)
         if not content_type.model_class():
             raise Http404(
-                _("Content type %(ct_id)s object has no associated model") %
-                {'ct_id': content_type_id}
+                _("Content type %(ct_id)s object has no associated model")
+                % {"ct_id": content_type_id}
             )
         obj = content_type.get_object_for_this_type(pk=object_id)
     except (ObjectDoesNotExist, ValueError):
         raise Http404(
-            _('Content type %(ct_id)s object %(obj_id)s doesn’t exist') %
-            {'ct_id': content_type_id, 'obj_id': object_id}
+            _("Content type %(ct_id)s object %(obj_id)s doesn’t exist")
+            % {"ct_id": content_type_id, "obj_id": object_id}
         )
 
     try:
         get_absolute_url = obj.get_absolute_url
     except AttributeError:
         raise Http404(
-            _('%(ct_name)s objects don’t have a get_absolute_url() method') %
-            {'ct_name': content_type.name}
+            _("%(ct_name)s objects don’t have a get_absolute_url() method")
+            % {"ct_name": content_type.name}
         )
     absurl = get_absolute_url()
 
@@ -38,7 +38,7 @@ def shortcut(request, content_type_id, object_id):
     # if necessary.
 
     # If the object actually defines a domain, we're done.
-    if absurl.startswith(('http://', 'https://', '//')):
+    if absurl.startswith(("http://", "https://", "//")):
         return HttpResponseRedirect(absurl)
 
     # Otherwise, we need to introspect the object's relationships for a
@@ -48,8 +48,8 @@ def shortcut(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         object_domain = None
 
-    if apps.is_installed('django.contrib.sites'):
-        Site = apps.get_model('sites.Site')
+    if apps.is_installed("django.contrib.sites"):
+        Site = apps.get_model("sites.Site")
         opts = obj._meta
 
         for field in opts.many_to_many:
@@ -83,6 +83,6 @@ def shortcut(request, content_type_id, object_id):
     # to whatever get_absolute_url() returned.
     if object_domain is not None:
         protocol = request.scheme
-        return HttpResponseRedirect('%s://%s%s' % (protocol, object_domain, absurl))
+        return HttpResponseRedirect("%s://%s%s" % (protocol, object_domain, absurl))
     else:
         return HttpResponseRedirect(absurl)

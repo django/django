@@ -2,6 +2,7 @@
 #
 # Translators:
 # Allisson Azevedo <allisson@gmail.com>, 2014
+# Amanda Savluchinske <amandasavluchinske@gmail.com>, 2019
 # andrewsmedina <andrewsmedina@gmail.com>, 2013
 # dudanogueira <dudanogueira@gmail.com>, 2019
 # Eduardo Cereto Carvalho, 2011
@@ -9,15 +10,16 @@
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Lucas Infante <maccinza@gmail.com>, 2015
+# Rafael Fontenelle <rffontenelle@gmail.com>, 2021
 # Sergio Oliveira <seocam@seocam.com>, 2013
 # Thiago Avelino <t@avelino.xxx>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-18 17:14+0000\n"
-"Last-Translator: dudanogueira <dudanogueira@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2021-01-17 06:37+0000\n"
+"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -36,8 +38,9 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "Exemplo: '/sobre/contato/'. Lembre-se das barras no começo e no final."
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr ""
+"Exemplo: “/about/contact/”. Certifique-se de ter barras no início e no final."
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
@@ -46,8 +49,8 @@ msgstr ""
 "Este valor deve conter apenas letras, números, pontos, sublinhados, traços, "
 "barras ou til."
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Exemplo: '/sobre/contato'. Certifique-se de ter a barra no início."
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "Exemplo: “/about/contact”. Certifique-se de ter uma barra no início."
 
 msgid "URL is missing a leading slash."
 msgstr "Está faltando uma barra no início da URL."
@@ -72,11 +75,11 @@ msgid "template name"
 msgstr "nome do template"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"Exemplo: 'flatpages/contact_page.html'. Se não for informado, será utilizado "
-"'flatpages/default.html'."
+"Exemplo: “flatpages/contact_page.html”. Se isso não for fornecido, o sistema "
+"utilizará “flatpages/default.html”."
 
 msgid "registration required"
 msgstr "registro obrigatório"

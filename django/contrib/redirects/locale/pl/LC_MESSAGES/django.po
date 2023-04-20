@@ -3,14 +3,14 @@
 # Translators:
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
-# m_aciek <maciej.olko@gmail.com>, 2019
+# m_aciek <maciej.olko@gmail.com>, 2019,2021
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-11-11 14:54+0000\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-09-06 21:50+0000\n"
 "Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -41,14 +41,14 @@ msgid "redirect to"
 msgstr "przekieruj na"
 
 msgid ""
-"This can be either an absolute path (as above) or a full URL starting with "
-"“http://”."
+"This can be either an absolute path (as above) or a full URL starting with a "
+"scheme such as “https://”."
 msgstr ""
-"Podaj ścieżkę bezwzględną (jak powyżej) lub pełen URL rozpoczynający się od "
-"„http://”."
+"Może to być ścieżka bezwzględna (jak powyżej) lub pełny URL rozpoczynający "
+"się schematem takim jak \"https://\"."
 
 msgid "redirect"
-msgstr "przekieruj"
+msgstr "przekierowanie"
 
 msgid "redirects"
 msgstr "przekierowania"

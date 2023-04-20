@@ -6,14 +6,15 @@
 # mozillazg <opensource.mozillazg@gmail.com>, 2016
 # Ronald White <tkliuxing@me.com>, 2014
 # Suntravel Chris <chrisfromcn@gmail.com>, 2019
+# wolf ice <warwolf7677@163.com>, 2020
 # Kevin Sze <leiarix@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-16 20:42+0100\n"
-"PO-Revision-Date: 2019-02-01 07:11+0000\n"
-"Last-Translator: Suntravel Chris <chrisfromcn@gmail.com>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2020-03-04 04:05+0000\n"
+"Last-Translator: wolf ice <warwolf7677@163.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/django/django/"
 "language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -32,16 +33,16 @@ msgid "URL"
 msgstr "URL"
 
 msgid ""
-"Example: '/about/contact/'. Make sure to have leading and trailing slashes."
-msgstr "例如：'/about/contact/'。请确保开始和结尾的斜杠。"
+"Example: “/about/contact/”. Make sure to have leading and trailing slashes."
+msgstr "例如：“/about/contact/”。确保有开头和结尾的斜杠。"
 
 msgid ""
 "This value must contain only letters, numbers, dots, underscores, dashes, "
 "slashes or tildes."
 msgstr "该值必须只能包含字母，数字，点号，下划线，破折号，和"
 
-msgid "Example: '/about/contact'. Make sure to have a leading slash."
-msgstr "Example: '/about/contact'. 请确保开头的正斜杠。"
+msgid "Example: “/about/contact”. Make sure to have a leading slash."
+msgstr "例如：“/about/contact”。确保有一个开头的斜杠。"
 
 msgid "URL is missing a leading slash."
 msgstr "URL头部缺失斜线."
@@ -66,11 +67,11 @@ msgid "template name"
 msgstr "模板名称"
 
 msgid ""
-"Example: 'flatpages/contact_page.html'. If this isn't provided, the system "
-"will use 'flatpages/default.html'."
+"Example: “flatpages/contact_page.html”. If this isn’t provided, the system "
+"will use “flatpages/default.html”."
 msgstr ""
-"例如：'flatpages/contact_page.html'。若未提供，系统将使用'flatpages/default."
-"html'。"
+"例如：“flatpages/contact_page.html”。如果它未被提供，系统将使用“flatpages/"
+"default.html”。"
 
 msgid "registration required"
 msgstr "请先注册"

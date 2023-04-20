@@ -3,8 +3,16 @@ import os
 import sys
 import uuid
 from ctypes import (
-    addressof, byref, c_buffer, c_char_p, c_double, c_int, c_void_p, string_at,
+    addressof,
+    byref,
+    c_buffer,
+    c_char_p,
+    c_double,
+    c_int,
+    c_void_p,
+    string_at,
 )
+from pathlib import Path
 
 from django.contrib.gis.gdal.driver import Driver
 from django.contrib.gis.gdal.error import GDALException
@@ -12,8 +20,11 @@ from django.contrib.gis.gdal.prototypes import raster as capi
 from django.contrib.gis.gdal.raster.band import BandList
 from django.contrib.gis.gdal.raster.base import GDALRasterBase
 from django.contrib.gis.gdal.raster.const import (
-    GDAL_RESAMPLE_ALGORITHMS, VSI_DELETE_BUFFER_ON_READ,
-    VSI_FILESYSTEM_BASE_PATH, VSI_TAKE_BUFFER_OWNERSHIP,
+    GDAL_RESAMPLE_ALGORITHMS,
+    VSI_DELETE_BUFFER_ON_READ,
+    VSI_FILESYSTEM_PREFIX,
+    VSI_MEM_FILESYSTEM_BASE_PATH,
+    VSI_TAKE_BUFFER_OWNERSHIP,
 )
 from django.contrib.gis.gdal.srs import SpatialReference, SRSException
 from django.contrib.gis.geometry import json_regex
@@ -23,9 +34,9 @@ from django.utils.functional import cached_property
 
 class TransformPoint(list):
     indices = {
-        'origin': (0, 3),
-        'scale': (1, 5),
-        'skew': (2, 4),
+        "origin": (0, 3),
+        "scale": (1, 5),
+        "skew": (2, 4),
     }
 
     def __init__(self, raster, prop):
@@ -60,6 +71,7 @@ class GDALRaster(GDALRasterBase):
     """
     Wrap a raster GDAL Data Source object.
     """
+
     destructor = capi.close_ds
 
     def __init__(self, ds_input, write=False):
@@ -72,12 +84,21 @@ class GDALRaster(GDALRasterBase):
             ds_input = json.loads(ds_input)
 
         # If input is a valid file path, try setting file as source.
-        if isinstance(ds_input, str):
+        if isinstance(ds_input, (str, Path)):
+            ds_input = str(ds_input)
+            if not ds_input.startswith(VSI_FILESYSTEM_PREFIX) and not os.path.exists(
+                ds_input
+            ):
+                raise GDALException(
+                    'Unable to read raster source input "%s".' % ds_input
+                )
             try:
                 # GDALOpen will auto-detect the data source type.
                 self._ptr = capi.open_ds(force_bytes(ds_input), self._write)
             except GDALException as err:
-                raise GDALException('Could not open the datasource at "{}" ({}).'.format(ds_input, err))
+                raise GDALException(
+                    'Could not open the datasource at "{}" ({}).'.format(ds_input, err)
+                )
         elif isinstance(ds_input, bytes):
             # Create a new raster in write mode.
             self._write = 1
@@ -88,7 +109,7 @@ class GDALRaster(GDALRasterBase):
             # deleted.
             self._ds_input = c_buffer(ds_input)
             # Create random name to reference in vsimem filesystem.
-            vsi_path = os.path.join(VSI_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+            vsi_path = os.path.join(VSI_MEM_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
             # Create vsimem file from buffer.
             capi.create_vsi_file_from_mem_buffer(
                 force_bytes(vsi_path),
@@ -102,30 +123,36 @@ class GDALRaster(GDALRasterBase):
             except GDALException:
                 # Remove the broken file from the VSI filesystem.
                 capi.unlink_vsi_file(force_bytes(vsi_path))
-                raise GDALException('Failed creating VSI raster from the input buffer.')
+                raise GDALException("Failed creating VSI raster from the input buffer.")
         elif isinstance(ds_input, dict):
             # A new raster needs to be created in write mode
             self._write = 1
 
             # Create driver (in memory by default)
-            driver = Driver(ds_input.get('driver', 'MEM'))
+            driver = Driver(ds_input.get("driver", "MEM"))
 
             # For out of memory drivers, check filename argument
-            if driver.name != 'MEM' and 'name' not in ds_input:
-                raise GDALException('Specify name for creation of raster with driver "{}".'.format(driver.name))
+            if driver.name != "MEM" and "name" not in ds_input:
+                raise GDALException(
+                    'Specify name for creation of raster with driver "{}".'.format(
+                        driver.name
+                    )
+                )
 
             # Check if width and height where specified
-            if 'width' not in ds_input or 'height' not in ds_input:
-                raise GDALException('Specify width and height attributes for JSON or dict input.')
+            if "width" not in ds_input or "height" not in ds_input:
+                raise GDALException(
+                    "Specify width and height attributes for JSON or dict input."
+                )
 
             # Check if srid was specified
-            if 'srid' not in ds_input:
-                raise GDALException('Specify srid for JSON or dict input.')
+            if "srid" not in ds_input:
+                raise GDALException("Specify srid for JSON or dict input.")
 
             # Create null terminated gdal options array.
             papsz_options = []
-            for key, val in ds_input.get('papsz_options', {}).items():
-                option = '{}={}'.format(key, val)
+            for key, val in ds_input.get("papsz_options", {}).items():
+                option = "{}={}".format(key, val)
                 papsz_options.append(option.upper().encode())
             papsz_options.append(None)
 
@@ -135,51 +162,54 @@ class GDALRaster(GDALRasterBase):
             # Create GDAL Raster
             self._ptr = capi.create_ds(
                 driver._ptr,
-                force_bytes(ds_input.get('name', '')),
-                ds_input['width'],
-                ds_input['height'],
-                ds_input.get('nr_of_bands', len(ds_input.get('bands', []))),
-                ds_input.get('datatype', 6),
+                force_bytes(ds_input.get("name", "")),
+                ds_input["width"],
+                ds_input["height"],
+                ds_input.get("nr_of_bands", len(ds_input.get("bands", []))),
+                ds_input.get("datatype", 6),
                 byref(papsz_options),
             )
 
             # Set band data if provided
-            for i, band_input in enumerate(ds_input.get('bands', [])):
+            for i, band_input in enumerate(ds_input.get("bands", [])):
                 band = self.bands[i]
-                if 'nodata_value' in band_input:
-                    band.nodata_value = band_input['nodata_value']
+                if "nodata_value" in band_input:
+                    band.nodata_value = band_input["nodata_value"]
                     # Instantiate band filled with nodata values if only
                     # partial input data has been provided.
                     if band.nodata_value is not None and (
-                            'data' not in band_input or
-                            'size' in band_input or
-                            'shape' in band_input):
+                        "data" not in band_input
+                        or "size" in band_input
+                        or "shape" in band_input
+                    ):
                         band.data(data=(band.nodata_value,), shape=(1, 1))
                 # Set band data values from input.
                 band.data(
-                    data=band_input.get('data'),
-                    size=band_input.get('size'),
-                    shape=band_input.get('shape'),
-                    offset=band_input.get('offset'),
+                    data=band_input.get("data"),
+                    size=band_input.get("size"),
+                    shape=band_input.get("shape"),
+                    offset=band_input.get("offset"),
                 )
 
             # Set SRID
-            self.srs = ds_input.get('srid')
+            self.srs = ds_input.get("srid")
 
             # Set additional properties if provided
-            if 'origin' in ds_input:
-                self.origin.x, self.origin.y = ds_input['origin']
+            if "origin" in ds_input:
+                self.origin.x, self.origin.y = ds_input["origin"]
 
-            if 'scale' in ds_input:
-                self.scale.x, self.scale.y = ds_input['scale']
+            if "scale" in ds_input:
+                self.scale.x, self.scale.y = ds_input["scale"]
 
-            if 'skew' in ds_input:
-                self.skew.x, self.skew.y = ds_input['skew']
+            if "skew" in ds_input:
+                self.skew.x, self.skew.y = ds_input["skew"]
         elif isinstance(ds_input, c_void_p):
             # Instantiate the object using an existing pointer to a gdal raster.
             self._ptr = ds_input
         else:
-            raise GDALException('Invalid data source input type: "{}".'.format(type(ds_input)))
+            raise GDALException(
+                'Invalid data source input type: "{}".'.format(type(ds_input))
+            )
 
     def __del__(self):
         if self.is_vsi_based:
@@ -194,7 +224,7 @@ class GDALRaster(GDALRasterBase):
         """
         Short-hand representation because WKB may be very large.
         """
-        return '<Raster object at %s>' % hex(addressof(self._ptr))
+        return "<Raster object at %s>" % hex(addressof(self._ptr))
 
     def _flush(self):
         """
@@ -205,12 +235,16 @@ class GDALRaster(GDALRasterBase):
         """
         # Raise an Exception if the value is being changed in read mode.
         if not self._write:
-            raise GDALException('Raster needs to be opened in write mode to change values.')
+            raise GDALException(
+                "Raster needs to be opened in write mode to change values."
+            )
         capi.flush_ds(self._ptr)
 
     @property
     def vsi_buffer(self):
-        if not self.is_vsi_based:
+        if not (
+            self.is_vsi_based and self.name.startswith(VSI_MEM_FILESYSTEM_BASE_PATH)
+        ):
             return None
         # Prepare an integer that will contain the buffer length.
         out_length = c_int()
@@ -225,7 +259,7 @@ class GDALRaster(GDALRasterBase):
 
     @cached_property
     def is_vsi_based(self):
-        return self.name.startswith(VSI_FILESYSTEM_BASE_PATH)
+        return self._ptr and self.name.startswith(VSI_FILESYSTEM_PREFIX)
 
     @property
     def name(self):
@@ -266,7 +300,7 @@ class GDALRaster(GDALRasterBase):
             wkt = capi.get_ds_projection_ref(self._ptr)
             if not wkt:
                 return None
-            return SpatialReference(wkt, srs_type='wkt')
+            return SpatialReference(wkt, srs_type="wkt")
         except SRSException:
             return None
 
@@ -282,7 +316,7 @@ class GDALRaster(GDALRasterBase):
         elif isinstance(value, (int, str)):
             srs = SpatialReference(value)
         else:
-            raise ValueError('Could not create a SpatialReference from input.')
+            raise ValueError("Could not create a SpatialReference from input.")
         capi.set_ds_projection_ref(self._ptr, srs.wkt.encode())
         self._flush()
 
@@ -316,7 +350,7 @@ class GDALRaster(GDALRasterBase):
     def geotransform(self, values):
         "Set the geotransform for the data source."
         if len(values) != 6 or not all(isinstance(x, (int, float)) for x in values):
-            raise ValueError('Geotransform must consist of 6 numeric values.')
+            raise ValueError("Geotransform must consist of 6 numeric values.")
         # Create ctypes double array with input and write data
         values = (c_double * 6)(*values)
         capi.set_ds_geotransform(self._ptr, byref(values))
@@ -327,21 +361,21 @@ class GDALRaster(GDALRasterBase):
         """
         Coordinates of the raster origin.
         """
-        return TransformPoint(self, 'origin')
+        return TransformPoint(self, "origin")
 
     @property
     def scale(self):
         """
         Pixel scale in units of the raster projection.
         """
-        return TransformPoint(self, 'scale')
+        return TransformPoint(self, "scale")
 
     @property
     def skew(self):
         """
         Skew of pixels (rotation parameters).
         """
-        return TransformPoint(self, 'skew')
+        return TransformPoint(self, "skew")
 
     @property
     def extent(self):
@@ -363,7 +397,7 @@ class GDALRaster(GDALRasterBase):
     def bands(self):
         return BandList(self)
 
-    def warp(self, ds_input, resampling='NearestNeighbour', max_error=0.0):
+    def warp(self, ds_input, resampling="NearestNeighbour", max_error=0.0):
         """
         Return a warped GDALRaster with the given input characteristics.
 
@@ -381,23 +415,23 @@ class GDALRaster(GDALRasterBase):
         consult the GDAL_RESAMPLE_ALGORITHMS constant.
         """
         # Get the parameters defining the geotransform, srid, and size of the raster
-        ds_input.setdefault('width', self.width)
-        ds_input.setdefault('height', self.height)
-        ds_input.setdefault('srid', self.srs.srid)
-        ds_input.setdefault('origin', self.origin)
-        ds_input.setdefault('scale', self.scale)
-        ds_input.setdefault('skew', self.skew)
+        ds_input.setdefault("width", self.width)
+        ds_input.setdefault("height", self.height)
+        ds_input.setdefault("srid", self.srs.srid)
+        ds_input.setdefault("origin", self.origin)
+        ds_input.setdefault("scale", self.scale)
+        ds_input.setdefault("skew", self.skew)
         # Get the driver, name, and datatype of the target raster
-        ds_input.setdefault('driver', self.driver.name)
+        ds_input.setdefault("driver", self.driver.name)
 
-        if 'name' not in ds_input:
-            ds_input['name'] = self.name + '_copy.' + self.driver.name
+        if "name" not in ds_input:
+            ds_input["name"] = self.name + "_copy." + self.driver.name
 
-        if 'datatype' not in ds_input:
-            ds_input['datatype'] = self.bands[0].datatype()
+        if "datatype" not in ds_input:
+            ds_input["datatype"] = self.bands[0].datatype()
 
         # Instantiate raster bands filled with nodata values.
-        ds_input['bands'] = [{'nodata_value': bnd.nodata_value} for bnd in self.bands]
+        ds_input["bands"] = [{"nodata_value": bnd.nodata_value} for bnd in self.bands]
 
         # Create target raster
         target = GDALRaster(ds_input, write=True)
@@ -407,10 +441,16 @@ class GDALRaster(GDALRasterBase):
 
         # Reproject image
         capi.reproject_image(
-            self._ptr, self.srs.wkt.encode(),
-            target._ptr, target.srs.wkt.encode(),
-            algorithm, 0.0, max_error,
-            c_void_p(), c_void_p(), c_void_p()
+            self._ptr,
+            self.srs.wkt.encode(),
+            target._ptr,
+            target.srs.wkt.encode(),
+            algorithm,
+            0.0,
+            max_error,
+            c_void_p(),
+            c_void_p(),
+            c_void_p(),
         )
 
         # Make sure all data is written to file
@@ -418,40 +458,76 @@ class GDALRaster(GDALRasterBase):
 
         return target
 
-    def transform(self, srid, driver=None, name=None, resampling='NearestNeighbour',
-                  max_error=0.0):
+    def clone(self, name=None):
+        """Return a clone of this GDALRaster."""
+        if name:
+            clone_name = name
+        elif self.driver.name != "MEM":
+            clone_name = self.name + "_copy." + self.driver.name
+        else:
+            clone_name = os.path.join(VSI_MEM_FILESYSTEM_BASE_PATH, str(uuid.uuid4()))
+        return GDALRaster(
+            capi.copy_ds(
+                self.driver._ptr,
+                force_bytes(clone_name),
+                self._ptr,
+                c_int(),
+                c_char_p(),
+                c_void_p(),
+                c_void_p(),
+            ),
+            write=self._write,
+        )
+
+    def transform(
+        self, srs, driver=None, name=None, resampling="NearestNeighbour", max_error=0.0
+    ):
         """
-        Return a copy of this raster reprojected into the given SRID.
+        Return a copy of this raster reprojected into the given spatial
+        reference system.
         """
         # Convert the resampling algorithm name into an algorithm id
         algorithm = GDAL_RESAMPLE_ALGORITHMS[resampling]
 
-        # Instantiate target spatial reference system
-        target_srs = SpatialReference(srid)
+        if isinstance(srs, SpatialReference):
+            target_srs = srs
+        elif isinstance(srs, (int, str)):
+            target_srs = SpatialReference(srs)
+        else:
+            raise TypeError(
+                "Transform only accepts SpatialReference, string, and integer "
+                "objects."
+            )
 
+        if target_srs.srid == self.srid and (not driver or driver == self.driver.name):
+            return self.clone(name)
         # Create warped virtual dataset in the target reference system
         target = capi.auto_create_warped_vrt(
-            self._ptr, self.srs.wkt.encode(), target_srs.wkt.encode(),
-            algorithm, max_error, c_void_p()
+            self._ptr,
+            self.srs.wkt.encode(),
+            target_srs.wkt.encode(),
+            algorithm,
+            max_error,
+            c_void_p(),
         )
         target = GDALRaster(target)
 
         # Construct the target warp dictionary from the virtual raster
         data = {
-            'srid': srid,
-            'width': target.width,
-            'height': target.height,
-            'origin': [target.origin.x, target.origin.y],
-            'scale': [target.scale.x, target.scale.y],
-            'skew': [target.skew.x, target.skew.y],
+            "srid": target_srs.srid,
+            "width": target.width,
+            "height": target.height,
+            "origin": [target.origin.x, target.origin.y],
+            "scale": [target.scale.x, target.scale.y],
+            "skew": [target.skew.x, target.skew.y],
         }
 
         # Set the driver and filepath if provided
         if driver:
-            data['driver'] = driver
+            data["driver"] = driver
 
         if name:
-            data['name'] = name
+            data["name"] = name
 
         # Warp the raster into new srid
         return self.warp(data, resampling=resampling, max_error=max_error)
@@ -462,6 +538,4 @@ class GDALRaster(GDALRasterBase):
         Return information about this raster in a string format equivalent
         to the output of the gdalinfo command line utility.
         """
-        if not capi.get_ds_info:
-            raise ValueError('GDAL ≥ 2.1 is required for using the info property.')
         return capi.get_ds_info(self.ptr, None).decode()

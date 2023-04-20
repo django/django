@@ -1,0 +1,15 @@
+===========================
+Django 3.1.11 release notes
+===========================
+
+*May 13, 2021*
+
+Django 3.1.11 fixes a regression in 3.1.9.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.1.9 where saving ``FileField`` would raise a
+  ``SuspiciousFileOperation`` even when a custom
+  :attr:`~django.db.models.FileField.upload_to` returns a valid file path
+  (:ticket:`32718`).

@@ -7,7 +7,7 @@ This document will get you up and running with Django.
 Install Python
 ==============
 
-Django is a Python Web framework. See :ref:`faq-python-version-support` for
+Django is a Python web framework. See :ref:`faq-python-version-support` for
 details.
 
 Get the latest version of Python at https://www.python.org/downloads/ or with
@@ -34,9 +34,9 @@ memory when the server starts. Code stays in memory throughout the
 life of an Apache process, which leads to significant performance
 gains over other server arrangements. In daemon mode, mod_wsgi spawns
 an independent daemon process that handles requests. The daemon
-process can run as a different user than the Web server, possibly
+process can run as a different user than the web server, possibly
 leading to improved security. The daemon process can be restarted
-without restarting the entire Apache Web server, possibly making
+without restarting the entire Apache web server, possibly making
 refreshing your codebase more seamless. Consult the mod_wsgi
 documentation to determine which mode is right for your setup. Make
 sure you have Apache installed with the mod_wsgi module activated.
@@ -79,8 +79,9 @@ databases with Django.
 In addition to a database backend, you'll need to make sure your Python
 database bindings are installed.
 
-* If you're using PostgreSQL, you'll need the `psycopg2`_ package. Refer to the
-  :ref:`PostgreSQL notes <postgresql-notes>` for further details.
+* If you're using PostgreSQL, you'll need the `psycopg`_ or `psycopg2`_
+  package. Refer to the :ref:`PostgreSQL notes <postgresql-notes>` for further
+  details.
 
 * If you're using MySQL or MariaDB, you'll need a :ref:`DB API driver
   <mysql-db-api-drivers>` like ``mysqlclient``. See :ref:`notes for the MySQL
@@ -111,7 +112,8 @@ database queries, Django will need permission to create a test database.
 .. _PostgreSQL: https://www.postgresql.org/
 .. _MariaDB: https://mariadb.org/
 .. _MySQL: https://www.mysql.com/
-.. _psycopg2: http://initd.org/psycopg/
+.. _psycopg: https://www.psycopg.org/psycopg3/
+.. _psycopg2: https://www.psycopg.org/
 .. _SQLite: https://www.sqlite.org/
 .. _cx_Oracle: https://oracle.github.io/python-cx_Oracle/
 .. _Oracle: https://www.oracle.com/
@@ -137,11 +139,11 @@ This is the recommended way to install Django.
    it's outdated. If it's outdated, you'll know because installation won't
    work.
 
-#. Take a look at virtualenv_ and virtualenvwrapper_. These tools provide
+#. Take a look at :doc:`venv <python:tutorial/venv>`. This tool provides
    isolated Python environments, which are more practical than installing
-   packages systemwide. They also allow installing packages without
+   packages systemwide. It also allows installing packages without
    administrator privileges. The :doc:`contributing tutorial
-   </intro/contributing>` walks through how to create a virtualenv.
+   </intro/contributing>` walks through how to create a virtual environment.
 
 #. After you've created and activated a virtual environment, enter the command:
 
@@ -150,9 +152,7 @@ This is the recommended way to install Django.
         $ python -m pip install Django
 
 .. _pip: https://pip.pypa.io/
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/en/latest/
-.. _standalone pip installer: https://pip.pypa.io/en/latest/installing/#installing-with-get-pip-py
+.. _standalone pip installer: https://pip.pypa.io/en/latest/installation/
 
 .. _installing-distribution-package:
 
@@ -198,11 +198,12 @@ latest bug fixes and improvements, follow these instructions:
    This will create a directory ``django`` in your current directory.
 
 #. Make sure that the Python interpreter can load Django's code. The most
-   convenient way to do this is to use virtualenv_, virtualenvwrapper_, and
-   pip_. The :doc:`contributing tutorial </intro/contributing>` walks through
-   how to create a virtualenv.
+   convenient way to do this is to use a virtual environment and pip_. The
+   :doc:`contributing tutorial </intro/contributing>` walks through how to
+   create a virtual environment.
 
-#. After setting up and activating the virtualenv, run the following command:
+#. After setting up and activating the virtual environment, run the following
+   command:
 
    .. console::
 

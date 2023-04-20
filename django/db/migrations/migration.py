@@ -1,3 +1,6 @@
+import re
+
+from django.db.migrations.utils import get_migration_name_timestamp
 from django.db.transaction import atomic
 
 from .exceptions import IrreversibleError
@@ -11,7 +14,8 @@ class Migration:
     and subclass it as a class called Migration. It will have one or more
     of the following attributes:
 
-     - operations: A list of Operation instances, probably from django.db.migrations.operations
+     - operations: A list of Operation instances, probably from
+       django.db.migrations.operations
      - dependencies: A list of tuples of (app_path, migration_name)
      - run_before: A list of tuples of (app_path, migration_name)
      - replaces: A list of migration_names
@@ -59,9 +63,9 @@ class Migration:
 
     def __eq__(self, other):
         return (
-            isinstance(other, Migration) and
-            self.name == other.name and
-            self.app_label == other.app_label
+            isinstance(other, Migration)
+            and self.name == other.name
+            and self.app_label == other.app_label
         )
 
     def __repr__(self):
@@ -101,27 +105,35 @@ class Migration:
             # there instead
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                if not operation.reduces_to_sql:
-                    schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:"
-                    )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
+                    schema_editor.collected_sql.append(
+                        "-- THIS OPERATION CANNOT BE WRITTEN AS SQL"
+                    )
                     continue
+                collected_sql_before = len(schema_editor.collected_sql)
             # Save the state before the operation has run
             old_state = project_state.clone()
             operation.state_forwards(self.app_label, project_state)
             # Run the operation
-            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+            atomic_operation = operation.atomic or (
+                self.atomic and operation.atomic is not False
+            )
             if not schema_editor.atomic_migration and atomic_operation:
                 # Force a transaction on a non-transactional-DDL backend or an
                 # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
-                    operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
+                    operation.database_forwards(
+                        self.app_label, schema_editor, old_state, project_state
+                    )
             else:
                 # Normal behaviour
-                operation.database_forwards(self.app_label, schema_editor, old_state, project_state)
+                operation.database_forwards(
+                    self.app_label, schema_editor, old_state, project_state
+                )
+            if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
+                schema_editor.collected_sql.append("-- (no-op)")
         return project_state
 
     def unapply(self, project_state, schema_editor, collect_sql=False):
@@ -144,7 +156,9 @@ class Migration:
         for operation in self.operations:
             # If it's irreversible, error out
             if not operation.reversible:
-                raise IrreversibleError("Operation %s in %s is not reversible" % (operation, self))
+                raise IrreversibleError(
+                    "Operation %s in %s is not reversible" % (operation, self)
+                )
             # Preserve new state from previous run to not tamper the same state
             # over all operations
             new_state = new_state.clone()
@@ -156,24 +170,56 @@ class Migration:
         for operation, to_state, from_state in to_run:
             if collect_sql:
                 schema_editor.collected_sql.append("--")
-                if not operation.reduces_to_sql:
-                    schema_editor.collected_sql.append(
-                        "-- MIGRATION NOW PERFORMS OPERATION THAT CANNOT BE WRITTEN AS SQL:"
-                    )
                 schema_editor.collected_sql.append("-- %s" % operation.describe())
                 schema_editor.collected_sql.append("--")
                 if not operation.reduces_to_sql:
+                    schema_editor.collected_sql.append(
+                        "-- THIS OPERATION CANNOT BE WRITTEN AS SQL"
+                    )
                     continue
-            atomic_operation = operation.atomic or (self.atomic and operation.atomic is not False)
+                collected_sql_before = len(schema_editor.collected_sql)
+            atomic_operation = operation.atomic or (
+                self.atomic and operation.atomic is not False
+            )
             if not schema_editor.atomic_migration and atomic_operation:
                 # Force a transaction on a non-transactional-DDL backend or an
                 # atomic operation inside a non-atomic migration.
                 with atomic(schema_editor.connection.alias):
-                    operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+                    operation.database_backwards(
+                        self.app_label, schema_editor, from_state, to_state
+                    )
             else:
                 # Normal behaviour
-                operation.database_backwards(self.app_label, schema_editor, from_state, to_state)
+                operation.database_backwards(
+                    self.app_label, schema_editor, from_state, to_state
+                )
+            if collect_sql and collected_sql_before == len(schema_editor.collected_sql):
+                schema_editor.collected_sql.append("-- (no-op)")
         return project_state
+
+    def suggest_name(self):
+        """
+        Suggest a name for the operations this migration might represent. Names
+        are not guaranteed to be unique, but put some effort into the fallback
+        name to avoid VCS conflicts if possible.
+        """
+        if self.initial:
+            return "initial"
+
+        raw_fragments = [op.migration_name_fragment for op in self.operations]
+        fragments = [re.sub(r"\W+", "_", name) for name in raw_fragments if name]
+
+        if not fragments or len(fragments) != len(self.operations):
+            return "auto_%s" % get_migration_name_timestamp()
+
+        name = fragments[0]
+        for fragment in fragments[1:]:
+            new_name = f"{name}_{fragment}"
+            if len(new_name) > 52:
+                name = f"{name}_and_more"
+                break
+            name = new_name
+        return name
 
 
 class SwappableTuple(tuple):

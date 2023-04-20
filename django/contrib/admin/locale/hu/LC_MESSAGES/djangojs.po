@@ -1,19 +1,19 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# András Veres-Szentkirályi, 2016
+# András Veres-Szentkirályi, 2016,2020-2021
 # Attila Nagy <>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
-# János R (Hangya), 2011
+# János R, 2011
 # Máté Őry <orymate@iit.bme.hu>, 2012
 # Szilveszter Farkas <szilveszter.farkas@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: János R (Hangya)\n"
+"POT-Creation-Date: 2021-01-15 09:00+0100\n"
+"PO-Revision-Date: 2021-04-01 15:16+0000\n"
+"Last-Translator: András Veres-Szentkirályi\n"
 "Language-Team: Hungarian (http://www.transifex.com/django/django/language/"
 "hu/)\n"
 "MIME-Version: 1.0\n"
@@ -86,8 +86,8 @@ msgstr ""
 "futtat egy műveletet, akkor a módosítások elvesznek."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Kiválasztott egy műveletet, de nem mentette az egyes mezőkhöz kapcsolódó "
@@ -95,8 +95,8 @@ msgstr ""
 "műveletet."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Kiválasztott egy műveletet, és nem módosított egyetlen mezőt sem. "
@@ -185,6 +185,54 @@ msgstr "november"
 
 msgid "December"
 msgstr "december"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "már"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "ápr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "máj"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "jún"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "júl"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "szep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "dec"
 
 msgctxt "one letter Sunday"
 msgid "S"

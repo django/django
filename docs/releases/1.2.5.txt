@@ -115,9 +115,9 @@ ModelAdmin.lookup_allowed signature changed
 -------------------------------------------
 
 Django 1.2.4 introduced a method ``lookup_allowed`` on ``ModelAdmin``, to cope
-with a security issue (changeset `[15033]
-<https://code.djangoproject.com/changeset/15033>`_). Although this method was
-never documented, it seems some people have overridden ``lookup_allowed``,
-especially to cope with regressions introduced by that changeset. While the
-method is still undocumented and not marked as stable, it may be helpful to know
-that the signature of this function has changed.
+with a security issue (changeset :commit:`[15033]
+<85207a245bf09fdebe486b4c7bbcb65300f2a693>`). Although this method was never
+documented, it seems some people have overridden ``lookup_allowed``, especially
+to cope with regressions introduced by that changeset. While the method is
+still undocumented and not marked as stable, it may be helpful to know that the
+signature of this function has changed.

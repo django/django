@@ -1,0 +1,22 @@
+===========================
+Django 2.2.11 release notes
+===========================
+
+*March 4, 2020*
+
+Django 2.2.11 fixes a security issue and a data loss bug in 2.2.10.
+
+CVE-2020-9402: Potential SQL injection via ``tolerance`` parameter in GIS functions and aggregates on Oracle
+============================================================================================================
+
+GIS functions and aggregates on Oracle were subject to SQL injection,
+using a suitably crafted ``tolerance``.
+
+Bugfixes
+========
+
+* Fixed a data loss possibility in the
+  :meth:`~django.db.models.query.QuerySet.select_for_update`. When using
+  related fields or parent link fields with :ref:`multi-table-inheritance` in
+  the ``of`` argument, the corresponding models were not locked
+  (:ticket:`31246`).

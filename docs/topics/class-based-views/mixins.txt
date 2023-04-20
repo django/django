@@ -174,12 +174,11 @@ specialized date-based list views.)
 Using Django's class-based view mixins
 ======================================
 
-Now we've seen how Django's generic class-based views use the provided
-mixins, let's look at other ways we can combine them. Of course we're
-still going to be combining them with either built-in class-based
-views, or other generic class-based views, but there are a range of
-rarer problems you can solve than are provided for by Django out of
-the box.
+Now we've seen how Django's generic class-based views use the provided mixins,
+let's look at other ways we can combine them. We're still going to be combining
+them with either built-in class-based views, or other generic class-based
+views, but there are a range of rarer problems you can solve than are provided
+for by Django out of the box.
 
 .. warning::
 
@@ -222,7 +221,7 @@ We'll demonstrate this with the ``Author`` model we used in the
 :doc:`generic class-based views introduction<generic-display>`.
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseForbidden, HttpResponseRedirect
     from django.urls import reverse
@@ -230,8 +229,10 @@ We'll demonstrate this with the ``Author`` model we used in the
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Author
 
-    class RecordInterest(SingleObjectMixin, View):
+
+    class RecordInterestView(SingleObjectMixin, View):
         """Records the current user's interest in an author."""
+
         model = Author
 
         def post(self, request, *args, **kwargs):
@@ -242,7 +243,9 @@ We'll demonstrate this with the ``Author`` model we used in the
             self.object = self.get_object()
             # Actually record interest somehow here!
 
-            return HttpResponseRedirect(reverse('author-detail', kwargs={'pk': self.object.pk}))
+            return HttpResponseRedirect(
+                reverse("author-detail", kwargs={"pk": self.object.pk})
+            )
 
 In practice you'd probably want to record the interest in a key-value
 store rather than in a relational database, so we've left that bit
@@ -254,14 +257,18 @@ look up the author we're interested in, which it does with a call to
 We can hook this into our URLs easily enough:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import path
-    from books.views import RecordInterest
+    from books.views import RecordInterestView
 
     urlpatterns = [
-        #...
-        path('author/<int:pk>/interest/', RecordInterest.as_view(), name='author-interest'),
+        # ...
+        path(
+            "author/<int:pk>/interest/",
+            RecordInterestView.as_view(),
+            name="author-interest",
+        ),
     ]
 
 Note the ``pk`` named group, which
@@ -308,13 +315,14 @@ object. In order to do this, we need to have two different querysets:
     will add in the suitable ``page_obj`` and ``paginator`` for us
     providing we remember to call ``super()``.
 
-Now we can write a new ``PublisherDetail``::
+Now we can write a new ``PublisherDetailView``::
 
     from django.views.generic import ListView
     from django.views.generic.detail import SingleObjectMixin
     from books.models import Publisher
 
-    class PublisherDetail(SingleObjectMixin, ListView):
+
+    class PublisherDetailView(SingleObjectMixin, ListView):
         paginate_by = 2
         template_name = "books/publisher_detail.html"
 
@@ -324,7 +332,7 @@ Now we can write a new ``PublisherDetail``::
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            context['publisher'] = self.object
+            context["publisher"] = self.object
             return context
 
         def get_queryset(self):
@@ -435,7 +443,7 @@ code so that on ``POST`` the form gets called appropriately.
     both of the views implement ``get()``, and things would get much more
     confusing.
 
-Our new ``AuthorDetail`` looks like this::
+Our new ``AuthorDetailView`` looks like this::
 
     # CAUTION: you almost certainly do not want to do this.
     # It is provided as part of a discussion of problems you can
@@ -449,15 +457,17 @@ Our new ``AuthorDetail`` looks like this::
     from django.views.generic.edit import FormMixin
     from books.models import Author
 
+
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
 
-    class AuthorDetail(FormMixin, DetailView):
+
+    class AuthorDetailView(FormMixin, DetailView):
         model = Author
         form_class = AuthorInterestForm
 
         def get_success_url(self):
-            return reverse('author-detail', kwargs={'pk': self.object.pk})
+            return reverse("author-detail", kwargs={"pk": self.object.pk})
 
         def post(self, request, *args, **kwargs):
             if not request.user.is_authenticated:
@@ -505,8 +515,8 @@ clear division here: ``GET`` requests should get the
 data), and ``POST`` requests should get the :class:`FormView`. Let's
 set up those views first.
 
-The ``AuthorDisplay`` view is almost the same as :ref:`when we
-first introduced AuthorDetail<generic-views-extra-work>`; we have to
+The ``AuthorDetailView`` view is almost the same as :ref:`when we
+first introduced AuthorDetailView<generic-views-extra-work>`; we have to
 write our own ``get_context_data()`` to make the
 ``AuthorInterestForm`` available to the template. We'll skip the
 ``get_object()`` override from before for clarity::
@@ -515,30 +525,33 @@ write our own ``get_context_data()`` to make the
     from django.views.generic import DetailView
     from books.models import Author
 
+
     class AuthorInterestForm(forms.Form):
         message = forms.CharField()
 
-    class AuthorDisplay(DetailView):
+
+    class AuthorDetailView(DetailView):
         model = Author
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            context['form'] = AuthorInterestForm()
+            context["form"] = AuthorInterestForm()
             return context
 
-Then the ``AuthorInterest`` is a :class:`FormView`, but we have to bring in
-:class:`~django.views.generic.detail.SingleObjectMixin` so we can find the
-author we're talking about, and we have to remember to set ``template_name`` to
-ensure that form errors will render the same template as ``AuthorDisplay`` is
-using on ``GET``::
+Then the ``AuthorInterestFormView`` is a :class:`FormView`, but we have to
+bring in :class:`~django.views.generic.detail.SingleObjectMixin` so we can find
+the author we're talking about, and we have to remember to set
+``template_name`` to ensure that form errors will render the same template as
+``AuthorDetailView`` is using on ``GET``::
 
     from django.http import HttpResponseForbidden
     from django.urls import reverse
     from django.views.generic import FormView
     from django.views.generic.detail import SingleObjectMixin
 
-    class AuthorInterest(SingleObjectMixin, FormView):
-        template_name = 'books/author_detail.html'
+
+    class AuthorInterestFormView(SingleObjectMixin, FormView):
+        template_name = "books/author_detail.html"
         form_class = AuthorInterestForm
         model = Author
 
@@ -549,28 +562,28 @@ using on ``GET``::
             return super().post(request, *args, **kwargs)
 
         def get_success_url(self):
-            return reverse('author-detail', kwargs={'pk': self.object.pk})
+            return reverse("author-detail", kwargs={"pk": self.object.pk})
 
-Finally we bring this together in a new ``AuthorDetail`` view. We
+Finally we bring this together in a new ``AuthorView`` view. We
 already know that calling :meth:`~django.views.generic.base.View.as_view()` on
 a class-based view gives us something that behaves exactly like a function
 based view, so we can do that at the point we choose between the two subviews.
 
-You can of course pass through keyword arguments to
+You can pass through keyword arguments to
 :meth:`~django.views.generic.base.View.as_view()` in the same way you
-would in your URLconf, such as if you wanted the ``AuthorInterest`` behavior
-to also appear at another URL but using a different template::
+would in your URLconf, such as if you wanted the ``AuthorInterestFormView``
+behavior to also appear at another URL but using a different template::
 
     from django.views import View
 
-    class AuthorDetail(View):
 
+    class AuthorView(View):
         def get(self, request, *args, **kwargs):
-            view = AuthorDisplay.as_view()
+            view = AuthorDetailView.as_view()
             return view(request, *args, **kwargs)
 
         def post(self, request, *args, **kwargs):
-            view = AuthorInterest.as_view()
+            view = AuthorInterestFormView.as_view()
             return view(request, *args, **kwargs)
 
 This approach can also be used with any other generic class-based
@@ -594,18 +607,17 @@ For example, a JSON mixin might look something like this::
 
     from django.http import JsonResponse
 
+
     class JSONResponseMixin:
         """
         A mixin that can be used to render a JSON response.
         """
+
         def render_to_json_response(self, context, **response_kwargs):
             """
             Returns a JSON response, transforming 'context' to make the payload.
             """
-            return JsonResponse(
-                self.get_data(context),
-                **response_kwargs
-            )
+            return JsonResponse(self.get_data(context), **response_kwargs)
 
         def get_data(self, context):
             """
@@ -630,6 +642,7 @@ To use it, we need to mix it into a ``TemplateView`` for example, and override
 
     from django.views.generic import TemplateView
 
+
     class JSONView(JSONResponseMixin, TemplateView):
         def render_to_response(self, context, **response_kwargs):
             return self.render_to_json_response(context, **response_kwargs)
@@ -637,11 +650,12 @@ To use it, we need to mix it into a ``TemplateView`` for example, and override
 Equally we could use our mixin with one of the generic views. We can make our
 own version of :class:`~django.views.generic.detail.DetailView` by mixing
 ``JSONResponseMixin`` with the
-``django.views.generic.detail.BaseDetailView`` -- (the
+:class:`~django.views.generic.detail.BaseDetailView` -- (the
 :class:`~django.views.generic.detail.DetailView` before template
 rendering behavior has been mixed in)::
 
     from django.views.generic.detail import BaseDetailView
+
 
     class JSONDetailView(JSONResponseMixin, BaseDetailView):
         def render_to_response(self, context, **response_kwargs):
@@ -654,7 +668,7 @@ same behavior -- except for the format of the response.
 If you want to be really adventurous, you could even mix a
 :class:`~django.views.generic.detail.DetailView` subclass that is able
 to return *both* HTML and JSON content, depending on some property of
-the HTTP request, such as a query argument or a HTTP header. Mix in both the
+the HTTP request, such as a query argument or an HTTP header. Mix in both the
 ``JSONResponseMixin`` and a
 :class:`~django.views.generic.detail.SingleObjectTemplateResponseMixin`,
 and override the implementation of
@@ -664,10 +678,13 @@ that the user requested::
 
     from django.views.generic.detail import SingleObjectTemplateResponseMixin
 
-    class HybridDetailView(JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView):
+
+    class HybridDetailView(
+        JSONResponseMixin, SingleObjectTemplateResponseMixin, BaseDetailView
+    ):
         def render_to_response(self, context):
             # Look for a 'format=json' GET argument
-            if self.request.GET.get('format') == 'json':
+            if self.request.GET.get("format") == "json":
                 return self.render_to_json_response(context)
             else:
                 return super().render_to_response(context)

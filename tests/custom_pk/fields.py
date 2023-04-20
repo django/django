@@ -20,16 +20,15 @@ class MyWrapper:
         return self.value == other
 
 
-class MyAutoField(models.CharField):
-
+class MyWrapperField(models.CharField):
     def __init__(self, *args, **kwargs):
-        kwargs['max_length'] = 10
+        kwargs["max_length"] = 10
         super().__init__(*args, **kwargs)
 
     def pre_save(self, instance, add):
         value = getattr(instance, self.attname, None)
         if not value:
-            value = MyWrapper(''.join(random.sample(string.ascii_lowercase, 10)))
+            value = MyWrapper("".join(random.sample(string.ascii_lowercase, 10)))
             setattr(instance, self.attname, value)
         return value
 
@@ -58,3 +57,15 @@ class MyAutoField(models.CharField):
         if isinstance(value, MyWrapper):
             return str(value)
         return value
+
+
+class MyAutoField(models.BigAutoField):
+    def from_db_value(self, value, expression, connection):
+        if value is None:
+            return None
+        return MyWrapper(value)
+
+    def get_prep_value(self, value):
+        if value is None:
+            return None
+        return int(value)

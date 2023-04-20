@@ -2,7 +2,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     replaces = [
         ("app1", "2_auto"),
         ("app1", "3_auto"),
@@ -10,6 +9,4 @@ class Migration(migrations.Migration):
 
     dependencies = [("app1", "1_auto"), ("app2", "2_auto")]
 
-    operations = [
-        migrations.RunPython(migrations.RunPython.noop)
-    ]
+    operations = [migrations.RunPython(migrations.RunPython.noop)]

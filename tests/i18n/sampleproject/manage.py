@@ -2,7 +2,7 @@
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join('..', '..', '..')))
+sys.path.append(os.path.abspath(os.path.join("..", "..", "..")))
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sampleproject.settings")

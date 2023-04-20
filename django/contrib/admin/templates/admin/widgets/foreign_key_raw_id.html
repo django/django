@@ -1,1 +1,2 @@
-{% include 'django/forms/widgets/input.html' %}{% if related_url %}<a href="{{ related_url }}" class="related-lookup" id="lookup_id_{{ widget.name }}" title="{{ link_title }}"></a>{% endif %}{% if link_label %}&nbsp;<strong>{% if link_url %}<a href="{{ link_url }}">{% endif %}{{ link_label }}{% if link_url %}</a>{% endif %}</strong>{% endif %}
+{% include 'django/forms/widgets/input.html' %}{% if related_url %}<a href="{{ related_url }}" class="related-lookup" id="lookup_id_{{ widget.name }}" title="{{ link_title }}"></a>{% endif %}{% if link_label %}
+<strong>{% if link_url %}<a href="{{ link_url }}">{{ link_label }}</a>{% else %}{{ link_label }}{% endif %}</strong>{% endif %}

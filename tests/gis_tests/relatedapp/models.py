@@ -36,7 +36,7 @@ class Parcel(SimpleModel):
     city = models.ForeignKey(City, models.CASCADE)
     center1 = models.PointField()
     # Throwing a curveball w/`db_column` here.
-    center2 = models.PointField(srid=2276, db_column='mycenter')
+    center2 = models.PointField(srid=2276, db_column="mycenter")
     border1 = models.PolygonField()
     border2 = models.PolygonField(srid=2276)
 
@@ -56,7 +56,7 @@ class Article(SimpleModel):
 
 class Book(SimpleModel):
     title = models.CharField(max_length=100)
-    author = models.ForeignKey(Author, models.SET_NULL, related_name='books', null=True)
+    author = models.ForeignKey(Author, models.SET_NULL, related_name="books", null=True)
 
 
 class Event(SimpleModel):

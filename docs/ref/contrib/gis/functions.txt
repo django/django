@@ -8,10 +8,12 @@ Geographic Database Functions
 The functions documented on this page allow users to access geographic database
 functions to be used in annotations, aggregations, or filters in Django.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.db.models.functions import Length
-    >>> Track.objects.annotate(length=Length('line')).filter(length__gt=100)
+    >>> Track.objects.annotate(length=Length("line")).filter(length__gt=100)
 
 Not all backends support all functions, so refer to the documentation of each
 function to see if your database backend supports the function you want to use.
@@ -20,17 +22,17 @@ get a ``NotImplementedError`` exception.
 
 Function's summary:
 
-=========================  ========================  ======================  =======================  ==================  =====================
-Measurement                Relationships             Operations              Editors                  Output format       Miscellaneous
-=========================  ========================  ======================  =======================  ==================  =====================
-:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`  :class:`AsGeoJSON`  :class:`IsValid`
-:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`       :class:`AsGML`      :class:`MemSize`
-:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`         :class:`AsKML`      :class:`NumGeometries`
-:class:`Length`            :class:`Envelope`         :class:`Union`          :class:`Scale`           :class:`AsSVG`      :class:`NumPoints`
-:class:`Perimeter`         :class:`LineLocatePoint`                          :class:`SnapToGrid`      :class:`AsWKB`
-..                         :class:`PointOnSurface`                           :class:`Transform`       :class:`AsWKT`
-..                                                                           :class:`Translate`       :class:`GeoHash`
-=========================  ========================  ======================  =======================  ==================  =====================
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
+Measurement                Relationships             Operations              Editors                  Input format        Output format       Miscellaneous
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
+:class:`Area`              :class:`Azimuth`          :class:`Difference`     :class:`ForcePolygonCW`                      :class:`AsGeoJSON`  :class:`IsEmpty`
+:class:`Distance`          :class:`BoundingCircle`   :class:`Intersection`   :class:`MakeValid`                           :class:`AsGML`      :class:`IsValid`
+:class:`GeometryDistance`  :class:`Centroid`         :class:`SymDifference`  :class:`Reverse`                             :class:`AsKML`      :class:`MemSize`
+:class:`Length`            :class:`ClosestPoint`     :class:`Union`          :class:`Scale`                               :class:`AsSVG`      :class:`NumGeometries`
+:class:`Perimeter`         :class:`Envelope`                                 :class:`SnapToGrid`      :class:`FromWKB`    :class:`AsWKB`      :class:`NumPoints`
+                           :class:`LineLocatePoint`                          :class:`Transform`       :class:`FromWKT`    :class:`AsWKT`
+                           :class:`PointOnSurface`                           :class:`Translate`                           :class:`GeoHash`
+=========================  ========================  ======================  =======================  ==================  ==================  ======================
 
 ``Area``
 ========
@@ -38,13 +40,13 @@ Measurement                Relationships             Operations              Edi
 .. class:: Area(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
-<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_area>`__,
+<https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area>`_,
 Oracle, `PostGIS <https://postgis.net/docs/ST_Area.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the area of the
 field as an :class:`~django.contrib.gis.measure.Area` measure.
 
-MySQL and SpatiaLite without LWGEOM don't support area calculations on
+MySQL and SpatiaLite without LWGEOM/RTTOPO don't support area calculations on
 geographic SRSes.
 
 ``AsGeoJSON``
@@ -52,18 +54,20 @@ geographic SRSes.
 
 .. class:: AsGeoJSON(expression, bbox=False, crs=False, precision=8, **extra)
 
-*Availability*: MariaDB (≥ 10.2.4), `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__ (≥ 5.7.5),
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsGeoJSON.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `GeoJSON
-<http://geojson.org/>`_ representation of the geometry. Note that the result is
-not a complete GeoJSON structure but only the ``geometry`` key content of a
+<https://geojson.org/>`_ representation of the geometry. Note that the result
+is not a complete GeoJSON structure but only the ``geometry`` key content of a
 GeoJSON structure. See also :doc:`/ref/contrib/gis/serializers`.
 
-Example::
+Example:
 
-    >>> City.objects.annotate(json=AsGeoJSON('point')).get(name='Chicago').json
+.. code-block:: pycon
+
+    >>> City.objects.annotate(json=AsGeoJSON("point")).get(name="Chicago").json
     {"type":"Point","coordinates":[-87.65018,41.85039]}
 
 =====================  =====================================================
@@ -83,10 +87,6 @@ Keyword Argument       Description
                        Oracle.
 =====================  =====================================================
 
-.. versionchanged:: 3.1
-
-    Oracle support was added.
-
 ``AsGML``
 =========
 
@@ -98,9 +98,11 @@ SpatiaLite
 Accepts a single geographic field or expression and returns a `Geographic Markup
 Language (GML)`__ representation of the geometry.
 
-Example::
+Example:
 
-    >>> qs = Zipcode.objects.annotate(gml=AsGML('poly'))
+.. code-block:: pycon
+
+    >>> qs = Zipcode.objects.annotate(gml=AsGML("poly"))
     >>> print(qs[0].gml)
     <gml:Polygon srsName="EPSG:4326"><gml:OuterBoundaryIs>-147.78711,70.245363 ...
     -147.78711,70.245363</gml:OuterBoundaryIs></gml:Polygon>
@@ -127,9 +129,11 @@ __ https://en.wikipedia.org/wiki/Geography_Markup_Language
 Accepts a single geographic field or expression and returns a `Keyhole Markup
 Language (KML)`__ representation of the geometry.
 
-Example::
+Example:
 
-    >>> qs = Zipcode.objects.annotate(kml=AsKML('poly'))
+.. code-block:: pycon
+
+    >>> qs = Zipcode.objects.annotate(kml=AsKML("poly"))
     >>> print(qs[0].kml)
     <Polygon><outerBoundaryIs><LinearRing><coordinates>-103.04135,36.217596,0 ...
     -103.04135,36.217596,0</coordinates></LinearRing></outerBoundaryIs></Polygon>
@@ -173,42 +177,38 @@ __ https://www.w3.org/Graphics/SVG/
 
 .. class:: AsWKB(expression, **extra)
 
-.. versionadded:: 3.1
-
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsBinary.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known
-binary (WKB)`__ representation of the geometry.
+binary (WKB)`_ representation of the geometry.
 
-Example::
+Example:
 
-    >>> bytes(City.objects.annotate(wkb=AsWKB('point')).get(name='Chelyabinsk').wkb)
+.. code-block:: pycon
+
+    >>> bytes(City.objects.annotate(wkb=AsWKB("point")).get(name="Chelyabinsk").wkb)
     b'\x01\x01\x00\x00\x00]3\xf9f\x9b\x91K@\x00X\x1d9\xd2\xb9N@'
-
-__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
 
 ``AsWKT``
 =========
 
 .. class:: AsWKT(expression, **extra)
 
-.. versionadded:: 3.1
-
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext>`__,
 Oracle, `PostGIS <https://postgis.net/docs/ST_AsText.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns a `Well-known text
-(WKT)`__ representation of the geometry.
+(WKT)`_ representation of the geometry.
 
-Example::
+Example:
 
-    >>> City.objects.annotate(wkt=AsWKT('point')).get(name='Chelyabinsk').wkt
+.. code-block:: pycon
+
+    >>> City.objects.annotate(wkt=AsWKT("point")).get(name="Chelyabinsk").wkt
     'POINT (55.137555 61.451728)'
-
-__ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 
 ``Azimuth``
 ===========
@@ -216,7 +216,7 @@ __ https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry
 .. class:: Azimuth(point_a, point_b, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Azimuth.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Returns the azimuth in radians of the segment defined by the given point
 geometries, or ``None`` if the two points are coincident. The azimuth is angle
@@ -229,7 +229,7 @@ south = ``π``; west = ``3π/2``.
 .. class:: BoundingCircle(expression, num_seg=48, **extra)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MinimumBoundingCircle.html>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
 SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A>`_
 
 Accepts a single geographic field or expression and returns the smallest circle
@@ -248,6 +248,19 @@ The ``num_seg`` parameter is used only on PostGIS.
 
 Accepts a single geographic field or expression and returns the ``centroid``
 value of the geometry.
+
+``ClosestPoint``
+================
+
+.. versionadded:: 5.0
+
+.. class:: ClosestPoint(expr1, expr2, **extra)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_ClosestPoint.html>`__,
+SpatiaLite
+
+Accepts two geographic fields or expressions and returns the 2-dimensional
+point on geometry A that is closest to geometry B.
 
 ``Difference``
 ==============
@@ -288,12 +301,15 @@ resource-intensive).
 
 In the following example, the distance from the city of Hobart to every other
 :class:`~django.contrib.gis.db.models.PointField` in the ``AustraliaCity``
-queryset is calculated::
+queryset is calculated:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.db.models.functions import Distance
-    >>> pnt = AustraliaCity.objects.get(name='Hobart').point
-    >>> for city in AustraliaCity.objects.annotate(distance=Distance('point', pnt)):
+    >>> pnt = AustraliaCity.objects.get(name="Hobart").point
+    >>> for city in AustraliaCity.objects.annotate(distance=Distance("point", pnt)):
     ...     print(city.name, city.distance)
+    ...
     Wollongong 990071.220408 m
     Shellharbour 972804.613941 m
     Thirroul 1002334.36351 m
@@ -315,8 +331,8 @@ queryset is calculated::
 
 *Availability*: MariaDB, `MySQL
 <https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope>`__,
-`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/18/spatl/
-SDO_GEOM-reference.html#GUID-646638D0-2C5F-490A-AF63-DE9B7A4C97C1__CHDJCEIH>`__,
+`Oracle <https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/
+spatial-operators-reference.html#GUID-ACED800F-3435-44AA-9606-D40934A23ED0>`__,
 `PostGIS <https://postgis.net/docs/ST_Envelope.html>`__, SpatiaLite
 
 Accepts a single geographic field or expression and returns the geometry
@@ -335,14 +351,41 @@ of the polygon/multipolygon in which all exterior rings are oriented clockwise
 and all interior rings are oriented counterclockwise. Non-polygonal geometries
 are returned unchanged.
 
+``FromWKB``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: FromWKB(expression, **extra)
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromWKB.html>`__, SpatiaLite
+
+Creates geometry from `Well-known binary (WKB)`_ representation.
+
+``FromWKT``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: FromWKT(expression, **extra)
+
+*Availability*: MariaDB, `MySQL
+<https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext>`__,
+Oracle, `PostGIS <https://postgis.net/docs/ST_GeomFromText.html>`__, SpatiaLite
+
+Creates geometry from `Well-known text (WKT)`_ representation.
+
 ``GeoHash``
 ===========
 
 .. class:: GeoHash(expression, precision=None, **extra)
 
 *Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite (LWGEOM)
+<https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash>`__,
+`PostGIS <https://postgis.net/docs/ST_GeoHash.html>`__, SpatiaLite
+(LWGEOM/RTTOPO)
 
 Accepts a single geographic field or expression and returns a `GeoHash`__
 representation of the geometry.
@@ -356,8 +399,6 @@ __ https://en.wikipedia.org/wiki/Geohash
 ====================
 
 .. class:: GeometryDistance(expr1, expr2, **extra)
-
-.. versionadded:: 3.0
 
 *Availability*: `PostGIS <https://postgis.net/docs/geometry_distance_knn.html>`__
 
@@ -377,14 +418,26 @@ it provides index-assisted nearest-neighbor result sets.
 Accepts two geographic fields or expressions and returns the geometric
 intersection between them.
 
+``IsEmpty``
+===========
+
+.. versionadded:: 4.2
+
+.. class:: IsEmpty(expr)
+
+*Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
+
+Accepts a geographic field or expression and tests if the value is an empty
+geometry. Returns ``True`` if its value is empty and ``False`` otherwise.
+
 ``IsValid``
 ===========
 
 .. class:: IsValid(expr)
 
 *Availability*: `MySQL
-<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__ (≥ 5.7.5),
-`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite (LWGEOM)
+<https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid>`__,
+`PostGIS <https://postgis.net/docs/ST_IsValid.html>`__, Oracle, SpatiaLite
 
 Accepts a geographic field or expression and tests if the value is well formed.
 Returns ``True`` if its value is a valid geometry and ``False`` otherwise.
@@ -426,7 +479,7 @@ Returns a float between 0 and 1 representing the location of the closest point o
 .. class:: MakeValid(expr)
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_MakeValid.html>`__,
-SpatiaLite (LWGEOM)
+SpatiaLite (LWGEOM/RTTOPO)
 
 Accepts a geographic field or expression and attempts to convert the value into
 a valid geometry without losing any of the input vertices. Geometries that are
@@ -593,3 +646,6 @@ parameters.
 
 Accepts two geographic fields or expressions and returns the union of both
 geometries.
+
+.. _`Well-known binary (WKB)`: https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary
+.. _`Well-known text (WKT)`: https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry

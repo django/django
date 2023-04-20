@@ -6,20 +6,18 @@ Django provides a few classes that help you manage paginated data -- that is,
 data that's split across several pages, with "Previous/Next" links. These
 classes live in :source:`django/core/paginator.py`.
 
+For examples, see the :doc:`Pagination topic guide </topics/pagination>`.
+
 .. module:: django.core.paginator
    :synopsis: Classes to help you easily manage paginated data.
 
 ``Paginator`` class
 ===================
 
-.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True)
+.. class:: Paginator(object_list, per_page, orphans=0, allow_empty_first_page=True, error_messages=None)
 
     A paginator acts like a sequence of :class:`Page` when using ``len()`` or
     iterating it directly.
-
-    .. versionchanged:: 3.1
-
-        Support for iterating over ``Paginator`` was added.
 
 .. attribute:: Paginator.object_list
 
@@ -58,6 +56,40 @@ classes live in :source:`django/core/paginator.py`.
     ``False`` and ``object_list`` is  empty, then an ``EmptyPage`` error will
     be raised.
 
+.. attribute:: Paginator.error_messages
+
+    .. versionadded:: 5.0
+
+    The ``error_messages`` argument lets you override the default messages that
+    the paginator will raise. Pass in a dictionary with keys matching the error
+    messages you want to override. Available error message keys are:
+    ``invalid_page``, ``min_page``, and ``no_results``.
+
+    For example, here is the default error message:
+
+    .. code-block:: pycon
+
+        >>> from django.core.paginator import Paginator
+        >>> paginator = Paginator([1, 2, 3], 2)
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: That page contains no results
+
+    And here is a custom error message:
+
+    .. code-block:: pycon
+
+        >>> paginator = Paginator(
+        ...     [1, 2, 3],
+        ...     2,
+        ...     error_messages={"no_results": "Page does not exist"},
+        ... )
+        >>> paginator.page(5)
+        Traceback (most recent call last):
+          ...
+        EmptyPage: Page does not exist
+
 Methods
 -------
 
@@ -76,10 +108,39 @@ Methods
 .. method:: Paginator.page(number)
 
     Returns a :class:`Page` object with the given 1-based index. Raises
-    :exc:`InvalidPage` if the given page number doesn't exist.
+    :exc:`PageNotAnInteger` if the ``number`` cannot be converted to an integer
+    by calling ``int()``. Raises :exc:`EmptyPage` if the given page number
+    doesn't exist.
+
+.. method:: Paginator.get_elided_page_range(number, *, on_each_side=3, on_ends=2)
+
+    Returns a 1-based list of page numbers similar to
+    :attr:`Paginator.page_range`, but may add an ellipsis to either or both
+    sides of the current page number when :attr:`Paginator.num_pages` is large.
+
+    The number of pages to include on each side of the current page number is
+    determined by the ``on_each_side`` argument which defaults to 3.
+
+    The number of pages to include at the beginning and end of page range is
+    determined by the ``on_ends`` argument which defaults to 2.
+
+    For example, with the default values for ``on_each_side`` and ``on_ends``,
+    if the current page is 10 and there are 50 pages, the page range will be
+    ``[1, 2, '…', 7, 8, 9, 10, 11, 12, 13, '…', 49, 50]``. This will result in
+    pages 7, 8, and 9 to the left of and 11, 12, and 13 to the right of the
+    current page as well as pages 1 and 2 at the start and 49 and 50 at the
+    end.
+
+    Raises :exc:`InvalidPage` if the given page number doesn't exist.
 
 Attributes
 ----------
+
+.. attribute:: Paginator.ELLIPSIS
+
+    A translatable string used as a substitute for elided page numbers in the
+    page range returned by :meth:`~Paginator.get_elided_page_range`. Default is
+    ``'…'``.
 
 .. attribute:: Paginator.count
 

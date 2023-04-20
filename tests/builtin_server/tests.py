@@ -1,8 +1,14 @@
 import sys
 import traceback
 from io import BytesIO
-from unittest import TestCase
+from unittest import TestCase, mock
 from wsgiref import simple_server
+
+from django.core.servers.basehttp import get_internal_wsgi_application
+from django.core.signals import request_finished
+from django.test import RequestFactory, override_settings
+
+from .views import FILE_RESPONSE_HOLDER
 
 # If data is too large, socket will choke, so write chunks no larger than 32MB
 # at a time. The rationale behind the 32MB can be found in #5596#comment:4.
@@ -22,20 +28,20 @@ class ServerHandler(simple_server.ServerHandler):
 
         elif not self.headers_sent:
             # Before the first output, send the stored headers
-            self.bytes_sent = len(data)    # make sure we know content-length
+            self.bytes_sent = len(data)  # make sure we know content-length
             self.send_headers()
         else:
             self.bytes_sent += len(data)
 
         # XXX check Content-Length and truncate if too many bytes written?
         data = BytesIO(data)
-        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), b''):
+        for chunk in iter(lambda: data.read(MAX_SOCKET_CHUNK_SIZE), b""):
             self._write(chunk)
             self._flush()
 
     def error_output(self, environ, start_response):
         super().error_output(environ, start_response)
-        return ['\n'.join(traceback.format_exception(*sys.exc_info()))]
+        return ["\n".join(traceback.format_exception(*sys.exc_info()))]
 
 
 class DummyHandler:
@@ -55,13 +61,13 @@ class FileWrapperHandler(ServerHandler):
 
 
 def wsgi_app(environ, start_response):
-    start_response('200 OK', [('Content-Type', 'text/plain')])
-    return [b'Hello World!']
+    start_response("200 OK", [("Content-Type", "text/plain")])
+    return [b"Hello World!"]
 
 
 def wsgi_app_file_wrapper(environ, start_response):
-    start_response('200 OK', [('Content-Type', 'text/plain')])
-    return environ['wsgi.file_wrapper'](BytesIO(b'foo'))
+    start_response("200 OK", [("Content-Type", "text/plain")])
+    return environ["wsgi.file_wrapper"](BytesIO(b"foo"))
 
 
 class WSGIFileWrapperTests(TestCase):
@@ -74,20 +80,50 @@ class WSGIFileWrapperTests(TestCase):
     """
 
     def test_file_wrapper_uses_sendfile(self):
-        env = {'SERVER_PROTOCOL': 'HTTP/1.0'}
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        env = {"SERVER_PROTOCOL": "HTTP/1.0"}
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         handler.run(wsgi_app_file_wrapper)
         self.assertTrue(handler._used_sendfile)
-        self.assertEqual(handler.stdout.getvalue(), b'')
-        self.assertEqual(handler.stderr.getvalue(), b'')
+        self.assertEqual(handler.stdout.getvalue(), b"")
+        self.assertEqual(handler.stderr.getvalue(), b"")
 
     def test_file_wrapper_no_sendfile(self):
-        env = {'SERVER_PROTOCOL': 'HTTP/1.0'}
-        handler = FileWrapperHandler(None, BytesIO(), BytesIO(), env)
+        env = {"SERVER_PROTOCOL": "HTTP/1.0"}
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
         handler.run(wsgi_app)
         self.assertFalse(handler._used_sendfile)
-        self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b'Hello World!')
-        self.assertEqual(handler.stderr.getvalue(), b'')
+        self.assertEqual(handler.stdout.getvalue().splitlines()[-1], b"Hello World!")
+        self.assertEqual(handler.stderr.getvalue(), b"")
+
+    @override_settings(ROOT_URLCONF="builtin_server.urls")
+    def test_file_response_closing(self):
+        """
+        View returning a FileResponse properly closes the file and http
+        response when file_wrapper is used.
+        """
+        env = RequestFactory().get("/fileresponse/").environ
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
+        handler.run(get_internal_wsgi_application())
+        # Sendfile is used only when file_wrapper has been used.
+        self.assertTrue(handler._used_sendfile)
+        # Fetch the original response object.
+        self.assertIn("response", FILE_RESPONSE_HOLDER)
+        response = FILE_RESPONSE_HOLDER["response"]
+        # The response and file buffers are closed.
+        self.assertIs(response.closed, True)
+        buf1, buf2 = FILE_RESPONSE_HOLDER["buffers"]
+        self.assertIs(buf1.closed, True)
+        self.assertIs(buf2.closed, True)
+        FILE_RESPONSE_HOLDER.clear()
+
+    @override_settings(ROOT_URLCONF="builtin_server.urls")
+    def test_file_response_call_request_finished(self):
+        env = RequestFactory().get("/fileresponse/").environ
+        handler = FileWrapperHandler(BytesIO(), BytesIO(), BytesIO(), env)
+        with mock.MagicMock() as signal_handler:
+            request_finished.connect(signal_handler)
+            handler.run(get_internal_wsgi_application())
+            self.assertEqual(signal_handler.call_count, 1)
 
 
 class WriteChunkCounterHandler(ServerHandler):
@@ -113,9 +149,9 @@ class WriteChunkCounterHandler(ServerHandler):
 
 
 def send_big_data_app(environ, start_response):
-    start_response('200 OK', [('Content-Type', 'text/plain')])
+    start_response("200 OK", [("Content-Type", "text/plain")])
     # Return a blob of data that is 1.5 times the maximum chunk size.
-    return [b'x' * (MAX_SOCKET_CHUNK_SIZE + MAX_SOCKET_CHUNK_SIZE // 2)]
+    return [b"x" * (MAX_SOCKET_CHUNK_SIZE + MAX_SOCKET_CHUNK_SIZE // 2)]
 
 
 class ServerHandlerChunksProperly(TestCase):
@@ -128,7 +164,7 @@ class ServerHandlerChunksProperly(TestCase):
     """
 
     def test_chunked_data(self):
-        env = {'SERVER_PROTOCOL': 'HTTP/1.0'}
+        env = {"SERVER_PROTOCOL": "HTTP/1.0"}
         handler = WriteChunkCounterHandler(None, BytesIO(), BytesIO(), env)
         handler.run(send_big_data_app)
         self.assertEqual(handler.write_chunk_counter, 2)

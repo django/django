@@ -6,9 +6,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:49+0200\n"
-"PO-Revision-Date: 2018-05-18 08:24+0000\n"
-"Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
+"POT-Creation-Date: 2020-05-11 20:56+0200\n"
+"PO-Revision-Date: 2020-05-12 20:01+0000\n"
+"Last-Translator: Transifex Bot <>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/django/django/language/"
 "lt/)\n"
 "MIME-Version: 1.0\n"
@@ -33,24 +33,14 @@ msgid "Map of strings to strings/nulls"
 msgstr "Susietos tekstinės reikšmės su tekstinėmis reikšmėmis/nulls"
 
 #, python-format
-msgid "The value of \"%(key)s\" is not a string or null."
-msgstr "\"%(key)s\" reikšmė nėra tekstinė arba null."
-
-msgid "A JSON object"
-msgstr "JSON objektas"
-
-msgid "Value must be valid JSON."
-msgstr "Reikšmė turi būti tinkamas JSON."
+msgid "The value of “%(key)s” is not a string or null."
+msgstr ""
 
 msgid "Could not load JSON data."
 msgstr "Nepavyko užkrauti JSON duomenų."
 
 msgid "Input must be a JSON dictionary."
 msgstr "Įvestis turi būti JSON žodynas."
-
-#, python-format
-msgid "'%(value)s' value must be valid JSON."
-msgstr "'%(value)s' reikšmė turi būti tinkamas JSON."
 
 msgid "Enter two valid values."
 msgstr "Įveskite dvi tinkamas reikšmes."

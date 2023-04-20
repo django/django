@@ -33,13 +33,17 @@ built-in handling for user-uploaded files, but you can have Django serve your
 
     if settings.DEBUG:
         urlpatterns += [
-            re_path(r'^media/(?P<path>.*)$', serve, {
-                'document_root': settings.MEDIA_ROOT,
-            }),
+            re_path(
+                r"^media/(?P<path>.*)$",
+                serve,
+                {
+                    "document_root": settings.MEDIA_ROOT,
+                },
+            ),
         ]
 
 Note, the snippet assumes your :setting:`MEDIA_URL` has a value of
-``'/media/'``. This will call the :func:`~django.views.static.serve` view,
+``'media/'``. This will call the :func:`~django.views.static.serve` view,
 passing in the path from the URLconf and the (required) ``document_root``
 parameter.
 
@@ -121,15 +125,16 @@ default, call the view ``django.views.defaults.permission_denied``.
 
 This view loads and renders the template ``403.html`` in your root template
 directory, or if this file does not exist, instead serves the text
-"403 Forbidden", as per :rfc:`7231#section-6.5.3` (the HTTP 1.1 Specification).
-The template context contains ``exception``, which is the string
-representation of the exception that triggered the view.
+"403 Forbidden", as per :rfc:`9110#section-15.5.4` (the HTTP 1.1
+Specification). The template context contains ``exception``, which is the
+string representation of the exception that triggered the view.
 
 ``django.views.defaults.permission_denied`` is triggered by a
 :exc:`~django.core.exceptions.PermissionDenied` exception. To deny access in a
 view you can use code like this::
 
     from django.core.exceptions import PermissionDenied
+
 
     def edit(request, pk):
         if not request.user.is_staff:

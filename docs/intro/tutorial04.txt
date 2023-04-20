@@ -3,7 +3,7 @@ Writing your first Django app, part 4
 =====================================
 
 This tutorial begins where :doc:`Tutorial 3 </intro/tutorial03>` left off. We're
-continuing the Web-poll application and will focus on form processing and
+continuing the web-poll application and will focus on form processing and
 cutting down our code.
 
 .. admonition:: Where to get help:
@@ -18,18 +18,18 @@ Let's update our poll detail template ("polls/detail.html") from the last
 tutorial, so that the template contains an HTML ``<form>`` element:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/detail.html
-
-    <h1>{{ question.question_text }}</h1>
-
-    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+    :caption: ``polls/templates/polls/detail.html``
 
     <form action="{% url 'polls:vote' question.id %}" method="post">
     {% csrf_token %}
-    {% for choice in question.choice_set.all %}
-        <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
-        <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
-    {% endfor %}
+    <fieldset>
+        <legend><h1>{{ question.question_text }}</h1></legend>
+        {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+        {% for choice in question.choice_set.all %}
+            <input type="radio" name="choice" id="choice{{ forloop.counter }}" value="{{ choice.id }}">
+            <label for="choice{{ forloop.counter }}">{{ choice.choice_text }}</label><br>
+        {% endfor %}
+    </fieldset>
     <input type="submit" value="Vote">
     </form>
 
@@ -47,7 +47,7 @@ A quick rundown:
   ``method="get"``) is very important, because the act of submitting this
   form will alter data server-side. Whenever you create a form that alters
   data server-side, use ``method="post"``. This tip isn't specific to
-  Django; it's good Web development practice in general.
+  Django; it's good web development practice in general.
 
 * ``forloop.counter`` indicates how many times the :ttag:`for` tag has gone
   through its loop
@@ -64,39 +64,45 @@ something with it. Remember, in :doc:`Tutorial 3 </intro/tutorial03>`, we
 created a URLconf for the polls application that includes this line:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
-    path('<int:question_id>/vote/', views.vote, name='vote'),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponse, HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
     from django.urls import reverse
 
     from .models import Choice, Question
+
+
     # ...
     def vote(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
         try:
-            selected_choice = question.choice_set.get(pk=request.POST['choice'])
+            selected_choice = question.choice_set.get(pk=request.POST["choice"])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the question voting form.
-            return render(request, 'polls/detail.html', {
-                'question': question,
-                'error_message': "You didn't select a choice.",
-            })
+            return render(
+                request,
+                "polls/detail.html",
+                {
+                    "question": question,
+                    "error_message": "You didn't select a choice.",
+                },
+            )
         else:
             selected_choice.votes += 1
             selected_choice.save()
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
             # user hits the Back button.
-            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+            return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
@@ -126,7 +132,7 @@ This code includes a few things we haven't covered yet in this tutorial:
 
   As the Python comment above points out, you should always return an
   :class:`~django.http.HttpResponseRedirect` after successfully dealing with
-  POST data. This tip isn't specific to Django; it's good Web development
+  POST data. This tip isn't specific to Django; it's good web development
   practice in general.
 
 * We are using the :func:`~django.urls.reverse` function in the
@@ -138,7 +144,7 @@ This code includes a few things we haven't covered yet in this tutorial:
   this :func:`~django.urls.reverse` call will return a string like
   ::
 
-    '/polls/3/results/'
+    "/polls/3/results/"
 
   where the ``3`` is the value of ``question.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
@@ -152,14 +158,14 @@ After somebody votes in a question, the ``vote()`` view redirects to the results
 page for the question. Let's write that view:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.shortcuts import get_object_or_404, render
 
 
     def results(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
-        return render(request, 'polls/results.html', {'question': question})
+        return render(request, "polls/results.html", {"question": question})
 
 This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 3
 </intro/tutorial03>`. The only difference is the template name. We'll fix this
@@ -168,7 +174,7 @@ redundancy later.
 Now, create a ``polls/results.html`` template:
 
 .. code-block:: html+django
-    :caption: polls/templates/polls/results.html
+    :caption: ``polls/templates/polls/results.html``
 
     <h1>{{ question.question_text }}</h1>
 
@@ -204,7 +210,7 @@ The ``detail()`` (from :doc:`Tutorial 3 </intro/tutorial03>`) and ``results()``
 views are very short -- and, as mentioned above, redundant. The ``index()``
 view, which displays a list of polls, is similar.
 
-These views represent a common case of basic Web development: getting data from
+These views represent a common case of basic web development: getting data from
 the database according to a parameter passed in the URL, loading a template and
 returning the rendered template. Because this is so common, Django provides a
 shortcut, called the "generic views" system.
@@ -240,18 +246,18 @@ Amend URLconf
 First, open the ``polls/urls.py`` URLconf and change it like so:
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
-        path('<int:question_id>/vote/', views.vote, name='vote'),
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+        path("<int:question_id>/vote/", views.vote, name="vote"),
     ]
 
 Note that the name of the matched pattern in the path strings of the second and
@@ -265,7 +271,7 @@ views and use Django's generic views instead. To do so, open the
 ``polls/views.py`` file and change it like so:
 
 .. code-block:: python
-    :caption: polls/views.py
+    :caption: ``polls/views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import get_object_or_404, render
@@ -276,26 +282,26 @@ views and use Django's generic views instead. To do so, open the
 
 
     class IndexView(generic.ListView):
-        template_name = 'polls/index.html'
-        context_object_name = 'latest_question_list'
+        template_name = "polls/index.html"
+        context_object_name = "latest_question_list"
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by("-pub_date")[:5]
 
 
     class DetailView(generic.DetailView):
         model = Question
-        template_name = 'polls/detail.html'
+        template_name = "polls/detail.html"
 
 
     class ResultsView(generic.DetailView):
         model = Question
-        template_name = 'polls/results.html'
+        template_name = "polls/results.html"
 
 
     def vote(request, question_id):
-        ... # same as above, no changes needed.
+        ...  # same as above, no changes needed.
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and

@@ -7,13 +7,14 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.middleware.csrf import rotate_token
 from django.utils.crypto import constant_time_compare
 from django.utils.module_loading import import_string
+from django.views.decorators.debug import sensitive_variables
 
 from .signals import user_logged_in, user_logged_out, user_login_failed
 
-SESSION_KEY = '_auth_user_id'
-BACKEND_SESSION_KEY = '_auth_user_backend'
-HASH_SESSION_KEY = '_auth_user_hash'
-REDIRECT_FIELD_NAME = 'next'
+SESSION_KEY = "_auth_user_id"
+BACKEND_SESSION_KEY = "_auth_user_backend"
+HASH_SESSION_KEY = "_auth_user_hash"
+REDIRECT_FIELD_NAME = "next"
 
 
 def load_backend(path):
@@ -27,8 +28,8 @@ def _get_backends(return_tuples=False):
         backends.append((backend, backend_path) if return_tuples else backend)
     if not backends:
         raise ImproperlyConfigured(
-            'No authentication backends have been defined. Does '
-            'AUTHENTICATION_BACKENDS contain anything?'
+            "No authentication backends have been defined. Does "
+            "AUTHENTICATION_BACKENDS contain anything?"
         )
     return backends
 
@@ -37,6 +38,7 @@ def get_backends():
     return _get_backends(return_tuples=False)
 
 
+@sensitive_variables("credentials")
 def _clean_credentials(credentials):
     """
     Clean a dictionary of credentials of potentially sensitive info before
@@ -44,8 +46,8 @@ def _clean_credentials(credentials):
 
     Not comprehensive - intended for user_login_failed signal
     """
-    SENSITIVE_CREDENTIALS = re.compile('api|token|key|secret|password|signature', re.I)
-    CLEANSED_SUBSTITUTE = '********************'
+    SENSITIVE_CREDENTIALS = re.compile("api|token|key|secret|password|signature", re.I)
+    CLEANSED_SUBSTITUTE = "********************"
     for key in credentials:
         if SENSITIVE_CREDENTIALS.search(key):
             credentials[key] = CLEANSED_SUBSTITUTE
@@ -58,6 +60,7 @@ def _get_user_session_key(request):
     return get_user_model()._meta.pk.to_python(request.session[SESSION_KEY])
 
 
+@sensitive_variables("credentials")
 def authenticate(request=None, **credentials):
     """
     If the given credentials are valid, return a User object.
@@ -67,12 +70,14 @@ def authenticate(request=None, **credentials):
         try:
             backend_signature.bind(request, **credentials)
         except TypeError:
-            # This backend doesn't accept these credentials as arguments. Try the next one.
+            # This backend doesn't accept these credentials as arguments. Try
+            # the next one.
             continue
         try:
             user = backend.authenticate(request, **credentials)
         except PermissionDenied:
-            # This backend says to stop in our tracks - this user should not be allowed in at all.
+            # This backend says to stop in our tracks - this user should not be
+            # allowed in at all.
             break
         if user is None:
             continue
@@ -81,7 +86,9 @@ def authenticate(request=None, **credentials):
         return user
 
     # The credentials supplied are invalid to all backends, fire signal
-    user_login_failed.send(sender=__name__, credentials=_clean_credentials(credentials), request=request)
+    user_login_failed.send(
+        sender=__name__, credentials=_clean_credentials(credentials), request=request
+    )
 
 
 def login(request, user, backend=None):
@@ -90,16 +97,19 @@ def login(request, user, backend=None):
     have to reauthenticate on every request. Note that data set during
     the anonymous session is retained when the user logs in.
     """
-    session_auth_hash = ''
+    session_auth_hash = ""
     if user is None:
         user = request.user
-    if hasattr(user, 'get_session_auth_hash'):
+    if hasattr(user, "get_session_auth_hash"):
         session_auth_hash = user.get_session_auth_hash()
 
     if SESSION_KEY in request.session:
         if _get_user_session_key(request) != user.pk or (
-                session_auth_hash and
-                not constant_time_compare(request.session.get(HASH_SESSION_KEY, ''), session_auth_hash)):
+            session_auth_hash
+            and not constant_time_compare(
+                request.session.get(HASH_SESSION_KEY, ""), session_auth_hash
+            )
+        ):
             # To avoid reusing another user's session, create a new, empty
             # session if the existing session corresponds to a different
             # authenticated user.
@@ -115,18 +125,20 @@ def login(request, user, backend=None):
             _, backend = backends[0]
         else:
             raise ValueError(
-                'You have multiple authentication backends configured and '
-                'therefore must provide the `backend` argument or set the '
-                '`backend` attribute on the user.'
+                "You have multiple authentication backends configured and "
+                "therefore must provide the `backend` argument or set the "
+                "`backend` attribute on the user."
             )
     else:
         if not isinstance(backend, str):
-            raise TypeError('backend must be a dotted import path string (got %r).' % backend)
+            raise TypeError(
+                "backend must be a dotted import path string (got %r)." % backend
+            )
 
     request.session[SESSION_KEY] = user._meta.pk.value_to_string(user)
     request.session[BACKEND_SESSION_KEY] = backend
     request.session[HASH_SESSION_KEY] = session_auth_hash
-    if hasattr(request, 'user'):
+    if hasattr(request, "user"):
         request.user = user
     rotate_token(request)
     user_logged_in.send(sender=user.__class__, request=request, user=user)
@@ -139,13 +151,14 @@ def logout(request):
     """
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
-    user = getattr(request, 'user', None)
-    if not getattr(user, 'is_authenticated', True):
+    user = getattr(request, "user", None)
+    if not getattr(user, "is_authenticated", True):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
     request.session.flush()
-    if hasattr(request, 'user'):
+    if hasattr(request, "user"):
         from django.contrib.auth.models import AnonymousUser
+
         request.user = AnonymousUser()
 
 
@@ -156,10 +169,13 @@ def get_user_model():
     try:
         return django_apps.get_model(settings.AUTH_USER_MODEL, require_ready=False)
     except ValueError:
-        raise ImproperlyConfigured("AUTH_USER_MODEL must be of the form 'app_label.model_name'")
+        raise ImproperlyConfigured(
+            "AUTH_USER_MODEL must be of the form 'app_label.model_name'"
+        )
     except LookupError:
         raise ImproperlyConfigured(
-            "AUTH_USER_MODEL refers to model '%s' that has not been installed" % settings.AUTH_USER_MODEL
+            "AUTH_USER_MODEL refers to model '%s' that has not been installed"
+            % settings.AUTH_USER_MODEL
         )
 
 
@@ -169,6 +185,7 @@ def get_user(request):
     If no user is retrieved, return an instance of `AnonymousUser`.
     """
     from .models import AnonymousUser
+
     user = None
     try:
         user_id = _get_user_session_key(request)
@@ -180,15 +197,28 @@ def get_user(request):
             backend = load_backend(backend_path)
             user = backend.get_user(user_id)
             # Verify the session
-            if hasattr(user, 'get_session_auth_hash'):
+            if hasattr(user, "get_session_auth_hash"):
                 session_hash = request.session.get(HASH_SESSION_KEY)
-                session_hash_verified = session_hash and constant_time_compare(
-                    session_hash,
-                    user.get_session_auth_hash()
-                )
+                if not session_hash:
+                    session_hash_verified = False
+                else:
+                    session_auth_hash = user.get_session_auth_hash()
+                    session_hash_verified = constant_time_compare(
+                        session_hash, session_auth_hash
+                    )
                 if not session_hash_verified:
-                    request.session.flush()
-                    user = None
+                    # If the current secret does not verify the session, try
+                    # with the fallback secrets and stop when a matching one is
+                    # found.
+                    if session_hash and any(
+                        constant_time_compare(session_hash, fallback_auth_hash)
+                        for fallback_auth_hash in user.get_session_auth_fallback_hash()
+                    ):
+                        request.session.cycle_key()
+                        request.session[HASH_SESSION_KEY] = session_auth_hash
+                    else:
+                        request.session.flush()
+                        user = None
 
     return user or AnonymousUser()
 
@@ -197,7 +227,7 @@ def get_permission_codename(action, opts):
     """
     Return the codename of the permission for the specified action.
     """
-    return '%s_%s' % (action, opts.model_name)
+    return "%s_%s" % (action, opts.model_name)
 
 
 def update_session_auth_hash(request, user):
@@ -210,8 +240,5 @@ def update_session_auth_hash(request, user):
     password was changed.
     """
     request.session.cycle_key()
-    if hasattr(user, 'get_session_auth_hash') and request.user == user:
+    if hasattr(user, "get_session_auth_hash") and request.user == user:
         request.session[HASH_SESSION_KEY] = user.get_session_auth_hash()
-
-
-default_app_config = 'django.contrib.auth.apps.AuthConfig'

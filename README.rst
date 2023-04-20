@@ -2,7 +2,7 @@
 Django
 ======
 
-Django is a high-level Python Web framework that encourages rapid development
+Django is a high-level Python web framework that encourages rapid development
 and clean, pragmatic design. Thanks for checking it out.
 
 All documentation is in the "``docs``" directory and online at
@@ -29,9 +29,8 @@ ticket here: https://code.djangoproject.com/newticket
 
 To get more help:
 
-* Join the ``#django`` channel on irc.freenode.net. Lots of helpful people hang
-  out there. See https://en.wikipedia.org/wiki/Wikipedia:IRC/Tutorial if you're
-  new to IRC.
+* Join the ``#django`` channel on ``irc.libera.chat``. Lots of helpful people
+  hang out there. See https://web.libera.chat if you're new to IRC.
 
 * Join the django-users mailing list, or read the archives, at
   https://groups.google.com/group/django-users.
@@ -46,3 +45,10 @@ To run Django's test suite:
 * Follow the instructions in the "Unit tests" section of
   ``docs/internals/contributing/writing-code/unit-tests.txt``, published online at
   https://docs.djangoproject.com/en/dev/internals/contributing/writing-code/unit-tests/#running-the-unit-tests
+
+Supporting the Development of Django
+====================================
+
+Django's development depends on your contributions. 
+
+If you depend on Django, remember to support the Django Software Foundation: https://www.djangoproject.com/fundraising/

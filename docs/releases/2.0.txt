@@ -54,11 +54,11 @@ Simplified URL routing syntax
 The new :func:`django.urls.path()` function allows a simpler, more readable URL
 routing syntax. For example, this example from previous Django releases::
 
-    url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+    url(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
 
 could be written as::
 
-    path('articles/<int:year>/', views.year_archive),
+    path("articles/<int:year>/", views.year_archive),
 
 The new syntax supports type coercion of URL parameters. In the example, the
 view will receive the ``year`` keyword argument as an integer rather than as
@@ -99,7 +99,7 @@ Minor features
 
 * The new :attr:`.ModelAdmin.autocomplete_fields` attribute and
   :meth:`.ModelAdmin.get_autocomplete_fields` method allow using a
-  `Select2 <https://select2.org>`_ search widget for ``ForeignKey`` and
+  `Select2 <https://select2.org/>`_ search widget for ``ForeignKey`` and
   ``ManyToManyField``.
 
 :mod:`django.contrib.auth`
@@ -212,7 +212,7 @@ Management Commands
   ``PositiveIntegerField`` or ``PositiveSmallIntegerField``.
 
 * The new :option:`makemessages --add-location` option controls the comment
-  format in PO files.
+  format in ``.po`` files.
 
 * :djadmin:`loaddata` can now :ref:`read from stdin <loading-fixtures-stdin>`.
 
@@ -237,7 +237,7 @@ Models
   finds the starting index of a string inside another string.
 
 * On Oracle, ``AutoField`` and ``BigAutoField`` are now created as `identity
-  columns <https://docs.oracle.com/en/database/oracle/oracle-database/18/drdaa/
+  columns <https://docs.oracle.com/en/database/oracle/oracle-database/21/drdaa/
   intro-to-tools-and-products-supporting-migraiton.html#GUID-14E4817B-F3BC-4D99
   -B471-A0ACDC303CC9>`__.
 
@@ -306,7 +306,7 @@ Pagination
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* The :djadmin:`runserver` Web server supports HTTP 1.1.
+* The :djadmin:`runserver` web server supports HTTP 1.1.
 
 Templates
 ~~~~~~~~~
@@ -345,7 +345,7 @@ Removed support for bytestrings in some places
 ----------------------------------------------
 
 To support native Python 2 strings, older Django versions had to accept both
-bytestrings and unicode strings. Now that Python 2 support is dropped,
+bytestrings and Unicode strings. Now that Python 2 support is dropped,
 bytestrings should only be encountered around input/output boundaries (handling
 of binary fields or HTTP streams, for example). You might have to update your
 code to limit bytestring usage to a minimum, as Django no longer accepts
@@ -434,6 +434,7 @@ form::
 
     from django.contrib.auth.forms import UserChangeForm
 
+
     class MyUserChangeForm(UserChangeForm):
         last_name = forms.CharField(max_length=30, required=False)
 
@@ -443,8 +444,10 @@ If you wish to keep this restriction in the admin when editing users, set
     from django.contrib.auth.admin import UserAdmin
     from django.contrib.auth.models import User
 
+
     class MyUserAdmin(UserAdmin):
         form = MyUserChangeForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
@@ -454,7 +457,9 @@ If you wish to keep this restriction in the admin when editing users, set
 
 Calling ``QuerySet.reverse()`` or ``last()`` on a sliced queryset leads to
 unexpected results due to the slice being applied after reordering. This is
-now prohibited, e.g.::
+now prohibited, e.g.:
+
+.. code-block:: pycon
 
     >>> Model.objects.all()[:2].reverse()
     Traceback (most recent call last):
@@ -484,18 +489,18 @@ For custom management commands that use options not created using
 ``parser.add_argument()``, add a ``stealth_options`` attribute on the command::
 
     class MyCommand(BaseCommand):
-        stealth_options = ('option_name', ...)
+        stealth_options = ("option_name", ...)
 
 Indexes no longer accept positional arguments
 ---------------------------------------------
 
 For example::
 
-    models.Index(['headline', '-pub_date'], 'index_name')
+    models.Index(["headline", "-pub_date"], "index_name")
 
 raises an exception and should be replaced with::
 
-    models.Index(fields=['headline', '-pub_date'], name='index_name')
+    models.Index(fields=["headline", "-pub_date"], name="index_name")
 
 Foreign key constraints are now enabled on SQLite
 -------------------------------------------------
@@ -528,7 +533,7 @@ rebuild tables using a script similar to this::
         for model in app.get_models(include_auto_created=True):
             if model._meta.managed and not (model._meta.proxy or model._meta.swapped):
                 for base in model.__bases__:
-                    if hasattr(base, '_meta'):
+                    if hasattr(base, "_meta"):
                         base._meta.local_many_to_many = []
                 model._meta.local_many_to_many = []
                 with connection.schema_editor() as editor:
@@ -558,15 +563,15 @@ Miscellaneous
 * :class:`~django.views.generic.base.RedirectView` no longer silences
   ``NoReverseMatch`` if the ``pattern_name`` doesn't exist.
 
-* When :setting:`USE_L10N` is off, :class:`~django.forms.FloatField` and
+* When ``USE_L10N`` is off, :class:`~django.forms.FloatField` and
   :class:`~django.forms.DecimalField` now respect :setting:`DECIMAL_SEPARATOR`
   and :setting:`THOUSAND_SEPARATOR` during validation. For example, with the
   settings::
 
      USE_L10N = False
      USE_THOUSAND_SEPARATOR = True
-     DECIMAL_SEPARATOR = ','
-     THOUSAND_SEPARATOR = '.'
+     DECIMAL_SEPARATOR = ","
+     THOUSAND_SEPARATOR = "."
 
   an input of ``"1.345"`` is now converted to ``1345`` instead of ``1.345``.
 

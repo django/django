@@ -5,35 +5,34 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.models import ContentType
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import (
-    RequestFactory, SimpleTestCase, TestCase, override_settings,
-)
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
-from .admin import MediaInline, MediaPermanentInline, site as admin_site
+from .admin import MediaInline, MediaPermanentInline
+from .admin import site as admin_site
 from .models import Category, Episode, EpisodePermanent, Media, PhoneNumber
 
 
 class TestDataMixin:
-
     @classmethod
     def setUpTestData(cls):
-        cls.superuser = User.objects.create_superuser(username='super', password='secret', email='super@example.com')
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
 
 
-@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericAdminViewTest(TestDataMixin, TestCase):
-
     def setUp(self):
         self.client.force_login(self.superuser)
 
-        e = Episode.objects.create(name='This Week in Django')
+        e = Episode.objects.create(name="This Week in Django")
         self.episode_pk = e.pk
-        m = Media(content_object=e, url='http://example.com/podcast.mp3')
+        m = Media(content_object=e, url="http://example.com/podcast.mp3")
         m.save()
         self.mp3_media_pk = m.pk
 
-        m = Media(content_object=e, url='http://example.com/logo.png')
+        m = Media(content_object=e, url="http://example.com/logo.png")
         m.save()
         self.png_media_pk = m.pk
 
@@ -41,7 +40,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         """
         A smoke test to ensure GET on the add_view works.
         """
-        response = self.client.get(reverse('admin:generic_inline_admin_episode_add'))
+        response = self.client.get(reverse("admin:generic_inline_admin_episode_add"))
         self.assertEqual(response.status_code, 200)
 
     def test_basic_edit_GET(self):
@@ -49,7 +48,9 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         A smoke test to ensure GET on the change_view works.
         """
         response = self.client.get(
-            reverse('admin:generic_inline_admin_episode_change', args=(self.episode_pk,))
+            reverse(
+                "admin:generic_inline_admin_episode_change", args=(self.episode_pk,)
+            )
         )
         self.assertEqual(response.status_code, 200)
 
@@ -64,32 +65,37 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
             "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "0",
             "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
         }
-        response = self.client.post(reverse('admin:generic_inline_admin_episode_add'), post_data)
+        response = self.client.post(
+            reverse("admin:generic_inline_admin_episode_add"), post_data
+        )
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_basic_edit_POST(self):
         """
         A smoke test to ensure POST on edit_view works.
         """
+        prefix = "generic_inline_admin-media-content_type-object_id"
         post_data = {
             "name": "This Week in Django",
             # inline data
-            "generic_inline_admin-media-content_type-object_id-TOTAL_FORMS": "3",
-            "generic_inline_admin-media-content_type-object_id-INITIAL_FORMS": "2",
-            "generic_inline_admin-media-content_type-object_id-MAX_NUM_FORMS": "0",
-            "generic_inline_admin-media-content_type-object_id-0-id": "%d" % self.mp3_media_pk,
-            "generic_inline_admin-media-content_type-object_id-0-url": "http://example.com/podcast.mp3",
-            "generic_inline_admin-media-content_type-object_id-1-id": "%d" % self.png_media_pk,
-            "generic_inline_admin-media-content_type-object_id-1-url": "http://example.com/logo.png",
-            "generic_inline_admin-media-content_type-object_id-2-id": "",
-            "generic_inline_admin-media-content_type-object_id-2-url": "",
+            f"{prefix}-TOTAL_FORMS": "3",
+            f"{prefix}-INITIAL_FORMS": "2",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            f"{prefix}-0-id": str(self.mp3_media_pk),
+            f"{prefix}-0-url": "http://example.com/podcast.mp3",
+            f"{prefix}-1-id": str(self.png_media_pk),
+            f"{prefix}-1-url": "http://example.com/logo.png",
+            f"{prefix}-2-id": "",
+            f"{prefix}-2-url": "",
         }
-        url = reverse('admin:generic_inline_admin_episode_change', args=(self.episode_pk,))
+        url = reverse(
+            "admin:generic_inline_admin_episode_change", args=(self.episode_pk,)
+        )
         response = self.client.post(url, post_data)
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
 
-@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
     factory = RequestFactory()
 
@@ -103,8 +109,8 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         content type IDs, which will vary depending on what other tests
         have been run), thus we do it here.
         """
-        e = model.objects.create(name='This Week in Django')
-        Media.objects.create(content_object=e, url='http://example.com/podcast.mp3')
+        e = model.objects.create(name="This Week in Django")
+        Media.objects.create(content_object=e, url="http://example.com/podcast.mp3")
         return e
 
     def test_no_param(self):
@@ -112,8 +118,10 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         With one initial form, extra (default) at 3, there should be 4 forms.
         """
         e = self._create_object(Episode)
-        response = self.client.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        formset = response.context['inline_admin_formsets'][0].formset
+        response = self.client.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        formset = response.context["inline_admin_formsets"][0].formset
         self.assertEqual(formset.total_form_count(), 4)
         self.assertEqual(formset.initial_form_count(), 1)
 
@@ -121,6 +129,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         """
         With extra=0, there should be one form.
         """
+
         class ExtraInline(GenericTabularInline):
             model = Media
             extra = 0
@@ -129,10 +138,12 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin.inlines = [ExtraInline]
 
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
         self.assertEqual(formset.total_form_count(), 1)
         self.assertEqual(formset.initial_form_count(), 1)
 
@@ -140,6 +151,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         """
         With extra=5 and max_num=2, there should be only 2 forms.
         """
+
         class MaxNumInline(GenericTabularInline):
             model = Media
             extra = 5
@@ -149,10 +161,12 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin.inlines = [MaxNumInline]
 
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
         self.assertEqual(formset.total_form_count(), 2)
         self.assertEqual(formset.initial_form_count(), 1)
 
@@ -160,6 +174,7 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         """
         With extra=3 and min_num=2, there should be five forms.
         """
+
         class MinNumInline(GenericTabularInline):
             model = Media
             extra = 3
@@ -169,15 +184,16 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin.inlines = [MinNumInline]
 
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
         self.assertEqual(formset.total_form_count(), 5)
         self.assertEqual(formset.initial_form_count(), 1)
 
     def test_get_extra(self):
-
         class GetExtraInline(GenericTabularInline):
             model = Media
             extra = 4
@@ -188,15 +204,16 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin = admin.ModelAdmin(Episode, admin_site)
         modeladmin.inlines = [GetExtraInline]
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
 
         self.assertEqual(formset.extra, 2)
 
     def test_get_min_num(self):
-
         class GetMinNumInline(GenericTabularInline):
             model = Media
             min_num = 5
@@ -207,15 +224,16 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin = admin.ModelAdmin(Episode, admin_site)
         modeladmin.inlines = [GetMinNumInline]
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
 
         self.assertEqual(formset.min_num, 2)
 
     def test_get_max_num(self):
-
         class GetMaxNumInline(GenericTabularInline):
             model = Media
             extra = 5
@@ -226,52 +244,58 @@ class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
         modeladmin = admin.ModelAdmin(Episode, admin_site)
         modeladmin.inlines = [GetMaxNumInline]
         e = self._create_object(Episode)
-        request = self.factory.get(reverse('admin:generic_inline_admin_episode_change', args=(e.pk,)))
-        request.user = User(username='super', is_superuser=True)
+        request = self.factory.get(
+            reverse("admin:generic_inline_admin_episode_change", args=(e.pk,))
+        )
+        request.user = User(username="super", is_superuser=True)
         response = modeladmin.changeform_view(request, object_id=str(e.pk))
-        formset = response.context_data['inline_admin_formsets'][0].formset
+        formset = response.context_data["inline_admin_formsets"][0].formset
 
         self.assertEqual(formset.max_num, 2)
 
 
-@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
-
     def setUp(self):
         self.client.force_login(self.superuser)
 
     def test_add(self):
-        category_id = Category.objects.create(name='male').pk
+        category_id = Category.objects.create(name="male").pk
+        prefix = "generic_inline_admin-phonenumber-content_type-object_id"
         post_data = {
             "name": "John Doe",
             # inline data
-            "generic_inline_admin-phonenumber-content_type-object_id-TOTAL_FORMS": "1",
-            "generic_inline_admin-phonenumber-content_type-object_id-INITIAL_FORMS": "0",
-            "generic_inline_admin-phonenumber-content_type-object_id-MAX_NUM_FORMS": "0",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-id": "",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-phone_number": "555-555-5555",
-            "generic_inline_admin-phonenumber-content_type-object_id-0-category": "%s" % category_id,
+            f"{prefix}-TOTAL_FORMS": "1",
+            f"{prefix}-INITIAL_FORMS": "0",
+            f"{prefix}-MAX_NUM_FORMS": "0",
+            f"{prefix}-0-id": "",
+            f"{prefix}-0-phone_number": "555-555-5555",
+            f"{prefix}-0-category": str(category_id),
         }
-        response = self.client.get(reverse('admin:generic_inline_admin_contact_add'))
+        response = self.client.get(reverse("admin:generic_inline_admin_contact_add"))
         self.assertEqual(response.status_code, 200)
-        response = self.client.post(reverse('admin:generic_inline_admin_contact_add'), post_data)
+        response = self.client.post(
+            reverse("admin:generic_inline_admin_contact_add"), post_data
+        )
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
     def test_delete(self):
         from .models import Contact
-        c = Contact.objects.create(name='foo')
+
+        c = Contact.objects.create(name="foo")
         PhoneNumber.objects.create(
             object_id=c.id,
             content_type=ContentType.objects.get_for_model(Contact),
             phone_number="555-555-5555",
         )
-        response = self.client.post(reverse('admin:generic_inline_admin_contact_delete', args=[c.pk]))
-        self.assertContains(response, 'Are you sure you want to delete')
+        response = self.client.post(
+            reverse("admin:generic_inline_admin_contact_delete", args=[c.pk])
+        )
+        self.assertContains(response, "Are you sure you want to delete")
 
 
-@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class NoInlineDeletionTest(SimpleTestCase):
-
     def test_no_deletion(self):
         inline = MediaPermanentInline(EpisodePermanent, admin_site)
         fake_request = object()
@@ -284,7 +308,7 @@ class MockRequest:
 
 
 class MockSuperUser:
-    def has_perm(self, perm):
+    def has_perm(self, perm, obj=None):
         return True
 
 
@@ -292,9 +316,8 @@ request = MockRequest()
 request.user = MockSuperUser()
 
 
-@override_settings(ROOT_URLCONF='generic_inline_admin.urls')
+@override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineModelAdminTest(SimpleTestCase):
-
     def setUp(self):
         self.site = AdminSite()
 
@@ -317,26 +340,25 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         used in conjunction with `GenericInlineModelAdmin.readonly_fields`
         and when no `ModelAdmin.exclude` is defined.
         """
-        class MediaForm(ModelForm):
 
+        class MediaForm(ModelForm):
             class Meta:
                 model = Media
-                exclude = ['url']
+                exclude = ["url"]
 
         class MediaInline(GenericTabularInline):
-            readonly_fields = ['description']
+            readonly_fields = ["description"]
             form = MediaForm
             model = Media
 
         class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                MediaInline
-            ]
+            inlines = [MediaInline]
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
-            ['keywords', 'id', 'DELETE'])
+            ["keywords", "id", "DELETE"],
+        )
 
     def test_custom_form_meta_exclude(self):
         """
@@ -348,25 +370,23 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         # First with `GenericInlineModelAdmin`  -----------------
 
         class MediaForm(ModelForm):
-
             class Meta:
                 model = Media
-                exclude = ['url']
+                exclude = ["url"]
 
         class MediaInline(GenericTabularInline):
-            exclude = ['description']
+            exclude = ["description"]
             form = MediaForm
             model = Media
 
         class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                MediaInline
-            ]
+            inlines = [MediaInline]
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
-            ['url', 'keywords', 'id', 'DELETE'])
+            ["url", "keywords", "id", "DELETE"],
+        )
 
         # Then, only with `ModelForm`  -----------------
 
@@ -375,14 +395,13 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             model = Media
 
         class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                MediaInline
-            ]
+            inlines = [MediaInline]
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
-            ['description', 'keywords', 'id', 'DELETE'])
+            ["description", "keywords", "id", "DELETE"],
+        )
 
     def test_get_fieldsets(self):
         # get_fieldsets is called when figuring out form fields.
@@ -390,7 +409,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
         class MediaForm(ModelForm):
             class Meta:
                 model = Media
-                fields = '__all__'
+                fields = "__all__"
 
         class MediaInline(GenericTabularInline):
             form = MediaForm
@@ -398,20 +417,21 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             can_delete = False
 
             def get_fieldsets(self, request, obj=None):
-                return [(None, {'fields': ['url', 'description']})]
+                return [(None, {"fields": ["url", "description"]})]
 
         ma = MediaInline(Media, self.site)
         form = ma.get_formset(None).form
-        self.assertEqual(form._meta.fields, ['url', 'description'])
+        self.assertEqual(form._meta.fields, ["url", "description"])
 
     def test_get_formsets_with_inlines_returns_tuples(self):
         """
         get_formsets_with_inlines() returns the correct tuples.
         """
+
         class MediaForm(ModelForm):
             class Meta:
                 model = Media
-                exclude = ['url']
+                exclude = ["url"]
 
         class MediaInline(GenericTabularInline):
             form = MediaForm
@@ -422,12 +442,13 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             model = Media
 
         class EpisodeAdmin(admin.ModelAdmin):
-            inlines = [
-                AlternateInline, MediaInline
-            ]
+            inlines = [AlternateInline, MediaInline]
+
         ma = EpisodeAdmin(Episode, self.site)
         inlines = ma.get_inline_instances(request)
-        for (formset, inline), other_inline in zip(ma.get_formsets_with_inlines(request), inlines):
+        for (formset, inline), other_inline in zip(
+            ma.get_formsets_with_inlines(request), inlines
+        ):
             self.assertIsInstance(formset, other_inline.get_formset(request).__class__)
 
     def test_get_inline_instances_override_get_inlines(self):
@@ -441,17 +462,20 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             inlines = (AlternateInline, MediaInline)
 
             def get_inlines(self, request, obj):
-                if hasattr(request, 'name'):
-                    if request.name == 'alternate':
+                if hasattr(request, "name"):
+                    if request.name == "alternate":
                         return self.inlines[:1]
-                    elif request.name == 'media':
+                    elif request.name == "media":
                         return self.inlines[1:2]
                 return []
 
         ma = EpisodeAdmin(Episode, self.site)
         self.assertEqual(ma.get_inlines(request, None), [])
         self.assertEqual(ma.get_inline_instances(request), [])
-        for name, inline_class in (('alternate', AlternateInline), ('media', MediaInline)):
+        for name, inline_class in (
+            ("alternate", AlternateInline),
+            ("media", MediaInline),
+        ):
             request.name = name
             self.assertEqual(ma.get_inlines(request, None), (inline_class,)),
             self.assertEqual(type(ma.get_inline_instances(request)[0]), inline_class)

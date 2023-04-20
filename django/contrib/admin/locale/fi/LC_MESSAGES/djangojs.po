@@ -1,15 +1,16 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Aarni Koskela, 2015,2017
+# Aarni Koskela, 2015,2017,2020-2022
 # Antti Kaihola <antti.15+transifex@kaihola.fi>, 2011
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Jiri Grönroos <jiri.gronroos@iki.fi>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-17 23:12+0200\n"
-"PO-Revision-Date: 2017-09-19 16:41+0000\n"
+"POT-Creation-Date: 2022-05-17 05:26-0500\n"
+"PO-Revision-Date: 2022-07-25 07:59+0000\n"
 "Last-Translator: Aarni Koskela\n"
 "Language-Team: Finnish (http://www.transifex.com/django/django/language/"
 "fi/)\n"
@@ -28,7 +29,7 @@ msgid ""
 "This is the list of available %s. You may choose some by selecting them in "
 "the box below and then clicking the \"Choose\" arrow between the two boxes."
 msgstr ""
-"Tämä on lista saatavillaolevista %s. Valitse allaolevasta laatikosta "
+"Tämä on lista saatavilla olevista %s. Valitse alla olevasta laatikosta "
 "haluamasi ja siirrä ne valittuihin klikkamalla \"Valitse\"-nuolta "
 "laatikoiden välillä."
 
@@ -85,8 +86,8 @@ msgstr ""
 "Jos suoritat toiminnon, tallentamattomat muutoksesi katoavat."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
 "Olet valinnut toiminnon, mutta et ole vielä tallentanut muutoksiasi "
@@ -94,12 +95,28 @@ msgstr ""
 "toiminto uudelleen."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
 "Olet valinnut toiminnon etkä ole tehnyt yhtään muutosta yksittäisissä "
-"kentissä. Etsit todennäköisesti Suorita-nappia Tallenna-napin sijaan."
+"kentissä. Etsit todennäköisesti Suorita-painiketta Tallenna-painikkeen "
+"sijaan."
+
+msgid "Now"
+msgstr "Nyt"
+
+msgid "Midnight"
+msgstr "24"
+
+msgid "6 a.m."
+msgstr "06"
+
+msgid "Noon"
+msgstr "12"
+
+msgid "6 p.m."
+msgstr "18:00"
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -113,26 +130,11 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Huom: Olet %s tunnin palvelinaikaa jäljessä."
 msgstr[1] "Huom: Olet %s tuntia palvelinaikaa jäljessä."
 
-msgid "Now"
-msgstr "Nyt"
-
 msgid "Choose a Time"
 msgstr "Valitse kellonaika"
 
 msgid "Choose a time"
 msgstr "Valitse kellonaika"
-
-msgid "Midnight"
-msgstr "24"
-
-msgid "6 a.m."
-msgstr "06"
-
-msgid "Noon"
-msgstr "12"
-
-msgid "6 p.m."
-msgstr "18:00"
 
 msgid "Cancel"
 msgstr "Peruuta"
@@ -185,6 +187,54 @@ msgstr "marraskuu"
 msgid "December"
 msgstr "joulukuu"
 
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Tammi"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Helmi"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Maalis"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Huhti"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Touko"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Kesä"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Heinä"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Elo"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Syys"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Loka"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Marras"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Joulu"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Su"
@@ -212,6 +262,12 @@ msgstr "Pe"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "La"
+
+msgid ""
+"You have already submitted this form. Are you sure you want to submit it "
+"again?"
+msgstr ""
+"Olet jo lähettänyt tämän lomakkeen. Haluatko varmasti lähettää sen uudelleen?"
 
 msgid "Show"
 msgstr "Näytä"

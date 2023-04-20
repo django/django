@@ -1,6 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Albin Larsson <albin.post@gmail.com>, 2022
 # Alex Nordlund <deep.alexander@gmail.com>, 2012
 # Cybjit <cybjit@gmail.com>, 2012
 # Jannis Leidel <jannis@leidel.info>, 2011
@@ -11,13 +12,14 @@
 # Petter Strandmark <petter.strandmark@gmail.com>, 2019
 # Samuel Linde <samuel@linde.im>, 2011
 # Thomas Lundqvist, 2013,2016
+# Tomas Lööw <tomas.loow@mailbox.org>, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-24 13:46+0200\n"
-"PO-Revision-Date: 2019-01-28 13:46+0000\n"
-"Last-Translator: Petter Strandmark <petter.strandmark@gmail.com>\n"
+"POT-Creation-Date: 2021-09-21 10:22+0200\n"
+"PO-Revision-Date: 2022-07-25 08:09+0000\n"
+"Last-Translator: Albin Larsson <albin.post@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/django/django/language/"
 "sv/)\n"
 "MIME-Version: 1.0\n"
@@ -40,7 +42,7 @@ msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-objekt med primärnyckel %(key)r finns inte."
 
 msgid "Password changed successfully."
-msgstr "Lösenordet ändrades."
+msgstr "Lösenordet ändrades framgångsrikt."
 
 #, python-format
 msgid "Change password: %s"
@@ -61,8 +63,8 @@ msgstr "Inget lösenord angivet."
 msgid "Invalid password format or unknown hashing algorithm."
 msgstr "Ogiltigt lösenordsformat eller okänd hashalgoritm."
 
-msgid "The two password fields didn't match."
-msgstr "De två lösenordsfälten stämde inte överens."
+msgid "The two password fields didn’t match."
+msgstr "De två lösenordsfälten stämmer inte överens."
 
 msgid "Password"
 msgstr "Lösenord"
@@ -74,7 +76,7 @@ msgid "Enter the same password as before, for verification."
 msgstr "Fyll i samma lösenord som tidigare för verifiering."
 
 msgid ""
-"Raw passwords are not stored, so there is no way to see this user's "
+"Raw passwords are not stored, so there is no way to see this user’s "
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Lösenord lagras inte direkt, så det finns inget sätt att se denna användares "
@@ -141,6 +143,9 @@ msgstr "arbetsfaktor"
 
 msgid "checksum"
 msgstr "kontrollsumma"
+
+msgid "block size"
+msgstr "blockstorlek"
 
 msgid "name"
 msgstr "namn"
@@ -253,19 +258,20 @@ msgstr[1] "Ditt lösenord måste innehålla minst %(min_length)d tecken."
 msgid "The password is too similar to the %(verbose_name)s."
 msgstr "Ditt lösenord är alltför likt %(verbose_name)s."
 
-msgid "Your password can't be too similar to your other personal information."
-msgstr "Ditt lösenord kan inte vara alltför lik din personliga information."
+msgid "Your password can’t be too similar to your other personal information."
+msgstr ""
+"Ditt lösenord kan inte vara alltför likt din övriga personliga information."
 
 msgid "This password is too common."
 msgstr "Detta lösenord är alldeles för vanligt."
 
-msgid "Your password can't be a commonly used password."
+msgid "Your password can’t be a commonly used password."
 msgstr "Ditt lösenord kan inte vara ett allmänt använt lösenord."
 
 msgid "This password is entirely numeric."
 msgstr "Detta lösenord är enbart numeriskt."
 
-msgid "Your password can't be entirely numeric."
+msgid "Your password can’t be entirely numeric."
 msgstr "Ditt lösenord kan inte bara vara numeriskt."
 
 #, python-format

@@ -2,22 +2,22 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2017,2019
+# BouRock, 2015-2017,2019-2021,2023
 # BouRock, 2014-2015
-# Caner Başaran <basaran.caner@protonmail.com>, 2013
+# Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2014
 # Gökmen Görgen <gokmen@alageek.com>, 2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Metin Amiroff <amiroff@gmail.com>, 2012
-# Murat Çorlu <muratcorlu@gmail.com>, 2012
+# Murat Çorlu <muratcorlu@me.com>, 2012
 # U. Ozan Basar <software@nano.net.tr>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-09-17 07:59+0000\n"
-"Last-Translator: BouRock\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: BouRock, 2015-2017,2019-2021,2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -86,7 +86,7 @@ msgid ""
 "Please enter a correct %(username)s and password. Note that both fields may "
 "be case-sensitive."
 msgstr ""
-"Lütfen doğru %(username)s ve parola girin. Her iki alanında büyük küçük "
+"Lütfen doğru %(username)s ve parola girin. Her iki alanın da büyük/küçük "
 "harfe duyarlı olabileceğini unutmayın."
 
 msgid "This account is inactive."
@@ -142,6 +142,9 @@ msgstr "iş faktörü"
 
 msgid "checksum"
 msgstr "sağlama"
+
+msgid "block size"
+msgstr "blok boyutu"
 
 msgid "name"
 msgstr "adı"
@@ -246,7 +249,7 @@ msgstr[1] "Bu parola çok kısa. En az %(min_length)d karakter içermek zorunda.
 msgid "Your password must contain at least %(min_length)d character."
 msgid_plural "Your password must contain at least %(min_length)d characters."
 msgstr[0] "Parolanız en az %(min_length)d karakter içermek zorunda."
-msgstr[1] "Parolanız en az %(min_length)d karakter içermek zorunda."
+msgstr[1] "Parolanız en az %(min_length)d karakter içermek zorundadır."
 
 #, python-format
 msgid "The password is too similar to the %(verbose_name)s."
@@ -259,7 +262,7 @@ msgid "This password is too common."
 msgstr "Bu parola çok geneldir."
 
 msgid "Your password can’t be a commonly used password."
-msgstr "Parolanız genelde kullanılan bir parola olamaz."
+msgstr "Parolanız yaygın olarak kullanılan bir parola olamaz."
 
 msgid "This password is entirely numeric."
 msgstr "Bu parola tamamıyla sayısaldır."
@@ -272,11 +275,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s sitesinde parola sıfırlama"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Geçerli bir kullanıcı adı girin. Bu değer sadece İngilizce harfleri, "
-"sayıları, ve @/./+/-/_ karakterlerini içerebilir."
+"Geçerli bir kullanıcı adı girin. Bu değer sadece aksansız küçük a-z ve büyük "
+"A-Z harfleri, sayıları, ve @/./+/-/_ karakterlerini içerebilir."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

@@ -25,11 +25,9 @@ Basic configuration
 ===================
 
 Once you've got mod_wsgi installed and activated, edit your Apache server's
-`httpd.conf`_ file and add the following. If you are using a version of Apache
-older than 2.4, replace ``Require all granted`` with ``Allow from all`` and
-also add the line ``Order deny,allow`` above it.
+`httpd.conf`_ file and add the following.
 
-.. _httpd.conf: https://wiki.apache.org/httpd/DistrosDefaultLayout
+.. _httpd.conf: https://cwiki.apache.org/confluence/display/httpd/DistrosDefaultLayout
 
 .. code-block:: apache
 
@@ -50,9 +48,9 @@ your project package (``mysite`` in this example). This tells Apache to serve
 any request below the given URL using the WSGI application defined in that
 file.
 
-If you install your project's Python dependencies inside a `virtualenv`_, add
-the path to the virtualenv using ``WSGIPythonHome``. See the `mod_wsgi
-virtualenv guide`_ for more details.
+If you install your project's Python dependencies inside a :mod:`virtual
+environment <venv>`, add the path using ``WSGIPythonHome``. See the `mod_wsgi
+virtual environment guide`_ for more details.
 
 The ``WSGIPythonPath`` line ensures that your project package is available for
 import on the Python path; in other words, that ``import mysite`` works.
@@ -66,8 +64,7 @@ for you; otherwise, you'll need to create it. See the :doc:`WSGI overview
 documentation</howto/deployment/wsgi/index>` for the default contents you
 should put in this file, and what else you can add to it.
 
-.. _virtualenv: https://virtualenv.pypa.io/
-.. _mod_wsgi virtualenv guide: https://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
+.. _mod_wsgi virtual environment guide: https://modwsgi.readthedocs.io/en/develop/user-guides/virtual-environments.html
 
 .. warning::
 
@@ -86,14 +83,24 @@ should put in this file, and what else you can add to it.
 
 .. admonition:: Fixing ``UnicodeEncodeError`` for file uploads
 
-    If you get a ``UnicodeEncodeError`` when uploading files with file names
-    that contain non-ASCII characters, make sure Apache is configured to accept
-    non-ASCII file names::
+    If you get a ``UnicodeEncodeError`` when uploading or writing files with
+    file names or content that contains non-ASCII characters, make sure Apache
+    is configured to support UTF-8 encoding:
+
+    .. code-block:: shell
 
         export LANG='en_US.UTF-8'
         export LC_ALL='en_US.UTF-8'
 
     A common location to put this configuration is ``/etc/apache2/envvars``.
+
+    Alternatively, if you are :ref:`using mod_wsgi daemon mode<daemon-mode>`
+    you can add ``lang`` and ``locale`` options to the ``WSGIDaemonProcess``
+    directive:
+
+    .. code-block:: text
+
+        WSGIDaemonProcess example.com lang='en_US.UTF-8' locale='en_US.UTF-8'
 
     See the :ref:`unicode-files` section of the Unicode reference guide for
     details.
@@ -134,10 +141,10 @@ mode`_.
 Serving files
 =============
 
-Django doesn't serve files itself; it leaves that job to whichever Web
+Django doesn't serve files itself; it leaves that job to whichever web
 server you choose.
 
-We recommend using a separate Web server -- i.e., one that's not also running
+We recommend using a separate web server -- i.e., one that's not also running
 Django -- for serving media. Here are some good choices:
 
 * Nginx_
@@ -175,10 +182,6 @@ a static file. All other URLs will be served using mod_wsgi:
     </Files>
     </Directory>
 
-If you are using a version of Apache older than 2.4, replace
-``Require all granted`` with ``Allow from all`` and also add the line
-``Order deny,allow`` above it.
-
 .. _Nginx: https://nginx.org/en/
 .. _Apache: https://httpd.apache.org/
 
@@ -196,15 +199,15 @@ When :mod:`django.contrib.staticfiles` is in :setting:`INSTALLED_APPS`, the
 Django development server automatically serves the static files of the
 admin app (and any other installed apps). This is however not the case when you
 use any other server arrangement. You're responsible for setting up Apache, or
-whichever Web server you're using, to serve the admin files.
+whichever web server you're using, to serve the admin files.
 
-The admin files live in (:file:`django/contrib/admin/static/admin`) of the
+The admin files live in (:source:`django/contrib/admin/static/admin`) of the
 Django distribution.
 
 We **strongly** recommend using :mod:`django.contrib.staticfiles` to handle the
-admin files (along with a Web server as outlined in the previous section; this
+admin files (along with a web server as outlined in the previous section; this
 means using the :djadmin:`collectstatic` management command to collect the
-static files in :setting:`STATIC_ROOT`, and then configuring your Web server to
+static files in :setting:`STATIC_ROOT`, and then configuring your web server to
 serve :setting:`STATIC_ROOT` at :setting:`STATIC_URL`), but here are three
 other approaches:
 

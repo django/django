@@ -14,13 +14,15 @@ All of these functions are available from the
 
 Returns a version 4 UUID.
 
-The `pgcrypto extension`_ must be installed. You can use the
-:class:`~django.contrib.postgres.operations.CryptoExtension` migration
+On PostgreSQL < 13, the `pgcrypto extension`_ must be installed. You can use
+the :class:`~django.contrib.postgres.operations.CryptoExtension` migration
 operation to install it.
 
 .. _pgcrypto extension: https://www.postgresql.org/docs/current/pgcrypto.html
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.postgres.functions import RandomUUID
     >>> Article.objects.update(uuid=RandomUUID())
@@ -41,7 +43,9 @@ sets up a transaction and thus sets the time that ``TransactionNow()`` will
 return; nested calls create savepoints which do not affect the transaction
 time.
 
-Usage example::
+Usage example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.postgres.functions import TransactionNow
     >>> Article.objects.filter(published__lte=TransactionNow())

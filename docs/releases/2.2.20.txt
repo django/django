@@ -1,0 +1,15 @@
+===========================
+Django 2.2.20 release notes
+===========================
+
+*April 6, 2021*
+
+Django 2.2.20 fixes a security issue with severity "low" in 2.2.19.
+
+CVE-2021-28658: Potential directory-traversal via uploaded files
+================================================================
+
+``MultiPartParser`` allowed directory-traversal via uploaded files with
+suitably crafted file names.
+
+Built-in upload handlers were not affected by this vulnerability.

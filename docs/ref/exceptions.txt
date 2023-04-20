@@ -26,12 +26,12 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: ObjectDoesNotExist
 
-    The base class for :exc:`~django.db.models.Model.DoesNotExist` exceptions;
-    a ``try/except`` for ``ObjectDoesNotExist`` will catch
+    The base class for :exc:`Model.DoesNotExist
+    <django.db.models.Model.DoesNotExist>` exceptions. A ``try/except`` for
+    ``ObjectDoesNotExist`` will catch
     :exc:`~django.db.models.Model.DoesNotExist` exceptions for all models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information
-    on :exc:`ObjectDoesNotExist` and :exc:`~django.db.models.Model.DoesNotExist`.
+    See :meth:`~django.db.models.query.QuerySet.get()`.
 
 ``EmptyResultSet``
 ------------------
@@ -41,6 +41,17 @@ Django core exception classes are defined in ``django.core.exceptions``.
     ``EmptyResultSet`` may be raised during query generation if a query won't
     return any results. Most Django projects won't encounter this exception,
     but it might be useful for implementing custom lookups and expressions.
+
+``FullResultSet``
+-----------------
+
+.. exception:: FullResultSet
+
+.. versionadded:: 4.2
+
+    ``FullResultSet`` may be raised during query generation if a query will
+    match everything. Most Django projects won't encounter this exception, but
+    it might be useful for implementing custom lookups and expressions.
 
 ``FieldDoesNotExist``
 ---------------------
@@ -56,13 +67,13 @@ Django core exception classes are defined in ``django.core.exceptions``.
 
 .. exception:: MultipleObjectsReturned
 
-    The :exc:`MultipleObjectsReturned` exception is raised by a query if only
-    one object is expected, but multiple objects are returned. A base version
-    of this exception is provided in :mod:`django.core.exceptions`; each model
-    class contains a subclassed version that can be used to identify the
-    specific object type that has returned multiple objects.
+    The base class for :exc:`Model.MultipleObjectsReturned
+    <django.db.models.Model.MultipleObjectsReturned>` exceptions. A
+    ``try/except`` for ``MultipleObjectsReturned`` will catch
+    :exc:`~django.db.models.Model.MultipleObjectsReturned` exceptions for all
+    models.
 
-    See :meth:`~django.db.models.query.QuerySet.get()` for further information.
+    See :meth:`~django.db.models.query.QuerySet.get()`.
 
 ``SuspiciousOperation``
 -----------------------
@@ -84,11 +95,16 @@ Django core exception classes are defined in ``django.core.exceptions``.
     * ``SuspiciousMultipartForm``
     * ``SuspiciousSession``
     * ``TooManyFieldsSent``
+    * ``TooManyFilesSent``
 
-    If a ``SuspiciousOperation`` exception reaches the WSGI handler level it is
-    logged at the ``Error`` level and results in
+    If a ``SuspiciousOperation`` exception reaches the ASGI/WSGI handler level
+    it is logged at the ``Error`` level and results in
     a :class:`~django.http.HttpResponseBadRequest`. See the :doc:`logging
     documentation </topics/logging/>` for more information.
+
+.. versionchanged:: 3.2.18
+
+    ``SuspiciousOperation`` is raised when too many files are submitted.
 
 ``PermissionDenied``
 --------------------
@@ -162,14 +178,22 @@ or model are classified as ``NON_FIELD_ERRORS``. This constant is used
 as a key in dictionaries that otherwise map fields to their respective
 list of errors.
 
+``BadRequest``
+--------------
+
+.. exception:: BadRequest
+
+    The :exc:`BadRequest` exception is raised when the request cannot be
+    processed due to a client error. If a ``BadRequest`` exception reaches the
+    ASGI/WSGI handler level it results in a
+    :class:`~django.http.HttpResponseBadRequest`.
+
 ``RequestAborted``
 ------------------
 
 .. exception:: RequestAborted
 
-    .. versionadded:: 3.0
-
-    The :exc:`RequestAborted` exception is raised when a HTTP body being read
+    The :exc:`RequestAborted` exception is raised when an HTTP body being read
     in by the handler is cut off midstream and the client connection closes,
     or when the client does not send data and hits a timeout where the server
     closes the connection.
@@ -184,8 +208,6 @@ list of errors.
 
 .. exception:: SynchronousOnlyOperation
 
-    .. versionadded:: 3.0
-
     The :exc:`SynchronousOnlyOperation` exception is raised when code that
     is only allowed in synchronous Python code is called from an asynchronous
     context (a thread with a running asynchronous event loop). These parts of
@@ -194,7 +216,7 @@ list of errors.
 
     If you are trying to call code that is synchronous-only from an
     asynchronous thread, then create a synchronous thread and call it in that.
-    You can accomplish this is with ``asgiref.sync.sync_to_async``.
+    You can accomplish this is with :func:`asgiref.sync.sync_to_async`.
 
 .. currentmodule:: django.urls
 
@@ -263,10 +285,10 @@ of :exc:`IntegrityError`.
 
 .. currentmodule:: django.http
 
-Http Exceptions
+HTTP Exceptions
 ===============
 
-Http exceptions may be imported from ``django.http``.
+HTTP exceptions may be imported from ``django.http``.
 
 ``UnreadablePostError``
 -----------------------
@@ -274,6 +296,22 @@ Http exceptions may be imported from ``django.http``.
 .. exception:: UnreadablePostError
 
     :exc:`UnreadablePostError` is raised when a user cancels an upload.
+
+.. currentmodule:: django.contrib.sessions.exceptions
+
+Sessions Exceptions
+===================
+
+Sessions exceptions are defined in ``django.contrib.sessions.exceptions``.
+
+``SessionInterrupted``
+----------------------
+
+.. exception:: SessionInterrupted
+
+    :exc:`SessionInterrupted` is raised when a session is destroyed in a
+    concurrent request. It's a subclass of
+    :exc:`~django.core.exceptions.BadRequest`.
 
 Transaction Exceptions
 ======================
