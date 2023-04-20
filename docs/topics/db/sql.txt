@@ -121,11 +121,13 @@ had ``Person`` data in it, you could easily map it into ``Person`` instances:
 .. code-block:: pycon
 
     >>> Person.objects.raw(
-    ...     """SELECT first AS first_name,
-    ...                              last AS last_name,
-    ...                              bd AS birth_date,
-    ...                              pk AS id,
-    ...                       FROM some_other_table"""
+    ...     """
+    ...     SELECT first AS first_name,
+    ...            last AS last_name,
+    ...            bd AS birth_date,
+    ...            pk AS id,
+    ...     FROM some_other_table
+    ...     """
     ... )
 
 As long as the names match, the model instances will be created correctly.
@@ -175,8 +177,9 @@ fields that are omitted from the query will be loaded on demand. For example:
 
     >>> for p in Person.objects.raw("SELECT id, first_name FROM myapp_person"):
     ...     print(
-    ...         p.first_name, p.last_name  # This will be retrieved by the original query
-    ...     )  # This will be retrieved on demand
+    ...         p.first_name,  # This will be retrieved by the original query
+    ...         p.last_name,  # This will be retrieved on demand
+    ...     )
     ...
     John Smith
     Jane Jones
