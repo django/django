@@ -65,7 +65,7 @@ class TestHashedFiles:
 
     def test_path_ignored_completely(self):
         relpath = self.hashed_file_path("cached/css/ignored.css")
-        self.assertEqual(relpath, "cached/css/ignored.55e7c226dda1.css")
+        self.assertEqual(relpath, "cached/css/ignored.55e07d2ecdda.css")
         with storage.staticfiles_storage.open(relpath) as relfile:
             content = relfile.read()
             self.assertIn(b"#foobar", content)
