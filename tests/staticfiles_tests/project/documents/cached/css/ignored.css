@@ -5,6 +5,7 @@ body {
     background: url("data:foobar");
     background: url("chrome:foobar");
     background: url("//foobar");
+    background: url("/foobar");
     background: url();
 }
 
