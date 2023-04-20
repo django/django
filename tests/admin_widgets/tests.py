@@ -1772,39 +1772,59 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
 
 @skipUnless(Image, "Pillow not installed")
 class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
-    def test_clearablefileinput_widget(self):
+    name_input_id = "id_name"
+    photo_input_id = "id_photo"
+    tests_files_folder = "%s/files" % os.getcwd()
+    clear_checkbox_id = "photo-clear_id"
+
+    def _submit_and_wait(self):
+        from selenium.webdriver.common.by import By
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.CSS_SELECTOR, "input[value='Save and continue editing']"
+            ).click()
+
+    def _run_image_upload_path(self):
         from selenium.webdriver.common.by import By
 
         self.admin_login(username="super", password="secret", login_url="/")
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_student_add"),
         )
-
-        photo_input_id = "id_photo"
-        save_and_edit_button_css_selector = "input[value='Save and continue editing']"
-        tests_files_folder = "%s/files" % os.getcwd()
-        clear_checkbox_id = "photo-clear_id"
-
-        def _submit_and_wait():
-            with self.wait_page_loaded():
-                self.selenium.find_element(
-                    By.CSS_SELECTOR, save_and_edit_button_css_selector
-                ).click()
-
         # Add a student.
-        title_input = self.selenium.find_element(By.ID, "id_name")
-        title_input.send_keys("Joe Doe")
-        photo_input = self.selenium.find_element(By.ID, photo_input_id)
-        photo_input.send_keys(f"{tests_files_folder}/test.png")
-        _submit_and_wait()
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.send_keys("Joe Doe")
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/test.png")
+        self._submit_and_wait()
         student = Student.objects.last()
         self.assertEqual(student.name, "Joe Doe")
-        self.assertEqual(student.photo.name, "photos/test.png")
+        self.assertRegex(student.photo.name, r"^photos\/(test|test_.+).png")
+
+    def test_clearablefileinput_widget(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "")
+        # "Currently" with "Clear" checkbox and "Change" are not shown.
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertNotIn("Currently", photo_field_row.text)
+        self.assertNotIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_invalid_file(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
         # Uploading non-image files is not supported by Safari with Selenium,
         # so upload a broken one instead.
-        photo_input = self.selenium.find_element(By.ID, photo_input_id)
-        photo_input.send_keys(f"{tests_files_folder}/brokenimg.png")
-        _submit_and_wait()
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/brokenimg.png")
+        self._submit_and_wait()
         self.assertEqual(
             self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
             (
@@ -1813,12 +1833,30 @@ class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
             ),
         )
         # "Currently" with "Clear" checkbox and "Change" still shown.
-        cover_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
-        self.assertIn("Currently", cover_field_row.text)
-        self.assertIn("Change", cover_field_row.text)
-        # "Clear" box works.
-        self.selenium.find_element(By.ID, clear_checkbox_id).click()
-        _submit_and_wait()
-        student.refresh_from_db()
-        self.assertEqual(student.name, "Joe Doe")
-        self.assertEqual(student.photo.name, "")
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertIn("Currently", photo_field_row.text)
+        self.assertIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_preserve_clear_checkbox(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        # "Clear" is not checked by default.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            False,
+        )
+        # "Clear" was checked, but a validation error is raised.
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.clear()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            "This field is required.",
+        )
+        # "Clear" persists checked.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            True,
+        )
