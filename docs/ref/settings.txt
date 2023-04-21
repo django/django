@@ -3217,7 +3217,7 @@ Default: ``messages.INFO``
 Sets the minimum message level that will be recorded by the messages
 framework. See :ref:`message levels <message-level>` for more details.
 
-.. admonition:: Important
+.. admonition:: Avoiding circular imports
 
    If you override ``MESSAGE_LEVEL`` in your settings file and rely on any of
    the built-in constants, you must import the constants module directly to
@@ -3272,7 +3272,7 @@ rendered as a CSS class in HTML. If you specify a value, it will extend
 the default. This means you only have to specify those values which you need
 to override. See :ref:`message-displaying` above for more details.
 
-.. admonition:: Important
+.. admonition:: Avoiding circular imports
 
    If you override ``MESSAGE_TAGS`` in your settings file and rely on any of
    the built-in constants, you must import the ``constants`` module directly to
