@@ -42,6 +42,25 @@ class CacheControlDecoratorTest(SimpleTestCase):
         response = MyClass().a_view(HttpRequestProxy(request))
         self.assertEqual(response.headers["Cache-Control"], "a=b")
 
+    def test_cache_control_empty_decorator(self):
+        @cache_control()
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        self.assertEqual(response.get("Cache-Control"), "")
+
+    def test_cache_control_full_decorator(self):
+        @cache_control(max_age=123, private=True, public=True, custom=456)
+        def a_view(request):
+            return HttpResponse()
+
+        response = a_view(HttpRequest())
+        cache_control_items = response.get("Cache-Control").split(", ")
+        self.assertEqual(
+            set(cache_control_items), {"max-age=123", "private", "public", "custom=456"}
+        )
+
 
 class CachePageDecoratorTest(SimpleTestCase):
     def test_cache_page(self):
