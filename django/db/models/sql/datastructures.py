@@ -185,10 +185,6 @@ class Join:
     def __hash__(self):
         return hash(self.identity)
 
-    def equals(self, other):
-        # Ignore filtered_relation in equality check.
-        return self.identity[:-1] == other.identity[:-1]
-
     def demote(self):
         new = self.relabeled_clone({})
         new.join_type = INNER
@@ -239,6 +235,3 @@ class BaseTable:
 
     def __hash__(self):
         return hash(self.identity)
-
-    def equals(self, other):
-        return self.identity == other.identity
