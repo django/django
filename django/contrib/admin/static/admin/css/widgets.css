@@ -368,10 +368,6 @@ p.file-upload {
     font-weight: bold;
 }
 
-.aligned p.file-upload {
-    margin-left: 170px;
-}
-
 .file-upload a {
     font-weight: normal;
 }
