@@ -34,6 +34,31 @@ class LogEntryManager(models.Manager):
             action_flag=action_flag,
             change_message=change_message,
         )
+    
+    def log_actions(self, user_id, queryset, action_flag, change_message=''):
+        """
+        Method to bulk_create multiple LogEntry objects 
+        from a given queryset.
+        """
+        if isinstance(change_message, list):
+            change_message = json.dumps(change_message)
+        log_entry_list = []
+        for object in queryset:
+            content_type = ContentType.objects.get_for_model(queryset.query.model)
+            content_type_id = content_type.id
+            object_repr = str(object)
+            model_instance = self.model(
+                user_id=user_id,
+                content_type_id=content_type_id,
+                object_id=str(object.pk),
+                object_repr=object_repr[:200],
+                action_flag=action_flag,
+                change_message=change_message,
+            )
+
+            log_entry_list.append(model_instance)
+
+        return self.objects.bulk_create(log_entry_list)
 
 
 class LogEntry(models.Model):

@@ -848,6 +848,20 @@ class ModelAdmin(BaseModelAdmin):
             object_repr=object_repr,
             action_flag=DELETION,
         )
+    
+    def log_deletions(self, request, queryset):
+        """
+        Log that multiple objects will be deleted. Note that this method must be
+        called before the deletion of multiple objects
+
+        The default implementation creates some LogEntry objects.
+        """
+        from django.contrib.admin.models import DELETION, LogEntry
+        return LogEntry.objects.log_actions(
+            user_id=request.user.pk,
+            queryset=queryset,
+            action_flag=DELETION,
+        )
 
     @display(description=mark_safe('<input type="checkbox" id="action-toggle">'))
     def action_checkbox(self, obj):
