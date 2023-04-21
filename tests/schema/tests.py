@@ -1293,6 +1293,21 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaisesMessage(DataError, msg):
                 editor.alter_field(ArrayModel, old_field, new_field, strict=True)
 
+    def _add_ci_collation(self):
+        ci_collation = "case_insensitive"
+
+        def drop_collation():
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider=icu, "
+                f"locale='und-u-ks-level2', deterministic=false)"
+            )
+        self.addCleanup(drop_collation)
+        return ci_collation
+
     @isolate_apps("schema")
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     @skipUnlessDBFeature(
@@ -1302,19 +1317,8 @@ class SchemaTests(TransactionTestCase):
     def test_db_collation_arrayfield(self):
         from django.contrib.postgres.fields import ArrayField
 
-        ci_collation = "case_insensitive"
+        ci_collation = self._add_ci_collation()
         cs_collation = "en-x-icu"
-
-        def drop_collation():
-            with connection.cursor() as cursor:
-                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
-                f"locale = 'und-u-ks-level2', deterministic = false)"
-            )
-        self.addCleanup(drop_collation)
 
         class ArrayModel(Model):
             field = ArrayField(CharField(max_length=16, db_collation=ci_collation))
@@ -1349,18 +1353,7 @@ class SchemaTests(TransactionTestCase):
         "supports_non_deterministic_collations",
     )
     def test_unique_with_collation_charfield(self):
-        ci_collation = "case_insensitive"
-
-        def drop_collation():
-            with connection.cursor() as cursor:
-                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
-                f"locale = 'und-u-ks-level2', deterministic = false)"
-            )
-        self.addCleanup(drop_collation)
+        ci_collation = self._add_ci_collation()
 
         class CiCharModel(Model):
             field = CharField(max_length=16, db_collation=ci_collation, unique=True)
