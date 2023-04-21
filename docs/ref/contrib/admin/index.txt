@@ -327,7 +327,7 @@ subclass::
         class FlatPageAdmin(admin.ModelAdmin):
             fields = [("url", "title"), "content"]
 
-    .. admonition:: Note
+    .. admonition:: Possible confusion with the ``ModelAdmin.fieldsets`` option
 
         This ``fields`` option should not be confused with the ``fields``
         dictionary key that is within the :attr:`~ModelAdmin.fieldsets` option,
@@ -466,7 +466,7 @@ subclass::
 
     For an example see the section :ref:`admin-custom-validation`.
 
-    .. admonition:: Note
+    .. admonition:: Omit the ``Meta.model`` attribute
 
         If you define the ``Meta.model`` attribute on a
         :class:`~django.forms.ModelForm`, you must also define the
@@ -480,7 +480,7 @@ subclass::
         ``fields = []`` in the ``Meta`` class to satisfy the validation on the
         ``ModelForm``.
 
-    .. admonition:: Note
+    .. admonition:: ``ModelAdmin.exclude`` takes precedence
 
         If your ``ModelForm`` and ``ModelAdmin`` both define an ``exclude``
         option then ``ModelAdmin`` takes precedence::
@@ -1786,7 +1786,7 @@ templates used by the :class:`ModelAdmin` views:
                         kwargs["choices"].append(("ready", "Ready for deployment"))
                 return super().formfield_for_choice_field(db_field, request, **kwargs)
 
-    .. admonition:: Note
+    .. admonition:: ``choices`` limitations
 
         Any ``choices`` attribute set on the formfield will be limited to the
         form field only. If the corresponding field on the model has choices
@@ -1817,7 +1817,7 @@ templates used by the :class:`ModelAdmin` views:
             def get_changelist_form(self, request, **kwargs):
                 return MyForm
 
-    .. admonition:: Note
+    .. admonition:: Omit the ``Meta.model`` attribute
 
         If you define the ``Meta.model`` attribute on a
         :class:`~django.forms.ModelForm`, you must also define the
