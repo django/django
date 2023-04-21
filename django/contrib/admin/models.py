@@ -44,7 +44,7 @@ class LogEntryManager(models.Manager):
             change_message = json.dumps(change_message)
         log_entry_list = []
         for object in queryset:
-            content_type = ContentType.objects.get_for_model(queryset.query.model)
+            content_type = ContentType.objects.get_for_model(object)
             content_type_id = content_type.id
             object_repr = str(object)
             model_instance = self.model(
