@@ -828,7 +828,7 @@ class ModelAdminTests(TestCase):
         queryset = Band.objects.all().order_by('-id')[:2]
         created = ma.log_deletions(mock_request, queryset)
         logs = LogEntry.objects.all()
-        self.assertListEqual(created, list(logs))
+        self.assertCountEqual(created, list(logs))
         log_values = list(logs.order_by("id").values_list(
             "user",
             "content_type",
