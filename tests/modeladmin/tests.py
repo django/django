@@ -814,11 +814,6 @@ class ModelAdminTests(TestCase):
         )
 
     def test_multiple_log_actions(self):
-        """
-        Test for the newly introduced ModelAdmin.log_deletions()
-        and the LogEntryManager.log_actions()
-
-        """
         ma = ModelAdmin(Band, self.site)
         mock_request = MockRequest()
         mock_request.user = User.objects.create(username="akash")
@@ -831,14 +826,23 @@ class ModelAdminTests(TestCase):
         band2 = Band.objects.create(name="Mohiner Ghoraguli",
                                     bio="A progressive rock band from Calcutta.",
                                     sign_date=date(1967, 1, 1))
-        queryset = Band.objects.filter(Q(pk=band1.pk) | Q(pk=band2.pk))
+        queryset = Band.objects.all().order_by('-id')[:2]
         created = ma.log_deletions(mock_request, queryset)
-        fetched = LogEntry.objects.filter(action_flag=flag).order_by('-id')[:2]
-        self.assertEqual(len(created), len(fetched))
-        for item in fetched:
-            self.assertEqual(item.action_flag, flag)
-            self.assertEqual(item.content_type, content_type)
-            self.assertEqual(item.user, mock_request.user)
+        logs = LogEntry.objects.all()
+        self.assertListEqual(created, list(logs))
+        log_values = list(logs.order_by("-id").values_list(
+            "user",
+            "content_type",
+            "object_id",
+            "object_repr",
+            "action_flag",
+            "change_message",
+        ))
+        expected_log_values = [
+            (mock_request.user.id, content_type.id, str(band1.pk), repr(band1)[:200], flag, ""),
+            (mock_request.user.id, content_type.id, str(band2.pk), repr(band2)[:200], flag, ""),
+        ]
+        self.assertEqual(log_values, expected_log_values)
 
     def test_log_actions(self):
         ma = ModelAdmin(Band, self.site)

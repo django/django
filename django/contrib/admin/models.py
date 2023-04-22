@@ -51,21 +51,17 @@ class LogEntryManager(models.Manager):
         """
         if isinstance(change_message, list):
             change_message = json.dumps(change_message)
-        log_entry_list = []
-        for object in queryset:
-            content_type = ContentType.objects.get_for_model(object)
-            content_type_id = content_type.id
-            object_repr = str(object)
-            model_instance = self.model(
+        log_entry_list = [
+            self.model(
                 user_id=user_id,
-                content_type_id=content_type_id,
-                object_id=str(object.pk),
-                object_repr=object_repr[:200],
+                content_type_id=ContentType.objects.get_for_model(obj).id,
+                object_id=str(obj.pk),
+                object_repr=repr(obj)[:200],
                 action_flag=action_flag,
                 change_message=change_message,
             )
-
-            log_entry_list.append(model_instance)
+            for obj in queryset
+        ]
 
         return self.model.objects.bulk_create(log_entry_list)
 

@@ -982,7 +982,8 @@ class ModelAdmin(BaseModelAdmin):
     def log_deletions(self, request, queryset):
         """
         Log that multiple objects will be deleted. Note that this method must be
-        called before the deletion of multiple objects
+        called before the deletion of multiple objects.
+        
         The default implementation creates some LogEntry objects.
         """
         from django.contrib.admin.models import DELETION, LogEntry
