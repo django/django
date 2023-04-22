@@ -18,6 +18,7 @@ from django.contrib.admin.widgets import (
 )
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
@@ -811,6 +812,31 @@ class ModelAdminTests(TestCase):
             list(list(ma.get_formsets_with_inlines(request))[0][0]().forms[0].fields),
             ["extra", "transport", "id", "DELETE", "main_band"],
         )
+
+    def test_multiple_log_actions(self):
+        """
+        Test for the newly introduced ModelAdmin.log_deletions()
+        and the LogEntryManager.log_actions()
+
+        """
+        ma = ModelAdmin(Band, self.site)
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create(username="akash")
+        content_type = get_content_type_for_model(self.band)
+
+        flag = DELETION
+        band1 = Band.objects.create(name="The Beatles", bio="A legendary rock band from Liverpool.", sign_date=date(1962, 1, 1))
+        band2 = Band.objects.create(name="Mohiner Ghoraguli", bio="An iconic progressive rock band from Calcutta.", sign_date=date(1967, 1, 1))
+        queryset = Band.objects.filter(Q(pk=band1.pk) | Q(pk=band2.pk))
+        created = ma.log_deletions(mock_request, queryset)
+        fetched = LogEntry.objects.filter(action_flag=flag).order_by('-id')[:2]
+
+        self.assertEqual(len(created), len(fetched))
+
+        for item in fetched:
+            self.assertEqual(item.action_flag, flag)
+            self.assertEqual(item.content_type, content_type)
+            self.assertEqual(item.user, mock_request.user)
 
     def test_log_actions(self):
         ma = ModelAdmin(Band, self.site)
