@@ -834,9 +834,7 @@ class ModelAdminTests(TestCase):
         queryset = Band.objects.filter(Q(pk=band1.pk) | Q(pk=band2.pk))
         created = ma.log_deletions(mock_request, queryset)
         fetched = LogEntry.objects.filter(action_flag=flag).order_by('-id')[:2]
-
         self.assertEqual(len(created), len(fetched))
-
         for item in fetched:
             self.assertEqual(item.action_flag, flag)
             self.assertEqual(item.content_type, content_type)
