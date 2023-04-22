@@ -46,7 +46,7 @@ class LogEntryManager(models.Manager):
 
     def log_actions(self, user_id, queryset, action_flag, change_message=''):
         """
-        Method to bulk_create multiple LogEntry objects 
+        Method to bulk_create multiple LogEntry objects
         from a given queryset.
         """
         if isinstance(change_message, list):
@@ -68,7 +68,6 @@ class LogEntryManager(models.Manager):
             log_entry_list.append(model_instance)
 
         return self.model.objects.bulk_create(log_entry_list)
-
 
 
 class LogEntry(models.Model):

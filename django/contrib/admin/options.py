@@ -978,7 +978,7 @@ class ModelAdmin(BaseModelAdmin):
             object_repr=object_repr,
             action_flag=DELETION,
         )
-    
+
     def log_deletions(self, request, queryset):
         """
         Log that multiple objects will be deleted. Note that this method must be
