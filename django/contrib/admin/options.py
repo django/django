@@ -142,6 +142,10 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
     show_full_result_count = True
     checks_class = BaseModelAdminChecks
 
+    can_add = True
+    can_change = True
+    can_delete = True
+
     def check(self, **kwargs):
         return self.checks_class().check(self, **kwargs)
 
@@ -551,11 +555,13 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         return False
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         """
         Return True if the given request has permission to add an object.
         Can be overridden by the user in subclasses.
         """
+        if not self.can_add:
+            return False
         opts = self.opts
         codename = get_permission_codename("add", opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
@@ -571,6 +577,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         model instance. If `obj` is None, this should return True if the given
         request has permission to change *any* object of the given type.
         """
+        if not self.can_change:
+            return False
         opts = self.opts
         codename = get_permission_codename("change", opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
@@ -586,6 +594,8 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         model instance. If `obj` is None, this should return True if the given
         request has permission to delete *any* object of the given type.
         """
+        if not self.can_delete:
+            return False
         opts = self.opts
         codename = get_permission_codename("delete", opts)
         return request.user.has_perm("%s.%s" % (opts.app_label, codename))
@@ -2321,7 +2331,6 @@ class InlineModelAdmin(BaseModelAdmin):
     template = None
     verbose_name = None
     verbose_name_plural = None
-    can_delete = True
     show_change_link = False
     checks_class = InlineModelAdminChecks
     classes = None
@@ -2485,7 +2494,7 @@ class InlineModelAdmin(BaseModelAdmin):
             for perm in perms
         )
 
-    def has_add_permission(self, request, obj):
+    def has_add_permission(self, request, obj=None):
         if self.opts.auto_created:
             # Auto-created intermediate models don't have their own
             # permissions. The user needs to have the change permission for the
