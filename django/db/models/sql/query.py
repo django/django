@@ -1347,6 +1347,7 @@ class Query(BaseExpression):
         split_subq=True,
         check_filterable=True,
         summarize=False,
+        update_join_types=True,
     ):
         """
         Build a WhereNode for a single filter clause but don't add it
@@ -1385,6 +1386,7 @@ class Query(BaseExpression):
                 split_subq=split_subq,
                 check_filterable=check_filterable,
                 summarize=summarize,
+                update_join_types=update_join_types,
             )
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
@@ -1537,6 +1539,7 @@ class Query(BaseExpression):
         split_subq=True,
         check_filterable=True,
         summarize=False,
+        update_join_types=True,
     ):
         """Add a Q-object to the current filter."""
         connector = q_object.connector
@@ -1556,40 +1559,16 @@ class Query(BaseExpression):
                 split_subq=split_subq,
                 check_filterable=check_filterable,
                 summarize=summarize,
+                update_join_types=update_join_types,
             )
             joinpromoter.add_votes(needed_inner)
             if child_clause:
                 target_clause.add(child_clause, connector)
-        needed_inner = joinpromoter.update_join_types(self)
+        if update_join_types:
+            needed_inner = joinpromoter.update_join_types(self)
+        else:
+            needed_inner = []
         return target_clause, needed_inner
-
-    def build_filtered_relation_q(
-        self, q_object, reuse, branch_negated=False, current_negated=False
-    ):
-        """Add a FilteredRelation object to the current filter."""
-        connector = q_object.connector
-        current_negated ^= q_object.negated
-        branch_negated = branch_negated or q_object.negated
-        target_clause = WhereNode(connector=connector, negated=q_object.negated)
-        for child in q_object.children:
-            if isinstance(child, Node):
-                child_clause = self.build_filtered_relation_q(
-                    child,
-                    reuse=reuse,
-                    branch_negated=branch_negated,
-                    current_negated=current_negated,
-                )
-            else:
-                child_clause, _ = self.build_filter(
-                    child,
-                    can_reuse=reuse,
-                    branch_negated=branch_negated,
-                    current_negated=current_negated,
-                    allow_joins=True,
-                    split_subq=False,
-                )
-            target_clause.add(child_clause, connector)
-        return target_clause
 
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
