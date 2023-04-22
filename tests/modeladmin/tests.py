@@ -18,7 +18,6 @@ from django.contrib.admin.widgets import (
 )
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models import Q
 from django.forms.widgets import Select
 from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
@@ -830,7 +829,7 @@ class ModelAdminTests(TestCase):
         created = ma.log_deletions(mock_request, queryset)
         logs = LogEntry.objects.all()
         self.assertListEqual(created, list(logs))
-        log_values = list(logs.order_by("-id").values_list(
+        log_values = list(logs.order_by("id").values_list(
             "user",
             "content_type",
             "object_id",
@@ -839,8 +838,14 @@ class ModelAdminTests(TestCase):
             "change_message",
         ))
         expected_log_values = [
-            (mock_request.user.id, content_type.id, str(band1.pk), repr(band1)[:200], flag, ""),
-            (mock_request.user.id, content_type.id, str(band2.pk), repr(band2)[:200], flag, ""),
+            (
+            mock_request.user.id,
+            content_type.id,
+            str(obj.pk),
+            repr(obj)[:200],
+            flag,
+            "")
+            for obj in queryset
         ]
         self.assertEqual(log_values, expected_log_values)
 
