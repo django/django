@@ -829,7 +829,7 @@ class ModelAdminTests(TestCase):
                                     bio="A legendary rock band from Liverpool.",
                                     sign_date=date(1962, 1, 1))
         band2 = Band.objects.create(name="Mohiner Ghoraguli",
-                                    bio="An iconic progressive rock band from Calcutta.",
+                                    bio="A progressive rock band from Calcutta.",
                                     sign_date=date(1967, 1, 1))
         queryset = Band.objects.filter(Q(pk=band1.pk) | Q(pk=band2.pk))
         created = ma.log_deletions(mock_request, queryset)
