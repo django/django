@@ -916,10 +916,13 @@ class ModelAdminChecks(BaseModelAdminChecks):
                         id="admin.E108",
                     )
                 ]
-        if isinstance(field, models.ManyToManyField):
+        if isinstance(field, models.ManyToManyField) or (
+            getattr(field, "rel", None) and field.rel.field.many_to_one
+        ):
             return [
                 checks.Error(
-                    "The value of '%s' must not be a ManyToManyField." % label,
+                    f"The value of '{label}' must not be a many-to-many field or a "
+                    f"reverse foreign key.",
                     obj=obj.__class__,
                     id="admin.E109",
                 )
