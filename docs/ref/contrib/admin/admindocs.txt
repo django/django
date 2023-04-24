@@ -23,7 +23,7 @@ the following:
   your ``urlpatterns``. Make sure it's included *before* the
   ``'admin/'`` entry, so that requests to ``/admin/doc/`` don't get
   handled by the latter entry.
-* Install the docutils Python module (https://docutils.sourceforge.io/).
+* Install the :pypi:`docutils` package.
 * **Optional:** Using the admindocs bookmarklets requires
   ``django.contrib.admindocs.middleware.XViewMiddleware`` to be installed.
 

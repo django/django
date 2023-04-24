@@ -148,7 +148,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
                 '<a href="https://docutils.sourceforge.io/">docutils</a> '
                 "library.</h3>"
                 "<p>Please ask your administrators to install "
-                '<a href="https://docutils.sourceforge.io/">docutils</a>.</p>',
+                '<a href="https://pypi.org/project/docutils/">docutils</a>.</p>',
                 html=True,
             )
             self.assertContains(
