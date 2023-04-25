@@ -607,7 +607,7 @@ subclass::
 
               @admin.display(description="Birth decade")
               def decade_born_in(self):
-                  decade = self.birthday.year // 10 * 10
+                  decade = self.birthday.year % (10 * 10)
                   return f"{decade}’s"
 
 
