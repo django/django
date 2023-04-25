@@ -431,6 +431,35 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.context["LANGUAGE_CODE"], "nl")
 
 
+@override_settings(ROOT_URLCONF="i18n.urls_default_unprefixed", LANGUAGE_CODE="nl")
+class URLPrefixedFalseTranslatedTests(URLTestCaseBase):
+    def test_en_redirect_from_cookie_with_name(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "en"})
+        response = self.client.get("/gebruikers/", follow=True)
+        self.assertRedirects(response, "/en/users/", 302)
+        self.assertEqual(response.status_code, 200)
+
+    def test_en_redirect_from_header_with_name(self):
+        response = self.client.get(
+            "/gebruikers/", headers={"accept-language": "en"}, follow=True
+        )
+        self.assertRedirects(response, "/en/users/", 302)
+        self.assertEqual(response.status_code, 200)
+
+    def test_en_redirect_from_cookie_without_name(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "en"})
+        response = self.client.get("/profiel/", follow=True)
+        self.assertRedirects(response, "/en/account/", 302)
+        self.assertEqual(response.status_code, 200)
+
+    def test_en_redirect_from_header_without_name(self):
+        response = self.client.get(
+            "/profiel/", headers={"accept-language": "en"}, follow=True
+        )
+        self.assertRedirects(response, "/en/account/", 302)
+        self.assertEqual(response.status_code, 200)
+
+
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):
     """
     #21579 - LocaleMiddleware should respect the script prefix.

@@ -1,3 +1,5 @@
+from urllib.parse import quote
+
 from django.conf import settings
 from django.conf.urls.i18n import is_language_prefix_patterns_used
 from django.http import HttpResponseRedirect
@@ -5,6 +7,7 @@ from django.urls import get_script_prefix, is_valid_path
 from django.utils import translation
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.http import RFC3986_SUBDELIMS, escape_leading_slashes
 
 
 class LocaleMiddleware(MiddlewareMixin):
@@ -68,6 +71,8 @@ class LocaleMiddleware(MiddlewareMixin):
                 and not language_path.endswith("/")
                 and is_valid_path("%s/" % language_path, urlconf)
             )
+            with translation.override(settings.LANGUAGE_CODE):
+                valid_path_in_default = is_valid_path(request.path_info, urlconf)
 
             if path_valid or path_needs_slash:
                 script_prefix = get_script_prefix()
@@ -80,6 +85,18 @@ class LocaleMiddleware(MiddlewareMixin):
                 # get_language_from_request(). HTTP caches may cache this
                 # redirect, so add the Vary header.
                 redirect = self.response_redirect_class(language_url)
+                patch_vary_headers(redirect, ("Accept-Language", "Cookie"))
+                return redirect
+            elif (
+                not prefixed_default_language
+                and language_from_request != settings.LANGUAGE_CODE
+                and valid_path_in_default
+            ):
+                result, text_subs = valid_path_in_default.get_pattern_and_text_subs()
+                script_prefix = get_script_prefix()
+                path = f"{script_prefix}{language}/{result}"
+                url = quote(path % text_subs, safe=RFC3986_SUBDELIMS + "/~:@")
+                redirect = self.response_redirect_class(escape_leading_slashes(url))
                 patch_vary_headers(redirect, ("Accept-Language", "Cookie"))
                 return redirect
 

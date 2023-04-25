@@ -101,6 +101,22 @@ class ResolverMatch:
     def __reduce_ex__(self, protocol):
         raise PicklingError(f"Cannot pickle {self.__class__.__qualname__}.")
 
+    def get_pattern_and_text_subs(self):
+        url_pattern = self.tried[-1][1]
+        result, params = normalize(url_pattern.pattern.regex.pattern)[0]
+        if self.args:
+            subs = dict(zip(params, self.args))
+        else:
+            subs = self.kwargs
+        # Convert the subs to text using Converter.to_url().
+        text_subs = {}
+        for k, v in subs.items():
+            if k in url_pattern.pattern.converters:
+                text_subs[k] = url_pattern.pattern.converters[k].to_url(v)
+            else:
+                text_subs[k] = str(v)
+        return result, text_subs
+
 
 def get_resolver(urlconf=None):
     if urlconf is None:
