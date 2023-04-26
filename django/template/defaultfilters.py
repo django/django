@@ -628,7 +628,10 @@ def length_is(value, arg):
 @register.filter(is_safe=True)
 def random(value):
     """Return a random item from the list."""
-    return random_module.choice(value)
+    try:
+        return random_module.choice(value)
+    except IndexError:
+        return ""
 
 
 @register.filter("slice", is_safe=True)

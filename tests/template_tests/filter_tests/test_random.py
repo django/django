@@ -24,3 +24,8 @@ class RandomTests(SimpleTestCase):
             "random02", {"a": ["a&b", "a&b"], "b": [mark_safe("a&b"), mark_safe("a&b")]}
         )
         self.assertEqual(output, "a&b a&b")
+
+    @setup({"empty_list": "{{ list|random }}"})
+    def test_empty_list(self):
+        output = self.engine.render_to_string("empty_list", {"list": []})
+        self.assertEqual(output, "")
