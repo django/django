@@ -1196,8 +1196,8 @@ manager will *not* be reset. This was necessary to resolve an inconsistency in
 the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
 
-pytz may be required
---------------------
+``pytz`` may be required
+------------------------
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
 a :exc:`ValueError` when encountering them, you will have to install pytz_. You
