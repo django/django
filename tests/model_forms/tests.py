@@ -236,6 +236,15 @@ class ModelFormBaseTest(TestCase):
         field_dict = fields_for_model(Person, fields=())
         self.assertEqual(len(field_dict), 0)
 
+    def test_fields_for_model_form_fields(self):
+        form_declared_fields = CustomWriterForm.declared_fields
+        field_dict = fields_for_model(
+            Writer,
+            fields=["name"],
+            form_declared_fields=form_declared_fields,
+        )
+        self.assertIs(field_dict["name"], form_declared_fields["name"])
+
     def test_empty_fields_on_modelform(self):
         """
         No fields on a ModelForm should actually result in no fields.
