@@ -316,7 +316,7 @@ Note:
           The latest ``lastmod`` returned by calling the method with all
           items returned by :meth:`Sitemap.items`.
 
-    .. method:: Sitemap.get_languages_for_item(item, lang_code)
+    .. method:: Sitemap.get_languages_for_item(item)
 
         .. versionadded:: 4.2
 
