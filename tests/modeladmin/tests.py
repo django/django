@@ -819,27 +819,39 @@ class ModelAdminTests(TestCase):
         content_type = get_content_type_for_model(self.band)
 
         flag = DELETION
-        Band.objects.create(name="The Beatles",
-                            bio="A legendary rock band from Liverpool.",
-                            sign_date=date(1962, 1, 1))
-        Band.objects.create(name="Mohiner Ghoraguli",
-                            bio="A progressive rock band from Calcutta.",
-                            sign_date=date(1967, 1, 1))
-        queryset = Band.objects.all().order_by('-id')[:2]
+        Band.objects.create(
+            name="The Beatles",
+            bio="A legendary rock band from Liverpool.",
+            sign_date=date(1962, 1, 1),
+        )
+        Band.objects.create(
+            name="Mohiner Ghoraguli",
+            bio="A progressive rock band from Calcutta.",
+            sign_date=date(1967, 1, 1),
+        )
+        queryset = Band.objects.all().order_by("-id")[:2]
         created = ma.log_deletions(mock_request, queryset)
         logs = LogEntry.objects.all()
         self.assertCountEqual(created, list(logs))
-        log_values = list(logs.order_by("id").values_list(
-            "user",
-            "content_type",
-            "object_id",
-            "object_repr",
-            "action_flag",
-            "change_message",
-        ))
+        log_values = list(
+            logs.order_by("id").values_list(
+                "user",
+                "content_type",
+                "object_id",
+                "object_repr",
+                "action_flag",
+                "change_message",
+            )
+        )
         expected_log_values = [
-            (mock_request.user.id, content_type.id,
-             str(obj.pk), repr(obj)[:200], flag, "")
+            (
+                mock_request.user.id,
+                content_type.id,
+                str(obj.pk),
+                repr(obj)[:200],
+                flag,
+                "",
+            )
             for obj in queryset
         ]
         self.assertEqual(log_values, expected_log_values)

@@ -44,7 +44,7 @@ class LogEntryManager(models.Manager):
             change_message=change_message,
         )
 
-    def log_actions(self, user_id, queryset, action_flag, change_message=''):
+    def log_actions(self, user_id, queryset, action_flag, change_message=""):
         """
         Method to bulk_create multiple LogEntry objects
         from a given queryset.

@@ -987,6 +987,7 @@ class ModelAdmin(BaseModelAdmin):
         The default implementation creates some LogEntry objects.
         """
         from django.contrib.admin.models import DELETION, LogEntry
+
         return LogEntry.objects.log_actions(
             user_id=request.user.pk,
             queryset=queryset,
