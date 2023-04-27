@@ -24,6 +24,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
     supports_update_conflicts = True
+    delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
         BEGIN

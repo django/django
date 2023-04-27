@@ -1890,7 +1890,10 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
-        if self.single_alias and not self.contains_self_reference_subquery:
+        if self.single_alias and (
+            self.connection.features.delete_can_self_reference_subquery
+            or not self.contains_self_reference_subquery
+        ):
             return self._as_sql(self.query)
         innerq = self.query.clone()
         innerq.__class__ = Query
