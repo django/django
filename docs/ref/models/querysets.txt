@@ -3898,8 +3898,8 @@ by the aggregate.
 .. class:: Count(expression, distinct=False, filter=None, **extra)
 
     Returns the number of objects that are related through the provided
-    expression. ``Count('*')`` is shorthand for the SQL expression
-    ``COUNT(*)``.
+    expression. ``Count('*')`` is equivalent to the SQL ``COUNT(*)``
+    expression.
 
     * Default alias: ``<field>__count``
     * Return type: ``int``
