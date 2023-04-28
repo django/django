@@ -16,37 +16,28 @@ class LocaleMiddleware(MiddlewareMixin):
 
     response_redirect_class = HttpResponseRedirect
 
-    def get_fallback_language(self, request):
-        """
-        Return the fallback language for the current request based on the
-        settings. If LANGUAGE_CODE is a variant not included in the supported
-        languages, get_fallback_language() will try to fallback to a supported
-        generic variant.
-
-        Can be overridden to have a fallback language depending on the request,
-        e.g. based on top level domain.
-        """
-        try:
-            return translation.get_supported_language_variant(settings.LANGUAGE_CODE)
-        except LookupError:
-            return settings.LANGUAGE_CODE
-
     def process_request(self, request):
         urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
-        i18n_patterns_used, _ = is_language_prefix_patterns_used(urlconf)
+        (
+            i18n_patterns_used,
+            prefixed_default_language,
+        ) = is_language_prefix_patterns_used(urlconf)
         language = translation.get_language_from_request(
             request, check_path=i18n_patterns_used
         )
-        if not language:
-            language = self.get_fallback_language(request)
-
+        language_from_path = translation.get_language_from_path(request.path_info)
+        if (
+            not language_from_path
+            and i18n_patterns_used
+            and not prefixed_default_language
+        ):
+            language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 
     def process_response(self, request, response):
         language = translation.get_language()
         language_from_path = translation.get_language_from_path(request.path_info)
-        language_from_request = translation.get_language_from_request(request)
         urlconf = getattr(request, "urlconf", settings.ROOT_URLCONF)
         (
             i18n_patterns_used,
@@ -57,7 +48,7 @@ class LocaleMiddleware(MiddlewareMixin):
             response.status_code == 404
             and not language_from_path
             and i18n_patterns_used
-            and (prefixed_default_language or language_from_request)
+            and prefixed_default_language
         ):
             # Maybe the language code is missing in the URL? Try adding the
             # language prefix and redirecting to that URL.
