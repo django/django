@@ -8,8 +8,8 @@ from django.db.backends.base.introspection import TableInfo
 from django.test import (
     TestCase,
     TransactionTestCase,
-    skipUnlessDBFeature,
     skipIfDBFeature,
+    skipUnlessDBFeature,
 )
 
 from .models import PeopleMoreData, test_collation
