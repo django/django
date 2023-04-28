@@ -467,6 +467,12 @@ Miscellaneous
 
 * Support for ``PROJ`` < 5 is removed.
 
+* :class:`~django.core.mail.backends.smtp.EmailBackend` now verifies a
+  :py:attr:`hostname <ssl.SSLContext.check_hostname>` and
+  :py:attr:`certificates <ssl.SSLContext.verify_mode>`. If you need the
+  previous behavior that is less restrictive and not recommended, subclass
+  ``EmailBackend`` and override the ``ssl_context`` property.
+
 .. _deprecated-features-4.2:
 
 Features deprecated in 4.2
