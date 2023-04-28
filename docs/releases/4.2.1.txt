@@ -31,6 +31,11 @@ Bugfixes
   ``prefix_default_language`` argument when a fallback language of the default
   language was used (:ticket:`34455`).
 
+* Fixed a regression in Django 4.2 where translated URLs of the default
+  language from ``i18n_patterns()`` with ``prefix_default_language`` set to
+  ``False`` raised 404 errors for a request with a different language
+  (:ticket:`34515`).
+
 * Fixed a regression in Django 4.2 where creating copies and deep copies of
   ``HttpRequest``, ``HttpResponse``, and their subclasses didn't always work
   correctly (:ticket:`34482`, :ticket:`34484`).
