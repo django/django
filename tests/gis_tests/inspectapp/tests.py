@@ -60,17 +60,25 @@ class InspectDbTests(TestCase):
     def test_indexes(self):
         out = StringIO()
         call_command(
-            'inspectdb',
-            table_name_filter=lambda tn: tn.startswith('inspectapp_indexes'),
+            "inspectdb",
+            table_name_filter=lambda tn: tn.startswith("inspectapp_indexes"),
             stdout=out,
         )
         output = out.getvalue()
-        self.assertIn('        indexes = ', output, msg='inspectdb should generate indexes.')
-        # there should not be an index on a single-column geo field (assumed to be default)
+        self.assertIn(
+            "        indexes = ",
+            output,
+            msg="inspectdb should generate indexes.",
+        )
+        # there should not be an index on a single-column geo field
+        # (assumed to be default)
         index = "models.Index(fields=['point'], name="
         self.assertNotIn(index, output)
         # but our manually-created one should
-        self.assertIn("models.Index(fields=['name', 'other'], name='name_plus_other')", output)
+        self.assertIn(
+            "models.Index(fields=['name', 'other'], name='name_plus_other')",
+            output,
+        )
 
 
 @modify_settings(

@@ -399,7 +399,10 @@ class Command(BaseCommand):
                 orders = params.get("orders", [""] * len(columns))
 
                 field_names = [
-                    f'{"-" if order.lower() == "desc" else ""}{column_to_field_name[column]}'
+                    (
+                        f'{"-" if order.lower() == "desc" else ""}'
+                        f"{column_to_field_name[column]}"
+                    )
                     for column, order in zip(columns, orders)
                 ]
                 index_str = f"models.Index(fields={field_names!r}, name={name!r})"
@@ -407,10 +410,11 @@ class Command(BaseCommand):
                 if params["type"] not in ["btree", Index.suffix]:
                     comment = f'Index type is {params["type"]}'
                 if params["type"] in ["rtree", "spatial"] and len(columns) == 1:
-                    # assume this is a default spatial index, so let's make a note of it and
-                    # continue
+                    # assume this is a default spatial index, so let's make a note
+                    # of it and continue
                     index_comments.append(
-                        f"Skipped default spatial index for {column_to_field_name[columns[0]]}"
+                        "Skipped default spatial index for "
+                        f"{column_to_field_name[columns[0]]}"
                     )
                     indexes.append("")
                     continue
