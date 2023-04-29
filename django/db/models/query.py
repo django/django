@@ -23,7 +23,7 @@ from django.db import (
 from django.db.models import AutoField, DateField, DateTimeField, Field, sql
 from django.db.models.constants import LOOKUP_SEP, OnConflict
 from django.db.models.deletion import Collector
-from django.db.models.expressions import Case, F, Value, When, Star
+from django.db.models.expressions import Case, F, Value, When
 from django.db.models.functions import Cast, Trunc
 from django.db.models.query_utils import FilteredRelation, Q
 from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE
@@ -565,8 +565,6 @@ class QuerySet(AltersData):
         clone.query.qualify = True
         clone.query.inner_query = self.query.chain()
         clone.query.inner_query.subquery = True
-        # clone.query.default_cols = False
-        # clone.query.select = [Star()]
         return clone
 
     def aggregate(self, *args, **kwargs):
