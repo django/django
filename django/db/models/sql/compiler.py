@@ -682,9 +682,6 @@ class SQLCompiler:
             # The limits must be applied to the outer query to avoid pruning
             # results too eagerly.
             with_limits=False,
-            # # Force unique aliasing of selected columns to avoid collisions
-            # # and make rhs predicates referencing easier.
-            # with_col_aliases=True,
         )
         qualify_sql, qualify_params = self.compile(self.qualify)
         result = [
