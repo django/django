@@ -682,9 +682,9 @@ class SQLCompiler:
             # The limits must be applied to the outer query to avoid pruning
             # results too eagerly.
             with_limits=False,
-            # Force unique aliasing of selected columns to avoid collisions
-            # and make rhs predicates referencing easier.
-            with_col_aliases=True,
+            # # Force unique aliasing of selected columns to avoid collisions
+            # # and make rhs predicates referencing easier.
+            # with_col_aliases=True,
         )
         qualify_sql, qualify_params = self.compile(self.qualify)
         result = [
@@ -1112,6 +1112,14 @@ class SQLCompiler:
         might change the tables that are needed. This means the select columns,
         ordering, and distinct must be done first.
         """
+
+        if self.query.inner_query is not None:
+            clause_sql, clause_params = self.compile(self.query.inner_query)
+            table_name = next(iter(self.query.alias_map.keys()))
+            table_name = self.connection.ops.quote_name(table_name)
+            clause_sql = f"{clause_sql} {table_name}"
+            return [clause_sql], clause_params
+
         result = []
         params = []
         for alias in tuple(self.query.alias_map):

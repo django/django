@@ -186,6 +186,7 @@ class Query(BaseExpression):
 
     filter_is_sticky = False
     subquery = False
+    inner_query = None
 
     # SQL-related attributes.
     # Select and related select clauses are expressions to use in the SELECT
