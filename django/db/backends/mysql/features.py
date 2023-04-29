@@ -296,9 +296,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         """
         return self._mysql_storage_engine != "MyISAM"
 
-    uses_savepoints = property(operator.attrgetter("supports_transactions"))
-    can_release_savepoints = property(operator.attrgetter("supports_transactions"))
-
     @cached_property
     def ignores_table_name_case(self):
         return self.connection.mysql_server_data["lower_case_table_names"]
