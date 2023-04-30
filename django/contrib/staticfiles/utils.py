@@ -41,7 +41,7 @@ def get_files(storage, ignore_patterns=None, location=""):
 
 def check_settings(base_url=None):
     """
-    Check if the staticfiles settings have sane values.
+    Check if the staticfiles settings have same values.
     """
     if base_url is None:
         base_url = settings.STATIC_URL
