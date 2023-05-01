@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 import itertools
 import math
 
@@ -29,6 +30,7 @@ class Lookup(Expression):
     lookup_name = None
     prepare_rhs = True
     can_use_none_as_rhs = False
+    constrains_nulls = False
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -201,6 +203,14 @@ class Lookup(Expression):
     def allowed_default(self):
         return self.lhs.allowed_default and self.rhs.allowed_default
 
+    def exclude_nulls(self, nullable_aliases):
+        if self.can_use_none_as_rhs and self.rhs is None:
+            return []
+        conditions = self.lhs.exclude_nulls(nullable_aliases)
+        if exclude_rhs_nulls := getattr(self.rhs, "exclude_nulls", None):
+            conditions.extend(exclude_rhs_nulls(nullable_aliases))
+        return conditions
+
 
 class Transform(RegisterLookupMixin, Func):
     """
@@ -214,6 +224,9 @@ class Transform(RegisterLookupMixin, Func):
     @property
     def lhs(self):
         return self.get_source_expressions()[0]
+
+    def exclude_nulls(self, nullable_aliases):
+        return self.lhs.exclude_nulls(nullable_aliases)
 
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, "get_bilateral_transforms"):
@@ -495,6 +508,25 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
 
+    # XXX: This is gargabe for now, we need to adapt exclude_nulls so it's
+    # able to return OR and not only AND conditions to account for
+    # https://github.com/django/django/commit/cec10f992be8eed5ed90506375ae5794cbb7069e
+    @cached_property
+    def rhs_contains_direct_null(self):
+        return (
+            isinstance(self.rhs, Iterable)
+            and not isinstance(self.rhs, (str, bytes))
+            and any(v is None for v in self.rhs)
+        )
+
+    @property
+    def constrains_nulls(self):
+        return not self.rhs_contains_direct_null
+
+    def exclude_nulls(self, nullable_aliases):
+        if not self.rhs_contains_direct_null:
+            return super().exclude_nulls(nullable_aliases)
+
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
 
@@ -658,6 +690,13 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 class IsNull(BuiltinLookup):
     lookup_name = "isnull"
     prepare_rhs = False
+
+    @property
+    def constrains_nulls(self):
+        return self.rhs is True
+
+    def exclude_nulls(self, nullable_aliases):
+        return []
 
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
