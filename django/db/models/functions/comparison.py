@@ -88,6 +88,12 @@ class Coalesce(Func):
                 return result
         return None
 
+    def is_nullable(self, nullable_aliases):
+        return not any(
+            not expr.is_nullable(nullable_aliases)
+            for expr in self.get_source_expressions()
+        )
+
     def as_oracle(self, compiler, connection, **extra_context):
         # Oracle prohibits mixing TextField (NCLOB) and CharField (NVARCHAR2),
         # so convert all fields to NCLOB when that type is expected.

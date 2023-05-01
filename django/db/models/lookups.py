@@ -24,6 +24,7 @@ class Lookup(Expression):
     lookup_name = None
     prepare_rhs = True
     can_use_none_as_rhs = False
+    constrains_nulls = False
 
     def __init__(self, lhs, rhs):
         self.lhs, self.rhs = lhs, rhs
@@ -192,6 +193,14 @@ class Lookup(Expression):
     def allowed_default(self):
         return self.lhs.allowed_default and self.rhs.allowed_default
 
+    def exclude_nulls(self, nullable_aliases):
+        if self.can_use_none_as_rhs and self.rhs is None:
+            return []
+        conditions = self.lhs.exclude_nulls(nullable_aliases)
+        if exclude_rhs_nulls := getattr(self.rhs, "exclude_nulls", None):
+            conditions.extend(exclude_rhs_nulls(nullable_aliases))
+        return conditions
+
 
 class Transform(RegisterLookupMixin, Func):
     """
@@ -205,6 +214,9 @@ class Transform(RegisterLookupMixin, Func):
     @property
     def lhs(self):
         return self.get_source_expressions()[0]
+
+    def exclude_nulls(self, nullable_aliases):
+        return self.lhs.exclude_nulls(nullable_aliases)
 
     def get_bilateral_transforms(self):
         if hasattr(self.lhs, "get_bilateral_transforms"):
@@ -637,6 +649,13 @@ class Range(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
 class IsNull(BuiltinLookup):
     lookup_name = "isnull"
     prepare_rhs = False
+
+    @property
+    def constrains_nulls(self):
+        return self.rhs is True
+
+    def exclude_nulls(self, nullable_aliases):
+        return []
 
     def as_sql(self, compiler, connection):
         if not isinstance(self.rhs, bool):
