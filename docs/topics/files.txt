@@ -261,13 +261,17 @@ For example::
         my_file = models.FileField(storage=select_storage)
 
 In order to set a storage defined in the :setting:`STORAGES` setting you can
-use a lambda function::
+use :data:`~django.core.files.storage.storages`::
 
     from django.core.files.storage import storages
 
 
+    def select_storage():
+        return storages["mystorage"]
+
+
     class MyModel(models.Model):
-        upload = models.FileField(storage=lambda: storages["custom_storage"])
+        upload = models.FileField(storage=select_storage)
 
 .. versionchanged:: 4.2
 
