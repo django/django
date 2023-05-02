@@ -53,3 +53,8 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 where breadcrumbs didn't appear on admin
   site app index views (:ticket:`34512`).
+
+* Made squashing migrations reduce ``AddIndex``, ``RemoveIndex``,
+  ``RenameIndex``, and ``CreateModel`` operations which allows removing a
+  deprecated ``Meta.index_together`` option from historical migrations and use
+  ``Meta.indexes`` instead (:ticket:`34525`).
