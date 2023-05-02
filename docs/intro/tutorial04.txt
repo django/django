@@ -314,8 +314,8 @@ two views abstract the concepts of "display a list of objects" and
 
 * The :class:`~django.views.generic.detail.DetailView` generic view
   expects the primary key value captured from the URL to be called
-  ``"pk"``, so we've changed ``question_id`` to ``pk`` for the generic
-  views.
+  ``"pk"``, so we've changed ``question_id`` to ``pk`` in the URLconf
+  for the generic views.
 
 By default, the :class:`~django.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.
