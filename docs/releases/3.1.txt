@@ -821,7 +821,7 @@ Miscellaneous
   :class:`~django.db.models.expressions.RawSQL` instead beforehand.
 
 * The ``NullBooleanField`` model field is deprecated in favor of
-  ``BooleanField(null=True)``.
+  ``BooleanField(null=True, blank=True)``.
 
 * ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
   deprecated.

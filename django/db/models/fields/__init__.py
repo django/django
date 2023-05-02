@@ -2248,7 +2248,7 @@ class NullBooleanField(BooleanField):
             "NullBooleanField is removed except for support in historical "
             "migrations."
         ),
-        "hint": "Use BooleanField(null=True) instead.",
+        "hint": "Use BooleanField(null=True, blank=True) instead.",
         "id": "fields.E903",
     }
 
