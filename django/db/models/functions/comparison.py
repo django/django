@@ -74,6 +74,7 @@ class Coalesce(Func):
     """Return, from left to right, the first non-null expression."""
 
     function = "COALESCE"
+    constrains_nulls = True
 
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:

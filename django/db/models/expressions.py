@@ -331,9 +331,16 @@ class BaseExpression:
             if not self._output_field_resolved_to_none:
                 raise
 
+    @cached_property
+    def constrains_nulls(self):
+        return any(
+            expr and expr.constrains_nulls for expr in self.get_source_expressions()
+        )
+
     def is_nullable(self, nullable_aliases):
         return any(
-            expr.is_nullable(nullable_aliases) for expr in self.get_source_expressions()
+            expr and expr.is_nullable(nullable_aliases)
+            for expr in self.get_source_expressions()
         )
 
     def exclude_nulls(self, nullable_aliases):
@@ -935,6 +942,7 @@ class ResolvedOuterRef(F):
 
     contains_aggregate = False
     contains_over_clause = False
+    constrains_nulls = False
 
     def as_sql(self, *args, **kwargs):
         raise ValueError(
@@ -965,6 +973,7 @@ class ResolvedOuterRef(F):
 class OuterRef(F):
     contains_aggregate = False
     contains_over_clause = False
+    constrains_nulls = False
 
     def resolve_expression(self, *args, **kwargs):
         if isinstance(self.name, self.__class__):
@@ -1346,6 +1355,8 @@ class Col(Expression):
 
 
 class ColPairs(Expression):
+    constrains_nulls = False
+
     def __init__(self, alias, targets, sources, output_field):
         super().__init__(output_field=output_field)
         self.alias = alias

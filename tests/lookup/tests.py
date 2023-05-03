@@ -19,7 +19,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Abs, Cast, Length, Substr
+from django.db.models.functions import Abs, Cast, Coalesce, Length, Substr
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -1620,9 +1620,26 @@ class LookupQueryingTests(TestCase):
             Season.objects.get(Exact(F("games__home"), "NY") & Q(games__away="Boston")),
             self.s1,
         )
+        with self.assertNumQueries(1) as ctx:
+            self.assertEqual(
+                Season.objects.get(
+                    Exact(F("games__home"), "NY") & Exact(F("games__away"), "Boston")
+                ),
+                self.s1,
+            )
+        self.assertNotIn("LEFT OUTER", ctx.captured_queries[0]["sql"])
+
+    def test_multivalued_isnull(self):
         self.assertEqual(
-            Season.objects.get(
-                Exact(F("games__home"), "NY") & Exact(F("games__away"), "Boston")
+            Season.objects.get(IsNull(F("games"), True)),
+            self.s2,
+        )
+
+    def test_multivalued_coalesce(self):
+        product = Product.objects.create(qty_target=42)
+        self.assertEqual(
+            Product.objects.get(
+                Exact(Coalesce("stock__qty_available", "qty_target"), 42)
             ),
-            self.s1,
+            product,
         )

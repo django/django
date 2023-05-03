@@ -1437,6 +1437,16 @@ class Query(BaseExpression):
                 "permitted%s" % (unsupported_lookup, output_field.__name__, suggestion)
             )
 
+    def _build_lookup_clause(self, lookup, current_negated, nullable_aliases):
+        conditions = [lookup]
+        require_outer = lookup.constrains_nulls and not current_negated
+        if current_negated and not lookup.constrains_nulls:
+            require_outer = True
+            exclude_nulls = lookup.exclude_nulls(nullable_aliases)
+            if exclude_nulls:
+                conditions.extend(exclude_nulls)
+        return WhereNode(conditions, connector=AND), require_outer
+
     def build_filter(
         self,
         filter_expr,
@@ -1491,12 +1501,19 @@ class Query(BaseExpression):
         if hasattr(filter_expr, "resolve_expression"):
             if not getattr(filter_expr, "conditional", False):
                 raise TypeError("Cannot filter against a non-conditional expression.")
+            pre_joins = self.alias_refcount.copy()
             condition = filter_expr.resolve_expression(
                 self, allow_joins=allow_joins, reuse=can_reuse, summarize=summarize
             )
+            used_joins = {
+                k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
+            }
             if not isinstance(condition, Lookup):
                 condition = self.build_lookup(["exact"], condition, True)
-            return WhereNode([condition], connector=AND), []
+            clause, require_outer = self._build_lookup_clause(
+                condition, current_negated, {}
+            )
+            return clause, used_joins if not require_outer else ()
         arg, value = filter_expr
         if not arg:
             raise FieldError("Cannot parse keyword query %r" % arg)
@@ -1563,20 +1580,13 @@ class Query(BaseExpression):
             col = self._get_col(targets[0], join_info.final_field, alias)
 
         lookup = self.build_lookup(lookups, col, value)
-        conditions = [lookup]
-
-        require_outer = lookup.constrains_nulls and not current_negated
-        if current_negated and not lookup.constrains_nulls:
-            require_outer = True
-            if self.alias_map[join_list[-1]].join_type == LOUTER:
-                nullable_aliases = {alias}
-            else:
-                nullable_aliases = {}
-            exclude_nulls = lookup.exclude_nulls(nullable_aliases)
-            if exclude_nulls:
-                conditions.extend(exclude_nulls)
-
-        clause = WhereNode(conditions, connector=AND)
+        if self.alias_map[join_list[-1]].join_type == LOUTER:
+            nullable_aliases = {alias}
+        else:
+            nullable_aliases = {}
+        clause, require_outer = self._build_lookup_clause(
+            lookup, current_negated, nullable_aliases
+        )
         return clause, used_joins if not require_outer else ()
 
     def add_filter(self, filter_lhs, filter_rhs):
@@ -2070,7 +2080,13 @@ class Query(BaseExpression):
             lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
             query.where.add(lookup, AND)
 
-        condition, needed_inner = self.build_filter(Exists(query))
+        query.where.add(lookup, AND)
+        condition, needed_inner = self.build_filter(
+            Exists(query),
+            current_negated=True,
+            branch_negated=True,
+            can_reuse=can_reuse,
+        )
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(

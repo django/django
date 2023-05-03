@@ -267,6 +267,10 @@ class WhereNode(tree.Node):
     def is_summary(self):
         return any(child.is_summary for child in self.children)
 
+    @property
+    def constrains_nulls(self):
+        return any(child.constrains_nulls for child in self.children)
+
     @staticmethod
     def _resolve_leaf(expr, query, *args, **kwargs):
         if hasattr(expr, "resolve_expression"):
