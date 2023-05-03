@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+May 3, 2023 - :cve:`2023-31047`
+-------------------------------
+
+Potential bypass of validation when uploading multiple files using one form
+field. `Full description
+<https://www.djangoproject.com/weblog/2023/may/03/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <21b1b1fc03e5f9e9f8c977ee6e35618dd3b353dd>`
+* Django 4.1 :commit:`(patch) <e7c3a2ccc3a562328600be05068ed9149e12ce64>`
+* Django 3.2 :commit:`(patch) <eed53d0011622e70b936e203005f0e6f4ac48965>`
+
 February 14, 2023 - :cve:`2023-24580`
 -------------------------------------
 
