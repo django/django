@@ -502,7 +502,8 @@ Should become::
 
 Running the :djadmin:`makemigrations` command will generate a migration
 containing a :class:`~django.db.migrations.operations.RenameIndex` operation
-which will rename the existing index.
+which will rename the existing index. Next, consider squashing migrations to
+remove ``index_together`` from historical migrations.
 
 The ``AlterIndexTogether`` migration operation is now officially supported only
 for pre-Django 4.2 migration files. For backward compatibility reasons, it's
