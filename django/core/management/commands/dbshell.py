@@ -41,7 +41,7 @@ class Command(BaseCommand):
             raise CommandError(
                 '"%s" returned non-zero exit status %s.'
                 % (
-                    " ".join(e.cmd),
+                    " ".join(map(str, e.cmd)),
                     e.returncode,
                 ),
                 returncode=e.returncode,
