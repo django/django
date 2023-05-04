@@ -2,3 +2,8 @@ pyenchant
 Sphinx>=4.5.0
 sphinxcontrib-spelling
 blacken-docs
+
+# Due to Sphinx's viewcode extension, the docs are dependent on Django itself.
+# Below Django is installed from the local directory. This assumes installation
+# from the project root, i.e. `python -m pip install -r docs/requirements.txt`.
+.

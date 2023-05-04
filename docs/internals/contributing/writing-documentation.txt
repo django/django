@@ -45,11 +45,16 @@ documentation is transformed into HTML, PDF, and any other output format.
 __ https://www.sphinx-doc.org/
 __ https://docutils.sourceforge.io/
 
-To build the documentation locally, install Sphinx:
+To build the documentation locally, from the project root, install the
+documentation building requirements:
 
 .. console::
 
-     $ python -m pip install Sphinx
+     $ python -m pip install -r docs/requirements.txt
+
+This command must be run (from the project root) because the docs are dependent
+on Django itself. ``docs/requirements.txt`` installs Django from the directory
+in which the command is run.
 
 Then from the ``docs`` directory, build the HTML:
 

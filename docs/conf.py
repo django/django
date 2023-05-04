@@ -11,6 +11,10 @@
 
 import sys
 from os.path import abspath, dirname, join
+from unittest.mock import Mock
+
+from django.apps import apps
+from django.conf import settings
 
 # Workaround for sphinx-build recursion limit overflow:
 # pickle.dump(doctree, f, pickle.HIGHEST_PROTOCOL)
@@ -44,6 +48,34 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.inheritance_diagram",
 ]
+
+# The Sphinx extension 'sphinx.ext.viewcode' generates source code links by
+# importing each of the documented modules. If any module has side effects on
+# import, these are executed when sphinx-build is run. Sometimes configured
+# settings, Django apps and external dependencies are required to import a
+# module. These requirements are satisfied below.
+sys.modules["psycopg.types"] = Mock()
+sys.modules["django.db.backends.postgresql.psycopg_any"] = Mock()
+# Mock modules which require a geospatial library to be installed.
+sys.modules["django.contrib.gis.geos"] = Mock()
+sys.modules["django.contrib.gis.gdal.libgdal"] = Mock()
+sys.modules["django.contrib.gis.gdal.prototypes"] = Mock()
+sys.modules["django.contrib.gis.db.models.functions"] = Mock()
+settings.configure()
+# For Django 3.2, the SECRET_KEY setting must be configured.
+settings.SECRET_KEY = "example-secret-key"
+apps.populate(
+    [
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.flatpages",
+        "django.contrib.messages",
+        "django.contrib.redirects",
+        "django.contrib.sessions",
+        "django.contrib.sites",
+    ]
+)
 
 # AutosectionLabel settings.
 # Uses a <page>:<label> schema which doesn't work for duplicate sub-section

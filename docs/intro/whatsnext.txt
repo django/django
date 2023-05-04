@@ -158,12 +158,12 @@ As HTML, locally
 You can get a local copy of the HTML documentation following a few steps:
 
 * Django's documentation uses a system called Sphinx__ to convert from
-  plain text to HTML. You'll need to install Sphinx by either downloading
-  and installing the package from the Sphinx website, or with ``pip``:
+  plain text to HTML. You'll need to install the documentation dependencies:
 
-  .. console::
+  .. code-block:: console
 
-        $ python -m pip install Sphinx
+        $ cd path/to/django/docs
+        $ python -m pip install -r requirements.txt
 
 * Then, use the included ``Makefile`` to turn the documentation into HTML:
 
