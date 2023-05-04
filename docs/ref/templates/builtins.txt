@@ -1116,7 +1116,7 @@ Example usage:
         {% resetcycle %}
     {% endfor %}
 
-This example would return this HTML::
+This example would return this HTML:
 
 .. code-block:: html
 
