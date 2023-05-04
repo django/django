@@ -1,10 +1,18 @@
 import pickle
+import unittest
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.validators import validate_image_file_extension
 from django.forms import FileField, FileInput
 from django.test import SimpleTestCase
+
+try:
+    from PIL import Image  # NOQA
+except ImportError:
+    HAS_PILLOW = False
+else:
+    HAS_PILLOW = True
 
 
 class FileFieldTest(SimpleTestCase):
@@ -151,6 +159,7 @@ class MultipleFileFieldTest(SimpleTestCase):
         with self.assertRaisesMessage(ValidationError, msg):
             f.clean(files[::-1])
 
+    @unittest.skipUnless(HAS_PILLOW, "Pillow not installed")
     def test_file_multiple_validation(self):
         f = MultipleFileField(validators=[validate_image_file_extension])
 
