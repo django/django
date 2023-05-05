@@ -1496,6 +1496,7 @@ class BaseDatabaseSchemaEditor:
         for field in model._meta.local_fields:
             output.extend(self._field_indexes_sql(model, field))
 
+        # RemovedInDjango51Warning.
         for field_names in model._meta.index_together:
             fields = [model._meta.get_field(field) for field in field_names]
             output.append(self._create_index_sql(model, fields=fields, suffix="_idx"))
