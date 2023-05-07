@@ -1264,7 +1264,7 @@ such as this:
 
     path("clients/", include("project_name.app_name.urls"))
 
-...then, in a template, you can create a link to this view like this::
+...then, in a template, you can create a link to this view like this:
 
 .. code-block:: html+django
 
