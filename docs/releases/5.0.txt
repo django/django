@@ -241,6 +241,8 @@ Decorators
   * :func:`~django.views.decorators.cache.cache_control`
   * :func:`~django.views.decorators.cache.never_cache`
   * :func:`~django.views.decorators.common.no_append_slash`
+  * :func:`~django.views.decorators.debug.sensitive_variables`
+  * :func:`~django.views.decorators.debug.sensitive_post_parameters`
   * ``xframe_options_deny()``
   * ``xframe_options_sameorigin()``
   * ``xframe_options_exempt()``
@@ -253,7 +255,9 @@ Email
 Error Reporting
 ~~~~~~~~~~~~~~~
 
-* ...
+* :func:`~django.views.decorators.debug.sensitive_variables` and
+  :func:`~django.views.decorators.debug.sensitive_post_parameters` can now be
+  used with asynchronous functions.
 
 File Storage
 ~~~~~~~~~~~~

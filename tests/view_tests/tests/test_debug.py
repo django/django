@@ -9,6 +9,8 @@ from io import StringIO
 from pathlib import Path
 from unittest import mock, skipIf, skipUnless
 
+from asgiref.sync import async_to_sync, iscoroutinefunction
+
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import DatabaseError, connection
@@ -39,6 +41,10 @@ from django.views.debug import (
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
 
 from ..views import (
+    async_sensitive_method_view,
+    async_sensitive_method_view_nested,
+    async_sensitive_view,
+    async_sensitive_view_nested,
     custom_exception_reporter_filter_view,
     index_page,
     multivalue_dict_key_error,
@@ -1351,7 +1357,10 @@ class ExceptionReportTestMixin:
         Asserts that potentially sensitive info are displayed in the response.
         """
         request = self.rf.post("/some_url/", self.breakfast_data)
-        response = view(request)
+        if iscoroutinefunction(view):
+            response = async_to_sync(view)(request)
+        else:
+            response = view(request)
         if check_for_vars:
             # All variables are shown.
             self.assertContains(response, "cooked_eggs", status_code=500)
@@ -1371,7 +1380,10 @@ class ExceptionReportTestMixin:
         Asserts that certain sensitive info are not displayed in the response.
         """
         request = self.rf.post("/some_url/", self.breakfast_data)
-        response = view(request)
+        if iscoroutinefunction(view):
+            response = async_to_sync(view)(request)
+        else:
+            response = view(request)
         if check_for_vars:
             # Non-sensitive variable's name and value are shown.
             self.assertContains(response, "cooked_eggs", status_code=500)
@@ -1418,7 +1430,10 @@ class ExceptionReportTestMixin:
         with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
-            view(request)
+            if iscoroutinefunction(view):
+                async_to_sync(view)(request)
+            else:
+                view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -1451,7 +1466,10 @@ class ExceptionReportTestMixin:
         with self.settings(ADMINS=[("Admin", "admin@fattie-breakie.com")]):
             mail.outbox = []  # Empty outbox
             request = self.rf.post("/some_url/", self.breakfast_data)
-            view(request)
+            if iscoroutinefunction(view):
+                async_to_sync(view)(request)
+            else:
+                view(request)
             self.assertEqual(len(mail.outbox), 1)
             email = mail.outbox[0]
 
@@ -1543,6 +1561,24 @@ class ExceptionReporterFilterTests(
             self.verify_safe_response(sensitive_view)
             self.verify_safe_email(sensitive_view)
 
+    def test_async_sensitive_request(self):
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(async_sensitive_view)
+            self.verify_unsafe_email(async_sensitive_view)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(async_sensitive_view)
+            self.verify_safe_email(async_sensitive_view)
+
+    def test_async_sensitive_nested_request(self):
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(async_sensitive_view_nested)
+            self.verify_unsafe_email(async_sensitive_view_nested)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(async_sensitive_view_nested)
+            self.verify_safe_email(async_sensitive_view_nested)
+
     def test_paranoid_request(self):
         """
         No POST parameters and frame variables can be seen in the
@@ -1597,6 +1633,46 @@ class ExceptionReporterFilterTests(
                 sensitive_method_view, check_for_POST_params=False
             )
             self.verify_safe_email(sensitive_method_view, check_for_POST_params=False)
+
+    def test_async_sensitive_method(self):
+        """
+        The sensitive_variables decorator works with async object methods.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(
+                async_sensitive_method_view, check_for_POST_params=False
+            )
+            self.verify_unsafe_email(
+                async_sensitive_method_view, check_for_POST_params=False
+            )
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(
+                async_sensitive_method_view, check_for_POST_params=False
+            )
+            self.verify_safe_email(
+                async_sensitive_method_view, check_for_POST_params=False
+            )
+
+    def test_async_sensitive_method_nested(self):
+        """
+        The sensitive_variables decorator works with async object methods.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(
+                async_sensitive_method_view_nested, check_for_POST_params=False
+            )
+            self.verify_unsafe_email(
+                async_sensitive_method_view_nested, check_for_POST_params=False
+            )
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(
+                async_sensitive_method_view_nested, check_for_POST_params=False
+            )
+            self.verify_safe_email(
+                async_sensitive_method_view_nested, check_for_POST_params=False
+            )
 
     def test_sensitive_function_arguments(self):
         """
@@ -1889,6 +1965,30 @@ class NonHTMLResponseExceptionReporterFilter(
 
         with self.settings(DEBUG=False):
             self.verify_safe_response(sensitive_view, check_for_vars=False)
+
+    def test_async_sensitive_request(self):
+        """
+        Sensitive POST parameters cannot be seen in the default
+        error reports for sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(async_sensitive_view, check_for_vars=False)
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(async_sensitive_view, check_for_vars=False)
+
+    def test_async_sensitive_request_nested(self):
+        """
+        Sensitive POST parameters cannot be seen in the default
+        error reports for sensitive requests.
+        """
+        with self.settings(DEBUG=True):
+            self.verify_unsafe_response(
+                async_sensitive_view_nested, check_for_vars=False
+            )
+
+        with self.settings(DEBUG=False):
+            self.verify_safe_response(async_sensitive_view_nested, check_for_vars=False)
 
     def test_paranoid_request(self):
         """
