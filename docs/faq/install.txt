@@ -82,7 +82,7 @@ Should I use the stable version or development version?
 
 Generally, if you're using code in production, you should be using a
 stable release. The Django project publishes a full stable release
-every nine months or so, with bugfix updates in between. These stable
+every eight months or so, with bugfix updates in between. These stable
 releases contain the API that is covered by our backwards
 compatibility guarantees; if you write code against stable releases,
 you shouldn't have any problems upgrading when the next official
