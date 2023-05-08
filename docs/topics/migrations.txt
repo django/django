@@ -27,6 +27,9 @@ and Django's handling of database schema:
 * :djadmin:`showmigrations`, which lists a project's migrations and their
   status.
 
+* :djadmin:`optimizemigration`, which optimizes the operations within a
+  migration.
+
 You should think of migrations as a version control system for your database
 schema. ``makemigrations`` is responsible for packaging up your model changes
 into individual migration files - analogous to commits - and ``migrate`` is
@@ -629,26 +632,66 @@ to be able to write your own, see the :doc:`migration operations reference
 </ref/migration-operations>` and the "how-to" on :doc:`writing migrations
 </howto/writing-migrations>`.
 
-.. _migration-squashing:
 
-Squashing migrations
-====================
+Optimizing migrations
+=====================
 
-You are encouraged to make migrations freely and not worry about how many you
-have; the migration code is optimized to deal with hundreds at a time without
-much slowdown. However, eventually you will want to move back from having
-several hundred migrations to just a few, and that's where squashing comes in.
+Django developers are free to create as migrations as required and do not have
+to worry about the number of migrations created as Django is optimized to deal
+with hundreds at a time without much slowdown.  However, there may come a time when migrations will become so numerous that it
+will start to have a noticeable impact on various tasks like running tests on
+CI.
 
-Squashing is the act of reducing an existing set of many migrations down to
-one (or sometimes a few) migrations which still represent the same changes.
+There are a few steps that developers can take to mitigate or remediate this by
+reducing the amount of work that migrations has to do:
 
-Django does this by taking all of your existing migrations, extracting their
-``Operation``\s and putting them all in sequence, and then running an optimizer
-over them to try and reduce the length of the list - for example, it knows
+
+Optimizing migrations
+---------------------
+
+Django will automatically optimize migrations created via the
+:djadmin:`makemigrations` command however you may also choose to optimize manually
+created migrations with the :djadmin:`optimizemigration` command:
+
+.. code-block:: shell
+
+    $ python manage.py optimizemigration <app_label> <migration_name>
+
+Migration optimization attempts to reduce the list of migration operations by
+merging known pairs of possible reductions together.  For example, it knows
 that :class:`~django.db.migrations.operations.CreateModel` and
 :class:`~django.db.migrations.operations.DeleteModel` cancel each other out,
 and it knows that :class:`~django.db.migrations.operations.AddField` can be
 rolled into :class:`~django.db.migrations.operations.CreateModel`.
+
+
+Updating migrations
+-------------------
+
+When creating new migrations you have the option of updating the previously
+created migration if one exists.  Running ``makemigrations --update`` will add any new operations to the last
+migration created, then optimize it:
+
+.. code-block:: shell
+
+    $ python manage.py makemigrations --update
+
+.. _migration-squashing:
+
+Squashing migrations
+--------------------
+
+Squashing is the act of reducing an existing set of many migrations down to
+one (or sometimes a few) migrations which still represent the same changes.
+
+
+Using squashmigrations
+----------------------
+
+Django has a tool to squash migrations automatically called :djadmin:`squashmigrations`.
+This command takes all of your existing migrations, extracts their
+``Operation``\s and puts them all in sequence, and then running the :ref:`optimizer <migration-optimizing>`
+over them.
 
 Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
@@ -707,7 +750,38 @@ brand new migrations from your models. In a future release of Django,
 :djadmin:`squashmigrations` will be updated to attempt to resolve these errors
 itself.
 
-Once you've squashed your migration, you should then commit it alongside the
+Manually squashing migrations
+-----------------------------
+
+In this cases where :djadmin:`squashmigrations` is not able to run
+successfully, you can squash migrations manually using
+the following process similar to how ``squashmigrations`` works with the
+exception that the range must include the final migration:
+
+- Select the range of migrations for an app that you'd like squashed (including the final migration)
+- Identify any non-elidable operations that need to be preserved within this range
+- Move the migrations within the range to a temporary directory
+- Run makemigrations to generate a new replacement migration
+- Move the replaced migrations back into the migration directory
+- Edit the new migration to add a `replaces` attribute to define the range from
+  step 1, eg:
+
+.. code-block:: python
+
+  replaces = [
+    '0001_initial',
+    '0002_some_change',
+    '0003_another_change',
+    '0004_undo_something',
+  ]
+
+- Copy all non-elidable operation identified in step 2 into the newly created migration along with any dependencies.
+
+
+Managing squashed migrations
+----------------------------
+
+Once you've squashed your migrations, you should then commit it alongside the
 migrations it replaces and distribute this change to all running instances
 of your application, making sure that they run ``migrate`` to store the change
 in their database.
@@ -731,6 +805,7 @@ You must then transition the squashed migration to a normal migration by:
     with the :option:`migrate --prune` option.
 
 .. _migration-serializing:
+
 
 Serializing values
 ==================
