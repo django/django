@@ -49,7 +49,7 @@ class LookupTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Create a few Authors.
-        cls.au1 = Author.objects.create(name="Author 1", alias="a1")
+        cls.au1 = Author.objects.create(name="Author 1", alias="a1", bio="x" * 4001)
         cls.au2 = Author.objects.create(name="Author 2", alias="a2")
         # Create a few Articles.
         cls.a1 = Article.objects.create(
@@ -1028,6 +1028,13 @@ class LookupTests(TestCase):
         """
         Season.objects.create(year=2012, gt=None)
         self.assertQuerySetEqual(Season.objects.filter(gt__regex=r"^$"), [])
+
+    def test_textfield_exact_null(self):
+        with self.assertNumQueries(1) as ctx:
+            self.assertSequenceEqual(Author.objects.filter(bio=None), [self.au2])
+        # Columns with IS NULL condition are not wrapped (except PostgreSQL).
+        bio_column = connection.ops.quote_name(Author._meta.get_field("bio").column)
+        self.assertIn(f"{bio_column} IS NULL", ctx.captured_queries[0]["sql"])
 
     def test_regex_non_string(self):
         """

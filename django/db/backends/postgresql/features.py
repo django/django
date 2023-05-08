@@ -82,6 +82,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "indexes.tests.SchemaIndexesNotPostgreSQLTests."
             "test_create_index_ignores_opclasses",
         },
+        "PostgreSQL requires casting to text.": {
+            "lookup.tests.LookupTests.test_textfield_exact_null",
+        },
     }
 
     @cached_property
