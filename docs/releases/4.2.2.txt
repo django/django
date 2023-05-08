@@ -9,4 +9,6 @@ Django 4.2.2 fixes several bugs in 4.2.1.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.2 that caused an unnecessary
+  ``DBMS_LOB.SUBSTR()`` wrapping in the ``__isnull`` and ``__exact=None``
+  lookups for ``TextField()``/``BinaryField()`` on Oracle (:ticket:`34544`).

@@ -296,12 +296,6 @@ END;
             columns.append(value[0])
         return tuple(columns)
 
-    def field_cast_sql(self, db_type, internal_type):
-        if db_type and db_type.endswith("LOB") and internal_type != "JSONField":
-            return "DBMS_LOB.SUBSTR(%s)"
-        else:
-            return "%s"
-
     def no_limit_value(self):
         return None
 
@@ -344,7 +338,9 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
             return "UPPER(%s)"
-        if internal_type == "JSONField" and lookup_type == "exact":
+        if (
+            lookup_type != "isnull" and internal_type in ("BinaryField", "TextField")
+        ) or (lookup_type == "exact" and internal_type == "JSONField"):
             return "DBMS_LOB.SUBSTR(%s)"
         return "%s"
 
