@@ -19,6 +19,7 @@ class Alarm(models.Model):
 class Author(models.Model):
     name = models.CharField(max_length=100)
     alias = models.CharField(max_length=50, null=True, blank=True)
+    bio = models.TextField(null=True)
 
     class Meta:
         ordering = ("name",)
@@ -50,21 +51,10 @@ class NulledTextField(models.TextField):
         return None if value == "" else value
 
 
-class NullField(models.Field):
-    pass
-
-
-NullField.register_lookup(IsNull)
-
-
 @NulledTextField.register_lookup
 class NulledTransform(models.Transform):
     lookup_name = "nulled"
     template = "NULL"
-
-    @property
-    def output_field(self):
-        return NullField()
 
 
 @NulledTextField.register_lookup
