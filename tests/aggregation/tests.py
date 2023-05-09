@@ -41,6 +41,7 @@ from django.db.models.functions import (
     Pi,
     TruncDate,
     TruncHour,
+    Round,
 )
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
@@ -2182,3 +2183,50 @@ class AggregateAnnotationPruningTests(TestCase):
             mod_count=Count("*")
         )
         self.assertEqual(queryset.count(), 1)
+
+    def test_referenced_group_by_aggregation_over_annotation(self):
+        total_books_qs = (
+            Book.objects.filter(authors__pk=OuterRef("pk"))
+            .order_by()
+            .values("pk")
+            .annotate(total=Count("pk"))
+            .values("total")
+        )
+
+        annotated_authors = (
+            Author.objects.annotate(
+                total_books=Subquery(
+                    total_books_qs.annotate(total_books=F("total")).values(
+                        "total_books"
+                    )
+                ),
+                total_books_a=Subquery(
+                    total_books_qs.filter(name__istartswith="a")
+                    .annotate(total_books_a=F("total"))
+                    .values("total_books_a")
+                ),
+            )
+            .values(
+                "pk",
+                "total_books",
+                "total_books_a",
+            )
+            .order_by("-total_books")
+        )
+
+        totals = annotated_authors.aggregate(
+            sum_total_books=Sum("total_books"),
+            sum_total_books_a=Sum("total_books_a"),
+            a_over_total_rate=Case(
+                When(
+                    sum_total_books=0,
+                    then=0,
+                ),
+                default=Round((Sum("total_books_a") / Sum("total_books")) * 100, 2),
+                output_field=FloatField(),
+            ),
+        )
+
+        self.assertEqual(totals["sum_total_books"], 3)
+        self.assertEqual(totals["sum_total_books_a"], 0)
+        self.assertEqual(totals["a_over_total_rate"], 0)
