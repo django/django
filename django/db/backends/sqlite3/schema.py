@@ -389,11 +389,10 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # ADD COLUMN.
             field.primary_key
             or field.unique
-            or
+            or not field.null
             # Fields with default values cannot by handled by ALTER TABLE ADD
             # COLUMN statement because DROP DEFAULT is not supported in
             # ALTER TABLE.
-            not field.null
             or self.effective_default(field) is not None
         ):
             self._remake_table(model, create_field=field)
