@@ -39,9 +39,9 @@ from django.db.models.functions import (
     Mod,
     Now,
     Pi,
+    Round,
     TruncDate,
     TruncHour,
-    Round,
 )
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
