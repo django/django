@@ -3662,13 +3662,19 @@ class OperationTests(OperationTestBase):
             ),
             # Literal "%" should be escaped in a way that is not a considered a
             # wildcard.
-            (models.Q(rebate__endswith="%"), {"rebate": "10%"}, {"rebate": "10$"}),
+            (models.Q(rebate__endswith="%"), {"rebate": "10%"}, {"rebate": "10%$"}),
             # Right-hand-side baked "%" literals should not be used for
             # parameters interpolation.
             (
                 ~models.Q(surname__startswith=models.F("name")),
                 {"name": "Albert"},
                 {"name": "Albert", "surname": "Alberto"},
+            ),
+            # Exact matches against "%" literals should also be supported.
+            (
+                models.Q(name="%"),
+                {"name": "%"},
+                {"name": "Albert"},
             ),
         ]
         for check, valid, invalid in checks:
