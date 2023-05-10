@@ -41,9 +41,9 @@ except ImportError:
 
 
 try:
-    import pywatchman
+    import watchfiles
 except ImportError:
-    pywatchman = None
+    watchfiles = None
 
 
 def is_django_module(module):
@@ -437,7 +437,7 @@ class WatchmanReloader(BaseReloader):
 
     @cached_property
     def client(self):
-        return pywatchman.client(timeout=self.client_timeout)
+        return watchfiles.client(timeout=self.client_timeout)
 
     def _watch_root(self, root):
         # In practice this shouldn't occur, however, it's possible that a
@@ -595,9 +595,9 @@ class WatchmanReloader(BaseReloader):
                 self.processed_request.clear()
             try:
                 self.client.receive()
-            except pywatchman.SocketTimeout:
+            except watchfiles.SocketTimeout:
                 pass
-            except pywatchman.WatchmanError as ex:
+            except watchfiles.WatchmanError as ex:
                 logger.debug("Watchman error: %s, checking server status.", ex)
                 self.check_server_status(ex)
             else:
@@ -621,9 +621,9 @@ class WatchmanReloader(BaseReloader):
 
     @classmethod
     def check_availability(cls):
-        if not pywatchman:
-            raise WatchmanUnavailable("pywatchman not installed.")
-        client = pywatchman.client(timeout=0.1)
+        if not watchfiles:
+            raise WatchmanUnavailable("watchfiles not installed.")
+        client = watchfiles.client(timeout=0.1)
         try:
             result = client.capabilityCheck()
         except Exception:
