@@ -1213,9 +1213,9 @@ The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
 because it features a slightly different API. However, it is almost identical,
 with the following notable differences:
 
-* It should be given an iterator that yields bytestrings as content. When
-  serving under WSGI, this should be a sync iterator. When serving under ASGI,
-  this is should an async iterator.
+* It should be given an iterator that yields bytestrings, :class:`memoryview`,
+  or strings as content. When serving under WSGI, this should be a sync
+  iterator. When serving under ASGI, then it should be an async iterator.
 
 * You cannot access its content, except by iterating the response object
   itself. This should only occur when the response is returned to the client:
