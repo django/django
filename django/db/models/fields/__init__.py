@@ -875,10 +875,7 @@ class Field(RegisterLookupMixin):
 
     @property
     def db_returning(self):
-        """
-        Private API intended only to be used by Django itself. Currently only
-        the PostgreSQL backend supports returning multiple fields on a model.
-        """
+        """Private API intended only to be used by Django itself."""
         return False
 
     def set_attributes_from_name(self, name):
