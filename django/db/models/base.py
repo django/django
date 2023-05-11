@@ -118,6 +118,11 @@ class ModelBase(type):
             else:
                 new_attrs[obj_name] = obj
         new_class = super_new(cls, name, bases, new_attrs, **kwargs)
+        # update contributable_attrs with any such attributes added to new_class - these came from __init_subclass__
+        for obj_name, obj in dict(vars(new_class)).items():
+            if _has_contribute_to_class(obj):
+                contributable_attrs[obj_name] = obj
+                delattr(new_class, obj_name)
 
         abstract = getattr(attr_meta, "abstract", False)
         meta = attr_meta or getattr(new_class, "Meta", None)

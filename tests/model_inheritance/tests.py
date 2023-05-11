@@ -250,6 +250,24 @@ class ModelInheritanceTests(TestCase):
         self.assertEqual(saved_kwargs, kwargs)
 
     @isolate_apps("model_inheritance")
+    def test_fields_can_be_added_in_init_subclass(self):
+        class BaseBookModel(models.Model):
+            class Meta:
+                abstract = True
+
+            def __init_subclass__(cls, author_model_cls, **kwargs):
+                super().__init_subclass__(**kwargs)
+                cls.author = models.ForeignKey(author_model_cls, on_delete = models.CASCADE)
+
+        class Author(models.Model):
+            name = models.CharField(max_length = 256, unique = True)
+
+        class Book(BaseBookModel, author_model_cls = Author):
+            pass
+
+        self.assertIsInstance(Book._meta.get_field('author'), models.ForeignKey)
+
+    @isolate_apps("model_inheritance")
     def test_set_name(self):
         class ClassAttr:
             called = None
