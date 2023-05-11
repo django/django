@@ -50,6 +50,23 @@ either all or none of the changes will be committed.
     some overhead. The impact on performance depends on the query patterns of your
     application and on how well your database handles locking.
 
+.. warning::
+    The use of ATOMIC_REQUESTS=True may have unintended consequences if your code 
+    uses caching, proactively updates data in the cache, or makes the assumption 
+    that values are updated in the database after a transaction is finished. 
+    
+    When ATOMIC_REQUESTS=True, Django wraps each request in a database transaction
+    to ensure that all database changes are atomic and either succeed or fail 
+    together. However, this can cause problems with caching if your code expects 
+    changes to be visible outside of the transaction. Additionally, caching 
+    frameworks may not be designed to work with transactions and may not behave 
+    as expected. 
+
+    If your code uses caching or proactively updates data in the cache, consider 
+    disabling ATOMIC_REQUESTS to avoid unexpected behavior. Similarly, if your 
+    code assumes that database changes are visible outside of the transaction, 
+    you may need to update your code to take transactions into account.
+    
 .. admonition:: Per-request transactions and streaming responses
 
     When a view returns a :class:`~django.http.StreamingHttpResponse`, reading
