@@ -382,6 +382,9 @@ Miscellaneous
 * ``ImageField.update_dimension_fields()`` is no longer called on the
   ``post_init`` signal if ``width_field`` and ``height_field`` are not set.
 
+* :class:`~django.db.models.functions.Now` database function now uses
+  ``LOCALTIMESTAMP`` instead of ``CURRENT_TIMESTAMP`` on Oracle.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
