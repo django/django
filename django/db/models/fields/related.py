@@ -11,7 +11,13 @@ from django.db import connection, router
 from django.db.backends import utils
 from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
+from django.db.models.deletion import (
+    CASCADE,
+    DO_NOTHING,
+    ON_DELETE_DB_CHOICES,
+    SET_DEFAULT,
+    SET_NULL,
+)
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -944,6 +950,7 @@ class ForeignKey(ForeignObject):
         self,
         to,
         on_delete,
+        on_delete_db=ON_DELETE_DB_CHOICES.DO_NOTHING_DB,
         related_name=None,
         related_query_name=None,
         limit_choices_to=None,
@@ -972,7 +979,6 @@ class ForeignKey(ForeignObject):
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")
-
         kwargs["rel"] = self.rel_class(
             self,
             to,
@@ -982,6 +988,7 @@ class ForeignKey(ForeignObject):
             limit_choices_to=limit_choices_to,
             parent_link=parent_link,
             on_delete=on_delete,
+            on_delete_db=on_delete_db,
         )
         kwargs.setdefault("db_index", True)
 
@@ -1005,6 +1012,7 @@ class ForeignKey(ForeignObject):
             *super().check(**kwargs),
             *self._check_on_delete(),
             *self._check_unique(),
+            *self._check_on_delete_db(),
         ]
 
     def _check_on_delete(self):
@@ -1050,6 +1058,25 @@ class ForeignKey(ForeignObject):
             if self.unique
             else []
         )
+
+    def _check_on_delete_db(self, **kwargs):
+        on_delete = getattr(self.remote_field, "on_delete", None)
+        on_delete_db = getattr(self.remote_field, "on_delete_db", None)
+
+        if (
+            on_delete_db != ON_DELETE_DB_CHOICES.DO_NOTHING_DB
+            and on_delete != DO_NOTHING
+        ):
+            return [
+                checks.Error(
+                    "The on_delete must be set to on_delete=DO_NOTHING to work with"
+                    "on_delete_db",
+                    hint="Remove the on_delete_db or set on_delete=DO_NOTHING",
+                    obj=self,
+                    id="fields.E322",
+                )
+            ]
+        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

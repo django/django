@@ -1,4 +1,5 @@
 from collections import Counter, defaultdict
+from enum import Enum
 from functools import partial, reduce
 from itertools import chain
 from operator import attrgetter, or_
@@ -17,6 +18,14 @@ class RestrictedError(IntegrityError):
     def __init__(self, msg, restricted_objects):
         self.restricted_objects = restricted_objects
         super().__init__(msg, restricted_objects)
+
+
+class ON_DELETE_DB_CHOICES(Enum):
+    DO_NOTHING_DB = ""
+    CASCADE_DB = "CASCADE"
+    RESTRICT_DB = "RESTRICT"
+    SET_NULL_DB = "SET NULL"
+    SET_DEFAULT_DB = "SET DEFAULT"
 
 
 def CASCADE(collector, field, sub_objs, using):
@@ -128,6 +137,8 @@ class Collector:
         new_objs = []
         model = objs[0].__class__
         instances = self.data[model]
+        print(objs)
+        print(instances)
         for obj in objs:
             if obj not in instances:
                 new_objs.append(obj)
@@ -152,6 +163,8 @@ class Collector:
         Schedule a field update. 'objs' must be a homogeneous iterable
         collection of model instances (e.g. a QuerySet).
         """
+        print("****************")
+        print("******************")
         self.field_updates[field, value].append(objs)
 
     def add_restricted_objects(self, field, objs):
@@ -324,8 +337,10 @@ class Collector:
                 model_fast_deletes[related_model].append(field)
                 continue
             batches = self.get_del_batches(new_objs, [field])
+            print(batches)
             for batch in batches:
                 sub_objs = self.related_objects(related_model, [field], batch)
+                print(sub_objs)
                 # Non-referenced fields can be deferred if no signal receivers
                 # are connected for the related model as they'll never be
                 # exposed to the user. Skip field deferring when some
@@ -363,8 +378,10 @@ class Collector:
             )
         for related_model, related_fields in model_fast_deletes.items():
             batches = self.get_del_batches(new_objs, related_fields)
+            print(batches)
             for batch in batches:
                 sub_objs = self.related_objects(related_model, related_fields, batch)
+                print(sub_objs)
                 self.fast_deletes.append(sub_objs)
         for field in model._meta.private_fields:
             if hasattr(field, "bulk_related_objects"):

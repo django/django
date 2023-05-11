@@ -47,6 +47,7 @@ class ForeignObjectRel(FieldCacheMixin):
         limit_choices_to=None,
         parent_link=False,
         on_delete=None,
+        on_delete_db=None,
     ):
         self.field = field
         self.model = to
@@ -55,6 +56,7 @@ class ForeignObjectRel(FieldCacheMixin):
         self.limit_choices_to = {} if limit_choices_to is None else limit_choices_to
         self.parent_link = parent_link
         self.on_delete = on_delete
+        self.on_delete_db = on_delete_db
 
         self.symmetrical = False
         self.multiple = True
@@ -279,6 +281,7 @@ class ManyToOneRel(ForeignObjectRel):
         limit_choices_to=None,
         parent_link=False,
         on_delete=None,
+        on_delete_db=None,
     ):
         super().__init__(
             field,
@@ -288,6 +291,7 @@ class ManyToOneRel(ForeignObjectRel):
             limit_choices_to=limit_choices_to,
             parent_link=parent_link,
             on_delete=on_delete,
+            on_delete_db=on_delete_db,
         )
 
         self.field_name = field_name
@@ -334,6 +338,7 @@ class OneToOneRel(ManyToOneRel):
         limit_choices_to=None,
         parent_link=False,
         on_delete=None,
+        on_delete_db=None,
     ):
         super().__init__(
             field,
@@ -344,6 +349,7 @@ class OneToOneRel(ManyToOneRel):
             limit_choices_to=limit_choices_to,
             parent_link=parent_link,
             on_delete=on_delete,
+            on_delete_db=on_delete_db,
         )
 
         self.multiple = False
