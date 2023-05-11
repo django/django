@@ -236,6 +236,11 @@ class Now(Func):
             **extra_context,
         )
 
+    def as_oracle(self, compiler, connection, **extra_context):
+        return self.as_sql(
+            compiler, connection, template="LOCALTIMESTAMP", **extra_context
+        )
+
 
 class TruncBase(TimezoneMixin, Transform):
     kind = None
