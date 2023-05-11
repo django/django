@@ -255,17 +255,17 @@ class ModelInheritanceTests(TestCase):
             class Meta:
                 abstract = True
 
-            def __init_subclass__(cls, author_model_cls, **kwargs):
+            def __init_subclass__(cls, author_cls, **kwargs):
                 super().__init_subclass__(**kwargs)
-                cls.author = models.ForeignKey(author_model_cls, on_delete = models.CASCADE)
+                cls.author = models.ForeignKey(author_cls, on_delete=models.CASCADE)
 
         class Author(models.Model):
-            name = models.CharField(max_length = 256, unique = True)
+            name = models.CharField(max_length=256, unique=True)
 
-        class Book(BaseBookModel, author_model_cls = Author):
+        class Book(BaseBookModel, author_cls=Author):
             pass
 
-        self.assertIsInstance(Book._meta.get_field('author'), models.ForeignKey)
+        self.assertIsInstance(Book._meta.get_field("author"), models.ForeignKey)
 
     @isolate_apps("model_inheritance")
     def test_set_name(self):
