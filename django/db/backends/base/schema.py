@@ -13,6 +13,7 @@ from django.db.backends.ddl_references import (
 )
 from django.db.backends.utils import names_digest, split_identifier, truncate_name
 from django.db.models import Deferrable, Index
+from django.db.models.deletion import ON_DELETE_DB_CHOICES
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -698,6 +699,7 @@ class BaseDatabaseSchemaEditor:
                     "to_table": self.quote_name(to_table),
                     "to_column": self.quote_name(to_column),
                     "deferrable": self.connection.ops.deferrable_sql(),
+                    "on_delete_db": self._create_on_delete_sql(model, field),
                 }
             # Otherwise, add FK constraints later.
             else:
@@ -1484,7 +1486,9 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _create_on_delete_sql(self, model, field):
-        on_delete_db = getattr(field.remote_field, "on_delete_db", None)
+        on_delete_db = getattr(
+            field.remote_field, "on_delete_db", ON_DELETE_DB_CHOICES.DO_NOTHING_DB
+        )
         if on_delete_db.value:
             return "ON DELETE %s" % on_delete_db.value
         return ""
