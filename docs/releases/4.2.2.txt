@@ -12,3 +12,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused an unnecessary
   ``DBMS_LOB.SUBSTR()`` wrapping in the ``__isnull`` and ``__exact=None``
   lookups for ``TextField()``/``BinaryField()`` on Oracle (:ticket:`34544`).
+
+* jQuery is upgraded from version 3.6.4 to 3.7.0, which fixed a regression
+  where the admin autocomplete search input did not focus on click
+  (:ticket:`33504`).
