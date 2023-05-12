@@ -1060,34 +1060,30 @@ class ForeignKey(ForeignObject):
         )
 
     def has_related_models_with_db_cascading(self, model):
-        stack = [model]
-        while stack:
-            curr_model = stack.pop()
-            on_delete = getattr(self.remote_field, "on_delete", None)
-            related_models = [
-                rel.related_model
-                for rel in curr_model._meta.get_fields()
-                if rel.related_model and not rel.auto_created
-            ]
-            has_related_cascade_db = any(
-                any(
-                    (
-                        isinstance(rel, ForeignKey)
-                        and hasattr(rel.remote_field, "on_delete")
-                        and rel.remote_field.on_delete == DB_CASCADE
-                        and on_delete != DB_CASCADE
-                    )
-                    for rel in model_ptr._meta.get_fields()
+        # get all related models
+        if not hasattr(model, "_meta"):
+            return False
+
+        on_delete = getattr(self.remote_field, "on_delete", None)
+        related_models = [
+            rel.related_model
+            for rel in model._meta.get_fields()
+            if rel.related_model and not rel.auto_created
+        ]
+        has_related_cascade_db = any(
+            any(
+                (
+                    isinstance(rel, ForeignKey)
+                    and hasattr(rel.remote_field, "on_delete")
+                    and rel.remote_field.on_delete == DB_CASCADE
+                    and on_delete != DB_CASCADE
                 )
-                for model_ptr in related_models
+                for rel in model._meta.get_fields()
             )
+            for model in [item for item in related_models if hasattr(item, "_meta")]
+        )
 
-            if has_related_cascade_db:
-                return True
-
-            stack.extend(related_models)
-
-        return False
+        return has_related_cascade_db
 
     def _check_on_delete_db(self, **kwargs):
         on_delete = getattr(self.remote_field, "on_delete", None)
