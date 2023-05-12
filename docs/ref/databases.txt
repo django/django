@@ -98,7 +98,7 @@ appropriate value at the beginning of each request, or disable persistent
 connections.
 
 If a connection is created in a long-running process, outside of Django’s
-request-response cycle, the connection will remain open until explicitly
+request/response cycle, the connection will remain open until explicitly
 closed, or timeout occurs.
 
 Encoding
