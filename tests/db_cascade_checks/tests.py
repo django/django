@@ -149,7 +149,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             content_object = GenericForeignKey("some_fk", "object_id")
 
             class Meta:
-                managed = False
+                abstract = True
 
         class SomeAnotherModel(models.Model):
             another_fk = models.ForeignKey(
@@ -159,7 +159,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             content_object = GenericForeignKey("another_fk", "object_id")
 
             class Meta:
-                managed = False
+                abstract = True
 
         comment_field = SomeModel._meta.get_field("some_fk")
         self.assertEqual(
