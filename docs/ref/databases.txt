@@ -31,7 +31,7 @@ Persistent connections
 ----------------------
 
 Persistent connections avoid the overhead of reestablishing a connection to
-the database in each request. They're controlled by the
+the database in each HTTP request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
 connection. It can be set independently for each database.
 
@@ -100,6 +100,10 @@ parameters such as the connection's isolation level or time zone, you should
 either restore Django's defaults at the end of each request, force an
 appropriate value at the beginning of each request, or disable persistent
 connections.
+
+If a connection is created in a long-running process, outside of Django’s
+request-response cycle, the connection will remain open until explicitly
+closed, or timeout occurs.
 
 Encoding
 --------
