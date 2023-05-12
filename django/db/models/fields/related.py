@@ -1038,6 +1038,46 @@ class ForeignKey(ForeignObject):
                     id="fields.E321",
                 )
             ]
+        elif (
+            on_delete == DB_CASCADE
+            and hasattr(self.model, "_meta")
+            and any(
+                not parent._meta.abstract
+                for parent in self.model._meta.get_parent_list()
+            )
+        ):
+            return [
+                checks.Error(
+                    "Field specifies unsupported on_delete=DB_CASCADE, on "
+                    "inherited model",
+                    hint="Set a default value, or change the on_delete rule.",
+                    obj=self,
+                    id="fields.E325",
+                )
+            ]
+        elif (
+            on_delete == DB_CASCADE
+            and hasattr(self.model, "_meta")
+            and (
+                any(  # generic relation
+                    hasattr(field, "bulk_related_objects")
+                    for field in self.model._meta.private_fields
+                )
+                or any(  # generic foreign key
+                    hasattr(field, "get_content_type")
+                    for field in self.model._meta.private_fields
+                )
+            )
+        ):
+            return [
+                checks.Error(
+                    "Field specifies unsupported on_delete=DB_CASCADE on model "
+                    "declaring a GenericForeignKey.",
+                    hint="Change the on_delete rule.",
+                    obj=self,
+                    id="fields.E345",
+                )
+            ]
         else:
             return []
 
@@ -1059,8 +1099,11 @@ class ForeignKey(ForeignObject):
             else []
         )
 
-    def has_related_models_with_db_cascading(self, model):
-        # get all related models
+    def _has_related_models_with_db_cascading(self, model):
+        """
+        If the foreignkey parent has DB cascading and the Current model has non
+        db cascading return true
+        """
         if not hasattr(model, "_meta"):
             return False
 
@@ -1114,7 +1157,7 @@ class ForeignKey(ForeignObject):
                     id="fields.E324",
                 )
             ]
-        elif self.has_related_models_with_db_cascading(self.model):
+        elif self._has_related_models_with_db_cascading(self.model):
             return [
                 checks.Error(
                     "Using normal cascading with DB cascading referenced model is "
