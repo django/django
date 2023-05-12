@@ -6,6 +6,7 @@ from django.db.models.constraints import *  # NOQA
 from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
     CASCADE,
+    DB_CASCADE,
     DO_NOTHING,
     ON_DELETE_DB_CHOICES,
     PROTECT,
@@ -114,4 +115,5 @@ __all__ += [
     "ManyToManyRel",
     "OneToOneRel",
     "ON_DELETE_DB_CHOICES",
+    "DB_CASCADE",
 ]

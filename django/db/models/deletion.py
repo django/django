@@ -92,6 +92,10 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
+def DB_CASCADE(collector, field, sub_objs, using):
+    pass
+
+
 def get_candidate_relations_to_delete(opts):
     # The candidate relations are the ones that come from N-1 and 1-1 relations.
     # N-N  (i.e., many-to-many) relations aren't candidates for deletion.
@@ -137,8 +141,6 @@ class Collector:
         new_objs = []
         model = objs[0].__class__
         instances = self.data[model]
-        print(objs)
-        print(instances)
         for obj in objs:
             if obj not in instances:
                 new_objs.append(obj)
@@ -163,8 +165,6 @@ class Collector:
         Schedule a field update. 'objs' must be a homogeneous iterable
         collection of model instances (e.g. a QuerySet).
         """
-        print("****************")
-        print("******************")
         self.field_updates[field, value].append(objs)
 
     def add_restricted_objects(self, field, objs):
@@ -337,10 +337,8 @@ class Collector:
                 model_fast_deletes[related_model].append(field)
                 continue
             batches = self.get_del_batches(new_objs, [field])
-            print(batches)
             for batch in batches:
                 sub_objs = self.related_objects(related_model, [field], batch)
-                print(sub_objs)
                 # Non-referenced fields can be deferred if no signal receivers
                 # are connected for the related model as they'll never be
                 # exposed to the user. Skip field deferring when some
@@ -378,10 +376,8 @@ class Collector:
             )
         for related_model, related_fields in model_fast_deletes.items():
             batches = self.get_del_batches(new_objs, related_fields)
-            print(batches)
             for batch in batches:
                 sub_objs = self.related_objects(related_model, related_fields, batch)
-                print(sub_objs)
                 self.fast_deletes.append(sub_objs)
         for field in model._meta.private_fields:
             if hasattr(field, "bulk_related_objects"):

@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
-    DO_NOTHING,
+    DB_CASCADE,
     ON_DELETE_DB_CHOICES,
     SET_DEFAULT,
     SET_NULL,
@@ -1059,21 +1059,73 @@ class ForeignKey(ForeignObject):
             else []
         )
 
+    def has_related_models_with_db_cascading(self, model):
+        stack = [model]
+        while stack:
+            curr_model = stack.pop()
+            on_delete = getattr(self.remote_field, "on_delete", None)
+            related_models = [
+                rel.related_model
+                for rel in curr_model._meta.get_fields()
+                if rel.related_model and not rel.auto_created
+            ]
+            has_related_cascade_db = any(
+                any(
+                    (
+                        isinstance(rel, ForeignKey)
+                        and hasattr(rel.remote_field, "on_delete")
+                        and rel.remote_field.on_delete == DB_CASCADE
+                        and on_delete != DB_CASCADE
+                    )
+                    for rel in model_ptr._meta.get_fields()
+                )
+                for model_ptr in related_models
+            )
+
+            if has_related_cascade_db:
+                return True
+
+            stack.extend(related_models)
+
+        return False
+
     def _check_on_delete_db(self, **kwargs):
         on_delete = getattr(self.remote_field, "on_delete", None)
         on_delete_db = getattr(self.remote_field, "on_delete_db", None)
 
         if (
             on_delete_db != ON_DELETE_DB_CHOICES.DO_NOTHING_DB
-            and on_delete != DO_NOTHING
+            and on_delete != DB_CASCADE
         ):
             return [
                 checks.Error(
-                    "The on_delete must be set to on_delete=DO_NOTHING to work with"
-                    "on_delete_db",
-                    hint="Remove the on_delete_db or set on_delete=DO_NOTHING",
+                    "The on_delete must be set to on_delete=models.DB_CASCADE to work"
+                    " with on_delete_db",
+                    hint="Remove the on_delete_db or set on_delete=models.DB_CASCADE",
                     obj=self,
                     id="fields.E322",
+                )
+            ]
+        elif on_delete_db == ON_DELETE_DB_CHOICES.SET_NULL_DB and not self.null:
+            return [
+                checks.Error(
+                    "Field specifies on_delete_db=SET_NULL_DB, but cannot be null.",
+                    hint=(
+                        "Set null=True argument on the field, or change the "
+                        "on_delete_db rule."
+                    ),
+                    obj=self,
+                    id="fields.E324",
+                )
+            ]
+        elif self.has_related_models_with_db_cascading(self.model):
+            return [
+                checks.Error(
+                    "Using normal cascading with DB cascading referenced model is "
+                    "prohibited",
+                    hint="Use database level cascading for foreignkeys",
+                    obj=self,
+                    id="fields.E323",
                 )
             ]
         return []
