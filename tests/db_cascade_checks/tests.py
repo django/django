@@ -1,6 +1,6 @@
 from django.core.checks import Error
-from django.db import OperationalError, models
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.db import models
+from django.test import TestCase
 
 from .models import Bar, Foo
 
@@ -61,7 +61,6 @@ class DatabaseLevelCascadeCheckTests(TestCase):
         bar_field = Bar._meta.get_field("foo")
         self.assertEqual(bar_field.check(), [])
 
-    @skipIfDBFeature("supports_mysql")
     def test_null_condition_with_set_null_db(self):
         class SetNullDbNotNullModel(models.Model):
             foo = models.ForeignKey(
@@ -69,6 +68,9 @@ class DatabaseLevelCascadeCheckTests(TestCase):
                 on_delete=models.DB_CASCADE,
                 on_delete_db=models.ON_DELETE_DB_CHOICES.SET_NULL_DB,
             )
+
+            class Meta:
+                managed = False
 
         field = SetNullDbNotNullModel._meta.get_field("foo")
         self.assertEqual(
@@ -85,8 +87,3 @@ class DatabaseLevelCascadeCheckTests(TestCase):
                 )
             ],
         )
-
-    @skipUnlessDBFeature("supports_mysql")
-    def test_null_condition_with_set_null_db_only_mysql(self):
-        with self.assertRaises(OperationalError):
-            self.test_null_condition_with_set_null_db()
