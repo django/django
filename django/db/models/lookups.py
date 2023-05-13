@@ -185,6 +185,10 @@ class Lookup(Expression):
             sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
         return sql, params
 
+    @cached_property
+    def allowed_default(self):
+        return self.lhs.allowed_default and self.rhs.allowed_default
+
 
 class Transform(RegisterLookupMixin, Func):
     """

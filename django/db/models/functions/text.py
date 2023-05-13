@@ -257,7 +257,7 @@ class Reverse(Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         # REVERSE in Oracle is undocumented and doesn't support multi-byte
         # strings. Use a special subquery instead.
-        return super().as_sql(
+        sql, params = super().as_sql(
             compiler,
             connection,
             template=(
@@ -268,6 +268,7 @@ class Reverse(Transform):
             ),
             **extra_context,
         )
+        return sql, params * 3
 
 
 class Right(Left):

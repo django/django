@@ -201,6 +201,15 @@ class BaseDatabaseFeatures:
     # Does the backend require literal defaults, rather than parameterized ones?
     requires_literal_defaults = False
 
+    # Does the backend support functions in defaults?
+    supports_expression_defaults = True
+
+    # Does the backend support the DEFAULT keyword in insert queries?
+    supports_default_keyword_in_insert = True
+
+    # Does the backend support the DEFAULT keyword in bulk insert queries?
+    supports_default_keyword_in_bulk_insert = True
+
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
 
@@ -360,6 +369,9 @@ class BaseDatabaseFeatures:
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None
+
+    # SQL to create a model instance using the database defaults.
+    insert_test_table_with_defaults = None
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.

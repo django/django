@@ -351,6 +351,38 @@ looking at your Django code. For example::
         db_comment="Date and time when the article was published",
     )
 
+``db_default``
+--------------
+
+.. versionadded:: 5.0
+
+.. attribute:: Field.db_default
+
+The database-computed default value for this field. This can be a literal value
+or a database function, such as :class:`~django.db.models.functions.Now`::
+
+    created = models.DateTimeField(db_default=Now())
+
+More complex expressions can be used, as long as they are made from literals
+and database functions::
+
+    month_due = models.DateField(
+        db_default=TruncMonth(
+            Now() + timedelta(days=90),
+            output_field=models.DateField(),
+        )
+    )
+
+Database defaults cannot reference other fields or models. For example, this is
+invalid::
+
+    end = models.IntegerField(db_default=F("start") + 50)
+
+If both ``db_default`` and :attr:`Field.default` are set, ``default`` will take
+precedence when creating instances in Python code. ``db_default`` will still be
+set at the database level and will be used when inserting rows outside of the
+ORM or when adding a new field in a migration.
+
 ``db_index``
 ------------
 
@@ -407,6 +439,9 @@ should be the value of the field they reference (``pk`` unless
 The default value is used when new model instances are created and a value
 isn't provided for the field. When the field is a primary key, the default is
 also used when the field is set to ``None``.
+
+The default value can also be set at the database level with
+:attr:`Field.db_default`.
 
 ``editable``
 ------------

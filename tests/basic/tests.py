@@ -20,6 +20,7 @@ from .models import (
     ArticleSelectOnSave,
     ChildPrimaryKeyWithDefault,
     FeaturedArticle,
+    PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
     SelfRef,
 )
@@ -174,6 +175,11 @@ class ModelInstanceCreationTests(TestCase):
         # An UPDATE attempt is skipped when a primary key has default.
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
+
+    def test_save_primary_with_db_default(self):
+        # An UPDATE attempt is skipped when a primary key has db_default.
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDbDefault().save()
 
     def test_save_parent_primary_with_default(self):
         # An UPDATE attempt is skipped when an inherited primary key has

@@ -56,8 +56,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     )
 
     def quote_value(self, value):
-        if isinstance(value, str):
-            value = value.replace("%", "%%")
         return sql.quote(value, self.connection.connection)
 
     def _field_indexes_sql(self, model, field):

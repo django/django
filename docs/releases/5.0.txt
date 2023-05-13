@@ -108,6 +108,21 @@ Can now be simplified to:
 per-project, per-field, or per-request basis. See
 :ref:`reusable-field-group-templates`.
 
+Database-computed default values
+--------------------------------
+
+The new :attr:`Field.db_default <django.db.models.Field.db_default>` parameter
+sets a database-computed default value. For example::
+
+    from django.db import models
+    from django.db.models.functions import Now, Pi
+
+
+    class MyModel(models.Model):
+        age = models.IntegerField(db_default=18)
+        created = models.DateTimeField(db_default=Now())
+        circumference = models.FloatField(db_default=2 * Pi())
+
 Minor features
 --------------
 
@@ -355,7 +370,16 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* ``DatabaseFeatures.supports_expression_defaults`` should be set to ``False``
+  if the database doesn't support using database functions as defaults.
+
+* ``DatabaseFeatures.supports_default_keyword_in_insert`` should be set to
+  ``False`` if the database doesn't support the ``DEFAULT`` keyword in
+  ``INSERT`` queries.
+
+* ``DatabaseFeatures.supports_default_keyword_in_bulk insert`` should be set to
+  ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
+  ``INSERT`` queries.
 
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
@@ -381,6 +405,9 @@ Miscellaneous
 
 * ``ImageField.update_dimension_fields()`` is no longer called on the
   ``post_init`` signal if ``width_field`` and ``height_field`` are not set.
+
+* :class:`~django.db.models.functions.Now` database function now uses
+  ``LOCALTIMESTAMP`` instead of ``CURRENT_TIMESTAMP`` on Oracle.
 
 .. _deprecated-features-5.0:
 
