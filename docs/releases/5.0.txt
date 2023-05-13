@@ -123,7 +123,7 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
-Database level cascading support for Foreignkeys
+Database level cascading support for Foreignkey
 ---------------------------------------------------------------
 The ``on_delete`` argument for ``Foreignkey`` now supports an extra option
 ``DB_CASCADE`` this will behave like ``DO_NOTHING`` in Django, but leverage 
