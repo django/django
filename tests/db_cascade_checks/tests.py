@@ -115,8 +115,10 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             [
                 Error(
                     "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model",
-                    hint="Set a default value, or change the on_delete rule.",
+                    "inherited model as it already contains a parent_ptr "
+                    "with in-python cascading options, both cannot be used "
+                    "together",
+                    hint="Change the on_delete rule to other options",
                     obj=field,
                     id="fields.E325",
                 )
@@ -129,8 +131,10 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             [
                 Error(
                     "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model",
-                    hint="Set a default value, or change the on_delete rule.",
+                    "inherited model as it already contains a parent_ptr "
+                    "with in-python cascading options, both cannot be used "
+                    "together",
+                    hint="Change the on_delete rule to other options",
                     obj=multiple_inheritence_field,
                     id="fields.E325",
                 )

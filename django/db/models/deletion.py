@@ -25,7 +25,6 @@ class ON_DELETE_DB_CHOICES(Enum):
     CASCADE_DB = "CASCADE"
     RESTRICT_DB = "RESTRICT"
     SET_NULL_DB = "SET NULL"
-    SET_DEFAULT_DB = "SET DEFAULT"
 
 
 def CASCADE(collector, field, sub_objs, using):

@@ -29,15 +29,6 @@ class Baz(models.Model):
     )
 
 
-# class Fiz(models.Model):
-#     """Third level foreignkey child for Foo
-#     Implemented using in python cascading"""
-#     baz = models.ForeignKey(
-#         Baz,
-#         on_delete=models.CASCADE
-#     )
-
-
 class RestrictBar(models.Model):
     """First level child of foo with cascading set to restrict"""
 

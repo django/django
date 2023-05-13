@@ -1049,8 +1049,10 @@ class ForeignKey(ForeignObject):
             return [
                 checks.Error(
                     "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model",
-                    hint="Set a default value, or change the on_delete rule.",
+                    "inherited model as it already contains a parent_ptr "
+                    "with in-python cascading options, both cannot be used "
+                    "together",
+                    hint="Change the on_delete rule to other options",
                     obj=self,
                     id="fields.E325",
                 )
