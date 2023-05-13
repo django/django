@@ -123,6 +123,23 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
+Database level cascading support for Foreignkeys
+---------------------------------------------------------------
+The ``on_delete`` argument for ``Foreignkey`` now supports an extra option
+``DB_CASCADE`` this will behave like ``DO_NOTHING`` in Django, but leverage 
+the Database level cascading options supported by SQL.
+
+A new optional argument named ``on_delete_db`` is also passed to the
+``Foreignkey``. This will specify the type of database level cascading we are
+looking for if the ``on_delete`` is set to ``DB_CASCADE``.
+
+Supported values of the ``on_delete_db`` argument can be the following::
+
+  ON_DELETE_DB_CHOICES.DO_NOTHING_DB = Does nothing, used as default value.
+  ON_DELETE_DB_CHOICES.CASCADE_DB = Deletes the child on parent deletion.
+  ON_DELETE_DB_CHOICES.RESTRICT_DB = Prevent the deletion if child exists.
+  ON_DELETE_DB_CHOICES.SET_NULL_DB = Set the value to null in child table.
+
 Minor features
 --------------
 
