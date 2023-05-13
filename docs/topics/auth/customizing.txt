@@ -301,6 +301,30 @@ checks if a user may close tasks::
 
     user.has_perm("app.close_task")
 
+Custom permissions may contain placeholders. ``%(model_name)s`` is available
+in the ``codename``. ``%(verbose_name)s`` is available in the ``name``.
+
+Child models will then inherit the specific permission::
+
+        class Base(models.Model):
+            # ...
+
+            class Meta:
+                permissions = (
+                    ("close_%(model_name)s", "Can close %(verbose_name)s"),
+                )
+
+
+        class Task(Base):
+            pass
+
+The model ``Task`` now has the permission ``close_task`` with the
+label "Can close task".
+
+.. versionchanged:: 4.2
+
+    Substitutions for ``model_name`` and ``verbose_name`` were added.
+
 .. _extending-user:
 
 Extending the existing ``User`` model

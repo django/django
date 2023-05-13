@@ -447,3 +447,34 @@ class AbstractInheritanceTests(SimpleTestCase):
                 ("name", models.CharField),
             ],
         )
+
+    @isolate_apps('model_inheritance')
+    def test_permission_inheritance_abstract(self):
+        """
+        Abstract permissions with %(model_name)s interpolation should become concrete
+        """
+
+        class A(models.Model):
+            class Meta:
+                app_label = 'model_inheritance'
+                abstract = True
+                permissions = [
+                    ('check_%(model_name)s', 'Check %(verbose_name)s'),
+                ]
+
+        class B(A):
+            pass
+
+        class C(A):
+            class Meta(A.Meta):
+                app_label = 'model_inheritance'
+                permissions = A.Meta.permissions + [
+                    ('concrete_c_permission', 'Concrete C permission'),
+                ]
+
+        self.assertEqual(A._meta.permissions, [('check_a', 'Check a')])
+        self.assertEqual(B._meta.permissions, [('check_b', 'Check b')])
+        self.assertEqual(
+            C._meta.permissions,
+            [('check_c', 'Check c'), ('concrete_c_permission', 'Concrete C permission')]
+        )

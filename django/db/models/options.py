@@ -205,6 +205,18 @@ class Options:
 
             self.unique_together = normalize_together(self.unique_together)
             self.index_together = normalize_together(self.index_together)
+
+            # Replace any %(model_name)s / %(verbose_name)s placeholders.
+            perms = meta_attrs.pop('permissions', self.permissions)
+            interpolated_perms = []
+            if perms:
+                for codename, name in perms:
+                    codename = codename % {'model_name': self.model_name}
+                    name = name % {'verbose_name': self.verbose_name}
+                    interpolated_perms.append((codename, name))
+
+            self.permissions = interpolated_perms
+
             if self.index_together:
                 warnings.warn(
                     f"'index_together' is deprecated. Use 'Meta.indexes' in "
