@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import (
     PBKDF2PasswordHasher,
     PBKDF2SHA1PasswordHasher,
     ScryptPasswordHasher,
+    acheck_password,
     check_password,
     get_hasher,
     identify_hasher,
@@ -58,6 +59,15 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(is_password_usable(blank_encoded))
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
+
+    async def test_acheck_password(self):
+        encoded = make_password("lètmein")
+        self.assertIs(await acheck_password("lètmein", encoded), True)
+        self.assertIs(await acheck_password("lètmeinz", encoded), False)
+        # Blank passwords.
+        blank_encoded = make_password("")
+        self.assertIs(await acheck_password("", blank_encoded), True)
+        self.assertIs(await acheck_password(" ", blank_encoded), False)
 
     def test_bytes(self):
         encoded = make_password(b"bytes_password")

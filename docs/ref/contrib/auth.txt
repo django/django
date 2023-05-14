@@ -166,10 +166,17 @@ Methods
         were used.
 
     .. method:: check_password(raw_password)
+    .. method:: acheck_password(raw_password)
+
+        *Asynchronous version*: ``acheck_password()``
 
         Returns ``True`` if the given raw string is the correct password for
         the user. (This takes care of the password hashing in making the
         comparison.)
+
+        .. versionchanged:: 5.0
+
+            ``acheck_password()`` method was added.
 
     .. method:: set_unusable_password()
 
