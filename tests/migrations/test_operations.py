@@ -988,6 +988,72 @@ class OperationTests(OperationTestBase):
                 "test_rmwsc_rider", ["pony_id"], ("test_rmwsc_littlehorse", "id")
             )
 
+    def test_rename_model_with_cross_app_fk(self):
+        app_label_1 = "test_rmw_fk_1"
+        app_label_2 = "test_rmw_fk_2"
+        project_state = self.apply_operations(
+            app_label_1,
+            ProjectState(),
+            operations=[
+                migrations.CreateModel(
+                    "Rider",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                    ],
+                )
+            ],
+        )
+        project_state = self.apply_operations(
+            app_label_2,
+            project_state,
+            operations=[
+                migrations.CreateModel(
+                    "Rider2",
+                    fields=[
+                        ("id", models.AutoField(primary_key=True)),
+                        (
+                            "riders",
+                            models.ForeignKey(f"{app_label_1}.Rider", models.CASCADE),
+                        ),
+                    ],
+                ),
+            ],
+        )
+        rider_table_1 = f"{app_label_1}_rider"
+        rider_table_2 = f"{app_label_2}_rider2"
+        self.assertTableExists(rider_table_1)
+        self.assertTableExists(rider_table_2)
+        if connection.features.supports_foreign_keys:
+            # the foreign key on rider2 points to rider
+            self.assertFKExists(rider_table_2, ["riders_id"], (rider_table_1, "id"))
+        # Rename model.
+        project_state_2 = project_state.clone()
+        project_state = self.apply_operations(
+            app_label_1,
+            project_state,
+            operations=[migrations.RenameModel("Rider", "NewRider")],
+            atomic=connection.features.supports_atomic_references_rename,
+        )
+
+        rider_table_1 = f"{app_label_1}_newrider"
+        rider_table_2 = f"{app_label_2}_rider2"
+        self.assertTableExists(rider_table_1)
+        self.assertTableExists(rider_table_2)
+        # Reversal.
+        self.unapply_operations(
+            app_label_1,
+            project_state_2,
+            operations=[migrations.RenameModel("Rider", "NewRider")],
+            atomic=connection.features.supports_atomic_references_rename,
+        )
+        rider_table_1 = f"{app_label_1}_rider"
+        rider_table_2 = f"{app_label_2}_rider2"
+        self.assertTableExists(rider_table_1)
+        self.assertTableExists(rider_table_2)
+        if connection.features.supports_foreign_keys:
+            # the foreign key on rider2 points to rider
+            self.assertFKExists(rider_table_2, ["riders_id"], (rider_table_1, "id"))
+
     def test_rename_model_with_self_referential_m2m(self):
         app_label = "test_rename_model_with_self_referential_m2m"
 
