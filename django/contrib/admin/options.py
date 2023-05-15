@@ -250,9 +250,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         if related_admin is not None:
             ordering = related_admin.get_ordering(request)
             if ordering is not None and ordering != ():
-                return related_admin.get_queryset(request).order_by(
-                    *ordering
-                )
+                return related_admin.get_queryset(request).order_by(*ordering)
         return None
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
