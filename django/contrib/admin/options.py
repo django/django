@@ -250,7 +250,7 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         if related_admin is not None:
             ordering = related_admin.get_ordering(request)
             if ordering is not None and ordering != ():
-                return db_field.remote_field.model._default_manager.using(db).order_by(
+                return related_admin.get_queryset(request).order_by(
                     *ordering
                 )
         return None
