@@ -1,0 +1,17 @@
+{
+    "name": "django/django",
+    "image": "mcr.microsoft.com/devcontainers/python:3",
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+          "python.terminal.activateEnvInCurrentTerminal": true,
+          "python.terminal.launchArgs": [
+            "-X",
+            "dev"
+          ]
+        }
+      }
+    },
+    "postCreateCommand": "chmod +x .devcontainer/cmds.sh && ./.devcontainer/cmds.sh"
+}
