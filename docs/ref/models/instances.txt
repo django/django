@@ -541,7 +541,8 @@ You may have noticed Django database objects use the same ``save()`` method
 for creating and changing objects. Django abstracts the need to use ``INSERT``
 or ``UPDATE`` SQL statements. Specifically, when you call ``save()`` and the
 object's primary key attribute does **not** define a
-:attr:`~django.db.models.Field.default`, Django follows this algorithm:
+:attr:`~django.db.models.Field.default` or
+:attr:`~django.db.models.Field.db_default`, Django follows this algorithm:
 
 * If the object's primary key attribute is set to a value that evaluates to
   ``True`` (i.e., a value other than ``None`` or the empty string), Django
@@ -551,9 +552,10 @@ object's primary key attribute does **not** define a
   exist in the database), Django executes an ``INSERT``.
 
 If the object's primary key attribute defines a
-:attr:`~django.db.models.Field.default` then Django executes an ``UPDATE`` if
-it is an existing model instance and primary key is set to a value that exists
-in the database. Otherwise, Django executes an ``INSERT``.
+:attr:`~django.db.models.Field.default` or
+:attr:`~django.db.models.Field.db_default` then Django executes an ``UPDATE``
+if it is an existing model instance and primary key is set to a value that
+exists in the database. Otherwise, Django executes an ``INSERT``.
 
 The one gotcha here is that you should be careful not to specify a primary-key
 value explicitly when saving new objects, if you cannot guarantee the
@@ -569,6 +571,10 @@ object's primary key value. An example is the PostgreSQL ``ON UPDATE`` trigger
 which returns ``NULL``. In such cases it is possible to revert to the old
 algorithm by setting the :attr:`~django.db.models.Options.select_on_save`
 option to ``True``.
+
+.. versionchanged:: 5.0
+
+    The ``Field.db_default`` parameter was added.
 
 .. _ref-models-force-insert:
 

@@ -4,6 +4,7 @@ import uuid
 from django.core.checks import Error
 from django.core.checks import Warning as DjangoWarning
 from django.db import connection, models
+from django.db.models.functions import Coalesce, Pi
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
@@ -1057,3 +1058,109 @@ class DbCommentTests(TestCase):
 
         errors = Model._meta.get_field("field").check(databases=self.databases)
         self.assertEqual(errors, [])
+
+
+@isolate_apps("invalid_models_tests")
+class InvalidDBDefaultTests(TestCase):
+    def test_db_default(self):
+        class Model(models.Model):
+            field = models.FloatField(db_default=Pi())
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            expected_errors = []
+        else:
+            msg = (
+                f"{connection.display_name} does not support default database values "
+                "with expressions (db_default)."
+            )
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E011")]
+        self.assertEqual(errors, expected_errors)
+
+    def test_db_default_literal(self):
+        class Model(models.Model):
+            field = models.IntegerField(db_default=1)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+        self.assertEqual(errors, [])
+
+    def test_db_default_required_db_features(self):
+        class Model(models.Model):
+            field = models.FloatField(db_default=Pi())
+
+            class Meta:
+                required_db_features = {"supports_expression_defaults"}
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+        self.assertEqual(errors, [])
+
+    def test_db_default_expression_invalid(self):
+        expression = models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            msg = f"{expression} cannot be used in db_default."
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E012")]
+        else:
+            msg = (
+                f"{connection.display_name} does not support default database values "
+                "with expressions (db_default)."
+            )
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E011")]
+        self.assertEqual(errors, expected_errors)
+
+    def test_db_default_expression_required_db_features(self):
+        expression = models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+            class Meta:
+                required_db_features = {"supports_expression_defaults"}
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            msg = f"{expression} cannot be used in db_default."
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E012")]
+        else:
+            expected_errors = []
+        self.assertEqual(errors, expected_errors)
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_db_default_combined_invalid(self):
+        expression = models.Value(4.5) + models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        msg = f"{expression} cannot be used in db_default."
+        expected_error = Error(msg=msg, obj=field, id="fields.E012")
+        self.assertEqual(errors, [expected_error])
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_db_default_function_arguments_invalid(self):
+        expression = Coalesce(models.Value(4.5), models.F("field_name"))
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        msg = f"{expression} cannot be used in db_default."
+        expected_error = Error(msg=msg, obj=field, id="fields.E012")
+        self.assertEqual(errors, [expected_error])

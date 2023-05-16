@@ -99,6 +99,8 @@ class JSONField(CheckFieldDefaultMixin, Field):
         return "JSONField"
 
     def get_db_prep_value(self, value, connection, prepared=False):
+        if not prepared:
+            value = self.get_prep_value(value)
         # RemovedInDjango51Warning: When the deprecation ends, replace with:
         # if (
         #     isinstance(value, expressions.Value)

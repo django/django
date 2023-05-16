@@ -10,7 +10,7 @@ from django.db import (
     connection,
 )
 from django.db.models import FileField, Value
-from django.db.models.functions import Lower
+from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
     override_settings,
@@ -299,6 +299,19 @@ class BulkCreateTests(TestCase):
         )
         bbb = Restaurant.objects.filter(name="betty's beetroot bar")
         self.assertEqual(bbb.count(), 1)
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_insert_now(self):
+        NullableFields.objects.bulk_create(
+            [
+                NullableFields(datetime_field=Now()),
+                NullableFields(datetime_field=Now()),
+            ]
+        )
+        self.assertEqual(
+            NullableFields.objects.filter(datetime_field__isnull=False).count(),
+            2,
+        )
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_bulk_insert_nullable_fields(self):

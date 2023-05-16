@@ -562,10 +562,20 @@ Usage example:
     ``Now()`` uses ``STATEMENT_TIMESTAMP`` instead. If you need the transaction
     timestamp, use :class:`django.contrib.postgres.functions.TransactionNow`.
 
+.. admonition:: Oracle
+
+    On Oracle, the SQL ``LOCALTIMESTAMP`` is used to avoid issues with casting
+    ``CURRENT_TIMESTAMP`` to ``DateTimeField``.
+
 .. versionchanged:: 4.2
 
     Support for microsecond precision on MySQL and millisecond precision on
     SQLite were added.
+
+.. versionchanged:: 5.0
+
+    In older versions, the SQL ``CURRENT_TIMESTAMP`` was used on Oracle instead
+    of ``LOCALTIMESTAMP``.
 
 ``Trunc``
 ---------

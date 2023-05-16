@@ -156,7 +156,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         field_map = {
             column: (
                 display_size,
-                default if default != "NULL" else None,
+                default.rstrip() if default and default != "NULL" else None,
                 collation,
                 is_autofield,
                 is_json,
