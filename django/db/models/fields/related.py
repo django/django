@@ -14,7 +14,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
     DB_CASCADE,
-    ON_DELETE_DB_CHOICES,
+    DB_SET_NULL,
     SET_DEFAULT,
     SET_NULL,
 )
@@ -950,7 +950,6 @@ class ForeignKey(ForeignObject):
         self,
         to,
         on_delete,
-        on_delete_db=ON_DELETE_DB_CHOICES.DO_NOTHING_DB,
         related_name=None,
         related_query_name=None,
         limit_choices_to=None,
@@ -979,6 +978,7 @@ class ForeignKey(ForeignObject):
             to_field = to_field or (to._meta.pk and to._meta.pk.name)
         if not callable(on_delete):
             raise TypeError("on_delete must be callable.")
+
         kwargs["rel"] = self.rel_class(
             self,
             to,
@@ -988,7 +988,6 @@ class ForeignKey(ForeignObject):
             limit_choices_to=limit_choices_to,
             parent_link=parent_link,
             on_delete=on_delete,
-            on_delete_db=on_delete_db,
         )
         kwargs.setdefault("db_index", True)
 
@@ -1012,12 +1011,11 @@ class ForeignKey(ForeignObject):
             *super().check(**kwargs),
             *self._check_on_delete(),
             *self._check_unique(),
-            *self._check_on_delete_db(),
         ]
 
     def _check_on_delete(self):
         on_delete = getattr(self.remote_field, "on_delete", None)
-        if on_delete == SET_NULL and not self.null:
+        if on_delete in [SET_NULL, DB_SET_NULL] and not self.null:
             return [
                 checks.Error(
                     "Field specifies on_delete=SET_NULL, but cannot be null.",
@@ -1039,7 +1037,7 @@ class ForeignKey(ForeignObject):
                 )
             ]
         elif (
-            on_delete == DB_CASCADE
+            on_delete in [DB_CASCADE, DB_SET_NULL]
             and hasattr(self.model, "_meta")
             and any(
                 not parent._meta.abstract
@@ -1058,7 +1056,7 @@ class ForeignKey(ForeignObject):
                 )
             ]
         elif (
-            on_delete == DB_CASCADE
+            on_delete in [DB_CASCADE, DB_SET_NULL]
             and hasattr(self.model, "_meta")
             and (
                 any(  # generic relation
@@ -1080,8 +1078,17 @@ class ForeignKey(ForeignObject):
                     id="fields.E345",
                 )
             ]
-        else:
-            return []
+        elif self._has_related_models_with_db_cascading(self.model):
+            return [
+                checks.Error(
+                    "Using normal cascading with DB cascading referenced model is "
+                    "prohibited",
+                    hint="Use database level cascading for foreignkeys",
+                    obj=self,
+                    id="fields.E323",
+                )
+            ]
+        return []
 
     def _check_unique(self, **kwargs):
         return (
@@ -1120,8 +1127,8 @@ class ForeignKey(ForeignObject):
                 (
                     isinstance(rel, ForeignKey)
                     and hasattr(rel.remote_field, "on_delete")
-                    and rel.remote_field.on_delete == DB_CASCADE
-                    and on_delete != DB_CASCADE
+                    and rel.remote_field.on_delete in [DB_CASCADE, DB_SET_NULL]
+                    and on_delete in [CASCADE, SET_NULL]
                 )
                 for rel in model._meta.get_fields()
             )
@@ -1129,47 +1136,6 @@ class ForeignKey(ForeignObject):
         )
 
         return has_related_cascade_db
-
-    def _check_on_delete_db(self, **kwargs):
-        on_delete = getattr(self.remote_field, "on_delete", None)
-        on_delete_db = getattr(self.remote_field, "on_delete_db", None)
-
-        if (
-            on_delete_db != ON_DELETE_DB_CHOICES.DO_NOTHING_DB
-            and on_delete != DB_CASCADE
-        ):
-            return [
-                checks.Error(
-                    "The on_delete must be set to on_delete=models.DB_CASCADE to work"
-                    " with on_delete_db",
-                    hint="Remove the on_delete_db or set on_delete=models.DB_CASCADE",
-                    obj=self,
-                    id="fields.E322",
-                )
-            ]
-        elif on_delete_db == ON_DELETE_DB_CHOICES.SET_NULL_DB and not self.null:
-            return [
-                checks.Error(
-                    "Field specifies on_delete_db=SET_NULL_DB, but cannot be null.",
-                    hint=(
-                        "Set null=True argument on the field, or change the "
-                        "on_delete_db rule."
-                    ),
-                    obj=self,
-                    id="fields.E324",
-                )
-            ]
-        elif self._has_related_models_with_db_cascading(self.model):
-            return [
-                checks.Error(
-                    "Using normal cascading with DB cascading referenced model is "
-                    "prohibited",
-                    hint="Use database level cascading for foreignkeys",
-                    obj=self,
-                    id="fields.E323",
-                )
-            ]
-        return []
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

@@ -1,5 +1,4 @@
 from collections import Counter, defaultdict
-from enum import Enum
 from functools import partial, reduce
 from itertools import chain
 from operator import attrgetter, or_
@@ -18,13 +17,6 @@ class RestrictedError(IntegrityError):
     def __init__(self, msg, restricted_objects):
         self.restricted_objects = restricted_objects
         super().__init__(msg, restricted_objects)
-
-
-class ON_DELETE_DB_CHOICES(Enum):
-    DO_NOTHING_DB = ""
-    CASCADE_DB = "CASCADE"
-    RESTRICT_DB = "RESTRICT"
-    SET_NULL_DB = "SET NULL"
 
 
 def CASCADE(collector, field, sub_objs, using):
@@ -91,8 +83,20 @@ def DO_NOTHING(collector, field, sub_objs, using):
     pass
 
 
-def DB_CASCADE(collector, field, sub_objs, using):
-    pass
+class DatabaseOnDelete:
+    def __init__(self, operation):
+        self.operation = operation
+
+    def __call__(self, collector, field, sub_objs, using):
+        pass
+
+    def as_sql(self, connection):
+        return connection.ops.fk_on_delete_sql(self.operation)
+
+
+DB_CASCADE = DatabaseOnDelete("CASCADE")
+DB_SET_NULL = DatabaseOnDelete("SET NULL")
+DB_RESTRICT = DatabaseOnDelete("RESTRICT")
 
 
 def get_candidate_relations_to_delete(opts):

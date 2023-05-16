@@ -7,8 +7,9 @@ from django.db.models.constraints import __all__ as constraints_all
 from django.db.models.deletion import (
     CASCADE,
     DB_CASCADE,
+    DB_RESTRICT,
+    DB_SET_NULL,
     DO_NOTHING,
-    ON_DELETE_DB_CHOICES,
     PROTECT,
     RESTRICT,
     SET,
@@ -114,6 +115,7 @@ __all__ += [
     "ManyToOneRel",
     "ManyToManyRel",
     "OneToOneRel",
-    "ON_DELETE_DB_CHOICES",
     "DB_CASCADE",
+    "DB_RESTRICT",
+    "DB_SET_NULL",
 ]

@@ -14,7 +14,6 @@ class Bar(models.Model):
     foo = models.ForeignKey(
         Foo,
         on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
     )
 
 
@@ -25,7 +24,6 @@ class Baz(models.Model):
     bar = models.ForeignKey(
         Bar,
         on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
     )
 
 
@@ -34,8 +32,7 @@ class RestrictBar(models.Model):
 
     foo = models.ForeignKey(
         Foo,
-        on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.RESTRICT_DB,
+        on_delete=models.DB_RESTRICT,
     )
 
 
@@ -44,8 +41,7 @@ class RestrictBaz(models.Model):
 
     bar = models.ForeignKey(
         Bar,
-        on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.RESTRICT_DB,
+        on_delete=models.DB_RESTRICT,
     )
 
 
@@ -54,8 +50,7 @@ class SetNullBar(models.Model):
 
     foo = models.ForeignKey(
         Foo,
-        on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.SET_NULL_DB,
+        on_delete=models.DB_SET_NULL,
         null=True,
     )
     another_field = models.CharField(max_length=20)
@@ -66,8 +61,7 @@ class SetNullBaz(models.Model):
 
     bar = models.ForeignKey(
         Bar,
-        on_delete=models.DB_CASCADE,
-        on_delete_db=models.ON_DELETE_DB_CHOICES.SET_NULL_DB,
+        on_delete=models.DB_SET_NULL,
         null=True,
     )
     another_field = models.CharField(max_length=20)

@@ -17,7 +17,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_unique = "ALTER TABLE %(table)s DROP INDEX %(name)s"
     sql_create_column_inline_fk = (
         ", ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s(%(to_column)s) %(on_delete_db)s"
+        "REFERENCES %(to_table)s(%(to_column)s)%(on_delete_db)s"
     )
     sql_delete_fk = "ALTER TABLE %(table)s DROP FOREIGN KEY %(name)s"
 

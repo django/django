@@ -14,8 +14,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
-        "REFERENCES %(to_table)s (%(to_column)s) "
-        "%(on_delete_db)s DEFERRABLE INITIALLY DEFERRED"
+        "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s"
+        "DEFERRABLE INITIALLY DEFERRED"
     )
     sql_create_column_inline_fk = sql_create_inline_fk
     sql_delete_column = "ALTER TABLE %(table)s DROP COLUMN %(column)s"

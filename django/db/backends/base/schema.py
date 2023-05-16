@@ -13,7 +13,7 @@ from django.db.backends.ddl_references import (
 )
 from django.db.backends.utils import names_digest, split_identifier, truncate_name
 from django.db.models import NOT_PROVIDED, Deferrable, Index
-from django.db.models.deletion import ON_DELETE_DB_CHOICES
+from django.db.models.deletion import DatabaseOnDelete
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -1560,11 +1560,9 @@ class BaseDatabaseSchemaEditor:
         )
 
     def _create_on_delete_sql(self, model, field):
-        on_delete_db = getattr(
-            field.remote_field, "on_delete_db", ON_DELETE_DB_CHOICES.DO_NOTHING_DB
-        )
-        if on_delete_db.value:
-            return "ON DELETE %s" % on_delete_db.value
+        on_delete = getattr(field.remote_field, "on_delete", None)
+        if isinstance(on_delete, DatabaseOnDelete):
+            return on_delete.as_sql(self.connection)
         return ""
 
     def _index_columns(self, table, columns, col_suffixes, opclasses):

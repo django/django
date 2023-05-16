@@ -8,28 +8,6 @@ from .models import Bar, Foo
 
 
 class DatabaseLevelCascadeCheckTests(TestCase):
-    def test_system_check_on_on_delete_db_combination(self):
-        class MixedBar(models.Model):
-            foo = models.ForeignKey(
-                Foo,
-                on_delete=models.CASCADE,
-                on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
-            )
-
-        mixed_bar_field = MixedBar._meta.get_field("foo")
-        self.assertEqual(
-            mixed_bar_field.check(),
-            [
-                Error(
-                    "The on_delete must be set to on_delete=models.DB_CASCADE to work"
-                    " with on_delete_db",
-                    hint="Remove the on_delete_db or set on_delete=models.DB_CASCADE",
-                    obj=mixed_bar_field,
-                    id="fields.E322",
-                )
-            ],
-        )
-
     def test_system_check_on_nested_db_with_non_db_cascading(self):
         class BadBar(models.Model):
             foo = models.ForeignKey(Foo, on_delete=models.CASCADE)
@@ -40,7 +18,6 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             bar = models.ForeignKey(
                 Bar,
                 on_delete=models.CASCADE,
-                # on_delete_db=models.CASCADE
             )
 
         baz_field = Baz._meta.get_field("bar")
@@ -67,8 +44,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
         class SetNullDbNotNullModel(models.Model):
             foo = models.ForeignKey(
                 Foo,
-                on_delete=models.DB_CASCADE,
-                on_delete_db=models.ON_DELETE_DB_CHOICES.SET_NULL_DB,
+                on_delete=models.DB_SET_NULL,
             )
 
             class Meta:
@@ -79,13 +55,13 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             field.check(),
             [
                 Error(
-                    "Field specifies on_delete_db=SET_NULL_DB, but cannot be null.",
+                    "Field specifies on_delete=SET_NULL, but cannot be null.",
                     hint=(
                         "Set null=True argument on the field, or change the "
-                        "on_delete_db rule."
+                        "on_delete rule."
                     ),
                     obj=field,
-                    id="fields.E324",
+                    id="fields.E320",
                 )
             ],
         )
@@ -95,7 +71,6 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             another_foo = models.ForeignKey(
                 Foo,
                 on_delete=models.DB_CASCADE,
-                on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
             )
 
             class Meta:
@@ -103,10 +78,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
 
         class MultipleInheritedBar(Foo, Bar):
             another_foo = models.ForeignKey(
-                Foo,
-                on_delete=models.DB_CASCADE,
-                on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
-                related_name="another_foo",
+                Foo, on_delete=models.DB_CASCADE, related_name="another_foo"
             )
 
         field = AnotherBar._meta.get_field("another_foo")
@@ -146,7 +118,6 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             some_fk = models.ForeignKey(
                 ContentType,
                 on_delete=models.DB_CASCADE,
-                on_delete_db=models.ON_DELETE_DB_CHOICES.CASCADE_DB,
                 related_name="ctcmnt",
             )
             object_id = models.PositiveIntegerField()

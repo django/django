@@ -125,20 +125,12 @@ sets a database-computed default value. For example::
 
 Database level cascading support for ForeignKey field
 ---------------------------------------------------------------
-The ``on_delete`` argument for ``ForeignKey`` now supports an extra option
-``DB_CASCADE`` this will behave like ``DO_NOTHING`` in Django, but leverage 
-the Database level cascading options supported by SQL.
+The ``on_delete`` argument for ``ForeignKey`` now supports three extra options
+the new supported values of the ``on_delete`` argument can be the following:
 
-A new optional argument named ``on_delete_db`` is also passed to the
-``ForeignKey``. This will specify the type of database level cascading we are
-looking for if the ``on_delete`` is set to ``DB_CASCADE``.
-
-Supported values of the ``on_delete_db`` argument can be the following:
-
-``ON_DELETE_DB_CHOICES.DO_NOTHING_DB`` : Does nothing, used as default value.
-``ON_DELETE_DB_CHOICES.CASCADE_DB`` : Deletes the child on parent deletion.
-``ON_DELETE_DB_CHOICES.RESTRICT_DB`` : Prevent the deletion if child exists.
-``ON_DELETE_DB_CHOICES.SET_NULL_DB`` : Set the value to null in child table.
+``DB_CASCADE`` : Deletes the child on parent deletion at a database level.
+``DB_RESTRICT`` : Prevent the deletion if child exists at a database level.
+``DB_SET_NULL`` : Set the value to null in child table at a database level.
 
 Minor features
 --------------
