@@ -118,7 +118,7 @@ class BaseDatabaseSchemaEditor:
 
     sql_create_fk = (
         "ALTER TABLE %(table)s ADD CONSTRAINT %(name)s FOREIGN KEY (%(column)s) "
-        "REFERENCES %(to_table)s (%(to_column)s) %(on_delete_db)s %(deferrable)s"
+        "REFERENCES %(to_table)s (%(to_column)s)%(on_delete_db)s%(deferrable)s"
     )
     sql_create_inline_fk = None
     sql_create_column_inline_fk = None
