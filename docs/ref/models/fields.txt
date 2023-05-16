@@ -1723,6 +1723,34 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
 
+* .. attribute:: DB_CASCADE
+
+    DB_CASCADE is a custom option introduced in Django that allows the database
+    to handle cascading deletes instead of relying on Django's emulation of the
+    SQL constraint ON DELETE CASCADE. With DB_CASCADE, the database engine
+    itself takes care of deleting related objects when a referenced object is
+    deleted.
+
+    :meth:`.Model.delete` isn't called on related models, but the
+    :data:`~django.db.models.signals.pre_delete` and
+    :data:`~django.db.models.signals.post_delete` signals are not sent for any
+    deleted objects.
+
+* .. attribute:: DB_RESTRICT
+
+    Prevent deletion of the referenced object by raising
+    :exc:`~django.db.IntegrityError`. this is going to call SQL constraint ON
+    DELETE RESTRICT on a database level while creating or altering the
+    ForeignKey and enforces restrictions on deleting objects that have
+    referenced relationships
+
+* .. attribute:: DB_SET_NULL
+
+    Set the :class:`ForeignKey` null; this is only possible if
+    :attr:`~Field.null` is ``True``. This works on a database level instead of
+    using in-django options. this is going to call SQL constraint ON DELETE SET
+    NULL on a database level while creating or altering the ForeignKey
+
 .. attribute:: ForeignKey.limit_choices_to
 
     Sets a limit to the available choices for this field when this field is
