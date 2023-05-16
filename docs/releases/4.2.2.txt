@@ -15,3 +15,7 @@ Bugfixes
 
 * Restored, following a regression in Django 4.2, ``get_prep_value()`` call in
   ``JSONField`` subclasses (:ticket:`34539`).
+
+* Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.defer()``
+  when passing a ``ManyToManyField`` or ``GenericForeignKey`` reference. While
+  doing so is a no-op, it was allowed in older version (:ticket:`34570`).
