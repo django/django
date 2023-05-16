@@ -1620,9 +1620,6 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create an SQL constraint in the database. Support for
-    database-level cascade options :ticket:`may be implemented later <21961>`.
-
 The possible values for :attr:`~ForeignKey.on_delete` are found in
 :mod:`django.db.models`:
 
@@ -1725,6 +1722,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: DB_CASCADE
 
+    .. versionadded:: 5.0
+
     DB_CASCADE is a custom option introduced in Django that allows the database
     to handle cascading deletes instead of relying on Django's emulation of the
     SQL constraint ON DELETE CASCADE. With DB_CASCADE, the database engine
@@ -1738,6 +1737,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
 * .. attribute:: DB_RESTRICT
 
+    .. versionadded:: 5.0
+
     Prevent deletion of the referenced object by raising
     :exc:`~django.db.IntegrityError`. this is going to call SQL constraint ON
     DELETE RESTRICT on a database level while creating or altering the
@@ -1745,6 +1746,8 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     referenced relationships
 
 * .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 5.0
 
     Set the :class:`ForeignKey` null; this is only possible if
     :attr:`~Field.null` is ``True``. This works on a database level instead of
