@@ -17,6 +17,11 @@ class SecurityMiddleware(MiddlewareMixin):
         self.redirect_exempt = [re.compile(r) for r in settings.SECURE_REDIRECT_EXEMPT]
         self.referrer_policy = settings.SECURE_REFERRER_POLICY
         self.cross_origin_opener_policy = settings.SECURE_CROSS_ORIGIN_OPENER_POLICY
+        self.csp = settings.SECURE_CSP
+        self.csp_multiple = settings.SECURE_CSP_MULTIPLE
+        self.csp_report_only = settings.SECURE_CSP_REPORT_ONLY
+        self.csp_nonce = settings.SECURE_CSP_INCLUDE_NONCE_IN
+        self.csp_exclude_url_prefixes = settings.SECURE_CSP_EXCLUDE_URL_PREFIXES
 
     def process_request(self, request):
         path = request.path.lstrip("/")
@@ -63,4 +68,33 @@ class SecurityMiddleware(MiddlewareMixin):
                 "Cross-Origin-Opener-Policy",
                 self.cross_origin_opener_policy,
             )
+
+        if request.path_info.startswith(self.csp_exclude_url_prefixes):
+            return response
+
+        if self.csp:
+            header = "Content-Security-Policy"
+            csp_header_value = "; ".join((f"{k} {v}" for k, v in self.csp.items()))
+
+            if self.csp_report_only:
+                header += "-Report-Only"
+
+            if self.csp_nonce:
+                nonce = getattr(request, "_csp_nonce", None)
+                csp_header_value += "; 'nonce-%s'" % nonce
+            response.headers[header] = csp_header_value
+
+        if self.csp_multiple:
+            # Support a comma-separated string or iterable of values to allow
+            # fallback.
+            header = "Content-Security-Policy"
+            csp_header_value = "; ".join(
+                [v.strip() for v in self.csp_multiple.split(";")]
+                if isinstance(self.csp_multiple, str)
+                else self.csp_multiple
+            )
+            if self.csp_report_only:
+                header += "-Report-Only"
+            response.headers[header] = csp_header_value
+
         return response
