@@ -9,7 +9,7 @@ from django.forms.renderers import (
     Jinja2DivFormRenderer,
     TemplatesSetting,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.utils.deprecation import RemovedInDjango60Warning
 
 try:
@@ -74,3 +74,11 @@ class DeprecationTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
             Jinja2DivFormRenderer()
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_deprecation_renderers_can_be_instantiated(self):
+        tests = [DjangoDivFormRenderer, Jinja2DivFormRenderer]
+        for cls in tests:
+            with self.subTest(renderer_class=cls):
+                renderer = cls()
+                self.assertIsInstance(renderer, cls)
