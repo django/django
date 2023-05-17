@@ -4,7 +4,7 @@ from django.test import TestCase
 from .models import Bar, Baz, Foo, RestrictBar, RestrictBaz, SetNullBar, SetNullBaz
 
 
-class DatabaseLevelCascadeTests(TestCase):
+class DatabaseLevelOnDeleteTests(TestCase):
     def test_deletion_on_nested_cascades(self):
         foo = Foo.objects.create()
         bar = Bar.objects.create(foo=foo)
@@ -55,3 +55,57 @@ class DatabaseLevelCascadeTests(TestCase):
         self.assertEqual(baz.another_field, orphan_baz.another_field)
         self.assertNotEqual(baz.bar, orphan_baz.bar)
         self.assertIsNone(orphan_baz.bar)
+
+
+class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
+    def test_queries_on_nested_cascade(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            Bar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                Baz.objects.create(bar=bar)
+
+        # one is the deletion
+        # three select queries for Bar, SetNullBar and RestrictBar
+        with self.assertNumQueries(4):
+            foo.delete()
+
+    def test_queries_on_nested_set_null(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            SetNullBar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                SetNullBaz.objects.create(bar=bar)
+
+        # one is the deletion
+        # three select queries for Bar, SetNullBar and RestrictBar
+        with self.assertNumQueries(4):
+            foo.delete()
+
+    def test_queries_together_on_nested_set_null_cascade(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            Bar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                Baz.objects.create(bar=bar)
+
+        for i in range(3):
+            SetNullBar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                SetNullBaz.objects.create(bar=bar)
+
+        # one is the deletion
+        # three select queries for Bar, SetNullBar and RestrictBar
+        with self.assertNumQueries(4):
+            foo.delete()
