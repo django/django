@@ -32,18 +32,18 @@ databases -- a default PostgreSQL database and a MySQL database called
 ``users``::
 
     DATABASES = {
-        'default': {
-            'NAME': 'app_data',
-            'ENGINE': 'django.db.backends.postgresql',
-            'USER': 'postgres_user',
-            'PASSWORD': 's3krit'
+        "default": {
+            "NAME": "app_data",
+            "ENGINE": "django.db.backends.postgresql",
+            "USER": "postgres_user",
+            "PASSWORD": "s3krit",
         },
-        'users': {
-            'NAME': 'user_data',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'priv4te'
-        }
+        "users": {
+            "NAME": "user_data",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "priv4te",
+        },
     }
 
 If the concept of a ``default`` database doesn't make sense in the context
@@ -57,19 +57,19 @@ example ``settings.py`` snippet defining two non-default databases, with the
 ``default`` entry intentionally left empty::
 
     DATABASES = {
-        'default': {},
-        'users': {
-            'NAME': 'user_data',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'superS3cret'
+        "default": {},
+        "users": {
+            "NAME": "user_data",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "superS3cret",
         },
-        'customers': {
-            'NAME': 'customer_data',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_cust',
-            'PASSWORD': 'veryPriv@ate'
-        }
+        "customers": {
+            "NAME": "customer_data",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_cust",
+            "PASSWORD": "veryPriv@ate",
+        },
     }
 
 If you attempt to access a database that you haven't defined in your
@@ -280,30 +280,30 @@ with two read replicas. Here are the settings specifying these
 databases::
 
     DATABASES = {
-        'default': {},
-        'auth_db': {
-            'NAME': 'auth_db_name',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'swordfish',
+        "default": {},
+        "auth_db": {
+            "NAME": "auth_db_name",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "swordfish",
         },
-        'primary': {
-            'NAME': 'primary_name',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'spam',
+        "primary": {
+            "NAME": "primary_name",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "spam",
         },
-        'replica1': {
-            'NAME': 'replica1_name',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'eggs',
+        "replica1": {
+            "NAME": "replica1_name",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "eggs",
         },
-        'replica2': {
-            'NAME': 'replica2_name',
-            'ENGINE': 'django.db.backends.mysql',
-            'USER': 'mysql_user',
-            'PASSWORD': 'bacon',
+        "replica2": {
+            "NAME": "replica2_name",
+            "ENGINE": "django.db.backends.mysql",
+            "USER": "mysql_user",
+            "PASSWORD": "bacon",
         },
     }
 
@@ -317,14 +317,15 @@ same database)::
         A router to control all database operations on models in the
         auth and contenttypes applications.
         """
-        route_app_labels = {'auth', 'contenttypes'}
+
+        route_app_labels = {"auth", "contenttypes"}
 
         def db_for_read(self, model, **hints):
             """
             Attempts to read auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'auth_db'
+                return "auth_db"
             return None
 
         def db_for_write(self, model, **hints):
@@ -332,7 +333,7 @@ same database)::
             Attempts to write auth and contenttypes models go to auth_db.
             """
             if model._meta.app_label in self.route_app_labels:
-                return 'auth_db'
+                return "auth_db"
             return None
 
         def allow_relation(self, obj1, obj2, **hints):
@@ -341,10 +342,10 @@ same database)::
             involved.
             """
             if (
-                obj1._meta.app_label in self.route_app_labels or
-                obj2._meta.app_label in self.route_app_labels
+                obj1._meta.app_label in self.route_app_labels
+                or obj2._meta.app_label in self.route_app_labels
             ):
-               return True
+                return True
             return None
 
         def allow_migrate(self, db, app_label, model_name=None, **hints):
@@ -353,7 +354,7 @@ same database)::
             'auth_db' database.
             """
             if app_label in self.route_app_labels:
-                return db == 'auth_db'
+                return db == "auth_db"
             return None
 
 And we also want a router that sends all other apps to the
@@ -362,25 +363,26 @@ from::
 
     import random
 
+
     class PrimaryReplicaRouter:
         def db_for_read(self, model, **hints):
             """
             Reads go to a randomly-chosen replica.
             """
-            return random.choice(['replica1', 'replica2'])
+            return random.choice(["replica1", "replica2"])
 
         def db_for_write(self, model, **hints):
             """
             Writes always go to primary.
             """
-            return 'primary'
+            return "primary"
 
         def allow_relation(self, obj1, obj2, **hints):
             """
             Relations between objects are allowed if both objects are
             in the primary/replica pool.
             """
-            db_set = {'primary', 'replica1', 'replica2'}
+            db_set = {"primary", "replica1", "replica2"}
             if obj1._state.db in db_set and obj2._state.db in db_set:
                 return True
             return None
@@ -395,7 +397,7 @@ Finally, in the settings file, we add the following (substituting
 ``path.to.`` with the actual Python path to the module(s) where the
 routers are defined)::
 
-    DATABASE_ROUTERS = ['path.to.AuthRouter', 'path.to.PrimaryReplicaRouter']
+    DATABASE_ROUTERS = ["path.to.AuthRouter", "path.to.PrimaryReplicaRouter"]
 
 The order in which routers are processed is significant. Routers will
 be queried in the order they are listed in the
@@ -414,17 +416,17 @@ With this setup installed, and all databases migrated as per
 .. code-block:: pycon
 
     >>> # This retrieval will be performed on the 'auth_db' database
-    >>> fred = User.objects.get(username='fred')
-    >>> fred.first_name = 'Frederick'
+    >>> fred = User.objects.get(username="fred")
+    >>> fred.first_name = "Frederick"
 
     >>> # This save will also be directed to 'auth_db'
     >>> fred.save()
 
     >>> # These retrieval will be randomly allocated to a replica database
-    >>> dna = Person.objects.get(name='Douglas Adams')
+    >>> dna = Person.objects.get(name="Douglas Adams")
 
     >>> # A new object has no database allocation when created
-    >>> mh = Book(title='Mostly Harmless')
+    >>> mh = Book(title="Mostly Harmless")
 
     >>> # This assignment will consult the router, and set mh onto
     >>> # the same database as the author object
@@ -434,7 +436,7 @@ With this setup installed, and all databases migrated as per
     >>> mh.save()
 
     >>> # ... but if we re-retrieve the object, it will come back on a replica
-    >>> mh = Book.objects.get(title='Mostly Harmless')
+    >>> mh = Book.objects.get(title="Mostly Harmless")
 
 This example defined a router to handle interaction with models from the
 ``auth`` app, and other routers to handle interaction with all other apps. If
@@ -467,10 +469,10 @@ which you want to run the query. For example:
     >>> Author.objects.all()
 
     >>> # So will this.
-    >>> Author.objects.using('default')
+    >>> Author.objects.using("default")
 
     >>> # This will run on the 'other' database.
-    >>> Author.objects.using('other')
+    >>> Author.objects.using("other")
 
 Selecting a database for ``save()``
 -----------------------------------
@@ -483,7 +485,7 @@ use this:
 
 .. code-block:: pycon
 
-    >>> my_object.save(using='legacy_users')
+    >>> my_object.save(using="legacy_users")
 
 If you don't specify ``using``, the ``save()`` method will save into
 the default database allocated by the routers.
@@ -500,9 +502,9 @@ Consider the following example:
 
 .. code-block:: pycon
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')  # (statement 1)
-    >>> p.save(using='second') # (statement 2)
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")  # (statement 1)
+    >>> p.save(using="second")  # (statement 2)
 
 In statement 1, a new ``Person`` object is saved to the ``first``
 database. At this time, ``p`` doesn't have a primary key, so Django
@@ -526,19 +528,19 @@ database:
 
 .. code-block:: pycon
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')
-    >>> p.pk = None # Clear the primary key.
-    >>> p.save(using='second') # Write a completely new object.
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")
+    >>> p.pk = None  # Clear the primary key.
+    >>> p.save(using="second")  # Write a completely new object.
 
 The second option is to use the ``force_insert`` option to ``save()``
 to ensure that Django does an SQL ``INSERT``:
 
 .. code-block:: pycon
 
-    >>> p = Person(name='Fred')
-    >>> p.save(using='first')
-    >>> p.save(using='second', force_insert=True)
+    >>> p = Person(name="Fred")
+    >>> p.save(using="first")
+    >>> p.save(using="second", force_insert=True)
 
 This will ensure that the person named ``Fred`` will have the same
 primary key on both databases. If that primary key is already in use
@@ -554,8 +556,8 @@ place:
 
 .. code-block:: pycon
 
-    >>> u = User.objects.using('legacy_users').get(username='fred')
-    >>> u.delete() # will delete from the `legacy_users` database
+    >>> u = User.objects.using("legacy_users").get(username="fred")
+    >>> u.delete()  # will delete from the `legacy_users` database
 
 To specify the database from which a model will be deleted, pass a
 ``using`` keyword argument to the ``Model.delete()`` method. This
@@ -566,8 +568,8 @@ database to the ``new_users`` database, you might use these commands:
 
 .. code-block:: pycon
 
-    >>> user_obj.save(using='new_users')
-    >>> user_obj.delete(using='legacy_users')
+    >>> user_obj.save(using="new_users")
+    >>> user_obj.delete(using="legacy_users")
 
 Using managers with multiple databases
 --------------------------------------
@@ -583,7 +585,7 @@ is a manager method, not a ``QuerySet`` method, you can't do
 manager, not on ``QuerySet`` objects derived from the manager.) The
 solution is to use ``db_manager()``, like this::
 
-    User.objects.db_manager('new_users').create_user(...)
+    User.objects.db_manager("new_users").create_user(...)
 
 ``db_manager()`` returns a copy of the manager bound to the database you specify.
 
@@ -619,7 +621,7 @@ for multiple-database support::
 
     class MultiDBModelAdmin(admin.ModelAdmin):
         # A handy constant for the name of the alternate database.
-        using = 'other'
+        using = "other"
 
         def save_model(self, request, obj, form, change):
             # Tell Django to save objects to the 'other' database.
@@ -636,12 +638,16 @@ for multiple-database support::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(
+                db_field, request, using=self.using, **kwargs
+            )
 
         def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(
+                db_field, request, using=self.using, **kwargs
+            )
 
 The implementation provided here implements a multi-database strategy
 where all objects of a given type are stored on a specific database
@@ -653,7 +659,7 @@ need to reflect that strategy.
 similar fashion. They require three customized methods::
 
     class MultiDBTabularInline(admin.TabularInline):
-        using = 'other'
+        using = "other"
 
         def get_queryset(self, request):
             # Tell Django to look for inline objects on the 'other' database.
@@ -662,29 +668,36 @@ similar fashion. They require three customized methods::
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             # Tell Django to populate ForeignKey widgets using a query
             # on the 'other' database.
-            return super().formfield_for_foreignkey(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_foreignkey(
+                db_field, request, using=self.using, **kwargs
+            )
 
         def formfield_for_manytomany(self, db_field, request, **kwargs):
             # Tell Django to populate ManyToMany widgets using a query
             # on the 'other' database.
-            return super().formfield_for_manytomany(db_field, request, using=self.using, **kwargs)
+            return super().formfield_for_manytomany(
+                db_field, request, using=self.using, **kwargs
+            )
 
 Once you've written your model admin definitions, they can be
 registered with any ``Admin`` instance::
 
     from django.contrib import admin
 
+
     # Specialize the multi-db admin objects for use with specific models.
     class BookInline(MultiDBTabularInline):
         model = Book
 
+
     class PublisherAdmin(MultiDBModelAdmin):
         inlines = [BookInline]
+
 
     admin.site.register(Author, MultiDBModelAdmin)
     admin.site.register(Publisher, PublisherAdmin)
 
-    othersite = admin.AdminSite('othersite')
+    othersite = admin.AdminSite("othersite")
     othersite.register(Publisher, MultiDBModelAdmin)
 
 This example sets up two admin sites. On the first site, the
@@ -703,7 +716,8 @@ object that allows you to retrieve a specific connection using its
 alias::
 
     from django.db import connections
-    with connections['my_db_alias'].cursor() as cursor:
+
+    with connections["my_db_alias"].cursor() as cursor:
         ...
 
 Limitations of multiple databases

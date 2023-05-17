@@ -279,8 +279,9 @@ was added in Django 1.6), you might have some passwords that use the
 You can check if that's the case like this::
 
     from django.contrib.auth import get_user_model
+
     User = get_user_model()
-    User.objects.filter(password__startswith='bcrypt$$')
+    User.objects.filter(password__startswith="bcrypt$$")
 
 If you want to continue to allow those passwords to be used, you'll
 have to define the :setting:`PASSWORD_HASHERS` setting (if you don't already)
@@ -407,8 +408,8 @@ Miscellaneous
   suitable alternatives. Compared to the ``QUERY_TERMS`` constant, they allow
   your code to also account for any custom lookups that have been registered.
 
-* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use `bcrypt
-  <https://pypi.org/project/bcrypt/>`_ instead.
+* Compatibility with ``py-bcrypt`` is removed as it's unmaintained. Use
+  :pypi:`bcrypt` instead.
 
 .. _deprecated-features-2.1:
 

@@ -224,13 +224,13 @@ the content of the response manually:
 
     # Set up a rendered TemplateResponse
     >>> from django.template.response import TemplateResponse
-    >>> t = TemplateResponse(request, 'original.html', {})
+    >>> t = TemplateResponse(request, "original.html", {})
     >>> t.render()
     >>> print(t.content)
     Original content
 
     # Re-rendering doesn't change content
-    >>> t.template_name = 'new.html'
+    >>> t.template_name = "new.html"
     >>> t.render()
     >>> print(t.content)
     Original content
@@ -267,13 +267,15 @@ the template response::
 
     from django.template.response import TemplateResponse
 
+
     def my_render_callback(response):
         # Do content-sensitive processing
         do_post_processing()
 
+
     def my_view(request):
         # Create a response
-        response = TemplateResponse(request, 'mytemplate.html', {})
+        response = TemplateResponse(request, "mytemplate.html", {})
         # Register the callback
         response.add_post_render_callback(my_render_callback)
         # Return the response
@@ -298,5 +300,8 @@ template and a context containing a queryset::
 
     from django.template.response import TemplateResponse
 
+
     def blog_index(request):
-        return TemplateResponse(request, 'entry_list.html', {'entries': Entry.objects.all()})
+        return TemplateResponse(
+            request, "entry_list.html", {"entries": Entry.objects.all()}
+        )

@@ -77,10 +77,11 @@ respectively. For example::
 
     from django.contrib.staticfiles import storage
 
+
     class MyStaticFilesStorage(storage.StaticFilesStorage):
         def __init__(self, *args, **kwargs):
-            kwargs['file_permissions_mode'] = 0o640
-            kwargs['directory_permissions_mode'] = 0o760
+            kwargs["file_permissions_mode"] = 0o640
+            kwargs["directory_permissions_mode"] = 0o760
             super().__init__(*args, **kwargs)
 
 Then set the ``staticfiles`` storage backend in :setting:`STORAGES` setting to
@@ -141,6 +142,7 @@ class, override the ``ignore_patterns`` attribute of this class and replace
 :setting:`INSTALLED_APPS` setting::
 
     from django.contrib.staticfiles.apps import StaticFilesConfig
+
 
     class MyStaticFilesConfig(StaticFilesConfig):
         ignore_patterns = [...]  # your custom ignore list
@@ -298,6 +300,11 @@ method). The regular expressions used to find those paths
 
 * The `@import`_ rule and `url()`_ statement of `Cascading Style Sheets`_.
 * `Source map`_ comments in CSS and JavaScript files.
+
+Subclass ``ManifestStaticFilesStorage`` and set the
+``support_js_module_import_aggregation`` attribute to ``True``, if you want to
+use the experimental regular expressions to cover:
+
 * The `modules import`_ in JavaScript.
 * The `modules aggregation`_ in JavaScript.
 
@@ -322,8 +329,10 @@ argument. For example::
 
     from django.conf import settings
     from django.contrib.staticfiles.storage import (
-        ManifestStaticFilesStorage, StaticFilesStorage,
+        ManifestStaticFilesStorage,
+        StaticFilesStorage,
     )
+
 
     class MyManifestStaticFilesStorage(ManifestStaticFilesStorage):
         def __init__(self, *args, **kwargs):
@@ -338,8 +347,8 @@ argument. For example::
 
 .. versionchanged:: 4.2
 
-    Support for finding paths to JavaScript modules in ``import`` and
-    ``export`` statements was added.
+    Experimental optional support for finding paths to JavaScript modules in
+    ``import`` and ``export`` statements was added.
 
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
 
@@ -421,7 +430,7 @@ of directory paths in which the finders searched. Example usage::
 
     from django.contrib.staticfiles import finders
 
-    result = finders.find('css/base.css')
+    result = finders.find("css/base.css")
     searched_locations = finders.searched_locations
 
 Other Helpers
@@ -499,7 +508,7 @@ primary URL configuration::
 
    if settings.DEBUG:
        urlpatterns += [
-           re_path(r'^static/(?P<path>.*)$', views.serve),
+           re_path(r"^static/(?P<path>.*)$", views.serve),
        ]
 
 Note, the beginning of the pattern (``r'^static/'``) should be your

@@ -173,50 +173,56 @@ class MigrateTests(MigrationTestBase):
         for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
-        # Run the migrations to 0001 only
-        call_command("migrate", "migrations", "0001", verbosity=0)
-        call_command("migrate", "migrations", "0001", verbosity=0, database="other")
-        # Make sure the right tables exist
-        self.assertTableExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        # Also check the "other" database
-        self.assertTableNotExists("migrations_author", using="other")
-        self.assertTableExists("migrations_tribble", using="other")
 
-        # Fake a roll-back
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        call_command(
-            "migrate", "migrations", "zero", fake=True, verbosity=0, database="other"
-        )
-        # Make sure the tables still exist
-        self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble", using="other")
-        # Try to run initial migration
-        with self.assertRaises(DatabaseError):
+        try:
+            # Run the migrations to 0001 only
             call_command("migrate", "migrations", "0001", verbosity=0)
-        # Run initial migration with an explicit --fake-initial
-        out = io.StringIO()
-        with mock.patch(
-            "django.core.management.color.supports_color", lambda *args: False
-        ):
+            call_command("migrate", "migrations", "0001", verbosity=0, database="other")
+            # Make sure the right tables exist
+            self.assertTableExists("migrations_author")
+            self.assertTableNotExists("migrations_tribble")
+            # Also check the "other" database
+            self.assertTableNotExists("migrations_author", using="other")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Fake a roll-back
+            call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
             call_command(
                 "migrate",
                 "migrations",
-                "0001",
-                fake_initial=True,
-                stdout=out,
-                verbosity=1,
-            )
-            call_command(
-                "migrate",
-                "migrations",
-                "0001",
-                fake_initial=True,
+                "zero",
+                fake=True,
                 verbosity=0,
                 database="other",
             )
-        self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
-        try:
+            # Make sure the tables still exist
+            self.assertTableExists("migrations_author")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Try to run initial migration
+            with self.assertRaises(DatabaseError):
+                call_command("migrate", "migrations", "0001", verbosity=0)
+            # Run initial migration with an explicit --fake-initial
+            out = io.StringIO()
+            with mock.patch(
+                "django.core.management.color.supports_color", lambda *args: False
+            ):
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    stdout=out,
+                    verbosity=1,
+                )
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    verbosity=0,
+                    database="other",
+                )
+            self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
+
             # Run migrations all the way.
             call_command("migrate", verbosity=0)
             call_command("migrate", verbosity=0, database="other")

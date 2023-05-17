@@ -34,7 +34,13 @@ class UniqueConstraintProduct(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=["name", "color"], name="name_color_uniq"),
+            models.UniqueConstraint(
+                fields=["name", "color"],
+                name="name_color_uniq",
+                # Custom message and error code are ignored.
+                violation_error_code="custom_code",
+                violation_error_message="Custom message",
+            )
         ]
 
 

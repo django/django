@@ -881,7 +881,7 @@ needed. You don't need to restart the server for code changes to take effect.
 However, some actions like adding files don't trigger a restart, so you'll
 have to restart the server in these cases.
 
-If you're using Linux or MacOS and install both `pywatchman`_ and the
+If you're using Linux or MacOS and install both :pypi:`pywatchman` and the
 `Watchman`_ service, kernel signals will be used to autoreload the server
 (rather than polling file modification timestamps each second). This offers
 better performance on large projects, reduced response time after code changes,
@@ -903,7 +903,6 @@ more robust change detection, and a reduction in power usage. Django supports
     by setting the :envvar:`DJANGO_WATCHMAN_TIMEOUT` environment variable.
 
 .. _Watchman: https://facebook.github.io/watchman/
-.. _pywatchman: https://pypi.org/project/pywatchman/
 .. _watchman documentation: https://facebook.github.io/watchman/docs/config#ignore_dirs
 
 When you start the server, and each time you change Python code while the
@@ -1012,6 +1011,13 @@ By default, the development server doesn't serve any static files for your site
 (such as CSS files, images, things under :setting:`MEDIA_URL` and so forth). If
 you want to configure Django to serve static media, read
 :doc:`/howto/static-files/index`.
+
+Serving with ASGI in development
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django's ``runserver`` command provides a WSGI server. In order to run under
+ASGI you will need to use an :doc:`ASGI server </howto/deployment/asgi/index>`.
+The Django Daphne project provides :ref:`daphne-runserver` that you can use.
 
 ``sendtestemail``
 -----------------
@@ -1913,9 +1919,9 @@ Under Windows, the legacy ``cmd.exe`` native console doesn't support ANSI
 escape sequences so by default there is no color output. In this case either of
 two third-party libraries are needed:
 
-* Install colorama_, a Python package that translates ANSI color codes into
-  Windows API calls. Django commands will detect its presence and will make use
-  of its services to color output just like on Unix-based platforms.
+* Install :pypi:`colorama`, a Python package that translates ANSI color codes
+  into Windows API calls. Django commands will detect its presence and will
+  make use of its services to color output just like on Unix-based platforms.
   ``colorama`` can be installed via pip:
 
   .. code-block:: doscon
@@ -1934,7 +1940,6 @@ installation of ``ANSICON`` by setting the appropriate environmental variable,
 .. _`Windows Terminal`: https://www.microsoft.com/en-us/p/windows-terminal-preview/9n0dx20hk701
 .. _`VS Code`: https://code.visualstudio.com
 .. _ANSICON: http://adoxa.altervista.org/ansicon/
-.. _colorama: https://pypi.org/project/colorama/
 
 Custom colors
 ~~~~~~~~~~~~~
@@ -2097,9 +2102,9 @@ Examples::
       from django.core import management
       from django.core.management.commands import loaddata
 
-      management.call_command('flush', verbosity=0, interactive=False)
-      management.call_command('loaddata', 'test_data', verbosity=0)
-      management.call_command(loaddata.Command(), 'test_data', verbosity=0)
+      management.call_command("flush", verbosity=0, interactive=False)
+      management.call_command("loaddata", "test_data", verbosity=0)
+      management.call_command(loaddata.Command(), "test_data", verbosity=0)
 
 Note that command options that take no arguments are passed as keywords
 with ``True`` or ``False``, as you can see with the ``interactive`` option above.
@@ -2107,14 +2112,14 @@ with ``True`` or ``False``, as you can see with the ``interactive`` option above
 Named arguments can be passed by using either one of the following syntaxes::
 
       # Similar to the command line
-      management.call_command('dumpdata', '--natural-foreign')
+      management.call_command("dumpdata", "--natural-foreign")
 
       # Named argument similar to the command line minus the initial dashes and
       # with internal dashes replaced by underscores
-      management.call_command('dumpdata', natural_foreign=True)
+      management.call_command("dumpdata", natural_foreign=True)
 
       # `use_natural_foreign_keys` is the option destination variable
-      management.call_command('dumpdata', use_natural_foreign_keys=True)
+      management.call_command("dumpdata", use_natural_foreign_keys=True)
 
 Some command options have different names when using ``call_command()`` instead
 of ``django-admin`` or ``manage.py``. For example, ``django-admin
@@ -2125,7 +2130,7 @@ passed to ``parser.add_argument()``.
 
 Command options which take multiple options are passed a list::
 
-      management.call_command('dumpdata', exclude=['contenttypes', 'auth'])
+      management.call_command("dumpdata", exclude=["contenttypes", "auth"])
 
 The return value of the ``call_command()`` function is the same as the return
 value of the ``handle()`` method of the command.
@@ -2136,5 +2141,5 @@ Output redirection
 Note that you can redirect standard output and error streams as all commands
 support the ``stdout`` and ``stderr`` options. For example, you could write::
 
-    with open('/path/to/command_output', 'w') as f:
-        management.call_command('dumpdata', stdout=f)
+    with open("/path/to/command_output", "w") as f:
+        management.call_command("dumpdata", stdout=f)

@@ -59,6 +59,14 @@ should return a rendered templates (as a string) or raise
 
         Defaults to ``"django/forms/formsets/div.html"`` template.
 
+    .. attribute:: field_template_name
+
+        .. versionadded:: 5.0
+
+        The default name of the template used to render a ``BoundField``.
+
+        Defaults to ``"django/forms/field.html"``
+
     .. method:: get_template(template_name)
 
         Subclasses must implement this method with the appropriate template
@@ -137,7 +145,8 @@ Using this renderer along with the built-in templates requires either:
   of one of your template engines. To generate that path::
 
     import django
-    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
+
+    django.__path__[0] + "/forms/templates"  # or '/forms/jinja2'
 
 Using this renderer requires you to make sure the form templates your project
 needs can be located.
@@ -160,6 +169,16 @@ forms receive a dictionary with the following values:
 * ``fields``: All bound fields, except the hidden fields.
 * ``hidden_fields``: All hidden bound fields.
 * ``errors``: All non field related or hidden field related form errors.
+
+Context available in field templates
+====================================
+
+.. versionadded:: 5.0
+
+Field templates receive a context from :meth:`.BoundField.get_context`. By
+default, fields receive a dictionary with the following values:
+
+* ``field``: The :class:`~django.forms.BoundField`.
 
 Context available in widget templates
 =====================================
@@ -186,7 +205,7 @@ Overriding built-in formset templates
 :attr:`.BaseFormSet.template_name`
 
 To override formset templates, you must use the :class:`TemplatesSetting`
-renderer. Then overriding widget templates works :doc:`the same as
+renderer. Then overriding formset templates works :doc:`the same as
 </howto/overriding-templates>` overriding any other template in your project.
 
 .. _overriding-built-in-form-templates:
@@ -197,7 +216,20 @@ Overriding built-in form templates
 :attr:`.Form.template_name`
 
 To override form templates, you must use the :class:`TemplatesSetting`
-renderer. Then overriding widget templates works :doc:`the same as
+renderer. Then overriding form templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.
+
+.. _overriding-built-in-field-templates:
+
+Overriding built-in field templates
+===================================
+
+.. versionadded:: 5.0
+
+:attr:`.Field.template_name`
+
+To override field templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding field templates works :doc:`the same as
 </howto/overriding-templates>` overriding any other template in your project.
 
 .. _overriding-built-in-widget-templates:

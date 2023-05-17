@@ -35,6 +35,7 @@ if "%1" == "help" (
 	echo.  linkcheck  to check all external links for integrity
 	echo.  doctest    to run all doctests embedded in the documentation if enabled
 	echo.  spelling   to check for typos in documentation
+	echo.  black      to apply the black formatting to code blocks in documentation
 	goto end
 )
 
@@ -194,6 +195,14 @@ if "%1" == "spelling" (
 	echo.Check finished. Wrong words can be found in %BUILDDIR%/^
 spelling/output.txt.
 	goto end
+)
+
+if "%1" == "black" (
+	for /f "usebackq tokens=*" %%i in (`dir *.txt /s /b ^| findstr /v /c:"_build" /c:"_theme"`) do (
+		blacken-docs --rst-literal-block %%i
+	)
+	echo.
+	echo.Code blocks reformatted
 )
 
 :end

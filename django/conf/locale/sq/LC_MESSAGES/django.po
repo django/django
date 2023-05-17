@@ -2,16 +2,16 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2014
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2022
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2023
 # Besnik Bleta <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-07-25 06:49+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2023\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -52,6 +52,9 @@ msgstr "Boshnjake"
 
 msgid "Catalan"
 msgstr "Katalane"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurdishte e Qendrës (Sorani)"
 
 msgid "Czech"
 msgstr "Çeke"
@@ -390,6 +393,8 @@ msgstr "Siguroni që kjo vlerë është më e madhe ose baras me %(limit_value)s
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
 msgstr ""
+"Garantoni që vlera të jetë një shumëfish i madhësisë së hapit "
+"%(limit_value)s."
 
 #, python-format
 msgid ""
@@ -464,7 +469,7 @@ msgstr "Ka tashmë %(model_name)s me këtë %(field_labels)s."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "Është cenuar kufizimi “%(name)s”."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -506,6 +511,9 @@ msgstr "Buleane (Ose True, ose False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Varg (deri në %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Varg (i pakufizuar)"
 
 msgid "Comma-separated integers"
 msgstr "Numra të plotë të ndarë me presje"
@@ -1197,8 +1205,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Nëse përdorni etiketën <meta name=\"referrer\" content=\"no-referrer\"> "
 "etiketën ose përfshini kryet “Referrer-Policy: no-referrer”, ju lutemi, "
@@ -1298,13 +1306,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
-"Po e shihni këtë faqe ngaqë te kartela juaj e rregullimeve gjendet <a href="
-"\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target="
-"\"_blank\" rel=\"noopener\">DEBUG=True</a> dhe s’keni formësuar ndonjë URL."
+"Po e shihni këtë faqe ngaqë te kartela juaj e rregullimeve gjendet <a "
+"href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> dhe s’keni formësuar "
+"ndonjë URL."
 
 msgid "Django Documentation"
 msgstr "Dokumentim i Django-s"

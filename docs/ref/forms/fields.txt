@@ -26,9 +26,9 @@ value:
 
     >>> from django import forms
     >>> f = forms.EmailField()
-    >>> f.clean('foo@example.com')
+    >>> f.clean("foo@example.com")
     'foo@example.com'
-    >>> f.clean('invalid email address')
+    >>> f.clean("invalid email address")
     Traceback (most recent call last):
     ...
     ValidationError: ['Enter a valid email address.']
@@ -55,9 +55,9 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
 
     >>> from django import forms
     >>> f = forms.CharField()
-    >>> f.clean('foo')
+    >>> f.clean("foo")
     'foo'
-    >>> f.clean('')
+    >>> f.clean("")
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
@@ -65,7 +65,7 @@ an empty value -- either ``None`` or the empty string (``""``) -- then
     Traceback (most recent call last):
     ...
     ValidationError: ['This field is required.']
-    >>> f.clean(' ')
+    >>> f.clean(" ")
     ' '
     >>> f.clean(0)
     '0'
@@ -80,9 +80,9 @@ To specify that a field is *not* required, pass ``required=False`` to the
 .. code-block:: pycon
 
     >>> f = forms.CharField(required=False)
-    >>> f.clean('foo')
+    >>> f.clean("foo")
     'foo'
-    >>> f.clean('')
+    >>> f.clean("")
     ''
     >>> f.clean(None)
     ''
@@ -124,9 +124,10 @@ We've specified ``auto_id=False`` to simplify the output:
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(label='Your name')
-    ...     url = forms.URLField(label='Your website', required=False)
+    ...     name = forms.CharField(label="Your name")
+    ...     url = forms.URLField(label="Your website", required=False)
     ...     comment = forms.CharField()
+    ...
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <div>Your name:<input type="text" name="name" required></div>
@@ -146,8 +147,9 @@ The ``label_suffix`` argument lets you override the form's
     >>> class ContactForm(forms.Form):
     ...     age = forms.IntegerField()
     ...     nationality = forms.CharField()
-    ...     captcha_answer = forms.IntegerField(label='2 + 2', label_suffix=' =')
-    >>> f = ContactForm(label_suffix='?')
+    ...     captcha_answer = forms.IntegerField(label="2 + 2", label_suffix=" =")
+    ...
+    >>> f = ContactForm(label_suffix="?")
     >>> print(f)
     <div><label for="id_age">Age?</label><input type="number" name="age" required id="id_age"></div>
     <div><label for="id_nationality">Nationality?</label><input type="text" name="nationality" required id="id_nationality"></div>
@@ -170,9 +172,10 @@ field is initialized to a particular value. For example:
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='Your name')
-    ...     url = forms.URLField(initial='http://')
+    ...     name = forms.CharField(initial="Your name")
+    ...     url = forms.URLField(initial="http://")
     ...     comment = forms.CharField()
+    ...
     >>> f = CommentForm(auto_id=False)
     >>> print(f)
     <div>Name:<input type="text" name="name" value="Your name" required></div>
@@ -189,7 +192,8 @@ and the HTML output will include any validation errors:
     ...     name = forms.CharField()
     ...     url = forms.URLField()
     ...     comment = forms.CharField()
-    >>> default_data = {'name': 'Your name', 'url': 'http://'}
+    ...
+    >>> default_data = {"name": "Your name", "url": "http://"}
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
     <div>Name:<input type="text" name="name" value="Your name" required></div>
@@ -206,10 +210,11 @@ validation if a particular field's value is not given. ``initial`` values are
 .. code-block:: pycon
 
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='Your name')
-    ...     url = forms.URLField(initial='http://')
+    ...     name = forms.CharField(initial="Your name")
+    ...     url = forms.URLField(initial="http://")
     ...     comment = forms.CharField()
-    >>> data = {'name': '', 'url': '', 'comment': 'Foo'}
+    ...
+    >>> data = {"name": "", "url": "", "comment": "Foo"}
     >>> f = CommentForm(data)
     >>> f.is_valid()
     False
@@ -224,6 +229,7 @@ Instead of a constant, you can also pass any callable:
     >>> import datetime
     >>> class DateForm(forms.Form):
     ...     day = forms.DateField(initial=datetime.date.today)
+    ...
     >>> print(DateForm())
     <div><label for="id_day">Day:</label><input type="text" name="day" value="2023-02-11" required id="id_day"></div>
 
@@ -257,10 +263,11 @@ fields. We've specified ``auto_id=False`` to simplify the output:
 
     >>> from django import forms
     >>> class HelpTextContactForm(forms.Form):
-    ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    ...     subject = forms.CharField(max_length=100, help_text="100 characters max.")
     ...     message = forms.CharField()
-    ...     sender = forms.EmailField(help_text='A valid email address, please.')
+    ...     sender = forms.EmailField(help_text="A valid email address, please.")
     ...     cc_myself = forms.BooleanField(required=False)
+    ...
     >>> f = HelpTextContactForm(auto_id=False)
     >>> print(f)
     <div>Subject:<div class="helptext">100 characters max.</div><input type="text" name="subject" maxlength="100" required></div>
@@ -281,7 +288,7 @@ want to override. For example, here is the default error message:
 
     >>> from django import forms
     >>> generic = forms.CharField()
-    >>> generic.clean('')
+    >>> generic.clean("")
     Traceback (most recent call last):
       ...
     ValidationError: ['This field is required.']
@@ -290,8 +297,8 @@ And here is a custom error message:
 
 .. code-block:: pycon
 
-    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
-    >>> name.clean('')
+    >>> name = forms.CharField(error_messages={"required": "Please enter your name"})
+    >>> name.clean("")
     Traceback (most recent call last):
       ...
     ValidationError: ['Please enter your name']
@@ -329,6 +336,19 @@ The ``disabled`` boolean argument, when set to ``True``, disables a form field
 using the ``disabled`` HTML attribute so that it won't be editable by users.
 Even if a user tampers with the field's value submitted to the server, it will
 be ignored in favor of the value from the form's initial data.
+
+``template_name``
+-----------------
+
+.. attribute:: Field.template_name
+
+.. versionadded:: 5.0
+
+The ``template_name`` argument allows a custom template to be used when the
+field is rendered with :meth:`~django.forms.BoundField.as_field_group`. By 
+default this value is set to ``"django/forms/field.html"``. Can be changed per
+field by overriding this attribute or more generally by overriding the default
+template, see also :ref:`overriding-built-in-field-templates`.
 
 Checking if the field data has changed
 ======================================
@@ -424,13 +444,18 @@ For each field, we describe the default widget used if you don't specify
     .. attribute:: choices
 
         Either an :term:`iterable` of 2-tuples to use as choices for this
-        field, :ref:`enumeration <field-choices-enum-types>` choices, or a
+        field, :ref:`enumeration type <field-choices-enum-types>`, or a
         callable that returns such an iterable. This argument accepts the same
         formats as the ``choices`` argument to a model field. See the
         :ref:`model field reference documentation on choices <field-choices>`
         for more details. If the argument is a callable, it is evaluated each
         time the field's form is initialized, in addition to during rendering.
         Defaults to an empty list.
+
+    .. versionchanged:: 5.0
+
+        Support for using :ref:`enumeration types <field-choices-enum-types>`
+        directly in the ``choices`` was added.
 
 ``DateField``
 -------------
@@ -448,7 +473,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.date`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
@@ -472,7 +497,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.datetime`` object, in addition to ISO 8601 formats.
 
     The field always accepts strings in ISO 8601 formatted dates or similar
@@ -746,12 +771,13 @@ For each field, we describe the default widget used if you don't specify
         >>> from django.core.files.uploadedfile import SimpleUploadedFile
         >>> class ImageForm(forms.Form):
         ...     img = forms.ImageField()
-        >>> file_data = {'img': SimpleUploadedFile('test.png', <file data>)}
+        ...
+        >>> file_data = {"img": SimpleUploadedFile("test.png", b"file data")}
         >>> form = ImageForm({}, file_data)
         # Pillow closes the underlying file descriptor.
         >>> form.is_valid()
         True
-        >>> image_field = form.cleaned_data['img']
+        >>> image_field = form.cleaned_data["img"]
         >>> image_field.image
         <PIL.PngImagePlugin.PngImageFile image mode=RGBA size=191x287 at 0x7F5985045C18>
         >>> image_field.image.width
@@ -893,9 +919,9 @@ For each field, we describe the default widget used if you don't specify
         NullBooleanField(
             widget=Select(
                 choices=[
-                    ('', 'Unknown'),
-                    (True, 'Yes'),
-                    (False, 'No'),
+                    ("", "Unknown"),
+                    (True, "Yes"),
+                    (False, "No"),
                 ]
             )
         )
@@ -970,7 +996,7 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: input_formats
 
-        A list of formats used to attempt to convert a string to a valid
+        An iterable of formats used to attempt to convert a string to a valid
         ``datetime.time`` object.
 
     If no ``input_formats`` argument is provided, the default input formats are
@@ -1045,8 +1071,18 @@ For each field, we describe the default widget used if you don't specify
       given value is a valid URL.
     * Error message keys: ``required``, ``invalid``
 
-    Has the optional arguments ``max_length``, ``min_length``, and
-    ``empty_value`` which work just as they do for :class:`CharField`.
+    Has the optional arguments ``max_length``, ``min_length``, ``empty_value``
+    which work just as they do for :class:`CharField`, and ``assume_scheme``
+    that defaults to ``"http"``.
+
+    .. versionchanged:: 5.0
+
+        The ``assume_scheme`` argument was added.
+
+    .. deprecated:: 5.0
+
+        The default value for ``assume_scheme`` will change from ``"http"`` to
+        ``"https"`` in Django 6.0.
 
 ``UUIDField``
 -------------
@@ -1141,32 +1177,35 @@ Slightly complex built-in ``Field`` classes
 
             from django.core.validators import RegexValidator
 
+
             class PhoneField(MultiValueField):
                 def __init__(self, **kwargs):
                     # Define one message for all fields.
                     error_messages = {
-                        'incomplete': 'Enter a country calling code and a phone number.',
+                        "incomplete": "Enter a country calling code and a phone number.",
                     }
                     # Or define a different message for each field.
                     fields = (
                         CharField(
-                            error_messages={'incomplete': 'Enter a country calling code.'},
+                            error_messages={"incomplete": "Enter a country calling code."},
                             validators=[
-                                RegexValidator(r'^[0-9]+$', 'Enter a valid country calling code.'),
+                                RegexValidator(r"^[0-9]+$", "Enter a valid country calling code."),
                             ],
                         ),
                         CharField(
-                            error_messages={'incomplete': 'Enter a phone number.'},
-                            validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid phone number.')],
+                            error_messages={"incomplete": "Enter a phone number."},
+                            validators=[RegexValidator(r"^[0-9]+$", "Enter a valid phone number.")],
                         ),
                         CharField(
-                            validators=[RegexValidator(r'^[0-9]+$', 'Enter a valid extension.')],
+                            validators=[RegexValidator(r"^[0-9]+$", "Enter a valid extension.")],
                             required=False,
                         ),
                     )
                     super().__init__(
-                        error_messages=error_messages, fields=fields,
-                        require_all_fields=False, **kwargs
+                        error_messages=error_messages,
+                        fields=fields,
+                        require_all_fields=False,
+                        **kwargs
                     )
 
     .. attribute:: MultiValueField.widget
@@ -1238,7 +1277,7 @@ method::
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-            self.fields['foo_select'].queryset = ...
+            self.fields["foo_select"].queryset = ...
 
 Both ``ModelChoiceField`` and ``ModelMultipleChoiceField`` have an ``iterator``
 attribute which specifies the class used to iterate over the queryset when
@@ -1351,6 +1390,7 @@ generating choices. See :ref:`iterating-relationship-choices` for details.
 
         from django.forms import ModelChoiceField
 
+
         class MyModelChoiceField(ModelChoiceField):
             def label_from_instance(self, obj):
                 return "My Object #%i" % obj.id
@@ -1416,12 +1456,14 @@ For example, consider the following models::
 
     from django.db import models
 
+
     class Topping(models.Model):
         name = models.CharField(max_length=100)
         price = models.DecimalField(decimal_places=2, max_digits=6)
 
         def __str__(self):
             return self.name
+
 
     class Pizza(models.Model):
         topping = models.ForeignKey(Topping, on_delete=models.CASCADE)
@@ -1432,18 +1474,24 @@ the value of ``Topping.price`` as the HTML attribute ``data-price`` for each
 
     from django import forms
 
+
     class ToppingSelect(forms.Select):
-        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-            option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        def create_option(
+            self, name, value, label, selected, index, subindex=None, attrs=None
+        ):
+            option = super().create_option(
+                name, value, label, selected, index, subindex, attrs
+            )
             if value:
-                option['attrs']['data-price'] = value.instance.price
+                option["attrs"]["data-price"] = value.instance.price
             return option
+
 
     class PizzaForm(forms.ModelForm):
         class Meta:
             model = Pizza
-            fields = ['topping']
-            widgets = {'topping': ToppingSelect}
+            fields = ["topping"]
+            widgets = {"topping": ToppingSelect}
 
 This will render the ``Pizza.topping`` select as:
 

@@ -57,16 +57,16 @@ Gentle IRC reminders can also work -- again, strategically timed if possible.
 During a bug sprint would be a very good time, for example.
 
 Another way to get traction is to pull several related tickets together. When
-the someone sits down to review a bug in an area they haven't touched for
+someone sits down to review a bug in an area they haven't touched for
 a while, it can take a few minutes to remember all the fine details of how
 that area of code works. If you collect several minor bug fixes together into
 a similarly themed group, you make an attractive target, as the cost of coming
 up to speed on an area of code can be spread over multiple tickets.
 
 Please refrain from emailing anyone personally or repeatedly raising the same
-issue over and over. This sort of behavior will not gain you any additional
-attention -- certainly not the attention that you need in order to get your
-issue addressed.
+issue over and over again. This sort of behavior will not gain you any
+additional attention -- certainly not the attention that you need in order to
+get your issue addressed.
 
 But I've reminded you several times and you keep ignoring my patch!
 ===================================================================

@@ -1293,6 +1293,21 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaisesMessage(DataError, msg):
                 editor.alter_field(ArrayModel, old_field, new_field, strict=True)
 
+    def _add_ci_collation(self):
+        ci_collation = "case_insensitive"
+
+        def drop_collation():
+            with connection.cursor() as cursor:
+                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
+
+        with connection.cursor() as cursor:
+            cursor.execute(
+                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider=icu, "
+                f"locale='und-u-ks-level2', deterministic=false)"
+            )
+        self.addCleanup(drop_collation)
+        return ci_collation
+
     @isolate_apps("schema")
     @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
     @skipUnlessDBFeature(
@@ -1302,19 +1317,8 @@ class SchemaTests(TransactionTestCase):
     def test_db_collation_arrayfield(self):
         from django.contrib.postgres.fields import ArrayField
 
-        ci_collation = "case_insensitive"
+        ci_collation = self._add_ci_collation()
         cs_collation = "en-x-icu"
-
-        def drop_collation():
-            with connection.cursor() as cursor:
-                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
-                f"locale = 'und-u-ks-level2', deterministic = false)"
-            )
-        self.addCleanup(drop_collation)
 
         class ArrayModel(Model):
             field = ArrayField(CharField(max_length=16, db_collation=ci_collation))
@@ -1349,18 +1353,7 @@ class SchemaTests(TransactionTestCase):
         "supports_non_deterministic_collations",
     )
     def test_unique_with_collation_charfield(self):
-        ci_collation = "case_insensitive"
-
-        def drop_collation():
-            with connection.cursor() as cursor:
-                cursor.execute(f"DROP COLLATION IF EXISTS {ci_collation}")
-
-        with connection.cursor() as cursor:
-            cursor.execute(
-                f"CREATE COLLATION IF NOT EXISTS {ci_collation} (provider = icu, "
-                f"locale = 'und-u-ks-level2', deterministic = false)"
-            )
-        self.addCleanup(drop_collation)
+        ci_collation = self._add_ci_collation()
 
         class CiCharModel(Model):
             field = CharField(max_length=16, db_collation=ci_collation, unique=True)
@@ -1377,6 +1370,42 @@ class SchemaTests(TransactionTestCase):
             ci_collation,
         )
         self.assertIn("field", self.get_uniques(CiCharModel._meta.db_table))
+
+    @isolate_apps("schema")
+    @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific")
+    @skipUnlessDBFeature(
+        "supports_collation_on_charfield",
+        "supports_non_deterministic_collations",
+    )
+    def test_relation_to_collation_charfield(self):
+        ci_collation = self._add_ci_collation()
+
+        class CiCharModel(Model):
+            field = CharField(max_length=16, db_collation=ci_collation, unique=True)
+
+            class Meta:
+                app_label = "schema"
+
+        class RelationModel(Model):
+            field = OneToOneField(CiCharModel, CASCADE, to_field="field")
+
+            class Meta:
+                app_label = "schema"
+
+        # Create the table.
+        with connection.schema_editor() as editor:
+            editor.create_model(CiCharModel)
+            editor.create_model(RelationModel)
+        self.isolated_local_models = [CiCharModel, RelationModel]
+        self.assertEqual(
+            self.get_column_collation(RelationModel._meta.db_table, "field_id"),
+            ci_collation,
+        )
+        self.assertEqual(
+            self.get_column_collation(CiCharModel._meta.db_table, "field"),
+            ci_collation,
+        )
+        self.assertIn("field_id", self.get_uniques(RelationModel._meta.db_table))
 
     def test_alter_textfield_to_null(self):
         """
@@ -2073,6 +2102,9 @@ class SchemaTests(TransactionTestCase):
         with self.assertRaises(IntegrityError):
             NoteRename.objects.create(detail_info=None)
 
+    @skipUnlessDBFeature(
+        "supports_column_check_constraints", "can_introspect_check_constraints"
+    )
     @isolate_apps("schema")
     def test_rename_field_with_check_to_truncated_name(self):
         class AuthorWithLongColumn(Model):

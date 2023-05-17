@@ -134,6 +134,7 @@ extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
     "commit": ("https://github.com/django/django/commit/%s", "%s"),
     "cve": ("https://nvd.nist.gov/vuln/detail/CVE-%s", "CVE-%s"),
+    "pypi": ("https://pypi.org/project/%s/", "%s"),
     # A file or directory. GitHub redirects from blob to tree if needed.
     "source": ("https://github.com/django/django/blob/main/%s", "%s"),
     "ticket": ("https://code.djangoproject.com/ticket/%s", "#%s"),
@@ -404,7 +405,7 @@ epub_cover = ("", "epub-cover.html")
 # The format is a list of tuples containing the path and title.
 # epub_pre_files = []
 
-# HTML files shat should be inserted after the pages created by sphinx.
+# HTML files that should be inserted after the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
 # epub_post_files = []
 

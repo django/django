@@ -146,6 +146,7 @@ def fields_for_model(
     field_classes=None,
     *,
     apply_limit_choices_to=True,
+    form_declared_fields=None,
 ):
     """
     Return a dictionary containing form fields for the given model.
@@ -176,7 +177,11 @@ def fields_for_model(
 
     ``apply_limit_choices_to`` is a boolean indicating if limit_choices_to
     should be applied to a field's queryset.
+
+    ``form_declared_fields`` is a dictionary of form fields created directly on
+    a form.
     """
+    form_declared_fields = form_declared_fields or {}
     field_dict = {}
     ignored = []
     opts = model._meta
@@ -203,6 +208,9 @@ def fields_for_model(
         if fields is not None and f.name not in fields:
             continue
         if exclude and f.name in exclude:
+            continue
+        if f.name in form_declared_fields:
+            field_dict[f.name] = form_declared_fields[f.name]
             continue
 
         kwargs = {}
@@ -310,6 +318,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 opts.field_classes,
                 # limit_choices_to will be applied during ModelForm.__init__().
                 apply_limit_choices_to=False,
+                form_declared_fields=new_class.declared_fields,
             )
 
             # make sure opts.fields doesn't specify an invalid field
@@ -319,8 +328,7 @@ class ModelFormMetaclass(DeclarativeFieldsMetaclass):
                 message = "Unknown field(s) (%s) specified for %s"
                 message %= (", ".join(missing_fields), opts.model.__name__)
                 raise FieldError(message)
-            # Override default model fields with any custom declared ones
-            # (plus, include all the other declared fields).
+            # Include all the other declared fields.
             fields.update(new_class.declared_fields)
         else:
             fields = new_class.declared_fields

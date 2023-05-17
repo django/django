@@ -27,6 +27,15 @@ from django.utils.hashable import make_hashable
 from django.utils.regex_helper import _lazy_re_compile
 
 
+class PositionRef(Ref):
+    def __init__(self, ordinal, refs, source):
+        self.ordinal = ordinal
+        super().__init__(refs, source)
+
+    def as_sql(self, compiler, connection):
+        return str(self.ordinal), ()
+
+
 class SQLCompiler:
     # Multiline ordering SQL clause may appear from RawSQL.
     ordering_parts = _lazy_re_compile(
@@ -142,10 +151,10 @@ class SQLCompiler:
         # Note that even if the group_by is set, it is only the minimal
         # set to group by. So, we need to add cols in select, order_by, and
         # having into the select in any case.
-        selected_expr_indices = {}
-        for index, (expr, _, alias) in enumerate(select, start=1):
+        selected_expr_positions = {}
+        for ordinal, (expr, _, alias) in enumerate(select, start=1):
             if alias:
-                selected_expr_indices[expr] = index
+                selected_expr_positions[expr] = ordinal
             # Skip members of the select clause that are already explicitly
             # grouped against.
             if alias in group_by_refs:
@@ -174,9 +183,9 @@ class SQLCompiler:
                 continue
             if (
                 allows_group_by_select_index
-                and (select_index := selected_expr_indices.get(expr)) is not None
+                and (position := selected_expr_positions.get(expr)) is not None
             ):
-                sql, params = str(select_index), ()
+                sql, params = str(position), ()
             else:
                 sql, params = expr.select_format(self, sql, params)
             params_hash = make_hashable(params)
@@ -321,6 +330,14 @@ class SQLCompiler:
         else:
             default_order, _ = ORDER_DIR["DESC"]
 
+        selected_exprs = {}
+        if select := self.select:
+            for ordinal, (expr, _, alias) in enumerate(select, start=1):
+                pos_expr = PositionRef(ordinal, alias, expr)
+                if alias:
+                    selected_exprs[alias] = pos_expr
+                selected_exprs[expr] = pos_expr
+
         for field in ordering:
             if hasattr(field, "resolve_expression"):
                 if isinstance(field, Value):
@@ -331,13 +348,25 @@ class SQLCompiler:
                 if not self.query.standard_ordering:
                     field = field.copy()
                     field.reverse_ordering()
-                if isinstance(field.expression, F) and (
-                    annotation := self.query.annotation_select.get(
-                        field.expression.name
-                    )
+                select_ref = selected_exprs.get(field.expression)
+                if select_ref or (
+                    isinstance(field.expression, F)
+                    and (select_ref := selected_exprs.get(field.expression.name))
                 ):
-                    field.expression = Ref(field.expression.name, annotation)
-                yield field, isinstance(field.expression, Ref)
+                    # Emulation of NULLS (FIRST|LAST) cannot be combined with
+                    # the usage of ordering by position.
+                    if (
+                        field.nulls_first is None and field.nulls_last is None
+                    ) or self.connection.features.supports_order_by_nulls_modifier:
+                        field = field.copy()
+                        field.expression = select_ref
+                    # Alias collisions are not possible when dealing with
+                    # combined queries so fallback to it if emulation of NULLS
+                    # handling is required.
+                    elif self.query.combinator:
+                        field = field.copy()
+                        field.expression = Ref(select_ref.refs, select_ref.source)
+                yield field, select_ref is not None
                 continue
             if field == "?":  # random
                 yield OrderBy(Random()), False
@@ -346,11 +375,11 @@ class SQLCompiler:
             col, order = get_order_dir(field, default_order)
             descending = order == "DESC"
 
-            if col in self.query.annotation_select:
+            if select_ref := selected_exprs.get(col):
                 # Reference to expression in SELECT clause
                 yield (
                     OrderBy(
-                        Ref(col, self.query.annotation_select[col]),
+                        select_ref,
                         descending=descending,
                     ),
                     True,
@@ -647,7 +676,7 @@ class SQLCompiler:
                 )
             )
         inner_query_compiler = inner_query.get_compiler(
-            self.using, elide_empty=self.elide_empty
+            self.using, connection=self.connection, elide_empty=self.elide_empty
         )
         inner_sql, inner_params = inner_query_compiler.as_sql(
             # The limits must be applied to the outer query to avoid pruning
@@ -1861,7 +1890,10 @@ class SQLDeleteCompiler(SQLCompiler):
         Create the SQL for this query. Return the SQL string and list of
         parameters.
         """
-        if self.single_alias and not self.contains_self_reference_subquery:
+        if self.single_alias and (
+            self.connection.features.delete_can_self_reference_subquery
+            or not self.contains_self_reference_subquery
+        ):
             return self._as_sql(self.query)
         innerq = self.query.clone()
         innerq.__class__ = Query

@@ -9,12 +9,14 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
 
     from django.db import models
 
+
     class Place(models.Model):
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
 
         def __str__(self):
             return f"{self.name} the place"
+
 
     class Restaurant(models.Model):
         place = models.OneToOneField(
@@ -27,6 +29,7 @@ In this example, a ``Place`` optionally can be a ``Restaurant``::
 
         def __str__(self):
             return "%s the restaurant" % self.place.name
+
 
     class Waiter(models.Model):
         restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
@@ -42,9 +45,9 @@ Create a couple of Places:
 
 .. code-block:: pycon
 
-    >>> p1 = Place(name='Demon Dogs', address='944 W. Fullerton')
+    >>> p1 = Place(name="Demon Dogs", address="944 W. Fullerton")
     >>> p1.save()
-    >>> p2 = Place(name='Ace Hardware', address='1013 N. Ashland')
+    >>> p2 = Place(name="Ace Hardware", address="1013 N. Ashland")
     >>> p2.save()
 
 Create a Restaurant. Pass the "parent" object as this object's primary key:
@@ -74,16 +77,17 @@ p2 doesn't have an associated restaurant:
 
     >>> from django.core.exceptions import ObjectDoesNotExist
     >>> try:
-    >>>     p2.restaurant
-    >>> except ObjectDoesNotExist:
-    >>>     print("There is no restaurant here.")
+    ...     p2.restaurant
+    ... except ObjectDoesNotExist:
+    ...     print("There is no restaurant here.")
+    ...
     There is no restaurant here.
 
 You can also use ``hasattr`` to avoid the need for exception catching:
 
 .. code-block:: pycon
 
-    >>> hasattr(p2, 'restaurant')
+    >>> hasattr(p2, "restaurant")
     False
 
 Set the place using assignment notation. Because place is the primary key on
@@ -112,7 +116,7 @@ raises ``ValueError``:
 
 .. code-block:: pycon
 
-    >>> p3 = Place(name='Demon Dogs', address='944 W. Fullerton')
+    >>> p3 = Place(name="Demon Dogs", address="944 W. Fullerton")
     >>> Restaurant.objects.create(place=p3, serves_hot_dogs=True, serves_pizza=False)
     Traceback (most recent call last):
     ...
@@ -132,7 +136,7 @@ Restaurants:
 
 .. code-block:: pycon
 
-    >>> Place.objects.order_by('name')
+    >>> Place.objects.order_by("name")
     <QuerySet [<Place: Ace Hardware the place>, <Place: Demon Dogs the place>]>
 
 You can query the models using :ref:`lookups across relationships <lookups-that-span-relationships>`:
@@ -177,7 +181,7 @@ Add a Waiter to the Restaurant:
 
 .. code-block:: pycon
 
-    >>> w = r.waiter_set.create(name='Joe')
+    >>> w = r.waiter_set.create(name="Joe")
     >>> w
     <Waiter: Joe the waiter at Demon Dogs the restaurant>
 

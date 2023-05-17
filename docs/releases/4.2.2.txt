@@ -1,0 +1,12 @@
+==========================
+Django 4.2.2 release notes
+==========================
+
+*Expected June 5, 2023*
+
+Django 4.2.2 fixes several bugs in 4.2.1.
+
+Bugfixes
+========
+
+* ...

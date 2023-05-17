@@ -1,8 +1,8 @@
-============================================
-Django 4.2 release notes - UNDER DEVELOPMENT
-============================================
+========================
+Django 4.2 release notes
+========================
 
-*Expected April 2023*
+*April 3, 2023*
 
 Welcome to Django 4.2!
 
@@ -35,15 +35,19 @@ Psycopg 3 support
 -----------------
 
 Django now supports `psycopg`_ version 3.1.8 or higher. To update your code,
-install the `psycopg library`_, you don't need to change the
+install the :pypi:`psycopg library <psycopg>`, you don't need to change the
 :setting:`ENGINE <DATABASE-ENGINE>` as ``django.db.backends.postgresql``
 supports both libraries.
 
 Support for ``psycopg2`` is likely to be deprecated and removed at some point
 in the future.
 
+Be aware that ``psycopg`` 3 introduces some breaking changes over ``psycopg2``.
+As a consequence, you may need to make some changes to account for
+`differences from psycopg2`_.
+
 .. _psycopg: https://www.psycopg.org/psycopg3/
-.. _psycopg library: https://pypi.org/project/psycopg/
+.. _differences from psycopg2: https://www.psycopg.org/psycopg3/docs/basic/from_pg2.html
 
 Comments on columns and tables
 ------------------------------
@@ -54,6 +58,7 @@ options allow creating comments on columns and tables, respectively. For
 example::
 
     from django.db import models
+
 
     class Question(models.Model):
         text = models.TextField(db_comment="Poll question")
@@ -135,7 +140,7 @@ Minor features
 * :attr:`.ModelAdmin.list_editable` now uses atomic transactions when making
   edits.
 
-* jQuery is upgraded from version 3.6.0 to 3.6.3.
+* jQuery is upgraded from version 3.6.0 to 3.6.4.
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -201,8 +206,10 @@ Minor features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * :class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage` now
-  replaces paths to JavaScript modules in ``import`` and ``export`` statements
-  with their hashed counterparts.
+  has experimental support for replacing paths to JavaScript modules in
+  ``import`` and ``export`` statements with their hashed counterparts. If you
+  want to try it, subclass ``ManifestStaticFilesStorage`` and set the
+  ``support_js_module_import_aggregation`` attribute to ``True``.
 
 * The new :attr:`.ManifestStaticFilesStorage.manifest_hash` attribute provides
   a hash over all files in the manifest and changes whenever one of the files
@@ -240,10 +247,6 @@ Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * Added support and translations for the Central Kurdish (Sorani) language.
-
-* The :class:`~django.middleware.locale.LocaleMiddleware` now respects a
-  language from the request when :func:`~django.conf.urls.i18n.i18n_patterns`
-  is used with the ``prefix_default_language`` argument set to ``False``.
 
 Logging
 ~~~~~~~
@@ -373,6 +376,10 @@ backends.
   should be enabled if your backend supports functional dependency detection in
   ``GROUP BY`` clauses as specified by the ``SQL:1999`` standard.
 
+* :djadmin:`inspectdb` now uses ``display_size`` from
+  ``DatabaseIntrospection.get_table_description()`` rather than
+  ``internal_size`` for ``CharField``.
+
 Dropped support for MariaDB 10.3
 --------------------------------
 
@@ -404,9 +411,6 @@ fields modified in the custom ``save()`` methods should be added to the
 Miscellaneous
 -------------
 
-* The undocumented ``SimpleTemplateResponse.rendering_attrs`` and
-  ``TemplateResponse.rendering_attrs`` are renamed to ``non_picklable_attrs``.
-
 * The undocumented ``django.http.multipartparser.parse_header()`` function is
   removed. Use ``django.utils.http.parse_header_parameters()`` instead.
 
@@ -432,10 +436,6 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.9.0 to 3.21.0.
 
-* :djadmin:`inspectdb` now uses ``display_size`` from
-  ``DatabaseIntrospection.get_table_description()`` rather than
-  ``internal_size`` for ``CharField``.
-
 * The minimum supported version of ``asgiref`` is increased from 3.5.2 to
   3.6.0.
 
@@ -454,8 +454,8 @@ Miscellaneous
 * The minimum supported version of ``jinja2`` is increased from 2.9.2 to
   2.11.0.
 
-* The minimum supported version of `redis-py`_ is increased from 3.0.0 to
-  3.4.0.
+* The minimum supported version of :pypi:`redis-py <redis>` is increased from
+  3.0.0 to 3.4.0.
 
 * Manually instantiated ``WSGIRequest`` objects must be provided a file-like
   object for ``wsgi.input``. Previously, Django was more lax than the expected
@@ -463,7 +463,11 @@ Miscellaneous
 
 * Support for ``PROJ`` < 5 is removed.
 
-.. _`redis-py`: https://pypi.org/project/redis/
+* :class:`~django.core.mail.backends.smtp.EmailBackend` now verifies a
+  :py:attr:`hostname <ssl.SSLContext.check_hostname>` and
+  :py:attr:`certificates <ssl.SSLContext.verify_mode>`. If you need the
+  previous behavior that is less restrictive and not recommended, subclass
+  ``EmailBackend`` and override the ``ssl_context`` property.
 
 .. _deprecated-features-4.2:
 
@@ -498,7 +502,8 @@ Should become::
 
 Running the :djadmin:`makemigrations` command will generate a migration
 containing a :class:`~django.db.migrations.operations.RenameIndex` operation
-which will rename the existing index.
+which will rename the existing index. Next, consider squashing migrations to
+remove ``index_together`` from historical migrations.
 
 The ``AlterIndexTogether`` migration operation is now officially supported only
 for pre-Django 4.2 migration files. For backward compatibility reasons, it's
@@ -526,7 +531,7 @@ Code that use to pass JSON encoded string literals::
         Document(data=Value('"foo-bar"')),
     )
     Document.objects.annotate(
-        JSONBAgg("field", default=Value('[]')),
+        JSONBAgg("field", default=Value("[]")),
     )
 
 Should become::

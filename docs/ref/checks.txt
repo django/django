@@ -703,8 +703,8 @@ with the admin site:
 * **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField`` field.
+* **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
+  field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,

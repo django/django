@@ -54,8 +54,12 @@ To activate sitemap generation on your Django site, add this line to your
 
     from django.contrib.sitemaps.views import sitemap
 
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.views.sitemap')
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -99,6 +103,7 @@ your sitemap class might look::
 
     from django.contrib.sitemaps import Sitemap
     from blog.models import Entry
+
 
     class BlogSitemap(Sitemap):
         changefreq = "never"
@@ -309,7 +314,7 @@ Note:
           The latest ``lastmod`` returned by calling the method with all
           items returned by :meth:`Sitemap.items`.
 
-    .. method:: Sitemap.get_languages_for_item(item, lang_code)
+    .. method:: Sitemap.get_languages_for_item(item)
 
         .. versionadded:: 4.2
 
@@ -350,18 +355,20 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
     from blog.models import Entry
 
     info_dict = {
-        'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
+        "queryset": Entry.objects.all(),
+        "date_field": "pub_date",
     }
 
     urlpatterns = [
         # some generic view using info_dict
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-             {'sitemaps': {'blog': GenericSitemap(info_dict, priority=0.6)}},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"blog": GenericSitemap(info_dict, priority=0.6)}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -378,15 +385,17 @@ the ``location`` method of the sitemap. For example::
     from django.contrib import sitemaps
     from django.urls import reverse
 
+
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
-        changefreq = 'daily'
+        changefreq = "daily"
 
         def items(self):
-            return ['main', 'about', 'license']
+            return ["main", "about", "license"]
 
         def location(self, item):
             return reverse(item)
+
 
     # urls.py
     from django.contrib.sitemaps.views import sitemap
@@ -396,16 +405,20 @@ the ``location`` method of the sitemap. For example::
     from . import views
 
     sitemaps = {
-        'static': StaticViewSitemap,
+        "static": StaticViewSitemap,
     }
 
     urlpatterns = [
-        path('', views.main, name='main'),
-        path('about/', views.about, name='about'),
-        path('license/', views.license, name='license'),
+        path("", views.main, name="main"),
+        path("about/", views.about, name="about"),
+        path("license/", views.license, name="license"),
         # ...
-        path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap')
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -428,10 +441,18 @@ Here's what the relevant URLconf lines would look like for the example above::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('sitemap.xml', views.index, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.index'),
-        path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
@@ -455,12 +476,17 @@ with a caching decorator -- you must name your sitemap view and pass
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        path('sitemap.xml',
-             cache_page(86400)(sitemaps_views.index),
-             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
-        path('sitemap-<section>.xml',
-             cache_page(86400)(sitemaps_views.sitemap),
-             {'sitemaps': sitemaps}, name='sitemaps'),
+        path(
+            "sitemap.xml",
+            cache_page(86400)(sitemaps_views.index),
+            {"sitemaps": sitemaps, "sitemap_url_name": "sitemaps"},
+        ),
+        path(
+            "sitemap-<section>.xml",
+            cache_page(86400)(sitemaps_views.sitemap),
+            {"sitemaps": sitemaps},
+            name="sitemaps",
+        ),
     ]
 
 Template customization
@@ -473,14 +499,18 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('custom-sitemap.xml', views.index, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.index'),
-        path('custom-sitemap-<section>.xml', views.sitemap, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "custom-sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "custom-sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -600,6 +630,7 @@ One useful way to call :func:`ping_google` is from a model's ``save()``
 method::
 
     from django.contrib.sitemaps import ping_google
+
 
     class Entry(models.Model):
         # ...

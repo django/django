@@ -5,8 +5,15 @@ from django.contrib.contenttypes.admin import GenericTabularInline
 from django.contrib.contenttypes.models import ContentType
 from django.forms.formsets import DEFAULT_MAX_NUM
 from django.forms.models import ModelForm
-from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.test import (
+    RequestFactory,
+    SimpleTestCase,
+    TestCase,
+    ignore_warnings,
+    override_settings,
+)
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .admin import MediaInline, MediaPermanentInline
 from .admin import site as admin_site
@@ -21,6 +28,7 @@ class TestDataMixin:
         )
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericAdminViewTest(TestDataMixin, TestCase):
     def setUp(self):
@@ -95,6 +103,7 @@ class GenericAdminViewTest(TestDataMixin, TestCase):
         self.assertEqual(response.status_code, 302)  # redirect somewhere
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class GenericInlineAdminParametersTest(TestDataMixin, TestCase):
     factory = RequestFactory()
@@ -296,6 +305,7 @@ class GenericInlineAdminWithUniqueTogetherTest(TestDataMixin, TestCase):
 
 @override_settings(ROOT_URLCONF="generic_inline_admin.urls")
 class NoInlineDeletionTest(SimpleTestCase):
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_no_deletion(self):
         inline = MediaPermanentInline(EpisodePermanent, admin_site)
         fake_request = object()
@@ -321,6 +331,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
     def setUp(self):
         self.site = AdminSite()
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_get_formset_kwargs(self):
         media_inline = MediaInline(Media, AdminSite())
 
@@ -360,6 +371,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             ["keywords", "id", "DELETE"],
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_custom_form_meta_exclude(self):
         """
         The custom ModelForm's `Meta.exclude` is respected by
@@ -403,6 +415,7 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             ["description", "keywords", "id", "DELETE"],
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_get_fieldsets(self):
         # get_fieldsets is called when figuring out form fields.
         # Refs #18681.

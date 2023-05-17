@@ -19,7 +19,7 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.functions import Cast, Substr
+from django.db.models.functions import Abs, Cast, Length, Substr
 from django.db.models.lookups import (
     Exact,
     GreaterThan,
@@ -29,7 +29,7 @@ from django.db.models.lookups import (
     LessThanOrEqual,
 )
 from django.test import TestCase, skipUnlessDBFeature
-from django.test.utils import isolate_apps
+from django.test.utils import isolate_apps, register_lookup
 
 from .models import (
     Article,
@@ -245,6 +245,35 @@ class LookupTests(TestCase):
         msg = "in_bulk()'s field_name must be a unique field but 'author' isn't."
         with self.assertRaisesMessage(ValueError, msg):
             Article.objects.in_bulk([self.au1], field_name="author")
+
+    @skipUnlessDBFeature("can_distinct_on_fields")
+    def test_in_bulk_preserve_ordering(self):
+        articles = (
+            Article.objects.order_by("author_id", "-pub_date")
+            .distinct("author_id")
+            .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
+        )
+        self.assertEqual(
+            articles,
+            {self.au1.id: self.a4, self.au2.id: self.a5},
+        )
+
+    @skipUnlessDBFeature("can_distinct_on_fields")
+    def test_in_bulk_preserve_ordering_with_batch_size(self):
+        old_max_query_params = connection.features.max_query_params
+        connection.features.max_query_params = 1
+        try:
+            articles = (
+                Article.objects.order_by("author_id", "-pub_date")
+                .distinct("author_id")
+                .in_bulk([self.au1.id, self.au2.id], field_name="author_id")
+            )
+            self.assertEqual(
+                articles,
+                {self.au1.id: self.a4, self.au2.id: self.a5},
+            )
+        finally:
+            connection.features.max_query_params = old_max_query_params
 
     @skipUnlessDBFeature("can_distinct_on_fields")
     def test_in_bulk_distinct_field(self):
@@ -784,6 +813,16 @@ class LookupTests(TestCase):
         ):
             Article.objects.filter(pub_date__gobbledygook="blahblah")
 
+    def test_unsupported_lookups_custom_lookups(self):
+        slug_field = Article._meta.get_field("slug")
+        msg = (
+            "Unsupported lookup 'lengtp' for SlugField or join on the field not "
+            "permitted, perhaps you meant length?"
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            with register_lookup(slug_field, Length):
+                Article.objects.filter(slug__lengtp=20)
+
     def test_relation_nested_lookup_error(self):
         # An invalid nested lookup on a related field raises a useful error.
         msg = (
@@ -798,6 +837,31 @@ class LookupTests(TestCase):
         )
         with self.assertRaisesMessage(FieldError, msg):
             Tag.objects.filter(articles__foo="bar")
+
+    def test_unsupported_lookup_reverse_foreign_key(self):
+        msg = (
+            "Unsupported lookup 'title' for ManyToOneRel or join on the field not "
+            "permitted."
+        )
+        with self.assertRaisesMessage(FieldError, msg):
+            Author.objects.filter(article__title="Article 1")
+
+    def test_unsupported_lookup_reverse_foreign_key_custom_lookups(self):
+        msg = (
+            "Unsupported lookup 'abspl' for ManyToOneRel or join on the field not "
+            "permitted, perhaps you meant abspk?"
+        )
+        fk_field = Article._meta.get_field("author")
+        with self.assertRaisesMessage(FieldError, msg):
+            with register_lookup(fk_field, Abs, lookup_name="abspk"):
+                Author.objects.filter(article__abspl=2)
+
+    def test_filter_by_reverse_related_field_transform(self):
+        fk_field = Article._meta.get_field("author")
+        with register_lookup(fk_field, Abs):
+            self.assertSequenceEqual(
+                Author.objects.filter(article__abs=self.a1.pk), [self.au1]
+            )
 
     def test_regex(self):
         # Create some articles with a bit more interesting headlines for
@@ -1293,6 +1357,9 @@ class LookupQueryingTests(TestCase):
         cls.s1 = Season.objects.create(year=1942, gt=1942)
         cls.s2 = Season.objects.create(year=1842, gt=1942, nulled_text_field="text")
         cls.s3 = Season.objects.create(year=2042, gt=1942)
+        Game.objects.create(season=cls.s1, home="NY", away="Boston")
+        Game.objects.create(season=cls.s1, home="NY", away="Tampa")
+        Game.objects.create(season=cls.s3, home="Boston", away="Tampa")
 
     def test_annotate(self):
         qs = Season.objects.annotate(equal=Exact(F("year"), 1942))
@@ -1462,4 +1529,20 @@ class LookupQueryingTests(TestCase):
                 {"year": 1842, "century": "other"},
                 {"year": 2042, "century": "other"},
             ],
+        )
+
+    def test_multivalued_join_reuse(self):
+        self.assertEqual(
+            Season.objects.get(Exact(F("games__home"), "NY"), games__away="Boston"),
+            self.s1,
+        )
+        self.assertEqual(
+            Season.objects.get(Exact(F("games__home"), "NY") & Q(games__away="Boston")),
+            self.s1,
+        )
+        self.assertEqual(
+            Season.objects.get(
+                Exact(F("games__home"), "NY") & Exact(F("games__away"), "Boston")
+            ),
+            self.s1,
         )

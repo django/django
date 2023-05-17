@@ -230,6 +230,19 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             model, old_field, new_field, new_type, old_collation, new_collation
         )
 
+    def _field_db_check(self, field, field_db_params):
+        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
+            10,
+            5,
+            2,
+        ):
+            return super()._field_db_check(field, field_db_params)
+        # On MySQL and MariaDB < 10.5.2 (no support for
+        # "ALTER TABLE ... RENAME COLUMN" statements), check constraints with
+        # the column name as it requires explicit recreation when the column is
+        # renamed.
+        return field_db_params["check"]
+
     def _rename_field_sql(self, table, old_field, new_field, new_type):
         new_type = self._set_field_new_type_null_status(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)

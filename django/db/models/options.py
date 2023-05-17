@@ -43,8 +43,7 @@ DEFAULT_NAMES = (
     "proxy",
     "swappable",
     "auto_created",
-    # Must be kept for backward compatibility with old migrations.
-    "index_together",
+    "index_together",  # RemovedInDjango51Warning.
     "apps",
     "default_permissions",
     "select_on_save",

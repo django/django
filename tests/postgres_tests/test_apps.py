@@ -31,14 +31,14 @@ class PostgresConfigTests(TestCase):
         from django.contrib.postgres.signals import register_type_handlers
 
         self.assertNotIn(
-            register_type_handlers, connection_created._live_receivers(None)
+            register_type_handlers, connection_created._live_receivers(None)[0]
         )
         with modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"}):
             self.assertIn(
-                register_type_handlers, connection_created._live_receivers(None)
+                register_type_handlers, connection_created._live_receivers(None)[0]
             )
         self.assertNotIn(
-            register_type_handlers, connection_created._live_receivers(None)
+            register_type_handlers, connection_created._live_receivers(None)[0]
         )
 
     def test_register_serializer_for_migrations(self):

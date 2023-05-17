@@ -46,16 +46,18 @@ The following is a unit test using the request factory::
 
     from .views import MyView, my_view
 
+
     class SimpleTest(TestCase):
         def setUp(self):
             # Every test needs access to the request factory.
             self.factory = RequestFactory()
             self.user = User.objects.create_user(
-                username='jacob', email='jacob@…', password='top_secret')
+                username="jacob", email="jacob@…", password="top_secret"
+            )
 
         def test_details(self):
             # Create an instance of a GET request.
-            request = self.factory.get('/customer/details')
+            request = self.factory.get("/customer/details")
 
             # Recall that middleware are not supported. You can simulate a
             # logged-in user by setting request.user manually.
@@ -107,10 +109,10 @@ For example, assuming the following class-based view:
 
 
     class HomeView(TemplateView):
-        template_name = 'myapp/home.html'
+        template_name = "myapp/home.html"
 
         def get_context_data(self, **kwargs):
-            kwargs['environment'] = 'Production'
+            kwargs["environment"] = "Production"
             return super().get_context_data(**kwargs)
 
 You may directly test the ``get_context_data()`` method by first instantiating
@@ -126,12 +128,12 @@ your test's code:
 
     class HomePageTest(TestCase):
         def test_environment_set_in_context(self):
-            request = RequestFactory().get('/')
+            request = RequestFactory().get("/")
             view = HomeView()
             view.setup(request)
 
             context = view.get_context_data()
-            self.assertIn('environment', context)
+            self.assertIn("environment", context)
 
 .. _topics-testing-advanced-multiple-hosts:
 
@@ -150,6 +152,7 @@ example, the test suite for docs.djangoproject.com includes the following::
 
     from django.test import TestCase
 
+
     class SearchFormTestCase(TestCase):
         def test_empty_get(self):
             response = self.client.get(
@@ -160,11 +163,7 @@ example, the test suite for docs.djangoproject.com includes the following::
 
 and the settings file includes a list of the domains supported by the project::
 
-    ALLOWED_HOSTS = [
-        'www.djangoproject.dev',
-        'docs.djangoproject.dev',
-        ...
-    ]
+    ALLOWED_HOSTS = ["www.djangoproject.dev", "docs.djangoproject.dev", ...]
 
 Another option is to add the required hosts to :setting:`ALLOWED_HOSTS` using
 :meth:`~django.test.override_settings()` or
@@ -176,10 +175,11 @@ multitenancy). For example, you could write a test for the domain
 
     from django.test import TestCase, override_settings
 
+
     class MultiDomainTestCase(TestCase):
-        @override_settings(ALLOWED_HOSTS=['otherserver'])
+        @override_settings(ALLOWED_HOSTS=["otherserver"])
         def test_other_domain(self):
-            response = self.client.get('http://otherserver/foo/bar/')
+            response = self.client.get("http://otherserver/foo/bar/")
 
 Disabling :setting:`ALLOWED_HOSTS` checking (``ALLOWED_HOSTS = ['*']``) when
 running tests prevents the test client from raising a helpful error message if
@@ -207,21 +207,21 @@ a *test mirror*. Consider the following (simplified) example database
 configuration::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'myproject',
-            'HOST': 'dbprimary',
-             # ... plus some other settings
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "myproject",
+            "HOST": "dbprimary",
+            # ... plus some other settings
         },
-        'replica': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': 'myproject',
-            'HOST': 'dbreplica',
-            'TEST': {
-                'MIRROR': 'default',
+        "replica": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": "myproject",
+            "HOST": "dbreplica",
+            "TEST": {
+                "MIRROR": "default",
             },
             # ... plus some other settings
-        }
+        },
     }
 
 In this setup, we have two database servers: ``dbprimary``, described
@@ -261,36 +261,36 @@ can specify the dependencies that exist using the :setting:`DEPENDENCIES
 example database configuration::
 
     DATABASES = {
-        'default': {
+        "default": {
             # ... db settings
-            'TEST': {
-                'DEPENDENCIES': ['diamonds'],
+            "TEST": {
+                "DEPENDENCIES": ["diamonds"],
             },
         },
-        'diamonds': {
+        "diamonds": {
             # ... db settings
-            'TEST': {
-                'DEPENDENCIES': [],
+            "TEST": {
+                "DEPENDENCIES": [],
             },
         },
-        'clubs': {
+        "clubs": {
             # ... db settings
-            'TEST': {
-                'DEPENDENCIES': ['diamonds'],
+            "TEST": {
+                "DEPENDENCIES": ["diamonds"],
             },
         },
-        'spades': {
+        "spades": {
             # ... db settings
-            'TEST': {
-                'DEPENDENCIES': ['diamonds', 'hearts'],
+            "TEST": {
+                "DEPENDENCIES": ["diamonds", "hearts"],
             },
         },
-        'hearts': {
+        "hearts": {
             # ... db settings
-            'TEST': {
-                'DEPENDENCIES': ['diamonds', 'clubs'],
+            "TEST": {
+                "DEPENDENCIES": ["diamonds", "clubs"],
             },
-        }
+        },
     }
 
 Under this configuration, the ``diamonds`` database will be created first,
@@ -387,17 +387,20 @@ same file that inherit from ``SerializeMixin`` will run sequentially::
     from django.test import TestCase
     from django.test.testcases import SerializeMixin
 
+
     class ImageTestCaseMixin(SerializeMixin):
         lockfile = __file__
 
         def setUp(self):
-            self.filename = os.path.join(temp_storage_dir, 'my_file.png')
+            self.filename = os.path.join(temp_storage_dir, "my_file.png")
             self.file = create_file(self.filename)
+
 
     class RemoveImageTests(ImageTestCaseMixin, TestCase):
         def test_remove_image(self):
             os.remove(self.filename)
             self.assertFalse(os.path.exists(self.filename))
+
 
     class ResizeImageTests(ImageTestCaseMixin, TestCase):
         def test_resize_image(self):
@@ -443,7 +446,7 @@ Let's take a look inside a couple of those files:
     from django.test.utils import get_runner
 
     if __name__ == "__main__":
-        os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.test_settings'
+        os.environ["DJANGO_SETTINGS_MODULE"] = "tests.test_settings"
         django.setup()
         TestRunner = get_runner(settings)
         test_runner = TestRunner()
@@ -462,7 +465,7 @@ labels to run, etc.
 .. code-block:: python
     :caption: ``tests/test_settings.py``
 
-    SECRET_KEY = 'fake-key'
+    SECRET_KEY = "fake-key"
     INSTALLED_APPS = [
         "tests",
     ]
@@ -854,7 +857,7 @@ important part of testing applications, so it's strongly recommended to check
 the coverage of your tests.
 
 Django can be easily integrated with `coverage.py`_, a tool for measuring code
-coverage of Python programs. First, `install coverage.py`_. Next, run the
+coverage of Python programs. First, install :pypi:`coverage`. Next, run the
 following from your project folder containing ``manage.py``:
 
 .. code-block:: shell
@@ -875,4 +878,3 @@ For more options like annotated HTML listings detailing missed lines, see the
 `coverage.py`_ docs.
 
 .. _coverage.py: https://coverage.readthedocs.io/
-.. _install coverage.py: https://pypi.org/project/coverage/

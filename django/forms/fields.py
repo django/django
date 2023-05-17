@@ -10,12 +10,14 @@ import operator
 import os
 import re
 import uuid
+import warnings
 from decimal import Decimal, DecimalException
 from io import BytesIO
 from urllib.parse import urlsplit, urlunsplit
 
 from django.core import validators
 from django.core.exceptions import ValidationError
+from django.db.models.enums import ChoicesMeta
 from django.forms.boundfield import BoundField
 from django.forms.utils import from_current_timezone, to_current_timezone
 from django.forms.widgets import (
@@ -41,6 +43,7 @@ from django.forms.widgets import (
 )
 from django.utils import formats
 from django.utils.dateparse import parse_datetime, parse_duration
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.duration import duration_string
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.regex_helper import _lazy_re_compile
@@ -106,6 +109,7 @@ class Field:
         localize=False,
         disabled=False,
         label_suffix=None,
+        template_name=None,
     ):
         # required -- Boolean that specifies whether the field is required.
         #             True by default.
@@ -163,6 +167,7 @@ class Field:
         self.error_messages = messages
 
         self.validators = [*self.default_validators, *validators]
+        self.template_name = template_name
 
         super().__init__()
 
@@ -750,7 +755,19 @@ class URLField(CharField):
     }
     default_validators = [validators.URLValidator()]
 
-    def __init__(self, **kwargs):
+    def __init__(self, *, assume_scheme=None, **kwargs):
+        if assume_scheme is None:
+            warnings.warn(
+                "The default scheme will be changed from 'http' to 'https' in Django "
+                "6.0. Pass the forms.URLField.assume_scheme argument to silence this "
+                "warning.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
+            assume_scheme = "http"
+        # RemovedInDjango60Warning: When the deprecation ends, replace with:
+        # self.assume_scheme = assume_scheme or "https"
+        self.assume_scheme = assume_scheme
         super().__init__(strip=True, **kwargs)
 
     def to_python(self, value):
@@ -770,8 +787,8 @@ class URLField(CharField):
         if value:
             url_fields = split_url(value)
             if not url_fields[0]:
-                # If no URL scheme given, assume http://
-                url_fields[0] = "http"
+                # If no URL scheme given, add a scheme.
+                url_fields[0] = self.assume_scheme
             if not url_fields[1]:
                 # Assume that if no domain is provided, that the path segment
                 # contains the domain.
@@ -857,6 +874,8 @@ class ChoiceField(Field):
 
     def __init__(self, *, choices=(), **kwargs):
         super().__init__(**kwargs)
+        if isinstance(choices, ChoicesMeta):
+            choices = choices.choices
         self.choices = choices
 
     def __deepcopy__(self, memo):

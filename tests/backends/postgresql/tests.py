@@ -296,12 +296,42 @@ class Tests(TestCase):
         finally:
             new_connection.close()
 
+    def test_connect_custom_cursor_factory(self):
+        """
+        A custom cursor factory can be configured with DATABASES["options"]
+        ["cursor_factory"].
+        """
+        from django.db.backends.postgresql.base import Cursor
+
+        class MyCursor(Cursor):
+            pass
+
+        new_connection = connection.copy()
+        new_connection.settings_dict["OPTIONS"]["cursor_factory"] = MyCursor
+        try:
+            new_connection.connect()
+            self.assertEqual(new_connection.connection.cursor_factory, MyCursor)
+        finally:
+            new_connection.close()
+
     def test_connect_no_is_usable_checks(self):
         new_connection = connection.copy()
         try:
             with mock.patch.object(new_connection, "is_usable") as is_usable:
                 new_connection.connect()
             is_usable.assert_not_called()
+        finally:
+            new_connection.close()
+
+    def test_client_encoding_utf8_enforce(self):
+        new_connection = connection.copy()
+        new_connection.settings_dict["OPTIONS"]["client_encoding"] = "iso-8859-2"
+        try:
+            new_connection.connect()
+            if is_psycopg3:
+                self.assertEqual(new_connection.connection.info.encoding, "utf-8")
+            else:
+                self.assertEqual(new_connection.connection.encoding, "UTF8")
         finally:
             new_connection.close()
 
@@ -390,3 +420,13 @@ class Tests(TestCase):
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
+
+    def test_compose_sql_when_no_connection(self):
+        new_connection = connection.copy()
+        try:
+            self.assertEqual(
+                new_connection.ops.compose_sql("SELECT %s", ["test"]),
+                "SELECT 'test'",
+            )
+        finally:
+            new_connection.close()

@@ -34,10 +34,10 @@ MRO is an acronym for Method Resolution Order.
         from django.http import HttpResponse
         from django.views import View
 
-        class MyView(View):
 
+        class MyView(View):
             def get(self, request, *args, **kwargs):
-                return HttpResponse('Hello, World!')
+                return HttpResponse("Hello, World!")
 
     **Example urls.py**::
 
@@ -46,7 +46,7 @@ MRO is an acronym for Method Resolution Order.
         from myapp.views import MyView
 
         urlpatterns = [
-            path('mine/', MyView.as_view(), name='my-view'),
+            path("mine/", MyView.as_view(), name="my-view"),
         ]
 
     **Attributes**
@@ -57,7 +57,7 @@ MRO is an acronym for Method Resolution Order.
 
         Default::
 
-            ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']
+            ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
 
     **Methods**
 
@@ -150,13 +150,13 @@ MRO is an acronym for Method Resolution Order.
 
         from articles.models import Article
 
-        class HomePageView(TemplateView):
 
+        class HomePageView(TemplateView):
             template_name = "home.html"
 
             def get_context_data(self, **kwargs):
                 context = super().get_context_data(**kwargs)
-                context['latest_articles'] = Article.objects.all()[:5]
+                context["latest_articles"] = Article.objects.all()[:5]
                 return context
 
     **Example urls.py**::
@@ -166,7 +166,7 @@ MRO is an acronym for Method Resolution Order.
         from myapp.views import HomePageView
 
         urlpatterns = [
-            path('', HomePageView.as_view(), name='home'),
+            path("", HomePageView.as_view(), name="home"),
         ]
 
     **Context**
@@ -213,14 +213,14 @@ MRO is an acronym for Method Resolution Order.
 
         from articles.models import Article
 
-        class ArticleCounterRedirectView(RedirectView):
 
+        class ArticleCounterRedirectView(RedirectView):
             permanent = False
             query_string = True
-            pattern_name = 'article-detail'
+            pattern_name = "article-detail"
 
             def get_redirect_url(self, *args, **kwargs):
-                article = get_object_or_404(Article, pk=kwargs['pk'])
+                article = get_object_or_404(Article, pk=kwargs["pk"])
                 article.update_counter()
                 return super().get_redirect_url(*args, **kwargs)
 
@@ -232,9 +232,17 @@ MRO is an acronym for Method Resolution Order.
         from article.views import ArticleCounterRedirectView, ArticleDetailView
 
         urlpatterns = [
-            path('counter/<int:pk>/', ArticleCounterRedirectView.as_view(), name='article-counter'),
-            path('details/<int:pk>/', ArticleDetailView.as_view(), name='article-detail'),
-            path('go-to-django/', RedirectView.as_view(url='https://www.djangoproject.com/'), name='go-to-django'),
+            path(
+                "counter/<int:pk>/",
+                ArticleCounterRedirectView.as_view(),
+                name="article-counter",
+            ),
+            path("details/<int:pk>/", ArticleDetailView.as_view(), name="article-detail"),
+            path(
+                "go-to-django/",
+                RedirectView.as_view(url="https://www.djangoproject.com/"),
+                name="go-to-django",
+            ),
         ]
 
     **Attributes**

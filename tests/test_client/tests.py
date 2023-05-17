@@ -19,8 +19,8 @@ testing against the contexts and templates produced by a view,
 rather than the HTML rendered to the end-user.
 
 """
+import copy
 import itertools
-import pickle
 import tempfile
 from unittest import mock
 
@@ -81,20 +81,24 @@ class ClientTest(TestCase):
         self.assertEqual(response.context["var"], "\xf2")
         self.assertEqual(response.templates[0].name, "GET Template")
 
-    def test_pickling_response(self):
+    def test_copy_response(self):
         tests = ["/cbv_view/", "/get_view/"]
         for url in tests:
             with self.subTest(url=url):
                 response = self.client.get(url)
-                dump = pickle.dumps(response)
-                response_from_pickle = pickle.loads(dump)
-                self.assertEqual(repr(response), repr(response_from_pickle))
+                response_copy = copy.copy(response)
+                self.assertEqual(repr(response), repr(response_copy))
+                self.assertIs(response_copy.client, response.client)
+                self.assertIs(response_copy.resolver_match, response.resolver_match)
+                self.assertIs(response_copy.wsgi_request, response.wsgi_request)
 
-    async def test_pickling_response_async(self):
+    async def test_copy_response_async(self):
         response = await self.async_client.get("/async_get_view/")
-        dump = pickle.dumps(response)
-        response_from_pickle = pickle.loads(dump)
-        self.assertEqual(repr(response), repr(response_from_pickle))
+        response_copy = copy.copy(response)
+        self.assertEqual(repr(response), repr(response_copy))
+        self.assertIs(response_copy.client, response.client)
+        self.assertIs(response_copy.resolver_match, response.resolver_match)
+        self.assertIs(response_copy.asgi_request, response.asgi_request)
 
     def test_query_string_encoding(self):
         # WSGI requires latin-1 encoded strings.

@@ -406,9 +406,27 @@ class MultipleHiddenInput(HiddenInput):
 
 
 class FileInput(Input):
+    allow_multiple_selected = False
     input_type = "file"
     needs_multipart_form = True
     template_name = "django/forms/widgets/file.html"
+
+    def __init__(self, attrs=None):
+        if (
+            attrs is not None
+            and not self.allow_multiple_selected
+            and attrs.get("multiple", False)
+        ):
+            raise ValueError(
+                "%s doesn't support uploading multiple files."
+                % self.__class__.__qualname__
+            )
+        if self.allow_multiple_selected:
+            if attrs is None:
+                attrs = {"multiple": True}
+            else:
+                attrs.setdefault("multiple", True)
+        super().__init__(attrs)
 
     def format_value(self, value):
         """File input never renders a value."""
@@ -416,7 +434,13 @@ class FileInput(Input):
 
     def value_from_datadict(self, data, files, name):
         "File widgets take data from FILES, not POST"
-        return files.get(name)
+        getter = files.get
+        if self.allow_multiple_selected:
+            try:
+                getter = files.getlist
+            except AttributeError:
+                pass
+        return getter(name)
 
     def value_omitted_from_data(self, data, files, name):
         return name not in files
@@ -433,6 +457,7 @@ class ClearableFileInput(FileInput):
     initial_text = _("Currently")
     input_text = _("Change")
     template_name = "django/forms/widgets/clearable_file_input.html"
+    checked = False
 
     def clear_checkbox_name(self, name):
         """
@@ -475,10 +500,12 @@ class ClearableFileInput(FileInput):
             }
         )
         context["widget"]["attrs"].setdefault("disabled", False)
+        context["widget"]["attrs"]["checked"] = self.checked
         return context
 
     def value_from_datadict(self, data, files, name):
         upload = super().value_from_datadict(data, files, name)
+        self.checked = self.clear_checkbox_name(name) in data
         if not self.is_required and CheckboxInput().value_from_datadict(
             data, files, self.clear_checkbox_name(name)
         ):
@@ -1161,6 +1188,8 @@ class SelectDateWidget(Widget):
                 # Return pseudo-ISO dates with zeros for any unselected values,
                 # e.g. '2017-0-23'.
                 return "%s-%s-%s" % (y or 0, m or 0, d or 0)
+            except OverflowError:
+                return "0-0-0"
             return date_value.strftime(input_format)
         return data.get(name)
 

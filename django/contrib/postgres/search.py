@@ -144,10 +144,7 @@ class SearchVector(SearchVectorCombinable, Func):
             weight_sql, extra_params = compiler.compile(clone.weight)
             sql = "setweight({}, {})".format(sql, weight_sql)
 
-        # These parameters must be bound on the client side because we may
-        # want to create an index on this expression.
-        sql = connection.ops.compose_sql(sql, config_params + params + extra_params)
-        return sql, []
+        return sql, config_params + params + extra_params
 
 
 class CombinedSearchVector(SearchVectorCombinable, CombinedExpression):

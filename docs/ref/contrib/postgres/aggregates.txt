@@ -16,7 +16,7 @@ module. They are described in more detail in the `PostgreSQL docs
 
     .. code-block:: pycon
 
-        >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
+        >>> SomeModel.objects.aggregate(arr=ArrayAgg("somefield"))
         {'arr': [0, 1, 2]}
 
 .. admonition:: Common aggregate options
@@ -49,10 +49,11 @@ General-purpose aggregation functions
 
         Examples::
 
-            'some_field'
-            '-some_field'
+            "some_field"
+            "-some_field"
             from django.db.models import F
-            F('some_field').desc()
+
+            F("some_field").desc()
 
     .. versionchanged:: 5.0
 
@@ -103,7 +104,7 @@ General-purpose aggregation functions
 
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolAnd
-        >>> Comment.objects.aggregate(booland=BoolAnd('published'))
+        >>> Comment.objects.aggregate(booland=BoolAnd("published"))
         {'booland': False}
         >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
         {'booland': True}
@@ -127,7 +128,7 @@ General-purpose aggregation functions
 
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolOr
-        >>> Comment.objects.aggregate(boolor=BoolOr('published'))
+        >>> Comment.objects.aggregate(boolor=BoolOr("published"))
         {'boolor': True}
         >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))
         {'boolor': False}
@@ -160,8 +161,9 @@ General-purpose aggregation functions
         class Room(models.Model):
             number = models.IntegerField(unique=True)
 
+
         class HotelReservation(models.Model):
-            room = models.ForeignKey('Room', on_delete=models.CASCADE)
+            room = models.ForeignKey("Room", on_delete=models.CASCADE)
             start = models.DateTimeField()
             end = models.DateTimeField()
             requirements = models.JSONField(blank=True, null=True)
@@ -171,10 +173,10 @@ General-purpose aggregation functions
         >>> from django.contrib.postgres.aggregates import JSONBAgg
         >>> Room.objects.annotate(
         ...     requirements=JSONBAgg(
-        ...         'hotelreservation__requirements',
-        ...         ordering='-hotelreservation__start',
+        ...         "hotelreservation__requirements",
+        ...         ordering="-hotelreservation__start",
         ...     )
-        ... ).filter(requirements__0__sea_view=True).values('number', 'requirements')
+        ... ).filter(requirements__0__sea_view=True).values("number", "requirements")
         <QuerySet [{'number': 102, 'requirements': [
             {'parking': False, 'sea_view': True, 'double_bed': False},
             {'parking': True, 'double_bed': True}
@@ -216,6 +218,7 @@ General-purpose aggregation functions
 
         class Publication(models.Model):
             title = models.CharField(max_length=30)
+
 
         class Article(models.Model):
             headline = models.CharField(max_length=100)
@@ -373,11 +376,11 @@ Here's some examples of some of the general-purpose aggregation functions:
 
 .. code-block:: pycon
 
-    >>> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
+    >>> TestModel.objects.aggregate(result=StringAgg("field1", delimiter=";"))
     {'result': 'foo;bar;test'}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field2'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field2"))
     {'result': [1, 2, 3]}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field1'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field1"))
     {'result': ['foo', 'bar', 'test']}
 
 The next example shows the usage of statistical aggregate functions. The
@@ -386,8 +389,9 @@ underlying math will be not described (you can read about this, for example, at
 
 .. code-block:: pycon
 
-    >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
+    >>> TestModel.objects.aggregate(count=RegrCount(y="field3", x="field2"))
     {'count': 2}
-    >>> TestModel.objects.aggregate(avgx=RegrAvgX(y='field3', x='field2'),
-    ...                             avgy=RegrAvgY(y='field3', x='field2'))
+    >>> TestModel.objects.aggregate(
+    ...     avgx=RegrAvgX(y="field3", x="field2"), avgy=RegrAvgY(y="field3", x="field2")
+    ... )
     {'avgx': 2, 'avgy': 13}

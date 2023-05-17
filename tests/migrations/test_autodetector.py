@@ -2266,10 +2266,9 @@ class AutodetectorTests(BaseAutodetectorTests):
             changes,
             "eggs",
             0,
-            ["CreateModel", "CreateModel", "AddIndex", "AlterUniqueTogether"],
+            ["CreateModel", "CreateModel"],
         )
         self.assertNotIn("unique_together", changes["eggs"][0].operations[0].options)
-        self.assertNotIn("unique_together", changes["eggs"][0].operations[1].options)
         self.assertMigrationDependencies(changes, "eggs", 0, [])
 
     def test_alter_db_table_add(self):
@@ -2565,6 +2564,9 @@ class AutodetectorTests(BaseAutodetectorTests):
 
     def test_create_model_with_indexes(self):
         """Test creation of new model with indexes already defined."""
+        added_index = models.Index(
+            fields=["name"], name="create_model_with_indexes_idx"
+        )
         author = ModelState(
             "otherapp",
             "Author",
@@ -2573,25 +2575,25 @@ class AutodetectorTests(BaseAutodetectorTests):
                 ("name", models.CharField(max_length=200)),
             ],
             {
-                "indexes": [
-                    models.Index(fields=["name"], name="create_model_with_indexes_idx")
-                ]
+                "indexes": [added_index],
             },
         )
         changes = self.get_changes([], [author])
-        added_index = models.Index(
-            fields=["name"], name="create_model_with_indexes_idx"
-        )
         # Right number of migrations?
         self.assertEqual(len(changes["otherapp"]), 1)
         # Right number of actions?
         migration = changes["otherapp"][0]
-        self.assertEqual(len(migration.operations), 2)
+        self.assertEqual(len(migration.operations), 1)
         # Right actions order?
-        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel", "AddIndex"])
+        self.assertOperationTypes(changes, "otherapp", 0, ["CreateModel"])
         self.assertOperationAttributes(changes, "otherapp", 0, 0, name="Author")
         self.assertOperationAttributes(
-            changes, "otherapp", 0, 1, model_name="author", index=added_index
+            changes,
+            "otherapp",
+            0,
+            0,
+            name="Author",
+            options={"indexes": [added_index]},
         )
 
     def test_add_indexes(self):
@@ -2718,6 +2720,65 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertOperationAttributes(
             changes, "testapp", 0, 0, model_name="author", constraint=added_constraint
+        )
+
+    def test_add_constraints_with_new_model(self):
+        book_with_unique_title_and_pony = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("title", models.CharField(max_length=200)),
+                ("pony", models.ForeignKey("otherapp.Pony", models.CASCADE)),
+            ],
+            {
+                "constraints": [
+                    models.UniqueConstraint(
+                        fields=["title", "pony"],
+                        name="unique_title_pony",
+                    )
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [self.book_with_no_author],
+            [book_with_unique_title_and_pony, self.other_pony],
+        )
+
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["CreateModel", "AddField", "AddConstraint"],
+        )
+
+    def test_add_index_with_new_model(self):
+        book_with_index_title_and_pony = ModelState(
+            "otherapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("title", models.CharField(max_length=200)),
+                ("pony", models.ForeignKey("otherapp.Pony", models.CASCADE)),
+            ],
+            {
+                "indexes": [
+                    models.Index(fields=["title", "pony"], name="index_title_pony"),
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [self.book_with_no_author],
+            [book_with_index_title_and_pony, self.other_pony],
+        )
+
+        self.assertNumberMigrations(changes, "otherapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "otherapp",
+            0,
+            ["CreateModel", "AddField", "AddIndex"],
         )
 
     def test_remove_constraints(self):
@@ -3984,62 +4045,69 @@ class AutodetectorTests(BaseAutodetectorTests):
             },
         )
 
-    def test_add_model_order_with_respect_to_index_constraint(self):
-        tests = [
-            (
-                "AddIndex",
-                {
-                    "indexes": [
-                        models.Index(fields=["_order"], name="book_order_idx"),
-                    ]
-                },
-            ),
-            (
-                "AddConstraint",
-                {
-                    "constraints": [
-                        models.CheckConstraint(
-                            check=models.Q(_order__gt=1),
-                            name="book_order_gt_1",
-                        ),
-                    ]
-                },
-            ),
-        ]
-        for operation, extra_option in tests:
-            with self.subTest(operation=operation):
-                after = ModelState(
-                    "testapp",
-                    "Author",
-                    [
-                        ("id", models.AutoField(primary_key=True)),
-                        ("name", models.CharField(max_length=200)),
-                        ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
-                    ],
-                    options={
-                        "order_with_respect_to": "book",
-                        **extra_option,
-                    },
-                )
-                changes = self.get_changes([], [self.book, after])
-                self.assertNumberMigrations(changes, "testapp", 1)
-                self.assertOperationTypes(
-                    changes,
-                    "testapp",
-                    0,
-                    [
-                        "CreateModel",
-                        operation,
-                    ],
-                )
-                self.assertOperationAttributes(
-                    changes,
-                    "testapp",
-                    0,
-                    0,
-                    name="Author",
-                    options={"order_with_respect_to": "book"},
-                )
+    def test_add_model_order_with_respect_to_constraint(self):
+        after = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+                ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+            ],
+            options={
+                "order_with_respect_to": "book",
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(_order__gt=1), name="book_order_gt_1"
+                    ),
+                ],
+            },
+        )
+        changes = self.get_changes([], [self.book, after])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(
+            changes,
+            "testapp",
+            0,
+            ["CreateModel", "AddConstraint"],
+        )
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="Author",
+            options={"order_with_respect_to": "book"},
+        )
+
+    def test_add_model_order_with_respect_to_index(self):
+        after = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+                ("book", models.ForeignKey("otherapp.Book", models.CASCADE)),
+            ],
+            options={
+                "order_with_respect_to": "book",
+                "indexes": [models.Index(fields=["_order"], name="book_order_idx")],
+            },
+        )
+        changes = self.get_changes([], [self.book, after])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["CreateModel"])
+        self.assertOperationAttributes(
+            changes,
+            "testapp",
+            0,
+            0,
+            name="Author",
+            options={
+                "order_with_respect_to": "book",
+                "indexes": [models.Index(fields=["_order"], name="book_order_idx")],
+            },
+        )
 
     def test_set_alter_order_with_respect_to_index_constraint_unique_together(self):
         tests = [

@@ -793,6 +793,47 @@ class FilteredRelationAggregationTests(TestCase):
             qs.annotate(total=Count("pk")).values("total"), [{"total": 1}]
         )
 
+    def test_condition_spans_join(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                )
+            ).filter(
+                contains_editor_author__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_spans_join_chained(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                ),
+                contains_editor_author_ref=FilteredRelation(
+                    "author",
+                    condition=Q(author__name=F("contains_editor_author__name")),
+                ),
+            ).filter(
+                contains_editor_author_ref__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_self_ref(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_author=FilteredRelation(
+                    "author",
+                    condition=Q(title__icontains=F("author__name")),
+                )
+            ).filter(
+                contains_author__isnull=False,
+            ),
+            [self.book1],
+        )
+
 
 class FilteredRelationAnalyticalAggregationTests(TestCase):
     @classmethod

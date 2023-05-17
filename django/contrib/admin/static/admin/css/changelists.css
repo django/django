@@ -215,9 +215,9 @@
     color: var(--link-hover-color);
 }
 
-#changelist-filter #changelist-filter-clear a {
+#changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 

@@ -4,6 +4,7 @@
 # Allisson Azevedo <allisson@gmail.com>, 2014
 # bruno.devpod <bruno.devpod@gmail.com>, 2014
 # Eduardo Cereto Carvalho, 2012
+# Erick Mesquita, 2023
 # semente, 2012-2013
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Rafael Fontenelle <rffontenelle@gmail.com>, 2022
@@ -14,8 +15,8 @@ msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-04-07 14:40+0200\n"
-"PO-Revision-Date: 2022-04-24 18:40+0000\n"
-"Last-Translator: Rafael Fontenelle <rffontenelle@gmail.com>, 2022\n"
+"PO-Revision-Date: 2023-04-24 18:40+0000\n"
+"Last-Translator: Erick Mesquita, 2023\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/django/django/"
 "language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -329,7 +330,7 @@ msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mês"
 msgstr[1] "%(num)d mses"
-msgstr[2] "%(num)d mses"
+msgstr[2] "%(num)d meses"
 
 #, python-format
 msgctxt "naturaltime-future"

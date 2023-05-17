@@ -22,9 +22,13 @@ form .form-row p {
     padding-left: 0;
 }
 
-.form-row > div {
+.flex-container {
     display: flex;
     flex-wrap: wrap;
+}
+
+.form-multiline > div {
+    padding-bottom: 10px;
 }
 
 /* FORM LABELS */
@@ -90,13 +94,8 @@ form ul.inline li {
     padding: 6px 0;
     margin-top: 0;
     margin-bottom: 0;
-    margin-left: 170px;
-    overflow-wrap: break-word;
-}
-
-.aligned label + div.readonly,
-.aligned label + .datetime {
     margin-left: 0;
+    overflow-wrap: break-word;
 }
 
 .aligned ul label {
@@ -135,11 +134,6 @@ form .aligned p.datetime div.help.timezonewarning {
     margin-left: 0;
     padding-left: 0;
     font-weight: normal;
-}
-
-form .aligned .checkbox-row + .help {
-    margin-left: 0;
-    padding-left: 0;
 }
 
 form .aligned p.help:last-child,
@@ -184,14 +178,7 @@ form .aligned table p {
     width: 610px;
 }
 
-.checkbox-row p.help,
-.checkbox-row div.help {
-    margin-left: 0;
-    padding-left: 0;
-}
-
 fieldset .fieldBox {
-    float: left;
     margin-right: 20px;
 }
 

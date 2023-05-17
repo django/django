@@ -9,6 +9,7 @@ objects, but an ``Article`` can only have one ``Reporter`` object::
 
     from django.db import models
 
+
     class Reporter(models.Model):
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
@@ -16,6 +17,7 @@ objects, but an ``Article`` can only have one ``Reporter`` object::
 
         def __str__(self):
             return f"{self.first_name} {self.last_name}"
+
 
     class Article(models.Model):
         headline = models.CharField(max_length=100)
@@ -26,7 +28,7 @@ objects, but an ``Article`` can only have one ``Reporter`` object::
             return self.headline
 
         class Meta:
-            ordering = ['headline']
+            ordering = ["headline"]
 
 What follows are examples of operations that can be performed using the Python
 API facilities.
@@ -35,10 +37,10 @@ Create a few Reporters:
 
 .. code-block:: pycon
 
-    >>> r = Reporter(first_name='John', last_name='Smith', email='john@example.com')
+    >>> r = Reporter(first_name="John", last_name="Smith", email="john@example.com")
     >>> r.save()
 
-    >>> r2 = Reporter(first_name='Paul', last_name='Jones', email='paul@example.com')
+    >>> r2 = Reporter(first_name="Paul", last_name="Jones", email="paul@example.com")
     >>> r2.save()
 
 Create an Article:
@@ -61,8 +63,10 @@ raises ``ValueError``:
 
 .. code-block:: pycon
 
-    >>> r3 = Reporter(first_name='John', last_name='Smith', email='john@example.com')
-    >>> Article.objects.create(headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3)
+    >>> r3 = Reporter(first_name="John", last_name="Smith", email="john@example.com")
+    >>> Article.objects.create(
+    ...     headline="This is a test", pub_date=date(2005, 7, 27), reporter=r3
+    ... )
     Traceback (most recent call last):
     ...
     ValueError: save() prohibited to prevent data loss due to unsaved related object 'reporter'.
@@ -77,7 +81,9 @@ Create an Article via the Reporter object:
 
 .. code-block:: pycon
 
-    >>> new_article = r.article_set.create(headline="John's second story", pub_date=date(2005, 7, 29))
+    >>> new_article = r.article_set.create(
+    ...     headline="John's second story", pub_date=date(2005, 7, 29)
+    ... )
     >>> new_article
     <Article: John's second story>
     >>> new_article.reporter
@@ -89,7 +95,9 @@ Create a new article:
 
 .. code-block:: pycon
 
-    >>> new_article2 = Article.objects.create(headline="Paul's story", pub_date=date(2006, 1, 17), reporter=r)
+    >>> new_article2 = Article.objects.create(
+    ...     headline="Paul's story", pub_date=date(2006, 1, 17), reporter=r
+    ... )
     >>> new_article2.reporter
     <Reporter: John Smith>
     >>> new_article2.reporter.id
@@ -136,18 +144,18 @@ This works as many levels deep as you want. There's no limit. For example:
 
 .. code-block:: pycon
 
-    >>> r.article_set.filter(headline__startswith='This')
+    >>> r.article_set.filter(headline__startswith="This")
     <QuerySet [<Article: This is a test>]>
 
     # Find all Articles for any Reporter whose first name is "John".
-    >>> Article.objects.filter(reporter__first_name='John')
+    >>> Article.objects.filter(reporter__first_name="John")
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Exact match is implied here:
 
 .. code-block:: pycon
 
-    >>> Article.objects.filter(reporter__first_name='John')
+    >>> Article.objects.filter(reporter__first_name="John")
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Query twice over the related field. This translates to an AND condition in the
@@ -155,7 +163,7 @@ WHERE clause:
 
 .. code-block:: pycon
 
-    >>> Article.objects.filter(reporter__first_name='John', reporter__last_name='Smith')
+    >>> Article.objects.filter(reporter__first_name="John", reporter__last_name="Smith")
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 For the related lookup you can supply a primary key value or pass the related
@@ -170,16 +178,18 @@ object explicitly:
     >>> Article.objects.filter(reporter=r)
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
-    >>> Article.objects.filter(reporter__in=[1,2]).distinct()
+    >>> Article.objects.filter(reporter__in=[1, 2]).distinct()
     <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
-    >>> Article.objects.filter(reporter__in=[r,r2]).distinct()
+    >>> Article.objects.filter(reporter__in=[r, r2]).distinct()
     <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
 
 You can also use a queryset instead of a literal list of instances:
 
 .. code-block:: pycon
 
-    >>> Article.objects.filter(reporter__in=Reporter.objects.filter(first_name='John')).distinct()
+    >>> Article.objects.filter(
+    ...     reporter__in=Reporter.objects.filter(first_name="John")
+    ... ).distinct()
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
 
 Querying in the opposite direction:
@@ -193,27 +203,27 @@ Querying in the opposite direction:
     >>> Reporter.objects.filter(article=a)
     <QuerySet [<Reporter: John Smith>]>
 
-    >>> Reporter.objects.filter(article__headline__startswith='This')
+    >>> Reporter.objects.filter(article__headline__startswith="This")
     <QuerySet [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]>
-    >>> Reporter.objects.filter(article__headline__startswith='This').distinct()
+    >>> Reporter.objects.filter(article__headline__startswith="This").distinct()
     <QuerySet [<Reporter: John Smith>]>
 
 Counting in the opposite direction works in conjunction with ``distinct()``:
 
 .. code-block:: pycon
 
-    >>> Reporter.objects.filter(article__headline__startswith='This').count()
+    >>> Reporter.objects.filter(article__headline__startswith="This").count()
     3
-    >>> Reporter.objects.filter(article__headline__startswith='This').distinct().count()
+    >>> Reporter.objects.filter(article__headline__startswith="This").distinct().count()
     1
 
 Queries can go round in circles:
 
 .. code-block:: pycon
 
-    >>> Reporter.objects.filter(article__reporter__first_name__startswith='John')
+    >>> Reporter.objects.filter(article__reporter__first_name__startswith="John")
     <QuerySet [<Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>, <Reporter: John Smith>]>
-    >>> Reporter.objects.filter(article__reporter__first_name__startswith='John').distinct()
+    >>> Reporter.objects.filter(article__reporter__first_name__startswith="John").distinct()
     <QuerySet [<Reporter: John Smith>]>
     >>> Reporter.objects.filter(article__reporter=r).distinct()
     <QuerySet [<Reporter: John Smith>]>
@@ -226,19 +236,19 @@ ForeignKey was defined with :attr:`django.db.models.ForeignKey.on_delete` set to
 
     >>> Article.objects.all()
     <QuerySet [<Article: John's second story>, <Article: Paul's story>, <Article: This is a test>]>
-    >>> Reporter.objects.order_by('first_name')
+    >>> Reporter.objects.order_by("first_name")
     <QuerySet [<Reporter: John Smith>, <Reporter: Paul Jones>]>
     >>> r2.delete()
     >>> Article.objects.all()
     <QuerySet [<Article: John's second story>, <Article: This is a test>]>
-    >>> Reporter.objects.order_by('first_name')
+    >>> Reporter.objects.order_by("first_name")
     <QuerySet [<Reporter: John Smith>]>
 
 You can delete using a JOIN in the query:
 
 .. code-block:: pycon
 
-    >>> Reporter.objects.filter(article__headline__startswith='This').delete()
+    >>> Reporter.objects.filter(article__headline__startswith="This").delete()
     >>> Reporter.objects.all()
     <QuerySet []>
     >>> Article.objects.all()

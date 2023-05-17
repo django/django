@@ -326,7 +326,7 @@ Navigate to Django's ``tests/shortcuts/`` folder and create a new file
 
     class MakeToastTests(SimpleTestCase):
         def test_make_toast(self):
-            self.assertEqual(make_toast(), 'toast')
+            self.assertEqual(make_toast(), "toast")
 
 This test checks that the ``make_toast()`` returns ``'toast'``.
 
@@ -375,7 +375,7 @@ Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
 bottom, add::
 
     def make_toast():
-        return 'toast'
+        return "toast"
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django

@@ -107,15 +107,12 @@ Installing some prerequisites
 =============================
 
 The current state of Python packaging is a bit muddled with various tools. For
-this tutorial, we're going to use setuptools_ to build our package. It's the
-recommended packaging tool (merged with the ``distribute`` fork). We'll also be
-using `pip`_ to install and uninstall it. You should install these
+this tutorial, we're going to use :pypi:`setuptools` to build our package. It's
+the recommended packaging tool (merged with the ``distribute`` fork). We'll
+also be using :pypi:`pip` to install and uninstall it. You should install these
 two packages now. If you need help, you can refer to :ref:`how to install
 Django with pip<installing-official-release>`. You can install ``setuptools``
 the same way.
-
-.. _setuptools: https://pypi.org/project/setuptools/
-.. _pip: https://pypi.org/project/pip/
 
 Packaging your app
 ==================
@@ -163,13 +160,13 @@ this. For a small app like polls, this process isn't too difficult.
        1. Add "polls" to your INSTALLED_APPS setting like this::
 
            INSTALLED_APPS = [
-               ...
-               'polls',
+               ...,
+               "polls",
            ]
 
        2. Include the polls URLconf in your project urls.py like this::
 
-           path('polls/', include('polls.urls')),
+           path("polls/", include("polls.urls")),
 
        3. Run ``python manage.py migrate`` to create the polls models.
 

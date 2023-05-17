@@ -68,9 +68,9 @@ Django source tree, as for any code change:
   ``Translations``, and attach the patch to it.
 
 .. _Transifex: https://www.transifex.com/
-.. _Django project page: https://www.transifex.com/django/django/
+.. _Django project page: https://app.transifex.com/django/django/
 .. _Django internationalization forum: https://forum.djangoproject.com/c/internals/i18n/14
-.. _Transifex User Guide: https://docs.transifex.com/
+.. _Transifex User Guide: https://help.transifex.com/
 
 .. _translating-documentation:
 
@@ -79,7 +79,7 @@ Documentation
 
 There is also an opportunity to translate the documentation, though this is a
 huge undertaking to complete entirely (you have been warned!). We use the same
-`Transifex tool <https://www.transifex.com/django/django-docs/>`_. The
+`Transifex tool <https://app.transifex.com/django/django-docs/>`_. The
 translations will appear at ``https://docs.djangoproject.com/<language_code>/``
 when at least the ``docs/intro/*`` files are fully translated in your language.
 

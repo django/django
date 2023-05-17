@@ -42,7 +42,7 @@ model):
 .. code-block:: pycon
 
     >>> from zipcode.models import Zipcode
-    >>> z = Zipcode(code=77096, poly='POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> z = Zipcode(code=77096, poly="POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))")
     >>> z.save()
 
 :class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models:
@@ -50,7 +50,7 @@ model):
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> poly = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> poly = GEOSGeometry("POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))")
     >>> z = Zipcode(code=77096, poly=poly)
     >>> z.save()
 
@@ -61,11 +61,15 @@ transform procedure:
 
 .. code-block:: pycon
 
-    >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
+    >>> poly_3084 = GEOSGeometry(
+    ...     "POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))", srid=3084
+    ... )  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
     >>> z = Zipcode(code=78212, poly=poly_3084)
     >>> z.save()
     >>> from django.db import connection
-    >>> print(connection.queries[-1]['sql']) # printing the last SQL statement executed (requires DEBUG=True)
+    >>> print(
+    ...     connection.queries[-1]["sql"]
+    ... )  # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
@@ -93,7 +97,7 @@ Here is an example of how to create a raster object from a raster file
 .. code-block:: pycon
 
     >>> from elevation.models import Elevation
-    >>> dem = Elevation(name='Volcano', rast='/path/to/raster/volcano.tif')
+    >>> dem = Elevation(name="Volcano", rast="/path/to/raster/volcano.tif")
     >>> dem.save()
 
 :class:`~django.contrib.gis.gdal.GDALRaster` objects may also be used to save
@@ -102,9 +106,17 @@ raster models:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import GDALRaster
-    >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...                    'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]})
-    >>> dem = Elevation(name='Canyon', rast=rast)
+    >>> rast = GDALRaster(
+    ...     {
+    ...         "width": 10,
+    ...         "height": 10,
+    ...         "name": "Canyon",
+    ...         "srid": 4326,
+    ...         "scale": [0.1, -0.1],
+    ...         "bands": [{"data": range(100)}],
+    ...     }
+    ... )
+    >>> dem = Elevation(name="Canyon", rast=rast)
     >>> dem.save()
 
 Note that this equivalent to:
@@ -112,9 +124,15 @@ Note that this equivalent to:
 .. code-block:: pycon
 
     >>> dem = Elevation.objects.create(
-    ...     name='Canyon',
-    ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...           'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]},
+    ...     name="Canyon",
+    ...     rast={
+    ...         "width": 10,
+    ...         "height": 10,
+    ...         "name": "Canyon",
+    ...         "srid": 4326,
+    ...         "scale": [0.1, -0.1],
+    ...         "bands": [{"data": range(100)}],
+    ...     },
     ... )
 
 .. _spatial-lookups-intro:
@@ -139,7 +157,7 @@ Geometry Lookups
 Geographic queries with geometries take the following general form (assuming
 the ``Zipcode`` model used in the :doc:`model-api`):
 
-.. code-block:: pycon
+.. code-block:: text
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
@@ -175,7 +193,7 @@ band index can be specified.
 This results in the following general form for lookups involving rasters
 (assuming the ``Elevation`` model used in the :doc:`model-api`):
 
-.. code-block:: pycon
+.. code-block:: text
 
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
@@ -270,6 +288,7 @@ For example, let's say we have a ``SouthTexasCity`` model (from the
 
     from django.contrib.gis.db import models
 
+
     class SouthTexasCity(models.Model):
         name = models.CharField(max_length=30)
         # A projected coordinate system (only valid for South Texas!)
@@ -281,10 +300,10 @@ Then distance queries may be performed as follows:
 .. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
+    >>> from django.contrib.gis.measure import D  # ``D`` is a shortcut for ``Distance``
     >>> from geoapp.models import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
-    >>> pnt = GEOSGeometry('POINT(-96.876369 29.905320)', srid=4326)
+    >>> pnt = GEOSGeometry("POINT(-96.876369 29.905320)", srid=4326)
     # If numeric parameter, units of field (meters in this case) are assumed.
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
     # Find all Cities within 7 km, > 20 miles away, and > 100 chains away (an obscure unit)

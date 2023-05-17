@@ -499,7 +499,7 @@ Use of both ``and`` and ``or`` clauses within the same tag is allowed, with
 
 will be interpreted like:
 
-.. code-block:: python
+.. code-block:: pycon
 
     if (athlete_list and coach_list) or cheerleader_list
 
@@ -945,11 +945,11 @@ is a list of cities represented by dictionaries containing ``"name"``,
 .. code-block:: python
 
     cities = [
-        {'name': 'Mumbai', 'population': '19,000,000', 'country': 'India'},
-        {'name': 'Calcutta', 'population': '15,000,000', 'country': 'India'},
-        {'name': 'New York', 'population': '20,000,000', 'country': 'USA'},
-        {'name': 'Chicago', 'population': '7,000,000', 'country': 'USA'},
-        {'name': 'Tokyo', 'population': '33,000,000', 'country': 'Japan'},
+        {"name": "Mumbai", "population": "19,000,000", "country": "India"},
+        {"name": "Calcutta", "population": "15,000,000", "country": "India"},
+        {"name": "New York", "population": "20,000,000", "country": "USA"},
+        {"name": "Chicago", "population": "7,000,000", "country": "USA"},
+        {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
     ]
 
 ...and you'd like to display a hierarchical list that is ordered by country,
@@ -1031,11 +1031,11 @@ grouped together):
 .. code-block:: python
 
     cities = [
-        {'name': 'Mumbai', 'population': '19,000,000', 'country': 'India'},
-        {'name': 'New York', 'population': '20,000,000', 'country': 'USA'},
-        {'name': 'Calcutta', 'population': '15,000,000', 'country': 'India'},
-        {'name': 'Chicago', 'population': '7,000,000', 'country': 'USA'},
-        {'name': 'Tokyo', 'population': '33,000,000', 'country': 'Japan'},
+        {"name": "Mumbai", "population": "19,000,000", "country": "India"},
+        {"name": "New York", "population": "20,000,000", "country": "USA"},
+        {"name": "Calcutta", "population": "15,000,000", "country": "India"},
+        {"name": "Chicago", "population": "7,000,000", "country": "USA"},
+        {"name": "Tokyo", "population": "33,000,000", "country": "Japan"},
     ]
 
 With this input for ``cities``, the example ``{% regroup %}`` template code
@@ -1116,16 +1116,18 @@ Example usage:
         {% resetcycle %}
     {% endfor %}
 
-This example would return this HTML::
+This example would return this HTML:
 
-    <h1>José Mourinho</h1>
-    <p class="odd">Thibaut Courtois</p>
-    <p class="even">John Terry</p>
-    <p class="odd">Eden Hazard</p>
+.. code-block:: html
 
-    <h1>Carlo Ancelotti</h1>
-    <p class="odd">Manuel Neuer</p>
-    <p class="even">Thomas Müller</p>
+    <h1>Gareth</h1>
+    <p class="odd">Harry</p>
+    <p class="even">John</p>
+    <p class="odd">Nick</p>
+
+    <h1>John</h1>
+    <p class="odd">Andrea</p>
+    <p class="even">Melissa</p>
 
 Notice how the first block ends with ``class="odd"`` and the new one starts
 with ``class="odd"``. Without the ``{% resetcycle %}`` tag, the second block
@@ -1253,16 +1255,18 @@ takes a client ID (here, ``client()`` is a method inside the views file
 
 .. code-block:: python
 
-    path('client/<int:id>/', app_views.client, name='app-views-client')
+    path("client/<int:id>/", app_views.client, name="app-views-client")
 
 If this app's URLconf is included into the project's URLconf under a path
 such as this:
 
 .. code-block:: python
 
-    path('clients/', include('project_name.app_name.urls'))
+    path("clients/", include("project_name.app_name.urls"))
 
 ...then, in a template, you can create a link to this view like this::
+
+.. code-block:: html+django
 
     {% url 'app-views-client' client.id %}
 
@@ -1695,9 +1699,9 @@ If ``value`` is:
 .. code-block:: python
 
     [
-        {'name': 'zed', 'age': 19},
-        {'name': 'amy', 'age': 22},
-        {'name': 'joe', 'age': 31},
+        {"name": "zed", "age": 19},
+        {"name": "amy", "age": 22},
+        {"name": "joe", "age": 31},
     ]
 
 then the output would be:
@@ -1705,9 +1709,9 @@ then the output would be:
 .. code-block:: python
 
     [
-        {'name': 'amy', 'age': 22},
-        {'name': 'joe', 'age': 31},
-        {'name': 'zed', 'age': 19},
+        {"name": "amy", "age": 22},
+        {"name": "joe", "age": 31},
+        {"name": "zed", "age": 19},
     ]
 
 You can also do more complicated things like:
@@ -1723,9 +1727,9 @@ If ``books`` is:
 .. code-block:: python
 
     [
-        {'title': '1984', 'author': {'name': 'George', 'age': 45}},
-        {'title': 'Timequake', 'author': {'name': 'Kurt', 'age': 75}},
-        {'title': 'Alice', 'author': {'name': 'Lewis', 'age': 33}},
+        {"title": "1984", "author": {"name": "George", "age": 45}},
+        {"title": "Timequake", "author": {"name": "Kurt", "age": 75}},
+        {"title": "Alice", "author": {"name": "Lewis", "age": 33}},
     ]
 
 then the output would be:
@@ -1748,9 +1752,9 @@ If ``value`` is:
 .. code-block:: python
 
     [
-        ('a', '42'),
-        ('c', 'string'),
-        ('b', 'foo'),
+        ("a", "42"),
+        ("c", "string"),
+        ("b", "foo"),
     ]
 
 then the output would be:
@@ -1758,9 +1762,9 @@ then the output would be:
 .. code-block:: python
 
     [
-        ('a', '42'),
-        ('b', 'foo'),
-        ('c', 'string'),
+        ("a", "42"),
+        ("b", "foo"),
+        ("c", "string"),
     ]
 
 You must pass the index as an integer rather than a string. The following

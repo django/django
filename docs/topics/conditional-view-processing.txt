@@ -71,8 +71,10 @@ Suppose you have this pair of models, representing a small blog system::
     import datetime
     from django.db import models
 
+
     class Blog(models.Model):
         ...
+
 
     class Entry(models.Model):
         blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
@@ -91,6 +93,7 @@ You can then use this function to provide early detection of an unchanged page
 for your front page view::
 
     from django.views.decorators.http import condition
+
 
     @condition(last_modified_func=latest_entry)
     def front_page(request, blog_id):
@@ -135,6 +138,8 @@ using one of these decorators::
 
     def front_page(request, blog_id):
         ...
+
+
     front_page = last_modified(latest_entry)(front_page)
 
 Use ``condition`` when testing both conditions
@@ -150,7 +155,8 @@ this would lead to incorrect behavior.
     @etag(etag_func)
     @last_modified(last_modified_func)
     def my_view(request):
-        # ...
+        ...
+
 
     # End of bad code.
 

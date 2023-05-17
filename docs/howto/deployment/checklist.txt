@@ -52,19 +52,21 @@ Instead of hardcoding the secret key in your settings module, consider loading
 it from an environment variable::
 
     import os
-    SECRET_KEY = os.environ['SECRET_KEY']
+
+    SECRET_KEY = os.environ["SECRET_KEY"]
 
 or from a file::
 
-    with open('/etc/secret_key.txt') as f:
+    with open("/etc/secret_key.txt") as f:
         SECRET_KEY = f.read().strip()
 
 If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
 
     import os
-    SECRET_KEY = os.environ['CURRENT_SECRET_KEY']
+
+    SECRET_KEY = os.environ["CURRENT_SECRET_KEY"]
     SECRET_KEY_FALLBACKS = [
-        os.environ['OLD_SECRET_KEY'],
+        os.environ["OLD_SECRET_KEY"],
     ]
 
 Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a

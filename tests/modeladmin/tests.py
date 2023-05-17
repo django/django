@@ -19,8 +19,9 @@ from django.contrib.admin.widgets import (
 from django.contrib.auth.models import User
 from django.db import models
 from django.forms.widgets import Select
-from django.test import SimpleTestCase, TestCase
+from django.test import RequestFactory, SimpleTestCase, TestCase
 from django.test.utils import isolate_apps
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import Band, Concert, Song
 
@@ -121,7 +122,10 @@ class ModelAdminTests(TestCase):
             fields = ["name"]
 
         ma = BandAdmin(Band, self.site)
-        self.assertTrue(ma.lookup_allowed("name__nonexistent", "test_value"))
+        self.assertIs(
+            ma.lookup_allowed("name__nonexistent", "test_value", request),
+            True,
+        )
 
     @isolate_apps("modeladmin")
     def test_lookup_allowed_onetoone(self):
@@ -147,12 +151,119 @@ class ModelAdminTests(TestCase):
         ma = EmployeeProfileAdmin(EmployeeProfile, self.site)
         # Reverse OneToOneField
         self.assertIs(
-            ma.lookup_allowed("employee__employeeinfo__description", "test_value"), True
+            ma.lookup_allowed(
+                "employee__employeeinfo__description", "test_value", request
+            ),
+            True,
         )
         # OneToOneField and ForeignKey
         self.assertIs(
-            ma.lookup_allowed("employee__department__code", "test_value"), True
+            ma.lookup_allowed("employee__department__code", "test_value", request),
+            True,
         )
+
+    @isolate_apps("modeladmin")
+    def test_lookup_allowed_foreign_primary(self):
+        class Country(models.Model):
+            name = models.CharField(max_length=256)
+
+        class Place(models.Model):
+            country = models.ForeignKey(Country, models.CASCADE)
+
+        class Restaurant(models.Model):
+            place = models.OneToOneField(Place, models.CASCADE, primary_key=True)
+
+        class Waiter(models.Model):
+            restaurant = models.ForeignKey(Restaurant, models.CASCADE)
+
+        class WaiterAdmin(ModelAdmin):
+            list_filter = [
+                "restaurant__place__country",
+                "restaurant__place__country__name",
+            ]
+
+        ma = WaiterAdmin(Waiter, self.site)
+        self.assertIs(
+            ma.lookup_allowed("restaurant__place__country", "1", request),
+            True,
+        )
+        self.assertIs(
+            ma.lookup_allowed("restaurant__place__country__id__exact", "1", request),
+            True,
+        )
+        self.assertIs(
+            ma.lookup_allowed(
+                "restaurant__place__country__name", "test_value", request
+            ),
+            True,
+        )
+
+    def test_lookup_allowed_considers_dynamic_list_filter(self):
+        class ConcertAdmin(ModelAdmin):
+            list_filter = ["main_band__sign_date"]
+
+            def get_list_filter(self, request):
+                if getattr(request, "user", None):
+                    return self.list_filter + ["main_band__name"]
+                return self.list_filter
+
+        model_admin = ConcertAdmin(Concert, self.site)
+        request_band_name_filter = RequestFactory().get(
+            "/", {"main_band__name": "test"}
+        )
+        self.assertIs(
+            model_admin.lookup_allowed(
+                "main_band__sign_date", "?", request_band_name_filter
+            ),
+            True,
+        )
+        self.assertIs(
+            model_admin.lookup_allowed(
+                "main_band__name", "?", request_band_name_filter
+            ),
+            False,
+        )
+        request_with_superuser = request
+        self.assertIs(
+            model_admin.lookup_allowed(
+                "main_band__sign_date", "?", request_with_superuser
+            ),
+            True,
+        )
+        self.assertIs(
+            model_admin.lookup_allowed("main_band__name", "?", request_with_superuser),
+            True,
+        )
+
+    def test_lookup_allowed_without_request_deprecation(self):
+        class ConcertAdmin(ModelAdmin):
+            list_filter = ["main_band__sign_date"]
+
+            def get_list_filter(self, request):
+                return self.list_filter + ["main_band__name"]
+
+            def lookup_allowed(self, lookup, value):
+                return True
+
+        model_admin = ConcertAdmin(Concert, self.site)
+        msg = (
+            "`request` must be added to the signature of ModelAdminTests."
+            "test_lookup_allowed_without_request_deprecation.<locals>."
+            "ConcertAdmin.lookup_allowed()."
+        )
+        request_band_name_filter = RequestFactory().get(
+            "/", {"main_band__name": "test"}
+        )
+        request_band_name_filter.user = User.objects.create_superuser(
+            username="bob", email="bob@test.com", password="test"
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            changelist = model_admin.get_changelist_instance(request_band_name_filter)
+            filterspec = changelist.get_filters(request_band_name_filter)[0][0]
+            self.assertEqual(filterspec.title, "sign date")
+            filterspec = changelist.get_filters(request_band_name_filter)[0][1]
+            self.assertEqual(filterspec.title, "name")
+            self.assertSequenceEqual(filterspec.lookup_choices, [self.band.name])
 
     def test_field_arguments(self):
         # If fields is specified, fieldsets_add and fieldsets_change should

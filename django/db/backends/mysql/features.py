@@ -24,6 +24,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
     supports_update_conflicts = True
+    delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
         CREATE PROCEDURE test_procedure ()
         BEGIN
@@ -108,6 +109,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests."
                 "test_update_ordered_by_inline_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
+                "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
         }
         if self.connection.mysql_is_mariadb and (
@@ -151,6 +153,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     "ONLY_FULL_GROUP_BY mode is enabled on MySQL, see #34262.": {
                         "aggregation.tests.AggregateTestCase."
                         "test_group_by_nested_expression_with_params",
+                    },
+                }
+            )
+        if self.connection.mysql_version < (8, 0, 31):
+            skips.update(
+                {
+                    "Nesting of UNIONs at the right-hand side is not supported on "
+                    "MySQL < 8.0.31": {
+                        "queries.test_qs_combinators.QuerySetSetOperationTests."
+                        "test_union_nested"
                     },
                 }
             )
@@ -284,9 +296,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         All storage engines except MyISAM support transactions.
         """
         return self._mysql_storage_engine != "MyISAM"
-
-    uses_savepoints = property(operator.attrgetter("supports_transactions"))
-    can_release_savepoints = property(operator.attrgetter("supports_transactions"))
 
     @cached_property
     def ignores_table_name_case(self):

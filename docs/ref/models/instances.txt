@@ -36,6 +36,7 @@ need to :meth:`~Model.save()`.
 
         from django.db import models
 
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
@@ -44,6 +45,7 @@ need to :meth:`~Model.save()`.
                 book = cls(title=title)
                 # do something with the book
                 return book
+
 
         book = Book.create("Pride and Prejudice")
 
@@ -55,10 +57,12 @@ need to :meth:`~Model.save()`.
                 # do something with the book
                 return book
 
+
         class Book(models.Model):
             title = models.CharField(max_length=100)
 
             objects = BookManager()
+
 
         book = Book.objects.create_book("Pride and Prejudice")
 
@@ -88,6 +92,7 @@ are loaded from the database::
 
     from django.db.models import DEFERRED
 
+
     @classmethod
     def from_db(cls, db, field_names, values):
         # Default implementation of from_db() (subject to change and could
@@ -108,12 +113,14 @@ are loaded from the database::
         )
         return instance
 
+
     def save(self, *args, **kwargs):
         # Check how the current values differ from ._loaded_values. For example,
         # prevent changing the creator_id of the model. (This example doesn't
         # support cases where 'creator_id' is deferred).
         if not self._state.adding and (
-                self.creator_id != self._loaded_values['creator_id']):
+            self.creator_id != self._loaded_values["creator_id"]
+        ):
             raise ValueError("Updating the value of creator isn't allowed")
         super().save(*args, **kwargs)
 
@@ -163,7 +170,7 @@ update, you could write a test similar to this::
 
     def test_update_result(self):
         obj = MyModel.objects.create(val=1)
-        MyModel.objects.filter(pk=obj.pk).update(val=F('val') + 1)
+        MyModel.objects.filter(pk=obj.pk).update(val=F("val") + 1)
         # At this point obj.val is still 1, but the value in the database
         # was updated to 2. The object's updated value needs to be reloaded
         # from the database.
@@ -251,6 +258,7 @@ when you want to run one-step model validation for your own manually created
 models. For example::
 
     from django.core.exceptions import ValidationError
+
     try:
         article.full_clean()
     except ValidationError as e:
@@ -282,14 +290,16 @@ access to more than a single field::
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class Article(models.Model):
         ...
+
         def clean(self):
             # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError(_('Draft entries may not have a publication date.'))
+            if self.status == "draft" and self.pub_date is not None:
+                raise ValidationError(_("Draft entries may not have a publication date."))
             # Set the pub_date for published items if it hasn't been set already.
-            if self.status == 'published' and self.pub_date is None:
+            if self.status == "published" and self.pub_date is None:
                 self.pub_date = datetime.date.today()
 
 Note, however, that like :meth:`Model.full_clean()`, a model's ``clean()``
@@ -302,6 +312,7 @@ will be stored in a special error dictionary key,
 that are tied to the entire model instead of to a specific field::
 
     from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
+
     try:
         article.full_clean()
     except ValidationError as e:
@@ -314,19 +325,24 @@ error to the ``pub_date`` field::
 
     class Article(models.Model):
         ...
+
         def clean(self):
             # Don't allow draft entries to have a pub_date.
-            if self.status == 'draft' and self.pub_date is not None:
-                raise ValidationError({'pub_date': _('Draft entries may not have a publication date.')})
+            if self.status == "draft" and self.pub_date is not None:
+                raise ValidationError(
+                    {"pub_date": _("Draft entries may not have a publication date.")}
+                )
             ...
 
 If you detect errors in multiple fields during ``Model.clean()``, you can also
 pass a dictionary mapping field names to errors::
 
-    raise ValidationError({
-        'title': ValidationError(_('Missing title.'), code='required'),
-        'pub_date': ValidationError(_('Invalid date.'), code='invalid'),
-    })
+    raise ValidationError(
+        {
+            "title": ValidationError(_("Missing title."), code="required"),
+            "pub_date": ValidationError(_("Invalid date."), code="invalid"),
+        }
+    )
 
 Then, ``full_clean()`` will check unique constraints on your model.
 
@@ -344,20 +360,22 @@ Then, ``full_clean()`` will check unique constraints on your model.
 
         class Article(models.Model):
             ...
+
             def clean_fields(self, exclude=None):
                 super().clean_fields(exclude=exclude)
-                if self.status == 'draft' and self.pub_date is not None:
-                    if exclude and 'status' in exclude:
+                if self.status == "draft" and self.pub_date is not None:
+                    if exclude and "status" in exclude:
                         raise ValidationError(
-                            _('Draft entries may not have a publication date.')
+                            _("Draft entries may not have a publication date.")
                         )
                     else:
-                        raise ValidationError({
-                            'status': _(
-                                'Set status to draft if there is not a '
-                                'publication date.'
-                             ),
-                        })
+                        raise ValidationError(
+                            {
+                                "status": _(
+                                    "Set status to draft if there is not a " "publication date."
+                                ),
+                            }
+                        )
 
 .. method:: Model.validate_unique(exclude=None)
 
@@ -421,10 +439,10 @@ an attribute on your object the first time you call ``save()``:
 
 .. code-block:: pycon
 
-    >>> b2 = Blog(name='Cheddar Talk', tagline='Thoughts on cheese.')
-    >>> b2.id     # Returns None, because b2 doesn't have an ID yet.
+    >>> b2 = Blog(name="Cheddar Talk", tagline="Thoughts on cheese.")
+    >>> b2.id  # Returns None, because b2 doesn't have an ID yet.
     >>> b2.save()
-    >>> b2.id     # Returns the ID of your new object.
+    >>> b2.id  # Returns the ID of your new object.
 
 There's no way to tell what the value of an ID will be before you call
 ``save()``, because that value is calculated by your database, not by Django.
@@ -455,10 +473,10 @@ rather than relying on the auto-assignment of the ID:
 
 .. code-block:: pycon
 
-    >>> b3 = Blog(id=3, name='Cheddar Talk', tagline='Thoughts on cheese.')
-    >>> b3.id     # Returns 3.
+    >>> b3 = Blog(id=3, name="Cheddar Talk", tagline="Thoughts on cheese.")
+    >>> b3.id  # Returns 3.
     >>> b3.save()
-    >>> b3.id     # Returns 3.
+    >>> b3.id  # Returns 3.
 
 If you assign auto-primary-key values manually, make sure not to use an
 already-existing primary-key value! If you create a new object with an explicit
@@ -468,7 +486,7 @@ changing the existing record rather than creating a new one.
 Given the above ``'Cheddar Talk'`` blog example, this example would override the
 previous record in the database::
 
-    b4 = Blog(id=3, name='Not Cheddar', tagline='Anything but cheese.')
+    b4 = Blog(id=3, name="Not Cheddar", tagline="Anything but cheese.")
     b4.save()  # Overrides the previous blog with ID=3!
 
 See `How Django knows to UPDATE vs. INSERT`_, below, for the reason this
@@ -583,7 +601,7 @@ doing the arithmetic in Python like:
 
 .. code-block:: pycon
 
-    >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
+    >>> product = Product.objects.get(name="Venezuelan Beaver Cheese")
     >>> product.number_sold += 1
     >>> product.save()
 
@@ -601,8 +619,8 @@ as:
 .. code-block:: pycon
 
     >>> from django.db.models import F
-    >>> product = Product.objects.get(name='Venezuelan Beaver Cheese')
-    >>> product.number_sold = F('number_sold') + 1
+    >>> product = Product.objects.get(name="Venezuelan Beaver Cheese")
+    >>> product.number_sold = F("number_sold") + 1
     >>> product.save()
 
 For more details, see the documentation on :class:`F expressions
@@ -620,8 +638,8 @@ This may be desirable if you want to update just one or a few fields on
 an object. There will be a slight performance benefit from preventing
 all of the model fields from being updated in the database. For example::
 
-    product.name = 'Name changed again'
-    product.save(update_fields=['name'])
+    product.name = "Name changed again"
+    product.save(update_fields=["name"])
 
 The ``update_fields`` argument can be any iterable containing strings. An
 empty ``update_fields`` iterable will skip the save. A value of ``None`` will
@@ -714,12 +732,13 @@ For example::
 
     from django.db import models
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
 
         def __str__(self):
-            return f'{self.first_name} {self.last_name}'
+            return f"{self.first_name} {self.last_name}"
 
 ``__eq__()``
 ------------
@@ -736,15 +755,19 @@ For example::
 
     from django.db import models
 
+
     class MyModel(models.Model):
         id = models.AutoField(primary_key=True)
+
 
     class MyProxyModel(MyModel):
         class Meta:
             proxy = True
 
+
     class MultitableInherited(MyModel):
         pass
+
 
     # Primary keys compared
     MyModel(id=1) == MyModel(id=1)
@@ -793,7 +816,8 @@ For example::
 
     def get_absolute_url(self):
         from django.urls import reverse
-        return reverse('people-detail', kwargs={'pk' : self.pk})
+
+        return reverse("people-detail", kwargs={"pk": self.pk})
 
 One place Django uses ``get_absolute_url()`` is in the admin app. If an object
 defines this method, the object-editing page will have a "View on site" link
@@ -811,7 +835,7 @@ URL, you should define ``get_absolute_url()``.
     reduce possibilities of link or redirect poisoning::
 
         def get_absolute_url(self):
-            return '/%s/' % self.name
+            return "/%s/" % self.name
 
     If ``self.name`` is ``'/example.com'`` this returns ``'//example.com/'``
     which, in turn, is a valid schema relative URL but not the expected
@@ -863,11 +887,12 @@ For example::
 
     from django.db import models
 
+
     class Person(models.Model):
         SHIRT_SIZES = [
-            ('S', 'Small'),
-            ('M', 'Medium'),
-            ('L', 'Large'),
+            ("S", "Small"),
+            ("M", "Medium"),
+            ("L", "Large"),
         ]
         name = models.CharField(max_length=60)
         shirt_size = models.CharField(max_length=2, choices=SHIRT_SIZES)

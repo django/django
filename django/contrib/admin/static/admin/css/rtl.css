@@ -13,7 +13,7 @@ th {
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink {
+.viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
@@ -128,7 +128,9 @@ thead th.sorted .text {
 
 form .aligned ul {
     margin-right: 163px;
+    padding-right: 10px;
     margin-left: 0;
+    padding-left: 0;
 }
 
 form ul.inline li {
@@ -143,9 +145,24 @@ form .aligned div.help {
     padding-right: 10px;
 }
 
-form .aligned .checkbox-row + .help {
+form div.help ul,
+form .aligned .checkbox-row + .help,
+form .aligned p.datetime div.help.timezonewarning {
     margin-right: 0;
     padding-right: 0;
+}
+
+form .wide p.help, form .wide div.help {
+    padding-left: 0;
+    padding-right: 50px;
+}
+
+form .wide p,
+form .wide ul.errorlist,
+form .wide input + p.help,
+form .wide input + div.help {
+    margin-right: 200px;
+    margin-left: 0px;
 }
 
 .submit-row {
@@ -153,7 +170,6 @@ form .aligned .checkbox-row + .help {
 }
 
 fieldset .fieldBox {
-    float: right;
     margin-left: 20px;
     margin-right: 0;
 }

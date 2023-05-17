@@ -66,7 +66,7 @@ created a URLconf for the polls application that includes this line:
 .. code-block:: python
     :caption: ``polls/urls.py``
 
-    path('<int:question_id>/vote/', views.vote, name='vote'),
+    path("<int:question_id>/vote/", views.vote, name="vote"),
 
 We also created a dummy implementation of the ``vote()`` function. Let's
 create a real version. Add the following to ``polls/views.py``:
@@ -79,24 +79,30 @@ create a real version. Add the following to ``polls/views.py``:
     from django.urls import reverse
 
     from .models import Choice, Question
+
+
     # ...
     def vote(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
         try:
-            selected_choice = question.choice_set.get(pk=request.POST['choice'])
+            selected_choice = question.choice_set.get(pk=request.POST["choice"])
         except (KeyError, Choice.DoesNotExist):
             # Redisplay the question voting form.
-            return render(request, 'polls/detail.html', {
-                'question': question,
-                'error_message': "You didn't select a choice.",
-            })
+            return render(
+                request,
+                "polls/detail.html",
+                {
+                    "question": question,
+                    "error_message": "You didn't select a choice.",
+                },
+            )
         else:
             selected_choice.votes += 1
             selected_choice.save()
             # Always return an HttpResponseRedirect after successfully dealing
             # with POST data. This prevents data from being posted twice if a
             # user hits the Back button.
-            return HttpResponseRedirect(reverse('polls:results', args=(question.id,)))
+            return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
 This code includes a few things we haven't covered yet in this tutorial:
 
@@ -138,7 +144,7 @@ This code includes a few things we haven't covered yet in this tutorial:
   this :func:`~django.urls.reverse` call will return a string like
   ::
 
-    '/polls/3/results/'
+    "/polls/3/results/"
 
   where the ``3`` is the value of ``question.id``. This redirected URL will
   then call the ``'results'`` view to display the final page.
@@ -159,7 +165,7 @@ page for the question. Let's write that view:
 
     def results(request, question_id):
         question = get_object_or_404(Question, pk=question_id)
-        return render(request, 'polls/results.html', {'question': question})
+        return render(request, "polls/results.html", {"question": question})
 
 This is almost exactly the same as the ``detail()`` view from :doc:`Tutorial 3
 </intro/tutorial03>`. The only difference is the template name. We'll fix this
@@ -246,12 +252,12 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
-        path('<int:question_id>/vote/', views.vote, name='vote'),
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
+        path("<int:question_id>/vote/", views.vote, name="vote"),
     ]
 
 Note that the name of the matched pattern in the path strings of the second and
@@ -276,26 +282,26 @@ views and use Django's generic views instead. To do so, open the
 
 
     class IndexView(generic.ListView):
-        template_name = 'polls/index.html'
-        context_object_name = 'latest_question_list'
+        template_name = "polls/index.html"
+        context_object_name = "latest_question_list"
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by("-pub_date")[:5]
 
 
     class DetailView(generic.DetailView):
         model = Question
-        template_name = 'polls/detail.html'
+        template_name = "polls/detail.html"
 
 
     class ResultsView(generic.DetailView):
         model = Question
-        template_name = 'polls/results.html'
+        template_name = "polls/results.html"
 
 
     def vote(request, question_id):
-        ... # same as above, no changes needed.
+        ...  # same as above, no changes needed.
 
 We're using two generic views here:
 :class:`~django.views.generic.list.ListView` and

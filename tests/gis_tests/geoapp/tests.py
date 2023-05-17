@@ -1,4 +1,3 @@
-import tempfile
 from io import StringIO
 
 from django.contrib.gis import gdal
@@ -15,6 +14,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
@@ -232,7 +232,7 @@ class GeoModelTest(TestCase):
         self.assertIn('"point": "%s"' % houston.point.ewkt, result)
 
         # Reload now dumped data
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json") as tmp:
+        with NamedTemporaryFile(mode="w", suffix=".json") as tmp:
             tmp.write(result)
             tmp.seek(0)
             call_command("loaddata", tmp.name, verbosity=0)

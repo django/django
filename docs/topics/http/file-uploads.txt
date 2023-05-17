@@ -26,6 +26,7 @@ Consider a form containing a :class:`~django.forms.FileField`:
 
     from django import forms
 
+
     class UploadFileForm(forms.Form):
         title = forms.CharField(max_length=50)
         file = forms.FileField()
@@ -55,15 +56,16 @@ described in :ref:`binding-uploaded-files`. This would look something like:
     # Imaginary function to handle an uploaded file.
     from somewhere import handle_uploaded_file
 
+
     def upload_file(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = UploadFileForm(request.POST, request.FILES)
             if form.is_valid():
-                handle_uploaded_file(request.FILES['file'])
-                return HttpResponseRedirect('/success/url/')
+                handle_uploaded_file(request.FILES["file"])
+                return HttpResponseRedirect("/success/url/")
         else:
             form = UploadFileForm()
-        return render(request, 'upload.html', {'form': form})
+        return render(request, "upload.html", {"form": form})
 
 Notice that we have to pass :attr:`request.FILES <django.http.HttpRequest.FILES>`
 into the form's constructor; this is how file data gets bound into a form.
@@ -71,7 +73,7 @@ into the form's constructor; this is how file data gets bound into a form.
 Here's a common way you might handle an uploaded file::
 
     def handle_uploaded_file(f):
-        with open('some/file/name.txt', 'wb+') as destination:
+        with open("some/file/name.txt", "wb+") as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
 
@@ -95,16 +97,17 @@ corresponding :class:`~django.db.models.FileField` when calling
     from django.shortcuts import render
     from .forms import ModelFormWithFileField
 
+
     def upload_file(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = ModelFormWithFileField(request.POST, request.FILES)
             if form.is_valid():
                 # file is saved
                 form.save()
-                return HttpResponseRedirect('/success/url/')
+                return HttpResponseRedirect("/success/url/")
         else:
             form = ModelFormWithFileField()
-        return render(request, 'upload.html', {'form': form})
+        return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually, you can assign the file object from
 :attr:`request.FILES <django.http.HttpRequest.FILES>` to the file field in the
@@ -115,16 +118,17 @@ model::
     from .forms import UploadFileForm
     from .models import ModelWithFileField
 
+
     def upload_file(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             form = UploadFileForm(request.POST, request.FILES)
             if form.is_valid():
-                instance = ModelWithFileField(file_field=request.FILES['file'])
+                instance = ModelWithFileField(file_field=request.FILES["file"])
                 instance.save()
-                return HttpResponseRedirect('/success/url/')
+                return HttpResponseRedirect("/success/url/")
         else:
             form = UploadFileForm()
-        return render(request, 'upload.html', {'form': form})
+        return render(request, "upload.html", {"form": form})
 
 If you are constructing an object manually outside of a request, you can assign
 a :class:`~django.core.files.File` like object to the
@@ -133,25 +137,61 @@ a :class:`~django.core.files.File` like object to the
     from django.core.management.base import BaseCommand
     from django.core.files.base import ContentFile
 
+
     class MyCommand(BaseCommand):
         def handle(self, *args, **options):
-            content_file = ContentFile(b'Hello world!', name='hello-world.txt')
+            content_file = ContentFile(b"Hello world!", name="hello-world.txt")
             instance = ModelWithFileField(file_field=content_file)
             instance.save()
+
+.. _uploading_multiple_files:
 
 Uploading multiple files
 ------------------------
 
-If you want to upload multiple files using one form field, set the ``multiple``
-HTML attribute of field's widget:
+..
+    Tests in tests.forms_tests.field_tests.test_filefield.MultipleFileFieldTest
+    should be updated after any changes in the following snippets.
+
+If you want to upload multiple files using one form field, create a subclass
+of the field's widget and set the ``allow_multiple_selected`` attribute on it
+to ``True``.
+
+In order for such files to be all validated by your form (and have the value of
+the field include them all), you will also have to subclass ``FileField``. See
+below for an example.
+
+.. admonition:: Multiple file field
+
+    Django is likely to have a proper multiple file field support at some point
+    in the future.
 
 .. code-block:: python
     :caption: ``forms.py``
 
     from django import forms
 
+
+    class MultipleFileInput(forms.ClearableFileInput):
+        allow_multiple_selected = True
+
+
+    class MultipleFileField(forms.FileField):
+        def __init__(self, *args, **kwargs):
+            kwargs.setdefault("widget", MultipleFileInput())
+            super().__init__(*args, **kwargs)
+
+        def clean(self, data, initial=None):
+            single_file_clean = super().clean
+            if isinstance(data, (list, tuple)):
+                result = [single_file_clean(d, initial) for d in data]
+            else:
+                result = single_file_clean(data, initial)
+            return result
+
+
     class FileFieldForm(forms.Form):
-        file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
+        file_field = MultipleFileField()
 
 Then override the ``post`` method of your
 :class:`~django.views.generic.edit.FormView` subclass to handle multiple file
@@ -163,21 +203,40 @@ uploads:
     from django.views.generic.edit import FormView
     from .forms import FileFieldForm
 
+
     class FileFieldFormView(FormView):
         form_class = FileFieldForm
-        template_name = 'upload.html'  # Replace with your template.
-        success_url = '...'  # Replace with your URL or reverse().
+        template_name = "upload.html"  # Replace with your template.
+        success_url = "..."  # Replace with your URL or reverse().
 
         def post(self, request, *args, **kwargs):
             form_class = self.get_form_class()
             form = self.get_form(form_class)
-            files = request.FILES.getlist('file_field')
             if form.is_valid():
-                for f in files:
-                    ...  # Do something with each file.
                 return self.form_valid(form)
             else:
                 return self.form_invalid(form)
+
+        def form_valid(self, form):
+            files = form.cleaned_data["file_field"]
+            for f in files:
+                ...  # Do something with each file.
+            return super().form_valid()
+
+.. warning::
+
+   This will allow you to handle multiple files at the form level only. Be
+   aware that you cannot use it to put multiple files on a single model
+   instance (in a single field), for example, even if the custom widget is used
+   with a form field related to a model ``FileField``.
+
+.. versionchanged:: 3.2.19
+
+   In previous versions, there was no support for the ``allow_multiple_selected``
+   class attribute, and users were advised to create the widget with the HTML
+   attribute ``multiple`` set through the ``attrs`` argument. However, this
+   caused validation of the form field to be applied only to the last file
+   submitted, which could have adverse security implications.
 
 Upload Handlers
 ===============
@@ -189,8 +248,10 @@ handler* -- a small class that handles file data as it gets uploaded. Upload
 handlers are initially defined in the :setting:`FILE_UPLOAD_HANDLERS` setting,
 which defaults to::
 
-    ["django.core.files.uploadhandler.MemoryFileUploadHandler",
-     "django.core.files.uploadhandler.TemporaryFileUploadHandler"]
+    [
+        "django.core.files.uploadhandler.MemoryFileUploadHandler",
+        "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+    ]
 
 Together :class:`MemoryFileUploadHandler` and
 :class:`TemporaryFileUploadHandler` provide Django's default file upload
@@ -276,14 +337,16 @@ list::
 
         from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+
         @csrf_exempt
         def upload_file_view(request):
             request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
             return _upload_file_view(request)
 
+
         @csrf_protect
         def _upload_file_view(request):
-            ... # Process request
+            ...  # Process request
 
     If you are using a class-based view, you will need to use
     :func:`~django.views.decorators.csrf.csrf_exempt` on its
@@ -295,13 +358,13 @@ list::
         from django.views import View
         from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
-        @method_decorator(csrf_exempt, name='dispatch')
-        class UploadFileView(View):
 
+        @method_decorator(csrf_exempt, name="dispatch")
+        class UploadFileView(View):
             def setup(self, request, *args, **kwargs):
                 request.upload_handlers.insert(0, ProgressBarUploadHandler(request))
                 super().setup(request, *args, **kwargs)
 
             @method_decorator(csrf_protect)
             def post(self, request, *args, **kwargs):
-                ... # Process request
+                ...  # Process request

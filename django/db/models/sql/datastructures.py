@@ -2,8 +2,11 @@
 Useful auxiliary data structures for query construction. Not useful outside
 the SQL domain.
 """
+import warnings
+
 from django.core.exceptions import FullResultSet
 from django.db.models.sql.constants import INNER, LOUTER
+from django.utils.deprecation import RemovedInDjango60Warning
 
 
 class MultiJoin(Exception):
@@ -61,7 +64,20 @@ class Join:
         self.join_type = join_type
         # A list of 2-tuples to use in the ON clause of the JOIN.
         # Each 2-tuple will create one join condition in the ON clause.
-        self.join_cols = join_field.get_joining_columns()
+        if hasattr(join_field, "get_joining_fields"):
+            self.join_fields = join_field.get_joining_fields()
+            self.join_cols = tuple(
+                (lhs_field.column, rhs_field.column)
+                for lhs_field, rhs_field in self.join_fields
+            )
+        else:
+            warnings.warn(
+                "The usage of get_joining_columns() in Join is deprecated. Implement "
+                "get_joining_fields() instead.",
+                RemovedInDjango60Warning,
+            )
+            self.join_fields = None
+            self.join_cols = join_field.get_joining_columns()
         # Along which field (or ForeignObjectRel in the reverse join case)
         self.join_field = join_field
         # Is this join nullabled?
@@ -78,18 +94,25 @@ class Join:
         params = []
         qn = compiler.quote_name_unless_alias
         qn2 = connection.ops.quote_name
-
         # Add a join condition for each pair of joining columns.
-        for lhs_col, rhs_col in self.join_cols:
-            join_conditions.append(
-                "%s.%s = %s.%s"
-                % (
-                    qn(self.parent_alias),
-                    qn2(lhs_col),
-                    qn(self.table_alias),
-                    qn2(rhs_col),
+        # RemovedInDjango60Warning: when the depraction ends, replace with:
+        # for lhs, rhs in self.join_field:
+        join_fields = self.join_fields or self.join_cols
+        for lhs, rhs in join_fields:
+            if isinstance(lhs, str):
+                # RemovedInDjango60Warning: when the depraction ends, remove
+                # the branch for strings.
+                lhs_full_name = "%s.%s" % (qn(self.parent_alias), qn2(lhs))
+                rhs_full_name = "%s.%s" % (qn(self.table_alias), qn2(rhs))
+            else:
+                lhs, rhs = connection.ops.prepare_join_on_clause(
+                    self.parent_alias, lhs, self.table_alias, rhs
                 )
-            )
+                lhs_sql, lhs_params = compiler.compile(lhs)
+                lhs_full_name = lhs_sql % lhs_params
+                rhs_sql, rhs_params = compiler.compile(rhs)
+                rhs_full_name = rhs_sql % rhs_params
+            join_conditions.append(f"{lhs_full_name} = {rhs_full_name}")
 
         # Add a single condition inside parentheses for whatever
         # get_extra_restriction() returns.
@@ -131,10 +154,7 @@ class Join:
         new_parent_alias = change_map.get(self.parent_alias, self.parent_alias)
         new_table_alias = change_map.get(self.table_alias, self.table_alias)
         if self.filtered_relation is not None:
-            filtered_relation = self.filtered_relation.clone()
-            filtered_relation.path = [
-                change_map.get(p, p) for p in self.filtered_relation.path
-            ]
+            filtered_relation = self.filtered_relation.relabeled_clone(change_map)
         else:
             filtered_relation = None
         return self.__class__(
@@ -164,10 +184,6 @@ class Join:
 
     def __hash__(self):
         return hash(self.identity)
-
-    def equals(self, other):
-        # Ignore filtered_relation in equality check.
-        return self.identity[:-1] == other.identity[:-1]
 
     def demote(self):
         new = self.relabeled_clone({})
@@ -219,6 +235,3 @@ class BaseTable:
 
     def __hash__(self):
         return hash(self.identity)
-
-    def equals(self, other):
-        return self.identity == other.identity

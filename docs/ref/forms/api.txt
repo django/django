@@ -36,10 +36,12 @@ your :class:`Form` class constructor:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
 
 In this dictionary, the keys are the field names, which correspond to the
@@ -58,7 +60,7 @@ check the value of the form's :attr:`~Form.is_bound` attribute:
     >>> f = ContactForm()
     >>> f.is_bound
     False
-    >>> f = ContactForm({'subject': 'hello'})
+    >>> f = ContactForm({"subject": "hello"})
     >>> f.is_bound
     True
 
@@ -93,10 +95,12 @@ and return a boolean designating whether the data was valid:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
@@ -107,10 +111,12 @@ email address:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': '',
-    ...         'message': 'Hi there',
-    ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "",
+    ...     "message": "Hi there",
+    ...     "sender": "invalid email address",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
@@ -256,7 +262,7 @@ it's not necessary to include every field in your form. For example:
 
 .. code-block:: pycon
 
-    >>> f = ContactForm(initial={'subject': 'Hi there!'})
+    >>> f = ContactForm(initial={"subject": "Hi there!"})
 
 These values are only displayed for unbound forms, and they're not used as
 fallback values if a particular value isn't provided.
@@ -271,10 +277,11 @@ precedence:
 
     >>> from django import forms
     >>> class CommentForm(forms.Form):
-    ...     name = forms.CharField(initial='class')
+    ...     name = forms.CharField(initial="class")
     ...     url = forms.URLField()
     ...     comment = forms.CharField()
-    >>> f = CommentForm(initial={'name': 'instance'}, auto_id=False)
+    ...
+    >>> f = CommentForm(initial={"name": "instance"}, auto_id=False)
     >>> print(f)
     <div>Name:<input type="text" name="name" value="instance" required></div>
     <div>Url:<input type="url" name="url" required></div>
@@ -298,15 +305,16 @@ dealing with callables whose return values can change (e.g. ``datetime.now`` or
     >>> import uuid
     >>> class UUIDCommentForm(CommentForm):
     ...     identifier = forms.UUIDField(initial=uuid.uuid4)
+    ...
     >>> f = UUIDCommentForm()
-    >>> f.get_initial_for_field(f.fields['identifier'], 'identifier')
+    >>> f.get_initial_for_field(f.fields["identifier"], "identifier")
     UUID('972ca9e4-7bfe-4f5b-af7d-07b3aa306334')
-    >>> f.get_initial_for_field(f.fields['identifier'], 'identifier')
+    >>> f.get_initial_for_field(f.fields["identifier"], "identifier")
     UUID('1b411fab-844e-4dec-bd4f-e9b0495f04d0')
     >>> # Using BoundField.initial, for comparison
-    >>> f['identifier'].initial
+    >>> f["identifier"].initial
     UUID('28a09c59-5f00-4ed9-9179-a3b074fa9c30')
-    >>> f['identifier'].initial
+    >>> f["identifier"].initial
     UUID('28a09c59-5f00-4ed9-9179-a3b074fa9c30')
 
 Checking which form data has changed
@@ -358,12 +366,13 @@ attribute:
 
 .. code-block:: pycon
 
-    >>> for row in f.fields.values(): print(row)
+    >>> for row in f.fields.values():
+    ...     print(row)
     ...
     <django.forms.fields.CharField object at 0x7ffaac632510>
     <django.forms.fields.URLField object at 0x7ffaac632f90>
     <django.forms.fields.CharField object at 0x7ffaac3aa050>
-    >>> f.fields['name']
+    >>> f.fields["name"]
     <django.forms.fields.CharField object at 0x7ffaac6324d0>
 
 You can alter the field and :class:`.BoundField` of :class:`Form` instance to
@@ -409,10 +418,12 @@ it, you can access the clean data via its ``cleaned_data`` attribute:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
@@ -428,10 +439,12 @@ only the valid fields:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': '',
-    ...         'message': 'Hi there',
-    ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "",
+    ...     "message": "Hi there",
+    ...     "sender": "invalid email address",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     False
@@ -445,17 +458,19 @@ but ``cleaned_data`` contains only the form's fields:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True,
-    ...         'extra_field_1': 'foo',
-    ...         'extra_field_2': 'bar',
-    ...         'extra_field_3': 'baz'}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ...     "extra_field_1": "foo",
+    ...     "extra_field_2": "bar",
+    ...     "extra_field_3": "baz",
+    ... }
     >>> f = ContactForm(data)
     >>> f.is_valid()
     True
-    >>> f.cleaned_data # Doesn't contain extra_field_1, etc.
+    >>> f.cleaned_data  # Doesn't contain extra_field_1, etc.
     {'cc_myself': True, 'message': 'Hi there', 'sender': 'foo@example.com', 'subject': 'hello'}
 
 When the ``Form`` is valid, ``cleaned_data`` will include a key and value for
@@ -470,7 +485,8 @@ fields. In this example, the data dictionary doesn't include a value for the
     ...     first_name = forms.CharField()
     ...     last_name = forms.CharField()
     ...     nick_name = forms.CharField(required=False)
-    >>> data = {'first_name': 'John', 'last_name': 'Lennon'}
+    ...
+    >>> data = {"first_name": "John", "last_name": "Lennon"}
     >>> f = OptionalPersonForm(data)
     >>> f.is_valid()
     True
@@ -513,10 +529,12 @@ include ``checked`` if appropriate:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data)
     >>> print(f)
     <div><label for="id_subject">Subject:</label><input type="text" name="subject" value="hello" maxlength="100" required id="id_subject"></div>
@@ -764,9 +782,10 @@ attributes::
 
     from django import forms
 
+
     class ContactForm(forms.Form):
-        error_css_class = 'error'
-        required_css_class = 'required'
+        error_css_class = "error"
+        required_css_class = "required"
 
         # ... and the rest of your fields here
 
@@ -781,13 +800,13 @@ classes, as needed. The HTML will look something like:
     <div class="required"><label for="id_message" class="required">Message:</label> ...
     <div class="required"><label for="id_sender" class="required">Sender:</label> ...
     <div><label for="id_cc_myself">Cc myself:</label> ...
-    >>> f['subject'].label_tag()
+    >>> f["subject"].label_tag()
     <label class="required" for="id_subject">Subject:</label>
-    >>> f['subject'].legend_tag()
+    >>> f["subject"].legend_tag()
     <legend class="required" for="id_subject">Subject:</legend>
-    >>> f['subject'].label_tag(attrs={'class': 'foo'})
+    >>> f["subject"].label_tag(attrs={"class": "foo"})
     <label for="id_subject" class="foo required">Subject:</label>
-    >>> f['subject'].legend_tag(attrs={'class': 'foo'})
+    >>> f["subject"].legend_tag(attrs={"class": "foo"})
     <legend for="id_subject" class="foo required">Subject:</legend>
 
 .. _ref-forms-api-configuring-label:
@@ -847,7 +866,7 @@ attributes based on the format string. For example, for a format string
 
 .. code-block:: pycon
 
-    >>> f = ContactForm(auto_id='id_for_%s')
+    >>> f = ContactForm(auto_id="id_for_%s")
     >>> print(f)
     <div><label for="id_for_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
     <div><label for="id_for_message">Message:</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
@@ -869,13 +888,13 @@ It's possible to customize that character, or omit it entirely, using the
 
 .. code-block:: pycon
 
-    >>> f = ContactForm(auto_id='id_for_%s', label_suffix='')
+    >>> f = ContactForm(auto_id="id_for_%s", label_suffix="")
     >>> print(f)
     <div><label for="id_for_subject">Subject</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
     <div><label for="id_for_message">Message</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
     <div><label for="id_for_sender">Sender</label><input type="email" name="sender" required id="id_for_sender"></div>
     <div><label for="id_for_cc_myself">Cc myself</label><input type="checkbox" name="cc_myself" id="id_for_cc_myself"></div>
-    >>> f = ContactForm(auto_id='id_for_%s', label_suffix=' ->')
+    >>> f = ContactForm(auto_id="id_for_%s", label_suffix=" ->")
     >>> print(f)
     <div><label for="id_for_subject">Subject:</label><input type="text" name="subject" maxlength="100" required id="id_for_subject"></div>
     <div><label for="id_for_message">Message -&gt;</label><textarea name="message" cols="40" rows="10" required id="id_for_message"></textarea></div>
@@ -915,6 +934,7 @@ You can set this as a class attribute when declaring your form or use the
 ``renderer`` argument to ``Form.__init__()``. For example::
 
     from django import forms
+
 
     class MyForm(forms.Form):
         default_renderer = MyRenderer()
@@ -964,10 +984,12 @@ method you're using:
 
 .. code-block:: pycon
 
-    >>> data = {'subject': '',
-    ...         'message': 'Hi there',
-    ...         'sender': 'invalid email address',
-    ...         'cc_myself': True}
+    >>> data = {
+    ...     "subject": "",
+    ...     "message": "Hi there",
+    ...     "sender": "invalid email address",
+    ...     "cc_myself": True,
+    ... }
     >>> f = ContactForm(data, auto_id=False)
     >>> print(f)
     <div>Subject:<ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" required></div>
@@ -1072,7 +1094,7 @@ using the field's name as the key:
 .. code-block:: pycon
 
     >>> form = ContactForm()
-    >>> print(form['subject'])
+    >>> print(form["subject"])
     <input id="id_subject" type="text" name="subject" maxlength="100" required>
 
 To retrieve all ``BoundField`` objects, iterate the form:
@@ -1080,7 +1102,9 @@ To retrieve all ``BoundField`` objects, iterate the form:
 .. code-block:: pycon
 
     >>> form = ContactForm()
-    >>> for boundfield in form: print(boundfield)
+    >>> for boundfield in form:
+    ...     print(boundfield)
+    ...
     <input id="id_subject" type="text" name="subject" maxlength="100" required>
     <input type="text" name="message" id="id_message" required>
     <input type="email" name="sender" id="id_sender" required>
@@ -1091,10 +1115,10 @@ The field-specific output honors the form object's ``auto_id`` setting:
 .. code-block:: pycon
 
     >>> f = ContactForm(auto_id=False)
-    >>> print(f['message'])
+    >>> print(f["message"])
     <input type="text" name="message" required>
-    >>> f = ContactForm(auto_id='id_%s')
-    >>> print(f['message'])
+    >>> f = ContactForm(auto_id="id_%s")
+    >>> print(f["message"])
     <input type="text" name="message" id="id_message" required>
 
 Attributes of ``BoundField``
@@ -1114,10 +1138,10 @@ Attributes of ``BoundField``
     .. code-block:: pycon
 
         >>> unbound_form = ContactForm()
-        >>> print(unbound_form['subject'].data)
+        >>> print(unbound_form["subject"].data)
         None
-        >>> bound_form = ContactForm(data={'subject': 'My Subject'})
-        >>> print(bound_form['subject'].data)
+        >>> bound_form = ContactForm(data={"subject": "My Subject"})
+        >>> print(bound_form["subject"].data)
         My Subject
 
 .. attribute:: BoundField.errors
@@ -1127,19 +1151,19 @@ Attributes of ``BoundField``
 
     .. code-block:: pycon
 
-        >>> data = {'subject': 'hi', 'message': '', 'sender': '', 'cc_myself': ''}
+        >>> data = {"subject": "hi", "message": "", "sender": "", "cc_myself": ""}
         >>> f = ContactForm(data, auto_id=False)
-        >>> print(f['message'])
+        >>> print(f["message"])
         <input type="text" name="message" required>
-        >>> f['message'].errors
+        >>> f["message"].errors
         ['This field is required.']
-        >>> print(f['message'].errors)
+        >>> print(f["message"].errors)
         <ul class="errorlist"><li>This field is required.</li></ul>
-        >>> f['subject'].errors
+        >>> f["subject"].errors
         []
-        >>> print(f['subject'].errors)
+        >>> print(f["subject"].errors)
 
-        >>> str(f['subject'].errors)
+        >>> str(f["subject"].errors)
         ''
 
 .. attribute:: BoundField.field
@@ -1177,7 +1201,7 @@ Attributes of ``BoundField``
     :attr:`~django.forms.Widget.attrs` on the field's widget. For example,
     declaring a field like this::
 
-        my_field = forms.CharField(widget=forms.TextInput(attrs={'id': 'myFIELD'}))
+        my_field = forms.CharField(widget=forms.TextInput(attrs={"id": "myFIELD"}))
 
     and using the template above, would render something like:
 
@@ -1201,10 +1225,11 @@ Attributes of ``BoundField``
         >>> from datetime import datetime
         >>> class DatedCommentForm(CommentForm):
         ...     created = forms.DateTimeField(initial=datetime.now)
+        ...
         >>> f = DatedCommentForm()
-        >>> f['created'].initial
+        >>> f["created"].initial
         datetime.datetime(2021, 7, 27, 9, 5, 54)
-        >>> f['created'].initial
+        >>> f["created"].initial
         datetime.datetime(2021, 7, 27, 9, 5, 54)
 
     Using :attr:`BoundField.initial` is recommended over
@@ -1227,10 +1252,20 @@ Attributes of ``BoundField``
     .. code-block:: pycon
 
         >>> f = ContactForm()
-        >>> print(f['subject'].name)
+        >>> print(f["subject"].name)
         subject
-        >>> print(f['message'].name)
+        >>> print(f["message"].name)
         message
+
+.. attribute:: BoundField.template_name
+
+    .. versionadded:: 5.0
+
+    The name of the template rendered with :meth:`.BoundField.as_field_group`.
+
+    A property returning the value of the
+    :attr:`~django.forms.Field.template_name` if set otherwise
+    :attr:`~django.forms.renderers.BaseRenderer.field_template_name`.
 
 .. attribute:: BoundField.use_fieldset
 
@@ -1255,6 +1290,15 @@ Attributes of ``BoundField``
 
 Methods of ``BoundField``
 -------------------------
+
+.. method:: BoundField.as_field_group()
+
+    .. versionadded:: 5.0
+
+    Renders the field using :meth:`.BoundField.render` with default values
+    which renders the ``BoundField``, including its label, help text and errors
+    using the template's :attr:`~django.forms.Field.template_name` if set
+    otherwise :attr:`~django.forms.renderers.BaseRenderer.field_template_name`
 
 .. method:: BoundField.as_hidden(attrs=None, **kwargs)
 
@@ -1282,8 +1326,8 @@ Methods of ``BoundField``
 
     .. code-block:: pycon
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> f['message'].css_classes()
+        >>> f = ContactForm(data={"message": ""})
+        >>> f["message"].css_classes()
         'required'
 
     If you want to provide some additional classes in addition to the
@@ -1292,9 +1336,16 @@ Methods of ``BoundField``
 
     .. code-block:: pycon
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> f['message'].css_classes('foo bar')
+        >>> f = ContactForm(data={"message": ""})
+        >>> f["message"].css_classes("foo bar")
         'foo bar required'
+
+.. method:: BoundField.get_context()
+
+    .. versionadded:: 5.0
+
+    Return the template context for rendering the field. The available context
+    is ``field`` being the instance of the bound field.
 
 .. method:: BoundField.label_tag(contents=None, attrs=None, label_suffix=None, tag=None)
 
@@ -1327,8 +1378,8 @@ Methods of ``BoundField``
 
     .. code-block:: pycon
 
-        >>> f = ContactForm(data={'message': ''})
-        >>> print(f['message'].label_tag())
+        >>> f = ContactForm(data={"message": ""})
+        >>> print(f["message"].label_tag())
         <label for="id_message">Message:</label>
 
     If you'd like to customize the rendering this can be achieved by overriding
@@ -1343,6 +1394,20 @@ Methods of ``BoundField``
     checkbox widgets where ``<legend>`` may be more appropriate than a
     ``<label>``.
 
+.. method:: BoundField.render(template_name=None, context=None, renderer=None)
+
+    .. versionadded:: 5.0
+
+    The render method is called by ``as_field_group``. All arguments are 
+    optional and default to:
+
+    * ``template_name``: :attr:`.BoundField.template_name`
+    * ``context``: Value returned by :meth:`.BoundField.get_context`
+    * ``renderer``: Value returned by :attr:`.Form.default_renderer`
+
+    By passing ``template_name`` you can customize the template used for just a
+    single call.
+
 .. method:: BoundField.value()
 
     Use this method to render the raw value of this field as it would be rendered
@@ -1350,12 +1415,12 @@ Methods of ``BoundField``
 
     .. code-block:: pycon
 
-        >>> initial = {'subject': 'welcome'}
+        >>> initial = {"subject": "welcome"}
         >>> unbound_form = ContactForm(initial=initial)
-        >>> bound_form = ContactForm(data={'subject': 'hi'}, initial=initial)
-        >>> print(unbound_form['subject'].value())
+        >>> bound_form = ContactForm(data={"subject": "hi"}, initial=initial)
+        >>> print(unbound_form["subject"].value())
         welcome
-        >>> print(bound_form['subject'].value())
+        >>> print(bound_form["subject"].value())
         hi
 
 Customizing ``BoundField``
@@ -1391,6 +1456,7 @@ be implemented as follows::
             else:
                 return None
 
+
     class GPSCoordinatesField(Field):
         def get_bound_field(self, form, field_name):
             return GPSCoordinatesBoundField(form, self, field_name)
@@ -1425,11 +1491,13 @@ need to bind the file data containing the mugshot image:
 
     # Bound form with an image field
     >>> from django.core.files.uploadedfile import SimpleUploadedFile
-    >>> data = {'subject': 'hello',
-    ...         'message': 'Hi there',
-    ...         'sender': 'foo@example.com',
-    ...         'cc_myself': True}
-    >>> file_data = {'mugshot': SimpleUploadedFile('face.jpg', <file data>)}
+    >>> data = {
+    ...     "subject": "hello",
+    ...     "message": "Hi there",
+    ...     "sender": "foo@example.com",
+    ...     "cc_myself": True,
+    ... }
+    >>> file_data = {"mugshot": SimpleUploadedFile("face.jpg", b"file data")}
     >>> f = ContactFormWithMugshot(data, file_data)
 
 In practice, you will usually specify ``request.FILES`` as the source
@@ -1494,6 +1562,7 @@ fields are ordered first:
 
     >>> class ContactFormWithPriority(ContactForm):
     ...     priority = forms.CharField()
+    ...
     >>> f = ContactFormWithPriority(auto_id=False)
     >>> print(f)
     <div>Subject:<input type="text" name="subject" maxlength="100" required></div>
@@ -1513,10 +1582,13 @@ classes:
     >>> class PersonForm(forms.Form):
     ...     first_name = forms.CharField()
     ...     last_name = forms.CharField()
+    ...
     >>> class InstrumentForm(forms.Form):
     ...     instrument = forms.CharField()
+    ...
     >>> class BeatleForm(InstrumentForm, PersonForm):
     ...     haircut_type = forms.CharField()
+    ...
     >>> b = BeatleForm(auto_id=False)
     >>> print(b)
     <div>First name:<input type="text" name="first_name" required></div>
@@ -1534,9 +1606,11 @@ by setting the name of the field to ``None`` on the subclass. For example:
     >>> class ParentForm(forms.Form):
     ...     name = forms.CharField()
     ...     age = forms.IntegerField()
+    ...
 
     >>> class ChildForm(ParentForm):
     ...     name = None
+    ...
 
     >>> list(ChildForm().fields)
     ['age']
@@ -1568,4 +1642,5 @@ The prefix can also be specified on the form class:
 
     >>> class PersonForm(forms.Form):
     ...     ...
-    ...     prefix = 'person'
+    ...     prefix = "person"
+    ...

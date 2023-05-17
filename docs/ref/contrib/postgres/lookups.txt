@@ -53,7 +53,7 @@ The ``trigram_word_similar`` lookup can be used on
 
 .. code-block:: pycon
 
-    >>> Sentence.objects.filter(name__trigram_word_similar='Middlesborough')
+    >>> Sentence.objects.filter(name__trigram_word_similar="Middlesborough")
     ['<Sentence: Gumby rides on the path of Middlesbrough>']
 
 .. fieldlookup:: trigram_strict_word_similar

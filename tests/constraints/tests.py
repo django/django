@@ -7,6 +7,8 @@ from django.db.models.constraints import BaseConstraint, UniqueConstraint
 from django.db.models.functions import Lower
 from django.db.transaction import atomic
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test.utils import ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     ChildModel,
@@ -26,48 +28,48 @@ def get_constraints(table):
 
 class BaseConstraintTests(SimpleTestCase):
     def test_constraint_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.constraint_sql(None, None)
 
     def test_contains_expressions(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         self.assertIs(c.contains_expressions, False)
 
     def test_create_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.create_sql(None, None)
 
     def test_remove_sql(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.remove_sql(None, None)
 
     def test_validate(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         msg = "This method must be implemented by a subclass."
         with self.assertRaisesMessage(NotImplementedError, msg):
             c.validate(None, None)
 
     def test_default_violation_error_message(self):
-        c = BaseConstraint("name")
+        c = BaseConstraint(name="name")
         self.assertEqual(
             c.get_violation_error_message(), "Constraint “name” is violated."
         )
 
     def test_custom_violation_error_message(self):
         c = BaseConstraint(
-            "base_name", violation_error_message="custom %(name)s message"
+            name="base_name", violation_error_message="custom %(name)s message"
         )
         self.assertEqual(c.get_violation_error_message(), "custom base_name message")
 
     def test_custom_violation_error_message_clone(self):
         constraint = BaseConstraint(
-            "base_name",
+            name="base_name",
             violation_error_message="custom %(name)s message",
         ).clone()
         self.assertEqual(
@@ -75,18 +77,44 @@ class BaseConstraintTests(SimpleTestCase):
             "custom base_name message",
         )
 
+    def test_custom_violation_code_message(self):
+        c = BaseConstraint(name="base_name", violation_error_code="custom_code")
+        self.assertEqual(c.violation_error_code, "custom_code")
+
     def test_deconstruction(self):
         constraint = BaseConstraint(
-            "base_name",
+            name="base_name",
             violation_error_message="custom %(name)s message",
+            violation_error_code="custom_code",
         )
         path, args, kwargs = constraint.deconstruct()
         self.assertEqual(path, "django.db.models.BaseConstraint")
         self.assertEqual(args, ())
         self.assertEqual(
             kwargs,
-            {"name": "base_name", "violation_error_message": "custom %(name)s message"},
+            {
+                "name": "base_name",
+                "violation_error_message": "custom %(name)s message",
+                "violation_error_code": "custom_code",
+            },
         )
+
+    def test_deprecation(self):
+        msg = "Passing positional arguments to BaseConstraint is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+            BaseConstraint("name", "violation error message")
+
+    def test_name_required(self):
+        msg = (
+            "BaseConstraint.__init__() missing 1 required keyword-only argument: 'name'"
+        )
+        with self.assertRaisesMessage(TypeError, msg):
+            BaseConstraint()
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_positional_arguments(self):
+        c = BaseConstraint("name", "custom %(name)s message")
+        self.assertEqual(c.get_violation_error_message(), "custom name message")
 
 
 class CheckConstraintTests(TestCase):
@@ -129,6 +157,20 @@ class CheckConstraintTests(TestCase):
                 check=check1, name="price", violation_error_message="custom error"
             ),
         )
+        self.assertNotEqual(
+            models.CheckConstraint(check=check1, name="price"),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_code="custom_code"
+            ),
+        )
+        self.assertEqual(
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_code="custom_code"
+            ),
+            models.CheckConstraint(
+                check=check1, name="price", violation_error_code="custom_code"
+            ),
+        )
 
     def test_repr(self):
         constraint = models.CheckConstraint(
@@ -139,6 +181,30 @@ class CheckConstraintTests(TestCase):
             repr(constraint),
             "<CheckConstraint: check=(AND: ('price__gt', F(discounted_price))) "
             "name='price_gt_discounted_price'>",
+        )
+
+    def test_repr_with_violation_error_message(self):
+        constraint = models.CheckConstraint(
+            check=models.Q(price__lt=1),
+            name="price_lt_one",
+            violation_error_message="More than 1",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<CheckConstraint: check=(AND: ('price__lt', 1)) name='price_lt_one' "
+            "violation_error_message='More than 1'>",
+        )
+
+    def test_repr_with_violation_error_code(self):
+        constraint = models.CheckConstraint(
+            check=models.Q(price__lt=1),
+            name="price_lt_one",
+            violation_error_code="more_than_one",
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<CheckConstraint: check=(AND: ('price__lt', 1)) name='price_lt_one' "
+            "violation_error_code='more_than_one'>",
         )
 
     def test_invalid_check_types(self):
@@ -205,6 +271,21 @@ class CheckConstraintTests(TestCase):
         )
         # Valid product.
         constraint.validate(Product, Product(price=10, discounted_price=5))
+
+    def test_validate_custom_error(self):
+        check = models.Q(price__gt=models.F("discounted_price"))
+        constraint = models.CheckConstraint(
+            check=check,
+            name="price",
+            violation_error_message="discount is fake",
+            violation_error_code="fake_discount",
+        )
+        # Invalid product.
+        invalid_product = Product(price=10, discounted_price=42)
+        msg = "discount is fake"
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
+            constraint.validate(Product, invalid_product)
+        self.assertEqual(cm.exception.code, "fake_discount")
 
     def test_validate_boolean_expressions(self):
         constraint = models.CheckConstraint(
@@ -308,6 +389,30 @@ class UniqueConstraintTests(TestCase):
                 fields=["foo", "bar"],
                 name="unique",
                 violation_error_message="custom error",
+            ),
+        )
+        self.assertNotEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_code="custom_error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_code="other_custom_error",
+            ),
+        )
+        self.assertEqual(
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_code="custom_error",
+            ),
+            models.UniqueConstraint(
+                fields=["foo", "bar"],
+                name="unique",
+                violation_error_code="custom_error",
             ),
         )
 
@@ -467,6 +572,34 @@ class UniqueConstraintTests(TestCase):
             "name='book_func_uq'>",
         )
 
+    def test_repr_with_violation_error_message(self):
+        constraint = models.UniqueConstraint(
+            models.F("baz__lower"),
+            name="unique_lower_baz",
+            violation_error_message="BAZ",
+        )
+        self.assertEqual(
+            repr(constraint),
+            (
+                "<UniqueConstraint: expressions=(F(baz__lower),) "
+                "name='unique_lower_baz' violation_error_message='BAZ'>"
+            ),
+        )
+
+    def test_repr_with_violation_error_code(self):
+        constraint = models.UniqueConstraint(
+            models.F("baz__lower"),
+            name="unique_lower_baz",
+            violation_error_code="baz",
+        )
+        self.assertEqual(
+            repr(constraint),
+            (
+                "<UniqueConstraint: expressions=(F(baz__lower),) "
+                "name='unique_lower_baz' violation_error_code='baz'>"
+            ),
+        )
+
     def test_deconstruction(self):
         fields = ["foo", "bar"]
         name = "unique_fields"
@@ -615,8 +748,9 @@ class UniqueConstraintTests(TestCase):
         non_unique_product = UniqueConstraintProduct(
             name=self.p1.name, color=self.p1.color
         )
-        with self.assertRaisesMessage(ValidationError, msg):
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
             constraint.validate(UniqueConstraintProduct, non_unique_product)
+        self.assertEqual(cm.exception.code, "unique_together")
         # Null values are ignored.
         constraint.validate(
             UniqueConstraintProduct,
@@ -670,6 +804,24 @@ class UniqueConstraintTests(TestCase):
             UniqueConstraintConditionProduct(name=p1.name, color=None),
             exclude={"name"},
         )
+
+    @skipUnlessDBFeature("supports_partial_indexes")
+    def test_validate_conditon_custom_error(self):
+        p1 = UniqueConstraintConditionProduct.objects.create(name="p1")
+        constraint = models.UniqueConstraint(
+            fields=["name"],
+            name="name_without_color_uniq",
+            condition=models.Q(color__isnull=True),
+            violation_error_code="custom_code",
+            violation_error_message="Custom message",
+        )
+        msg = "Custom message"
+        with self.assertRaisesMessage(ValidationError, msg) as cm:
+            constraint.validate(
+                UniqueConstraintConditionProduct,
+                UniqueConstraintConditionProduct(name=p1.name, color=None),
+            )
+        self.assertEqual(cm.exception.code, "custom_code")
 
     def test_validate_expression(self):
         constraint = models.UniqueConstraint(Lower("name"), name="name_lower_uniq")

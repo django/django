@@ -208,7 +208,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     self.ops.max_name_length(),
                 )
             )
-        conn_params = {"client_encoding": "UTF8"}
         if settings_dict["NAME"]:
             conn_params = {
                 "dbname": settings_dict["NAME"],
@@ -220,10 +219,17 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             conn_params = {"dbname": "postgres", **settings_dict["OPTIONS"]}
         else:
             conn_params = {**settings_dict["OPTIONS"]}
+        conn_params["client_encoding"] = "UTF8"
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
-        conn_params.pop("server_side_binding", None)
+        server_side_binding = conn_params.pop("server_side_binding", None)
+        conn_params.setdefault(
+            "cursor_factory",
+            ServerBindingCursor
+            if is_psycopg3 and server_side_binding is True
+            else Cursor,
+        )
         if settings_dict["USER"]:
             conn_params["user"] = settings_dict["USER"]
         if settings_dict["PASSWORD"]:
@@ -269,20 +275,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
-        if is_psycopg3:
-            connection.cursor_factory = (
-                ServerBindingCursor
-                if options.get("server_side_binding") is True
-                else Cursor
-            )
-        else:
+        if not is_psycopg3:
             # Register dummy loads() to avoid a round trip from psycopg2's
             # decode to json.dumps() to json.loads(), when using a custom
             # decoder in JSONField.
             psycopg2.extras.register_default_jsonb(
                 conn_or_curs=connection, loads=lambda x: x
             )
-            connection.cursor_factory = Cursor
         return connection
 
     def ensure_timezone(self):

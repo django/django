@@ -120,6 +120,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "migrations.test_operations.OperationTests."
             "test_alter_field_pk_fk_db_collation",
         },
+        "Oracle doesn't support comparing NCLOB to NUMBER.": {
+            "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).

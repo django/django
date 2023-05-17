@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -44,11 +44,11 @@ msgstr ""
 msgid "Authentication and Authorization"
 msgstr ""
 
-#: contrib/auth/base_user.py:57
+#: contrib/auth/base_user.py:58
 msgid "password"
 msgstr ""
 
-#: contrib/auth/base_user.py:58
+#: contrib/auth/base_user.py:59
 msgid "last login"
 msgstr ""
 
@@ -75,10 +75,6 @@ msgstr ""
 
 #: contrib/auth/forms.py:103 contrib/auth/forms.py:472
 msgid "Enter the same password as before, for verification."
-msgstr ""
-
-#: contrib/auth/forms.py:152 contrib/auth/models.py:353
-msgid "A user with that username already exists."
 msgstr ""
 
 #: contrib/auth/forms.py:168
@@ -240,6 +236,10 @@ msgstr ""
 msgid "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
 msgstr ""
 
+#: contrib/auth/models.py:353
+msgid "A user with that username already exists."
+msgstr ""
+
 #: contrib/auth/models.py:356
 msgid "first name"
 msgstr ""
@@ -332,8 +332,8 @@ msgstr ""
 
 #: contrib/auth/validators.py:12
 msgid ""
-"Enter a valid username. This value may contain only ASCII letters, numbers, "
-"and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 
 #: contrib/auth/validators.py:22

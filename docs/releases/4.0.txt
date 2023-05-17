@@ -89,9 +89,9 @@ For example::
         class Meta:
             constraints = [
                 UniqueConstraint(
-                    Lower('first_name'),
-                    Lower('last_name').desc(),
-                    name='first_last_name_unique',
+                    Lower("first_name"),
+                    Lower("last_name").desc(),
+                    name="first_last_name_unique",
                 ),
             ]
 
@@ -109,11 +109,9 @@ Redis cache backend
 -------------------
 
 The new ``django.core.cache.backends.redis.RedisCache`` cache backend provides
-built-in support for caching with Redis. `redis-py`_ 3.0.0 or higher is
-required. For more details, see the :ref:`documentation on caching with Redis
-in Django <redis>`.
-
-.. _`redis-py`: https://pypi.org/project/redis/
+built-in support for caching with Redis. :pypi:`redis-py <redis>` 3.0.0 or
+higher is required. For more details, see the :ref:`documentation on caching
+with Redis in Django <redis>`.
 
 Template based form rendering
 -----------------------------
@@ -468,7 +466,7 @@ instead.
 If you want to support legacy browsers and set the header, use this line in a
 custom middleware::
 
-    response.headers.setdefault('X-XSS-Protection', '1; mode=block')
+    response.headers.setdefault("X-XSS-Protection", "1; mode=block")
 
 .. _Content-Security-Policy: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 

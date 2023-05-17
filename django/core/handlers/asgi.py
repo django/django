@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import sys
 import tempfile
@@ -25,6 +26,15 @@ from django.utils.functional import cached_property
 logger = logging.getLogger("django.request")
 
 
+def get_script_prefix(scope):
+    """
+    Return the script prefix to use from either the scope or a setting.
+    """
+    if settings.FORCE_SCRIPT_NAME:
+        return settings.FORCE_SCRIPT_NAME
+    return scope.get("root_path", "") or ""
+
+
 class ASGIRequest(HttpRequest):
     """
     Custom request subclass that decodes from an ASGI-standard request dict
@@ -40,7 +50,7 @@ class ASGIRequest(HttpRequest):
         self._post_parse_error = False
         self._read_started = False
         self.resolver_match = None
-        self.script_name = self.scope.get("root_path", "")
+        self.script_name = get_script_prefix(scope)
         if self.script_name:
             # TODO: Better is-prefix checking, slash handling?
             self.path_info = scope["path"].removeprefix(self.script_name)
@@ -169,25 +179,57 @@ class ASGIHandler(base.BaseHandler):
         except RequestAborted:
             return
         # Request is complete and can be served.
-        set_script_prefix(self.get_script_prefix(scope))
-        await sync_to_async(signals.request_started.send, thread_sensitive=True)(
-            sender=self.__class__, scope=scope
-        )
+        set_script_prefix(get_script_prefix(scope))
+        await signals.request_started.asend(sender=self.__class__, scope=scope)
         # Get the request and check for basic issues.
         request, error_response = self.create_request(scope, body_file)
         if request is None:
             body_file.close()
             await self.send_response(error_response, send)
             return
-        # Get the response, using the async mode of BaseHandler.
+        # Try to catch a disconnect while getting response.
+        tasks = [
+            asyncio.create_task(self.run_get_response(request)),
+            asyncio.create_task(self.listen_for_disconnect(receive)),
+        ]
+        done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+        done, pending = done.pop(), pending.pop()
+        # Allow views to handle cancellation.
+        pending.cancel()
+        try:
+            await pending
+        except asyncio.CancelledError:
+            # Task re-raised the CancelledError as expected.
+            pass
+        try:
+            response = done.result()
+        except RequestAborted:
+            body_file.close()
+            return
+        except AssertionError:
+            body_file.close()
+            raise
+        # Send the response.
+        await self.send_response(response, send)
+
+    async def listen_for_disconnect(self, receive):
+        """Listen for disconnect from the client."""
+        message = await receive()
+        if message["type"] == "http.disconnect":
+            raise RequestAborted()
+        # This should never happen.
+        assert False, "Invalid ASGI message after request body: %s" % message["type"]
+
+    async def run_get_response(self, request):
+        """Get async response."""
+        # Use the async mode of BaseHandler.
         response = await self.get_response_async(request)
         response._handler_class = self.__class__
         # Increase chunk size on file responses (ASGI servers handles low-level
         # chunking).
         if isinstance(response, FileResponse):
             response.block_size = self.chunk_size
-        # Send the response.
-        await self.send_response(response, send)
+        return response
 
     async def read_body(self, receive):
         """Reads an HTTP body from an ASGI connection."""
@@ -311,11 +353,3 @@ class ASGIHandler(base.BaseHandler):
                 (position + cls.chunk_size) >= len(data),
             )
             position += cls.chunk_size
-
-    def get_script_prefix(self, scope):
-        """
-        Return the script prefix to use from either the scope or a setting.
-        """
-        if settings.FORCE_SCRIPT_NAME:
-            return settings.FORCE_SCRIPT_NAME
-        return scope.get("root_path", "") or ""

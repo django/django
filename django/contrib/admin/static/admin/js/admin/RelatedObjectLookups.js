@@ -11,7 +11,7 @@
         relatedWindows.forEach(function(win) {
             if(!win.closed) {
                 win.dismissChildPopups();
-                win.close();
+                win.close();    
             }
         });
     }
@@ -19,7 +19,7 @@
     function setPopupIndex() {
         if(document.getElementsByName("_popup").length > 0) {
             const index = window.name.lastIndexOf("__") + 2;
-            popupIndex = parseInt(window.name.substring(index));
+            popupIndex = parseInt(window.name.substring(index));   
         } else {
             popupIndex = 0;
         }
@@ -186,7 +186,6 @@
         win.close();
     }
 
-
     function customEncodeURIComponent(s) {
         // Ensure that primary key values do not confuse the admin URLs by
         // escaping problematic characters.
@@ -220,12 +219,7 @@
 
     }
 
-
-
-
-
     window.customEncodeURIComponent = customEncodeURIComponent;
-
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;
     window.showRelatedObjectPopup = showRelatedObjectPopup;

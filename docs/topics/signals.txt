@@ -17,8 +17,10 @@ changes::
     from django.apps import AppConfig
     from django.core.signals import setting_changed
 
+
     def my_callback(sender, **kwargs):
         print("Setting changed!")
+
 
     class MyAppConfig(AppConfig):
         ...
@@ -94,6 +96,21 @@ This would be wrong -- in fact, Django will throw an error if you do so. That's
 because at any point arguments could get added to the signal and your receiver
 must be able to handle those new arguments.
 
+Receivers may also be asynchronous functions, with the same signature but
+declared using ``async def``::
+
+    async def my_callback(sender, **kwargs):
+        await asyncio.sleep(5)
+        print("Request finished!")
+
+Signals can be sent either synchronously or asynchronously, and receivers will
+automatically be adapted to the correct call-style. See :ref:`sending signals
+<sending-signals>` for more information.
+
+.. versionchanged:: 5.0
+
+    Support for asynchronous receivers was added.
+
 .. _connecting-receiver-functions:
 
 Connecting receiver functions
@@ -119,6 +136,7 @@ Here's how you connect with the decorator::
     from django.core.signals import request_finished
     from django.dispatch import receiver
 
+
     @receiver(request_finished)
     def my_callback(sender, **kwargs):
         print("Request finished!")
@@ -142,12 +160,14 @@ Now, our ``my_callback`` function will be called each time a request finishes.
         from django.apps import AppConfig
         from django.core.signals import request_finished
 
+
         class MyAppConfig(AppConfig):
             ...
 
             def ready(self):
                 # Implicitly connect signal handlers decorated with @receiver.
                 from . import signals
+
                 # Explicitly connect a signal handler.
                 request_finished.connect(signals.my_callback)
 
@@ -243,18 +263,26 @@ For example::
 
 This declares a ``pizza_done`` signal.
 
+.. _sending-signals:
+
 Sending signals
 ---------------
 
-There are two ways to send signals in Django.
+There are two ways to send signals synchronously in Django.
 
 .. method:: Signal.send(sender, **kwargs)
 .. method:: Signal.send_robust(sender, **kwargs)
 
-To send a signal, call either :meth:`Signal.send` (all built-in signals use
-this) or :meth:`Signal.send_robust`. You must provide the ``sender`` argument
-(which is a class most of the time) and may provide as many other keyword
-arguments as you like.
+Signals may also be sent asynchronously.
+
+.. method:: Signal.asend(sender, **kwargs)
+.. method:: Signal.asend_robust(sender, **kwargs)
+
+To send a signal, call either :meth:`Signal.send`, :meth:`Signal.send_robust`,
+:meth:`await Signal.asend()<Signal.asend>`, or
+:meth:`await Signal.asend_robust() <Signal.asend_robust>`. You must provide the
+``sender`` argument (which is a class most of the time) and may provide as many
+other keyword arguments as you like.
 
 For example, here's how sending our ``pizza_done`` signal might look::
 
@@ -265,9 +293,8 @@ For example, here's how sending our ``pizza_done`` signal might look::
             pizza_done.send(sender=self.__class__, toppings=toppings, size=size)
             ...
 
-Both ``send()`` and ``send_robust()`` return a list of tuple pairs
-``[(receiver, response), ... ]``, representing the list of called receiver
-functions and their response values.
+All four methods return a list of tuple pairs ``[(receiver, response), ...]``,
+representing the list of called receiver functions and their response values.
 
 ``send()`` differs from ``send_robust()`` in how exceptions raised by receiver
 functions are handled. ``send()`` does *not* catch any exceptions raised by
@@ -280,6 +307,33 @@ error instance is returned in the tuple pair for the receiver that raised the er
 
 The tracebacks are present on the ``__traceback__`` attribute of the errors
 returned when calling ``send_robust()``.
+
+``asend()`` is similar as ``send()``, but it is coroutine that must be
+awaited::
+
+    async def asend_pizza(self, toppings, size):
+        await pizza_done.asend(sender=self.__class__, toppings=toppings, size=size)
+        ...
+
+Whether synchronous or asynchronous, receivers will be correctly adapted to
+whether ``send()`` or ``asend()`` is used. Synchronous receivers will be
+called using :func:`~.sync_to_async` when invoked via ``asend()``. Asynchronous
+receivers will be called using :func:`~.async_to_sync` when invoked via
+``sync()``. Similar to the :ref:`case for middleware <async_performance>`,
+there is a small performance cost to adapting receivers in this way. Note that
+in order to reduce the number of sync/async calling-style switches within a
+``send()`` or ``asend()`` call, the receivers are grouped by whether or not
+they are async before being called. This means that an asynchronous receiver
+registered before a synchronous receiver may be executed after the synchronous
+receiver. In addition, async receivers are executed concurrently using
+``asyncio.gather()``.
+
+All built-in signals, except those in the async request-response cycle, are
+dispatched using :meth:`Signal.send`.
+
+.. versionchanged:: 5.0
+
+    Support for asynchronous signals was added.
 
 Disconnecting signals
 =====================

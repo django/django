@@ -114,6 +114,15 @@ class QuerySetSetOperationTests(TestCase):
             [1, 2, 3, 4, 6, 7, 8, 9, 10, None],
         )
 
+    def test_union_nested(self):
+        qs1 = Number.objects.all()
+        qs2 = qs1.union(qs1)
+        self.assertNumbersEqual(
+            qs1.union(qs2),
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            ordered=False,
+        )
+
     @skipUnlessDBFeature("supports_select_intersection")
     def test_intersection_with_empty_qs(self):
         qs1 = Number.objects.all()
@@ -237,7 +246,7 @@ class QuerySetSetOperationTests(TestCase):
             )
             .values_list("num", "count")
         )
-        self.assertCountEqual(qs1.union(qs2), [(1, 0), (2, 1)])
+        self.assertCountEqual(qs1.union(qs2), [(1, 0), (1, 2)])
 
     def test_union_with_extra_and_values_list(self):
         qs1 = (
@@ -357,6 +366,20 @@ class QuerySetSetOperationTests(TestCase):
         self.assertSequenceEqual(
             qs1.union(qs2).order_by("extra_name").values_list("pk", flat=True),
             [reserved_name.pk],
+        )
+
+    def test_union_multiple_models_with_values_list_and_annotations(self):
+        ReservedName.objects.create(name="rn1", order=10)
+        Celebrity.objects.create(name="c1")
+        qs1 = ReservedName.objects.annotate(row_type=Value("rn")).values_list(
+            "name", "order", "row_type"
+        )
+        qs2 = Celebrity.objects.annotate(
+            row_type=Value("cb"), order=Value(-10)
+        ).values_list("name", "order", "row_type")
+        self.assertSequenceEqual(
+            qs1.union(qs2).order_by("order"),
+            [("c1", -10, "cb"), ("rn1", 10, "rn")],
         )
 
     def test_union_in_subquery(self):

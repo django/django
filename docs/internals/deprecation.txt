@@ -18,6 +18,23 @@ details on these changes.
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers will be removed.
 
+* Support for passing positional arguments to ``BaseConstraint`` will be
+  removed.
+
+* ``request`` will be required in the signature of
+  ``ModelAdmin.lookup_allowed()`` subclasses.
+
+* The ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+  ``get_joining_columns()``.
+
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` will be removed.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method will be removed.
+
+* The default scheme for ``forms.URLField`` will change from ``"http"`` to
+  ``"https"``.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

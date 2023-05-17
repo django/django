@@ -7,6 +7,7 @@ import os
 import pathlib
 import re
 import sys
+import time
 import uuid
 import zoneinfo
 from types import NoneType
@@ -432,24 +433,20 @@ class WriterTests(SimpleTestCase):
             DateChoices.DATE_1,
             ("datetime.date(1969, 7, 20)", {"import datetime"}),
         )
-        field = models.CharField(default=TextChoices.B, choices=TextChoices.choices)
+        field = models.CharField(default=TextChoices.B, choices=TextChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.CharField(choices=[('A', 'A value'), ('B', 'B value')], "
             "default='B')",
         )
-        field = models.IntegerField(
-            default=IntegerChoices.B, choices=IntegerChoices.choices
-        )
+        field = models.IntegerField(default=IntegerChoices.B, choices=IntegerChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
             "models.IntegerField(choices=[(1, 'One'), (2, 'Two')], default=2)",
         )
-        field = models.DateField(
-            default=DateChoices.DATE_2, choices=DateChoices.choices
-        )
+        field = models.DateField(default=DateChoices.DATE_2, choices=DateChoices)
         string = MigrationWriter.serialize(field)[0]
         self.assertEqual(
             string,
@@ -912,13 +909,18 @@ class WriterTests(SimpleTestCase):
                             ),
                         ),
                     ),
+                    migrations.AddField(
+                        "mymodel",
+                        "myfield2",
+                        models.FloatField(default=time.time),
+                    ),
                 ]
             },
         )
         writer = MigrationWriter(migration)
         output = writer.as_string()
         self.assertIn(
-            "import datetime\nfrom django.db import migrations, models\n",
+            "import datetime\nimport time\nfrom django.db import migrations, models\n",
             output,
         )
 

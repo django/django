@@ -10,6 +10,7 @@ from django.contrib.admin.utils import (
 )
 from django.contrib.admin.views.main import (
     ALL_VAR,
+    IS_FACETS_VAR,
     IS_POPUP_VAR,
     ORDER_VAR,
     PAGE_VAR,
@@ -475,6 +476,7 @@ def search_form(cl):
         "show_result_count": cl.result_count != cl.full_result_count,
         "search_var": SEARCH_VAR,
         "is_popup_var": IS_POPUP_VAR,
+        "is_facets_var": IS_FACETS_VAR,
     }
 
 

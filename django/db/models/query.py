@@ -1108,9 +1108,9 @@ class QuerySet(AltersData):
                 qs = ()
                 for offset in range(0, len(id_list), batch_size):
                     batch = id_list[offset : offset + batch_size]
-                    qs += tuple(self.filter(**{filter_key: batch}).order_by())
+                    qs += tuple(self.filter(**{filter_key: batch}))
             else:
-                qs = self.filter(**{filter_key: id_list}).order_by()
+                qs = self.filter(**{filter_key: id_list})
         else:
             qs = self._chain()
         return {getattr(obj, field_name): obj for obj in qs}
@@ -1190,11 +1190,18 @@ class QuerySet(AltersData):
         # Inline annotations in order_by(), if possible.
         new_order_by = []
         for col in query.order_by:
-            if annotation := query.annotations.get(col):
+            alias = col
+            descending = False
+            if isinstance(alias, str) and alias.startswith("-"):
+                alias = alias.removeprefix("-")
+                descending = True
+            if annotation := query.annotations.get(alias):
                 if getattr(annotation, "contains_aggregate", False):
                     raise exceptions.FieldError(
                         f"Cannot update when ordering by an aggregate: {annotation}"
                     )
+                if descending:
+                    annotation = annotation.desc()
                 new_order_by.append(annotation)
             else:
                 new_order_by.append(col)

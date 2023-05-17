@@ -2,6 +2,8 @@ import datetime
 import decimal
 import json
 from collections import defaultdict
+from functools import reduce
+from operator import or_
 
 from django.core.exceptions import FieldDoesNotExist
 from django.db import models, router
@@ -17,6 +19,8 @@ from django.utils.text import capfirst
 from django.utils.translation import ngettext
 from django.utils.translation import override as translation_override
 
+# NOTE: There is a QUOTE_MAP JavaScript equivalent to this one in:
+# django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
 QUOTE_MAP = {i: "_%02X" % i for i in b'":/_#?;@&=+$,"[]<>%\n\\'}
 UNQUOTE_MAP = {v: chr(k) for k, v in QUOTE_MAP.items()}
 UNQUOTE_RE = _lazy_re_compile("_(?:%s)" % "|".join([x[1:] for x in UNQUOTE_MAP]))
@@ -54,10 +58,17 @@ def lookup_spawns_duplicates(opts, lookup_path):
     return False
 
 
+def get_last_value_from_parameters(parameters, key):
+    value = parameters.get(key)
+    return value[-1] if isinstance(value, list) else value
+
+
 def prepare_lookup_value(key, value, separator=","):
     """
     Return a lookup value prepared to be used in queryset filtering.
     """
+    if isinstance(value, list):
+        return [prepare_lookup_value(key, v, separator=separator) for v in value]
     # if key ends with __in, split parameter into separate values
     if key.endswith("__in"):
         value = value.split(separator)
@@ -67,6 +78,13 @@ def prepare_lookup_value(key, value, separator=","):
     return value
 
 
+def build_q_object_from_lookup_parameters(parameters):
+    q_object = models.Q()
+    for param, param_item_list in parameters.items():
+        q_object &= reduce(or_, (models.Q((param, item)) for item in param_item_list))
+    return q_object
+
+
 def quote(s):
     """
     Ensure that primary key values do not confuse the admin URLs by escaping
@@ -74,6 +92,8 @@ def quote(s):
     Similar to urllib.parse.quote(), except that the quoting is slightly
     different so that it doesn't get automatically unquoted by the web browser.
     """
+    # There is a `customEncodeURIComponent` JavaScript equivalent to this one in:
+    # django/contrib/admin/static/admin/js/admin/RelatedObjectLookups.js
     return s.translate(QUOTE_MAP) if isinstance(s, str) else s
 
 

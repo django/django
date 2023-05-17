@@ -155,7 +155,9 @@ Caching of related model instances
 ----------------------------------
 
 When traversing relations, the ORM will avoid re-fetching objects that were
-previously loaded. For example, with the tutorial's models::
+previously loaded. For example, with the tutorial's models:
+
+.. code-block:: pycon
 
     >>> first_poll = Poll.objects.all()[0]
     >>> first_choice = first_poll.choice_set.all()[0]
@@ -403,7 +405,9 @@ Context in year and month archive class-based views
 provide a ``date_list`` sorted in ascending order in the context, like their
 function-based predecessors, but it actually was in descending order. In 1.5,
 the documented order was restored. You may want to add (or remove) the
-``reversed`` keyword when you're iterating on ``date_list`` in a template::
+``reversed`` keyword when you're iterating on ``date_list`` in a template:
+
+.. code-block:: html+django
 
     {% for date in date_list reversed %}
 

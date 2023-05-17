@@ -45,7 +45,3 @@ QUnit.test('updateRelatedObjectLinks properly quotes URL value', function(assert
     assert.equal(href, expectedValue, 'URL value is properly quoted');
 });
 
-
-
-
-

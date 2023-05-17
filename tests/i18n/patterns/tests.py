@@ -431,6 +431,27 @@ class URLResponseTests(URLTestCaseBase):
         self.assertEqual(response.context["LANGUAGE_CODE"], "nl")
 
 
+@override_settings(ROOT_URLCONF="i18n.urls_default_unprefixed", LANGUAGE_CODE="nl")
+class URLPrefixedFalseTranslatedTests(URLTestCaseBase):
+    def test_translated_path_unprefixed_language_other_than_accepted_header(self):
+        response = self.client.get("/gebruikers/", headers={"accept-language": "en"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_unprefixed_language_other_than_cookie_language(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "en"})
+        response = self.client.get("/gebruikers/")
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_prefixed_language_other_than_accepted_header(self):
+        response = self.client.get("/en/users/", headers={"accept-language": "nl"})
+        self.assertEqual(response.status_code, 200)
+
+    def test_translated_path_prefixed_language_other_than_cookie_language(self):
+        self.client.cookies.load({settings.LANGUAGE_COOKIE_NAME: "nl"})
+        response = self.client.get("/en/users/")
+        self.assertEqual(response.status_code, 200)
+
+
 class URLRedirectWithScriptAliasTests(URLTestCaseBase):
     """
     #21579 - LocaleMiddleware should respect the script prefix.

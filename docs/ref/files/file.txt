@@ -135,18 +135,18 @@ below) will also have a couple of extra methods:
     Saves a new file with the file name and contents provided. This will not
     replace the existing file, but will create a new file and update the object
     to point to it. If ``save`` is ``True``, the model's ``save()`` method will
-    be called once the file is saved. That is, these two lines::
+    be called once the file is saved. That is, these two lines:
 
     .. code-block:: pycon
 
-        >>> car.photo.save('myphoto.jpg', content, save=False)
+        >>> car.photo.save("myphoto.jpg", content, save=False)
         >>> car.save()
 
     are equivalent to:
 
     .. code-block:: pycon
 
-        >>> car.photo.save('myphoto.jpg', content, save=True)
+        >>> car.photo.save("myphoto.jpg", content, save=True)
 
     Note that the ``content`` argument must be an instance of either
     :class:`File` or of a subclass of :class:`File`, such as

@@ -12,6 +12,9 @@ class BaseDatabaseFeatures:
     allows_group_by_select_index = True
     empty_fetchmany_value = []
     update_can_self_select = True
+    # Does the backend support self-reference subqueries in the DELETE
+    # statement?
+    delete_can_self_reference_subquery = True
 
     # Does the backend distinguish between '' and None?
     interprets_empty_strings_as_nulls = False

@@ -27,6 +27,7 @@ This example model defines a ``Person``, which has a ``first_name`` and
 
     from django.db import models
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
@@ -71,9 +72,9 @@ application by the :djadmin:`manage.py startapp <startapp>` script),
 :setting:`INSTALLED_APPS` should read, in part::
 
     INSTALLED_APPS = [
-        #...
-        'myapp',
-        #...
+        # ...
+        "myapp",
+        # ...
     ]
 
 When you add new apps to :setting:`INSTALLED_APPS`, be sure to run
@@ -93,10 +94,12 @@ Example::
 
     from django.db import models
 
+
     class Musician(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
         instrument = models.CharField(max_length=100)
+
 
     class Album(models.Model):
         artist = models.ForeignKey(Musician, on_delete=models.CASCADE)
@@ -161,11 +164,11 @@ ones:
     A choices list looks like this::
 
         YEAR_IN_SCHOOL_CHOICES = [
-            ('FR', 'Freshman'),
-            ('SO', 'Sophomore'),
-            ('JR', 'Junior'),
-            ('SR', 'Senior'),
-            ('GR', 'Graduate'),
+            ("FR", "Freshman"),
+            ("SO", "Sophomore"),
+            ("JR", "Junior"),
+            ("SR", "Senior"),
+            ("GR", "Graduate"),
         ]
 
     .. note::
@@ -180,11 +183,12 @@ ones:
 
         from django.db import models
 
+
         class Person(models.Model):
             SHIRT_SIZES = [
-                ('S', 'Small'),
-                ('M', 'Medium'),
-                ('L', 'Large'),
+                ("S", "Small"),
+                ("M", "Medium"),
+                ("L", "Large"),
             ]
             name = models.CharField(max_length=60)
             shirt_size = models.CharField(max_length=1, choices=SHIRT_SIZES)
@@ -203,10 +207,11 @@ ones:
 
         from django.db import models
 
+
         class Runner(models.Model):
-            MedalType = models.TextChoices('MedalType', 'GOLD SILVER BRONZE')
+            MedalType = models.TextChoices("MedalType", "GOLD SILVER BRONZE")
             name = models.CharField(max_length=60)
-            medal = models.CharField(blank=True, choices=MedalType.choices, max_length=10)
+            medal = models.CharField(blank=True, choices=MedalType, max_length=10)
 
     Further examples are available in the :ref:`model field reference
     <field-choices>`.
@@ -236,15 +241,16 @@ ones:
 
         from django.db import models
 
+
         class Fruit(models.Model):
             name = models.CharField(max_length=100, primary_key=True)
 
     .. code-block:: pycon
 
-        >>> fruit = Fruit.objects.create(name='Apple')
-        >>> fruit.name = 'Pear'
+        >>> fruit = Fruit.objects.create(name="Apple")
+        >>> fruit.name = "Pear"
         >>> fruit.save()
-        >>> Fruit.objects.values_list('name', flat=True)
+        >>> Fruit.objects.values_list("name", flat=True)
         <QuerySet ['Apple', 'Pear']>
 
 :attr:`~Field.unique`
@@ -338,9 +344,11 @@ For example, if a ``Car`` model has a ``Manufacturer`` -- that is, a
 
     from django.db import models
 
+
     class Manufacturer(models.Model):
         # ...
         pass
+
 
     class Car(models.Model):
         manufacturer = models.ForeignKey(Manufacturer, on_delete=models.CASCADE)
@@ -394,9 +402,11 @@ For example, if a ``Pizza`` has multiple ``Topping`` objects -- that is, a
 
     from django.db import models
 
+
     class Topping(models.Model):
         # ...
         pass
+
 
     class Pizza(models.Model):
         # ...
@@ -459,18 +469,21 @@ something like this::
 
     from django.db import models
 
+
     class Person(models.Model):
         name = models.CharField(max_length=128)
 
         def __str__(self):
             return self.name
 
+
     class Group(models.Model):
         name = models.CharField(max_length=128)
-        members = models.ManyToManyField(Person, through='Membership')
+        members = models.ManyToManyField(Person, through="Membership")
 
         def __str__(self):
             return self.name
+
 
     class Membership(models.Model):
         person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -510,17 +523,23 @@ the intermediate model:
     >>> ringo = Person.objects.create(name="Ringo Starr")
     >>> paul = Person.objects.create(name="Paul McCartney")
     >>> beatles = Group.objects.create(name="The Beatles")
-    >>> m1 = Membership(person=ringo, group=beatles,
+    >>> m1 = Membership(
+    ...     person=ringo,
+    ...     group=beatles,
     ...     date_joined=date(1962, 8, 16),
-    ...     invite_reason="Needed a new drummer.")
+    ...     invite_reason="Needed a new drummer.",
+    ... )
     >>> m1.save()
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>]>
     >>> ringo.group_set.all()
     <QuerySet [<Group: The Beatles>]>
-    >>> m2 = Membership.objects.create(person=paul, group=beatles,
+    >>> m2 = Membership.objects.create(
+    ...     person=paul,
+    ...     group=beatles,
     ...     date_joined=date(1960, 8, 1),
-    ...     invite_reason="Wanted to form a band.")
+    ...     invite_reason="Wanted to form a band.",
+    ... )
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>]>
 
@@ -532,9 +551,13 @@ fields:
 
 .. code-block:: pycon
 
-    >>> beatles.members.add(john, through_defaults={'date_joined': date(1960, 8, 1)})
-    >>> beatles.members.create(name="George Harrison", through_defaults={'date_joined': date(1960, 8, 1)})
-    >>> beatles.members.set([john, paul, ringo, george], through_defaults={'date_joined': date(1960, 8, 1)})
+    >>> beatles.members.add(john, through_defaults={"date_joined": date(1960, 8, 1)})
+    >>> beatles.members.create(
+    ...     name="George Harrison", through_defaults={"date_joined": date(1960, 8, 1)}
+    ... )
+    >>> beatles.members.set(
+    ...     [john, paul, ringo, george], through_defaults={"date_joined": date(1960, 8, 1)}
+    ... )
 
 You may prefer to create instances of the intermediate model directly.
 
@@ -545,9 +568,12 @@ remove all intermediate model instances:
 
 .. code-block:: pycon
 
-    >>> Membership.objects.create(person=ringo, group=beatles,
+    >>> Membership.objects.create(
+    ...     person=ringo,
+    ...     group=beatles,
     ...     date_joined=date(1968, 9, 4),
-    ...     invite_reason="You've been gone for a month and we miss you.")
+    ...     invite_reason="You've been gone for a month and we miss you.",
+    ... )
     >>> beatles.members.all()
     <QuerySet [<Person: Ringo Starr>, <Person: Paul McCartney>, <Person: Ringo Starr>]>
     >>> # This deletes both of the intermediate model instances for Ringo Starr
@@ -573,7 +599,7 @@ the attributes of the many-to-many-related model:
 .. code-block:: pycon
 
     # Find all the groups with a member whose name starts with 'Paul'
-    >>> Group.objects.filter(members__name__startswith='Paul')
+    >>> Group.objects.filter(members__name__startswith="Paul")
     <QuerySet [<Group: The Beatles>]>
 
 As you are using an intermediate model, you can also query on its attributes:
@@ -582,8 +608,8 @@ As you are using an intermediate model, you can also query on its attributes:
 
     # Find all the members of the Beatles that joined after 1 Jan 1961
     >>> Person.objects.filter(
-    ...     group__name='The Beatles',
-    ...     membership__date_joined__gt=date(1961,1,1))
+    ...     group__name="The Beatles", membership__date_joined__gt=date(1961, 1, 1)
+    ... )
     <QuerySet [<Person: Ringo Starr]>
 
 If you need to access a membership's information you may do so by directly
@@ -660,6 +686,7 @@ refer to the other model class wherever needed. For example::
     from django.db import models
     from geography.models import ZipCode
 
+
     class Restaurant(models.Model):
         # ...
         zip_code = models.ForeignKey(
@@ -675,7 +702,9 @@ Field name restrictions
 Django places some restrictions on model field names:
 
 #. A field name cannot be a Python reserved word, because that would result
-   in a Python syntax error. For example::
+   in a Python syntax error. For example:
+
+   .. code-block:: text
 
        class Example(models.Model):
            pass = models.IntegerField() # 'pass' is a reserved word!
@@ -684,7 +713,7 @@ Django places some restrictions on model field names:
    the way Django's query lookup syntax works. For example::
 
        class Example(models.Model):
-           foo__bar = models.IntegerField() # 'foo__bar' has two underscores!
+           foo__bar = models.IntegerField()  # 'foo__bar' has two underscores!
 
 #. A field name cannot end with an underscore, for similar reasons.
 
@@ -713,6 +742,7 @@ provided in :doc:`/howto/custom-model-fields`.
 Give your model metadata by using an inner ``class Meta``, like so::
 
     from django.db import models
+
 
     class Ox(models.Model):
         horn_length = models.IntegerField()
@@ -760,6 +790,7 @@ For example, this model has a few custom methods::
 
     from django.db import models
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
@@ -768,6 +799,7 @@ For example, this model has a few custom methods::
         def baby_boomer_status(self):
             "Returns the person's baby-boomer status."
             import datetime
+
             if self.birth_date < datetime.date(1945, 8, 1):
                 return "Pre-boomer"
             elif self.birth_date < datetime.date(1965, 1, 1):
@@ -778,7 +810,7 @@ For example, this model has a few custom methods::
         @property
         def full_name(self):
             "Returns the person's full name."
-            return f'{self.first_name} {self.last_name}'
+            return f"{self.first_name} {self.last_name}"
 
 The last method in this example is a :term:`property`.
 
@@ -824,6 +856,7 @@ to happen whenever you save an object. For example (see
 
     from django.db import models
 
+
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
@@ -837,13 +870,14 @@ You can also prevent saving::
 
     from django.db import models
 
+
     class Blog(models.Model):
         name = models.CharField(max_length=100)
         tagline = models.TextField()
 
         def save(self, *args, **kwargs):
             if self.name == "Yoko Ono's blog":
-                return # Yoko shall never have her own blog!
+                return  # Yoko shall never have her own blog!
             else:
                 super().save(*args, **kwargs)  # Call the "real" save() method.
 
@@ -867,6 +901,7 @@ example::
 
     from django.db import models
     from django.utils.text import slugify
+
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -955,12 +990,14 @@ An example::
 
     from django.db import models
 
+
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
         age = models.PositiveIntegerField()
 
         class Meta:
             abstract = True
+
 
     class Student(CommonInfo):
         home_group = models.CharField(max_length=5)
@@ -988,16 +1025,18 @@ extend the parent's :ref:`Meta <meta-options>` class, it can subclass it. For ex
 
     from django.db import models
 
+
     class CommonInfo(models.Model):
         # ...
         class Meta:
             abstract = True
-            ordering = ['name']
+            ordering = ["name"]
+
 
     class Student(CommonInfo):
         # ...
         class Meta(CommonInfo.Meta):
-            db_table = 'student_info'
+            db_table = "student_info"
 
 Django does make one adjustment to the :ref:`Meta <meta-options>` class of an
 abstract base class: before installing the :ref:`Meta <meta-options>`
@@ -1019,18 +1058,21 @@ explicitly declare the :ref:`Meta <meta-options>` inheritance. For example::
 
     from django.db import models
 
+
     class CommonInfo(models.Model):
         name = models.CharField(max_length=100)
         age = models.PositiveIntegerField()
 
         class Meta:
             abstract = True
-            ordering = ['name']
+            ordering = ["name"]
+
 
     class Unmanaged(models.Model):
         class Meta:
             abstract = True
             managed = False
+
 
     class Student(CommonInfo, Unmanaged):
         home_group = models.CharField(max_length=5)
@@ -1069,6 +1111,7 @@ For example, given an app ``common/models.py``::
 
     from django.db import models
 
+
     class Base(models.Model):
         m2m = models.ManyToManyField(
             OtherModel,
@@ -1079,8 +1122,10 @@ For example, given an app ``common/models.py``::
         class Meta:
             abstract = True
 
+
     class ChildA(Base):
         pass
+
 
     class ChildB(Base):
         pass
@@ -1088,6 +1133,7 @@ For example, given an app ``common/models.py``::
 Along with another app ``rare/models.py``::
 
     from common.models import Base
+
 
     class ChildB(Base):
         pass
@@ -1126,9 +1172,11 @@ For example::
 
     from django.db import models
 
+
     class Place(models.Model):
         name = models.CharField(max_length=50)
         address = models.CharField(max_length=80)
+
 
     class Restaurant(Place):
         serves_hot_dogs = models.BooleanField(default=False)
@@ -1163,7 +1211,8 @@ The automatically-created :class:`~django.db.models.OneToOneField` on
 ``Restaurant`` that links it to ``Place`` looks like this::
 
     place_ptr = models.OneToOneField(
-        Place, on_delete=models.CASCADE,
+        Place,
+        on_delete=models.CASCADE,
         parent_link=True,
         primary_key=True,
     )
@@ -1221,7 +1270,9 @@ subclass with a :class:`~django.db.models.ManyToManyField`::
     class Supplier(Place):
         customers = models.ManyToManyField(Place)
 
-This results in the error::
+This results in the error:
+
+.. code-block:: pytb
 
     Reverse query name for 'Supplier.customers' clashes with reverse query
     name for 'Supplier.place_ptr'.
@@ -1270,9 +1321,11 @@ For example, suppose you want to add a method to the ``Person`` model. You can d
 
     from django.db import models
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=30)
         last_name = models.CharField(max_length=30)
+
 
     class MyPerson(Person):
         class Meta:
@@ -1341,9 +1394,11 @@ when you query the ``Person`` model like this::
 
     from django.db import models
 
+
     class NewManager(models.Manager):
         # ...
         pass
+
 
     class MyPerson(Person):
         objects = NewManager()
@@ -1362,6 +1417,7 @@ containing the new managers and inherit that after the primary base class::
 
         class Meta:
             abstract = True
+
 
     class MyPerson(Person, ExtraManagers):
         class Meta:
@@ -1427,9 +1483,11 @@ use an explicit :class:`~django.db.models.AutoField` in the base models::
         article_id = models.AutoField(primary_key=True)
         ...
 
+
     class Book(models.Model):
         book_id = models.AutoField(primary_key=True)
         ...
+
 
     class BookReview(Book, Article):
         pass
@@ -1442,13 +1500,18 @@ are automatically generated and inherited by the child::
     class Piece(models.Model):
         pass
 
+
     class Article(Piece):
-        article_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
+        article_piece = models.OneToOneField(
+            Piece, on_delete=models.CASCADE, parent_link=True
+        )
         ...
+
 
     class Book(Piece):
         book_piece = models.OneToOneField(Piece, on_delete=models.CASCADE, parent_link=True)
         ...
+
 
     class BookReview(Book, Article):
         pass

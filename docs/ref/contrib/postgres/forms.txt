@@ -32,14 +32,15 @@ Fields
 
             >>> class NumberListForm(forms.Form):
             ...     numbers = SimpleArrayField(forms.IntegerField())
+            ...
 
-            >>> form = NumberListForm({'numbers': '1,2,3'})
+            >>> form = NumberListForm({"numbers": "1,2,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data
             {'numbers': [1, 2, 3]}
 
-            >>> form = NumberListForm({'numbers': '1,2,a'})
+            >>> form = NumberListForm({"numbers": "1,2,a"})
             >>> form.is_valid()
             False
 
@@ -55,9 +56,10 @@ Fields
             >>> from django.contrib.postgres.forms import SimpleArrayField
 
             >>> class GridForm(forms.Form):
-            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter='|')
+            ...     places = SimpleArrayField(SimpleArrayField(IntegerField()), delimiter="|")
+            ...
 
-            >>> form = GridForm({'places': '1,2|2,1|4,3'})
+            >>> form = GridForm({"places": "1,2|2,1|4,3"})
             >>> form.is_valid()
             True
             >>> form.cleaned_data
@@ -115,31 +117,31 @@ Fields
 
             SplitArrayField(IntegerField(required=True), size=3, remove_trailing_nulls=False)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> ValidationError - third entry required.
-            ['1', '', '3']  # -> ValidationError - second entry required.
-            ['', '2', '']  # -> ValidationError - first and third entries required.
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> ValidationError - third entry required.
+            ["1", "", "3"]  # -> ValidationError - second entry required.
+            ["", "2", ""]  # -> ValidationError - first and third entries required.
 
             SplitArrayField(IntegerField(required=False), size=3, remove_trailing_nulls=False)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2, None]
-            ['1', '', '3']  # -> [1, None, 3]
-            ['', '2', '']  # -> [None, 2, None]
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2, None]
+            ["1", "", "3"]  # -> [1, None, 3]
+            ["", "2", ""]  # -> [None, 2, None]
 
             SplitArrayField(IntegerField(required=True), size=3, remove_trailing_nulls=True)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2]
-            ['1', '', '3']  # -> ValidationError - second entry required.
-            ['', '2', '']  # -> ValidationError - first entry required.
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2]
+            ["1", "", "3"]  # -> ValidationError - second entry required.
+            ["", "2", ""]  # -> ValidationError - first entry required.
 
             SplitArrayField(IntegerField(required=False), size=3, remove_trailing_nulls=True)
 
-            ['1', '2', '3']  # -> [1, 2, 3]
-            ['1', '2', '']  # -> [1, 2]
-            ['1', '', '3']  # -> [1, None, 3]
-            ['', '2', '']  # -> [None, 2]
+            ["1", "2", "3"]  # -> [1, 2, 3]
+            ["1", "2", ""]  # -> [1, 2]
+            ["1", "", "3"]  # -> [1, None, 3]
+            ["", "2", ""]  # -> [None, 2]
 
 ``HStoreField``
 ---------------

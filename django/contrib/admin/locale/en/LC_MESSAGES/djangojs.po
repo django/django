@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -78,10 +78,12 @@ msgstr ""
 msgid "Click to remove all chosen %s at once."
 msgstr ""
 
-#: contrib/admin/static/admin/js/SelectFilter2.js:210
+#: contrib/admin/static/admin/js/SelectFilter2.js:211
 #, javascript-format
-msgid "%s selected options not visible"
-msgstr ""
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 #: contrib/admin/static/admin/js/actions.js:67
 msgid "%(sel)s of %(cnt)s selected"

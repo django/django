@@ -587,5 +587,5 @@ class PermissionTests(TestCase):
     def test_str(self):
         p = Permission.objects.get(codename="view_customemailfield")
         self.assertEqual(
-            str(p), "auth_tests | custom email field | Can view custom email field"
+            str(p), "Auth_Tests | custom email field | Can view custom email field"
         )

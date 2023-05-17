@@ -31,7 +31,7 @@ class TemplateTestMixin:
 
     def test_url_reverse_view_name(self):
         """
-        #19827 -- url tag should keep original strack trace when reraising
+        #19827 -- url tag should keep original stack trace when reraising
         exception.
         """
         t = self._engine().from_string("{% url will_not_match %}")

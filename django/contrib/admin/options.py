@@ -1,4 +1,5 @@
 import copy
+import enum
 import json
 import re
 from functools import partial, update_wrapper
@@ -68,6 +69,13 @@ from django.views.generic import RedirectView
 
 IS_POPUP_VAR = "_popup"
 TO_FIELD_VAR = "_to_field"
+IS_FACETS_VAR = "_facets"
+
+
+class ShowFacets(enum.Enum):
+    NEVER = "NEVER"
+    ALLOW = "ALLOW"
+    ALWAYS = "ALWAYS"
 
 
 HORIZONTAL, VERTICAL = 1, 2
@@ -428,7 +436,9 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             else self.get_list_display(request)
         )
 
-    def lookup_allowed(self, lookup, value):
+    # RemovedInDjango60Warning: when the deprecation ends, replace with:
+    # def lookup_allowed(self, lookup, value, request):
+    def lookup_allowed(self, lookup, value, request=None):
         from django.contrib.admin.filters import SimpleListFilter
 
         model = self.model
@@ -453,12 +463,14 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
                 # Lookups on nonexistent fields are ok, since they're ignored
                 # later.
                 break
-            # It is allowed to filter on values that would be found from local
-            # model anyways. For example, if you filter on employee__department__id,
-            # then the id value would be found already from employee__department_id.
             if not prev_field or (
                 prev_field.is_relation
-                and field not in prev_field.path_infos[-1].target_fields
+                and field not in model._meta.parents.values()
+                and field is not model._meta.auto_field
+                and (
+                    model._meta.auto_field is None
+                    or part not in getattr(prev_field, "to_fields", [])
+                )
             ):
                 relation_parts.append(part)
             if not getattr(field, "path_infos", None):
@@ -472,7 +484,12 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             # Either a local field filter, or no fields at all.
             return True
         valid_lookups = {self.date_hierarchy}
-        for filter_item in self.list_filter:
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
+        # for filter_item in self.get_list_filter(request):
+        list_filter = (
+            self.get_list_filter(request) if request is not None else self.list_filter
+        )
+        for filter_item in list_filter:
             if isinstance(filter_item, type) and issubclass(
                 filter_item, SimpleListFilter
             ):
@@ -628,6 +645,7 @@ class ModelAdmin(BaseModelAdmin):
     save_on_top = False
     paginator = Paginator
     preserve_filters = True
+    show_facets = ShowFacets.ALLOW
     inlines = ()
 
     # Custom templates (designed to be over-ridden in subclasses)

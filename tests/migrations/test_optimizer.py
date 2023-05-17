@@ -221,10 +221,10 @@ class OptimizerTests(SimpleTestCase):
             migrations.AlterOrderWithRespectTo("Foo", "a")
         )
 
-    def _test_alter_alter_model(self, alter_foo, alter_bar):
+    def _test_alter_alter(self, alter_foo, alter_bar):
         """
         Two AlterUniqueTogether/AlterIndexTogether/AlterOrderWithRespectTo
-        should collapse into the second.
+        /AlterField should collapse into the second.
         """
         self.assertOptimizesTo(
             [
@@ -237,27 +237,33 @@ class OptimizerTests(SimpleTestCase):
         )
 
     def test_alter_alter_table_model(self):
-        self._test_alter_alter_model(
+        self._test_alter_alter(
             migrations.AlterModelTable("Foo", "a"),
             migrations.AlterModelTable("Foo", "b"),
         )
 
     def test_alter_alter_unique_model(self):
-        self._test_alter_alter_model(
+        self._test_alter_alter(
             migrations.AlterUniqueTogether("Foo", [["a", "b"]]),
             migrations.AlterUniqueTogether("Foo", [["a", "c"]]),
         )
 
     def test_alter_alter_index_model(self):
-        self._test_alter_alter_model(
+        self._test_alter_alter(
             migrations.AlterIndexTogether("Foo", [["a", "b"]]),
             migrations.AlterIndexTogether("Foo", [["a", "c"]]),
         )
 
     def test_alter_alter_owrt_model(self):
-        self._test_alter_alter_model(
+        self._test_alter_alter(
             migrations.AlterOrderWithRespectTo("Foo", "a"),
             migrations.AlterOrderWithRespectTo("Foo", "b"),
+        )
+
+    def test_alter_alter_field(self):
+        self._test_alter_alter(
+            migrations.AlterField("Foo", "name", models.IntegerField()),
+            migrations.AlterField("Foo", "name", models.IntegerField(help_text="help")),
         )
 
     def test_optimize_through_create(self):
@@ -1151,4 +1157,196 @@ class OptimizerTests(SimpleTestCase):
                     "Pony", new_name="new_name", old_fields=("weight", "pink")
                 ),
             ]
+        )
+
+    def test_add_remove_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.AddIndex(
+                    "Pony",
+                    models.Index(
+                        fields=["weight", "pink"], name="idx_pony_weight_pink"
+                    ),
+                ),
+                migrations.RemoveIndex("Pony", "idx_pony_weight_pink"),
+            ],
+            [],
+        )
+
+    def test_create_model_add_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [models.Index(fields=["age"], name="idx_pony_age")],
+                    },
+                ),
+                migrations.AddIndex(
+                    "Pony",
+                    models.Index(fields=["weight"], name="idx_pony_weight"),
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [
+                            models.Index(fields=["age"], name="idx_pony_age"),
+                            models.Index(fields=["weight"], name="idx_pony_weight"),
+                        ],
+                    },
+                ),
+            ],
+        )
+
+    def test_create_model_remove_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [
+                            models.Index(fields=["age"], name="idx_pony_age"),
+                            models.Index(fields=["weight"], name="idx_pony_weight"),
+                        ],
+                    },
+                ),
+                migrations.RemoveIndex("Pony", "idx_pony_age"),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [
+                            models.Index(fields=["weight"], name="idx_pony_weight"),
+                        ],
+                    },
+                ),
+            ],
+        )
+
+    def test_create_model_remove_index_together_rename_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "index_together": [("age", "weight")],
+                    },
+                ),
+                migrations.RenameIndex(
+                    "Pony", new_name="idx_pony_age_weight", old_fields=("age", "weight")
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [
+                            models.Index(
+                                fields=["age", "weight"], name="idx_pony_age_weight"
+                            ),
+                        ],
+                    },
+                ),
+            ],
+        )
+
+    def test_create_model_index_together_rename_index(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                        ("height", models.IntegerField()),
+                        ("rank", models.IntegerField()),
+                    ],
+                    options={
+                        "index_together": [("age", "weight"), ("height", "rank")],
+                    },
+                ),
+                migrations.RenameIndex(
+                    "Pony", new_name="idx_pony_age_weight", old_fields=("age", "weight")
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                        ("height", models.IntegerField()),
+                        ("rank", models.IntegerField()),
+                    ],
+                    options={
+                        "index_together": {("height", "rank")},
+                        "indexes": [
+                            models.Index(
+                                fields=["age", "weight"], name="idx_pony_age_weight"
+                            ),
+                        ],
+                    },
+                ),
+            ],
+        )
+
+    def test_create_model_rename_index_no_old_fields(self):
+        self.assertOptimizesTo(
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [models.Index(fields=["age"], name="idx_pony_age")],
+                    },
+                ),
+                migrations.RenameIndex(
+                    "Pony", new_name="idx_pony_age_new", old_name="idx_pony_age"
+                ),
+            ],
+            [
+                migrations.CreateModel(
+                    name="Pony",
+                    fields=[
+                        ("weight", models.IntegerField()),
+                        ("age", models.IntegerField()),
+                    ],
+                    options={
+                        "indexes": [models.Index(fields=["age"], name="idx_pony_age")],
+                    },
+                ),
+                migrations.RenameIndex(
+                    "Pony", new_name="idx_pony_age_new", old_name="idx_pony_age"
+                ),
+            ],
         )

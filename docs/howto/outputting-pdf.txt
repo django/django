@@ -20,8 +20,8 @@ participating in a March Madness contest.
 Install ReportLab
 =================
 
-The ReportLab library is `available on PyPI`_. A `user guide`_ (not
-coincidentally, a PDF file) is also available for download.
+The ReportLab library is :pypi:`available on PyPI <reportlab>`. A `user guide`_
+(not coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
 .. console::
@@ -36,7 +36,6 @@ Test your installation by importing it in the Python interactive interpreter:
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _available on PyPI: https://pypi.org/project/reportlab/
 .. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view
@@ -51,6 +50,7 @@ Here's a "Hello World" example::
     import io
     from django.http import FileResponse
     from reportlab.pdfgen import canvas
+
 
     def some_view(request):
         # Create a file-like buffer to receive PDF data.
@@ -70,7 +70,7 @@ Here's a "Hello World" example::
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+        return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
