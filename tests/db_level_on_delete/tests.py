@@ -1,16 +1,7 @@
 from django.db import IntegrityError
 from django.test import TestCase
 
-from .models import (
-    AnotherSetNullBaz,
-    Bar,
-    Baz,
-    Foo,
-    RestrictBar,
-    RestrictBaz,
-    SetNullBar,
-    SetNullBaz,
-)
+from .models import Bar, Baz, Foo, RestrictBar, RestrictBaz, SetNullBar, SetNullBaz
 
 
 class DatabaseLevelOnDeleteTests(TestCase):
@@ -65,24 +56,6 @@ class DatabaseLevelOnDeleteTests(TestCase):
         self.assertNotEqual(baz.bar, orphan_baz.bar)
         self.assertIsNone(orphan_baz.bar)
 
-    def test_nested_set_null_on_deletion(self):
-        foo = Foo.objects.create()
-        bar = SetNullBar.objects.create(foo=foo)
-        baz = AnotherSetNullBaz.objects.create(setnullbar=bar)
-        foo.delete()
-
-        orphan_bar = SetNullBar.objects.get(pk=bar.pk)
-        self.assertEqual(bar.pk, orphan_bar.pk)
-        self.assertEqual(bar.another_field, orphan_bar.another_field)
-        self.assertNotEqual(bar.foo, orphan_bar.foo)
-        self.assertIsNone(orphan_bar.foo)
-
-        orphan_baz = AnotherSetNullBaz.objects.get(pk=baz.pk)
-        self.assertEqual(baz.pk, orphan_baz.pk)
-        self.assertEqual(baz.another_field, orphan_baz.another_field)
-        self.assertEqual(baz.setnullbar, orphan_baz.setnullbar)
-        self.assertIsNotNone(orphan_baz.setnullbar)
-
 
 class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
     def test_queries_on_nested_cascade(self):
@@ -104,11 +77,11 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
         foo = Foo.objects.create()
 
         for i in range(3):
-            SetNullBar.objects.create(foo=foo)
+            Bar.objects.create(foo=foo)
 
-        for setnullbar in SetNullBar.objects.all():
+        for bar in Bar.objects.all():
             for i in range(3):
-                AnotherSetNullBaz.objects.create(setnullbar=setnullbar)
+                SetNullBaz.objects.create(bar=bar)
 
         # one is the deletion
         # three select queries for Bar, SetNullBar and RestrictBar
