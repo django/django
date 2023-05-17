@@ -37,7 +37,7 @@ html[data-theme="light"],
     --message-warning-bg: #ffc;
     --message-error-bg: #ffefef;
 
-    --darkened-bg: #f8f8f8; /* A bit darker than --body-bg */
+    --darkened-bg: #e9e9e9; /* A bit darker than --body-bg */
     --selected-bg: #e4e4e4; /* E.g. selected table cells */
     --selected-row: #ffc;
 
