@@ -65,3 +65,14 @@ class SetNullBaz(models.Model):
         null=True,
     )
     another_field = models.CharField(max_length=20)
+
+
+class AnotherSetNullBaz(models.Model):
+    """Second level child of foo with cascading set to null"""
+
+    setnullbar = models.ForeignKey(
+        SetNullBar,
+        on_delete=models.DB_SET_NULL,
+        null=True,
+    )
+    another_field = models.CharField(max_length=20)
