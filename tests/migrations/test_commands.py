@@ -2649,6 +2649,32 @@ class MakeMigrationsTests(MigrationTestBase):
                 self.assertNotEqual(initial_content, fp.read())
             self.assertIn(f"Deleted {migration_file}", out.getvalue())
 
+    def test_makemigrations_update_custom_name(self):
+        custom_name = "delete_something"
+        with self.temporary_migration_module(
+            module="migrations.test_migrations"
+        ) as migration_dir:
+            old_migration_file = os.path.join(migration_dir, "0002_second.py")
+            with open(old_migration_file) as fp:
+                initial_content = fp.read()
+
+            with captured_stdout() as out:
+                call_command(
+                    "makemigrations", "migrations", update=True, name=custom_name
+                )
+            self.assertFalse(
+                any(
+                    filename.startswith("0003")
+                    for filename in os.listdir(migration_dir)
+                )
+            )
+            self.assertIs(os.path.exists(old_migration_file), False)
+            new_migration_file = os.path.join(migration_dir, f"0002_{custom_name}.py")
+            self.assertIs(os.path.exists(new_migration_file), True)
+            with open(new_migration_file) as fp:
+                self.assertNotEqual(initial_content, fp.read())
+            self.assertIn(f"Deleted {old_migration_file}", out.getvalue())
+
     def test_makemigrations_update_applied_migration(self):
         recorder = MigrationRecorder(connection)
         recorder.record_applied("migrations", "0001_initial")
