@@ -757,6 +757,9 @@ generated migration files to ``stdout``.
 Merges model changes into the latest migration and optimize the resulting
 operations.
 
+The updated migration will have a generated name. In order to preserve the
+previous name, set it using ``--name``.
+
 ``migrate``
 -----------
 
