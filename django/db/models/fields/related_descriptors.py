@@ -65,6 +65,7 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from asgiref.sync import sync_to_async
 
+from django.db import models
 from django.core.exceptions import FieldError
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -1129,6 +1130,39 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 self.prefetch_cache_name,
                 False,
             )
+
+        @property
+        def constrained_target(self):
+            # If the through relation's target field's foreign integrity is
+            # enforced, the query can be performed solely against the through
+            # table as the INNER JOIN'ing against target table is unnecessary.
+            if not self.target_field.db_constraint:
+                return None
+            db = router.db_for_read(self.through, instance=self.instance)
+            if not connections[db].features.supports_foreign_keys:
+                return None
+            hints = {'instance': self.instance}
+            manager = self.through._base_manager.db_manager(db, hints=hints)
+            filters = {self.source_field_name: self.instance.pk}
+            # Nullable target rows must be excluded as well as they would have
+            # been filtered out from an INNER JOIN.
+            if self.target_field.null:
+                filters['%s__isnull' % self.target_field_name] = False
+            return manager.filter(**filters)
+
+        def exists(self):
+            constrained_target = self.constrained_target
+            if constrained_target and ManyRelatedManager.__class__ == models.Manager:
+                return constrained_target.exists()
+            else:
+                return super().exists()
+
+        def count(self):
+            constrained_target = self.constrained_target
+            if constrained_target and ManyRelatedManager.__class__ == models.Manager:
+                return constrained_target.count()
+            else:
+                return super().count()
 
         def add(self, *objs, through_defaults=None):
             self._remove_prefetched_objects()

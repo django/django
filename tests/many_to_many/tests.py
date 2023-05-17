@@ -5,6 +5,14 @@ from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
 from .models import Article, InheritedArticleA, InheritedArticleB, Publication, User
 
+from django.db import connection, transaction
+from django.test import TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
+
+from .models import (
+    Article, InheritedArticleA, InheritedArticleB, NullablePublicationThrough,
+    NullableTargetArticle, Publication,
+)
 
 class ManyToManyTests(TestCase):
     @classmethod
@@ -555,3 +563,36 @@ class ManyToManyTests(TestCase):
         self.assertEqual(
             self.p3.article_set.exists(), self.p3.article_set.all().exists()
         )
+
+class ManyToManyQueryTests(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article = Article.objects.create(headline='Django lets you build Web apps easily')
+        cls.nullable_target_article = NullableTargetArticle.objects.create(headline='The python is good')
+        NullablePublicationThrough.objects.create(article=cls.nullable_target_article, publication=None)
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_count_join_optimization(self):
+        with CaptureQueriesContext(connection) as query:
+            self.article.publications.count()
+        self.assertNotIn('JOIN', query[0]['sql'])
+        self.assertEqual(self.nullable_target_article.publications.count(), 0)
+
+    def test_count_join_optimization_disabled(self):
+        with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
+                CaptureQueriesContext(connection) as query:
+            self.article.publications.count()
+        self.assertIn('JOIN', query[0]['sql'])
+
+    @skipUnlessDBFeature('supports_foreign_keys')
+    def test_exists_join_optimization(self):
+        with CaptureQueriesContext(connection) as query:
+            self.article.publications.exists()
+        self.assertNotIn('JOIN', query[0]['sql'])
+        self.assertIs(self.nullable_target_article.publications.exists(), False)
+
+    def test_exists_join_optimization_disabled(self):
+        with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
+                CaptureQueriesContext(connection) as query:
+            self.article.publications.exists()
+        self.assertIn('JOIN', query[0]['sql'])
