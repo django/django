@@ -292,7 +292,7 @@ dependencies:
 * :pypi:`pywatchman`
 * :pypi:`redis` 3.4+
 * :pypi:`setuptools`
-* :pypi:`memcached`, plus a `supported Python binding
+* :pypi:`python-memcached`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
