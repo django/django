@@ -1624,7 +1624,7 @@ The possible values for :attr:`~ForeignKey.on_delete` are listed below. Import
 them from :mod:`django.db.models`. The ``DB_*`` variants use the database to
 prevent deletions or update referring objects, whilst the other values make
 Django perform the relevant actions. The database variants are normally more
-performant because they require less data to be fetched, but they don’t call
+efficient because they require less data to be fetched, but they don’t call
 any custom methods or send any signals.
 
 * .. attribute:: CASCADE
