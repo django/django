@@ -1620,8 +1620,12 @@ relation works.
             null=True,
         )
 
-The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+The possible values for :attr:`~ForeignKey.on_delete` are listed below. Import
+them from :mod:`django.db.models`. The ``DB_*`` variants use the database to
+prevent deletions or update referring objects, whilst the other values make
+Django perform the relevant actions. The database variants are normally more
+performant because they require less data to be fetched, but they don’t call
+any custom methods or send any signals.
 
 * .. attribute:: CASCADE
 
@@ -1724,35 +1728,36 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
 
     .. versionadded:: 5.0
 
-    DB_CASCADE is a custom option introduced in Django that allows the database
-    to handle cascading deletes instead of relying on Django's emulation of the
-    SQL constraint ON DELETE CASCADE. With DB_CASCADE, the database engine
-    itself takes care of deleting related objects when a referenced object is
-    deleted.
+    ``DB_CASCADE`` is a custom option introduced in Django that allows the
+    database to handle cascading deletes instead of relying on Django's
+    emulation of the SQL constraint ``ON DELETE CASCADE``. With ``DB_CASCADE``,
+    the database itself takes care of deleting related objects when a
+    referenced object is deleted.
 
-    :meth:`.Model.delete` isn't called on related models, but the
+    :meth:`.Model.delete` isn't called on related models, and the
     :data:`~django.db.models.signals.pre_delete` and
-    :data:`~django.db.models.signals.post_delete` signals are not sent for any
-    deleted objects.
+    :data:`~django.db.models.signals.post_delete` signals are also not sent for
+    any deleted objects.
 
 * .. attribute:: DB_RESTRICT
 
     .. versionadded:: 5.0
 
-    Prevent deletion of the referenced object by raising
-    :exc:`~django.db.IntegrityError`. this is going to call SQL constraint ON
-    DELETE RESTRICT on a database level while creating or altering the
-    ForeignKey and enforces restrictions on deleting objects that have
-    referenced relationships
+    It prevents the deletion of the referenced object by raising the
+    :class:`~django.db.IntegrityError` exception. This action triggers the SQL
+    constraint ``ON DELETE RESTRICT`` at the database level during the creation
+    or modification of the ``ForeignKey``. It enforces restrictions on deleting
+    objects that have referenced relationships.
 
 * .. attribute:: DB_SET_NULL
 
     .. versionadded:: 5.0
 
-    Set the :class:`ForeignKey` null; this is only possible if
+    Set the :class:`ForeignKey` value to ``null``; this is only possible if
     :attr:`~Field.null` is ``True``. This works on a database level instead of
-    using in-django options. this is going to call SQL constraint ON DELETE SET
-    NULL on a database level while creating or altering the ForeignKey
+    using in-django options. This triggers SQL constraint 
+    ``ON DELETE SET NULL`` on a database level while creating or altering the
+    ``ForeignKey``.
 
 .. attribute:: ForeignKey.limit_choices_to
 

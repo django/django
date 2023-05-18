@@ -123,14 +123,16 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
-Database level cascading support for ForeignKey field
----------------------------------------------------------------
-The ``on_delete`` argument for ``ForeignKey`` now supports three extra options
-the new supported values of the ``on_delete`` argument can be the following:
+Database-level values for ``ForeignKey.on_delete``
+--------------------------------------------------
 
-``DB_CASCADE`` : Deletes the child on parent deletion at a database level.
-``DB_RESTRICT`` : Prevent the deletion if child exists at a database level.
-``DB_SET_NULL`` : Set the value to null in child table at a database level.
+:class:`~django.db.models.ForeignKey`
+:attr:`~django.db.models.ForeignKey.on_delete` now supports three extra values
+to specify database-level actions:
+
+* ``DB_CASCADE`` - deletes the referring object.
+* ``DB_RESTRICT`` - prevents deletion of referred-to objects.
+* ``DB_SET_NULL`` - sets the referring foreign key to SQL ``NULL``.
 
 Minor features
 --------------
