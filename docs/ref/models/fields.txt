@@ -1607,11 +1607,11 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
-    emulate the behavior of the SQL constraint specified by the
-    :attr:`on_delete` argument. For example, if you have a nullable
-    :class:`ForeignKey` and you want it to be set null when the referenced
-    object is deleted::
+    When an object referenced by a :class:`ForeignKey` is deleted, the
+    referring objects need updating. The :attr:`on_delete` argument specifies
+    how this is done, and whether Django or your database makes the updates. For
+    example, if you have a nullable :class:`ForeignKey` and you want Django to set
+    it to ``None`` when the referenced object is deleted::
 
         user = models.ForeignKey(
             User,
