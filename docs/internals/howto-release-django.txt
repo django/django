@@ -402,8 +402,8 @@ Now you're ready to actually put the release out there. To do this:
    __ https://github.com/django/djangoproject.com/blob/main/djangoproject/static/robots.docs.txt
 
 #. Post the release announcement to the |django-announce|, |django-developers|,
-   and |django-users| mailing lists. This should include a link to the
-   announcement blog post.
+   |django-users| mailing lists, and the Django Forum. This should include a
+   link to the announcement blog post.
 
 #. If this is a security release, send a separate email to
    oss-security@lists.openwall.com. Provide a descriptive subject, for example,
