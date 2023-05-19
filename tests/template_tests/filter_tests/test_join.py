@@ -55,6 +55,22 @@ class JoinTests(SimpleTestCase):
         )
         self.assertEqual(output, "alpha & beta &amp; me")
 
+    @setup(
+        {
+            "join_autoescape_off": (
+                "{% autoescape off %}"
+                "{{ var_list|join:var_joiner }}"
+                "{% endautoescape %}"
+            ),
+        }
+    )
+    def test_join_autoescape_off(self):
+        var_list = ["<p>Hello World!</p>", "beta & me", "<script>Hi!</script>"]
+        context = {"var_list": var_list, "var_joiner": "<br/>"}
+        output = self.engine.render_to_string("join_autoescape_off", context)
+        expected_result = "<p>Hello World!</p><br/>beta & me<br/><script>Hi!</script>"
+        self.assertEqual(output, expected_result)
+
 
 class FunctionTests(SimpleTestCase):
     def test_list(self):
@@ -69,7 +85,7 @@ class FunctionTests(SimpleTestCase):
     def test_autoescape_off(self):
         self.assertEqual(
             join(["<a>", "<img>", "</a>"], "<br>", autoescape=False),
-            "<a>&lt;br&gt;<img>&lt;br&gt;</a>",
+            "<a><br><img><br></a>",
         )
 
     def test_noniterable_arg(self):
