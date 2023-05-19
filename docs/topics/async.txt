@@ -83,6 +83,8 @@ view functions:
 
 * :func:`~django.views.decorators.cache.cache_control`
 * :func:`~django.views.decorators.cache.never_cache`
+* ``sensitive_variables()``
+* ``sensitive_post_parameters()``
 
 For example::
 

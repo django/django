@@ -233,9 +233,12 @@ CSRF
 Decorators
 ~~~~~~~~~~
 
-* The :func:`~django.views.decorators.cache.cache_control` and
-  :func:`~django.views.decorators.cache.never_cache` decorators now support
-  wrapping asynchronous view functions.
+* The following decorators now support wrapping asynchronous view functions:
+
+  * :func:`~django.views.decorators.cache.cache_control`
+  * :func:`~django.views.decorators.cache.never_cache`
+  * ``sensitive_variables()``
+  * ``sensitive_post_parameters()``
 
 Email
 ~~~~~
