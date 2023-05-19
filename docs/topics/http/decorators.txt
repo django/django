@@ -147,3 +147,7 @@ customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
 
     This decorator allows individual views to be excluded from
     :setting:`APPEND_SLASH` URL normalization.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
