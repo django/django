@@ -1,5 +1,7 @@
 from functools import wraps
 
+from asgiref.sync import iscoroutinefunction
+
 from django.http import HttpRequest
 
 
@@ -33,15 +35,25 @@ def sensitive_variables(*variables):
         )
 
     def decorator(func):
-        @wraps(func)
-        def sensitive_variables_wrapper(*func_args, **func_kwargs):
-            if variables:
-                sensitive_variables_wrapper.sensitive_variables = variables
-            else:
-                sensitive_variables_wrapper.sensitive_variables = "__ALL__"
-            return func(*func_args, **func_kwargs)
+        if iscoroutinefunction(func):
 
-        return sensitive_variables_wrapper
+            async def _view_wrapper(*args, **kwargs):
+                if variables:
+                    _view_wrapper.sensitive_variables = variables
+                else:
+                    _view_wrapper.sensitive_variables = "__ALL__"
+                return await func(*args, **kwargs)
+
+        else:
+
+            def _view_wrapper(*args, **kwargs):
+                if variables:
+                    _view_wrapper.sensitive_variables = variables
+                else:
+                    _view_wrapper.sensitive_variables = "__ALL__"
+                return func(*args, **kwargs)
+
+        return wraps(func)(_view_wrapper)
 
     return decorator
 
