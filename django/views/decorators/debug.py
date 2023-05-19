@@ -88,21 +88,31 @@ def sensitive_post_parameters(*parameters):
             "@sensitive_post_parameters."
         )
 
-    def decorator(view):
-        @wraps(view)
-        def sensitive_post_parameters_wrapper(request, *args, **kwargs):
-            if not isinstance(request, HttpRequest):
-                raise TypeError(
-                    "sensitive_post_parameters didn't receive an HttpRequest "
-                    "object. If you are decorating a classmethod, make sure "
-                    "to use @method_decorator."
-                )
-            if parameters:
-                request.sensitive_post_parameters = parameters
-            else:
-                request.sensitive_post_parameters = "__ALL__"
-            return view(request, *args, **kwargs)
+    def _process_request(request, parameters):
+        if not isinstance(request, HttpRequest):
+            raise TypeError(
+                "sensitive_post_parameters didn't receive an HttpRequest "
+                "object. If you are decorating a classmethod, make sure "
+                "to use @method_decorator."
+            )
+        if parameters:
+            request.sensitive_post_parameters = parameters
+        else:
+            request.sensitive_post_parameters = "__ALL__"
 
-        return sensitive_post_parameters_wrapper
+    def decorator(view):
+        if iscoroutinefunction(view):
+
+            async def _view_wrapper(request, *args, **kwargs):
+                _process_request(request, parameters)
+                return await view(request, *args, **kwargs)
+
+        else:
+
+            def _view_wrapper(request, *args, **kwargs):
+                _process_request(request, parameters)
+                return view(request, *args, **kwargs)
+
+        return wraps(view)(_view_wrapper)
 
     return decorator

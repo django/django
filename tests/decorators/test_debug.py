@@ -80,6 +80,20 @@ class SensitiveVariablesTests(SimpleTestCase):
 
 
 class SensitivePostParametersTests(SimpleTestCase):
+    def test_wrapped_sync_function_is_not_coroutine_function(self):
+        def sync_view(request):
+            return HttpResponse()
+
+        wrapped_view = sensitive_post_parameters()(sync_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), False)
+
+    def test_wrapped_async_function_is_coroutine_function(self):
+        async def async_view(request):
+            return HttpResponse()
+
+        wrapped_view = sensitive_post_parameters()(async_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), True)
+
     def test_sensitive_post_parameters_without_parameters(self):
         @sensitive_post_parameters()
         def sync_view(request):
@@ -90,6 +104,16 @@ class SensitivePostParametersTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(request.sensitive_post_parameters, "__ALL__")
 
+    async def test_sensitive_post_parameters_without_parameters_with_async_view(self):
+        @sensitive_post_parameters()
+        async def async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = await async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, "__ALL__")
+
     def test_sensitive_post_parameters_with_parameters(self):
         @sensitive_post_parameters("a", "b")
         def sync_view(request):
@@ -97,6 +121,16 @@ class SensitivePostParametersTests(SimpleTestCase):
 
         request = HttpRequest()
         response = sync_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(request.sensitive_post_parameters, ("a", "b"))
+
+    async def test_sensitive_post_parameters_with_parameters_with_async_view(self):
+        @sensitive_post_parameters("a", "b")
+        async def async_view(request):
+            return HttpResponse()
+
+        request = HttpRequest()
+        response = await async_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(request.sensitive_post_parameters, ("a", "b"))
 
@@ -113,6 +147,12 @@ class SensitivePostParametersTests(SimpleTestCase):
             def sync_view(request):
                 return HttpResponse()
 
+        with self.assertRaisesMessage(TypeError, error_message):
+
+            @sensitive_post_parameters
+            async def async_view(request):
+                return HttpResponse()
+
     def test_non_httprequest_as_request_raises_exception(self):
         @sensitive_post_parameters()
         def sync_view(request):
@@ -126,3 +166,17 @@ class SensitivePostParametersTests(SimpleTestCase):
 
         with self.assertRaisesMessage(TypeError, error_message):
             sync_view(NotAHttpRequest())
+
+    async def test_non_httprequest_as_request_raises_exception_with_async_view(self):
+        @sensitive_post_parameters()
+        async def async_view(request):
+            return HttpResponse()
+
+        error_message = (
+            "sensitive_post_parameters didn't receive an HttpRequest "
+            "object. If you are decorating a classmethod, make sure "
+            "to use @method_decorator."
+        )
+
+        with self.assertRaisesMessage(TypeError, error_message):
+            await async_view(NotAHttpRequest())
