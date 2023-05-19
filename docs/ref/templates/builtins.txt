@@ -1831,6 +1831,8 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
         {{ title|escape }}
     {% endautoescape %}
 
+To escape each element of a sequence, use the :tfilter:`escapeseq` filter.
+
 .. templatefilter:: escapejs
 
 ``escapejs``
@@ -1856,6 +1858,23 @@ This can be used as follows:
 
     <script>
     let myValue = '{{ value|escapejs }}'
+
+.. templatefilter:: escapeseq
+
+``escapeseq``
+-------------
+
+.. versionadded:: 5.0
+
+Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
+conjunction with other filters that operate on sequences, such as
+:tfilter:`join`. For example:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|escapeseq|join:", " }}
+    {% endautoescape %}
 
 .. templatefilter:: filesizeformat
 
