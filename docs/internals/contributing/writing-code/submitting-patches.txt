@@ -147,10 +147,12 @@ A "non-trivial" patch is one that is more than a small bug fix. It's a patch
 that introduces Django functionality and makes some sort of design decision.
 
 If you provide a non-trivial patch, include evidence that alternatives have
-been discussed on |django-developers|.
+been discussed on the `Django Forum`_ or |django-developers| list.
 
 If you're not sure whether your patch should be considered non-trivial, ask on
 the ticket for opinions.
+
+.. _Django Forum: https://forum.djangoproject.com/
 
 .. _deprecating-a-feature:
 
