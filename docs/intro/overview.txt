@@ -22,7 +22,7 @@ code.
 .. _object-relational mapper: https://en.wikipedia.org/wiki/Object-relational_mapping
 
 The :doc:`data-model syntax </topics/db/models>` offers many rich ways of
-representing your models -- so far, it's been solving many years' worth of
+representing your models -- so far, it has been solving many years' worth of
 database-schema problems. Here's a quick example:
 
 .. code-block:: python
