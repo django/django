@@ -15,6 +15,7 @@ from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
+from django.db.utils import DEFAULT_DB_ALIAS
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -198,6 +199,33 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
 
+    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
+        super().__init__(settings_dict, alias)
+
+        self.pool = None
+        pool_options = settings_dict.get("OPTIONS", {}).get("pool", None)
+
+        if pool_options is not None:
+            # Verify that we are not running with persistent connections
+            if settings_dict.get("CONN_MAX_AGE", 0) != 0:
+                raise ImproperlyConfigured(
+                    "Pooling doesn't support persistent connections"
+                )
+            if pool_options is True:  # simply sets the default options
+                pool_options = {}
+
+            from psycopg_pool import ConnectionPool
+
+            connect_kwargs = self.get_connection_params()
+            # Ensure we run in autocommit, Django properly sets it later on
+            connect_kwargs["autocommit"] = True
+            self.pool = ConnectionPool(
+                kwargs=connect_kwargs,
+                open=False,  # Do not open the pool during startup
+                configure=self._configure_connection,
+                reset=self._reset_connection,
+            )
+
     def get_database_version(self):
         """
         Return a tuple of the database's version.
@@ -241,6 +269,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn_params.pop("assume_role", None)
         conn_params.pop("isolation_level", None)
+        conn_params.pop("pool", None)
         server_side_binding = conn_params.pop("server_side_binding", None)
         conn_params.setdefault(
             "cursor_factory",
@@ -290,7 +319,12 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     f"Invalid transaction isolation level {isolation_level_value} "
                     f"specified. Use one of the psycopg.IsolationLevel values."
                 )
-        connection = self.Database.connect(**conn_params)
+        if self.pool:
+            # If nothing else has opened the pool, open it now
+            self.pool.open()
+            connection = self.pool.getconn()
+        else:
+            connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
         return connection
@@ -317,14 +351,27 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         role_name = self.settings_dict.get("OPTIONS", {}).get("assume_role")
         commit_role = ensure_role(connection, self.ops, role_name)
 
-        if (commit_role or commit_tz) and not self.get_autocommit():
-            connection.commit()
+        return commit_role or commit_tz
+
+    def _reset_connection(self, connection):
+        pass  # We have nothing to do here (yet)
+
+    def _close(self):
+        if self.connection is not None:
+            if self.pool:
+                self.pool.putconn(self.connection)
+            else:
+                with self.wrap_database_errors:
+                    return self.connection.close()
 
     def init_connection_state(self):
         super().init_connection_state()
 
-        if self.connection is not None:
-            self._configure_connection(self.connection)
+        if self.connection is not None and not self.pool:
+            commit = self._configure_connection(self.connection)
+
+            if commit and not self.get_autocommit():
+                self.connection.commit()
 
     @async_unsafe
     def create_cursor(self, name=None):
