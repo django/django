@@ -157,7 +157,7 @@ class Count(Aggregate):
     allow_distinct = True
 
     def __init__(self, expression, filter=None, default=0, **extra):
-        if default:
+        if default != 0:
             raise TypeError(f"{self.__class__.__name__} does not allow default.")
 
         if expression == "*":
