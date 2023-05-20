@@ -914,15 +914,17 @@ class TestStatisticsAggregate(PostgreSQLTestCase):
         self.assertEqual(values, {"regravgy": 2.0})
 
     def test_regr_count_general(self):
-        values = StatTestModel.objects.aggregate(
-            regrcount=RegrCount(y="int2", x="int1")
-        )
+        with self.assertNumQueries(1) as ctx:
+            values = StatTestModel.objects.aggregate(
+                regrcount=RegrCount(y="int2", x="int1")
+            )
         self.assertEqual(values, {"regrcount": 3})
-
-    def test_regr_count_default(self):
-        msg = "RegrCount does not allow default."
-        with self.assertRaisesMessage(TypeError, msg):
-            RegrCount(y="int2", x="int1", default=0)
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn(
+            'SELECT COALESCE(REGR_COUNT("postgres_tests_stattestmodel"."int2", '
+            '"postgres_tests_stattestmodel"."int1"), 0)',
+            sql,
+        )
 
     def test_regr_intercept_general(self):
         values = StatTestModel.objects.aggregate(

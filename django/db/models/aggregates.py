@@ -155,14 +155,13 @@ class Count(Aggregate):
     name = "Count"
     output_field = IntegerField()
     allow_distinct = True
-    empty_result_set_value = 0
 
-    def __init__(self, expression, filter=None, **extra):
+    def __init__(self, expression, filter=None, default=0, **extra):
         if expression == "*":
             expression = Star()
         if isinstance(expression, Star) and filter is not None:
             raise ValueError("Star cannot be used with filter. Please specify a field.")
-        super().__init__(expression, filter=filter, **extra)
+        super().__init__(expression, filter=filter, default=default, **extra)
 
 
 class Max(Aggregate):

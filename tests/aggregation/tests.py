@@ -535,14 +535,17 @@ class AggregateTestCase(TestCase):
         )
 
     def test_count(self):
-        vals = Book.objects.aggregate(Count("rating"))
+        with self.assertNumQueries(1) as ctx:
+            vals = Book.objects.aggregate(Count("rating"))
         self.assertEqual(vals, {"rating__count": 6})
+        sql = ctx.captured_queries[0]["sql"]
+        self.assertIn('SELECT COALESCE(COUNT("aggregation_book"."rating"), 0)', sql)
 
     def test_count_star(self):
         with self.assertNumQueries(1) as ctx:
             Book.objects.aggregate(n=Count("*"))
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn("SELECT COUNT(*) ", sql)
+        self.assertIn("SELECT COALESCE(COUNT(*), 0)", sql)
 
     def test_count_distinct_expression(self):
         aggs = Book.objects.aggregate(
@@ -1789,11 +1792,6 @@ class AggregateTestCase(TestCase):
                 )["latest_opening"],
                 datetime.datetime,
             )
-
-    def test_aggregation_default_unsupported_by_count(self):
-        msg = "Count does not allow default."
-        with self.assertRaisesMessage(TypeError, msg):
-            Count("age", default=0)
 
     def test_aggregation_default_unset(self):
         for Aggregate in [Avg, Max, Min, StdDev, Sum, Variance]:

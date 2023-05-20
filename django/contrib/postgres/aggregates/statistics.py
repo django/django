@@ -48,7 +48,11 @@ class RegrAvgY(StatAggregate):
 class RegrCount(StatAggregate):
     function = "REGR_COUNT"
     output_field = IntegerField()
-    empty_result_set_value = 0
+
+    def __init__(self, y, x, output_field=None, filter=None, default=0):
+        super().__init__(
+            y, x, output_field=output_field, filter=filter, default=default
+        )
 
 
 class RegrIntercept(StatAggregate):
