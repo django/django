@@ -327,6 +327,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
+        if not is_psycopg3:
+            # Register dummy loads() to avoid a round trip from psycopg2's
+            # decode to json.dumps() to json.loads(), when using a custom
+            # decoder in JSONField.
+            psycopg2.extras.register_default_jsonb(
+                conn_or_curs=connection, loads=lambda x: x
+            )
         return connection
 
     def ensure_timezone(self):
@@ -335,13 +342,10 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return ensure_timezone(self.connection, self.ops, self.timezone_name)
 
     def _configure_connection(self, connection):
-        if not is_psycopg3:
-            # Register dummy loads() to avoid a round trip from psycopg2's
-            # decode to json.dumps() to json.loads(), when using a custom
-            # decoder in JSONField.
-            psycopg2.extras.register_default_jsonb(
-                conn_or_curs=connection, loads=lambda x: x
-            )
+        # NOTE: This function is called from init_connection_state for non-pool
+        # connections and from the psycopg pool itself after a connection is
+        # opened. Please make sure that whatever is done here does not access
+        # anything on self aside from variables.
 
         # Commit after setting the time zone.
         commit_tz = ensure_timezone(connection, self.ops, self.timezone_name)
@@ -354,6 +358,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return commit_role or commit_tz
 
     def _reset_connection(self, connection):
+        # TODO: How would we like our connection state to look like?
+
         pass  # We have nothing to do here (yet)
 
     def _close(self):
