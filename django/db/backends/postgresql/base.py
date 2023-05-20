@@ -86,6 +86,24 @@ def _get_varchar_column(data):
     return "varchar(%(max_length)s)" % data
 
 
+def ensure_timezone(connection, ops, timezone_name):
+    conn_timezone_name = connection.info.parameter_status("TimeZone")
+    if timezone_name and conn_timezone_name != timezone_name:
+        with connection.cursor() as cursor:
+            cursor.execute(ops.set_time_zone_sql(), [timezone_name])
+        return True
+    return False
+
+
+def ensure_role(connection, ops, role_name):
+    if role_name:
+        with connection.cursor() as cursor:
+            sql = ops.compose_sql("SET ROLE %s", [role_name])
+            cursor.execute(sql)
+        return True
+    return False
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "postgresql"
     display_name = "PostgreSQL"
@@ -275,6 +293,14 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         connection = self.Database.connect(**conn_params)
         if set_isolation_level:
             connection.isolation_level = self.isolation_level
+        return connection
+
+    def ensure_timezone(self):
+        if self.connection is None:
+            return False
+        return ensure_timezone(self.connection, self.ops, self.timezone_name)
+
+    def _configure_connection(self, connection):
         if not is_psycopg3:
             # Register dummy loads() to avoid a round trip from psycopg2's
             # decode to json.dumps() to json.loads(), when using a custom
@@ -282,41 +308,23 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             psycopg2.extras.register_default_jsonb(
                 conn_or_curs=connection, loads=lambda x: x
             )
-        return connection
 
-    def ensure_timezone(self):
-        if self.connection is None:
-            return False
-        conn_timezone_name = self.connection.info.parameter_status("TimeZone")
-        timezone_name = self.timezone_name
-        if timezone_name and conn_timezone_name != timezone_name:
-            with self.connection.cursor() as cursor:
-                cursor.execute(self.ops.set_time_zone_sql(), [timezone_name])
-            return True
-        return False
+        # Commit after setting the time zone.
+        commit_tz = ensure_timezone(connection, self.ops, self.timezone_name)
+        # Set the role on the connection. This is useful if the credential used
+        # to login is not the same as the role that owns database resources. As
+        # can be the case when using temporary or ephemeral credentials.
+        role_name = self.settings_dict.get("OPTIONS", {}).get("assume_role")
+        commit_role = ensure_role(connection, self.ops, role_name)
 
-    def ensure_role(self):
-        if self.connection is None:
-            return False
-        if new_role := self.settings_dict.get("OPTIONS", {}).get("assume_role"):
-            with self.connection.cursor() as cursor:
-                sql = self.ops.compose_sql("SET ROLE %s", [new_role])
-                cursor.execute(sql)
-            return True
-        return False
+        if (commit_role or commit_tz) and not self.get_autocommit():
+            connection.commit()
 
     def init_connection_state(self):
         super().init_connection_state()
 
-        # Commit after setting the time zone.
-        commit_tz = self.ensure_timezone()
-        # Set the role on the connection. This is useful if the credential used
-        # to login is not the same as the role that owns database resources. As
-        # can be the case when using temporary or ephemeral credentials.
-        commit_role = self.ensure_role()
-
-        if (commit_role or commit_tz) and not self.get_autocommit():
-            self.connection.commit()
+        if self.connection is not None:
+            self._configure_connection(self.connection)
 
     @async_unsafe
     def create_cursor(self, name=None):
