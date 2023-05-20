@@ -50,6 +50,9 @@ class RegrCount(StatAggregate):
     output_field = IntegerField()
 
     def __init__(self, y, x, output_field=None, filter=None, default=0):
+        if default:
+            raise TypeError(f"{self.__class__.__name__} does not allow default.")
+
         super().__init__(
             y, x, output_field=output_field, filter=filter, default=default
         )
