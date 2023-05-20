@@ -153,6 +153,10 @@ Minor features
 * ``AuthenticationMiddleware`` now adds an :meth:`.HttpRequest.auser`
   asynchronous method that returns the currently logged-in user.
 
+* The new :func:`django.contrib.auth.hashers.acheck_password` asynchronous
+  function and :meth:`.AbstractBaseUser.acheck_password` method allow
+  asynchronous checking of user passwords.
+
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

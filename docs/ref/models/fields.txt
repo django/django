@@ -278,7 +278,7 @@ Django provides an ``IntegerChoices`` class. For example::
         suit = models.IntegerField(choices=Suit)
 
 It is also possible to make use of the `Enum Functional API
-<https://docs.python.org/3/library/enum.html#functional-api>`_ with the caveat
+<https://docs.python.org/3/howto/enum.html#functional-api>`_ with the caveat
 that labels are automatically generated as highlighted above:
 
 .. code-block:: pycon

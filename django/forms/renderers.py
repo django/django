@@ -81,7 +81,7 @@ class DjangoDivFormRenderer(DjangoTemplates):
             "DjangoTemplates instead.",
             RemovedInDjango60Warning,
         )
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 # RemovedInDjango60Warning.
@@ -97,7 +97,7 @@ class Jinja2DivFormRenderer(Jinja2):
             "Jinja2 instead.",
             RemovedInDjango60Warning,
         )
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class TemplatesSetting(BaseRenderer):
