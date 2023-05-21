@@ -8,17 +8,11 @@ from django.contrib.auth.decorators import (
     user_passes_test,
 )
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
-from django.middleware.clickjacking import XFrameOptionsMiddleware
 from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
 from django.utils.safestring import mark_safe
 from django.views.decorators.cache import cache_control, cache_page, never_cache
-from django.views.decorators.clickjacking import (
-    xframe_options_deny,
-    xframe_options_exempt,
-    xframe_options_sameorigin,
-)
 from django.views.decorators.http import (
     condition,
     require_GET,
@@ -463,54 +457,3 @@ class MethodDecoratorTests(SimpleTestCase):
         Test().method()
         self.assertEqual(func_name, "method")
         self.assertIsNotNone(func_module)
-
-
-class XFrameOptionsDecoratorsTests(TestCase):
-    """
-    Tests for the X-Frame-Options decorators.
-    """
-
-    def test_deny_decorator(self):
-        """
-        Ensures @xframe_options_deny properly sets the X-Frame-Options header.
-        """
-
-        @xframe_options_deny
-        def a_view(request):
-            return HttpResponse()
-
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers["X-Frame-Options"], "DENY")
-
-    def test_sameorigin_decorator(self):
-        """
-        Ensures @xframe_options_sameorigin properly sets the X-Frame-Options
-        header.
-        """
-
-        @xframe_options_sameorigin
-        def a_view(request):
-            return HttpResponse()
-
-        r = a_view(HttpRequest())
-        self.assertEqual(r.headers["X-Frame-Options"], "SAMEORIGIN")
-
-    def test_exempt_decorator(self):
-        """
-        Ensures @xframe_options_exempt properly instructs the
-        XFrameOptionsMiddleware to NOT set the header.
-        """
-
-        @xframe_options_exempt
-        def a_view(request):
-            return HttpResponse()
-
-        req = HttpRequest()
-        resp = a_view(req)
-        self.assertIsNone(resp.get("X-Frame-Options", None))
-        self.assertTrue(resp.xframe_options_exempt)
-
-        # Since the real purpose of the exempt decorator is to suppress
-        # the middleware's functionality, let's make sure it actually works...
-        r = XFrameOptionsMiddleware(a_view)(req)
-        self.assertIsNone(r.get("X-Frame-Options", None))

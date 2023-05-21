@@ -83,6 +83,9 @@ view functions:
 
 * :func:`~django.views.decorators.cache.cache_control`
 * :func:`~django.views.decorators.cache.never_cache`
+* ``xframe_options_deny()``
+* ``xframe_options_sameorigin()``
+* ``xframe_options_exempt()``
 
 For example::
 
