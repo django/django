@@ -51,6 +51,11 @@ class SpecialName(models.Model):
         db_table = "inspectdb_special.table name"
 
 
+class PascalCaseName(models.Model):
+    class Meta:
+        db_table = "inspectdb_pascal.PascalCase"
+
+
 class ColumnTypes(models.Model):
     id = models.AutoField(primary_key=True)
     big_int_field = models.BigIntegerField()
