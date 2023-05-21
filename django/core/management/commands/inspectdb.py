@@ -56,9 +56,6 @@ class Command(BaseCommand):
         # 'table_name_filter' is a stealth option
         table_name_filter = options.get("table_name_filter")
 
-        def table2model(table_name):
-            return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
-
         with connection.cursor() as cursor:
             yield "# This is an auto-generated Django model module."
             yield "# You'll have to do the following manually to clean this up:"
@@ -125,7 +122,7 @@ class Command(BaseCommand):
                     yield "# The error was: %s" % e
                     continue
 
-                model_name = table2model(table_name)
+                model_name = self.normalize_table_name(table_name)
                 yield ""
                 yield ""
                 yield "class %s(models.Model):" % model_name
@@ -180,7 +177,7 @@ class Command(BaseCommand):
                         rel_to = (
                             "self"
                             if ref_db_table == table_name
-                            else table2model(ref_db_table)
+                            else self.normalize_table_name(ref_db_table)
                         )
                         if rel_to in known_models:
                             field_type = "%s(%s" % (rel_type, rel_to)
@@ -321,6 +318,10 @@ class Command(BaseCommand):
             field_params["db_column"] = col_name
 
         return new_name, field_params, field_notes
+
+    def normalize_table_name(self, table_name):
+        """Translate the table name to a Python-compatible model name."""
+        return re.sub(r"[^a-zA-Z0-9]", "", table_name.title())
 
     def get_field_type(self, connection, table_name, row):
         """
