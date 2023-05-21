@@ -224,6 +224,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 open=False,  # Do not open the pool during startup
                 configure=self._configure_connection,
                 reset=self._reset_connection,
+                **pool_options,
             )
 
     def get_database_version(self):
