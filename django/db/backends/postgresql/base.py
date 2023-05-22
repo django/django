@@ -219,7 +219,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 connect_kwargs = self.get_connection_params()
                 # Ensure we run in autocommit, Django properly sets it later on
                 connect_kwargs["autocommit"] = True
-                print("Creating pool")
                 pool = ConnectionPool(
                     kwargs=connect_kwargs,
                     open=False,  # Do not open the pool during startup
@@ -227,7 +226,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     **pool_options,
                 )
 
-            self._connection_pools[self.alias] = pool
+            # NOTE: `setdefault` ensures that multiple threads don't set this in
+            # parallel. Since we do not open the pool during it's init above, this
+            # means that at worst during startup multiple threads generate pool
+            # objects and the first to set it wins.
+            self._connection_pools.setdefault(self.alias, pool)
 
         return self._connection_pools[self.alias]
 
@@ -364,10 +367,13 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _close(self):
         if self.connection is not None:
-            if self.pool:
-                self.pool.putconn(self.connection)
-            else:
-                with self.wrap_database_errors:
+            # NOTE: `wrap_database_error` only works for `putconn` as long as there
+            # is not `reset` function set in the pool because that is defered into
+            # a thread and not directly executed.
+            with self.wrap_database_errors:
+                if self.pool:
+                    self.pool.putconn(self.connection)
+                else:
                     return self.connection.close()
 
     def init_connection_state(self):
