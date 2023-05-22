@@ -25,3 +25,6 @@ Bugfixes
 
 * Fixed a performance regression in Django 4.2 when compiling queries without
   ordering (:ticket:`34580`).
+
+* Fixed a regression in Django 4.2 where nonexistent stylesheet was linked on a
+  “Congratulations!” page (:ticket:`34588`).
