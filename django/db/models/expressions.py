@@ -1541,6 +1541,7 @@ class Subquery(BaseExpression, Combinable):
     template = "(%(subquery)s)"
     contains_aggregate = False
     empty_result_set_value = None
+    subquery = True
 
     def __init__(self, queryset, output_field=None, **extra):
         # Allow the usage of both QuerySet and sql.Query objects.
