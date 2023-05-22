@@ -32,3 +32,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with expressions referencing other aggregates
   (:ticket:`34551`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with aggregates referencing subqueries
+  (:ticket:`34551`).
