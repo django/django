@@ -224,7 +224,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                     kwargs=connect_kwargs,
                     open=False,  # Do not open the pool during startup
                     configure=self._configure_connection,
-                    reset=self._reset_connection,
                     **pool_options,
                 )
 
@@ -362,11 +361,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         commit_role = ensure_role(connection, self.ops, role_name)
 
         return commit_role or commit_tz
-
-    def _reset_connection(self, connection):
-        # TODO: How would we like our connection state to look like?
-
-        pass  # We have nothing to do here (yet)
 
     def _close(self):
         if self.connection is not None:
