@@ -115,7 +115,7 @@ Cache
 * The :ref:`local-memory cache backend <local-memory-caching>` now uses a
   least-recently-used (LRU) culling strategy rather than a pseudo-random one.
 
-* The new :meth:`~django.core.caches.cache.touch` method of the :ref:`low-level
+* The new :meth:`~django.core.cache.cache.touch` method of the :ref:`low-level
   cache API <low-level-cache-api>` updates the timeout of cache keys.
 
 CSRF
