@@ -15,7 +15,6 @@ from django.db import DatabaseError as WrappedDatabaseError
 from django.db import connections
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.utils import CursorDebugWrapper as BaseCursorDebugWrapper
-from django.db.utils import DEFAULT_DB_ALIAS
 from django.utils.asyncio import async_unsafe
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
@@ -198,34 +197,40 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     ops_class = DatabaseOperations
     # PostgreSQL backend-specific attributes.
     _named_cursor_idx = 0
+    _connection_pools = {}
 
-    def __init__(self, settings_dict, alias=DEFAULT_DB_ALIAS):
-        super().__init__(settings_dict, alias)
+    @cached_property
+    def pool(self):
+        if self.alias not in self._connection_pools:
+            pool = None
+            pool_options = self.settings_dict.get("OPTIONS", {}).get("pool", None)
 
-        self.pool = None
-        pool_options = settings_dict.get("OPTIONS", {}).get("pool", None)
+            if pool_options is not None:
+                # Verify that we are not running with persistent connections
+                if self.settings_dict.get("CONN_MAX_AGE", 0) != 0:
+                    raise ImproperlyConfigured(
+                        "Pooling doesn't support persistent connections"
+                    )
+                if pool_options is True:  # simply sets the default options
+                    pool_options = {}
 
-        if pool_options is not None:
-            # Verify that we are not running with persistent connections
-            if settings_dict.get("CONN_MAX_AGE", 0) != 0:
-                raise ImproperlyConfigured(
-                    "Pooling doesn't support persistent connections"
+                from psycopg_pool import ConnectionPool
+
+                connect_kwargs = self.get_connection_params()
+                # Ensure we run in autocommit, Django properly sets it later on
+                connect_kwargs["autocommit"] = True
+                print("Creating pool")
+                pool = ConnectionPool(
+                    kwargs=connect_kwargs,
+                    open=False,  # Do not open the pool during startup
+                    configure=self._configure_connection,
+                    reset=self._reset_connection,
+                    **pool_options,
                 )
-            if pool_options is True:  # simply sets the default options
-                pool_options = {}
 
-            from psycopg_pool import ConnectionPool
+            self._connection_pools[self.alias] = pool
 
-            connect_kwargs = self.get_connection_params()
-            # Ensure we run in autocommit, Django properly sets it later on
-            connect_kwargs["autocommit"] = True
-            self.pool = ConnectionPool(
-                kwargs=connect_kwargs,
-                open=False,  # Do not open the pool during startup
-                configure=self._configure_connection,
-                reset=self._reset_connection,
-                **pool_options,
-            )
+        return self._connection_pools[self.alias]
 
     def get_database_version(self):
         """
