@@ -345,7 +345,8 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* The new :tfilter:`escapeseq` template filter applies :tfilter:`escape` to
+  each element of a sequence.
 
 Tests
 ~~~~~
