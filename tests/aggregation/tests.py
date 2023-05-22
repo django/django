@@ -1260,7 +1260,7 @@ class AggregateTestCase(TestCase):
         self.assertEqual(author.sum_age, other_author.sum_age)
 
     def test_aggregate_over_aggregate(self):
-        msg = "Cannot resolve keyword 'age_agg' into field."
+        msg = "Cannot compute Avg('age_agg'): 'age_agg' is an aggregate"
         with self.assertRaisesMessage(FieldError, msg):
             Author.objects.aggregate(
                 age_agg=Sum(F("age")),
@@ -2102,12 +2102,17 @@ class AggregateTestCase(TestCase):
         )
         self.assertEqual(len(qs), 6)
 
-    def test_aggregation_over_annotation_shared_alias(self):
+    def test_multiple_aggregate_references(self):
+        aggregates = Author.objects.aggregate(
+            total_books=Count("book"),
+            coalesced_total_books=Coalesce("total_books", 0),
+        )
         self.assertEqual(
-            Publisher.objects.annotate(agg=Count("book__authors")).aggregate(
-                agg=Count("agg"),
-            ),
-            {"agg": 5},
+            aggregates,
+            {
+                "total_books": 10,
+                "coalesced_total_books": 10,
+            },
         )
 
 
