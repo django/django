@@ -48,6 +48,16 @@ class RecorderTests(TestCase):
             set(),
         )
 
+    def test_has_table_cached(self):
+        """
+        The has_table() method caches a positive result and not continually
+        query for the existence of the migrations table.
+        """
+        recorder = MigrationRecorder(connection)
+        with self.assertNumQueries(1):
+            self.assertEqual(recorder.has_table(), True)
+            self.assertEqual(recorder.has_table(), True)
+
 
 class LoaderTests(TestCase):
     """
