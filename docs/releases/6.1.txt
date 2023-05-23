@@ -244,7 +244,12 @@ Management Commands
 Migrations
 ~~~~~~~~~~
 
-* ...
+* The :class:`~django.db.migrations.operations.RemoveField` operation now
+  supports providing one-off default values for non-nullable fields. This
+  default value will make the
+  :class:`~django.db.migrations.operations.RemoveField` operation with a
+  non-nullable field reversible. If the default value is not provided, the
+  operation will be irreversible.
 
 Models
 ~~~~~~

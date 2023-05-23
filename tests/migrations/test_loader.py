@@ -106,7 +106,7 @@ class LoaderTests(TestCase):
 
         author_state = project_state.models["migrations", "author"]
         self.assertEqual(
-            list(author_state.fields), ["id", "name", "slug", "age", "rating"]
+            list(author_state.fields), ["id", "name", "slug", "age", "price", "rating"]
         )
 
         book_state = project_state.models["migrations", "book"]
