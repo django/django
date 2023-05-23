@@ -4,6 +4,7 @@ from django.test import SimpleTestCase
 from django.test.utils import ignore_warnings
 from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, classproperty, lazy
+from django.utils.version import PY312
 
 
 class FunctionalTests(SimpleTestCase):
@@ -156,7 +157,18 @@ class FunctionalTests(SimpleTestCase):
 
     def test_cached_property_reuse_different_names(self):
         """Disallow this case because the decorated function wouldn't be cached."""
-        with self.assertRaises(RuntimeError) as ctx:
+        type_msg = (
+            "Cannot assign the same cached_property to two different names ('a' and "
+            "'b')."
+        )
+        if PY312:
+            error_type = TypeError
+            msg = type_msg
+        else:
+            error_type = RuntimeError
+            msg = "Error calling __set_name__"
+
+        with self.assertRaisesMessage(error_type, msg) as ctx:
 
             class ReusedCachedProperty:
                 @cached_property
@@ -165,15 +177,8 @@ class FunctionalTests(SimpleTestCase):
 
                 b = a
 
-        self.assertEqual(
-            str(ctx.exception.__context__),
-            str(
-                TypeError(
-                    "Cannot assign the same cached_property to two different "
-                    "names ('a' and 'b')."
-                )
-            ),
-        )
+        if not PY312:
+            self.assertEqual(str(ctx.exception.__context__), str(TypeError(type_msg)))
 
     def test_cached_property_reuse_same_name(self):
         """
