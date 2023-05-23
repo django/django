@@ -1172,11 +1172,31 @@ class MigrationAutodetector:
             self._generate_removed_field(app_label, model_name, field_name)
 
     def _generate_removed_field(self, app_label, model_name, field_name):
+        field = self.from_state.models[app_label, model_name].get_field(field_name)
+        # NOT NULL fields with no default or fields which don't allow
+        # empty strings as default, can't be removed, because the reverse
+        # migration will need a default value to populate existing rows in
+        # the database while adding the field back.
+        default = models.NOT_PROVIDED
+        time_fields = (models.DateField, models.DateTimeField, models.TimeField)
+        if (
+            not field.null
+            and not field.has_default()
+            and not field.many_to_many
+            and not (field.blank and field.empty_strings_allowed)
+            and not (
+                isinstance(field, time_fields)
+                and (field.auto_now or field.auto_now_add)
+            )
+        ):
+            default = self.questioner.ask_not_null_removal(field_name, model_name)
+
         self.add_operation(
             app_label,
             operations.RemoveField(
                 model_name=model_name,
                 name=field_name,
+                default=default,
             ),
             # We might need to depend on the removal of an
             # order_with_respect_to or index/unique_together operation;
