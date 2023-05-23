@@ -539,7 +539,10 @@ class AggregateTestCase(TestCase):
             vals = Book.objects.aggregate(Count("rating"))
         self.assertEqual(vals, {"rating__count": 6})
         sql = ctx.captured_queries[0]["sql"]
-        self.assertIn('SELECT COALESCE(COUNT("aggregation_book"."rating"), 0)', sql)
+        self.assertRegex(
+            sql,
+            r"SELECT COALESCE\(COUNT\(.aggregation_book.+rating.\), 0\)",
+        )
 
     def test_count_star(self):
         with self.assertNumQueries(1) as ctx:
