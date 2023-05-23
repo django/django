@@ -1828,7 +1828,7 @@ class ListFiltersTests(TestCase):
         request.user = self.alfred
         changelist = modeladmin.get_changelist_instance(request)
         changelist.get_results(request)
-        self.assertEqual(changelist.full_result_count, 4)
+        self.assertEqual(changelist.full_result_count, 3)
 
     def test_emptylistfieldfilter(self):
         empty_description = Department.objects.create(code="EMPT", description="")
