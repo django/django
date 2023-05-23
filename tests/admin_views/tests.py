@@ -6209,8 +6209,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(
             fonts,
             [
-                "-apple-system",
-                "BlinkMacSystemFont",
                 "Segoe UI",
                 "system-ui",
                 "Roboto",

@@ -56,8 +56,6 @@ html[data-theme="light"],
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
     --font-family-primary:
-        -apple-system,
-        BlinkMacSystemFont,
         "Segoe UI",
         system-ui,
         Roboto,
