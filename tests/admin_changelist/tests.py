@@ -1219,10 +1219,10 @@ class ChangeListTests(TestCase):
         with CaptureQueriesContext(connection) as context:
             response = self.client.post(changelist_url, data=data)
             self.assertEqual(response.status_code, 200)
-            self.assertIn("WHERE", context.captured_queries[4]["sql"])
-            self.assertIn("IN", context.captured_queries[4]["sql"])
+            self.assertIn("WHERE", context.captured_queries[3]["sql"])
+            self.assertIn("IN", context.captured_queries[3]["sql"])
             # Check only the first few characters since the UUID may have dashes.
-            self.assertIn(str(a.pk)[:8], context.captured_queries[4]["sql"])
+            self.assertIn(str(a.pk)[:8], context.captured_queries[3]["sql"])
 
     def test_deterministic_order_for_unordered_model(self):
         """
