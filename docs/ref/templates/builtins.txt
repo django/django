@@ -56,6 +56,15 @@ is because the filter chaining sequence executes first :tfilter:`join` on
 fed to :tfilter:`escape` filter, which does not apply a second round of
 escaping.
 
+In order to properly escape every element in a sequence, use the
+:tfilter:`escapeseq` filter:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|escapeseq|join:", " }}
+    {% endautoescape %}
+
 .. templatetag:: block
 
 ``block``
@@ -1859,7 +1868,9 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
     In such cases, chaining ``escape`` would not reescape strings that have
     already been marked as safe.
 
-To escape each element of a sequence, use the :tfilter:`escapeseq` filter.
+    This is especially important when using filters that operate on sequences,
+    for example :tfilter:`join`. If you need to escape each element in a
+    sequence, use the dedicated :tfilter:`escapeseq` filter.
 
 .. templatefilter:: escapejs
 
