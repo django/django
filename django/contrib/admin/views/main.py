@@ -312,6 +312,9 @@ class ChangeList:
         result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
+        # Note this isn't necessarily the same as result_count in the case of
+        # no filtering. Filters defined in list_filters may still apply some
+        # default filtering which may be removed with query parameters.
         if self.model_admin.show_full_result_count:
             full_result_count = self.root_queryset.count()
         else:
