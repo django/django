@@ -1215,7 +1215,7 @@ It can also be registered as a transform. For example:
 .. class:: Log(expression1, expression2, **extra)
 
 Accepts two numeric fields or expressions and returns the logarithm of
-the first to base of the second.
+the second to base of the first.
 
 Usage example:
 
