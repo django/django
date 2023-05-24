@@ -21,15 +21,6 @@ Controls the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block. The block is closed with an ``endautoescape`` ending tag.
 
-When auto-escaping is in effect, all variable content has HTML escaping applied
-to it before placing the result into the output (but after any filters have
-been applied). This is equivalent to manually applying the :tfilter:`escape`
-filter to each variable.
-
-The only exceptions are variables that are already marked as "safe" from
-escaping, either by the code that populated the variable, or because it has had
-the :tfilter:`safe` or :tfilter:`escape` filters applied.
-
 Sample usage:
 
 .. code-block:: html+django
@@ -37,6 +28,33 @@ Sample usage:
     {% autoescape on %}
         {{ body }}
     {% endautoescape %}
+
+When auto-escaping is in effect, all content derived from variables has HTML
+escaping applied before placing the result into the output (but after any
+filters are applied). This is equivalent to manually applying the
+:tfilter:`escape` filter to each variable.
+
+The only exceptions are variables already marked as "safe" from escaping.
+Variables could be marked as "safe" by the code which populated the variable,
+by applying the :tfilter:`safe` or :tfilter:`escape` filters, or because it's
+the result of a previous filter that marked the string as "safe".
+
+Within the scope of disabled auto-escaping, chaining filters, including
+:tfilter:`escape`, may cause unexpected (but documented) results such as the
+following:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|join:", "|escape }}
+    {% endautoescape %}
+
+The above code will output the joined elements of ``my_list`` unescaped. This
+is because the filter chaining sequence executes first :tfilter:`join` on
+``my_list`` (without applying escaping to each item since ``autoescape`` is
+``off``), marking the result as safe. Subsequently, this safe result will be
+fed to :tfilter:`escape` filter, which does not apply a second round of
+escaping.
 
 .. templatetag:: block
 
@@ -1831,6 +1849,16 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
     {% autoescape off %}
         {{ title|escape }}
     {% endautoescape %}
+
+.. admonition:: Chaining ``escape`` with other filters
+
+    As mentioned in the :ttag:`autoescape` section, when filters including
+    ``escape`` are chained together, it can result in unexpected outcomes if
+    preceding filters mark a potentially unsafe string as safe due to the lack
+    of escaping caused by :ttag:`autoescape` being ``off``.
+
+    In such cases, chaining ``escape`` would not reescape strings that have
+    already been marked as safe.
 
 .. templatefilter:: escapejs
 
