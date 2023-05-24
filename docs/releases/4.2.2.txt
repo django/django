@@ -36,3 +36,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with aggregates referencing subqueries
   (:ticket:`34551`).
+
+* Fixed a regression in Django 4.2 that caused a crash of querysets on SQLite
+  when filtering on ``DecimalField`` against values outside of the defined
+  range (:ticket:`34590`).
