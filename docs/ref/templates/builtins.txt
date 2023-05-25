@@ -1877,18 +1877,19 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
 ``escapejs``
 ------------
 
-Escapes characters for use in JavaScript strings. This does *not* make the
-string safe for use in HTML or JavaScript template literals, but does protect
-you from syntax errors when using templates to generate JavaScript/JSON.
+Escapes characters for use as a whole JavaScript string literal, within single
+or double quotes, as below. This filter does not make the string safe for use
+in *"JavaScript template literals"* (the JavaScript backtick syntax). Any other
+uses not listed above are not supported. It is generally recommended that data
+should be passed using HTML ``data-`` attributes, or the :tfilter:`json_script`
+filter, rather than in embedded JavaScript.
 
 For example:
 
 .. code-block:: html+django
 
-    {{ value|escapejs }}
-
-If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
-the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
+    <script>
+    let myValue = '{{ value|escapejs }}'
 
 .. templatefilter:: escapeseq
 
