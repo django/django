@@ -1838,23 +1838,18 @@ To escape each element of a sequence, use the :tfilter:`escapeseq` filter.
 ``escapejs``
 ------------
 
-Escapes characters for use in JavaScript strings. This makes the string safe
-for use in HTML and JavaScript or JSON string literals. Note that it does *not*
-make the string safe for use in "JavaScript template literals" (i.e. the
-JavaScript backtick syntax).
+Escapes characters for use in JavaScript strings (text written inside single
+or double quotes). Using this filter only makes the string safe when used as
+the whole content of a JavaScript or JSON string literal (please see the
+example below). Note that it does not make the string safe for use in
+"JavaScript template literals" (i.e. the JavaScript backtick syntax), and
+any other use is not supported. It is generally recommended however that
+data should be passed using HTML `data-` attributes, or the
+:tfilter:`json_script` filter, rather than in embedded JavaScript.
 
 For example:
 
 .. code-block:: html+django
-
-    {{ value|escapejs }}
-
-If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
-the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
-
-This can be used as follows:
-
-.. code-block:: html
 
     <script>
     let myValue = '{{ value|escapejs }}'
