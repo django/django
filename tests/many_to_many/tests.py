@@ -1,18 +1,14 @@
 from unittest import mock
 
-from django.db import transaction
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
-
-from .models import Article, InheritedArticleA, InheritedArticleB, Publication, User
-
 from django.db import connection, transaction
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Article, InheritedArticleA, InheritedArticleB, NullablePublicationThrough,
-    NullableTargetArticle, Publication,
+    Article, CustomArticle, InheritedArticleA, InheritedArticleB, NullablePublicationThrough,
+    NullableTargetArticle, Publication, User
 )
+
 
 class ManyToManyTests(TestCase):
     @classmethod
@@ -36,6 +32,7 @@ class ManyToManyTests(TestCase):
 
         cls.a4 = Article.objects.create(headline="Oxygen-free diet works wonders")
         cls.a4.publications.add(cls.p2)
+
 
     def test_add(self):
         # Create an Article.
@@ -565,29 +562,49 @@ class ManyToManyTests(TestCase):
         )
 
 class ManyToManyQueryTests(TestCase):
+    """
+      #29725 - Testing SQL optimization when using
+      count() and exists() functions on queryset for
+      many to many relations
+    """
     @classmethod
     def setUpTestData(cls):
         cls.article = Article.objects.create(headline='Django lets you build Web apps easily')
         cls.nullable_target_article = NullableTargetArticle.objects.create(headline='The python is good')
         NullablePublicationThrough.objects.create(article=cls.nullable_target_article, publication=None)
+        cls.custom_article = CustomArticle.objects.create(headline='Django lets you build Web apps easily')
+
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_count_join_optimization(self):
-        with CaptureQueriesContext(connection) as query:
+        with self.assertNumQueries(1) as queries:
             self.article.publications.count()
-        self.assertNotIn('JOIN', query[0]['sql'])
+
+        self.article.publications.prefetch_related()
+        with self.assertNumQueries(1) as queries:
+            self.article.publications.count()
+
+        self.assertNotIn('JOIN', queries[0]['sql'])
         self.assertEqual(self.nullable_target_article.publications.count(), 0)
+
 
     def test_count_join_optimization_disabled(self):
         with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
                 CaptureQueriesContext(connection) as query:
             self.article.publications.count()
+            self.custom_article.publications.count()
+
         self.assertIn('JOIN', query[0]['sql'])
 
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_exists_join_optimization(self):
         with CaptureQueriesContext(connection) as query:
             self.article.publications.exists()
+
+        self.article.publications.prefetch_related()
+        with self.assertNumQueries(1):
+            self.article.publications.exists()
+
         self.assertNotIn('JOIN', query[0]['sql'])
         self.assertIs(self.nullable_target_article.publications.exists(), False)
 
@@ -595,4 +612,6 @@ class ManyToManyQueryTests(TestCase):
         with mock.patch.object(connection.features, 'supports_foreign_keys', False), \
                 CaptureQueriesContext(connection) as query:
             self.article.publications.exists()
+            self.custom_article.publications.exists()
+
         self.assertIn('JOIN', query[0]['sql'])

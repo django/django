@@ -78,11 +78,27 @@ class InheritedArticleA(AbstractArticle):
 class InheritedArticleB(AbstractArticle):
     pass
 
+
 class NullableTargetArticle(models.Model):
     headline = models.CharField(max_length=100)
-    publications = models.ManyToManyField(Publication, through='NullablePublicationThrough')
+    publications = models.ManyToManyField(
+        Publication,
+        through='NullablePublicationThrough'
+    )
 
 
 class NullablePublicationThrough(models.Model):
     article = models.ForeignKey(NullableTargetArticle, models.CASCADE)
     publication = models.ForeignKey(Publication, models.CASCADE, null=True)
+
+# Manager and models to test if custom managers disable the SQL Optimization in #29725
+class CustomManager(models.Manager):
+    pass
+
+
+class CustomArticle(models.Model):
+    # Same as the Article class above
+    headline = models.CharField(max_length=100)
+    publications = models.ManyToManyField(Publication, name="publications")
+
+    objects = CustomManager()

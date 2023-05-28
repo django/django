@@ -65,7 +65,6 @@ and two directions (forward and reverse) for a total of six combinations.
 
 from asgiref.sync import sync_to_async
 
-from django.db import models
 from django.core.exceptions import FieldError
 from django.db import (
     DEFAULT_DB_ALIAS,
@@ -74,7 +73,7 @@ from django.db import (
     router,
     transaction,
 )
-from django.db.models import Q, Window, signals
+from django.db.models import Manager, Q, Window, signals
 from django.db.models.functions import RowNumber
 from django.db.models.lookups import GreaterThan, LessThanOrEqual
 from django.db.models.query import QuerySet
@@ -1152,14 +1151,16 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
 
         def exists(self):
             constrained_target = self.constrained_target
-            if constrained_target and ManyRelatedManager.__class__ == models.Manager:
+            if constrained_target is not None and superclass is Manager and (
+                self.prefetch_cache_name is not None):
                 return constrained_target.exists()
             else:
                 return super().exists()
 
         def count(self):
             constrained_target = self.constrained_target
-            if constrained_target and ManyRelatedManager.__class__ == models.Manager:
+            if constrained_target is not None and superclass is Manager and (
+                self.prefetch_cache_name is not None):
                 return constrained_target.count()
             else:
                 return super().count()
