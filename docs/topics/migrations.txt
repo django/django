@@ -535,6 +535,31 @@ database migrations such as ``__init__()``, ``deconstruct()``, and
 which reference the field exist. For example, after squashing migrations and
 removing the old ones, you should be able to remove the field completely.
 
+.. _moving-model-between-apps:
+
+Moving a model between apps
+===========================
+
+  .. versionadded:: 5.1
+
+Django seamlessly handles the process of transferring models from one app
+to another. This involves recognizing the moved model and automatically
+generating the necessary migrations.
+
+When we are going to move a model - that is, delete a model in one app and
+create it new in another - we want to avoid dropping and recreating its
+database table (which would lose all data). A table rename will happen
+unless the moved model in new app defines a ``Meta.db_table`` that matches
+the old one.
+
+To move a model (without a table rename), we first create the new model, making
+it point to the already existing table. To make Django not attempt to create
+that table (which would fail), we mark it ``managed=False`` upon creation.
+After this, we momentarily have two models pointing at the same table. Now,
+to remove the old model without deleting the table, we mark it
+``managed=False`` as well. Finally, we can remove the old model and mark the
+new one ``managed=True``.
+
 .. _data-migrations:
 
 Data Migrations
