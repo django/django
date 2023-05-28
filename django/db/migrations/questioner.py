@@ -72,6 +72,10 @@ class MigrationQuestioner:
         """Was this model really renamed?"""
         return self.defaults.get("ask_rename_model", False)
 
+    def ask_move_model(self, old_model_state, new_model_state):
+        """Was this model really moved?"""
+        return self.defaults.get("ask_move_model", False)
+
     def ask_merge(self, app_label):
         """Should these migrations really be merged?"""
         return self.defaults.get("ask_merge", False)
@@ -235,6 +239,20 @@ class InteractiveMigrationQuestioner(MigrationQuestioner):
         return self._boolean_input(
             msg
             % (old_model_state.app_label, old_model_state.name, new_model_state.name),
+            False,
+        )
+
+    def ask_move_model(self, old_model_state, new_model_state):
+        """Was this model really moved?"""
+        msg = "Was the model %s.%s moved to %s.%s? [y/N]"
+        return self._boolean_input(
+            msg
+            % (
+                old_model_state.app_label,
+                old_model_state.name,
+                new_model_state.app_label,
+                new_model_state.name,
+            ),
             False,
         )
 
