@@ -633,44 +633,42 @@ to be able to write your own, see the :doc:`migration operations reference
 </howto/writing-migrations>`.
 
 
-Optimizing migrations
-=====================
+Managing Migrations
+===================
 
-Django developers are free to create as migrations as required and do not have
-to worry about the number of migrations created as Django is optimized to deal
-with hundreds at a time without much slowdown.  However, there may come a time when migrations will become so numerous that it
-will start to have a noticeable impact on various tasks like running tests on
-CI.
+You are encouraged to create as many migrations as required and do not have to
+worry about the number of migrations created as Django is optimized to deal
+with hundreds at a time without much slowdown.  However, there may come a time
+when migrations will become so numerous that it will start to have a noticeable
+impact on various tasks like running tests on CI.
 
 There are a few steps that developers can take to mitigate or remediate this by
 reducing the amount of work that migrations has to do:
 
-
 Optimizing migrations
 ---------------------
 
-Django will automatically optimize migrations created via the
-:djadmin:`makemigrations` command however you may also choose to optimize manually
-created migrations with the :djadmin:`optimizemigration` command:
+Migration operations can often be reduced to a more equivalent optimal form. An
+example would be a :class:`~django.db.migrations.operations.CreateModel`
+operation followed by a :class:`~django.db.migrations.operations.RenameModel`
+operation: this can be reduced to a single operation by combining the final
+name of the model with the
+:class:`~django.db.migrations.operations.CreateModel`.
+
+Django automatically optimizes new migration files created with the
+:djadmin:`makemigrations` command however you may also choose to optimize
+manually created migration files with the :djadmin:`optimizemigration` command:
 
 .. code-block:: shell
 
     $ python manage.py optimizemigration <app_label> <migration_name>
 
-Migration optimization attempts to reduce the list of migration operations by
-merging known pairs of possible reductions together.  For example, it knows
-that :class:`~django.db.migrations.operations.CreateModel` and
-:class:`~django.db.migrations.operations.DeleteModel` cancel each other out,
-and it knows that :class:`~django.db.migrations.operations.AddField` can be
-rolled into :class:`~django.db.migrations.operations.CreateModel`.
-
-
 Updating migrations
 -------------------
 
-When creating new migrations you have the option of updating the previously
-created migration if one exists.  Running ``makemigrations --update`` will add any new operations to the last
-migration created, then optimize it:
+When making migrations you have the option of updating the previously created
+migration if one exists.  Running ``makemigrations --update`` will add any new
+operations to the last migration created then optimize it:
 
 .. code-block:: shell
 
@@ -681,17 +679,27 @@ migration created, then optimize it:
 Squashing migrations
 --------------------
 
-Squashing is the act of reducing an existing set of many migrations down to
-one (or sometimes a few) migrations which still represent the same changes.
+To optimize migrations across multiple migration files, "squashing" is
+required.  Squashing extracts all the operations from a set of migration files,
+combines them together into an equivalent sequence, then optimizes the result.
+
+Squashed migrations
+
+Squashing can be done either automatically or manually, with both processes
+sharing some steps.
+
+The steps are as follows:
+
+ 1. Squash migrations into an optimal equivalent reduced set of migration files
+ 2. Set the ``replaces`` attribute
 
 
-Using squashmigrations
-----------------------
 
-Django has a tool to squash migrations automatically called :djadmin:`squashmigrations`.
-This command takes all of your existing migrations, extracts their
-``Operation``\s and puts them all in sequence, and then running the :ref:`optimizer <migration-optimizing>`
-over them.
+Automatically squashing migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Django has a tool to squash migrations automatically called
+:djadmin:`squashmigrations`.
 
 Once the operation sequence has been reduced as much as possible - the amount
 possible depends on how closely intertwined your models are and if you have
@@ -751,7 +759,7 @@ brand new migrations from your models. In a future release of Django,
 itself.
 
 Manually squashing migrations
------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In this cases where :djadmin:`squashmigrations` is not able to run
 successfully, you can squash migrations manually using
@@ -776,7 +784,6 @@ exception that the range must include the final migration:
   ]
 
 - Copy all non-elidable operation identified in step 2 into the newly created migration along with any dependencies.
-
 
 Managing squashed migrations
 ----------------------------
