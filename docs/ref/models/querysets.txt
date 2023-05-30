@@ -2021,7 +2021,8 @@ may be generated.
 XOR (``^``)
 ~~~~~~~~~~~
 
-Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
+Combines two ``QuerySet``\s using the SQL ``XOR`` operator. A ``XOR``
+expression matches rows that are matched by an odd number of operands.
 
 The following are equivalent::
 
@@ -2044,12 +2045,20 @@ SQL equivalent:
     .. code-block:: sql
 
         (x OR y OR ... OR z) AND
-        1=(
+        1=MOD(
             (CASE WHEN x THEN 1 ELSE 0 END) +
             (CASE WHEN y THEN 1 ELSE 0 END) +
             ...
-            (CASE WHEN z THEN 1 ELSE 0 END) +
+            (CASE WHEN z THEN 1 ELSE 0 END),
+            2
         )
+
+   .. versionchanged:: 5.0
+
+        In older versions, on databases without native support for the SQL
+        ``XOR`` operator, ``XOR`` returned rows that were matched by exactly
+        one operand. The previous behavior was not consistent with MySQL,
+        MariaDB, and Python behavior.
 
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
