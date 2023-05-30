@@ -1,14 +1,19 @@
+from unittest import mock
+
 from django.db import connection, transaction
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import (
-    Article, CustomArticle, InheritedArticleA, InheritedArticleB,
-    NullablePublicationThrough, NullableTargetArticle, Publication,
-    User
+    Article,
+    CustomArticle,
+    InheritedArticleA,
+    InheritedArticleB,
+    NullablePublicationThrough,
+    NullableTargetArticle,
+    Publication,
+    User,
 )
-
-from unittest import mock
 
 
 class ManyToManyTests(TestCase):
@@ -585,7 +590,6 @@ class ManyToManyQueryTests(TestCase):
             headline='Django lets you build Web apps easily'
         )
 
-
     @skipUnlessDBFeature('supports_foreign_keys')
     def test_count_join_optimization(self):
         with self.assertNumQueries(1) as queries:
@@ -598,7 +602,6 @@ class ManyToManyQueryTests(TestCase):
 
         self.assertNotIn('JOIN', queries[0]['sql'])
         self.assertEqual(self.nullable_target_article.publications.count(), 0)
-
 
     def test_count_join_optimization_disabled(self):
         with mock.patch.object(connection.features, 'supports_foreign_keys', False), \

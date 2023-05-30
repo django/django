@@ -1076,7 +1076,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def get_prefetch_cache(self):
             try:
                 return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except:
+            except (AttributeError, KeyError):
                 return None
 
         def _remove_prefetched_objects(self):
@@ -1147,27 +1147,33 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             db = router.db_for_read(self.through, instance=self.instance)
             if not connections[db].features.supports_foreign_keys:
                 return None
-            hints = {'instance': self.instance}
+            hints = {"instance": self.instance}
             manager = self.through._base_manager.db_manager(db, hints=hints)
             filters = {self.source_field_name: self.instance.pk}
             # Nullable target rows must be excluded as well as they would have
             # been filtered out from an INNER JOIN.
             if self.target_field.null:
-                filters['%s__isnull' % self.target_field_name] = False
+                filters["%s__isnull" % self.target_field_name] = False
             return manager.filter(**filters)
 
         def exists(self):
             constrained_target = self.constrained_target
-            if constrained_target is not None and superclass is Manager and (
-                    self.get_prefetch_cache() is None):
+            if (
+                constrained_target is not None
+                and superclass is Manager
+                and (self.get_prefetch_cache() is None)
+            ):
                 return constrained_target.exists()
             else:
                 return super().exists()
 
         def count(self):
             constrained_target = self.constrained_target
-            if constrained_target is not None and superclass is Manager and (
-                    self.get_prefetch_cache() is None):
+            if (
+                constrained_target is not None
+                and superclass is Manager
+                and (self.get_prefetch_cache() is None)
+            ):
                 return constrained_target.count()
             else:
                 return super().count()
