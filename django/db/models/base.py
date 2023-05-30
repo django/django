@@ -900,10 +900,12 @@ class Model(AltersData, metaclass=ModelBase):
 
     save_base.alters_data = True
 
-    def _save_parents(self, cls, using, update_fields):
+    def _save_parents(self, cls, using, update_fields, updated_parents=None):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
         inserted = False
+        if updated_parents is None:
+            updated_parents = {}
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (
@@ -912,16 +914,23 @@ class Model(AltersData, metaclass=ModelBase):
                 and getattr(self, field.attname) is not None
             ):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            parent_inserted = self._save_parents(
-                cls=parent, using=using, update_fields=update_fields
-            )
-            updated = self._save_table(
-                cls=parent,
-                using=using,
-                update_fields=update_fields,
-                force_insert=parent_inserted,
-            )
-            if not updated:
+            if (parent_updated := updated_parents.get(parent)) is None:
+                parent_inserted = self._save_parents(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    updated_parents=updated_parents,
+                )
+                updated = self._save_table(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    force_insert=parent_inserted,
+                )
+                if not updated:
+                    inserted = True
+                updated_parents[parent] = updated
+            elif not parent_updated:
                 inserted = True
             # Set the parent's PK value to self.
             if field:
