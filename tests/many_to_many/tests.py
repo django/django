@@ -628,9 +628,7 @@ class ManyToManyQueryTests(TestCase):
 
     def test_exists_join_optimization_disabled(self):
         with mock.patch.object(
-            connection.features,
-            "supports_foreign_keys",
-            False
+            connection.features, "supports_foreign_keys", False
         ), CaptureQueriesContext(connection) as query:
             self.article.publications.exists()
             self.custom_article.publications.exists()
