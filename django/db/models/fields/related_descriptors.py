@@ -1073,6 +1073,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             queryset._defer_next_filter = True
             return queryset._next_is_sticky().filter(**self.core_filters)
 
+        def get_prefetch_cache(self):
+            try:
+                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
+            except:
+                return None
+
         def _remove_prefetched_objects(self):
             try:
                 self.instance._prefetched_objects_cache.pop(self.prefetch_cache_name)
@@ -1080,11 +1086,12 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
                 pass  # nothing to clear from cache
 
         def get_queryset(self):
-            try:
-                return self.instance._prefetched_objects_cache[self.prefetch_cache_name]
-            except (AttributeError, KeyError):
+            cache = self.get_prefetch_cache()
+            if cache is None:
                 queryset = super().get_queryset()
                 return self._apply_rel_filters(queryset)
+            else:
+                return cache
 
         def get_prefetch_queryset(self, instances, queryset=None):
             if queryset is None:
@@ -1152,7 +1159,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def exists(self):
             constrained_target = self.constrained_target
             if constrained_target is not None and superclass is Manager and (
-                self.prefetch_cache_name is not None):
+                    self.get_prefetch_cache() is None):
                 return constrained_target.exists()
             else:
                 return super().exists()
@@ -1160,7 +1167,7 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
         def count(self):
             constrained_target = self.constrained_target
             if constrained_target is not None and superclass is Manager and (
-                self.prefetch_cache_name is not None):
+                    self.get_prefetch_cache() is None):
                 return constrained_target.count()
             else:
                 return super().count()

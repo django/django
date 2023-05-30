@@ -91,6 +91,7 @@ class NullablePublicationThrough(models.Model):
     article = models.ForeignKey(NullableTargetArticle, models.CASCADE)
     publication = models.ForeignKey(Publication, models.CASCADE, null=True)
 
+
 # Manager and models to test if custom managers disable the SQL Optimization in #29725
 class CustomManager(models.Manager):
     pass
