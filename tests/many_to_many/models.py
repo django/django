@@ -82,7 +82,7 @@ class InheritedArticleB(AbstractArticle):
 class NullableTargetArticle(models.Model):
     headline = models.CharField(max_length=100)
     publications = models.ManyToManyField(
-        Publication, through='NullablePublicationThrough'
+        Publication, through="NullablePublicationThrough"
     )
 
 
