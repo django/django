@@ -249,6 +249,9 @@ class ReverseSelectRelatedTestCase(TestCase):
             self.assertEqual(p.child1.name2, "n2")
         p = qs.get(name2="n2")
         with self.assertNumQueries(0):
+            self.assertEqual(p.child1.value, 1)
+            self.assertEqual(p.child1.child4.value4, 4)
+        with self.assertNumQueries(2):
             self.assertEqual(p.child1.name1, "n1")
             self.assertEqual(p.child1.child4.name1, "n1")
 
