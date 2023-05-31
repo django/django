@@ -20,6 +20,9 @@ Bugfixes
   when passing a ``ManyToManyField`` or ``GenericForeignKey`` reference. While
   doing so is a no-op, it was allowed in older version (:ticket:`34570`).
 
+* Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.only()``
+  when passing a reverse ``OneToOneField`` reference (:ticket:`34612`).
+
 * Fixed a bug in Django 4.2 where :option:`makemigrations --update` didn't
   respect the ``--name`` option (:ticket:`34568`).
 

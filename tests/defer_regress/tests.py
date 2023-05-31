@@ -178,6 +178,16 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(i.one_to_one_item.name, "second")
         with self.assertNumQueries(1):
             self.assertEqual(i.value, 42)
+        with self.assertNumQueries(1):
+            i = Item.objects.select_related("one_to_one_item").only(
+                "name", "one_to_one_item__item"
+            )[0]
+            self.assertEqual(i.one_to_one_item.pk, o2o.pk)
+            self.assertEqual(i.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.one_to_one_item.name, "second")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.value, 42)
 
     def test_defer_with_select_related(self):
         item1 = Item.objects.create(name="first", value=47)
