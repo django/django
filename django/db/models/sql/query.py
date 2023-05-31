@@ -2000,7 +2000,12 @@ class Query(BaseExpression):
             filter_rhs = OuterRef(filter_rhs)
         elif isinstance(filter_rhs, F):
             filter_rhs = OuterRef(filter_rhs.name)
-        query.add_filter(filter_lhs, filter_rhs)
+        negate = False
+        if filter_rhs is None:
+            negate = True
+            query.add_filter(f"{filter_lhs}__isnull", False)
+        else:
+            query.add_filter(filter_lhs, filter_rhs)
         query.clear_ordering(force=True)
         # Try to have as simple as possible subquery -> trim leading joins from
         # the subquery.
@@ -2025,7 +2030,10 @@ class Query(BaseExpression):
             lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
             query.where.add(lookup, AND)
 
-        condition, needed_inner = self.build_filter(Exists(query))
+        exists = Exists(query)
+        if negate:
+            exists = ~Q(exists)
+        condition, needed_inner = self.build_filter(exists)
 
         if contains_louter:
             or_null_condition, _ = self.build_filter(
