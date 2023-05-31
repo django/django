@@ -264,3 +264,10 @@ class TestFirstLast(TestCase):
             qs.first()
         with self.assertRaisesMessage(TypeError, msg % "last"):
             qs.last()
+
+    def test_reset_order_is_ordered(self):
+        """
+        The order_by method must make the queryset ordered.
+        """
+        qs = Person.objects.order_by()
+        self.assertTrue(qs.ordered)

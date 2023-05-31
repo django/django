@@ -2711,6 +2711,12 @@ equivalent to the above example::
     except IndexError:
         p = None
 
+To remove default ordering, call ``order_by()`` without args. Be careful, this
+result ordering depends on how the database return when ordering is not defined.
+
+    p = Article.objects.order_by().first()
+
+
 ``last()``
 ~~~~~~~~~~
 

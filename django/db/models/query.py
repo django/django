@@ -1766,6 +1766,8 @@ class QuerySet(AltersData):
             return True
         if self.query.extra_order_by or self.query.order_by:
             return True
+        elif not self.query.default_ordering:
+            return True
         elif (
             self.query.default_ordering
             and self.query.get_meta().ordering
