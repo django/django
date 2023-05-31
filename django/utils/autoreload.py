@@ -8,11 +8,15 @@ import threading
 import time
 import traceback
 import weakref
+import fnmatch
 from collections import defaultdict
 from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
+from pathlib import Path
+from typing import Callable, Generator, List, Set, Union
+from django.utils.autoreload import BaseReloader, common_roots, sys_path_directories
 
 import django
 from django.apps import apps
@@ -44,6 +48,12 @@ try:
     import pywatchman
 except ImportError:
     pywatchman = None
+
+
+try:
+    import watchfiles
+except ImportError:
+    watchfiles = None
 
 
 def is_django_module(module):
@@ -636,6 +646,84 @@ class WatchmanReloader(BaseReloader):
         if version < (4, 9):
             raise WatchmanUnavailable("Watchman 4.9 or later is required.")
 
+class MutableWatcher:
+    """
+    Watchfiles doesn't give us a way to adjust watches at runtime, but it does give us a way to stop the watcher
+    when a condition is set.
+    This class wraps this to provide a single iterator that may replace the underlying watchfiles iterator when
+    roots are added or removed.
+    """
+
+    def __init__(self, filter_func: Callable[[watchfiles.Change, str], bool]):
+        self.change_event = threading.Event()
+        self.stop_event = threading.Event()
+        self.roots: Set[str] = set()
+        self.filter_func = filter_func
+
+    def set_roots(self, roots: Set[str]):
+        if roots != self.roots:
+            self.roots = roots
+            self.change_event.set()
+
+    def stop(self):
+        self.stop_event.set()
+
+    def __iter__(self) -> Generator[List[watchfiles.Change], None, None]:
+        while True:
+            self.change_event.clear()
+            for changes in watchfiles.watch(*self.roots, watch_filter=self.filter_func,
+                                            stop_event=self.stop_event, debounce=0,
+                                            rust_timeout=100, yield_on_timeout=True):
+                if self.change_event.is_set():
+                    break
+                yield changes
+
+
+class WatchfilesReloader(BaseReloader):
+    def __init__(self):
+        self.watcher = MutableWatcher(self.file_filter)
+        self.processed_request = threading.Event()
+        super().__init__()
+
+    def file_filter(self, change: watchfiles.Change, path: str) -> bool:
+        path = Path(path)
+        if path in set(self.watched_files(include_globs=False)):
+            return True
+        for directory, globs in self.directory_globs.items():
+            if path.is_relative_to(directory):
+                for glob in globs:
+                    if fnmatch.fnmatch(path.relative_to(directory), glob):
+                        return True
+        return False
+
+    def watched_roots(self, watched_files: List[Path]) -> Set[Path]:
+        extra_directories = self.directory_globs.keys()
+        watched_file_dirs = {f.parent for f in watched_files}
+        sys_paths = set(sys_path_directories())
+        return {*extra_directories, *watched_file_dirs, *sys_paths}
+
+    def request_processed(self, **kwargs):
+        logger.debug("Request processed. Setting update_watches event.")
+        self.processed_request.set()
+
+    def update_watches(self):
+        watched_files = list(self.watched_files(include_globs=False))
+        roots = common_roots(self.watched_roots(watched_files))
+        self.watcher.set_roots(roots)
+
+    def tick(self) -> Generator[None, None, None]:
+        request_finished.connect(self.request_processed)
+        self.update_watches()
+
+        for changes in self.watcher:
+            if self.processed_request.is_set():
+                self.update_watches()
+                self.processed_request.clear()
+
+            for _, path in changes:
+                logger.debug(f"File changed: {path}")
+                self.notify_file_changed(Path(path))
+            yield
 
 def get_reloader():
     """Return the most suitable reloader for this environment."""
