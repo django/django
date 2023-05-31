@@ -2035,11 +2035,10 @@ class Query(BaseExpression):
             )
             condition.add(or_null_condition, OR)
             # Note that the end result will be:
-            # (outercol NOT IN innerq AND outercol IS NOT NULL) OR outercol IS NULL.
-            # This might look crazy but due to how IN works, this seems to be
-            # correct. If the IS NOT NULL check is removed then outercol NOT
-            # IN will return UNKNOWN. If the IS NULL check is removed, then if
-            # outercol IS NULL we will not match the row.
+            #   NOT EXISTS (inner_q) OR outercol IS NULL
+            # this might look crazy but due to how NULL works, this seems to be
+            # correct. If the IS NULL check is removed, then if outercol
+            # IS NULL we will not match the row.
         return condition, needed_inner
 
     def set_empty(self):
