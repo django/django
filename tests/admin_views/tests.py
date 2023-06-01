@@ -3714,7 +3714,6 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             change_message="Deleted something",
         )
 
-
     def setUp(self):
         self.client.force_login(self.superuser)
 
