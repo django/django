@@ -1553,6 +1553,28 @@ class FormsFormsetTestCase(SimpleTestCase):
         self.assertEqual(formset.non_form_errors().renderer, renderer)
         self.assertEqual(formset.empty_form.renderer, renderer)
 
+    def test_form_default_renderer(self):
+        """
+        In the absense of a renderer passed to formset_factory, the default_renderer
+        attribute of the Form class should be respected.
+        """
+        from django.forms.renderers import Jinja2
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = Jinja2
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer, renderer=None)
+        formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
+        self.assertIsInstance(
+            formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
+        )
+
     def test_repr(self):
         valid_formset = self.make_choiceformset([("test", 1)])
         valid_formset.full_clean()
