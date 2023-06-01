@@ -275,6 +275,48 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
     <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
+When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
+returns a value, we associate ``help_text`` with the input using the
+``aria-describedby`` HTML attribute:
+
+.. code-block:: pycon
+
+    >>> from django import forms
+    >>> class UserForm(forms.Form):
+    ...     username = forms.CharField(max_length=255, help_text="e.g., user@example.com")
+    ...
+    >>> f = UserForm()
+    >>> print(f)
+    <div>
+    <label for="id_username">Username:</label>
+    <div class="helptext" id="id_username_helptext">e.g., user@example.com</div>
+    <input type="text" name="username" maxlength="255" required aria-describedby="id_username_helptext" id="id_username">
+    </div>
+
+When adding a custom ``aria-describedby`` attribute, make sure to also include
+the ``id`` of the ``help_text`` element (if used) in the desired order. For
+screen reader users, descriptions will be read in their order of appearance
+inside ``aria-describedby``:
+
+.. code-block:: pycon
+
+    >>> class UserForm(forms.Form):
+    ...     username = forms.CharField(
+    ...         max_length=255,
+    ...         help_text="e.g., user@example.com",
+    ...         widget=forms.TextInput(
+    ...             attrs={"aria-describedby": "custom-description id_username_helptext"},
+    ...         ),
+    ...     )
+    ...
+    >>> f = UserForm()
+    >>> print(f["username"])
+    <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="255" id="id_username" required>
+
+.. versionchanged:: 5.0
+
+    ``aria-describedby`` was added to associate ``help_text`` with its input.
+
 ``error_messages``
 ------------------
 

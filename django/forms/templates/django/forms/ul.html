@@ -12,7 +12,7 @@
     {% if field.label %}{{ field.label_tag }}{% endif %}
     {{ field }}
     {% if field.help_text %}
-      <span class="helptext">{{ field.help_text|safe }}</span>
+      <span class="helptext"{% if field.id_for_label %} id="{{ field.id_for_label}}_helptext"{% endif %}>{{ field.help_text|safe }}</span>
     {% endif %}
     {% if forloop.last %}
       {% for field in hidden_fields %}{{ field }}{% endfor %}

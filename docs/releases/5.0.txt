@@ -61,7 +61,9 @@ For example, the template below:
     <div>
       {{ form.name.label_tag }}
       {% if form.name.help_text %}
-        <div class="helptext">{{ form.name.help_text|safe }}</div>
+        <div class="helptext" id="{{ form.name.id_for_label }}_helptext">
+          {{ form.name.help_text|safe }}
+        </div>
       {% endif %}
       {{ form.name.errors }}
       {{ form.name }}
@@ -69,7 +71,9 @@ For example, the template below:
         <div class="col">
           {{ form.email.label_tag }}
           {% if form.email.help_text %}
-            <div class="helptext">{{ form.email.help_text|safe }}</div>
+            <div class="helptext" id="{{ form.email.id_for_label }}_helptext">
+              {{ form.email.help_text|safe }}
+            </div>
           {% endif %}
           {{ form.email.errors }}
           {{ form.email }}
@@ -77,7 +81,9 @@ For example, the template below:
         <div class="col">
           {{ form.password.label_tag }}
           {% if form.password.help_text %}
-            <div class="helptext">{{ form.password.help_text|safe }}</div>
+            <div class="helptext" id="{{ form.password.id_for_label }}_helptext">
+              {{ form.password.help_text|safe }}
+            </div>
           {% endif %}
           {{ form.password.errors }}
           {{ form.password }}
@@ -293,6 +299,10 @@ Forms
 
 * The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
   specifying a default URL scheme.
+
+* In order to improve accessibility and enable screen readers to associate form
+  fields with their help text, the form field now includes the
+  ``aria-describedby`` HTML attribute.
 
 Generic Views
 ~~~~~~~~~~~~~

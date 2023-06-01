@@ -723,7 +723,9 @@ loop:
             {{ field.errors }}
             {{ field.label_tag }} {{ field }}
             {% if field.help_text %}
-            <p class="help">{{ field.help_text|safe }}</p>
+              <p class="help" id="{{ field.id_for_label }}_helptext">
+                {{ field.help_text|safe }}
+              </p>
             {% endif %}
         </div>
     {% endfor %}
