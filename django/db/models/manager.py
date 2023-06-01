@@ -100,7 +100,7 @@ class BaseManager:
         new_methods = {}
         for name, method in inspect.getmembers(
             queryset_class,
-            predicate=lambda obj: isinstance(obj, (property, types.FunctionType))
+            predicate=lambda obj: isinstance(obj, (property, types.FunctionType)),
         ):
             # Only copy missing methods.
             if hasattr(cls, name):
