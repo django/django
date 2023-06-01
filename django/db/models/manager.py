@@ -1,5 +1,6 @@
 import copy
 import inspect
+import types
 from functools import wraps
 from importlib import import_module
 
@@ -88,9 +89,18 @@ class BaseManager:
 
             return manager_method
 
+        def create_property(name, _property):
+            @property
+            @wraps(_property)
+            def manager_property(self):
+                return getattr(self.get_queryset(), name)
+
+            return manager_property
+
         new_methods = {}
         for name, method in inspect.getmembers(
-            queryset_class, predicate=inspect.isfunction
+            queryset_class,
+            predicate=lambda obj: isinstance(obj, (property, types.FunctionType))
         ):
             # Only copy missing methods.
             if hasattr(cls, name):
@@ -100,8 +110,11 @@ class BaseManager:
             queryset_only = getattr(method, "queryset_only", None)
             if queryset_only or (queryset_only is None and name.startswith("_")):
                 continue
-            # Copy the method onto the manager.
-            new_methods[name] = create_method(name, method)
+            # Copy the method or property onto the manager.
+            if isinstance(method, property):
+                new_methods[name] = create_property(name, method)
+            else:
+                new_methods[name] = create_method(name, method)
         return new_methods
 
     @classmethod
