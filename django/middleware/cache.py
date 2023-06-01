@@ -1,5 +1,7 @@
 """
-Cache middleware. If enabled, each Django-powered page will be cached based on
+Cache middleware.
+
+If enabled, each Django-powered page will be cached based on
 URL. The canonical way to enable cache middleware is to set
 ``UpdateCacheMiddleware`` as your first piece of middleware, and
 ``FetchFromCacheMiddleware`` as the last::
@@ -113,7 +115,10 @@ class UpdateCacheMiddleware(MiddlewareMixin):
             elif timeout == 0:
                 # max-age was set to 0, don't cache.
                 return response
+
         patch_response_headers(response, timeout)
+
+        # Set the cache key.
         if timeout and response.status_code == 200:
             cache_key = learn_cache_key(
                 request, response, timeout, self.key_prefix, cache=self.cache

@@ -29,6 +29,8 @@ from django.utils.translation import get_language
 
 cc_delim_re = _lazy_re_compile(r"\s*,\s*")
 
+PATH_PREFIX = "views.decorators.cache"
+
 
 def patch_cache_control(response, **kwargs):
     """
@@ -335,7 +337,9 @@ def has_vary_header(response, header_query):
 
 
 def _i18n_cache_key_suffix(request, cache_key):
-    """If necessary, add the current locale or time zone to the cache key."""
+    """
+    If necessary, add the current locale or time zone to the cache key.
+    """
     if settings.USE_I18N:
         # first check if LocaleMiddleware or another middleware added
         # LANGUAGE_CODE to request, then fall back to the active language
@@ -347,48 +351,59 @@ def _i18n_cache_key_suffix(request, cache_key):
 
 
 def _generate_cache_key(request, method, headerlist, key_prefix):
-    """Return a cache key from the headers given in the header list."""
+    """
+    Generate and return a cache key.
+
+    This method works with or without "headerlist" being present. The
+    "headerlist" will be an empty list if the response doesn't have
+    "Vary" headers.
+    """
+    cache_type = "cache_page"
+
     ctx = md5(usedforsecurity=False)
     for header in headerlist:
         value = request.META.get(header)
         if value is not None:
             ctx.update(value.encode())
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
-    cache_key = "views.decorators.cache.cache_page.%s.%s.%s.%s" % (
-        key_prefix,
-        method,
-        url.hexdigest(),
-        ctx.hexdigest(),
-    )
+
+    url_hex = url.hexdigest()
+    ctx_hex = ctx.hexdigest()
+    cache_key = f"{PATH_PREFIX}.{cache_type}.{key_prefix}.{method}.{url_hex}.{ctx_hex}"
+
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def _generate_cache_header_key(key_prefix, request):
-    """Return a cache key for the header cache."""
+    """
+    Generate and return a cache key for the header cache.
+    """
+    cache_type = "cache_header"
+
     url = md5(request.build_absolute_uri().encode("ascii"), usedforsecurity=False)
-    cache_key = "views.decorators.cache.cache_header.%s.%s" % (
-        key_prefix,
-        url.hexdigest(),
-    )
+    url_hex = url.hexdigest()
+    cache_key = f"{PATH_PREFIX}.{cache_type}.{key_prefix}.{url_hex}"
+
     return _i18n_cache_key_suffix(request, cache_key)
 
 
 def get_cache_key(request, key_prefix=None, method="GET", cache=None):
     """
-    Return a cache key based on the request URL and query. It can be used
-    in the request phase because it pulls the list of headers to take into
-    account from the global URL registry and uses those to build a cache key
-    to check against.
+    Return a cache key based on the request URL and query.
 
-    If there isn't a headerlist stored, return None, indicating that the page
-    needs to be rebuilt.
+    It can be used in the request phase because it pulls the list of
+    headers to take into account from the global URL registry and uses
+    those to build a cache key to check against.
+
+    If there isn't a headerlist stored, return None, indicating that the
+    page needs to be rebuilt.
     """
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
-    cache_key = _generate_cache_header_key(key_prefix, request)
+    cache_header_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
-    headerlist = cache.get(cache_key)
+    headerlist = cache.get(cache_header_key)
     if headerlist is not None:
         return _generate_cache_key(request, method, headerlist, key_prefix)
     else:
@@ -408,32 +423,34 @@ def learn_cache_key(request, response, cache_timeout=None, key_prefix=None, cach
     cache, this just means that we have to build the response once to get at
     the Vary header and so at the list of headers to use for the cache key.
     """
+
     if key_prefix is None:
         key_prefix = settings.CACHE_MIDDLEWARE_KEY_PREFIX
     if cache_timeout is None:
         cache_timeout = settings.CACHE_MIDDLEWARE_SECONDS
-    cache_key = _generate_cache_header_key(key_prefix, request)
+
+    # Generate the cache header key.
+    cache_header_key = _generate_cache_header_key(key_prefix, request)
     if cache is None:
         cache = caches[settings.CACHE_MIDDLEWARE_ALIAS]
+
+    # Handle the "Vary" header.
+    headerlist = []
     if response.has_header("Vary"):
         is_accept_language_redundant = settings.USE_I18N
         # If i18n is used, the generated cache key will be suffixed with the
         # current locale. Adding the raw value of Accept-Language is redundant
         # in that case and would result in storing the same content under
         # multiple keys in the cache. See #18191 for details.
-        headerlist = []
         for header in cc_delim_re.split(response.headers["Vary"]):
             header = header.upper().replace("-", "_")
             if header != "ACCEPT_LANGUAGE" or not is_accept_language_redundant:
                 headerlist.append("HTTP_" + header)
         headerlist.sort()
-        cache.set(cache_key, headerlist, cache_timeout)
-        return _generate_cache_key(request, request.method, headerlist, key_prefix)
-    else:
-        # if there is no Vary header, we still need a cache key
-        # for the request.build_absolute_uri()
-        cache.set(cache_key, [], cache_timeout)
-        return _generate_cache_key(request, request.method, [], key_prefix)
+
+    # Finally, generate and return the cache key.
+    cache.set(cache_header_key, headerlist, cache_timeout)
+    return _generate_cache_key(request, request.method, headerlist, key_prefix)
 
 
 def _to_tuple(s):
