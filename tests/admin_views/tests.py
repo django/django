@@ -3697,6 +3697,23 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             2,
             change_message="Changed something",
         )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            1,
+            change_message="Added something",
+        )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            3,
+            change_message="Deleted something",
+        )
+
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -3753,6 +3770,21 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             "admin:admin_views_modelwithstringprimarykey_change", args=(quote(self.pk),)
         )
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
+        self.assertContains(response, should_contain)
+
+    def test_recentactions_changed(self):
+        response = self.client.get(reverse("admin:index"))
+        should_contain = '<span class="visually-hidden">Changed:'
+        self.assertContains(response, should_contain)
+
+    def test_recentactions_delete(self):
+        response = self.client.get(reverse("admin:index"))
+        should_contain = '<span class="visually-hidden">Deleted:'
+        self.assertContains(response, should_contain)
+
+    def test_recentactions_added(self):
+        response = self.client.get(reverse("admin:index"))
+        should_contain = '<span class="visually-hidden">Added:'
         self.assertContains(response, should_contain)
 
     def test_deleteconfirmation_link(self):
