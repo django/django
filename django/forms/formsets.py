@@ -566,7 +566,7 @@ def formset_factory(
         "absolute_max": absolute_max,
         "validate_min": validate_min,
         "validate_max": validate_max,
-        "renderer": renderer or get_default_renderer(),
+        "renderer": renderer or form.default_renderer or get_default_renderer()
     }
     return type(form.__name__ + "FormSet", (formset,), attrs)
 
