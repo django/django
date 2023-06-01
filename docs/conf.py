@@ -40,8 +40,8 @@ extensions = [
     "djangodocs",
     "sphinx.ext.extlinks",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx.ext.linkcode",
 ]
 
 # AutosectionLabel settings.
