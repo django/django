@@ -3,9 +3,11 @@ import decimal
 import functools
 import logging
 import time
+import warnings
 from contextlib import contextmanager
 from hashlib import md5
 
+from django.apps import apps
 from django.db import NotSupportedError
 from django.utils.dateparse import parse_time
 
@@ -18,6 +20,12 @@ class CursorWrapper:
         self.db = db
 
     WRAP_ERROR_ATTRS = frozenset(["fetchone", "fetchmany", "fetchall", "nextset"])
+
+    APPS_NOT_READY_WARNING_MSG = (
+        "Accessing the database during app initialization is discouraged. To fix this "
+        "warning, avoid executing queries in AppConfig.ready() or when your app "
+        "modules are imported."
+    )
 
     def __getattr__(self, attr):
         cursor_attr = getattr(self.cursor, attr)
@@ -53,6 +61,8 @@ class CursorWrapper:
                 "Keyword parameters for callproc are not supported on this "
                 "database backend."
             )
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None and kparams is None:
@@ -80,6 +90,8 @@ class CursorWrapper:
         return executor(sql, params, many, context)
 
     def _execute(self, sql, params, *ignored_wrapper_args):
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             if params is None:
@@ -89,6 +101,8 @@ class CursorWrapper:
                 return self.cursor.execute(sql, params)
 
     def _executemany(self, sql, param_list, *ignored_wrapper_args):
+        if not apps.ready:
+            warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
             return self.cursor.executemany(sql, param_list)
