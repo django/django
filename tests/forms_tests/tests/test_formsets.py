@@ -1561,7 +1561,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         from django.forms.renderers import Jinja2
 
         class ChoiceWithDefaultRenderer(Choice):
-            default_renderer = Jinja2
+            default_renderer = Jinja2()
 
         data = {
             "choices-TOTAL_FORMS": "1",
@@ -1571,7 +1571,7 @@ class FormsFormsetTestCase(SimpleTestCase):
 
         ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer, renderer=None)
         formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
-        self.assertIsInstance(
+        self.assertEqual(
             formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
         )
 
