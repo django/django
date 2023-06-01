@@ -9,6 +9,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+import functools
 import sys
 from os.path import abspath, dirname, join
 
@@ -28,6 +29,10 @@ sys.path.insert(1, dirname(dirname(abspath(__file__))))
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 sys.path.append(abspath(join(dirname(__file__), "_ext")))
+
+# Use the module to GitHub url resolver, but import it after the _ext directoy
+# it lives in has been added to sys.path.
+import github_links  # NOQA
 
 # -- General configuration -----------------------------------------------------
 
@@ -432,3 +437,9 @@ epub_cover = ("", "epub-cover.html")
 
 # If false, no index is generated.
 # epub_use_index = True
+
+linkcode_resolve = functools.partial(
+    github_links.github_linkcode_resolve,
+    version=version,
+    next_version=django_next_version,
+)
