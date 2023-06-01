@@ -9,10 +9,12 @@ from django.db import models
 from django.forms.formsets import formset_factory
 from django.forms.models import (
     BaseModelFormSet,
+    ModelForm,
     _get_foreign_key,
     inlineformset_factory,
     modelformset_factory,
 )
+from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -2365,3 +2367,44 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         BookFormSet = modelformset_factory(Author, fields="__all__", renderer=renderer)
         formset = BookFormSet()
         self.assertEqual(formset.renderer, renderer)
+
+    def test_modelformset_factory_default_renderer(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ModelFormWithDefaultRenderer(ModelForm):
+            default_renderer = CustomRenderer()
+
+        BookFormSet = modelformset_factory(
+            Author, form=ModelFormWithDefaultRenderer, fields="__all__"
+        )
+        formset = BookFormSet()
+        self.assertEqual(
+            formset.forms[0].renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertIsInstance(formset.renderer, DjangoTemplates)
+
+    def test_inlineformset_factory_default_renderer(self):
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ModelFormWithDefaultRenderer(ModelForm):
+            default_renderer = CustomRenderer()
+
+        BookFormSet = inlineformset_factory(
+            Author,
+            Book,
+            form=ModelFormWithDefaultRenderer,
+            fields="__all__",
+        )
+        formset = BookFormSet()
+        self.assertEqual(
+            formset.forms[0].renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertEqual(
+            formset.empty_form.renderer, ModelFormWithDefaultRenderer.default_renderer
+        )
+        self.assertIsInstance(formset.renderer, DjangoTemplates)
