@@ -577,6 +577,9 @@ Miscellaneous
 
 * Support for ``cx_Oracle`` < 8.3 is removed.
 
+* Executing SQL queries before the app registry has been fully populated now
+  raises :exc:`RuntimeWarning`.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
