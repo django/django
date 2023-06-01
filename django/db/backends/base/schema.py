@@ -864,7 +864,8 @@ class BaseDatabaseSchemaEditor:
         # Drop any FK constraints, we'll remake them later
         fks_dropped = set()
         if (
-            self.connection.features.supports_foreign_keys
+            self._fk_constraints_should_be_recreated()
+            and self.connection.features.supports_foreign_keys
             and old_field.remote_field
             and old_field.db_constraint
             and self._field_should_be_altered(
@@ -1533,6 +1534,9 @@ class BaseDatabaseSchemaEditor:
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
+
+    def _fk_constraints_should_be_recreated(self):
+        return self.connection.vendor == "mysql"
 
     def _field_should_be_indexed(self, model, field):
         return field.db_index and not field.unique

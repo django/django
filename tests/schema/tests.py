@@ -1676,6 +1676,71 @@ class SchemaTests(TransactionTestCase):
             {"fks": expected_fks, "uniques": 0, "indexes": expected_indexes},
         )
 
+    @unittest.skipIf(connection.vendor == "mysql", "All but MySQL")
+    def test_remove_unnecessary_fk_constraint_drop(self):
+        """
+        #34417 - Tests for recreation of foreign key constrains while dropping index.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        author = Author.objects.create(
+            name='Alice'
+        )
+        Book.objects.create(
+            author=author,
+            title="Much Ado About Foreign Keys",
+            pub_date=datetime.datetime.now(),
+        )
+
+        old_field = Book._meta.get_field("author")
+        # dropping index on foreign key field
+        new_field = ForeignKey(Author, CASCADE, db_index=False)
+        new_field.set_attributes_from_name("author")
+        with self.assertLogs("django.db.backends.schema", "DEBUG") as cm:
+            with connection.schema_editor() as editor:
+                editor.alter_field(Book, old_field, new_field, strict=True)
+
+        # make sure foreign key constrains are not touched
+        self.assertFalse(
+            any('schema_book_author_id_c80c8297_fk_schema_author_id' in record.args[0] for record in cm.records), True
+        )
+
+    @unittest.skipUnless(connection.vendor == "mysql", "MySQL specific")
+    def test_if_fk_constraint_is_recreated(self):
+        """
+        #34417 - Tests for recreation of foreign key constrains while dropping index.
+        """
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+            editor.create_model(Book)
+
+        author = Author.objects.create(
+            name='Alice'
+        )
+        Book.objects.create(
+            author=author,
+            title="Much Ado About Foreign Keys",
+            pub_date=datetime.datetime.now(),
+        )
+
+        old_field = Book._meta.get_field("author")
+        # dropping index on foreign key field
+        new_field = ForeignKey(Author, CASCADE, db_index=False)
+        new_field.set_attributes_from_name("author")
+        with self.assertLogs("django.db.backends.schema", "DEBUG") as cm:
+            with connection.schema_editor() as editor:
+                editor.alter_field(Book, old_field, new_field, strict=True)
+
+        # Make sure the constraint is dropped and recreated
+        self.assertTrue(
+            any('DROP FOREIGN KEY' in record.args[0] for record in cm.records), False
+        )
+        self.assertTrue(
+            any('ADD CONSTRAINT' in record.args[0] for record in cm.records), False
+        )
+
     def test_alter_field_o2o_to_fk(self):
         with connection.schema_editor() as editor:
             editor.create_model(Author)
