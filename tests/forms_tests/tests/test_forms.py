@@ -4794,7 +4794,7 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><label for="id_username">Username:</label>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            "required></p>"
+            'aria-describedby="id_username_help_text" required></p>'
             '<p><label for="id_password1">Password1:</label>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><label for="id_password2">Password2:</label>'
@@ -4831,7 +4831,7 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><legend for="id_username">Username:</legend>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            "required></p>"
+            'aria-describedby="id_username_help_text" required></p>'
             '<p><legend for="id_password1">Password1:</legend>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><legend for="id_password2">Password2:</legend>'

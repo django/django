@@ -192,8 +192,9 @@ Django will then include the extra attributes in the rendered output:
     <div>Url:<input type="url" name="url" required></div>
     <div>Comment:<input type="text" name="comment" size="40" required></div>
 
-You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
-:attr:`BoundField.id_for_label` for an example.
+You can also set the HTML ``id`` and ``aria-describedby`` using
+:attr:`~Widget.attrs`. See :attr:`BoundField.id_for_label` and
+:attr:`~django.forms.Field.help_text` for examples.
 
 .. _styling-widget-classes:
 

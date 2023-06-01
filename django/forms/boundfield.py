@@ -287,6 +287,10 @@ class BoundField(RenderableFieldMixin):
                 attrs["required"] = True
         if self.field.disabled:
             attrs["disabled"] = True
+        if custom_aria_described_by_id := widget.attrs.get("aria-describedby"):
+            attrs["aria-describedby"] = custom_aria_described_by_id
+        elif self.field.help_text and self.id_for_label:
+            attrs["aria-describedby"] = f"{self.id_for_label}_help_text"
         return attrs
 
     @property

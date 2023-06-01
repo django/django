@@ -60,7 +60,6 @@ class VideoStreamForm(forms.ModelForm):
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AutocompleteMixinTests(TestCase):
     empty_option = '<option value=""></option>'
-    maxDiff = 1000
 
     def test_build_attrs(self):
         form = AlbumForm()
