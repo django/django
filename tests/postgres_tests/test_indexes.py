@@ -15,7 +15,7 @@ from django.db import NotSupportedError, connection
 from django.db.models import CharField, F, Index, Q
 from django.db.models.functions import Cast, Collate, Length, Lower
 from django.test import skipUnlessDBFeature
-from django.test.utils import modify_settings, register_lookup
+from django.test.utils import register_lookup
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .fields import SearchVector, SearchVectorField
@@ -235,7 +235,6 @@ class SpGistIndexTests(IndexTestMixin, PostgreSQLSimpleTestCase):
         )
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SchemaTests(PostgreSQLTestCase):
     get_opclass_query = """
         SELECT opcname, c.relname FROM pg_opclass AS oc
@@ -539,6 +538,21 @@ class SchemaTests(PostgreSQLTestCase):
         with connection.schema_editor() as editor:
             editor.remove_index(Scene, index)
         self.assertNotIn(index_name, self.get_constraints(table))
+
+    def test_search_vector(self):
+        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
+        index_name = "test_search_vector"
+        index = Index(SearchVector("id", "scene", config="english"), name=index_name)
+        # Indexed function must be IMMUTABLE.
+        with connection.schema_editor() as editor:
+            editor.add_index(Scene, index)
+        constraints = self.get_constraints(Scene._meta.db_table)
+        self.assertIn(index_name, constraints)
+        self.assertIs(constraints[index_name]["index"], True)
+
+        with connection.schema_editor() as editor:
+            editor.remove_index(Scene, index)
+        self.assertNotIn(index_name, self.get_constraints(Scene._meta.db_table))
 
     def test_hash_index(self):
         # Ensure the table is there and doesn't have an index.

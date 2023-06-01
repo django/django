@@ -1,9 +1,8 @@
 from unittest import mock
 
 from django.test import SimpleTestCase
-from django.test.utils import ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property, classproperty, lazy
+from django.utils.version import PY312
 
 
 class FunctionalTests(SimpleTestCase):
@@ -108,30 +107,6 @@ class FunctionalTests(SimpleTestCase):
         for attr in attrs:
             self.assertCachedPropertyWorks(attr, Class)
 
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_cached_property_name(self):
-        class Class:
-            def other_value(self):
-                """Here is the docstring..."""
-                return 1, object()
-
-            other = cached_property(other_value, name="other")
-            other2 = cached_property(other_value, name="different_name")
-
-        self.assertCachedPropertyWorks("other", Class)
-        # An explicit name is ignored.
-        obj = Class()
-        obj.other2
-        self.assertFalse(hasattr(obj, "different_name"))
-
-    def test_cached_property_name_deprecation_warning(self):
-        def value(self):
-            return 1
-
-        msg = "The name argument is deprecated as it's unnecessary as of Python 3.6."
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            cached_property(value, name="other_name")
-
     def test_cached_property_auto_name(self):
         """
         cached_property caches its value and behaves like a property
@@ -156,7 +131,18 @@ class FunctionalTests(SimpleTestCase):
 
     def test_cached_property_reuse_different_names(self):
         """Disallow this case because the decorated function wouldn't be cached."""
-        with self.assertRaises(RuntimeError) as ctx:
+        type_msg = (
+            "Cannot assign the same cached_property to two different names ('a' and "
+            "'b')."
+        )
+        if PY312:
+            error_type = TypeError
+            msg = type_msg
+        else:
+            error_type = RuntimeError
+            msg = "Error calling __set_name__"
+
+        with self.assertRaisesMessage(error_type, msg) as ctx:
 
             class ReusedCachedProperty:
                 @cached_property
@@ -165,15 +151,8 @@ class FunctionalTests(SimpleTestCase):
 
                 b = a
 
-        self.assertEqual(
-            str(ctx.exception.__context__),
-            str(
-                TypeError(
-                    "Cannot assign the same cached_property to two different "
-                    "names ('a' and 'b')."
-                )
-            ),
-        )
+        if not PY312:
+            self.assertEqual(str(ctx.exception.__context__), str(TypeError(type_msg)))
 
     def test_cached_property_reuse_same_name(self):
         """
@@ -258,6 +237,10 @@ class FunctionalTests(SimpleTestCase):
         msg = "Cannot call lazy() with both bytes and text return types."
         with self.assertRaisesMessage(ValueError, msg):
             lazy_obj()
+
+    def test_lazy_str_cast_mixed_result_types(self):
+        lazy_value = lazy(lambda: [1], str, list)()
+        self.assertEqual(str(lazy_value), "[1]")
 
     def test_classproperty_getter(self):
         class Foo:

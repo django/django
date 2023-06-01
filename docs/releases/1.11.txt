@@ -256,10 +256,11 @@ Database backends
 * Added the :setting:`TEST['TEMPLATE'] <TEST_TEMPLATE>` setting to let
   PostgreSQL users specify a template for creating the test database.
 
-* :meth:`.QuerySet.iterator()` now uses :ref:`server-side cursors
-  <psycopg2:server-side-cursors>` on PostgreSQL. This feature transfers some of
-  the worker memory load (used to hold query results) to the database and might
-  increase database memory usage.
+* :meth:`.QuerySet.iterator()` now uses `server-side cursors`_ on PostgreSQL.
+  This feature transfers some of the worker memory load (used to hold query
+  results) to the database and might increase database memory usage.
+
+  .. _server-side cursors: https://www.psycopg.org/docs/usage.html#server-side-cursors
 
 * Added MySQL support for the ``'isolation_level'`` option in
   :setting:`OPTIONS` to allow specifying the :ref:`transaction isolation level
@@ -578,8 +579,7 @@ It's automatically installed along with Django.
 
 Support for ``settings.TIME_ZONE = None`` is removed as the behavior isn't
 commonly used and is questionably useful. If you want to automatically detect
-the timezone based on the system timezone, you can use `tzlocal
-<https://pypi.org/project/tzlocal/>`_::
+the timezone based on the system timezone, you can use :pypi:`tzlocal`::
 
     from tzlocal import get_localzone
 
@@ -799,23 +799,25 @@ Use :func:`django.urls.reverse` instead. For example::
 
     from django.db import models
 
+
     class MyModel(models.Model):
         ...
 
         @models.permalink
         def url(self):
-            return ('guitarist_detail', [self.slug])
+            return ("guitarist_detail", [self.slug])
 
 becomes::
 
     from django.db import models
     from django.urls import reverse
 
+
     class MyModel(models.Model):
         ...
 
         def url(self):
-            return reverse('guitarist_detail', args=[self.slug])
+            return reverse("guitarist_detail", args=[self.slug])
 
 Miscellaneous
 -------------

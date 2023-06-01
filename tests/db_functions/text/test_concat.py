@@ -21,7 +21,7 @@ class ConcatTests(TestCase):
         Author.objects.create(name="Margaret", goes_by="Maggie")
         Author.objects.create(name="Rhonda", alias="adnohR")
         authors = Author.objects.annotate(joined=Concat("alias", "goes_by"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 "",
@@ -46,7 +46,7 @@ class ConcatTests(TestCase):
         authors = Author.objects.annotate(
             joined=Concat("name", V(" ("), "goes_by", V(")"), output_field=CharField()),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"),
             [
                 "Jayden ()",

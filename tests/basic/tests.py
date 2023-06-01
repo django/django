@@ -20,6 +20,7 @@ from .models import (
     ArticleSelectOnSave,
     ChildPrimaryKeyWithDefault,
     FeaturedArticle,
+    PrimaryKeyWithDbDefault,
     PrimaryKeyWithDefault,
     SelfRef,
 )
@@ -175,6 +176,11 @@ class ModelInstanceCreationTests(TestCase):
         with self.assertNumQueries(1):
             PrimaryKeyWithDefault().save()
 
+    def test_save_primary_with_db_default(self):
+        # An UPDATE attempt is skipped when a primary key has db_default.
+        with self.assertNumQueries(1):
+            PrimaryKeyWithDbDefault().save()
+
     def test_save_parent_primary_with_default(self):
         # An UPDATE attempt is skipped when an inherited primary key has
         # default.
@@ -199,7 +205,7 @@ class ModelTest(TestCase):
         some_pub_date = datetime(2014, 5, 16, 12, 1)
         for headline in headlines:
             Article(headline=headline, pub_date=some_pub_date).save()
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Article.objects.order_by("headline"),
             sorted(headlines),
             transform=lambda a: a.headline,
@@ -628,7 +634,6 @@ class ModelLookupTest(TestCase):
 
 
 class ConcurrentSaveTests(TransactionTestCase):
-
     available_apps = ["basic"]
 
     @skipUnlessDBFeature("test_db_allows_multiple_connections")
@@ -805,8 +810,9 @@ class SelectOnSaveTests(TestCase):
                 "An error occurred in the current transaction. You can't "
                 "execute queries until the end of the 'atomic' block."
             )
-            with self.assertRaisesMessage(DatabaseError, msg):
+            with self.assertRaisesMessage(DatabaseError, msg) as cm:
                 asos.save(update_fields=["pub_date"])
+            self.assertIsInstance(cm.exception.__cause__, DatabaseError)
         finally:
             Article._base_manager._queryset_class = orig_class
 

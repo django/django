@@ -59,7 +59,7 @@ class DeprecatedFieldsTests(SimpleTestCase):
                 checks.Error(
                     "NullBooleanField is removed except for support in historical "
                     "migrations.",
-                    hint="Use BooleanField(null=True) instead.",
+                    hint="Use BooleanField(null=True, blank=True) instead.",
                     obj=NullBooleanFieldModel._meta.get_field("nb"),
                     id="fields.E903",
                 ),

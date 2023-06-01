@@ -106,9 +106,9 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(3, 8))
+    @mock.patch.object(connection, "get_database_version", return_value=(3, 20))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "SQLite 3.9 or later is required (found 3.8)."
+        msg = "SQLite 3.21 or later is required (found 3.20)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
@@ -117,7 +117,6 @@ class Tests(TestCase):
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
 @isolate_apps("backends")
 class SchemaTests(TransactionTestCase):
-
     available_apps = ["backends"]
 
     def test_autoincrement(self):

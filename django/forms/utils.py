@@ -1,16 +1,13 @@
 import json
-import warnings
 from collections import UserList
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.forms.renderers import get_default_renderer
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.html import escape, format_html_join
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.utils.version import get_docs_version
 
 
 def pretty_name(name):
@@ -45,16 +42,6 @@ def flatatt(attrs):
     )
 
 
-DEFAULT_TEMPLATE_DEPRECATION_MSG = (
-    'The "default.html" templates for forms and formsets will be removed. These were '
-    'proxies to the equivalent "table.html" templates, but the new "div.html" '
-    "templates will be the default from Django 5.0. Transitional renderers are "
-    "provided to allow you to opt-in to the new output style now. See "
-    "https://docs.djangoproject.com/en/%s/releases/4.1/ for more details"
-    % get_docs_version()
-)
-
-
 class RenderableMixin:
     def get_context(self):
         raise NotImplementedError(
@@ -65,17 +52,33 @@ class RenderableMixin:
         renderer = renderer or self.renderer
         template = template_name or self.template_name
         context = context or self.get_context()
-        if (
-            template == "django/forms/default.html"
-            or template == "django/forms/formsets/default.html"
-        ):
-            warnings.warn(
-                DEFAULT_TEMPLATE_DEPRECATION_MSG, RemovedInDjango50Warning, stacklevel=2
-            )
         return mark_safe(renderer.render(template, context))
 
     __str__ = render
     __html__ = render
+
+
+class RenderableFieldMixin(RenderableMixin):
+    def as_field_group(self):
+        return self.render()
+
+    def as_hidden(self):
+        raise NotImplementedError(
+            "Subclasses of RenderableFieldMixin must provide an as_hidden() method."
+        )
+
+    def as_widget(self):
+        raise NotImplementedError(
+            "Subclasses of RenderableFieldMixin must provide an as_widget() method."
+        )
+
+    def __str__(self):
+        """Render this field as an HTML widget."""
+        if self.field.show_hidden_initial:
+            return self.as_widget() + self.as_hidden(only_initial=True)
+        return self.as_widget()
+
+    __html__ = __str__
 
 
 class RenderableFormMixin(RenderableMixin):
@@ -215,9 +218,7 @@ def from_current_timezone(value):
     if settings.USE_TZ and value is not None and timezone.is_naive(value):
         current_timezone = timezone.get_current_timezone()
         try:
-            if not timezone._is_pytz_zone(
-                current_timezone
-            ) and timezone._datetime_ambiguous_or_imaginary(value, current_timezone):
+            if timezone._datetime_ambiguous_or_imaginary(value, current_timezone):
                 raise ValueError("Ambiguous or non-existent time.")
             return timezone.make_aware(value, current_timezone)
         except Exception as exc:

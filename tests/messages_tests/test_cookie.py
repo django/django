@@ -1,5 +1,6 @@
 import json
 import random
+from unittest import TestCase
 
 from django.conf import settings
 from django.contrib.messages import constants
@@ -8,6 +9,8 @@ from django.contrib.messages.storage.cookie import (
     CookieStorage,
     MessageDecoder,
     MessageEncoder,
+    bisect_keep_left,
+    bisect_keep_right,
 )
 from django.test import SimpleTestCase, override_settings
 from django.utils.crypto import get_random_string
@@ -60,9 +63,9 @@ class CookieTests(BaseTests, SimpleTestCase):
 
     def encode_decode(self, *args, **kwargs):
         storage = self.get_storage()
-        message = Message(constants.DEBUG, *args, **kwargs)
+        message = [Message(constants.DEBUG, *args, **kwargs)]
         encoded = storage._encode(message)
-        return storage._decode(encoded)
+        return storage._decode(encoded)[0]
 
     def test_get(self):
         storage = self.storage_class(self.get_request())
@@ -73,7 +76,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(list(storage), example_messages)
 
     @override_settings(SESSION_COOKIE_SAMESITE="Strict")
-    def test_cookie_setings(self):
+    def test_cookie_settings(self):
         """
         CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
         SESSION_COOKIE_HTTPONLY (#15618, #20972).
@@ -204,3 +207,20 @@ class CookieTests(BaseTests, SimpleTestCase):
                     self.encode_decode("message", extra_tags=extra_tags).extra_tags,
                     extra_tags,
                 )
+
+
+class BisectTests(TestCase):
+    def test_bisect_keep_left(self):
+        self.assertEqual(bisect_keep_left([1, 1, 1], fn=lambda arr: sum(arr) != 2), 2)
+        self.assertEqual(bisect_keep_left([1, 1, 1], fn=lambda arr: sum(arr) != 0), 0)
+        self.assertEqual(bisect_keep_left([], fn=lambda arr: sum(arr) != 0), 0)
+
+    def test_bisect_keep_right(self):
+        self.assertEqual(bisect_keep_right([1, 1, 1], fn=lambda arr: sum(arr) != 2), 1)
+        self.assertEqual(
+            bisect_keep_right([1, 1, 1, 1], fn=lambda arr: sum(arr) != 2), 2
+        )
+        self.assertEqual(
+            bisect_keep_right([1, 1, 1, 1, 1], fn=lambda arr: sum(arr) != 1), 4
+        )
+        self.assertEqual(bisect_keep_right([], fn=lambda arr: sum(arr) != 0), 0)

@@ -8,6 +8,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # Oracle crashes with "ORA-00932: inconsistent datatypes: expected - got
     # BLOB" when grouping by LOBs (#24096).
     allows_group_by_lob = False
+    allows_group_by_select_index = False
     interprets_empty_strings_as_nulls = True
     has_select_for_update = True
     has_select_for_update_nowait = True
@@ -24,12 +25,14 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partially_nullable_unique_constraints = False
     supports_deferrable_unique_constraints = True
     truncates_names = True
+    supports_comments = True
     supports_tablespaces = True
     supports_sequence_reset = False
     can_introspect_materialized_views = True
     atomic_transactions = False
     nulls_order_largest = True
     requires_literal_defaults = True
+    supports_default_keyword_in_bulk_insert = False
     closed_cursor_error_class = InterfaceError
     bare_select_suffix = " FROM DUAL"
     # Select for update with limit can be achieved on Oracle, but not with the
@@ -69,6 +72,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_partial_indexes = False
     can_rename_index = True
     supports_slicing_ordering_in_compound = True
+    requires_compound_order_by_subquery = True
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
     supports_comparing_boolean_expr = False
@@ -117,6 +121,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "migrations.test_operations.OperationTests."
             "test_alter_field_pk_fk_db_collation",
         },
+        "Oracle doesn't support comparing NCLOB to NUMBER.": {
+            "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/cx_Oracle with respect to string handling (#23843).
@@ -124,6 +131,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "annotations.tests.NonAggregateAnnotationTestCase."
         "test_custom_functions_can_ref_other_functions",
     }
+    insert_test_table_with_defaults = (
+        "INSERT INTO {} VALUES (DEFAULT, DEFAULT, DEFAULT)"
+    )
 
     @cached_property
     def introspected_field_types(self):

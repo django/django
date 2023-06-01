@@ -326,6 +326,24 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
         ).get(name="Foo")
         self.assertEqual(rhr_rings, st.force_polygon_cw.coords)
 
+    @skipUnlessDBFeature("has_FromWKB_function")
+    def test_fromwkb(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKB(Value(g.wkb.tobytes())),
+            flat=True,
+        )[0]
+        self.assertIs(g.equals_exact(g2, 0.00001), True)
+
+    @skipUnlessDBFeature("has_FromWKT_function")
+    def test_fromwkt(self):
+        g = Point(56.811078, 60.608647)
+        g2 = City.objects.values_list(
+            functions.FromWKT(Value(g.wkt)),
+            flat=True,
+        )[0]
+        self.assertIs(g.equals_exact(g2, 0.00001), True)
+
     @skipUnlessDBFeature("has_GeoHash_function")
     def test_geohash(self):
         # Reference query:
@@ -370,6 +388,18 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 self.assertIsNone(c.inter)
             else:
                 self.assertIs(c.inter.empty, True)
+
+    @skipUnlessDBFeature("supports_empty_geometries", "has_IsEmpty_function")
+    def test_isempty(self):
+        empty = City.objects.create(name="Nowhere", point=Point(srid=4326))
+        City.objects.create(name="Somewhere", point=Point(6.825, 47.1, srid=4326))
+        self.assertSequenceEqual(
+            City.objects.annotate(isempty=functions.IsEmpty("point")).filter(
+                isempty=True
+            ),
+            [empty],
+        )
+        self.assertSequenceEqual(City.objects.filter(point__isempty=True), [empty])
 
     @skipUnlessDBFeature("has_IsValid_function")
     def test_isvalid(self):
@@ -425,6 +455,18 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             ValueError, "AreaField only accepts Area measurement objects."
         ):
             qs.get(area__lt=500000)
+
+    @skipUnlessDBFeature("has_ClosestPoint_function")
+    def test_closest_point(self):
+        qs = Country.objects.annotate(
+            closest_point=functions.ClosestPoint("mpoly", functions.Centroid("mpoly"))
+        )
+        for country in qs:
+            self.assertIsInstance(country.closest_point, Point)
+            self.assertEqual(
+                country.mpoly.intersection(country.closest_point),
+                country.closest_point,
+            )
 
     @skipUnlessDBFeature("has_LineLocatePoint_function")
     def test_line_locate_point(self):

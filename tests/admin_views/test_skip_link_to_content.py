@@ -96,27 +96,6 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.switch_to.active_element, django_administration_title
         )
 
-    def test_skip_link_is_skipped_when_there_is_searchbar(self):
-        from selenium.webdriver.common.by import By
-
-        self.admin_login(
-            username="super",
-            password="secret",
-            login_url=reverse("admin:index"),
-        )
-
-        group_a_tag = self.selenium.find_element(By.LINK_TEXT, "Groups")
-        with self.wait_page_loaded():
-            group_a_tag.click()
-
-        # `Skip link` is not present.
-        skip_link = self.selenium.find_element(By.CLASS_NAME, "skip-to-content-link")
-        self.assertFalse(skip_link.is_displayed())
-
-        # `Searchbar` has autofocus.
-        searchbar = self.selenium.find_element(By.ID, "searchbar")
-        self.assertEqual(self.selenium.switch_to.active_element, searchbar)
-
     def test_skip_link_with_RTL_language_doesnt_create_horizontal_scrolling(self):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys

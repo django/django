@@ -43,15 +43,15 @@ Mergers hold the following prerogatives:
   approved by:
 
   - another Merger,
-  - a technical board member,
+  - a steering council member,
   - a member of the `triage & review team`_, or
   - a member of the `security team`_.
 
 - Initiating discussion of a minor change in the appropriate venue, and request
   that other Mergers refrain from merging it while discussion proceeds.
-- Requesting a vote of the technical board regarding any minor change if, in
+- Requesting a vote of the steering council regarding any minor change if, in
   the Merger's opinion, discussion has failed to reach a consensus.
-- Requesting a vote of the technical board when a `major change`_ (significant
+- Requesting a vote of the steering council when a `major change`_ (significant
   enough to require the use of the `DEP process`_) reaches one of its
   implementation milestones and is intended to merge.
 
@@ -61,7 +61,7 @@ Mergers hold the following prerogatives:
 Membership
 ----------
 
-`The technical board`_ selects Mergers_ as necessary to maintain their number
+`The steering council`_ selects Mergers_ as necessary to maintain their number
 at a minimum of three, in order to spread the workload and avoid over-burdening
 or burning out any individual Merger. There is no upper limit to the number of
 Mergers.
@@ -72,33 +72,33 @@ to make the role of Merger sustainable.
 
 The following restrictions apply to the role of Merger:
 
-- A person must not simultaneously serve as a member of the technical board. If
-  a Merger is elected to the technical board, they shall cease to be a Merger
-  immediately upon taking up membership in the technical board.
+- A person must not simultaneously serve as a member of the steering council. If
+  a Merger is elected to the steering council, they shall cease to be a Merger
+  immediately upon taking up membership in the steering council.
 - A person may serve in the roles of Releaser and Merger simultaneously.
 
-The selection process, when a vacancy occurs or when the technical board deems
+The selection process, when a vacancy occurs or when the steering council deems
 it necessary to select additional persons for such a role, occur as follows:
 
 - Any member in good standing of an appropriate discussion venue, or the Django
   Software Foundation board acting with the input of the DSF's Fellowship
   committee, may suggest a person for consideration.
-- The technical board considers the suggestions put forth, and then any member
-  of the technical board formally nominates a candidate for the role.
-- The technical board votes on nominees.
+- The steering council considers the suggestions put forth, and then any member
+  of the steering council formally nominates a candidate for the role.
+- The steering council votes on nominees.
 
 Mergers may resign their role at any time, but should endeavor to provide some
 advance notice in order to allow the selection of a replacement. Termination of
 the contract of a Django Fellow by the Django Software Foundation temporarily
-suspends that person's Merger role until such time as the technical board can
+suspends that person's Merger role until such time as the steering council can
 vote on their nomination.
 
 Otherwise, a Merger may be removed by:
 
-- Becoming disqualified due to election to the technical board.
+- Becoming disqualified due to election to the steering council.
 - Becoming disqualified due to actions taken by the Code of Conduct committee
   of the Django Software Foundation.
-- A vote of the technical board.
+- A vote of the steering council.
 
 .. _releasers-team:
 
@@ -109,20 +109,20 @@ Role
 ----
 
 Releasers_ are a small set of people who have the authority to upload packaged
-releases of Django to the `Python Package Index`_, and to the
+releases of Django to the :pypi:`Python Package Index <Django>` and to the
 `djangoproject.com`_ website.
 
 Prerogatives
 ------------
 
 Releasers_ :doc:`build Django releases </internals/howto-release-django>` and
-upload them to the `Python Package Index`_, and to the `djangoproject.com`_
-website.
+upload them to the :pypi:`Python Package Index <Django>` and to the
+`djangoproject.com`_ website.
 
 Membership
 ----------
 
-`The technical board`_ selects Releasers_ as necessary to maintain their number
+`The steering council`_ selects Releasers_ as necessary to maintain their number
 at a minimum of three, in order to spread the workload and avoid over-burdening
 or burning out any individual Releaser. There is no upper limit to the number
 of Releasers.
@@ -133,40 +133,39 @@ to make the role of Releaser sustainable.
 
 A person may serve in the roles of Releaser and Merger simultaneously.
 
-The selection process, when a vacancy occurs or when the technical board deems
+The selection process, when a vacancy occurs or when the steering council deems
 it necessary to select additional persons for such a role, occur as follows:
 
 - Any member in good standing of an appropriate discussion venue, or the Django
   Software Foundation board acting with the input of the DSF's Fellowship
   committee, may suggest a person for consideration.
-- The technical board considers the suggestions put forth, and then any member
-  of the technical board formally nominates a candidate for the role.
-- The technical board votes on nominees.
+- The steering council considers the suggestions put forth, and then any member
+  of the steering council formally nominates a candidate for the role.
+- The steering council votes on nominees.
 
 Releasers may resign their role at any time, but should endeavor to provide
 some advance notice in order to allow the selection of a replacement.
 Termination of the contract of a Django Fellow by the Django Software
 Foundation temporarily suspends that person's Releaser role until such time as
-the technical board can vote on their nomination.
+the steering council can vote on their nomination.
 
 Otherwise, a Releaser may be removed by:
 
 - Becoming disqualified due to actions taken by the Code of Conduct committee
   of the Django Software Foundation.
-- A vote of the technical board.
+- A vote of the steering council.
 
-.. _`Python Package Index`: https://pypi.org/project/Django/
 .. _djangoproject.com: https://www.djangoproject.com/download/
 
-.. _technical-board:
+.. _steering-council:
 
-Technical board
-===============
+Steering council
+================
 
 Role
 ----
 
-The technical board is a group of experienced contributors who:
+The steering council is a group of experienced contributors who:
 
 - provide oversight of Django's development and release process,
 - assist in setting the direction of feature development and releases,
@@ -179,7 +178,7 @@ Framework.
 Prerogatives
 ------------
 
-The technical board holds the following prerogatives:
+The steering council holds the following prerogatives:
 
 - Making a binding decision regarding any question of a technical change to
   Django.
@@ -189,15 +188,15 @@ The technical board holds the following prerogatives:
   of Django.
 - Setting and adjusting the schedule of releases of Django.
 - Selecting and removing mergers and releasers.
-- Participating in the removal of members of the technical board, when deemed
+- Participating in the removal of members of the steering council, when deemed
   appropriate.
-- Calling elections of the technical board outside of those which are
-  automatically triggered, at times when the technical board deems an election
+- Calling elections of the steering council outside of those which are
+  automatically triggered, at times when the steering council deems an election
   is appropriate.
 - Participating in modifying Django's governance (see
   :ref:`organization-change`).
-- Declining to vote on a matter the technical board feels is unripe for a
-  binding decision, or which the technical board feels is outside the scope of
+- Declining to vote on a matter the steering council feels is unripe for a
+  binding decision, or which the steering council feels is outside the scope of
   its powers.
 - Taking charge of the governance of other technical teams within the Django
   open-source project, and governing those teams accordingly.
@@ -205,30 +204,28 @@ The technical board holds the following prerogatives:
 Membership
 ----------
 
-`The technical board`_ is an elected group of five experienced contributors
+`The steering council`_ is an elected group of five experienced contributors
 who demonstrate:
 
-- A history of technical contributions to Django or the Django ecosystem. This
-  history must begin at least 18 months prior to the individual's candidacy for
-  the technical board.
-- A history of participation in Django's development outside of contributions
-  merged to the `Django Git repository`_. This may include, but is not
-  restricted to:
+- A history of substantive contributions to Django or the Django ecosystem.
+  This history must begin at least 18 months prior to the individual's
+  candidacy for the Steering Council, and include substantive contributions in
+  at least two of these bullet points:
+  - Code contributions on Django projects or major third-party packages in the Django ecosystem
+  - Reviewing pull requests and/or triaging Django project tickets
+  - Documentation, tutorials or blog posts
+  - Discussions about Django on the django-developers mailing list or the Django Forum
+  - Running Django-related events or user groups
 
-  - Participation in discussions on the |django-developers| mailing list or
-    the `Django forum`_.
-  - Reviewing and offering feedback on pull requests in the Django source-code
-    repository.
-  - Assisting in triage and management of the Django bug tracker.
+- A history of engagement with the direction and future of Django. This does
+  not need to be recent, but candidates who have not engaged in the past three
+  years must still demonstrate an understanding of Django's changes and
+  direction within those three years.
 
-- A history of recent engagement with the direction and development of Django.
-  Such engagement must have occurred within a period of no more than two years
-  prior to the individual's candidacy for the technical board.
-
-A new board is elected after each release cycle of Django. The election process
+A new council is elected after each release cycle of Django. The election process
 works as follows:
 
-#. The technical board direct one of its members to notify the Secretary of the
+#. The steering council directs one of its members to notify the Secretary of the
    Django Software Foundation, in writing, of the triggering of the election,
    and the condition which triggered it. The Secretary post to the appropriate
    venue -- the |django-developers| mailing list and the `Django forum`_ to
@@ -248,7 +245,7 @@ works as follows:
    roster of candidates are maintained by the DSF Board, and candidates must
    provide evidence of their qualifications as part of registration. The DSF
    Board may challenge and reject the registration of candidates it believes do
-   not meet the qualifications of members of the Technical Board, or who it
+   not meet the qualifications of members of the Steering Council, or who it
    believes are registering in bad faith.
 #. Registration of candidates close one week after it has opened. One week
    after registration of candidates closes, the Secretary of the DSF publish
@@ -264,16 +261,16 @@ works as follows:
    majority vote of the DSF Board, then posted by the Secretary of the DSF to
    the |django-developers| mailing list and the Django Forum. The five
    candidates with the highest vote totals are immediately become the new
-   technical board.
+   steering council.
 
-A member of the technical board may be removed by:
+A member of the steering council may be removed by:
 
 - Becoming disqualified due to actions taken by the Code of Conduct committee
   of the Django Software Foundation.
 - Determining that they did not possess the qualifications of a member of the
-  technical board. This determination must be made jointly by the other members
-  of the technical board, and the `DSF Board`_. A valid determination of
-  ineligibility requires that all other members of the technical board and all
+  steering council. This determination must be made jointly by the other members
+  of the steering council, and the `DSF Board`_. A valid determination of
+  ineligibility requires that all other members of the steering council and all
   members of the DSF Board vote who can vote on the issue (the affected person,
   if a DSF Board member, must not vote) vote "yes" on a motion that the person
   in question is ineligible.
@@ -285,7 +282,7 @@ A member of the technical board may be removed by:
 .. _mergers: https://www.djangoproject.com/foundation/teams/#mergers-team
 .. _releasers: https://www.djangoproject.com/foundation/teams/#releasers-team
 .. _`security team`: https://www.djangoproject.com/foundation/teams/#security-team
-.. _`the technical board`: https://www.djangoproject.com/foundation/teams/#technical-board-team
+.. _`the steering council`: https://www.djangoproject.com/foundation/teams/#steering-council-team
 .. _`triage & review team`: https://www.djangoproject.com/foundation/teams/#triage-review-team
 
 .. _organization-change:

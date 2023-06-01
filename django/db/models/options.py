@@ -30,6 +30,7 @@ DEFAULT_NAMES = (
     "verbose_name",
     "verbose_name_plural",
     "db_table",
+    "db_table_comment",
     "ordering",
     "unique_together",
     "permissions",
@@ -42,8 +43,7 @@ DEFAULT_NAMES = (
     "proxy",
     "swappable",
     "auto_created",
-    # Must be kept for backward compatibility with old migrations.
-    "index_together",
+    "index_together",  # RemovedInDjango51Warning.
     "apps",
     "default_permissions",
     "select_on_save",
@@ -89,6 +89,7 @@ class Options:
         "many_to_many",
         "concrete_fields",
         "local_concrete_fields",
+        "_non_pk_concrete_field_names",
         "_forward_fields_map",
         "managers",
         "managers_map",
@@ -111,6 +112,7 @@ class Options:
         self.verbose_name = None
         self.verbose_name_plural = None
         self.db_table = ""
+        self.db_table_comment = ""
         self.ordering = []
         self._ordering_clash = False
         self.indexes = []
@@ -525,6 +527,7 @@ class Options:
         combined with filtering of field properties is the public API for
         obtaining this field list.
         """
+
         # For legacy reasons, the fields property should only contain forward
         # fields that are not private or with a m2m cardinality. Therefore we
         # pass these three filters as filters to the generator.
@@ -980,6 +983,19 @@ class Options:
             attr = inspect.getattr_static(self.model, name)
             if isinstance(attr, property):
                 names.append(name)
+        return frozenset(names)
+
+    @cached_property
+    def _non_pk_concrete_field_names(self):
+        """
+        Return a set of the non-pk concrete field names defined on the model.
+        """
+        names = []
+        for field in self.concrete_fields:
+            if not field.primary_key:
+                names.append(field.name)
+                if field.name != field.attname:
+                    names.append(field.attname)
         return frozenset(names)
 
     @cached_property

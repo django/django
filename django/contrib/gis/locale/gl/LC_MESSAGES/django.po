@@ -4,13 +4,14 @@
 # fasouto <fsoutomoure@gmail.com>, 2011
 # fonso <fonzzo@gmail.com>, 2013
 # Leandro Regueiro <leandro.regueiro@gmail.com>, 2013
+# X Bello <xbello@gmail.com>, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-19 16:49+0100\n"
-"PO-Revision-Date: 2017-09-23 18:54+0000\n"
-"Last-Translator: Jannis Leidel <jannis@leidel.info>\n"
+"POT-Creation-Date: 2019-09-08 17:27+0200\n"
+"PO-Revision-Date: 2023-04-24 18:45+0000\n"
+"Last-Translator: X Bello <xbello@gmail.com>, 2023\n"
 "Language-Team: Galician (http://www.transifex.com/django/django/language/"
 "gl/)\n"
 "MIME-Version: 1.0\n"
@@ -20,14 +21,16 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "GIS"
-msgstr ""
+msgstr "SIX"
 
 msgid "The base GIS field."
-msgstr ""
+msgstr "O cambo básico de XIS."
 
 msgid ""
-"The base Geometry field -- maps to the OpenGIS Specification Geometry type."
+"The base Geometry field — maps to the OpenGIS Specification Geometry type."
 msgstr ""
+"O cambo básico Geometry — correspónese co tipo Geometry da especificación "
+"OpenGIS."
 
 msgid "Point"
 msgstr "Punto"
@@ -51,10 +54,10 @@ msgid "Geometry collection"
 msgstr "Colección de xeometrías"
 
 msgid "Extent Aggregate Field"
-msgstr ""
+msgstr "Campo de Agregación de Extensión"
 
 msgid "Raster Field"
-msgstr ""
+msgstr "Campo de Raster"
 
 msgid "No geometry value provided."
 msgstr "Non se proporcionou un valor de xeometría."
@@ -73,17 +76,17 @@ msgstr ""
 "xeométrico do formulario."
 
 msgid "Delete all Features"
-msgstr ""
+msgstr "Eliminar tódalas Propiedades"
 
 msgid "WKT debugging window:"
-msgstr ""
+msgstr "Ventá de depurado de WKT:"
 
 msgid "Debugging window (serialized value)"
-msgstr ""
+msgstr "Ventá de depurado (valor serializado)"
 
 msgid "No feeds are registered."
 msgstr "Non hai feeds rexistradas."
 
 #, python-format
-msgid "Slug %r isn't registered."
-msgstr "A url curta %r non está rexistrada."
+msgid "Slug %r isn’t registered."
+msgstr "O slug %r non está rexistrado."

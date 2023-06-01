@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
 from django.utils.functional import cached_property
@@ -306,7 +307,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def _commit(self):
         if self.connection is not None:
-            with wrap_oracle_errors():
+            with debug_transaction(self, "COMMIT"), wrap_oracle_errors():
                 return self.connection.commit()
 
     # Oracle doesn't support releasing savepoints. But we fake them when query
@@ -528,7 +529,7 @@ class FormatStylePlaceholderCursor:
         elif hasattr(params, "keys"):
             # Handle params as dict
             args = {k: ":%s" % k for k in params}
-            query = query % args
+            query %= args
         elif unify_by_values and params:
             # Handle params as a dict with unified query parameters by their
             # values. It can be used only in single query execute() because
@@ -542,11 +543,11 @@ class FormatStylePlaceholderCursor:
             }
             args = [params_dict[param] for param in params]
             params = {value: key for key, value in params_dict.items()}
-            query = query % tuple(args)
+            query %= tuple(args)
         else:
             # Handle params as sequence
             args = [(":arg%d" % i) for i in range(len(params))]
-            query = query % tuple(args)
+            query %= tuple(args)
         return query, self._format_params(params)
 
     def execute(self, query, params=None):

@@ -1,6 +1,7 @@
 import mimetypes
 import unittest
 from os import path
+from unittest import mock
 from urllib.parse import quote
 
 from django.conf.urls.static import static
@@ -8,7 +9,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import FileResponse, HttpResponseNotModified
 from django.test import SimpleTestCase, override_settings
 from django.utils.http import http_date
-from django.views.static import was_modified_since
+from django.views.static import directory_index, was_modified_since
 
 from .. import urls
 from ..urls import media_dir
@@ -40,9 +41,10 @@ class StaticTests(SimpleTestCase):
     def test_chunked(self):
         "The static view should stream files in chunks to avoid large memory usage"
         response = self.client.get("/%s/%s" % (self.prefix, "long-line.txt"))
-        first_chunk = next(response.streaming_content)
+        response_iterator = iter(response)
+        first_chunk = next(response_iterator)
         self.assertEqual(len(first_chunk), FileResponse.block_size)
-        second_chunk = next(response.streaming_content)
+        second_chunk = next(response_iterator)
         response.close()
         # strip() to prevent OS line endings from causing differences
         self.assertEqual(len(second_chunk.strip()), 1449)
@@ -63,7 +65,7 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         response = self.client.get(
             "/%s/%s" % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE="Thu, 1 Jan 1970 00:00:00 GMT",
+            headers={"if-modified-since": "Thu, 1 Jan 1970 00:00:00 GMT"},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
@@ -73,9 +75,11 @@ class StaticTests(SimpleTestCase):
         file_name = "file.txt"
         response = self.client.get(
             "/%s/%s" % (self.prefix, file_name),
-            HTTP_IF_MODIFIED_SINCE="Mon, 18 Jan 2038 05:14:07 GMT"
-            # This is 24h before max Unix time. Remember to fix Django and
-            # update this test well before 2038 :)
+            headers={
+                # This is 24h before max Unix time. Remember to fix Django and
+                # update this test well before 2038 :)
+                "if-modified-since": "Mon, 18 Jan 2038 05:14:07 GMT"
+            },
         )
         self.assertIsInstance(response, HttpResponseNotModified)
 
@@ -83,12 +87,13 @@ class StaticTests(SimpleTestCase):
         """Handle bogus If-Modified-Since values gracefully
 
         Assume that a file is modified since an invalid timestamp as per RFC
-        2616, section 14.25.
+        9110 Section 13.1.3.
         """
         file_name = "file.txt"
         invalid_date = "Mon, 28 May 999999999999 28:25:26 GMT"
         response = self.client.get(
-            "/%s/%s" % (self.prefix, file_name), HTTP_IF_MODIFIED_SINCE=invalid_date
+            "/%s/%s" % (self.prefix, file_name),
+            headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
@@ -99,12 +104,13 @@ class StaticTests(SimpleTestCase):
         """Handle even more bogus If-Modified-Since values gracefully
 
         Assume that a file is modified since an invalid timestamp as per RFC
-        2616, section 14.25.
+        9110 Section 13.1.3.
         """
         file_name = "file.txt"
         invalid_date = ": 1291108438, Wed, 20 Oct 2010 14:05:00 GMT"
         response = self.client.get(
-            "/%s/%s" % (self.prefix, file_name), HTTP_IF_MODIFIED_SINCE=invalid_date
+            "/%s/%s" % (self.prefix, file_name),
+            headers={"if-modified-since": invalid_date},
         )
         response_content = b"".join(response)
         with open(path.join(media_dir, file_name), "rb") as fp:
@@ -147,6 +153,18 @@ class StaticTests(SimpleTestCase):
     def test_index_custom_template(self):
         response = self.client.get("/%s/" % self.prefix)
         self.assertEqual(response.content, b"Test index")
+
+    def test_template_encoding(self):
+        """
+        The template is loaded directly, not via a template loader, and should
+        be opened as utf-8 charset as is the default specified on template
+        engines.
+        """
+        from django.views.static import Path
+
+        with mock.patch.object(Path, "open") as m:
+            directory_index(mock.MagicMock(), mock.MagicMock())
+            m.assert_called_once_with(encoding="utf-8")
 
 
 class StaticHelperTest(StaticTests):

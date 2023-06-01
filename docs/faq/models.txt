@@ -8,7 +8,9 @@ How can I see the raw SQL queries Django is running?
 ====================================================
 
 Make sure your Django :setting:`DEBUG` setting is set to ``True``.
-Then do this::
+Then do this:
+
+.. code-block:: pycon
 
     >>> from django.db import connection
     >>> connection.queries
@@ -17,24 +19,27 @@ Then do this::
 
 ``connection.queries`` is only available if :setting:`DEBUG` is ``True``.
 It's a list of dictionaries in order of query execution. Each dictionary has
-the following::
+the following:
 
-    ``sql`` -- The raw SQL statement
-    ``time`` -- How long the statement took to execute, in seconds.
+* ``sql`` - The raw SQL statement
+* ``time`` - How long the statement took to execute, in seconds.
 
 ``connection.queries`` includes all SQL statements -- INSERTs, UPDATES,
 SELECTs, etc. Each time your app hits the database, the query will be recorded.
 
 If you are using :doc:`multiple databases</topics/db/multi-db>`, you can use the
-same interface on each member of the ``connections`` dictionary::
+same interface on each member of the ``connections`` dictionary:
+
+.. code-block:: pycon
 
     >>> from django.db import connections
-    >>> connections['my_db_alias'].queries
+    >>> connections["my_db_alias"].queries
 
 If you need to clear the query list manually at any point in your functions,
 call ``reset_queries()``, like this::
 
     from django.db import reset_queries
+
     reset_queries()
 
 Can I use Django with a preexisting database?
@@ -85,6 +90,8 @@ these options, create a migration with a
 ``ALTER TABLE`` statements that do what you want to do.
 
 For example, if you're using MySQL and want your tables to use the MyISAM table
-type, use the following SQL::
+type, use the following SQL:
+
+.. code-block:: sql
 
     ALTER TABLE myapp_mytable ENGINE=MyISAM;

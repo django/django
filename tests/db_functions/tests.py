@@ -17,7 +17,7 @@ class FunctionTests(TestCase):
         Author.objects.create(name="Rhonda Simpson", alias="ronny")
 
         authors = Author.objects.order_by(Length(Coalesce("alias", "name")))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 "Rhonda Simpson",
@@ -27,7 +27,7 @@ class FunctionTests(TestCase):
         )
 
         authors = Author.objects.order_by(Length(Coalesce("alias", "name")).desc())
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors,
             [
                 "John Smith",
@@ -41,7 +41,7 @@ class FunctionTests(TestCase):
             Author.objects.create(name="John Smith", alias="smithj")
             Author.objects.create(name="Rhonda")
             authors = Author.objects.filter(name__upper__exact="john smith")
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 authors.order_by("name"),
                 [
                     "John Smith",
@@ -54,7 +54,7 @@ class FunctionTests(TestCase):
             Author.objects.create(name="John Smith", alias="smithj")
             Author.objects.create(name="Rhonda")
             authors = Author.objects.filter(name__upper__in=["john smith", "rhonda"])
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 authors.order_by("name"),
                 [
                     "John Smith",
@@ -66,12 +66,12 @@ class FunctionTests(TestCase):
     def test_function_as_filter(self):
         Author.objects.create(name="John Smith", alias="SMITHJ")
         Author.objects.create(name="Rhonda")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.filter(alias=Upper(V("smithj"))),
             ["John Smith"],
             lambda x: x.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Author.objects.exclude(alias=Upper(V("smithj"))),
             ["Rhonda"],
             lambda x: x.name,

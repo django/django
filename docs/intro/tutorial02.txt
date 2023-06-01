@@ -148,7 +148,7 @@ These concepts are represented by Python classes. Edit the
 
     class Question(models.Model):
         question_text = models.CharField(max_length=200)
-        pub_date = models.DateTimeField('date published')
+        pub_date = models.DateTimeField("date published")
 
 
     class Choice(models.Model):
@@ -220,13 +220,13 @@ this:
     :caption: ``mysite/settings.py``
 
     INSTALLED_APPS = [
-        'polls.apps.PollsConfig',
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
+        "polls.apps.PollsConfig",
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
     ]
 
 Now Django knows to include the ``polls`` app. Let's run another command:
@@ -381,7 +381,9 @@ We're using this instead of simply typing "python", because :file:`manage.py`
 sets the :envvar:`DJANGO_SETTINGS_MODULE` environment variable, which gives
 Django the Python import path to your :file:`mysite/settings.py` file.
 
-Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
+Once you're in the shell, explore the :doc:`database API </topics/db/queries>`:
+
+.. code-block:: pycon
 
     >>> from polls.models import Choice, Question  # Import the model classes we just wrote.
 
@@ -407,7 +409,7 @@ Once you're in the shell, explore the :doc:`database API </topics/db/queries>`::
     >>> q.question_text
     "What's new?"
     >>> q.pub_date
-    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=<UTC>)
+    datetime.datetime(2012, 2, 26, 13, 0, 0, 775217, tzinfo=datetime.timezone.utc)
 
     # Change values by changing the attributes, then calling save().
     >>> q.question_text = "What's up?"
@@ -428,10 +430,12 @@ representation of this object. Let's fix that by editing the ``Question`` model
 
     from django.db import models
 
+
     class Question(models.Model):
         # ...
         def __str__(self):
             return self.question_text
+
 
     class Choice(models.Model):
         # ...
@@ -468,7 +472,9 @@ you aren't familiar with time zone handling in Python, you can learn more in
 the :doc:`time zone support docs </topics/i18n/timezones>`.
 
 Save these changes and start a new Python interactive shell by running
-``python manage.py shell`` again::
+``python manage.py shell`` again:
+
+.. code-block:: pycon
 
     >>> from polls.models import Choice, Question
 
@@ -480,7 +486,7 @@ Save these changes and start a new Python interactive shell by running
     # keyword arguments.
     >>> Question.objects.filter(id=1)
     <QuerySet [<Question: What's up?>]>
-    >>> Question.objects.filter(question_text__startswith='What')
+    >>> Question.objects.filter(question_text__startswith="What")
     <QuerySet [<Question: What's up?>]>
 
     # Get the question that was published this year.
@@ -518,11 +524,11 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet []>
 
     # Create three choices.
-    >>> q.choice_set.create(choice_text='Not much', votes=0)
+    >>> q.choice_set.create(choice_text="Not much", votes=0)
     <Choice: Not much>
-    >>> q.choice_set.create(choice_text='The sky', votes=0)
+    >>> q.choice_set.create(choice_text="The sky", votes=0)
     <Choice: The sky>
-    >>> c = q.choice_set.create(choice_text='Just hacking again', votes=0)
+    >>> c = q.choice_set.create(choice_text="Just hacking again", votes=0)
 
     # Choice objects have API access to their related Question objects.
     >>> c.question
@@ -543,7 +549,7 @@ Save these changes and start a new Python interactive shell by running
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
 
     # Let's delete one of the choices. Use delete() for that.
-    >>> c = q.choice_set.filter(choice_text__startswith='Just hacking')
+    >>> c = q.choice_set.filter(choice_text__startswith="Just hacking")
     >>> c.delete()
 
 For more information on model relations, see :doc:`Accessing related objects

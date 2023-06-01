@@ -12,12 +12,6 @@ in the admin change form. The ``formset:added`` and ``formset:removed`` events
 allow this. ``event.detail.formsetName`` is the formset the row belongs to.
 For the ``formset:added`` event, ``event.target`` is the newly added row.
 
-.. versionchanged:: 4.1
-
-    In older versions, the event was a ``jQuery`` event with ``$row`` and
-    ``formsetName`` parameters. It is now a JavaScript ``CustomEvent`` with
-    parameters set in ``event.detail``.
-
 In your custom ``change_form.html`` template, extend the
 ``admin_change_form_document_ready`` block and add the event listener code:
 

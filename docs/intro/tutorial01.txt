@@ -23,7 +23,7 @@ in a shell prompt (indicated by the $ prefix):
 If Django is installed, you should see the version of your installation. If it
 isn't, you'll get an error telling "No module named django".
 
-This tutorial is written for Django |version|, which supports Python 3.8 and
+This tutorial is written for Django |version|, which supports Python 3.10 and
 later. If the Django version doesn't match, you can refer to the tutorial for
 your version of Django by using the version switcher at the bottom right corner
 of this page, or update Django to the newest version. If you're using an older
@@ -76,7 +76,9 @@ work, see :ref:`troubleshooting-django-admin`.
     Put your code in some directory **outside** of the document root, such as
     :file:`/home/mycode`.
 
-Let's look at what :djadmin:`startproject` created::
+Let's look at what :djadmin:`startproject` created:
+
+.. code-block:: text
 
     mysite/
         manage.py
@@ -181,10 +183,10 @@ It worked!
 
     .. console::
 
-        $ python manage.py runserver 0:8000
+        $ python manage.py runserver 0.0.0.0:8000
 
-    **0** is a shortcut for **0.0.0.0**. Full docs for the development server
-    can be found in the :djadmin:`runserver` reference.
+    Full docs for the development server can be found in the
+    :djadmin:`runserver` reference.
 
 .. admonition:: Automatic reloading of :djadmin:`runserver`
 
@@ -224,7 +226,9 @@ and type this command:
 
     $ python manage.py startapp polls
 
-That'll create a directory :file:`polls`, which is laid out like this::
+That'll create a directory :file:`polls`, which is laid out like this:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -257,7 +261,9 @@ This is the simplest view possible in Django. To call the view, we need to map
 it to a URL - and for this we need a URLconf.
 
 To create a URLconf in the polls directory, create a file called ``urls.py``.
-Your app directory should now look like::
+Your app directory should now look like:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -280,7 +286,7 @@ In the ``polls/urls.py`` file include the following code:
     from . import views
 
     urlpatterns = [
-        path('', views.index, name='index'),
+        path("", views.index, name="index"),
     ]
 
 The next step is to point the root URLconf at the ``polls.urls`` module. In
@@ -294,8 +300,8 @@ The next step is to point the root URLconf at the ``polls.urls`` module. In
     from django.urls import include, path
 
     urlpatterns = [
-        path('polls/', include('polls.urls')),
-        path('admin/', admin.site.urls),
+        path("polls/", include("polls.urls")),
+        path("admin/", admin.site.urls),
     ]
 
 The :func:`~django.urls.include` function allows referencing other URLconfs.

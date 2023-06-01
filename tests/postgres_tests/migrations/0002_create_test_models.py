@@ -18,7 +18,6 @@ from ..models import TagField
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("postgres_tests", "0001_setup_extensions"),
     ]

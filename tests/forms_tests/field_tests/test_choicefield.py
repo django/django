@@ -95,7 +95,8 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             JOHN = "J", "John"
             PAUL = "P", "Paul"
 
-        f = ChoiceField(choices=FirstNames.choices)
+        f = ChoiceField(choices=FirstNames)
+        self.assertEqual(f.choices, FirstNames.choices)
         self.assertEqual(f.clean("J"), "J")
         msg = "'Select a valid choice. 3 is not one of the available choices.'"
         with self.assertRaisesMessage(ValidationError, msg):

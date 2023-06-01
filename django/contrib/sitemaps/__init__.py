@@ -1,4 +1,3 @@
-import warnings
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
@@ -8,7 +7,6 @@ from django.core import paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import NoReverseMatch, reverse
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 PING_URL = "https://www.google.com/webmasters/tools/ping"
 
@@ -92,6 +90,10 @@ class Sitemap:
             return attr(item)
         return attr
 
+    def get_languages_for_item(self, item):
+        """Languages for which this item is displayed."""
+        return self._languages()
+
     def _languages(self):
         if self.languages is not None:
             return self.languages
@@ -103,8 +105,8 @@ class Sitemap:
             # This is necessary to paginate with all languages already considered.
             items = [
                 (item, lang_code)
-                for lang_code in self._languages()
                 for item in self.items()
+                for lang_code in self.get_languages_for_item(item)
             ]
             return items
         return self.items()
@@ -129,17 +131,7 @@ class Sitemap:
 
     def get_protocol(self, protocol=None):
         # Determine protocol
-        if self.protocol is None and protocol is None:
-            warnings.warn(
-                "The default sitemap protocol will be changed from 'http' to "
-                "'https' in Django 5.0. Set Sitemap.protocol to silence this "
-                "warning.",
-                category=RemovedInDjango50Warning,
-                stacklevel=2,
-            )
-        # RemovedInDjango50Warning: when the deprecation ends, replace 'http'
-        # with 'https'.
-        return self.protocol or protocol or "http"
+        return self.protocol or protocol or "https"
 
     def get_domain(self, site=None):
         # Determine domain
@@ -167,7 +159,7 @@ class Sitemap:
             return None
         if callable(self.lastmod):
             try:
-                return max([self.lastmod(item) for item in self.items()])
+                return max([self.lastmod(item) for item in self.items()], default=None)
             except TypeError:
                 return None
         else:
@@ -201,7 +193,8 @@ class Sitemap:
             }
 
             if self.i18n and self.alternates:
-                for lang_code in self._languages():
+                item_languages = self.get_languages_for_item(item[0])
+                for lang_code in item_languages:
                     loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
                     url_info["alternates"].append(
                         {
@@ -209,7 +202,7 @@ class Sitemap:
                             "lang_code": lang_code,
                         }
                     )
-                if self.x_default:
+                if self.x_default and settings.LANGUAGE_CODE in item_languages:
                     lang_code = settings.LANGUAGE_CODE
                     loc = f"{protocol}://{domain}{self._location(item, lang_code)}"
                     loc = loc.replace(f"/{lang_code}/", "/", 1)

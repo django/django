@@ -1,5 +1,7 @@
 from unittest import mock
 
+from asgiref.sync import sync_to_async
+
 from django.conf.global_settings import PASSWORD_HASHERS
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -122,8 +124,8 @@ class UserManagerTestCase(TransactionTestCase):
         self.assertFalse(user.has_usable_password())
 
     def test_create_user_email_domain_normalize_rfc3696(self):
-        # According to https://tools.ietf.org/html/rfc3696#section-3
-        # the "@" symbol can be part of the local part of an email address
+        # According to RFC 3696 Section 3 the "@" symbol can be part of the
+        # local part of an email address.
         returned = UserManager.normalize_email(r"Abc\@DEF@EXAMPLE.com")
         self.assertEqual(returned, r"Abc\@DEF@example.com")
 
@@ -307,6 +309,29 @@ class AbstractUserTestCase(TestCase):
                 "django.contrib.auth.password_validation.password_changed"
             ) as pw_changed:
                 user.check_password("foo")
+                self.assertEqual(pw_changed.call_count, 0)
+            self.assertNotEqual(initial_password, user.password)
+        finally:
+            hasher.iterations = old_iterations
+
+    @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
+    async def test_acheck_password_upgrade(self):
+        user = await sync_to_async(User.objects.create_user)(
+            username="user", password="foo"
+        )
+        initial_password = user.password
+        self.assertIs(await user.acheck_password("foo"), True)
+        hasher = get_hasher("default")
+        self.assertEqual("pbkdf2_sha256", hasher.algorithm)
+
+        old_iterations = hasher.iterations
+        try:
+            # Upgrade the password iterations.
+            hasher.iterations = old_iterations + 1
+            with mock.patch(
+                "django.contrib.auth.password_validation.password_changed"
+            ) as pw_changed:
+                self.assertIs(await user.acheck_password("foo"), True)
                 self.assertEqual(pw_changed.call_count, 0)
             self.assertNotEqual(initial_password, user.password)
         finally:
@@ -587,5 +612,5 @@ class PermissionTests(TestCase):
     def test_str(self):
         p = Permission.objects.get(codename="view_customemailfield")
         self.assertEqual(
-            str(p), "auth_tests | custom email field | Can view custom email field"
+            str(p), "Auth_Tests | custom email field | Can view custom email field"
         )

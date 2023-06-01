@@ -1,7 +1,7 @@
 import itertools
 import math
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
@@ -128,7 +128,7 @@ class Lookup(Expression):
     def rhs_is_direct_value(self):
         return not hasattr(self.rhs, "as_sql")
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -184,6 +184,10 @@ class Lookup(Expression):
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
             sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
         return sql, params
+
+    @cached_property
+    def allowed_default(self):
+        return self.lhs.allowed_default and self.rhs.allowed_default
 
 
 class Transform(RegisterLookupMixin, Func):
@@ -309,7 +313,7 @@ class FieldGetDbPrepValueIterableMixin(FieldGetDbPrepValueMixin):
         return sql, tuple(params)
 
 
-class PostgresOperatorLookup(FieldGetDbPrepValueMixin, Lookup):
+class PostgresOperatorLookup(Lookup):
     """Lookup defined by operators on PostgreSQL."""
 
     postgres_operator = None
@@ -389,6 +393,24 @@ class LessThanOrEqual(FieldGetDbPrepValueMixin, BuiltinLookup):
     lookup_name = "lte"
 
 
+class IntegerFieldOverflow:
+    underflow_exception = EmptyResultSet
+    overflow_exception = EmptyResultSet
+
+    def process_rhs(self, compiler, connection):
+        rhs = self.rhs
+        if isinstance(rhs, int):
+            field_internal_type = self.lhs.output_field.get_internal_type()
+            min_value, max_value = connection.ops.integer_field_range(
+                field_internal_type
+            )
+            if min_value is not None and rhs < min_value:
+                raise self.underflow_exception
+            if max_value is not None and rhs > max_value:
+                raise self.overflow_exception
+        return super().process_rhs(compiler, connection)
+
+
 class IntegerFieldFloatRounding:
     """
     Allow floats to work as query values for IntegerField. Without this, the
@@ -402,13 +424,30 @@ class IntegerFieldFloatRounding:
 
 
 @IntegerField.register_lookup
-class IntegerGreaterThanOrEqual(IntegerFieldFloatRounding, GreaterThanOrEqual):
+class IntegerFieldExact(IntegerFieldOverflow, Exact):
     pass
 
 
 @IntegerField.register_lookup
-class IntegerLessThan(IntegerFieldFloatRounding, LessThan):
-    pass
+class IntegerGreaterThan(IntegerFieldOverflow, GreaterThan):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerGreaterThanOrEqual(
+    IntegerFieldOverflow, IntegerFieldFloatRounding, GreaterThanOrEqual
+):
+    underflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThan(IntegerFieldOverflow, IntegerFieldFloatRounding, LessThan):
+    overflow_exception = FullResultSet
+
+
+@IntegerField.register_lookup
+class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
+    overflow_exception = FullResultSet
 
 
 @Field.register_lookup
@@ -568,7 +607,7 @@ class IsNull(BuiltinLookup):
             raise ValueError(
                 "The QuerySet value for an isnull lookup must be True or False."
             )
-        sql, params = compiler.compile(self.lhs)
+        sql, params = self.process_lhs(compiler, connection)
         if self.rhs:
             return "%s IS NULL" % sql, params
         else:

@@ -50,7 +50,7 @@ class StartsWithRelation(models.ForeignObject):
         from_field = self.model._meta.get_field(self.from_fields[0])
         return StartsWith(to_field.get_col(alias), from_field.get_col(related_alias))
 
-    def get_joining_columns(self, reverse_join=False):
+    def get_joining_fields(self, reverse_join=False):
         return ()
 
     def get_path_info(self, filtered_relation=None):

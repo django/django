@@ -42,6 +42,7 @@ from django.db.models.functions import (
 )
 from django.db.models.lookups import Exact
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import CaptureQueriesContext
 
 from .models import Classification, Detail, Employee, PastEmployeeDepartment
 
@@ -103,7 +104,7 @@ class WindowFunctionTests(TestCase):
                 qs = Employee.objects.annotate(
                     rank=Window(expression=DenseRank(), order_by=order_by),
                 )
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     qs,
                     [
                         ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 1),
@@ -137,7 +138,7 @@ class WindowFunctionTests(TestCase):
                 order_by=[F("hire_date").asc()],
             )
         ).order_by("department", "department_sum")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", 45000, 45000),
@@ -173,7 +174,7 @@ class WindowFunctionTests(TestCase):
                 order_by=F("hire_date__year").asc(),
             )
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 1),
@@ -212,7 +213,7 @@ class WindowFunctionTests(TestCase):
                 order_by=F("pk").asc(),
             )
         ).order_by("pk")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", 1),
@@ -242,7 +243,7 @@ class WindowFunctionTests(TestCase):
                 expression=RowNumber(),
             )
         ).order_by("pk")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", 1),
@@ -269,7 +270,7 @@ class WindowFunctionTests(TestCase):
                 partition_by="department",
             )
         ).order_by("department", "-salary", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Adams", 50000, "Accounting", 44250.00),
@@ -306,7 +307,7 @@ class WindowFunctionTests(TestCase):
                 order_by=[F("salary").asc(), F("name").asc()],
             )
         ).order_by("department", F("salary").asc(), F("name").asc())
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Williams", 37000, "Accounting", None),
@@ -333,7 +334,7 @@ class WindowFunctionTests(TestCase):
                 order_by=[F("bonus").asc(), F("name").asc()],
             )
         ).order_by("department", F("bonus").asc(), F("name").asc())
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Williams", 92.5, "Accounting", None),
@@ -360,7 +361,7 @@ class WindowFunctionTests(TestCase):
                 order_by=F("hire_date").asc(),
             )
         ).order_by("department", "hire_date")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 45000),
@@ -393,7 +394,7 @@ class WindowFunctionTests(TestCase):
                 order_by=F("hire_date").asc(),
             )
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 (
@@ -531,7 +532,7 @@ class WindowFunctionTests(TestCase):
                 order_by=[F("salary").asc(), F("name").asc()],
             )
         ).order_by("department", "salary", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Williams", "Accounting", 37000, 37000),
@@ -562,7 +563,7 @@ class WindowFunctionTests(TestCase):
                 partition_by=ExtractYear("hire_date"),
             )
         ).order_by(ExtractYear("hire_date"), "salary")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", 45000, 2005, 100000),
@@ -599,7 +600,7 @@ class WindowFunctionTests(TestCase):
             )
         ).order_by("salary", "name")
         # Round result of cume_dist because Oracle uses greater precision.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Moore", "IT", 34000, 0.0833333333),
@@ -631,7 +632,7 @@ class WindowFunctionTests(TestCase):
                 partition_by=F("department"),
             )
         ).order_by("department", "hire_date", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", datetime.date(2005, 11, 1), 45000, None),
@@ -670,7 +671,7 @@ class WindowFunctionTests(TestCase):
                 partition_by="department",
             )
         ).order_by("department", F("hire_date").asc(), F("name").desc())
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 45000),
@@ -707,7 +708,7 @@ class WindowFunctionTests(TestCase):
                 order_by=F("hire_date").asc(),
             )
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 37000),
@@ -758,7 +759,7 @@ class WindowFunctionTests(TestCase):
                 order_by="-salary",
             )
         ).order_by("ntile", "-salary", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Miller", "Management", 100000, 1),
@@ -789,7 +790,7 @@ class WindowFunctionTests(TestCase):
             )
         ).order_by("percent_rank")
         # Round to account for precision differences among databases.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Moore", "IT", 34000, 0.0),
@@ -838,7 +839,7 @@ class WindowFunctionTests(TestCase):
                 partition_by=[F("department"), F("hire_date__year")],
             )
         ).order_by("department", "hire_date", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 45000),
@@ -876,7 +877,7 @@ class WindowFunctionTests(TestCase):
                 order_by=[F("hire_date").asc(), F("name").asc()],
             )
         ).order_by("department", "sum")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 45000),
@@ -921,25 +922,25 @@ class WindowFunctionTests(TestCase):
             ),
         ).order_by("department", "name")
         # Direct window reference.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(department_salary_rank=1),
             ["Adams", "Wilkinson", "Miller", "Johnson", "Smith"],
             lambda employee: employee.name,
         )
         # Through a combined expression containing a window.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(department_avg_age_diff__gt=0),
             ["Jenson", "Jones", "Williams", "Miller", "Smith"],
             lambda employee: employee.name,
         )
         # Intersection of multiple windows.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(department_salary_rank=1, department_avg_age_diff__gt=0),
             ["Miller"],
             lambda employee: employee.name,
         )
         # Union of multiple windows.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(Q(department_salary_rank=1) | Q(department_avg_age_diff__gt=0)),
             [
                 "Adams",
@@ -1021,7 +1022,7 @@ class WindowFunctionTests(TestCase):
                 Window(Avg("age"), partition_by="department") - F("age")
             ),
         ).order_by("department", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.filter(department_avg_age_diff__gt=0),
             ["Jenson", "Jones", "Williams", "Miller", "Smith"],
             lambda employee: employee.name,
@@ -1038,7 +1039,7 @@ class WindowFunctionTests(TestCase):
             .filter(department_avg_age_diff__gt=0)
             .order_by("department", "name")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             ["Jenson", "Jones", "Williams", "Miller", "Smith"],
             lambda employee: employee.name,
@@ -1056,19 +1057,19 @@ class WindowFunctionTests(TestCase):
             ),
         ).order_by("department", "name")
         # Direct window reference.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.exclude(department_salary_rank__gt=1),
             ["Adams", "Wilkinson", "Miller", "Johnson", "Smith"],
             lambda employee: employee.name,
         )
         # Through a combined expression containing a window.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.exclude(department_avg_age_diff__lte=0),
             ["Jenson", "Jones", "Williams", "Miller", "Smith"],
             lambda employee: employee.name,
         )
         # Union of multiple windows.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.exclude(
                 Q(department_salary_rank__gt=1) | Q(department_avg_age_diff__lte=0)
             ),
@@ -1076,7 +1077,7 @@ class WindowFunctionTests(TestCase):
             lambda employee: employee.name,
         )
         # Intersection of multiple windows.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs.exclude(department_salary_rank__gt=1, department_avg_age_diff__lte=0),
             [
                 "Adams",
@@ -1144,7 +1145,7 @@ class WindowFunctionTests(TestCase):
         A query filtering against a window function have its limit applied
         after window filtering takes place.
         """
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Employee.objects.annotate(
                 department_salary_rank=Window(
                     Rank(), partition_by="department", order_by="-salary"
@@ -1157,16 +1158,21 @@ class WindowFunctionTests(TestCase):
         )
 
     def test_filter_count(self):
-        self.assertEqual(
-            Employee.objects.annotate(
-                department_salary_rank=Window(
-                    Rank(), partition_by="department", order_by="-salary"
+        with CaptureQueriesContext(connection) as ctx:
+            self.assertEqual(
+                Employee.objects.annotate(
+                    department_salary_rank=Window(
+                        Rank(), partition_by="department", order_by="-salary"
+                    )
                 )
+                .filter(department_salary_rank=1)
+                .count(),
+                5,
             )
-            .filter(department_salary_rank=1)
-            .count(),
-            5,
-        )
+        self.assertEqual(len(ctx.captured_queries), 1)
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 3)
+        self.assertNotIn("group by", sql)
 
     @skipUnlessDBFeature("supports_frame_range_fixed_distance")
     def test_range_n_preceding_and_following(self):
@@ -1179,7 +1185,7 @@ class WindowFunctionTests(TestCase):
             )
         )
         self.assertIn("RANGE BETWEEN 2 PRECEDING AND 2 FOLLOWING", str(qs.query))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), 37000),
@@ -1218,7 +1224,7 @@ class WindowFunctionTests(TestCase):
         self.assertIn(
             "RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING", str(qs.query)
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Jones", "Accounting", 45000, datetime.date(2005, 11, 1), 165000),
@@ -1260,7 +1266,7 @@ class WindowFunctionTests(TestCase):
                 .values("hire_date")[:1],
             ),
         ).order_by("department", "name")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Adams", "Accounting", datetime.date(2005, 11, 1)),
@@ -1297,7 +1303,7 @@ class WindowFunctionTests(TestCase):
             )
         ).order_by("sum", "hire_date")
         self.assertIn("ROWS BETWEEN UNBOUNDED PRECEDING AND 3 FOLLOWING", str(qs.query))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 280000),
@@ -1430,7 +1436,7 @@ class WindowFunctionTests(TestCase):
                         order_by=[order_by],
                     )
                 ).order_by("value__department", "department_sum")
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     qs,
                     [
                         ("Brown", "HR", 50000, 50000),
@@ -1580,6 +1586,25 @@ class WindowUnsupportedTests(TestCase):
                 Employee.objects.annotate(
                     dense_rank=Window(expression=DenseRank())
                 ).get()
+
+    def test_filter_subquery(self):
+        qs = Employee.objects.annotate(
+            department_salary_rank=Window(
+                Rank(), partition_by="department", order_by="-salary"
+            )
+        )
+        msg = (
+            "Referencing outer query window expression is not supported: "
+            "department_salary_rank."
+        )
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            qs.annotate(
+                employee_name=Subquery(
+                    Employee.objects.filter(
+                        age=OuterRef("department_salary_rank")
+                    ).values("name")[:1]
+                )
+            )
 
 
 class NonQueryWindowTests(SimpleTestCase):

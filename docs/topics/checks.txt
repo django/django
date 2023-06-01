@@ -31,6 +31,7 @@ check function::
 
     from django.core.checks import Error, register
 
+
     @register()
     def example_check(app_configs, **kwargs):
         errors = []
@@ -38,10 +39,10 @@ check function::
         if check_failed:
             errors.append(
                 Error(
-                    'an error',
-                    hint='A hint.',
+                    "an error",
+                    hint="A hint.",
                     obj=checked_object,
-                    id='myapp.E001',
+                    id="myapp.E001",
                 )
             )
         return errors
@@ -102,6 +103,7 @@ make the following call::
 
     from django.core.checks import register, Tags
 
+
     @register(Tags.compatibility)
     def my_check(app_configs, **kwargs):
         # ... perform compatibility checks and collect errors
@@ -124,6 +126,8 @@ The code below is equivalent to the code above::
 
     def my_check(app_configs, **kwargs):
         ...
+
+
     register(my_check, Tags.security, deploy=True)
 
 .. _field-checking:
@@ -150,6 +154,7 @@ code snippet shows how you can implement this check::
     from django.core import checks
     from django.db import models
 
+
     class RangedIntegerField(models.IntegerField):
         def __init__(self, min=None, max=None, **kwargs):
             super().__init__(**kwargs)
@@ -167,15 +172,13 @@ code snippet shows how you can implement this check::
             return errors
 
         def _check_min_max_values(self, **kwargs):
-            if (self.min is not None and
-                    self.max is not None and
-                    self.min > self.max):
+            if self.min is not None and self.max is not None and self.min > self.max:
                 return [
                     checks.Error(
-                        'min greater than max.',
-                        hint='Decrease min or increase max.',
+                        "min greater than max.",
+                        hint="Decrease min or increase max.",
                         obj=self,
-                        id='myapp.E001',
+                        id="myapp.E001",
                     )
                 ]
             # When no error, return an empty list
@@ -200,13 +203,14 @@ Writing tests
 Messages are comparable. That allows you to easily write tests::
 
     from django.core.checks import Error
+
     errors = checked_object.check()
     expected_errors = [
         Error(
-            'an error',
-            hint='A hint.',
+            "an error",
+            hint="A hint.",
             obj=checked_object,
-            id='myapp.E001',
+            id="myapp.E001",
         )
     ]
     self.assertEqual(errors, expected_errors)

@@ -296,12 +296,6 @@ END;
             columns.append(value[0])
         return tuple(columns)
 
-    def field_cast_sql(self, db_type, internal_type):
-        if db_type and db_type.endswith("LOB") and internal_type != "JSONField":
-            return "DBMS_LOB.SUBSTR(%s)"
-        else:
-            return "%s"
-
     def no_limit_value(self):
         return None
 
@@ -323,16 +317,16 @@ END;
         # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
-        if isinstance(params, (tuple, list)):
-            for i, param in enumerate(reversed(params), start=1):
-                param_num = len(params) - i
-                statement = statement.replace(
-                    ":arg%d" % param_num, force_str(param, errors="replace")
-                )
-        elif isinstance(params, dict):
+        if params:
+            if isinstance(params, (tuple, list)):
+                params = {
+                    f":arg{i}": param for i, param in enumerate(dict.fromkeys(params))
+                }
+            elif isinstance(params, dict):
+                params = {f":{key}": val for (key, val) in params.items()}
             for key in sorted(params, key=len, reverse=True):
                 statement = statement.replace(
-                    ":%s" % key, force_str(params[key], errors="replace")
+                    key, force_str(params[key], errors="replace")
                 )
         return statement
 
@@ -344,7 +338,9 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
             return "UPPER(%s)"
-        if internal_type == "JSONField" and lookup_type == "exact":
+        if (
+            lookup_type != "isnull" and internal_type in ("BinaryField", "TextField")
+        ) or (lookup_type == "exact" and internal_type == "JSONField"):
             return "DBMS_LOB.SUBSTR(%s)"
         return "%s"
 

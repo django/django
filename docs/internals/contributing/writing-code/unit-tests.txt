@@ -69,17 +69,18 @@ command from any place in the Django source tree:
     $ tox
 
 By default, ``tox`` runs the test suite with the bundled test settings file for
-SQLite, ``black``, ``flake8``, ``isort``, and the documentation spelling
-checker. In addition to the system dependencies noted elsewhere in this
-documentation, the command ``python3`` must be on your path and linked to the
-appropriate version of Python. A list of default environments can be seen as
-follows:
+SQLite, ``black``, ``blacken-docs``, ``flake8``, ``isort``, and the
+documentation spelling checker. In addition to the system dependencies noted
+elsewhere in this documentation, the command ``python3`` must be on your path
+and linked to the appropriate version of Python. A list of default environments
+can be seen as follows:
 
 .. console::
 
     $ tox -l
     py3
     black
+    blacken-docs
     flake8>=3.7.0
     docs
     isort>=5.1.0
@@ -91,14 +92,14 @@ In addition to the default environments, ``tox`` supports running unit tests
 for other versions of Python and other database backends. Since Django's test
 suite doesn't bundle a settings file for database backends other than SQLite,
 however, you must :ref:`create and provide your own test settings
-<running-unit-tests-settings>`. For example, to run the tests on Python 3.9
+<running-unit-tests-settings>`. For example, to run the tests on Python 3.10
 using PostgreSQL:
 
 .. console::
 
-    $ tox -e py39-postgres -- --settings=my_postgres_settings
+    $ tox -e py310-postgres -- --settings=my_postgres_settings
 
-This command sets up a Python 3.9 virtual environment, installs Django's
+This command sets up a Python 3.10 virtual environment, installs Django's
 test suite dependencies (including those for PostgreSQL), and calls
 ``runtests.py`` with the supplied arguments (in this case,
 ``--settings=my_postgres_settings``).
@@ -113,14 +114,14 @@ above:
 
 .. code-block:: console
 
-    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py39-postgres
+    $ DJANGO_SETTINGS_MODULE=my_postgres_settings tox -e py310-postgres
 
 Windows users should use:
 
 .. code-block:: doscon
 
     ...\> set DJANGO_SETTINGS_MODULE=my_postgres_settings
-    ...\> tox -e py39-postgres
+    ...\> tox -e py310-postgres
 
 Running the JavaScript tests
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,7 +251,7 @@ Running the Selenium tests
 --------------------------
 
 Some tests require Selenium and a web browser. To run these tests, you must
-install the selenium_ package and run the tests with the
+install the :pypi:`selenium` package and run the tests with the
 ``--selenium=<BROWSERS>`` option. For example, if you have Firefox and Google
 Chrome installed:
 
@@ -276,28 +277,31 @@ Running all the tests
 If you want to run the full suite of tests, you'll need to install a number of
 dependencies:
 
-*  aiosmtpd_
-*  argon2-cffi_ 19.1.0+
-*  asgiref_ 3.5.2+ (required)
-*  bcrypt_
-*  colorama_
-*  docutils_
-*  geoip2_
-*  jinja2_ 2.7+
-*  numpy_
-*  Pillow_ 6.2.0+
-*  PyYAML_
-*  pytz_ (required)
-*  pywatchman_
-*  redis_
-*  setuptools_
-*  memcached_, plus a :ref:`supported Python binding <memcached>`
-*  gettext_ (:ref:`gettext_on_windows`)
-*  selenium_
-*  sqlparse_ 0.2.2+ (required)
-*  tblib_ 1.5.0+
+* :pypi:`aiosmtpd`
+* :pypi:`argon2-cffi` 19.2.0+
+* :pypi:`asgiref` 3.6.0+ (required)
+* :pypi:`bcrypt`
+* :pypi:`colorama`
+* :pypi:`docutils`
+* :pypi:`geoip2`
+* :pypi:`Jinja2` 2.11+
+* :pypi:`numpy`
+* :pypi:`Pillow` 6.2.1+
+* :pypi:`PyYAML`
+* :pypi:`pytz` (required)
+* :pypi:`pywatchman`
+* :pypi:`redis` 3.4+
+* :pypi:`setuptools`
+* :pypi:`python-memcached`, plus a `supported Python binding
+  <https://memcached.org/>`_
+* `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
+  (:ref:`gettext_on_windows`)
+* :pypi:`selenium`
+* :pypi:`sqlparse` 0.3.1+ (required)
+* :pypi:`tblib` 1.5.0+
 
-You can find these dependencies in `pip requirements files`_ inside the
+You can find these dependencies in `pip requirements files
+<https://pip.pypa.io/en/latest/user_guide/#requirements-files>`_ inside the
 ``tests/requirements`` directory of the Django source tree and install them
 like so:
 
@@ -323,31 +327,8 @@ and install the Geospatial libraries</ref/contrib/gis/install/index>`.
 Each of these dependencies is optional. If you're missing any of them, the
 associated tests will be skipped.
 
-To run some of the autoreload tests, you'll need to install the Watchman_
-service.
-
-.. _aiosmtpd: https://pypi.org/project/aiosmtpd/
-.. _argon2-cffi: https://pypi.org/project/argon2-cffi/
-.. _asgiref: https://pypi.org/project/asgiref/
-.. _bcrypt: https://pypi.org/project/bcrypt/
-.. _colorama: https://pypi.org/project/colorama/
-.. _docutils: https://pypi.org/project/docutils/
-.. _geoip2: https://pypi.org/project/geoip2/
-.. _jinja2: https://pypi.org/project/Jinja2/
-.. _numpy: https://pypi.org/project/numpy/
-.. _Pillow: https://pypi.org/project/Pillow/
-.. _PyYAML: https://pyyaml.org/wiki/PyYAML
-.. _pytz: https://pypi.org/project/pytz/
-.. _pywatchman: https://pypi.org/project/pywatchman/
-.. _redis: https://pypi.org/project/redis/
-.. _setuptools: https://pypi.org/project/setuptools/
-.. _memcached: https://memcached.org/
-.. _gettext: https://www.gnu.org/software/gettext/manual/gettext.html
-.. _selenium: https://pypi.org/project/selenium/
-.. _sqlparse: https://pypi.org/project/sqlparse/
-.. _pip requirements files: https://pip.pypa.io/en/latest/user_guide/#requirements-files
-.. _tblib: https://pypi.org/project/tblib/
-.. _Watchman: https://facebook.github.io/watchman/
+To run some of the autoreload tests, you'll need to install the
+`Watchman <https://facebook.github.io/watchman/>`_ service.
 
 Code coverage
 -------------
@@ -356,14 +337,19 @@ Contributors are encouraged to run coverage on the test suite to identify areas
 that need additional tests. The coverage tool installation and use is described
 in :ref:`testing code coverage<topics-testing-code-coverage>`.
 
-Coverage should be run in a single process to obtain accurate statistics. To
-run coverage on the Django test suite using the standard test settings:
+To run coverage on the Django test suite using the standard test settings:
 
 .. console::
 
-   $ coverage run ./runtests.py --settings=test_sqlite --parallel=1
+   $ coverage run ./runtests.py --settings=test_sqlite
 
-After running coverage, generate the html report by running:
+After running coverage, combine all coverage statistics by running:
+
+.. console::
+
+   $ coverage combine
+
+After that generate the html report by running:
 
 .. console::
 
@@ -396,13 +382,17 @@ Ensure you have the latest point release of a :ref:`supported Python version
 that may cause the test suite to fail or hang.
 
 On **macOS** (High Sierra and newer versions), you might see this message
-logged, after which the tests hang::
+logged, after which the tests hang:
+
+.. code-block:: pytb
 
     objc[42074]: +[__NSPlaceholderDate initialize] may have been in progress in
     another thread when fork() was called.
 
 To avoid this set a ``OBJC_DISABLE_INITIALIZE_FORK_SAFETY`` environment
-variable, for example::
+variable, for example:
+
+.. code-block:: shell
 
     $ OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES ./runtests.py
 
@@ -515,8 +505,6 @@ this purpose.
 Tips for writing tests
 ======================
 
-.. highlight:: python
-
 Isolating model registration
 ----------------------------
 
@@ -529,11 +517,13 @@ a temporary ``Apps`` instance. To do this, use the
     from django.test import SimpleTestCase
     from django.test.utils import isolate_apps
 
+
     class TestModelDefinition(SimpleTestCase):
-        @isolate_apps('app_label')
+        @isolate_apps("app_label")
         def test_model_definition(self):
             class TestModel(models.Model):
                 pass
+
             ...
 
 .. admonition:: Setting ``app_label``
@@ -553,8 +543,9 @@ a temporary ``Apps`` instance. To do this, use the
         from django.test import SimpleTestCase
         from django.test.utils import isolate_apps
 
+
         class TestModelDefinition(SimpleTestCase):
-            @isolate_apps('app_label', 'other_app_label')
+            @isolate_apps("app_label", "other_app_label")
             def test_model_definition(self):
                 # This model automatically receives app_label='app_label'
                 class TestModel(models.Model):
@@ -562,5 +553,6 @@ a temporary ``Apps`` instance. To do this, use the
 
                 class OtherAppModel(models.Model):
                     class Meta:
-                        app_label = 'other_app_label'
+                        app_label = "other_app_label"
+
                 ...

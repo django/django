@@ -274,7 +274,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Load fixture 6, JSON file with dynamic ContentType fields. Testing ManyToOne.
         management.call_command("loaddata", "fixture6.json", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Tag.objects.all(),
             [
                 '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
@@ -286,7 +286,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Load fixture 7, XML file with dynamic ContentType fields. Testing ManyToOne.
         management.call_command("loaddata", "fixture7.xml", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Tag.objects.all(),
             [
                 '<Tag: <Article: Copyright is fine the way it is> tagged "copyright">',
@@ -300,7 +300,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Load fixture 8, JSON file with dynamic Permission fields. Testing ManyToMany.
         management.call_command("loaddata", "fixture8.json", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Visa.objects.all(),
             [
                 "<Visa: Django Reinhardt Can add user, Can change user, Can delete "
@@ -314,7 +314,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Load fixture 9, XML file with dynamic Permission fields. Testing ManyToMany.
         management.call_command("loaddata", "fixture9.xml", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Visa.objects.all(),
             [
                 "<Visa: Django Reinhardt Can add user, Can change user, Can delete "
@@ -916,15 +916,11 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
         with self.assertRaisesMessage(IntegrityError, msg):
             management.call_command("loaddata", "invalid.json", verbosity=0)
 
-    @unittest.skipUnless(
-        connection.vendor == "postgresql", "psycopg2 prohibits null characters in data."
-    )
+    @skipUnlessDBFeature("prohibits_null_characters_in_text_exception")
     def test_loaddata_null_characters_on_postgresql(self):
-        msg = (
-            "Could not load fixtures.Article(pk=2): "
-            "A string literal cannot contain NUL (0x00) characters."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
+        error, msg = connection.features.prohibits_null_characters_in_text_exception
+        msg = f"Could not load fixtures.Article(pk=2): {msg}"
+        with self.assertRaisesMessage(error, msg):
             management.call_command("loaddata", "null_character_in_field_value.json")
 
     def test_loaddata_app_option(self):
@@ -934,7 +930,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command(
                 "loaddata", "db_fixture_1", verbosity=0, app_label="someotherapp"
             )
-        self.assertQuerysetEqual(Article.objects.all(), [])
+        self.assertQuerySetEqual(Article.objects.all(), [])
         management.call_command(
             "loaddata", "db_fixture_1", verbosity=0, app_label="fixtures"
         )
@@ -985,7 +981,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
             management.call_command(
                 "loaddata", "db_fixture_3", verbosity=0, database="default"
             )
-        self.assertQuerysetEqual(Article.objects.all(), [])
+        self.assertQuerySetEqual(Article.objects.all(), [])
 
     def test_output_formats(self):
         # Load back in fixture 1, we need the articles from it
@@ -993,7 +989,7 @@ class FixtureLoadingTests(DumpDataAssertMixin, TestCase):
 
         # Try to load fixture 6 using format discovery
         management.call_command("loaddata", "fixture6", verbosity=0)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Tag.objects.all(),
             [
                 '<Tag: <Article: Time to reform copyright> tagged "copyright">',
@@ -1171,7 +1167,6 @@ class NonexistentFixtureTests(TestCase):
 
 
 class FixtureTransactionTests(DumpDataAssertMixin, TransactionTestCase):
-
     available_apps = [
         "fixtures",
         "django.contrib.sites",

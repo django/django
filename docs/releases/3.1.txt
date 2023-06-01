@@ -41,7 +41,7 @@ To get started with async views, you need to declare a view using
 
     async def my_view(request):
         await asyncio.sleep(0.5)
-        return HttpResponse('Hello, async world!')
+        return HttpResponse("Hello, async world!")
 
 All asynchronous features are supported whether you are running under WSGI or
 ASGI mode. However, there will be performance penalties using async code in
@@ -76,18 +76,22 @@ PostgreSQL-only::
 
     from django.db import models
 
+
     class ContactInfo(models.Model):
         data = models.JSONField()
 
-    ContactInfo.objects.create(data={
-        'name': 'John',
-        'cities': ['London', 'Cambridge'],
-        'pets': {'dogs': ['Rufus', 'Meg']},
-    })
+
+    ContactInfo.objects.create(
+        data={
+            "name": "John",
+            "cities": ["London", "Cambridge"],
+            "pets": {"dogs": ["Rufus", "Meg"]},
+        }
+    )
     ContactInfo.objects.filter(
-        data__name='John',
-        data__pets__has_key='dogs',
-        data__cities__contains='London',
+        data__name="John",
+        data__pets__has_key="dogs",
+        data__cities__contains="London",
     ).delete()
 
 If your project uses ``django.contrib.postgres.fields.JSONField``, plus the
@@ -259,7 +263,7 @@ Cache
   field names in the ``no-cache`` directive for the ``Cache-Control`` header,
   according to :rfc:`7234#section-5.2.2.2`.
 
-* :meth:`~django.core.caches.cache.delete` now returns ``True`` if the key was
+* :meth:`~django.core.cache.cache.delete` now returns ``True`` if the key was
   successfully deleted, ``False`` otherwise.
 
 CSRF
@@ -591,6 +595,7 @@ form::
     from django import forms
     from django.contrib.auth.forms import UserChangeForm
 
+
     class MyUserChangeForm(UserChangeForm):
         first_name = forms.CharField(max_length=30, required=False)
 
@@ -600,8 +605,10 @@ If you wish to keep this restriction in the admin when editing users, set
     from django.contrib.auth.admin import UserAdmin
     from django.contrib.auth.models import User
 
+
     class MyUserAdmin(UserAdmin):
         form = MyUserChangeForm
+
 
     admin.site.unregister(User)
     admin.site.register(User, MyUserAdmin)
@@ -814,7 +821,7 @@ Miscellaneous
   :class:`~django.db.models.expressions.RawSQL` instead beforehand.
 
 * The ``NullBooleanField`` model field is deprecated in favor of
-  ``BooleanField(null=True)``.
+  ``BooleanField(null=True, blank=True)``.
 
 * ``django.conf.urls.url()`` alias of :func:`django.urls.re_path` is
   deprecated.

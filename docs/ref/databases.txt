@@ -31,7 +31,7 @@ Persistent connections
 ----------------------
 
 Persistent connections avoid the overhead of reestablishing a connection to
-the database in each request. They're controlled by the
+the database in each HTTP request. They're controlled by the
 :setting:`CONN_MAX_AGE` parameter which defines the maximum lifetime of a
 connection. It can be set independently for each database.
 
@@ -72,10 +72,6 @@ connections, e.g. after database server restart. The health check is performed
 only once per request and only if the database is being accessed during the
 handling of the request.
 
-.. versionchanged:: 4.1
-
-    The :setting:`CONN_HEALTH_CHECKS` setting was added.
-
 Caveats
 ~~~~~~~
 
@@ -101,6 +97,10 @@ either restore Django's defaults at the end of each request, force an
 appropriate value at the beginning of each request, or disable persistent
 connections.
 
+If a connection is created in a long-running process, outside of Django’s
+request-response cycle, the connection will remain open until explicitly
+closed, or timeout occurs.
+
 Encoding
 --------
 
@@ -114,10 +114,17 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 12 and higher. `psycopg2`_ 2.8.4 or higher is
-required, though the latest release is recommended.
+Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
-.. _psycopg2: https://www.psycopg.org/
+.. note::
+
+    Support for ``psycopg2`` is likely to be deprecated and removed at some
+    point in the future.
+
+.. versionchanged:: 4.2
+
+    Support for ``psycopg`` 3.1.8+ was added.
 
 .. _postgresql-connection-settings:
 
@@ -134,11 +141,11 @@ password from the `password file`_, you must specify them in the
     :caption: ``settings.py``
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'OPTIONS': {
-                'service': 'my_service',
-                'passfile': '.my_pgpass',
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "OPTIONS": {
+                "service": "my_service",
+                "passfile": ".my_pgpass",
             },
         }
     }
@@ -199,12 +206,12 @@ level`_. If you need a higher isolation level such as ``REPEATABLE READ`` or
 ``SERIALIZABLE``, set it in the :setting:`OPTIONS` part of your database
 configuration in :setting:`DATABASES`::
 
-    import psycopg2.extensions
+    from django.db.backends.postgresql.psycopg_any import IsolationLevel
 
     DATABASES = {
         # ...
-        'OPTIONS': {
-            'isolation_level': psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE,
+        "OPTIONS": {
+            "isolation_level": IsolationLevel.SERIALIZABLE,
         },
     }
 
@@ -215,6 +222,56 @@ configuration in :setting:`DATABASES`::
     designed for advanced uses.
 
 .. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
+
+.. versionchanged:: 4.2
+
+    ``IsolationLevel`` was added.
+
+.. _database-role:
+
+Role
+----
+
+.. versionadded:: 4.2
+
+If you need to use a different role for database connections than the role use
+to establish the connection, set it in the :setting:`OPTIONS` part of your
+database configuration in :setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "assume_role": "my_application_role",
+            },
+        },
+    }
+
+.. _database-server-side-parameters-binding:
+
+Server-side parameters binding
+------------------------------
+
+.. versionadded:: 4.2
+
+With `psycopg`_ 3.1.8+, Django defaults to the :ref:`client-side binding
+cursors <psycopg:client-side-binding-cursors>`. If you want to use the
+:ref:`server-side binding <psycopg:server-side-binding>` set it in the
+:setting:`OPTIONS` part of your database configuration in
+:setting:`DATABASES`::
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            # ...
+            "OPTIONS": {
+                "server_side_binding": True,
+            },
+        },
+    }
+
+This option is ignored with ``psycopg2``.
 
 Indexes for ``varchar`` and ``text`` columns
 --------------------------------------------
@@ -244,7 +301,7 @@ Server-side cursors
 
 When using :meth:`QuerySet.iterator()
 <django.db.models.query.QuerySet.iterator>`, Django opens a :ref:`server-side
-cursor <psycopg2:server-side-cursors>`. By default, PostgreSQL assumes that
+cursor <psycopg:server-side-cursors>`. By default, PostgreSQL assumes that
 only the first 10% of the results of cursor queries will be fetched. The query
 planner spends less time planning the query and starts returning results
 faster, but this could diminish performance if more than 10% of the results are
@@ -295,25 +352,21 @@ Django uses PostgreSQL's identity columns to store auto-incrementing primary
 keys. An identity column is populated with values from a `sequence`_ that keeps
 track of the next available value. Manually assigning a value to an
 auto-incrementing field doesn't update the field's sequence, which might later
-cause a conflict. For example::
+cause a conflict. For example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.auth.models import User
-    >>> User.objects.create(username='alice', pk=1)
+    >>> User.objects.create(username="alice", pk=1)
     <User: alice>
     >>> # The sequence hasn't been updated; its next value is 1.
-    >>> User.objects.create(username='bob')
-    ...
+    >>> User.objects.create(username="bob")
     IntegrityError: duplicate key value violates unique constraint
     "auth_user_pkey" DETAIL:  Key (id)=(1) already exists.
 
 If you need to specify such values, reset the sequence afterward to avoid
 reusing a value that's already in the table. The :djadmin:`sqlsequencereset`
 management command generates the SQL statements to do that.
-
-.. versionchanged:: 4.1
-
-    In older versions, PostgreSQL’s ``SERIAL`` data type was used instead of
-    identity columns.
 
 .. _sequence: https://www.postgresql.org/docs/current/sql-createsequence.html
 
@@ -337,6 +390,9 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
     or corruption in the case of a server crash or power loss. Only use this on
     a development machine where you can easily restore the entire contents of
     all databases in the cluster.
+
+.. _psycopg: https://www.psycopg.org/psycopg3/
+.. _psycopg2: https://www.psycopg.org/
 
 .. _mariadb-notes:
 
@@ -396,12 +452,11 @@ MySQL DB API Drivers
 MySQL has a couple drivers that implement the Python Database API described in
 :pep:`249`:
 
-- `mysqlclient`_ is a native driver. It's **the recommended choice**.
+- :pypi:`mysqlclient` is a native driver. It's **the recommended choice**.
 - `MySQL Connector/Python`_ is a pure Python driver from Oracle that does not
   require the MySQL client library or any Python modules outside the standard
   library.
 
-.. _mysqlclient: https://pypi.org/project/mysqlclient/
 .. _MySQL Connector/Python: https://dev.mysql.com/downloads/connector/python/
 
 These drivers are thread-safe and provide connection pooling.
@@ -415,7 +470,7 @@ Connector/Python includes `its own`_.
 mysqlclient
 ~~~~~~~~~~~
 
-Django requires `mysqlclient`_ 1.4.0 or later.
+Django requires `mysqlclient`_ 1.4.3 or later.
 
 MySQL Connector/Python
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -440,7 +495,9 @@ This needs to be done just once for your MySQL server, not per database.
 Creating your database
 ----------------------
 
-You can `create your database`_ using the command-line tools and this SQL::
+You can `create your database`_ using the command-line tools and this SQL:
+
+.. code-block:: sql
 
   CREATE DATABASE <dbname> CHARACTER SET utf8;
 
@@ -512,14 +569,15 @@ Here's a sample configuration which uses a MySQL option file::
 
     # settings.py
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'OPTIONS': {
-                'read_default_file': '/path/to/my.cnf',
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "OPTIONS": {
+                "read_default_file": "/path/to/my.cnf",
             },
         }
     }
 
+.. code-block:: ini
 
     # my.cnf
     [client]
@@ -590,7 +648,9 @@ If you're using a hosting service and can't change your server's default
 storage engine, you have a couple of options.
 
 * After the tables are created, execute an ``ALTER TABLE`` statement to
-  convert a table to a new storage engine (such as InnoDB)::
+  convert a table to a new storage engine (such as InnoDB):
+
+  .. code-block:: sql
 
       ALTER TABLE <tablename> ENGINE=INNODB;
 
@@ -599,8 +659,8 @@ storage engine, you have a couple of options.
 * Another option is to use the ``init_command`` option for MySQLdb prior to
   creating your tables::
 
-      'OPTIONS': {
-         'init_command': 'SET default_storage_engine=INNODB',
+      "OPTIONS": {
+          "init_command": "SET default_storage_engine=INNODB",
       }
 
   This sets the default storage engine upon connecting to the database.
@@ -670,7 +730,9 @@ includes a fractional indication (e.g. ``DATETIME(6)``).
 Django will not upgrade existing columns to include fractional seconds if the
 database server supports it. If you want to enable them on an existing database,
 it's up to you to either manually update the column on the target database, by
-executing a command like::
+executing a command like:
+
+.. code-block:: sql
 
     ALTER TABLE `your_table` MODIFY `your_datetime_column` DATETIME(6)
 
@@ -730,7 +792,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.9.0 and later.
+Django supports SQLite 3.21.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
@@ -804,9 +866,9 @@ If you're getting this error, you can solve it by:
 * Increase the default timeout value by setting the ``timeout`` database
   option::
 
-      'OPTIONS': {
+      "OPTIONS": {
           # ...
-          'timeout': 20,
+          "timeout": 20,
           # ...
       }
 
@@ -818,14 +880,6 @@ If you're getting this error, you can solve it by:
 
 SQLite does not support the ``SELECT ... FOR UPDATE`` syntax. Calling it will
 have no effect.
-
-"pyformat" parameter style in raw queries not supported
--------------------------------------------------------
-
-For most backends, raw queries (``Manager.raw()`` or ``cursor.execute()``)
-can use the "pyformat" parameter style, where placeholders in the query
-are given as ``'%(name)s'`` and the parameters are passed as a dictionary
-rather than a list. SQLite does not support this.
 
 .. _sqlite-isolation:
 
@@ -852,6 +906,10 @@ raised.
 
 To enable the JSON1 extension you can follow the instruction on
 `the wiki page`_.
+
+.. note::
+
+    The JSON1 extension is enabled by default on SQLite 3.38+.
 
 .. _JSON1 extension: https://www.sqlite.org/json1.html
 .. _the wiki page: https://code.djangoproject.com/wiki/JSON1Extension
@@ -920,13 +978,13 @@ To connect using the service name of your Oracle database, your ``settings.py``
 file should look something like this::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.oracle',
-            'NAME': 'xe',
-            'USER': 'a_user',
-            'PASSWORD': 'a_password',
-            'HOST': '',
-            'PORT': '',
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            "NAME": "xe",
+            "USER": "a_user",
+            "PASSWORD": "a_password",
+            "HOST": "",
+            "PORT": "",
         }
     }
 
@@ -937,13 +995,13 @@ and want to connect using the SID ("xe" in this example), then fill in both
 :setting:`HOST` and :setting:`PORT` like so::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.oracle',
-            'NAME': 'xe',
-            'USER': 'a_user',
-            'PASSWORD': 'a_password',
-            'HOST': 'dbprod01ned.mycompany.com',
-            'PORT': '1540',
+        "default": {
+            "ENGINE": "django.db.backends.oracle",
+            "NAME": "xe",
+            "USER": "a_user",
+            "PASSWORD": "a_password",
+            "HOST": "dbprod01ned.mycompany.com",
+            "PORT": "1540",
         }
     }
 
@@ -960,14 +1018,14 @@ using RAC or pluggable databases without ``tnsnames.ora``, for example.
 
 Example of an Easy Connect string::
 
-    'NAME': 'localhost:1521/orclpdb1',
+    "NAME": "localhost:1521/orclpdb1"
 
 Example of a full DSN string::
 
-    'NAME': (
-        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))'
-        '(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))'
-    ),
+    "NAME": (
+        "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))"
+        "(CONNECT_DATA=(SERVICE_NAME=orclpdb1)))"
+    )
 
 Threaded option
 ---------------
@@ -976,9 +1034,9 @@ If you plan to run Django in a multithreaded environment (e.g. Apache using the
 default MPM module on any modern operating system), then you **must** set
 the ``threaded`` option of your Oracle database configuration to ``True``::
 
-    'OPTIONS': {
-        'threaded': True,
-    },
+    "OPTIONS": {
+        "threaded": True,
+    }
 
 Failure to do this may result in crashes and other odd behavior.
 
@@ -992,9 +1050,9 @@ inserting into a remote table, or into a view with an ``INSTEAD OF`` trigger.
 The ``RETURNING INTO`` clause can be disabled by setting the
 ``use_returning_into`` option of the database configuration to ``False``::
 
-    'OPTIONS': {
-        'use_returning_into': False,
-    },
+    "OPTIONS": {
+        "use_returning_into": False,
+    }
 
 In this case, the Oracle backend will use a separate ``SELECT`` query to
 retrieve ``AutoField`` values.
@@ -1014,6 +1072,7 @@ a quoted name as the value for ``db_table``::
     class LegacyModel(models.Model):
         class Meta:
             db_table = '"name_left_in_lowercase"'
+
 
     class ForeignModel(models.Model):
         class Meta:
@@ -1070,7 +1129,9 @@ database backends to modify its behavior, features, or configuration.
 
 Consider, for example, that you need to change a single database feature.
 First, you have to create a new directory with a ``base`` module in it. For
-example::
+example:
+
+.. code-block:: text
 
     mysite/
         ...
@@ -1088,9 +1149,11 @@ example of subclassing the PostgreSQL engine to change a feature class
 
     from django.db.backends.postgresql import base, features
 
+
     class DatabaseFeatures(features.DatabaseFeatures):
         def allows_group_by_selected_pks_on_model(self, model):
             return True
+
 
     class DatabaseWrapper(base.DatabaseWrapper):
         features_class = DatabaseFeatures
@@ -1099,9 +1162,9 @@ Finally, you must specify a :setting:`DATABASE-ENGINE` in your ``settings.py``
 file::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'mydbengine',
-            ...
+        "default": {
+            "ENGINE": "mydbengine",
+            # ...
         },
     }
 
@@ -1116,21 +1179,15 @@ Using a 3rd-party database backend
 In addition to the officially supported databases, there are backends provided
 by 3rd parties that allow you to use other databases with Django:
 
-* `CockroachDB`_
-* `Firebird`_
-* `Google Cloud Spanner`_
-* `Microsoft SQL Server`_
-* `TiDB`_
-* `YugabyteDB`_
+* :pypi:`CockroachDB <django-cockroachdb>`
+* :pypi:`Firebird <django-firebird>`
+* :pypi:`Google Cloud Spanner <django-google-spanner>`
+* :pypi:`Microsoft SQL Server <mssql-django>`
+* :pypi:`Snowflake <django-snowflake>`
+* :pypi:`TiDB <django-tidb>`
+* :pypi:`YugabyteDB <django-yugabytedb>`
 
 The Django versions and ORM features supported by these unofficial backends
 vary considerably. Queries regarding the specific capabilities of these
 unofficial backends, along with any support queries, should be directed to
 the support channels provided by each 3rd party project.
-
-.. _CockroachDB: https://pypi.org/project/django-cockroachdb/
-.. _Firebird: https://pypi.org/project/django-firebird/
-.. _Google Cloud Spanner: https://pypi.org/project/django-google-spanner/
-.. _Microsoft SQL Server: https://pypi.org/project/mssql-django/
-.. _TiDB: https://pypi.org/project/django-tidb/
-.. _YugabyteDB: https://pypi.org/project/django-yugabytedb/

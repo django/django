@@ -679,11 +679,13 @@ class ReadOnlyPizzaAdmin(admin.ModelAdmin):
 class WorkHourAdmin(admin.ModelAdmin):
     list_display = ("datum", "employee")
     list_filter = ("employee",)
+    show_facets = admin.ShowFacets.ALWAYS
 
 
 class FoodDeliveryAdmin(admin.ModelAdmin):
     list_display = ("reference", "driver", "restaurant")
     list_editable = ("driver", "restaurant")
+    show_facets = admin.ShowFacets.NEVER
 
 
 class CoverLetterAdmin(admin.ModelAdmin):
@@ -1165,6 +1167,14 @@ class GetFormsetsArgumentCheckingAdmin(admin.ModelAdmin):
         return super().get_formsets_with_inlines(request, obj)
 
 
+class CountryAdmin(admin.ModelAdmin):
+    search_fields = ["name"]
+
+
+class TravelerAdmin(admin.ModelAdmin):
+    autocomplete_fields = ["living_country"]
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1286,8 +1296,8 @@ site.register(ExplicitlyProvidedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(ImplicitlyGeneratedPK, GetFormsetsArgumentCheckingAdmin)
 site.register(UserProxy)
 site.register(Box)
-site.register(Country)
-site.register(Traveler)
+site.register(Country, CountryAdmin)
+site.register(Traveler, TravelerAdmin)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)

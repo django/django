@@ -290,7 +290,7 @@ class ManyToOneTests(TestCase):
         )
         # ... and should work fine with the string that comes out of
         # forms.Form.cleaned_data.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             (
                 Article.objects.filter(reporter__first_name__exact="John").extra(
                     where=["many_to_one_reporter.last_name='%s'" % "Smith"]

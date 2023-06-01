@@ -304,7 +304,7 @@ class TypeSerializer(BaseSerializer):
     def serialize(self):
         special_cases = [
             (models.Model, "models.Model", ["from django.db import models"]),
-            (type(None), "type(None)", []),
+            (types.NoneType, "types.NoneType", ["import types"]),
         ]
         for case, string, imports in special_cases:
             if case is self.value:
@@ -338,7 +338,7 @@ class Serializer:
         (datetime.date, datetime.timedelta, datetime.time): DateTimeSerializer,
         SettingsReference: SettingsReferenceSerializer,
         float: FloatSerializer,
-        (bool, int, type(None), bytes, str, range): BaseSimpleSerializer,
+        (bool, int, types.NoneType, bytes, str, range): BaseSimpleSerializer,
         decimal.Decimal: DecimalSerializer,
         (functools.partial, functools.partialmethod): FunctoolsPartialSerializer,
         (

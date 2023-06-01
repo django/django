@@ -199,8 +199,8 @@ class CommandTests(SimpleTestCase):
         with mock.patch(
             "django.core.management.base.BaseCommand.check"
         ) as mocked_check:
-            management.call_command("specific_system_checks")
-        mocked_check.called_once_with(tags=[Tags.staticfiles, Tags.models])
+            management.call_command("specific_system_checks", skip_checks=False)
+        mocked_check.assert_called_once_with(tags=[Tags.staticfiles, Tags.models])
 
     def test_requires_system_checks_invalid(self):
         class Command(BaseCommand):
@@ -467,6 +467,30 @@ class CommandRunTests(AdminScriptTestCase):
         out, err = self.run_manage(["set_option", "--skip-checks", "--set", "foo"])
         self.assertNoOutput(err)
         self.assertEqual(out.strip(), "Set foo")
+
+    def test_subparser_error_formatting(self):
+        self.write_settings("settings.py", apps=["user_commands"])
+        out, err = self.run_manage(["subparser", "foo", "twelve"])
+        self.maxDiff = None
+        self.assertNoOutput(out)
+        err_lines = err.splitlines()
+        self.assertEqual(len(err_lines), 2)
+        self.assertEqual(
+            err_lines[1],
+            "manage.py subparser foo: error: argument bar: invalid int value: 'twelve'",
+        )
+
+    def test_subparser_non_django_error_formatting(self):
+        self.write_settings("settings.py", apps=["user_commands"])
+        out, err = self.run_manage(["subparser_vanilla", "foo", "seven"])
+        self.assertNoOutput(out)
+        err_lines = err.splitlines()
+        self.assertEqual(len(err_lines), 2)
+        self.assertEqual(
+            err_lines[1],
+            "manage.py subparser_vanilla foo: error: argument bar: invalid int value: "
+            "'seven'",
+        )
 
 
 class UtilsTests(SimpleTestCase):

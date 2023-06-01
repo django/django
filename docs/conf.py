@@ -97,6 +97,10 @@ source_suffix = ".txt"
 # The root toctree document.
 root_doc = "contents"
 
+# Disable auto-created table of contents entries for all domain objects (e.g.
+# functions, classes, attributes, etc.) in Sphinx 5.2+.
+toc_object_entries = False
+
 # General substitutions.
 project = "Django"
 copyright = "Django Software Foundation and contributors"
@@ -107,7 +111,7 @@ copyright = "Django Software Foundation and contributors"
 # built documents.
 #
 # The short X.Y version.
-version = "4.2"
+version = "5.0"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -124,12 +128,13 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "4.2"
+django_next_version = "5.0"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),
     "commit": ("https://github.com/django/django/commit/%s", "%s"),
     "cve": ("https://nvd.nist.gov/vuln/detail/CVE-%s", "CVE-%s"),
+    "pypi": ("https://pypi.org/project/%s/", "%s"),
     # A file or directory. GitHub redirects from blob to tree if needed.
     "source": ("https://github.com/django/django/blob/main/%s", "%s"),
     "ticket": ("https://code.djangoproject.com/ticket/%s", "#%s"),
@@ -174,7 +179,7 @@ pygments_style = "trac"
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-    "psycopg2": ("https://www.psycopg.org/docs/", None),
+    "psycopg": ("https://www.psycopg.org/psycopg3/docs/", None),
 }
 
 # Python's docs don't change every week.
@@ -400,7 +405,7 @@ epub_cover = ("", "epub-cover.html")
 # The format is a list of tuples containing the path and title.
 # epub_pre_files = []
 
-# HTML files shat should be inserted after the pages created by sphinx.
+# HTML files that should be inserted after the pages created by sphinx.
 # The format is a list of tuples containing the path and title.
 # epub_post_files = []
 

@@ -25,8 +25,8 @@ class DateHierarchyTests(TestCase):
         request.user = self.superuser
         changelist = EventAdmin(Event, custom_site).get_changelist_instance(request)
         _, _, lookup_params, *_ = changelist.get_filters(request)
-        self.assertEqual(lookup_params["date__gte"], expected_from_date)
-        self.assertEqual(lookup_params["date__lt"], expected_to_date)
+        self.assertEqual(lookup_params["date__gte"], [expected_from_date])
+        self.assertEqual(lookup_params["date__lt"], [expected_to_date])
 
     def test_bounded_params(self):
         tests = (

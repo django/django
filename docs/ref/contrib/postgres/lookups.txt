@@ -23,7 +23,9 @@ extension using the
 operation.
 
 The ``trigram_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::
+:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
+
+.. code-block:: pycon
 
     >>> City.objects.filter(name__trigram_similar="Middlesborough")
     ['<City: Middlesbrough>']
@@ -47,9 +49,11 @@ extension using the
 operation.
 
 The ``trigram_word_similar`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::
+:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
 
-    >>> Sentence.objects.filter(name__trigram_word_similar='Middlesborough')
+.. code-block:: pycon
+
+    >>> Sentence.objects.filter(name__trigram_word_similar="Middlesborough")
     ['<Sentence: Gumby rides on the path of Middlesbrough>']
 
 .. fieldlookup:: trigram_strict_word_similar
@@ -91,7 +95,9 @@ operation is available if you want to perform this activation using migrations).
 .. _unaccent extension on PostgreSQL: https://www.postgresql.org/docs/current/unaccent.html
 
 The ``unaccent`` lookup can be used on
-:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`::
+:class:`~django.db.models.CharField` and :class:`~django.db.models.TextField`:
+
+.. code-block:: pycon
 
     >>> City.objects.filter(name__unaccent="México")
     ['<City: Mexico>']

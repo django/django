@@ -2,9 +2,16 @@
 Django 4.1.2 release notes
 ==========================
 
-*Expected October 4, 2022*
+*October 4, 2022*
 
-Django 4.1.2 fixes several bugs in 4.1.1.
+Django 4.1.2 fixes a security issue with severity "medium" and several bugs in
+4.1.1.
+
+CVE-2022-41323: Potential denial-of-service vulnerability in internationalized URLs
+===================================================================================
+
+Internationalized URLs were subject to potential denial of service attack via
+the locale parameter.
 
 Bugfixes
 ========
@@ -22,3 +29,30 @@ Bugfixes
 * Fixed a regression in Django 4.1 that caused a
   ``QuerySet.values()/values_list()`` crash on ``ArrayAgg()`` and
   ``JSONBAgg()`` (:ticket:`34016`).
+
+* Fixed a bug in Django 4.1 that caused :attr:`.ModelAdmin.autocomplete_fields`
+  to be incorrectly selected after adding/changing related instances via popups
+  (:ticket:`34025`).
+
+* Fixed a regression in Django 4.1 where the app registry was not populated
+  when running parallel tests with the ``multiprocessing`` start method
+  ``spawn`` (:ticket:`34010`).
+
+* Fixed a regression in Django 4.1 where the ``--debug-mode`` argument to
+  ``test`` did not work when running parallel tests with the
+  ``multiprocessing`` start method ``spawn`` (:ticket:`34010`).
+
+* Fixed a regression in Django 4.1 that didn't alter a sequence type when
+  altering type of pre-Django 4.1 serial columns on PostgreSQL
+  (:ticket:`34058`).
+
+* Fixed a regression in Django 4.1 that caused a crash for :class:`View`
+  subclasses with asynchronous handlers when handling non-allowed HTTP methods
+  (:ticket:`34062`).
+
+* Reverted caching related managers for ``ForeignKey``, ``ManyToManyField``,
+  and ``GenericRelation`` that caused the incorrect refreshing of related
+  objects (:ticket:`33984`).
+
+* Relaxed the system check added in Django 4.1 for the same name used for
+  multiple template tag modules to a warning (:ticket:`32987`).

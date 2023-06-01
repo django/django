@@ -28,7 +28,7 @@ class RelatedObjectTests(TestCase):
         i3.save()
         i3.cc.add(r)
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Issue.objects.filter(client=r.id),
             [
                 1,
@@ -36,15 +36,15 @@ class RelatedObjectTests(TestCase):
             ],
             lambda i: i.num,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Issue.objects.filter(client=g.id),
             [
                 3,
             ],
             lambda i: i.num,
         )
-        self.assertQuerysetEqual(Issue.objects.filter(cc__id__exact=g.id), [])
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(Issue.objects.filter(cc__id__exact=g.id), [])
+        self.assertQuerySetEqual(
             Issue.objects.filter(cc__id__exact=r.id),
             [
                 2,
@@ -55,7 +55,7 @@ class RelatedObjectTests(TestCase):
 
         # These queries combine results from the m2m and the m2o relationships.
         # They're three ways of saying the same thing.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Issue.objects.filter(Q(cc__id__exact=r.id) | Q(client=r.id)),
             [
                 1,
@@ -64,7 +64,7 @@ class RelatedObjectTests(TestCase):
             ],
             lambda i: i.num,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Issue.objects.filter(cc__id__exact=r.id)
             | Issue.objects.filter(client=r.id),
             [
@@ -74,7 +74,7 @@ class RelatedObjectTests(TestCase):
             ],
             lambda i: i.num,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Issue.objects.filter(Q(client=r.id) | Q(cc__id__exact=r.id)),
             [
                 1,

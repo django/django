@@ -6,19 +6,11 @@ from django.contrib.auth.backends import RemoteUserBackend
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.models import User
 from django.middleware.csrf import _get_new_csrf_string, _mask_cipher_secret
-from django.test import (
-    Client,
-    TestCase,
-    ignore_warnings,
-    modify_settings,
-    override_settings,
-)
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test import Client, TestCase, modify_settings, override_settings
 
 
 @override_settings(ROOT_URLCONF="auth_tests.urls")
 class RemoteUserTest(TestCase):
-
     middleware = "django.contrib.auth.middleware.RemoteUserMiddleware"
     backend = "django.contrib.auth.backends.RemoteUserBackend"
     header = "REMOTE_USER"
@@ -277,34 +269,6 @@ class RemoteUserCustomTest(RemoteUserTest):
         self.assertEqual(User.objects.count(), num_users + 1)
         newuser = User.objects.get(username="newuser")
         self.assertEqual(newuser.email, "user@example.com")
-
-
-# RemovedInDjango50Warning.
-class CustomRemoteUserNoCreatedArgumentBackend(CustomRemoteUserBackend):
-    def configure_user(self, request, user):
-        return super().configure_user(request, user)
-
-
-@ignore_warnings(category=RemovedInDjango50Warning)
-class RemoteUserCustomNoCreatedArgumentTest(RemoteUserTest):
-    backend = "auth_tests.test_remote_user.CustomRemoteUserNoCreatedArgumentBackend"
-
-
-@override_settings(ROOT_URLCONF="auth_tests.urls")
-@modify_settings(
-    AUTHENTICATION_BACKENDS={
-        "append": "auth_tests.test_remote_user.CustomRemoteUserNoCreatedArgumentBackend"
-    },
-    MIDDLEWARE={"append": "django.contrib.auth.middleware.RemoteUserMiddleware"},
-)
-class RemoteUserCustomNoCreatedArgumentDeprecationTest(TestCase):
-    def test_known_user_sync(self):
-        msg = (
-            "`created=True` must be added to the signature of "
-            "CustomRemoteUserNoCreatedArgumentBackend.configure_user()."
-        )
-        with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-            self.client.get("/remote_user/", **{RemoteUserTest.header: "newuser"})
 
 
 class CustomHeaderMiddleware(RemoteUserMiddleware):

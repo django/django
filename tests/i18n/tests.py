@@ -18,15 +18,8 @@ from django.conf import settings
 from django.conf.locale import LANG_INFO
 from django.conf.urls.i18n import i18n_patterns
 from django.template import Context, Template
-from django.test import (
-    RequestFactory,
-    SimpleTestCase,
-    TestCase,
-    ignore_warnings,
-    override_settings,
-)
+from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
 from django.utils import translation
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.formats import (
     date_format,
     get_format,
@@ -550,26 +543,13 @@ class FormattingTests(SimpleTestCase):
                 self.assertIn(
                     "23", time_format(some_datetime)
                 )  # Uses TIME_FORMAT by default
+                self.assertIn("2017", date_format(some_datetime, "DATETIME_FORMAT"))
+                self.assertIn("2017", date_format(some_date, "YEAR_MONTH_FORMAT"))
+                self.assertIn("14", date_format(some_date, "MONTH_DAY_FORMAT"))
+                self.assertIn("2017", date_format(some_date, "SHORT_DATE_FORMAT"))
                 self.assertIn(
                     "2017",
-                    date_format(some_datetime, format=get_format("DATETIME_FORMAT")),
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(some_date, format=get_format("YEAR_MONTH_FORMAT")),
-                )
-                self.assertIn(
-                    "14", date_format(some_date, format=get_format("MONTH_DAY_FORMAT"))
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(some_date, format=get_format("SHORT_DATE_FORMAT")),
-                )
-                self.assertIn(
-                    "2017",
-                    date_format(
-                        some_datetime, format=get_format("SHORT_DATETIME_FORMAT")
-                    ),
+                    date_format(some_datetime, "SHORT_DATETIME_FORMAT"),
                 )
 
     def test_locale_independent(self):
@@ -668,181 +648,6 @@ class FormattingTests(SimpleTestCase):
             self.assertEqual(
                 "⌚ 10:15", Template('{{ t|time:"⌚ H:i" }}').render(self.ctxt)
             )
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False)
-    def test_l10n_disabled(self):
-        """
-        Catalan locale with format i18n disabled translations will be used,
-        but not formats
-        """
-        with translation.override("ca", deactivate=True):
-            self.maxDiff = 3000
-            self.assertEqual("N j, Y", get_format("DATE_FORMAT"))
-            self.assertEqual(0, get_format("FIRST_DAY_OF_WEEK"))
-            self.assertEqual(".", get_format("DECIMAL_SEPARATOR"))
-            self.assertEqual("10:15 a.m.", time_format(self.t))
-            self.assertEqual("Des. 31, 2009", date_format(self.d))
-            self.assertEqual("desembre 2009", date_format(self.d, "YEAR_MONTH_FORMAT"))
-            self.assertEqual(
-                "12/31/2009 8:50 p.m.", date_format(self.dt, "SHORT_DATETIME_FORMAT")
-            )
-            self.assertEqual("No localizable", localize("No localizable"))
-            self.assertEqual("66666.666", localize(self.n))
-            self.assertEqual("99999.999", localize(self.f))
-            self.assertEqual("10000", localize(self.long))
-            self.assertEqual("Des. 31, 2009", localize(self.d))
-            self.assertEqual("Des. 31, 2009, 8:50 p.m.", localize(self.dt))
-            self.assertEqual("66666.666", Template("{{ n }}").render(self.ctxt))
-            self.assertEqual("99999.999", Template("{{ f }}").render(self.ctxt))
-            self.assertEqual("Des. 31, 2009", Template("{{ d }}").render(self.ctxt))
-            self.assertEqual(
-                "Des. 31, 2009, 8:50 p.m.", Template("{{ dt }}").render(self.ctxt)
-            )
-            self.assertEqual(
-                "66666.67", Template('{{ n|floatformat:"2u" }}').render(self.ctxt)
-            )
-            self.assertEqual(
-                "100000.0", Template('{{ f|floatformat:"u" }}').render(self.ctxt)
-            )
-            self.assertEqual(
-                "66666.67",
-                Template('{{ n|floatformat:"2gu" }}').render(self.ctxt),
-            )
-            self.assertEqual(
-                "100000.0",
-                Template('{{ f|floatformat:"ug" }}').render(self.ctxt),
-            )
-            self.assertEqual(
-                "10:15 a.m.", Template('{{ t|time:"TIME_FORMAT" }}').render(self.ctxt)
-            )
-            self.assertEqual(
-                "12/31/2009",
-                Template('{{ d|date:"SHORT_DATE_FORMAT" }}').render(self.ctxt),
-            )
-            self.assertEqual(
-                "12/31/2009 8:50 p.m.",
-                Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt),
-            )
-
-            form = I18nForm(
-                {
-                    "decimal_field": "66666,666",
-                    "float_field": "99999,999",
-                    "date_field": "31/12/2009",
-                    "datetime_field": "31/12/2009 20:50",
-                    "time_field": "20:50",
-                    "integer_field": "1.234",
-                }
-            )
-            self.assertFalse(form.is_valid())
-            self.assertEqual(["Introdu\xefu un n\xfamero."], form.errors["float_field"])
-            self.assertEqual(
-                ["Introdu\xefu un n\xfamero."], form.errors["decimal_field"]
-            )
-            self.assertEqual(
-                ["Introdu\xefu una data v\xe0lida."], form.errors["date_field"]
-            )
-            self.assertEqual(
-                ["Introdu\xefu una data/hora v\xe0lides."],
-                form.errors["datetime_field"],
-            )
-            self.assertEqual(
-                ["Introdu\xefu un n\xfamero enter."], form.errors["integer_field"]
-            )
-
-            form2 = SelectDateForm(
-                {
-                    "date_field_month": "12",
-                    "date_field_day": "31",
-                    "date_field_year": "2009",
-                }
-            )
-            self.assertTrue(form2.is_valid())
-            self.assertEqual(
-                datetime.date(2009, 12, 31), form2.cleaned_data["date_field"]
-            )
-            self.assertHTMLEqual(
-                '<select name="mydate_month" id="id_mydate_month">'
-                '<option value="">---</option>'
-                '<option value="1">gener</option>'
-                '<option value="2">febrer</option>'
-                '<option value="3">mar\xe7</option>'
-                '<option value="4">abril</option>'
-                '<option value="5">maig</option>'
-                '<option value="6">juny</option>'
-                '<option value="7">juliol</option>'
-                '<option value="8">agost</option>'
-                '<option value="9">setembre</option>'
-                '<option value="10">octubre</option>'
-                '<option value="11">novembre</option>'
-                '<option value="12" selected>desembre</option>'
-                "</select>"
-                '<select name="mydate_day" id="id_mydate_day">'
-                '<option value="">---</option>'
-                '<option value="1">1</option>'
-                '<option value="2">2</option>'
-                '<option value="3">3</option>'
-                '<option value="4">4</option>'
-                '<option value="5">5</option>'
-                '<option value="6">6</option>'
-                '<option value="7">7</option>'
-                '<option value="8">8</option>'
-                '<option value="9">9</option>'
-                '<option value="10">10</option>'
-                '<option value="11">11</option>'
-                '<option value="12">12</option>'
-                '<option value="13">13</option>'
-                '<option value="14">14</option>'
-                '<option value="15">15</option>'
-                '<option value="16">16</option>'
-                '<option value="17">17</option>'
-                '<option value="18">18</option>'
-                '<option value="19">19</option>'
-                '<option value="20">20</option>'
-                '<option value="21">21</option>'
-                '<option value="22">22</option>'
-                '<option value="23">23</option>'
-                '<option value="24">24</option>'
-                '<option value="25">25</option>'
-                '<option value="26">26</option>'
-                '<option value="27">27</option>'
-                '<option value="28">28</option>'
-                '<option value="29">29</option>'
-                '<option value="30">30</option>'
-                '<option value="31" selected>31</option>'
-                "</select>"
-                '<select name="mydate_year" id="id_mydate_year">'
-                '<option value="">---</option>'
-                '<option value="2009" selected>2009</option>'
-                '<option value="2010">2010</option>'
-                '<option value="2011">2011</option>'
-                '<option value="2012">2012</option>'
-                '<option value="2013">2013</option>'
-                '<option value="2014">2014</option>'
-                '<option value="2015">2015</option>'
-                '<option value="2016">2016</option>'
-                '<option value="2017">2017</option>'
-                '<option value="2018">2018</option>'
-                "</select>",
-                forms.SelectDateWidget(years=range(2009, 2019)).render(
-                    "mydate", datetime.date(2009, 12, 31)
-                ),
-            )
-
-            # We shouldn't change the behavior of the floatformat filter re:
-            # thousand separator and grouping when localization is disabled
-            # even if the USE_THOUSAND_SEPARATOR, NUMBER_GROUPING and
-            # THOUSAND_SEPARATOR settings are specified.
-            with self.settings(
-                USE_THOUSAND_SEPARATOR=True, NUMBER_GROUPING=1, THOUSAND_SEPARATOR="!"
-            ):
-                self.assertEqual(
-                    "66666.67", Template('{{ n|floatformat:"2u" }}').render(self.ctxt)
-                )
-                self.assertEqual(
-                    "100000.0", Template('{{ f|floatformat:"u" }}').render(self.ctxt)
-                )
 
     def test_false_like_locale_formats(self):
         """
@@ -961,7 +766,7 @@ class FormattingTests(SimpleTestCase):
                     Template('{{ dt|date:"SHORT_DATETIME_FORMAT" }}').render(self.ctxt),
                 )
                 self.assertEqual(
-                    date_format(datetime.datetime.now(), "DATE_FORMAT"),
+                    date_format(datetime.datetime.now()),
                     Template('{% now "DATE_FORMAT" %}').render(self.ctxt),
                 )
 
@@ -1435,7 +1240,7 @@ class FormattingTests(SimpleTestCase):
                 self.assertEqual(sanitize_separators("77\xa0777,777"), "77777.777")
                 self.assertEqual(sanitize_separators("12 345"), "12345")
                 self.assertEqual(sanitize_separators("77 777,777"), "77777.777")
-            with translation.override(None):  # RemovedInDjango50Warning
+            with translation.override(None):
                 with self.settings(USE_THOUSAND_SEPARATOR=True, THOUSAND_SEPARATOR="."):
                     self.assertEqual(sanitize_separators("12\xa0345"), "12\xa0345")
 
@@ -1447,25 +1252,20 @@ class FormattingTests(SimpleTestCase):
                 # Suspicion that user entered dot as decimal separator (#22171)
                 self.assertEqual(sanitize_separators("10.10"), "10.10")
 
-        # RemovedInDjango50Warning: When the deprecation ends, remove
-        # @ignore_warnings and USE_L10N=False. The assertions should remain
-        # because format-related settings will take precedence over
-        # locale-dictated formats.
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            with self.settings(USE_L10N=False):
-                with self.settings(DECIMAL_SEPARATOR=","):
-                    self.assertEqual(sanitize_separators("1001,10"), "1001.10")
-                    self.assertEqual(sanitize_separators("1001.10"), "1001.10")
-                with self.settings(
-                    DECIMAL_SEPARATOR=",",
-                    THOUSAND_SEPARATOR=".",
-                    USE_THOUSAND_SEPARATOR=True,
-                ):
-                    self.assertEqual(sanitize_separators("1.001,10"), "1001.10")
-                    self.assertEqual(sanitize_separators("1001,10"), "1001.10")
-                    self.assertEqual(sanitize_separators("1001.10"), "1001.10")
-                    # Invalid output.
-                    self.assertEqual(sanitize_separators("1,001.10"), "1.001.10")
+        with translation.override(None):
+            with self.settings(DECIMAL_SEPARATOR=","):
+                self.assertEqual(sanitize_separators("1001,10"), "1001.10")
+                self.assertEqual(sanitize_separators("1001.10"), "1001.10")
+            with self.settings(
+                DECIMAL_SEPARATOR=",",
+                THOUSAND_SEPARATOR=".",
+                USE_THOUSAND_SEPARATOR=True,
+            ):
+                self.assertEqual(sanitize_separators("1.001,10"), "1001.10")
+                self.assertEqual(sanitize_separators("1001,10"), "1001.10")
+                self.assertEqual(sanitize_separators("1001.10"), "1001.10")
+                # Invalid output.
+                self.assertEqual(sanitize_separators("1,001.10"), "1.001.10")
 
     def test_iter_format_modules(self):
         """
@@ -1538,10 +1338,6 @@ class FormattingTests(SimpleTestCase):
             "{% load l10n %}{{ int }}/{{ float }}/{{ date }}; "
             "{{ int|unlocalize }}/{{ float|unlocalize }}/{{ date|unlocalize }}"
         )
-        template4 = Template(
-            "{% load l10n %}{{ int }}/{{ float }}/{{ date }}; "
-            "{{ int|localize }}/{{ float|localize }}/{{ date|localize }}"
-        )
         expected_localized = "1.455/3,14/31. Dezember 2016"
         expected_unlocalized = "1455/3.14/Dez. 31, 2016"
         output1 = "; ".join([expected_localized, expected_localized])
@@ -1549,22 +1345,7 @@ class FormattingTests(SimpleTestCase):
             [expected_localized, expected_unlocalized, expected_localized]
         )
         output3 = "; ".join([expected_localized, expected_unlocalized])
-        output4 = "; ".join([expected_unlocalized, expected_localized])
         with translation.override("de", deactivate=True):
-            # RemovedInDjango50Warning: When the deprecation ends, remove
-            # @ignore_warnings and USE_L10N=False. The assertions should remain
-            # because format-related settings will take precedence over
-            # locale-dictated formats.
-            with ignore_warnings(category=RemovedInDjango50Warning):
-                with self.settings(
-                    USE_L10N=False,
-                    DATE_FORMAT="N j, Y",
-                    DECIMAL_SEPARATOR=".",
-                    NUMBER_GROUPING=0,
-                    USE_THOUSAND_SEPARATOR=True,
-                ):
-                    self.assertEqual(template1.render(context), output1)
-                    self.assertEqual(template4.render(context), output4)
             with self.settings(USE_THOUSAND_SEPARATOR=True):
                 self.assertEqual(template1.render(context), output1)
                 self.assertEqual(template2.render(context), output2)
@@ -1586,16 +1367,6 @@ class FormattingTests(SimpleTestCase):
             NUMBER_GROUPING=2,
         ):
             self.assertEqual(template.render(context), "1455/3.14/24.1567")
-        # RemovedInDjango50Warning.
-        with ignore_warnings(category=RemovedInDjango50Warning):
-            with self.settings(
-                USE_L10N=False,
-                DECIMAL_SEPARATOR=",",
-                USE_THOUSAND_SEPARATOR=True,
-                THOUSAND_SEPARATOR="°",
-                NUMBER_GROUPING=2,
-            ):
-                self.assertEqual(template.render(context), "1455/3.14/24.1567")
 
     def test_localized_as_text_as_hidden_input(self):
         """
@@ -1730,6 +1501,14 @@ class MiscTests(SimpleTestCase):
             ("de;q=0.", [("de", 0.0)]),
             ("en; q=1,", [("en", 1.0)]),
             ("en; q=1.0, * ; q=0.5", [("en", 1.0), ("*", 0.5)]),
+            (
+                "en" + "-x" * 20,
+                [("en-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x-x", 1.0)],
+            ),
+            (
+                ", ".join(["en; q=1.0"] * 20),
+                [("en", 1.0)] * 20,
+            ),
             # Bad headers
             ("en-gb;q=1.0000", []),
             ("en;q=0.1234", []),
@@ -1746,6 +1525,10 @@ class MiscTests(SimpleTestCase):
             ("", []),
             ("en;q=1e0", []),
             ("en-au;q=１.０", []),
+            # Invalid as language-range value too long.
+            ("xxxxxxxx" + "-xxxxxxxx" * 500, []),
+            # Header value too long, only parse up to limit.
+            (", ".join(["en; q=1.0"] * 500), [("en", 1.0)] * 45),
         ]
         for value, expected in tests:
             with self.subTest(value=value):
@@ -1754,55 +1537,32 @@ class MiscTests(SimpleTestCase):
                 )
 
     def test_parse_literal_http_header(self):
-        """
-        Now test that we parse a literal HTTP header correctly.
-        """
-        g = get_language_from_request
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "pt-br"}
-        self.assertEqual("pt-br", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "pt"}
-        self.assertEqual("pt", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "es,de"}
-        self.assertEqual("es", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "es-ar,de"}
-        self.assertEqual("es-ar", g(r))
-
-        # This test assumes there won't be a Django translation to a US
-        # variation of the Spanish language, a safe assumption. When the
-        # user sets it as the preferred language, the main 'es'
-        # translation should be selected instead.
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "es-us"}
-        self.assertEqual(g(r), "es")
-
-        # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh-hans)
-        # the user sets zh-hans as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-hans,de"}
-        self.assertEqual(g(r), "zh-hans")
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "NL"}
-        self.assertEqual("nl", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "fy"}
-        self.assertEqual("fy", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "ia"}
-        self.assertEqual("ia", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "sr-latn"}
-        self.assertEqual("sr-latn", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-hans"}
-        self.assertEqual("zh-hans", g(r))
-
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-hant"}
-        self.assertEqual("zh-hant", g(r))
+        tests = [
+            ("pt-br", "pt-br"),
+            ("pt", "pt"),
+            ("es,de", "es"),
+            ("es-a,de", "es"),
+            # There isn't a Django translation to a US variation of the Spanish
+            # language, a safe assumption. When the user sets it as the
+            # preferred language, the main 'es' translation should be selected
+            # instead.
+            ("es-us", "es"),
+            # There isn't a main language (zh) translation of Django but there
+            # is a translation to variation (zh-hans) the user sets zh-hans as
+            # the preferred language, it should be selected without falling
+            # back nor ignoring it.
+            ("zh-hans,de", "zh-hans"),
+            ("NL", "nl"),
+            ("fy", "fy"),
+            ("ia", "ia"),
+            ("sr-latn", "sr-latn"),
+            ("zh-hans", "zh-hans"),
+            ("zh-hant", "zh-hant"),
+        ]
+        for header, expected in tests:
+            with self.subTest(header=header):
+                request = self.rf.get("/", headers={"accept-language": header})
+                self.assertEqual(get_language_from_request(request), expected)
 
     @override_settings(
         LANGUAGES=[
@@ -1822,23 +1582,19 @@ class MiscTests(SimpleTestCase):
         refs #18419 -- this is explicitly for browser compatibility
         """
         g = get_language_from_request
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-cn,en"}
-        self.assertEqual(g(r), "zh-hans")
+        request = self.rf.get("/", headers={"accept-language": "zh-cn,en"})
+        self.assertEqual(g(request), "zh-hans")
 
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-tw,en"}
-        self.assertEqual(g(r), "zh-hant")
+        request = self.rf.get("/", headers={"accept-language": "zh-tw,en"})
+        self.assertEqual(g(request), "zh-hant")
 
     def test_special_fallback_language(self):
         """
         Some languages may have special fallbacks that don't follow the simple
         'fr-ca' -> 'fr' logic (notably Chinese codes).
         """
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "zh-my,en"}
-        self.assertEqual(get_language_from_request(r), "zh-hans")
+        request = self.rf.get("/", headers={"accept-language": "zh-my,en"})
+        self.assertEqual(get_language_from_request(request), "zh-hans")
 
     def test_subsequent_code_fallback_language(self):
         """
@@ -1853,46 +1609,37 @@ class MiscTests(SimpleTestCase):
             ("zh-hant-tw", "zh-hant"),
             ("zh-hant-SG", "zh-hant"),
         ]
-        r = self.rf.get("/")
-        r.COOKIES = {}
         for value, expected in tests:
             with self.subTest(value=value):
-                r.META = {"HTTP_ACCEPT_LANGUAGE": f"{value},en"}
-                self.assertEqual(get_language_from_request(r), expected)
+                request = self.rf.get("/", headers={"accept-language": f"{value},en"})
+                self.assertEqual(get_language_from_request(request), expected)
 
     def test_parse_language_cookie(self):
-        """
-        Now test that we parse language preferences stored in a cookie correctly.
-        """
         g = get_language_from_request
-        r = self.rf.get("/")
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: "pt-br"}
-        r.META = {}
-        self.assertEqual("pt-br", g(r))
+        request = self.rf.get("/")
+        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "pt-br"
+        self.assertEqual("pt-br", g(request))
 
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: "pt"}
-        r.META = {}
-        self.assertEqual("pt", g(r))
+        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "pt"
+        self.assertEqual("pt", g(request))
 
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: "es"}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "de"}
-        self.assertEqual("es", g(r))
+        request = self.rf.get("/", headers={"accept-language": "de"})
+        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "es"
+        self.assertEqual("es", g(request))
 
-        # This test assumes there won't be a Django translation to a US
-        # variation of the Spanish language, a safe assumption. When the
-        # user sets it as the preferred language, the main 'es'
-        # translation should be selected instead.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: "es-us"}
-        r.META = {}
-        self.assertEqual(g(r), "es")
-
-        # This tests the following scenario: there isn't a main language (zh)
-        # translation of Django but there is a translation to variation (zh-hans)
-        # the user sets zh-hans as the preferred language, it should be selected
-        # by Django without falling back nor ignoring it.
-        r.COOKIES = {settings.LANGUAGE_COOKIE_NAME: "zh-hans"}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "de"}
-        self.assertEqual(g(r), "zh-hans")
+        # There isn't a Django translation to a US variation of the Spanish
+        # language, a safe assumption. When the user sets it as the preferred
+        # language, the main 'es' translation should be selected instead.
+        request = self.rf.get("/")
+        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "es-us"
+        self.assertEqual(g(request), "es")
+        # There isn't a main language (zh) translation of Django but there is a
+        # translation to variation (zh-hans) the user sets zh-hans as the
+        # preferred language, it should be selected without falling back nor
+        # ignoring it.
+        request = self.rf.get("/", headers={"accept-language": "de"})
+        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] = "zh-hans"
+        self.assertEqual(g(request), "zh-hans")
 
     @override_settings(
         USE_I18N=True,
@@ -1993,12 +1740,10 @@ class MiscTests(SimpleTestCase):
         previously valid should not be used (#14170).
         """
         g = get_language_from_request
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "pt-br"}
-        self.assertEqual("pt-br", g(r))
+        request = self.rf.get("/", headers={"accept-language": "pt-br"})
+        self.assertEqual("pt-br", g(request))
         with self.settings(LANGUAGES=[("en", "English")]):
-            self.assertNotEqual("pt-br", g(r))
+            self.assertNotEqual("pt-br", g(request))
 
     def test_i18n_patterns_returns_list(self):
         with override_settings(USE_I18N=False):
@@ -2171,6 +1916,12 @@ class UnprefixedDefaultLanguageTests(SimpleTestCase):
         response = self.client.get("/simple/")
         self.assertEqual(response.content, b"Yes")
 
+    @override_settings(LANGUAGE_CODE="en-us")
+    def test_default_lang_fallback_without_prefix(self):
+        response = self.client.get("/simple/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.content, b"Yes")
+
     def test_other_lang_with_prefix(self):
         response = self.client.get("/fr/simple/")
         self.assertEqual(response.content, b"Oui")
@@ -2238,15 +1989,16 @@ class CountrySpecificLanguageTests(SimpleTestCase):
 
     def test_get_language_from_request(self):
         # issue 19919
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "en-US,en;q=0.8,bg;q=0.6,ru;q=0.4"}
-        lang = get_language_from_request(r)
+        request = self.rf.get(
+            "/", headers={"accept-language": "en-US,en;q=0.8,bg;q=0.6,ru;q=0.4"}
+        )
+        lang = get_language_from_request(request)
         self.assertEqual("en-us", lang)
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
-        lang = get_language_from_request(r)
+
+        request = self.rf.get(
+            "/", headers={"accept-language": "bg-bg,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
+        )
+        lang = get_language_from_request(request)
         self.assertEqual("bg", lang)
 
     def test_get_language_from_request_null(self):
@@ -2258,15 +2010,16 @@ class CountrySpecificLanguageTests(SimpleTestCase):
 
     def test_specific_language_codes(self):
         # issue 11915
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
-        lang = get_language_from_request(r)
+        request = self.rf.get(
+            "/", headers={"accept-language": "pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
+        )
+        lang = get_language_from_request(request)
         self.assertEqual("pt-br", lang)
-        r = self.rf.get("/")
-        r.COOKIES = {}
-        r.META = {"HTTP_ACCEPT_LANGUAGE": "pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
-        lang = get_language_from_request(r)
+
+        request = self.rf.get(
+            "/", headers={"accept-language": "pt-pt,en-US;q=0.8,en;q=0.6,ru;q=0.4"}
+        )
+        lang = get_language_from_request(request)
         self.assertEqual("pt-br", lang)
 
 

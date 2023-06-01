@@ -1,11 +1,9 @@
 from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.backends.db import SessionStore
 from django.db import models
 from django.db.models import Count
-from django.test import TestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test import TestCase
 
 from .models import (
     Base,
@@ -70,7 +68,7 @@ class DeferRegressionTest(TestCase):
         obj = Leaf.objects.only("name", "child").select_related()[0]
         self.assertEqual(obj.child.name, "c1")
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Leaf.objects.select_related().only("child__name", "second_child__name"),
             [
                 "l1",
@@ -105,29 +103,6 @@ class DeferRegressionTest(TestCase):
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(
-        SESSION_SERIALIZER="django.contrib.sessions.serializers.PickleSerializer"
-    )
-    def test_ticket_12163(self):
-        # Test for #12163 - Pickling error saving session with unsaved model
-        # instances.
-        SESSION_KEY = "2b1189a188b44ad18c35e1baac6ceead"
-
-        item = Item()
-        item._deferred = False
-        s = SessionStore(SESSION_KEY)
-        s.clear()
-        s["item"] = item
-        s.save(must_create=True)
-
-        s = SessionStore(SESSION_KEY)
-        s.modified = True
-        s.save()
-
-        i2 = s["item"]
-        self.assertFalse(i2._deferred)
 
     def test_ticket_16409(self):
         # Regression for #16409 - make sure defer() and only() work with annotate()
@@ -295,6 +270,12 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(leaf.child.name, "Child")
         with self.assertNumQueries(1):
             self.assertEqual(leaf.second_child.value, 64)
+
+    def test_defer_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        with self.assertNumQueries(1):
+            self.assertEqual(Request.objects.defer("items").get(), request)
 
 
 class DeferDeletionSignalsTests(TestCase):

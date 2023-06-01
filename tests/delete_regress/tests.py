@@ -45,7 +45,6 @@ from .models import (
 # get two connections to an in-memory database.
 @skipUnlessDBFeature("test_db_allows_multiple_connections")
 class DeleteLockingTest(TransactionTestCase):
-
     available_apps = ["delete_regress"]
 
     def setUp(self):
@@ -126,7 +125,6 @@ class DeleteCascadeTests(TestCase):
 
 
 class DeleteCascadeTransactionTests(TransactionTestCase):
-
     available_apps = ["delete_regress"]
 
     def test_inheritance(self):
@@ -381,15 +379,20 @@ class DeleteTests(TestCase):
         child = Child.objects.create(name="Juan")
         Book.objects.create(pagecount=500, owner=child)
         PlayedWith.objects.create(child=child, toy=toy, date=datetime.date.today())
-        Book.objects.filter(
-            Exists(
-                Book.objects.filter(
-                    pk=OuterRef("pk"),
-                    owner__toys=toy.pk,
-                ),
-            )
-        ).delete()
+        with self.assertNumQueries(1) as ctx:
+            Book.objects.filter(
+                Exists(
+                    Book.objects.filter(
+                        pk=OuterRef("pk"),
+                        owner__toys=toy.pk,
+                    ),
+                )
+            ).delete()
+
         self.assertIs(Book.objects.exists(), False)
+        sql = ctx.captured_queries[0]["sql"].lower()
+        if connection.features.delete_can_self_reference_subquery:
+            self.assertEqual(sql.count("select"), 1)
 
 
 class DeleteDistinct(SimpleTestCase):

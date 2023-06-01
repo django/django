@@ -87,7 +87,7 @@ class DjangoJSONEncoder(json.JSONEncoder):
             if o.microsecond:
                 r = r[:23] + r[26:]
             if r.endswith("+00:00"):
-                r = r[:-6] + "Z"
+                r = r.removesuffix("+00:00") + "Z"
             return r
         elif isinstance(o, datetime.date):
             return o.isoformat()

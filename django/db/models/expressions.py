@@ -2,18 +2,17 @@ import copy
 import datetime
 import functools
 import inspect
-import warnings
 from collections import defaultdict
 from decimal import Decimal
+from types import NoneType
 from uuid import UUID
 
-from django.core.exceptions import EmptyResultSet, FieldError
+from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import fields
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import Q
 from django.utils.deconstruct import deconstructible
-from django.utils.deprecation import RemovedInDjango50Warning
 from django.utils.functional import cached_property
 from django.utils.hashable import make_hashable
 
@@ -162,6 +161,9 @@ class Combinable:
             "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
         )
 
+    def __invert__(self):
+        return NegatedExpression(self)
+
 
 class BaseExpression:
     """Base class for all query expressions."""
@@ -174,6 +176,8 @@ class BaseExpression:
     filterable = True
     # Can the expression can be used as a source expression in Window?
     window_compatible = False
+    # Can the expression be used as a database default value?
+    allowed_default = False
 
     def __init__(self, output_field=None):
         if output_field is not None:
@@ -402,6 +406,12 @@ class BaseExpression:
         )
         return clone
 
+    def get_refs(self):
+        refs = set()
+        for expr in self.get_source_expressions():
+            refs |= expr.get_refs()
+        return refs
+
     def copy(self):
         return copy.copy(self)
 
@@ -417,7 +427,7 @@ class BaseExpression:
         )
         return clone
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         if not self.contains_aggregate:
             return [self]
         cols = []
@@ -499,7 +509,6 @@ class Expression(BaseExpression, Combinable):
 # The current approach for NULL is based on lowest common denominator behavior
 # i.e. if one of the supported databases is raising an error (rather than
 # return NULL) for `val <op> NULL`, then Django raises FieldError.
-NoneType = type(None)
 
 _connector_combinations = [
     # Numeric operations - operands of same type.
@@ -533,6 +542,7 @@ _connector_combinations = [
             Combinable.SUB,
             Combinable.MUL,
             Combinable.DIV,
+            Combinable.MOD,
         )
     },
     # Bitwise operators.
@@ -725,6 +735,10 @@ class CombinedExpression(SQLiteNumericMixin, Expression):
         c.rhs = rhs
         return c
 
+    @cached_property
+    def allowed_default(self):
+        return self.lhs.allowed_default and self.rhs.allowed_default
+
 
 class DurationExpression(CombinedExpression):
     def compile(self, side, compiler, connection):
@@ -796,6 +810,8 @@ class TemporalSubtraction(CombinedExpression):
 class F(Combinable):
     """An object capable of resolving references to existing query objects."""
 
+    allowed_default = False
+
     def __init__(self, name):
         """
         Arguments:
@@ -826,6 +842,9 @@ class F(Combinable):
     def __hash__(self):
         return hash(self.name)
 
+    def copy(self):
+        return copy.copy(self)
+
 
 class ResolvedOuterRef(F):
     """
@@ -846,6 +865,11 @@ class ResolvedOuterRef(F):
 
     def resolve_expression(self, *args, **kwargs):
         col = super().resolve_expression(*args, **kwargs)
+        if col.contains_over_clause:
+            raise NotSupportedError(
+                f"Referencing outer query window expression is not supported: "
+                f"{self.name}."
+            )
         # FIXME: Rename possibly_multivalued to multivalued and fix detection
         # for non-multivalued JOINs (e.g. foreign key fields). This should take
         # into account only many-to-many and one-to-many relationships.
@@ -855,7 +879,7 @@ class ResolvedOuterRef(F):
     def relabeled_clone(self, relabels):
         return self
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return []
 
 
@@ -948,6 +972,8 @@ class Func(SQLiteNumericMixin, Expression):
                 if empty_result_set_value is NotImplemented:
                     raise
                 arg_sql, arg_params = compiler.compile(Value(empty_result_set_value))
+            except FullResultSet:
+                arg_sql, arg_params = compiler.compile(Value(True))
             sql_parts.append(arg_sql)
             params.extend(arg_params)
         data = {**self.extra, **extra_context}
@@ -969,6 +995,10 @@ class Func(SQLiteNumericMixin, Expression):
         copy.extra = self.extra.copy()
         return copy
 
+    @cached_property
+    def allowed_default(self):
+        return all(expression.allowed_default for expression in self.source_expressions)
+
 
 @deconstructible(path="django.db.models.Value")
 class Value(SQLiteNumericMixin, Expression):
@@ -977,6 +1007,7 @@ class Value(SQLiteNumericMixin, Expression):
     # Provide a default value for `for_save` in order to allow unresolved
     # instances to be compiled until a decision is taken in #25425.
     for_save = False
+    allowed_default = True
 
     def __init__(self, value, output_field=None):
         """
@@ -1018,7 +1049,7 @@ class Value(SQLiteNumericMixin, Expression):
         c.for_save = for_save
         return c
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return []
 
     def _resolve_output_field(self):
@@ -1051,6 +1082,8 @@ class Value(SQLiteNumericMixin, Expression):
 
 
 class RawSQL(Expression):
+    allowed_default = True
+
     def __init__(self, sql, params, output_field=None):
         if output_field is None:
             output_field = fields.Field()
@@ -1063,7 +1096,7 @@ class RawSQL(Expression):
     def as_sql(self, compiler, connection):
         return "(%s)" % self.sql, self.params
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return [self]
 
     def resolve_expression(
@@ -1092,8 +1125,14 @@ class Star(Expression):
         return "*", []
 
 
-class Col(Expression):
+class DatabaseDefault(Expression):
+    """Placeholder expression for the database default in an insert query."""
 
+    def as_sql(self, compiler, connection):
+        return "DEFAULT", []
+
+
+class Col(Expression):
     contains_column_references = True
     possibly_multivalued = False
 
@@ -1121,7 +1160,7 @@ class Col(Expression):
             relabels.get(self.alias, self.alias), self.target, self.output_field
         )
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return [self]
 
     def get_db_converters(self, connection):
@@ -1158,13 +1197,16 @@ class Ref(Expression):
         # just a reference to the name of `source`.
         return self
 
+    def get_refs(self):
+        return {self.refs}
+
     def relabeled_clone(self, relabels):
         return self
 
     def as_sql(self, compiler, connection):
         return connection.ops.quote_name(self.refs), []
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return [self]
 
 
@@ -1193,6 +1235,7 @@ class ExpressionList(Func):
 
 
 class OrderByList(Func):
+    allowed_default = False
     template = "ORDER BY %(expressions)s"
 
     def __init__(self, *expressions, **extra):
@@ -1235,11 +1278,11 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
     def get_source_expressions(self):
         return [self.expression]
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         if isinstance(self.expression, Expression):
             expression = self.expression.copy()
             expression.output_field = self.output_field
-            return expression.get_group_by_cols(alias=alias)
+            return expression.get_group_by_cols()
         # For non-expressions e.g. an SQL WHERE clause, the entire
         # `expression` must be included in the GROUP BY clause.
         return super().get_group_by_cols()
@@ -1249,6 +1292,61 @@ class ExpressionWrapper(SQLiteNumericMixin, Expression):
 
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__, self.expression)
+
+    @property
+    def allowed_default(self):
+        return self.expression.allowed_default
+
+
+class NegatedExpression(ExpressionWrapper):
+    """The logical negation of a conditional expression."""
+
+    def __init__(self, expression):
+        super().__init__(expression, output_field=fields.BooleanField())
+
+    def __invert__(self):
+        return self.expression.copy()
+
+    def as_sql(self, compiler, connection):
+        try:
+            sql, params = super().as_sql(compiler, connection)
+        except EmptyResultSet:
+            features = compiler.connection.features
+            if not features.supports_boolean_expr_in_select_clause:
+                return "1=1", ()
+            return compiler.compile(Value(True))
+        ops = compiler.connection.ops
+        # Some database backends (e.g. Oracle) don't allow EXISTS() and filters
+        # to be compared to another expression unless they're wrapped in a CASE
+        # WHEN.
+        if not ops.conditional_expression_supported_in_where_clause(self.expression):
+            return f"CASE WHEN {sql} = 0 THEN 1 ELSE 0 END", params
+        return f"NOT {sql}", params
+
+    def resolve_expression(
+        self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False
+    ):
+        resolved = super().resolve_expression(
+            query, allow_joins, reuse, summarize, for_save
+        )
+        if not getattr(resolved.expression, "conditional", False):
+            raise TypeError("Cannot negate non-conditional expressions.")
+        return resolved
+
+    def select_format(self, compiler, sql, params):
+        # Wrap boolean expressions with a CASE WHEN expression if a database
+        # backend (e.g. Oracle) doesn't support boolean expression in SELECT or
+        # GROUP BY list.
+        expression_supported_in_where_clause = (
+            compiler.connection.ops.conditional_expression_supported_in_where_clause
+        )
+        if (
+            not compiler.connection.features.supports_boolean_expr_in_select_clause
+            # Avoid double wrapping.
+            and expression_supported_in_where_clause(self.expression)
+        ):
+            sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
+        return sql, params
 
 
 @deconstructible(path="django.db.models.When")
@@ -1309,14 +1407,6 @@ class When(Expression):
         template_params = extra_context
         sql_params = []
         condition_sql, condition_params = compiler.compile(self.condition)
-        # Filters that match everything are handled as empty strings in the
-        # WHERE clause, but in a CASE WHEN expression they must use a predicate
-        # that's always True.
-        if condition_sql == "":
-            if connection.features.supports_boolean_expr_in_select_clause:
-                condition_sql, condition_params = compiler.compile(Value(True))
-            else:
-                condition_sql, condition_params = "1=1", ()
         template_params["condition"] = condition_sql
         result_sql, result_params = compiler.compile(self.result)
         template_params["result"] = result_sql
@@ -1327,12 +1417,16 @@ class When(Expression):
             *result_params,
         )
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         # This is not a complete expression and cannot be used in GROUP BY.
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
         return cols
+
+    @cached_property
+    def allowed_default(self):
+        return self.condition.allowed_default and self.result.allowed_default
 
 
 @deconstructible(path="django.db.models.Case")
@@ -1403,14 +1497,17 @@ class Case(SQLiteNumericMixin, Expression):
         template_params = {**self.extra, **extra_context}
         case_parts = []
         sql_params = []
+        default_sql, default_params = compiler.compile(self.default)
         for case in self.cases:
             try:
                 case_sql, case_params = compiler.compile(case)
             except EmptyResultSet:
                 continue
+            except FullResultSet:
+                default_sql, default_params = compiler.compile(case.result)
+                break
             case_parts.append(case_sql)
             sql_params.extend(case_params)
-        default_sql, default_params = compiler.compile(self.default)
         if not case_parts:
             return default_sql, default_params
         case_joiner = case_joiner or self.case_joiner
@@ -1423,10 +1520,16 @@ class Case(SQLiteNumericMixin, Expression):
             sql = connection.ops.unification_cast_sql(self.output_field) % sql
         return sql, sql_params
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         if not self.cases:
-            return self.default.get_group_by_cols(alias)
-        return super().get_group_by_cols(alias)
+            return self.default.get_group_by_cols()
+        return super().get_group_by_cols()
+
+    @cached_property
+    def allowed_default(self):
+        return self.default.allowed_default and all(
+            case_.allowed_default for case_ in self.cases
+        )
 
 
 class Subquery(BaseExpression, Combinable):
@@ -1438,6 +1541,7 @@ class Subquery(BaseExpression, Combinable):
     template = "(%(subquery)s)"
     contains_aggregate = False
     empty_result_set_value = None
+    subquery = True
 
     def __init__(self, queryset, output_field=None, **extra):
         # Allow the usage of both QuerySet and sql.Query objects.
@@ -1467,68 +1571,28 @@ class Subquery(BaseExpression, Combinable):
     def get_external_cols(self):
         return self.query.get_external_cols()
 
-    def as_sql(self, compiler, connection, template=None, query=None, **extra_context):
+    def as_sql(self, compiler, connection, template=None, **extra_context):
         connection.ops.check_expression_support(self)
         template_params = {**self.extra, **extra_context}
-        query = query or self.query
-        subquery_sql, sql_params = query.as_sql(compiler, connection)
+        subquery_sql, sql_params = self.query.as_sql(compiler, connection)
         template_params["subquery"] = subquery_sql[1:-1]
 
         template = template or template_params.get("template", self.template)
         sql = template % template_params
         return sql, sql_params
 
-    def get_group_by_cols(self, alias=None):
-        # If this expression is referenced by an alias for an explicit GROUP BY
-        # through values() a reference to this expression and not the
-        # underlying .query must be returned to ensure external column
-        # references are not grouped against as well.
-        if alias:
-            return [Ref(alias, self)]
-        return self.query.get_group_by_cols()
+    def get_group_by_cols(self):
+        return self.query.get_group_by_cols(wrapper=self)
 
 
 class Exists(Subquery):
     template = "EXISTS(%(subquery)s)"
     output_field = fields.BooleanField()
+    empty_result_set_value = False
 
-    def __init__(self, queryset, negated=False, **kwargs):
-        self.negated = negated
+    def __init__(self, queryset, **kwargs):
         super().__init__(queryset, **kwargs)
-
-    def __invert__(self):
-        clone = self.copy()
-        clone.negated = not self.negated
-        return clone
-
-    def get_group_by_cols(self, alias=None):
-        # self.query only gets limited to a single row in the .exists() call
-        # from self.as_sql() so deferring to Query.get_group_by_cols() is
-        # inappropriate.
-        if alias is None:
-            return [self]
-        return super().get_group_by_cols(alias)
-
-    def as_sql(self, compiler, connection, template=None, **extra_context):
-        query = self.query.exists(using=connection.alias)
-        try:
-            sql, params = super().as_sql(
-                compiler,
-                connection,
-                template=template,
-                query=query,
-                **extra_context,
-            )
-        except EmptyResultSet:
-            if self.negated:
-                features = compiler.connection.features
-                if not features.supports_boolean_expr_in_select_clause:
-                    return "1=1", ()
-                return compiler.compile(Value(True))
-            raise
-        if self.negated:
-            sql = "NOT {}".format(sql)
-        return sql, params
+        self.query = self.query.exists()
 
     def select_format(self, compiler, sql, params):
         # Wrap EXISTS() with a CASE WHEN expression if a database backend
@@ -1548,16 +1612,7 @@ class OrderBy(Expression):
         if nulls_first and nulls_last:
             raise ValueError("nulls_first and nulls_last are mutually exclusive")
         if nulls_first is False or nulls_last is False:
-            # When the deprecation ends, replace with:
-            # raise ValueError(
-            #     "nulls_first and nulls_last values must be True or None."
-            # )
-            warnings.warn(
-                "Passing nulls_first=False or nulls_last=False is deprecated, use None "
-                "instead.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+            raise ValueError("nulls_first and nulls_last values must be True or None.")
         self.nulls_first = nulls_first
         self.nulls_last = nulls_last
         self.descending = descending
@@ -1616,7 +1671,7 @@ class OrderBy(Expression):
             return copy.as_sql(compiler, connection)
         return self.as_sql(compiler, connection)
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         cols = []
         for source in self.get_source_expressions():
             cols.extend(source.get_group_by_cols())
@@ -1746,7 +1801,7 @@ class Window(SQLiteNumericMixin, Expression):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         group_by_cols = []
         if self.partition_by:
             group_by_cols.extend(self.partition_by.get_group_by_cols())
@@ -1794,7 +1849,7 @@ class WindowFrame(Expression):
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self)
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return []
 
     def __str__(self):

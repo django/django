@@ -183,7 +183,6 @@ Put the following in the ``tests.py`` file in the ``polls`` application:
 
 
     class QuestionModelTests(TestCase):
-
         def test_was_published_recently_with_future_question(self):
             """
             was_published_recently() returns False for questions whose pub_date
@@ -206,7 +205,9 @@ In the terminal, we can run our test:
 
     $ python manage.py test polls
 
-and you'll see something like::
+and you'll see something like:
+
+.. code-block:: shell
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -267,7 +268,9 @@ past:
         now = timezone.now()
         return now - datetime.timedelta(days=1) <= self.pub_date <= now
 
-and run the test again::
+and run the test again:
+
+.. code-block:: pytb
 
     Creating test database for alias 'default'...
     System check identified no issues (0 silenced).
@@ -307,6 +310,7 @@ more comprehensively:
         time = timezone.now() - datetime.timedelta(days=1, seconds=1)
         old_question = Question(pub_date=time)
         self.assertIs(old_question.was_published_recently(), False)
+
 
     def test_was_published_recently_with_recent_question(self):
         """
@@ -376,16 +380,20 @@ it earlier, check it before continuing.
 
 Next we need to import the test client class (later in ``tests.py`` we will use
 the :class:`django.test.TestCase` class, which comes with its own client, so
-this won't be required)::
+this won't be required):
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> # create an instance of the client for our use
     >>> client = Client()
 
-With that ready, we can ask the client to do some work for us::
+With that ready, we can ask the client to do some work for us:
+
+.. code-block:: pycon
 
     >>> # get a response from '/'
-    >>> response = client.get('/')
+    >>> response = client.get("/")
     Not Found: /
     >>> # we should expect a 404 from that address; if you instead see an
     >>> # "Invalid HTTP_HOST header" error and a 400 response, you probably
@@ -395,12 +403,12 @@ With that ready, we can ask the client to do some work for us::
     >>> # on the other hand we should expect to find something at '/polls/'
     >>> # we'll use 'reverse()' rather than a hardcoded URL
     >>> from django.urls import reverse
-    >>> response = client.get(reverse('polls:index'))
+    >>> response = client.get(reverse("polls:index"))
     >>> response.status_code
     200
     >>> response.content
     b'\n    <ul>\n    \n        <li><a href="/polls/1/">What&#x27;s up?</a></li>\n    \n    </ul>\n\n'
-    >>> response.context['latest_question_list']
+    >>> response.context["latest_question_list"]
     <QuerySet [<Question: What's up?>]>
 
 Improving our view
@@ -416,12 +424,12 @@ based on :class:`~django.views.generic.list.ListView`:
     :caption: ``polls/views.py``
 
     class IndexView(generic.ListView):
-        template_name = 'polls/index.html'
-        context_object_name = 'latest_question_list'
+        template_name = "polls/index.html"
+        context_object_name = "latest_question_list"
 
         def get_queryset(self):
             """Return the last five published questions."""
-            return Question.objects.order_by('-pub_date')[:5]
+            return Question.objects.order_by("-pub_date")[:5]
 
 We need to amend the ``get_queryset()`` method and change it so that it also
 checks the date by comparing it with ``timezone.now()``. First we need to add
@@ -442,9 +450,9 @@ and then we must amend the ``get_queryset`` method like so:
         Return the last five published questions (not including those set to be
         published in the future).
         """
-        return Question.objects.filter(
-            pub_date__lte=timezone.now()
-        ).order_by('-pub_date')[:5]
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by("-pub_date")[
+            :5
+        ]
 
 ``Question.objects.filter(pub_date__lte=timezone.now())`` returns a queryset
 containing ``Question``\s whose ``pub_date`` is less than or equal to - that
@@ -488,10 +496,10 @@ class:
             """
             If no questions exist, an appropriate message is displayed.
             """
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_past_question(self):
             """
@@ -499,9 +507,9 @@ class:
             index page.
             """
             question = create_question(question_text="Past question.", days=-30)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -511,9 +519,9 @@ class:
             the index page.
             """
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
+            response = self.client.get(reverse("polls:index"))
             self.assertContains(response, "No polls are available.")
-            self.assertQuerysetEqual(response.context['latest_question_list'], [])
+            self.assertQuerySetEqual(response.context["latest_question_list"], [])
 
         def test_future_question_and_past_question(self):
             """
@@ -522,9 +530,9 @@ class:
             """
             question = create_question(question_text="Past question.", days=-30)
             create_question(question_text="Future question.", days=30)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question],
             )
 
@@ -534,9 +542,9 @@ class:
             """
             question1 = create_question(question_text="Past question 1.", days=-30)
             question2 = create_question(question_text="Past question 2.", days=-5)
-            response = self.client.get(reverse('polls:index'))
-            self.assertQuerysetEqual(
-                response.context['latest_question_list'],
+            response = self.client.get(reverse("polls:index"))
+            self.assertQuerySetEqual(
+                response.context["latest_question_list"],
                 [question2, question1],
             )
 
@@ -551,7 +559,7 @@ repetition out of the process of creating questions.
 Note that the :class:`django.test.TestCase` class provides some additional
 assertion methods. In these examples, we use
 :meth:`~django.test.SimpleTestCase.assertContains()` and
-:meth:`~django.test.TransactionTestCase.assertQuerysetEqual()`.
+:meth:`~django.test.TransactionTestCase.assertQuerySetEqual()`.
 
 In ``test_past_question``, we create a question and verify that it appears in
 the list.
@@ -576,6 +584,7 @@ we need to add a similar  constraint to ``DetailView``:
 
     class DetailView(generic.DetailView):
         ...
+
         def get_queryset(self):
             """
             Excludes any questions that aren't published yet.
@@ -595,8 +604,8 @@ is not:
             The detail view of a question with a pub_date in the future
             returns a 404 not found.
             """
-            future_question = create_question(question_text='Future question.', days=5)
-            url = reverse('polls:detail', args=(future_question.id,))
+            future_question = create_question(question_text="Future question.", days=5)
+            url = reverse("polls:detail", args=(future_question.id,))
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
 
@@ -605,8 +614,8 @@ is not:
             The detail view of a question with a pub_date in the past
             displays the question's text.
             """
-            past_question = create_question(question_text='Past Question.', days=-5)
-            url = reverse('polls:detail', args=(past_question.id,))
+            past_question = create_question(question_text="Past Question.", days=-5)
+            url = reverse("polls:detail", args=(past_question.id,))
             response = self.client.get(url)
             self.assertContains(response, past_question.question_text)
 

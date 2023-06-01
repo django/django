@@ -45,6 +45,7 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 	@echo "  spelling   to check for typos in documentation"
+	@echo "  black      to apply the black formatting to code blocks in documentation"
 
 
 clean:
@@ -161,3 +162,10 @@ spelling:
 	@echo
 	@echo "Check finished. Wrong words can be found in " \
 		"$(BUILDDIR)/spelling/output.txt."
+
+black:
+	@mkdir -p $(BUILDDIR)/black
+	find -name "*.txt" -not -path "./_build/*" -not -path "./_theme/*" \
+		| xargs blacken-docs --rst-literal-block; echo $$? > "$(BUILDDIR)/black/output.txt"
+	@echo
+	@echo "Code blocks reformatted"

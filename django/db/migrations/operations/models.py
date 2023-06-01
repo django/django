@@ -303,6 +303,71 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
+        elif (
+            isinstance(operation, IndexOperation)
+            and self.name_lower == operation.model_name_lower
+        ):
+            if isinstance(operation, AddIndex):
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "indexes": [
+                                *self.options.get("indexes", []),
+                                operation.index,
+                            ],
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RemoveIndex):
+                options_indexes = [
+                    index
+                    for index in self.options.get("indexes", [])
+                    if index.name != operation.name
+                ]
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "indexes": options_indexes,
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
+            elif isinstance(operation, RenameIndex) and operation.old_fields:
+                options_index_together = {
+                    fields
+                    for fields in self.options.get("index_together", [])
+                    if fields != operation.old_fields
+                }
+                if options_index_together:
+                    self.options["index_together"] = options_index_together
+                else:
+                    self.options.pop("index_together", None)
+                return [
+                    CreateModel(
+                        self.name,
+                        fields=self.fields,
+                        options={
+                            **self.options,
+                            "indexes": [
+                                *self.options.get("indexes", []),
+                                models.Index(
+                                    fields=operation.old_fields, name=operation.new_name
+                                ),
+                            ],
+                        },
+                        bases=self.bases,
+                        managers=self.managers,
+                    ),
+                ]
         return super().reduce(operation, app_label)
 
 
@@ -400,27 +465,19 @@ class RenameModel(ModelOperation):
             fields = zip(
                 old_model._meta.local_many_to_many, new_model._meta.local_many_to_many
             )
-            for (old_field, new_field) in fields:
+            for old_field, new_field in fields:
                 # Skip self-referential fields as these are renamed above.
                 if (
                     new_field.model == new_field.related_model
                     or not new_field.remote_field.through._meta.auto_created
                 ):
                     continue
-                # Rename the M2M table that's based on this model's name.
-                old_m2m_model = old_field.remote_field.through
-                new_m2m_model = new_field.remote_field.through
-                schema_editor.alter_db_table(
-                    new_m2m_model,
-                    old_m2m_model._meta.db_table,
-                    new_m2m_model._meta.db_table,
-                )
-                # Rename the column in the M2M table that's based on this
-                # model's name.
-                schema_editor.alter_field(
-                    new_m2m_model,
-                    old_m2m_model._meta.get_field(old_model._meta.model_name),
-                    new_m2m_model._meta.get_field(new_model._meta.model_name),
+                # Rename columns and the M2M table.
+                schema_editor._alter_many_to_many(
+                    new_model,
+                    old_field,
+                    new_field,
+                    strict=False,
                 )
 
     def database_backwards(self, app_label, schema_editor, from_state, to_state):
@@ -505,7 +562,7 @@ class AlterModelTable(ModelOptionOperation):
                 new_model._meta.db_table,
             )
             # Rename M2M fields whose name is based on this model's db_table
-            for (old_field, new_field) in zip(
+            for old_field, new_field in zip(
                 old_model._meta.local_many_to_many, new_model._meta.local_many_to_many
             ):
                 if new_field.remote_field.through._meta.auto_created:
@@ -527,6 +584,44 @@ class AlterModelTable(ModelOptionOperation):
     @property
     def migration_name_fragment(self):
         return "alter_%s_table" % self.name_lower
+
+
+class AlterModelTableComment(ModelOptionOperation):
+    def __init__(self, name, table_comment):
+        self.table_comment = table_comment
+        super().__init__(name)
+
+    def deconstruct(self):
+        kwargs = {
+            "name": self.name,
+            "table_comment": self.table_comment,
+        }
+        return (self.__class__.__qualname__, [], kwargs)
+
+    def state_forwards(self, app_label, state):
+        state.alter_model_options(
+            app_label, self.name_lower, {"db_table_comment": self.table_comment}
+        )
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        new_model = to_state.apps.get_model(app_label, self.name)
+        if self.allow_migrate_model(schema_editor.connection.alias, new_model):
+            old_model = from_state.apps.get_model(app_label, self.name)
+            schema_editor.alter_db_table_comment(
+                new_model,
+                old_model._meta.db_table_comment,
+                new_model._meta.db_table_comment,
+            )
+
+    def database_backwards(self, app_label, schema_editor, from_state, to_state):
+        return self.database_forwards(app_label, schema_editor, from_state, to_state)
+
+    def describe(self):
+        return f"Alter {self.name} table comment"
+
+    @property
+    def migration_name_fragment(self):
+        return f"alter_{self.name_lower}_table_comment"
 
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
@@ -831,6 +926,14 @@ class AddIndex(IndexOperation):
     def migration_name_fragment(self):
         return "%s_%s" % (self.model_name_lower, self.index.name.lower())
 
+    def reduce(self, operation, app_label):
+        if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
+            return []
+        if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
+            self.index.name = operation.new_name
+            return [AddIndex(model_name=self.model_name, index=self.index)]
+        return super().reduce(operation, app_label)
+
 
 class RemoveIndex(IndexOperation):
     """Remove an index from a model."""
@@ -1063,6 +1166,15 @@ class AddConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+
+    def reduce(self, operation, app_label):
+        if (
+            isinstance(operation, RemoveConstraint)
+            and self.model_name_lower == operation.model_name_lower
+            and self.constraint.name == operation.name
+        ):
+            return []
+        return super().reduce(operation, app_label)
 
 
 class RemoveConstraint(IndexOperation):

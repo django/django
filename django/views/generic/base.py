@@ -1,5 +1,6 @@
-import asyncio
 import logging
+
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction
 
 from django.core.exceptions import ImproperlyConfigured
 from django.http import (
@@ -68,8 +69,8 @@ class View:
         ]
         if not handlers:
             return False
-        is_async = asyncio.iscoroutinefunction(handlers[0])
-        if not all(asyncio.iscoroutinefunction(h) == is_async for h in handlers[1:]):
+        is_async = iscoroutinefunction(handlers[0])
+        if not all(iscoroutinefunction(h) == is_async for h in handlers[1:]):
             raise ImproperlyConfigured(
                 f"{cls.__qualname__} HTTP handlers must either be all sync or all "
                 "async."
@@ -117,7 +118,7 @@ class View:
 
         # Mark the callback if the view class is async.
         if cls.view_is_async:
-            view._is_coroutine = asyncio.coroutines._is_coroutine
+            markcoroutinefunction(view)
 
         return view
 
@@ -148,7 +149,16 @@ class View:
             request.path,
             extra={"status_code": 405, "request": request},
         )
-        return HttpResponseNotAllowed(self._allowed_methods())
+        response = HttpResponseNotAllowed(self._allowed_methods())
+
+        if self.view_is_async:
+
+            async def func():
+                return response
+
+            return func()
+        else:
+            return response
 
     def options(self, request, *args, **kwargs):
         """Handle responding to requests for the OPTIONS HTTP verb."""

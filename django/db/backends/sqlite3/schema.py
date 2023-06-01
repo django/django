@@ -6,12 +6,11 @@ from django.db import NotSupportedError
 from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.ddl_references import Statement
 from django.db.backends.utils import strip_quotes
-from django.db.models import UniqueConstraint
+from django.db.models import NOT_PROVIDED, UniqueConstraint
 from django.db.transaction import atomic
 
 
 class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
-
     sql_delete_table = "DROP TABLE %(table)s"
     sql_create_fk = None
     sql_create_inline_fk = (
@@ -174,7 +173,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             super().alter_field(model, old_field, new_field, strict=strict)
 
     def _remake_table(
-        self, model, create_field=None, delete_field=None, alter_field=None
+        self, model, create_field=None, delete_field=None, alter_fields=None
     ):
         """
         Shortcut to transform a model from old_model into new_model
@@ -191,6 +190,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
           4. Rename the "new__app_model" table to "app_model"
           5. Restore any index of the previous "app_model" table.
         """
+
         # Self-referential fields must be recreated rather than copied from
         # the old model to ensure their remote_field.field_name doesn't refer
         # to an altered field.
@@ -213,15 +213,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         # If any of the new or altered fields is introducing a new PK,
         # remove the old one
         restore_pk_field = None
-        if getattr(create_field, "primary_key", False) or (
-            alter_field and getattr(alter_field[1], "primary_key", False)
+        alter_fields = alter_fields or []
+        if getattr(create_field, "primary_key", False) or any(
+            getattr(new_field, "primary_key", False) for _, new_field in alter_fields
         ):
             for name, field in list(body.items()):
-                if field.primary_key and not (
+                if field.primary_key and not any(
                     # Do not remove the old primary key when an altered field
                     # that introduces a primary key is the same field.
-                    alter_field
-                    and name == alter_field[1].name
+                    name == new_field.name
+                    for _, new_field in alter_fields
                 ):
                     field.primary_key = False
                     restore_pk_field = field
@@ -232,20 +233,28 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         if create_field:
             body[create_field.name] = create_field
             # Choose a default and insert it into the copy map
-            if not create_field.many_to_many and create_field.concrete:
+            if (
+                create_field.db_default is NOT_PROVIDED
+                and not create_field.many_to_many
+                and create_field.concrete
+            ):
                 mapping[create_field.column] = self.prepare_default(
-                    self.effective_default(create_field),
+                    self.effective_default(create_field)
                 )
         # Add in any altered fields
-        if alter_field:
+        for alter_field in alter_fields:
             old_field, new_field = alter_field
             body.pop(old_field.name, None)
             mapping.pop(old_field.column, None)
             body[new_field.name] = new_field
             if old_field.null and not new_field.null:
+                if new_field.db_default is NOT_PROVIDED:
+                    default = self.prepare_default(self.effective_default(new_field))
+                else:
+                    default, _ = self.db_default_sql(new_field)
                 case_sql = "coalesce(%(col)s, %(default)s)" % {
                     "col": self.quote_name(old_field.column),
-                    "default": self.prepare_default(self.effective_default(new_field)),
+                    "default": default,
                 }
                 mapping[new_field.column] = case_sql
             else:
@@ -271,6 +280,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             for unique in model._meta.unique_together
         ]
 
+        # RemovedInDjango51Warning.
         # Work out the new value for index_together, taking renames into
         # account
         index_together = [
@@ -300,7 +310,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             "app_label": model._meta.app_label,
             "db_table": model._meta.db_table,
             "unique_together": unique_together,
-            "index_together": index_together,
+            "index_together": index_together,  # RemovedInDjango51Warning.
             "indexes": indexes,
             "constraints": constraints,
             "apps": apps,
@@ -316,7 +326,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             "app_label": model._meta.app_label,
             "db_table": "new__%s" % strip_quotes(model._meta.db_table),
             "unique_together": unique_together,
-            "index_together": index_together,
+            "index_together": index_together,  # RemovedInDjango51Warning.
             "indexes": indexes,
             "constraints": constraints,
             "apps": apps,
@@ -379,17 +389,27 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     def add_field(self, model, field):
         """Create a field on a model."""
-        if (
+        from django.db.models.expressions import Value
+
+        # Special-case implicit M2M tables.
+        if field.many_to_many and field.remote_field.through._meta.auto_created:
+            self.create_model(field.remote_field.through)
+        elif (
             # Primary keys and unique fields are not supported in ALTER TABLE
             # ADD COLUMN.
             field.primary_key
             or field.unique
-            or
+            or not field.null
             # Fields with default values cannot by handled by ALTER TABLE ADD
             # COLUMN statement because DROP DEFAULT is not supported in
             # ALTER TABLE.
-            not field.null
             or self.effective_default(field) is not None
+            # Fields with non-constant defaults cannot by handled by ALTER
+            # TABLE ADD COLUMN statement.
+            or (
+                field.db_default is not NOT_PROVIDED
+                and not isinstance(field.db_default, Value)
+            )
         ):
             self._remake_table(model, create_field=field)
         else:
@@ -454,7 +474,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 )
             )
         # Alter by remaking table
-        self._remake_table(model, alter_field=(old_field, new_field))
+        self._remake_table(model, alter_fields=[(old_field, new_field)])
         # Rebuild tables with FKs pointing to this field.
         old_collation = old_db_params.get("collation")
         new_collation = new_db_params.get("collation")
@@ -492,18 +512,30 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # propagate this altering.
             self._remake_table(
                 old_field.remote_field.through,
-                alter_field=(
-                    # The field that points to the target model is needed, so
-                    # we can tell alter_field to change it - this is
-                    # m2m_reverse_field_name() (as opposed to m2m_field_name(),
-                    # which points to our model).
-                    old_field.remote_field.through._meta.get_field(
-                        old_field.m2m_reverse_field_name()
+                alter_fields=[
+                    (
+                        # The field that points to the target model is needed,
+                        # so that table can be remade with the new m2m field -
+                        # this is m2m_reverse_field_name().
+                        old_field.remote_field.through._meta.get_field(
+                            old_field.m2m_reverse_field_name()
+                        ),
+                        new_field.remote_field.through._meta.get_field(
+                            new_field.m2m_reverse_field_name()
+                        ),
                     ),
-                    new_field.remote_field.through._meta.get_field(
-                        new_field.m2m_reverse_field_name()
+                    (
+                        # The field that points to the model itself is needed,
+                        # so that table can be remade with the new self field -
+                        # this is m2m_field_name().
+                        old_field.remote_field.through._meta.get_field(
+                            old_field.m2m_field_name()
+                        ),
+                        new_field.remote_field.through._meta.get_field(
+                            new_field.m2m_field_name()
+                        ),
                     ),
-                ),
+                ],
             )
             return
 

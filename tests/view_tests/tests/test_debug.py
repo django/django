@@ -7,7 +7,7 @@ import tempfile
 import threading
 from io import StringIO
 from pathlib import Path
-from unittest import mock, skipIf
+from unittest import mock, skipIf, skipUnless
 
 from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -22,6 +22,7 @@ from django.urls.converters import IntConverter
 from django.utils.functional import SimpleLazyObject
 from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import mark_safe
+from django.utils.version import PY311
 from django.views.debug import (
     CallableSettingWrapper,
     ExceptionCycleWarning,
@@ -236,7 +237,7 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/raises500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(
             response,
             "Raised during: view_tests.views.raises500",
@@ -253,7 +254,9 @@ class DebugViewTests(SimpleTestCase):
             html=True,
         )
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/classbased500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get(
+                "/classbased500/", headers={"accept": "text/plain"}
+            )
         self.assertContains(
             response,
             "Raised during: view_tests.views.Raises500View",
@@ -431,7 +434,7 @@ class DebugViewTests(SimpleTestCase):
         )
 
         with self.assertLogs("django.request", "ERROR"):
-            response = self.client.get("/raises500/", HTTP_ACCEPT="text/plain")
+            response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(response, "Oh dear, an error occurred!", status_code=500)
 
 
@@ -659,6 +662,40 @@ class ExceptionReporterTests(SimpleTestCase):
             text,
         )
 
+    @skipUnless(PY311, "Exception notes were added in Python 3.11.")
+    def test_exception_with_notes(self):
+        request = self.rf.get("/test_view/")
+        try:
+            try:
+                raise RuntimeError("Oops")
+            except Exception as err:
+                err.add_note("First Note")
+                err.add_note("Second Note")
+                err.add_note(mark_safe("<script>alert(1);</script>"))
+                raise err
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn(
+            '<pre class="exception_value">Oops\nFirst Note\nSecond Note\n'
+            "&lt;script&gt;alert(1);&lt;/script&gt;</pre>",
+            html,
+        )
+        self.assertIn(
+            "Exception Value: Oops\nFirst Note\nSecond Note\n"
+            "&lt;script&gt;alert(1);&lt;/script&gt;",
+            html,
+        )
+
+        text = reporter.get_traceback_text()
+        self.assertIn(
+            "Exception Value: Oops\nFirst Note\nSecond Note\n"
+            "<script>alert(1);</script>",
+            text,
+        )
+
     def test_mid_stack_exception_without_traceback(self):
         try:
             try:
@@ -730,6 +767,79 @@ class ExceptionReporterTests(SimpleTestCase):
         self.assertIn(explicit_exc.format("<p>Top level</p>"), text)
         self.assertIn(implicit_exc.format("<p>Second exception</p>"), text)
         self.assertEqual(3, text.count("<p>Final exception</p>"))
+
+    @skipIf(
+        sys._xoptions.get("no_debug_ranges", False)
+        or os.environ.get("PYTHONNODEBUGRANGES", False),
+        "Fine-grained error locations are disabled.",
+    )
+    @skipUnless(PY311, "Fine-grained error locations were added in Python 3.11.")
+    def test_highlight_error_position(self):
+        request = self.rf.get("/test_view/")
+        try:
+            try:
+                raise AttributeError("Top level")
+            except AttributeError as explicit:
+                try:
+                    raise ValueError(mark_safe("<p>2nd exception</p>")) from explicit
+                except ValueError:
+                    raise IndexError("Final exception")
+        except Exception:
+            exc_type, exc_value, tb = sys.exc_info()
+
+        reporter = ExceptionReporter(request, exc_type, exc_value, tb)
+        html = reporter.get_traceback_html()
+        self.assertIn(
+            "<pre>                raise AttributeError(&quot;Top level&quot;)\n"
+            "                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>",
+            html,
+        )
+        self.assertIn(
+            "<pre>                    raise ValueError(mark_safe("
+            "&quot;&lt;p&gt;2nd exception&lt;/p&gt;&quot;)) from explicit\n"
+            "                         "
+            "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>",
+            html,
+        )
+        self.assertIn(
+            "<pre>                    raise IndexError(&quot;Final exception&quot;)\n"
+            "                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</pre>",
+            html,
+        )
+        # Pastebin.
+        self.assertIn(
+            "    raise AttributeError(&quot;Top level&quot;)\n"
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            html,
+        )
+        self.assertIn(
+            "    raise ValueError(mark_safe("
+            "&quot;&lt;p&gt;2nd exception&lt;/p&gt;&quot;)) from explicit\n"
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            html,
+        )
+        self.assertIn(
+            "    raise IndexError(&quot;Final exception&quot;)\n"
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            html,
+        )
+        # Text traceback.
+        text = reporter.get_traceback_text()
+        self.assertIn(
+            '    raise AttributeError("Top level")\n'
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            text,
+        )
+        self.assertIn(
+            '    raise ValueError(mark_safe("<p>2nd exception</p>")) from explicit\n'
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            text,
+        )
+        self.assertIn(
+            '    raise IndexError("Final exception")\n'
+            "    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+            text,
+        )
 
     def test_reporting_frames_without_source(self):
         try:
@@ -1008,7 +1118,7 @@ class ExceptionReporterTests(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS="example.com")
     def test_disallowed_host(self):
         "An exception report can be generated even for a disallowed host."
-        request = self.rf.get("/", HTTP_HOST="evil.com")
+        request = self.rf.get("/", headers={"host": "evil.com"})
         reporter = ExceptionReporter(request, None, None, None)
         html = reporter.get_traceback_html()
         self.assertIn("http://evil.com/", html)
@@ -1093,7 +1203,7 @@ class ExceptionReporterTests(SimpleTestCase):
 
     @override_settings(ALLOWED_HOSTS=["example.com"])
     def test_get_raw_insecure_uri(self):
-        factory = RequestFactory(HTTP_HOST="evil.com")
+        factory = RequestFactory(headers={"host": "evil.com"})
         tests = [
             ("////absolute-uri", "http://evil.com//absolute-uri"),
             ("/?foo=bar", "http://evil.com/?foo=bar"),
@@ -1218,7 +1328,7 @@ class PlainTextReportTests(SimpleTestCase):
     @override_settings(ALLOWED_HOSTS="example.com")
     def test_disallowed_host(self):
         "An exception report can be generated even for a disallowed host."
-        request = self.rf.get("/", HTTP_HOST="evil.com")
+        request = self.rf.get("/", headers={"host": "evil.com"})
         reporter = ExceptionReporter(request, None, None, None)
         text = reporter.get_traceback_text()
         self.assertIn("http://evil.com/", text)
@@ -1679,7 +1789,7 @@ class ExceptionReporterFilterTests(
         )
 
     def test_request_meta_filtering(self):
-        request = self.rf.get("/", HTTP_SECRET_HEADER="super_secret")
+        request = self.rf.get("/", headers={"secret-header": "super_secret"})
         reporter_filter = SafeExceptionReporterFilter()
         self.assertEqual(
             reporter_filter.get_safe_request_meta(request)["HTTP_SECRET_HEADER"],
@@ -1687,14 +1797,21 @@ class ExceptionReporterFilterTests(
         )
 
     def test_exception_report_uses_meta_filtering(self):
-        response = self.client.get("/raises500/", HTTP_SECRET_HEADER="super_secret")
+        response = self.client.get(
+            "/raises500/", headers={"secret-header": "super_secret"}
+        )
         self.assertNotIn(b"super_secret", response.content)
         response = self.client.get(
             "/raises500/",
-            HTTP_SECRET_HEADER="super_secret",
-            HTTP_ACCEPT="application/json",
+            headers={"secret-header": "super_secret", "accept": "application/json"},
         )
         self.assertNotIn(b"super_secret", response.content)
+
+    @override_settings(SESSION_COOKIE_NAME="djangosession")
+    def test_cleanse_session_cookie_value(self):
+        self.client.cookies.load({"djangosession": "should not be displayed"})
+        response = self.client.get("/raises500/")
+        self.assertNotContains(response, "should not be displayed", status_code=500)
 
 
 class CustomExceptionReporterFilter(SafeExceptionReporterFilter):
@@ -1749,7 +1866,7 @@ class NonHTMLResponseExceptionReporterFilter(
     Refs #14614.
     """
 
-    rf = RequestFactory(HTTP_ACCEPT="application/json")
+    rf = RequestFactory(headers={"accept": "application/json"})
 
     def test_non_sensitive_request(self):
         """
@@ -1801,7 +1918,9 @@ class NonHTMLResponseExceptionReporterFilter(
 
     @override_settings(DEBUG=True, ROOT_URLCONF="view_tests.urls")
     def test_non_html_response_encoding(self):
-        response = self.client.get("/raises500/", HTTP_ACCEPT="application/json")
+        response = self.client.get(
+            "/raises500/", headers={"accept": "application/json"}
+        )
         self.assertEqual(response.headers["Content-Type"], "text/plain; charset=utf-8")
 
 

@@ -49,7 +49,7 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_commands():
     """
     Return a dictionary mapping command names to their callback applications.
@@ -279,8 +279,8 @@ class ManagementUtility:
         """
         Output completion suggestions for BASH.
 
-        The output of this function is passed to BASH's `COMREPLY` variable and
-        treated as completion suggestions. `COMREPLY` expects a space
+        The output of this function is passed to BASH's `COMPREPLY` variable
+        and treated as completion suggestions. `COMPREPLY` expects a space
         separated string as the result.
 
         The `COMP_WORDS` and `COMP_CWORD` BASH environment variables are used

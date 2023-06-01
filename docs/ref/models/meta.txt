@@ -49,15 +49,15 @@ Retrieving a single field instance of a model by name
         >>> from django.contrib.auth.models import User
 
         # A field on the model
-        >>> User._meta.get_field('username')
+        >>> User._meta.get_field("username")
         <django.db.models.fields.CharField: username>
 
         # A field from another model that has a relation with the current model
-        >>> User._meta.get_field('logentry')
+        >>> User._meta.get_field("logentry")
         <ManyToOneRel: admin.logentry>
 
         # A non existent field
-        >>> User._meta.get_field('does_not_exist')
+        >>> User._meta.get_field("does_not_exist")
         Traceback (most recent call last):
             ...
         FieldDoesNotExist: User has no field named 'does_not_exist'

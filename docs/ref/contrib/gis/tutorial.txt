@@ -77,10 +77,10 @@ The ``geodjango`` project settings are stored in the ``geodjango/settings.py``
 file. Edit the database connection settings to match your setup::
 
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.contrib.gis.db.backends.postgis',
-            'NAME': 'geodjango',
-            'USER': 'geo',
+        "default": {
+            "ENGINE": "django.contrib.gis.db.backends.postgis",
+            "NAME": "geodjango",
+            "USER": "geo",
         },
     }
 
@@ -89,14 +89,14 @@ In addition, modify the :setting:`INSTALLED_APPS` setting to include
 and ``world`` (your newly created application)::
 
     INSTALLED_APPS = [
-        'django.contrib.admin',
-        'django.contrib.auth',
-        'django.contrib.contenttypes',
-        'django.contrib.sessions',
-        'django.contrib.messages',
-        'django.contrib.staticfiles',
-        'django.contrib.gis',
-        'world',
+        "django.contrib.admin",
+        "django.contrib.auth",
+        "django.contrib.contenttypes",
+        "django.contrib.sessions",
+        "django.contrib.messages",
+        "django.contrib.staticfiles",
+        "django.contrib.gis",
+        "world",
     ]
 
 Geographic Data
@@ -197,18 +197,19 @@ model to represent this data::
 
     from django.contrib.gis.db import models
 
+
     class WorldBorder(models.Model):
         # Regular Django fields corresponding to the attributes in the
         # world borders shapefile.
         name = models.CharField(max_length=50)
         area = models.IntegerField()
-        pop2005 = models.IntegerField('Population 2005')
-        fips = models.CharField('FIPS Code', max_length=2, null=True)
-        iso2 = models.CharField('2 Digit ISO', max_length=2)
-        iso3 = models.CharField('3 Digit ISO', max_length=3)
-        un = models.IntegerField('United Nations Code')
-        region = models.IntegerField('Region Code')
-        subregion = models.IntegerField('Sub-Region Code')
+        pop2005 = models.IntegerField("Population 2005")
+        fips = models.CharField("FIPS Code", max_length=2, null=True)
+        iso2 = models.CharField("2 Digit ISO", max_length=2)
+        iso3 = models.CharField("3 Digit ISO", max_length=3)
+        un = models.IntegerField("United Nations Code")
+        region = models.IntegerField("Region Code")
+        subregion = models.IntegerField("Sub-Region Code")
         lon = models.FloatField()
         lat = models.FloatField()
 
@@ -321,14 +322,18 @@ First, invoke the Django shell:
     $ python manage.py shell
 
 If you downloaded the :ref:`worldborders` data earlier in the tutorial, then
-you can determine its path using Python's :class:`pathlib.Path`::
+you can determine its path using Python's :class:`pathlib.Path`:
+
+.. code-block:: pycon
 
     >>> from pathlib import Path
     >>> import world
-    >>> world_shp = Path(world.__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
+    >>> world_shp = Path(world.__file__).resolve().parent / "data" / "TM_WORLD_BORDERS-0.3.shp"
 
 Now, open the world borders shapefile using GeoDjango's
-:class:`~django.contrib.gis.gdal.DataSource` interface::
+:class:`~django.contrib.gis.gdal.DataSource` interface:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import DataSource
     >>> ds = DataSource(world_shp)
@@ -336,7 +341,9 @@ Now, open the world borders shapefile using GeoDjango's
     / ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)
 
 Data source objects can have different layers of geospatial features; however,
-shapefiles are only allowed to have one layer::
+shapefiles are only allowed to have one layer:
+
+.. code-block:: pycon
 
     >>> print(len(ds))
     1
@@ -344,7 +351,9 @@ shapefiles are only allowed to have one layer::
     >>> print(lyr)
     TM_WORLD_BORDERS-0.3
 
-You can see the layer's geometry type and how many features it contains::
+You can see the layer's geometry type and how many features it contains:
+
+.. code-block:: pycon
 
     >>> print(lyr.geom_type)
     Polygon
@@ -363,7 +372,9 @@ You can see the layer's geometry type and how many features it contains::
 
 The :class:`~django.contrib.gis.gdal.Layer` may also have a spatial reference
 system associated with it.  If it does, the ``srs`` attribute will return a
-:class:`~django.contrib.gis.gdal.SpatialReference` object::
+:class:`~django.contrib.gis.gdal.SpatialReference` object:
+
+.. code-block:: pycon
 
     >>> srs = lyr.srs
     >>> print(srs)
@@ -379,7 +390,7 @@ system associated with it.  If it does, the ``srs`` attribute will return a
     AXIS["Latitude",NORTH],
     AXIS["Longitude",EAST],
     AUTHORITY["EPSG","4326"]]
-    >>> srs.proj # PROJ representation
+    >>> srs.proj  # PROJ representation
     '+proj=longlat +datum=WGS84 +no_defs'
 
 This shapefile is in the popular WGS84 spatial reference
@@ -401,28 +412,36 @@ string) associated with each of the fields:
 You can iterate over each feature in the layer and extract information from both
 the feature's geometry (accessed via the ``geom`` attribute) as well as the
 feature's attribute fields (whose **values** are accessed via ``get()``
-method)::
+method):
+
+.. code-block:: pycon
 
     >>> for feat in lyr:
-    ...    print(feat.get('NAME'), feat.geom.num_points)
+    ...     print(feat.get("NAME"), feat.geom.num_points)
     ...
     Guernsey 18
     Jersey 26
     South Georgia South Sandwich Islands 338
     Taiwan 363
 
-:class:`~django.contrib.gis.gdal.Layer` objects may be sliced::
+:class:`~django.contrib.gis.gdal.Layer` objects may be sliced:
+
+.. code-block:: pycon
 
     >>> lyr[0:2]
     [<django.contrib.gis.gdal.feature.Feature object at 0x2f47690>, <django.contrib.gis.gdal.feature.Feature object at 0x2f47650>]
 
-And individual features may be retrieved by their feature ID::
+And individual features may be retrieved by their feature ID:
+
+.. code-block:: pycon
 
     >>> feat = lyr[234]
-    >>> print(feat.get('NAME'))
+    >>> print(feat.get("NAME"))
     San Marino
 
-Boundary geometries may be exported as WKT and GeoJSON::
+Boundary geometries may be exported as WKT and GeoJSON:
+
+.. code-block:: pycon
 
     >>> geom = feat.geom
     >>> print(geom.wkt)
@@ -442,21 +461,22 @@ with the following code::
     from .models import WorldBorder
 
     world_mapping = {
-        'fips' : 'FIPS',
-        'iso2' : 'ISO2',
-        'iso3' : 'ISO3',
-        'un' : 'UN',
-        'name' : 'NAME',
-        'area' : 'AREA',
-        'pop2005' : 'POP2005',
-        'region' : 'REGION',
-        'subregion' : 'SUBREGION',
-        'lon' : 'LON',
-        'lat' : 'LAT',
-        'mpoly' : 'MULTIPOLYGON',
+        "fips": "FIPS",
+        "iso2": "ISO2",
+        "iso3": "ISO3",
+        "un": "UN",
+        "name": "NAME",
+        "area": "AREA",
+        "pop2005": "POP2005",
+        "region": "REGION",
+        "subregion": "SUBREGION",
+        "lon": "LON",
+        "lat": "LAT",
+        "mpoly": "MULTIPOLYGON",
     }
 
-    world_shp = Path(__file__).resolve().parent / 'data' / 'TM_WORLD_BORDERS-0.3.shp'
+    world_shp = Path(__file__).resolve().parent / "data" / "TM_WORLD_BORDERS-0.3.shp"
+
 
     def run(verbose=True):
         lm = LayerMapping(WorldBorder, world_shp, world_mapping, transform=False)
@@ -484,7 +504,9 @@ Afterward, invoke the Django shell from the ``geodjango`` project directory:
     $ python manage.py shell
 
 Next, import the ``load`` module, call the ``run`` routine, and watch
-``LayerMapping`` do the work::
+``LayerMapping`` do the work:
+
+.. code-block:: pycon
 
     >>> from world import load
     >>> load.run()
@@ -533,6 +555,7 @@ directly into the ``models.py`` of a GeoDjango application::
     # This is an auto-generated Django model module created by ogrinspect.
     from django.contrib.gis.db import models
 
+
     class WorldBorder(models.Model):
         fips = models.CharField(max_length=2)
         iso2 = models.CharField(max_length=2)
@@ -547,20 +570,21 @@ directly into the ``models.py`` of a GeoDjango application::
         lat = models.FloatField()
         geom = models.MultiPolygonField(srid=4326)
 
+
     # Auto-generated `LayerMapping` dictionary for WorldBorder model
     worldborders_mapping = {
-        'fips' : 'FIPS',
-        'iso2' : 'ISO2',
-        'iso3' : 'ISO3',
-        'un' : 'UN',
-        'name' : 'NAME',
-        'area' : 'AREA',
-        'pop2005' : 'POP2005',
-        'region' : 'REGION',
-        'subregion' : 'SUBREGION',
-        'lon' : 'LON',
-        'lat' : 'LAT',
-        'geom' : 'MULTIPOLYGON',
+        "fips": "FIPS",
+        "iso2": "ISO2",
+        "iso3": "ISO3",
+        "un": "UN",
+        "name": "NAME",
+        "area": "AREA",
+        "pop2005": "POP2005",
+        "region": "REGION",
+        "subregion": "SUBREGION",
+        "lon": "LON",
+        "lat": "LAT",
+        "geom": "MULTIPOLYGON",
     }
 
 Spatial Queries
@@ -576,15 +600,19 @@ a particular point.  First, fire up the management shell:
 
     $ python manage.py shell
 
-Now, define a point of interest [#]_::
+Now, define a point of interest [#]_:
 
-    >>> pnt_wkt = 'POINT(-95.3385 29.7245)'
+.. code-block:: pycon
+
+    >>> pnt_wkt = "POINT(-95.3385 29.7245)"
 
 The ``pnt_wkt`` string represents the point at -95.3385 degrees longitude,
 29.7245 degrees latitude.  The geometry is in a format known as
 Well Known Text (WKT), a standard issued by the Open Geospatial
 Consortium (OGC). [#]_  Import the ``WorldBorder`` model, and perform
-a ``contains`` lookup using the ``pnt_wkt`` as the parameter::
+a ``contains`` lookup using the ``pnt_wkt`` as the parameter:
+
+.. code-block:: pycon
 
     >>> from world.models import WorldBorder
     >>> WorldBorder.objects.filter(mpoly__contains=pnt_wkt)
@@ -596,7 +624,9 @@ United States (exactly what you would expect).
 Similarly, you may also use a :doc:`GEOS geometry object <geos>`.
 Here, you can combine the ``intersects`` spatial lookup with the ``get``
 method to retrieve only the ``WorldBorder`` instance for San Marino instead
-of a queryset::
+of a queryset:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import Point
     >>> pnt = Point(12.4604, 43.9420)
@@ -614,29 +644,35 @@ When doing spatial queries, GeoDjango automatically transforms
 geometries if they're in a different coordinate system.  In the following
 example, coordinates will be expressed in `EPSG SRID 32140`__,
 a coordinate system specific to south Texas **only** and in units of
-**meters**, not degrees::
+**meters**, not degrees:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry, Point
     >>> pnt = Point(954158.1, 4215137.1, srid=32140)
 
 Note that ``pnt`` may also be constructed with EWKT, an "extended" form of
-WKT that includes the SRID::
+WKT that includes the SRID:
 
-    >>> pnt = GEOSGeometry('SRID=32140;POINT(954158.1 4215137.1)')
+.. code-block:: pycon
+
+    >>> pnt = GEOSGeometry("SRID=32140;POINT(954158.1 4215137.1)")
 
 GeoDjango's ORM will automatically wrap geometry values
 in transformation SQL, allowing the developer to work at a higher level
-of abstraction::
+of abstraction:
+
+.. code-block:: pycon
 
     >>> qs = WorldBorder.objects.filter(mpoly__intersects=pnt)
-    >>> print(qs.query) # Generating the SQL
+    >>> print(qs.query)  # Generating the SQL
     SELECT "world_worldborder"."id", "world_worldborder"."name", "world_worldborder"."area",
     "world_worldborder"."pop2005", "world_worldborder"."fips", "world_worldborder"."iso2",
     "world_worldborder"."iso3", "world_worldborder"."un", "world_worldborder"."region",
     "world_worldborder"."subregion", "world_worldborder"."lon", "world_worldborder"."lat",
     "world_worldborder"."mpoly" FROM "world_worldborder"
     WHERE ST_Intersects("world_worldborder"."mpoly", ST_Transform(%s, 4326))
-    >>> qs # printing evaluates the queryset
+    >>> qs  # printing evaluates the queryset
     <QuerySet [<WorldBorder: United States>]>
 
 __ https://spatialreference.org/ref/epsg/32140/
@@ -646,7 +682,9 @@ __ https://spatialreference.org/ref/epsg/32140/
 .. admonition:: Raw queries
 
     When using :doc:`raw queries </topics/db/sql>`, you must wrap your geometry
-    fields so that the field value can be recognized by GEOS::
+    fields so that the field value can be recognized by GEOS:
+
+    .. code-block:: pycon
 
         from django.db import connection
         # or if you're querying a non-default database:
@@ -663,20 +701,24 @@ GeoDjango loads geometries in a standardized textual representation.  When the
 geometry field is first accessed, GeoDjango creates a
 :class:`~django.contrib.gis.geos.GEOSGeometry` object, exposing powerful
 functionality, such as serialization properties for popular geospatial
-formats::
+formats:
 
-    >>> sm = WorldBorder.objects.get(name='San Marino')
+.. code-block:: pycon
+
+    >>> sm = WorldBorder.objects.get(name="San Marino")
     >>> sm.mpoly
     <MultiPolygon object at 0x24c6798>
-    >>> sm.mpoly.wkt # WKT
+    >>> sm.mpoly.wkt  # WKT
     MULTIPOLYGON (((12.4157980000000006 43.9579540000000009, 12.4505540000000003 43.9797209999999978, ...
-    >>> sm.mpoly.wkb # WKB (as Python binary buffer)
+    >>> sm.mpoly.wkb  # WKB (as Python binary buffer)
     <read-only buffer for 0x1fe2c70, size -1, offset 0 at 0x2564c40>
-    >>> sm.mpoly.geojson # GeoJSON
+    >>> sm.mpoly.geojson  # GeoJSON
     '{ "type": "MultiPolygon", "coordinates": [ [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...
 
 This includes access to all of the advanced geometric operations provided by
-the GEOS library::
+the GEOS library:
+
+.. code-block:: pycon
 
     >>> pnt = Point(12.4604, 43.9420)
     >>> sm.mpoly.contains(pnt)
@@ -720,7 +762,7 @@ Next, edit your ``urls.py`` in the ``geodjango`` application folder as follows::
     from django.urls import include, path
 
     urlpatterns = [
-        path('admin/', admin.site.urls),
+        path("admin/", admin.site.urls),
     ]
 
 Create an admin user:

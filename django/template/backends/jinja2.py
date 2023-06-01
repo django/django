@@ -8,10 +8,10 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 
 from .base import BaseEngine
+from .utils import csrf_input_lazy, csrf_token_lazy
 
 
 class Jinja2(BaseEngine):
-
     app_dirname = "jinja2"
 
     def __init__(self, params):
@@ -62,8 +62,6 @@ class Template:
         )
 
     def render(self, context=None, request=None):
-        from .utils import csrf_input_lazy, csrf_token_lazy
-
         if context is None:
             context = {}
         if request is not None:

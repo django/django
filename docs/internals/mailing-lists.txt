@@ -1,6 +1,6 @@
-=============
-Mailing lists
-=============
+=======================
+Mailing lists and Forum
+=======================
 
 .. Important::
 
@@ -10,13 +10,33 @@ Mailing lists
     not public. For further details, please see :doc:`our security
     policies </internals/security>`.
 
-Django has several official mailing lists on Google Groups that are open to
-anyone.
+Django Forum
+============
+
+Django has an `official Forum`_ where you can input and ask questions.
+
+There are several categories of discussion including:
+
+* `Using Django`_: to ask any question regarding the installation, usage, or
+  debugging of Django.
+* `Internals`_: for discussion of the development of Django itself.
+
+.. _official Forum: https://forum.djangoproject.com
+.. _Internals: https://forum.djangoproject.com/c/internals/5
+.. _Using Django: https://forum.djangoproject.com/c/users/6
+
+In addition, Django has several official mailing lists on Google Groups that
+are open to anyone.
 
 .. _django-users-mailing-list:
 
 ``django-users``
 ================
+
+.. note::
+
+    The `Using Django`_ category of the `official Forum`_ is now the preferred
+    venue for asking usage questions.
 
 This is the right place if you are looking to ask any question regarding the
 installation, usage, or debugging of Django.
@@ -39,6 +59,11 @@ installation, usage, or debugging of Django.
 
 ``django-developers``
 =====================
+
+.. note::
+
+    The `Internals`_ category of the `official Forum`_ is now the preferred
+    venue for discussing the development of Django.
 
 The discussion about the development of Django itself takes place here.
 

@@ -1,9 +1,18 @@
 import pickle
+import unittest
 
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.forms import FileField
+from django.core.validators import validate_image_file_extension
+from django.forms import FileField, FileInput
 from django.test import SimpleTestCase
+
+try:
+    from PIL import Image  # NOQA
+except ImportError:
+    HAS_PILLOW = False
+else:
+    HAS_PILLOW = True
 
 
 class FileFieldTest(SimpleTestCase):
@@ -109,3 +118,69 @@ class FileFieldTest(SimpleTestCase):
 
     def test_file_picklable(self):
         self.assertIsInstance(pickle.loads(pickle.dumps(FileField())), FileField)
+
+
+class MultipleFileInput(FileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+
+class MultipleFileFieldTest(SimpleTestCase):
+    def test_file_multiple(self):
+        f = MultipleFileField()
+        files = [
+            SimpleUploadedFile("name1", b"Content 1"),
+            SimpleUploadedFile("name2", b"Content 2"),
+        ]
+        self.assertEqual(f.clean(files), files)
+
+    def test_file_multiple_empty(self):
+        f = MultipleFileField()
+        files = [
+            SimpleUploadedFile("empty", b""),
+            SimpleUploadedFile("nonempty", b"Some Content"),
+        ]
+        msg = "'The submitted file is empty.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(files)
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean(files[::-1])
+
+    @unittest.skipUnless(HAS_PILLOW, "Pillow not installed")
+    def test_file_multiple_validation(self):
+        f = MultipleFileField(validators=[validate_image_file_extension])
+
+        good_files = [
+            SimpleUploadedFile("image1.jpg", b"fake JPEG"),
+            SimpleUploadedFile("image2.png", b"faux image"),
+            SimpleUploadedFile("image3.bmp", b"fraudulent bitmap"),
+        ]
+        self.assertEqual(f.clean(good_files), good_files)
+
+        evil_files = [
+            SimpleUploadedFile("image1.sh", b"#!/bin/bash -c 'echo pwned!'\n"),
+            SimpleUploadedFile("image2.png", b"faux image"),
+            SimpleUploadedFile("image3.jpg", b"fake JPEG"),
+        ]
+
+        evil_rotations = (
+            evil_files[i:] + evil_files[:i]  # Rotate by i.
+            for i in range(len(evil_files))
+        )
+        msg = "File extension “sh” is not allowed. Allowed extensions are: "
+        for rotated_evil_files in evil_rotations:
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean(rotated_evil_files)

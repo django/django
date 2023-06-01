@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
           cache: 'pip'
           cache-dependency-path: 'docs/requirements.txt'
       - run: python -m pip install -r docs/requirements.txt
@@ -40,3 +40,24 @@ jobs:
           export SPHINXOPTS="-q -W --keep-going -j auto"
           export LANGUAGE=en_US
           make spelling
+
+  blacken-docs:
+    runs-on: ubuntu-latest
+    name: blacken-docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: python -m pip install blacken-docs
+      - name: Build docs
+        run: |
+          cd docs
+          make black
+          RESULT=`cat _build/black/output.txt`
+          if [ "$RESULT" -gt 0 ]; then
+              echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"
+          fi;
+          exit $RESULT

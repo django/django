@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import json
 from importlib import import_module
 
 import sqlparse
@@ -7,6 +8,7 @@ import sqlparse
 from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.encoding import force_str
 
@@ -268,6 +270,7 @@ class BaseDatabaseOperations:
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
+
         # Convert params to contain string values.
         def to_string(s):
             return force_str(s, strings_only=True, errors="replace")
@@ -524,6 +527,9 @@ class BaseDatabaseOperations:
         else:
             return value
 
+    def adapt_integerfield_value(self, value, internal_type):
+        return value
+
     def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected
@@ -574,6 +580,9 @@ class BaseDatabaseOperations:
         type for the backend driver.
         """
         return value or None
+
+    def adapt_json_value(self, value, encoder):
+        return json.dumps(value, cls=encoder)
 
     def year_lookup_bounds_for_date_field(self, value, iso_year=False):
         """
@@ -768,3 +777,9 @@ class BaseDatabaseOperations:
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         return ""
+
+    def prepare_join_on_clause(self, lhs_table, lhs_field, rhs_table, rhs_field):
+        lhs_expr = Col(lhs_table, lhs_field)
+        rhs_expr = Col(rhs_table, rhs_field)
+
+        return lhs_expr, rhs_expr

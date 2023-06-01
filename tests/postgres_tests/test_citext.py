@@ -5,14 +5,12 @@ strings and thus eliminates the need for operations such as iexact and other
 modifiers to enforce use of an index.
 """
 from django.db import IntegrityError
-from django.test.utils import modify_settings
 from django.utils.deprecation import RemovedInDjango51Warning
 
 from . import PostgreSQLTestCase
 from .models import CITestModel
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class CITextTestCase(PostgreSQLTestCase):
     case_sensitive_lookups = ("contains", "startswith", "endswith", "regex")
 

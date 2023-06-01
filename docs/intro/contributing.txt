@@ -41,11 +41,13 @@ so that it can be of use to the widest audience.
 .. admonition:: Where to get help:
 
     If you're having trouble going through this tutorial, please post a message
-    to |django-developers| or drop by `#django-dev on irc.libera.chat`__ to
-    chat with other Django users who might be able to help.
+    on the `Django Forum`_, |django-developers|, or drop by
+    `#django-dev on irc.libera.chat`__ to chat with other Django users who
+    might be able to help.
 
 __ https://diveinto.org/python3/table-of-contents.html
 __ https://web.libera.chat/#django-dev
+.. _Django Forum: https://forum.djangoproject.com/
 
 What does this tutorial cover?
 ------------------------------
@@ -326,7 +328,7 @@ Navigate to Django's ``tests/shortcuts/`` folder and create a new file
 
     class MakeToastTests(SimpleTestCase):
         def test_make_toast(self):
-            self.assertEqual(make_toast(), 'toast')
+            self.assertEqual(make_toast(), "toast")
 
 This test checks that the ``make_toast()`` returns ``'toast'``.
 
@@ -357,7 +359,9 @@ that's really what happens. ``cd`` to the Django ``tests/`` directory and run:
     $ ./runtests.py shortcuts
 
 If the tests ran correctly, you should see one failure corresponding to the test
-method we added, with this error::
+method we added, with this error:
+
+.. code-block:: pytb
 
     ImportError: cannot import name 'make_toast' from 'django.shortcuts'
 
@@ -373,7 +377,7 @@ Navigate to the ``django/`` folder and open the ``shortcuts.py`` file. At the
 bottom, add::
 
     def make_toast():
-        return 'toast'
+        return "toast"
 
 Now we need to make sure that the test we wrote earlier passes, so we can see
 whether the code we added is working correctly. Again, navigate to the Django
@@ -407,7 +411,9 @@ Writing Documentation
 
 This is a new feature, so it should be documented. Open the file
 ``docs/topics/http/shortcuts.txt`` and add the following at the end of the
-file::
+file:
+
+.. code-block:: rst
 
     ``make_toast()``
     ================
@@ -421,7 +427,9 @@ file::
 Since this new feature will be in an upcoming release it is also added to the
 release notes for the next version of Django. Open the release notes for the
 latest version in ``docs/releases/``, which at time of writing is ``2.2.txt``.
-Add a note under the "Minor Features" header::
+Add a note under the "Minor Features" header:
+
+.. code-block:: rst
 
     :mod:`django.shortcuts`
     ~~~~~~~~~~~~~~~~~~~~~~~

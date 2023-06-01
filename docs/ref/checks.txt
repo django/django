@@ -175,6 +175,9 @@ Model fields
   ``choices`` (``<count>`` characters).
 * **fields.E010**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances.
+* **fields.E011**: ``<database>`` does not support default database values with
+  expressions (``db_default``).
+* **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -196,6 +199,8 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.W163**: ``<database>`` does not support comments on columns
+  (``db_comment``).
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
 * **fields.E180**: ``<database>`` does not support ``JSONField``\s.
@@ -315,6 +320,7 @@ Related fields
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
+* **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
 
 Models
 ------
@@ -400,6 +406,8 @@ Models
   expressions.
 * **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
   expression and won't be validated during the model ``full_clean()``.
+* **models.W046**: ``<database>`` does not support comments on tables
+  (``db_table_comment``).
 
 Security
 --------
@@ -553,6 +561,9 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 * **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``. *This check was changed to* ``templates.W003`` *in Django
+  4.1.2*.
+* **templates.W003**:``<name>`` is used for multiple template tag modules:
   ``<module list>``.
 
 Translation
@@ -695,8 +706,8 @@ with the admin site:
 * **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField`` field.
+* **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
+  field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,

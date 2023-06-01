@@ -1,3 +1,4 @@
+import warnings
 from datetime import datetime, timedelta
 
 from django import forms
@@ -9,11 +10,14 @@ from django.contrib.admin.exceptions import (
     DisallowedModelAdminToField,
 )
 from django.contrib.admin.options import (
+    IS_FACETS_VAR,
     IS_POPUP_VAR,
     TO_FIELD_VAR,
     IncorrectLookupParameters,
+    ShowFacets,
 )
 from django.contrib.admin.utils import (
+    build_q_object_from_lookup_parameters,
     get_fields_from_path,
     lookup_spawns_duplicates,
     prepare_lookup_value,
@@ -28,7 +32,9 @@ from django.core.paginator import InvalidPage
 from django.db.models import Exists, F, Field, ManyToOneRel, OrderBy, OuterRef
 from django.db.models.expressions import Combinable
 from django.urls import reverse
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.http import urlencode
+from django.utils.inspect import func_supports_parameter
 from django.utils.timezone import make_aware
 from django.utils.translation import gettext
 
@@ -39,7 +45,14 @@ PAGE_VAR = "p"
 SEARCH_VAR = "q"
 ERROR_FLAG = "e"
 
-IGNORED_PARAMS = (ALL_VAR, ORDER_VAR, SEARCH_VAR, IS_POPUP_VAR, TO_FIELD_VAR)
+IGNORED_PARAMS = (
+    ALL_VAR,
+    ORDER_VAR,
+    SEARCH_VAR,
+    IS_FACETS_VAR,
+    IS_POPUP_VAR,
+    TO_FIELD_VAR,
+)
 
 
 class ChangeListSearchForm(forms.Form):
@@ -103,6 +116,10 @@ class ChangeList:
             self.page_num = 1
         self.show_all = ALL_VAR in request.GET
         self.is_popup = IS_POPUP_VAR in request.GET
+        self.add_facets = model_admin.show_facets is ShowFacets.ALWAYS or (
+            model_admin.show_facets is ShowFacets.ALLOW and IS_FACETS_VAR in request.GET
+        )
+        self.is_facets_optional = model_admin.show_facets is ShowFacets.ALLOW
         to_field = request.GET.get(TO_FIELD_VAR)
         if to_field and not model_admin.to_field_allowed(request, to_field):
             raise DisallowedModelAdminToField(
@@ -110,10 +127,15 @@ class ChangeList:
             )
         self.to_field = to_field
         self.params = dict(request.GET.items())
+        self.filter_params = dict(request.GET.lists())
         if PAGE_VAR in self.params:
             del self.params[PAGE_VAR]
+            del self.filter_params[PAGE_VAR]
         if ERROR_FLAG in self.params:
             del self.params[ERROR_FLAG]
+            del self.filter_params[ERROR_FLAG]
+        self.remove_facet_link = self.get_query_string(remove=[IS_FACETS_VAR])
+        self.add_facet_link = self.get_query_string({IS_FACETS_VAR: True})
 
         if self.is_popup:
             self.list_editable = ()
@@ -141,7 +163,7 @@ class ChangeList:
         """
         Return all params except IGNORED_PARAMS.
         """
-        params = params or self.params
+        params = params or self.filter_params
         lookup_params = params.copy()  # a dictionary of the query string
         # Remove all the parameters that are globally and systematically
         # ignored.
@@ -155,9 +177,20 @@ class ChangeList:
         may_have_duplicates = False
         has_active_filters = False
 
-        for key, value in lookup_params.items():
-            if not self.model_admin.lookup_allowed(key, value):
-                raise DisallowedModelAdminLookup("Filtering by %s not allowed" % key)
+        supports_request = func_supports_parameter(
+            self.model_admin.lookup_allowed, "request"
+        )
+        if not supports_request:
+            warnings.warn(
+                f"`request` must be added to the signature of "
+                f"{self.model_admin.__class__.__qualname__}.lookup_allowed().",
+                RemovedInDjango60Warning,
+            )
+        for key, value_list in lookup_params.items():
+            for value in value_list:
+                params = (key, value, request) if supports_request else (key, value)
+                if not self.model_admin.lookup_allowed(*params):
+                    raise DisallowedModelAdminLookup(f"Filtering by {key} not allowed")
 
         filter_specs = []
         for list_filter in self.list_filter:
@@ -209,9 +242,9 @@ class ChangeList:
                 day = lookup_params.pop("%s__day" % self.date_hierarchy, None)
                 try:
                     from_date = datetime(
-                        int(year),
-                        int(month if month is not None else 1),
-                        int(day if day is not None else 1),
+                        int(year[-1]),
+                        int(month[-1] if month is not None else 1),
+                        int(day[-1] if day is not None else 1),
                     )
                 except ValueError as e:
                     raise IncorrectLookupParameters(e) from e
@@ -228,8 +261,8 @@ class ChangeList:
                     to_date = make_aware(to_date)
                 lookup_params.update(
                     {
-                        "%s__gte" % self.date_hierarchy: from_date,
-                        "%s__lt" % self.date_hierarchy: to_date,
+                        "%s__gte" % self.date_hierarchy: [from_date],
+                        "%s__lt" % self.date_hierarchy: [to_date],
                     }
                 )
 
@@ -258,7 +291,7 @@ class ChangeList:
             new_params = {}
         if remove is None:
             remove = []
-        p = self.params.copy()
+        p = self.filter_params.copy()
         for r in remove:
             for k in list(p):
                 if k.startswith(r):
@@ -269,7 +302,7 @@ class ChangeList:
                     del p[k]
             else:
                 p[k] = v
-        return "?%s" % urlencode(sorted(p.items()))
+        return "?%s" % urlencode(sorted(p.items()), doseq=True)
 
     def get_results(self, request):
         paginator = self.model_admin.get_paginator(
@@ -279,6 +312,9 @@ class ChangeList:
         result_count = paginator.count
 
         # Get the total number of objects, with no admin filters applied.
+        # Note this isn't necessarily the same as result_count in the case of
+        # no filtering. Filters defined in list_filters may still apply some
+        # default filtering which may be removed with query parameters.
         if self.model_admin.show_full_result_count:
             full_result_count = self.root_queryset.count()
         else:
@@ -375,8 +411,8 @@ class ChangeList:
                             order_field.desc() if pfx == "-" else order_field.asc()
                         )
                     # reverse order if order_field has already "-" as prefix
-                    elif order_field.startswith("-") and pfx == "-":
-                        ordering.append(order_field[1:])
+                    elif pfx == "-" and order_field.startswith(pfx):
+                        ordering.append(order_field.removeprefix(pfx))
                     else:
                         ordering.append(pfx + order_field)
                 except (IndexError, ValueError):
@@ -474,7 +510,7 @@ class ChangeList:
                     else:
                         continue
                 elif field.startswith("-"):
-                    field = field[1:]
+                    field = field.removeprefix("-")
                     order_type = "desc"
                 else:
                     order_type = "asc"
@@ -492,7 +528,7 @@ class ChangeList:
                 ordering_fields[idx] = "desc" if pfx == "-" else "asc"
         return ordering_fields
 
-    def get_queryset(self, request):
+    def get_queryset(self, request, exclude_parameters=None):
         # First, we collect all the declared list filters.
         (
             self.filter_specs,
@@ -504,15 +540,20 @@ class ChangeList:
         # Then, we let every list filter modify the queryset to its liking.
         qs = self.root_queryset
         for filter_spec in self.filter_specs:
-            new_qs = filter_spec.queryset(request, qs)
-            if new_qs is not None:
-                qs = new_qs
+            if (
+                exclude_parameters is None
+                or filter_spec.expected_parameters() != exclude_parameters
+            ):
+                new_qs = filter_spec.queryset(request, qs)
+                if new_qs is not None:
+                    qs = new_qs
 
         try:
             # Finally, we apply the remaining lookup parameters from the query
             # string (i.e. those that haven't already been processed by the
             # filters).
-            qs = qs.filter(**remaining_lookup_params)
+            q_object = build_q_object_from_lookup_parameters(remaining_lookup_params)
+            qs = qs.filter(q_object)
         except (SuspiciousOperation, ImproperlyConfigured):
             # Allow certain types of errors to be re-raised as-is so that the
             # caller can treat them in a special way.

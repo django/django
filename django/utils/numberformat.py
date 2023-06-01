@@ -27,9 +27,9 @@ def format(
     """
     if number is None or number == "":
         return mark_safe(number)
-    use_grouping = (
-        use_l10n or (use_l10n is None and settings.USE_L10N)
-    ) and settings.USE_THOUSAND_SEPARATOR
+    if use_l10n is None:
+        use_l10n = True
+    use_grouping = use_l10n and settings.USE_THOUSAND_SEPARATOR
     use_grouping = use_grouping or force_grouping
     use_grouping = use_grouping and grouping != 0
     # Make the common case fast
@@ -41,7 +41,6 @@ def format(
     if isinstance(number, float) and "e" in str(number).lower():
         number = Decimal(str(number))
     if isinstance(number, Decimal):
-
         if decimal_pos is not None:
             # If the provided number is too small to affect any of the visible
             # decimal places, consider it equal to '0'.
@@ -81,7 +80,7 @@ def format(
     else:
         int_part, dec_part = str_number, ""
     if decimal_pos is not None:
-        dec_part = dec_part + ("0" * (decimal_pos - len(dec_part)))
+        dec_part += "0" * (decimal_pos - len(dec_part))
     dec_part = dec_part and decimal_sep + dec_part
     # grouping
     if use_grouping:

@@ -24,7 +24,7 @@ html[data-theme="light"],
     --breadcrumbs-link-fg: var(--body-bg);
     --breadcrumbs-bg: var(--primary);
 
-    --link-fg: #447e9b;
+    --link-fg: #417893;
     --link-hover-color: #036;
     --link-selected-fg: #5b80b2;
 
@@ -46,8 +46,8 @@ html[data-theme="light"],
     --button-hover-bg: #609ab6;
     --default-button-bg: var(--secondary);
     --default-button-hover-bg: #205067;
-    --close-button-bg: #888; /* Previously #bbb, contrast 1.92 */
-    --close-button-hover-bg: #747474;
+    --close-button-bg: #747474;
+    --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;
     --delete-button-hover-bg: #a41515;
 
@@ -56,8 +56,6 @@ html[data-theme="light"],
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
     --font-family-primary:
-        -apple-system,
-        BlinkMacSystemFont,
         "Segoe UI",
         system-ui,
         Roboto,
@@ -194,7 +192,7 @@ li ul {
 
 li, dt, dd {
     font-size: 0.8125rem;
-    line-height: 20px;
+    line-height: 1.25rem;
 }
 
 dt {
@@ -308,7 +306,7 @@ table {
 
 td, th {
     font-size: 0.8125rem;
-    line-height: 16px;
+    line-height: 1rem;
     border-bottom: 1px solid var(--hairline-color);
     vertical-align: top;
     padding: 8px;
@@ -501,7 +499,7 @@ textarea:focus, select:focus, .vTextField:focus {
 }
 
 select {
-    height: 30px;
+    height: 1.875rem;
 }
 
 select[multiple] {
@@ -722,6 +720,11 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
+.hidelink {
+    padding-left: 16px;
+    background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+}
+
 .addlink {
     padding-left: 16px;
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
@@ -761,7 +764,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: block;
     float: left;
     margin-left: 5px;
-    height: 16px;
+    height: 1rem;
 }
 
 .object-tools a {
@@ -936,7 +939,8 @@ a.deletelink:focus, a.deletelink:hover {
 
 #branding h1 {
     padding: 0;
-    margin: 0 20px 0 0;
+    margin: 0;
+    margin-inline-end: 20px;
     font-weight: 300;
     font-size: 1.5rem;
     color: var(--header-branding-color);
@@ -1058,8 +1062,8 @@ a.deletelink:focus, a.deletelink:hover {
 .delete-confirmation form .cancel-link {
     display: inline-block;
     vertical-align: middle;
-    height: 15px;
-    line-height: 15px;
+    height: 0.9375rem;
+    line-height: 0.9375rem;
     border-radius: 4px;
     padding: 10px 15px;
     color: var(--button-fg);
@@ -1130,4 +1134,8 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator a:focus, .paginator a:hover {
     color: white;
     background: var(--link-hover-color);
+}
+
+.base-svgs {
+    display: none;
 }

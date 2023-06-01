@@ -5,9 +5,7 @@ These tests use dialogue from the 1975 film Monty Python and the Holy Grail.
 All text copyright Python (Monty) Pictures. Thanks to sacred-texts.com for the
 transcript.
 """
-from django.db import connection
 from django.db.models import F, Value
-from django.test import modify_settings
 
 from . import PostgreSQLSimpleTestCase, PostgreSQLTestCase
 from .models import Character, Line, LineSavedSearch, Scene
@@ -103,17 +101,18 @@ class GrailTestData:
         )
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
     def test_simple(self):
         searched = Line.objects.filter(dialogue__search="elbows")
         self.assertSequenceEqual(searched, [self.verse1])
 
     def test_non_exact_match(self):
+        self.check_default_text_search_config()
         searched = Line.objects.filter(dialogue__search="hearts")
         self.assertSequenceEqual(searched, [self.verse2])
 
     def test_search_two_terms(self):
+        self.check_default_text_search_config()
         searched = Line.objects.filter(dialogue__search="heart bowel")
         self.assertSequenceEqual(searched, [self.verse2])
 
@@ -140,7 +139,6 @@ class SimpleSearchTest(GrailTestData, PostgreSQLTestCase):
                 self.assertSequenceEqual(searched, [match])
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
     def test_existing_vector(self):
         Line.objects.update(dialogue_search_vector=SearchVector("dialogue"))
@@ -161,6 +159,12 @@ class SearchVectorFieldTest(GrailTestData, PostgreSQLTestCase):
             search="cadeaux"
         )
         self.assertNotIn("COALESCE(COALESCE", str(searched.query))
+
+    def test_values_with_percent(self):
+        searched = Line.objects.annotate(
+            search=SearchVector(Value("This week everything is 10% off"))
+        ).filter(search="10 % off")
+        self.assertEqual(len(searched), 9)
 
 
 class SearchConfigTests(PostgreSQLSimpleTestCase):
@@ -339,7 +343,6 @@ class MultipleFieldsTest(GrailTestData, PostgreSQLTestCase):
         self.assertSequenceEqual(searched, [self.french])
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class TestCombinations(GrailTestData, PostgreSQLTestCase):
     def test_vector_add(self):
         searched = Line.objects.annotate(
@@ -370,6 +373,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
             Line.objects.filter(dialogue__search=None + SearchVector("character__name"))
 
     def test_combine_different_vector_configs(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             search=(
                 SearchVector("dialogue", config="english")
@@ -442,6 +446,7 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
         self.assertSequenceEqual(searched, [self.verse2])
 
     def test_combine_raw_phrase(self):
+        self.check_default_text_search_config()
         searched = Line.objects.filter(
             dialogue__search=(
                 SearchQuery("burn:*", search_type="raw", config="simple")
@@ -462,7 +467,6 @@ class TestCombinations(GrailTestData, PostgreSQLTestCase):
             Line.objects.filter(dialogue__search=None & SearchQuery("kneecaps"))
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
     def test_ranking(self):
         searched = (
@@ -515,10 +519,11 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
         vector = SearchVector("dialogue", weight="D") + SearchVector(
             "character__name", weight="A"
         )
+        weights = [1.0, 0.0, 0.0, 0.5]
         searched = (
             Line.objects.filter(scene=self.witch_scene)
             .annotate(
-                rank=SearchRank(vector, SearchQuery("witch"), weights=[1, 0, 0, 0.5]),
+                rank=SearchRank(vector, SearchQuery("witch"), weights=weights),
             )
             .order_by("-rank")[:2]
         )
@@ -609,26 +614,6 @@ class TestRankingAndWeights(GrailTestData, PostgreSQLTestCase):
         )
 
 
-class SearchVectorIndexTests(PostgreSQLTestCase):
-    def test_search_vector_index(self):
-        """SearchVector generates IMMUTABLE SQL in order to be indexable."""
-        # This test should be moved to test_indexes and use a functional
-        # index instead once support lands (see #26167).
-        query = Line.objects.all().query
-        resolved = SearchVector("id", "dialogue", config="english").resolve_expression(
-            query
-        )
-        compiler = query.get_compiler(connection.alias)
-        sql, params = resolved.as_sql(compiler, connection)
-        # Indexed function must be IMMUTABLE.
-        with connection.cursor() as cursor:
-            cursor.execute(
-                "CREATE INDEX search_vector_index ON %s USING GIN (%s)"
-                % (Line._meta.db_table, sql),
-                params,
-            )
-
-
 class SearchQueryTests(PostgreSQLSimpleTestCase):
     def test_str(self):
         tests = (
@@ -661,9 +646,9 @@ class SearchQueryTests(PostgreSQLSimpleTestCase):
                 self.assertEqual(str(query), expected_str)
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
     def test_headline(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 F("dialogue"),
@@ -679,6 +664,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         )
 
     def test_headline_untyped_args(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             headline=SearchHeadline("dialogue", "killed", config="english"),
         ).get(pk=self.verse0.pk)
@@ -731,6 +717,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         )
 
     def test_headline_highlight_all_option(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 "dialogue",
@@ -745,6 +732,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         )
 
     def test_headline_short_word_option(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 "dialogue",
@@ -762,6 +750,7 @@ class SearchHeadlineTests(GrailTestData, PostgreSQLTestCase):
         )
 
     def test_headline_fragments_words_options(self):
+        self.check_default_text_search_config()
         searched = Line.objects.annotate(
             headline=SearchHeadline(
                 "dialogue",
