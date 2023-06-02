@@ -1073,7 +1073,7 @@ class ForeignKey(ForeignObject):
                 )
             ]
         elif related_model_status := self._has_related_models_with_db_cascading(
-            self.model
+            self.model, on_delete
         ):
             return [
                 checks.Error(
@@ -1123,13 +1123,13 @@ class ForeignKey(ForeignObject):
             else []
         )
 
-    def _has_related_models_with_db_cascading(self, model):
+    @classmethod
+    def _has_related_models_with_db_cascading(cls, model, on_delete):
         """
         If the foreignkey parent has DB cascading and the Current model has non
         db cascading return true
         """
         non_db_related_models = {}
-        on_delete = getattr(self.remote_field, "on_delete", None)
         # Optimization for the case when the model does not have non-db deletion
         if not hasattr(model, "_meta") or on_delete in [
             DB_CASCADE,
