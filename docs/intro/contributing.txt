@@ -320,7 +320,7 @@ In order to resolve this ticket, we'll add a ``make_toast()`` function to the
 use the function and check that its output looks correct.
 
 Navigate to Django's ``tests/shortcuts/`` folder and create a new file
-``test_make_toast.py``. Add the following code::
+``tests_make_toast.py``. Add the following code::
 
     from django.shortcuts import make_toast
     from django.test import SimpleTestCase
@@ -509,11 +509,11 @@ Use the arrow keys to move up and down.
     +.. versionadded:: 2.2
     +
     +Returns ``'toast'``.
-    diff --git a/tests/shortcuts/test_make_toast.py b/tests/shortcuts/test_make_toast.py
+    diff --git a/tests/shortcuts/tests_make_toast.py b/tests/shortcuts/tests_make_toast.py
     new file mode 100644
     index 0000000000..6f4c627b6e
     --- /dev/null
-    +++ b/tests/shortcuts/test_make_toast.py
+    +++ b/tests/shortcuts/tests_make_toast.py
     @@ -0,0 +1,7 @@
     +from django.shortcuts import make_toast
     +from django.test import SimpleTestCase
