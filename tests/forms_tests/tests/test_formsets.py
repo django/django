@@ -1570,7 +1570,7 @@ class FormsFormsetTestCase(SimpleTestCase):
         }
 
         ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer, renderer=None)
-        formset = ChoiceFormSet(data, auto_id=False, prefix="choices")
+        formset = ChoiceFormSet(data, prefix="choices")
         self.assertEqual(
             formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
         )
