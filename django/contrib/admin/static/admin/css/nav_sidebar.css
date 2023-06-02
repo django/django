@@ -104,10 +104,8 @@
 
 @media (forced-colors: active) {
     #nav-sidebar .current-model {
-        background: var(--selected-row);
-        border: 2px SelectedItem solid;
+        border: 2px solid SelectedItem;
     }
-
 }
 
 .main > #nav-sidebar + .content {
