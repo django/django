@@ -419,6 +419,11 @@ Miscellaneous
 * :class:`~django.db.models.functions.Now` database function now uses
   ``LOCALTIMESTAMP`` instead of ``CURRENT_TIMESTAMP`` on Oracle.
 
+* :attr:`.AdminSite.site_header` is now rendered in a ``<div>`` tag instead of
+  ``<h1>``. Screen reader users rely on heading elements for navigation within
+  a page. Having two ``<h1>`` elements was confusing and the site header wasn't
+  helpful as it is repeated on all pages.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
