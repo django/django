@@ -122,16 +122,3 @@ html[data-theme="dark"] .theme-toggle svg.theme-icon-when-dark {
 html[data-theme="light"] .theme-toggle svg.theme-icon-when-light {
     display: block;
 }
-
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0,0,0,0);
-    white-space: nowrap;
-    border: 0;
-    color: var(--body-fg);
-    background-color: var(--body-bg);
-}
