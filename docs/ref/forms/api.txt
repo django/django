@@ -992,10 +992,20 @@ method you're using:
     ... }
     >>> f = ContactForm(data, auto_id=False)
     >>> print(f)
-    <div>Subject:<ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="subject" maxlength="100" required></div>
-    <div>Message:<textarea name="message" cols="40" rows="10" required>Hi there</textarea></div>
-    <div>Sender:<ul class="errorlist"><li>Enter a valid email address.</li></ul><input type="email" name="sender" value="invalid email address" required></div>
-    <div>Cc myself:<input type="checkbox" name="cc_myself" checked></div>
+    <div>Subject:
+      <ul class="errorlist"><li>This field is required.</li></ul>
+      <input type="text" name="subject" maxlength="100" required aria-invalid="true">
+    </div>
+    <div>Message:
+      <textarea name="message" cols="40" rows="10" required>Hi there</textarea>
+    </div>
+    <div>Sender:
+      <ul class="errorlist"><li>Enter a valid email address.</li></ul>
+      <input type="email" name="sender" value="invalid email address" required aria-invalid="true">
+    </div>
+    <div>Cc myself:
+      <input type="checkbox" name="cc_myself" checked>
+    </div>
 
 .. _ref-forms-error-list-format:
 
@@ -1154,7 +1164,7 @@ Attributes of ``BoundField``
         >>> data = {"subject": "hi", "message": "", "sender": "", "cc_myself": ""}
         >>> f = ContactForm(data, auto_id=False)
         >>> print(f["message"])
-        <input type="text" name="message" required>
+        <input type="text" name="message" required aria-invalid="true">
         >>> f["message"].errors
         ['This field is required.']
         >>> print(f["message"].errors)
@@ -1165,6 +1175,13 @@ Attributes of ``BoundField``
 
         >>> str(f["subject"].errors)
         ''
+
+    When rendering a field with errors, ``aria-invalid="true"`` will be set on
+    the field's widget to indicate there is an error to screen reader users.
+
+    .. versionchanged:: 5.0
+
+        The ``aria-invalid="true"`` was added when a field has errors.
 
 .. attribute:: BoundField.field
 

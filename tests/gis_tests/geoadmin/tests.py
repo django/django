@@ -30,7 +30,7 @@ class GeoAdminTest(SimpleTestCase):
             ' rows="10" name="point" hidden></textarea>',
             output,
         )
-        self.assertEqual(len(cm.records), 1)
+        self.assertEqual(len(cm.records), 2)
         self.assertEqual(
             cm.records[0].getMessage(),
             "Error creating geometry from value 'INVALID()' (String input "

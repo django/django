@@ -310,6 +310,9 @@ Forms
   fields with their help text, the form field now includes the
   ``aria-describedby`` HTML attribute.
 
+* In order to improve accessibility, the invalid form field now includes the
+  ``aria-invalid="true"`` HTML attribute.
+
 Generic Views
 ~~~~~~~~~~~~~
 

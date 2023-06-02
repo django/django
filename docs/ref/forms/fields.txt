@@ -196,9 +196,17 @@ and the HTML output will include any validation errors:
     >>> default_data = {"name": "Your name", "url": "http://"}
     >>> f = CommentForm(default_data, auto_id=False)
     >>> print(f)
-    <div>Name:<input type="text" name="name" value="Your name" required></div>
-    <div>Url:<ul class="errorlist"><li>Enter a valid URL.</li></ul><input type="url" name="url" value="http://" required></div>
-    <div>Comment:<ul class="errorlist"><li>This field is required.</li></ul><input type="text" name="comment" required></div>
+    <div>Name:
+      <input type="text" name="name" value="Your name" required>
+    </div>
+    <div>Url:
+      <ul class="errorlist"><li>Enter a valid URL.</li></ul>
+      <input type="url" name="url" value="http://" required aria-invalid="true">
+    </div>
+    <div>Comment:
+      <ul class="errorlist"><li>This field is required.</li></ul>
+      <input type="text" name="comment" required aria-invalid="true">
+    </div>
 
 This is why ``initial`` values are only displayed for unbound forms. For bound
 forms, the HTML output will use the bound data.
