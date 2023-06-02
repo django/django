@@ -555,6 +555,15 @@ def formset_factory(
         absolute_max = max_num + DEFAULT_MAX_NUM
     if max_num > absolute_max:
         raise ValueError("'absolute_max' must be greater or equal to 'max_num'.")
+
+    if renderer is None:
+        if form.default_renderer is None:
+            renderer = get_default_renderer()
+        else:
+            renderer = form.default_renderer
+            if isinstance(form.default_renderer, type):
+                renderer = renderer()
+
     attrs = {
         "form": form,
         "extra": extra,
@@ -566,7 +575,7 @@ def formset_factory(
         "absolute_max": absolute_max,
         "validate_min": validate_min,
         "validate_max": validate_max,
-        "renderer": renderer or form.default_renderer or get_default_renderer(),
+        "renderer": renderer,
     }
     return type(form.__name__ + "FormSet", (formset,), attrs)
 

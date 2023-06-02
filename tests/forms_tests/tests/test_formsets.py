@@ -1577,6 +1577,28 @@ class FormsFormsetTestCase(SimpleTestCase):
             formset.forms[0].renderer, ChoiceWithDefaultRenderer.default_renderer
         )
 
+    def test_form_default_renderer_class(self):
+        """
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
+        """
+
+        class CustomRenderer(DjangoTemplates):
+            pass
+
+        class ChoiceWithDefaultRenderer(Choice):
+            default_renderer = CustomRenderer
+
+        data = {
+            "choices-TOTAL_FORMS": "1",
+            "choices-INITIAL_FORMS": "0",
+            "choices-MIN_NUM_FORMS": "0",
+        }
+
+        ChoiceFormSet = formset_factory(ChoiceWithDefaultRenderer, renderer=None)
+        formset = ChoiceFormSet(data, prefix="choices")
+        self.assertIsInstance(formset.forms[0].renderer, CustomRenderer)
+
     def test_repr(self):
         valid_formset = self.make_choiceformset([("test", 1)])
         valid_formset.full_clean()
