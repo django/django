@@ -195,6 +195,18 @@ Django will then include the extra attributes in the rendered output:
 You can also set the HTML ``id`` using :attr:`~Widget.attrs`. See
 :attr:`BoundField.id_for_label` for an example.
 
+For widgets that have options on their own, like those inheriting from :class:`ChoiceWidget`,
+you can also pass option-specific attributes using using `option_attrs`.
+For example, if you wish to set custom CSS classes for a RadioSelect's options, you could
+do as follows:
+
+.. code-block:: pycon
+
+    >>> from django.forms.widgets import RadioSelect
+    >>> widget = RadioSelect(choices=(("J", "John"),), option_attrs={"class": "special"})
+    >>> widget.render(name="beatle", value=["J"])
+    '<div><div>\n    <label><input type="radio" name="beatle" value="J" class="special" checked>\n John</label>\n\n</div>\n</div>'
+
 .. _styling-widget-classes:
 
 Styling widget classes

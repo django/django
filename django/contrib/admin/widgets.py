@@ -490,6 +490,7 @@ class AutocompleteMixin:
         self.db = using
         self.choices = choices
         self.attrs = {} if attrs is None else attrs.copy()
+        self.option_attrs = {}
         self.i18n_name = get_select2_language()
 
     def get_url(self):

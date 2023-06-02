@@ -200,6 +200,38 @@ class RadioSelectTest(WidgetTest):
         """,
         )
 
+    def test_render_as_subwidget_with_option_attrs(self):
+        """We render option_attrs for the subwidget."""
+        choices = (("", "------"),) + self.beatles
+        widget_instance = self.widget(
+            choices=choices,
+            option_attrs={"class": "special"},
+        )
+        self.check_html(
+            MultiWidget([widget_instance]),
+            "beatle",
+            ["J"],
+            html="""
+            <div>
+            <div><label>
+            <input type="radio" name="beatle_0" value=""
+                class="special"> ------</label></div>
+            <div><label>
+            <input checked type="radio" name="beatle_0" value="J"
+                class="special"> John</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="P"
+                class="special"> Paul</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="G"
+                class="special"> George</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="R"
+                class="special"> Ringo</label></div>
+            </div>
+        """,
+        )
+
     def test_fieldset(self):
         class TestForm(Form):
             template_name = "forms_tests/use_fieldset.html"
