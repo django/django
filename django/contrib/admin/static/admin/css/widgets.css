@@ -579,16 +579,13 @@ ul.timelist, .timelist li {
 }
 
 .related-widget-wrapper-link {
-    opacity: 0.3;
+    opacity: .6;
+    filter: grayscale(1);
 }
 
 .related-widget-wrapper-link:link {
-    opacity: .8;
-}
-
-.related-widget-wrapper-link:link:focus,
-.related-widget-wrapper-link:link:hover {
     opacity: 1;
+    filter: grayscale(0);
 }
 
 select + .related-widget-wrapper-link,
