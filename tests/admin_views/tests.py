@@ -3771,20 +3771,11 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
 
-    def test_recentactions_changed(self):
+    def test_recentactions_description(self):
         response = self.client.get(reverse("admin:index"))
-        should_contain = '<span class="visually-hidden">Changed:'
-        self.assertContains(response, should_contain)
-
-    def test_recentactions_delete(self):
-        response = self.client.get(reverse("admin:index"))
-        should_contain = '<span class="visually-hidden">Deleted:'
-        self.assertContains(response, should_contain)
-
-    def test_recentactions_added(self):
-        response = self.client.get(reverse("admin:index"))
-        should_contain = '<span class="visually-hidden">Added:'
-        self.assertContains(response, should_contain)
+        for operation in ["Added", "Changed", "Deleted"]:
+            with self.subTest(operation):
+                self.assertContains(response, f'<span class="visually-hidden">{operation}:')
 
     def test_deleteconfirmation_link(self):
         """ "
