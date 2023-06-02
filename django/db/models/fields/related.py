@@ -14,6 +14,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
     DB_CASCADE,
+    DB_RESTRICT,
     DB_SET_NULL,
     SET_DEFAULT,
     SET_NULL,
@@ -1015,7 +1016,19 @@ class ForeignKey(ForeignObject):
 
     def _check_on_delete(self):
         on_delete = getattr(self.remote_field, "on_delete", None)
-        if on_delete in [SET_NULL, DB_SET_NULL] and not self.null:
+        if on_delete == DB_SET_NULL and not self.null:
+            return [
+                checks.Error(
+                    "Field specifies on_delete=DB_SET_NULL, but cannot be null.",
+                    hint=(
+                        "Set null=True argument on the field, or change the on_delete "
+                        "rule."
+                    ),
+                    obj=self,
+                    id="fields.E320",
+                )
+            ]
+        elif on_delete == SET_NULL and not self.null:
             return [
                 checks.Error(
                     "Field specifies on_delete=SET_NULL, but cannot be null.",
@@ -1037,26 +1050,7 @@ class ForeignKey(ForeignObject):
                 )
             ]
         elif (
-            on_delete in [DB_CASCADE, DB_SET_NULL]
-            and hasattr(self.model, "_meta")
-            and any(
-                not parent._meta.abstract
-                for parent in self.model._meta.get_parent_list()
-            )
-        ):
-            return [
-                checks.Error(
-                    "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model as it already contains a parent_ptr "
-                    "with in-python cascading options, both cannot be used "
-                    "together",
-                    hint="Change the on_delete rule to other options",
-                    obj=self,
-                    id="fields.E325",
-                )
-            ]
-        elif (
-            on_delete in [DB_CASCADE, DB_SET_NULL]
+            on_delete in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]
             and hasattr(self.model, "_meta")
             and (
                 any(  # generic relation
@@ -1071,18 +1065,22 @@ class ForeignKey(ForeignObject):
         ):
             return [
                 checks.Error(
-                    "Field specifies unsupported on_delete=DB_CASCADE on model "
+                    f"Field specifies unsupported on_delete={on_delete} on model "
                     "declaring a GenericForeignKey.",
-                    hint="Change the on_delete rule.",
+                    hint="Change the on_delete rule to a non DB_* method",
                     obj=self,
                     id="fields.E345",
                 )
             ]
-        elif self._has_related_models_with_db_cascading(self.model):
+        elif related_model_status := self._has_related_models_with_db_cascading(
+            self.model
+        ):
             return [
                 checks.Error(
                     "Using normal cascading with DB cascading referenced model is "
-                    "prohibited",
+                    "prohibited "
+                    f"Related model is {related_model_status.get('model')} "
+                    f"Related field is {related_model_status.get('field')}",
                     hint="Use database level cascading for foreignkeys",
                     obj=self,
                     id="fields.E323",
@@ -1113,29 +1111,40 @@ class ForeignKey(ForeignObject):
         If the foreignkey parent has DB cascading and the Current model has non
         db cascading return true
         """
-        if not hasattr(model, "_meta"):
-            return False
-
+        non_db_related_models = {}
         on_delete = getattr(self.remote_field, "on_delete", None)
+        # Optimization for the case when the model does not have non-db deletion
+        if not hasattr(model, "_meta") or on_delete in [
+            DB_CASCADE,
+            DB_SET_NULL,
+            DB_RESTRICT,
+        ]:
+            return non_db_related_models
+        # Fetch all the models related to the current model
+        # In other words fetch all the foreignkey childs.
         related_models = [
             rel.related_model
             for rel in model._meta.get_fields()
-            if rel.related_model and not rel.auto_created
+            if rel.related_model
+            and not rel.auto_created
+            and hasattr(rel.related_model, "_meta")
         ]
-        has_related_cascade_db = any(
-            any(
-                (
+        for rel_model in related_models:
+            # check through the related models
+            # if they have DB level deletion return True
+            # Our current model already has non_db cascade
+            for rel in rel_model._meta.get_fields():
+                if (
                     isinstance(rel, ForeignKey)
                     and hasattr(rel.remote_field, "on_delete")
-                    and rel.remote_field.on_delete in [DB_CASCADE, DB_SET_NULL]
-                    and on_delete in [CASCADE, SET_NULL]
-                )
-                for rel in model._meta.get_fields()
-            )
-            for model in [item for item in related_models if hasattr(item, "_meta")]
-        )
+                    and rel.remote_field.on_delete
+                    in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]
+                ):
+                    non_db_related_models["model"] = rel_model
+                    non_db_related_models["field"] = rel
+                    return non_db_related_models
 
-        return has_related_cascade_db
+        return non_db_related_models
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()

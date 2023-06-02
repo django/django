@@ -5,6 +5,7 @@ from .models import (
     AnotherSetNullBaz,
     Bar,
     Baz,
+    ChildFoo,
     Foo,
     RestrictBar,
     RestrictBaz,
@@ -19,16 +20,13 @@ class DatabaseLevelOnDeleteTests(TestCase):
         bar = Bar.objects.create(foo=foo)
         baz = Baz.objects.create(bar=bar)
 
-        self.assertEqual(bar, Bar.objects.get(pk=bar.pk))
-        self.assertEqual(baz, Baz.objects.get(pk=baz.pk))
-
         foo.delete()
 
         with self.assertRaises(Bar.DoesNotExist):
-            Bar.objects.get(pk=bar.pk)
+            bar.refresh_from_db()
 
         with self.assertRaises(Baz.DoesNotExist):
-            Baz.objects.get(pk=baz.pk)
+            baz.refresh_from_db()
 
     def test_restricted_deletion(self):
         foo = Foo.objects.create()
@@ -96,8 +94,7 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
                 Baz.objects.create(bar=bar)
 
         # one is the deletion
-        # three select queries for Bar, SetNullBar and RestrictBar
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(1):
             foo.delete()
 
     def test_queries_on_nested_set_null(self):
@@ -111,8 +108,7 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
                 AnotherSetNullBaz.objects.create(setnullbar=setnullbar)
 
         # one is the deletion
-        # three select queries for Bar, SetNullBar and RestrictBar
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(1):
             foo.delete()
 
     def test_queries_on_nested_set_null_cascade(self):
@@ -126,6 +122,15 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
                 SetNullBaz.objects.create(bar=bar)
 
         # one is the deletion
-        # three select queries for Bar, SetNullBar and RestrictBar
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(1):
             foo.delete()
+
+    def test_deletion_on_inherited_model(self):
+        foo1 = Foo.objects.create()
+        child_foo = ChildFoo.objects.create(foo_ptr=foo1)
+
+        with self.assertNumQueries(1):
+            foo1.delete()
+
+        with self.assertRaises(ChildFoo.DoesNotExist):
+            child_foo.refresh_from_db()

@@ -84,8 +84,9 @@ def DO_NOTHING(collector, field, sub_objs, using):
 
 
 class DatabaseOnDelete:
-    def __init__(self, operation):
+    def __init__(self, operation, name):
         self.operation = operation
+        self.name = name
 
     def __call__(self, collector, field, sub_objs, using):
         pass
@@ -93,10 +94,13 @@ class DatabaseOnDelete:
     def as_sql(self, connection):
         return connection.ops.fk_on_delete_sql(self.operation)
 
+    def __str__(self):
+        return self.name
 
-DB_CASCADE = DatabaseOnDelete("CASCADE")
-DB_SET_NULL = DatabaseOnDelete("SET NULL")
-DB_RESTRICT = DatabaseOnDelete("RESTRICT")
+
+DB_CASCADE = DatabaseOnDelete("CASCADE", "DB_CASCADE")
+DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
+DB_RESTRICT = DatabaseOnDelete("RESTRICT", "DB_RESTRICT")
 
 
 def get_candidate_relations_to_delete(opts):
@@ -232,7 +236,13 @@ class Collector:
             and
             # Foreign keys pointing to this model.
             all(
-                related.field.remote_field.on_delete is DO_NOTHING
+                related.field.remote_field.on_delete
+                in [
+                    DO_NOTHING,
+                    DB_CASCADE,
+                    DB_SET_NULL,
+                    DB_RESTRICT,
+                ]
                 for related in get_candidate_relations_to_delete(opts)
             )
             and (
@@ -333,7 +343,7 @@ class Collector:
                 continue
             field = related.field
             on_delete = field.remote_field.on_delete
-            if on_delete == DO_NOTHING:
+            if on_delete in [DO_NOTHING, DB_CASCADE, DB_SET_NULL, DB_RESTRICT]:
                 continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):

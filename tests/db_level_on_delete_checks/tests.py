@@ -21,12 +21,15 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             )
 
         baz_field = Baz._meta.get_field("bar")
+        related_model_status = {"model": Bar, "field": Bar._meta.get_field("foo")}
         self.assertEqual(
             baz_field.check(),
             [
                 Error(
                     "Using normal cascading with DB cascading referenced model is "
-                    "prohibited",
+                    "prohibited "
+                    f"Related model is {related_model_status.get('model')} "
+                    f"Related field is {related_model_status.get('field')}",
                     hint="Use database level cascading for foreignkeys",
                     obj=baz_field,
                     id="fields.E323",
@@ -55,60 +58,13 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             field.check(),
             [
                 Error(
-                    "Field specifies on_delete=SET_NULL, but cannot be null.",
+                    "Field specifies on_delete=DB_SET_NULL, but cannot be null.",
                     hint=(
                         "Set null=True argument on the field, or change the "
                         "on_delete rule."
                     ),
                     obj=field,
                     id="fields.E320",
-                )
-            ],
-        )
-
-    def test_check_on_inherited_models(self):
-        class AnotherBar(Bar):
-            another_foo = models.ForeignKey(
-                Foo,
-                on_delete=models.DB_CASCADE,
-            )
-
-            class Meta:
-                managed = False
-
-        class MultipleInheritedBar(Foo, Bar):
-            another_foo = models.ForeignKey(
-                Foo, on_delete=models.DB_CASCADE, related_name="another_foo"
-            )
-
-        field = AnotherBar._meta.get_field("another_foo")
-        self.assertEqual(
-            field.check(),
-            [
-                Error(
-                    "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model as it already contains a parent_ptr "
-                    "with in-python cascading options, both cannot be used "
-                    "together",
-                    hint="Change the on_delete rule to other options",
-                    obj=field,
-                    id="fields.E325",
-                )
-            ],
-        )
-
-        multiple_inheritence_field = MultipleInheritedBar._meta.get_field("another_foo")
-        self.assertEqual(
-            multiple_inheritence_field.check(),
-            [
-                Error(
-                    "Field specifies unsupported on_delete=DB_CASCADE, on "
-                    "inherited model as it already contains a parent_ptr "
-                    "with in-python cascading options, both cannot be used "
-                    "together",
-                    hint="Change the on_delete rule to other options",
-                    obj=multiple_inheritence_field,
-                    id="fields.E325",
                 )
             ],
         )
@@ -143,7 +99,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
                 Error(
                     "Field specifies unsupported on_delete=DB_CASCADE on model "
                     "declaring a GenericForeignKey.",
-                    hint="Change the on_delete rule.",
+                    hint="Change the on_delete rule to a non DB_* method",
                     obj=comment_field,
                     id="fields.E345",
                 )
