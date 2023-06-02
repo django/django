@@ -59,7 +59,7 @@ For example, the template below:
     <form>
     ...
     <div>
-      {{ form.name.label }}
+      {{ form.name.label_tag }}
       {% if form.name.help_text %}
         <div class="helptext">{{ form.name.help_text|safe }}</div>
       {% endif %}
@@ -67,7 +67,7 @@ For example, the template below:
       {{ form.name }}
       <div class="row">
         <div class="col">
-          {{ form.email.label }}
+          {{ form.email.label_tag }}
           {% if form.email.help_text %}
             <div class="helptext">{{ form.email.help_text|safe }}</div>
           {% endif %}
@@ -75,7 +75,7 @@ For example, the template below:
           {{ form.email }}
         </div>
         <div class="col">
-          {{ form.password.label }}
+          {{ form.password.label_tag }}
           {% if form.password.help_text %}
             <div class="helptext">{{ form.password.help_text|safe }}</div>
           {% endif %}

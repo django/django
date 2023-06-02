@@ -1,5 +1,6 @@
+from django.db import connection
 from django.db.models import IntegerField, Value
-from django.db.models.functions import Lower, Right
+from django.db.models.functions import Length, Lower, Right
 from django.test import TestCase
 
 from ..models import Author
@@ -25,6 +26,21 @@ class RightTests(TestCase):
     def test_invalid_length(self):
         with self.assertRaisesMessage(ValueError, "'length' must be greater than 0"):
             Author.objects.annotate(raises=Right("name", 0))
+
+    def test_zero_length(self):
+        Author.objects.create(name="Tom", alias="tom")
+        authors = Author.objects.annotate(
+            name_part=Right("name", Length("name") - Length("alias"))
+        )
+        self.assertQuerySetEqual(
+            authors.order_by("name"),
+            [
+                "mith",
+                "" if connection.features.interprets_empty_strings_as_nulls else None,
+                "",
+            ],
+            lambda a: a.name_part,
+        )
 
     def test_expressions(self):
         authors = Author.objects.annotate(
