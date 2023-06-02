@@ -152,7 +152,7 @@ def logout(request):
     # Dispatch the signal before the user is logged out so the receivers have a
     # chance to find out *who* logged out.
     user = getattr(request, "user", None)
-    if not getattr(user, "is_authenticated", True):
+    if not hasattr(user, "is_authenticated"):
         user = None
     user_logged_out.send(sender=user.__class__, request=request, user=user)
     request.session.flush()
