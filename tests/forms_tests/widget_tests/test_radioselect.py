@@ -179,6 +179,42 @@ class RadioSelectTest(ChoiceWidgetTest):
         """
         self.check_html(widget, "beatle", "J", html=html)
 
+    def test_constructor_option_attrs(self):
+        """
+        Attributes provided at instantiation are passed to the constituent
+        inputs.
+        """
+        widget = self.widget(
+            attrs={"id": "foo"},
+            option_attrs={"data-test": "custom", "class": "other"},
+            choices=self.beatles,
+        )
+        html = """
+        <div id="foo">
+          <div>
+            <label>
+            <input checked class="other" data-test="custom" type="radio"
+            value="J" name="beatle">John</label>
+          </div>
+          <div>
+            <label>
+            <input class="other" data-test="custom" type="radio"
+            value="P" name="beatle">Paul</label>
+          </div>
+          <div>
+            <label>
+            <input class="other" data-test="custom" type="radio"
+            value="G" name="beatle">George</label>
+          </div>
+          <div>
+            <label>
+            <input class="other" data-test="custom" type="radio"
+            value="R" name="beatle">Ringo</label>
+          </div>
+        </div>
+        """
+        self.check_html(widget, "beatle", "J", html=html)
+
     def test_compare_to_str(self):
         """
         The value is compared to its str().
@@ -489,6 +525,38 @@ class RadioSelectTest(ChoiceWidgetTest):
             "beatle",
             ["J", "Some text"],
             html=html,
+        )
+
+    def test_render_as_subwidget_with_option_attrs(self):
+        """We render option_attrs for the subwidget."""
+        choices = (("", "------"),) + self.beatles
+        widget_instance = self.widget(
+            choices=choices,
+            option_attrs={"class": "special"},
+        )
+        self.check_html(
+            MultiWidget([widget_instance]),
+            "beatle",
+            ["J"],
+            html="""
+            <div>
+            <div><label>
+            <input type="radio" name="beatle_0" value=""
+                class="special"> ------</label></div>
+            <div><label>
+            <input checked type="radio" name="beatle_0" value="J"
+                class="special"> John</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="P"
+                class="special"> Paul</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="G"
+                class="special"> George</label></div>
+            <div><label>
+            <input type="radio" name="beatle_0" value="R"
+                class="special"> Ringo</label></div>
+            </div>
+        """,
         )
 
     def test_fieldset(self):
