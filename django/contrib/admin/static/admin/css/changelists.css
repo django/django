@@ -267,10 +267,10 @@
 
 @media (forced-colors: active) {
     #changelist table tbody tr.selected {
-        border: 2px SelectedItem solid;
+        background-color: SelectedItem;
     }
     #changelist table tbody tr:has(input[type=checkbox]:checked) {
-        border: 2px SelectedItem solid;
+        background-color: SelectedItem;
     }
 }
 

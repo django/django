@@ -104,7 +104,7 @@
 
 @media (forced-colors: active) {
     #nav-sidebar .current-model {
-        border: 2px solid SelectedItem;
+        background-color: SelectedItem;
     }
 }
 
