@@ -119,6 +119,22 @@ class WhereNode(tree.Node):
         None, [] if this node is empty, and raise EmptyResultSet if this
         node can't match anything.
         """
+        if (
+            self.negated
+            and self.connector in (AND, OR)
+            and all(
+                isinstance(child, WhereNode) and child.negated
+                for child in self.children
+            )
+        ):
+            return self.create(
+                [
+                    child.create(child.children, child.connector)
+                    for child in self.children
+                ],
+                AND if self.connector == OR else OR,
+            ).as_sql(compiler, connection)
+
         result = []
         result_params = []
         if self.connector == AND:
