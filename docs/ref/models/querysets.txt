@@ -2994,6 +2994,35 @@ ForeignKeys which are set to :attr:`~django.db.models.ForeignKey.on_delete`
 Note that the queries generated in object deletion is an implementation
 detail subject to change.
 
+``bulk_delete()``
+~~~~~~~~~~~~~~~~~~
+
+.. method:: bulk_delete()
+.. versionadded:: 5.0
+
+Performs an efficient SQL delete query on the :class:`.QuerySet` and
+returns the number of objects deleted and a dictionary with the number of
+deletions per object type same as the ``delete()`` method
+
+This method performs a fast deletion for all the models in the QuerySet,
+ignoring all signal calls and optimizing the deletion process for models
+with no foreign key references and inheritance.
+
+.. code-block:: pycon
+
+    >>> blogs = Blog.objects.all()
+
+    # This will delete all Blogs and all of their Entry objects.
+    >>> blogs.bulk_delete()
+    (5, {'blog.Blog': 1, 'blog.Entry': 2, 'blog.Entry_authors': 2})
+
+.. warning::
+
+    The ``bulk_delete`` method does not handle any pre-delete or post-delete 
+    operations defined through signals. Ensure that you understand the 
+    implications of using this method before incorporating it into your 
+    project.
+
 ``as_manager()``
 ~~~~~~~~~~~~~~~~
 

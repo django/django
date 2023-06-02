@@ -123,6 +123,12 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
+Bulk Delete Method
+-------------------
+The new method :meth:`.QuerySet.bulk_delete` is introduced for faster and 
+efficient deletion. The ``bulk_delete`` method bypasses Django's normal
+deletion process and triggers a faster and efficient deletion
+
 Minor features
 --------------
 
