@@ -5,18 +5,18 @@ from django.utils.translation import gettext_lazy as _
 
 class Redirect(models.Model):
     site = models.ForeignKey(Site, models.CASCADE, verbose_name=_("site"))
-    old_path = models.CharField(
+    old_path = models.TextField(
         _("redirect from"),
-        max_length=200,
+        max_length=2000,
         db_index=True,
         help_text=_(
             "This should be an absolute path, excluding the domain name. Example: "
             "“/events/search/”."
         ),
     )
-    new_path = models.CharField(
+    new_path = models.TextField(
         _("redirect to"),
-        max_length=200,
+        max_length=2000,
         blank=True,
         help_text=_(
             "This can be either an absolute path (as above) or a full URL "

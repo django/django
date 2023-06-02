@@ -186,7 +186,7 @@ Minor features
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* Allow ``Redirect.old_path/new_path`` to be up to 2000 characters long.
 
 :mod:`django.contrib.sessions`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
