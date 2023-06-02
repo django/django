@@ -290,7 +290,7 @@ class BoundField(RenderableFieldMixin):
         if custom_aria_described_by_id := widget.attrs.get("aria-describedby"):
             attrs["aria-describedby"] = custom_aria_described_by_id
         elif self.field.help_text and self.id_for_label:
-            attrs["aria-describedby"] = f"{self.id_for_label}_help_text"
+            attrs["aria-describedby"] = f"{self.id_for_label}_helptext"
         return attrs
 
     @property

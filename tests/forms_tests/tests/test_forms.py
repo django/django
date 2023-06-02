@@ -3014,6 +3014,134 @@ Options: <select multiple name="options" required>
             "</td></tr>",
         )
 
+        def test_help_text_aria_describedby(self):
+            """
+            aria-describedby is added to the widget and refers to the id of
+            the help_text.
+            """
+
+            class UserRegistration(Form):
+                username = CharField(max_length=10, help_text="e.g., user@example.com")
+                password = CharField(
+                    widget=PasswordInput, help_text="Wählen Sie mit Bedacht."
+                )
+
+            p = UserRegistration()
+            self.assertHTMLEqual(
+                p.as_div(),
+                '<div><label for="id_username">Username:</label>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext" id="id_username">'
+                '<span class="helptext" id="id_username_helptext">'
+                'e.g., user@example.com</span></div><div><label for="id_password">'
+                'Password:</label><input type="password" name="password" '
+                'required aria-describedby="id_password_helptext" id="id_password">'
+                '<span class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</span></div>",
+            )
+            self.assertHTMLEqual(
+                p.as_ul(),
+                '<li><label for="id_username">Username:</label>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext" id="id_username">'
+                '<span class="helptext" id="id_username_helptext">'
+                'e.g., user@example.com</span></li><li><label for="id_password">'
+                'Password:</label><input type="password" name="password" '
+                'required aria-describedby="id_password_helptext" id="id_password">'
+                '<span class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</span></li>",
+            )
+            self.assertHTMLEqual(
+                p.as_p(),
+                '<p><label for="id_username">Username:</label>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext" id="id_username">'
+                '<span class="helptext" id="id_username_helptext">'
+                'e.g., user@example.com</span></p><p><label for="id_password">'
+                'Password:</label><input type="password" name="password" '
+                'required aria-describedby="id_password_helptext" id="id_password">'
+                '<span class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</span></p>",
+            )
+            self.assertHTMLEqual(
+                p.as_table(),
+                '<tr><th><label for="id_username">Username:</label></th><td>'
+                '<input type="text" name="username" maxlength="10" required '
+                'aria-describedby="id_username_helptext" id="id_username"><br>'
+                '<span class="helptext" id="id_username_helptext">'
+                "e.g., user@example.com</span></td></tr><tr><th><label "
+                'for="id_password">Password:</label></th><td><input type="password" '
+                'name="password" required aria-describedby="id_password_helptext" '
+                'id="id_password"><br><span class="helptext" id="id_password_helptext">'
+                "Wählen Sie mit Bedacht.</span></td></tr>",
+            )
+
+    def test_custom_describedby(self):
+        """aria-describedby provided to the widget overrides the default"""
+
+        class UserRegistration(Form):
+            username = CharField(
+                max_length=10,
+                help_text="e.g., user@example.com",
+                widget=TextInput(attrs={"aria-describedby": "custom-description"}),
+            )
+            password = CharField(
+                widget=PasswordInput, help_text="Wählen Sie mit Bedacht."
+            )
+
+        p = UserRegistration()
+        self.assertHTMLEqual(
+            p.as_div(),
+            '<div><label for="id_username">Username:</label>'
+            '<div class="helptext" id="id_username_helptext">'
+            "e.g., user@example.com</div>"
+            '<input type="text" name="username" maxlength="10" required '
+            'aria-describedby="custom-description" '
+            'id="id_username"></div><div><label for="id_password">Password:'
+            '</label><div class="helptext" id="id_password_helptext">'
+            "Wählen Sie mit Bedacht.</div>"
+            '<input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password">'
+            "</div>",
+        )
+        self.assertHTMLEqual(
+            p.as_ul(),
+            '<li><label for="id_username">Username:</label><input type="text" '
+            'name="username" maxlength="10" required '
+            'aria-describedby="custom-description" '
+            'id="id_username"><span class="helptext" id="id_username_helptext">'
+            'e.g., user@example.com</span></li><li><label for="id_password">Password:'
+            '</label><input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password">'
+            '<span class="helptext" id="id_password_helptext">'
+            "Wählen Sie mit Bedacht.</span></li>",
+        )
+        self.assertHTMLEqual(
+            p.as_p(),
+            '<p><label for="id_username">Username:</label><input type="text" '
+            'name="username" maxlength="10" required '
+            'aria-describedby="custom-description" '
+            'id="id_username"><span class="helptext" id="id_username_helptext">'
+            'e.g., user@example.com</span></p><p><label for="id_password">Password:'
+            '</label><input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password">'
+            '<span class="helptext" id="id_password_helptext">'
+            "Wählen Sie mit Bedacht.</span></p>",
+        )
+        self.assertHTMLEqual(
+            p.as_table(),
+            '<tr><th><label for="id_username">Username:</label></th><td>'
+            '<input type="text" name="username" maxlength="10" required '
+            'aria-describedby="custom-description" id="id_username"><br>'
+            '<span class="helptext" id="id_username_helptext">'
+            "e.g., user@example.com</span></td></tr><tr><th>"
+            '<label for="id_password">Password:</label></th><td>'
+            '<input type="password" name="password" required '
+            'aria-describedby="id_password_helptext" id="id_password"><br>'
+            '<span class="helptext" id="id_password_helptext">'
+            "Wählen Sie mit Bedacht.</span></td></tr>",
+        )
+
     def test_subclassing_forms(self):
         # You can subclass a Form to add fields. The resulting form subclass will have
         # all of the fields of the parent Form, plus whichever fields you define in the
@@ -4794,7 +4922,7 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><label for="id_username">Username:</label>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            'aria-describedby="id_username_help_text" required></p>'
+            'aria-describedby="id_username_helptext" required></p>'
             '<p><label for="id_password1">Password1:</label>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><label for="id_password2">Password2:</label>'
@@ -4831,7 +4959,7 @@ class TemplateTests(SimpleTestCase):
             "<form>"
             '<p><legend for="id_username">Username:</legend>'
             '<input id="id_username" type="text" name="username" maxlength="10" '
-            'aria-describedby="id_username_help_text" required></p>'
+            'aria-describedby="id_username_helptext" required></p>'
             '<p><legend for="id_password1">Password1:</legend>'
             '<input type="password" name="password1" id="id_password1" required></p>'
             '<p><legend for="id_password2">Password2:</legend>'
