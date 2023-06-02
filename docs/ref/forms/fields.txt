@@ -289,16 +289,16 @@ returns a value, we associate``help_text`` with the input using
     <input type="text" name="username" maxlength="10" required aria-describedby="id_username_helptext" id="id_username">
     </div>
     
-When adding a custom ``aria-describedby`` attribute, make sure to also include the id of the ``help_text`` element (if used).
+When adding a custom ``aria-describedby`` attribute, make sure to also include the id of the ``help_text`` element (if used) in the correct order.
 
     >>> class UserForm(forms.Form):
     ...     username = forms.CharField(
     ...         max_length=10, help_text='e.g., user@example.com',
-    ...         widget=forms.TextInput(attrs={'aria-describedby': 'custom-description'}),
+    ...         widget=forms.TextInput(attrs={'aria-describedby': 'custom-description id_username_helptext'}),
     ...     )
     >>> f = UserForm()
     >>> print(f['username'])
-    <input type="text" name="username" aria-describedby="custom-description" maxlength="10" id="id_username" required>
+    <input type="text" name="username" aria-describedby="custom-description id_username_helptext" maxlength="10" id="id_username" required>
 
 .. versionchanged:: 5.0
 

@@ -287,6 +287,8 @@ class BoundField(RenderableFieldMixin):
                 attrs["required"] = True
         if self.field.disabled:
             attrs["disabled"] = True
+        # If custom aria-describedby attribute is specified and help_text is used the
+        # custom aria-described by is preserved so user can set the correct order.
         if custom_aria_described_by_id := widget.attrs.get("aria-describedby"):
             attrs["aria-describedby"] = custom_aria_described_by_id
         elif self.field.help_text and self.id_for_label:
