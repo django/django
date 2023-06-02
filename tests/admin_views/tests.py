@@ -3775,7 +3775,9 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         response = self.client.get(reverse("admin:index"))
         for operation in ["Added", "Changed", "Deleted"]:
             with self.subTest(operation):
-                self.assertContains(response, f'<span class="visually-hidden">{operation}:')
+                self.assertContains(
+                    response, f'<span class="visually-hidden">{operation}:'
+                )
 
     def test_deleteconfirmation_link(self):
         """ "
