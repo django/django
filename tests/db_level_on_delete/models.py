@@ -5,15 +5,6 @@ class Foo(models.Model):
     """Initial model named Foo"""
 
 
-class ChildFoo(Foo):
-    foo_ptr = models.OneToOneField(
-        Foo,
-        on_delete=models.DB_CASCADE,
-        parent_link=True,
-        primary_key=True,
-    )
-
-
 class Bar(models.Model):
     """First level foreignkey child for Foo
     Implemented using database level cascading"""

@@ -5,7 +5,6 @@ from .models import (
     AnotherSetNullBaz,
     Bar,
     Baz,
-    ChildFoo,
     Foo,
     RestrictBar,
     RestrictBaz,
@@ -124,13 +123,3 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
         # one is the deletion
         with self.assertNumQueries(1):
             foo.delete()
-
-    def test_deletion_on_inherited_model(self):
-        foo1 = Foo.objects.create()
-        child_foo = ChildFoo.objects.create(foo_ptr=foo1)
-
-        with self.assertNumQueries(1):
-            foo1.delete()
-
-        with self.assertRaises(ChildFoo.DoesNotExist):
-            child_foo.refresh_from_db()

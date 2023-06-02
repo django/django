@@ -1086,6 +1086,23 @@ class ForeignKey(ForeignObject):
                     id="fields.E323",
                 )
             ]
+        elif (
+            on_delete in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]
+            and hasattr(self.model, "_meta")
+            and any(
+                not parent._meta.abstract
+                for parent in self.model._meta.get_parent_list()
+            )
+        ):
+            return [
+                checks.Error(
+                    f"Field specifies unsupported on_delete={on_delete} on "
+                    "inherited model. Use non DB_* values for this field",
+                    hint="Change the on_delete rule to other options",
+                    obj=self,
+                    id="fields.E325",
+                )
+            ]
         return []
 
     def _check_unique(self, **kwargs):

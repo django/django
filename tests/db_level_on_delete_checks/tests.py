@@ -69,6 +69,49 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             ],
         )
 
+    def test_check_on_inherited_models(self):
+        class AnotherBar(Bar):
+            another_foo = models.ForeignKey(
+                Foo,
+                on_delete=models.DB_CASCADE,
+            )
+
+            class Meta:
+                managed = False
+
+        class MultipleInheritedBar(Foo, Bar):
+            another_foo = models.ForeignKey(
+                Foo, on_delete=models.DB_CASCADE, related_name="another_foo"
+            )
+
+        field = AnotherBar._meta.get_field("another_foo")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "Field specifies unsupported on_delete=DB_CASCADE on "
+                    "inherited model. Use non DB_* values for this field",
+                    hint="Change the on_delete rule to other options",
+                    obj=field,
+                    id="fields.E325",
+                )
+            ],
+        )
+
+        multiple_inheritence_field = MultipleInheritedBar._meta.get_field("another_foo")
+        self.assertEqual(
+            multiple_inheritence_field.check(),
+            [
+                Error(
+                    "Field specifies unsupported on_delete=DB_CASCADE on "
+                    "inherited model. Use non DB_* values for this field",
+                    hint="Change the on_delete rule to other options",
+                    obj=multiple_inheritence_field,
+                    id="fields.E325",
+                )
+            ],
+        )
+
     def test_check_on_generic_foreign_key(self):
         class SomeModel(models.Model):
             some_fk = models.ForeignKey(
