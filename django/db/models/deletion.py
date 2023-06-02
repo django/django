@@ -94,7 +94,7 @@ def get_candidate_relations_to_delete(opts):
 
 
 class Collector:
-    def __init__(self, using, origin=None):
+    def __init__(self, using, origin=None, perform_signals=True):
         self.using = using
         # A Model or QuerySet object.
         self.origin = origin
@@ -107,6 +107,8 @@ class Collector:
         # fast_deletes is a list of queryset-likes that can be deleted without
         # fetching the objects into memory.
         self.fast_deletes = []
+        # set perform_signals to false in order to ignore signals
+        self.perform_signals = perform_signals
 
         # Tracks deletion-order dependency for databases without transactions
         # or ability to defer constraint checks. Only concrete model classes
@@ -180,9 +182,10 @@ class Collector:
             self.clear_restricted_objects_from_set(model, objs)
 
     def _has_signal_listeners(self, model):
-        return signals.pre_delete.has_listeners(
-            model
-        ) or signals.post_delete.has_listeners(model)
+        return self.perform_signals and (
+            signals.pre_delete.has_listeners(model)
+            or signals.post_delete.has_listeners(model)
+        )
 
     def can_fast_delete(self, objs, from_field=None):
         """
@@ -371,7 +374,10 @@ class Collector:
                 # It's something like generic foreign key.
                 sub_objs = field.bulk_related_objects(new_objs, self.using)
                 self.collect(
-                    sub_objs, source=model, nullable=True, fail_on_restricted=False
+                    sub_objs,
+                    source=model,
+                    nullable=True,
+                    fail_on_restricted=False,
                 )
 
         if fail_on_restricted:
@@ -434,9 +440,10 @@ class Collector:
         self.data = {model: self.data[model] for model in sorted_models}
 
     def delete(self):
-        # sort instance collections
-        for model, instances in self.data.items():
-            self.data[model] = sorted(instances, key=attrgetter("pk"))
+        # sort instance collections if signals are being sent
+        if self.perform_signals:
+            for model, instances in self.data.items():
+                self.data[model] = sorted(instances, key=attrgetter("pk"))
 
         # if possible, bring the models in an order suitable for databases that
         # don't support transactions or cannot defer constraint checks until the
@@ -458,14 +465,15 @@ class Collector:
 
         with transaction.atomic(using=self.using, savepoint=False):
             # send pre_delete signals
-            for model, obj in self.instances_with_model():
-                if not model._meta.auto_created:
-                    signals.pre_delete.send(
-                        sender=model,
-                        instance=obj,
-                        using=self.using,
-                        origin=self.origin,
-                    )
+            if self.perform_signals:
+                for model, obj in self.instances_with_model():
+                    if not model._meta.auto_created:
+                        signals.pre_delete.send(
+                            sender=model,
+                            instance=obj,
+                            using=self.using,
+                            origin=self.origin,
+                        )
 
             # fast deletes
             for qs in self.fast_deletes:
@@ -495,9 +503,10 @@ class Collector:
                         list({obj.pk for obj in objs}), {field.name: value}, self.using
                     )
 
-            # reverse instance collections
-            for instances in self.data.values():
-                instances.reverse()
+            # reverse instance collections if signals are being sent
+            if self.perform_signals:
+                for instances in self.data.values():
+                    instances.reverse()
 
             # delete instances
             for model, instances in self.data.items():
@@ -507,7 +516,7 @@ class Collector:
                 if count:
                     deleted_counter[model._meta.label] += count
 
-                if not model._meta.auto_created:
+                if not model._meta.auto_created and self.perform_signals:
                     for obj in instances:
                         signals.post_delete.send(
                             sender=model,
@@ -516,7 +525,8 @@ class Collector:
                             origin=self.origin,
                         )
 
-        for model, instances in self.data.items():
-            for instance in instances:
-                setattr(instance, model._meta.pk.attname, None)
+        if self.perform_signals:
+            for model, instances in self.data.items():
+                for instance in instances:
+                    setattr(instance, model._meta.pk.attname, None)
         return sum(deleted_counter.values()), dict(deleted_counter)
