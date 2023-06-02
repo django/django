@@ -102,6 +102,14 @@
     background: var(--selected-row);
 }
 
+@media (forced-colors: active) {
+    #nav-sidebar .current-model {
+        background: var(--selected-row);
+        border: 2px SelectedItem solid;
+    }
+
+}
+
 .main > #nav-sidebar + .content {
     max-width: calc(100% - 23px);
 }
