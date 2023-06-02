@@ -32,8 +32,11 @@ __all__ = [
     "BadHeaderError",
     "forbid_multi_line_headers",
     "get_connection",
+    "aget_connection",
     "send_mail",
+    "asend_mail",
     "send_mass_mail",
+    "asend_mass_mail",
     "mail_admins",
     "mail_managers",
 ]
@@ -49,6 +52,15 @@ def get_connection(backend=None, fail_silently=False, **kwds):
     """
     klass = import_string(backend or settings.EMAIL_BACKEND)
     return klass(fail_silently=fail_silently, **kwds)
+
+
+async def aget_connection(backend=None, fail_silently=False, **kwds):
+    """See get_connection()."""
+    klass = import_string(backend or settings.EMAIL_BACKEND)
+    connection = klass(fail_silently=fail_silently, **kwds)
+    if hasattr(connection, "astart"):
+        await connection.astart()
+    return connection
 
 
 def send_mail(
@@ -87,6 +99,37 @@ def send_mail(
     return mail.send()
 
 
+async def asend_mail(
+    subject,
+    message,
+    from_email,
+    recipient_list,
+    fail_silently=False,
+    auth_user=None,
+    auth_password=None,
+    connection=None,
+    html_message=None,
+):
+    """
+    See send_mail().
+
+    Note: The API for this method is frozen. New code wanting to extend the
+    functionality should use the EmailMessage class directly.
+    """
+    connection = connection or await aget_connection(
+        username=auth_user,
+        password=auth_password,
+        fail_silently=fail_silently,
+    )
+    mail = EmailMultiAlternatives(
+        subject, message, from_email, recipient_list, connection=connection
+    )
+    if html_message:
+        mail.attach_alternative(html_message, "text/html")
+
+    return await mail.asend()
+
+
 def send_mass_mail(
     datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None
 ):
@@ -114,12 +157,25 @@ def send_mass_mail(
     return connection.send_messages(messages)
 
 
-def mail_admins(
-    subject, message, fail_silently=False, connection=None, html_message=None
+async def asend_mass_mail(
+    datatuple, fail_silently=False, auth_user=None, auth_password=None, connection=None
 ):
-    """Send a message to the admins, as defined by the ADMINS setting."""
-    if not settings.ADMINS:
-        return
+    """
+    See send_mass_mail().
+    """
+    connection = connection or await aget_connection(
+        username=auth_user,
+        password=auth_password,
+        fail_silently=fail_silently,
+    )
+    messages = [
+        EmailMessage(subject, message, sender, recipient, connection=connection)
+        for subject, message, sender, recipient in datatuple
+    ]
+    return await connection.asend_messages(messages)
+
+
+def _base_mail_admins(subject, message, connection=None, html_message=None):
     if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.ADMINS):
         raise ValueError("The ADMINS setting must be a list of 2-tuples.")
     mail = EmailMultiAlternatives(
@@ -131,15 +187,29 @@ def mail_admins(
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
+    return mail
+
+
+def mail_admins(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
+    """Send a message to the admins, as defined by the ADMINS setting."""
+    if not settings.MANAGERS:
+        return
+    mail = _base_mail_admins(subject, message, fail_silently, connection, html_message)
     mail.send(fail_silently=fail_silently)
 
 
-def mail_managers(
+async def amail_admins(
     subject, message, fail_silently=False, connection=None, html_message=None
 ):
-    """Send a message to the managers, as defined by the MANAGERS setting."""
     if not settings.MANAGERS:
         return
+    mail = _base_mail_admins(subject, message, fail_silently, connection, html_message)
+    await mail.asend(fail_silently=fail_silently)
+
+
+def _base_mail_managers(subject, message, connection=None, html_message=None):
     if not all(isinstance(a, (list, tuple)) and len(a) == 2 for a in settings.MANAGERS):
         raise ValueError("The MANAGERS setting must be a list of 2-tuples.")
     mail = EmailMultiAlternatives(
@@ -151,4 +221,28 @@ def mail_managers(
     )
     if html_message:
         mail.attach_alternative(html_message, "text/html")
+    return mail
+
+
+def mail_managers(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
+    """Send a message to the managers, as defined by the MANAGERS setting."""
+    if not settings.MANAGERS:
+        return
+    mail = _base_mail_managers(
+        subject, message, fail_silently, connection, html_message
+    )
     mail.send(fail_silently=fail_silently)
+
+
+async def amail_managers(
+    subject, message, fail_silently=False, connection=None, html_message=None
+):
+    """Send a message to the managers, as defined by the MANAGERS setting."""
+    if not settings.MANAGERS:
+        return
+    mail = _base_mail_managers(
+        subject, message, fail_silently, connection, html_message
+    )
+    await mail.asend(fail_silently=fail_silently)
