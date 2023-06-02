@@ -612,8 +612,10 @@ escaping HTML.
 .. function:: format_html(format_string, *args, **kwargs)
 
     This is similar to :meth:`str.format`, except that it is appropriate for
-    building up HTML fragments. All args and kwargs are passed through
+    building up HTML fragments. The first argument ``format_string`` is not
+    escaped but all other args and kwargs are passed through
     :func:`conditional_escape` before being passed to ``str.format()``.
+    Finally, the output has :func:`~django.utils.safestring.mark_safe` applied.
 
     For the case of building up small HTML fragments, this function is to be
     preferred over string interpolation using ``%`` or ``str.format()``
@@ -698,8 +700,8 @@ escaping HTML.
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
     the return value will be ``"Joel is a slug"``.
 
-    If you are looking for a more robust solution, consider using a third
-    party HTML sanitizing tool.
+    If you are looking for a more robust solution, consider using a third-party
+    HTML sanitizing tool.
 
 .. function:: html_safe()
 

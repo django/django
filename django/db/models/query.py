@@ -1205,9 +1205,7 @@ class QuerySet(AltersData):
 
         del_query = self._chain()
 
-        # The delete is actually 2 queries - one to find related objects,
-        # and one to delete. Make sure that the discovery of related
-        # objects is performed on the same database as the deletion.
+        # This also has same two queries for delete
         del_query._for_write = True
 
         # Disable non-supported fields.
