@@ -1716,8 +1716,10 @@ class TestIsBoundBehavior(SimpleTestCase):
             "<li>(Hidden field INITIAL_FORMS) This field is required.</li>"
             "</ul>"
             "<div>"
-            '<input type="hidden" name="form-TOTAL_FORMS" id="id_form-TOTAL_FORMS">'
-            '<input type="hidden" name="form-INITIAL_FORMS" id="id_form-INITIAL_FORMS">'
+            '<input type="hidden" name="form-TOTAL_FORMS" aria-invalid="true" '
+            'id="id_form-TOTAL_FORMS">'
+            '<input type="hidden" name="form-INITIAL_FORMS" aria-invalid="true" '
+            'id="id_form-INITIAL_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
             "</div>\n",
@@ -1748,9 +1750,9 @@ class TestIsBoundBehavior(SimpleTestCase):
             "</ul>"
             "<div>"
             '<input type="hidden" name="form-TOTAL_FORMS" value="two" '
-            'id="id_form-TOTAL_FORMS">'
+            'aria-invalid="true" id="id_form-TOTAL_FORMS">'
             '<input type="hidden" name="form-INITIAL_FORMS" value="one" '
-            'id="id_form-INITIAL_FORMS">'
+            'aria-invalid="true" id="id_form-INITIAL_FORMS">'
             '<input type="hidden" name="form-MIN_NUM_FORMS" id="id_form-MIN_NUM_FORMS">'
             '<input type="hidden" name="form-MAX_NUM_FORMS" id="id_form-MAX_NUM_FORMS">'
             "</div>\n",

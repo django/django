@@ -275,6 +275,8 @@ Forms
 * To improve accessibility :attr:`~django.forms.Field.help_text` is now
   associated to its input using ``aria-describedby``.
 
+* To improve accessibility ``aria-invalid`` is added to invalid form fields.
+
 Generic Views
 ~~~~~~~~~~~~~
 
