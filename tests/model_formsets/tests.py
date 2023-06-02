@@ -14,6 +14,7 @@ from django.forms.models import (
     inlineformset_factory,
     modelformset_factory,
 )
+from django.forms.renderers import DjangoTemplates
 from django.http import QueryDict
 from django.test import TestCase, skipUnlessDBFeature
 
@@ -2368,10 +2369,11 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         self.assertEqual(formset.renderer, renderer)
 
     def test_modelformset_factory_default_renderer(self):
-        from django.forms.renderers import Jinja2
+        class CustomRenderer(DjangoTemplates):
+            pass
 
         class ModelFormWithDefaultRenderer(ModelForm):
-            default_renderer = Jinja2()
+            default_renderer = CustomRenderer()
 
         BookFormSet = modelformset_factory(
             Author, form=ModelFormWithDefaultRenderer, fields="__all__"
@@ -2382,10 +2384,11 @@ class TestModelFormsetOverridesTroughFormMeta(TestCase):
         )
 
     def test_inlineformset_factory_default_renderer(self):
-        from django.forms.renderers import Jinja2
+        class CustomRenderer(DjangoTemplates):
+            pass
 
         class ModelFormWithDefaultRenderer(ModelForm):
-            default_renderer = Jinja2()
+            default_renderer = CustomRenderer()
 
         BookFormSet = inlineformset_factory(
             Author,

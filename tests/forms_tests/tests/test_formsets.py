@@ -23,7 +23,7 @@ from django.forms.formsets import (
     all_valid,
     formset_factory,
 )
-from django.forms.renderers import TemplatesSetting
+from django.forms.renderers import DjangoTemplates, TemplatesSetting
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.test import SimpleTestCase
@@ -1558,10 +1558,12 @@ class FormsFormsetTestCase(SimpleTestCase):
         In the absence of a renderer passed to the formset_factory(),
         Form.default_renderer is respected.
         """
-        from django.forms.renderers import Jinja2
+
+        class CustomRenderer(DjangoTemplates):
+            pass
 
         class ChoiceWithDefaultRenderer(Choice):
-            default_renderer = Jinja2()
+            default_renderer = CustomRenderer()
 
         data = {
             "choices-TOTAL_FORMS": "1",
