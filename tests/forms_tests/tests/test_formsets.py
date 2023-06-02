@@ -1555,8 +1555,8 @@ class FormsFormsetTestCase(SimpleTestCase):
 
     def test_form_default_renderer(self):
         """
-        In the absense of a renderer passed to formset_factory, the default_renderer
-        attribute of the Form class should be respected.
+        In the absence of a renderer passed to the formset_factory(),
+        Form.default_renderer is respected.
         """
         from django.forms.renderers import Jinja2
 
