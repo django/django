@@ -74,3 +74,35 @@ class AnotherSetNullBaz(models.Model):
         null=True,
     )
     another_field = models.CharField(max_length=20)
+
+
+class GrandParent(models.Model):
+    pass
+
+
+class Child(GrandParent):
+    grandparent_ptr = models.OneToOneField(
+        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_RESTRICT
+    )
+
+
+class Parent(GrandParent):
+    grandparent_ptr = models.OneToOneField(
+        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DiamondParent(GrandParent):
+    gp_ptr = models.OneToOneField(
+        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DiamondChild(Parent, DiamondParent):
+    parent_ptr = models.OneToOneField(
+        Parent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+    diamondparent_ptr = models.OneToOneField(
+        DiamondParent, parent_link=True, on_delete=models.DB_CASCADE
+    )

@@ -1,11 +1,16 @@
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 
 from .models import (
     AnotherSetNullBaz,
     Bar,
     Baz,
+    Child,
+    DiamondChild,
+    DiamondParent,
     Foo,
+    GrandParent,
+    Parent,
     RestrictBar,
     RestrictBaz,
     SetNullBar,
@@ -123,3 +128,34 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
         # one is the deletion
         with self.assertNumQueries(1):
             foo.delete()
+
+    def test_queries_on_inherited_model(self):
+        gp = GrandParent.objects.create()
+        parent = Parent.objects.create(grandparent_ptr=gp)
+        diamond_parent = DiamondParent.objects.create(gp_ptr=gp)
+
+        dc = DiamondChild.objects.create(
+            parent_ptr=parent, diamondparent_ptr=diamond_parent
+        )
+
+        with self.assertNumQueries(1):
+            gp.delete()
+
+        with self.assertRaises(Parent.DoesNotExist):
+            parent.refresh_from_db()
+
+        with self.assertRaises(DiamondParent.DoesNotExist):
+            diamond_parent.refresh_from_db()
+
+        with self.assertRaises(DiamondChild.DoesNotExist):
+            dc.refresh_from_db()
+
+    def test_restrict_on_inherited_model(self):
+        gp = GrandParent.objects.create()
+        child = Child.objects.create(grandparent_ptr=gp)
+
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                gp.delete()
+
+        child.refresh_from_db()

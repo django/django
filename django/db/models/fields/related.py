@@ -1086,23 +1086,6 @@ class ForeignKey(ForeignObject):
                     id="fields.E323",
                 )
             ]
-        elif (
-            on_delete in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]
-            and hasattr(self.model, "_meta")
-            and any(
-                not parent._meta.abstract
-                for parent in self.model._meta.get_parent_list()
-            )
-        ):
-            return [
-                checks.Error(
-                    f"Field specifies unsupported on_delete={on_delete} on "
-                    "inherited model. Use non DB_* values for this field",
-                    hint="Change the on_delete rule to other options",
-                    obj=self,
-                    id="fields.E325",
-                )
-            ]
         return []
 
     def _check_unique(self, **kwargs):
@@ -1151,14 +1134,18 @@ class ForeignKey(ForeignObject):
             # if they have DB level deletion return True
             # Our current model already has non_db cascade
             for rel in rel_model._meta.get_fields():
-                if (
-                    isinstance(rel, ForeignKey)
-                    and hasattr(rel.remote_field, "on_delete")
-                    and rel.remote_field.on_delete
-                    in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]
-                ):
+                related_on_delete = None
+                related_remote_field = rel
+                if isinstance(rel, OneToOneRel) and hasattr(rel, "on_delete"):
+                    related_on_delete = rel.on_delete
+                    related_remote_field = rel.remote_field
+                elif (
+                    isinstance(rel, ForeignKey) or isinstance(rel, OneToOneField)
+                ) and hasattr(rel.remote_field, "on_delete"):
+                    related_on_delete = rel.remote_field.on_delete
+                if related_on_delete in [DB_CASCADE, DB_SET_NULL, DB_RESTRICT]:
                     non_db_related_models["model"] = rel_model
-                    non_db_related_models["field"] = rel
+                    non_db_related_models["field"] = related_remote_field
                     return non_db_related_models
 
         return non_db_related_models
