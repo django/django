@@ -197,6 +197,15 @@ class Template:
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
+            if self.origin.name != UNKNOWN_SOURCE:
+                try:
+                    raw_message = e.args[0]
+                except IndexError:
+                    pass
+                else:
+                    template_path = "Template: %s, " % self.origin.name
+                    e.raw_template_error_message = raw_message
+                    e.args = (template_path + raw_message, *e.args[1:])
             raise
 
     def get_exception_info(self, exception, token):

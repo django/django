@@ -396,7 +396,10 @@ class ExceptionReporter:
         if self.exc_type:
             c["exception_type"] = self.exc_type.__name__
         if self.exc_value:
-            c["exception_value"] = str(self.exc_value)
+            if raw_msg := getattr(self.exc_value, "raw_template_error_message", None):
+                c["exception_value"] = raw_msg
+            else:
+                c["exception_value"] = str(self.exc_value)
             if exc_notes := getattr(self.exc_value, "__notes__", None):
                 c["exception_notes"] = "\n" + "\n".join(exc_notes)
         if frames:
