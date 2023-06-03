@@ -224,14 +224,14 @@ Swappable dependencies
 .. function:: django.db.migrations.swappable_dependency(value)
 
 The ``swappable_dependency()`` function is used in migrations to declare
-"swappable" dependencies on migrations in the app of the swapped-in model.
-Currently, the first migration of this app and as a consequence the swapped-in
+"swappable" dependencies on migrations in the app of the swapped-in model,
+currently, on the first migration of this app. As a consequence, the swapped-in
 model should be created in the initial migration. The argument ``value`` is a
 string ``"<app label>.<model>"`` describing an app label and a model name, e.g.
 ``"myapp.MyModel"``.
 
 By using ``swappable_dependency()``, you inform the migration framework that
-the migration relies on a migration which sets up up a swappable model,
+the migration relies on another migration which sets up a swappable model,
 allowing for the possibility of substituting the model with a different
 implementation in the future. This is typically used for referencing models
 that are subject to customization or replacement, such as the custom user
