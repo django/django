@@ -13,7 +13,7 @@ class CodeLocator(ast.NodeVisitor):
         self.import_locations = {}
 
     @classmethod
-    def from_code(cls, code: str) -> "CodeLocator":
+    def from_code(cls, code):
         tree = ast.parse(code)
         locator = cls()
         locator.visit(tree)
@@ -50,8 +50,8 @@ class CodeNotFound(Exception):
     pass
 
 
-def module_name_to_file_path(module_name: str) -> pathlib.Path:
-    # Avoid importlib machinery as locating a module involves importing its 
+def module_name_to_file_path(module_name):
+    # Avoid importlib machinery as locating a module involves importing its
     # parent, which would trigger import side effects.
 
     for suffix in [".py", "/__init__.py"]:
@@ -62,7 +62,7 @@ def module_name_to_file_path(module_name: str) -> pathlib.Path:
     raise CodeNotFound
 
 
-def get_path_and_line(module: str, fullname: str) -> tuple[str, int]:
+def get_path_and_line(module, fullname):
     path = module_name_to_file_path(module_name=module)
 
     locator = get_locator(path)
@@ -103,14 +103,14 @@ def get_path_and_line(module: str, fullname: str) -> tuple[str, int]:
         )
 
 
-def get_branch(version: str, next_version: str) -> str:
+def get_branch(version, next_version):
     if version == next_version:
         return "main"
     else:
         return f"stable/{version}.x"
 
 
-def github_linkcode_resolve(domain, info, *, version: str, next_version: str):
+def github_linkcode_resolve(domain, info, *, version, next_version):
     """ """
     if domain != "py":
         return None
