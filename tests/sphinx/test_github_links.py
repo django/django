@@ -8,7 +8,7 @@ class GitHubLinkTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         # The file implementing the code under test cannot be imported through
-        # standard means, so include its parent in the pythonpath for the 
+        # standard means, so include its parent in the pythonpath for the
         # duration of the tests.
         cls.ext_path = str((pathlib.Path(__file__).parents[2] / "docs/_ext").resolve())
         sys.path.insert(0, cls.ext_path)

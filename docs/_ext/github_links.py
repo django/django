@@ -78,14 +78,13 @@ def get_path_and_line(module, fullname):
     except KeyError:
         raise CodeNotFound
 
-    # let's say we do
+    # From a statement such as:
     # from . import y.z
     # - either y.z might be an object in the parent module
     # - or y might be a module, and z be an object in y
     # also:
-    # - either the current file is x/__init__.py, and we should be looking in
-    #   x.y
-    # - or the current file is x/a.py, and we should be looking in x.a.y
+    # - either the current file is x/__init__.py, and z would be in x.y
+    # - or the current file is x/a.py, and z would be in x.a.y
     if path.name != "__init__.py":
         # Look in parent module
         module = module.rsplit(".", maxsplit=1)[0]
@@ -131,8 +130,7 @@ def github_linkcode_resolve(domain, info, *, version, next_version):
     branch = get_branch(version=version, next_version=next_version)
 
     relative_path = path.relative_to(BASE_PATH)
-    # We need to explicitly make a /-separated path otherwise on windows,
-    # str(file) returns \-separated path.
+    # Use a /-separated path otherwise on windows, str(file) returns \-separated path.
     url_path = "/".join(relative_path.parts)
 
     return f"https://github.com/django/django/blob/{branch}/{url_path}{linespec}"
