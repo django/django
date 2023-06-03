@@ -45,18 +45,14 @@ class I:
         self.assertEqual(locator.import_locations, {"b": "a", "c": "a", "e": ".d"})
 
     def test_module_name_to_file_path_package(self):
-        self.assertTrue(
-            str(self.github_links.module_name_to_file_path("django")).endswith(
-                "/django/__init__.py"
-            )
-        )
+        path = self.github_links.module_name_to_file_path("django")
+
+        self.assertEqual("/".join(path.parts[-2:]), "django/__init__.py")
 
     def test_module_name_to_file_path_module(self):
-        self.assertTrue(
-            str(
-                self.github_links.module_name_to_file_path("django.shortcuts")
-            ).endswith("/django/shortcuts.py")
-        )
+        path = self.github_links.module_name_to_file_path("django.shortcuts")
+
+        self.assertEqual("/".join(path.parts[-2:]), "django/shortcuts.py")
 
     def test_get_path_and_line_class(self):
         path, line = self.github_links.get_path_and_line(
