@@ -1729,10 +1729,11 @@ any custom methods or send any signals.
     .. versionadded:: 5.0
 
     ``DB_CASCADE`` is a custom option introduced in Django that allows the
-    database to handle cascading deletes instead of relying on Django's
-    emulation of the SQL constraint ``ON DELETE CASCADE``. With ``DB_CASCADE``,
-    the database itself takes care of deleting related objects when a
-    referenced object is deleted.
+    database to handle cascading deletes. This action triggers the SQL
+    constraint ``ON DELETE RESTRICT`` at the database level during the creation
+    or modification of the ``ForeignKey``. With ``DB_CASCADE``, the database
+    itself takes care of deleting related objects when a referenced object 
+    is deleted.
 
     :meth:`.Model.delete` isn't called on related models, and the
     :data:`~django.db.models.signals.pre_delete` and
