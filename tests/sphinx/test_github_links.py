@@ -8,8 +8,8 @@ class GitHubLinkTests(SimpleTestCase):
     @classmethod
     def setUpClass(cls):
         # The file implementing the code under test cannot be imported through
-        # standard means, so we cheat a little bit an include its parent in
-        # the pythonpath for the duration of the tests.
+        # standard means, so include its parent in the pythonpath for the 
+        # duration of the tests.
         cls.ext_path = str((pathlib.Path(__file__).parents[2] / "docs/_ext").resolve())
         sys.path.insert(0, cls.ext_path)
 
@@ -20,14 +20,9 @@ class GitHubLinkTests(SimpleTestCase):
 
     @property
     def github_links(self):
-        # We need the import to happen *after* setUpClass, so we can't
-        # have it at the top of the file and it's displeasant to have it
-        # in each and every test. A property is the simplest alternative.
-
-        # No linter/IDE will ever be able to tell that this is a valid import,
-        # so don't worry if the next import gets flagged by your IDE as
-        # invalid, the IDE just doesn't know that we manipulated the
-        # pythonpath.
+        # The import must happen after setUpClass, so it can't be imported at
+        # the top of the file. A property is used to avoid the import in every test.
+        # Linters/IDEs may not be able to detect this as a valid import.
         import github_links
 
         return github_links

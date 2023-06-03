@@ -34,12 +34,8 @@ class CodeLocator(ast.NodeVisitor):
     def visit_ImportFrom(self, node):
         for alias in node.names:
             if alias.asname:
-                # It could make sense to follow aliases (`import x as y`), but
-                # in our case, it would mean that someone would click
-                # "[Source]" on MyClassA and might receive a link to MyClassB
-                # if there was `import MyClassB as MyClassA`, and we're
-                # afraid it would be more confusing that useful.
-                # Feel free to challenge this assumption.
+                # Exclude linking aliases (`import x as y`) to avoid confusion when
+                # clicking a source link to a differently named entity.
                 continue
             self.import_locations[alias.name] = ("." * node.level) + (node.module or "")
 
@@ -55,9 +51,8 @@ class CodeNotFound(Exception):
 
 
 def module_name_to_file_path(module_name: str) -> pathlib.Path:
-    # sadly, we can't use the importlib machinery here because locating a
-    # module involves importing its parent, and we want to avoid importing
-    # anything, so we need to guess the file location from the module name
+    # Avoid importlib machinery as locating a module involves importing its 
+    # parent, which would trigger import side effects.
 
     for suffix in [".py", "/__init__.py"]:
         file_path = BASE_PATH / (module_name.replace(".", "/") + suffix)
