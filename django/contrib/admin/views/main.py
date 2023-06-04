@@ -12,8 +12,8 @@ from django.contrib.admin.exceptions import (
 from django.contrib.admin.options import (
     IS_FACETS_VAR,
     IS_POPUP_VAR,
-    TO_FIELD_VAR,
     SOURCE_MODEL_VAR,
+    TO_FIELD_VAR,
     IncorrectLookupParameters,
     ShowFacets,
 )
@@ -52,6 +52,7 @@ IGNORED_PARAMS = (
     SEARCH_VAR,
     IS_FACETS_VAR,
     IS_POPUP_VAR,
+    SOURCE_MODEL_VAR,
     TO_FIELD_VAR,
 )
 
