@@ -1365,7 +1365,6 @@ class ModelAdmin(BaseModelAdmin):
         # the presence of keys in request.POST.
 
         if IS_POPUP_VAR in request.POST:
-
             to_field = request.POST.get(TO_FIELD_VAR)
             if to_field:
                 attr = str(to_field)
