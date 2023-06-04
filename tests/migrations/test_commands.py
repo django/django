@@ -173,50 +173,56 @@ class MigrateTests(MigrationTestBase):
         for db in self.databases:
             self.assertTableNotExists("migrations_author", using=db)
             self.assertTableNotExists("migrations_tribble", using=db)
-        # Run the migrations to 0001 only
-        call_command("migrate", "migrations", "0001", verbosity=0)
-        call_command("migrate", "migrations", "0001", verbosity=0, database="other")
-        # Make sure the right tables exist
-        self.assertTableExists("migrations_author")
-        self.assertTableNotExists("migrations_tribble")
-        # Also check the "other" database
-        self.assertTableNotExists("migrations_author", using="other")
-        self.assertTableExists("migrations_tribble", using="other")
 
-        # Fake a roll-back
-        call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
-        call_command(
-            "migrate", "migrations", "zero", fake=True, verbosity=0, database="other"
-        )
-        # Make sure the tables still exist
-        self.assertTableExists("migrations_author")
-        self.assertTableExists("migrations_tribble", using="other")
-        # Try to run initial migration
-        with self.assertRaises(DatabaseError):
+        try:
+            # Run the migrations to 0001 only
             call_command("migrate", "migrations", "0001", verbosity=0)
-        # Run initial migration with an explicit --fake-initial
-        out = io.StringIO()
-        with mock.patch(
-            "django.core.management.color.supports_color", lambda *args: False
-        ):
+            call_command("migrate", "migrations", "0001", verbosity=0, database="other")
+            # Make sure the right tables exist
+            self.assertTableExists("migrations_author")
+            self.assertTableNotExists("migrations_tribble")
+            # Also check the "other" database
+            self.assertTableNotExists("migrations_author", using="other")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Fake a roll-back
+            call_command("migrate", "migrations", "zero", fake=True, verbosity=0)
             call_command(
                 "migrate",
                 "migrations",
-                "0001",
-                fake_initial=True,
-                stdout=out,
-                verbosity=1,
-            )
-            call_command(
-                "migrate",
-                "migrations",
-                "0001",
-                fake_initial=True,
+                "zero",
+                fake=True,
                 verbosity=0,
                 database="other",
             )
-        self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
-        try:
+            # Make sure the tables still exist
+            self.assertTableExists("migrations_author")
+            self.assertTableExists("migrations_tribble", using="other")
+            # Try to run initial migration
+            with self.assertRaises(DatabaseError):
+                call_command("migrate", "migrations", "0001", verbosity=0)
+            # Run initial migration with an explicit --fake-initial
+            out = io.StringIO()
+            with mock.patch(
+                "django.core.management.color.supports_color", lambda *args: False
+            ):
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    stdout=out,
+                    verbosity=1,
+                )
+                call_command(
+                    "migrate",
+                    "migrations",
+                    "0001",
+                    fake_initial=True,
+                    verbosity=0,
+                    database="other",
+                )
+            self.assertIn("migrations.0001_initial... faked", out.getvalue().lower())
+
             # Run migrations all the way.
             call_command("migrate", verbosity=0)
             call_command("migrate", verbosity=0, database="other")
@@ -354,6 +360,26 @@ class MigrateTests(MigrationTestBase):
         self.assertTableNotExists("migrations_author")
         self.assertTableNotExists("migrations_tribble")
         self.assertTableNotExists("migrations_book")
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.migrated_app",
+        ]
+    )
+    def test_migrate_check_migrated_app(self):
+        out = io.StringIO()
+        try:
+            call_command("migrate", "migrated_app", verbosity=0)
+            call_command(
+                "migrate",
+                "migrated_app",
+                stdout=out,
+                check_unapplied=True,
+            )
+            self.assertEqual(out.getvalue(), "")
+        finally:
+            # Unmigrate everything.
+            call_command("migrate", "migrated_app", "zero", verbosity=0)
 
     @override_settings(
         MIGRATION_MODULES={
@@ -2371,9 +2397,10 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations --check should exit with a non-zero status when
         there are changes to an app requiring migrations.
         """
-        with self.temporary_migration_module():
+        with self.temporary_migration_module() as tmpdir:
             with self.assertRaises(SystemExit):
                 call_command("makemigrations", "--check", "migrations", verbosity=0)
+            self.assertFalse(os.path.exists(tmpdir))
 
         with self.temporary_migration_module(
             module="migrations.test_migrations_no_changes"
@@ -2583,6 +2610,134 @@ class MakeMigrationsTests(MigrationTestBase):
                 )
             out_value = out.getvalue()
             self.assertIn("0003_auto", out_value)
+
+    def test_makemigrations_update(self):
+        with self.temporary_migration_module(
+            module="migrations.test_migrations"
+        ) as migration_dir:
+            migration_file = os.path.join(migration_dir, "0002_second.py")
+            with open(migration_file) as fp:
+                initial_content = fp.read()
+
+            with captured_stdout() as out:
+                call_command("makemigrations", "migrations", update=True)
+            self.assertFalse(
+                any(
+                    filename.startswith("0003")
+                    for filename in os.listdir(migration_dir)
+                )
+            )
+            self.assertIs(os.path.exists(migration_file), False)
+            new_migration_file = os.path.join(
+                migration_dir,
+                "0002_delete_tribble_author_rating_modelwithcustombase_and_more.py",
+            )
+            with open(new_migration_file) as fp:
+                self.assertNotEqual(initial_content, fp.read())
+            self.assertIn(f"Deleted {migration_file}", out.getvalue())
+
+    def test_makemigrations_update_existing_name(self):
+        with self.temporary_migration_module(
+            module="migrations.test_auto_now_add"
+        ) as migration_dir:
+            migration_file = os.path.join(migration_dir, "0001_initial.py")
+            with open(migration_file) as fp:
+                initial_content = fp.read()
+
+            with captured_stdout() as out:
+                call_command("makemigrations", "migrations", update=True)
+            self.assertIs(os.path.exists(migration_file), False)
+            new_migration_file = os.path.join(
+                migration_dir,
+                "0001_initial_updated.py",
+            )
+            with open(new_migration_file) as fp:
+                self.assertNotEqual(initial_content, fp.read())
+            self.assertIn(f"Deleted {migration_file}", out.getvalue())
+
+    def test_makemigrations_update_custom_name(self):
+        custom_name = "delete_something"
+        with self.temporary_migration_module(
+            module="migrations.test_migrations"
+        ) as migration_dir:
+            old_migration_file = os.path.join(migration_dir, "0002_second.py")
+            with open(old_migration_file) as fp:
+                initial_content = fp.read()
+
+            with captured_stdout() as out:
+                call_command(
+                    "makemigrations", "migrations", update=True, name=custom_name
+                )
+            self.assertFalse(
+                any(
+                    filename.startswith("0003")
+                    for filename in os.listdir(migration_dir)
+                )
+            )
+            self.assertIs(os.path.exists(old_migration_file), False)
+            new_migration_file = os.path.join(migration_dir, f"0002_{custom_name}.py")
+            self.assertIs(os.path.exists(new_migration_file), True)
+            with open(new_migration_file) as fp:
+                self.assertNotEqual(initial_content, fp.read())
+            self.assertIn(f"Deleted {old_migration_file}", out.getvalue())
+
+    def test_makemigrations_update_applied_migration(self):
+        recorder = MigrationRecorder(connection)
+        recorder.record_applied("migrations", "0001_initial")
+        recorder.record_applied("migrations", "0002_second")
+        with self.temporary_migration_module(module="migrations.test_migrations"):
+            msg = "Cannot update applied migration 'migrations.0002_second'."
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("makemigrations", "migrations", update=True)
+
+    def test_makemigrations_update_no_migration(self):
+        with self.temporary_migration_module(module="migrations.test_migrations_empty"):
+            msg = "App migrations has no migration, cannot update last migration."
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("makemigrations", "migrations", update=True)
+
+    def test_makemigrations_update_squash_migration(self):
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_squashed"
+        ):
+            msg = "Cannot update squash migration 'migrations.0001_squashed_0002'."
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("makemigrations", "migrations", update=True)
+
+    def test_makemigrations_update_manual_porting(self):
+        with self.temporary_migration_module(
+            module="migrations.test_migrations_plan"
+        ) as migration_dir:
+            with captured_stdout() as out:
+                call_command("makemigrations", "migrations", update=True)
+            # Previous migration exists.
+            previous_migration_file = os.path.join(migration_dir, "0005_fifth.py")
+            self.assertIs(os.path.exists(previous_migration_file), True)
+            # New updated migration exists.
+            files = [f for f in os.listdir(migration_dir) if f.startswith("0005_auto")]
+            updated_migration_file = os.path.join(migration_dir, files[0])
+            self.assertIs(os.path.exists(updated_migration_file), True)
+            self.assertIn(
+                f"Updated migration {updated_migration_file} requires manual porting.\n"
+                f"Previous migration {previous_migration_file} was kept and must be "
+                f"deleted after porting functions manually.",
+                out.getvalue(),
+            )
+
+    @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.alter_fk.author_app",
+            "migrations.migrations_test_apps.alter_fk.book_app",
+        ]
+    )
+    def test_makemigrations_update_dependency_migration(self):
+        with self.temporary_migration_module(app_label="book_app"):
+            msg = (
+                "Cannot update migration 'book_app.0001_initial' that migrations "
+                "'author_app.0002_alter_id' depend on."
+            )
+            with self.assertRaisesMessage(CommandError, msg):
+                call_command("makemigrations", "book_app", update=True)
 
 
 class SquashMigrationsTests(MigrationTestBase):
@@ -3005,11 +3160,12 @@ class OptimizeMigrationTests(MigrationTestBase):
         with self.temporary_migration_module(
             module="migrations.test_migrations_manual_porting"
         ) as migration_dir:
+            version = get_docs_version()
             msg = (
-                "Migration will require manual porting but is already a squashed "
-                "migration.\nTransition to a normal migration first: "
-                "https://docs.djangoproject.com/en/dev/topics/migrations/"
-                "#squashing-migrations"
+                f"Migration will require manual porting but is already a squashed "
+                f"migration.\nTransition to a normal migration first: "
+                f"https://docs.djangoproject.com/en/{version}/topics/migrations/"
+                f"#squashing-migrations"
             )
             with self.assertRaisesMessage(CommandError, msg):
                 call_command("optimizemigration", "migrations", "0004", stdout=out)

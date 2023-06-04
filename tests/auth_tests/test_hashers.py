@@ -11,24 +11,16 @@ from django.contrib.auth.hashers import (
     PBKDF2PasswordHasher,
     PBKDF2SHA1PasswordHasher,
     ScryptPasswordHasher,
-    SHA1PasswordHasher,
+    acheck_password,
     check_password,
     get_hasher,
     identify_hasher,
     is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
 from django.test.utils import override_settings
-
-try:
-    import crypt
-except ImportError:
-    crypt = None
-else:
-    # On some platforms (e.g. OpenBSD), crypt.crypt() always return None.
-    if crypt.crypt("") is None:
-        crypt = None
+from django.utils.deprecation import RemovedInDjango51Warning
 
 try:
     import bcrypt
@@ -39,6 +31,14 @@ try:
     import argon2
 except ImportError:
     argon2 = None
+
+# scrypt requires OpenSSL 1.1+
+try:
+    import hashlib
+
+    scrypt = hashlib.scrypt
+except ImportError:
+    scrypt = None
 
 
 class PBKDF2SingleIterationHasher(PBKDF2PasswordHasher):
@@ -60,6 +60,15 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
 
+    async def test_acheck_password(self):
+        encoded = make_password("lètmein")
+        self.assertIs(await acheck_password("lètmein", encoded), True)
+        self.assertIs(await acheck_password("lètmeinz", encoded), False)
+        # Blank passwords.
+        blank_encoded = make_password("")
+        self.assertIs(await acheck_password("", blank_encoded), True)
+        self.assertIs(await acheck_password(" ", blank_encoded), False)
+
     def test_bytes(self):
         encoded = make_password(b"bytes_password")
         self.assertTrue(encoded.startswith("pbkdf2_sha256$"))
@@ -75,7 +84,7 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = make_password("lètmein", "seasalt", "pbkdf2_sha256")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$390000$seasalt$8xBlGd3jVgvJ+92hWPxi5ww0uuAuAnKgC45eudxro7c=",
+            "pbkdf2_sha256$720000$seasalt$eDupbcisD1UuIiou3hMuMu8oe/XwnpDw45r6AA5iv0E=",
         )
         self.assertTrue(is_password_usable(encoded))
         self.assertTrue(check_password("lètmein", encoded))
@@ -94,6 +103,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.SHA1PasswordHasher"]
     )
@@ -120,6 +130,14 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
     @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.SHA1PasswordHasher"]
+    )
+    def test_sha1_deprecation_warning(self):
+        msg = "django.contrib.auth.hashers.SHA1PasswordHasher is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            get_hasher("sha1")
+
+    @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"]
     )
     def test_md5(self):
@@ -142,6 +160,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
     )
@@ -163,6 +182,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
     )
@@ -172,6 +192,15 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             hasher.encode("password", salt="salt")
 
+    @override_settings(
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
+    )
+    def test_unsalted_md5_deprecation_warning(self):
+        msg = "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            get_hasher("unsalted_md5")
+
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
     )
@@ -192,6 +221,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertTrue(check_password("", blank_encoded))
         self.assertFalse(check_password(" ", blank_encoded))
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
     )
@@ -201,44 +231,13 @@ class TestUtilsHashPass(SimpleTestCase):
         with self.assertRaisesMessage(ValueError, msg):
             hasher.encode("password", salt="salt")
 
-    @skipUnless(crypt, "no crypt module to generate password.")
     @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
+        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
     )
-    def test_crypt(self):
-        encoded = make_password("lètmei", "ab", "crypt")
-        self.assertEqual(encoded, "crypt$$ab1Hv2Lg7ltQo")
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password("lètmei", encoded))
-        self.assertFalse(check_password("lètmeiz", encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "crypt")
-        # Blank passwords
-        blank_encoded = make_password("", "ab", "crypt")
-        self.assertTrue(blank_encoded.startswith("crypt$"))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password("", blank_encoded))
-        self.assertFalse(check_password(" ", blank_encoded))
-
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt_encode_invalid_salt(self):
-        hasher = get_hasher("crypt")
-        msg = "salt must be of length 2."
-        with self.assertRaisesMessage(ValueError, msg):
-            hasher.encode("password", salt="a")
-
-    @skipUnless(crypt, "no crypt module to generate password.")
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.CryptPasswordHasher"]
-    )
-    def test_crypt_encode_invalid_hash(self):
-        hasher = get_hasher("crypt")
-        msg = "hash must be provided."
-        with mock.patch("crypt.crypt", return_value=None):
-            with self.assertRaisesMessage(TypeError, msg):
-                hasher.encode("password", salt="ab")
+    def test_unsalted_sha1_deprecation_warning(self):
+        msg = "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            get_hasher("unsalted_sha1")
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
@@ -356,7 +355,7 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertFalse(check_password("", encoded))
         self.assertFalse(check_password("lètmein", encoded))
         self.assertFalse(check_password("lètmeinz", encoded))
-        with self.assertRaisesMessage(ValueError, "Unknown password hashing algorith"):
+        with self.assertRaisesMessage(ValueError, "Unknown password hashing algorithm"):
             identify_hasher(encoded)
         # Assert that the unusable passwords actually contain a random part.
         # This might fail one day due to a hash collision.
@@ -390,8 +389,8 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
             encoded,
-            "pbkdf2_sha256$390000$seasalt2$geC/uZ92nRXDSjSxeoiBqYyRcrLzMm8xK3r"
-            "o1QS1uo8=",
+            "pbkdf2_sha256$720000$"
+            "seasalt2$e8hbsPnTo9qWhT3xYfKWoRth0h0J3360yb/tipPhPtY=",
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -399,7 +398,7 @@ class TestUtilsHashPass(SimpleTestCase):
         hasher = PBKDF2SHA1PasswordHasher()
         encoded = hasher.encode("lètmein", "seasalt2")
         self.assertEqual(
-            encoded, "pbkdf2_sha1$390000$seasalt2$aDapRanzW8aHTz97v2TcfHzWD+I="
+            encoded, "pbkdf2_sha1$720000$seasalt2$2DDbzziqCtfldrRSNAaF8oA9OMw="
         )
         self.assertTrue(hasher.verify("lètmein", encoded))
 
@@ -418,13 +417,13 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(
         PASSWORD_HASHERS=[
             "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-            "django.contrib.auth.hashers.SHA1PasswordHasher",
+            "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
             "django.contrib.auth.hashers.MD5PasswordHasher",
         ],
     )
     def test_upgrade(self):
         self.assertEqual("pbkdf2_sha256", get_hasher("default").algorithm)
-        for algo in ("sha1", "md5"):
+        for algo in ("pbkdf2_sha1", "md5"):
             with self.subTest(algo=algo):
                 encoded = make_password("lètmein", hasher=algo)
                 state = {"upgraded": False}
@@ -448,13 +447,13 @@ class TestUtilsHashPass(SimpleTestCase):
     @override_settings(
         PASSWORD_HASHERS=[
             "django.contrib.auth.hashers.PBKDF2PasswordHasher",
-            "django.contrib.auth.hashers.SHA1PasswordHasher",
+            "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
             "django.contrib.auth.hashers.MD5PasswordHasher",
         ],
     )
     def test_no_upgrade_on_incorrect_pass(self):
         self.assertEqual("pbkdf2_sha256", get_hasher("default").algorithm)
-        for algo in ("sha1", "md5"):
+        for algo in ("pbkdf2_sha1", "md5"):
             with self.subTest(algo=algo):
                 encoded = make_password("lètmein", hasher=algo)
                 state = {"upgraded": False}
@@ -569,7 +568,6 @@ class TestUtilsHashPass(SimpleTestCase):
             PBKDF2PasswordHasher,
             PBKDF2SHA1PasswordHasher,
             ScryptPasswordHasher,
-            SHA1PasswordHasher,
         ]
         msg = "salt must be provided and cannot contain $."
         for hasher_class in hasher_classes:
@@ -585,7 +583,6 @@ class TestUtilsHashPass(SimpleTestCase):
             PBKDF2PasswordHasher,
             PBKDF2SHA1PasswordHasher,
             ScryptPasswordHasher,
-            SHA1PasswordHasher,
         ]
         msg = "password must be provided."
         for hasher_class in hasher_classes:
@@ -757,6 +754,7 @@ class TestUtilsHashPassArgon2(SimpleTestCase):
             setattr(hasher, attr, old_value)
 
 
+@skipUnless(scrypt, "scrypt not available")
 @override_settings(PASSWORD_HASHERS=PASSWORD_HASHERS)
 class TestUtilsHashPassScrypt(SimpleTestCase):
     def test_scrypt(self):

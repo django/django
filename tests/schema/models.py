@@ -62,15 +62,6 @@ class AuthorWithUniqueName(models.Model):
         apps = new_apps
 
 
-class AuthorWithIndexedNameAndBirthday(models.Model):
-    name = models.CharField(max_length=255)
-    birthday = models.DateField()
-
-    class Meta:
-        apps = new_apps
-        index_together = [["name", "birthday"]]
-
-
 class AuthorWithUniqueNameAndBirthday(models.Model):
     name = models.CharField(max_length=255)
     birthday = models.DateField()
@@ -178,15 +169,6 @@ class Tag(models.Model):
 
     class Meta:
         apps = new_apps
-
-
-class TagIndexed(models.Model):
-    title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True)
-
-    class Meta:
-        apps = new_apps
-        index_together = [["slug", "title"]]
 
 
 class TagM2MTest(models.Model):

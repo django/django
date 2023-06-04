@@ -1,5 +1,6 @@
 from django.db.models import Transform
 from django.db.models.lookups import PostgresOperatorLookup
+from django.db.models.sql.query import Query
 
 from .search import SearchVector, SearchVectorExact, SearchVectorField
 
@@ -17,6 +18,13 @@ class ContainedBy(PostgresOperatorLookup):
 class Overlap(PostgresOperatorLookup):
     lookup_name = "overlap"
     postgres_operator = "&&"
+
+    def get_prep_lookup(self):
+        from .expressions import ArraySubquery
+
+        if isinstance(self.rhs, Query):
+            self.rhs = ArraySubquery(self.rhs)
+        return super().get_prep_lookup()
 
 
 class HasKey(PostgresOperatorLookup):
@@ -63,3 +71,8 @@ class TrigramSimilar(PostgresOperatorLookup):
 class TrigramWordSimilar(PostgresOperatorLookup):
     lookup_name = "trigram_word_similar"
     postgres_operator = "%%>"
+
+
+class TrigramStrictWordSimilar(PostgresOperatorLookup):
+    lookup_name = "trigram_strict_word_similar"
+    postgres_operator = "%%>>"

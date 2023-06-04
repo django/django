@@ -1,5 +1,7 @@
 import functools
 import re
+from collections import defaultdict
+from graphlib import TopologicalSorter
 from itertools import chain
 
 from django.conf import settings
@@ -14,7 +16,6 @@ from django.db.migrations.utils import (
     RegexObject,
     resolve_relation,
 )
-from django.utils.topological_sort import stable_topological_sort
 
 
 class MigrationAutodetector:
@@ -122,6 +123,7 @@ class MigrationAutodetector:
         self.generated_operations = {}
         self.altered_indexes = {}
         self.altered_constraints = {}
+        self.renamed_fields = {}
 
         # Prepare some old/new state and model lists, separating
         # proxy models and ignoring unmigrated apps.
@@ -168,7 +170,13 @@ class MigrationAutodetector:
         self.generate_created_proxies()
         self.generate_altered_options()
         self.generate_altered_managers()
+        self.generate_altered_db_table_comment()
 
+        # Create the renamed fields and store them in self.renamed_fields.
+        # They are used by create_altered_indexes(), generate_altered_fields(),
+        # generate_removed_altered_index/unique_together(), and
+        # generate_altered_index/unique_together().
+        self.create_renamed_fields()
         # Create the altered indexes and store them in self.altered_indexes.
         # This avoids the same computation in generate_removed_indexes()
         # and generate_added_indexes().
@@ -179,16 +187,17 @@ class MigrationAutodetector:
         self.generate_removed_indexes()
         # Generate field renaming operations.
         self.generate_renamed_fields()
+        self.generate_renamed_indexes()
         # Generate removal of foo together.
         self.generate_removed_altered_unique_together()
-        self.generate_removed_altered_index_together()
+        self.generate_removed_altered_index_together()  # RemovedInDjango51Warning.
         # Generate field operations.
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
         self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
-        self.generate_altered_index_together()
+        self.generate_altered_index_together()  # RemovedInDjango51Warning.
         self.generate_added_indexes()
         self.generate_added_constraints()
         self.generate_altered_db_table()
@@ -375,22 +384,17 @@ class MigrationAutodetector:
         nicely inside the same app.
         """
         for app_label, ops in sorted(self.generated_operations.items()):
-            # construct a dependency graph for intra-app dependencies
-            dependency_graph = {op: set() for op in ops}
+            ts = TopologicalSorter()
             for op in ops:
+                ts.add(op)
                 for dep in op._auto_deps:
                     # Resolve intra-app dependencies to handle circular
                     # references involving a swappable model.
                     dep = self._resolve_dependency(dep)[0]
-                    if dep[0] == app_label:
-                        for op2 in ops:
-                            if self.check_dependency(op2, dep):
-                                dependency_graph[op].add(op2)
-
-            # we use a stable sort for deterministic tests & general behavior
-            self.generated_operations[app_label] = stable_topological_sort(
-                ops, dependency_graph
-            )
+                    if dep[0] != app_label:
+                        continue
+                    ts.add(op, *(x for x in ops if self.check_dependency(x, dep)))
+            self.generated_operations[app_label] = list(ts.static_order())
 
     def _optimize_migrations(self):
         # Add in internal dependencies among the migrations
@@ -608,6 +612,7 @@ class MigrationAutodetector:
             indexes = model_state.options.pop("indexes")
             constraints = model_state.options.pop("constraints")
             unique_together = model_state.options.pop("unique_together", None)
+            # RemovedInDjango51Warning.
             index_together = model_state.options.pop("index_together", None)
             order_with_respect_to = model_state.options.pop(
                 "order_with_respect_to", None
@@ -737,6 +742,7 @@ class MigrationAutodetector:
                     ),
                     dependencies=related_dependencies,
                 )
+            # RemovedInDjango51Warning.
             if index_together:
                 self.add_operation(
                     app_label,
@@ -826,6 +832,7 @@ class MigrationAutodetector:
                         related_fields[field_name] = field
             # Generate option removal first
             unique_together = model_state.options.pop("unique_together", None)
+            # RemovedInDjango51Warning.
             index_together = model_state.options.pop("index_together", None)
             if unique_together:
                 self.add_operation(
@@ -835,6 +842,7 @@ class MigrationAutodetector:
                         unique_together=None,
                     ),
                 )
+            # RemovedInDjango51Warning.
             if index_together:
                 self.add_operation(
                     app_label,
@@ -906,11 +914,12 @@ class MigrationAutodetector:
                 ),
             )
 
-    def generate_renamed_fields(self):
+    def create_renamed_fields(self):
         """Work out renamed fields."""
-        self.renamed_fields = {}
+        self.renamed_operations = []
+        old_field_keys = self.old_field_keys.copy()
         for app_label, model_name, field_name in sorted(
-            self.new_field_keys - self.old_field_keys
+            self.new_field_keys - old_field_keys
         ):
             old_model_name = self.renamed_models.get(
                 (app_label, model_name), model_name
@@ -921,7 +930,7 @@ class MigrationAutodetector:
             # Scan to see if this is actually a rename!
             field_dec = self.deep_deconstruct(field)
             for rem_app_label, rem_model_name, rem_field_name in sorted(
-                self.old_field_keys - self.new_field_keys
+                old_field_keys - self.new_field_keys
             ):
                 if rem_app_label == app_label and rem_model_name == model_name:
                     old_field = old_model_state.get_field(rem_field_name)
@@ -946,36 +955,63 @@ class MigrationAutodetector:
                         if self.questioner.ask_rename(
                             model_name, rem_field_name, field_name, field
                         ):
-                            # A db_column mismatch requires a prior noop
-                            # AlterField for the subsequent RenameField to be a
-                            # noop on attempts at preserving the old name.
-                            if old_field.db_column != field.db_column:
-                                altered_field = field.clone()
-                                altered_field.name = rem_field_name
-                                self.add_operation(
+                            self.renamed_operations.append(
+                                (
+                                    rem_app_label,
+                                    rem_model_name,
+                                    old_field.db_column,
+                                    rem_field_name,
                                     app_label,
-                                    operations.AlterField(
-                                        model_name=model_name,
-                                        name=rem_field_name,
-                                        field=altered_field,
-                                    ),
+                                    model_name,
+                                    field,
+                                    field_name,
                                 )
-                            self.add_operation(
-                                app_label,
-                                operations.RenameField(
-                                    model_name=model_name,
-                                    old_name=rem_field_name,
-                                    new_name=field_name,
-                                ),
                             )
-                            self.old_field_keys.remove(
+                            old_field_keys.remove(
                                 (rem_app_label, rem_model_name, rem_field_name)
                             )
-                            self.old_field_keys.add((app_label, model_name, field_name))
+                            old_field_keys.add((app_label, model_name, field_name))
                             self.renamed_fields[
                                 app_label, model_name, field_name
                             ] = rem_field_name
                             break
+
+    def generate_renamed_fields(self):
+        """Generate RenameField operations."""
+        for (
+            rem_app_label,
+            rem_model_name,
+            rem_db_column,
+            rem_field_name,
+            app_label,
+            model_name,
+            field,
+            field_name,
+        ) in self.renamed_operations:
+            # A db_column mismatch requires a prior noop AlterField for the
+            # subsequent RenameField to be a noop on attempts at preserving the
+            # old name.
+            if rem_db_column != field.db_column:
+                altered_field = field.clone()
+                altered_field.name = rem_field_name
+                self.add_operation(
+                    app_label,
+                    operations.AlterField(
+                        model_name=model_name,
+                        name=rem_field_name,
+                        field=altered_field,
+                    ),
+                )
+            self.add_operation(
+                app_label,
+                operations.RenameField(
+                    model_name=model_name,
+                    old_name=rem_field_name,
+                    new_name=field_name,
+                ),
+            )
+            self.old_field_keys.remove((rem_app_label, rem_model_name, rem_field_name))
+            self.old_field_keys.add((app_label, model_name, field_name))
 
     def generate_added_fields(self):
         """Make AddField operations."""
@@ -986,8 +1022,9 @@ class MigrationAutodetector:
 
     def _generate_added_field(self, app_label, model_name, field_name):
         field = self.to_state.models[app_label, model_name].get_field(field_name)
-        # Fields that are foreignkeys/m2ms depend on stuff
-        dependencies = []
+        # Adding a field always depends at least on its removal.
+        dependencies = [(app_label, model_name, field_name, False)]
+        # Fields that are foreignkeys/m2ms depend on stuff.
         if field.remote_field and field.remote_field.model:
             dependencies.extend(
                 self._get_dependencies_for_foreign_key(
@@ -1003,6 +1040,7 @@ class MigrationAutodetector:
         preserve_default = (
             field.null
             or field.has_default()
+            or field.db_default is not models.NOT_PROVIDED
             or field.many_to_many
             or (field.blank and field.empty_strings_allowed)
             or (isinstance(field, time_fields) and field.auto_now)
@@ -1150,6 +1188,7 @@ class MigrationAutodetector:
                         old_field.null
                         and not new_field.null
                         and not new_field.has_default()
+                        and new_field.db_default is models.NOT_PROVIDED
                         and not new_field.many_to_many
                     ):
                         field = new_field.clone()
@@ -1178,6 +1217,8 @@ class MigrationAutodetector:
 
     def create_altered_indexes(self):
         option_name = operations.AddIndex.option_name
+        self.renamed_index_together_values = defaultdict(list)
+
         for app_label, model_name in sorted(self.kept_model_keys):
             old_model_name = self.renamed_models.get(
                 (app_label, model_name), model_name
@@ -1187,20 +1228,85 @@ class MigrationAutodetector:
 
             old_indexes = old_model_state.options[option_name]
             new_indexes = new_model_state.options[option_name]
-            add_idx = [idx for idx in new_indexes if idx not in old_indexes]
-            rem_idx = [idx for idx in old_indexes if idx not in new_indexes]
+            added_indexes = [idx for idx in new_indexes if idx not in old_indexes]
+            removed_indexes = [idx for idx in old_indexes if idx not in new_indexes]
+            renamed_indexes = []
+            # Find renamed indexes.
+            remove_from_added = []
+            remove_from_removed = []
+            for new_index in added_indexes:
+                new_index_dec = new_index.deconstruct()
+                new_index_name = new_index_dec[2].pop("name")
+                for old_index in removed_indexes:
+                    old_index_dec = old_index.deconstruct()
+                    old_index_name = old_index_dec[2].pop("name")
+                    # Indexes are the same except for the names.
+                    if (
+                        new_index_dec == old_index_dec
+                        and new_index_name != old_index_name
+                    ):
+                        renamed_indexes.append((old_index_name, new_index_name, None))
+                        remove_from_added.append(new_index)
+                        remove_from_removed.append(old_index)
+            # Find index_together changed to indexes.
+            for (
+                old_value,
+                new_value,
+                index_together_app_label,
+                index_together_model_name,
+                dependencies,
+            ) in self._get_altered_foo_together_operations(
+                operations.AlterIndexTogether.option_name
+            ):
+                if (
+                    app_label != index_together_app_label
+                    or model_name != index_together_model_name
+                ):
+                    continue
+                removed_values = old_value.difference(new_value)
+                for removed_index_together in removed_values:
+                    renamed_index_together_indexes = []
+                    for new_index in added_indexes:
+                        _, args, kwargs = new_index.deconstruct()
+                        # Ensure only 'fields' are defined in the Index.
+                        if (
+                            not args
+                            and new_index.fields == list(removed_index_together)
+                            and set(kwargs) == {"name", "fields"}
+                        ):
+                            renamed_index_together_indexes.append(new_index)
+
+                    if len(renamed_index_together_indexes) == 1:
+                        renamed_index = renamed_index_together_indexes[0]
+                        remove_from_added.append(renamed_index)
+                        renamed_indexes.append(
+                            (None, renamed_index.name, removed_index_together)
+                        )
+                        self.renamed_index_together_values[
+                            index_together_app_label, index_together_model_name
+                        ].append(removed_index_together)
+            # Remove renamed indexes from the lists of added and removed
+            # indexes.
+            added_indexes = [
+                idx for idx in added_indexes if idx not in remove_from_added
+            ]
+            removed_indexes = [
+                idx for idx in removed_indexes if idx not in remove_from_removed
+            ]
 
             self.altered_indexes.update(
                 {
                     (app_label, model_name): {
-                        "added_indexes": add_idx,
-                        "removed_indexes": rem_idx,
+                        "added_indexes": added_indexes,
+                        "removed_indexes": removed_indexes,
+                        "renamed_indexes": renamed_indexes,
                     }
                 }
             )
 
     def generate_added_indexes(self):
         for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            dependencies = self._get_dependencies_for_model(app_label, model_name)
             for index in alt_indexes["added_indexes"]:
                 self.add_operation(
                     app_label,
@@ -1208,6 +1314,7 @@ class MigrationAutodetector:
                         model_name=model_name,
                         index=index,
                     ),
+                    dependencies=dependencies,
                 )
 
     def generate_removed_indexes(self):
@@ -1218,6 +1325,21 @@ class MigrationAutodetector:
                     operations.RemoveIndex(
                         model_name=model_name,
                         name=index.name,
+                    ),
+                )
+
+    def generate_renamed_indexes(self):
+        for (app_label, model_name), alt_indexes in self.altered_indexes.items():
+            for old_index_name, new_index_name, old_fields in alt_indexes[
+                "renamed_indexes"
+            ]:
+                self.add_operation(
+                    app_label,
+                    operations.RenameIndex(
+                        model_name=model_name,
+                        new_name=new_index_name,
+                        old_name=old_index_name,
+                        old_fields=old_fields,
                     ),
                 )
 
@@ -1249,6 +1371,7 @@ class MigrationAutodetector:
             app_label,
             model_name,
         ), alt_constraints in self.altered_constraints.items():
+            dependencies = self._get_dependencies_for_model(app_label, model_name)
             for constraint in alt_constraints["added_constraints"]:
                 self.add_operation(
                     app_label,
@@ -1256,6 +1379,7 @@ class MigrationAutodetector:
                         model_name=model_name,
                         constraint=constraint,
                     ),
+                    dependencies=dependencies,
                 )
 
     def generate_removed_constraints(self):
@@ -1300,11 +1424,27 @@ class MigrationAutodetector:
         dependencies = [(dep_app_label, dep_object_name, None, True)]
         if getattr(field.remote_field, "through", None):
             through_app_label, through_object_name = resolve_relation(
-                remote_field_model,
+                field.remote_field.through,
                 app_label,
                 model_name,
             )
             dependencies.append((through_app_label, through_object_name, None, True))
+        return dependencies
+
+    def _get_dependencies_for_model(self, app_label, model_name):
+        """Return foreign key dependencies of the given model."""
+        dependencies = []
+        model_state = self.to_state.models[app_label, model_name]
+        for field in model_state.fields.values():
+            if field.is_relation:
+                dependencies.extend(
+                    self._get_dependencies_for_foreign_key(
+                        app_label,
+                        model_name,
+                        field,
+                        self.to_state,
+                    )
+                )
         return dependencies
 
     def _get_altered_foo_together_operations(self, option_name):
@@ -1362,6 +1502,13 @@ class MigrationAutodetector:
             model_name,
             dependencies,
         ) in self._get_altered_foo_together_operations(operation.option_name):
+            if operation == operations.AlterIndexTogether:
+                old_value = {
+                    value
+                    for value in old_value
+                    if value
+                    not in self.renamed_index_together_values[app_label, model_name]
+                }
             removal_value = new_value.intersection(old_value)
             if removal_value or old_value:
                 self.add_operation(
@@ -1375,6 +1522,7 @@ class MigrationAutodetector:
     def generate_removed_altered_unique_together(self):
         self._generate_removed_altered_foo_together(operations.AlterUniqueTogether)
 
+    # RemovedInDjango51Warning.
     def generate_removed_altered_index_together(self):
         self._generate_removed_altered_foo_together(operations.AlterIndexTogether)
 
@@ -1397,6 +1545,7 @@ class MigrationAutodetector:
     def generate_altered_unique_together(self):
         self._generate_altered_foo_together(operations.AlterUniqueTogether)
 
+    # RemovedInDjango51Warning.
     def generate_altered_index_together(self):
         self._generate_altered_foo_together(operations.AlterIndexTogether)
 
@@ -1418,6 +1567,28 @@ class MigrationAutodetector:
                     operations.AlterModelTable(
                         name=model_name,
                         table=new_db_table_name,
+                    ),
+                )
+
+    def generate_altered_db_table_comment(self):
+        models_to_check = self.kept_model_keys.union(
+            self.kept_proxy_keys, self.kept_unmanaged_keys
+        )
+        for app_label, model_name in sorted(models_to_check):
+            old_model_name = self.renamed_models.get(
+                (app_label, model_name), model_name
+            )
+            old_model_state = self.from_state.models[app_label, old_model_name]
+            new_model_state = self.to_state.models[app_label, model_name]
+
+            old_db_table_comment = old_model_state.options.get("db_table_comment")
+            new_db_table_comment = new_model_state.options.get("db_table_comment")
+            if old_db_table_comment != new_db_table_comment:
+                self.add_operation(
+                    app_label,
+                    operations.AlterModelTableComment(
+                        name=model_name,
+                        table_comment=new_db_table_comment,
                     ),
                 )
 

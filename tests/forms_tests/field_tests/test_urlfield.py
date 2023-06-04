@@ -1,10 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.forms import URLField
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from . import FormFieldAssertionsMixin
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_urlfield_widget(self):
         f = URLField()
@@ -26,7 +28,9 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             f.clean("http://abcdefghijklmnopqrstuvwxyz.com")
 
     def test_urlfield_clean(self):
-        f = URLField(required=False)
+        # RemovedInDjango60Warning: When the deprecation ends, remove the
+        # assume_scheme argument.
+        f = URLField(required=False, assume_scheme="https")
         tests = [
             ("http://localhost", "http://localhost"),
             ("http://example.com", "http://example.com"),
@@ -38,8 +42,8 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
                 "http://example.com?some_param=some_value",
                 "http://example.com?some_param=some_value",
             ),
-            ("valid-with-hyphens.com", "http://valid-with-hyphens.com"),
-            ("subdomain.domain.com", "http://subdomain.domain.com"),
+            ("valid-with-hyphens.com", "https://valid-with-hyphens.com"),
+            ("subdomain.domain.com", "https://subdomain.domain.com"),
             ("http://200.8.9.10", "http://200.8.9.10"),
             ("http://200.8.9.10:8000/test", "http://200.8.9.10:8000/test"),
             ("http://valid-----hyphens.com", "http://valid-----hyphens.com"),
@@ -49,7 +53,7 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             ),
             (
                 "www.example.com/s/http://code.djangoproject.com/ticket/13804",
-                "http://www.example.com/s/http://code.djangoproject.com/ticket/13804",
+                "https://www.example.com/s/http://code.djangoproject.com/ticket/13804",
             ),
             # Normalization.
             ("http://example.com/     ", "http://example.com/"),
@@ -135,3 +139,24 @@ class URLFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         msg = "__init__() got multiple values for keyword argument 'strip'"
         with self.assertRaisesMessage(TypeError, msg):
             URLField(strip=False)
+
+    def test_urlfield_assume_scheme(self):
+        f = URLField()
+        # RemovedInDjango60Warning: When the deprecation ends, replace with:
+        # "https://example.com"
+        self.assertEqual(f.clean("example.com"), "http://example.com")
+        f = URLField(assume_scheme="http")
+        self.assertEqual(f.clean("example.com"), "http://example.com")
+        f = URLField(assume_scheme="https")
+        self.assertEqual(f.clean("example.com"), "https://example.com")
+
+
+class URLFieldAssumeSchemeDeprecationTest(FormFieldAssertionsMixin, SimpleTestCase):
+    def test_urlfield_raises_warning(self):
+        msg = (
+            "The default scheme will be changed from 'http' to 'https' in Django 6.0. "
+            "Pass the forms.URLField.assume_scheme argument to silence this warning."
+        )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            f = URLField()
+            self.assertEqual(f.clean("example.com"), "http://example.com")

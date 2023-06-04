@@ -419,14 +419,14 @@ class AdminEmailHandlerTest(SimpleTestCase):
         # Text email
         admin_email_handler.include_html = False
         try:
-            self.client.get("/", HTTP_HOST="evil.com")
+            self.client.get("/", headers={"host": "evil.com"})
         finally:
             admin_email_handler.include_html = old_include_html
 
         # HTML email
         admin_email_handler.include_html = True
         try:
-            self.client.get("/", HTTP_HOST="evil.com")
+            self.client.get("/", headers={"host": "evil.com"})
         finally:
             admin_email_handler.include_html = old_include_html
 

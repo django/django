@@ -20,13 +20,24 @@
     flex-direction: column;
 }
 
-.selector-chosen select {
-    border-top: none;
-}
-
 .selector-available h2, .selector-chosen h2 {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
+}
+
+.selector-chosen .list-footer-display {
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin: 0 0 10px;
+    padding: 8px;
+    text-align: center;
+    background: var(--primary);
+    color: var(--header-link-color);
+    cursor: pointer;
+}
+.selector-chosen .list-footer-display__clear {
+    color: var(--breadcrumbs-fg);
 }
 
 .selector-chosen h2 {
@@ -60,7 +71,8 @@
     line-height: 1;
 }
 
-.selector .selector-available input {
+.selector .selector-available input,
+.selector .selector-chosen input {
     width: 320px;
     margin-left: 8px;
 }
@@ -85,6 +97,15 @@
     padding: 0 10px;
     margin: 0 0 10px;
     border-radius: 0 0 4px 4px;
+}
+.selector .selector-chosen--with-filtered select {
+    margin: 0;
+    border-radius: 0;
+    height: 14em;
+}
+
+.selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
+    display: none;
 }
 
 .selector-add, .selector-remove {
@@ -256,8 +277,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 18px;
-    width: 18px;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -345,10 +366,6 @@ p.file-upload {
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
     font-weight: bold;
-}
-
-.aligned p.file-upload {
-    margin-left: 170px;
 }
 
 .file-upload a {
@@ -477,7 +494,7 @@ span.clearable-file-input label {
     background: var(--body-bg);
     color: var(--body-quiet-color);
     font-size: 0.6875rem;
-    line-height: 11px;
+    line-height: 0.6875rem;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
 }
@@ -577,4 +594,10 @@ ul.timelist, .timelist li {
 select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
     margin-left: 7px;
+}
+
+/* GIS MAPS */
+.dj_map {
+    width: 600px;
+    height: 400px;
 }

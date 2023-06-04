@@ -17,7 +17,6 @@ def get_connection():
 @override_settings(DEBUG=True)
 @unittest.skipUnless(connection.vendor == "mysql", "MySQL tests")
 class IsolationLevelTests(TestCase):
-
     read_committed = "read committed"
     repeatable_read = "repeatable read"
     isolation_values = {
@@ -107,11 +106,11 @@ class Tests(TestCase):
     @mock.patch.object(connection, "get_database_version")
     def test_check_database_version_supported(self, mocked_get_database_version):
         if connection.mysql_is_mariadb:
-            mocked_get_database_version.return_value = (10, 1)
-            msg = "MariaDB 10.2 or later is required (found 10.1)."
+            mocked_get_database_version.return_value = (10, 3)
+            msg = "MariaDB 10.4 or later is required (found 10.3)."
         else:
-            mocked_get_database_version.return_value = (5, 6)
-            msg = "MySQL 5.7 or later is required (found 5.6)."
+            mocked_get_database_version.return_value = (5, 7)
+            msg = "MySQL 8 or later is required (found 5.7)."
 
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()

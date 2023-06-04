@@ -65,6 +65,7 @@ Django model terminology, that's represented by a
     from django.contrib.sites.models import Site
     from django.db import models
 
+
     class Article(models.Model):
         headline = models.CharField(max_length=200)
         # ...
@@ -83,6 +84,7 @@ This accomplishes several things quite nicely:
   story is on the current site. It looks something like this::
 
       from django.contrib.sites.shortcuts import get_current_site
+
 
       def article_detail(request, article_id):
           try:
@@ -108,6 +110,7 @@ like this::
     from django.contrib.sites.models import Site
     from django.db import models
 
+
     class Article(models.Model):
         headline = models.CharField(max_length=200)
         # ...
@@ -126,6 +129,7 @@ For example::
 
     from django.conf import settings
 
+
     def my_view(request):
         if settings.SITE_ID == 3:
             # Do something.
@@ -140,9 +144,10 @@ domain::
 
     from django.contrib.sites.shortcuts import get_current_site
 
+
     def my_view(request):
         current_site = get_current_site(request)
-        if current_site.domain == 'foo.com':
+        if current_site.domain == "foo.com":
             # Do something
             pass
         else:
@@ -160,9 +165,10 @@ the :setting:`SITE_ID` setting. This example is equivalent to the previous one::
 
     from django.contrib.sites.models import Site
 
+
     def my_function_without_request():
         current_site = Site.objects.get_current()
-        if current_site.domain == 'foo.com':
+        if current_site.domain == "foo.com":
             # Do something
             pass
         else:
@@ -190,17 +196,17 @@ Here's an example of what the form-handling view looks like::
     from django.contrib.sites.shortcuts import get_current_site
     from django.core.mail import send_mail
 
+
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
         current_site = get_current_site(request)
         send_mail(
-            'Thanks for subscribing to %s alerts' % current_site.name,
-            'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % (
-                current_site.name,
-            ),
-            'editor@%s' % current_site.domain,
+            "Thanks for subscribing to %s alerts" % current_site.name,
+            "Thanks for your subscription. We appreciate it.\n\n-The %s team."
+            % (current_site.name,),
+            "editor@%s" % current_site.domain,
             [user.email],
         )
 
@@ -218,13 +224,14 @@ farm out to the template system like so::
     from django.core.mail import send_mail
     from django.template import loader
 
+
     def register_for_newsletter(request):
         # Check form values, etc., and subscribe the user.
         # ...
 
-        subject = loader.get_template('alerts/subject.txt').render({})
-        message = loader.get_template('alerts/message.txt').render({})
-        send_mail(subject, message, 'editor@ljworld.com', [user.email])
+        subject = loader.get_template("alerts/subject.txt").render({})
+        message = loader.get_template("alerts/message.txt").render({})
+        send_mail(subject, message, "editor@ljworld.com", [user.email])
 
         # ...
 
@@ -241,7 +248,9 @@ Getting the current domain for full URLs
 Django's ``get_absolute_url()`` convention is nice for getting your objects'
 URL without the domain name, but in some cases you might want to display the
 full URL -- with ``http://`` and the domain and everything -- for an object.
-To do this, you can use the sites framework. An example::
+To do this, you can use the sites framework. An example:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sites.models import Site
     >>> obj = MyModel.objects.get(id=3)
@@ -249,7 +258,7 @@ To do this, you can use the sites framework. An example::
     '/mymodel/objects/3/'
     >>> Site.objects.get_current().domain
     'example.com'
-    >>> 'https://%s%s' % (Site.objects.get_current().domain, obj.get_absolute_url())
+    >>> "https://%s%s" % (Site.objects.get_current().domain, obj.get_absolute_url())
     'https://example.com/mymodel/objects/3/'
 
 .. _enabling-the-sites-framework:
@@ -326,8 +335,9 @@ your model explicitly. For example::
     from django.contrib.sites.managers import CurrentSiteManager
     from django.db import models
 
+
     class Photo(models.Model):
-        photo = models.FileField(upload_to='photos')
+        photo = models.FileField(upload_to="photos")
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         site = models.ForeignKey(Site, on_delete=models.CASCADE)
@@ -363,13 +373,14 @@ demonstrates this::
     from django.contrib.sites.managers import CurrentSiteManager
     from django.db import models
 
+
     class Photo(models.Model):
-        photo = models.FileField(upload_to='photos')
+        photo = models.FileField(upload_to="photos")
         photographer_name = models.CharField(max_length=100)
         pub_date = models.DateField()
         publish_on = models.ForeignKey(Site, on_delete=models.CASCADE)
         objects = models.Manager()
-        on_site = CurrentSiteManager('publish_on')
+        on_site = CurrentSiteManager("publish_on")
 
 If you attempt to use :class:`~django.contrib.sites.managers.CurrentSiteManager`
 and pass a field name that doesn't exist, Django will raise a ``ValueError``.
@@ -394,6 +405,7 @@ Site middleware
 If you often use this pattern::
 
     from django.contrib.sites.models import Site
+
 
     def my_view(request):
         site = Site.objects.get_current()

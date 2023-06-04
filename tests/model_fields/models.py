@@ -1,5 +1,4 @@
 import json
-import os
 import tempfile
 import uuid
 
@@ -70,11 +69,18 @@ class WhizIterEmpty(models.Model):
 
 
 class Choiceful(models.Model):
+    class Suit(models.IntegerChoices):
+        DIAMOND = 1, "Diamond"
+        SPADE = 2, "Spade"
+        HEART = 3, "Heart"
+        CLUB = 4, "Club"
+
     no_choices = models.IntegerField(null=True)
     empty_choices = models.IntegerField(choices=(), null=True)
     with_choices = models.IntegerField(choices=[(1, "A")], null=True)
     empty_choices_bool = models.BooleanField(choices=())
     empty_choices_text = models.TextField(choices=())
+    choices_from_enum = models.IntegerField(choices=Suit)
 
 
 class BigD(models.Model):
@@ -141,7 +147,6 @@ class NullBooleanModel(models.Model):
 
 class BooleanModel(models.Model):
     bfield = models.BooleanField()
-    string = models.CharField(max_length=10, default="abc")
 
 
 class DateTimeModel(models.Model):
@@ -214,6 +219,7 @@ class GenericIPAddress(models.Model):
 # These models aren't used in any test, just here to ensure they validate
 # successfully.
 
+
 # See ticket #16570.
 class DecimalLessThanOne(models.Model):
     d = models.DecimalField(max_digits=3, decimal_places=3)
@@ -266,7 +272,6 @@ if Image:
     # Set up a temp directory for file storage.
     temp_storage_dir = tempfile.mkdtemp()
     temp_storage = FileSystemStorage(temp_storage_dir)
-    temp_upload_to_dir = os.path.join(temp_storage.location, "tests")
 
     class Person(models.Model):
         """

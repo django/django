@@ -7,6 +7,78 @@ in a backward incompatible way, following their deprecation, as per the
 :ref:`deprecation policy <internal-release-deprecation-policy>`. More details
 about each item can often be found in the release notes of two versions prior.
 
+.. _deprecation-removed-in-6.0:
+
+6.0
+---
+
+See the :ref:`Django 5.0 release notes <deprecated-features-5.0>` for more
+details on these changes.
+
+* The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
+  renderers will be removed.
+
+* Support for passing positional arguments to ``BaseConstraint`` will be
+  removed.
+
+* ``request`` will be required in the signature of
+  ``ModelAdmin.lookup_allowed()`` subclasses.
+
+* The ``django.db.models.sql.datastructures.Join`` will no longer fallback to
+  ``get_joining_columns()``.
+
+* The ``get_joining_columns()`` method of ``ForeignObject`` and
+  ``ForeignObjectRel`` will be removed.
+
+* The ``ForeignObject.get_reverse_joining_columns()`` method will be removed.
+
+* The default scheme for ``forms.URLField`` will change from ``"http"`` to
+  ``"https"``.
+
+.. _deprecation-removed-in-5.1:
+
+5.1
+---
+
+See the :ref:`Django 4.2 release notes <deprecated-features-4.2>` for more
+details on these changes.
+
+* The ``BaseUserManager.make_random_password()`` method will be removed.
+
+* The model's ``Meta.index_together`` option will be removed.
+
+* The ``length_is`` template filter will be removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` will be removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` will be removed. Stub fields
+  will remain for compatibility with historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin will be removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget``
+  will be removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method will be removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method will be removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions will be removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` will be removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings will be
+  removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function will be
+  removed.
+
 .. _deprecation-removed-in-5.0:
 
 5.0
@@ -102,6 +174,15 @@ details on these changes.
   longer be allowed.
 
 * The ``django.contrib.gis.admin.OpenLayersWidget`` will be removed.
+
+* The ``django.contrib.auth.hashers.CryptPasswordHasher`` will be removed.
+
+* The ``"django/forms/default.html"`` and
+  ``"django/forms/formsets/default.html"`` templates will be removed.
+
+* The ability to pass ``nulls_first=False`` or ``nulls_last=False`` to
+  ``Expression.asc()`` and ``Expression.desc()`` methods, and the ``OrderBy``
+  expression will be removed.
 
 .. _deprecation-removed-in-4.1:
 

@@ -1,5 +1,4 @@
 import unittest
-from unittest import mock
 
 from migrations.test_base import OperationTestBase
 
@@ -7,7 +6,7 @@ from django.db import IntegrityError, NotSupportedError, connection, transaction
 from django.db.migrations.state import ProjectState
 from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
-from django.test import modify_settings, override_settings, skipUnlessDBFeature
+from django.test import modify_settings, override_settings
 from django.test.utils import CaptureQueriesContext
 
 from . import PostgreSQLTestCase
@@ -318,7 +317,6 @@ class CreateCollationTests(PostgreSQLTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"name": "C_test", "locale": "C"})
 
-    @skipUnlessDBFeature("supports_non_deterministic_collations")
     def test_create_non_deterministic_collation(self):
         operation = CreateCollation(
             "case_insensitive_test",
@@ -382,27 +380,6 @@ class CreateCollationTests(PostgreSQLTestCase):
                 )
         self.assertEqual(len(captured_queries), 1)
         self.assertIn("DROP COLLATION", captured_queries[0]["sql"])
-
-    def test_nondeterministic_collation_not_supported(self):
-        operation = CreateCollation(
-            "case_insensitive_test",
-            provider="icu",
-            locale="und-u-ks-level2",
-            deterministic=False,
-        )
-        project_state = ProjectState()
-        new_state = project_state.clone()
-        msg = "Non-deterministic collations require PostgreSQL 12+."
-        with connection.schema_editor(atomic=False) as editor:
-            with mock.patch(
-                "django.db.backends.postgresql.features.DatabaseFeatures."
-                "supports_non_deterministic_collations",
-                False,
-            ):
-                with self.assertRaisesMessage(NotSupportedError, msg):
-                    operation.database_forwards(
-                        self.app_label, editor, project_state, new_state
-                    )
 
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")

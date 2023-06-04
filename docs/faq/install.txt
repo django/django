@@ -50,10 +50,11 @@ What Python version can I use with Django?
 ============== ===============
 Django version Python versions
 ============== ===============
-2.2            3.5, 3.6, 3.7, 3.8 (added in 2.2.8), 3.9 (added in 2.2.17)
-3.1            3.6, 3.7, 3.8, 3.9 (added in 3.1.3)
 3.2            3.6, 3.7, 3.8, 3.9, 3.10 (added in 3.2.9)
-4.0, 4.1       3.8, 3.9, 3.10
+4.0            3.8, 3.9, 3.10
+4.1            3.8, 3.9, 3.10, 3.11 (added in 4.1.3)
+4.2            3.8, 3.9, 3.10, 3.11
+5.0            3.10, 3.11, 3.12
 ============== ===============
 
 For each version of Python, only the latest micro release (A.B.C) is officially
@@ -82,7 +83,7 @@ Should I use the stable version or development version?
 
 Generally, if you're using code in production, you should be using a
 stable release. The Django project publishes a full stable release
-every nine months or so, with bugfix updates in between. These stable
+every eight months or so, with bugfix updates in between. These stable
 releases contain the API that is covered by our backwards
 compatibility guarantees; if you write code against stable releases,
 you shouldn't have any problems upgrading when the next official

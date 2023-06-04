@@ -110,6 +110,10 @@ class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name="provider")
 
 
+class CustomSupplier(Supplier):
+    pass
+
+
 class ParkingLot(Place):
     # An explicit link to the parent (we can control the attribute name).
     parent = models.OneToOneField(

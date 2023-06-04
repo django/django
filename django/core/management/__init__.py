@@ -49,7 +49,7 @@ def load_command_class(app_name, name):
     return module.Command()
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def get_commands():
     """
     Return a dictionary mapping command names to their callback applications.
@@ -64,10 +64,6 @@ def get_commands():
     The dictionary is in the format {command_name: app_name}. Key-value
     pairs from this dictionary can then be used in calls to
     load_command_class(app_name, command_name)
-
-    If a specific version of a command must be loaded (e.g., with the
-    startapp command), the instantiated module can be placed in the
-    dictionary in place of the application name.
 
     The dictionary is cached on the first call and reused on subsequent
     calls.
@@ -283,8 +279,8 @@ class ManagementUtility:
         """
         Output completion suggestions for BASH.
 
-        The output of this function is passed to BASH's `COMREPLY` variable and
-        treated as completion suggestions. `COMREPLY` expects a space
+        The output of this function is passed to BASH's `COMPREPLY` variable
+        and treated as completion suggestions. `COMPREPLY` expects a space
         separated string as the result.
 
         The `COMP_WORDS` and `COMP_CWORD` BASH environment variables are used

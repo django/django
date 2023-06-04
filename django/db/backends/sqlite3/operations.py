@@ -69,13 +69,13 @@ class DatabaseOperations(BaseDatabaseOperations):
                 "accepting multiple arguments."
             )
 
-    def date_extract_sql(self, lookup_type, field_name):
+    def date_extract_sql(self, lookup_type, sql, params):
         """
         Support EXTRACT with a user-defined function django_date_extract()
         that's registered in connect(). Use single quotes because this is a
         string and could otherwise cause a collision with a field name.
         """
-        return "django_date_extract('%s', %s)" % (lookup_type.lower(), field_name)
+        return f"django_date_extract(%s, {sql})", (lookup_type.lower(), *params)
 
     def fetch_returned_insert_rows(self, cursor):
         """
@@ -88,53 +88,53 @@ class DatabaseOperations(BaseDatabaseOperations):
         """Do nothing since formatting is handled in the custom function."""
         return sql
 
-    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
-        return "django_date_trunc('%s', %s, %s, %s)" % (
+    def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
+        return f"django_date_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
-            field_name,
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
-    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
-        return "django_time_trunc('%s', %s, %s, %s)" % (
+    def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
+        return f"django_time_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
-            field_name,
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
     def _convert_tznames_to_sql(self, tzname):
         if tzname and settings.USE_TZ:
-            return "'%s'" % tzname, "'%s'" % self.connection.timezone_name
-        return "NULL", "NULL"
+            return tzname, self.connection.timezone_name
+        return None, None
 
-    def datetime_cast_date_sql(self, field_name, tzname):
-        return "django_datetime_cast_date(%s, %s, %s)" % (
-            field_name,
+    def datetime_cast_date_sql(self, sql, params, tzname):
+        return f"django_datetime_cast_date({sql}, %s, %s)", (
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
-    def datetime_cast_time_sql(self, field_name, tzname):
-        return "django_datetime_cast_time(%s, %s, %s)" % (
-            field_name,
+    def datetime_cast_time_sql(self, sql, params, tzname):
+        return f"django_datetime_cast_time({sql}, %s, %s)", (
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_extract('%s', %s, %s, %s)" % (
+    def datetime_extract_sql(self, lookup_type, sql, params, tzname):
+        return f"django_datetime_extract(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
-            field_name,
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
-    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
-        return "django_datetime_trunc('%s', %s, %s, %s)" % (
+    def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
+        return f"django_datetime_trunc(%s, {sql}, %s, %s)", (
             lookup_type.lower(),
-            field_name,
+            *params,
             *self._convert_tznames_to_sql(tzname),
         )
 
-    def time_extract_sql(self, lookup_type, field_name):
-        return "django_time_extract('%s', %s)" % (lookup_type.lower(), field_name)
+    def time_extract_sql(self, lookup_type, sql, params):
+        return f"django_time_extract(%s, {sql})", (lookup_type.lower(), *params)
 
     def pk_default_value(self):
         return "NULL"
@@ -168,9 +168,7 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def last_executed_query(self, cursor, sql, params):
         # Python substitutes parameters in Modules/_sqlite/cursor.c with:
-        # pysqlite_statement_bind_parameters(
-        #   self->statement, parameters, allow_8bit_chars
-        # );
+        # bind_parameters(state, self->statement, parameters);
         # Unfortunately there is no way to reach self->statement from Python,
         # so we quote and substitute parameters manually.
         if params:
@@ -384,8 +382,15 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "django_format_dtdelta(%s)" % ", ".join(fn_params)
 
     def integer_field_range(self, internal_type):
-        # SQLite doesn't enforce any integer constraints
-        return (None, None)
+        # SQLite doesn't enforce any integer constraints, but sqlite3 supports
+        # integers up to 64 bits.
+        if internal_type in [
+            "PositiveBigIntegerField",
+            "PositiveIntegerField",
+            "PositiveSmallIntegerField",
+        ]:
+            return (0, 9223372036854775807)
+        return (-9223372036854775808, 9223372036854775807)
 
     def subtract_temporals(self, internal_type, lhs, rhs):
         lhs_sql, lhs_params = lhs

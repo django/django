@@ -74,6 +74,12 @@ LANG_INFO = {
         "name": "Catalan",
         "name_local": "català",
     },
+    "ckb": {
+        "bidi": True,
+        "code": "ckb",
+        "name": "Central Kurdish (Sorani)",
+        "name_local": "کوردی",
+    },
     "cs": {
         "bidi": False,
         "code": "cs",

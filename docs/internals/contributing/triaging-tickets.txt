@@ -6,10 +6,10 @@ Django uses Trac_ for managing the work on the code base. Trac is a
 community-tended garden of the bugs people have found and the features people
 would like to see added. As in any garden, sometimes there are weeds to be
 pulled and sometimes there are flowers and vegetables that need picking. We need
-your help to sort out one from the other, and in the end we all benefit
+your help to sort out one from the other, and in the end, we all benefit
 together.
 
-Like all gardens, we can aspire to perfection but in reality there's no such
+Like all gardens, we can aspire to perfection, but in reality there's no such
 thing. Even in the most pristine garden there are still snails and insects.
 In a community garden there are also helpful people who -- with the best of
 intentions -- fertilize the weeds and poison the roses. It's the job of the
@@ -154,7 +154,7 @@ Someday/Maybe
 -------------
 
 This stage isn't shown on the diagram. It's used sparingly to keep track of
-high-level ideas or long term feature requests.
+high-level ideas or long-term feature requests.
 
 These tickets are uncommon and overall less useful since they don't describe
 concrete actionable issues. They are enhancement requests that we might
@@ -227,7 +227,7 @@ easier to find.
 Severity
 --------
 
-The *severity* attribute is used to identify blockers, that is, issues which
+The *severity* attribute is used to identify blockers, that is, issues that
 should get fixed before releasing the next version of Django. Typically those
 issues are bugs causing regressions from earlier versions or potentially
 causing severe data losses. This attribute is quite rarely used and the vast
@@ -256,7 +256,7 @@ Keywords
 --------
 
 With this field you may label a ticket with multiple keywords. This can be
-useful, for example, to group several tickets of a same theme. Keywords can
+useful, for example, to group several tickets on the same theme. Keywords can
 either be comma or space separated. Keyword search finds the keyword string
 anywhere in the keywords. For example, clicking on a ticket with the keyword
 "form" will yield similar tickets tagged with keywords containing strings such
@@ -306,13 +306,14 @@ A ticket can be resolved in a number of ways:
       submit support queries as tickets).
 
 * wontfix
-      Used when a someone decides that the request isn't appropriate for
+      Used when someone decides that the request isn't appropriate for
       consideration in Django. Sometimes a ticket is closed as "wontfix" with a
-      request for the reporter to start a discussion on the |django-developers|
-      mailing list if they feel differently from the rationale provided by the
-      person who closed the ticket. Other times, a mailing list discussion
-      precedes the decision to close a ticket. Always use the mailing list to
-      get a consensus before reopening tickets closed as "wontfix".
+      request for the reporter to start a discussion on the `Django Forum`_ or
+      |django-developers| mailing list if they feel differently from the
+      rationale provided by the person who closed the ticket. Other times, a
+      discussion precedes the decision to close a ticket. Always use the forum
+      or mailing list to get a consensus before reopening tickets closed as
+      "wontfix".
 
 * duplicate
       Used when another ticket covers the same issue. By closing duplicate
@@ -332,7 +333,7 @@ If you believe that the ticket was closed in error -- because you're
 still having the issue, or it's popped up somewhere else, or the triagers have
 made a mistake -- please reopen the ticket and provide further information.
 Again, please do not reopen tickets that have been marked as "wontfix" and
-bring the issue to |django-developers| instead.
+bring the issue to the `Django Forum`_ or |django-developers| instead.
 
 .. _how-can-i-help-with-triaging:
 
@@ -353,7 +354,7 @@ Then, you can help out by:
 
 * Closing "Unreviewed" tickets as "needsinfo" when the description is too
   sparse to be actionable, or when they're feature requests requiring a
-  discussion on |django-developers|.
+  discussion on the `Django Forum`_ or |django-developers|.
 
 * Correcting the "Needs tests", "Needs documentation", or "Has patch"
   flags for tickets where they are incorrectly set.
@@ -371,7 +372,7 @@ Then, you can help out by:
   reports about a particular part of Django, it may indicate we should
   consider refactoring that part of the code. If a trend is emerging,
   you should raise it for discussion (referencing the relevant tickets)
-  on |django-developers|.
+  on the `Django Forum`_ or |django-developers|.
 
 * Verify if patches submitted by other users are correct. If they are correct
   and also contain appropriate documentation and tests then move them to the
@@ -393,27 +394,26 @@ However, we do ask the following of all general community members working in
 the ticket database:
 
 * Please **don't** promote your own tickets to "Ready for checkin". You
-  may mark other people's tickets which you've reviewed as "Ready for
+  may mark other people's tickets that you've reviewed as "Ready for
   checkin", but you should get at minimum one other community member to
   review a patch that you submit.
 
-* Please **don't** reverse a decision without posting a message to
-  |django-developers| to find consensus.
+* Please **don't** reverse a decision without posting a message to the
+  `Django Forum`_ or |django-developers| to find consensus.
 
 * If you're unsure if you should be making a change, don't make the
   change but instead leave a comment with your concerns on the ticket,
-  or post a message to |django-developers|. It's okay to be unsure,
-  but your input is still valuable.
+  or post a message to the `Django Forum`_ or |django-developers|. It's okay to
+  be unsure, but your input is still valuable.
 
 .. _Trac: https://code.djangoproject.com/
 .. _`easy pickings`: https://code.djangoproject.com/query?status=!closed&easy=1
 .. _`creating an account on Trac`: https://www.djangoproject.com/accounts/register/
 .. _password reset page: https://www.djangoproject.com/accounts/password/reset/
+.. _Django Forum: https://forum.djangoproject.com/
 
 Bisecting a regression
 ======================
-
-.. highlight:: console
 
 A regression is a bug that's present in some newer version of Django but not in
 an older one. An extremely helpful piece of information is the commit that
@@ -425,11 +425,15 @@ Begin by writing a regression test for Django's test suite for the issue. For
 example, we'll pretend we're debugging a regression in migrations. After you've
 written the test and confirmed that it fails on the latest main branch, put it
 in a separate file that you can run standalone. For our example, we'll pretend
-we created ``tests/migrations/test_regression.py``, which can be run with::
+we created ``tests/migrations/test_regression.py``, which can be run with:
+
+.. code-block:: shell
 
     $ ./runtests.py migrations.test_regression
 
-Next, we mark the current point in history as being "bad" since the test fails::
+Next, we mark the current point in history as being "bad" since the test fails:
+
+.. code-block:: shell
 
     $ git bisect bad
     You need to start by "git bisect start"
@@ -437,17 +441,21 @@ Next, we mark the current point in history as being "bad" since the test fails::
 
 Now, we need to find a point in git history before the regression was
 introduced (i.e. a point where the test passes). Use something like
-``git checkout HEAD~100`` to checkout an earlier revision (100 commits earlier,
+``git checkout HEAD~100`` to check out an earlier revision (100 commits earlier,
 in this case). Check if the test fails. If so, mark that point as "bad"
-(``git bisect bad``), then checkout an earlier revision and recheck. Once you
-find a revision where your test passes, mark it as "good"::
+(``git bisect bad``), then check out an earlier revision and recheck. Once you
+find a revision where your test passes, mark it as "good":
+
+.. code-block:: shell
 
     $ git bisect good
     Bisecting: X revisions left to test after this (roughly Y steps)
     ...
 
 Now we're ready for the fun part: using ``git bisect run`` to automate the rest
-of the process::
+of the process:
+
+.. code-block:: shell
 
     $ git bisect run tests/runtests.py migrations.test_regression
 

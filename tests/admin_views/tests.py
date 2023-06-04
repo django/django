@@ -2,18 +2,9 @@ import datetime
 import os
 import re
 import unittest
+import zoneinfo
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
-
-try:
-    import pytz
-except ImportError:
-    pytz = None
 
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
@@ -35,6 +26,7 @@ from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
     TestCase,
+    ignore_warnings,
     modify_settings,
     override_settings,
     skipUnlessDBFeature,
@@ -43,6 +35,7 @@ from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
 from django.utils.cache import get_max_age
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -157,9 +150,6 @@ MULTIPART_ENCTYPE = 'enctype="multipart/form-data"'
 def make_aware_datetimes(dt, iana_key):
     """Makes one aware datetime for each supported time zone provider."""
     yield dt.replace(tzinfo=zoneinfo.ZoneInfo(iana_key))
-
-    if pytz is not None:
-        yield pytz.timezone(iana_key).localize(dt, is_dst=None)
 
 
 class AdminFieldExtractionMixin:
@@ -803,8 +793,9 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         self.assertIs(response.context["cl"].has_related_field_in_list_display(), False)
 
     def test_limited_filter(self):
-        """Ensure admin changelist filters do not contain objects excluded via limit_choices_to.
-        This also tests relation-spanning filters (e.g. 'color__value').
+        """
+        Admin changelist filters do not contain objects excluded via
+        limit_choices_to.
         """
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
@@ -816,6 +807,47 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             response,
             '<a href="?color__id__exact=3">Blue</a>',
             msg_prefix="Changelist filter not correctly limited by limit_choices_to",
+        )
+
+    def test_change_list_facet_toggle(self):
+        # Toggle is visible when show_facet is the default of
+        # admin.ShowFacets.ALLOW.
+        admin_url = reverse("admin:admin_views_album_changelist")
+        response = self.client.get(admin_url)
+        self.assertContains(
+            response,
+            '<a href="?_facets=True" class="viewlink">Show counts</a>',
+            msg_prefix="Expected facet filter toggle not found in changelist view",
+        )
+        response = self.client.get(f"{admin_url}?_facets=True")
+        self.assertContains(
+            response,
+            '<a href="?" class="hidelink">Hide counts</a>',
+            msg_prefix="Expected facet filter toggle not found in changelist view",
+        )
+        # Toggle is not visible when show_facet is admin.ShowFacets.ALWAYS.
+        response = self.client.get(reverse("admin:admin_views_workhour_changelist"))
+        self.assertNotContains(
+            response,
+            "Show counts",
+            msg_prefix="Expected not to find facet filter toggle in changelist view",
+        )
+        self.assertNotContains(
+            response,
+            "Hide counts",
+            msg_prefix="Expected not to find facet filter toggle in changelist view",
+        )
+        # Toggle is not visible when show_facet is admin.ShowFacets.NEVER.
+        response = self.client.get(reverse("admin:admin_views_fooddelivery_changelist"))
+        self.assertNotContains(
+            response,
+            "Show counts",
+            msg_prefix="Expected not to find facet filter toggle in changelist view",
+        )
+        self.assertNotContains(
+            response,
+            "Hide counts",
+            msg_prefix="Expected not to find facet filter toggle in changelist view",
         )
 
     def test_relation_spanning_filters(self):
@@ -1471,6 +1503,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:password_change"))
         self.assertContains(
             response, '<div class="help" id="id_new_password1_helptext">'
+        )
+
+    def test_enable_zooming_on_mobile(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(
+            response,
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
         )
 
 
@@ -2694,6 +2733,20 @@ class AdminViewPermissionsTest(TestCase):
         formset = response.context["inline_admin_formsets"][0]
         self.assertEqual(len(formset.forms), 3)
 
+    def test_change_view_with_view_only_last_inline(self):
+        self.viewuser.user_permissions.add(
+            get_perm(Section, get_permission_codename("view", Section._meta))
+        )
+        self.client.force_login(self.viewuser)
+        response = self.client.get(
+            reverse("admin:admin_views_section_change", args=(self.s1.pk,))
+        )
+        self.assertEqual(len(response.context["inline_admin_formsets"]), 1)
+        formset = response.context["inline_admin_formsets"][0]
+        self.assertEqual(len(formset.forms), 3)
+        # The last inline is not marked as empty.
+        self.assertContains(response, 'id="article_set-2"')
+
     def test_change_view_with_view_and_add_inlines(self):
         """User has view and add permissions on the inline model."""
         self.viewuser.user_permissions.add(
@@ -3356,8 +3409,8 @@ class AdminViewDeletedObjectsTest(TestCase):
         cls.ssh1 = SuperSecretHideout.objects.create(
             location="super floating castle!", supervillain=cls.sv1
         )
-        cls.cy1 = CyclicOne.objects.create(name="I am recursive", two_id=1)
-        cls.cy2 = CyclicTwo.objects.create(name="I am recursive too", one_id=1)
+        cls.cy1 = CyclicOne.objects.create(pk=1, name="I am recursive", two_id=1)
+        cls.cy2 = CyclicTwo.objects.create(pk=1, name="I am recursive too", one_id=1)
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -3651,6 +3704,22 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             2,
             change_message="Changed something",
         )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            1,
+            change_message="Added something",
+        )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            3,
+            change_message="Deleted something",
+        )
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -3708,6 +3777,14 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         )
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
+
+    def test_recentactions_description(self):
+        response = self.client.get(reverse("admin:index"))
+        for operation in ["Added", "Changed", "Deleted"]:
+            with self.subTest(operation):
+                self.assertContains(
+                    response, f'<span class="visually-hidden">{operation}:'
+                )
 
     def test_deleteconfirmation_link(self):
         """ "
@@ -5533,7 +5610,6 @@ class PrePopulatedTest(TestCase):
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
-
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -5860,13 +5936,17 @@ class SeleniumTests(AdminSeleniumTestCase):
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
         self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
-        filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
+        from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
         from_box = self.selenium.find_element(By.ID, "id_toppings_from")
+        to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
         to_box = self.selenium.find_element(By.ID, "id_toppings_to")
         self.assertEqual(
-            to_box.get_property("offsetHeight"),
             (
-                filter_box.get_property("offsetHeight")
+                to_filter_box.get_property("offsetHeight")
+                + to_box.get_property("offsetHeight")
+            ),
+            (
+                from_filter_box.get_property("offsetHeight")
                 + from_box.get_property("offsetHeight")
             ),
         )
@@ -5881,13 +5961,21 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_question_add")
         self.selenium.get(url)
-        filter_box = self.selenium.find_element(By.ID, "id_related_questions_filter")
+        from_filter_box = self.selenium.find_element(
+            By.ID, "id_related_questions_filter"
+        )
         from_box = self.selenium.find_element(By.ID, "id_related_questions_from")
+        to_filter_box = self.selenium.find_element(
+            By.ID, "id_related_questions_filter_selected"
+        )
         to_box = self.selenium.find_element(By.ID, "id_related_questions_to")
         self.assertEqual(
-            to_box.get_property("offsetHeight"),
             (
-                filter_box.get_property("offsetHeight")
+                to_filter_box.get_property("offsetHeight")
+                + to_box.get_property("offsetHeight")
+            ),
+            (
+                from_filter_box.get_property("offsetHeight")
                 + from_box.get_property("offsetHeight")
             ),
         )
@@ -6151,7 +6239,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         ]
         self.assertEqual(
             fonts,
-            ["Roboto", "Lucida Grande", "Verdana", "Arial", "sans-serif"],
+            [
+                "Segoe UI",
+                "system-ui",
+                "Roboto",
+                "Helvetica Neue",
+                "Arial",
+                "sans-serif",
+                "Apple Color Emoji",
+                "Segoe UI Emoji",
+                "Segoe UI Symbol",
+                "Noto Color Emoji",
+            ],
         )
 
     def test_search_input_filtered_page(self):
@@ -6277,17 +6376,23 @@ class SeleniumTests(AdminSeleniumTestCase):
         finally:
             self.selenium.set_window_size(current_size["width"], current_size["height"])
 
-    def test_updating_related_objects_updates_fk_selects(self):
+    def test_updating_related_objects_updates_fk_selects_except_autocompletes(self):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.support.ui import Select
 
         born_country_select_id = "id_born_country"
         living_country_select_id = "id_living_country"
+        living_country_select2_textbox_id = "select2-id_living_country-container"
         favorite_country_to_vacation_select_id = "id_favorite_country_to_vacation"
         continent_select_id = "id_continent"
 
         def _get_HTML_inside_element_by_id(id_):
             return self.selenium.find_element(By.ID, id_).get_attribute("innerHTML")
+
+        def _get_text_inside_element_by_selector(selector):
+            return self.selenium.find_element(By.CSS_SELECTOR, selector).get_attribute(
+                "innerText"
+            )
 
         self.admin_login(
             username="super", password="secret", login_url=reverse("admin:index")
@@ -6313,12 +6418,16 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="1" selected="">Argentina</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            """,
+        # Argentina isn't added to the living_country select nor selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id}"), ""
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "",
         )
         # Argentina won't appear because favorite_country_to_vacation field has
         # limit_choices_to.
@@ -6346,13 +6455,18 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="2">Spain</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            <option value="2" selected="">Spain</option>
-            """,
+
+        # Spain is added to the living_country select and it's also selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id} option"),
+            "Spain",
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "Spain",
         )
         # Spain won't appear because favorite_country_to_vacation field has
         # limit_choices_to.
@@ -6382,13 +6496,17 @@ class SeleniumTests(AdminSeleniumTestCase):
             <option value="2">Italy</option>
             """,
         )
-        self.assertHTMLEqual(
-            _get_HTML_inside_element_by_id(living_country_select_id),
-            """
-            <option value="" selected="">---------</option>
-            <option value="1">Argentina</option>
-            <option value="2" selected="">Italy</option>
-            """,
+        # Italy is added to the living_country select and it's also selected by
+        # the select2 widget.
+        self.assertEqual(
+            _get_text_inside_element_by_selector(f"#{living_country_select_id} option"),
+            "Italy",
+        )
+        self.assertEqual(
+            _get_text_inside_element_by_selector(
+                f"#{living_country_select2_textbox_id}"
+            ),
+            "Italy",
         )
         # favorite_country_to_vacation field has no options.
         self.assertHTMLEqual(
@@ -6417,6 +6535,45 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(traveler.living_country.name, "Italy")
         self.assertEqual(traveler.favorite_country_to_vacation.name, "Qatar")
 
+    def test_redirect_on_add_view_add_another_button(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        add_url = reverse("admin7:admin_views_section_add")
+        self.selenium.get(self.live_server_url + add_url)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 1")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 1)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 2")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and add another"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 2)
+
+    def test_redirect_on_add_view_continue_button(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+        add_url = reverse("admin7:admin_views_section_add")
+        self.selenium.get(self.live_server_url + add_url)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input.send_keys("Test section 1")
+        self.selenium.find_element(
+            By.XPATH, '//input[@value="Save and continue editing"]'
+        ).click()
+        self.assertEqual(Section.objects.count(), 1)
+        name_input = self.selenium.find_element(By.ID, "id_name")
+        name_input_value = name_input.get_attribute("value")
+        self.assertEqual(name_input_value, "Test section 1")
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
@@ -6429,6 +6586,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_get(self):
         response = self.client.get(reverse("admin:admin_views_post_add"))
         self.assertNotContains(response, 'name="posted"')
@@ -6464,20 +6622,20 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         self.assertContains(response, '<div class="help"', 3)
         self.assertContains(
             response,
-            '<div class="help" id="id_title_helptext">Some help text for the title '
-            "(with Unicode ŠĐĆŽćžšđ)</div>",
+            '<div class="help" id="id_title_helptext"><div>Some help text for the '
+            "title (with Unicode ŠĐĆŽćžšđ)</div></div>",
             html=True,
         )
         self.assertContains(
             response,
-            '<div class="help" id="id_content_helptext">Some help text for the content '
-            "(with Unicode ŠĐĆŽćžšđ)</div>",
+            '<div class="help" id="id_content_helptext"><div>Some help text for the '
+            "content (with Unicode ŠĐĆŽćžšđ)</div></div>",
             html=True,
         )
         self.assertContains(
             response,
-            '<div class="help">Some help text for the date (with Unicode ŠĐĆŽćžšđ)'
-            "</div>",
+            '<div class="help"><div>Some help text for the date (with Unicode ŠĐĆŽćžšđ)'
+            "</div></div>",
             html=True,
         )
 
@@ -6489,6 +6647,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(response, "%d amount of cool" % p.pk)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_text_field(self):
         p = Post.objects.create(
             title="Readonly test",
@@ -6508,6 +6667,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         # Checking readonly field in inline.
         self.assertContains(response, "test<br>link")
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_post(self):
         data = {
             "title": "Django Got Readonly Fields",
@@ -6648,6 +6808,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         field = self.get_admin_readonly_field(response, "plotdetails")
         self.assertEqual(field.contents(), "-")  # default empty value
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):
         """
         Regression test for #22087 - ModelForm Meta overrides are ignored by
@@ -6659,7 +6820,7 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<div class="help">Overridden help text for the date</div>',
+            '<div class="help"><div>Overridden help text for the date</div></div>',
             html=True,
         )
         self.assertContains(
@@ -7107,6 +7268,7 @@ class CSSTest(TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_field_prefix_css_classes(self):
         """
         Fields have a CSS class name with a 'field-' prefix.
@@ -7852,6 +8014,21 @@ class AdminKeepChangeListFiltersTests(TestCase):
         self.assertRedirects(response, self.get_add_url())
         post_data.pop("_addanother")
 
+    def test_change_view_close_link(self):
+        viewuser = User.objects.create_user(
+            username="view", password="secret", is_staff=True
+        )
+        viewuser.user_permissions.add(
+            get_perm(User, get_permission_codename("view", User._meta))
+        )
+        self.client.force_login(viewuser)
+        response = self.client.get(self.get_change_url())
+        close_link = re.search(
+            '<a href="(.*?)" class="closelink">Close</a>', response.content.decode()
+        )
+        close_link = close_link[1].replace("&amp;", "&")
+        self.assertURLEqual(close_link, self.get_changelist_url())
+
     def test_change_view_without_preserved_filters(self):
         response = self.client.get(self.get_change_url(add_preserved_filters=False))
         # The action attribute is omitted.
@@ -7964,11 +8141,13 @@ class TestLabelVisibility(TestCase):
         self.assert_field_visible(response, "second")
 
     def assert_field_visible(self, response, field_name):
-        self.assertContains(response, '<div class="fieldBox field-%s">' % field_name)
+        self.assertContains(
+            response, f'<div class="flex-container fieldBox field-{field_name}">'
+        )
 
     def assert_field_hidden(self, response, field_name):
         self.assertContains(
-            response, '<div class="fieldBox field-%s hidden">' % field_name
+            response, f'<div class="flex-container fieldBox field-{field_name} hidden">'
         )
 
     def assert_fieldline_visible(self, response):
@@ -8012,7 +8191,7 @@ class AdminViewOnSiteTests(TestCase):
         Issue #20522
         Verifying that if the parent form fails validation, the inlines also
         run validation even if validation is contingent on parent form data.
-        Also, assertFormError() and assertFormsetError() is usable for admin
+        Also, assertFormError() and assertFormSetError() is usable for admin
         forms and formsets.
         """
         # The form validation should fail because 'some_required_info' is
@@ -8036,7 +8215,7 @@ class AdminViewOnSiteTests(TestCase):
             ["This field is required."],
         )
         self.assertFormError(response.context["adminform"], None, [])
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,
@@ -8045,7 +8224,7 @@ class AdminViewOnSiteTests(TestCase):
                 "contrived test case"
             ],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"], None, None, []
         )
 
@@ -8081,7 +8260,7 @@ class AdminViewOnSiteTests(TestCase):
             "some_required_info",
             ["This field is required."],
         )
-        self.assertFormsetError(
+        self.assertFormSetError(
             response.context["inline_admin_formset"],
             0,
             None,
@@ -8286,6 +8465,21 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     * Catch-all view disabled via AdminSite.final_catch_all_view.
     """
 
+    @classmethod
+    def setUpTestData(cls):
+        cls.staff_user = User.objects.create_user(
+            username="staff",
+            password="secret",
+            email="staff@example.com",
+            is_staff=True,
+        )
+        cls.non_staff_user = User.objects.create_user(
+            username="user",
+            password="secret",
+            email="user@example.com",
+            is_staff=False,
+        )
+
     def test_unknown_url_redirects_login_if_not_authenticated(self):
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url)
@@ -8294,12 +8488,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         )
 
     def test_unknown_url_404_if_authenticated(self):
-        superuser = User.objects.create_superuser(
-            username="super",
-            password="secret",
-            email="super@example.com",
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url)
         self.assertEqual(response.status_code, 404)
@@ -8337,26 +8526,14 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_unknown_url(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin/unknown/"
         response = self.client.get(unknown_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8364,14 +8541,20 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         )
 
     @override_settings(APPEND_SLASH=True)
-    def test_missing_slash_append_slash_true_script_name(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
+    def test_missing_slash_append_slash_true_query_string(self):
+        self.client.force_login(self.staff_user)
+        known_url = reverse("admin:admin_views_article_changelist")
+        response = self.client.get("%s?id=1" % known_url[:-1])
+        self.assertRedirects(
+            response,
+            f"{known_url}?id=1",
+            status_code=301,
+            fetch_redirect_response=False,
         )
-        self.client.force_login(superuser)
+
+    @override_settings(APPEND_SLASH=True)
+    def test_missing_slash_append_slash_true_script_name(self):
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1], SCRIPT_NAME="/prefix/")
         self.assertRedirects(
@@ -8381,15 +8564,21 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
             fetch_redirect_response=False,
         )
 
+    @override_settings(APPEND_SLASH=True)
+    def test_missing_slash_append_slash_true_script_name_query_string(self):
+        self.client.force_login(self.staff_user)
+        known_url = reverse("admin:admin_views_article_changelist")
+        response = self.client.get("%s?id=1" % known_url[:-1], SCRIPT_NAME="/prefix/")
+        self.assertRedirects(
+            response,
+            f"/prefix{known_url}?id=1",
+            status_code=301,
+            fetch_redirect_response=False,
+        )
+
     @override_settings(APPEND_SLASH=True, FORCE_SCRIPT_NAME="/prefix/")
     def test_missing_slash_append_slash_true_force_script_name(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8401,13 +8590,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_non_staff_user(self):
-        user = User.objects.create_user(
-            username="user",
-            password="secret",
-            email="user@example.com",
-            is_staff=False,
-        )
-        self.client.force_login(user)
+        self.client.force_login(self.non_staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
@@ -8415,28 +8598,27 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
             "/test_admin/admin/login/?next=/test_admin/admin/admin_views/article",
         )
 
+    @override_settings(APPEND_SLASH=True)
+    def test_missing_slash_append_slash_true_non_staff_user_query_string(self):
+        self.client.force_login(self.non_staff_user)
+        known_url = reverse("admin:admin_views_article_changelist")
+        response = self.client.get("%s?id=1" % known_url[:-1])
+        self.assertRedirects(
+            response,
+            "/test_admin/admin/login/?next=/test_admin/admin/admin_views/article"
+            "%3Fid%3D1",
+        )
+
     @override_settings(APPEND_SLASH=False)
     def test_missing_slash_append_slash_false(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_single_model_no_append_slash(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin9:admin_views_actor_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)
@@ -8449,12 +8631,7 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_unknown_url_404_if_authenticated_without_final_catch_all_view(self):
-        superuser = User.objects.create_superuser(
-            username="super",
-            password="secret",
-            email="super@example.com",
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin10/unknown/"
         response = self.client.get(unknown_url)
         self.assertEqual(response.status_code, 404)
@@ -8503,41 +8680,35 @@ class AdminSiteFinalCatchAllPatternTests(TestCase):
     def test_missing_slash_append_slash_true_unknown_url_without_final_catch_all_view(
         self,
     ):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         unknown_url = "/test_admin/admin10/unknown/"
         response = self.client.get(unknown_url[:-1])
         self.assertEqual(response.status_code, 404)
 
     @override_settings(APPEND_SLASH=True)
     def test_missing_slash_append_slash_true_without_final_catch_all_view(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertRedirects(
             response, known_url, status_code=301, target_status_code=403
         )
 
+    @override_settings(APPEND_SLASH=True)
+    def test_missing_slash_append_slash_true_query_without_final_catch_all_view(self):
+        self.client.force_login(self.staff_user)
+        known_url = reverse("admin10:admin_views_article_changelist")
+        response = self.client.get("%s?id=1" % known_url[:-1])
+        self.assertRedirects(
+            response,
+            f"{known_url}?id=1",
+            status_code=301,
+            fetch_redirect_response=False,
+        )
+
     @override_settings(APPEND_SLASH=False)
     def test_missing_slash_append_slash_false_without_final_catch_all_view(self):
-        superuser = User.objects.create_user(
-            username="staff",
-            password="secret",
-            email="staff@example.com",
-            is_staff=True,
-        )
-        self.client.force_login(superuser)
+        self.client.force_login(self.staff_user)
         known_url = reverse("admin10:admin_views_article_changelist")
         response = self.client.get(known_url[:-1])
         self.assertEqual(response.status_code, 404)

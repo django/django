@@ -3,11 +3,14 @@ import unittest
 
 from django.forms.renderers import (
     BaseRenderer,
+    DjangoDivFormRenderer,
     DjangoTemplates,
     Jinja2,
+    Jinja2DivFormRenderer,
     TemplatesSetting,
 )
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, ignore_warnings
+from django.utils.deprecation import RemovedInDjango60Warning
 
 try:
     import jinja2
@@ -53,3 +56,29 @@ class Jinja2Tests(SharedTests, SimpleTestCase):
 
 class TemplatesSettingTests(SharedTests, SimpleTestCase):
     renderer = TemplatesSetting
+
+
+class DeprecationTests(SimpleTestCase):
+    def test_django_div_renderer_warning(self):
+        msg = (
+            "The DjangoDivFormRenderer transitional form renderer is deprecated. Use "
+            "DjangoTemplates instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+            DjangoDivFormRenderer()
+
+    def test_jinja2_div_renderer_warning(self):
+        msg = (
+            "The Jinja2DivFormRenderer transitional form renderer is deprecated. Use "
+            "Jinja2 instead."
+        )
+        with self.assertRaisesMessage(RemovedInDjango60Warning, msg):
+            Jinja2DivFormRenderer()
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_deprecation_renderers_can_be_instantiated(self):
+        tests = [DjangoDivFormRenderer, Jinja2DivFormRenderer]
+        for cls in tests:
+            with self.subTest(renderer_class=cls):
+                renderer = cls()
+                self.assertIsInstance(renderer, cls)

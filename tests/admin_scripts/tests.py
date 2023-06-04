@@ -32,7 +32,6 @@ from django.db.migrations.recorder import MigrationRecorder
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
 from django.test.utils import captured_stderr, captured_stdout
 from django.urls import path
-from django.utils.version import PY39
 from django.views.static import serve
 
 from . import urls
@@ -107,7 +106,7 @@ class AdminScriptTestCase(SimpleTestCase):
                 paths.append(os.path.dirname(backend_dir))
         return paths
 
-    def run_test(self, args, settings_file=None, apps=None, umask=None):
+    def run_test(self, args, settings_file=None, apps=None, umask=-1):
         base_dir = os.path.dirname(self.test_dir)
         # The base dir for Django's tests is one level up.
         tests_dir = os.path.dirname(os.path.dirname(__file__))
@@ -136,12 +135,11 @@ class AdminScriptTestCase(SimpleTestCase):
             cwd=self.test_dir,
             env=test_environ,
             text=True,
-            # subprocess.run()'s umask was added in Python 3.9.
-            **({"umask": umask} if umask and PY39 else {}),
+            umask=umask,
         )
         return p.stdout, p.stderr
 
-    def run_django_admin(self, args, settings_file=None, umask=None):
+    def run_django_admin(self, args, settings_file=None, umask=-1):
         return self.run_test(["-m", "django", *args], settings_file, umask=umask)
 
     def run_manage(self, args, settings_file=None, manage_py=None):
@@ -1587,6 +1585,24 @@ class ManageRunserver(SimpleTestCase):
         call_command(self.cmd, addrport="7000")
         self.assertServerSettings("127.0.0.1", "7000")
 
+    def test_zero_ip_addr(self):
+        self.cmd.addr = "0"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("8000")
+        self.assertIn(
+            "Starting development server at http://0.0.0.0:8000/",
+            self.output.getvalue(),
+        )
+
+    def test_on_bind(self):
+        self.cmd.addr = "127.0.0.1"
+        self.cmd._raw_ipv6 = False
+        self.cmd.on_bind("14437")
+        self.assertIn(
+            "Starting development server at http://127.0.0.1:14437/",
+            self.output.getvalue(),
+        )
+
     @unittest.skipUnless(socket.has_ipv6, "platform doesn't support IPv6")
     def test_runner_addrport_ipv6(self):
         call_command(self.cmd, addrport="", use_ipv6=True)
@@ -2363,7 +2379,6 @@ class ExecuteFromCommandLine(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_scripts.urls")
 class StartProject(LiveServerTestCase, AdminScriptTestCase):
-
     available_apps = [
         "admin_scripts",
         "django.contrib.auth",
@@ -2467,6 +2482,23 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         self.assertNoOutput(err)
         self.assertTrue(os.path.isdir(testproject_dir))
         self.assertTrue(os.path.exists(os.path.join(testproject_dir, "additional_dir")))
+
+    def test_custom_project_template_non_python_files_not_formatted(self):
+        template_path = os.path.join(custom_templates_dir, "project_template")
+        args = ["startproject", "--template", template_path, "customtestproject"]
+        testproject_dir = os.path.join(self.test_dir, "customtestproject")
+
+        _, err = self.run_django_admin(args)
+        self.assertNoOutput(err)
+        with open(
+            os.path.join(template_path, "additional_dir", "requirements.in")
+        ) as f:
+            expected = f.read()
+        with open(
+            os.path.join(testproject_dir, "additional_dir", "requirements.in")
+        ) as f:
+            result = f.read()
+        self.assertEqual(expected, result)
 
     def test_template_dir_with_trailing_slash(self):
         "Ticket 17475: Template dir passed has a trailing path separator"
@@ -2780,7 +2812,6 @@ class StartProject(LiveServerTestCase, AdminScriptTestCase):
         sys.platform == "win32",
         "Windows only partially supports umasks and chmod.",
     )
-    @unittest.skipUnless(PY39, "subprocess.run()'s umask was added in Python 3.9.")
     def test_honor_umask(self):
         _, err = self.run_django_admin(["startproject", "testproject"], umask=0o077)
         self.assertNoOutput(err)

@@ -6,11 +6,11 @@ import random
 import tempfile
 import time
 import zlib
+from hashlib import md5
 
 from django.core.cache.backends.base import DEFAULT_TIMEOUT, BaseCache
 from django.core.files import locks
 from django.core.files.move import file_move_safe
-from django.utils.crypto import md5
 
 
 class FileBasedCache(BaseCache):
@@ -90,10 +90,11 @@ class FileBasedCache(BaseCache):
 
     def has_key(self, key, version=None):
         fname = self._key_to_file(key, version)
-        if os.path.exists(fname):
+        try:
             with open(fname, "rb") as f:
                 return not self._is_expired(f)
-        return False
+        except FileNotFoundError:
+            return False
 
     def _cull(self):
         """

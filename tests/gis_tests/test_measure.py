@@ -293,18 +293,3 @@ class AreaTest(unittest.TestCase):
         self.assertEqual(hash(a2), hash(a3))
         self.assertNotEqual(hash(a1), hash(a2))
         self.assertNotEqual(hash(a1), hash(a3))
-
-
-def suite():
-    s = unittest.TestSuite()
-    s.addTest(unittest.makeSuite(DistanceTest))
-    s.addTest(unittest.makeSuite(AreaTest))
-    return s
-
-
-def run(verbosity=2):
-    unittest.TextTestRunner(verbosity=verbosity).run(suite())
-
-
-if __name__ == "__main__":
-    run()

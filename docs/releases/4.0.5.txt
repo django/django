@@ -2,11 +2,18 @@
 Django 4.0.5 release notes
 ==========================
 
-*Expected May 3, 2022*
+*June 1, 2022*
 
 Django 4.0.5 fixes several bugs in 4.0.4.
 
 Bugfixes
 ========
 
-* ...
+* Fixed a bug in Django 4.0 where not all :setting:`OPTIONS <CACHES-OPTIONS>`
+  were passed to a Redis client (:ticket:`33681`).
+
+* Fixed a bug in Django 4.0 that caused a crash of ``QuerySet.filter()`` on
+  ``IsNull()`` expressions (:ticket:`33705`).
+
+* Fixed a bug in Django 4.0 where a hidden quick filter toolbar in the admin's
+  navigation sidebar was focusable (:ticket:`33725`).

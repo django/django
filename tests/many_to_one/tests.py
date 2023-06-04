@@ -290,7 +290,7 @@ class ManyToOneTests(TestCase):
         )
         # ... and should work fine with the string that comes out of
         # forms.Form.cleaned_data.
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             (
                 Article.objects.filter(reporter__first_name__exact="John").extra(
                     where=["many_to_one_reporter.last_name='%s'" % "Smith"]
@@ -654,6 +654,16 @@ class ManyToOneTests(TestCase):
         self.assertIsNot(c.parent, p)
         self.assertEqual(c.parent, p)
 
+    def test_save_parent_after_assign(self):
+        category = Category(name="cats")
+        record = Record(category=category)
+        category.save()
+        record.save()
+        category.name = "dogs"
+        with self.assertNumQueries(0):
+            self.assertEqual(category.id, record.category_id)
+            self.assertEqual(category.name, record.category.name)
+
     def test_save_nullable_fk_after_parent(self):
         parent = Parent()
         child = ChildNullableParent(parent=parent)
@@ -748,6 +758,9 @@ class ManyToOneTests(TestCase):
         )
         with self.assertRaisesMessage(ValueError, msg):
             th.child_set.count()
+        # The reverse foreign key manager can be created.
+        self.assertEqual(th.child_set.model, Third)
+
         th.save()
         # Now the model is saved, so we will need to execute a query.
         with self.assertNumQueries(1):

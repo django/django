@@ -300,7 +300,6 @@ class ViewTest(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
 class TemplateViewTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     def _assert_about(self, response):
@@ -427,7 +426,6 @@ class TemplateViewTest(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="generic_views.urls")
 class RedirectViewTest(SimpleTestCase):
-
     rf = RequestFactory()
 
     def test_no_url(self):

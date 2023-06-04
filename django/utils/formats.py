@@ -104,15 +104,13 @@ def get_format(format_type, lang=None, use_l10n=None):
     format_type is the name of the format, e.g. 'DATE_FORMAT'.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), otherwise it's always localized.
     """
     if use_l10n is None:
-        try:
-            use_l10n = settings._USE_L10N_INTERNAL
-        except AttributeError:
-            use_l10n = settings.USE_L10N
+        use_l10n = True
     if use_l10n and lang is None:
         lang = get_language()
+    format_type = str(format_type)  # format_type may be lazy.
     cache_key = (format_type, lang)
     try:
         return _format_cache[cache_key]
@@ -152,7 +150,7 @@ def date_format(value, format=None, use_l10n=None):
     localizable format.
 
     If use_l10n is provided and is not None, that will force the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), otherwise it's always localized.
     """
     return dateformat.format(
         value, get_format(format or "DATE_FORMAT", use_l10n=use_l10n)
@@ -164,7 +162,7 @@ def time_format(value, format=None, use_l10n=None):
     Format a datetime.time object using a localizable format.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), otherwise it's always localized.
     """
     return dateformat.time_format(
         value, get_format(format or "TIME_FORMAT", use_l10n=use_l10n)
@@ -176,13 +174,10 @@ def number_format(value, decimal_pos=None, use_l10n=None, force_grouping=False):
     Format a numeric value using localization settings.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), otherwise it's always localized.
     """
     if use_l10n is None:
-        try:
-            use_l10n = settings._USE_L10N_INTERNAL
-        except AttributeError:
-            use_l10n = settings.USE_L10N
+        use_l10n = True
     lang = get_language() if use_l10n else None
     return numberformat.format(
         value,
@@ -201,7 +196,7 @@ def localize(value, use_l10n=None):
     formatted as a string using current locale format.
 
     If use_l10n is provided and is not None, it forces the value to
-    be localized (or not), overriding the value of settings.USE_L10N.
+    be localized (or not), otherwise it's always localized.
     """
     if isinstance(value, str):  # Handle strings first for performance reasons.
         return value
@@ -216,7 +211,7 @@ def localize(value, use_l10n=None):
     elif isinstance(value, datetime.date):
         return date_format(value, use_l10n=use_l10n)
     elif isinstance(value, datetime.time):
-        return time_format(value, "TIME_FORMAT", use_l10n=use_l10n)
+        return time_format(value, use_l10n=use_l10n)
     return value
 
 

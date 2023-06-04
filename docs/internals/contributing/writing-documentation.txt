@@ -2,7 +2,7 @@
 Writing documentation
 =====================
 
-We place a high importance on consistency and readability of documentation.
+We place high importance on the consistency and readability of documentation.
 After all, Django was created in a journalism environment! So we treat our
 documentation like we treat our code: we aim to improve it as often as
 possible.
@@ -23,13 +23,13 @@ Getting the raw documentation
 
 Though Django's documentation is intended to be read as HTML at
 https://docs.djangoproject.com/, we edit it as a collection of text files for
-maximum flexibility. These files live in the top-level ``docs/`` directory of a
+maximum flexibility. These files live in the top-level :source:`docs/` directory of a
 Django release.
 
 If you'd like to start contributing to our docs, get the development version of
 Django from the source code repository
 (see :ref:`installing-development-version`). The development version has the
-latest-and-greatest documentation, just as it has latest-and-greatest code.
+latest-and-greatest documentation, just as it has the latest-and-greatest code.
 We also backport documentation fixes and improvements, at the discretion of the
 merger, to the last release branch. That's because it's highly advantageous to
 have the docs for the last release be up-to-date and correct (see
@@ -60,10 +60,11 @@ Then from the ``docs`` directory, build the HTML:
 To get started contributing, you'll want to read the :ref:`reStructuredText
 reference <sphinx:rst-index>`.
 
-Your locally-built documentation will be themed differently than the
-documentation at `docs.djangoproject.com <https://docs.djangoproject.com/>`_.
-This is OK! If your changes look good on your local machine, they'll look good
-on the website.
+Your locally-built documentation will be accessible at
+``docs/_build/html/index.html`` and it can be viewed in any web browser, though
+it will be themed differently than the documentation at
+`docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
+your changes look good on your local machine, they'll look good on the website.
 
 How the documentation is organized
 ==================================
@@ -92,7 +93,7 @@ The documentation is organized into several categories:
   Providing background context helps a newcomer connect the topic to things
   that they already know.
 
-* :doc:`Reference guides </ref/index>` contain technical reference for APIs.
+* :doc:`Reference guides </ref/index>` contain technical references for APIs.
   They describe the functioning of Django's internal machinery and instruct in
   its use.
 
@@ -120,7 +121,7 @@ Writing style
 =============
 
 When using pronouns in reference to a hypothetical person, such as "a user with
-a session cookie", gender neutral pronouns (they/their/them) should be used.
+a session cookie", gender-neutral pronouns (they/their/them) should be used.
 Instead of:
 
 * he or she... use they.
@@ -192,11 +193,15 @@ documentation:
   good reason.
 
 * The main thing to keep in mind as you write and edit docs is that the
-  more semantic markup you can add the better. So::
+  more semantic markup you can add the better. So:
+
+  .. code-block:: rst
 
       Add ``django.contrib.auth`` to your ``INSTALLED_APPS``...
 
-  Isn't nearly as helpful as::
+  Isn't nearly as helpful as:
+
+  .. code-block:: rst
 
       Add :mod:`django.contrib.auth` to your :setting:`INSTALLED_APPS`...
 
@@ -206,6 +211,9 @@ documentation:
   You can prefix the target with a ``~`` (that's a tilde) to get only the
   "last bit" of that path. So ``:mod:`~django.contrib.auth``` will
   display a link with the title "auth".
+
+* All Python code blocks should be formatted using the :pypi:`blacken-docs`
+  auto-formatter. This will be run by ``pre-commit`` if that is configured.
 
 * Use :mod:`~sphinx.ext.intersphinx` to reference Python's and Sphinx'
   documentation.
@@ -219,7 +227,9 @@ documentation:
 * To improve readability, use ``.. admonition:: Descriptive title`` rather than
   ``.. note::``. Use these boxes sparingly.
 
-* Use these heading styles::
+* Use these heading styles:
+
+  .. code-block:: rst
 
     ===
     One
@@ -252,50 +262,69 @@ documentation:
   also need to define a reference to the documentation for that environment
   variable using :rst:dir:`.. envvar:: <envvar>`.
 
+.. versionchanged:: 4.2
+
+    All Python code blocks in the Django documentation were reformatted with
+    :pypi:`blacken-docs`.
+
 Django-specific markup
 ======================
 
 Besides :ref:`Sphinx's built-in markup <sphinx:rst-index>`, Django's docs
 define some extra description units:
 
-* Settings::
+* Settings:
+
+  .. code-block:: rst
 
         .. setting:: INSTALLED_APPS
 
   To link to a setting, use ``:setting:`INSTALLED_APPS```.
 
-* Template tags::
+* Template tags:
+
+  .. code-block:: rst
 
         .. templatetag:: regroup
 
   To link, use ``:ttag:`regroup```.
 
-* Template filters::
+* Template filters:
+
+  .. code-block:: rst
 
         .. templatefilter:: linebreaksbr
 
   To link, use ``:tfilter:`linebreaksbr```.
 
-* Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``)::
+* Field lookups (i.e. ``Foo.objects.filter(bar__exact=whatever)``):
+
+  .. code-block:: rst
 
         .. fieldlookup:: exact
 
   To link, use ``:lookup:`exact```.
 
-* ``django-admin`` commands::
+* ``django-admin`` commands:
+
+  .. code-block:: rst
 
         .. django-admin:: migrate
 
   To link, use ``:djadmin:`migrate```.
 
-* ``django-admin`` command-line options::
+* ``django-admin`` command-line options:
+
+  .. code-block:: rst
 
         .. django-admin-option:: --traceback
 
   To link, use ``:option:`command_name --traceback``` (or omit ``command_name``
   for the options shared by all commands like ``--verbosity``).
 
-* Links to Trac tickets (typically reserved for patch release notes)::
+* Links to Trac tickets (typically reserved for patch release notes):
+
+  .. code-block:: rst
 
         :ticket:`12345`
 
@@ -304,7 +333,9 @@ command-line examples involving ``django-admin``, ``manage.py``, ``python``,
 etc.). In the HTML documentation, it renders a two-tab UI, with one tab showing
 a Unix-style command prompt and a second tab showing a Windows prompt.
 
-For example, you can replace this fragment::
+For example, you can replace this fragment:
+
+.. code-block:: rst
 
     use this command:
 
@@ -312,7 +343,9 @@ For example, you can replace this fragment::
 
         $ python manage.py shell
 
-with this one::
+with this one:
+
+.. code-block:: rst
 
     use this command:
 
@@ -351,7 +384,7 @@ Documenting new features
 Our policy for new features is:
 
     All documentation of new features should be written in a way that
-    clearly designates the features are only available in the Django
+    clearly designates the features that are only available in the Django
     development version. Assume documentation readers are using the latest
     release, not the development version.
 
@@ -359,7 +392,7 @@ Our preferred way for marking new features is by prefacing the features'
 documentation with: "``.. versionadded:: X.Y``", followed by a mandatory
 blank line and an optional description (indented).
 
-General improvements, or other changes to the APIs that should be emphasized
+General improvements or other changes to the APIs that should be emphasized
 should use the "``.. versionchanged:: X.Y``" directive (with the same format
 as the ``versionadded`` mentioned above.
 
@@ -368,7 +401,9 @@ In other words, since we only keep these annotations around for two releases,
 it's nice to be able to remove the annotation and its contents without having
 to reflow, reindent, or edit the surrounding text. For example, instead of
 putting the entire description of a new or changed feature in a block, do
-something like this::
+something like this:
+
+.. code-block:: rst
 
     .. class:: Author(first_name, last_name, middle_name=None)
 
@@ -392,7 +427,9 @@ redundant to do so as these annotations render as "New in Django A.B:" and
 "Changed in Django A.B", respectively.
 
 If a function, attribute, etc. is added, it's also okay to use a
-``versionadded`` annotation like this::
+``versionadded`` annotation like this:
+
+.. code-block:: rst
 
     .. attribute:: Author.middle_name
 
@@ -461,7 +498,7 @@ example:
     You can find both in the :doc:`settings reference document
     </ref/settings>`.
 
-  We use the Sphinx :rst:role:`doc` cross reference element when we want to
+  We use the Sphinx :rst:role:`doc` cross-reference element when we want to
   link to another document as a whole and the :rst:role:`ref` element when
   we want to link to an arbitrary location in a document.
 
@@ -481,7 +518,7 @@ example:
     with the full exception information. Each member of the list should be a tuple
     of (Full name, email address). Example::
 
-        [('John', 'john@example.com'), ('Mary', 'mary@example.com')]
+        [("John", "john@example.com"), ("Mary", "mary@example.com")]
 
     Note that Django will email *all* of these people whenever an error happens.
     See :doc:`/howto/error-reporting` for more information.
@@ -498,8 +535,7 @@ Spelling check
 ==============
 
 Before you commit your docs, it's a good idea to run the spelling checker.
-You'll need to install `sphinxcontrib-spelling
-<https://pypi.org/project/sphinxcontrib-spelling/>`_ first. Then from the
+You'll need to install :pypi:`sphinxcontrib-spelling` first. Then from the
 ``docs`` directory, run ``make spelling``. Wrong words (if any) along with the
 file and line number where they occur will be saved to
 ``_build/spelling/output.txt``.
@@ -531,7 +567,7 @@ Entries that have a status of "broken" need to be fixed. Those that have a
 status of "redirected" may need to be updated to point to the canonical
 location, e.g. the scheme has changed ``http://`` → ``https://``. In certain
 cases, we do not want to update a "redirected" link, e.g. a rewrite to always
-point to the latest or stable version of documentation, e.g. ``/en/stable/`` →
+point to the latest or stable version of the documentation, e.g. ``/en/stable/`` →
 ``/en/3.2/``.
 
 Translating documentation

@@ -14,9 +14,9 @@ from django.utils.crypto import (
     RANDOM_STRING_CHARS,
     constant_time_compare,
     get_random_string,
-    md5,
     pbkdf2,
 )
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.module_loading import import_string
 from django.utils.translation import gettext_noop as _
 
@@ -34,23 +34,21 @@ def is_password_usable(encoded):
     return encoded is None or not encoded.startswith(UNUSABLE_PASSWORD_PREFIX)
 
 
-def check_password(password, encoded, setter=None, preferred="default"):
+def verify_password(password, encoded, preferred="default"):
     """
-    Return a boolean of whether the raw password matches the three
-    part encoded digest.
-
-    If setter is specified, it'll be called when you need to
-    regenerate the password.
+    Return two booleans. The first is whether the raw password matches the
+    three part encoded digest, and the second whether to regenerate the
+    password.
     """
     if password is None or not is_password_usable(encoded):
-        return False
+        return False, False
 
     preferred = get_hasher(preferred)
     try:
         hasher = identify_hasher(encoded)
     except ValueError:
         # encoded is gibberish or uses a hasher that's no longer installed.
-        return False
+        return False, False
 
     hasher_changed = hasher.algorithm != preferred.algorithm
     must_update = hasher_changed or preferred.must_update(encoded)
@@ -63,8 +61,28 @@ def check_password(password, encoded, setter=None, preferred="default"):
     if not is_correct and not hasher_changed and must_update:
         hasher.harden_runtime(password, encoded)
 
+    return is_correct, must_update
+
+
+def check_password(password, encoded, setter=None, preferred="default"):
+    """
+    Return a boolean of whether the raw password matches the three part encoded
+    digest.
+
+    If setter is specified, it'll be called when you need to regenerate the
+    password.
+    """
+    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
     if setter and is_correct and must_update:
         setter(password)
+    return is_correct
+
+
+async def acheck_password(password, encoded, setter=None, preferred="default"):
+    """See check_password()."""
+    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
+    if setter and is_correct and must_update:
+        await setter(password)
     return is_correct
 
 
@@ -295,7 +313,7 @@ class PBKDF2PasswordHasher(BasePasswordHasher):
     """
 
     algorithm = "pbkdf2_sha256"
-    iterations = 390000
+    iterations = 720000
     digest = hashlib.sha256
 
     def encode(self, password, salt, iterations=None):
@@ -623,12 +641,21 @@ class ScryptPasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class SHA1PasswordHasher(BasePasswordHasher):
     """
     The SHA1 password hashing algorithm (not recommended)
     """
 
     algorithm = "sha1"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.SHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
@@ -674,7 +701,7 @@ class MD5PasswordHasher(BasePasswordHasher):
 
     def encode(self, password, salt):
         self._check_encode_args(password, salt)
-        hash = md5((salt + password).encode()).hexdigest()
+        hash = hashlib.md5((salt + password).encode()).hexdigest()
         return "%s$%s$%s" % (self.algorithm, salt, hash)
 
     def decode(self, encoded):
@@ -707,6 +734,7 @@ class MD5PasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     """
     Very insecure algorithm that you should *never* use; store SHA1 hashes
@@ -718,6 +746,14 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
     """
 
     algorithm = "unsalted_sha1"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
     def salt(self):
         return ""
@@ -751,6 +787,7 @@ class UnsaltedSHA1PasswordHasher(BasePasswordHasher):
         pass
 
 
+# RemovedInDjango51Warning.
 class UnsaltedMD5PasswordHasher(BasePasswordHasher):
     """
     Incredibly insecure algorithm that you should *never* use; stores unsalted
@@ -765,13 +802,21 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
 
     algorithm = "unsalted_md5"
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher is deprecated.",
+            RemovedInDjango51Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
     def salt(self):
         return ""
 
     def encode(self, password, salt):
         if salt != "":
             raise ValueError("salt must be empty.")
-        return md5(password.encode()).hexdigest()
+        return hashlib.md5(password.encode()).hexdigest()
 
     def decode(self, encoded):
         return {
@@ -781,8 +826,8 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         }
 
     def verify(self, password, encoded):
-        if len(encoded) == 37 and encoded.startswith("md5$$"):
-            encoded = encoded[5:]
+        if len(encoded) == 37:
+            encoded = encoded.removeprefix("md5$$")
         encoded_2 = self.encode(password, "")
         return constant_time_compare(encoded, encoded_2)
 
@@ -790,56 +835,6 @@ class UnsaltedMD5PasswordHasher(BasePasswordHasher):
         decoded = self.decode(encoded)
         return {
             _("algorithm"): decoded["algorithm"],
-            _("hash"): mask_hash(decoded["hash"], show=3),
-        }
-
-    def harden_runtime(self, password, encoded):
-        pass
-
-
-class CryptPasswordHasher(BasePasswordHasher):
-    """
-    Password hashing using UNIX crypt (not recommended)
-
-    The crypt module is not supported on all platforms.
-    """
-
-    algorithm = "crypt"
-    library = "crypt"
-
-    def salt(self):
-        return get_random_string(2)
-
-    def encode(self, password, salt):
-        crypt = self._load_library()
-        if len(salt) != 2:
-            raise ValueError("salt must be of length 2.")
-        hash = crypt.crypt(password, salt)
-        if hash is None:  # A platform like OpenBSD with a dummy crypt module.
-            raise TypeError("hash must be provided.")
-        # we don't need to store the salt, but Django used to do this
-        return "%s$%s$%s" % (self.algorithm, "", hash)
-
-    def decode(self, encoded):
-        algorithm, salt, hash = encoded.split("$", 2)
-        assert algorithm == self.algorithm
-        return {
-            "algorithm": algorithm,
-            "hash": hash,
-            "salt": salt,
-        }
-
-    def verify(self, password, encoded):
-        crypt = self._load_library()
-        decoded = self.decode(encoded)
-        data = crypt.crypt(password, decoded["hash"])
-        return constant_time_compare(decoded["hash"], data)
-
-    def safe_summary(self, encoded):
-        decoded = self.decode(encoded)
-        return {
-            _("algorithm"): decoded["algorithm"],
-            _("salt"): decoded["salt"],
             _("hash"): mask_hash(decoded["hash"], show=3),
         }
 

@@ -59,7 +59,7 @@ _json_script_escapes = {
 }
 
 
-def json_script(value, element_id=None):
+def json_script(value, element_id=None, encoder=None):
     """
     Escape all the HTML/XML special characters with their unicode escapes, so
     value is safe to be output anywhere except for inside a tag attribute. Wrap
@@ -67,7 +67,9 @@ def json_script(value, element_id=None):
     """
     from django.core.serializers.json import DjangoJSONEncoder
 
-    json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
+    json_str = json.dumps(value, cls=encoder or DjangoJSONEncoder).translate(
+        _json_script_escapes
+    )
     if element_id:
         template = '<script id="{}" type="application/json">{}</script>'
         args = (element_id, mark_safe(json_str))
@@ -191,9 +193,8 @@ def smart_urlquote(url):
 
     def unquote_quote(segment):
         segment = unquote(segment)
-        # Tilde is part of RFC3986 Unreserved Characters
-        # https://tools.ietf.org/html/rfc3986#section-2.3
-        # See also https://bugs.python.org/issue16285
+        # Tilde is part of RFC 3986 Section 2.3 Unreserved Characters,
+        # see also https://bugs.python.org/issue16285
         return quote(segment, safe=RFC3986_SUBDELIMS + RFC3986_GENDELIMS + "~")
 
     # Handle IDN before quoting.
@@ -342,7 +343,7 @@ class Urlizer:
             # Trim wrapping punctuation.
             for opening, closing in self.wrapping_punctuation:
                 if middle.startswith(opening):
-                    middle = middle[len(opening) :]
+                    middle = middle.removeprefix(opening)
                     lead += opening
                     trimmed_something = True
                 # Keep parentheses at the end only if they're balanced.
@@ -350,7 +351,7 @@ class Urlizer:
                     middle.endswith(closing)
                     and middle.count(closing) == middle.count(opening) + 1
                 ):
-                    middle = middle[: -len(closing)]
+                    middle = middle.removesuffix(closing)
                     trail = closing + trail
                     trimmed_something = True
             # Trim trailing punctuation (after trimming wrapping punctuation,

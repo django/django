@@ -1,0 +1,45 @@
+==========================
+Django 4.2.2 release notes
+==========================
+
+*Expected June 5, 2023*
+
+Django 4.2.2 fixes several bugs in 4.2.1.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 4.2 that caused an unnecessary
+  ``DBMS_LOB.SUBSTR()`` wrapping in the ``__isnull`` and ``__exact=None``
+  lookups for ``TextField()``/``BinaryField()`` on Oracle (:ticket:`34544`).
+
+* Restored, following a regression in Django 4.2, ``get_prep_value()`` call in
+  ``JSONField`` subclasses (:ticket:`34539`).
+
+* Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.defer()``
+  when passing a ``ManyToManyField`` or ``GenericForeignKey`` reference. While
+  doing so is a no-op, it was allowed in older version (:ticket:`34570`).
+
+* Fixed a regression in Django 4.2 that caused a crash of ``QuerySet.only()``
+  when passing a reverse ``OneToOneField`` reference (:ticket:`34612`).
+
+* Fixed a bug in Django 4.2 where :option:`makemigrations --update` didn't
+  respect the ``--name`` option (:ticket:`34568`).
+
+* Fixed a performance regression in Django 4.2 when compiling queries without
+  ordering (:ticket:`34580`).
+
+* Fixed a regression in Django 4.2 where nonexistent stylesheet was linked on a
+  “Congratulations!” page (:ticket:`34588`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with expressions referencing other aggregates
+  (:ticket:`34551`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with aggregates referencing subqueries
+  (:ticket:`34551`).
+
+* Fixed a regression in Django 4.2 that caused a crash of querysets on SQLite
+  when filtering on ``DecimalField`` against values outside of the defined
+  range (:ticket:`34590`).

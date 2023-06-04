@@ -118,19 +118,20 @@ def mark_for_rollback_on_error(using=None):
     """
     try:
         yield
-    except Exception:
+    except Exception as exc:
         connection = get_connection(using)
         if connection.in_atomic_block:
             connection.needs_rollback = True
+            connection.rollback_exc = exc
         raise
 
 
-def on_commit(func, using=None):
+def on_commit(func, using=None, robust=False):
     """
     Register `func` to be called when the current transaction is committed.
     If the current transaction is rolled back, `func` will not be called.
     """
-    get_connection(using).on_commit(func)
+    get_connection(using).on_commit(func, robust)
 
 
 #################################

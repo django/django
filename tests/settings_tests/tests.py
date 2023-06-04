@@ -4,13 +4,7 @@ import unittest
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
-from django.conf import (
-    ENVIRONMENT_VARIABLE,
-    USE_DEPRECATED_PYTZ_DEPRECATED_MSG,
-    LazySettings,
-    Settings,
-    settings,
-)
+from django.conf import ENVIRONMENT_VARIABLE, LazySettings, Settings, settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest
 from django.test import (
@@ -23,7 +17,6 @@ from django.test import (
 )
 from django.test.utils import requires_tz_support
 from django.urls import clear_script_prefix, set_script_prefix
-from django.utils.deprecation import RemovedInDjango50Warning
 
 
 @modify_settings(ITEMS={"prepend": ["b"], "append": ["d"], "remove": ["a", "e"]})
@@ -31,7 +24,6 @@ from django.utils.deprecation import RemovedInDjango50Warning
     ITEMS=["a", "c", "e"], ITEMS_OUTER=[1, 2, 3], TEST="override", TEST_OUTER="outer"
 )
 class FullyDecoratedTranTestCase(TransactionTestCase):
-
     available_apps = []
 
     def test_override(self):
@@ -347,40 +339,6 @@ class SettingsTests(SimpleTestCase):
     def test_incorrect_timezone(self):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()
-
-    def test_use_tz_false_deprecation(self):
-        settings_module = ModuleType("fake_settings_module")
-        settings_module.SECRET_KEY = "foo"
-        sys.modules["fake_settings_module"] = settings_module
-        msg = (
-            "The default value of USE_TZ will change from False to True in "
-            "Django 5.0. Set USE_TZ to False in your project settings if you "
-            "want to keep the current default behavior."
-        )
-        try:
-            with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-                Settings("fake_settings_module")
-        finally:
-            del sys.modules["fake_settings_module"]
-
-    def test_use_deprecated_pytz_deprecation(self):
-        settings_module = ModuleType("fake_settings_module")
-        settings_module.USE_DEPRECATED_PYTZ = True
-        settings_module.USE_TZ = True
-        sys.modules["fake_settings_module"] = settings_module
-        try:
-            with self.assertRaisesMessage(
-                RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG
-            ):
-                Settings("fake_settings_module")
-        finally:
-            del sys.modules["fake_settings_module"]
-
-        holder = LazySettings()
-        with self.assertRaisesMessage(
-            RemovedInDjango50Warning, USE_DEPRECATED_PYTZ_DEPRECATED_MSG
-        ):
-            holder.configure(USE_DEPRECATED_PYTZ=True)
 
 
 class TestComplexSettingOverride(SimpleTestCase):

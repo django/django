@@ -45,7 +45,6 @@ input[type="submit"], button {
 
     #branding h1 {
         margin: 0 0 8px;
-        font-size: 1.25rem;
         line-height: 1.2;
     }
 
@@ -105,13 +104,13 @@ input[type="submit"], button {
     }
 
     #changelist-search label {
-        line-height: 22px;
+        line-height: 1.375rem;
     }
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
-        height: 22px;
+        height: 1.375rem;
         margin: 0 10px 0 6px;
     }
 
@@ -187,23 +186,17 @@ input[type="submit"], button {
         box-sizing: border-box;
         margin: 0;
         padding: 6px 8px;
-        min-height: 36px;
+        min-height: 2.25rem;
         font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 36px;
+        height: 2.25rem;
     }
 
     .form-row select[multiple] {
         height: auto;
         min-height: 0;
-    }
-
-    fieldset .fieldBox {
-        float: none;
-        margin: 0 -10px;
-        padding: 0 10px;
     }
 
     fieldset .fieldBox + .fieldBox {
@@ -233,15 +226,11 @@ input[type="submit"], button {
     }
 
     .submit-row {
-        padding: 8px 8px 3px 8px;
+        padding: 8px;
     }
 
     .submit-row a.deletelink {
         padding: 10px 7px;
-    }
-
-    .submit-row input.default {
-        margin: 0 0 5px 5px;
     }
 
     .button, input[type=submit], input[type=button], .submit-row input, a.button {
@@ -393,10 +382,6 @@ input[type="submit"], button {
 
     .help-tooltip, .selector .help-icon {
         display: none;
-    }
-
-    form .form-row p.datetime {
-        width: 100%;
     }
 
     .datetime input {
@@ -569,13 +554,15 @@ input[type="submit"], button {
 
     .aligned .form-row,
     .aligned .form-row > div {
-        display: flex;
-        flex-wrap: wrap;
         max-width: 100vw;
     }
 
     .aligned .form-row > div {
         width: calc(100vw - 30px);
+    }
+
+    .flex-container {
+        flex-flow: column;
     }
 
     textarea {
@@ -633,7 +620,6 @@ input[type="submit"], button {
     }
 
     .aligned p.file-upload {
-        margin-left: 0;
         font-size: 0.8125rem;
     }
 
@@ -657,7 +643,8 @@ input[type="submit"], button {
         padding: 0;
     }
 
-    form .aligned ul {
+    form .aligned ul,
+    form .aligned ul.errorlist {
         margin-left: 0;
         padding-left: 0;
     }
@@ -824,28 +811,23 @@ input[type="submit"], button {
     /* Submit row */
 
     .submit-row {
-        padding: 10px 10px 5px;
+        padding: 10px;
         margin: 0 0 15px;
-        display: flex;
         flex-direction: column;
+        gap: 8px;
     }
 
-    .submit-row > * {
-        width: 100%;
-    }
-
-    .submit-row input, .submit-row input.default, .submit-row a, .submit-row a.closelink {
-        float: none;
-        margin: 0 0 10px;
+    .submit-row input, .submit-row input.default, .submit-row a {
         text-align: center;
     }
 
     .submit-row a.closelink {
         padding: 10px 0;
+        text-align: center;
     }
 
-    .submit-row p.deletelink-box {
-        order: 4;
+    .submit-row a.deletelink {
+        margin: 0;
     }
 
     /* Messages */
@@ -967,7 +949,7 @@ input[type="submit"], button {
     .calendar-shortcuts {
         padding: 10px 0;
         font-size: 0.75rem;
-        line-height: 12px;
+        line-height: 0.75rem;
     }
 
     .calendar-shortcuts a {

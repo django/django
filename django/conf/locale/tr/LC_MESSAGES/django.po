@@ -2,7 +2,7 @@
 #
 # Translators:
 # Ahmet Emre Aladağ <emre.aladag@isik.edu.tr>, 2013
-# BouRock, 2015-2021
+# BouRock, 2015-2023
 # BouRock, 2014-2015
 # Caner Başaran <basaran.caner@gmail.com>, 2013
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2012
@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-19 17:51+0000\n"
-"Last-Translator: BouRock\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: BouRock, 2015-2023\n"
 "Language-Team: Turkish (http://www.transifex.com/django/django/language/"
 "tr/)\n"
 "MIME-Version: 1.0\n"
@@ -60,6 +60,9 @@ msgstr "Boşnakça"
 
 msgid "Catalan"
 msgstr "Katalanca"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Orta Kürtçe (Sorani)"
 
 msgid "Czech"
 msgstr "Çekçe"
@@ -397,6 +400,11 @@ msgstr ""
 "Bu değerin %(limit_value)s değerinden büyük veya eşit olduğuna emin olun."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Bu değerin %(limit_value)s adım boyutunun katları olduğundan emin olun."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -468,6 +476,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Bu %(field_labels)s alanına sahip %(model_name)s zaten mevcut."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "\"%(name)s\" kısıtlaması ihlal edildi."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "%(value)r değeri geçerli bir seçim değil."
 
@@ -481,8 +493,8 @@ msgstr "Bu alan boş olamaz."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Bu %(field_label)s alanına sahip %(model_name)s zaten mevcut."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -508,6 +520,9 @@ msgstr "Boolean (Ya True ya da False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Dizgi (%(max_length)s karaktere kadar)"
+
+msgid "String (unlimited)"
+msgstr "Dizgi (sınırsız)"
 
 msgid "Comma-separated integers"
 msgstr "Virgülle ayrılmış tamsayılar"
@@ -781,16 +796,16 @@ msgstr ""
 "%(field_names)s. Sorun devam ederse bir hata raporu dosyalamanız gerekebilir."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Lütfen en fazla %d form gönderin."
-msgstr[1] "Lütfen en fazla %d form gönderin."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Lütfen en fazla %(num)d form gönderin."
+msgstr[1] "Lütfen en fazla %(num)d form gönderin."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Lütfen en az %d form gönderin."
-msgstr[1] "Lütfen en az %d form gönderin."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Lütfen en az %(num)d form gönderin."
+msgstr[1] "Lütfen en az %(num)d form gönderin."
 
 msgid "Order"
 msgstr "Sıralama"
@@ -1194,8 +1209,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Eğer <meta name=\"referrer\" content=\"no-referrer\"> etiketi "
 "kullanıyorsanız ya da “Referrer-Policy: no-referrer” üstbilgisini dahil "
@@ -1297,14 +1312,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Bu sayfayı görüyorsunuz çünkü <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> parametresi ayarlar dosyanızın içindedir ve herhangi bir "
-"URL yapılandırmadınız."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> parametresi ayarlar dosyanızın içindedir ve "
+"herhangi bir URL yapılandırmadınız."
 
 msgid "Django Documentation"
 msgstr "Django Belgeleri"

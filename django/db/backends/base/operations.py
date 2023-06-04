@@ -1,5 +1,6 @@
 import datetime
 import decimal
+import json
 from importlib import import_module
 
 import sqlparse
@@ -7,6 +8,7 @@ import sqlparse
 from django.conf import settings
 from django.db import NotSupportedError, transaction
 from django.db.backends import utils
+from django.db.models.expressions import Col
 from django.utils import timezone
 from django.utils.encoding import force_str
 
@@ -100,7 +102,7 @@ class BaseDatabaseOperations:
         """
         return "%s"
 
-    def date_extract_sql(self, lookup_type, field_name):
+    def date_extract_sql(self, lookup_type, sql, params):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         extracts a value from the given date field field_name.
@@ -110,7 +112,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def date_trunc_sql(self, lookup_type, field_name, tzname=None):
+    def date_trunc_sql(self, lookup_type, sql, params, tzname=None):
         """
         Given a lookup_type of 'year', 'month', or 'day', return the SQL that
         truncates the given date or datetime field field_name to a date object
@@ -124,7 +126,7 @@ class BaseDatabaseOperations:
             "method."
         )
 
-    def datetime_cast_date_sql(self, field_name, tzname):
+    def datetime_cast_date_sql(self, sql, params, tzname):
         """
         Return the SQL to cast a datetime value to date value.
         """
@@ -133,7 +135,7 @@ class BaseDatabaseOperations:
             "datetime_cast_date_sql() method."
         )
 
-    def datetime_cast_time_sql(self, field_name, tzname):
+    def datetime_cast_time_sql(self, sql, params, tzname):
         """
         Return the SQL to cast a datetime value to time value.
         """
@@ -142,7 +144,7 @@ class BaseDatabaseOperations:
             "datetime_cast_time_sql() method"
         )
 
-    def datetime_extract_sql(self, lookup_type, field_name, tzname):
+    def datetime_extract_sql(self, lookup_type, sql, params, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
         'second', return the SQL that extracts a value from the given
@@ -153,7 +155,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def datetime_trunc_sql(self, lookup_type, field_name, tzname):
+    def datetime_trunc_sql(self, lookup_type, sql, params, tzname):
         """
         Given a lookup_type of 'year', 'month', 'day', 'hour', 'minute', or
         'second', return the SQL that truncates the given datetime field
@@ -164,7 +166,7 @@ class BaseDatabaseOperations:
             "method"
         )
 
-    def time_trunc_sql(self, lookup_type, field_name, tzname=None):
+    def time_trunc_sql(self, lookup_type, sql, params, tzname=None):
         """
         Given a lookup_type of 'hour', 'minute' or 'second', return the SQL
         that truncates the given time or datetime field field_name to a time
@@ -177,12 +179,12 @@ class BaseDatabaseOperations:
             "subclasses of BaseDatabaseOperations may require a time_trunc_sql() method"
         )
 
-    def time_extract_sql(self, lookup_type, field_name):
+    def time_extract_sql(self, lookup_type, sql, params):
         """
         Given a lookup_type of 'hour', 'minute', or 'second', return the SQL
         that extracts a value from the given time field field_name.
         """
-        return self.date_extract_sql(lookup_type, field_name)
+        return self.date_extract_sql(lookup_type, sql, params)
 
     def deferrable_sql(self):
         """
@@ -268,6 +270,7 @@ class BaseDatabaseOperations:
         exists for database backends to provide a better implementation
         according to their own quoting schemes.
         """
+
         # Convert params to contain string values.
         def to_string(s):
             return force_str(s, strings_only=True, errors="replace")
@@ -524,6 +527,9 @@ class BaseDatabaseOperations:
         else:
             return value
 
+    def adapt_integerfield_value(self, value, internal_type):
+        return value
+
     def adapt_datefield_value(self, value):
         """
         Transform a date value to an object compatible with what is expected
@@ -574,6 +580,9 @@ class BaseDatabaseOperations:
         type for the backend driver.
         """
         return value or None
+
+    def adapt_json_value(self, value, encoder):
+        return json.dumps(value, cls=encoder)
 
     def year_lookup_bounds_for_date_field(self, value, iso_year=False):
         """
@@ -768,3 +777,9 @@ class BaseDatabaseOperations:
 
     def on_conflict_suffix_sql(self, fields, on_conflict, update_fields, unique_fields):
         return ""
+
+    def prepare_join_on_clause(self, lhs_table, lhs_field, rhs_table, rhs_field):
+        lhs_expr = Col(lhs_table, lhs_field)
+        rhs_expr = Col(rhs_table, rhs_field)
+
+        return lhs_expr, rhs_expr

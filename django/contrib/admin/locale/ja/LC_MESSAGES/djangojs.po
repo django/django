@@ -3,15 +3,16 @@
 # Translators:
 # Goto Hayato <habita.gh@gmail.com>, 2021
 # Jannis Leidel <jannis@leidel.info>, 2011
-# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016
+# Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023
+# Taichi Taniguchi, 2022
 # Takuro Onoue <kusanaginoturugi@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-07-02 13:55+0000\n"
-"Last-Translator: Goto Hayato <habita.gh@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2012,2014-2016,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -64,12 +65,21 @@ msgstr ""
 "これが選択された %s のリストです。下のボックスで選択し、2つのボックス間の "
 "\"削除\"矢印をクリックして一部を削除することができます。"
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "選択された%sのリストを絞り込むには、このボックスに入力します。"
+
 msgid "Remove all"
 msgstr "すべて削除"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "クリックするとすべての %s を選択から削除します。"
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "選択された%s件のオプションは非表示です。"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"

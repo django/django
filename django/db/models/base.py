@@ -4,6 +4,8 @@ import warnings
 from functools import partialmethod
 from itertools import chain
 
+from asgiref.sync import sync_to_async
+
 import django
 from django.apps import apps
 from django.conf import settings
@@ -28,6 +30,7 @@ from django.db.models import NOT_PROVIDED, ExpressionWrapper, IntegerField, Max,
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.deletion import CASCADE, Collector
+from django.db.models.expressions import RawSQL
 from django.db.models.fields.related import (
     ForeignObjectRel,
     OneToOneField,
@@ -45,7 +48,7 @@ from django.db.models.signals import (
     pre_init,
     pre_save,
 )
-from django.db.models.utils import make_model_tuple
+from django.db.models.utils import AltersData, make_model_tuple
 from django.utils.encoding import force_str
 from django.utils.hashable import make_hashable
 from django.utils.text import capfirst, get_text_list
@@ -433,18 +436,11 @@ class ModelBase(type):
         return cls._meta.default_manager
 
 
-class ModelStateCacheDescriptor:
-    """
-    Upon first access, replace itself with an empty dictionary on the instance.
-    """
-
-    def __set_name__(self, owner, name):
-        self.attribute_name = name
-
+class ModelStateFieldsCacheDescriptor:
     def __get__(self, instance, cls=None):
         if instance is None:
             return self
-        res = instance.__dict__[self.attribute_name] = {}
+        res = instance.fields_cache = {}
         return res
 
 
@@ -457,23 +453,10 @@ class ModelState:
     # explicit (non-auto) PKs. This impacts validation only; it has no effect
     # on the actual save.
     adding = True
-    fields_cache = ModelStateCacheDescriptor()
-    related_managers_cache = ModelStateCacheDescriptor()
-
-    def __getstate__(self):
-        state = self.__dict__.copy()
-        if "fields_cache" in state:
-            state["fields_cache"] = self.fields_cache.copy()
-        # Manager instances stored in related_managers_cache won't necessarily
-        # be deserializable if they were dynamically created via an inner
-        # scope, e.g. create_forward_many_to_many_manager() and
-        # create_generic_related_manager().
-        if "related_managers_cache" in state:
-            state["related_managers_cache"] = {}
-        return state
+    fields_cache = ModelStateFieldsCacheDescriptor()
 
 
-class Model(metaclass=ModelBase):
+class Model(AltersData, metaclass=ModelBase):
     def __init__(self, *args, **kwargs):
         # Alias some things as locals to avoid repeat global lookups
         cls = self.__class__
@@ -632,6 +615,7 @@ class Model(metaclass=ModelBase):
         """Hook to allow choosing the attributes to pickle."""
         state = self.__dict__.copy()
         state["_state"] = copy.copy(state["_state"])
+        state["_state"].fields_cache = state["_state"].fields_cache.copy()
         # memoryview cannot be pickled, so cast it to bytes and store
         # separately.
         _memoryview_attrs = []
@@ -753,7 +737,15 @@ class Model(metaclass=ModelBase):
             if field.is_cached(self):
                 field.delete_cached_value(self)
 
+        # Clear cached private relations.
+        for field in self._meta.private_fields:
+            if field.is_relation and field.is_cached(self):
+                field.delete_cached_value(self)
+
         self._state.db = db_instance._state.db
+
+    async def arefresh_from_db(self, using=None, fields=None):
+        return await sync_to_async(self.refresh_from_db)(using=using, fields=fields)
 
     def serializable_value(self, field_name):
         """
@@ -798,15 +790,7 @@ class Model(metaclass=ModelBase):
                 return
 
             update_fields = frozenset(update_fields)
-            field_names = set()
-
-            for field in self._meta.concrete_fields:
-                if not field.primary_key:
-                    field_names.add(field.name)
-
-                    if field.name != field.attname:
-                        field_names.add(field.attname)
-
+            field_names = self._meta._non_pk_concrete_field_names
             non_model_fields = update_fields.difference(field_names)
 
             if non_model_fields:
@@ -835,6 +819,18 @@ class Model(metaclass=ModelBase):
         )
 
     save.alters_data = True
+
+    async def asave(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        return await sync_to_async(self.save)(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
+
+    asave.alters_data = True
 
     def save_base(
         self,
@@ -975,8 +971,10 @@ class Model(metaclass=ModelBase):
             not raw
             and not force_insert
             and self._state.adding
-            and meta.pk.default
-            and meta.pk.default is not NOT_PROVIDED
+            and (
+                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
+                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
+            )
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -1099,9 +1097,9 @@ class Model(metaclass=ModelBase):
                         "related object '%s'." % (operation_name, field.name)
                     )
                 elif getattr(self, field.attname) in field.empty_values:
-                    # Use pk from related object if it has been saved after
-                    # an assignment.
-                    setattr(self, field.attname, obj.pk)
+                    # Set related object if it has been saved after an
+                    # assignment.
+                    setattr(self, field.name, obj)
                 # If the relationship's pk/to_field was changed, clear the
                 # cached relationship.
                 if getattr(obj, field.target_field.attname) != getattr(
@@ -1137,6 +1135,14 @@ class Model(metaclass=ModelBase):
 
     delete.alters_data = True
 
+    async def adelete(self, using=None, keep_parents=False):
+        return await sync_to_async(self.delete)(
+            using=using,
+            keep_parents=keep_parents,
+        )
+
+    adelete.alters_data = True
+
     def _get_FIELD_display(self, field):
         value = getattr(self, field.attname)
         choices_dict = dict(make_hashable(field.flatchoices))
@@ -1151,8 +1157,8 @@ class Model(metaclass=ModelBase):
         op = "gt" if is_next else "lt"
         order = "" if is_next else "-"
         param = getattr(self, field.attname)
-        q = Q((field.name, param), (f"pk__{op}", self.pk), _connector=Q.AND)
-        q = Q(q, (f"{field.name}__{op}", param), _connector=Q.OR)
+        q = Q.create([(field.name, param), (f"pk__{op}", self.pk)], connector=Q.AND)
+        q = Q.create([q, (f"{field.name}__{op}", param)], connector=Q.OR)
         qs = (
             self.__class__._default_manager.using(self._state.db)
             .filter(**kwargs)
@@ -1189,6 +1195,16 @@ class Model(metaclass=ModelBase):
             setattr(self, cachename, obj)
         return getattr(self, cachename)
 
+    def _get_field_value_map(self, meta, exclude=None):
+        if exclude is None:
+            exclude = set()
+        meta = meta or self._meta
+        return {
+            field.name: Value(getattr(self, field.attname), field)
+            for field in meta.local_concrete_fields
+            if field.name not in exclude
+        }
+
     def prepare_database_save(self, field):
         if self.pk is None:
             raise ValueError(
@@ -1221,7 +1237,7 @@ class Model(metaclass=ModelBase):
         if errors:
             raise ValidationError(errors)
 
-    def _get_unique_checks(self, exclude=None):
+    def _get_unique_checks(self, exclude=None, include_meta_constraints=False):
         """
         Return a list of checks to perform. Since validate_unique() could be
         called from a ModelForm, some fields may have been excluded; we can't
@@ -1234,13 +1250,15 @@ class Model(metaclass=ModelBase):
         unique_checks = []
 
         unique_togethers = [(self.__class__, self._meta.unique_together)]
-        constraints = [(self.__class__, self._meta.total_unique_constraints)]
+        constraints = []
+        if include_meta_constraints:
+            constraints = [(self.__class__, self._meta.total_unique_constraints)]
         for parent_class in self._meta.get_parent_list():
             if parent_class._meta.unique_together:
                 unique_togethers.append(
                     (parent_class, parent_class._meta.unique_together)
                 )
-            if parent_class._meta.total_unique_constraints:
+            if include_meta_constraints and parent_class._meta.total_unique_constraints:
                 constraints.append(
                     (parent_class, parent_class._meta.total_unique_constraints)
                 )
@@ -1251,10 +1269,11 @@ class Model(metaclass=ModelBase):
                     # Add the check if the field isn't excluded.
                     unique_checks.append((model_class, tuple(check)))
 
-        for model_class, model_constraints in constraints:
-            for constraint in model_constraints:
-                if not any(name in exclude for name in constraint.fields):
-                    unique_checks.append((model_class, constraint.fields))
+        if include_meta_constraints:
+            for model_class, model_constraints in constraints:
+                for constraint in model_constraints:
+                    if not any(name in exclude for name in constraint.fields):
+                        unique_checks.append((model_class, constraint.fields))
 
         # These are checks for the unique_for_<date/year/month>.
         date_checks = []
@@ -1410,10 +1429,38 @@ class Model(metaclass=ModelBase):
                 params=params,
             )
 
-    def full_clean(self, exclude=None, validate_unique=True):
+    def get_constraints(self):
+        constraints = [(self.__class__, self._meta.constraints)]
+        for parent_class in self._meta.get_parent_list():
+            if parent_class._meta.constraints:
+                constraints.append((parent_class, parent_class._meta.constraints))
+        return constraints
+
+    def validate_constraints(self, exclude=None):
+        constraints = self.get_constraints()
+        using = router.db_for_write(self.__class__, instance=self)
+
+        errors = {}
+        for model_class, model_constraints in constraints:
+            for constraint in model_constraints:
+                try:
+                    constraint.validate(model_class, self, exclude=exclude, using=using)
+                except ValidationError as e:
+                    if (
+                        getattr(e, "code", None) == "unique"
+                        and len(constraint.fields) == 1
+                    ):
+                        errors.setdefault(constraint.fields[0], []).append(e)
+                    else:
+                        errors = e.update_error_dict(errors)
+        if errors:
+            raise ValidationError(errors)
+
+    def full_clean(self, exclude=None, validate_unique=True, validate_constraints=True):
         """
-        Call clean_fields(), clean(), and validate_unique() on the model.
-        Raise a ValidationError for any errors that occur.
+        Call clean_fields(), clean(), validate_unique(), and
+        validate_constraints() on the model. Raise a ValidationError for any
+        errors that occur.
         """
         errors = {}
         if exclude is None:
@@ -1440,6 +1487,16 @@ class Model(metaclass=ModelBase):
                     exclude.add(name)
             try:
                 self.validate_unique(exclude=exclude)
+            except ValidationError as e:
+                errors = e.update_error_dict(errors)
+
+        # Run constraints checks, but only for fields that passed validation.
+        if validate_constraints:
+            for name in errors:
+                if name != NON_FIELD_ERRORS and name not in exclude:
+                    exclude.add(name)
+            try:
+                self.validate_constraints(exclude=exclude)
             except ValidationError as e:
                 errors = e.update_error_dict(errors)
 
@@ -1504,6 +1561,7 @@ class Model(metaclass=ModelBase):
                 *cls._check_ordering(),
                 *cls._check_constraints(databases),
                 *cls._check_default_pk(),
+                *cls._check_db_table_comment(databases),
             ]
 
         return errors
@@ -1539,6 +1597,29 @@ class Model(metaclass=ModelBase):
                 ),
             ]
         return []
+
+    @classmethod
+    def _check_db_table_comment(cls, databases):
+        if not cls._meta.db_table_comment:
+            return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, cls):
+                continue
+            connection = connections[db]
+            if not (
+                connection.features.supports_comments
+                or "supports_comments" in cls._meta.required_db_features
+            ):
+                errors.append(
+                    checks.Warning(
+                        f"{connection.display_name} does not support comments on "
+                        f"tables (db_table_comment).",
+                        obj=cls,
+                        id="models.W046",
+                    )
+                )
+        return errors
 
     @classmethod
     def _check_swappable(cls):
@@ -1792,6 +1873,7 @@ class Model(metaclass=ModelBase):
             )
         return errors
 
+    # RemovedInDjango51Warning.
     @classmethod
     def _check_index_together(cls):
         """Check the value of "index_together" option."""
@@ -2032,7 +2114,7 @@ class Model(metaclass=ModelBase):
         fields = (f for f in fields if isinstance(f, str) and f != "?")
 
         # Convert "-field" to "field".
-        fields = ((f[1:] if f.startswith("-") else f) for f in fields)
+        fields = (f.removeprefix("-") for f in fields)
 
         # Separate related fields and non-related fields.
         _fields = []
@@ -2339,8 +2421,28 @@ class Model(metaclass=ModelBase):
                         connection.features.supports_table_check_constraints
                         or "supports_table_check_constraints"
                         not in cls._meta.required_db_features
-                    ) and isinstance(constraint.check, Q):
-                        references.update(cls._get_expr_references(constraint.check))
+                    ):
+                        if isinstance(constraint.check, Q):
+                            references.update(
+                                cls._get_expr_references(constraint.check)
+                            )
+                        if any(
+                            isinstance(expr, RawSQL)
+                            for expr in constraint.check.flatten()
+                        ):
+                            errors.append(
+                                checks.Warning(
+                                    f"Check constraint {constraint.name!r} contains "
+                                    f"RawSQL() expression and won't be validated "
+                                    f"during the model full_clean().",
+                                    hint=(
+                                        "Silence this warning if you don't care about "
+                                        "it."
+                                    ),
+                                    obj=cls,
+                                    id="models.W045",
+                                ),
+                            )
             for field_name, *lookups in references:
                 # pk is an alias that won't be found by opts.get_field.
                 if field_name != "pk":

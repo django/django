@@ -1,6 +1,7 @@
 import argparse
 import ctypes
 import faulthandler
+import hashlib
 import io
 import itertools
 import logging
@@ -11,28 +12,23 @@ import random
 import sys
 import textwrap
 import unittest
-import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from importlib import import_module
 from io import StringIO
 
+import sqlparse
+
+import django
 from django.core.management import call_command
 from django.db import connections
 from django.test import SimpleTestCase, TestCase
-from django.test.utils import (
-    NullTimeKeeper,
-    TimeKeeper,
-    captured_stdout,
-    iter_test_cases,
-)
+from django.test.utils import NullTimeKeeper, TimeKeeper, iter_test_cases
 from django.test.utils import setup_databases as _setup_databases
 from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
-from django.utils.crypto import new_hash
 from django.utils.datastructures import OrderedSet
-from django.utils.deprecation import RemovedInDjango50Warning
 
 try:
     import ipdb as pdb
@@ -99,7 +95,9 @@ class DebugSQLTextTestResult(unittest.TextTestResult):
             self.stream.writeln(self.separator2)
             self.stream.writeln(err)
             self.stream.writeln(self.separator2)
-            self.stream.writeln(sql_debug)
+            self.stream.writeln(
+                sqlparse.format(sql_debug, reindent=True, keyword_case="upper")
+            )
 
 
 class PDBDebugResult(unittest.TextTestResult):
@@ -402,6 +400,7 @@ def _init_worker(
     serialized_contents=None,
     process_setup=None,
     process_setup_args=None,
+    debug_mode=None,
 ):
     """
     Switch to databases dedicated to this worker.
@@ -419,8 +418,12 @@ def _init_worker(
     start_method = multiprocessing.get_start_method()
 
     if start_method == "spawn":
-        process_setup(*process_setup_args)
-        setup_test_environment()
+        if process_setup and callable(process_setup):
+            if process_setup_args is None:
+                process_setup_args = ()
+            process_setup(*process_setup_args)
+        django.setup()
+        setup_test_environment(debug=debug_mode)
 
     for alias in connections:
         connection = connections[alias]
@@ -430,8 +433,6 @@ def _init_worker(
             if value := serialized_contents.get(alias):
                 connection._test_serialized_contents = value
         connection.creation.setup_worker_connection(_worker_id)
-        with captured_stdout():
-            call_command("check", databases=connections)
 
 
 def _run_subsuite(args):
@@ -445,6 +446,11 @@ def _run_subsuite(args):
     runner = runner_class(failfast=failfast, buffer=buffer)
     result = runner.run(subsuite)
     return subsuite_index, result.events
+
+
+def _process_setup_stub(*args):
+    """Stub method to simplify run() implementation."""
+    pass
 
 
 class ParallelTestSuite(unittest.TestSuite):
@@ -465,13 +471,18 @@ class ParallelTestSuite(unittest.TestSuite):
 
     # In case someone wants to modify these in a subclass.
     init_worker = _init_worker
+    process_setup = _process_setup_stub
+    process_setup_args = ()
     run_subsuite = _run_subsuite
     runner_class = RemoteTestRunner
 
-    def __init__(self, subsuites, processes, failfast=False, buffer=False):
+    def __init__(
+        self, subsuites, processes, failfast=False, debug_mode=False, buffer=False
+    ):
         self.subsuites = subsuites
         self.processes = processes
         self.failfast = failfast
+        self.debug_mode = debug_mode
         self.buffer = buffer
         self.initial_settings = None
         self.serialized_contents = None
@@ -496,11 +507,14 @@ class ParallelTestSuite(unittest.TestSuite):
         counter = multiprocessing.Value(ctypes.c_int, 0)
         pool = multiprocessing.Pool(
             processes=self.processes,
-            initializer=self.init_worker,
+            initializer=self.init_worker.__func__,
             initargs=[
                 counter,
                 self.initial_settings,
                 self.serialized_contents,
+                self.process_setup.__func__,
+                self.process_setup_args,
+                self.debug_mode,
             ],
         )
         args = [
@@ -566,7 +580,7 @@ class Shuffler:
 
     @classmethod
     def _hash_text(cls, text):
-        h = new_hash(cls.hash_algorithm, usedforsecurity=False)
+        h = hashlib.new(cls.hash_algorithm, usedforsecurity=False)
         h.update(text.encode("utf-8"))
         return h.hexdigest()
 
@@ -643,7 +657,6 @@ class DiscoverRunner:
         logger=None,
         **kwargs,
     ):
-
         self.pattern = pattern
         self.top_level = top_level
         self.verbosity = verbosity
@@ -861,15 +874,8 @@ class DiscoverRunner:
         self.test_loader._top_level_dir = None
         return tests
 
-    def build_suite(self, test_labels=None, extra_tests=None, **kwargs):
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
+    def build_suite(self, test_labels=None, **kwargs):
         test_labels = test_labels or ["."]
-        extra_tests = extra_tests or []
 
         discover_kwargs = {}
         if self.pattern is not None:
@@ -882,8 +888,6 @@ class DiscoverRunner:
         for label in test_labels:
             tests = self.load_tests_for_label(label, discover_kwargs)
             all_tests.extend(iter_test_cases(tests))
-
-        all_tests.extend(iter_test_cases(extra_tests))
 
         if self.tags or self.exclude_tags:
             if self.tags:
@@ -926,6 +930,7 @@ class DiscoverRunner:
                     subsuites,
                     processes,
                     self.failfast,
+                    self.debug_mode,
                     self.buffer,
                 )
         return suite
@@ -1013,7 +1018,7 @@ class DiscoverRunner:
             )
         return databases
 
-    def run_tests(self, test_labels, extra_tests=None, **kwargs):
+    def run_tests(self, test_labels, **kwargs):
         """
         Run the unit tests for all the test labels in the provided list.
 
@@ -1022,14 +1027,8 @@ class DiscoverRunner:
 
         Return the number of tests that failed.
         """
-        if extra_tests is not None:
-            warnings.warn(
-                "The extra_tests argument is deprecated.",
-                RemovedInDjango50Warning,
-                stacklevel=2,
-            )
         self.setup_test_environment()
-        suite = self.build_suite(test_labels, extra_tests)
+        suite = self.build_suite(test_labels)
         databases = self.get_databases(suite)
         suite.serialized_aliases = set(
             alias for alias, serialize in databases.items() if serialize

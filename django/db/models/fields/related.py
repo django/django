@@ -1,5 +1,6 @@
 import functools
 import inspect
+import warnings
 from functools import partial
 
 from django import forms
@@ -13,6 +14,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import CASCADE, SET_DEFAULT, SET_NULL
 from django.db.models.query_utils import PathInfo
 from django.db.models.utils import make_model_tuple
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -344,7 +346,6 @@ class RelatedField(FieldCacheMixin, Field):
         return None
 
     def contribute_to_class(self, cls, name, private_only=False, **kwargs):
-
         super().contribute_to_class(cls, name, private_only=private_only, **kwargs)
 
         self.opts = cls._meta
@@ -355,7 +356,7 @@ class RelatedField(FieldCacheMixin, Field):
             else:
                 related_name = self.opts.default_related_name
             if related_name:
-                related_name = related_name % {
+                related_name %= {
                     "class": cls.__name__.lower(),
                     "model_name": cls._meta.model_name.lower(),
                     "app_label": cls._meta.app_label.lower(),
@@ -407,12 +408,13 @@ class RelatedField(FieldCacheMixin, Field):
         select all instances of self.related_field.model related through
         this field to obj. obj is an instance of self.model.
         """
-        base_filter = (
-            (rh_field.attname, getattr(obj, lh_field.attname))
-            for lh_field, rh_field in self.related_fields
+        base_q = Q.create(
+            [
+                (rh_field.attname, getattr(obj, lh_field.attname))
+                for lh_field, rh_field in self.related_fields
+            ]
         )
         descriptor_filter = self.get_extra_descriptor_filter(obj)
-        base_q = Q(*base_filter)
         if isinstance(descriptor_filter, dict):
             return base_q & Q(**descriptor_filter)
         elif descriptor_filter:
@@ -540,7 +542,6 @@ class ForeignObject(RelatedField):
         swappable=True,
         **kwargs,
     ):
-
         if rel is None:
             rel = self.rel_class(
                 self,
@@ -778,13 +779,31 @@ class ForeignObject(RelatedField):
         return attname, None
 
     def get_joining_columns(self, reverse_join=False):
+        warnings.warn(
+            "ForeignObject.get_joining_columns() is deprecated. Use "
+            "get_joining_fields() instead.",
+            RemovedInDjango60Warning,
+        )
         source = self.reverse_related_fields if reverse_join else self.related_fields
         return tuple(
             (lhs_field.column, rhs_field.column) for lhs_field, rhs_field in source
         )
 
     def get_reverse_joining_columns(self):
+        warnings.warn(
+            "ForeignObject.get_reverse_joining_columns() is deprecated. Use "
+            "get_reverse_joining_fields() instead.",
+            RemovedInDjango60Warning,
+        )
         return self.get_joining_columns(reverse_join=True)
+
+    def get_joining_fields(self, reverse_join=False):
+        return tuple(
+            self.reverse_related_fields if reverse_join else self.related_fields
+        )
+
+    def get_reverse_joining_fields(self):
+        return self.get_joining_fields(reverse_join=True)
 
     def get_extra_descriptor_filter(self, instance):
         """
@@ -856,8 +875,8 @@ class ForeignObject(RelatedField):
         return self.get_reverse_path_info()
 
     @classmethod
-    @functools.lru_cache(maxsize=None)
-    def get_lookups(cls):
+    @functools.cache
+    def get_class_lookups(cls):
         bases = inspect.getmro(cls)
         bases = bases[: bases.index(ForeignObject) + 1]
         class_lookups = [parent.__dict__.get("class_lookups", {}) for parent in bases]
@@ -1059,22 +1078,6 @@ class ForeignKey(ForeignObject):
     def target_field(self):
         return self.foreign_related_fields[0]
 
-    def get_reverse_path_info(self, filtered_relation=None):
-        """Get path from the related model to this field's model."""
-        opts = self.model._meta
-        from_opts = self.remote_field.model._meta
-        return [
-            PathInfo(
-                from_opts=from_opts,
-                to_opts=opts,
-                target_fields=(opts.pk,),
-                join_field=self.remote_field,
-                m2m=not self.unique,
-                direct=False,
-                filtered_relation=filtered_relation,
-            )
-        ]
-
     def validate(self, value, model_instance):
         if self.remote_field.parent_link:
             return
@@ -1178,6 +1181,9 @@ class ForeignKey(ForeignObject):
 
     def db_type(self, connection):
         return self.target_field.rel_db_type(connection=connection)
+
+    def cast_db_type(self, connection):
+        return self.target_field.cast_db_type(connection=connection)
 
     def db_parameters(self, connection):
         target_db_parameters = self.target_field.db_parameters(connection)
@@ -1443,6 +1449,14 @@ class ManyToManyField(RelatedField):
                     id="fields.W345",
                 )
             )
+        if self.db_comment:
+            warnings.append(
+                checks.Warning(
+                    "db_comment has no effect on ManyToManyField.",
+                    obj=self,
+                    id="fields.W346",
+                )
+            )
 
         return warnings
 
@@ -1623,7 +1637,6 @@ class ManyToManyField(RelatedField):
                     (source_field_name, source),
                     (target_field_name, target),
                 ):
-
                     possible_field_names = []
                     for f in through._meta.fields:
                         if (

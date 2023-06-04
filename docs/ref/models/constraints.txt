@@ -31,24 +31,32 @@ option.
 
 .. admonition:: Validation of Constraints
 
-    In general constraints are **not** checked during ``full_clean()``, and do
-    not raise ``ValidationError``\s. Rather you'll get a database integrity
-    error on ``save()``. ``UniqueConstraint``\s without a
-    :attr:`~UniqueConstraint.condition` (i.e. non-partial unique constraints)
-    and :attr:`~UniqueConstraint.expressions` (i.e. non-functional unique
-    constraints) are different in this regard, in that they leverage the
-    existing ``validate_unique()`` logic, and thus enable two-stage validation.
-    In addition to ``IntegrityError`` on ``save()``, ``ValidationError`` is
-    also raised during model validation when the ``UniqueConstraint`` is
-    violated.
+    Constraints are checked during the :ref:`model validation
+    <validating-objects>`.
+
+.. admonition:: Validation of Constraints with ``JSONField``
+
+    Constraints containing :class:`~django.db.models.JSONField` may not raise
+    validation errors as key, index, and path transforms have many
+    database-specific caveats. This :ticket:`may be fully supported later
+    <34059>`.
+
+    You should always check that there are no log messages, in the
+    ``django.db.models`` logger, like *"Got a database error calling check() on
+    …"* to confirm it's validated properly.
 
 ``BaseConstraint``
 ==================
 
-.. class:: BaseConstraint(name)
+.. class:: BaseConstraint(* name, violation_error_code=None, violation_error_message=None)
 
     Base class for all constraints. Subclasses must implement
-    ``constraint_sql()``, ``create_sql()``, and ``remove_sql()`` methods.
+    ``constraint_sql()``, ``create_sql()``, ``remove_sql()`` and
+    ``validate()`` methods.
+
+    .. deprecated:: 5.0
+
+        Support for passing positional arguments is deprecated.
 
 All constraints have the following parameters in common:
 
@@ -60,10 +68,43 @@ All constraints have the following parameters in common:
 The name of the constraint. You must always specify a unique name for the
 constraint.
 
+``violation_error_code``
+------------------------
+
+.. versionadded:: 5.0
+
+.. attribute:: BaseConstraint.violation_error_code
+
+The error code used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to ``None``.
+
+``violation_error_message``
+---------------------------
+
+.. attribute:: BaseConstraint.violation_error_message
+
+The error message used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to
+``"Constraint “%(name)s” is violated."``.
+
+``validate()``
+--------------
+
+.. method:: BaseConstraint.validate(model, instance, exclude=None, using=DEFAULT_DB_ALIAS)
+
+Validates that the constraint, defined on ``model``, is respected on the
+``instance``. This will do a query on the database to ensure that the
+constraint is respected. If fields in the ``exclude`` list are needed to
+validate the constraint, the constraint is ignored.
+
+Raise a ``ValidationError`` if the constraint is violated.
+
+This method must be implemented by a subclass.
+
 ``CheckConstraint``
 ===================
 
-.. class:: CheckConstraint(*, check, name)
+.. class:: CheckConstraint(*, check, name, violation_error_code=None, violation_error_message=None)
 
     Creates a check constraint in the database.
 
@@ -78,10 +119,19 @@ specifies the check you want the constraint to enforce.
 For example, ``CheckConstraint(check=Q(age__gte=18), name='age_gte_18')``
 ensures the age field is never less than 18.
 
+.. admonition:: Oracle
+
+    Checks with nullable fields on Oracle must include a condition allowing for
+    ``NULL`` values in order for :meth:`validate() <BaseConstraint.validate>`
+    to behave the same as check constraints validation. For example, if ``age``
+    is a nullable field::
+
+        CheckConstraint(check=Q(age__gte=18) | Q(age__isnull=True), name="age_gte_18")
+
 ``UniqueConstraint``
 ====================
 
-.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: UniqueConstraint(*expressions, fields=(), name=None, condition=None, deferrable=None, include=None, opclasses=(), violation_error_code=None, violation_error_message=None)
 
     Creates a unique constraint in the database.
 
@@ -90,14 +140,12 @@ ensures the age field is never less than 18.
 
 .. attribute:: UniqueConstraint.expressions
 
-.. versionadded:: 4.0
-
 Positional argument ``*expressions`` allows creating functional unique
 constraints on expressions and database functions.
 
 For example::
 
-    UniqueConstraint(Lower('name').desc(), 'category', name='unique_lower_name_category')
+    UniqueConstraint(Lower("name").desc(), "category", name="unique_lower_name_category")
 
 creates a unique constraint on the lowercased value of the ``name`` field in
 descending order and the ``category`` field in the default ascending order.
@@ -127,7 +175,7 @@ enforce.
 
 For example::
 
-    UniqueConstraint(fields=['user'], condition=Q(status='DRAFT'), name='unique_draft_user')
+    UniqueConstraint(fields=["user"], condition=Q(status="DRAFT"), name="unique_draft_user")
 
 ensures that each user only has one draft.
 
@@ -145,8 +193,8 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
     from django.db.models import Deferrable, UniqueConstraint
 
     UniqueConstraint(
-        name='unique_order',
-        fields=['order'],
+        name="unique_order",
+        fields=["order"],
         deferrable=Deferrable.DEFERRED,
     )
 
@@ -176,7 +224,7 @@ and filter only by unique fields (:attr:`~UniqueConstraint.fields`).
 
 For example::
 
-    UniqueConstraint(name='unique_booking', fields=['room', 'date'], include=['full_name'])
+    UniqueConstraint(name="unique_booking", fields=["room", "date"], include=["full_name"])
 
 will allow filtering on ``room`` and ``date``, also selecting ``full_name``,
 while fetching data only from the index.
@@ -198,8 +246,42 @@ for each field in the index.
 
 For example::
 
-    UniqueConstraint(name='unique_username', fields=['username'], opclasses=['varchar_pattern_ops'])
+    UniqueConstraint(
+        name="unique_username", fields=["username"], opclasses=["varchar_pattern_ops"]
+    )
 
 creates a unique index on ``username`` using ``varchar_pattern_ops``.
 
 ``opclasses`` are ignored for databases besides PostgreSQL.
+
+``violation_error_code``
+------------------------
+
+.. versionadded:: 5.0
+
+.. attribute:: UniqueConstraint.violation_error_code
+
+The error code used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to ``None``.
+
+This code is *not used* for :class:`UniqueConstraint`\s with
+:attr:`~UniqueConstraint.fields` and without a
+:attr:`~UniqueConstraint.condition`. Such :class:`~UniqueConstraint`\s have the
+same error code as constraints defined with :attr:`.Field.unique` or in
+:attr:`Meta.unique_together <django.db.models.Options.constraints>`.
+
+``violation_error_message``
+---------------------------
+
+.. attribute:: UniqueConstraint.violation_error_message
+
+The error message used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to
+:attr:`.BaseConstraint.violation_error_message`.
+
+This message is *not used* for :class:`UniqueConstraint`\s with
+:attr:`~UniqueConstraint.fields` and without a
+:attr:`~UniqueConstraint.condition`. Such :class:`~UniqueConstraint`\s show the
+same message as constraints defined with
+:attr:`.Field.unique` or in
+:attr:`Meta.unique_together <django.db.models.Options.constraints>`.

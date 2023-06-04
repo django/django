@@ -2,10 +2,9 @@ from django.core.exceptions import ValidationError
 from django.forms import FloatField, NumberInput
 from django.test import SimpleTestCase
 from django.test.selenium import SeleniumTestCase
-from django.test.utils import ignore_warnings, override_settings
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import formats, translation
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from . import FormFieldAssertionsMixin
 
@@ -70,6 +69,21 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         self.assertEqual(f.max_value, 1.5)
         self.assertEqual(f.min_value, 0.5)
 
+    def test_floatfield_4(self):
+        f = FloatField(step_size=0.02)
+        self.assertWidgetRendersTo(
+            f,
+            '<input name="f" step="0.02" type="number" id="id_f" required>',
+        )
+        msg = "'Ensure this value is a multiple of step size 0.02.'"
+        with self.assertRaisesMessage(ValidationError, msg):
+            f.clean("0.01")
+        self.assertEqual(2.34, f.clean("2.34"))
+        self.assertEqual(2.1, f.clean("2.1"))
+        self.assertEqual(-0.50, f.clean("-.5"))
+        self.assertEqual(-1.26, f.clean("-1.26"))
+        self.assertEqual(f.step_size, 0.02)
+
     def test_floatfield_widget_attrs(self):
         f = FloatField(widget=NumberInput(attrs={"step": 0.01, "max": 1.0, "min": 0.0}))
         self.assertWidgetRendersTo(
@@ -96,39 +110,29 @@ class FloatFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
             localized_n = formats.localize_input(n)  # -> '4,35' in French
             self.assertFalse(f.has_changed(n, localized_n))
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_L10N=False, DECIMAL_SEPARATOR=",")
-    def test_decimalfield_support_decimal_separator(self):
-        f = FloatField(localize=True)
-        self.assertEqual(f.clean("1001,10"), 1001.10)
-        self.assertEqual(f.clean("1001.10"), 1001.10)
+    @override_settings(DECIMAL_SEPARATOR=",")
+    def test_floatfield_support_decimal_separator(self):
+        with translation.override(None):
+            f = FloatField(localize=True)
+            self.assertEqual(f.clean("1001,10"), 1001.10)
+            self.assertEqual(f.clean("1001.10"), 1001.10)
 
-    # RemovedInDjango50Warning: When the deprecation ends, remove
-    # @ignore_warnings and USE_L10N=False. The test should remain because
-    # format-related settings will take precedence over locale-dictated
-    # formats.
-    @ignore_warnings(category=RemovedInDjango50Warning)
     @override_settings(
-        USE_L10N=False,
         DECIMAL_SEPARATOR=",",
         USE_THOUSAND_SEPARATOR=True,
         THOUSAND_SEPARATOR=".",
     )
-    def test_decimalfield_support_thousands_separator(self):
-        f = FloatField(localize=True)
-        self.assertEqual(f.clean("1.001,10"), 1001.10)
-        msg = "'Enter a number.'"
-        with self.assertRaisesMessage(ValidationError, msg):
-            f.clean("1,001.1")
+    def test_floatfield_support_thousands_separator(self):
+        with translation.override(None):
+            f = FloatField(localize=True)
+            self.assertEqual(f.clean("1.001,10"), 1001.10)
+            msg = "'Enter a number.'"
+            with self.assertRaisesMessage(ValidationError, msg):
+                f.clean("1,001.1")
 
 
 @override_settings(ROOT_URLCONF="forms_tests.urls")
 class FloatFieldHTMLTest(SeleniumTestCase):
-
     available_apps = ["forms_tests"]
 
     def test_float_field_rendering_passes_client_side_validation(self):

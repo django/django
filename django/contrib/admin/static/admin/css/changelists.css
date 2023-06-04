@@ -90,7 +90,7 @@
 }
 
 #toolbar #searchbar {
-    height: 19px;
+    height: 1.1875rem;
     border: 1px solid var(--border-color);
     padding: 2px 5px;
     margin: 0;
@@ -215,35 +215,32 @@
     color: var(--link-hover-color);
 }
 
-#changelist-filter #changelist-filter-clear a {
+#changelist-filter #changelist-filter-extra-actions {
     font-size: 0.8125rem;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
     border-bottom: 1px solid var(--hairline-color);
 }
 
 /* DATE DRILLDOWN */
 
-.change-list ul.toplinks {
-    display: block;
-    float: left;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-}
-
-.change-list ul.toplinks li {
-    padding: 3px 6px;
+.change-list .toplinks {
+    display: flex;
+    padding-bottom: 5px;
+    flex-wrap: wrap;
+    gap: 3px 17px;
     font-weight: bold;
-    list-style-type: none;
-    display: inline-block;
 }
 
-.change-list ul.toplinks .date-back a {
+.change-list .toplinks a {
+    font-size: 0.8125rem;
+}
+
+.change-list .toplinks .date-back {
     color: var(--body-quiet-color);
 }
 
-.change-list ul.toplinks .date-back a:focus,
-.change-list ul.toplinks .date-back a:hover {
+.change-list .toplinks .date-back:focus,
+.change-list .toplinks .date-back:hover {
     color: var(--link-hover-color);
 }
 
@@ -258,7 +255,13 @@
     vertical-align: baseline;
 }
 
+/* Once the :has() pseudo-class is supported by all browsers, the tr.selected
+   selector and the JS adding the class can be removed. */
 #changelist table tbody tr.selected {
+    background-color: var(--selected-row);
+}
+
+#changelist table tbody tr:has(input[type=checkbox]:checked) {
     background-color: var(--selected-row);
 }
 
@@ -267,7 +270,7 @@
     background: var(--body-bg);
     border-top: none;
     border-bottom: none;
-    line-height: 24px;
+    line-height: 1.5rem;
     color: var(--body-quiet-color);
     width: 100%;
 }
@@ -286,7 +289,7 @@
 
 #changelist .actions select {
     vertical-align: top;
-    height: 24px;
+    height: 1.5rem;
     color: var(--body-fg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
@@ -313,7 +316,7 @@
     background: var(--body-bg);
     box-shadow: 0 -15px 20px -10px rgba(0, 0, 0, 0.15) inset;
     cursor: pointer;
-    height: 24px;
+    height: 1.5rem;
     line-height: 1;
     padding: 4px 8px;
     margin: 0;

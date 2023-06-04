@@ -72,28 +72,27 @@ If you have multiple caches defined in :setting:`CACHES`, Django will use the
 default cache. To use another cache, set :setting:`SESSION_CACHE_ALIAS` to the
 name of that cache.
 
-Once your cache is configured, you've got two choices for how to store data in
-the cache:
+Once your cache is configured, you have to choose between a database-backed
+cache or a non-persistent cache.
 
-* Set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cache"`` for a simple caching session
-  store. Session data will be stored directly in your cache. However, session
-  data may not be persistent: cached data can be evicted if the cache fills
-  up or if the cache server is restarted.
+The cached database backend (``cached_db``) uses a write-through cache --
+session writes are applied to both the cache and the database. Session reads
+use the cache, or the database if the data has been evicted from the cache. To
+use this backend, set :setting:`SESSION_ENGINE` to
+``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
+instructions for the `using database-backed sessions`_.
 
-* For persistent, cached data, set :setting:`SESSION_ENGINE` to
-  ``"django.contrib.sessions.backends.cached_db"``. This uses a
-  write-through cache -- every write to the cache will also be written to
-  the database. Session reads only use the database if the data is not
-  already in the cache.
+The cache backend (``cache``) stores session data only in your cache. This is
+faster because it avoids database persistence, but you will have to consider
+what happens when cache data is evicted. Eviction can occur if the cache fills
+up or the cache server is restarted, and it will mean session data is lost,
+including logging out users. To use this backend, set :setting:`SESSION_ENGINE`
+to ``"django.contrib.sessions.backends.cache"``.
 
-Both session stores are quite fast, but the simple cache is faster because it
-disregards persistence. In most cases, the ``cached_db`` backend will be fast
-enough, but if you need that last bit of performance, and are willing to let
-session data be expunged from time to time, the ``cache`` backend is for you.
-
-If you use the ``cached_db`` session backend, you also need to follow the
-configuration instructions for the `using database-backed sessions`_.
+The cache backend can be made persistent by using a persistent cache, such as
+Redis with appropriate configuration. But unless your cache is definitely
+configured for sufficient persistence, opt for the cached database backend.
+This avoids edge cases caused by unreliable data storage in production.
 
 Using file-based sessions
 -------------------------
@@ -122,20 +121,6 @@ and the :setting:`SECRET_KEY` setting.
     on ``True`` to prevent access to the stored data from JavaScript.
 
 .. warning::
-
-    **If the ``SECRET_KEY`` or ``SECRET_KEY_FALLBACKS`` are not kept secret and
-    you are using the**
-    ``django.contrib.sessions.serializers.PickleSerializer``, **this can lead
-    to arbitrary remote code execution.**
-
-    An attacker in possession of the :setting:`SECRET_KEY` or
-    :setting:`SECRET_KEY_FALLBACKS` can not only generate falsified session
-    data, which your site will trust, but also remotely execute arbitrary code,
-    as the data is serialized using pickle.
-
-    If you use cookie-based sessions, pay extra care that your secret key is
-    always kept completely secret, for any system which might be remotely
-    accessible.
 
     **The session data is signed but not encrypted**
 
@@ -358,14 +343,16 @@ Bundled serializers
     only serialize basic data types.
 
     In addition, as JSON supports only string keys, note that using non-string
-    keys in ``request.session`` won't work as expected::
+    keys in ``request.session`` won't work as expected:
+
+    .. code-block:: pycon
 
         >>> # initial assignment
-        >>> request.session[0] = 'bar'
+        >>> request.session[0] = "bar"
         >>> # subsequent requests following serialization & deserialization
         >>> # of session data
         >>> request.session[0]  # KeyError
-        >>> request.session['0']
+        >>> request.session["0"]
         'bar'
 
     Similarly, data that can't be encoded in JSON, such as non-UTF8 bytes like
@@ -373,17 +360,6 @@ Bundled serializers
 
     See the :ref:`custom-serializers` section for more details on limitations
     of JSON serialization.
-
-.. class:: serializers.PickleSerializer
-
-    Supports arbitrary Python objects, but, as described above, can lead to a
-    remote code execution vulnerability if :setting:`SECRET_KEY` or any key of
-    :setting:`SECRET_KEY_FALLBACKS` becomes known by an attacker.
-
-    .. deprecated:: 4.1
-
-        Due to the risk of remote code execution, this serializer is deprecated
-        and will be removed in Django 5.0.
 
 .. _custom-serializers:
 
@@ -426,19 +402,19 @@ This simplistic view sets a ``has_commented`` variable to ``True`` after a user
 posts a comment. It doesn't let a user post a comment more than once::
 
     def post_comment(request, new_comment):
-        if request.session.get('has_commented', False):
+        if request.session.get("has_commented", False):
             return HttpResponse("You've already commented.")
         c = comments.Comment(comment=new_comment)
         c.save()
-        request.session['has_commented'] = True
-        return HttpResponse('Thanks for your comment!')
+        request.session["has_commented"] = True
+        return HttpResponse("Thanks for your comment!")
 
 This simplistic view logs in a "member" of the site::
 
     def login(request):
-        m = Member.objects.get(username=request.POST['username'])
-        if m.check_password(request.POST['password']):
-            request.session['member_id'] = m.id
+        m = Member.objects.get(username=request.POST["username"])
+        if m.check_password(request.POST["password"]):
+            request.session["member_id"] = m.id
             return HttpResponse("You're logged in.")
         else:
             return HttpResponse("Your username and password didn't match.")
@@ -447,7 +423,7 @@ This simplistic view logs in a "member" of the site::
 
     def logout(request):
         try:
-            del request.session['member_id']
+            del request.session["member_id"]
         except KeyError:
             pass
         return HttpResponse("You're logged out.")
@@ -480,15 +456,16 @@ Here's a typical usage example::
     from django.http import HttpResponse
     from django.shortcuts import render
 
+
     def login(request):
-        if request.method == 'POST':
+        if request.method == "POST":
             if request.session.test_cookie_worked():
                 request.session.delete_test_cookie()
                 return HttpResponse("You're logged in.")
             else:
                 return HttpResponse("Please enable cookies and try again.")
         request.session.set_test_cookie()
-        return render(request, 'foo/login_form.html')
+        return render(request, "foo/login_form.html")
 
 Using sessions out of views
 ===========================
@@ -500,21 +477,25 @@ Using sessions out of views
     you should consider importing ``SessionStore`` from the session engine
     designated by :setting:`SESSION_ENGINE`, as below:
 
+    .. code-block:: pycon
+
       >>> from importlib import import_module
       >>> from django.conf import settings
       >>> SessionStore = import_module(settings.SESSION_ENGINE).SessionStore
 
-An API is available to manipulate session data outside of a view::
+An API is available to manipulate session data outside of a view:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.backends.db import SessionStore
     >>> s = SessionStore()
     >>> # stored as seconds since epoch since datetimes are not serializable in JSON.
-    >>> s['last_login'] = 1376587691
+    >>> s["last_login"] = 1376587691
     >>> s.create()
     >>> s.session_key
     '2b1189a188b44ad18c35e113ac6ceead'
-    >>> s = SessionStore(session_key='2b1189a188b44ad18c35e113ac6ceead')
-    >>> s['last_login']
+    >>> s = SessionStore(session_key="2b1189a188b44ad18c35e113ac6ceead")
+    >>> s["last_login"]
     1376587691
 
 ``SessionStore.create()`` is designed to create a new session (i.e. one not
@@ -526,18 +507,22 @@ calls ``save()`` and loops until an unused ``session_key`` is generated.
 
 If you're using the ``django.contrib.sessions.backends.db`` backend, each
 session is a normal Django model. The ``Session`` model is defined in
-``django/contrib/sessions/models.py``. Because it's a normal model, you can
-access sessions using the normal Django database API::
+:source:`django/contrib/sessions/models.py`. Because it's a normal model, you can
+access sessions using the normal Django database API:
+
+.. code-block:: pycon
 
     >>> from django.contrib.sessions.models import Session
-    >>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
+    >>> s = Session.objects.get(pk="2b1189a188b44ad18c35e113ac6ceead")
     >>> s.expire_date
     datetime.datetime(2005, 8, 20, 13, 35, 12)
 
 Note that you'll need to call
 :meth:`~base_session.AbstractBaseSession.get_decoded()` to get the session
 dictionary. This is necessary because the dictionary is stored in an encoded
-format::
+format:
+
+.. code-block:: pycon
 
     >>> s.session_data
     'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
@@ -552,17 +537,17 @@ modified -- that is if any of its dictionary values have been assigned or
 deleted::
 
     # Session is modified.
-    request.session['foo'] = 'bar'
+    request.session["foo"] = "bar"
 
     # Session is modified.
-    del request.session['foo']
+    del request.session["foo"]
 
     # Session is modified.
-    request.session['foo'] = {}
+    request.session["foo"] = {}
 
     # Gotcha: Session is NOT modified, because this alters
     # request.session['foo'] instead of request.session.
-    request.session['foo']['bar'] = 'baz'
+    request.session["foo"]["bar"] = "baz"
 
 In the last case of the above example, we can tell the session object
 explicitly that it has been modified by setting the ``modified`` attribute on
@@ -820,12 +805,14 @@ to query the database for all active sessions for an account)::
     from django.contrib.sessions.base_session import AbstractBaseSession
     from django.db import models
 
+
     class CustomSession(AbstractBaseSession):
         account_id = models.IntegerField(null=True, db_index=True)
 
         @classmethod
         def get_session_store_class(cls):
             return SessionStore
+
 
     class SessionStore(DBStore):
         @classmethod
@@ -835,7 +822,7 @@ to query the database for all active sessions for an account)::
         def create_model_instance(self, data):
             obj = super().create_model_instance(data)
             try:
-                account_id = int(data.get('_auth_user_id'))
+                account_id = int(data.get("_auth_user_id"))
             except (ValueError, TypeError):
                 account_id = None
             obj.account_id = account_id
@@ -846,7 +833,7 @@ a custom one based on ``cached_db``, you should override the cache key prefix
 in order to prevent a namespace clash::
 
     class SessionStore(CachedDBStore):
-        cache_key_prefix = 'mysessions.custom_cached_db_backend'
+        cache_key_prefix = "mysessions.custom_cached_db_backend"
 
         # ...
 

@@ -1,13 +1,10 @@
 import gettext
 import os
 import re
+import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
-
-try:
-    import zoneinfo
-except ImportError:
-    from backports import zoneinfo
+from unittest import skipUnless
 
 from django import forms
 from django.conf import settings
@@ -25,9 +22,10 @@ from django.db.models import (
     ManyToManyField,
     UUIDField,
 )
-from django.test import SimpleTestCase, TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
 from django.urls import reverse
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Advisor,
@@ -38,6 +36,7 @@ from .models import (
     Company,
     Event,
     Honeycomb,
+    Image,
     Individual,
     Inventory,
     Member,
@@ -73,6 +72,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
         Helper to call formfield_for_dbfield for a given model and field name
         and verify that the returned formfield is appropriate.
         """
+
         # Override any settings on the model admin
         class MyModelAdmin(admin.ModelAdmin):
             pass
@@ -107,6 +107,7 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
     def test_TextField(self):
         self.assertFormfield(Event, "description", widgets.AdminTextareaWidget)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_URLField(self):
         self.assertFormfield(Event, "link", widgets.AdminURLFieldWidget)
 
@@ -273,6 +274,26 @@ class AdminFormfieldForDBFieldTests(SimpleTestCase):
             "Hold down “Control”, or “Command” on a Mac, to select more than one.",
         )
 
+    def test_m2m_widgets_no_allow_multiple_selected(self):
+        class NoAllowMultipleSelectedWidget(forms.SelectMultiple):
+            allow_multiple_selected = False
+
+        class AdvisorAdmin(admin.ModelAdmin):
+            filter_vertical = ["companies"]
+            formfield_overrides = {
+                ManyToManyField: {"widget": NoAllowMultipleSelectedWidget},
+            }
+
+        self.assertFormfield(
+            Advisor,
+            "companies",
+            widgets.FilteredSelectMultiple,
+            filter_vertical=["companies"],
+        )
+        ma = AdvisorAdmin(Advisor, admin.site)
+        f = ma.formfield_for_dbfield(Advisor._meta.get_field("companies"), request=None)
+        self.assertEqual(f.help_text, "")
+
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminFormfieldForDBFieldWithRequestTests(TestDataMixin, TestCase):
@@ -301,6 +322,7 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
     def setUp(self):
         self.client.force_login(self.superuser)
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_nonexistent_target_id(self):
         band = Band.objects.create(name="Bogey Blues")
         pk = band.pk
@@ -316,8 +338,8 @@ class AdminForeignKeyRawIdWidget(TestDataMixin, TestCase):
             "Select a valid choice. That choice is not one of the available choices.",
         )
 
+    @ignore_warnings(category=RemovedInDjango60Warning)
     def test_invalid_target_id(self):
-
         for test_str in ("Iñtërnâtiônàlizætiøn", "1234'", -1234):
             # This should result in an error message, not a server exception.
             response = self.client.post(
@@ -886,7 +908,6 @@ class RelatedFieldWidgetWrapperTests(SimpleTestCase):
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
 class AdminWidgetSeleniumTestCase(AdminSeleniumTestCase):
-
     available_apps = ["admin_widgets"] + AdminSeleniumTestCase.available_apps
 
     def setUp(self):
@@ -1086,7 +1107,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
 
             # Test with every locale
             with override_settings(LANGUAGE_CODE=language_code):
-
                 # Open a page that has a date picker widget
                 url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
                 self.selenium.get(self.live_server_url + url)
@@ -1594,6 +1614,7 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         self.assertCountSeleniumElements("#id_students_to > option", 2)
 
 
+@ignore_warnings(category=RemovedInDjango60Warning)
 class AdminRawIdWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
     def setUp(self):
         super().setUp()
@@ -1715,7 +1736,12 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         self.wait_for_value("#id_username", "newuser")
         self.selenium.back()
 
+        # Chrome and Safari don't update related object links when selecting
+        # the same option as previously submitted. As a consequence, the
+        # "pencil" and "eye" buttons remain disable, so select "---------"
+        # first.
         select = Select(self.selenium.find_element(By.ID, "id_user"))
+        select.select_by_index(0)
         select.select_by_value("newuser")
         # Click the Change User button to change it
         self.selenium.find_element(By.ID, "change_id_user").click()
@@ -1747,3 +1773,95 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+
+@skipUnless(Image, "Pillow not installed")
+class ImageFieldWidgetsSeleniumTests(AdminWidgetSeleniumTestCase):
+    name_input_id = "id_name"
+    photo_input_id = "id_photo"
+    tests_files_folder = "%s/files" % os.getcwd()
+    clear_checkbox_id = "photo-clear_id"
+
+    def _submit_and_wait(self):
+        from selenium.webdriver.common.by import By
+
+        with self.wait_page_loaded():
+            self.selenium.find_element(
+                By.CSS_SELECTOR, "input[value='Save and continue editing']"
+            ).click()
+
+    def _run_image_upload_path(self):
+        from selenium.webdriver.common.by import By
+
+        self.admin_login(username="super", password="secret", login_url="/")
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_student_add"),
+        )
+        # Add a student.
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.send_keys("Joe Doe")
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/test.png")
+        self._submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertRegex(student.photo.name, r"^photos\/(test|test_.+).png")
+
+    def test_clearablefileinput_widget(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        student = Student.objects.last()
+        self.assertEqual(student.name, "Joe Doe")
+        self.assertEqual(student.photo.name, "")
+        # "Currently" with "Clear" checkbox and "Change" are not shown.
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertNotIn("Currently", photo_field_row.text)
+        self.assertNotIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_invalid_file(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        # Uploading non-image files is not supported by Safari with Selenium,
+        # so upload a broken one instead.
+        photo_input = self.selenium.find_element(By.ID, self.photo_input_id)
+        photo_input.send_keys(f"{self.tests_files_folder}/brokenimg.png")
+        self._submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            (
+                "Upload a valid image. The file you uploaded was either not an image "
+                "or a corrupted image."
+            ),
+        )
+        # "Currently" with "Clear" checkbox and "Change" still shown.
+        photo_field_row = self.selenium.find_element(By.CSS_SELECTOR, ".field-photo")
+        self.assertIn("Currently", photo_field_row.text)
+        self.assertIn("Change", photo_field_row.text)
+
+    def test_clearablefileinput_widget_preserve_clear_checkbox(self):
+        from selenium.webdriver.common.by import By
+
+        self._run_image_upload_path()
+        # "Clear" is not checked by default.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            False,
+        )
+        # "Clear" was checked, but a validation error is raised.
+        name_input = self.selenium.find_element(By.ID, self.name_input_id)
+        name_input.clear()
+        self.selenium.find_element(By.ID, self.clear_checkbox_id).click()
+        self._submit_and_wait()
+        self.assertEqual(
+            self.selenium.find_element(By.CSS_SELECTOR, ".errorlist li").text,
+            "This field is required.",
+        )
+        # "Clear" persists checked.
+        self.assertIs(
+            self.selenium.find_element(By.ID, self.clear_checkbox_id).is_selected(),
+            True,
+        )

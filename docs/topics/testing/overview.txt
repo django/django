@@ -27,6 +27,7 @@ transaction to provide isolation::
     from django.test import TestCase
     from myapp.models import Animal
 
+
     class AnimalTestCase(TestCase):
         def setUp(self):
             Animal.objects.create(name="lion", sound="roar")
@@ -75,7 +76,9 @@ Running tests
 =============
 
 Once you've written tests, run them using the :djadmin:`test` command of
-your project's ``manage.py`` utility::
+your project's ``manage.py`` utility:
+
+.. code-block:: shell
 
     $ ./manage.py test
 
@@ -85,7 +88,9 @@ any file named ``test*.py`` under the current working directory.
 
 You can specify particular tests to run by supplying any number of "test
 labels" to ``./manage.py test``. Each test label can be a full Python dotted
-path to a package, module, ``TestCase`` subclass, or test method. For instance::
+path to a package, module, ``TestCase`` subclass, or test method. For instance:
+
+.. code-block:: shell
 
     # Run all the tests in the animals.tests module
     $ ./manage.py test animals.tests
@@ -100,13 +105,17 @@ path to a package, module, ``TestCase`` subclass, or test method. For instance::
     $ ./manage.py test animals.tests.AnimalTestCase.test_animals_can_speak
 
 You can also provide a path to a directory to discover tests below that
-directory::
+directory:
+
+.. code-block:: shell
 
     $ ./manage.py test animals/
 
 You can specify a custom filename pattern match using the ``-p`` (or
 ``--pattern``) option, if your test files are named differently from the
-``test*.py`` pattern::
+``test*.py`` pattern:
+
+.. code-block:: shell
 
     $ ./manage.py test --pattern="tests_*.py"
 
@@ -239,11 +248,6 @@ You may randomize and/or reverse the execution order inside groups using the
 :option:`test --shuffle` and :option:`--reverse <test --reverse>` options. This
 can help with ensuring your tests are independent from each other.
 
-.. versionchanged:: 4.0
-
-    In older versions, failures detected when loading tests were not ordered
-    first.
-
 .. _test-case-serialized-rollback:
 
 Rollback emulation
@@ -293,7 +297,9 @@ Understanding the test output
 
 When you run your tests, you'll see a number of messages as the test runner
 prepares itself. You can control the level of detail of these messages with the
-``verbosity`` option on the command line::
+``verbosity`` option on the command line:
+
+.. code-block:: shell
 
     Creating test database...
     Creating table myapp_animal
@@ -303,7 +309,9 @@ This tells you that the test runner is creating a test database, as described
 in the previous section.
 
 Once the test database has been created, Django will run your tests.
-If everything goes well, you'll see something like this::
+If everything goes well, you'll see something like this:
+
+.. code-block:: shell
 
     ----------------------------------------------------------------------
     Ran 22 tests in 0.221s
@@ -311,7 +319,9 @@ If everything goes well, you'll see something like this::
     OK
 
 If there are test failures, however, you'll see full details about which tests
-failed::
+failed:
+
+.. code-block:: shell
 
     ======================================================================
     FAIL: test_was_published_recently_with_future_poll (polls.tests.PollMethodTests)
@@ -336,10 +346,6 @@ or an unexpected success). If all the tests pass, the return code is 0. This
 feature is useful if you're using the test-runner script in a shell script and
 need to test for success or failure at that level.
 
-.. versionchanged:: 4.1
-
-    In older versions, the return code was 0 for unexpected successes.
-
 .. _speeding-up-tests-auth-hashers:
 
 Speeding up the tests
@@ -359,7 +365,7 @@ many users in your tests, you may want to use a custom settings file and set
 the :setting:`PASSWORD_HASHERS` setting to a faster hashing algorithm::
 
     PASSWORD_HASHERS = [
-        'django.contrib.auth.hashers.MD5PasswordHasher',
+        "django.contrib.auth.hashers.MD5PasswordHasher",
     ]
 
 Don't forget to also include in :setting:`PASSWORD_HASHERS` any hashing
@@ -371,3 +377,12 @@ Preserving the test database
 The :option:`test --keepdb` option preserves the test database between test
 runs. It skips the create and destroy actions which can greatly decrease the
 time to run tests.
+
+Avoiding disk access for media files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
+prevent disk access for media files. All data is kept in memory, then it gets
+discarded after tests run.

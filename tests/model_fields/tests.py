@@ -156,6 +156,7 @@ class ChoicesTests(SimpleTestCase):
         cls.empty_choices_bool = Choiceful._meta.get_field("empty_choices_bool")
         cls.empty_choices_text = Choiceful._meta.get_field("empty_choices_text")
         cls.with_choices = Choiceful._meta.get_field("with_choices")
+        cls.choices_from_enum = Choiceful._meta.get_field("choices_from_enum")
 
     def test_choices(self):
         self.assertIsNone(self.no_choices.choices)
@@ -191,6 +192,10 @@ class ChoicesTests(SimpleTestCase):
         for field in fields:
             with self.subTest(field=field):
                 self.assertIsInstance(field.formfield(), forms.ChoiceField)
+
+    def test_choices_from_enum(self):
+        # Choices class was transparently resolved when given as argument.
+        self.assertEqual(self.choices_from_enum.choices, Choiceful.Suit.choices)
 
 
 class GetFieldDisplayTests(SimpleTestCase):

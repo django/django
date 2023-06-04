@@ -5,10 +5,13 @@ import cx_Oracle
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
-from django.db.backends.base.introspection import TableInfo
+from django.db.backends.base.introspection import TableInfo as BaseTableInfo
 from django.utils.functional import cached_property
 
-FieldInfo = namedtuple("FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json"))
+FieldInfo = namedtuple(
+    "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
+)
+TableInfo = namedtuple("TableInfo", BaseTableInfo._fields + ("comment",))
 
 
 class DatabaseIntrospection(BaseDatabaseIntrospection):
@@ -77,8 +80,14 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         """Return a list of table and view names in the current database."""
         cursor.execute(
             """
-            SELECT table_name, 't'
+            SELECT
+                user_tables.table_name,
+                't',
+                user_tab_comments.comments
             FROM user_tables
+            LEFT OUTER JOIN
+                user_tab_comments
+                ON user_tab_comments.table_name = user_tables.table_name
             WHERE
                 NOT EXISTS (
                     SELECT 1
@@ -86,13 +95,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHERE user_mviews.mview_name = user_tables.table_name
                 )
             UNION ALL
-            SELECT view_name, 'v' FROM user_views
+            SELECT view_name, 'v', NULL FROM user_views
             UNION ALL
-            SELECT mview_name, 'v' FROM user_mviews
+            SELECT mview_name, 'v', NULL FROM user_mviews
         """
         )
         return [
-            TableInfo(self.identifier_converter(row[0]), row[1])
+            TableInfo(self.identifier_converter(row[0]), row[1], row[2])
             for row in cursor.fetchall()
         ]
 
@@ -116,7 +125,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     WHEN user_tab_cols.char_used IS NULL
                     THEN user_tab_cols.data_length
                     ELSE user_tab_cols.char_length
-                END as internal_size,
+                END as display_size,
                 CASE
                     WHEN user_tab_cols.identity_column = 'YES' THEN 1
                     ELSE 0
@@ -131,29 +140,36 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     )
                     THEN 1
                     ELSE 0
-                END as is_json
+                END as is_json,
+                user_col_comments.comments as col_comment
             FROM user_tab_cols
             LEFT OUTER JOIN
                 user_tables ON user_tables.table_name = user_tab_cols.table_name
+            LEFT OUTER JOIN
+                user_col_comments ON
+                user_col_comments.column_name = user_tab_cols.column_name AND
+                user_col_comments.table_name = user_tab_cols.table_name
             WHERE user_tab_cols.table_name = UPPER(%s)
             """,
             [table_name],
         )
         field_map = {
             column: (
-                internal_size,
-                default if default != "NULL" else None,
+                display_size,
+                default.rstrip() if default and default != "NULL" else None,
                 collation,
                 is_autofield,
                 is_json,
+                comment,
             )
             for (
                 column,
                 default,
                 collation,
-                internal_size,
+                display_size,
                 is_autofield,
                 is_json,
+                comment,
             ) in cursor.fetchall()
         }
         self.cache_bust_counter += 1
@@ -165,13 +181,21 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         description = []
         for desc in cursor.description:
             name = desc[0]
-            internal_size, default, collation, is_autofield, is_json = field_map[name]
-            name = name % {}  # cx_Oracle, for some reason, doubles percent signs.
+            (
+                display_size,
+                default,
+                collation,
+                is_autofield,
+                is_json,
+                comment,
+            ) = field_map[name]
+            name %= {}  # cx_Oracle, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),
-                    *desc[1:3],
-                    internal_size,
+                    desc[1],
+                    display_size,
+                    desc[3],
                     desc[4] or 0,
                     desc[5] or 0,
                     *desc[6:],
@@ -179,6 +203,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     collation,
                     is_autofield,
                     is_json,
+                    comment,
                 )
             )
         return description
@@ -248,7 +273,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             for field_name, rel_table_name, rel_field_name in cursor.fetchall()
         }
 
-    def get_primary_key_column(self, cursor, table_name):
+    def get_primary_key_columns(self, cursor, table_name):
         cursor.execute(
             """
             SELECT
@@ -259,13 +284,13 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             WHERE
                 user_constraints.constraint_name = cols.constraint_name AND
                 user_constraints.constraint_type = 'P' AND
-                user_constraints.table_name = UPPER(%s) AND
-                cols.position = 1
+                user_constraints.table_name = UPPER(%s)
+            ORDER BY
+                cols.position
             """,
             [table_name],
         )
-        row = cursor.fetchone()
-        return self.identifier_converter(row[0]) if row else None
+        return [self.identifier_converter(row[0]) for row in cursor.fetchall()]
 
     def get_constraints(self, cursor, table_name):
         """

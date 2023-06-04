@@ -161,3 +161,59 @@ class UniqueFuncConstraintModel(models.Model):
         constraints = [
             models.UniqueConstraint(Lower("field"), name="func_lower_field_uq"),
         ]
+
+
+class Product(models.Model):
+    price = models.IntegerField(null=True)
+    discounted_price = models.IntegerField(null=True)
+
+    class Meta:
+        required_db_features = {
+            "supports_table_check_constraints",
+        }
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(price__gt=models.F("discounted_price")),
+                name="price_gt_discounted_price_validation",
+            ),
+        ]
+
+
+class ChildProduct(Product):
+    class Meta:
+        required_db_features = {
+            "supports_table_check_constraints",
+        }
+
+
+class UniqueConstraintProduct(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=32)
+    rank = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "color"], name="name_color_uniq_validation"
+            ),
+            models.UniqueConstraint(fields=["rank"], name="rank_uniq_validation"),
+        ]
+
+
+class ChildUniqueConstraintProduct(UniqueConstraintProduct):
+    pass
+
+
+class UniqueConstraintConditionProduct(models.Model):
+    name = models.CharField(max_length=255)
+    color = models.CharField(max_length=31, null=True, blank=True)
+
+    class Meta:
+        required_db_features = {"supports_partial_indexes"}
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name"],
+                name="name_without_color_uniq_validation",
+                condition=models.Q(color__isnull=True),
+            ),
+        ]

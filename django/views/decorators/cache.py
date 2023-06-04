@@ -1,5 +1,7 @@
 from functools import wraps
 
+from asgiref.sync import iscoroutinefunction
+
 from django.middleware.cache import CacheMiddleware
 from django.utils.cache import add_never_cache_headers, patch_cache_control
 from django.utils.decorators import decorator_from_middleware_with_args
@@ -26,22 +28,34 @@ def cache_page(timeout, *, cache=None, key_prefix=None):
     )
 
 
+def _check_request(request, decorator_name):
+    # Ensure argument looks like a request.
+    if not hasattr(request, "META"):
+        raise TypeError(
+            f"{decorator_name} didn't receive an HttpRequest. If you are "
+            "decorating a classmethod, be sure to use @method_decorator."
+        )
+
+
 def cache_control(**kwargs):
     def _cache_controller(viewfunc):
-        @wraps(viewfunc)
-        def _cache_controlled(request, *args, **kw):
-            # Ensure argument looks like a request.
-            if not hasattr(request, "META"):
-                raise TypeError(
-                    "cache_control didn't receive an HttpRequest. If you are "
-                    "decorating a classmethod, be sure to use "
-                    "@method_decorator."
-                )
-            response = viewfunc(request, *args, **kw)
-            patch_cache_control(response, **kwargs)
-            return response
+        if iscoroutinefunction(viewfunc):
 
-        return _cache_controlled
+            async def _view_wrapper(request, *args, **kw):
+                _check_request(request, "cache_control")
+                response = await viewfunc(request, *args, **kw)
+                patch_cache_control(response, **kwargs)
+                return response
+
+        else:
+
+            def _view_wrapper(request, *args, **kw):
+                _check_request(request, "cache_control")
+                response = viewfunc(request, *args, **kw)
+                patch_cache_control(response, **kwargs)
+                return response
+
+        return wraps(viewfunc)(_view_wrapper)
 
     return _cache_controller
 
@@ -51,16 +65,20 @@ def never_cache(view_func):
     Decorator that adds headers to a response so that it will never be cached.
     """
 
-    @wraps(view_func)
-    def _wrapped_view_func(request, *args, **kwargs):
-        # Ensure argument looks like a request.
-        if not hasattr(request, "META"):
-            raise TypeError(
-                "never_cache didn't receive an HttpRequest. If you are "
-                "decorating a classmethod, be sure to use @method_decorator."
-            )
-        response = view_func(request, *args, **kwargs)
-        add_never_cache_headers(response)
-        return response
+    if iscoroutinefunction(view_func):
 
-    return _wrapped_view_func
+        async def _view_wrapper(request, *args, **kwargs):
+            _check_request(request, "never_cache")
+            response = await view_func(request, *args, **kwargs)
+            add_never_cache_headers(response)
+            return response
+
+    else:
+
+        def _view_wrapper(request, *args, **kwargs):
+            _check_request(request, "never_cache")
+            response = view_func(request, *args, **kwargs)
+            add_never_cache_headers(response)
+            return response
+
+    return wraps(view_func)(_view_wrapper)

@@ -1,16 +1,16 @@
+# RemovedInDjango51Warning.
 """
 The citext PostgreSQL extension supports indexing of case-insensitive text
 strings and thus eliminates the need for operations such as iexact and other
 modifiers to enforce use of an index.
 """
 from django.db import IntegrityError
-from django.test.utils import modify_settings
+from django.utils.deprecation import RemovedInDjango51Warning
 
 from . import PostgreSQLTestCase
 from .models import CITestModel
 
 
-@modify_settings(INSTALLED_APPS={"append": "django.contrib.postgres"})
 class CITextTestCase(PostgreSQLTestCase):
     case_sensitive_lookups = ("contains", "startswith", "endswith", "regex")
 
@@ -82,3 +82,10 @@ class CITextTestCase(PostgreSQLTestCase):
                 self.assertSequenceEqual(
                     CITestModel.objects.filter(**query), [self.john]
                 )
+
+    def test_citext_deprecated(self):
+        from django.contrib.postgres.fields import CIText
+
+        msg = "django.contrib.postgres.fields.CIText mixin is deprecated."
+        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
+            CIText()

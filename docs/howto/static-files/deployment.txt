@@ -15,8 +15,8 @@ Serving static files in production
 The basic outline of putting static files into production consists of two
 steps: run the :djadmin:`collectstatic` command when static files change, then
 arrange for the collected static files directory (:setting:`STATIC_ROOT`) to be
-moved to the static file server and served. Depending on
-:setting:`STATICFILES_STORAGE`, files may need to be moved to a new location
+moved to the static file server and served. Depending the ``staticfiles``
+:setting:`STORAGES` alias, files may need to be moved to a new location
 manually or the :func:`post_process
 <django.contrib.staticfiles.storage.StaticFilesStorage.post_process>` method of
 the ``Storage`` class might take care of that.
@@ -85,23 +85,30 @@ There's any number of ways you might do this, but if the provider has an API,
 you can use a :doc:`custom file storage backend </howto/custom-file-storage>`
 to integrate the CDN with your Django project. If you've written or are using a
 3rd party custom storage backend, you can tell :djadmin:`collectstatic` to use
-it by setting :setting:`STATICFILES_STORAGE` to the storage engine.
+it by setting ``staticfiles`` in :setting:`STORAGES`.
 
 For example, if you've written an S3 storage backend in
 ``myproject.storage.S3Storage`` you could use it with::
 
-    STATICFILES_STORAGE = 'myproject.storage.S3Storage'
+    STORAGES = {
+        # ...
+        "staticfiles": {"BACKEND": "myproject.storage.S3Storage"}
+    }
 
 Once that's done, all you have to do is run :djadmin:`collectstatic` and your
 static files would be pushed through your storage package up to S3. If you
 later needed to switch to a different storage provider, you may only have to
-change your :setting:`STATICFILES_STORAGE` setting.
+change ``staticfiles`` in the :setting:`STORAGES` setting.
 
 For details on how you'd write one of these backends, see
 :doc:`/howto/custom-file-storage`. There are 3rd party apps available that
 provide storage backends for many common file storage APIs. A good starting
 point is the `overview at djangopackages.org
 <https://djangopackages.org/grids/g/storage-backends/>`_.
+
+.. versionchanged:: 4.2
+
+    The :setting:`STORAGES` setting was added.
 
 Learn more
 ==========

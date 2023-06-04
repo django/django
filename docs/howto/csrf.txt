@@ -104,7 +104,7 @@ The above code could be simplified by using the `JavaScript Cookie library
     Django provides a view decorator which forces setting of the cookie:
     :func:`~django.views.decorators.csrf.ensure_csrf_cookie`.
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 
 .. _acquiring-csrf-token-from-html:
 
@@ -205,6 +205,7 @@ will require a CSRF token to be inserted you should use the
   from django.views.decorators.cache import cache_page
   from django.views.decorators.csrf import csrf_protect
 
+
   @cache_page(60 * 15)
   @csrf_protect
   def my_view(request):
@@ -225,7 +226,9 @@ decorator so that they no longer rejects requests. In every other respect
 
 If, for some reason, you *want* the test client to perform CSRF
 checks, you can create an instance of the test client that enforces
-CSRF checks::
+CSRF checks:
+
+.. code-block:: pycon
 
     >>> from django.test import Client
     >>> csrf_client = Client(enforce_csrf_checks=True)
@@ -278,17 +281,17 @@ path within it that needs protection. Example::
 
     from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+
     @csrf_exempt
     def my_view(request):
-
         @csrf_protect
         def protected_path(request):
             do_something()
 
         if some_condition():
-           return protected_path(request)
+            return protected_path(request)
         else:
-           do_something_else()
+            do_something_else()
 
 Protecting a page that uses AJAX without an HTML form
 -----------------------------------------------------

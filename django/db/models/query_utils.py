@@ -5,14 +5,17 @@ Factored out from django.db.models.query to avoid making the main module very
 large and/or so that they can be used by other modules without getting into
 circular import difficulties.
 """
-import copy
 import functools
 import inspect
+import logging
 from collections import namedtuple
 
 from django.core.exceptions import FieldError
+from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+
+logger = logging.getLogger("django.db.models")
 
 # PathInfo is used when converting lookups (fk__somecol). The contents
 # describe the relation in Model terms (model Options and Fields for both
@@ -50,17 +53,14 @@ class Q(tree.Node):
         )
 
     def _combine(self, other, conn):
-        if not (isinstance(other, Q) or getattr(other, "conditional", False) is True):
+        if getattr(other, "conditional", False) is False:
             raise TypeError(other)
-
         if not self:
-            return other.copy() if hasattr(other, "copy") else copy.copy(other)
-        elif isinstance(other, Q) and not other:
-            _, args, kwargs = self.deconstruct()
-            return type(self)(*args, **kwargs)
+            return other.copy()
+        if not other and isinstance(other, Q):
+            return self.copy()
 
-        obj = type(self)()
-        obj.connector = conn
+        obj = self.create(connector=conn)
         obj.add(self, conn)
         obj.add(other, conn)
         return obj
@@ -75,8 +75,7 @@ class Q(tree.Node):
         return self._combine(other, self.XOR)
 
     def __invert__(self):
-        obj = type(self)()
-        obj.add(self, self.AND)
+        obj = self.copy()
         obj.negate()
         return obj
 
@@ -91,9 +90,54 @@ class Q(tree.Node):
             allow_joins=allow_joins,
             split_subq=False,
             check_filterable=False,
+            summarize=summarize,
         )
         query.promote_joins(joins)
         return clause
+
+    def flatten(self):
+        """
+        Recursively yield this Q object and all subexpressions, in depth-first
+        order.
+        """
+        yield self
+        for child in self.children:
+            if isinstance(child, tuple):
+                # Use the lookup.
+                child = child[1]
+            if hasattr(child, "flatten"):
+                yield from child.flatten()
+            else:
+                yield child
+
+    def check(self, against, using=DEFAULT_DB_ALIAS):
+        """
+        Do a database query to check if the expressions of the Q instance
+        matches against the expressions.
+        """
+        # Avoid circular imports.
+        from django.db.models import BooleanField, Value
+        from django.db.models.functions import Coalesce
+        from django.db.models.sql import Query
+        from django.db.models.sql.constants import SINGLE
+
+        query = Query(None)
+        for name, value in against.items():
+            if not hasattr(value, "resolve_expression"):
+                value = Value(value)
+            query.add_annotation(value, name, select=False)
+        query.add_annotation(Value(1), "_check")
+        # This will raise a FieldError if a field is missing in "against".
+        if connections[using].features.supports_comparing_boolean_expr:
+            query.add_q(Q(Coalesce(self, True, output_field=BooleanField())))
+        else:
+            query.add_q(self)
+        compiler = query.get_compiler(using=using)
+        try:
+            return compiler.execute_sql(SINGLE) is not None
+        except DatabaseError as e:
+            logger.warning("Got a database error calling check() on %r: %s", self, e)
+            return True
 
     def deconstruct(self):
         path = "%s.%s" % (self.__class__.__module__, self.__class__.__name__)
@@ -149,18 +193,41 @@ class DeferredAttribute:
         return None
 
 
-class RegisterLookupMixin:
-    @classmethod
-    def _get_lookup(cls, lookup_name):
-        return cls.get_lookups().get(lookup_name, None)
+class class_or_instance_method:
+    """
+    Hook used in RegisterLookupMixin to return partial functions depending on
+    the caller type (instance or class of models.Field).
+    """
 
-    @classmethod
-    @functools.lru_cache(maxsize=None)
-    def get_lookups(cls):
+    def __init__(self, class_method, instance_method):
+        self.class_method = class_method
+        self.instance_method = instance_method
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return functools.partial(self.class_method, owner)
+        return functools.partial(self.instance_method, instance)
+
+
+class RegisterLookupMixin:
+    def _get_lookup(self, lookup_name):
+        return self.get_lookups().get(lookup_name, None)
+
+    @functools.cache
+    def get_class_lookups(cls):
         class_lookups = [
             parent.__dict__.get("class_lookups", {}) for parent in inspect.getmro(cls)
         ]
         return cls.merge_dicts(class_lookups)
+
+    def get_instance_lookups(self):
+        class_lookups = self.get_class_lookups()
+        if instance_lookups := getattr(self, "instance_lookups", None):
+            return {**class_lookups, **instance_lookups}
+        return class_lookups
+
+    get_lookups = class_or_instance_method(get_class_lookups, get_instance_lookups)
+    get_class_lookups = classmethod(get_class_lookups)
 
     def get_lookup(self, lookup_name):
         from django.db.models.lookups import Lookup
@@ -194,22 +261,33 @@ class RegisterLookupMixin:
         return merged
 
     @classmethod
-    def _clear_cached_lookups(cls):
+    def _clear_cached_class_lookups(cls):
         for subclass in subclasses(cls):
-            subclass.get_lookups.cache_clear()
+            subclass.get_class_lookups.cache_clear()
 
-    @classmethod
-    def register_lookup(cls, lookup, lookup_name=None):
+    def register_class_lookup(cls, lookup, lookup_name=None):
         if lookup_name is None:
             lookup_name = lookup.lookup_name
         if "class_lookups" not in cls.__dict__:
             cls.class_lookups = {}
         cls.class_lookups[lookup_name] = lookup
-        cls._clear_cached_lookups()
+        cls._clear_cached_class_lookups()
         return lookup
 
-    @classmethod
-    def _unregister_lookup(cls, lookup, lookup_name=None):
+    def register_instance_lookup(self, lookup, lookup_name=None):
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        if "instance_lookups" not in self.__dict__:
+            self.instance_lookups = {}
+        self.instance_lookups[lookup_name] = lookup
+        return lookup
+
+    register_lookup = class_or_instance_method(
+        register_class_lookup, register_instance_lookup
+    )
+    register_class_lookup = classmethod(register_class_lookup)
+
+    def _unregister_class_lookup(cls, lookup, lookup_name=None):
         """
         Remove given lookup from cls lookups. For use in tests only as it's
         not thread-safe.
@@ -217,10 +295,24 @@ class RegisterLookupMixin:
         if lookup_name is None:
             lookup_name = lookup.lookup_name
         del cls.class_lookups[lookup_name]
-        cls._clear_cached_lookups()
+        cls._clear_cached_class_lookups()
+
+    def _unregister_instance_lookup(self, lookup, lookup_name=None):
+        """
+        Remove given lookup from instance lookups. For use in tests only as
+        it's not thread-safe.
+        """
+        if lookup_name is None:
+            lookup_name = lookup.lookup_name
+        del self.instance_lookups[lookup_name]
+
+    _unregister_lookup = class_or_instance_method(
+        _unregister_class_lookup, _unregister_instance_lookup
+    )
+    _unregister_class_lookup = classmethod(_unregister_class_lookup)
 
 
-def select_related_descend(field, restricted, requested, load_fields, reverse=False):
+def select_related_descend(field, restricted, requested, select_mask, reverse=False):
     """
     Return True if this field should be used to descend deeper for
     select_related() purposes. Used by both the query construction code
@@ -232,7 +324,7 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
      * restricted - a boolean field, indicating if the field list has been
        manually restricted using a requested clause)
      * requested - The select_related() dictionary.
-     * load_fields - the set of fields to be loaded on this model
+     * select_mask - the dictionary of selected fields.
      * reverse - boolean, True if we are checking a reverse select related
     """
     if not field.remote_field:
@@ -246,14 +338,16 @@ def select_related_descend(field, restricted, requested, load_fields, reverse=Fa
             return False
     if not restricted and field.null:
         return False
-    if load_fields:
-        if field.attname not in load_fields:
-            if restricted and field.name in requested:
-                msg = (
-                    "Field %s.%s cannot be both deferred and traversed using "
-                    "select_related at the same time."
-                ) % (field.model._meta.object_name, field.name)
-                raise FieldError(msg)
+    if (
+        restricted
+        and select_mask
+        and field.name in requested
+        and field not in select_mask
+    ):
+        raise FieldError(
+            f"Field {field.model._meta.object_name}.{field.name} cannot be both "
+            "deferred and traversed using select_related at the same time."
+        )
     return True
 
 
@@ -265,9 +359,9 @@ def refs_expression(lookup_parts, annotations):
     """
     for n in range(1, len(lookup_parts) + 1):
         level_n_lookup = LOOKUP_SEP.join(lookup_parts[0:n])
-        if level_n_lookup in annotations and annotations[level_n_lookup]:
-            return annotations[level_n_lookup], lookup_parts[n:]
-    return False, ()
+        if annotations.get(level_n_lookup):
+            return level_n_lookup, lookup_parts[n:]
+    return None, ()
 
 
 def check_rel_lookup_compatibility(model, target_opts, field):
@@ -309,8 +403,11 @@ class FilteredRelation:
         self.alias = None
         if not isinstance(condition, Q):
             raise ValueError("condition argument must be a Q() instance.")
+        # .condition and .resolved_condition have to be stored independently
+        # as the former must remain unchanged for Join.__eq__ to remain stable
+        # and reusable even once their .filtered_relation are resolved.
         self.condition = condition
-        self.path = []
+        self.resolved_condition = None
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -324,18 +421,26 @@ class FilteredRelation:
     def clone(self):
         clone = FilteredRelation(self.relation_name, condition=self.condition)
         clone.alias = self.alias
-        clone.path = self.path[:]
+        if (resolved_condition := self.resolved_condition) is not None:
+            clone.resolved_condition = resolved_condition.clone()
         return clone
 
-    def resolve_expression(self, *args, **kwargs):
-        """
-        QuerySet.annotate() only accepts expression-like arguments
-        (with a resolve_expression() method).
-        """
-        raise NotImplementedError("FilteredRelation.resolve_expression() is unused.")
+    def relabeled_clone(self, change_map):
+        clone = self.clone()
+        if resolved_condition := clone.resolved_condition:
+            clone.resolved_condition = resolved_condition.relabeled_clone(change_map)
+        return clone
+
+    def resolve_expression(self, query, reuse, *args, **kwargs):
+        clone = self.clone()
+        clone.resolved_condition = query.build_filter(
+            self.condition,
+            can_reuse=reuse,
+            allow_joins=True,
+            split_subq=False,
+            update_join_types=False,
+        )[0]
+        return clone
 
     def as_sql(self, compiler, connection):
-        # Resolve the condition in Join.filtered_relation.
-        query = compiler.query
-        where = query.build_filtered_relation_q(self.condition, reuse=set(self.path))
-        return compiler.compile(where)
+        return compiler.compile(self.resolved_condition)

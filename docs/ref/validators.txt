@@ -18,17 +18,19 @@ For example, here's a validator that only allows even numbers::
     from django.core.exceptions import ValidationError
     from django.utils.translation import gettext_lazy as _
 
+
     def validate_even(value):
         if value % 2 != 0:
             raise ValidationError(
-                _('%(value)s is not an even number'),
-                params={'value': value},
+                _("%(value)s is not an even number"),
+                params={"value": value},
             )
 
 You can add this to a model field via the field's :attr:`~django.db.models.Field.validators`
 argument::
 
     from django.db import models
+
 
     class MyModel(models.Model):
         even_field = models.IntegerField(validators=[validate_even])
@@ -37,6 +39,7 @@ Because values are converted to Python before validators are run, you can even
 use the same validator with forms::
 
     from django import forms
+
 
     class MyForm(forms.Form):
         even_field = forms.IntegerField(validators=[validate_even])
@@ -318,7 +321,7 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: ProhibitNullCharactersValidator(message=None, code=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` if ``str(value)``
-    contains one or more nulls characters (``'\x00'``).
+    contains one or more null characters (``'\x00'``).
 
     :param message: If not ``None``, overrides :attr:`.message`.
     :param code: If not ``None``, overrides :attr:`code`.
@@ -333,3 +336,13 @@ to, or in lieu of custom ``field.clean()`` methods.
 
         The error code used by :exc:`~django.core.exceptions.ValidationError`
         if validation fails. Defaults to ``"null_characters_not_allowed"``.
+
+``StepValueValidator``
+----------------------
+
+.. class:: StepValueValidator(limit_value, message=None)
+
+    Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
+    ``'step_size'`` if ``value`` is not an integral multiple of
+    ``limit_value``, which can be a float, integer or decimal value or a
+    callable.

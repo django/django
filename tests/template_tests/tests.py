@@ -31,7 +31,7 @@ class TemplateTestMixin:
 
     def test_url_reverse_view_name(self):
         """
-        #19827 -- url tag should keep original strack trace when reraising
+        #19827 -- url tag should keep original stack trace when reraising
         exception.
         """
         t = self._engine().from_string("{% url will_not_match %}")
@@ -182,6 +182,14 @@ class TemplateTestMixin:
         template = self._engine().from_string("content")
         for node in template.nodelist:
             self.assertEqual(node.origin, template.origin)
+
+    def test_render_built_in_type_method(self):
+        """
+        Templates should not crash when rendering methods for built-in types
+        without required arguments.
+        """
+        template = self._engine().from_string("{{ description.count }}")
+        self.assertEqual(template.render(Context({"description": "test"})), "")
 
 
 class TemplateTests(TemplateTestMixin, SimpleTestCase):

@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.conf import settings
 from django.template.backends.django import get_template_tag_modules
 
-from . import Error, Tags, register
+from . import Error, Tags, Warning, register
 
 E001 = Error(
     "You have 'APP_DIRS': True in your TEMPLATES but also specify 'loaders' "
@@ -15,7 +15,7 @@ E002 = Error(
     "'string_if_invalid' in TEMPLATES OPTIONS must be a string but got: {} ({}).",
     id="templates.E002",
 )
-E003 = Error(
+W003 = Warning(
     "{} is used for multiple template tag modules: {}",
     id="templates.E003",
 )
@@ -50,25 +50,25 @@ def check_string_if_invalid_is_string(app_configs, **kwargs):
 @register(Tags.templates)
 def check_for_template_tags_with_the_same_name(app_configs, **kwargs):
     errors = []
-    libraries = defaultdict(list)
+    libraries = defaultdict(set)
 
     for conf in settings.TEMPLATES:
         custom_libraries = conf.get("OPTIONS", {}).get("libraries", {})
         for module_name, module_path in custom_libraries.items():
-            libraries[module_name].append(module_path)
+            libraries[module_name].add(module_path)
 
     for module_name, module_path in get_template_tag_modules():
-        libraries[module_name].append(module_path)
+        libraries[module_name].add(module_path)
 
     for library_name, items in libraries.items():
         if len(items) > 1:
             errors.append(
-                Error(
-                    E003.msg.format(
+                Warning(
+                    W003.msg.format(
                         repr(library_name),
-                        ", ".join(repr(item) for item in items),
+                        ", ".join(repr(item) for item in sorted(items)),
                     ),
-                    id=E003.id,
+                    id=W003.id,
                 )
             )
 

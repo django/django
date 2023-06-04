@@ -32,9 +32,9 @@ class RedisCacheClient:
         self,
         servers,
         serializer=None,
-        db=None,
         pool_class=None,
         parser_class=None,
+        **options,
     ):
         import redis
 
@@ -58,7 +58,7 @@ class RedisCacheClient:
             parser_class = import_string(parser_class)
         parser_class = parser_class or self._lib.connection.DefaultParser
 
-        self._pool_options = {"parser_class": parser_class, "db": db}
+        self._pool_options = {"parser_class": parser_class, **options}
 
     def _get_connection_pool_index(self, write):
         # Write to the first server. Read from other servers if there are more,
@@ -130,7 +130,7 @@ class RedisCacheClient:
         return bool(client.exists(key))
 
     def incr(self, key, delta):
-        client = self.get_client(key)
+        client = self.get_client(key, write=True)
         if not client.exists(key):
             raise ValueError("Key '%s' not found." % key)
         return client.incr(key, delta)
@@ -214,6 +214,8 @@ class RedisCache(BaseCache):
         return self._cache.incr(key, delta)
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        if not data:
+            return []
         safe_data = {}
         for key, value in data.items():
             key = self.make_and_validate_key(key, version=version)
@@ -222,10 +224,9 @@ class RedisCache(BaseCache):
         return []
 
     def delete_many(self, keys, version=None):
-        safe_keys = []
-        for key in keys:
-            key = self.make_and_validate_key(key, version=version)
-            safe_keys.append(key)
+        if not keys:
+            return
+        safe_keys = [self.make_and_validate_key(key, version=version) for key in keys]
         self._cache.delete_many(safe_keys)
 
     def clear(self):

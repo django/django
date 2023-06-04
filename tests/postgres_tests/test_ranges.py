@@ -20,13 +20,16 @@ from .models import (
 )
 
 try:
-    from psycopg2.extras import DateRange, DateTimeTZRange, NumericRange
-
     from django.contrib.postgres import fields as pg_fields
     from django.contrib.postgres import forms as pg_forms
     from django.contrib.postgres.validators import (
         RangeMaxValueValidator,
         RangeMinValueValidator,
+    )
+    from django.db.backends.postgresql.psycopg_any import (
+        DateRange,
+        DateTimeTZRange,
+        NumericRange,
     )
 except ImportError:
     pass
@@ -631,7 +634,7 @@ class TestValidators(PostgreSQLSimpleTestCase):
     def test_max(self):
         validator = RangeMaxValueValidator(5)
         validator(NumericRange(0, 5))
-        msg = "Ensure that this range is completely less than or equal to 5."
+        msg = "Ensure that the upper bound of the range is not greater than 5."
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
         self.assertEqual(cm.exception.messages[0], msg)
@@ -642,7 +645,7 @@ class TestValidators(PostgreSQLSimpleTestCase):
     def test_min(self):
         validator = RangeMinValueValidator(5)
         validator(NumericRange(10, 15))
-        msg = "Ensure that this range is completely greater than or equal to 5."
+        msg = "Ensure that the lower bound of the range is not less than 5."
         with self.assertRaises(exceptions.ValidationError) as cm:
             validator(NumericRange(0, 10))
         self.assertEqual(cm.exception.messages[0], msg)
@@ -687,17 +690,15 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(form),
             """
-            <tr>
-                <th>
-                <label>Field:</label>
-                </th>
-                <td>
+            <div>
+                <fieldset>
+                    <legend>Field:</legend>
                     <input id="id_field_0_0" name="field_0_0" type="text">
                     <input id="id_field_0_1" name="field_0_1" type="text">
                     <input id="id_field_1_0" name="field_1_0" type="text">
                     <input id="id_field_1_1" name="field_1_1" type="text">
-                </td>
-            </tr>
+                </fieldset>
+            </div>
         """,
         )
         form = SplitForm(
@@ -788,13 +789,13 @@ class TestFormField(PostgreSQLSimpleTestCase):
         self.assertHTMLEqual(
             str(RangeForm()),
             """
-        <tr>
-            <th><label>Ints:</label></th>
-            <td>
+        <div>
+            <fieldset>
+                <legend>Ints:</legend>
                 <input id="id_ints_0" name="ints_0" type="number">
                 <input id="id_ints_1" name="ints_1" type="number">
-            </td>
-        </tr>
+            </fieldset>
+        </div>
         """,
         )
 

@@ -7,11 +7,13 @@ from django.test import SimpleTestCase
 from django.utils.datastructures import MultiValueDict
 from django.utils.http import (
     base36_to_int,
+    content_disposition_header,
     escape_leading_slashes,
     http_date,
     int_to_base36,
     is_same_domain,
     parse_etags,
+    parse_header_parameters,
     parse_http_date,
     quote_etag,
     url_has_allowed_host_and_scheme,
@@ -176,6 +178,7 @@ class URLHasAllowedHostAndSchemeTests(unittest.TestCase):
             r"http:/\example.com",
             'javascript:alert("XSS")',
             "\njavascript:alert(x)",
+            "java\nscript:alert(x)",
             "\x08//example.com",
             r"http://otherserver\@example.com",
             r"http:\\testserver\@example.com",
@@ -327,7 +330,7 @@ class ETagProcessingTests(unittest.TestCase):
         )
         self.assertEqual(parse_etags("*"), ["*"])
 
-        # Ignore RFC 2616 ETags that are invalid according to RFC 7232.
+        # Ignore RFC 2616 ETags that are invalid according to RFC 9110.
         self.assertEqual(parse_etags(r'"etag", "e\"t\"ag"'), ['"etag"'])
 
     def test_quoting(self):
@@ -435,3 +438,102 @@ class EscapeLeadingSlashesTests(unittest.TestCase):
         for url, expected in tests:
             with self.subTest(url=url):
                 self.assertEqual(escape_leading_slashes(url), expected)
+
+
+class ParseHeaderParameterTests(unittest.TestCase):
+    def test_basic(self):
+        tests = [
+            ("text/plain", ("text/plain", {})),
+            ("text/vnd.just.made.this.up ; ", ("text/vnd.just.made.this.up", {})),
+            ("text/plain;charset=us-ascii", ("text/plain", {"charset": "us-ascii"})),
+            (
+                'text/plain ; charset="us-ascii"',
+                ("text/plain", {"charset": "us-ascii"}),
+            ),
+            (
+                'text/plain ; charset="us-ascii"; another=opt',
+                ("text/plain", {"charset": "us-ascii", "another": "opt"}),
+            ),
+            (
+                'attachment; filename="silly.txt"',
+                ("attachment", {"filename": "silly.txt"}),
+            ),
+            (
+                'attachment; filename="strange;name"',
+                ("attachment", {"filename": "strange;name"}),
+            ),
+            (
+                'attachment; filename="strange;name";size=123;',
+                ("attachment", {"filename": "strange;name", "size": "123"}),
+            ),
+            (
+                'form-data; name="files"; filename="fo\\"o;bar"',
+                ("form-data", {"name": "files", "filename": 'fo"o;bar'}),
+            ),
+        ]
+        for header, expected in tests:
+            with self.subTest(header=header):
+                self.assertEqual(parse_header_parameters(header), expected)
+
+    def test_rfc2231_parsing(self):
+        test_data = (
+            (
+                "Content-Type: application/x-stuff; "
+                "title*=us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "This is ***fun***",
+            ),
+            (
+                "Content-Type: application/x-stuff; title*=UTF-8''foo-%c3%a4.html",
+                "foo-ä.html",
+            ),
+            (
+                "Content-Type: application/x-stuff; title*=iso-8859-1''foo-%E4.html",
+                "foo-ä.html",
+            ),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header_parameters(raw_line)
+            self.assertEqual(parsed[1]["title"], expected_title)
+
+    def test_rfc2231_wrong_title(self):
+        """
+        Test wrongly formatted RFC 2231 headers (missing double single quotes).
+        Parsing should not crash (#24209).
+        """
+        test_data = (
+            (
+                "Content-Type: application/x-stuff; "
+                "title*='This%20is%20%2A%2A%2Afun%2A%2A%2A",
+                "'This%20is%20%2A%2A%2Afun%2A%2A%2A",
+            ),
+            ("Content-Type: application/x-stuff; title*='foo.html", "'foo.html"),
+            ("Content-Type: application/x-stuff; title*=bar.html", "bar.html"),
+        )
+        for raw_line, expected_title in test_data:
+            parsed = parse_header_parameters(raw_line)
+            self.assertEqual(parsed[1]["title"], expected_title)
+
+
+class ContentDispositionHeaderTests(unittest.TestCase):
+    def test_basic(self):
+        tests = (
+            ((False, None), None),
+            ((False, "example"), 'inline; filename="example"'),
+            ((True, None), "attachment"),
+            ((True, "example"), 'attachment; filename="example"'),
+            (
+                (True, '"example" file\\name'),
+                'attachment; filename="\\"example\\" file\\\\name"',
+            ),
+            ((True, "espécimen"), "attachment; filename*=utf-8''esp%C3%A9cimen"),
+            (
+                (True, '"espécimen" filename'),
+                "attachment; filename*=utf-8''%22esp%C3%A9cimen%22%20filename",
+            ),
+        )
+
+        for (is_attachment, filename), expected in tests:
+            with self.subTest(is_attachment=is_attachment, filename=filename):
+                self.assertEqual(
+                    content_disposition_header(is_attachment, filename), expected
+                )

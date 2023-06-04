@@ -10,7 +10,7 @@ from django.db import (
     connection,
 )
 from django.db.models import FileField, Value
-from django.db.models.functions import Lower
+from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
     override_settings,
@@ -21,6 +21,7 @@ from django.test import (
 from .models import (
     BigAutoFieldModel,
     Country,
+    FieldsWithDbColumns,
     NoFields,
     NullableFields,
     Pizzeria,
@@ -49,7 +50,7 @@ class BulkCreateTests(TestCase):
     def test_simple(self):
         created = Country.objects.bulk_create(self.data)
         self.assertEqual(created, self.data)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Country.objects.order_by("-name"),
             [
                 "United States of America",
@@ -119,7 +120,7 @@ class BulkCreateTests(TestCase):
                 Country(name="Tortall", iso_two_letter="TA"),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ProxyCountry.objects.all(),
             {"Qwghlm", "Tortall"},
             attrgetter("name"),
@@ -131,7 +132,7 @@ class BulkCreateTests(TestCase):
                 ProxyProxyCountry(name="Netherlands", iso_two_letter="NT"),
             ]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             ProxyProxyCountry.objects.all(),
             {
                 "Qwghlm",
@@ -146,7 +147,7 @@ class BulkCreateTests(TestCase):
         State.objects.bulk_create(
             [State(two_letter_code=s) for s in ["IL", "NY", "CA", "ME"]]
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             State.objects.order_by("two_letter_code"),
             [
                 "CA",
@@ -163,7 +164,7 @@ class BulkCreateTests(TestCase):
             State.objects.bulk_create(
                 [State(two_letter_code=s) for s in ["IL", "NY", "CA", "ME"]]
             )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             State.objects.order_by("two_letter_code"),
             [
                 "CA",
@@ -298,6 +299,19 @@ class BulkCreateTests(TestCase):
         )
         bbb = Restaurant.objects.filter(name="betty's beetroot bar")
         self.assertEqual(bbb.count(), 1)
+
+    @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_insert_now(self):
+        NullableFields.objects.bulk_create(
+            [
+                NullableFields(datetime_field=Now()),
+                NullableFields(datetime_field=Now()),
+            ]
+        )
+        self.assertEqual(
+            NullableFields.objects.filter(datetime_field__isnull=False).count(),
+            2,
+        )
 
     @skipUnlessDBFeature("has_bulk_insert")
     def test_bulk_insert_nullable_fields(self):
@@ -598,6 +612,39 @@ class BulkCreateTests(TestCase):
     @skipUnlessDBFeature(
         "supports_update_conflicts", "supports_update_conflicts_with_target"
     )
+    def test_update_conflicts_unique_fields_pk(self):
+        TwoFields.objects.bulk_create(
+            [
+                TwoFields(f1=1, f2=1, name="a"),
+                TwoFields(f1=2, f2=2, name="b"),
+            ]
+        )
+        self.assertEqual(TwoFields.objects.count(), 2)
+
+        obj1 = TwoFields.objects.get(f1=1)
+        obj2 = TwoFields.objects.get(f1=2)
+        conflicting_objects = [
+            TwoFields(pk=obj1.pk, f1=3, f2=3, name="c"),
+            TwoFields(pk=obj2.pk, f1=4, f2=4, name="d"),
+        ]
+        TwoFields.objects.bulk_create(
+            conflicting_objects,
+            update_conflicts=True,
+            unique_fields=["pk"],
+            update_fields=["name"],
+        )
+        self.assertEqual(TwoFields.objects.count(), 2)
+        self.assertCountEqual(
+            TwoFields.objects.values("f1", "f2", "name"),
+            [
+                {"f1": 1, "f2": 1, "name": "c"},
+                {"f1": 2, "f2": 2, "name": "d"},
+            ],
+        )
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts", "supports_update_conflicts_with_target"
+    )
     def test_update_conflicts_two_fields_unique_fields_both(self):
         with self.assertRaises((OperationalError, ProgrammingError)):
             self._test_update_conflicts_two_fields(["f1", "f2"])
@@ -739,3 +786,34 @@ class BulkCreateTests(TestCase):
     @skipIfDBFeature("supports_update_conflicts_with_target")
     def test_update_conflicts_no_unique_fields(self):
         self._test_update_conflicts([])
+
+    @skipUnlessDBFeature(
+        "supports_update_conflicts", "supports_update_conflicts_with_target"
+    )
+    def test_update_conflicts_unique_fields_update_fields_db_column(self):
+        FieldsWithDbColumns.objects.bulk_create(
+            [
+                FieldsWithDbColumns(rank=1, name="a"),
+                FieldsWithDbColumns(rank=2, name="b"),
+            ]
+        )
+        self.assertEqual(FieldsWithDbColumns.objects.count(), 2)
+
+        conflicting_objects = [
+            FieldsWithDbColumns(rank=1, name="c"),
+            FieldsWithDbColumns(rank=2, name="d"),
+        ]
+        FieldsWithDbColumns.objects.bulk_create(
+            conflicting_objects,
+            update_conflicts=True,
+            unique_fields=["rank"],
+            update_fields=["name"],
+        )
+        self.assertEqual(FieldsWithDbColumns.objects.count(), 2)
+        self.assertCountEqual(
+            FieldsWithDbColumns.objects.values("rank", "name"),
+            [
+                {"rank": 1, "name": "c"},
+                {"rank": 2, "name": "d"},
+            ],
+        )

@@ -1,24 +1,30 @@
 import datetime
 from unittest import skipUnless
 
+from django.conf import settings
 from django.db import connection
-from django.db.models import CASCADE, ForeignKey, Index, Q
+from django.db.models import (
+    CASCADE,
+    CharField,
+    DateTimeField,
+    ForeignKey,
+    Index,
+    Model,
+    Q,
+)
 from django.db.models.functions import Lower
 from django.test import (
     TestCase,
     TransactionTestCase,
+    ignore_warnings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import override_settings
+from django.test.utils import isolate_apps, override_settings
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango51Warning
 
-from .models import (
-    Article,
-    ArticleTranslation,
-    IndexedArticle2,
-    IndexTogetherSingleList,
-)
+from .models import Article, ArticleTranslation, IndexedArticle2
 
 
 class SchemaIndexesTests(TestCase):
@@ -64,22 +70,26 @@ class SchemaIndexesTests(TestCase):
             )
         self.assertEqual(index_name, expected[connection.vendor])
 
-    def test_index_together(self):
+    def test_quoted_index_name(self):
         editor = connection.schema_editor()
         index_sql = [str(statement) for statement in editor._model_indexes_sql(Article)]
         self.assertEqual(len(index_sql), 1)
-        # Ensure the index name is properly quoted
+        # Ensure the index name is properly quoted.
         self.assertIn(
-            connection.ops.quote_name(
-                editor._create_index_name(
-                    Article._meta.db_table, ["headline", "pub_date"], suffix="_idx"
-                )
-            ),
+            connection.ops.quote_name(Article._meta.indexes[0].name),
             index_sql[0],
         )
 
+    @ignore_warnings(category=RemovedInDjango51Warning)
+    @isolate_apps("indexes")
     def test_index_together_single_list(self):
-        # Test for using index_together with a single list (#22172)
+        class IndexTogetherSingleList(Model):
+            headline = CharField(max_length=100)
+            pub_date = DateTimeField()
+
+            class Meta:
+                index_together = ["headline", "pub_date"]
+
         index_sql = connection.schema_editor()._model_indexes_sql(
             IndexTogetherSingleList
         )
@@ -600,11 +610,17 @@ class CoveringIndexTests(TransactionTestCase):
             condition=Q(pub_date__isnull=False),
         )
         with connection.schema_editor() as editor:
+            extra_sql = ""
+            if settings.DEFAULT_INDEX_TABLESPACE:
+                extra_sql = "TABLESPACE %s " % editor.quote_name(
+                    settings.DEFAULT_INDEX_TABLESPACE
+                )
             self.assertIn(
-                "(%s) INCLUDE (%s) WHERE %s "
+                "(%s) INCLUDE (%s) %sWHERE %s "
                 % (
                     editor.quote_name("headline"),
                     editor.quote_name("pub_date"),
+                    extra_sql,
                     editor.quote_name("pub_date"),
                 ),
                 str(index.create_sql(Article, editor)),

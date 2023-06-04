@@ -79,6 +79,13 @@ Adds ``index`` to ``model``’s table.
 
 Removes ``index`` from ``model``’s table.
 
+``rename_index()``
+------------------
+
+.. method:: BaseDatabaseSchemaEditor.rename_index(model, old_index, new_index)
+
+Renames ``old_index`` from ``model``’s table to ``new_index``.
+
 ``add_constraint()``
 --------------------
 
@@ -117,6 +124,15 @@ value.
 .. method:: BaseDatabaseSchemaEditor.alter_db_table(model, old_db_table, new_db_table)
 
 Renames the model's table from ``old_db_table`` to ``new_db_table``.
+
+``alter_db_table_comment()``
+----------------------------
+
+.. versionadded:: 4.2
+
+.. method:: BaseDatabaseSchemaEditor.alter_db_table_comment(model, old_db_table_comment, new_db_table_comment)
+
+Change the ``model``’s table comment to ``new_db_table_comment``.
 
 ``alter_db_tablespace()``
 -------------------------

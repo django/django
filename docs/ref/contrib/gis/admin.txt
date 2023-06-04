@@ -8,8 +8,6 @@ GeoDjango's admin site
 ``GISModelAdmin``
 =================
 
-.. versionadded:: 4.0
-
 .. class:: GISModelAdmin
 
     .. attribute:: gis_widget
@@ -22,72 +20,3 @@ GeoDjango's admin site
 
         The keyword arguments that would be passed to the :attr:`gis_widget`.
         Defaults to an empty dictionary.
-
-``GeoModelAdmin``
-=================
-
-.. class:: GeoModelAdmin
-
-    .. attribute:: default_lon
-
-    The default center longitude.
-
-    .. attribute:: default_lat
-
-    The default center latitude.
-
-    .. attribute:: default_zoom
-
-    The default zoom level to use.  Defaults to 4.
-
-    .. attribute:: extra_js
-
-    Sequence of URLs to any extra JavaScript to include.
-
-    .. attribute:: map_template
-
-    Override the template used to generate the JavaScript slippy map.
-    Default is ``'gis/admin/openlayers.html'``.
-
-    .. attribute:: map_width
-
-    Width of the map, in pixels.  Defaults to 600.
-
-    .. attribute:: map_height
-
-    Height of the map, in pixels.  Defaults to 400.
-
-    .. attribute:: openlayers_url
-
-    Link to the URL of the OpenLayers JavaScript.  Defaults to
-    ``'https://cdnjs.cloudflare.com/ajax/libs/openlayers/2.13.1/OpenLayers.js'``.
-
-    .. attribute:: modifiable
-
-    Defaults to ``True``.  When set to ``False``, disables editing of
-    existing geometry fields in the admin.
-
-    .. note::
-
-        This is different from adding the geometry field to
-        :attr:`~django.contrib.admin.ModelAdmin.readonly_fields`,
-        which will only display the WKT of the geometry. Setting
-        ``modifiable=False``, actually displays the geometry in a map,
-        but disables the ability to edit its vertices.
-
-    .. deprecated:: 4.0
-
-        This class is deprecated. Use :class:`~django.contrib.admin.ModelAdmin`
-        instead.
-
-``OSMGeoAdmin``
-===============
-
-.. class:: OSMGeoAdmin
-
-    A subclass of :class:`GeoModelAdmin` that uses a Spherical Mercator projection
-    with `OpenStreetMap <https://www.openstreetmap.org/>`_ street data tiles.
-
-    .. deprecated:: 4.0
-
-        This class is deprecated. Use :class:`GISModelAdmin` instead.

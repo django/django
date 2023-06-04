@@ -12,7 +12,9 @@ command for the ``polls`` application from the
 
 To do this, add a ``management/commands`` directory to the application. Django
 will register a ``manage.py`` command for each Python module in that directory
-whose name doesn't begin with an underscore. For example::
+whose name doesn't begin with an underscore. For example:
+
+.. code-block:: text
 
     polls/
         __init__.py
@@ -47,14 +49,15 @@ look like this::
     from django.core.management.base import BaseCommand, CommandError
     from polls.models import Question as Poll
 
+
     class Command(BaseCommand):
-        help = 'Closes the specified poll for voting'
+        help = "Closes the specified poll for voting"
 
         def add_arguments(self, parser):
-            parser.add_argument('poll_ids', nargs='+', type=int)
+            parser.add_argument("poll_ids", nargs="+", type=int)
 
         def handle(self, *args, **options):
-            for poll_id in options['poll_ids']:
+            for poll_id in options["poll_ids"]:
                 try:
                     poll = Poll.objects.get(pk=poll_id)
                 except Poll.DoesNotExist:
@@ -63,7 +66,9 @@ look like this::
                 poll.opened = False
                 poll.save()
 
-                self.stdout.write(self.style.SUCCESS('Successfully closed poll "%s"' % poll_id))
+                self.stdout.write(
+                    self.style.SUCCESS('Successfully closed poll "%s"' % poll_id)
+                )
 
 .. _management-commands-output:
 
@@ -76,7 +81,7 @@ look like this::
     character, it will be added automatically, unless you specify the ``ending``
     parameter::
 
-        self.stdout.write("Unterminated line", ending='')
+        self.stdout.write("Unterminated line", ending="")
 
 The new custom command can be called using ``python manage.py closepoll
 <poll_ids>``.
@@ -99,18 +104,18 @@ options can be added in the :meth:`~BaseCommand.add_arguments` method like this:
     class Command(BaseCommand):
         def add_arguments(self, parser):
             # Positional arguments
-            parser.add_argument('poll_ids', nargs='+', type=int)
+            parser.add_argument("poll_ids", nargs="+", type=int)
 
             # Named (optional) arguments
             parser.add_argument(
-                '--delete',
-                action='store_true',
-                help='Delete poll instead of closing it',
+                "--delete",
+                action="store_true",
+                help="Delete poll instead of closing it",
             )
 
         def handle(self, *args, **options):
             # ...
-            if options['delete']:
+            if options["delete"]:
                 poll.delete()
             # ...
 
@@ -135,6 +140,7 @@ the database), deactivate translations using the ``@no_translations``
 decorator on your :meth:`~BaseCommand.handle` method::
 
     from django.core.management.base import BaseCommand, no_translations
+
 
     class Command(BaseCommand):
         ...
@@ -228,7 +234,7 @@ All attributes can be set in your derived class and can be used in
     An instance attribute that helps create colored output when writing to
     ``stdout`` or ``stderr``. For example::
 
-        self.stdout.write(self.style.SUCCESS('...'))
+        self.stdout.write(self.style.SUCCESS("..."))
 
     See :ref:`syntax-coloring` to learn how to modify the color palette and to
     see the available styles (use uppercased versions of the "roles" described
@@ -238,8 +244,6 @@ All attributes can be set in your derived class and can be used in
     ``self.style()`` calls will return the original string uncolored.
 
 .. attribute:: BaseCommand.suppressed_base_arguments
-
-    .. versionadded:: 4.0
 
     The default command options to suppress in the help output. This should be
     a set of option names (e.g. ``'--verbosity'``). The default values for the

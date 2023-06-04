@@ -13,6 +13,8 @@ class GZipMiddleware(MiddlewareMixin):
     on the Accept-Encoding header.
     """
 
+    max_random_bytes = 100
+
     def process_response(self, request, response):
         # It's not worth attempting to compress really short responses.
         if not response.streaming and len(response.content) < 200:
@@ -29,20 +31,40 @@ class GZipMiddleware(MiddlewareMixin):
             return response
 
         if response.streaming:
+            if response.is_async:
+                # pull to lexical scope to capture fixed reference in case
+                # streaming_content is set again later.
+                orignal_iterator = response.streaming_content
+
+                async def gzip_wrapper():
+                    async for chunk in orignal_iterator:
+                        yield compress_string(
+                            chunk,
+                            max_random_bytes=self.max_random_bytes,
+                        )
+
+                response.streaming_content = gzip_wrapper()
+            else:
+                response.streaming_content = compress_sequence(
+                    response.streaming_content,
+                    max_random_bytes=self.max_random_bytes,
+                )
             # Delete the `Content-Length` header for streaming content, because
             # we won't know the compressed size until we stream it.
-            response.streaming_content = compress_sequence(response.streaming_content)
             del response.headers["Content-Length"]
         else:
             # Return the compressed content only if it's actually shorter.
-            compressed_content = compress_string(response.content)
+            compressed_content = compress_string(
+                response.content,
+                max_random_bytes=self.max_random_bytes,
+            )
             if len(compressed_content) >= len(response.content):
                 return response
             response.content = compressed_content
             response.headers["Content-Length"] = str(len(response.content))
 
         # If there is a strong ETag, make it weak to fulfill the requirements
-        # of RFC 7232 section-2.1 while also allowing conditional request
+        # of RFC 9110 Section 8.8.1 while also allowing conditional request
         # matches on ETags.
         etag = response.get("ETag")
         if etag and etag.startswith('"'):

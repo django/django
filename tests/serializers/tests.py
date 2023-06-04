@@ -1,4 +1,3 @@
-import pickle
 from datetime import datetime
 from functools import partialmethod
 from io import StringIO
@@ -6,12 +5,11 @@ from unittest import mock, skipIf
 
 from django.core import serializers
 from django.core.serializers import SerializerDoesNotExist
-from django.core.serializers.base import PickleSerializer, ProgressBar
+from django.core.serializers.base import ProgressBar
 from django.db import connection, transaction
 from django.http import HttpResponse
 from django.test import SimpleTestCase, override_settings, skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test.utils import Approximate
 
 from .models import (
     Actor,
@@ -410,6 +408,33 @@ class SerializersTestBase:
         self.assertEqual(self._get_field_values(child_data, "parent_m2m"), [])
         self.assertEqual(self._get_field_values(child_data, "parent_data"), [])
 
+    def test_serialize_only_pk(self):
+        with self.assertNumQueries(5) as ctx:
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all(),
+                use_natural_foreign_keys=False,
+            )
+
+        categories_sql = ctx[1]["sql"]
+        self.assertNotIn(connection.ops.quote_name("meta_data_id"), categories_sql)
+        meta_data_sql = ctx[2]["sql"]
+        self.assertNotIn(connection.ops.quote_name("kind"), meta_data_sql)
+
+    def test_serialize_no_only_pk_with_natural_keys(self):
+        with self.assertNumQueries(5) as ctx:
+            serializers.serialize(
+                self.serializer_name,
+                Article.objects.all(),
+                use_natural_foreign_keys=True,
+            )
+
+        categories_sql = ctx[1]["sql"]
+        self.assertNotIn(connection.ops.quote_name("meta_data_id"), categories_sql)
+        # CategoryMetaData has natural_key().
+        meta_data_sql = ctx[2]["sql"]
+        self.assertIn(connection.ops.quote_name("kind"), meta_data_sql)
+
 
 class SerializerAPITests(SimpleTestCase):
     def test_stream_class(self):
@@ -436,7 +461,6 @@ class SerializerAPITests(SimpleTestCase):
 
 
 class SerializersTransactionTestBase:
-
     available_apps = ["serializers"]
 
     @skipUnlessDBFeature("supports_forward_references")
@@ -458,31 +482,6 @@ class SerializersTransactionTestBase:
         art_obj = Article.objects.all()[0]
         self.assertEqual(art_obj.categories.count(), 1)
         self.assertEqual(art_obj.author.name, "Agnes")
-
-
-class PickleSerializerTests(SimpleTestCase):
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_serializer_protocol(self):
-        serializer = PickleSerializer(protocol=3)
-        self.assertEqual(serializer.protocol, 3)
-        # If protocol is not provided, it defaults to pickle.HIGHEST_PROTOCOL
-        serializer = PickleSerializer()
-        self.assertEqual(serializer.protocol, pickle.HIGHEST_PROTOCOL)
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    def test_serializer_loads_dumps(self):
-        serializer = PickleSerializer()
-        test_data = "test data"
-        dump = serializer.dumps(test_data)
-        self.assertEqual(serializer.loads(dump), test_data)
-
-    def test_serializer_warning(self):
-        msg = (
-            "PickleSerializer is deprecated due to its security risk. Use "
-            "JSONSerializer instead."
-        )
-        with self.assertRaisesMessage(RemovedInDjango50Warning, msg):
-            PickleSerializer()
 
 
 def register_tests(test_class, method_name, test_func, exclude=()):

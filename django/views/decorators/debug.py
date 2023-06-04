@@ -1,4 +1,4 @@
-import functools
+from functools import wraps
 
 from django.http import HttpRequest
 
@@ -33,7 +33,7 @@ def sensitive_variables(*variables):
         )
 
     def decorator(func):
-        @functools.wraps(func)
+        @wraps(func)
         def sensitive_variables_wrapper(*func_args, **func_kwargs):
             if variables:
                 sensitive_variables_wrapper.sensitive_variables = variables
@@ -77,7 +77,7 @@ def sensitive_post_parameters(*parameters):
         )
 
     def decorator(view):
-        @functools.wraps(view)
+        @wraps(view)
         def sensitive_post_parameters_wrapper(request, *args, **kwargs):
             if not isinstance(request, HttpRequest):
                 raise TypeError(

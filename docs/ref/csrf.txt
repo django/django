@@ -14,7 +14,7 @@ who visits the malicious site in their browser. A related type of attack,
 a site with someone else's credentials, is also covered.
 
 The first defense against CSRF attacks is to ensure that GET requests (and other
-'safe' methods, as defined by :rfc:`7231#section-4.2.1`) are side effect free.
+'safe' methods, as defined by :rfc:`9110#section-9.2.1`) are side effect free.
 Requests via 'unsafe' methods, such as POST, PUT, and DELETE, can then be
 protected by the steps outlined in :ref:`using-csrf`.
 
@@ -82,21 +82,13 @@ The CSRF protection is based on the following things:
    Expanding the accepted referers beyond the current host or cookie domain can
    be done with the :setting:`CSRF_TRUSTED_ORIGINS` setting.
 
-.. versionadded:: 4.0
-
-    ``Origin`` checking was added, as described above.
-
-.. versionchanged:: 4.1
-
-    In older versions, the CSRF cookie value was masked.
-
 This ensures that only forms that have originated from trusted domains can be
 used to POST data back.
 
 It deliberately ignores GET requests (and other requests that are defined as
-'safe' by :rfc:`7231#section-4.2.1`). These requests ought never to have any
+'safe' by :rfc:`9110#section-9.2.1`). These requests ought never to have any
 potentially dangerous side effects, and so a CSRF attack with a GET request
-ought to be harmless. :rfc:`7231#section-4.2.1` defines POST, PUT, and DELETE
+ought to be harmless. :rfc:`9110#section-9.2.1` defines POST, PUT, and DELETE
 as 'unsafe', and all other methods are also assumed to be unsafe, for maximum
 protection.
 
@@ -119,7 +111,7 @@ vulnerability allows and much worse).
     alternatives like ``<a rel="noreferrer" ...>"`` for links to third-party
     sites.
 
-.. _BREACH: http://breachattack.com/
+.. _BREACH: https://www.breachattack.com/
 .. _Origin header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin
 .. _disable the referer: https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery
 
@@ -153,9 +145,10 @@ class-based views<decorating-class-based-views>`.
         from django.http import HttpResponse
         from django.views.decorators.csrf import csrf_exempt
 
+
         @csrf_exempt
         def my_view(request):
-            return HttpResponse('Hello world')
+            return HttpResponse("Hello world")
 
 .. function:: csrf_protect(view)
 
@@ -165,6 +158,7 @@ class-based views<decorating-class-based-views>`.
 
         from django.shortcuts import render
         from django.views.decorators.csrf import csrf_protect
+
 
         @csrf_protect
         def my_view(request):
@@ -184,6 +178,7 @@ class-based views<decorating-class-based-views>`.
 
         from django.shortcuts import render
         from django.views.decorators.csrf import requires_csrf_token
+
 
         @requires_csrf_token
         def my_view(request):

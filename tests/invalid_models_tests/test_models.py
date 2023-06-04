@@ -5,8 +5,9 @@ from django.core.checks.model_checks import _check_lazy_references
 from django.db import connection, connections, models
 from django.db.models.functions import Abs, Lower, Round
 from django.db.models.signals import post_init
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, ignore_warnings, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings, register_lookup
+from django.utils.deprecation import RemovedInDjango51Warning
 
 
 class EmptyRouter:
@@ -29,6 +30,7 @@ def get_max_column_name_length():
 
 
 @isolate_apps("invalid_models_tests")
+@ignore_warnings(category=RemovedInDjango51Warning)
 class IndexTogetherTests(SimpleTestCase):
     def test_non_iterable(self):
         class Model(models.Model):
@@ -745,6 +747,7 @@ class FieldNamesTests(TestCase):
         #13711 -- Model check for long M2M column names when database has
         column name length limits.
         """
+
         # A model with very long name which will be used to set relations to.
         class VeryLongModelNamezzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz(
             models.Model
@@ -1870,6 +1873,37 @@ class OtherModelTests(SimpleTestCase):
         )
 
 
+@isolate_apps("invalid_models_tests")
+class DbTableCommentTests(TestCase):
+    def test_db_table_comment(self):
+        class Model(models.Model):
+            class Meta:
+                db_table_comment = "Table comment"
+
+        errors = Model.check(databases=self.databases)
+        expected = (
+            []
+            if connection.features.supports_comments
+            else [
+                Warning(
+                    f"{connection.display_name} does not support comments on tables "
+                    f"(db_table_comment).",
+                    obj=Model,
+                    id="models.W046",
+                ),
+            ]
+        )
+        self.assertEqual(errors, expected)
+
+    def test_db_table_comment_required_db_features(self):
+        class Model(models.Model):
+            class Meta:
+                db_table_comment = "Table comment"
+                required_db_features = {"supports_comments"}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+
 class MultipleAutoFieldsTests(TestCase):
     def test_multiple_autofields(self):
         msg = (
@@ -2197,6 +2231,66 @@ class ConstraintsTests(TestCase):
             for field_name in joined_fields
         ]
         self.assertCountEqual(errors, expected_errors)
+
+    def test_check_constraint_raw_sql_check(self):
+        class Model(models.Model):
+            class Meta:
+                required_db_features = {"supports_table_check_constraints"}
+                constraints = [
+                    models.CheckConstraint(check=models.Q(id__gt=0), name="q_check"),
+                    models.CheckConstraint(
+                        check=models.ExpressionWrapper(
+                            models.Q(price__gt=20),
+                            output_field=models.BooleanField(),
+                        ),
+                        name="expression_wrapper_check",
+                    ),
+                    models.CheckConstraint(
+                        check=models.expressions.RawSQL(
+                            "id = 0",
+                            params=(),
+                            output_field=models.BooleanField(),
+                        ),
+                        name="raw_sql_check",
+                    ),
+                    models.CheckConstraint(
+                        check=models.Q(
+                            models.ExpressionWrapper(
+                                models.Q(
+                                    models.expressions.RawSQL(
+                                        "id = 0",
+                                        params=(),
+                                        output_field=models.BooleanField(),
+                                    )
+                                ),
+                                output_field=models.BooleanField(),
+                            )
+                        ),
+                        name="nested_raw_sql_check",
+                    ),
+                ]
+
+        expected_warnings = (
+            [
+                Warning(
+                    "Check constraint 'raw_sql_check' contains RawSQL() expression and "
+                    "won't be validated during the model full_clean().",
+                    hint="Silence this warning if you don't care about it.",
+                    obj=Model,
+                    id="models.W045",
+                ),
+                Warning(
+                    "Check constraint 'nested_raw_sql_check' contains RawSQL() "
+                    "expression and won't be validated during the model full_clean().",
+                    hint="Silence this warning if you don't care about it.",
+                    obj=Model,
+                    id="models.W045",
+                ),
+            ]
+            if connection.features.supports_table_check_constraints
+            else []
+        )
+        self.assertEqual(Model.check(databases=self.databases), expected_warnings)
 
     def test_unique_constraint_with_condition(self):
         class Model(models.Model):

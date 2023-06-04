@@ -2,7 +2,8 @@
 import random as random_module
 import re
 import types
-from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation
+import warnings
+from decimal import ROUND_HALF_UP, Context, Decimal, InvalidOperation, getcontext
 from functools import wraps
 from inspect import unwrap
 from operator import itemgetter
@@ -11,6 +12,7 @@ from urllib.parse import quote
 
 from django.utils import formats
 from django.utils.dateformat import format, time_format
+from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.encoding import iri_to_uri
 from django.utils.html import avoid_wrapping, conditional_escape, escape, escapejs
 from django.utils.html import json_script as _json_script
@@ -149,7 +151,7 @@ def floatformat(text, arg=-1):
             use_l10n = False
             arg = arg[:-1] or -1
     try:
-        input_val = repr(text)
+        input_val = str(text)
         d = Decimal(input_val)
     except InvalidOperation:
         try:
@@ -166,7 +168,7 @@ def floatformat(text, arg=-1):
     except (ValueError, OverflowError, InvalidOperation):
         return input_val
 
-    if not m and p < 0:
+    if not m and p <= 0:
         return mark_safe(
             formats.number_format(
                 "%d" % (int(d)),
@@ -182,6 +184,7 @@ def floatformat(text, arg=-1):
     units = len(tupl[1])
     units += -tupl[2] if m else tupl[2]
     prec = abs(p) + units + 1
+    prec = max(getcontext().prec, prec)
 
     # Avoid conversion to scientific notation by accessing `sign`, `digits`,
     # and `exponent` from Decimal.as_tuple() directly.
@@ -442,6 +445,16 @@ def escape_filter(value):
 
 
 @register.filter(is_safe=True)
+def escapeseq(value):
+    """
+    An "escape" filter for sequences. Mark each element in the sequence,
+    individually, as a string that should be auto-escaped. Return a list with
+    the results.
+    """
+    return [conditional_escape(obj) for obj in value]
+
+
+@register.filter(is_safe=True)
 @stringfilter
 def force_escape(value):
     """
@@ -583,8 +596,9 @@ def join(value, arg, autoescape=True):
     """Join a list with a string, like Python's ``str.join(list)``."""
     try:
         if autoescape:
-            value = [conditional_escape(v) for v in value]
-        data = conditional_escape(arg).join(value)
+            data = conditional_escape(arg).join([conditional_escape(v) for v in value])
+        else:
+            data = arg.join(value)
     except TypeError:  # Fail silently if arg isn't iterable.
         return value
     return mark_safe(data)
@@ -611,6 +625,11 @@ def length(value):
 @register.filter(is_safe=False)
 def length_is(value, arg):
     """Return a boolean of whether the value's length is the argument."""
+    warnings.warn(
+        "The length_is template filter is deprecated in favor of the length template "
+        "filter and the == operator within an {% if %} tag.",
+        RemovedInDjango51Warning,
+    )
     try:
         return len(value) == int(arg)
     except (ValueError, TypeError):
@@ -620,7 +639,10 @@ def length_is(value, arg):
 @register.filter(is_safe=True)
 def random(value):
     """Return a random item from the list."""
-    return random_module.choice(value)
+    try:
+        return random_module.choice(value)
+    except IndexError:
+        return ""
 
 
 @register.filter("slice", is_safe=True)

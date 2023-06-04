@@ -16,7 +16,7 @@ from django.db.models.functions import Lower
 from django.db.models.lookups import Exact, GreaterThan, IsNull, LessThan
 from django.db.models.sql.constants import SINGLE
 from django.db.models.sql.query import JoinPromoter, Query, get_field_names_from_opts
-from django.db.models.sql.where import OR
+from django.db.models.sql.where import AND, OR
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import register_lookup
 
@@ -164,12 +164,12 @@ class TestQuery(SimpleTestCase):
 class TestQueryNoModel(TestCase):
     def test_rawsql_annotation(self):
         query = Query(None)
-        sql = "%s IS NULL"
+        sql = "%s = 1"
         # Wrap with a CASE WHEN expression if a database backend (e.g. Oracle)
         # doesn't support boolean expression in SELECT list.
         if not connection.features.supports_boolean_expr_in_select_clause:
             sql = f"CASE WHEN {sql} THEN 1 ELSE 0 END"
-        query.add_annotation(RawSQL(sql, (None,), BooleanField()), "_check")
+        query.add_annotation(RawSQL(sql, (1,), BooleanField()), "_check")
         result = query.get_compiler(using=DEFAULT_DB_ALIAS).execute_sql(SINGLE)
         self.assertEqual(result[0], 1)
 
@@ -183,8 +183,7 @@ class TestQueryNoModel(TestCase):
     def test_q_annotation(self):
         query = Query(None)
         check = ExpressionWrapper(
-            Q(RawSQL("%s IS NULL", (None,), BooleanField()))
-            | Q(Exists(Item.objects.all())),
+            Q(RawSQL("%s = 1", (1,), BooleanField())) | Q(Exists(Item.objects.all())),
             BooleanField(),
         )
         query.add_annotation(check, "_check")
@@ -214,6 +213,6 @@ class TestQueryNoModel(TestCase):
 class JoinPromoterTest(SimpleTestCase):
     def test_repr(self):
         self.assertEqual(
-            repr(JoinPromoter("AND", 3, True)),
+            repr(JoinPromoter(AND, 3, True)),
             "JoinPromoter(connector='AND', num_children=3, negated=True)",
         )

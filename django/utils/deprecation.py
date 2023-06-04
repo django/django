@@ -1,19 +1,19 @@
-import asyncio
 import inspect
 import warnings
 
-from asgiref.sync import sync_to_async
+from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 
-class RemovedInNextVersionWarning(DeprecationWarning):
+class RemovedInDjango51Warning(DeprecationWarning):
     pass
 
 
-class RemovedInDjango50Warning(PendingDeprecationWarning):
+class RemovedInDjango60Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedAfterNextVersionWarning = RemovedInDjango50Warning
+RemovedInNextVersionWarning = RemovedInDjango51Warning
+RemovedAfterNextVersionWarning = RemovedInDjango60Warning
 
 
 class warn_about_renamed_method:
@@ -26,7 +26,7 @@ class warn_about_renamed_method:
         self.deprecation_warning = deprecation_warning
 
     def __call__(self, f):
-        def wrapped(*args, **kwargs):
+        def wrapper(*args, **kwargs):
             warnings.warn(
                 "`%s.%s` is deprecated, use `%s` instead."
                 % (self.class_name, self.old_method_name, self.new_method_name),
@@ -35,7 +35,7 @@ class warn_about_renamed_method:
             )
             return f(*args, **kwargs)
 
-        return wrapped
+        return wrapper
 
 
 class RenameMethodsBase(type):
@@ -119,16 +119,14 @@ class MiddlewareMixin:
         If get_response is a coroutine function, turns us into async mode so
         a thread is not consumed during a whole request.
         """
-        if asyncio.iscoroutinefunction(self.get_response):
+        if iscoroutinefunction(self.get_response):
             # Mark the class as async-capable, but do the actual switch
             # inside __call__ to avoid swapping out dunder methods
-            self._is_coroutine = asyncio.coroutines._is_coroutine
-        else:
-            self._is_coroutine = None
+            markcoroutinefunction(self)
 
     def __call__(self, request):
         # Exit out to async mode, if needed
-        if self._is_coroutine:
+        if iscoroutinefunction(self):
             return self.__acall__(request)
         response = None
         if hasattr(self, "process_request"):

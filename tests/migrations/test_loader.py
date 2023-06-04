@@ -48,6 +48,16 @@ class RecorderTests(TestCase):
             set(),
         )
 
+    def test_has_table_cached(self):
+        """
+        The has_table() method caches a positive result and not continually
+        query for the existence of the migrations table.
+        """
+        recorder = MigrationRecorder(connection)
+        with self.assertNumQueries(1):
+            self.assertEqual(recorder.has_table(), True)
+            self.assertEqual(recorder.has_table(), True)
+
 
 class LoaderTests(TestCase):
     """
@@ -390,7 +400,7 @@ class LoaderTests(TestCase):
         loader.build_graph()
 
         plan = set(loader.graph.forwards_plan(("app1", "4_auto")))
-        plan = plan - loader.applied_migrations.keys()
+        plan -= loader.applied_migrations.keys()
         expected_plan = {
             ("app2", "1_squashed_2"),
             ("app1", "3_auto"),
@@ -529,7 +539,7 @@ class LoaderTests(TestCase):
         # Load with nothing applied: both migrations squashed.
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(("app1", "4_auto")))
-        plan = plan - loader.applied_migrations.keys()
+        plan -= loader.applied_migrations.keys()
         expected_plan = {
             ("app1", "1_auto"),
             ("app2", "1_squashed_2"),
@@ -548,7 +558,7 @@ class LoaderTests(TestCase):
         loader.replace_migrations = False
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(("app1", "3_auto")))
-        plan = plan - loader.applied_migrations.keys()
+        plan -= loader.applied_migrations.keys()
         expected_plan = {
             ("app1", "1_auto"),
             ("app2", "1_auto"),
@@ -564,7 +574,7 @@ class LoaderTests(TestCase):
         self.record_applied(recorder, "app1", "2_auto")
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(("app1", "4_auto")))
-        plan = plan - loader.applied_migrations.keys()
+        plan -= loader.applied_migrations.keys()
         expected_plan = {
             ("app2", "1_squashed_2"),
             ("app1", "3_auto"),
@@ -576,7 +586,7 @@ class LoaderTests(TestCase):
         self.record_applied(recorder, "app2", "1_auto")
         loader.build_graph()
         plan = set(loader.graph.forwards_plan(("app1", "4_auto")))
-        plan = plan - loader.applied_migrations.keys()
+        plan -= loader.applied_migrations.keys()
         expected_plan = {
             ("app2", "2_auto"),
             ("app1", "3_auto"),

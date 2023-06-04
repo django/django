@@ -17,7 +17,8 @@ class FakeFieldFile:
 
 
 class ClearableFileInputTest(WidgetTest):
-    widget = ClearableFileInput()
+    def setUp(self):
+        self.widget = ClearableFileInput()
 
     def test_clear_input_renders(self):
         """
@@ -110,6 +111,16 @@ class ClearableFileInputTest(WidgetTest):
             ),
         )
 
+    def test_render_no_disabled(self):
+        class TestForm(Form):
+            clearable_file = FileField(
+                widget=self.widget, initial=FakeFieldFile(), required=False
+            )
+
+        form = TestForm()
+        with self.assertNoLogs("django.template", "DEBUG"):
+            form.render()
+
     def test_render_as_subwidget(self):
         """A ClearableFileInput as a subwidget of MultiWidget."""
         widget = MultiWidget(widgets=(self.widget,))
@@ -138,6 +149,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertIs(value, False)
+        self.assertIs(self.widget.checked, True)
 
     def test_clear_input_checked_returns_false_only_if_not_required(self):
         """
@@ -154,6 +166,7 @@ class ClearableFileInputTest(WidgetTest):
             name="myfile",
         )
         self.assertEqual(value, field)
+        self.assertIs(widget.checked, True)
 
     def test_html_does_not_mask_exceptions(self):
         """
@@ -232,3 +245,8 @@ class ClearableFileInputTest(WidgetTest):
             '<input type="file" name="clearable_file" id="id_clearable_file"></div>',
             form.render(),
         )
+
+    def test_multiple_error(self):
+        msg = "ClearableFileInput doesn't support uploading multiple files."
+        with self.assertRaisesMessage(ValueError, msg):
+            ClearableFileInput(attrs={"multiple": True})

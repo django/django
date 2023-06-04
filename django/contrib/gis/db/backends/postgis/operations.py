@@ -11,6 +11,7 @@ from django.contrib.gis.measure import Distance
 from django.core.exceptions import ImproperlyConfigured
 from django.db import NotSupportedError, ProgrammingError
 from django.db.backends.postgresql.operations import DatabaseOperations
+from django.db.backends.postgresql.psycopg_any import is_psycopg3
 from django.db.models import Func, Value
 from django.utils.functional import cached_property
 from django.utils.version import get_version_tuple
@@ -26,7 +27,8 @@ BILATERAL = "bilateral"
 class PostGISOperator(SpatialOperator):
     def __init__(self, geography=False, raster=False, **kwargs):
         # Only a subset of the operators and functions are available for the
-        # geography type.
+        # geography type. Lookups that don't support geography will be cast to
+        # geometry.
         self.geography = geography
         # Only a subset of the operators and functions are available for the
         # raster type. Lookups that don't support raster will be converted to
@@ -36,13 +38,8 @@ class PostGISOperator(SpatialOperator):
         super().__init__(**kwargs)
 
     def as_sql(self, connection, lookup, template_params, *args):
-        if lookup.lhs.output_field.geography and not self.geography:
-            raise ValueError(
-                'PostGIS geography does not support the "%s" '
-                "function/operator." % (self.func or self.op,)
-            )
-
         template_params = self.check_raster(lookup, template_params)
+        template_params = self.check_geography(lookup, template_params)
         return super().as_sql(connection, lookup, template_params, *args)
 
     def check_raster(self, lookup, template_params):
@@ -90,6 +87,12 @@ class PostGISOperator(SpatialOperator):
             elif rhs_is_raster and not lhs_is_raster:
                 template_params["rhs"] = "ST_Polygon(%s)" % template_params["rhs"]
 
+        return template_params
+
+    def check_geography(self, lookup, template_params):
+        """Convert geography fields to geometry types, if necessary."""
+        if lookup.lhs.output_field.geography and not self.geography:
+            template_params["lhs"] += "::geometry"
         return template_params
 
 
@@ -161,7 +164,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
 
     unsupported_functions = set()
 
-    select = "%s::bytea"
+    select = "%s" if is_psycopg3 else "%s::bytea"
+
     select_extent = None
 
     @cached_property
@@ -170,10 +174,10 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
             "AsWKB": "ST_AsBinary",
             "AsWKT": "ST_AsText",
             "BoundingCircle": "ST_MinimumBoundingCircle",
+            "FromWKB": "ST_GeomFromWKB",
+            "FromWKT": "ST_GeomFromText",
             "NumPoints": "ST_NPoints",
         }
-        if self.spatial_version < (2, 4, 0):
-            function_names["ForcePolygonCW"] = "ST_ForceRHR"
         return function_names
 
     @cached_property
@@ -199,7 +203,7 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
                 raise ImproperlyConfigured(
                     'Cannot determine PostGIS version for database "%s" '
                     'using command "SELECT postgis_lib_version()". '
-                    "GeoDjango requires at least PostGIS version 2.4. "
+                    "GeoDjango requires at least PostGIS version 2.5. "
                     "Was the database created from a spatial database "
                     "template?" % self.connection.settings_dict["NAME"]
                 )
@@ -409,6 +413,8 @@ class PostGISOperations(BaseSpatialOperations, DatabaseOperations):
         geom_class = expression.output_field.geom_class
 
         def converter(value, expression, connection):
+            if isinstance(value, str):  # Coming from hex strings.
+                value = value.encode("ascii")
             return None if value is None else GEOSGeometryBase(read(value), geom_class)
 
         return converter

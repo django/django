@@ -390,7 +390,6 @@ class SessionTestsMixin:
 
 
 class DatabaseSessionTests(SessionTestsMixin, TestCase):
-
     backend = DatabaseSession
     session_engine = "django.contrib.sessions.backends.db"
 
@@ -501,7 +500,6 @@ class CustomDatabaseSessionTests(DatabaseSessionTests):
 
 
 class CacheDBSessionTests(SessionTestsMixin, TestCase):
-
     backend = CacheDBSession
 
     def test_exists_searches_cache_first(self):
@@ -528,7 +526,6 @@ class CacheDBSessionWithTimeZoneTests(CacheDBSessionTests):
 
 
 class FileSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = FileSession
 
     def setUp(self):
@@ -624,7 +621,6 @@ class FileSessionPathLibTests(FileSessionTests):
 
 
 class CacheSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = CacheSession
 
     # Some backends might issue a warning
@@ -715,7 +711,7 @@ class SessionMiddlewareTests(TestCase):
         )
 
     def test_session_save_on_500(self):
-        def response_500(requset):
+        def response_500(request):
             response = HttpResponse("Horrible error")
             response.status_code = 500
             request.session["hello"] = "world"
@@ -723,6 +719,19 @@ class SessionMiddlewareTests(TestCase):
 
         request = self.request_factory.get("/")
         SessionMiddleware(response_500)(request)
+
+        # The value wasn't saved above.
+        self.assertNotIn("hello", request.session.load())
+
+    def test_session_save_on_5xx(self):
+        def response_503(request):
+            response = HttpResponse("Service Unavailable")
+            response.status_code = 503
+            request.session["hello"] = "world"
+            return response
+
+        request = self.request_factory.get("/")
+        SessionMiddleware(response_503)(request)
 
         # The value wasn't saved above.
         self.assertNotIn("hello", request.session.load())
@@ -867,7 +876,6 @@ class SessionMiddlewareTests(TestCase):
 
 
 class CookieSessionTests(SessionTestsMixin, SimpleTestCase):
-
     backend = CookieSession
 
     def test_save(self):

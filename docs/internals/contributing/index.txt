@@ -26,7 +26,7 @@ The work on Django itself falls into three major areas:
 
 **Localizing Django** 🗺️
     Django is translated into over 100 languages - There's even some
-    translation for Klingon?! The i18n team are always looking for translators
+    translation for Klingon?! The i18n team is always looking for translators
     to help maintain and increase language reach.
 
     See :doc:`localizing` to help translate Django.
@@ -65,9 +65,9 @@ Django community and others to maintain a great ecosystem to work in:
   friendly and helpful atmosphere. If you're new to the Django community,
   you should read the `posting guidelines`_.
 
-* Join the `#django IRC channel`_ on Libera.Chat and answer questions. By
-  explaining Django to other users, you're going to learn a lot about the
-  framework yourself.
+* Join the `Django Discord server`_ or the `#django IRC channel`_ on
+  Libera.Chat to discuss and answer questions. By explaining Django to other
+  users, you're going to learn a lot about the framework yourself.
 
 * Blog about Django. We syndicate all the Django blogs we know about on
   the `community page`_; if you'd like to see your blog on that page you
@@ -83,5 +83,6 @@ We're looking forward to working with you. Welcome aboard! ⛵️
 .. _posting guidelines: https://code.djangoproject.com/wiki/UsingTheMailingList
 .. _#django IRC channel: https://web.libera.chat/#django
 .. _community page: https://www.djangoproject.com/community/
+.. _Django Discord server: https://discord.gg/xcRH6mN4fa
 .. _Django forum: https://forum.djangoproject.com/
 .. _register it here: https://www.djangoproject.com/community/add/blogs/

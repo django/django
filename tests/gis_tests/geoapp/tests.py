@@ -1,4 +1,3 @@
-import tempfile
 from io import StringIO
 
 from django.contrib.gis import gdal
@@ -15,6 +14,7 @@ from django.contrib.gis.geos import (
     Polygon,
     fromstr,
 )
+from django.core.files.temp import NamedTemporaryFile
 from django.core.management import call_command
 from django.db import DatabaseError, NotSupportedError, connection
 from django.db.models import F, OuterRef, Subquery
@@ -212,6 +212,14 @@ class GeoModelTest(TestCase):
         with self.assertNumQueries(0):  # Ensure point isn't deferred.
             self.assertIsInstance(cities2[0].point, Point)
 
+    def test_gis_query_as_string(self):
+        """GIS queries can be represented as strings."""
+        query = City.objects.filter(point__within=Polygon.from_bbox((0, 0, 2, 2)))
+        self.assertIn(
+            connection.ops.quote_name(City._meta.db_table),
+            str(query.query),
+        )
+
     def test_dumpdata_loaddata_cycle(self):
         """
         Test a dumpdata/loaddata cycle with geographic data.
@@ -224,7 +232,7 @@ class GeoModelTest(TestCase):
         self.assertIn('"point": "%s"' % houston.point.ewkt, result)
 
         # Reload now dumped data
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json") as tmp:
+        with NamedTemporaryFile(mode="w", suffix=".json") as tmp:
             tmp.write(result)
             tmp.seek(0)
             call_command("loaddata", tmp.name, verbosity=0)
@@ -337,12 +345,9 @@ class GeoLookupTest(TestCase):
         invalid_geom = fromstr("POLYGON((0 0, 0 1, 1 1, 1 0, 1 1, 1 0, 0 0))")
         State.objects.create(name="invalid", poly=invalid_geom)
         qs = State.objects.all()
-        if connection.ops.oracle or (
-            connection.ops.mysql and connection.mysql_version < (8, 0, 0)
-        ):
+        if connection.ops.oracle:
             # Kansas has adjacent vertices with distance 6.99244813842e-12
             # which is smaller than the default Oracle tolerance.
-            # It's invalid on MySQL < 8 also.
             qs = qs.exclude(name="Kansas")
             self.assertEqual(
                 State.objects.filter(name="Kansas", poly__isvalid=False).count(), 1
@@ -399,12 +404,12 @@ class GeoLookupTest(TestCase):
     @skipUnlessGISLookup("strictly_above", "strictly_below")
     def test_strictly_above_below_lookups(self):
         dallas = City.objects.get(name="Dallas")
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             City.objects.filter(point__strictly_above=dallas.point).order_by("name"),
             ["Chicago", "Lawrence", "Oklahoma City", "Pueblo", "Victoria"],
             lambda b: b.name,
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             City.objects.filter(point__strictly_below=dallas.point).order_by("name"),
             ["Houston", "Wellington"],
             lambda b: b.name,
@@ -640,18 +645,16 @@ class GeoQuerySetTest(TestCase):
         self.assertIsNone(State.objects.aggregate(MakeLine("poly"))["poly__makeline"])
         # Reference query:
         # SELECT AsText(ST_MakeLine(geoapp_city.point)) FROM geoapp_city;
-        ref_line = GEOSGeometry(
-            "LINESTRING(-95.363151 29.763374,-96.801611 32.782057,"
-            "-97.521157 34.464642,174.783117 -41.315268,-104.609252 38.255001,"
-            "-95.23506 38.971823,-87.650175 41.850385,-123.305196 48.462611)",
-            srid=4326,
-        )
-        # We check for equality with a tolerance of 10e-5 which is a lower bound
-        # of the precisions of ref_line coordinates
         line = City.objects.aggregate(MakeLine("point"))["point__makeline"]
-        self.assertTrue(
-            ref_line.equals_exact(line, tolerance=10e-5), "%s != %s" % (ref_line, line)
-        )
+        ref_points = City.objects.values_list("point", flat=True)
+        self.assertIsInstance(line, LineString)
+        self.assertEqual(len(line), ref_points.count())
+        # Compare pairs of manually sorted points, as the default ordering is
+        # flaky.
+        for point, ref_city in zip(sorted(line), sorted(ref_points)):
+            point_x, point_y = point
+            self.assertAlmostEqual(point_x, ref_city.x, 5),
+            self.assertAlmostEqual(point_y, ref_city.y, 5),
 
     @skipUnlessDBFeature("supports_union_aggr")
     def test_unionagg(self):

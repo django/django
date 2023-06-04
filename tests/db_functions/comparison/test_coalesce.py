@@ -15,7 +15,7 @@ class CoalesceTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.annotate(display_name=Coalesce("alias", "name"))
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             authors.order_by("name"), ["smithj", "Rhonda"], lambda a: a.display_name
         )
 
@@ -39,7 +39,7 @@ class CoalesceTests(TestCase):
         article = Article.objects.annotate(
             headline=Coalesce("summary", "text", output_field=TextField()),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             article.order_by("title"), [lorem_ipsum], lambda a: a.headline
         )
         # mixed Text and Char wrapped
@@ -48,7 +48,7 @@ class CoalesceTests(TestCase):
                 Lower("summary"), Lower("text"), output_field=TextField()
             ),
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             article.order_by("title"), [lorem_ipsum.lower()], lambda a: a.headline
         )
 
@@ -56,19 +56,22 @@ class CoalesceTests(TestCase):
         Author.objects.create(name="John Smith", alias="smithj")
         Author.objects.create(name="Rhonda")
         authors = Author.objects.order_by(Coalesce("alias", "name"))
-        self.assertQuerysetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
         authors = Author.objects.order_by(Coalesce("alias", "name").asc())
-        self.assertQuerysetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["Rhonda", "John Smith"], lambda a: a.name)
         authors = Author.objects.order_by(Coalesce("alias", "name").desc())
-        self.assertQuerysetEqual(authors, ["John Smith", "Rhonda"], lambda a: a.name)
+        self.assertQuerySetEqual(authors, ["John Smith", "Rhonda"], lambda a: a.name)
 
     def test_empty_queryset(self):
         Author.objects.create(name="John Smith")
+        queryset = Author.objects.values("id")
         tests = [
-            Author.objects.none(),
-            Subquery(Author.objects.none()),
+            (queryset.none(), "QuerySet.none()"),
+            (queryset.filter(id=0), "QuerySet.filter(id=0)"),
+            (Subquery(queryset.none()), "Subquery(QuerySet.none())"),
+            (Subquery(queryset.filter(id=0)), "Subquery(Queryset.filter(id=0)"),
         ]
-        for empty_query in tests:
-            with self.subTest(empty_query.__class__.__name__):
+        for empty_query, description in tests:
+            with self.subTest(description), self.assertNumQueries(1):
                 qs = Author.objects.annotate(annotation=Coalesce(empty_query, 42))
                 self.assertEqual(qs.first().annotation, 42)

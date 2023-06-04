@@ -36,6 +36,68 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+May 3, 2023 - :cve:`2023-31047`
+-------------------------------
+
+Potential bypass of validation when uploading multiple files using one form
+field. `Full description
+<https://www.djangoproject.com/weblog/2023/may/03/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <21b1b1fc03e5f9e9f8c977ee6e35618dd3b353dd>`
+* Django 4.1 :commit:`(patch) <e7c3a2ccc3a562328600be05068ed9149e12ce64>`
+* Django 3.2 :commit:`(patch) <eed53d0011622e70b936e203005f0e6f4ac48965>`
+
+February 14, 2023 - :cve:`2023-24580`
+-------------------------------------
+
+Potential denial-of-service vulnerability in file uploads. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/14/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <628b33a854a9c68ec8a0c51f382f304a0044ec92>`
+* Django 4.0 :commit:`(patch) <83f1ea83e4553e211c1c5a0dfc197b66d4e50432>`
+* Django 3.2 :commit:`(patch) <a665ed5179f5bbd3db95ce67286d0192eff041d8>`
+
+February 1, 2023 - :cve:`2023-23969`
+------------------------------------
+
+Potential denial-of-service via ``Accept-Language`` headers. `Full description
+<https://www.djangoproject.com/weblog/2023/feb/01/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d7bd5a56b1ce0576e8e07a8001373576d277942>`
+* Django 4.0 :commit:`(patch) <4452642f193533e288a52c02efb5bbc766a68f95>`
+* Django 3.2 :commit:`(patch) <c7e0151fdf33e1b11d488b6f67b94fdf3a30614a>`
+
+October 4, 2022 - :cve:`2022-41323`
+-----------------------------------
+
+Potential denial-of-service vulnerability in internationalized URLs. `Full
+description
+<https://www.djangoproject.com/weblog/2022/oct/04/security-releases/>`__
+
+* Django 4.1 :commit:`(patch) <9d656ea51d9ea7105c0c0785783ac29d426a7d25>`
+* Django 4.0 :commit:`(patch) <23f0093125ac2e553da6c1b2f9988eb6a3dd2ea1>`
+* Django 3.2 :commit:`(patch) <5b6b257fa7ec37ff27965358800c67e2dd11c924>`
+
+August 3, 2022 - :cve:`2022-36359`
+----------------------------------
+
+Potential reflected file download vulnerability in FileResponse. `Full
+description
+<https://www.djangoproject.com/weblog/2022/aug/03/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <b7d9529cbe0af4adabb6ea5d01ed8dcce3668fb3>`
+* Django 3.2 :commit:`(patch) <b3e4494d759202a3b6bf247fd34455bf13be5b80>`
+
+July 4, 2022 - :cve:`2022-34265`
+--------------------------------
+
+Potential SQL injection via ``Trunc(kind)`` and ``Extract(lookup_name)``
+arguments. `Full description
+<https://www.djangoproject.com/weblog/2022/jul/04/security-releases/>`__
+
+* Django 4.0 :commit:`(patch) <0dc9c016fadb71a067e5a42be30164e3f96c0492>`
+* Django 3.2 :commit:`(patch) <a9010fe5555e6086a9d9ae50069579400ef0685e>`
+
 April 11, 2022 - :cve:`2022-28346`
 ----------------------------------
 

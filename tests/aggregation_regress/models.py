@@ -89,3 +89,49 @@ class SelfRefFK(models.Model):
     parent = models.ForeignKey(
         "self", models.SET_NULL, null=True, blank=True, related_name="children"
     )
+
+
+class AuthorProxy(Author):
+    class Meta:
+        proxy = True
+
+
+class Recipe(models.Model):
+    name = models.CharField(max_length=20)
+    author = models.ForeignKey(AuthorProxy, models.CASCADE)
+    tasters = models.ManyToManyField(AuthorProxy, related_name="recipes")
+
+
+class RecipeProxy(Recipe):
+    class Meta:
+        proxy = True
+
+
+class AuthorUnmanaged(models.Model):
+    age = models.IntegerField()
+
+    class Meta:
+        db_table = Author._meta.db_table
+        managed = False
+
+
+class RecipeTasterUnmanaged(models.Model):
+    recipe = models.ForeignKey("RecipeUnmanaged", models.CASCADE)
+    author = models.ForeignKey(
+        AuthorUnmanaged, models.CASCADE, db_column="authorproxy_id"
+    )
+
+    class Meta:
+        managed = False
+        db_table = Recipe.tasters.through._meta.db_table
+
+
+class RecipeUnmanaged(models.Model):
+    author = models.ForeignKey(AuthorUnmanaged, models.CASCADE)
+    tasters = models.ManyToManyField(
+        AuthorUnmanaged, through=RecipeTasterUnmanaged, related_name="+"
+    )
+
+    class Meta:
+        managed = False
+        db_table = Recipe._meta.db_table

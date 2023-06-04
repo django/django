@@ -7,6 +7,7 @@
 # Carlo Miron <carlo@miron.it>, 2018-2019
 # Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
+# Emanuele Di Giacomo, 2021
 # Flavio Curella <flavio.curella@gmail.com>, 2013,2016
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Themis Savvidis <themhs@gmail.com>, 2013
@@ -15,6 +16,7 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2018,2020
 # Nicola Larosa <transifex@teknico.net>, 2013
 # palmux <palmux@gmail.com>, 2014-2015,2017,2021
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023
 # Mattia Procopio <promat85@gmail.com>, 2015
 # Riccardo Magliocchetti <riccardo.magliocchetti@gmail.com>, 2017
 # Stefano Brentegani <sbrentegani@gmail.com>, 2014-2017
@@ -22,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-11-18 21:19+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -65,6 +67,9 @@ msgstr "Bosniaco"
 
 msgid "Catalan"
 msgstr "Catalano"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Curdo centrale (Sorani)"
 
 msgid "Czech"
 msgstr "Ceco"
@@ -223,7 +228,7 @@ msgid "Marathi"
 msgstr "Marathi"
 
 msgid "Malay"
-msgstr ""
+msgstr "Malese"
 
 msgid "Burmese"
 msgstr "Birmano"
@@ -402,6 +407,12 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Assicurati che questo valore sia maggiore o uguale a %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Assicurarsi che questo valore sia un multiplo della dimensione di passo "
+"%(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -412,6 +423,9 @@ msgstr[0] ""
 "Assicurati che questo valore contenga almeno %(limit_value)d carattere (ne "
 "ha %(show_value)d)."
 msgstr[1] ""
+"Assicurati che questo valore contenga almeno %(limit_value)d caratteri (ne "
+"ha %(show_value)d)."
+msgstr[2] ""
 "Assicurati che questo valore contenga almeno %(limit_value)d caratteri (ne "
 "ha %(show_value)d)."
 
@@ -428,6 +442,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Assicurati che questo valore non contenga più di %(limit_value)d caratteri "
 "(ne ha %(show_value)d)."
+msgstr[2] ""
+"Assicurati che questo valore non contenga più di %(limit_value)d caratteri "
+"(ne ha %(show_value)d)."
 
 msgid "Enter a number."
 msgstr "Inserisci un numero."
@@ -437,12 +454,14 @@ msgid "Ensure that there are no more than %(max)s digit in total."
 msgid_plural "Ensure that there are no more than %(max)s digits in total."
 msgstr[0] "Assicurati che non vi sia più di %(max)s cifra in totale."
 msgstr[1] "Assicurati che non vi siano più di %(max)s cifre in totale."
+msgstr[2] "Assicurati che non vi siano più di %(max)s cifre in totale."
 
 #, python-format
 msgid "Ensure that there are no more than %(max)s decimal place."
 msgid_plural "Ensure that there are no more than %(max)s decimal places."
 msgstr[0] "Assicurati che non vi sia più di %(max)s cifra decimale."
 msgstr[1] "Assicurati che non vi siano più di %(max)s cifre decimali."
+msgstr[2] "Assicurati che non vi siano più di %(max)s cifre decimali."
 
 #, python-format
 msgid ""
@@ -451,6 +470,8 @@ msgid_plural ""
 "Ensure that there are no more than %(max)s digits before the decimal point."
 msgstr[0] "Assicurati che non vi sia più di %(max)s cifra prima della virgola."
 msgstr[1] ""
+"Assicurati che non vi siano più di %(max)s cifre prima della virgola."
+msgstr[2] ""
 "Assicurati che non vi siano più di %(max)s cifre prima della virgola."
 
 #, python-format
@@ -472,6 +493,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s con questa %(field_labels)s esiste già."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Il vincolo “%(name)s” è stato violato."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Il valore %(value)r non è una scelta valida."
 
@@ -485,8 +510,8 @@ msgstr "Questo campo non può essere vuoto."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s con questo %(field_label)s esiste già."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -511,6 +536,9 @@ msgstr "Booleano (Vero o Falso)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Stringa (fino a %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Stringa (illimitata)"
 
 msgid "Comma-separated integers"
 msgstr "Interi separati da virgole"
@@ -738,6 +766,9 @@ msgstr[0] ""
 msgstr[1] ""
 "Assicurati che questo nome di file non contenga più di %(max)d caratteri (ne "
 "ha %(length)d)."
+msgstr[2] ""
+"Assicurati che questo nome di file non contenga più di %(max)d caratteri (ne "
+"ha %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr ""
@@ -785,16 +816,18 @@ msgstr ""
 "errore se il problema persiste."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Si prega di inviare al massimo %d form."
-msgstr[1] "Si prega di inviare al massimo %d form."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Si prega di inviare al massimo %(num)d form."
+msgstr[1] "Si prega di inviare al massimo %(num)d form."
+msgstr[2] "Si prega di inviare al massimo %(num)d form."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Si prega di inviare almeno %d form."
-msgstr[1] "Si prega di inviare almeno %d form."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Si prega di inviare almeno %(num)d form."
+msgstr[1] "Si prega di inviare almeno %(num)d form."
+msgstr[2] "Si prega di inviare almeno %(num)d form."
 
 msgid "Order"
 msgstr "Ordine"
@@ -869,6 +902,7 @@ msgid "%(size)d byte"
 msgid_plural "%(size)d bytes"
 msgstr[0] "%(size)d byte"
 msgstr[1] "%(size)d bytes"
+msgstr[2] "%(size)d bytes"
 
 #, python-format
 msgid "%s KB"
@@ -1138,36 +1172,42 @@ msgid "%(num)d year"
 msgid_plural "%(num)d years"
 msgstr[0] "%(num)d anno"
 msgstr[1] "%(num)d anni"
+msgstr[2] "%(num)d anni"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
 msgstr[0] "%(num)d mese"
 msgstr[1] "%(num)d mesi"
+msgstr[2] "%(num)d mesi"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
 msgstr[0] "%(num)d settimana"
 msgstr[1] "%(num)d settimane"
+msgstr[2] "%(num)d settimane"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
 msgstr[0] "%(num)d giorno"
 msgstr[1] "%(num)d giorni"
+msgstr[2] "%(num)d giorni"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
 msgstr[0] "%(num)d ora"
 msgstr[1] "%(num)d ore"
+msgstr[2] "%(num)d ore"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
 msgstr[0] "%(num)d minuto"
 msgstr[1] "%(num)d minuti"
+msgstr[2] "%(num)d minuti"
 
 msgid "Forbidden"
 msgstr "Proibito"
@@ -1199,8 +1239,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Se usi il tag <meta name=\"referrer\" content=\"no-referrer\"> o includi "
 "header 'Referrer-Policy: no-referrer', per favore rimuovili. Per la "
@@ -1299,13 +1339,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Stai vedendo questa pagina perché hai impostato <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> nel tuo file di configurazione e non hai "
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> nel tuo file di configurazione e non hai "
 "configurato nessun URL."
 
 msgid "Django Documentation"

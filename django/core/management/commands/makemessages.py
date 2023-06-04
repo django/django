@@ -40,6 +40,10 @@ def check_programs(*programs):
             )
 
 
+def is_valid_locale(locale):
+    return re.match(r"^[a-z]+$", locale) or re.match(r"^[a-z]+_[A-Z].*$", locale)
+
+
 @total_ordering
 class TranslatableFile:
     def __init__(self, dirpath, file_name, locale_dir):
@@ -427,14 +431,41 @@ class Command(BaseCommand):
 
             # Build po files for each selected locale
             for locale in locales:
-                if "-" in locale:
-                    self.stdout.write(
-                        "invalid locale %s, did you mean %s?"
-                        % (
-                            locale,
-                            locale.replace("-", "_"),
-                        ),
+                if not is_valid_locale(locale):
+                    # Try to guess what valid locale it could be
+                    # Valid examples are: en_GB, shi_Latn_MA and nl_NL-x-informal
+
+                    # Search for characters followed by a non character (i.e. separator)
+                    match = re.match(
+                        r"^(?P<language>[a-zA-Z]+)"
+                        r"(?P<separator>[^a-zA-Z])"
+                        r"(?P<territory>.+)$",
+                        locale,
                     )
+                    if match:
+                        locale_parts = match.groupdict()
+                        language = locale_parts["language"].lower()
+                        territory = (
+                            locale_parts["territory"][:2].upper()
+                            + locale_parts["territory"][2:]
+                        )
+                        proposed_locale = f"{language}_{territory}"
+                    else:
+                        # It could be a language in uppercase
+                        proposed_locale = locale.lower()
+
+                    # Recheck if the proposed locale is valid
+                    if is_valid_locale(proposed_locale):
+                        self.stdout.write(
+                            "invalid locale %s, did you mean %s?"
+                            % (
+                                locale,
+                                proposed_locale,
+                            ),
+                        )
+                    else:
+                        self.stdout.write("invalid locale %s" % locale)
+
                     continue
                 if self.verbosity > 0:
                     self.stdout.write("processing locale %s" % locale)

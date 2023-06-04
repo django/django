@@ -4,21 +4,14 @@ import re
 import unicodedata
 from binascii import Error as BinasciiError
 from email.utils import formatdate
-from urllib.parse import (
-    ParseResult,
-    SplitResult,
-    _coerce_args,
-    _splitnetloc,
-    _splitparams,
-    scheme_chars,
-)
+from urllib.parse import quote, unquote
 from urllib.parse import urlencode as original_urlencode
-from urllib.parse import uses_params
+from urllib.parse import urlparse
 
 from django.utils.datastructures import MultiValueDict
 from django.utils.regex_helper import _lazy_re_compile
 
-# based on RFC 7232, Appendix C
+# Based on RFC 9110 Appendix A.
 ETAG_MATCH = _lazy_re_compile(
     r"""
     \A(      # start of string and capture group
@@ -89,8 +82,8 @@ def urlencode(query, doseq=False):
 
 def http_date(epoch_seconds=None):
     """
-    Format the time to match the RFC1123 date format as specified by HTTP
-    RFC7231 section 7.1.1.1.
+    Format the time to match the RFC 5322 date format as specified by RFC 9110
+    Section 5.6.7.
 
     `epoch_seconds` is a floating point number expressed in seconds since the
     epoch, in UTC - such as that outputted by time.time(). If set to None, it
@@ -103,15 +96,15 @@ def http_date(epoch_seconds=None):
 
 def parse_http_date(date):
     """
-    Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
+    Parse a date format as specified by HTTP RFC 9110 Section 5.6.7.
 
     The three formats allowed by the RFC are accepted, even if only the first
     one is still in widespread use.
 
     Return an integer expressed in seconds since the epoch, in UTC.
     """
-    # email.utils.parsedate() does the job for RFC1123 dates; unfortunately
-    # RFC7231 makes it mandatory to support RFC850 dates too. So we roll
+    # email.utils.parsedate() does the job for RFC 1123 dates; unfortunately
+    # RFC 9110 makes it mandatory to support RFC 850 dates too. So we roll
     # our own RFC-compliant parsing.
     for regex in RFC1123_DATE, RFC850_DATE, ASCTIME_DATE:
         m = regex.match(date)
@@ -205,7 +198,7 @@ def urlsafe_base64_decode(s):
 def parse_etags(etag_str):
     """
     Parse a string of ETags given in an If-None-Match or If-Match header as
-    defined by RFC 7232. Return a list of quoted ETags, or ['*'] if all ETags
+    defined by RFC 9110. Return a list of quoted ETags, or ['*'] if all ETags
     should be matched.
     """
     if etag_str.strip() == "*":
@@ -277,63 +270,13 @@ def url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     )
 
 
-# Copied from urllib.parse.urlparse() but uses fixed urlsplit() function.
-def _urlparse(url, scheme="", allow_fragments=True):
-    """Parse a URL into 6 components:
-    <scheme>://<netloc>/<path>;<params>?<query>#<fragment>
-    Return a 6-tuple: (scheme, netloc, path, params, query, fragment).
-    Note that we don't break the components up in smaller bits
-    (e.g. netloc is a single string) and we don't expand % escapes."""
-    url, scheme, _coerce_result = _coerce_args(url, scheme)
-    splitresult = _urlsplit(url, scheme, allow_fragments)
-    scheme, netloc, url, query, fragment = splitresult
-    if scheme in uses_params and ";" in url:
-        url, params = _splitparams(url)
-    else:
-        params = ""
-    result = ParseResult(scheme, netloc, url, params, query, fragment)
-    return _coerce_result(result)
-
-
-# Copied from urllib.parse.urlsplit() with
-# https://github.com/python/cpython/pull/661 applied.
-def _urlsplit(url, scheme="", allow_fragments=True):
-    """Parse a URL into 5 components:
-    <scheme>://<netloc>/<path>?<query>#<fragment>
-    Return a 5-tuple: (scheme, netloc, path, query, fragment).
-    Note that we don't break the components up in smaller bits
-    (e.g. netloc is a single string) and we don't expand % escapes."""
-    url, scheme, _coerce_result = _coerce_args(url, scheme)
-    netloc = query = fragment = ""
-    i = url.find(":")
-    if i > 0:
-        for c in url[:i]:
-            if c not in scheme_chars:
-                break
-        else:
-            scheme, url = url[:i].lower(), url[i + 1 :]
-
-    if url[:2] == "//":
-        netloc, url = _splitnetloc(url, 2)
-        if ("[" in netloc and "]" not in netloc) or (
-            "]" in netloc and "[" not in netloc
-        ):
-            raise ValueError("Invalid IPv6 URL")
-    if allow_fragments and "#" in url:
-        url, fragment = url.split("#", 1)
-    if "?" in url:
-        url, query = url.split("?", 1)
-    v = SplitResult(scheme, netloc, url, query, fragment)
-    return _coerce_result(v)
-
-
 def _url_has_allowed_host_and_scheme(url, allowed_hosts, require_https=False):
     # Chrome considers any URL with more than two slashes to be absolute, but
     # urlparse is not so flexible. Treat any url with three slashes as unsafe.
     if url.startswith("///"):
         return False
     try:
-        url_info = _urlparse(url)
+        url_info = urlparse(url)
     except ValueError:  # e.g. invalid IPv6 addresses
         return False
     # Forbid URLs like http:///example.com - with a scheme, but without a hostname.
@@ -364,5 +307,69 @@ def escape_leading_slashes(url):
     redirecting to another host.
     """
     if url.startswith("//"):
-        url = "/%2F{}".format(url[2:])
+        url = "/%2F{}".format(url.removeprefix("//"))
     return url
+
+
+def _parseparam(s):
+    while s[:1] == ";":
+        s = s[1:]
+        end = s.find(";")
+        while end > 0 and (s.count('"', 0, end) - s.count('\\"', 0, end)) % 2:
+            end = s.find(";", end + 1)
+        if end < 0:
+            end = len(s)
+        f = s[:end]
+        yield f.strip()
+        s = s[end:]
+
+
+def parse_header_parameters(line):
+    """
+    Parse a Content-type like header.
+    Return the main content-type and a dictionary of options.
+    """
+    parts = _parseparam(";" + line)
+    key = parts.__next__().lower()
+    pdict = {}
+    for p in parts:
+        i = p.find("=")
+        if i >= 0:
+            has_encoding = False
+            name = p[:i].strip().lower()
+            if name.endswith("*"):
+                # Lang/encoding embedded in the value (like "filename*=UTF-8''file.ext")
+                # https://tools.ietf.org/html/rfc2231#section-4
+                name = name[:-1]
+                if p.count("'") == 2:
+                    has_encoding = True
+            value = p[i + 1 :].strip()
+            if len(value) >= 2 and value[0] == value[-1] == '"':
+                value = value[1:-1]
+                value = value.replace("\\\\", "\\").replace('\\"', '"')
+            if has_encoding:
+                encoding, lang, value = value.split("'")
+                value = unquote(value, encoding=encoding)
+            pdict[name] = value
+    return key, pdict
+
+
+def content_disposition_header(as_attachment, filename):
+    """
+    Construct a Content-Disposition HTTP header value from the given filename
+    as specified by RFC 6266.
+    """
+    if filename:
+        disposition = "attachment" if as_attachment else "inline"
+        try:
+            filename.encode("ascii")
+            file_expr = 'filename="{}"'.format(
+                filename.replace("\\", "\\\\").replace('"', r"\"")
+            )
+        except UnicodeEncodeError:
+            file_expr = "filename*=utf-8''{}".format(quote(filename))
+        return f"{disposition}; {file_expr}"
+    elif as_attachment:
+        return "attachment"
+    else:
+        return None

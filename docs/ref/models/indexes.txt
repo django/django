@@ -35,14 +35,14 @@ expressions and database functions.
 
 For example::
 
-    Index(Lower('title').desc(), 'pub_date', name='lower_title_date_idx')
+    Index(Lower("title").desc(), "pub_date", name="lower_title_date_idx")
 
 creates an index on the lowercased value of the ``title`` field in descending
 order and the ``pub_date`` field in the default ascending order.
 
 Another example::
 
-    Index(F('height') * F('weight'), Round('weight'), name='calc_idx')
+    Index(F("height") * F("weight"), Round("weight"), name="calc_idx")
 
 creates an index on the result of multiplying fields ``height`` and ``weight``
 and the ``weight`` rounded to the nearest integer.
@@ -197,7 +197,7 @@ fields (:attr:`~Index.fields`).
 
 For example::
 
-    Index(name='covering_index', fields=['headline'], include=['pub_date'])
+    Index(name="covering_index", fields=["headline"], include=["pub_date"])
 
 will allow filtering on ``headline``, also selecting ``pub_date``, while
 fetching data only from the index.
@@ -214,14 +214,9 @@ See the PostgreSQL documentation for more details about `covering indexes`_.
 
 .. admonition:: Restrictions on PostgreSQL
 
-    PostgreSQL 11+ only supports covering B-Tree indexes, PostgreSQL 12+ also
-    supports covering :class:`GiST indexes
-    <django.contrib.postgres.indexes.GistIndex>`, and PostgreSQL 14+ also
-    supports covering :class:`SP-GiST indexes
+    PostgreSQL supports covering B-Tree and :class:`GiST indexes
+    <django.contrib.postgres.indexes.GistIndex>`. PostgreSQL 14+ also supports
+    covering :class:`SP-GiST indexes
     <django.contrib.postgres.indexes.SpGistIndex>`.
-
-.. versionchanged:: 4.1
-
-    Support for covering SP-GiST indexes with PostgreSQL 14+ was added.
 
 .. _covering indexes: https://www.postgresql.org/docs/current/indexes-index-only-scans.html

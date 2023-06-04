@@ -19,6 +19,7 @@ from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import (
     DiscoverRunner,
     Shuffler,
+    _init_worker,
     reorder_test_bin,
     reorder_tests,
     shuffle_tests,
@@ -30,7 +31,6 @@ from django.test.utils import (
     get_unique_databases_and_mirrors,
     iter_test_cases,
 )
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import B, Person, Through
 
@@ -155,8 +155,7 @@ class TestSuiteTests(SimpleTestCase):
     def make_tests(self):
         """Return an iterable of tests."""
         suite = self.make_test_suite()
-        tests = list(iter_test_cases(suite))
-        return tests
+        return list(iter_test_cases(suite))
 
     def test_shuffle_tests(self):
         tests = self.make_tests()
@@ -684,6 +683,50 @@ class NoInitializeSuiteTestRunnerTests(SimpleTestCase):
             )
 
 
+class TestRunnerInitializerTests(SimpleTestCase):
+    # Raise an exception to don't actually run tests.
+    @mock.patch.object(
+        multiprocessing, "Pool", side_effect=Exception("multiprocessing.Pool()")
+    )
+    def test_no_initialize_suite_test_runner(self, mocked_pool):
+        class StubTestRunner(DiscoverRunner):
+            def setup_test_environment(self, **kwargs):
+                return
+
+            def setup_databases(self, **kwargs):
+                return
+
+            def run_checks(self, databases):
+                return
+
+            def teardown_databases(self, old_config, **kwargs):
+                return
+
+            def teardown_test_environment(self, **kwargs):
+                return
+
+            def run_suite(self, suite, **kwargs):
+                kwargs = self.get_test_runner_kwargs()
+                runner = self.test_runner(**kwargs)
+                return runner.run(suite)
+
+        runner = StubTestRunner(
+            verbosity=0, interactive=False, parallel=2, debug_mode=True
+        )
+        with self.assertRaisesMessage(Exception, "multiprocessing.Pool()"):
+            runner.run_tests(
+                [
+                    "test_runner_apps.sample.tests_sample.TestDjangoTestCase",
+                    "test_runner_apps.simple.tests",
+                ]
+            )
+        # Initializer must be a function.
+        self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
+        initargs = mocked_pool.call_args.kwargs["initargs"]
+        self.assertEqual(len(initargs), 6)
+        self.assertEqual(initargs[5], True)  # debug_mode
+
+
 class Ticket17477RegressionTests(AdminScriptTestCase):
     def setUp(self):
         super().setUp()
@@ -774,7 +817,7 @@ class AliasedDefaultTestSetupTest(unittest.TestCase):
             runner_instance.teardown_databases(old_config)
 
 
-class SetupDatabasesTests(SimpleTestCase):
+class SetupDatabasesTests(unittest.TestCase):
     def setUp(self):
         self.runner_instance = DiscoverRunner(verbosity=0)
 
@@ -865,30 +908,6 @@ class SetupDatabasesTests(SimpleTestCase):
                 self.runner_instance.setup_databases()
         mocked_db_creation.return_value.create_test_db.assert_called_once_with(
             verbosity=0, autoclobber=False, serialize=True, keepdb=False
-        )
-
-    def test_serialized_off(self):
-        tested_connections = db.ConnectionHandler(
-            {
-                "default": {
-                    "ENGINE": "django.db.backends.dummy",
-                    "TEST": {"SERIALIZE": False},
-                },
-            }
-        )
-        msg = (
-            "The SERIALIZE test database setting is deprecated as it can be "
-            "inferred from the TestCase/TransactionTestCase.databases that "
-            "enable the serialized_rollback feature."
-        )
-        with mock.patch(
-            "django.db.backends.dummy.base.DatabaseWrapper.creation_class"
-        ) as mocked_db_creation:
-            with mock.patch("django.test.utils.connections", new=tested_connections):
-                with self.assertWarnsMessage(RemovedInDjango50Warning, msg):
-                    self.runner_instance.setup_databases()
-        mocked_db_creation.return_value.create_test_db.assert_called_once_with(
-            verbosity=0, autoclobber=False, serialize=False, keepdb=False
         )
 
 
@@ -1012,42 +1031,3 @@ class RunTestsExceptionHandlingTests(unittest.TestCase):
                     )
             self.assertTrue(teardown_databases.called)
             self.assertFalse(teardown_test_environment.called)
-
-
-# RemovedInDjango50Warning
-class NoOpTestRunner(DiscoverRunner):
-    def setup_test_environment(self, **kwargs):
-        return
-
-    def setup_databases(self, **kwargs):
-        return
-
-    def run_checks(self, databases):
-        return
-
-    def teardown_databases(self, old_config, **kwargs):
-        return
-
-    def teardown_test_environment(self, **kwargs):
-        return
-
-
-class DiscoverRunnerExtraTestsDeprecationTests(SimpleTestCase):
-    msg = "The extra_tests argument is deprecated."
-
-    def get_runner(self):
-        return NoOpTestRunner(verbosity=0, interactive=False)
-
-    def test_extra_tests_build_suite(self):
-        runner = self.get_runner()
-        with self.assertWarnsMessage(RemovedInDjango50Warning, self.msg):
-            runner.build_suite(extra_tests=[])
-
-    def test_extra_tests_run_tests(self):
-        runner = self.get_runner()
-        with captured_stderr():
-            with self.assertWarnsMessage(RemovedInDjango50Warning, self.msg):
-                runner.run_tests(
-                    test_labels=["test_runner_apps.sample.tests_sample.EmptyTestCase"],
-                    extra_tests=[],
-                )

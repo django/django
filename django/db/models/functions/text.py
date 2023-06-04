@@ -1,17 +1,17 @@
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import CharField, IntegerField
-from django.db.models.functions import Coalesce
+from django.db.models.fields import CharField, IntegerField, TextField
+from django.db.models.functions import Cast, Coalesce
 from django.db.models.lookups import Transform
 
 
 class MySQLSHA2Mixin:
-    def as_mysql(self, compiler, connection, **extra_content):
+    def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler,
             connection,
             template="SHA2(%%(expressions)s, %s)" % self.function[3:],
-            **extra_content,
+            **extra_context,
         )
 
 
@@ -29,19 +29,20 @@ class OracleHashMixin:
 
 
 class PostgreSQLSHAMixin:
-    def as_postgresql(self, compiler, connection, **extra_content):
+    def as_postgresql(self, compiler, connection, **extra_context):
         return super().as_sql(
             compiler,
             connection,
             template="ENCODE(DIGEST(%(expressions)s, '%(function)s'), 'hex')",
             function=self.function.lower(),
-            **extra_content,
+            **extra_context,
         )
 
 
 class Chr(Transform):
     function = "CHR"
     lookup_name = "chr"
+    output_field = CharField()
 
     def as_mysql(self, compiler, connection, **extra_context):
         return super().as_sql(
@@ -79,6 +80,20 @@ class ConcatPair(Func):
             connection,
             template="%(expressions)s",
             arg_joiner=" || ",
+            **extra_context,
+        )
+
+    def as_postgresql(self, compiler, connection, **extra_context):
+        copy = self.copy()
+        copy.set_source_expressions(
+            [
+                Cast(expression, TextField())
+                for expression in copy.get_source_expressions()
+            ]
+        )
+        return super(ConcatPair, copy).as_sql(
+            compiler,
+            connection,
             **extra_context,
         )
 
@@ -242,7 +257,7 @@ class Reverse(Transform):
     def as_oracle(self, compiler, connection, **extra_context):
         # REVERSE in Oracle is undocumented and doesn't support multi-byte
         # strings. Use a special subquery instead.
-        return super().as_sql(
+        sql, params = super().as_sql(
             compiler,
             connection,
             template=(
@@ -253,6 +268,7 @@ class Reverse(Transform):
             ),
             **extra_context,
         )
+        return sql, params * 3
 
 
 class Right(Left):
@@ -260,7 +276,9 @@ class Right(Left):
 
     def get_substr(self):
         return Substr(
-            self.source_expressions[0], self.source_expressions[1] * Value(-1)
+            self.source_expressions[0],
+            self.source_expressions[1] * Value(-1),
+            self.source_expressions[1],
         )
 
 

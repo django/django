@@ -1,4 +1,3 @@
-import cgi
 import codecs
 import copy
 from io import BytesIO
@@ -14,7 +13,11 @@ from django.core.exceptions import (
     TooManyFieldsSent,
 )
 from django.core.files import uploadhandler
-from django.http.multipartparser import MultiPartParser, MultiPartParserError
+from django.http.multipartparser import (
+    MultiPartParser,
+    MultiPartParserError,
+    TooManyFilesSent,
+)
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -22,10 +25,8 @@ from django.utils.datastructures import (
 )
 from django.utils.encoding import escape_uri_path, iri_to_uri
 from django.utils.functional import cached_property
-from django.utils.http import is_same_domain
+from django.utils.http import is_same_domain, parse_header_parameters
 from django.utils.regex_helper import _lazy_re_compile
-
-from .multipartparser import parse_header
 
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
@@ -97,7 +98,7 @@ class HttpRequest:
 
     def _set_content_type_params(self, meta):
         """Set content_type, content_params, and encoding."""
-        self.content_type, self.content_params = cgi.parse_header(
+        self.content_type, self.content_params = parse_header_parameters(
             meta.get("CONTENT_TYPE", "")
         )
         if "charset" in self.content_params:
@@ -228,9 +229,7 @@ class HttpRequest:
                 # If location starts with '//' but has no netloc, reuse the
                 # schema and netloc from the current request. Strip the double
                 # slashes and continue as if it wasn't specified.
-                if location.startswith("//"):
-                    location = location[2:]
-                location = self._current_scheme_host + location
+                location = self._current_scheme_host + location.removeprefix("//")
             else:
                 # Join the constructed URL with the provided location, which
                 # allows the provided location to apply query strings to the
@@ -341,6 +340,8 @@ class HttpRequest:
                 self._body = self.read()
             except OSError as e:
                 raise UnreadablePostError(*e.args) from e
+            finally:
+                self._stream.close()
             self._stream = BytesIO(self._body)
         return self._body
 
@@ -368,7 +369,7 @@ class HttpRequest:
                 data = self
             try:
                 self._post, self._files = self.parse_file_upload(self.META, data)
-            except MultiPartParserError:
+            except (MultiPartParserError, TooManyFilesSent):
                 # An error occurred while parsing POST data. Since when
                 # formatting the error the request handler might access
                 # self.POST, set self._post and self._file to prevent
@@ -440,10 +441,35 @@ class HttpHeaders(CaseInsensitiveMapping):
     @classmethod
     def parse_header_name(cls, header):
         if header.startswith(cls.HTTP_PREFIX):
-            header = header[len(cls.HTTP_PREFIX) :]
+            header = header.removeprefix(cls.HTTP_PREFIX)
         elif header not in cls.UNPREFIXED_HEADERS:
             return None
         return header.replace("_", "-").title()
+
+    @classmethod
+    def to_wsgi_name(cls, header):
+        header = header.replace("-", "_").upper()
+        if header in cls.UNPREFIXED_HEADERS:
+            return header
+        return f"{cls.HTTP_PREFIX}{header}"
+
+    @classmethod
+    def to_asgi_name(cls, header):
+        return header.replace("-", "_").upper()
+
+    @classmethod
+    def to_wsgi_names(cls, headers):
+        return {
+            cls.to_wsgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
+
+    @classmethod
+    def to_asgi_names(cls, headers):
+        return {
+            cls.to_asgi_name(header_name): value
+            for header_name, value in headers.items()
+        }
 
 
 class QueryDict(MultiValueDict):
@@ -619,15 +645,13 @@ class QueryDict(MultiValueDict):
 
 class MediaType:
     def __init__(self, media_type_raw_line):
-        full_type, self.params = parse_header(
-            media_type_raw_line.encode("ascii") if media_type_raw_line else b""
+        full_type, self.params = parse_header_parameters(
+            media_type_raw_line if media_type_raw_line else ""
         )
         self.main_type, _, self.sub_type = full_type.partition("/")
 
     def __str__(self):
-        params_str = "".join(
-            "; %s=%s" % (k, v.decode("ascii")) for k, v in self.params.items()
-        )
+        params_str = "".join("; %s=%s" % (k, v) for k, v in self.params.items())
         return "%s%s%s" % (
             self.main_type,
             ("/%s" % self.sub_type) if self.sub_type else "",
@@ -685,7 +709,7 @@ def split_domain_port(host):
     bits = host.rsplit(":", 1)
     domain, port = bits if len(bits) == 2 else (bits[0], "")
     # Remove a trailing dot (if present) from the domain.
-    domain = domain[:-1] if domain.endswith(".") else domain
+    domain = domain.removesuffix(".")
     return domain, port
 
 

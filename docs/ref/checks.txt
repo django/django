@@ -94,10 +94,6 @@ Django's system checks are organized using the following tags:
 
 Some checks may be registered with multiple tags.
 
-.. versionchanged:: 4.0
-
-    The ``files`` tag was added.
-
 Core system checks
 ==================
 
@@ -157,8 +153,6 @@ If you're using MySQL or MariaDB, the following checks will be performed:
 Managing files
 --------------
 
-.. versionadded:: 4.0
-
 The following checks verify your setup for :doc:`/topics/files`:
 
 * **files.E001**: The :setting:`FILE_UPLOAD_TEMP_DIR` setting refers to the
@@ -181,6 +175,9 @@ Model fields
   ``choices`` (``<count>`` characters).
 * **fields.E010**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances.
+* **fields.E011**: ``<database>`` does not support default database values with
+  expressions (``db_default``).
+* **fields.E012**: ``<expression>`` cannot be used in ``db_default``.
 * **fields.E100**: ``AutoField``\s must set primary_key=True.
 * **fields.E110**: ``BooleanField``\s do not accept null values. *This check
   appeared before support for null values was added in Django 2.1.*
@@ -202,6 +199,8 @@ Model fields
 * **fields.W161**: Fixed default value provided.
 * **fields.W162**: ``<database>`` does not support a database index on
   ``<field data type>`` columns.
+* **fields.W163**: ``<database>`` does not support comments on columns
+  (``db_comment``).
 * **fields.E170**: ``BinaryField``’s ``default`` cannot be a string. Use bytes
   content instead.
 * **fields.E180**: ``<database>`` does not support ``JSONField``\s.
@@ -229,6 +228,15 @@ Model fields
   4.0. *This check appeared in Django 3.1 and 3.2*.
 * **fields.E904**: ``django.contrib.postgres.fields.JSONField`` is removed
   except for support in historical migrations.
+* **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
+* **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
+  deprecated. Support for it (except in historical migrations) will be removed
+  in Django 5.1.
 
 File fields
 ~~~~~~~~~~~
@@ -312,6 +320,7 @@ Related fields
   the table name of ``<model>``/``<model>.<field name>``.
 * **fields.W345**: ``related_name`` has no effect on ``ManyToManyField`` with a
   symmetrical relationship, e.g. to "self".
+* **fields.W346**: ``db_comment`` has no effect on ``ManyToManyField``.
 
 Models
 ------
@@ -395,6 +404,10 @@ Models
 * **models.W043**: ``<database>`` does not support indexes on expressions.
 * **models.W044**: ``<database>`` does not support unique constraints on
   expressions.
+* **models.W045**: Check constraint ``<constraint>`` contains ``RawSQL()``
+  expression and won't be validated during the model ``full_clean()``.
+* **models.W046**: ``<database>`` does not support comments on tables
+  (``db_table_comment``).
 
 Security
 --------
@@ -548,6 +561,9 @@ configured:
   :setting:`OPTIONS <TEMPLATES-OPTIONS>` must be a string but got: ``{value}``
   (``{type}``).
 * **templates.E003**:``<name>`` is used for multiple template tag modules:
+  ``<module list>``. *This check was changed to* ``templates.W003`` *in Django
+  4.1.2*.
+* **templates.W003**:``<name>`` is used for multiple template tag modules:
   ``<module list>``.
 
 Translation
@@ -690,8 +706,8 @@ with the admin site:
 * **admin.E108**: The value of ``list_display[n]`` refers to ``<label>``,
   which is not a callable, an attribute of ``<ModelAdmin class>``, or an
   attribute or method on ``<model>``.
-* **admin.E109**: The value of ``list_display[n]`` must not be a
-  ``ManyToManyField`` field.
+* **admin.E109**: The value of ``list_display[n]`` must not be a many-to-many
+  field or a reverse foreign key.
 * **admin.E110**: The value of ``list_display_links`` must be a list, a tuple,
   or ``None``.
 * **admin.E111**: The value of ``list_display_links[n]`` refers to ``<label>``,
@@ -855,6 +871,7 @@ fields:
 * **postgres.E003**: ``<field>`` default should be a callable instead of an
   instance so that it's not shared between all field instances. *This check was
   changed to* ``fields.E010`` *in Django 3.1*.
+* **postgres.W004**: Base field for array has warnings: ...
 
 ``sites``
 ---------

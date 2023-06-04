@@ -70,7 +70,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "book_join__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.author1, self.book1, self.editor_a, self.author1),
@@ -90,7 +90,7 @@ class FilteredRelationTests(TestCase):
             .select_related("author_join", "editor_join")
             .order_by("pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 (self.book1, self.author1, self.editor_a),
@@ -120,7 +120,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.book1, self.author1),
@@ -143,7 +143,7 @@ class FilteredRelationTests(TestCase):
                 .order_by("pk")
             )
             with self.assertNumQueries(1):
-                self.assertQuerysetEqual(
+                self.assertQuerySetEqual(
                     qs,
                     [
                         (self.book1, self.author1),
@@ -408,7 +408,7 @@ class FilteredRelationTests(TestCase):
     def test_defer(self):
         # One query for the list and one query for the deferred title.
         with self.assertNumQueries(2):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 Author.objects.annotate(
                     book_alice=FilteredRelation(
                         "book", condition=Q(book__title__iexact="poem by alice")
@@ -458,7 +458,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "book_editor_worked_with__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.author1, self.editor_a),
@@ -567,7 +567,7 @@ class FilteredRelationTests(TestCase):
             )
             .order_by("author", "book_title", "preferred_by_author_pk")
         )
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             qs,
             [
                 ("Alice", "The book by Alice", None),
@@ -594,7 +594,7 @@ class FilteredRelationTests(TestCase):
             .order_by("pk", "author_favorite_book_editor__pk")
         )
         with self.assertNumQueries(1):
-            self.assertQuerysetEqual(
+            self.assertQuerySetEqual(
                 qs,
                 [
                     (self.book1, self.editor_b),
@@ -791,6 +791,47 @@ class FilteredRelationAggregationTests(TestCase):
         self.assertEqual(qs.count(), 1)
         self.assertSequenceEqual(
             qs.annotate(total=Count("pk")).values("total"), [{"total": 1}]
+        )
+
+    def test_condition_spans_join(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                )
+            ).filter(
+                contains_editor_author__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_spans_join_chained(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_editor_author=FilteredRelation(
+                    "author", condition=Q(author__name__icontains=F("editor__name"))
+                ),
+                contains_editor_author_ref=FilteredRelation(
+                    "author",
+                    condition=Q(author__name=F("contains_editor_author__name")),
+                ),
+            ).filter(
+                contains_editor_author_ref__isnull=False,
+            ),
+            [self.book1],
+        )
+
+    def test_condition_self_ref(self):
+        self.assertSequenceEqual(
+            Book.objects.annotate(
+                contains_author=FilteredRelation(
+                    "author",
+                    condition=Q(title__icontains=F("author__name")),
+                )
+            ).filter(
+                contains_author__isnull=False,
+            ),
+            [self.book1],
         )
 
 

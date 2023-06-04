@@ -1,8 +1,8 @@
 """
 Classes to represent the definitions of aggregate functions.
 """
-from django.core.exceptions import FieldError
-from django.db.models.expressions import Case, Func, Star, When
+from django.core.exceptions import FieldError, FullResultSet
+from django.db.models.expressions import Case, Func, Star, Value, When
 from django.db.models.fields import IntegerField
 from django.db.models.functions.comparison import Coalesce
 from django.db.models.functions.mixins import (
@@ -65,7 +65,14 @@ class Aggregate(Func):
         c.filter = c.filter and c.filter.resolve_expression(
             query, allow_joins, reuse, summarize
         )
-        if not summarize:
+        if summarize:
+            # Summarized aggregates cannot refer to summarized aggregates.
+            for ref in c.get_refs():
+                if query.annotations[ref].is_summary:
+                    raise FieldError(
+                        f"Cannot compute {c.name}('{ref}'): '{ref}' is an aggregate"
+                    )
+        elif not self.is_summary:
             # Call Aggregate.get_source_expressions() to avoid
             # returning self.filter and including that in this loop.
             expressions = super(Aggregate, c).get_source_expressions()
@@ -85,6 +92,10 @@ class Aggregate(Func):
             return c
         if hasattr(default, "resolve_expression"):
             default = default.resolve_expression(query, allow_joins, reuse, summarize)
+            if default._output_field_or_none is None:
+                default.output_field = c._output_field_or_none
+        else:
+            default = Value(default, c._output_field_or_none)
         c.default = None  # Reset the default argument before wrapping.
         coalesce = Coalesce(c, default, output_field=c._output_field_or_none)
         coalesce.is_summary = c.is_summary
@@ -97,25 +108,29 @@ class Aggregate(Func):
             return "%s__%s" % (expressions[0].name, self.name.lower())
         raise TypeError("Complex expressions require an alias")
 
-    def get_group_by_cols(self, alias=None):
+    def get_group_by_cols(self):
         return []
 
     def as_sql(self, compiler, connection, **extra_context):
         extra_context["distinct"] = "DISTINCT " if self.distinct else ""
         if self.filter:
             if connection.features.supports_aggregate_filter_clause:
-                filter_sql, filter_params = self.filter.as_sql(compiler, connection)
-                template = self.filter_template % extra_context.get(
-                    "template", self.template
-                )
-                sql, params = super().as_sql(
-                    compiler,
-                    connection,
-                    template=template,
-                    filter=filter_sql,
-                    **extra_context,
-                )
-                return sql, (*params, *filter_params)
+                try:
+                    filter_sql, filter_params = self.filter.as_sql(compiler, connection)
+                except FullResultSet:
+                    pass
+                else:
+                    template = self.filter_template % extra_context.get(
+                        "template", self.template
+                    )
+                    sql, params = super().as_sql(
+                        compiler,
+                        connection,
+                        template=template,
+                        filter=filter_sql,
+                        **extra_context,
+                    )
+                    return sql, (*params, *filter_params)
             else:
                 copy = self.copy()
                 copy.filter = None

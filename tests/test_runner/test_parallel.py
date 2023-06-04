@@ -41,7 +41,6 @@ class ParallelTestRunnerTest(SimpleTestCase):
 
 
 class SampleFailingSubtest(SimpleTestCase):
-
     # This method name doesn't begin with "test" to prevent test discovery
     # from seeing it.
     def dummy_test(self):

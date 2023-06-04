@@ -31,9 +31,9 @@ from .schema import DatabaseSchemaEditor
 from .validation import DatabaseValidation
 
 version = Database.version_info
-if version < (1, 4, 0):
+if version < (1, 4, 3):
     raise ImproperlyConfigured(
-        "mysqlclient 1.4.0 or newer is required; you have %s." % Database.__version__
+        "mysqlclient 1.4.3 or newer is required; you have %s." % Database.__version__
     )
 
 

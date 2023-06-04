@@ -25,6 +25,7 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
     def __init__(self, base_field, size=None, **kwargs):
         self.base_field = base_field
+        self.db_collation = getattr(self.base_field, "db_collation", None)
         self.size = size
         if self.size:
             self.default_validators = [
@@ -67,18 +68,35 @@ class ArrayField(CheckFieldDefaultMixin, Field):
             )
         else:
             # Remove the field name checks as they are not needed here.
-            base_errors = self.base_field.check()
-            if base_errors:
-                messages = "\n    ".join(
-                    "%s (%s)" % (error.msg, error.id) for error in base_errors
+            base_checks = self.base_field.check()
+            if base_checks:
+                error_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Error)
                 )
-                errors.append(
-                    checks.Error(
-                        "Base field for array has errors:\n    %s" % messages,
-                        obj=self,
-                        id="postgres.E001",
+                if error_messages:
+                    errors.append(
+                        checks.Error(
+                            "Base field for array has errors:\n    %s" % error_messages,
+                            obj=self,
+                            id="postgres.E001",
+                        )
                     )
+                warning_messages = "\n    ".join(
+                    "%s (%s)" % (base_check.msg, base_check.id)
+                    for base_check in base_checks
+                    if isinstance(base_check, checks.Warning)
                 )
+                if warning_messages:
+                    errors.append(
+                        checks.Warning(
+                            "Base field for array has warnings:\n    %s"
+                            % warning_messages,
+                            obj=self,
+                            id="postgres.W004",
+                        )
+                    )
         return errors
 
     def set_attributes_from_name(self, name):
@@ -96,6 +114,11 @@ class ArrayField(CheckFieldDefaultMixin, Field):
     def cast_db_type(self, connection):
         size = self.size or ""
         return "%s[%s]" % (self.base_field.cast_db_type(connection), size)
+
+    def db_parameters(self, connection):
+        db_params = super().db_parameters(connection)
+        db_params["collation"] = self.db_collation
+        return db_params
 
     def get_placeholder(self, value, compiler, connection):
         return "%s::{}".format(self.db_type(connection))
@@ -214,7 +237,9 @@ class ArrayField(CheckFieldDefaultMixin, Field):
 
 class ArrayRHSMixin:
     def __init__(self, lhs, rhs):
-        if isinstance(rhs, (tuple, list)):
+        # Don't wrap arrays that contains only None values, psycopg doesn't
+        # allow this.
+        if isinstance(rhs, (tuple, list)) and any(self._rhs_not_none_values(rhs)):
             expressions = []
             for value in rhs:
                 if not hasattr(value, "resolve_expression"):
@@ -232,6 +257,13 @@ class ArrayRHSMixin:
         rhs, rhs_params = super().process_rhs(compiler, connection)
         cast_type = self.lhs.output_field.cast_db_type(connection)
         return "%s::%s" % (rhs, cast_type), rhs_params
+
+    def _rhs_not_none_values(self, rhs):
+        for x in rhs:
+            if isinstance(x, (list, tuple)):
+                yield from self._rhs_not_none_values(x)
+            elif x is not None:
+                yield True
 
 
 @ArrayField.register_lookup
@@ -265,7 +297,7 @@ class ArrayLenTransform(Transform):
         return (
             "CASE WHEN %(lhs)s IS NULL THEN NULL ELSE "
             "coalesce(array_length(%(lhs)s, 1), 0) END"
-        ) % {"lhs": lhs}, params
+        ) % {"lhs": lhs}, params * 2
 
 
 @ArrayField.register_lookup
@@ -293,7 +325,9 @@ class IndexTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "%s[%%s]" % lhs, params + [self.index]
+        if not lhs.endswith("]"):
+            lhs = "(%s)" % lhs
+        return "%s[%%s]" % lhs, (*params, self.index)
 
     @property
     def output_field(self):
@@ -317,7 +351,9 @@ class SliceTransform(Transform):
 
     def as_sql(self, compiler, connection):
         lhs, params = compiler.compile(self.lhs)
-        return "%s[%%s:%%s]" % lhs, params + [self.start, self.end]
+        if not lhs.endswith("]"):
+            lhs = "(%s)" % lhs
+        return "%s[%%s:%%s]" % lhs, (*params, self.start, self.end)
 
 
 class SliceTransformFactory:

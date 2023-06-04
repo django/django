@@ -67,6 +67,7 @@ Adds a few conveniences for perfectionists:
 
     from django.views.decorators.common import no_append_slash
 
+
     @no_append_slash
     def sensitive_fbv(request, *args, **kwargs):
         """View to be excluded from APPEND_SLASH."""
@@ -93,18 +94,33 @@ GZip middleware
 
 .. class:: GZipMiddleware
 
-.. warning::
+    .. attribute:: max_random_bytes
 
-    Security researchers recently revealed that when compression techniques
-    (including ``GZipMiddleware``) are used on a website, the site may become
-    exposed to a number of possible attacks. Before using ``GZipMiddleware`` on
-    your site, you should consider very carefully whether you are subject to
-    these attacks. If you're in *any* doubt about whether you're affected, you
-    should avoid using ``GZipMiddleware``. For more details, see the `the BREACH
-    paper (PDF)`_ and `breachattack.com`_.
+        Defaults to 100. Subclass ``GZipMiddleware`` and override the attribute
+        to change the maximum number of random bytes that is included with
+        compressed responses.
 
-    .. _the BREACH paper (PDF): http://breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
-    .. _breachattack.com: http://breachattack.com
+.. note::
+
+    Security researchers revealed that when compression techniques (including
+    ``GZipMiddleware``) are used on a website, the site may become exposed to a
+    number of possible attacks.
+
+    To mitigate attacks, Django implements a technique called *Heal The Breach
+    (HTB)*. It adds up to 100 bytes (see
+    :attr:`.max_random_bytes`) of random bytes to each response
+    to make the attacks less effective.
+
+    For more details, see the `BREACH paper (PDF)`_, `breachattack.com`_, and
+    the `Heal The Breach (HTB) paper`_.
+
+    .. _BREACH paper (PDF): https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf
+    .. _breachattack.com: https://www.breachattack.com/
+    .. _Heal The Breach (HTB) paper: https://ieeexplore.ieee.org/document/9754554
+
+.. versionchanged:: 4.2
+
+    Mitigation for the BREACH attack was added.
 
 The ``django.middleware.gzip.GZipMiddleware`` compresses content for browsers
 that understand GZip compression (all modern browsers).
@@ -122,7 +138,7 @@ It will NOT compress content if any of the following are true:
   containing ``gzip``.
 
 If the response has an ``ETag`` header, the ETag is made weak to comply with
-:rfc:`7232#section-2.1`.
+:rfc:`9110#section-8.8.1`.
 
 You can apply GZip compression to individual views using the
 :func:`~django.views.decorators.gzip.gzip_page()` decorator.
@@ -354,8 +370,6 @@ this setting are:
 
 Cross-Origin Opener Policy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.0
 
 Some browsers have the ability to isolate top-level windows from other
 documents by putting them in a separate browsing context group based on the

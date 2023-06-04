@@ -42,7 +42,7 @@ call itself::
     from django.views.generic import TemplateView
 
     urlpatterns = [
-        path('about/', TemplateView.as_view(template_name="about.html")),
+        path("about/", TemplateView.as_view(template_name="about.html")),
     ]
 
 Any arguments passed to :meth:`~django.views.generic.base.View.as_view` will
@@ -65,6 +65,7 @@ override the template name::
     # some_app/views.py
     from django.views.generic import TemplateView
 
+
     class AboutView(TemplateView):
         template_name = "about.html"
 
@@ -78,7 +79,7 @@ method instead, which provides a function-like entry to class-based views::
     from some_app.views import AboutView
 
     urlpatterns = [
-        path('about/', AboutView.as_view()),
+        path("about/", AboutView.as_view()),
     ]
 
 
@@ -103,7 +104,7 @@ We map the URL to book list view in the URLconf::
     from books.views import BookListView
 
     urlpatterns = [
-        path('books/', BookListView.as_view()),
+        path("books/", BookListView.as_view()),
     ]
 
 And the view::
@@ -112,14 +113,19 @@ And the view::
     from django.views.generic import ListView
     from books.models import Book
 
+
     class BookListView(ListView):
         model = Book
 
         def head(self, *args, **kwargs):
-            last_book = self.get_queryset().latest('publication_date')
+            last_book = self.get_queryset().latest("publication_date")
             response = HttpResponse(
                 # RFC 1123 date format.
-                headers={'Last-Modified': last_book.publication_date.strftime('%a, %d %b %Y %H:%M:%S GMT')},
+                headers={
+                    "Last-Modified": last_book.publication_date.strftime(
+                        "%a, %d %b %Y %H:%M:%S GMT"
+                    )
+                },
             )
             return response
 
@@ -134,8 +140,6 @@ information, the client may or may not download the full object list.
 Asynchronous class-based views
 ==============================
 
-.. versionadded:: 4.1
-
 As well as the synchronous (``def``) method handlers already shown, ``View``
 subclasses may define asynchronous (``async def``) method handlers to leverage
 asynchronous code using ``await``::
@@ -143,6 +147,7 @@ asynchronous code using ``await``::
     import asyncio
     from django.http import HttpResponse
     from django.views import View
+
 
     class AsyncView(View):
         async def get(self, request, *args, **kwargs):

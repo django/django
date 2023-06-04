@@ -1,10 +1,10 @@
 from django.contrib.gis.db.backends.base.features import BaseSpatialFeatures
 from django.db.backends.postgresql.features import (
-    DatabaseFeatures as Psycopg2DatabaseFeatures,
+    DatabaseFeatures as PsycopgDatabaseFeatures,
 )
 
 
-class DatabaseFeatures(BaseSpatialFeatures, Psycopg2DatabaseFeatures):
+class DatabaseFeatures(BaseSpatialFeatures, PsycopgDatabaseFeatures):
     supports_geography = True
     supports_3d_storage = True
     supports_3d_functions = True

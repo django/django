@@ -6,6 +6,7 @@ import argparse
 import os
 import sys
 from argparse import ArgumentParser, HelpFormatter
+from functools import partial
 from io import TextIOBase
 
 import django
@@ -71,6 +72,15 @@ class CommandParser(ArgumentParser):
         else:
             raise CommandError("Error: %s" % message)
 
+    def add_subparsers(self, **kwargs):
+        parser_class = kwargs.get("parser_class", type(self))
+        if issubclass(parser_class, CommandParser):
+            kwargs["parser_class"] = partial(
+                parser_class,
+                called_from_command_line=self.called_from_command_line,
+            )
+        return super().add_subparsers(**kwargs)
+
 
 def handle_default_options(options):
     """
@@ -87,7 +97,7 @@ def handle_default_options(options):
 def no_translations(handle_func):
     """Decorator that forces a command to run with translations deactivated."""
 
-    def wrapped(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         from django.utils import translation
 
         saved_locale = translation.get_language()
@@ -99,7 +109,7 @@ def no_translations(handle_func):
                 translation.activate(saved_locale)
         return res
 
-    return wrapped
+    return wrapper
 
 
 class DjangoHelpFormatter(HelpFormatter):
@@ -286,10 +296,10 @@ class BaseCommand:
         Create and return the ``ArgumentParser`` which will be used to
         parse the arguments to this command.
         """
+        kwargs.setdefault("formatter_class", DjangoHelpFormatter)
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
-            formatter_class=DjangoHelpFormatter,
             missing_args_message=getattr(self, "missing_args_message", None),
             called_from_command_line=getattr(self, "_called_from_command_line", None),
             **kwargs,

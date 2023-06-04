@@ -892,8 +892,8 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             # Test conversion from custom to a known srid
             c2w = gdal.CoordTransform(
                 gdal.SpatialReference(
-                    "+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +ellps=WGS84 "
-                    "+datum=WGS84 +units=m +no_defs"
+                    "+proj=mill +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +R_A +datum=WGS84 "
+                    "+units=m +no_defs"
                 ),
                 gdal.SpatialReference(4326),
             )
@@ -1127,8 +1127,10 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
             # Testing __getitem__ (doesn't work on Point or Polygon)
             if isinstance(g, Point):
-                with self.assertRaises(IndexError):
-                    g.x
+                # IndexError is not raised in GEOS 3.8.0.
+                if geos_version_tuple() != (3, 8, 0):
+                    with self.assertRaises(IndexError):
+                        g.x
             elif isinstance(g, Polygon):
                 lr = g.shell
                 self.assertEqual("LINEARRING EMPTY", lr.wkt)
@@ -1290,6 +1292,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
 
     def test_pickle(self):
         "Testing pickling and unpickling support."
+
         # Creating a list of test geometries for pickling,
         # and setting the SRID on some of them.
         def get_geoms(lst, srid=None):
@@ -1528,11 +1531,17 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(GEOSGeometry("POINT(1.0e-1 1.0e+1)"), Point(0.1, 10))
 
     def test_normalize(self):
-        g = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
-        self.assertIsNone(g.normalize())
-        self.assertTrue(
-            g.equals_exact(MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0)))
-        )
+        multipoint = MultiPoint(Point(0, 0), Point(2, 2), Point(1, 1))
+        normalized = MultiPoint(Point(2, 2), Point(1, 1), Point(0, 0))
+        # Geometry is normalized in-place and nothing is returned.
+        multipoint_1 = multipoint.clone()
+        self.assertIsNone(multipoint_1.normalize())
+        self.assertEqual(multipoint_1, normalized)
+        # If the `clone` keyword is set, then the geometry is not modified and
+        # a normalized clone of the geometry is returned instead.
+        multipoint_2 = multipoint.normalize(clone=True)
+        self.assertEqual(multipoint_2, normalized)
+        self.assertNotEqual(multipoint, normalized)
 
     @skipIf(geos_version_tuple() < (3, 8), "GEOS >= 3.8.0 is required")
     def test_make_valid(self):

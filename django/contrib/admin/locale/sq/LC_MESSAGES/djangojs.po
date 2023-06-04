@@ -2,15 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2012,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2021
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2023
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 13:33+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2023\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -65,12 +65,22 @@ msgstr ""
 "kutiza më poshtë e mandej duke klikuar mbi shigjetën \"Hiqe\" mes dy "
 "kutizave."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Shtypni në këtë kuadrat, që të filtroni listën e %s të përzgjedhur."
+
 msgid "Remove all"
 msgstr "Hiqi krejt"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klikoni që të hiqen krejt %s e zgjedhura njëherësh."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s mundësi e përzgjedhur jo e dukshme"
+msgstr[1] "%s mundësi të përzgjedhura jo të dukshme"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"

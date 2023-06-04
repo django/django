@@ -2,7 +2,7 @@
 #
 # Translators:
 # Christian Joergensen <christian@gmta.info>, 2012
-# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021
+# Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023
 # Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2013-2017,2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # 85794379431c3e0f5c85c0e72a78d45b_658ddd9, 2013
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-23 20:27+0000\n"
-"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2021,2023\n"
 "Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -271,18 +271,18 @@ msgid "Password reset on %(site_name)s"
 msgstr "Adgangskode nulstillet på %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Indtast et gyldigt brugernavn. Dette felt må kun indeholde engelske "
-"bogstaver, cifre og disse tegn: @/./+/-/_"
+"Indtast et gyldigt brugernavn. Denne værdi må kun indeholde små bogstaver a-"
+"z og store bogstaver A-Z uden accenter, samt cifre og tegnene @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "
 "@/./+/-/_ characters."
 msgstr ""
-"Indtast et gyldigt brugernavn. Dette felt må kun indeholde bogstaver og "
-"cifre samt disse tegn: @/./+/-/_"
+"Indtast et gyldigt brugernavn. Denne værdi må kun indeholde bogstaver, cifre "
+"og tegnene @/./+/-/_."
 
 msgid "Logged out"
 msgstr "Logget ud"

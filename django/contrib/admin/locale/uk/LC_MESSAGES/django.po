@@ -7,12 +7,13 @@
 # Boryslav Larin <brabadu@gmail.com>, 2011
 # Denis Podlesniy <haos616@gmail.com>, 2016
 # Igor Melnyk, 2014,2017
-# Illia Volochii <illia.volochii@gmail.com>, 2021
+# Illia Volochii <illia.volochii@gmail.com>, 2021-2023
 # Ivan Dmytrenko <dmitrenko.ivan@gmail.com>, 2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # Mikhail Kolesnik <mike@openbunker.org>, 2015
+# Mykola Holovetskyi, 2022
 # Mykola Zamkovoi <nickzam@gmail.com>, 2014
 # Sergiy Kuzmenko <s.kuzmenko@gmail.com>, 2011
 # tarasyyyk <taras.korzhak96@gmail.com>, 2018
@@ -21,9 +22,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-02 22:21+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021-2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -158,14 +159,14 @@ msgstr "Змінено \"%(object)s\" - %(changes)s"
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Видалено \"%(object)s.\""
 
 msgid "LogEntry Object"
 msgstr "Об'єкт журнального запису"
 
 #, python-brace-format
 msgid "Added {name} “{object}”."
-msgstr ""
+msgstr "Додано {name} \"{object}\"."
 
 msgid "Added."
 msgstr "Додано."
@@ -175,7 +176,7 @@ msgstr "та"
 
 #, python-brace-format
 msgid "Changed {fields} for {name} “{object}”."
-msgstr ""
+msgstr "Змінені {fields} для {name} \"{object}\"."
 
 #, python-brace-format
 msgid "Changed {fields}."
@@ -183,7 +184,7 @@ msgstr "Змінені {fields}."
 
 #, python-brace-format
 msgid "Deleted {name} “{object}”."
-msgstr ""
+msgstr "Видалено {name} \"{object}\"."
 
 msgid "No fields changed."
 msgstr "Поля не змінені."
@@ -193,10 +194,12 @@ msgstr "Ніщо"
 
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
+"Натисність \"Control\" або \"Command\" на Mac-пристрої, щоб вибрати більше "
+"аніж один."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" було додано успішно."
 
 msgid "You may edit it again below."
 msgstr "Ви можете відредагувати це знову."
@@ -204,26 +207,27 @@ msgstr "Ви можете відредагувати це знову."
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was added successfully. You may add another {name} below."
-msgstr ""
+msgstr "{name} \"{obj}\" було змінено успішно. Ви можете додати інше {name}."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may edit it again below."
 msgstr ""
+"{name} \"{obj}\" було змінено успішно. Нижче Ви можете редагувати його знову."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully. You may edit it again below."
-msgstr ""
+msgstr "{name} \"{obj}\" було додано успішно. Ви можете редагувати його знову."
 
 #, python-brace-format
 msgid ""
 "The {name} “{obj}” was changed successfully. You may add another {name} "
 "below."
-msgstr ""
+msgstr "{name} \"{obj}\" було змінено успішно. Ви можете додати інше {name}."
 
 #, python-brace-format
 msgid "The {name} “{obj}” was changed successfully."
-msgstr ""
+msgstr "{name} \"{obj}\" було змінено успішно."
 
 msgid ""
 "Items must be selected in order to perform actions on them. No items have "
@@ -236,11 +240,11 @@ msgstr "Дія не обрана."
 
 #, python-format
 msgid "The %(name)s “%(obj)s” was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" був видалений успішно."
 
 #, python-format
 msgid "%(name)s with ID “%(key)s” doesn’t exist. Perhaps it was deleted?"
-msgstr ""
+msgstr "%(name)s з ID \"%(key)s\" не існує. Можливо, воно було видалене?"
 
 #, python-format
 msgid "Add %s"
@@ -281,8 +285,9 @@ msgstr "0 з %(cnt)s обрано"
 msgid "Change history: %s"
 msgstr "Історія змін: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -333,6 +338,8 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Сталася помилка. Вона була відправлена адміністраторам сайту через email і "
+"має бути вирішена швидко. Дякуємо за ваше терпіння."
 
 msgid "Run the selected action"
 msgstr "Виконати обрану дію"
@@ -361,12 +368,14 @@ msgid "View"
 msgstr "Переглянути"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr ""
+msgstr "Ви не маєте дозволу переглядати чи редагувати будь-чого."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
+"Спершу, введіть користувацьке ім'я і пароль. Тоді, ви зможете редагувати "
+"більше користувацьких опцій."
 
 msgid "Enter a username and password."
 msgstr "Введіть ім'я користувача і пароль."
@@ -375,14 +384,18 @@ msgid "Change password"
 msgstr "Змінити пароль"
 
 msgid "Please correct the error below."
-msgstr "Будь ласка, виправіть помилку нижче."
-
-msgid "Please correct the errors below."
-msgstr "Будь ласка, виправте помилки, вказані нижче."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Будь ласка, виправте наведену нижче помилку."
+msgstr[1] "Будь ласка, виправте наведені нижче помилки."
+msgstr[2] "Будь ласка, виправте наведені нижче помилки."
+msgstr[3] "Будь ласка, виправте наведені нижче помилки."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Введіть новий пароль для користувача <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Перейти до основного вмісту"
 
 msgid "Welcome,"
 msgstr "Вітаємо,"
@@ -395,6 +408,9 @@ msgstr "Документація"
 
 msgid "Log out"
 msgstr "Вийти"
+
+msgid "Breadcrumbs"
+msgstr "Навігаційний рядок"
 
 #, python-format
 msgid "Add %(name)s"
@@ -421,6 +437,15 @@ msgstr "Пріорітет сортування: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Сортувати в іншому напрямку"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Перемкнути тему (поточна тема: автоматична)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Перемкнути тему (поточна тема: світла)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Перемкнути тему (поточна тема: темна)"
 
 msgid "Delete"
 msgstr "Видалити"
@@ -515,6 +540,8 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Щось не так з інсталяцією бази даних. Запевніться, що певні таблиці бази "
+"даних були створені і що вона може бути прочитана певним користувачем."
 
 #, python-format
 msgid ""
@@ -529,13 +556,16 @@ msgid "Forgotten your password or username?"
 msgstr "Забули пароль або ім'я користувача?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Увімкнути навігацію"
+
+msgid "Sidebar"
+msgstr "Бічна панель"
 
 msgid "Start typing to filter…"
-msgstr ""
+msgstr "Почніть писати для фільтру..."
 
 msgid "Filter navigation items"
-msgstr ""
+msgstr "Фільтрувати навігаційні об'єкти"
 
 msgid "Date/time"
 msgstr "Дата/час"
@@ -546,10 +576,19 @@ msgstr "Користувач"
 msgid "Action"
 msgstr "Дія"
 
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "запис"
+msgstr[1] "записи"
+msgstr[2] "записи"
+msgstr[3] "записи"
+
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
 "admin site."
 msgstr ""
+"Цей об'єкт не має історії змін. Напевно, він був доданий не через цей сайт "
+"адміністрування."
 
 msgid "Show all"
 msgstr "Показати всі"
@@ -602,8 +641,12 @@ msgstr "Додати ще одну %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Видалити обрану %(model)s"
 
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Переглянути обрану %(model)s"
+
 msgid "Thanks for spending some quality time with the web site today."
-msgstr ""
+msgstr "Дякуємо за час, який був проведений сьогодні на сайті."
 
 msgid "Log in again"
 msgstr "Увійти знову"
@@ -618,6 +661,8 @@ msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
 "password twice so we can verify you typed it in correctly."
 msgstr ""
+"Будь ласка введіть ваш старий пароль, заради безпеки, після цього введіть "
+"ваш новий пароль двічі для верифікації коректності написаного."
 
 msgid "Change my password"
 msgstr "Змінити мій пароль"
@@ -655,11 +700,15 @@ msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Ми відправили вам інструкції для встановлення пароля, якщо обліковий запис з "
+"введеною адресою існує. Ви маєте отримати їх найближчим часом."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Якщо Ви не отримали електронного листа, переконайтеся, будь ласка, в "
+"зареєстрованій адресі і перевірте папку \"Спам\"."
 
 #, python-format
 msgid ""
@@ -673,7 +722,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Будь ласка, перейдіть на цю сторінку, та оберіть новий пароль:"
 
 msgid "Your username, in case you’ve forgotten:"
-msgstr ""
+msgstr "Ваше користувацьке ім'я, у випадку, якщо ви забули:"
 
 msgid "Thanks for using our site!"
 msgstr "Дякуємо за користування нашим сайтом!"
@@ -686,6 +735,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Забули пароль? Введіть свою email-адресу нижче і ми відправимо вам "
+"інструкції по встановленню нового."
 
 msgid "Email address:"
 msgstr "Email адреса:"

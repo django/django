@@ -73,9 +73,9 @@ All attributes should be considered read-only, unless stated otherwise.
     A string representing the HTTP method used in the request. This is
     guaranteed to be uppercase. For example::
 
-        if request.method == 'GET':
+        if request.method == "GET":
             do_something()
-        elif request.method == 'POST':
+        elif request.method == "POST":
             do_something_else()
 
 .. attribute:: HttpRequest.encoding
@@ -179,28 +179,32 @@ All attributes should be considered read-only, unless stated otherwise.
     the request.
 
     The name of each header is stylized with title-casing (e.g. ``User-Agent``)
-    when it's displayed. You can access headers case-insensitively::
+    when it's displayed. You can access headers case-insensitively:
+
+    .. code-block:: pycon
 
         >>> request.headers
         {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6', ...}
 
-        >>> 'User-Agent' in request.headers
+        >>> "User-Agent" in request.headers
         True
-        >>> 'user-agent' in request.headers
+        >>> "user-agent" in request.headers
         True
 
-        >>> request.headers['User-Agent']
+        >>> request.headers["User-Agent"]
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
-        >>> request.headers['user-agent']
+        >>> request.headers["user-agent"]
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
-        >>> request.headers.get('User-Agent')
+        >>> request.headers.get("User-Agent")
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
-        >>> request.headers.get('user-agent')
+        >>> request.headers.get("user-agent")
         Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)
 
     For use in, for example, Django templates, headers can also be looked up
-    using underscores in place of hyphens::
+    using underscores in place of hyphens:
+
+    .. code-block:: html+django
 
         {{ request.headers.user_agent }}
 
@@ -273,12 +277,26 @@ middleware class is listed in :setting:`MIDDLEWARE`.
     :attr:`~django.contrib.auth.models.User.is_authenticated`, like so::
 
         if request.user.is_authenticated:
-            ... # Do something for logged-in users.
+            ...  # Do something for logged-in users.
         else:
-            ... # Do something for anonymous users.
+            ...  # Do something for anonymous users.
+
+    The :meth:`auser` method does the same thing but can be used from async
+    contexts.
 
 Methods
 -------
+
+.. method:: HttpRequest.auser()
+
+    .. versionadded:: 5.0
+
+    From the :class:`~django.contrib.auth.middleware.AuthenticationMiddleware`:
+    Coroutine. Returns an instance of :setting:`AUTH_USER_MODEL` representing
+    the currently logged-in user. If the user isn't currently logged in,
+    ``auser`` will return an instance of
+    :class:`~django.contrib.auth.models.AnonymousUser`. This is similar to the
+    :attr:`user` attribute but it works in async contexts.
 
 .. method:: HttpRequest.get_host()
 
@@ -300,9 +318,9 @@ Methods
 
             class MultipleProxyMiddleware:
                 FORWARDED_FOR_FIELDS = [
-                    'HTTP_X_FORWARDED_FOR',
-                    'HTTP_X_FORWARDED_HOST',
-                    'HTTP_X_FORWARDED_SERVER',
+                    "HTTP_X_FORWARDED_FOR",
+                    "HTTP_X_FORWARDED_HOST",
+                    "HTTP_X_FORWARDED_SERVER",
                 ]
 
                 def __init__(self, get_response):
@@ -315,8 +333,8 @@ Methods
                     """
                     for field in self.FORWARDED_FOR_FIELDS:
                         if field in request.META:
-                            if ',' in request.META[field]:
-                                parts = request.META[field].split(',')
+                            if "," in request.META[field]:
+                                parts = request.META[field].split(",")
                                 request.META[field] = parts[-1].strip()
                     return self.get_response(request)
 
@@ -381,24 +399,23 @@ Methods
     attached to the cookie value to ensure the cookie is not older than
     ``max_age`` seconds.
 
-    For example::
+    For example:
 
-        >>> request.get_signed_cookie('name')
+    .. code-block:: pycon
+
+        >>> request.get_signed_cookie("name")
         'Tony'
-        >>> request.get_signed_cookie('name', salt='name-salt')
+        >>> request.get_signed_cookie("name", salt="name-salt")
         'Tony' # assuming cookie was set using the same salt
-        >>> request.get_signed_cookie('nonexistent-cookie')
-        ...
+        >>> request.get_signed_cookie("nonexistent-cookie")
         KeyError: 'nonexistent-cookie'
-        >>> request.get_signed_cookie('nonexistent-cookie', False)
+        >>> request.get_signed_cookie("nonexistent-cookie", False)
         False
-        >>> request.get_signed_cookie('cookie-that-was-tampered-with')
-        ...
+        >>> request.get_signed_cookie("cookie-that-was-tampered-with")
         BadSignature: ...
-        >>> request.get_signed_cookie('name', max_age=60)
-        ...
+        >>> request.get_signed_cookie("name", max_age=60)
         SignatureExpired: Signature age 1677.3839159 > 60 seconds
-        >>> request.get_signed_cookie('name', False, max_age=60)
+        >>> request.get_signed_cookie("name", False, max_age=60)
         False
 
     See :doc:`cryptographic signing </topics/signing>` for more information.
@@ -411,9 +428,11 @@ Methods
 .. method:: HttpRequest.accepts(mime_type)
 
     Returns ``True`` if the request ``Accept`` header matches the ``mime_type``
-    argument::
+    argument:
 
-        >>> request.accepts('text/html')
+    .. code-block:: pycon
+
+        >>> request.accepts("text/html")
         True
 
     Most browsers send ``Accept: */*`` by default, so this would return
@@ -445,6 +464,7 @@ Methods
     :class:`~xml.etree.ElementTree.ElementTree`::
 
         import xml.etree.ElementTree as ET
+
         for element in ET.iterparse(request):
             process(element)
 
@@ -492,9 +512,11 @@ a subclass of dictionary. Exceptions are outlined here:
 .. classmethod:: QueryDict.fromkeys(iterable, value='', mutable=False, encoding=None)
 
     Creates a new ``QueryDict`` with keys from ``iterable`` and each value
-    equal to ``value``. For example::
+    equal to ``value``. For example:
 
-        >>> QueryDict.fromkeys(['a', 'a', 'b'], value='val')
+    .. code-block:: pycon
+
+        >>> QueryDict.fromkeys(["a", "a", "b"], value="val")
         <QueryDict: {'a': ['val', 'val'], 'b': ['val']}>
 
 .. method:: QueryDict.__getitem__(key)
@@ -530,22 +552,26 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Takes either a ``QueryDict`` or a dictionary. Like :meth:`dict.update`,
     except it *appends* to the current dictionary items rather than replacing
-    them. For example::
+    them. For example:
 
-        >>> q = QueryDict('a=1', mutable=True)
-        >>> q.update({'a': '2'})
-        >>> q.getlist('a')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1", mutable=True)
+        >>> q.update({"a": "2"})
+        >>> q.getlist("a")
         ['1', '2']
-        >>> q['a'] # returns the last
+        >>> q["a"]  # returns the last
         '2'
 
 .. method:: QueryDict.items()
 
     Like :meth:`dict.items`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator object instead of a view object.
-    For example::
+    For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> list(q.items())
         [('a', '3')]
 
@@ -553,9 +579,11 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Like :meth:`dict.values`, except this uses the same last-value logic as
     :meth:`__getitem__` and returns an iterator instead of a view object. For
-    example::
+    example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> list(q.values())
         ['3']
 
@@ -588,19 +616,23 @@ In addition, ``QueryDict`` has the following methods:
 .. method:: QueryDict.lists()
 
     Like :meth:`items()`, except it includes all values, as a list, for each
-    member of the dictionary. For example::
+    member of the dictionary. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3")
         >>> q.lists()
         [('a', ['1', '2', '3'])]
 
 .. method:: QueryDict.pop(key)
 
     Returns a list of values for the given key and removes them from the
-    dictionary. Raises ``KeyError`` if the key does not exist. For example::
+    dictionary. Raises ``KeyError`` if the key does not exist. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
-        >>> q.pop('a')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
+        >>> q.pop("a")
         ['1', '2', '3']
 
 .. method:: QueryDict.popitem()
@@ -608,9 +640,11 @@ In addition, ``QueryDict`` has the following methods:
     Removes an arbitrary member of the dictionary (since there's no concept
     of ordering), and returns a two value tuple containing the key and a list
     of all values for the key. Raises ``KeyError`` when called on an empty
-    dictionary. For example::
+    dictionary. For example:
 
-        >>> q = QueryDict('a=1&a=2&a=3', mutable=True)
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=2&a=3", mutable=True)
         >>> q.popitem()
         ('a', ['1', '2', '3'])
 
@@ -618,26 +652,32 @@ In addition, ``QueryDict`` has the following methods:
 
     Returns a ``dict`` representation of ``QueryDict``. For every (key, list)
     pair in ``QueryDict``, ``dict`` will have (key, item), where item is one
-    element of the list, using the same logic as :meth:`QueryDict.__getitem__`::
+    element of the list, using the same logic as :meth:`QueryDict.__getitem__`:
 
-        >>> q = QueryDict('a=1&a=3&a=5')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=1&a=3&a=5")
         >>> q.dict()
         {'a': '5'}
 
 .. method:: QueryDict.urlencode(safe=None)
 
-    Returns a string of the data in query string format. For example::
+    Returns a string of the data in query string format. For example:
 
-        >>> q = QueryDict('a=2&b=3&b=5')
+    .. code-block:: pycon
+
+        >>> q = QueryDict("a=2&b=3&b=5")
         >>> q.urlencode()
         'a=2&b=3&b=5'
 
     Use the ``safe`` parameter to pass characters which don't require encoding.
-    For example::
+    For example:
+
+    .. code-block:: pycon
 
         >>> q = QueryDict(mutable=True)
-        >>> q['next'] = '/a&b/'
-        >>> q.urlencode(safe='/')
+        >>> q["next"] = "/a&b/"
+        >>> q.urlencode(safe="/")
         'next=/a%26b/'
 
 ``HttpResponse`` objects
@@ -659,16 +699,20 @@ Passing strings
 ~~~~~~~~~~~~~~~
 
 Typical usage is to pass the contents of the page, as a string, bytestring,
-or :class:`memoryview`, to the :class:`HttpResponse` constructor::
+or :class:`memoryview`, to the :class:`HttpResponse` constructor:
+
+.. code-block:: pycon
 
     >>> from django.http import HttpResponse
     >>> response = HttpResponse("Here's the text of the web page.")
     >>> response = HttpResponse("Text only, please.", content_type="text/plain")
-    >>> response = HttpResponse(b'Bytestrings are also accepted.')
-    >>> response = HttpResponse(memoryview(b'Memoryview as well.'))
+    >>> response = HttpResponse(b"Bytestrings are also accepted.")
+    >>> response = HttpResponse(memoryview(b"Memoryview as well."))
 
 But if you want to add content incrementally, you can use ``response`` as a
-file-like object::
+file-like object:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
     >>> response.write("<p>Here's the text of the web page.</p>")
@@ -691,17 +735,21 @@ Setting header fields
 ~~~~~~~~~~~~~~~~~~~~~
 
 To set or remove a header field in your response, use
-:attr:`HttpResponse.headers`::
+:attr:`HttpResponse.headers`:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
-    >>> response.headers['Age'] = 120
-    >>> del response.headers['Age']
+    >>> response.headers["Age"] = 120
+    >>> del response.headers["Age"]
 
-You can also manipulate headers by treating your response like a dictionary::
+You can also manipulate headers by treating your response like a dictionary:
+
+.. code-block:: pycon
 
     >>> response = HttpResponse()
-    >>> response['Age'] = 120
-    >>> del response['Age']
+    >>> response["Age"] = 120
+    >>> del response["Age"]
 
 This proxies to ``HttpResponse.headers``, and is the original interface offered
 by ``HttpResponse``.
@@ -709,9 +757,11 @@ by ``HttpResponse``.
 When using this interface, unlike a dictionary, ``del`` doesn't raise
 ``KeyError`` if the header field doesn't exist.
 
-You can also set headers on instantiation::
+You can also set headers on instantiation:
 
-    >>> response = HttpResponse(headers={'Age': 120})
+.. code-block:: pycon
+
+    >>> response = HttpResponse(headers={"Age": 120})
 
 For setting the ``Cache-Control`` and ``Vary`` header fields, it is recommended
 to use the :func:`~django.utils.cache.patch_cache_control` and
@@ -728,12 +778,17 @@ Telling the browser to treat the response as a file attachment
 
 To tell the browser to treat the response as a file attachment, set the
 ``Content-Type`` and ``Content-Disposition`` headers. For example, this is how
-you might return a Microsoft Excel spreadsheet::
+you might return a Microsoft Excel spreadsheet:
 
-    >>> response = HttpResponse(my_data, headers={
-    ...     'Content-Type': 'application/vnd.ms-excel',
-    ...     'Content-Disposition': 'attachment; filename="foo.xls"',
-    ... })
+.. code-block:: pycon
+
+    >>> response = HttpResponse(
+    ...     my_data,
+    ...     headers={
+    ...         "Content-Type": "application/vnd.ms-excel",
+    ...         "Content-Disposition": 'attachment; filename="foo.xls"',
+    ...     },
+    ... )
 
 There's nothing Django-specific about the ``Content-Disposition`` header, but
 it's easy to forget the syntax, so we've included it here.
@@ -759,7 +814,7 @@ Attributes
 
 .. attribute:: HttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -768,7 +823,7 @@ Attributes
 .. attribute:: HttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
@@ -803,9 +858,9 @@ Methods
     :setting:`DEFAULT_CHARSET` settings, by default:
     ``"text/html; charset=utf-8"``.
 
-    ``status`` is the :rfc:`HTTP status code <7231#section-6>` for the response.
-    You can use Python's :py:class:`http.HTTPStatus` for meaningful aliases,
-    such as ``HTTPStatus.NO_CONTENT``.
+    ``status`` is the :rfc:`HTTP status code <9110#section-15>` for the
+    response. You can use Python's :py:class:`http.HTTPStatus` for meaningful
+    aliases, such as ``HTTPStatus.NO_CONTENT``.
 
     ``reason`` is the HTTP response phrase. If not provided, a default phrase
     will be used.
@@ -857,11 +912,6 @@ Methods
       number of seconds, or ``None`` (default) if the cookie should last only
       as long as the client's browser session. If ``expires`` is not specified,
       it will be calculated.
-
-      .. versionchanged:: 4.1
-
-        Support for ``timedelta`` objects was added.
-
     * ``expires`` should either be a string in the format
       ``"Wdy, DD-Mon-YY HH:MM:SS GMT"`` or a ``datetime.datetime`` object
       in UTC. If ``expires`` is a ``datetime`` object, the ``max_age``
@@ -1030,7 +1080,9 @@ Custom response classes
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 If you find yourself needing a response class that Django doesn't provide, you
-can create it with the help of :py:class:`http.HTTPStatus`. For example::
+can create it with the help of :py:class:`http.HTTPStatus`. For example:
+
+.. code-block:: pycon
 
     from http import HTTPStatus
     from django.http import HttpResponse
@@ -1069,10 +1121,12 @@ can create it with the help of :py:class:`http.HTTPStatus`. For example::
 Usage
 -----
 
-Typical usage could look like::
+Typical usage could look like:
+
+.. code-block:: pycon
 
     >>> from django.http import JsonResponse
-    >>> response = JsonResponse({'foo': 'bar'})
+    >>> response = JsonResponse({"foo": "bar"})
     >>> response.content
     b'{"foo": "bar"}'
 
@@ -1080,7 +1134,9 @@ Serializing non-dictionary objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to serialize objects other than ``dict`` you must set the ``safe``
-parameter to ``False``::
+parameter to ``False``:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse([1, 2, 3], safe=False)
 
@@ -1104,7 +1160,9 @@ Changing the default JSON encoder
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you need to use a different JSON encoder class you can pass the ``encoder``
-parameter to the constructor method::
+parameter to the constructor method:
+
+.. code-block:: pycon
 
     >>> response = JsonResponse(data, encoder=MyJSONEncoder)
 
@@ -1116,39 +1174,75 @@ parameter to the constructor method::
 .. class:: StreamingHttpResponse
 
 The :class:`StreamingHttpResponse` class is used to stream a response from
-Django to the browser. You might want to do this if generating the response
-takes too long or uses too much memory. For instance, it's useful for
-:ref:`generating large CSV files <streaming-csv-files>`.
+Django to the browser.
 
-.. admonition:: Performance considerations
+.. admonition:: Advanced usage
 
-    Django is designed for short-lived requests. Streaming responses will tie
-    a worker process for the entire duration of the response. This may result
-    in poor performance.
+    :class:`StreamingHttpResponse` is somewhat advanced, in that it is
+    important to know whether you'll be serving your application synchronously
+    under WSGI or asynchronously under ASGI, and adjust your usage
+    appropriately.
 
-    Generally speaking, you should perform expensive tasks outside of the
-    request-response cycle, rather than resorting to a streamed response.
+    Please read these notes with care.
+
+An example usage of :class:`StreamingHttpResponse` under WSGI is streaming
+content when generating the response would take too long or uses too much
+memory. For instance, it's useful for :ref:`generating large CSV files
+<streaming-csv-files>`.
+
+There are performance considerations when doing this, though. Django, under
+WSGI, is designed for short-lived requests. Streaming responses will tie a
+worker process for the entire duration of the response. This may result in poor
+performance.
+
+Generally speaking, you would perform expensive tasks outside of the
+request-response cycle, rather than resorting to a streamed response.
+
+When serving under ASGI, however, a :class:`StreamingHttpResponse` need not
+stop other requests from being served whilst waiting for I/O. This opens up
+the possibility of long-lived requests for streaming content and implementing
+patterns such as long-polling, and server-sent events.
+
+Even under ASGI note, :class:`StreamingHttpResponse` should only be used in
+situations where it is absolutely required that the whole content isn't
+iterated before transferring the data to the client. Because the content can't
+be accessed, many middleware can't function normally. For example the ``ETag``
+and ``Content-Length`` headers can't be generated for streaming responses.
 
 The :class:`StreamingHttpResponse` is not a subclass of :class:`HttpResponse`,
 because it features a slightly different API. However, it is almost identical,
 with the following notable differences:
 
-* It should be given an iterator that yields bytestrings as content.
+* It should be given an iterator that yields bytestrings, :class:`memoryview`,
+  or strings as content. When serving under WSGI, this should be a sync
+  iterator. When serving under ASGI, then it should be an async iterator.
 
 * You cannot access its content, except by iterating the response object
-  itself. This should only occur when the response is returned to the client.
+  itself. This should only occur when the response is returned to the client:
+  you should not iterate the response yourself.
+
+  Under WSGI the response will be iterated synchronously. Under ASGI the
+  response will be iterated asynchronously. (This is why the iterator type must
+  match the protocol you're using.)
+
+  To avoid a crash, an incorrect iterator type will be mapped to the correct
+  type during iteration, and a warning will be raised, but in order to do this
+  the iterator must be fully-consumed, which defeats the purpose of using a
+  :class:`StreamingHttpResponse` at all.
 
 * It has no ``content`` attribute. Instead, it has a
-  :attr:`~StreamingHttpResponse.streaming_content` attribute.
+  :attr:`~StreamingHttpResponse.streaming_content` attribute. This can be used
+  in middleware to wrap the response iterable, but should not be consumed.
 
 * You cannot use the file-like object ``tell()`` or ``write()`` methods.
   Doing so will raise an exception.
 
-:class:`StreamingHttpResponse` should only be used in situations where it is
-absolutely required that the whole content isn't iterated before transferring
-the data to the client. Because the content can't be accessed, many
-middleware can't function normally. For example the ``ETag`` and
-``Content-Length`` headers can't be generated for streaming responses.
+The :class:`HttpResponseBase` base class is common between
+:class:`HttpResponse` and :class:`StreamingHttpResponse`.
+
+.. versionchanged:: 4.2
+
+    Support for asynchronous iteration was added.
 
 Attributes
 ----------
@@ -1160,7 +1254,7 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.status_code
 
-    The :rfc:`HTTP status code <7231#section-6>` for the response.
+    The :rfc:`HTTP status code <9110#section-15>` for the response.
 
     Unless :attr:`reason_phrase` is explicitly set, modifying the value of
     ``status_code`` outside the constructor will also modify the value of
@@ -1169,7 +1263,7 @@ Attributes
 .. attribute:: StreamingHttpResponse.reason_phrase
 
     The HTTP reason phrase for the response. It uses the :rfc:`HTTP standard's
-    <7231#section-6.1>` default reason phrases.
+    <9110#section-15.1>` default reason phrases.
 
     Unless explicitly set, ``reason_phrase`` is determined by the value of
     :attr:`status_code`.
@@ -1177,6 +1271,16 @@ Attributes
 .. attribute:: StreamingHttpResponse.streaming
 
     This is always ``True``.
+
+.. attribute:: StreamingHttpResponse.is_async
+
+    .. versionadded:: 4.2
+
+    Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
+    is an asynchronous iterator or not.
+
+    This is useful for middleware needing to wrap
+    :attr:`StreamingHttpResponse.streaming_content`.
 
 ``FileResponse`` objects
 ========================
@@ -1199,16 +1303,30 @@ Attributes
     Note that if you pass a file-like object like ``io.BytesIO``, it's your
     task to ``seek()`` it before passing it to ``FileResponse``.
 
-    The ``Content-Length`` and ``Content-Type`` headers are automatically set
-    when they can be guessed from contents of ``open_file``.
+    The ``Content-Length`` header is automatically set when it can be guessed
+    from the content of ``open_file``.
+
+    The ``Content-Type`` header is automatically set when it can be guessed
+    from the ``filename``, or the name of ``open_file``.
 
 ``FileResponse`` accepts any file-like object with binary content, for example
-a file open in binary mode like so::
+a file open in binary mode like so:
+
+.. code-block:: pycon
 
     >>> from django.http import FileResponse
-    >>> response = FileResponse(open('myfile.png', 'rb'))
+    >>> response = FileResponse(open("myfile.png", "rb"))
 
 The file will be closed automatically, so don't open it with a context manager.
+
+.. admonition:: Use under ASGI
+
+    Python's file API is synchronous. This means that the file must be fully
+    consumed in order to be served under ASGI.
+
+    In order to stream a file asynchronously you need to use a third-party
+    package that provides an asynchronous file API, such as `aiofiles
+    <https://github.com/Tinche/aiofiles>`_.
 
 Methods
 -------
@@ -1218,3 +1336,12 @@ Methods
     This method is automatically called during the response initialization and
     set various headers (``Content-Length``, ``Content-Type``, and
     ``Content-Disposition``) depending on ``open_file``.
+
+``HttpResponseBase`` class
+==========================
+
+.. class:: HttpResponseBase
+
+The :class:`HttpResponseBase` class is common to all Django responses.
+It should not be used to create responses directly, but it can be
+useful for type-checking.

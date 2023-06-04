@@ -9,6 +9,7 @@ class People(models.Model):
 
 class Message(models.Model):
     from_field = models.ForeignKey(People, models.CASCADE, db_column="from_id")
+    author = models.ForeignKey(People, models.CASCADE, related_name="message_authors")
 
 
 class PeopleData(models.Model):
@@ -48,6 +49,11 @@ class SpecialName(models.Model):
 
     class Meta:
         db_table = "inspectdb_special.table name"
+
+
+class PascalCaseName(models.Model):
+    class Meta:
+        db_table = "inspectdb_pascal.PascalCase"
 
 
 class ColumnTypes(models.Model):
@@ -105,6 +111,13 @@ class TextFieldDbCollation(models.Model):
         required_db_features = {"supports_collation_on_textfield"}
 
 
+class CharFieldUnlimited(models.Model):
+    char_field = models.CharField(max_length=None)
+
+    class Meta:
+        required_db_features = {"supports_unlimited_charfield"}
+
+
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
@@ -131,3 +144,11 @@ class FuncUniqueConstraint(models.Model):
             )
         ]
         required_db_features = {"supports_expression_indexes"}
+
+
+class DbComment(models.Model):
+    rank = models.IntegerField(db_comment="'Rank' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

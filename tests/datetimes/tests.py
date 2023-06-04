@@ -1,14 +1,7 @@
 import datetime
-import unittest
 
-try:
-    import pytz
-except ImportError:
-    pytz = None
-
-from django.test import TestCase, ignore_warnings, override_settings
+from django.test import TestCase, override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango50Warning
 
 from .models import Article, Category, Comment
 
@@ -85,7 +78,7 @@ class DateTimesTests(TestCase):
                 datetime.datetime(2010, 7, 28),
             ],
         )
-        self.assertQuerysetEqual(
+        self.assertSequenceEqual(
             Article.objects.datetimes("comments__approval_date", "day"), []
         )
         self.assertSequenceEqual(
@@ -101,46 +94,6 @@ class DateTimesTests(TestCase):
         Article.objects.create(title="First one", pub_date=now)
         qs = Article.objects.datetimes("pub_date", "second")
         self.assertEqual(qs[0], now)
-
-    @unittest.skipUnless(pytz is not None, "Test requires pytz")
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(USE_TZ=True, TIME_ZONE="UTC", USE_DEPRECATED_PYTZ=True)
-    def test_datetimes_ambiguous_and_invalid_times(self):
-        sao = pytz.timezone("America/Sao_Paulo")
-        utc = pytz.UTC
-        article = Article.objects.create(
-            title="Article 1",
-            pub_date=utc.localize(datetime.datetime(2016, 2, 21, 1)),
-        )
-        Comment.objects.create(
-            article=article,
-            pub_date=utc.localize(datetime.datetime(2016, 10, 16, 13)),
-        )
-        with timezone.override(sao):
-            with self.assertRaisesMessage(
-                pytz.AmbiguousTimeError, "2016-02-20 23:00:00"
-            ):
-                Article.objects.datetimes("pub_date", "hour").get()
-            with self.assertRaisesMessage(
-                pytz.NonExistentTimeError, "2016-10-16 00:00:00"
-            ):
-                Comment.objects.datetimes("pub_date", "day").get()
-            self.assertEqual(
-                Article.objects.datetimes("pub_date", "hour", is_dst=False).get().dst(),
-                datetime.timedelta(0),
-            )
-            self.assertEqual(
-                Comment.objects.datetimes("pub_date", "day", is_dst=False).get().dst(),
-                datetime.timedelta(0),
-            )
-            self.assertEqual(
-                Article.objects.datetimes("pub_date", "hour", is_dst=True).get().dst(),
-                datetime.timedelta(0, 3600),
-            )
-            self.assertEqual(
-                Comment.objects.datetimes("pub_date", "hour", is_dst=True).get().dst(),
-                datetime.timedelta(0, 3600),
-            )
 
     def test_datetimes_returns_available_dates_for_given_scope_and_given_field(self):
         pub_dates = [

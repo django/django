@@ -53,12 +53,13 @@ Here's an example::
 
     from django import forms
 
+
     class CalendarWidget(forms.TextInput):
         class Media:
             css = {
-                'all': ('pretty.css',)
+                "all": ["pretty.css"],
             }
-            js = ('animations.js', 'actions.js')
+            js = ["animations.js", "actions.js"]
 
 This code defines a ``CalendarWidget``, which will be based on ``TextInput``.
 Every time the CalendarWidget is used on a form, that form will be directed
@@ -67,7 +68,9 @@ to include the CSS file ``pretty.css``, and the JavaScript files
 
 This static definition is converted at runtime into a widget property
 named ``media``. The list of assets for a ``CalendarWidget`` instance
-can be retrieved through this property::
+can be retrieved through this property:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -96,8 +99,8 @@ provide two CSS options -- one for the screen, and one for print::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'print': ('newspaper.css',)
+            "screen": ["pretty.css"],
+            "print": ["newspaper.css"],
         }
 
 If a group of CSS files are appropriate for multiple output media types,
@@ -107,21 +110,18 @@ requirements::
 
     class Media:
         css = {
-            'screen': ('pretty.css',),
-            'tv,projector': ('lo_res.css',),
-            'print': ('newspaper.css',)
+            "screen": ["pretty.css"],
+            "tv,projector": ["lo_res.css"],
+            "print": ["newspaper.css"],
         }
 
-If this last CSS definition were to be rendered, it would become the following HTML::
+If this last CSS definition were to be rendered, it would become the following HTML:
+
+.. code-block:: html+django
 
     <link href="http://static.example.com/pretty.css" media="screen" rel="stylesheet">
     <link href="http://static.example.com/lo_res.css" media="tv,projector" rel="stylesheet">
     <link href="http://static.example.com/newspaper.css" media="print" rel="stylesheet">
-
-.. versionchanged:: 4.1
-
-    In older versions, the ``type="text/css"`` attribute is included in CSS
-    links.
 
 ``js``
 ------
@@ -139,14 +139,17 @@ By default, any object using a static ``Media`` definition will
 inherit all the assets associated with the parent widget. This occurs
 regardless of how the parent defines its own requirements. For
 example, if we were to extend our basic Calendar widget from the
-example above::
+example above:
+
+.. code-block:: pycon
 
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             "all": ["fancy.css"],
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -158,15 +161,18 @@ example above::
 
 The FancyCalendar widget inherits all the assets from its parent
 widget. If you don't want ``Media`` to be inherited in this way, add
-an ``extend=False`` declaration to the ``Media`` declaration::
+an ``extend=False`` declaration to the ``Media`` declaration:
+
+.. code-block:: pycon
 
     >>> class FancyCalendarWidget(CalendarWidget):
     ...     class Media:
     ...         extend = False
     ...         css = {
-    ...             'all': ('fancy.css',)
+    ...             "all": ["fancy.css"],
     ...         }
-    ...         js = ('whizbang.js',)
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w = FancyCalendarWidget()
     >>> print(w.media)
@@ -195,8 +201,9 @@ be defined in a dynamic fashion::
     class CalendarWidget(forms.TextInput):
         @property
         def media(self):
-            return forms.Media(css={'all': ('pretty.css',)},
-                               js=('animations.js', 'actions.js'))
+            return forms.Media(
+                css={"all": ["pretty.css"]}, js=["animations.js", "actions.js"]
+            )
 
 See the section on `Media objects`_ for more details on how to construct
 return values for dynamic ``media`` properties.
@@ -224,15 +231,18 @@ To find the appropriate prefix to use, Django will check if the
 :setting:`STATIC_URL` setting is not ``None`` and automatically fall back
 to using :setting:`MEDIA_URL`. For example, if the :setting:`MEDIA_URL` for
 your site was ``'http://uploads.example.com/'`` and :setting:`STATIC_URL`
-was ``None``::
+was ``None``:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('/css/pretty.css',),
+    ...             "all": ["/css/pretty.css"],
     ...         }
-    ...         js = ('animations.js', 'http://othersite.com/actions.js')
+    ...         js = ["animations.js", "http://othersite.com/actions.js"]
+    ...
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -240,7 +250,9 @@ was ``None``::
     <script src="http://uploads.example.com/animations.js"></script>
     <script src="http://othersite.com/actions.js"></script>
 
-But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
+But if :setting:`STATIC_URL` is ``'http://static.example.com/'``:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -249,7 +261,9 @@ But if :setting:`STATIC_URL` is ``'http://static.example.com/'``::
     <script src="http://othersite.com/actions.js"></script>
 
 Or if :mod:`~django.contrib.staticfiles` is configured using the
-:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`::
+:class:`~django.contrib.staticfiles.storage.ManifestStaticFilesStorage`:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -260,24 +274,26 @@ Or if :mod:`~django.contrib.staticfiles` is configured using the
 Paths as objects
 ----------------
 
-.. versionadded:: 4.1
-
 Asset paths may also be given as hashable objects implementing an
 ``__html__()`` method. The ``__html__()`` method is typically added using the
 :func:`~django.utils.html.html_safe` decorator. The object is responsible for
-outputting the complete HTML ``<script>`` or ``<link>`` tag content::
+outputting the complete HTML ``<script>`` or ``<link>`` tag content:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> from django.utils.html import html_safe
     >>>
     >>> @html_safe
-    >>> class JSPath:
+    ... class JSPath:
     ...     def __str__(self):
     ...         return '<script src="https://example.org/asset.js" rel="stylesheet">'
+    ...
 
     >>> class SomeWidget(forms.TextInput):
     ...     class Media:
-    ...         js = (JSPath(),)
+    ...         js = [JSPath()]
+    ...
 
 ``Media`` objects
 =================
@@ -294,7 +310,9 @@ Subsets of assets
 -----------------
 
 If you only want files of a particular type, you can use the subscript
-operator to filter out a medium of interest. For example::
+operator to filter out a medium of interest. For example:
+
+.. code-block:: pycon
 
     >>> w = CalendarWidget()
     >>> print(w.media)
@@ -302,7 +320,7 @@ operator to filter out a medium of interest. For example::
     <script src="http://static.example.com/animations.js"></script>
     <script src="http://static.example.com/actions.js"></script>
 
-    >>> print(w.media['css'])
+    >>> print(w.media["css"])
     <link href="http://static.example.com/pretty.css" media="all" rel="stylesheet">
 
 When you use the subscript operator, the value that is returned is a
@@ -313,19 +331,23 @@ Combining ``Media`` objects
 
 ``Media`` objects can also be added together. When two ``Media`` objects are
 added, the resulting ``Media`` object contains the union of the assets
-specified by both::
+specified by both:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
     ...         css = {
-    ...             'all': ('pretty.css',)
+    ...             "all": ["pretty.css"],
     ...         }
-    ...         js = ('animations.js', 'actions.js')
+    ...         js = ["animations.js", "actions.js"]
+    ...
 
     >>> class OtherWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('whizbang.js',)
+    ...         js = ["whizbang.js"]
+    ...
 
     >>> w1 = CalendarWidget()
     >>> w2 = OtherWidget()
@@ -345,15 +367,19 @@ example, you may have a script that depends on jQuery. Therefore, combining
 ``Media`` objects attempts to preserve the relative order in which assets are
 defined in each ``Media`` class.
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class CalendarWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('jQuery.js', 'calendar.js', 'noConflict.js')
+    ...         js = ["jQuery.js", "calendar.js", "noConflict.js"]
+    ...
     >>> class TimeWidget(forms.TextInput):
     ...     class Media:
-    ...         js = ('jQuery.js', 'time.js', 'noConflict.js')
+    ...         js = ["jQuery.js", "time.js", "noConflict.js"]
+    ...
     >>> w1 = CalendarWidget()
     >>> w2 = TimeWidget()
     >>> print(w1.media + w2.media)
@@ -377,12 +403,15 @@ are exactly the same.
 Regardless of whether you define a ``media`` declaration, *all* Form
 objects have a ``media`` property. The default value for this property
 is the result of adding the ``media`` definitions for all widgets that
-are part of the form::
+are part of the form:
+
+.. code-block:: pycon
 
     >>> from django import forms
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)
+    ...
 
     >>> f = ContactForm()
     >>> f.media
@@ -392,16 +421,18 @@ are part of the form::
     <script src="http://static.example.com/whizbang.js"></script>
 
 If you want to associate additional assets with a form -- for example,
-CSS for form layout -- add a ``Media`` declaration to the form::
+CSS for form layout -- add a ``Media`` declaration to the form:
+
+.. code-block:: pycon
 
     >>> class ContactForm(forms.Form):
     ...     date = DateField(widget=CalendarWidget)
     ...     name = CharField(max_length=40, widget=OtherWidget)
-    ...
     ...     class Media:
     ...         css = {
-    ...             'all': ('layout.css',)
+    ...             "all": ["layout.css"],
     ...         }
+    ...
 
     >>> f = ContactForm()
     >>> f.media

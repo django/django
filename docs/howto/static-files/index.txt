@@ -16,10 +16,11 @@ Configuring static files
 
 #. In your settings file, define :setting:`STATIC_URL`, for example::
 
-      STATIC_URL = 'static/'
+      STATIC_URL = "static/"
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
-   the given relative path using the configured :setting:`STATICFILES_STORAGE`.
+   the given relative path using the configured ``staticfiles``
+   :setting:`STORAGES` alias.
 
    .. _staticfiles-in-templates:
 
@@ -53,7 +54,7 @@ settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
         BASE_DIR / "static",
-        '/var/www/static/',
+        "/var/www/static/",
     ]
 
 See the documentation for the :setting:`STATICFILES_FINDERS` setting for
@@ -171,7 +172,9 @@ for gathering static files in a single directory so you can serve them easily.
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-#. Run the :djadmin:`collectstatic` management command::
+#. Run the :djadmin:`collectstatic` management command:
+
+   .. code-block:: shell
 
        $ python manage.py collectstatic
 

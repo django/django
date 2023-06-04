@@ -25,6 +25,9 @@ serializer accepts the following additional option when it is called by
   have a model with more than one geometry field and you don't want to use the
   first defined geometry field (by default, the first geometry field is picked).
 
+* ``id_field``: A string containing the name of a field to use for the ``id``
+  key of the GeoJSON feature. By default, the primary key of objects is used.
+
 * ``srid``: The SRID to use for the ``geometry`` content. Defaults to 4326
   (WGS 84).
 
@@ -37,32 +40,28 @@ Example::
     from django.core.serializers import serialize
     from my_app.models import City
 
-    serialize('geojson', City.objects.all(),
-              geometry_field='point',
-              fields=('name',))
+    serialize("geojson", City.objects.all(), geometry_field="point", fields=["name"])
 
 Would output::
 
     {
-      'type': 'FeatureCollection',
-      'crs': {
-        'type': 'name',
-        'properties': {'name': 'EPSG:4326'}
-      },
-      'features': [
-        {
-          'type': 'Feature',
-          'geometry': {
-            'type': 'Point',
-            'coordinates': [-87.650175, 41.850385]
-          },
-          'properties': {
-            'name': 'Chicago'
-          }
-        }
-      ]
+        "type": "FeatureCollection",
+        "crs": {"type": "name", "properties": {"name": "EPSG:4326"}},
+        "features": [
+            {
+                "type": "Feature",
+                "id": 1,
+                "geometry": {"type": "Point", "coordinates": [-87.650175, 41.850385]},
+                "properties": {"name": "Chicago"},
+            }
+        ],
     }
 
 When the ``fields`` parameter is not specified, the ``geojson`` serializer adds
 a ``pk`` key to the ``properties`` dictionary with the primary key of the
 object as the value.
+
+.. versionchanged:: 4.2
+
+    The ``id`` key for serialized features was added. Also, the ``id_field``
+    option was added to the ``geojson`` serializer.

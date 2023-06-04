@@ -148,7 +148,7 @@ class ViewIndexView(BaseAdminDocsView):
             view_functions = extract_views_from_urlpatterns(url_resolver.url_patterns)
         except ImproperlyConfigured:
             view_functions = []
-        for (func, regex, namespace, name) in view_functions:
+        for func, regex, namespace, name in view_functions:
             views.append(
                 {
                     "full_name": get_view_name(func),
@@ -456,7 +456,8 @@ def extract_views_from_urlpatterns(urlpatterns, base="", namespace=None):
     """
     Return a list of views from a list of urlpatterns.
 
-    Each object in the returned list is a two-tuple: (view_func, regex)
+    Each object in the returned list is a four-tuple:
+    (view_func, regex, namespace, name)
     """
     views = []
     for p in urlpatterns:

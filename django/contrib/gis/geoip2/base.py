@@ -3,7 +3,6 @@ import socket
 import geoip2.database
 
 from django.conf import settings
-from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv46_address
 from django.utils._os import to_path
@@ -103,11 +102,11 @@ class GeoIP2:
             reader = geoip2.database.Reader(str(path), mode=cache)
             db_type = reader.metadata().database_type
 
-            if db_type.endswith("City"):
+            if "City" in db_type:
                 # GeoLite City database detected.
                 self._city = reader
                 self._city_file = path
-            elif db_type.endswith("Country"):
+            elif "Country" in db_type:
                 # GeoIP Country database detected.
                 self._country = reader
                 self._country_file = path
@@ -219,6 +218,9 @@ class GeoIP2:
         "Return a GEOS Point object for the given query."
         ll = self.lon_lat(query)
         if ll:
+            # Allows importing and using GeoIP2() when GEOS is not installed.
+            from django.contrib.gis.geos import Point
+
             return Point(ll, srid=4326)
         else:
             return None

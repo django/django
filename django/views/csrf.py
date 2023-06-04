@@ -1,104 +1,22 @@
+from pathlib import Path
+
 from django.conf import settings
 from django.http import HttpResponseForbidden
 from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.translation import gettext as _
 from django.utils.version import get_docs_version
 
-# We include the template inline since we need to be able to reliably display
-# this error message, especially for the sake of developers, and there isn't any
-# other way of making it available independent of what is in the settings file.
-
-# Only the text appearing with DEBUG=False is translated. Normal translation
-# tags cannot be used with this inline templates as makemessages would not be
-# able to discover the strings.
-
-CSRF_FAILURE_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="robots" content="NONE,NOARCHIVE">
-  <title>403 Forbidden</title>
-  <style type="text/css">
-    html * { padding:0; margin:0; }
-    body * { padding:10px 20px; }
-    body * * { padding:0; }
-    body { font:small sans-serif; background:#eee; color:#000; }
-    body>div { border-bottom:1px solid #ddd; }
-    h1 { font-weight:normal; margin-bottom:.4em; }
-    h1 span { font-size:60%; color:#666; font-weight:normal; }
-    #info { background:#f6f6f6; }
-    #info ul { margin: 0.5em 4em; }
-    #info p, #summary p { padding-top:10px; }
-    #summary { background: #ffc; }
-    #explanation { background:#eee; border-bottom: 0px none; }
-  </style>
-</head>
-<body>
-<div id="summary">
-  <h1>{{ title }} <span>(403)</span></h1>
-  <p>{{ main }}</p>
-{% if no_referer %}
-  <p>{{ no_referer1 }}</p>
-  <p>{{ no_referer2 }}</p>
-  <p>{{ no_referer3 }}</p>
-{% endif %}
-{% if no_cookie %}
-  <p>{{ no_cookie1 }}</p>
-  <p>{{ no_cookie2 }}</p>
-{% endif %}
-</div>
-{% if DEBUG %}
-<div id="info">
-  <h2>Help</h2>
-    {% if reason %}
-    <p>Reason given for failure:</p>
-    <pre>
-    {{ reason }}
-    </pre>
-    {% endif %}
-
-  <p>In general, this can occur when there is a genuine Cross Site Request Forgery, or when
-  <a
-  href="https://docs.djangoproject.com/en/{{ docs_version }}/ref/csrf/">Django’s
-  CSRF mechanism</a> has not been used correctly.  For POST forms, you need to
-  ensure:</p>
-
-  <ul>
-    <li>Your browser is accepting cookies.</li>
-
-    <li>The view function passes a <code>request</code> to the template’s <a
-    href="https://docs.djangoproject.com/en/dev/topics/templates/#django.template.backends.base.Template.render"><code>render</code></a>
-    method.</li>
-
-    <li>In the template, there is a <code>{% templatetag openblock %} csrf_token
-    {% templatetag closeblock %}</code> template tag inside each POST form that
-    targets an internal URL.</li>
-
-    <li>If you are not using <code>CsrfViewMiddleware</code>, then you must use
-    <code>csrf_protect</code> on any views that use the <code>csrf_token</code>
-    template tag, as well as those that accept the POST data.</li>
-
-    <li>The form has a valid CSRF token. After logging in in another browser
-    tab or hitting the back button after a login, you may need to reload the
-    page with the form, because the token is rotated after a login.</li>
-  </ul>
-
-  <p>You’re seeing the help section of this page because you have <code>DEBUG =
-  True</code> in your Django settings file. Change that to <code>False</code>,
-  and only the initial error message will be displayed.  </p>
-
-  <p>You can customize this page using the CSRF_FAILURE_VIEW setting.</p>
-</div>
-{% else %}
-<div id="explanation">
-  <p><small>{{ more }}</small></p>
-</div>
-{% endif %}
-</body>
-</html>
-"""  # NOQA
 CSRF_FAILURE_TEMPLATE_NAME = "403_csrf.html"
+
+
+def builtin_template_path(name):
+    """
+    Return a path to a builtin template.
+
+    Avoid calling this function at the module level or in a class-definition
+    because __file__ may not exist, e.g. in frozen environments.
+    """
+    return Path(__file__).parent / "templates" / name
 
 
 def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
@@ -151,8 +69,9 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
         t = loader.get_template(template_name)
     except TemplateDoesNotExist:
         if template_name == CSRF_FAILURE_TEMPLATE_NAME:
-            # If the default template doesn't exist, use the string template.
-            t = Engine().from_string(CSRF_FAILURE_TEMPLATE)
+            # If the default template doesn't exist, use the fallback template.
+            with builtin_template_path("csrf_403.html").open(encoding="utf-8") as fh:
+                t = Engine().from_string(fh.read())
             c = Context(c)
         else:
             # Raise if a developer-specified template doesn't exist.

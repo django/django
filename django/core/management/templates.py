@@ -1,5 +1,4 @@
 import argparse
-import cgi
 import mimetypes
 import os
 import posixpath
@@ -12,9 +11,14 @@ from urllib.request import build_opener
 import django
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.management.utils import handle_extensions, run_formatters
+from django.core.management.utils import (
+    find_formatters,
+    handle_extensions,
+    run_formatters,
+)
 from django.template import Context, Engine
 from django.utils import archive
+from django.utils.http import parse_header_parameters
 from django.utils.version import get_docs_version
 
 
@@ -80,7 +84,6 @@ class TemplateCommand(BaseCommand):
         )
 
     def handle(self, app_or_project, name, target=None, **options):
-        self.written_files = []
         self.app_or_project = app_or_project
         self.a_or_an = "an" if app_or_project == "app" else "a"
         self.paths_to_remove = []
@@ -106,6 +109,10 @@ class TemplateCommand(BaseCommand):
                     "Destination directory '%s' does not "
                     "exist, please create it first." % top_dir
                 )
+
+        # Find formatters, which are external executables, before input
+        # from the templates can sneak into the path.
+        formatter_paths = find_formatters()
 
         extensions = tuple(handle_extensions(options["extensions"]))
         extra_files = []
@@ -151,7 +158,6 @@ class TemplateCommand(BaseCommand):
         prefix_length = len(template_dir) + 1
 
         for root, dirs, files in os.walk(template_dir):
-
             path_rest = root[prefix_length:]
             relative_dir = path_rest.replace(base_name, name)
             if relative_dir:
@@ -175,7 +181,7 @@ class TemplateCommand(BaseCommand):
                 )
                 for old_suffix, new_suffix in self.rewrite_template_suffixes:
                     if new_path.endswith(old_suffix):
-                        new_path = new_path[: -len(old_suffix)] + new_suffix
+                        new_path = new_path.removesuffix(old_suffix) + new_suffix
                         break  # Only rewrite once
 
                 if os.path.exists(new_path):
@@ -201,7 +207,6 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.copyfile(old_path, new_path)
 
-                self.written_files.append(new_path)
                 if self.verbosity >= 2:
                     self.stdout.write("Creating %s" % new_path)
                 try:
@@ -224,7 +229,7 @@ class TemplateCommand(BaseCommand):
                 else:
                     shutil.rmtree(path_to_remove)
 
-        run_formatters(self.written_files)
+        run_formatters([top_dir], **formatter_paths)
 
     def handle_template(self, template, subdir):
         """
@@ -235,8 +240,7 @@ class TemplateCommand(BaseCommand):
         if template is None:
             return os.path.join(django.__path__[0], "conf", subdir)
         else:
-            if template.startswith("file://"):
-                template = template[7:]
+            template = template.removeprefix("file://")
             expanded_template = os.path.expanduser(template)
             expanded_template = os.path.normpath(expanded_template)
             if os.path.isdir(expanded_template):
@@ -327,7 +331,7 @@ class TemplateCommand(BaseCommand):
         # Trying to get better name from response headers
         content_disposition = headers["content-disposition"]
         if content_disposition:
-            _, params = cgi.parse_header(content_disposition)
+            _, params = parse_header_parameters(content_disposition)
             guessed_filename = params.get("filename") or used_name
         else:
             guessed_filename = used_name

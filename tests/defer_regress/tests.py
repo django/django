@@ -1,11 +1,9 @@
 from operator import attrgetter
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.sessions.backends.db import SessionStore
 from django.db import models
 from django.db.models import Count
-from django.test import TestCase, ignore_warnings, override_settings
-from django.utils.deprecation import RemovedInDjango50Warning
+from django.test import TestCase
 
 from .models import (
     Base,
@@ -70,7 +68,7 @@ class DeferRegressionTest(TestCase):
         obj = Leaf.objects.only("name", "child").select_related()[0]
         self.assertEqual(obj.child.name, "c1")
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Leaf.objects.select_related().only("child__name", "second_child__name"),
             [
                 "l1",
@@ -105,29 +103,6 @@ class DeferRegressionTest(TestCase):
         self.assertIsInstance(
             list(SimpleItem.objects.annotate(Count("feature")).only("name")), list
         )
-
-    @ignore_warnings(category=RemovedInDjango50Warning)
-    @override_settings(
-        SESSION_SERIALIZER="django.contrib.sessions.serializers.PickleSerializer"
-    )
-    def test_ticket_12163(self):
-        # Test for #12163 - Pickling error saving session with unsaved model
-        # instances.
-        SESSION_KEY = "2b1189a188b44ad18c35e1baac6ceead"
-
-        item = Item()
-        item._deferred = False
-        s = SessionStore(SESSION_KEY)
-        s.clear()
-        s["item"] = item
-        s.save(must_create=True)
-
-        s = SessionStore(SESSION_KEY)
-        s.modified = True
-        s.save()
-
-        i2 = s["item"]
-        self.assertFalse(i2._deferred)
 
     def test_ticket_16409(self):
         # Regression for #16409 - make sure defer() and only() work with annotate()
@@ -203,6 +178,16 @@ class DeferRegressionTest(TestCase):
             self.assertEqual(i.one_to_one_item.name, "second")
         with self.assertNumQueries(1):
             self.assertEqual(i.value, 42)
+        with self.assertNumQueries(1):
+            i = Item.objects.select_related("one_to_one_item").only(
+                "name", "one_to_one_item__item"
+            )[0]
+            self.assertEqual(i.one_to_one_item.pk, o2o.pk)
+            self.assertEqual(i.name, "first")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.one_to_one_item.name, "second")
+        with self.assertNumQueries(1):
+            self.assertEqual(i.value, 42)
 
     def test_defer_with_select_related(self):
         item1 = Item.objects.create(name="first", value=47)
@@ -246,8 +231,6 @@ class DeferRegressionTest(TestCase):
         )
         self.assertEqual(len(qs), 1)
 
-
-class DeferAnnotateSelectRelatedTest(TestCase):
     def test_defer_annotate_select_related(self):
         location = Location.objects.create()
         Request.objects.create(location=location)
@@ -275,6 +258,56 @@ class DeferAnnotateSelectRelatedTest(TestCase):
             ),
             list,
         )
+
+    def test_common_model_different_mask(self):
+        child = Child.objects.create(name="Child", value=42)
+        second_child = Child.objects.create(name="Second", value=64)
+        Leaf.objects.create(child=child, second_child=second_child)
+        with self.assertNumQueries(1):
+            leaf = (
+                Leaf.objects.select_related("child", "second_child")
+                .defer("child__name", "second_child__value")
+                .get()
+            )
+            self.assertEqual(leaf.child, child)
+            self.assertEqual(leaf.second_child, second_child)
+        self.assertEqual(leaf.child.get_deferred_fields(), {"name"})
+        self.assertEqual(leaf.second_child.get_deferred_fields(), {"value"})
+        with self.assertNumQueries(0):
+            self.assertEqual(leaf.child.value, 42)
+            self.assertEqual(leaf.second_child.name, "Second")
+        with self.assertNumQueries(1):
+            self.assertEqual(leaf.child.name, "Child")
+        with self.assertNumQueries(1):
+            self.assertEqual(leaf.second_child.value, 64)
+
+    def test_defer_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        with self.assertNumQueries(1):
+            self.assertEqual(Request.objects.defer("items").get(), request)
+
+    def test_only_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        with self.assertNumQueries(1):
+            self.assertEqual(Request.objects.only("items").get(), request)
+
+    def test_defer_reverse_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        item = Item.objects.create(value=1)
+        request.items.add(item)
+        with self.assertNumQueries(1):
+            self.assertEqual(Item.objects.defer("request").get(), item)
+
+    def test_only_reverse_many_to_many_ignored(self):
+        location = Location.objects.create()
+        request = Request.objects.create(location=location)
+        item = Item.objects.create(value=1)
+        request.items.add(item)
+        with self.assertNumQueries(1):
+            self.assertEqual(Item.objects.only("request").get(), item)
 
 
 class DeferDeletionSignalsTests(TestCase):

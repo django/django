@@ -8,9 +8,10 @@
 # Karol <kfuks2@o2.pl>, 2012
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016-2021
-# m_aciek <maciej.olko@gmail.com>, 2015
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020
+# Maciej Olko <maciej.olko@gmail.com>, 2016-2022
+# Maciej Olko <maciej.olko@gmail.com>, 2023
+# Maciej Olko <maciej.olko@gmail.com>, 2015
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2020,2022
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Ola Sitarska <ola@sitarska.com>, 2013
 # Roman Barczyński, 2014
@@ -19,17 +20,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-09-22 11:13+0000\n"
-"Last-Translator: m_aciek <maciej.olko@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Maciej Olko <maciej.olko@gmail.com>, 2023\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
-"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #, python-format
 msgid "Delete selected %(verbose_name_plural)s"
@@ -268,8 +269,7 @@ msgstr "Błąd bazy danych"
 msgid "%(count)s %(name)s was changed successfully."
 msgid_plural "%(count)s %(name)s were changed successfully."
 msgstr[0] "%(count)s %(name)s został(a)(-ło) pomyślnie zmieniony(-na)(-ne)."
-msgstr[1] ""
-"%(count)s %(name)s zostały(-ło)(-li) pomyślnie zmienione(-nych)(-nieni)."
+msgstr[1] "%(count)s %(name)s zostały(-ło) pomyślnie zmienione(-nych)."
 msgstr[2] "%(count)s %(name)s zostało pomyślnie zmienionych."
 msgstr[3] "%(count)s %(name)s zostało pomyślnie zmienione."
 
@@ -289,8 +289,9 @@ msgstr "Wybrano 0 z %(cnt)s"
 msgid "Change history: %s"
 msgstr "Historia zmian: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -387,14 +388,18 @@ msgid "Change password"
 msgstr "Zmień hasło"
 
 msgid "Please correct the error below."
-msgstr "Prosimy poprawić poniższy błąd."
-
-msgid "Please correct the errors below."
-msgstr "Proszę, popraw poniższe błędy."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Prosimy poprawić poniższy błąd."
+msgstr[1] "Prosimy poprawić poniższe błędy."
+msgstr[2] "Prosimy poprawić poniższe błędy."
+msgstr[3] "Prosimy poprawić poniższe błędy."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Podaj nowe hasło dla użytkownika <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Przejdź do głównej treści"
 
 msgid "Welcome,"
 msgstr "Witaj,"
@@ -407,6 +412,9 @@ msgstr "Dokumentacja"
 
 msgid "Log out"
 msgstr "Wyloguj się"
+
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
 
 #, python-format
 msgid "Add %(name)s"
@@ -433,6 +441,15 @@ msgstr "Priorytet sortowania: %(priority_number)s "
 
 msgid "Toggle sorting"
 msgstr "Przełącz sortowanie"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Przełącz motyw (bieżący motyw: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Przełącz motyw (bieżący motyw: jasny)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Przełącz motyw (bieżący motyw: ciemny)"
 
 msgid "Delete"
 msgstr "Usuń"
@@ -546,6 +563,9 @@ msgstr "Nie pamiętasz swojego hasła lub nazwy użytkownika?"
 msgid "Toggle navigation"
 msgstr "Przełącz nawigację"
 
+msgid "Sidebar"
+msgstr "Pasek boczny"
+
 msgid "Start typing to filter…"
 msgstr "Zacznij pisać, aby odfiltrować…"
 
@@ -560,6 +580,13 @@ msgstr "Użytkownik"
 
 msgid "Action"
 msgstr "Akcja"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "wpis"
+msgstr[1] "wpisy"
+msgstr[2] "wpisów"
+msgstr[3] "wpisu"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -618,6 +645,10 @@ msgstr "Dodaj kolejne(go)(-ną)(-ny) %(model)s"
 #, python-format
 msgid "Delete selected %(model)s"
 msgstr "Usuń wybraną(-ne)(-nego)(-ny) %(model)s"
+
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Obejrzyj wybraną(-ne)(-nego)(-ny) %(model)s"
 
 msgid "Thanks for spending some quality time with the web site today."
 msgstr "Dzięki za spędzenie cennego czasu ze stroną."

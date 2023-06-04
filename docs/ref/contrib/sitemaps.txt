@@ -54,8 +54,12 @@ To activate sitemap generation on your Django site, add this line to your
 
     from django.contrib.sitemaps.views import sitemap
 
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-         name='django.contrib.sitemaps.views.sitemap')
+    path(
+        "sitemap.xml",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    )
 
 This tells Django to build a sitemap when a client accesses :file:`/sitemap.xml`.
 
@@ -99,6 +103,7 @@ your sitemap class might look::
 
     from django.contrib.sitemaps import Sitemap
     from blog.models import Entry
+
 
     class BlogSitemap(Sitemap):
         changefreq = "never"
@@ -156,9 +161,9 @@ Note:
         In both cases, "absolute path" means a URL that doesn't include the
         protocol or domain. Examples:
 
-        * Good: :file:`'/foo/bar/'`
-        * Bad: :file:`'example.com/foo/bar/'`
-        * Bad: :file:`'https://example.com/foo/bar/'`
+        * Good: ``'/foo/bar/'``
+        * Bad: ``'example.com/foo/bar/'``
+        * Bad: ``'https://example.com/foo/bar/'``
 
         If :attr:`~Sitemap.location` isn't provided, the framework will call
         the ``get_absolute_url()`` method on each object as returned by
@@ -242,12 +247,12 @@ Note:
         This attribute defines the protocol (``'http'`` or ``'https'``) of the
         URLs in the sitemap. If it isn't set, the protocol with which the
         sitemap was requested is used. If the sitemap is built outside the
-        context of a request, the default is ``'http'``.
+        context of a request, the default is ``'https'``.
 
-        .. deprecated:: 4.0
+        .. versionchanged:: 5.0
 
-            The default protocol for sitemaps built outside the context of a
-            request will change from ``'http'`` to ``'https'`` in Django 5.0.
+            In older versions, the default protocol for sitemaps built outside
+            the context of a request was ``'http'``.
 
     .. attribute:: Sitemap.limit
 
@@ -296,8 +301,6 @@ Note:
 
     .. method:: Sitemap.get_latest_lastmod()
 
-        .. versionadded:: 4.1
-
         **Optional.** A method that returns the latest value returned by
         :attr:`~Sitemap.lastmod`. This function is used to add the ``lastmod``
         attribute to :ref:`Sitemap index context
@@ -310,6 +313,15 @@ Note:
         * If :attr:`~Sitemap.lastmod` is a method:
           The latest ``lastmod`` returned by calling the method with all
           items returned by :meth:`Sitemap.items`.
+
+    .. method:: Sitemap.get_languages_for_item(item)
+
+        .. versionadded:: 4.2
+
+        **Optional.** A method that returns the sequence of language codes for
+        which the item is displayed. By default
+        :meth:`~Sitemap.get_languages_for_item` returns
+        :attr:`~Sitemap.languages`.
 
 Shortcuts
 =========
@@ -343,18 +355,20 @@ Here's an example of a :doc:`URLconf </topics/http/urls>` using
     from blog.models import Entry
 
     info_dict = {
-        'queryset': Entry.objects.all(),
-        'date_field': 'pub_date',
+        "queryset": Entry.objects.all(),
+        "date_field": "pub_date",
     }
 
     urlpatterns = [
         # some generic view using info_dict
         # ...
-
         # the sitemap
-        path('sitemap.xml', sitemap,
-             {'sitemaps': {'blog': GenericSitemap(info_dict, priority=0.6)}},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": {"blog": GenericSitemap(info_dict, priority=0.6)}},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 .. _URLconf: ../url_dispatch/
@@ -371,15 +385,17 @@ the ``location`` method of the sitemap. For example::
     from django.contrib import sitemaps
     from django.urls import reverse
 
+
     class StaticViewSitemap(sitemaps.Sitemap):
         priority = 0.5
-        changefreq = 'daily'
+        changefreq = "daily"
 
         def items(self):
-            return ['main', 'about', 'license']
+            return ["main", "about", "license"]
 
         def location(self, item):
             return reverse(item)
+
 
     # urls.py
     from django.contrib.sitemaps.views import sitemap
@@ -389,16 +405,20 @@ the ``location`` method of the sitemap. For example::
     from . import views
 
     sitemaps = {
-        'static': StaticViewSitemap,
+        "static": StaticViewSitemap,
     }
 
     urlpatterns = [
-        path('', views.main, name='main'),
-        path('about/', views.about, name='about'),
-        path('license/', views.license, name='license'),
+        path("", views.main, name="main"),
+        path("about/", views.about, name="about"),
+        path("license/", views.license, name="license"),
         # ...
-        path('sitemap.xml', sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap')
+        path(
+            "sitemap.xml",
+            sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -421,10 +441,18 @@ Here's what the relevant URLconf lines would look like for the example above::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('sitemap.xml', views.index, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.index'),
-        path('sitemap-<section>.xml', views.sitemap, {'sitemaps': sitemaps},
-             name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 This will automatically generate a :file:`sitemap.xml` file that references
@@ -448,17 +476,18 @@ with a caching decorator -- you must name your sitemap view and pass
     from django.views.decorators.cache import cache_page
 
     urlpatterns = [
-        path('sitemap.xml',
-             cache_page(86400)(sitemaps_views.index),
-             {'sitemaps': sitemaps, 'sitemap_url_name': 'sitemaps'}),
-        path('sitemap-<section>.xml',
-             cache_page(86400)(sitemaps_views.sitemap),
-             {'sitemaps': sitemaps}, name='sitemaps'),
+        path(
+            "sitemap.xml",
+            cache_page(86400)(sitemaps_views.index),
+            {"sitemaps": sitemaps, "sitemap_url_name": "sitemaps"},
+        ),
+        path(
+            "sitemap-<section>.xml",
+            cache_page(86400)(sitemaps_views.sitemap),
+            {"sitemaps": sitemaps},
+            name="sitemaps",
+        ),
     ]
-
-.. versionchanged:: 4.1
-
-    Use of the ``Last-Modified`` header was added.
 
 Template customization
 ======================
@@ -470,14 +499,18 @@ parameter to the ``sitemap`` and ``index`` views via the URLconf::
     from django.contrib.sitemaps import views
 
     urlpatterns = [
-        path('custom-sitemap.xml', views.index, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.index'),
-        path('custom-sitemap-<section>.xml', views.sitemap, {
-            'sitemaps': sitemaps,
-            'template_name': 'custom_sitemap.html'
-        }, name='django.contrib.sitemaps.views.sitemap'),
+        path(
+            "custom-sitemap.xml",
+            views.index,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.index",
+        ),
+        path(
+            "custom-sitemap-<section>.xml",
+            views.sitemap,
+            {"sitemaps": sitemaps, "template_name": "custom_sitemap.html"},
+            name="django.contrib.sitemaps.views.sitemap",
+        ),
     ]
 
 
@@ -506,11 +539,6 @@ attributes:
 - ``location``: The location (url & page) of the sitemap.
 - ``lastmod``: Populated by the :meth:`~Sitemap.get_latest_lastmod`
   method for each sitemap.
-
-.. versionchanged:: 4.1
-
-    The context was changed to a list of objects with ``location`` and optional
-    ``lastmod`` attributes.
 
 Sitemap
 -------
@@ -603,6 +631,7 @@ method::
 
     from django.contrib.sitemaps import ping_google
 
+
     class Entry(models.Model):
         # ...
         def save(self, force_insert=False, force_update=False):
@@ -625,7 +654,9 @@ Pinging Google via ``manage.py``
 .. django-admin:: ping_google [sitemap_url]
 
 Once the sitemaps application is added to your project, you may also
-ping Google using the ``ping_google`` management command::
+ping Google using the ``ping_google`` management command:
+
+.. code-block:: shell
 
     python manage.py ping_google [/sitemap.xml]
 

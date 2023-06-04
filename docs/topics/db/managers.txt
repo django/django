@@ -27,8 +27,9 @@ class attribute of type ``models.Manager()`` on that model. For example::
 
     from django.db import models
 
+
     class Person(models.Model):
-        #...
+        # ...
         people = models.Manager()
 
 Using this example model, ``Person.objects`` will generate an
@@ -60,15 +61,16 @@ For example, this custom ``Manager`` adds a method ``with_counts()``::
     from django.db import models
     from django.db.models.functions import Coalesce
 
+
     class PollManager(models.Manager):
         def with_counts(self):
-            return self.annotate(
-                num_responses=Coalesce(models.Count("response"), 0)
-            )
+            return self.annotate(num_responses=Coalesce(models.Count("response"), 0))
+
 
     class OpinionPoll(models.Model):
         question = models.CharField(max_length=200)
         objects = PollManager()
+
 
     class Response(models.Model):
         poll = models.ForeignKey(OpinionPoll, on_delete=models.CASCADE)
@@ -92,6 +94,7 @@ example, using this model::
 
     from django.db import models
 
+
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
@@ -108,15 +111,16 @@ all objects, and one that returns only the books by Roald Dahl::
     # First, define the Manager subclass.
     class DahlBookManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(author='Roald Dahl')
+            return super().get_queryset().filter(author="Roald Dahl")
+
 
     # Then hook it into the Book model explicitly.
     class Book(models.Model):
         title = models.CharField(max_length=100)
         author = models.CharField(max_length=50)
 
-        objects = models.Manager() # The default manager.
-        dahl_objects = DahlBookManager() # The Dahl-specific manager.
+        objects = models.Manager()  # The default manager.
+        dahl_objects = DahlBookManager()  # The Dahl-specific manager.
 
 With this sample model, ``Book.objects.all()`` will return all books in the
 database, but ``Book.dahl_objects.all()`` will only return the ones written by
@@ -127,7 +131,7 @@ Because ``get_queryset()`` returns a ``QuerySet`` object, you can use
 these statements are all legal::
 
     Book.dahl_objects.all()
-    Book.dahl_objects.filter(title='Matilda')
+    Book.dahl_objects.filter(title="Matilda")
     Book.dahl_objects.count()
 
 This example also pointed out another interesting technique: using multiple
@@ -139,16 +143,20 @@ For example::
 
     class AuthorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='A')
+            return super().get_queryset().filter(role="A")
+
 
     class EditorManager(models.Manager):
         def get_queryset(self):
-            return super().get_queryset().filter(role='E')
+            return super().get_queryset().filter(role="E")
+
 
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -231,10 +239,11 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
 
     class PersonQuerySet(models.QuerySet):
         def authors(self):
-            return self.filter(role='A')
+            return self.filter(role="A")
 
         def editors(self):
-            return self.filter(role='E')
+            return self.filter(role="E")
+
 
     class PersonManager(models.Manager):
         def get_queryset(self):
@@ -246,10 +255,13 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
         def editors(self):
             return self.get_queryset().editors()
 
+
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(max_length=1, choices=[('A', _('Author')), ('E', _('Editor'))])
+        role = models.CharField(
+            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
+        )
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from
@@ -299,11 +311,13 @@ For example::
         # Available only on QuerySet.
         def opted_out_public_method(self):
             return
+
         opted_out_public_method.queryset_only = True
 
         # Available on both Manager and QuerySet.
         def _opted_in_private_method(self):
             return
+
         _opted_in_private_method.queryset_only = False
 
 ``from_queryset()``
@@ -320,9 +334,11 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
         def manager_only_method(self):
             return
 
+
     class CustomQuerySet(models.QuerySet):
         def manager_and_queryset_method(self):
             return
+
 
     class MyModel(models.Model):
         objects = CustomManager.from_queryset(CustomQuerySet)()
@@ -330,6 +346,7 @@ returns a *subclass* of your base ``Manager`` with a copy of the custom
 You may also store the generated class into a variable::
 
     MyManager = CustomManager.from_queryset(CustomQuerySet)
+
 
     class MyModel(models.Model):
         objects = MyManager()
@@ -399,6 +416,7 @@ it into the inheritance hierarchy *after* the defaults::
         class Meta:
             abstract = True
 
+
     class ChildC(AbstractBase, ExtraManager):
         # ...
         # Default manager is CustomManager, but OtherManager is
@@ -425,7 +443,9 @@ Implementation concerns
 
 Whatever features you add to your custom ``Manager``, it must be
 possible to make a shallow copy of a ``Manager`` instance; i.e., the
-following code must work::
+following code must work:
+
+.. code-block:: pycon
 
     >>> import copy
     >>> manager = MyManager()

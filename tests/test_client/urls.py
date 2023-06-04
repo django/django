@@ -7,6 +7,7 @@ from . import views
 urlpatterns = [
     path("upload_view/", views.upload_view, name="upload_view"),
     path("get_view/", views.get_view, name="get_view"),
+    path("cbv_view/", views.CBView.as_view()),
     path("post_view/", views.post_view),
     path("post_then_get_view/", views.post_then_get_view),
     path("put_view/", views.put_view),
