@@ -1121,6 +1121,7 @@ class Col(Expression):
             output_field = target
         super().__init__(output_field=output_field)
         self.alias, self.target = alias, target
+        self.identity = (self.__class__, self.alias, self.target, output_field)
 
     def __repr__(self):
         alias, target = self.alias, self.target
