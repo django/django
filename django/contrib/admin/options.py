@@ -1372,8 +1372,8 @@ class ModelAdmin(BaseModelAdmin):
                 attr = obj._meta.pk.attname
             value = obj.serializable_value(attr)
             popup_response = {
-                    "value": str(value),
-                    "obj": str(obj),
+                "value": str(value),
+                "obj": str(obj),
             }
 
             # Find the optgroup for the new item, if available

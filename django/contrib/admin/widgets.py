@@ -297,8 +297,8 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def get_context(self, name, value, attrs):
         from django.contrib.admin.views.main import (
             IS_POPUP_VAR,
-            TO_FIELD_VAR,
             SOURCE_MODEL_VAR,
+            TO_FIELD_VAR,
         )
 
         rel_opts = self.rel.model._meta
