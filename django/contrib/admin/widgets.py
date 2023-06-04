@@ -301,13 +301,12 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         info = (rel_opts.app_label, rel_opts.model_name)
         self.widget.choices = self.choices
         related_field_name = self.rel.get_related_field().name
-        m = self.rel.field.model
         url_params = "&".join(
             "%s=%s" % param
             for param in [
                 (TO_FIELD_VAR, related_field_name),
                 (IS_POPUP_VAR, 1),
-                (SOURCE_MODEL_VAR, m.__name__),
+                (SOURCE_MODEL_VAR, self.rel.field.model.__name__),
             ]
         )
         context = {
