@@ -43,3 +43,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of querysets on SQLite
   when filtering on ``DecimalField`` against values outside of the defined
   range (:ticket:`34590`).
+
+* Fixed a regression in Django 4.2 that caused a serialization crash on a
+  ``ManyToManyField`` without a natural key when its ``Manager``’s base
+  ``QuerySet`` used ``select_related()`` (:ticket:`34620`).
