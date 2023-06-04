@@ -89,6 +89,32 @@ def get_object_or_404(klass, *args, **kwargs):
         )
 
 
+def get_object_or_none(klass, *args, **kwargs):
+    """
+    Use get() to return an object, or return none if the object
+    does not exist.
+
+    klass may be a Model, Manager, or QuerySet object. All other passed
+    arguments and keyword arguments are used in the get() query.
+
+    Like with QuerySet.get(), MultipleObjectsReturned is raised if more than
+    one object is found.
+    """
+    queryset = _get_queryset(klass)
+    if not hasattr(queryset, "get"):
+        klass__name = (
+            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        )
+        raise ValueError(
+            "First argument to get_object_or_404() must be a Model, Manager, "
+            "or QuerySet, not '%s'." % klass__name
+        )
+    try:
+        return queryset.get(*args, **kwargs)
+    except queryset.model.DoesNotExist:
+        return queryset.none()
+
+
 def get_list_or_404(klass, *args, **kwargs):
     """
     Use filter() to return a list of objects, or raise an Http404 exception if
@@ -111,6 +137,29 @@ def get_list_or_404(klass, *args, **kwargs):
         raise Http404(
             "No %s matches the given query." % queryset.model._meta.object_name
         )
+    return obj_list
+
+
+def get_list_or_none(klass, *args, **kwargs):
+    """
+    Use filter() to return a list of objects, or return none if
+    the list is empty.
+
+    klass may be a Model, Manager, or QuerySet object. All other passed
+    arguments and keyword arguments are used in the filter() query.
+    """
+    queryset = _get_queryset(klass)
+    if not hasattr(queryset, "filter"):
+        klass__name = (
+            klass.__name__ if isinstance(klass, type) else klass.__class__.__name__
+        )
+        raise ValueError(
+            "First argument to get_list_or_404() must be a Model, Manager, or "
+            "QuerySet, not '%s'." % klass__name
+        )
+    obj_list = list(queryset.filter(*args, **kwargs))
+    if not obj_list:
+        return queryset.none()
     return obj_list
 
 
