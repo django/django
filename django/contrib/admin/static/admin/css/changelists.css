@@ -265,6 +265,15 @@
     background-color: var(--selected-row);
 }
 
+@media (forced-colors: active) {
+    #changelist table tbody tr.selected {
+        background-color: SelectedItem;
+    }
+    #changelist table tbody tr:has(input[type=checkbox]:checked) {
+        background-color: SelectedItem;
+    }
+}
+
 #changelist .actions {
     padding: 10px;
     background: var(--body-bg);
