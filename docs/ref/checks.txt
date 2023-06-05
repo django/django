@@ -675,8 +675,9 @@ with the admin site:
 * **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
   is not a field of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
-* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
-  attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E035**: The value of ``readonly_fields[n]`` refers to
+  ``<field_name>``, which is not a callable, an attribute of
+  ``<ModelAdmin class>``, or an attribute of ``<model>``.
 * **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
 * **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
   ``<field name>``, which is not a field of ``<model>``.
