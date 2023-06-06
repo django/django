@@ -310,7 +310,7 @@ class HttpResponseBaseTests(SimpleTestCase):
         r = HttpResponseBase()
         r.reason_phrase = "test"
         self.assertEqual(
-            r.reason_phrase, HttpResponseBase(reason_phrase="test").reason_phrase
+            r.reason_phrase, HttpResponseBase(reason="test").reason_phrase
         )
 
 
