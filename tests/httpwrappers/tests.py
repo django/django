@@ -11,8 +11,8 @@ from django.core.signals import request_finished
 from django.db import close_old_connections
 from django.http import (
     BadHeaderError,
-    HttpResponseBase,
     HttpResponse,
+    HttpResponseBase,
     HttpResponseNotAllowed,
     HttpResponseNotModified,
     HttpResponsePermanentRedirect,
@@ -309,7 +309,9 @@ class HttpResponseBaseTests(SimpleTestCase):
     def test_reason_phrase_setter(self):
         r = HttpResponseBase()
         r.reason_phrase = "test"
-        self.assertEqual(r.reason_phrase, HttpResponseBase(reason_phrase="test").reason_phrase)
+        self.assertEqual(
+            r.reason_phrase, HttpResponseBase(reason_phrase="test").reason_phrase
+        )
 
 
 class HttpResponseTests(SimpleTestCase):
