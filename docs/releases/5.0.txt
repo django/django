@@ -454,6 +454,9 @@ Miscellaneous
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
   ``"https"`` in Django 6.0.
 
+* Support for calling ``format_html()`` without passing args or kwargs will be
+  removed.
+
 Features removed in 5.0
 =======================
 

@@ -35,6 +35,9 @@ details on these changes.
 * The default scheme for ``forms.URLField`` will change from ``"http"`` to
   ``"https"``.
 
+* Support for calling ``format_html()`` without passing args or kwargs will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

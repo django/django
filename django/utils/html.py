@@ -3,9 +3,11 @@
 import html
 import json
 import re
+import warnings
 from html.parser import HTMLParser
 from urllib.parse import parse_qsl, quote, unquote, urlencode, urlsplit, urlunsplit
 
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import punycode
 from django.utils.functional import Promise, keep_lazy, keep_lazy_text
 from django.utils.http import RFC3986_GENDELIMS, RFC3986_SUBDELIMS
@@ -100,6 +102,13 @@ def format_html(format_string, *args, **kwargs):
     and call mark_safe() on the result. This function should be used instead
     of str.format or % interpolation to build up small HTML fragments.
     """
+    if not (args or kwargs):
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
+        # raise ValueError("args or kwargs must be provided.")
+        warnings.warn(
+            "Calling format_html() without passing args or kwargs is deprecated.",
+            RemovedInDjango60Warning,
+        )
     args_safe = map(conditional_escape, args)
     kwargs_safe = {k: conditional_escape(v) for (k, v) in kwargs.items()}
     return mark_safe(format_string.format(*args_safe, **kwargs_safe))
