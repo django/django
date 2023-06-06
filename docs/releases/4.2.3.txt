@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 that caused incorrect alignment of timezone
   warnings for ``DateField`` and ``TimeField`` in the admin (:ticket:`34645`).
+
+* Fixed a regression in Django 4.2 that caused incorrect highlighting of rows
+  in the admin changelist view when ``ModelAdmin.list_editable`` contained a
+  ``BooleanField`` (:ticket:`34638`).
