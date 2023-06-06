@@ -14,7 +14,7 @@ from django.http import (
 from django.http.multipartparser import MultiPartParserError
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
-from django.test.client import FakePayload
+from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
 
 
 class RequestsTests(SimpleTestCase):
@@ -536,6 +536,56 @@ class RequestsTests(SimpleTestCase):
         request.body  # evaluate
         self.assertEqual(request.read(1), b"n")
         self.assertEqual(request.POST, {"name": ["value"]})
+
+    def test_multipart_post_field_with_base64(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                    "dmFsdWU=",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        request.body  # evaluate
+        self.assertEqual(request.POST, {"name": ["value"]})
+
+    def test_multipart_post_field_with_invalid_base64(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "Content-Transfer-Encoding: base64",
+                    "",
+                    "123",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        request.body  # evaluate
+        self.assertEqual(request.POST, {"name": ["123"]})
 
     def test_POST_after_body_read_and_stream_read_multipart(self):
         """
