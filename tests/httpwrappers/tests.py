@@ -309,9 +309,7 @@ class HttpResponseBaseTests(SimpleTestCase):
     def test_reason_phrase_setter(self):
         r = HttpResponseBase()
         r.reason_phrase = "test"
-        self.assertEqual(
-            r.reason_phrase, HttpResponseBase(reason="test").reason_phrase
-        )
+        self.assertEqual(r.reason_phrase, HttpResponseBase(reason="test").reason_phrase)
 
 
 class HttpResponseTests(SimpleTestCase):
