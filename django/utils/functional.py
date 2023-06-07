@@ -151,6 +151,9 @@ def lazy(func, *resultclasses):
         def __hash__(self):
             return hash(self.__cast())
 
+        def __format__(self, format_spec):
+            return format(self.__cast(), format_spec)
+
         # Explicitly wrap methods which are required for certain operations on
         # int/str objects to function correctly.
 
