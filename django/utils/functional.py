@@ -163,6 +163,9 @@ def lazy(func, *resultclasses):
         def __mod__(self, other):
             return self.__cast() % other
 
+        def __mul__(self, other):
+            return self.__cast() * other
+
     # Add wrappers for all methods from resultclasses which haven't been
     # wrapped explicitly above.
     for resultclass in resultclasses:
