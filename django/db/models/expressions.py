@@ -1124,7 +1124,7 @@ class Col(Expression):
 
     @cached_property
     def identity(self):
-        return (self.__class__, self.alias, self.target, self.output_field)
+        return self.__class__, self.alias, self.target, self.output_field
 
     def __repr__(self):
         alias, target = self.alias, self.target
