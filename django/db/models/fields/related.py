@@ -1000,6 +1000,10 @@ class ForeignKey(ForeignObject):
     def __class_getitem__(cls, *args, **kwargs):
         return cls
 
+    @staticmethod
+    def get_internal_type():
+        return "ForeignKey"
+
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
@@ -1243,6 +1247,10 @@ class OneToOneField(ForeignKey):
         if "unique" in kwargs:
             del kwargs["unique"]
         return name, path, args, kwargs
+
+    @staticmethod
+    def get_internal_type():
+        return "OneToOneField"
 
     def formfield(self, **kwargs):
         if self.remote_field.parent_link:
@@ -1781,6 +1789,10 @@ class ManyToManyField(RelatedField):
                 swappable_setting,
             )
         return name, path, args, kwargs
+
+    @staticmethod
+    def get_internal_type():
+        return "ManyToManyField"
 
     def _get_path_info(self, direct=False, filtered_relation=None):
         """Called by both direct and indirect m2m traversal."""
