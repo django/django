@@ -12,7 +12,6 @@ from django.db import close_old_connections
 from django.http import (
     BadHeaderError,
     HttpResponse,
-    HttpResponseBase,
     HttpResponseNotAllowed,
     HttpResponseNotModified,
     HttpResponsePermanentRedirect,
@@ -298,18 +297,6 @@ class QueryDictTests(SimpleTestCase):
     def test_fromkeys_noniterable(self):
         with self.assertRaises(TypeError):
             QueryDict.fromkeys(0)
-
-
-class HttpResponseBaseTests(SimpleTestCase):
-    def test_charset_setter(self):
-        r = HttpResponseBase()
-        r.charset = "utf-8"
-        self.assertEqual(r.charset, HttpResponseBase(charset="utf-8").charset)
-
-    def test_reason_phrase_setter(self):
-        r = HttpResponseBase()
-        r.reason_phrase = "test"
-        self.assertEqual(r.reason_phrase, HttpResponseBase(reason="test").reason_phrase)
 
 
 class HttpResponseTests(SimpleTestCase):

@@ -52,6 +52,16 @@ class HttpResponseBaseTests(SimpleTestCase):
         r.setdefault("x-header", "DefaultValue")
         self.assertEqual(r.headers["X-Header"], "DefaultValue")
 
+    def test_charset_setter(self):
+        r = HttpResponseBase()
+        r.charset = "utf-8"
+        self.assertEqual(r.charset, "utf-8")
+
+    def test_reason_phrase_setter(self):
+        r = HttpResponseBase()
+        r.reason_phrase = "test"
+        self.assertEqual(r.reason_phrase, "test")
+
 
 class HttpResponseTests(SimpleTestCase):
     def test_status_code(self):
