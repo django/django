@@ -192,10 +192,60 @@ class FunctionalTests(SimpleTestCase):
         with self.assertRaisesMessage(TypeError, msg):
             Foo().cp
 
-    def test_lazy_add(self):
+    def test_lazy_add_int(self):
         lazy_4 = lazy(lambda: 4, int)
         lazy_5 = lazy(lambda: 5, int)
+        self.assertEqual(4 + lazy_5(), 9)
+        self.assertEqual(lazy_4() + 5, 9)
         self.assertEqual(lazy_4() + lazy_5(), 9)
+
+    def test_lazy_add_list(self):
+        lazy_4 = lazy(lambda: [4], list)
+        lazy_5 = lazy(lambda: [5], list)
+        self.assertEqual([4] + lazy_5(), [4, 5])
+        self.assertEqual(lazy_4() + [5], [4, 5])
+        self.assertEqual(lazy_4() + lazy_5(), [4, 5])
+
+    def test_lazy_add_str(self):
+        lazy_a = lazy(lambda: "a", str)
+        lazy_b = lazy(lambda: "b", str)
+        self.assertEqual("a" + lazy_b(), "ab")
+        self.assertEqual(lazy_a() + "b", "ab")
+        self.assertEqual(lazy_a() + lazy_b(), "ab")
+
+    def test_lazy_mod_int(self):
+        lazy_4 = lazy(lambda: 4, int)
+        lazy_5 = lazy(lambda: 5, int)
+        self.assertEqual(4 % lazy_5(), 4)
+        self.assertEqual(lazy_4() % 5, 4)
+        self.assertEqual(lazy_4() % lazy_5(), 4)
+
+    def test_lazy_mod_str(self):
+        lazy_a = lazy(lambda: "a%s", str)
+        lazy_b = lazy(lambda: "b", str)
+        self.assertEqual("a%s" % lazy_b(), "ab")
+        self.assertEqual(lazy_a() % "b", "ab")
+        self.assertEqual(lazy_a() % lazy_b(), "ab")
+
+    def test_lazy_mul_int(self):
+        lazy_4 = lazy(lambda: 4, int)
+        lazy_5 = lazy(lambda: 5, int)
+        self.assertEqual(4 * lazy_5(), 20)
+        self.assertEqual(lazy_4() * 5, 20)
+
+    def test_lazy_mul_list(self):
+        lazy_4 = lazy(lambda: [4], list)
+        lazy_5 = lazy(lambda: 5, int)
+        self.assertEqual([4] * lazy_5(), [4, 4, 4, 4, 4])
+        self.assertEqual(lazy_4() * 5, [4, 4, 4, 4, 4])
+        self.assertEqual(lazy_4() * lazy_5(), [4, 4, 4, 4, 4])
+
+    def test_lazy_mul_str(self):
+        lazy_a = lazy(lambda: "a", str)
+        lazy_5 = lazy(lambda: 5, int)
+        self.assertEqual("a" * lazy_5(), "aaaaa")
+        self.assertEqual(lazy_a() * 5, "aaaaa")
+        self.assertEqual(lazy_a() * lazy_5(), "aaaaa")
 
     def test_lazy_equality(self):
         """
