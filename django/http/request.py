@@ -18,6 +18,7 @@ from django.http.multipartparser import (
     MultiPartParserError,
     TooManyFilesSent,
 )
+from django.http.parsers import JSONParser
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -61,7 +62,7 @@ class HttpRequest:
         # `WSGIRequest.__init__()`.
 
         self.GET = QueryDict(mutable=True)
-        self.POST = QueryDict(mutable=True)
+        self.data = QueryDict(mutable=True)
         self.COOKIES = {}
         self.META = {}
         self.FILES = MultiValueDict()
@@ -351,12 +352,6 @@ class HttpRequest:
 
     def _load_post_and_files(self):
         """Populate self._post and self._files if the content-type is a form type"""
-        if self.method != "POST":
-            self._post, self._files = (
-                QueryDict(encoding=self._encoding),
-                MultiValueDict(),
-            )
-            return
         if self._read_started and not hasattr(self, "_body"):
             self._mark_post_parse_error()
             return
@@ -381,6 +376,10 @@ class HttpRequest:
                 QueryDict(self.body, encoding=self._encoding),
                 MultiValueDict(),
             )
+        elif self.content_type == "application/json":
+            parser = JSONParser()
+            self._post = parser.parse(self.body)
+            self._files = MultiValueDict()
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -419,6 +418,18 @@ class HttpRequest:
 
     def readlines(self):
         return list(self)
+
+    @property
+    def POST(self):
+        # change this and add supporting functions
+
+        if self.method != "POST":
+            return QueryDict(encoding=self._encoding)
+        return self.data
+
+    @POST.setter
+    def POST(self, post):
+        self.data = post
 
 
 class HttpHeaders(CaseInsensitiveMapping):

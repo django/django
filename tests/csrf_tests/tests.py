@@ -204,10 +204,10 @@ class PostErrorRequest(TestingHttpRequest):
     def _get_post(self):
         if self.post_error is not None:
             raise self.post_error
-        return self._post
+        return self.data
 
     def _set_post(self, post):
-        self._post = post
+        self.data = post
 
     POST = property(_get_post, _set_post)
 

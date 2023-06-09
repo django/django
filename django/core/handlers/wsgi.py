@@ -88,13 +88,15 @@ class WSGIRequest(HttpRequest):
         raw_query_string = get_bytes_from_wsgi(self.environ, "QUERY_STRING", "")
         return QueryDict(raw_query_string, encoding=self._encoding)
 
-    def _get_post(self):
+    @property
+    def data(self):
         if not hasattr(self, "_post"):
             self._load_post_and_files()
         return self._post
 
-    def _set_post(self, post):
-        self._post = post
+    @data.setter
+    def data(self, value):
+        self._post = value
 
     @cached_property
     def COOKIES(self):
@@ -106,8 +108,6 @@ class WSGIRequest(HttpRequest):
         if not hasattr(self, "_files"):
             self._load_post_and_files()
         return self._files
-
-    POST = property(_get_post, _set_post)
 
 
 class WSGIHandler(base.BaseHandler):

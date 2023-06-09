@@ -12,6 +12,7 @@ from django.http import (
     UnreadablePostError,
 )
 from django.http.multipartparser import MultiPartParserError
+from django.http.parsers import ParserException
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
@@ -21,12 +22,14 @@ class RequestsTests(SimpleTestCase):
     def test_httprequest(self):
         request = HttpRequest()
         self.assertEqual(list(request.GET), [])
+        self.assertEqual(list(request.data), [])
         self.assertEqual(list(request.POST), [])
         self.assertEqual(list(request.COOKIES), [])
         self.assertEqual(list(request.META), [])
 
         # .GET and .POST should be QueryDicts
         self.assertEqual(request.GET.urlencode(), "")
+        self.assertEqual(request.data.urlencode(), "")
         self.assertEqual(request.POST.urlencode(), "")
 
         # and FILES should be MultiValueDict
@@ -356,6 +359,152 @@ class RequestsTests(SimpleTestCase):
         with self.assertRaises(RawPostDataException):
             request.body
         self.assertEqual(request.POST, {})
+
+    def test_basic_data(self):
+        """
+        Parsed request data is available for all request methods.
+        """
+        # Test various request methods. Need not be exhaustive.
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload(urlencode({"key": "value"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.data, {"key": ["value"]})
+
+    # TODO: RemovedInDjango51Warning
+    def test_basic_POST_alias(self):
+        # Parsed data available for POST request.
+        payload = FakePayload(urlencode({"key": "value"}))
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_LENGTH": len(payload),
+                "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.POST, {"key": ["value"]})
+        # Other methods have empty POST.
+        for method in ["GET", "PUT", "DELETE"]:
+            with self.subTest(method=method):
+                payload = FakePayload(urlencode({"key": "value"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": method,
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.POST, {})
+
+    def test_json_parsing(self):
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            payload = FakePayload('{"key": "value"}')
+            request = WSGIRequest(
+                {
+                    "REQUEST_METHOD": method,
+                    "CONTENT_LENGTH": len(payload),
+                    "CONTENT_TYPE": "application/json",
+                    "wsgi.input": payload,
+                }
+            )
+            self.assertEqual(request.data, {"key": "value"})
+
+    def test_json_parsing_error(self):
+        for method in ["GET", "POST", "PUT", "DELETE"]:
+            payload = FakePayload("name=value")
+            request = WSGIRequest(
+                {
+                    "REQUEST_METHOD": method,
+                    "CONTENT_LENGTH": len(payload),
+                    "CONTENT_TYPE": "application/json",
+                    "wsgi.input": payload,
+                }
+            )
+            with self.assertRaises(ParserException):
+                request.data
+
+    def test_json_parsing_POST_multipart_form_data(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.data.get("json"), {"key": "value"})
+
+    def test_error_json_parsing_POST_multipart_form_data(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": value}',
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        with self.assertRaises(MultiPartParserError):
+            request.data
+
+    def test_json_parsing_and_other_data_POST_multipart_form_data(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        self.assertEqual(request.data, {"json": [{"key": "value"}], "name": ["value"]})
 
     def test_non_ascii_POST(self):
         payload = FakePayload(urlencode({"key": "España"}))

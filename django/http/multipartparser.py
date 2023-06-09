@@ -8,6 +8,7 @@ import base64
 import binascii
 import collections
 import html
+import json
 
 from django.conf import settings
 from django.core.exceptions import (
@@ -211,6 +212,10 @@ class MultiPartParser:
                 except (KeyError, IndexError, AttributeError):
                     continue
 
+                part_content_type = meta_data.get("content-type")
+                if part_content_type is not None:
+                    part_content_type = part_content_type[0].strip()
+
                 transfer_encoding = meta_data.get("content-transfer-encoding")
                 if transfer_encoding is not None:
                     transfer_encoding = transfer_encoding[0].strip()
@@ -247,9 +252,18 @@ class MultiPartParser:
                             "settings.DATA_UPLOAD_MAX_MEMORY_SIZE."
                         )
 
-                    self._post.appendlist(
-                        field_name, force_str(data, encoding, errors="replace")
-                    )
+                    if part_content_type == "application/json":
+                        try:
+                            self._post.appendlist(
+                                field_name,
+                                json.loads(force_str(data, encoding, errors="replace")),
+                            )
+                        except Exception:
+                            raise MultiPartParserError("Faulty json data")
+                    else:
+                        self._post.appendlist(
+                            field_name, force_str(data, encoding, errors="replace")
+                        )
                 elif item_type == FILE:
                     # Avoid storing more than DATA_UPLOAD_MAX_NUMBER_FILES.
                     num_files += 1
