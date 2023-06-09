@@ -1676,18 +1676,16 @@ class SchemaTests(TransactionTestCase):
             {"fks": expected_fks, "uniques": 0, "indexes": expected_indexes},
         )
 
-    @unittest.skipIf(connection.vendor == "mysql", "All but MySQL")
+    @skipIfDBFeature("requires_fk_constraints_to_be_recreated")
     def test_remove_unnecessary_fk_constraint_drop(self):
         """
-        #34417 - Tests for recreation of foreign key constrains while dropping index.
+        #34417 - Tests for recreation of foreign key constraints while dropping index.
         """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(Book)
 
-        author = Author.objects.create(
-            name='Alice'
-        )
+        author = Author.objects.create(name="Alice")
         Book.objects.create(
             author=author,
             title="Much Ado About Foreign Keys",
@@ -1702,23 +1700,25 @@ class SchemaTests(TransactionTestCase):
             with connection.schema_editor() as editor:
                 editor.alter_field(Book, old_field, new_field, strict=True)
 
-        # make sure foreign key constrains are not touched
+        # make sure foreign key constraints are not touched
         self.assertFalse(
-            any('schema_book_author_id_c80c8297_fk_schema_author_id' in record.args[0] for record in cm.records), True
+            any(
+                "schema_book_author_id_c80c8297_fk_schema_author_id" in record.args[0]
+                for record in cm.records
+            ),
+            True,
         )
 
-    @unittest.skipUnless(connection.vendor == "mysql", "MySQL specific")
+    @skipUnlessDBFeature("requires_fk_constraints_to_be_recreated")
     def test_if_fk_constraint_is_recreated(self):
         """
-        #34417 - Tests for recreation of foreign key constrains while dropping index.
+        #34417 - Tests for recreation of foreign key constraints while dropping index.
         """
         with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(Book)
 
-        author = Author.objects.create(
-            name='Alice'
-        )
+        author = Author.objects.create(name="Alice")
         Book.objects.create(
             author=author,
             title="Much Ado About Foreign Keys",
@@ -1735,10 +1735,10 @@ class SchemaTests(TransactionTestCase):
 
         # Make sure the constraint is dropped and recreated
         self.assertTrue(
-            any('DROP FOREIGN KEY' in record.args[0] for record in cm.records), False
+            any("DROP FOREIGN KEY" in record.args[0] for record in cm.records), False
         )
         self.assertTrue(
-            any('ADD CONSTRAINT' in record.args[0] for record in cm.records), False
+            any("ADD CONSTRAINT" in record.args[0] for record in cm.records), False
         )
 
     def test_alter_field_o2o_to_fk(self):
