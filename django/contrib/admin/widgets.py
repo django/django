@@ -48,7 +48,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         return context
 
 
-class AdminDateWidget(forms.DateInput):
+class BaseAdminDateWidget(forms.DateInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -60,7 +60,11 @@ class AdminDateWidget(forms.DateInput):
         super().__init__(attrs=attrs, format=format)
 
 
-class AdminTimeWidget(forms.TimeInput):
+class AdminDateWidget(BaseAdminDateWidget):
+    template_name = "admin/widgets/date.html"
+
+
+class BaseAdminTimeWidget(forms.TimeInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -72,6 +76,10 @@ class AdminTimeWidget(forms.TimeInput):
         super().__init__(attrs=attrs, format=format)
 
 
+class AdminTimeWidget(BaseAdminTimeWidget):
+    template_name = "admin/widgets/time.html"
+
+
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
@@ -80,7 +88,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     template_name = "admin/widgets/split_datetime.html"
 
     def __init__(self, attrs=None):
-        widgets = [AdminDateWidget, AdminTimeWidget]
+        widgets = [BaseAdminDateWidget, BaseAdminTimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
         # we want to define widgets.
         forms.MultiWidget.__init__(self, widgets, attrs)
