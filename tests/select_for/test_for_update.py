@@ -400,7 +400,6 @@ class SelectForUpdateTests(TransactionTestCase):
         self.person = Person.objects.create(
             name="Reinhardt", born=self.city1, died=self.city2
         )
-        self.person_profile = PersonProfile.objects.create(person=self.person)
 
     @skipUnlessDBFeature("has_select_for_update_of")
     def test_for_update_of_followed_by_values(self):
@@ -524,16 +523,15 @@ class SelectForUpdateTests(TransactionTestCase):
         Reverse OneToOneFields may be included in of=(...) as long as NULLs
         are excluded because LEFT JOIN isn't allowed in SELECT FOR UPDATE.
         """
+        person_profile = PersonProfile.objects.create(person=self.person)
         with transaction.atomic():
             person = (
-                Person.objects.select_related(
-                    "profile",
-                )
+                Person.objects.select_related("profile")
                 .exclude(profile=None)
                 .select_for_update(of=("profile",))
                 .get()
             )
-            self.assertEqual(person.profile, self.person_profile)
+            self.assertEqual(person.profile, person_profile)
 
     @skipUnlessDBFeature("supports_transactions")
     def test_for_update_requires_transaction(self):
