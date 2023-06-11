@@ -1701,13 +1701,10 @@ class SchemaTests(TransactionTestCase):
                 editor.alter_field(Book, old_field, new_field, strict=True)
 
         # make sure foreign key constraints are not touched
-        self.assertFalse(
-            any(
-                "schema_book_author_id_c80c8297_fk_schema_author_id" in record.args[0]
-                for record in cm.records
-            ),
-            True,
-        )
+        for record in cm.records:
+            self.assertNotIn(
+                "schema_book_author_id_c80c8297_fk_schema_author_id", record.args[0]
+            )
 
     @skipUnlessDBFeature("requires_fk_constraints_to_be_recreated")
     def test_if_fk_constraint_is_recreated(self):
@@ -1735,10 +1732,10 @@ class SchemaTests(TransactionTestCase):
 
         # Make sure the constraint is dropped and recreated
         self.assertTrue(
-            any("DROP FOREIGN KEY" in record.args[0] for record in cm.records), False
+            any("DROP FOREIGN KEY" in record.args[0] for record in cm.records)
         )
         self.assertTrue(
-            any("ADD CONSTRAINT" in record.args[0] for record in cm.records), False
+            any("ADD CONSTRAINT" in record.args[0] for record in cm.records)
         )
 
     def test_alter_field_o2o_to_fk(self):
