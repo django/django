@@ -8,9 +8,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import translation
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.html import escape
 
-from .models import Article, ArticleProxy, Car, Site
+from .models import Article, ArticleProxy, Car, InheritedLogEntryManager, Site
 
 
 @override_settings(ROOT_URLCONF="admin_utils.urls")
@@ -26,14 +27,22 @@ class LogEntryTests(TestCase):
             title="Title",
             created=datetime(2008, 3, 12, 11, 54),
         )
-        content_type_pk = ContentType.objects.get_for_model(Article).pk
-        LogEntry.objects.log_action(
+        cls.a2 = Article.objects.create(
+            site=cls.site,
+            title="Title 2",
+            created=datetime(2009, 3, 12, 11, 54),
+        )
+        cls.a3 = Article.objects.create(
+            site=cls.site,
+            title="Title 3",
+            created=datetime(2010, 3, 12, 11, 54),
+        )
+        LogEntry.objects.log_actions(
             cls.user.pk,
-            content_type_pk,
-            cls.a1.pk,
-            repr(cls.a1),
+            [cls.a1],
             CHANGE,
             change_message="Changed something",
+            single_object=True,
         )
 
     def setUp(self):
@@ -227,17 +236,94 @@ class LogEntryTests(TestCase):
         logentry = LogEntry.objects.first()
         self.assertEqual(repr(logentry), str(logentry.action_time))
 
+    # RemovedInDjango60Warning.
     def test_log_action(self):
-        content_type_pk = ContentType.objects.get_for_model(Article).pk
-        log_entry = LogEntry.objects.log_action(
-            self.user.pk,
-            content_type_pk,
-            self.a1.pk,
-            repr(self.a1),
-            CHANGE,
-            change_message="Changed something else",
-        )
+        msg = "LogEntryManager.log_action() is deprecated. Use log_actions() instead."
+        content_type_val = ContentType.objects.get_for_model(Article).pk
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            log_entry = LogEntry.objects.log_action(
+                self.user.pk,
+                content_type_val,
+                self.a1.pk,
+                repr(self.a1),
+                CHANGE,
+                change_message="Changed something else",
+            )
         self.assertEqual(log_entry, LogEntry.objects.latest("id"))
+
+    def test_log_actions(self):
+        queryset = Article.objects.all().order_by("-id")
+        msg = "Deleted Something"
+        content_type = ContentType.objects.get_for_model(self.a1)
+        self.assertEqual(len(queryset), 3)
+        with self.assertNumQueries(1):
+            LogEntry.objects.log_actions(
+                self.user.pk,
+                queryset,
+                DELETION,
+                change_message=msg,
+            )
+        logs = (
+            LogEntry.objects.filter(action_flag=DELETION)
+            .order_by("id")
+            .values_list(
+                "user",
+                "content_type",
+                "object_id",
+                "object_repr",
+                "action_flag",
+                "change_message",
+            )
+        )
+        expected_log_values = [
+            (
+                self.user.pk,
+                content_type.id,
+                str(obj.pk),
+                str(obj),
+                DELETION,
+                msg,
+            )
+            for obj in queryset
+        ]
+        self.assertSequenceEqual(logs, expected_log_values)
+
+    # RemovedInDjango60Warning.
+    def test_log_action_fallback(self):
+        LogEntry.objects2 = InheritedLogEntryManager()
+        queryset = Article.objects.all().order_by("-id")
+        content_type = ContentType.objects.get_for_model(self.a1)
+        self.assertEqual(len(queryset), 3)
+        msg = (
+            "The usage of log_action() is deprecated. Implement log_actions() instead."
+        )
+        with self.assertNumQueries(3):
+            with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+                LogEntry.objects2.log_actions(self.user.pk, queryset, DELETION)
+        log_values = (
+            LogEntry.objects.filter(action_flag=DELETION)
+            .order_by("id")
+            .values_list(
+                "user",
+                "content_type",
+                "object_id",
+                "object_repr",
+                "action_flag",
+                "change_message",
+            )
+        )
+        expected_log_values = [
+            (
+                self.user.pk,
+                content_type.id,
+                str(obj.pk),
+                "Test Repr",
+                DELETION,
+                "",
+            )
+            for obj in queryset
+        ]
+        self.assertSequenceEqual(log_values, expected_log_values)
 
     def test_recentactions_without_content_type(self):
         """
@@ -248,7 +334,7 @@ class LogEntryTests(TestCase):
         link = reverse("admin:admin_utils_article_change", args=(quote(self.a1.pk),))
         should_contain = """<a href="%s">%s</a>""" % (
             escape(link),
-            escape(repr(self.a1)),
+            escape(str(self.a1)),
         )
         self.assertContains(response, should_contain)
         should_contain = "Article"
@@ -320,28 +406,29 @@ class LogEntryTests(TestCase):
                 self.assertEqual(log.get_action_flag_display(), display_name)
 
     def test_hook_get_log_entries(self):
-        LogEntry.objects.log_action(
+        LogEntry.objects.log_actions(
             self.user.pk,
-            ContentType.objects.get_for_model(Article).pk,
-            self.a1.pk,
-            "Article changed",
+            [self.a1],
             CHANGE,
             change_message="Article changed message",
+            single_object=True,
         )
         c1 = Car.objects.create()
-        LogEntry.objects.log_action(
+        LogEntry.objects.log_actions(
             self.user.pk,
-            ContentType.objects.get_for_model(Car).pk,
-            c1.pk,
-            "Car created",
+            [c1],
             ADDITION,
             change_message="Car created message",
+            single_object=True,
         )
+        exp_str_article = escape(str(self.a1))
+        exp_str_car = escape(str(c1))
+
         response = self.client.get(reverse("admin:index"))
-        self.assertContains(response, "Article changed")
-        self.assertContains(response, "Car created")
+        self.assertContains(response, exp_str_article)
+        self.assertContains(response, exp_str_car)
 
         # site "custom_admin" only renders log entries of registered models
         response = self.client.get(reverse("custom_admin:index"))
-        self.assertContains(response, "Article changed")
-        self.assertNotContains(response, "Car created")
+        self.assertContains(response, exp_str_article)
+        self.assertNotContains(response, exp_str_car)

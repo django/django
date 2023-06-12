@@ -16,7 +16,6 @@ from django.contrib.admin.views.main import (
     TO_FIELD_VAR,
 )
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.db import DatabaseError, connection, models
 from django.db.models import F, Field, IntegerField
@@ -1636,8 +1635,7 @@ class GetAdminLogTests(TestCase):
         """{% get_admin_log %} works without specifying a user."""
         user = User(username="jondoe", password="secret", email="super@example.com")
         user.save()
-        ct = ContentType.objects.get_for_model(User)
-        LogEntry.objects.log_action(user.pk, ct.pk, user.pk, repr(user), 1)
+        LogEntry.objects.log_actions(user.pk, [user], 1, single_object=True)
         context = Context({"log_entries": LogEntry.objects.all()})
         t = Template(
             "{% load log %}"
@@ -1646,7 +1644,7 @@ class GetAdminLogTests(TestCase):
             "{{ entry|safe }}"
             "{% endfor %}"
         )
-        self.assertEqual(t.render(context), "Added “<User: jondoe>”.")
+        self.assertEqual(t.render(context), "Added “jondoe”.")
 
     def test_missing_args(self):
         msg = "'get_admin_log' statements require two arguments"

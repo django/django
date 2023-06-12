@@ -285,7 +285,10 @@ Features deprecated in 5.1
 Miscellaneous
 -------------
 
-* ...
+* The ``ModelAdmin.log_deletion()`` and ``LogEntryManager.log_action()``
+  methods are deprecated. Subclasses should implement
+  ``ModelAdmin.log_deletions()`` and  ``LogEntryManager.log_actions()``
+  instead.
 
 Features removed in 5.1
 =======================

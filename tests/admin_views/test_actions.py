@@ -4,9 +4,11 @@ from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth.models import Permission, User
 from django.core import mail
+from django.db import connection
 from django.template.loader import render_to_string
 from django.template.response import TemplateResponse
 from django.test import TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from .admin import SubscriberAdmin
@@ -74,8 +76,21 @@ class AdminActionsTest(TestCase):
         self.assertContains(confirmation, "<li>Subscribers: 2</li>")
         self.assertContains(confirmation, "<li>External subscribers: 1</li>")
         self.assertContains(confirmation, ACTION_CHECKBOX_NAME, count=2)
-        self.client.post(
-            reverse("admin:admin_views_subscriber_changelist"), delete_confirmation_data
+        with CaptureQueriesContext(connection) as ctx:
+            self.client.post(
+                reverse("admin:admin_views_subscriber_changelist"),
+                delete_confirmation_data,
+            )
+        # Log entries are inserted in bulk.
+        self.assertEqual(
+            len(
+                [
+                    q["sql"]
+                    for q in ctx.captured_queries
+                    if q["sql"].startswith("INSERT")
+                ]
+            ),
+            1,
         )
         self.assertEqual(Subscriber.objects.count(), 0)
 
