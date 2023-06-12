@@ -45,7 +45,7 @@ class ModelBackend(BaseBackend):
             # difference between an existing and a nonexistent user (#20760).
             UserModel().set_password(password)
         else:
-            if user.check_password(password) and self.user_can_authenticate(user):
+            if self.user_can_authenticate(user) and user.check_password(password):
                 return user
 
     def user_can_authenticate(self, user):
