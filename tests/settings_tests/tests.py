@@ -1,6 +1,7 @@
 import os
 import sys
 import unittest
+from datetime import datetime
 from types import ModuleType, SimpleNamespace
 from unittest import mock
 
@@ -339,6 +340,12 @@ class SettingsTests(SimpleTestCase):
     def test_incorrect_timezone(self):
         with self.assertRaisesMessage(ValueError, "Incorrect timezone setting: test"):
             settings._setup()
+
+    def test_override_timezone(self):
+        with override_settings(TIME_ZONE="Japan"):
+            now = datetime.now()
+            timezone = now.astimezone()
+            self.assertEqual(str(timezone.tzinfo), "JST")
 
 
 class TestComplexSettingOverride(SimpleTestCase):
