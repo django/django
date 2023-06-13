@@ -81,6 +81,7 @@ class UserAdmin(admin.ModelAdmin):
         "groups",
         "user_permissions",
     )
+    actions = ["users_deactivate"]
 
     def get_fieldsets(self, request, obj=None):
         if not obj:
@@ -214,6 +215,13 @@ class UserAdmin(admin.ModelAdmin):
             or "admin/auth/user/change_password.html",
             context,
         )
+
+    @action(
+    permissions=["change"],
+    description=_("Mark selected %(verbose_name_plural)s as not active"),
+)
+    def users_deactivate(self, request, queryset):
+        queryset.update(is_active=False)
 
     def response_add(self, request, obj, post_url_continue=None):
         """
