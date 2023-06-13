@@ -1035,7 +1035,7 @@ First of all, you need to install the :pypi:`selenium` package:
 
 .. console::
 
-    $ python -m pip install selenium
+    $ python -m pip install "selenium >= 3.8.0"
 
 Then, add a ``LiveServerTestCase``-based test to your app's tests module
 (for example: ``myapp/tests.py``). For this example, we'll assume you're using
