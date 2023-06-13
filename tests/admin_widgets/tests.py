@@ -23,6 +23,7 @@ from django.db.models import (
     UUIDField,
 )
 from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -1116,6 +1117,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.wait_for_text("#calendarin0 caption", expected_caption)
 
 
+@requires_tz_support
 @override_settings(TIME_ZONE="Asia/Singapore")
 class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_date_time_picker_shortcuts(self):
