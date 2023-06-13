@@ -5,8 +5,8 @@ import * as NewModule from "./module_test.js";
 import { testConst as alias } from "./module_test.js";
 import { firstConst, secondConst } from "./module_test.js";
 import {
-    firstVar as firstVarAlias,
-    secondVar as secondVarAlias
+    firstVar1 as firstVarAlias,
+    $second_var_2 as secondVarAlias
 } from "./module_test.js";
 import relativeModule from "../nested/js/nested.js";
 

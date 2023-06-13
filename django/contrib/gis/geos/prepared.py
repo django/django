@@ -8,6 +8,7 @@ class PreparedGeometry(GEOSBase):
     At the moment this includes the contains covers, and intersects
     operations.
     """
+
     ptr_type = capi.PREPGEOM_PTR
     destructor = capi.prepared_destroy
 
@@ -17,6 +18,7 @@ class PreparedGeometry(GEOSBase):
         # See #21662
         self._base_geom = geom
         from .geometry import GEOSGeometry
+
         if not isinstance(geom, GEOSGeometry):
             raise TypeError
         self.ptr = capi.geos_prepare(geom.ptr)

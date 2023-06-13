@@ -29,11 +29,15 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         else:
             coords = args
 
-        if not (isinstance(coords, (tuple, list)) or numpy and isinstance(coords, numpy.ndarray)):
-            raise TypeError('Invalid initialization input for LineStrings.')
+        if not (
+            isinstance(coords, (tuple, list))
+            or numpy
+            and isinstance(coords, numpy.ndarray)
+        ):
+            raise TypeError("Invalid initialization input for LineStrings.")
 
         # If SRID was passed in with the keyword arguments
-        srid = kwargs.get('srid')
+        srid = kwargs.get("srid")
 
         ncoords = len(coords)
         if not ncoords:
@@ -42,7 +46,8 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
 
         if ncoords < self._minlength:
             raise ValueError(
-                '%s requires at least %d points, got %s.' % (
+                "%s requires at least %d points, got %s."
+                % (
                     self.__class__.__name__,
                     self._minlength,
                     ncoords,
@@ -53,7 +58,7 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
         if numpy_coords:
             shape = coords.shape  # Using numpy's shape.
             if len(shape) != 2:
-                raise TypeError('Too many dimensions.')
+                raise TypeError("Too many dimensions.")
             self._checkdim(shape[1])
             ndim = shape[1]
         else:
@@ -63,13 +68,15 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             # Incrementing through each of the coordinates and verifying
             for coord in coords:
                 if not isinstance(coord, (tuple, list, Point)):
-                    raise TypeError('Each coordinate should be a sequence (list or tuple)')
+                    raise TypeError(
+                        "Each coordinate should be a sequence (list or tuple)"
+                    )
 
                 if ndim is None:
                     ndim = len(coord)
                     self._checkdim(ndim)
                 elif len(coord) != ndim:
-                    raise TypeError('Dimension mismatch.')
+                    raise TypeError("Dimension mismatch.")
 
         # Creating a coordinate sequence object because it is easier to
         # set the points using its methods.
@@ -122,20 +129,21 @@ class LineString(LinearGeometryMixin, GEOSGeometry):
             self._post_init()
         else:
             # can this happen?
-            raise GEOSException('Geometry resulting from slice deletion was invalid.')
+            raise GEOSException("Geometry resulting from slice deletion was invalid.")
 
     def _set_single(self, index, value):
         self._cs[index] = value
 
     def _checkdim(self, dim):
         if dim not in (2, 3):
-            raise TypeError('Dimension mismatch.')
+            raise TypeError("Dimension mismatch.")
 
     # #### Sequence Properties ####
     @property
     def tuple(self):
         "Return a tuple version of the geometry from the coordinate sequence."
         return self._cs.tuple
+
     coords = tuple
 
     def _listarr(self, func):
@@ -181,7 +189,5 @@ class LinearRing(LineString):
     @property
     def is_counterclockwise(self):
         if self.empty:
-            raise ValueError(
-                'Orientation of an empty LinearRing cannot be determined.'
-            )
+            raise ValueError("Orientation of an empty LinearRing cannot be determined.")
         return self._cs.is_counterclockwise

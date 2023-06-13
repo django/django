@@ -6,7 +6,7 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
 # madisvain <madisvain@gmail.com>, 2011
-# Martin <martinpajuste@gmail.com>, 2014-2015,2021
+# Martin <martinpajuste@gmail.com>, 2014-2015,2021-2023
 # Martin <martinpajuste@gmail.com>, 2016-2017,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2014,2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
@@ -14,9 +14,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-22 11:50+0000\n"
-"Last-Translator: Martin <martinpajuste@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2014-2015,2021-2023\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -57,6 +57,9 @@ msgstr "bosnia"
 
 msgid "Catalan"
 msgstr "katalaani"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Keskkurdi keel (sorani)"
 
 msgid "Czech"
 msgstr "tšehhi"
@@ -213,6 +216,9 @@ msgstr "mongoolia"
 
 msgid "Marathi"
 msgstr "marathi"
+
+msgid "Malay"
+msgstr "malai"
 
 msgid "Burmese"
 msgstr "birma"
@@ -390,6 +396,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Veendu, et see väärtus on suurem või võrdne kui %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Veendu, et see väärtus on arvu %(limit_value)s kordne."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -461,6 +471,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s väljaga %(field_labels)s on juba olemas."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr ""
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Väärtus %(value)r ei ole kehtiv valik."
 
@@ -474,8 +488,8 @@ msgstr "See väli ei saa olla tühi."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Sellise %(field_label)s-väljaga %(model_name)s on juba olemas."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -501,6 +515,9 @@ msgstr "Tõeväärtus (Kas tõene või väär)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (kuni %(max_length)s märki)"
+
+msgid "String (unlimited)"
+msgstr ""
 
 msgid "Comma-separated integers"
 msgstr "Komaga eraldatud täisarvud"
@@ -769,16 +786,16 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Palun kinnitage kõige rohkem %d vorm."
-msgstr[1] "Palun kinnitage kõige rohkem %d vormi."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Palun kinnitage kõige rohkem %(num)d vormi."
+msgstr[1] "Palun kinnitage kõige rohkem %(num)d vormi."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Palun kinnitage vähemalt %d vorm."
-msgstr[1] "Palun kinnitage vähemalt %d vormi."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Palun kinnitage vähemalt %(num)d vormi."
+msgstr[1] "Palun kinnitage vähemalt %(num)d vormi."
 
 msgid "Order"
 msgstr "Järjestus"
@@ -1116,40 +1133,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d aasta"
-msgstr[1] "%d aastat"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d aasta"
+msgstr[1] "%(num)d aastat"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d kuu"
-msgstr[1] "%d kuud"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d kuu"
+msgstr[1] "%(num)d kuud"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d nädal"
-msgstr[1] "%d nädalat"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d nädal"
+msgstr[1] "%(num)d nädalat"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d päev"
-msgstr[1] "%d päeva"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d päev"
+msgstr[1] "%(num)d päeva"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d tund"
-msgstr[1] "%d tundi"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d tund"
+msgstr[1] "%(num)d tundi"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minut"
-msgstr[1] "%d minutit"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minut"
+msgstr[1] "%(num)d minutit"
 
 msgid "Forbidden"
 msgstr "Keelatud"
@@ -1159,7 +1176,7 @@ msgstr "CSRF verifitseerimine ebaõnnestus. Päring katkestati."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
@@ -1181,8 +1198,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Kui kasutate <meta name=\"referrer\" content=\"no-referrer\"> silti või "
 "saadate päist “Referrer-Policy: no-referrer”, siis palun eemaldage need. "
@@ -1280,13 +1297,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Näete seda lehte, kuna teil on määratud <a href=\"https://docs.djangoproject."
-"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> Django seadete failis ja te ei ole ühtki URLi seadistanud."
+"com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> Django seadete failis ja te ei ole ühtki "
+"URLi seadistanud."
 
 msgid "Django Documentation"
 msgstr "Django dokumentatsioon"

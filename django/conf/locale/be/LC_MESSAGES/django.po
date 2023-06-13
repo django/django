@@ -2,24 +2,24 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2014-2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023
+# Bobsans <mr.bobsans@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 20:33+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019-2021,2023\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Afrikaans"
 msgstr "Афрыкаанс"
@@ -53,6 +53,9 @@ msgstr "Басьнійская"
 
 msgid "Catalan"
 msgstr "Каталёнская"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Цэнтральнакурдская (сарані)"
 
 msgid "Czech"
 msgstr "Чэская"
@@ -209,6 +212,9 @@ msgstr "Манґольская"
 
 msgid "Marathi"
 msgstr "Маратхі"
+
+msgid "Malay"
+msgstr "Малайская"
 
 msgid "Burmese"
 msgstr "Бірманская"
@@ -388,6 +394,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Значэньне мусіць быць большым або роўным %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Пераканайцеся, што гэта значэнне кратнае памеру кроку %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -475,6 +485,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "%(model_name)s з такім %(field_labels)s ужо існуе."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Абмежаванне \"%(name)s\" парушана."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Значэнне %(value)r не з'яўляецца правільным выбарам."
 
@@ -488,8 +502,8 @@ msgstr "Трэба запоўніць поле."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s з такім %(field_label)s ужо існуе."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -515,6 +529,9 @@ msgstr "Ляґічнае («сапраўдна» або «не сапраўдн�
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Радок (ня болей за %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Радок (неабмежаваны)"
 
 msgid "Comma-separated integers"
 msgstr "Цэлыя лікі, падзеленыя коскаю"
@@ -794,20 +811,20 @@ msgstr ""
 "памылку, калі праблема захоўваецца."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Калі ласка, адпраўце не болей чым %d форму."
-msgstr[1] "Калі ласка, адпраўце не болей чым %d формаў."
-msgstr[2] "Калі ласка, адпраўце не болей чым %d формаў."
-msgstr[3] "Калі ласка, адпраўце не болей чым %d формаў."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Калі ласка, адпраўце не болей чым %(num)d формаў."
+msgstr[1] "Калі ласка, адпраўце не болей чым %(num)d формаў."
+msgstr[2] "Калі ласка, адпраўце не болей чым %(num)d формаў."
+msgstr[3] "Калі ласка, адпраўце не болей чым %(num)d формаў."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Калі ласка, адпраўце не менш чым %d форму."
-msgstr[1] "Калі ласка, адпраўце не менш чым %d формаў."
-msgstr[2] "Калі ласка, адпраўце не менш чым %d формаў."
-msgstr[3] "Калі ласка, адпраўце не менш чым %d формаў."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Калі ласка, адпраўце не менш чым %(num)d формаў."
+msgstr[1] "Калі ласка, адпраўце не менш чым %(num)d формаў."
+msgstr[2] "Калі ласка, адпраўце не менш чым %(num)d формаў."
+msgstr[3] "Калі ласка, адпраўце не менш чым %(num)d формаў."
 
 msgid "Order"
 msgstr "Парадак"
@@ -1146,52 +1163,52 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d год"
-msgstr[1] "%d гады"
-msgstr[2] "%d гадоў"
-msgstr[3] "%d гадоў"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d год"
+msgstr[1] "%(num)d гадоў"
+msgstr[2] "%(num)d гадоў"
+msgstr[3] "%(num)d гадоў"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d месяц"
-msgstr[1] "%d месяцы"
-msgstr[2] "%d месяцаў"
-msgstr[3] "%d месяцаў"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d месяц"
+msgstr[1] "%(num)d месяцаў"
+msgstr[2] "%(num)d месяцаў"
+msgstr[3] "%(num)d месяцаў"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d тыдзень"
-msgstr[1] "%d тыдні"
-msgstr[2] "%d тыдняў"
-msgstr[3] "%d тыдняў"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d тыдзень"
+msgstr[1] "%(num)d тыдняў"
+msgstr[2] "%(num)d тыдняў"
+msgstr[3] "%(num)d тыдняў"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d дзень"
-msgstr[1] "%d дні"
-msgstr[2] "%d дзён"
-msgstr[3] "%d дзён"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d дзень"
+msgstr[1] "%(num)d  дзён"
+msgstr[2] "%(num)d  дзён"
+msgstr[3] "%(num)d дзён"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d гадзіна"
-msgstr[1] "%d гадзіны"
-msgstr[2] "%d гадзін"
-msgstr[3] "%d гадзін"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d гадзіна"
+msgstr[1] "%(num)d гадзін"
+msgstr[2] "%(num)d гадзін"
+msgstr[3] "%(num)d гадзін"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d хвіліна"
-msgstr[1] "%d хвіліны"
-msgstr[2] "%d хвілінаў"
-msgstr[3] "%d хвілінаў"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d хвіліна"
+msgstr[1] "%(num)d хвілін"
+msgstr[2] "%(num)d хвілін"
+msgstr[3] "%(num)d хвілін"
 
 msgid "Forbidden"
 msgstr "Забаронена"
@@ -1201,13 +1218,13 @@ msgstr "CSRF-праверка не атрымалася. Запыт спынен
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
 "Вы бачыце гэта паведамленне, таму што гэты HTTPS-сайт патрабуе каб Referer "
-"загаловак быў адасланы вашым вэб-браўзэрам, але гэтага не адбылося. Гэты "
-"загаловак неабходны для бяспекі, каб пераканацца, што ваш браўзэр не "
+"загаловак быў адасланы вашым аглядальнікам, але гэтага не адбылося. Гэты "
+"загаловак неабходны для бяспекі, каб пераканацца, што ваш аглядальнік не "
 "ўзаламаны трэцімі асобамі."
 
 msgid ""
@@ -1223,14 +1240,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Калі вы выкарыстоўваеце <meta name=\"referrer\" content=\"no-referrer\"> тэг "
 "ці дадалі загаловак “Referrer-Policy: no-referrer”, калі ласка выдаліце іх. "
 "CSRF абароне неабходны “Referer” загаловак для строгай праверкі. Калі Вы "
-"турбуецеся аб прыватнасці, выкарыстоўвайце альтэрнатывы, напрыклад <a rel="
-"\"noreferrer\" …>, для спасылкі на сайты трэціх асоб."
+"турбуецеся аб прыватнасці, выкарыстоўвайце альтэрнатывы, напрыклад <a "
+"rel=\"noreferrer\" …>, для спасылкі на сайты трэціх асоб."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1326,13 +1343,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Вы бачыце гэту старонку таму што <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True </a> у вашым файле налад і вы не сканфігурыравалі ніякіх URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True </a> у вашым файле налад і вы не "
+"сканфігурыравалі ніякіх URL."
 
 msgid "Django Documentation"
 msgstr "Дакументацыя Джангі"

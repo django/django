@@ -13,7 +13,7 @@ th {
     margin-right: 1.5em;
 }
 
-.viewlink, .addlink, .changelink {
+.viewlink, .addlink, .changelink, .hidelink {
     padding-left: 0;
     padding-right: 16px;
     background-position: 100% 1px;
@@ -111,19 +111,11 @@ thead th.sorted .text {
 
 .aligned label {
     padding: 0 0 3px 1em;
-    float: right;
 }
 
-.submit-row {
-    text-align: left
-}
-
-.submit-row p.deletelink-box {
-    float: right;
-}
-
-.submit-row input.default {
+.submit-row a.deletelink {
     margin-left: 0;
+    margin-right: auto;
 }
 
 .vDateField, .vTimeField {
@@ -134,13 +126,11 @@ thead th.sorted .text {
     margin-left: 5px;
 }
 
-form .aligned p.help, form .aligned div.help {
-    clear: right;
-}
-
 form .aligned ul {
     margin-right: 163px;
+    padding-right: 10px;
     margin-left: 0;
+    padding-left: 0;
 }
 
 form ul.inline li {
@@ -149,12 +139,39 @@ form ul.inline li {
     padding-left: 7px;
 }
 
-input[type=submit].default, .submit-row input.default {
-    float: left;
+form .aligned p.help,
+form .aligned div.help {
+    margin-right: 160px;
+    padding-right: 10px;
+}
+
+form div.help ul,
+form .aligned .checkbox-row + .help,
+form .aligned p.date div.help.timezonewarning,
+form .aligned p.datetime div.help.timezonewarning,
+form .aligned p.time div.help.timezonewarning {
+    margin-right: 0;
+    padding-right: 0;
+}
+
+form .wide p.help, form .wide div.help {
+    padding-left: 0;
+    padding-right: 50px;
+}
+
+form .wide p,
+form .wide ul.errorlist,
+form .wide input + p.help,
+form .wide input + div.help {
+    margin-right: 200px;
+    margin-left: 0px;
+}
+
+.submit-row {
+    text-align: right;
 }
 
 fieldset .fieldBox {
-    float: right;
     margin-left: 20px;
     margin-right: 0;
 }
@@ -175,12 +192,24 @@ fieldset .fieldBox {
     top: 0;
     left: auto;
     right: 10px;
+    background: url(../img/calendar-icons.svg) 0 -30px no-repeat;
+}
+
+.calendarbox .calendarnav-previous:focus,
+.calendarbox .calendarnav-previous:hover {
+    background-position: 0 -45px;
 }
 
 .calendarnav-next {
     top: 0;
     right: auto;
     left: 10px;
+    background: url(../img/calendar-icons.svg) 0 0 no-repeat;
+}
+
+.calendarbox .calendarnav-next:focus,
+.calendarbox .calendarnav-next:hover {
+    background-position: 0 -15px;
 }
 
 .calendar caption, .calendarbox h2 {
@@ -193,6 +222,38 @@ fieldset .fieldBox {
 
 .selector .selector-filter {
     text-align: right;
+}
+
+.selector-add {
+  background: url(../img/selector-icons.svg) 0 -64px no-repeat;
+}
+
+.active.selector-add:focus, .active.selector-add:hover {
+  background-position: 0 -80px;
+}
+
+.selector-remove {
+  background: url(../img/selector-icons.svg) 0 -96px no-repeat;
+}
+
+.active.selector-remove:focus, .active.selector-remove:hover {
+  background-position: 0 -112px;
+}
+
+a.selector-chooseall {
+    background: url(../img/selector-icons.svg) right -128px no-repeat;
+}
+
+a.active.selector-chooseall:focus, a.active.selector-chooseall:hover {
+    background-position: 100% -144px;
+}
+
+a.selector-clearall {
+    background: url(../img/selector-icons.svg) 0 -160px no-repeat;
+}
+
+a.active.selector-clearall:focus, a.active.selector-clearall:hover {
+    background-position: 0 -176px;
 }
 
 .inline-deletelink {

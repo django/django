@@ -2,6 +2,7 @@ import codecs
 import datetime
 import locale
 from decimal import Decimal
+from types import NoneType
 from urllib.parse import quote
 
 from django.utils.functional import Promise
@@ -13,10 +14,14 @@ class DjangoUnicodeDecodeError(UnicodeDecodeError):
         super().__init__(*args)
 
     def __str__(self):
-        return '%s. You passed in %r (%s)' % (super().__str__(), self.obj, type(self.obj))
+        return "%s. You passed in %r (%s)" % (
+            super().__str__(),
+            self.obj,
+            type(self.obj),
+        )
 
 
-def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Return a string representing 's'. Treat bytestrings using the 'encoding'
     codec.
@@ -30,7 +35,13 @@ def smart_str(s, encoding='utf-8', strings_only=False, errors='strict'):
 
 
 _PROTECTED_TYPES = (
-    type(None), int, float, Decimal, datetime.datetime, datetime.date, datetime.time,
+    NoneType,
+    int,
+    float,
+    Decimal,
+    datetime.datetime,
+    datetime.date,
+    datetime.time,
 )
 
 
@@ -43,7 +54,7 @@ def is_protected_type(obj):
     return isinstance(obj, _PROTECTED_TYPES)
 
 
-def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_str(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_str(), except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -65,7 +76,7 @@ def force_str(s, encoding='utf-8', strings_only=False, errors='strict'):
     return s
 
 
-def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+def smart_bytes(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Return a bytestring version of 's', encoded as specified in 'encoding'.
 
@@ -77,7 +88,7 @@ def smart_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     return force_bytes(s, encoding, strings_only, errors)
 
 
-def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
+def force_bytes(s, encoding="utf-8", strings_only=False, errors="strict"):
     """
     Similar to smart_bytes, except that lazy instances are resolved to
     strings, rather than kept as lazy objects.
@@ -86,10 +97,10 @@ def force_bytes(s, encoding='utf-8', strings_only=False, errors='strict'):
     """
     # Handle the common case first for performance reasons.
     if isinstance(s, bytes):
-        if encoding == 'utf-8':
+        if encoding == "utf-8":
             return s
         else:
-            return s.decode('utf-8', errors).encode(encoding, errors)
+            return s.decode("utf-8", errors).encode(encoding, errors)
     if strings_only and is_protected_type(s):
         return s
     if isinstance(s, memoryview):
@@ -102,16 +113,15 @@ def iri_to_uri(iri):
     Convert an Internationalized Resource Identifier (IRI) portion to a URI
     portion that is suitable for inclusion in a URL.
 
-    This is the algorithm from section 3.1 of RFC 3987, slightly simplified
-    since the input is assumed to be a string rather than an arbitrary byte
-    stream.
+    This is the algorithm from RFC 3987 Section 3.1, slightly simplified since
+    the input is assumed to be a string rather than an arbitrary byte stream.
 
     Take an IRI (string or UTF-8 bytes, e.g. '/I ♥ Django/' or
     b'/I \xe2\x99\xa5 Django/') and return a string containing the encoded
     result with ASCII chars only (e.g. '/I%20%E2%99%A5%20Django/').
     """
     # The list of safe characters here is constructed from the "reserved" and
-    # "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
+    # "unreserved" characters specified in RFC 3986 Sections 2.2 and 2.3:
     #     reserved    = gen-delims / sub-delims
     #     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
     #     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
@@ -120,7 +130,7 @@ def iri_to_uri(iri):
     # Of the unreserved characters, urllib.parse.quote() already considers all
     # but the ~ safe.
     # The % character is also added to the list of safe characters here, as the
-    # end of section 3.1 of RFC 3987 specifically mentions that % must not be
+    # end of RFC 3987 Section 3.1 specifically mentions that % must not be
     # converted.
     if iri is None:
         return iri
@@ -136,15 +146,14 @@ _hextobyte = {
     (fmt % char).encode(): bytes((char,))
     for ascii_range in _ascii_ranges
     for char in ascii_range
-    for fmt in ['%02x', '%02X']
+    for fmt in ["%02x", "%02X"]
 }
 # And then everything above 128, because bytes ≥ 128 are part of multibyte
 # Unicode characters.
-_hexdig = '0123456789ABCDEFabcdef'
-_hextobyte.update({
-    (a + b).encode(): bytes.fromhex(a + b)
-    for a in _hexdig[8:] for b in _hexdig
-})
+_hexdig = "0123456789ABCDEFabcdef"
+_hextobyte.update(
+    {(a + b).encode(): bytes.fromhex(a + b) for a in _hexdig[8:] for b in _hexdig}
+)
 
 
 def uri_to_iri(uri):
@@ -152,7 +161,7 @@ def uri_to_iri(uri):
     Convert a Uniform Resource Identifier(URI) into an Internationalized
     Resource Identifier(IRI).
 
-    This is the algorithm from section 3.2 of RFC 3987, excluding step 4.
+    This is the algorithm from RFC 3987 Section 3.2, excluding step 4.
 
     Take an URI in ASCII bytes (e.g. '/I%20%E2%99%A5%20Django/') and return
     a string containing the encoded result (e.g. '/I%20♥%20Django/').
@@ -164,7 +173,7 @@ def uri_to_iri(uri):
     # second block, decode the first 2 bytes if they represent a hex code to
     # decode. The rest of the block is the part after '%AB', not containing
     # any '%'. Add that to the output without further processing.
-    bits = uri.split(b'%')
+    bits = uri.split(b"%")
     if len(bits) == 1:
         iri = uri
     else:
@@ -177,9 +186,9 @@ def uri_to_iri(uri):
                 append(hextobyte[item[:2]])
                 append(item[2:])
             else:
-                append(b'%')
+                append(b"%")
                 append(item)
-        iri = b''.join(parts)
+        iri = b"".join(parts)
     return repercent_broken_unicode(iri).decode()
 
 
@@ -188,13 +197,13 @@ def escape_uri_path(path):
     Escape the unsafe characters from the path portion of a Uniform Resource
     Identifier (URI).
     """
-    # These are the "reserved" and "unreserved" characters specified in
-    # sections 2.2 and 2.3 of RFC 2396:
+    # These are the "reserved" and "unreserved" characters specified in RFC
+    # 3986 Sections 2.2 and 2.3:
     #   reserved    = ";" | "/" | "?" | ":" | "@" | "&" | "=" | "+" | "$" | ","
     #   unreserved  = alphanum | mark
     #   mark        = "-" | "_" | "." | "!" | "~" | "*" | "'" | "(" | ")"
     # The list of safe characters here is constructed subtracting ";", "=",
-    # and "?" according to section 3.3 of RFC 2396.
+    # and "?" according to RFC 3986 Section 3.3.
     # The reason for not subtracting and escaping "/" is that we are escaping
     # the entire path, not a path segment.
     return quote(path, safe="/:@&+$,-_.!~*'()")
@@ -202,12 +211,12 @@ def escape_uri_path(path):
 
 def punycode(domain):
     """Return the Punycode of the given domain if it's non-ASCII."""
-    return domain.encode('idna').decode('ascii')
+    return domain.encode("idna").decode("ascii")
 
 
 def repercent_broken_unicode(path):
     """
-    As per section 3.2 of RFC 3987, step three of converting a URI into an IRI,
+    As per RFC 3987 Section 3.2, step three of converting a URI into an IRI,
     repercent-encode any octet produced that is not part of a strictly legal
     UTF-8 octet sequence.
     """
@@ -217,8 +226,8 @@ def repercent_broken_unicode(path):
         except UnicodeDecodeError as e:
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
-            repercent = quote(path[e.start:e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-            path = path[:e.start] + repercent.encode() + path[e.end:]
+            repercent = quote(path[e.start : e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
+            path = path[: e.start] + repercent.encode() + path[e.end :]
         else:
             return path
 
@@ -240,15 +249,15 @@ def filepath_to_uri(path):
 
 def get_system_encoding():
     """
-    The encoding of the default system locale. Fallback to 'ascii' if the
+    The encoding for the character type functions. Fallback to 'ascii' if the
     #encoding is unsupported by Python or could not be determined. See tickets
     #10335 and #5846.
     """
     try:
-        encoding = locale.getdefaultlocale()[1] or 'ascii'
+        encoding = locale.getlocale()[1] or "ascii"
         codecs.lookup(encoding)
     except Exception:
-        encoding = 'ascii'
+        encoding = "ascii"
     return encoding
 
 

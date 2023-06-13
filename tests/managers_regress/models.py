@@ -2,21 +2,19 @@
 Various edge-cases for model managers.
 """
 
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
 class OnlyFred(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(name='fred')
+        return super().get_queryset().filter(name="fred")
 
 
 class OnlyBarney(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(name='barney')
+        return super().get_queryset().filter(name="barney")
 
 
 class Value42(models.Manager):
@@ -118,7 +116,9 @@ class Child7(Parent):
 
 # RelatedManagers
 class RelatedModel(models.Model):
-    test_gfk = GenericRelation('RelationModel', content_type_field='gfk_ctype', object_id_field='gfk_id')
+    test_gfk = GenericRelation(
+        "RelationModel", content_type_field="gfk_ctype", object_id_field="gfk_id"
+    )
     exact = models.BooleanField(null=True)
 
     def __str__(self):
@@ -126,13 +126,13 @@ class RelatedModel(models.Model):
 
 
 class RelationModel(models.Model):
-    fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name='test_fk')
+    fk = models.ForeignKey(RelatedModel, models.CASCADE, related_name="test_fk")
 
-    m2m = models.ManyToManyField(RelatedModel, related_name='test_m2m')
+    m2m = models.ManyToManyField(RelatedModel, related_name="test_m2m")
 
     gfk_ctype = models.ForeignKey(ContentType, models.SET_NULL, null=True)
     gfk_id = models.IntegerField(null=True)
-    gfk = GenericForeignKey(ct_field='gfk_ctype', fk_field='gfk_id')
+    gfk = GenericForeignKey(ct_field="gfk_ctype", fk_field="gfk_id")
 
     def __str__(self):
         return str(self.pk)

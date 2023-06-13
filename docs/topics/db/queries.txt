@@ -11,13 +11,16 @@ API. Refer to the :doc:`data model reference </ref/models/index>` for full
 details of all the various model lookup options.
 
 Throughout this guide (and in the reference), we'll refer to the following
-models, which comprise a Weblog application:
+models, which comprise a blog application:
 
 .. _queryset-model-example:
 
 .. code-block:: python
 
+    from datetime import date
+
     from django.db import models
+
 
     class Blog(models.Model):
         name = models.CharField(max_length=100)
@@ -26,6 +29,7 @@ models, which comprise a Weblog application:
         def __str__(self):
             return self.name
 
+
     class Author(models.Model):
         name = models.CharField(max_length=200)
         email = models.EmailField()
@@ -33,16 +37,17 @@ models, which comprise a Weblog application:
         def __str__(self):
             return self.name
 
+
     class Entry(models.Model):
         blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
         headline = models.CharField(max_length=255)
         body_text = models.TextField()
         pub_date = models.DateField()
-        mod_date = models.DateField()
+        mod_date = models.DateField(default=date.today)
         authors = models.ManyToManyField(Author)
-        number_of_comments = models.IntegerField()
-        number_of_pingbacks = models.IntegerField()
-        rating = models.IntegerField()
+        number_of_comments = models.IntegerField(default=0)
+        number_of_pingbacks = models.IntegerField(default=0)
+        rating = models.IntegerField(default=5)
 
         def __str__(self):
             return self.headline
@@ -57,10 +62,12 @@ class represents a particular record in the database table.
 To create an object, instantiate it using keyword arguments to the model class,
 then call :meth:`~django.db.models.Model.save` to save it to the database.
 
-Assuming models live in a file ``mysite/blog/models.py``, here's an example::
+Assuming models live in a file ``mysite/blog/models.py``, here's an example:
+
+.. code-block:: pycon
 
     >>> from blog.models import Blog
-    >>> b = Blog(name='Beatles Blog', tagline='All the latest Beatles news.')
+    >>> b = Blog(name="Beatles Blog", tagline="All the latest Beatles news.")
     >>> b.save()
 
 This performs an ``INSERT`` SQL statement behind the scenes. Django doesn't hit
@@ -84,9 +91,11 @@ To save changes to an object that's already in the database, use
 :meth:`~django.db.models.Model.save`.
 
 Given a ``Blog`` instance ``b5`` that has already been saved to the database,
-this example changes its name and updates its record in the database::
+this example changes its name and updates its record in the database:
 
-    >>> b5.name = 'New name'
+.. code-block:: pycon
+
+    >>> b5.name = "New name"
     >>> b5.save()
 
 This performs an ``UPDATE`` SQL statement behind the scenes. Django doesn't hit
@@ -99,7 +108,9 @@ Updating a :class:`~django.db.models.ForeignKey` field works exactly the same
 way as saving a normal field -- assign an object of the right type to the field
 in question. This example updates the ``blog`` attribute of an ``Entry``
 instance ``entry``, assuming appropriate instances of ``Entry`` and ``Blog``
-are already saved to the database (so we can retrieve them below)::
+are already saved to the database (so we can retrieve them below):
+
+.. code-block:: pycon
 
     >>> from blog.models import Blog, Entry
     >>> entry = Entry.objects.get(pk=1)
@@ -111,7 +122,9 @@ Updating a :class:`~django.db.models.ManyToManyField` works a little
 differently -- use the
 :meth:`~django.db.models.fields.related.RelatedManager.add` method on the field
 to add a record to the relation. This example adds the ``Author`` instance
-``joe`` to the ``entry`` object::
+``joe`` to the ``entry`` object:
+
+.. code-block:: pycon
 
     >>> from blog.models import Author
     >>> joe = Author.objects.create(name="Joe")
@@ -119,7 +132,9 @@ to add a record to the relation. This example adds the ``Author`` instance
 
 To add multiple records to a :class:`~django.db.models.ManyToManyField` in one
 go, include multiple arguments in the call to
-:meth:`~django.db.models.fields.related.RelatedManager.add`, like this::
+:meth:`~django.db.models.fields.related.RelatedManager.add`, like this:
+
+.. code-block:: pycon
 
     >>> john = Author.objects.create(name="John")
     >>> paul = Author.objects.create(name="Paul")
@@ -148,11 +163,13 @@ You get a :class:`~django.db.models.query.QuerySet` by using your model's
 :class:`~django.db.models.Manager`. Each model has at least one
 :class:`~django.db.models.Manager`, and it's called
 :attr:`~django.db.models.Model.objects` by default. Access it directly via the
-model class, like so::
+model class, like so:
+
+.. code-block:: pycon
 
     >>> Blog.objects
     <django.db.models.manager.Manager object at ...>
-    >>> b = Blog(name='Foo', tagline='Bar')
+    >>> b = Blog(name="Foo", tagline="Bar")
     >>> b.objects
     Traceback:
         ...
@@ -174,7 +191,9 @@ Retrieving all objects
 
 The simplest way to retrieve objects from a table is to get all of them. To do
 this, use the :meth:`~django.db.models.query.QuerySet.all` method on a
-:class:`~django.db.models.Manager`::
+:class:`~django.db.models.Manager`:
+
+.. code-block:: pycon
 
     >>> all_entries = Entry.objects.all()
 
@@ -221,15 +240,13 @@ Chaining filters
 
 The result of refining a :class:`~django.db.models.query.QuerySet` is itself a
 :class:`~django.db.models.query.QuerySet`, so it's possible to chain
-refinements together. For example::
+refinements together. For example:
 
-    >>> Entry.objects.filter(
-    ...     headline__startswith='What'
-    ... ).exclude(
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(headline__startswith="What").exclude(
     ...     pub_date__gte=datetime.date.today()
-    ... ).filter(
-    ...     pub_date__gte=datetime.date(2005, 1, 30)
-    ... )
+    ... ).filter(pub_date__gte=datetime.date(2005, 1, 30))
 
 This takes the initial :class:`~django.db.models.query.QuerySet` of all entries
 in the database, adds a filter, then an exclusion, then another filter. The
@@ -248,7 +265,9 @@ the previous :class:`~django.db.models.query.QuerySet`. Each refinement creates
 a separate and distinct :class:`~django.db.models.query.QuerySet` that can be
 stored, used and reused.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> q1 = Entry.objects.filter(headline__startswith="What")
     >>> q2 = q1.exclude(pub_date__gte=datetime.date.today())
@@ -272,7 +291,9 @@ refinement process.
 :class:`~django.db.models.query.QuerySet` doesn't involve any database
 activity. You can stack filters together all day long, and Django won't
 actually run the query until the :class:`~django.db.models.query.QuerySet` is
-*evaluated*. Take a look at this example::
+*evaluated*. Take a look at this example:
+
+.. code-block:: pycon
 
     >>> q = Entry.objects.filter(headline__startswith="What")
     >>> q = q.filter(pub_date__lte=datetime.date.today())
@@ -299,7 +320,9 @@ the query - in this case, it will be a
 
 If you know there is only one object that matches your query, you can use the
 :meth:`~django.db.models.query.QuerySet.get` method on a
-:class:`~django.db.models.Manager` which returns the object directly::
+:class:`~django.db.models.Manager` which returns the object directly:
+
+.. code-block:: pycon
 
     >>> one_entry = Entry.objects.get(pk=1)
 
@@ -343,11 +366,15 @@ Use a subset of Python's array-slicing syntax to limit your
 :class:`~django.db.models.query.QuerySet` to a certain number of results. This
 is the equivalent of SQL's ``LIMIT`` and ``OFFSET`` clauses.
 
-For example, this returns the first 5 objects (``LIMIT 5``)::
+For example, this returns the first 5 objects (``LIMIT 5``):
+
+.. code-block:: pycon
 
     >>> Entry.objects.all()[:5]
 
-This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``)::
+This returns the sixth through tenth objects (``OFFSET 5 LIMIT 5``):
+
+.. code-block:: pycon
 
     >>> Entry.objects.all()[5:10]
 
@@ -357,7 +384,9 @@ Generally, slicing a :class:`~django.db.models.query.QuerySet` returns a new
 :class:`~django.db.models.query.QuerySet` -- it doesn't evaluate the query. An
 exception is if you use the "step" parameter of Python slice syntax. For
 example, this would actually execute the query in order to return a list of
-every *second* object of the first 10::
+every *second* object of the first 10:
+
+.. code-block:: pycon
 
     >>> Entry.objects.all()[:10:2]
 
@@ -367,13 +396,17 @@ ambiguous nature of how that might work.
 To retrieve a *single* object rather than a list
 (e.g. ``SELECT foo FROM bar LIMIT 1``), use an index instead of a slice. For
 example, this returns the first ``Entry`` in the database, after ordering
-entries alphabetically by headline::
+entries alphabetically by headline:
 
-    >>> Entry.objects.order_by('headline')[0]
+.. code-block:: pycon
 
-This is roughly equivalent to::
+    >>> Entry.objects.order_by("headline")[0]
 
-    >>> Entry.objects.order_by('headline')[0:1].get()
+This is roughly equivalent to:
+
+.. code-block:: pycon
+
+    >>> Entry.objects.order_by("headline")[0:1].get()
 
 Note, however, that the first of these will raise ``IndexError`` while the
 second will raise ``DoesNotExist`` if no objects match the given criteria. See
@@ -391,9 +424,11 @@ methods :meth:`~django.db.models.query.QuerySet.filter`,
 :meth:`~django.db.models.query.QuerySet.get`.
 
 Basic lookups keyword arguments take the form ``field__lookuptype=value``.
-(That's a double-underscore). For example::
+(That's a double-underscore). For example:
 
-    >>> Entry.objects.filter(pub_date__lte='2006-01-01')
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(pub_date__lte="2006-01-01")
 
 translates (roughly) into the following SQL:
 
@@ -424,7 +459,9 @@ a taste of what's available, here's some of the more common lookups you'll
 probably use:
 
 :lookup:`exact`
-    An "exact" match. For example::
+    An "exact" match. For example:
+
+    .. code-block:: pycon
 
         >>> Entry.objects.get(headline__exact="Cat bites dog")
 
@@ -438,15 +475,19 @@ probably use:
     doesn't contain a double underscore -- the lookup type is assumed to be
     ``exact``.
 
-    For example, the following two statements are equivalent::
+    For example, the following two statements are equivalent:
+
+    .. code-block:: pycon
 
         >>> Blog.objects.get(id__exact=14)  # Explicit form
-        >>> Blog.objects.get(id=14)         # __exact is implied
+        >>> Blog.objects.get(id=14)  # __exact is implied
 
     This is for convenience, because ``exact`` lookups are the common case.
 
 :lookup:`iexact`
-    A case-insensitive match. So, the query::
+    A case-insensitive match. So, the query:
+
+    .. code-block:: pycon
 
         >>> Blog.objects.get(name__iexact="beatles blog")
 
@@ -456,7 +497,7 @@ probably use:
 :lookup:`contains`
     Case-sensitive containment test. For example::
 
-        Entry.objects.get(headline__contains='Lennon')
+        Entry.objects.get(headline__contains="Lennon")
 
     Roughly translates to this SQL:
 
@@ -489,9 +530,11 @@ across models, separated by double underscores, until you get to the field you
 want.
 
 This example retrieves all ``Entry`` objects with a ``Blog`` whose ``name``
-is ``'Beatles Blog'``::
+is ``'Beatles Blog'``:
 
-    >>> Entry.objects.filter(blog__name='Beatles Blog')
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(blog__name="Beatles Blog")
 
 This spanning can be as deep as you'd like.
 
@@ -500,16 +543,18 @@ It works backwards, too. While it :attr:`can be customized
 relationship in a lookup using the lowercase name of the model.
 
 This example retrieves all ``Blog`` objects which have at least one ``Entry``
-whose ``headline`` contains ``'Lennon'``::
+whose ``headline`` contains ``'Lennon'``:
 
-    >>> Blog.objects.filter(entry__headline__contains='Lennon')
+.. code-block:: pycon
+
+    >>> Blog.objects.filter(entry__headline__contains="Lennon")
 
 If you are filtering across multiple relationships and one of the intermediate
 models doesn't have a value that meets the filter condition, Django will treat
 it as if there is an empty (all values are ``NULL``), but valid, object there.
 All this means is that no error will be raised. For example, in this filter::
 
-    Blog.objects.filter(entry__authors__name='Lennon')
+    Blog.objects.filter(entry__authors__name="Lennon")
 
 (if there was a related ``Author`` model), if there was no ``author``
 associated with an entry, it would be treated as if there was also no ``name``
@@ -525,58 +570,84 @@ those latter objects, you could write::
 
     Blog.objects.filter(entry__authors__isnull=False, entry__authors__name__isnull=True)
 
+.. _spanning-multi-valued-relationships:
+
 Spanning multi-valued relationships
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-When you are filtering an object based on a
-:class:`~django.db.models.ManyToManyField` or a reverse
-:class:`~django.db.models.ForeignKey`, there are two different sorts of filter
-you may be interested in. Consider the ``Blog``/``Entry`` relationship
-(``Blog`` to ``Entry`` is a one-to-many relation). We might be interested in
-finding blogs that have an entry which has both *"Lennon"* in the headline and
-was published in 2008. Or we might want to find blogs that have an entry with
-*"Lennon"* in the headline as well as an entry that was published
-in 2008. Since there are multiple entries associated with a single ``Blog``,
-both of these queries are possible and make sense in some situations.
+When spanning a :class:`~django.db.models.ManyToManyField` or a reverse
+:class:`~django.db.models.ForeignKey` (such as from ``Blog`` to ``Entry``),
+filtering on multiple attributes raises the question of whether to require each
+attribute to coincide in the same related object. We might seek blogs that have
+an entry from 2008 with *“Lennon”* in its headline, or we might seek blogs that
+merely have any entry from 2008 as well as some newer or older entry with
+*“Lennon”* in its headline.
 
-The same type of situation arises with a
-:class:`~django.db.models.ManyToManyField`. For example, if an ``Entry`` has a
-:class:`~django.db.models.ManyToManyField` called ``tags``, we might want to
-find entries linked to tags called *"music"* and *"bands"* or we might want an
-entry that contains a tag with a name of *"music"* and a status of *"public"*.
+To select all blogs containing at least one entry from 2008 having *"Lennon"*
+in its headline (the same entry satisfying both conditions), we would write::
 
-To handle both of these situations, Django has a consistent way of processing
-:meth:`~django.db.models.query.QuerySet.filter` calls. Everything inside a
-single :meth:`~django.db.models.query.QuerySet.filter` call is applied
-simultaneously to filter out items matching all those requirements. Successive
-:meth:`~django.db.models.query.QuerySet.filter` calls further restrict the set
-of objects, but for multi-valued relations, they apply to any object linked to
-the primary model, not necessarily those objects that were selected by an
-earlier :meth:`~django.db.models.query.QuerySet.filter` call.
+    Blog.objects.filter(entry__headline__contains="Lennon", entry__pub_date__year=2008)
 
-That may sound a bit confusing, so hopefully an example will clarify. To
-select all blogs that contain entries with both *"Lennon"* in the headline
-and that were published in 2008 (the same entry satisfying both conditions),
-we would write::
+Otherwise, to perform a more permissive query selecting any blogs with merely
+*some* entry with *"Lennon"* in its headline and *some* entry from 2008, we
+would write::
 
-    Blog.objects.filter(entry__headline__contains='Lennon', entry__pub_date__year=2008)
+    Blog.objects.filter(entry__headline__contains="Lennon").filter(
+        entry__pub_date__year=2008
+    )
 
-To select all blogs that contain an entry with *"Lennon"* in the headline
-**as well as** an entry that was published in 2008, we would write::
-
-    Blog.objects.filter(entry__headline__contains='Lennon').filter(entry__pub_date__year=2008)
-
-Suppose there is only one blog that had both entries containing *"Lennon"* and
+Suppose there is only one blog that has both entries containing *"Lennon"* and
 entries from 2008, but that none of the entries from 2008 contained *"Lennon"*.
 The first query would not return any blogs, but the second query would return
-that one blog.
+that one blog. (This is because the entries selected by the second filter may
+or may not be the same as the entries in the first filter. We are filtering the
+``Blog`` items with each filter statement, not the ``Entry`` items.) In short,
+if each condition needs to match the same related object, then each should be
+contained in a single :meth:`~django.db.models.query.QuerySet.filter` call.
 
-In the second example, the first filter restricts the queryset to all those
-blogs linked to entries with *"Lennon"* in the headline. The second filter
-restricts the set of blogs *further* to those that are also linked to entries
-that were published in 2008. The entries selected by the second filter may or
-may not be the same as the entries in the first filter. We are filtering the
-``Blog`` items with each filter statement, not the ``Entry`` items.
+.. note::
+
+    As the second (more permissive) query chains multiple filters, it performs
+    multiple joins to the primary model, potentially yielding duplicates.
+
+        >>> from datetime import date
+        >>> beatles = Blog.objects.create(name='Beatles Blog')
+        >>> pop = Blog.objects.create(name='Pop Music Blog')
+        >>> Entry.objects.create(
+        ...     blog=beatles,
+        ...     headline='New Lennon Biography',
+        ...     pub_date=date(2008, 6, 1),
+        ... )
+        <Entry: New Lennon Biography>
+        >>> Entry.objects.create(
+        ...     blog=beatles,
+        ...     headline='New Lennon Biography in Paperback',
+        ...     pub_date=date(2009, 6, 1),
+        ... )
+        <Entry: New Lennon Biography in Paperback>
+        >>> Entry.objects.create(
+        ...     blog=pop,
+        ...     headline='Best Albums of 2008',
+        ...     pub_date=date(2008, 12, 15),
+        ... )
+        <Entry: Best Albums of 2008>
+        >>> Entry.objects.create(
+        ...     blog=pop,
+        ...     headline='Lennon Would Have Loved Hip Hop',
+        ...     pub_date=date(2020, 4, 1),
+        ... )
+        <Entry: Lennon Would Have Loved Hip Hop>
+        >>> Blog.objects.filter(
+        ...     entry__headline__contains='Lennon',
+        ...     entry__pub_date__year=2008,
+        ... )
+        <QuerySet [<Blog: Beatles Blog>]>
+        >>> Blog.objects.filter(
+        ...     entry__headline__contains='Lennon',
+        ... ).filter(
+        ...     entry__pub_date__year=2008,
+        ... )
+        <QuerySet [<Blog: Beatles Blog>, <Blog: Beatles Blog>, <Blog: Pop Music Blog]>
 
 .. note::
 
@@ -590,7 +661,7 @@ may not be the same as the entries in the first filter. We are filtering the
     entries with *"Lennon"* in the headline *and* entries published in 2008::
 
         Blog.objects.exclude(
-            entry__headline__contains='Lennon',
+            entry__headline__contains="Lennon",
             entry__pub_date__year=2008,
         )
 
@@ -602,7 +673,7 @@ may not be the same as the entries in the first filter. We are filtering the
 
         Blog.objects.exclude(
             entry__in=Entry.objects.filter(
-                headline__contains='Lennon',
+                headline__contains="Lennon",
                 pub_date__year=2008,
             ),
         )
@@ -623,43 +694,55 @@ of two different fields on the same model instance.
 
 For example, to find a list of all blog entries that have had more comments
 than pingbacks, we construct an ``F()`` object to reference the pingback count,
-and use that ``F()`` object in the query::
+and use that ``F()`` object in the query:
+
+.. code-block:: pycon
 
     >>> from django.db.models import F
-    >>> Entry.objects.filter(number_of_comments__gt=F('number_of_pingbacks'))
+    >>> Entry.objects.filter(number_of_comments__gt=F("number_of_pingbacks"))
 
 Django supports the use of addition, subtraction, multiplication,
 division, modulo, and power arithmetic with ``F()`` objects, both with constants
 and with other ``F()`` objects. To find all the blog entries with more than
-*twice* as many comments as pingbacks, we modify the query::
+*twice* as many comments as pingbacks, we modify the query:
 
-    >>> Entry.objects.filter(number_of_comments__gt=F('number_of_pingbacks') * 2)
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(number_of_comments__gt=F("number_of_pingbacks") * 2)
 
 To find all the entries where the rating of the entry is less than the
 sum of the pingback count and comment count, we would issue the
-query::
+query:
 
-    >>> Entry.objects.filter(rating__lt=F('number_of_comments') + F('number_of_pingbacks'))
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(rating__lt=F("number_of_comments") + F("number_of_pingbacks"))
 
 You can also use the double underscore notation to span relationships in
 an ``F()`` object. An ``F()`` object with a double underscore will introduce
 any joins needed to access the related object. For example, to retrieve all
 the entries where the author's name is the same as the blog name, we could
-issue the query::
+issue the query:
 
-    >>> Entry.objects.filter(authors__name=F('blog__name'))
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(authors__name=F("blog__name"))
 
 For date and date/time fields, you can add or subtract a
 :class:`~datetime.timedelta` object. The following would return all entries
-that were modified more than 3 days after they were published::
+that were modified more than 3 days after they were published:
+
+.. code-block:: pycon
 
     >>> from datetime import timedelta
-    >>> Entry.objects.filter(mod_date__gt=F('pub_date') + timedelta(days=3))
+    >>> Entry.objects.filter(mod_date__gt=F("pub_date") + timedelta(days=3))
 
 The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
-``.bitxor()``, ``.bitrightshift()``, and ``.bitleftshift()``. For example::
+``.bitxor()``, ``.bitrightshift()``, and ``.bitleftshift()``. For example:
 
-    >>> F('somefield').bitand(16)
+.. code-block:: pycon
+
+    >>> F("somefield").bitand(16)
 
 .. admonition:: Oracle
 
@@ -670,29 +753,38 @@ The ``F()`` objects support bitwise operations by ``.bitand()``, ``.bitor()``,
 Expressions can reference transforms
 ------------------------------------
 
-.. versionadded:: 3.2
-
 Django supports using transforms in expressions.
 
 For example, to find all ``Entry`` objects published in the same year as they
-were last modified::
+were last modified:
 
-    >>> Entry.objects.filter(pub_date__year=F('mod_date__year'))
+.. code-block:: pycon
 
-To find the earliest year an entry was published, we can issue the query::
+    >>> from django.db.models import F
+    >>> Entry.objects.filter(pub_date__year=F("mod_date__year"))
 
-    >>> Entry.objects.aggregate(first_published_year=Min('pub_date__year'))
+To find the earliest year an entry was published, we can issue the query:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Min
+    >>> Entry.objects.aggregate(first_published_year=Min("pub_date__year"))
 
 This example finds the value of the highest rated entry and the total number
-of comments on all entries for each year::
+of comments on all entries for each year:
 
-    >>> Entry.objects.values('pub_date__year').annotate(
+.. code-block:: pycon
+
+    >>> from django.db.models import OuterRef, Subquery, Sum
+    >>> Entry.objects.values("pub_date__year").annotate(
     ...     top_rating=Subquery(
     ...         Entry.objects.filter(
-    ...             pub_date__year=OuterRef('pub_date__year'),
-    ...         ).order_by('-rating').values('rating')[:1]
+    ...             pub_date__year=OuterRef("pub_date__year"),
+    ...         )
+    ...         .order_by("-rating")
+    ...         .values("rating")[:1]
     ...     ),
-    ...     total_comments=Sum('number_of_comments'),
+    ...     total_comments=Sum("number_of_comments"),
     ... )
 
 The ``pk`` lookup shortcut
@@ -702,27 +794,33 @@ For convenience, Django provides a ``pk`` lookup shortcut, which stands for
 "primary key".
 
 In the example ``Blog`` model, the primary key is the ``id`` field, so these
-three statements are equivalent::
+three statements are equivalent:
 
-    >>> Blog.objects.get(id__exact=14) # Explicit form
-    >>> Blog.objects.get(id=14) # __exact is implied
-    >>> Blog.objects.get(pk=14) # pk implies id__exact
+.. code-block:: pycon
+
+    >>> Blog.objects.get(id__exact=14)  # Explicit form
+    >>> Blog.objects.get(id=14)  # __exact is implied
+    >>> Blog.objects.get(pk=14)  # pk implies id__exact
 
 The use of ``pk`` isn't limited to ``__exact`` queries -- any query term
-can be combined with ``pk`` to perform a query on the primary key of a model::
+can be combined with ``pk`` to perform a query on the primary key of a model:
+
+.. code-block:: pycon
 
     # Get blogs entries with id 1, 4 and 7
-    >>> Blog.objects.filter(pk__in=[1,4,7])
+    >>> Blog.objects.filter(pk__in=[1, 4, 7])
 
     # Get all blog entries with id > 14
     >>> Blog.objects.filter(pk__gt=14)
 
 ``pk`` lookups also work across joins. For example, these three statements are
-equivalent::
+equivalent:
 
-    >>> Entry.objects.filter(blog__id__exact=3) # Explicit form
-    >>> Entry.objects.filter(blog__id=3)        # __exact is implied
-    >>> Entry.objects.filter(blog__pk=3)        # __pk implies __id__exact
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(blog__id__exact=3)  # Explicit form
+    >>> Entry.objects.filter(blog__id=3)  # __exact is implied
+    >>> Entry.objects.filter(blog__pk=3)  # __pk implies __id__exact
 
 Escaping percent signs and underscores in ``LIKE`` statements
 -------------------------------------------------------------
@@ -736,9 +834,11 @@ underscore signifies a single-character wildcard.)
 
 This means things should work intuitively, so the abstraction doesn't leak.
 For example, to retrieve all the entries that contain a percent sign, use the
-percent sign as any other character::
+percent sign as any other character:
 
-    >>> Entry.objects.filter(headline__contains='%')
+.. code-block:: pycon
+
+    >>> Entry.objects.filter(headline__contains="%")
 
 Django takes care of the quoting for you; the resulting SQL will look something
 like this:
@@ -771,7 +871,9 @@ results.
 Keep this caching behavior in mind, because it may bite you if you don't use
 your :class:`~django.db.models.query.QuerySet`\s correctly. For example, the
 following will create two :class:`~django.db.models.query.QuerySet`\s, evaluate
-them, and throw them away::
+them, and throw them away:
+
+.. code-block:: pycon
 
     >>> print([e.headline for e in Entry.objects.all()])
     >>> print([e.pub_date for e in Entry.objects.all()])
@@ -782,11 +884,13 @@ the same database records, because an ``Entry`` may have been added or deleted
 in the split second between the two requests.
 
 To avoid this problem, save the :class:`~django.db.models.query.QuerySet` and
-reuse it::
+reuse it:
+
+.. code-block:: pycon
 
     >>> queryset = Entry.objects.all()
-    >>> print([p.headline for p in queryset]) # Evaluate the query set.
-    >>> print([p.pub_date for p in queryset]) # Re-use the cache from the evaluation.
+    >>> print([p.headline for p in queryset])  # Evaluate the query set.
+    >>> print([p.pub_date for p in queryset])  # Reuse the cache from the evaluation.
 
 When ``QuerySet``\s are not cached
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -798,22 +902,28 @@ returned by the subsequent query are not cached. Specifically, this means that
 index will not populate the cache.
 
 For example, repeatedly getting a certain index in a queryset object will query
-the database each time::
+the database each time:
+
+.. code-block:: pycon
 
     >>> queryset = Entry.objects.all()
-    >>> print(queryset[5]) # Queries the database
-    >>> print(queryset[5]) # Queries the database again
+    >>> print(queryset[5])  # Queries the database
+    >>> print(queryset[5])  # Queries the database again
 
 However, if the entire queryset has already been evaluated, the cache will be
-checked instead::
+checked instead:
+
+.. code-block:: pycon
 
     >>> queryset = Entry.objects.all()
-    >>> [entry for entry in queryset] # Queries the database
-    >>> print(queryset[5]) # Uses cache
-    >>> print(queryset[5]) # Uses cache
+    >>> [entry for entry in queryset]  # Queries the database
+    >>> print(queryset[5])  # Uses cache
+    >>> print(queryset[5])  # Uses cache
 
 Here are some examples of other actions that will result in the entire queryset
-being evaluated and therefore populate the cache::
+being evaluated and therefore populate the cache:
+
+.. code-block:: pycon
 
     >>> [entry for entry in queryset]
     >>> bool(queryset)
@@ -825,6 +935,94 @@ being evaluated and therefore populate the cache::
     Simply printing the queryset will not populate the cache. This is because
     the call to ``__repr__()`` only returns a slice of the entire queryset.
 
+.. _async-queries:
+
+Asynchronous queries
+====================
+
+If you are writing asynchronous views or code, you cannot use the ORM for
+queries in quite the way we have described above, as you cannot call *blocking*
+synchronous code from asynchronous code - it will block up the event loop
+(or, more likely, Django will notice and raise a ``SynchronousOnlyOperation``
+to stop that from happening).
+
+Fortunately, you can do many queries using Django's asynchronous query APIs.
+Every method that might block - such as ``get()`` or ``delete()`` - has an
+asynchronous variant (``aget()`` or ``adelete()``), and when you iterate over
+results, you can use asynchronous iteration (``async for``) instead.
+
+Query iteration
+---------------
+
+The default way of iterating over a query - with ``for`` - will result in a
+blocking database query behind the scenes as Django loads the results at
+iteration time. To fix this, you can swap to ``async for``::
+
+    async for entry in Authors.objects.filter(name__startswith="A"):
+        ...
+
+Be aware that you also can't do other things that might iterate over the
+queryset, such as wrapping ``list()`` around it to force its evaluation (you
+can use ``async for`` in a comprehension, if you want it).
+
+Because ``QuerySet`` methods like ``filter()`` and ``exclude()`` do not
+actually run the query - they set up the queryset to run when it's iterated
+over - you can use those freely in asynchronous code. For a guide to which
+methods can keep being used like this, and which have asynchronous versions,
+read the next section.
+
+``QuerySet`` and manager methods
+--------------------------------
+
+Some methods on managers and querysets - like ``get()`` and ``first()`` - force
+execution of the queryset and are blocking. Some, like ``filter()`` and
+``exclude()``, don't force execution and so are safe to run from asynchronous
+code. But how are you supposed to tell the difference?
+
+While you could poke around and see if there is an ``a``-prefixed version of
+the method (for example, we have ``aget()`` but not ``afilter()``), there is a
+more logical way - look up what kind of method it is in the
+:doc:`QuerySet reference </ref/models/querysets>`.
+
+In there, you'll find the methods on QuerySets grouped into two sections:
+
+* *Methods that return new querysets*: These are the non-blocking ones,
+  and don't have asynchronous versions. You're free to use these in any
+  situation, though read the notes on ``defer()`` and ``only()`` before you use
+  them.
+
+* *Methods that do not return querysets*: These are the blocking ones, and
+  have asynchronous versions - the asynchronous name for each is noted in its
+  documentation, though our standard pattern is to add an ``a`` prefix.
+
+Using this distinction, you can work out when you need to use asynchronous
+versions, and when you don't. For example, here's a valid asynchronous query::
+
+    user = await User.objects.filter(username=my_input).afirst()
+
+``filter()`` returns a queryset, and so it's fine to keep chaining it inside an
+asynchronous environment, whereas ``first()`` evaluates and returns a model
+instance - thus, we change to ``afirst()``, and use ``await`` at the front of
+the whole expression in order to call it in an asynchronous-friendly way.
+
+.. note::
+
+    If you forget to put the ``await`` part in, you may see errors like
+    *"coroutine object has no attribute x"* or *"<coroutine …>"* strings in
+    place of your model instances. If you ever see these, you are missing an
+    ``await`` somewhere to turn that coroutine into a real value.
+
+Transactions
+------------
+
+Transactions are **not** currently supported with asynchronous queries and
+updates. You will find that trying to use one raises
+``SynchronousOnlyOperation``.
+
+If you wish to use a transaction, we suggest you write your ORM code inside a
+separate, synchronous function and then call that using ``sync_to_async`` - see
+:doc:`/topics/async` for more.
+
 .. _querying-jsonfield:
 
 Querying ``JSONField``
@@ -835,6 +1033,7 @@ mainly due to the existence of key transformations. To demonstrate, we will use
 the following example model::
 
     from django.db import models
+
 
     class Dog(models.Model):
         name = models.CharField(max_length=200)
@@ -848,7 +1047,7 @@ Storing and querying for ``None``
 
 As with other fields, storing ``None`` as the field's value will store it as
 SQL ``NULL``. While not recommended, it is possible to store JSON scalar
-``null`` instead of SQL ``NULL`` by using :class:`Value('null')
+``null`` instead of SQL ``NULL`` by using :class:`Value(None, JSONField())
 <django.db.models.Value>`.
 
 Whichever of the values is stored, when retrieved from the database, the Python
@@ -860,15 +1059,17 @@ is inside a :py:class:`list` or :py:class:`dict`, it will always be interpreted
 as JSON ``null``.
 
 When querying, ``None`` value will always be interpreted as JSON ``null``. To
-query for SQL ``NULL``, use :lookup:`isnull`::
+query for SQL ``NULL``, use :lookup:`isnull`:
 
-    >>> Dog.objects.create(name='Max', data=None)  # SQL NULL.
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Max", data=None)  # SQL NULL.
     <Dog: Max>
-    >>> Dog.objects.create(name='Archie', data=Value('null'))  # JSON null.
+    >>> Dog.objects.create(name="Archie", data=Value(None, JSONField()))  # JSON null.
     <Dog: Archie>
     >>> Dog.objects.filter(data=None)
     <QuerySet [<Dog: Archie>]>
-    >>> Dog.objects.filter(data=Value('null'))
+    >>> Dog.objects.filter(data=Value(None, JSONField()))
     <QuerySet [<Dog: Archie>]>
     >>> Dog.objects.filter(data__isnull=True)
     <QuerySet [<Dog: Max>]>
@@ -884,45 +1085,67 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
 
+.. versionchanged:: 4.2
+
+    Support for expressing JSON ``null`` using ``Value(None, JSONField())`` was
+    added.
+
+.. deprecated:: 4.2
+
+    Passing ``Value("null")`` to express JSON ``null`` is deprecated.
+
 .. fieldlookup:: jsonfield.key
 
 Key, index, and path transforms
 -------------------------------
 
-To query based on a given dictionary key, use that key as the lookup name::
+To query based on a given dictionary key, use that key as the lookup name:
 
-    >>> Dog.objects.create(name='Rufus', data={
-    ...     'breed': 'labrador',
-    ...     'owner': {
-    ...         'name': 'Bob',
-    ...         'other_pets': [{
-    ...             'name': 'Fishy',
-    ...         }],
+.. code-block:: pycon
+
+    >>> Dog.objects.create(
+    ...     name="Rufus",
+    ...     data={
+    ...         "breed": "labrador",
+    ...         "owner": {
+    ...             "name": "Bob",
+    ...             "other_pets": [
+    ...                 {
+    ...                     "name": "Fishy",
+    ...                 }
+    ...             ],
+    ...         },
     ...     },
-    ... })
+    ... )
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': None})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": None})
     <Dog: Meg>
-    >>> Dog.objects.filter(data__breed='collie')
+    >>> Dog.objects.filter(data__breed="collie")
     <QuerySet [<Dog: Meg>]>
 
-Multiple keys can be chained together to form a path lookup::
+Multiple keys can be chained together to form a path lookup:
 
-    >>> Dog.objects.filter(data__owner__name='Bob')
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(data__owner__name="Bob")
     <QuerySet [<Dog: Rufus>]>
 
 If the key is an integer, it will be interpreted as an index transform in an
-array::
+array:
 
-    >>> Dog.objects.filter(data__owner__other_pets__0__name='Fishy')
+.. code-block:: pycon
+
+    >>> Dog.objects.filter(data__owner__other_pets__0__name="Fishy")
     <QuerySet [<Dog: Rufus>]>
 
 If the key you wish to query by clashes with the name of another lookup, use
 the :lookup:`contains <jsonfield.contains>` lookup instead.
 
-To query for missing keys, use the ``isnull`` lookup::
+To query for missing keys, use the ``isnull`` lookup:
 
-    >>> Dog.objects.create(name='Shep', data={'breed': 'collie'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Shep", data={"breed": "collie"})
     <Dog: Shep>
     >>> Dog.objects.filter(data__owner__isnull=True)
     <QuerySet [<Dog: Shep>]>
@@ -935,6 +1158,37 @@ To query for missing keys, use the ``isnull`` lookup::
     :lookup:`iexact`, :lookup:`regex`, :lookup:`iregex`, :lookup:`startswith`,
     :lookup:`istartswith`, :lookup:`lt`, :lookup:`lte`, :lookup:`gt`, and
     :lookup:`gte`, as well as with :ref:`containment-and-key-lookups`.
+
+``KT()`` expressions
+~~~~~~~~~~~~~~~~~~~~
+
+.. versionadded:: 4.2
+
+.. module:: django.db.models.fields.json
+
+.. class:: KT(lookup)
+
+    Represents the text value of a key, index, or path transform of
+    :class:`~django.db.models.JSONField`. You can use the double underscore
+    notation in ``lookup`` to chain dictionary key and index transforms.
+
+    For example:
+
+    .. code-block:: pycon
+
+        >>> from django.db.models.fields.json import KT
+        >>> Dog.objects.create(
+        ...     name="Shep",
+        ...     data={
+        ...         "owner": {"name": "Bob"},
+        ...         "breed": ["collie", "lhasa apso"],
+        ...     },
+        ... )
+        <Dog: Shep>
+        >>> Dogs.objects.annotate(
+        ...     first_breed=KT("data__breed__1"), owner_name=KT("data__owner__name")
+        ... ).filter(first_breed__startswith="lhasa", owner_name="Bob")
+        <QuerySet [<Dog: Shep>]>
 
 .. note::
 
@@ -971,6 +1225,12 @@ To query for missing keys, use the ``isnull`` lookup::
     On PostgreSQL, if only one key or index is used, the SQL operator ``->`` is
     used. If multiple operators are used then the ``#>`` operator is used.
 
+.. admonition:: SQLite users
+
+    On SQLite, ``"true"``, ``"false"``, and ``"null"`` string values will
+    always be interpreted as ``True``, ``False``, and JSON ``null``
+    respectively.
+
 .. _containment-and-key-lookups:
 
 Containment and key lookups
@@ -983,17 +1243,19 @@ Containment and key lookups
 
 The :lookup:`contains` lookup is overridden on ``JSONField``. The returned
 objects are those where the given ``dict`` of key-value pairs are all
-contained in the top-level of the field. For example::
+contained in the top-level of the field. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
     <Dog: Meg>
-    >>> Dog.objects.create(name='Fred', data={})
+    >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
-    >>> Dog.objects.filter(data__contains={'owner': 'Bob'})
+    >>> Dog.objects.filter(data__contains={"owner": "Bob"})
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
-    >>> Dog.objects.filter(data__contains={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contains={"breed": "collie"})
     <QuerySet [<Dog: Meg>]>
 
 .. admonition:: Oracle and SQLite
@@ -1007,17 +1269,19 @@ contained in the top-level of the field. For example::
 
 This is the inverse of the :lookup:`contains <jsonfield.contains>` lookup - the
 objects returned will be those where the key-value pairs on the object are a
-subset of those in the value passed. For example::
+subset of those in the value passed. For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador', 'owner': 'Bob'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador", "owner": "Bob"})
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
     <Dog: Meg>
-    >>> Dog.objects.create(name='Fred', data={})
+    >>> Dog.objects.create(name="Fred", data={})
     <Dog: Fred>
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie", "owner": "Bob"})
     <QuerySet [<Dog: Meg>, <Dog: Fred>]>
-    >>> Dog.objects.filter(data__contained_by={'breed': 'collie'})
+    >>> Dog.objects.filter(data__contained_by={"breed": "collie"})
     <QuerySet [<Dog: Fred>]>
 
 .. admonition:: Oracle and SQLite
@@ -1030,13 +1294,15 @@ subset of those in the value passed. For example::
 ~~~~~~~~~~~
 
 Returns objects where the given key is in the top-level of the data. For
-example::
+example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
     <Dog: Meg>
-    >>> Dog.objects.filter(data__has_key='owner')
+    >>> Dog.objects.filter(data__has_key="owner")
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: jsonfield.has_any_keys
@@ -1045,13 +1311,15 @@ example::
 ~~~~~~~~~~~~
 
 Returns objects where all of the given keys are in the top-level of the data.
-For example::
+For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'breed': 'collie', 'owner': 'Bob'})
+    >>> Dog.objects.create(name="Meg", data={"breed": "collie", "owner": "Bob"})
     <Dog: Meg>
-    >>> Dog.objects.filter(data__has_keys=['breed', 'owner'])
+    >>> Dog.objects.filter(data__has_keys=["breed", "owner"])
     <QuerySet [<Dog: Meg>]>
 
 .. fieldlookup:: jsonfield.has_keys
@@ -1060,13 +1328,15 @@ For example::
 ~~~~~~~~~~~~~~~~
 
 Returns objects where any of the given keys are in the top-level of the data.
-For example::
+For example:
 
-    >>> Dog.objects.create(name='Rufus', data={'breed': 'labrador'})
+.. code-block:: pycon
+
+    >>> Dog.objects.create(name="Rufus", data={"breed": "labrador"})
     <Dog: Rufus>
-    >>> Dog.objects.create(name='Meg', data={'owner': 'Bob'})
+    >>> Dog.objects.create(name="Meg", data={"owner": "Bob"})
     <Dog: Meg>
-    >>> Dog.objects.filter(data__has_any_keys=['owner', 'breed'])
+    >>> Dog.objects.filter(data__has_any_keys=["owner", "breed"])
     <QuerySet [<Dog: Rufus>, <Dog: Meg>]>
 
 .. _complex-lookups-with-q:
@@ -1085,26 +1355,30 @@ are specified as in "Field lookups" above.
 For example, this ``Q`` object encapsulates a single ``LIKE`` query::
 
     from django.db.models import Q
-    Q(question__startswith='What')
 
-``Q`` objects can be combined using the ``&`` and ``|`` operators. When an
-operator is used on two ``Q`` objects, it yields a new ``Q`` object.
+    Q(question__startswith="What")
+
+``Q`` objects can be combined using the ``&``, ``|``, and ``^`` operators. When
+an operator is used on two ``Q`` objects, it yields a new ``Q`` object.
 
 For example, this statement yields a single ``Q`` object that represents the
 "OR" of two ``"question__startswith"`` queries::
 
-    Q(question__startswith='Who') | Q(question__startswith='What')
+    Q(question__startswith="Who") | Q(question__startswith="What")
 
-This is equivalent to the following SQL ``WHERE`` clause::
+This is equivalent to the following SQL ``WHERE`` clause:
+
+.. code-block:: sql
 
     WHERE question LIKE 'Who%' OR question LIKE 'What%'
 
 You can compose statements of arbitrary complexity by combining ``Q`` objects
-with the ``&`` and ``|`` operators and use parenthetical grouping. Also, ``Q``
-objects can be negated using the ``~`` operator, allowing for combined lookups
-that combine both a normal query and a negated (``NOT``) query::
+with the ``&``, ``|``, and ``^`` operators and use parenthetical grouping.
+Also, ``Q`` objects can be negated using the ``~`` operator, allowing for
+combined lookups that combine both a normal query and a negated (``NOT``)
+query::
 
-    Q(question__startswith='Who') | ~Q(pub_date__year=2005)
+    Q(question__startswith="Who") | ~Q(pub_date__year=2005)
 
 Each lookup function that takes keyword-arguments
 (e.g. :meth:`~django.db.models.query.QuerySet.filter`,
@@ -1115,8 +1389,8 @@ Each lookup function that takes keyword-arguments
 together. For example::
 
     Poll.objects.get(
-        Q(question__startswith='Who'),
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+        Q(question__startswith="Who"),
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
     )
 
 ... roughly translates into the SQL:
@@ -1133,15 +1407,15 @@ precede the definition of any keyword arguments. For example::
 
     Poll.objects.get(
         Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
-        question__startswith='Who',
+        question__startswith="Who",
     )
 
 ... would be a valid query, equivalent to the previous example; but::
 
     # INVALID QUERY
     Poll.objects.get(
-        question__startswith='Who',
-        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6))
+        question__startswith="Who",
+        Q(pub_date=date(2005, 5, 2)) | Q(pub_date=date(2005, 5, 6)),
     )
 
 ... would not be valid.
@@ -1158,14 +1432,18 @@ To compare two model instances, use the standard Python comparison operator,
 the double equals sign: ``==``. Behind the scenes, that compares the primary
 key values of two models.
 
-Using the ``Entry`` example above, the following two statements are equivalent::
+Using the ``Entry`` example above, the following two statements are equivalent:
+
+.. code-block:: pycon
 
     >>> some_entry == other_entry
     >>> some_entry.id == other_entry.id
 
 If a model's primary key isn't called ``id``, no problem. Comparisons will
 always use the primary key, whatever it's called. For example, if a model's
-primary key field is called ``name``, these two statements are equivalent::
+primary key field is called ``name``, these two statements are equivalent:
+
+.. code-block:: pycon
 
     >>> some_obj == other_obj
     >>> some_obj.name == other_obj.name
@@ -1178,10 +1456,12 @@ Deleting objects
 The delete method, conveniently, is named
 :meth:`~django.db.models.Model.delete`. This method immediately deletes the
 object and returns the number of objects deleted and a dictionary with
-the number of deletions per object type. Example::
+the number of deletions per object type. Example:
+
+.. code-block:: pycon
 
     >>> e.delete()
-    (1, {'weblog.Entry': 1})
+    (1, {'blog.Entry': 1})
 
 You can also delete objects in bulk. Every
 :class:`~django.db.models.query.QuerySet` has a
@@ -1189,7 +1469,9 @@ You can also delete objects in bulk. Every
 members of that :class:`~django.db.models.query.QuerySet`.
 
 For example, this deletes all ``Entry`` objects with a ``pub_date`` year of
-2005::
+2005:
+
+.. code-block:: pycon
 
     >>> Entry.objects.filter(pub_date__year=2005).delete()
     (5, {'webapp.Entry': 5})
@@ -1237,12 +1519,12 @@ simplest case, you can set ``pk`` to ``None`` and
 :attr:`_state.adding <django.db.models.Model._state>` to ``True``. Using our
 blog example::
 
-    blog = Blog(name='My blog', tagline='Blogging is easy')
-    blog.save() # blog.pk == 1
+    blog = Blog(name="My blog", tagline="Blogging is easy")
+    blog.save()  # blog.pk == 1
 
     blog.pk = None
     blog._state.adding = True
-    blog.save() # blog.pk == 2
+    blog.save()  # blog.pk == 2
 
 Things get more complicated if you use inheritance. Consider a subclass of
 ``Blog``::
@@ -1250,8 +1532,9 @@ Things get more complicated if you use inheritance. Consider a subclass of
     class ThemeBlog(Blog):
         theme = models.CharField(max_length=200)
 
-    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
-    django_blog.save() # django_blog.pk == 3
+
+    django_blog = ThemeBlog(name="Django", tagline="Django is easy", theme="python")
+    django_blog.save()  # django_blog.pk == 3
 
 Due to how inheritance works, you have to set both ``pk`` and ``id`` to
 ``None``, and ``_state.adding`` to ``True``::
@@ -1259,14 +1542,14 @@ Due to how inheritance works, you have to set both ``pk`` and ``id`` to
     django_blog.pk = None
     django_blog.id = None
     django_blog._state.adding = True
-    django_blog.save() # django_blog.pk == 4
+    django_blog.save()  # django_blog.pk == 4
 
 This process doesn't copy relations that aren't part of the model's database
 table. For example, ``Entry`` has a ``ManyToManyField`` to ``Author``. After
 duplicating an entry, you must set the many-to-many relations for the new
 entry::
 
-    entry = Entry.objects.all()[0] # some previous entry
+    entry = Entry.objects.all()[0]  # some previous entry
     old_authors = entry.authors.all()
     entry.pk = None
     entry._state.adding = True
@@ -1293,17 +1576,19 @@ a :class:`~django.db.models.query.QuerySet`. You can do this with the
 :meth:`~django.db.models.query.QuerySet.update` method. For example::
 
     # Update all the headlines with pub_date in 2007.
-    Entry.objects.filter(pub_date__year=2007).update(headline='Everything is the same')
+    Entry.objects.filter(pub_date__year=2007).update(headline="Everything is the same")
 
 You can only set non-relation fields and :class:`~django.db.models.ForeignKey`
 fields using this method. To update a non-relation field, provide the new value
 as a constant. To update :class:`~django.db.models.ForeignKey` fields, set the
-new value to be the new model instance you want to point to. For example::
+new value to be the new model instance you want to point to. For example:
+
+.. code-block:: pycon
 
     >>> b = Blog.objects.get(pk=1)
 
     # Change every Entry so that it belongs to this Blog.
-    >>> Entry.objects.all().update(blog=b)
+    >>> Entry.objects.update(blog=b)
 
 The ``update()`` method is applied instantly and returns the number of rows
 matched by the query (which may not be equal to the number of rows updated if
@@ -1311,12 +1596,14 @@ some rows already have the new value). The only restriction on the
 :class:`~django.db.models.query.QuerySet` being updated is that it can only
 access one database table: the model's main table. You can filter based on
 related fields, but you can only update columns in the model's main
-table. Example::
+table. Example:
+
+.. code-block:: pycon
 
     >>> b = Blog.objects.get(pk=1)
 
     # Update all the headlines belonging to this Blog.
-    >>> Entry.objects.filter(blog=b).update(headline='Everything is the same')
+    >>> Entry.objects.filter(blog=b).update(headline="Everything is the same")
 
 Be aware that the ``update()`` method is converted directly to an SQL
 statement. It is a bulk operation for direct updates. It doesn't run any
@@ -1335,17 +1622,21 @@ them and call :meth:`~django.db.models.Model.save`::
 Calls to update can also use :class:`F expressions <django.db.models.F>` to
 update one field based on the value of another field in the model. This is
 especially useful for incrementing counters based upon their current value. For
-example, to increment the pingback count for every entry in the blog::
+example, to increment the pingback count for every entry in the blog:
 
-    >>> Entry.objects.all().update(number_of_pingbacks=F('number_of_pingbacks') + 1)
+.. code-block:: pycon
+
+    >>> Entry.objects.update(number_of_pingbacks=F("number_of_pingbacks") + 1)
 
 However, unlike ``F()`` objects in filter and exclude clauses, you can't
 introduce joins when you use ``F()`` objects in an update -- you can only
 reference fields local to the model being updated. If you attempt to introduce
-a join with an ``F()`` object, a ``FieldError`` will be raised::
+a join with an ``F()`` object, a ``FieldError`` will be raised:
+
+.. code-block:: pycon
 
     # This will raise a FieldError
-    >>> Entry.objects.update(headline=F('blog__name'))
+    >>> Entry.objects.update(headline=F("blog__name"))
 
 .. _topics-db-queries-related:
 
@@ -1383,14 +1674,18 @@ Forward
 If a model has a :class:`~django.db.models.ForeignKey`, instances of that model
 will have access to the related (foreign) object via an attribute of the model.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> e = Entry.objects.get(id=2)
-    >>> e.blog # Returns the related Blog object.
+    >>> e.blog  # Returns the related Blog object.
 
 You can get and set via a foreign-key attribute. As you may expect, changes to
 the foreign key aren't saved to the database until you call
-:meth:`~django.db.models.Model.save`. Example::
+:meth:`~django.db.models.Model.save`. Example:
+
+.. code-block:: pycon
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = some_blog
@@ -1398,15 +1693,19 @@ the foreign key aren't saved to the database until you call
 
 If a :class:`~django.db.models.ForeignKey` field has ``null=True`` set (i.e.,
 it allows ``NULL`` values), you can assign ``None`` to remove the relation.
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> e = Entry.objects.get(id=2)
     >>> e.blog = None
-    >>> e.save() # "UPDATE blog_entry SET blog_id = NULL ...;"
+    >>> e.save()  # "UPDATE blog_entry SET blog_id = NULL ...;"
 
 Forward access to one-to-many relationships is cached the first time the
 related object is accessed. Subsequent accesses to the foreign key on the same
-object instance are cached. Example::
+object instance are cached. Example:
+
+.. code-block:: pycon
 
     >>> e = Entry.objects.get(id=2)
     >>> print(e.blog)  # Hits the database to retrieve the associated Blog.
@@ -1414,7 +1713,9 @@ object instance are cached. Example::
 
 Note that the :meth:`~django.db.models.query.QuerySet.select_related`
 :class:`~django.db.models.query.QuerySet` method recursively prepopulates the
-cache of all one-to-many relationships ahead of time. Example::
+cache of all one-to-many relationships ahead of time. Example:
+
+.. code-block:: pycon
 
     >>> e = Entry.objects.select_related().get(id=2)
     >>> print(e.blog)  # Doesn't hit the database; uses cached version.
@@ -1433,26 +1734,30 @@ source model name, lowercased. This :class:`~django.db.models.Manager` returns
 ``QuerySets``, which can be filtered and manipulated as described in the
 "Retrieving objects" section above.
 
-Example::
+Example:
+
+.. code-block:: pycon
 
     >>> b = Blog.objects.get(id=1)
-    >>> b.entry_set.all() # Returns all Entry objects related to Blog.
+    >>> b.entry_set.all()  # Returns all Entry objects related to Blog.
 
     # b.entry_set is a Manager that returns QuerySets.
-    >>> b.entry_set.filter(headline__contains='Lennon')
+    >>> b.entry_set.filter(headline__contains="Lennon")
     >>> b.entry_set.count()
 
 You can override the ``FOO_set`` name by setting the
 :attr:`~django.db.models.ForeignKey.related_name` parameter in the
 :class:`~django.db.models.ForeignKey` definition. For example, if the ``Entry``
 model was altered to ``blog = ForeignKey(Blog, on_delete=models.CASCADE,
-related_name='entries')``, the above example code would look like this::
+related_name='entries')``, the above example code would look like this:
+
+.. code-block:: pycon
 
     >>> b = Blog.objects.get(id=1)
-    >>> b.entries.all() # Returns all Entry objects related to Blog.
+    >>> b.entries.all()  # Returns all Entry objects related to Blog.
 
     # b.entries is a Manager that returns QuerySets.
-    >>> b.entries.filter(headline__contains='Lennon')
+    >>> b.entries.filter(headline__contains="Lennon")
     >>> b.entries.count()
 
 .. _using-custom-reverse-manager:
@@ -1467,13 +1772,15 @@ query you can use the following syntax::
 
     from django.db import models
 
+
     class Entry(models.Model):
-        #...
+        # ...
         objects = models.Manager()  # Default Manager
-        entries = EntryManager()    # Custom Manager
+        entries = EntryManager()  # Custom Manager
+
 
     b = Blog.objects.get(id=1)
-    b.entry_set(manager='entries').all()
+    b.entry_set(manager="entries").all()
 
 If ``EntryManager`` performed default filtering in its ``get_queryset()``
 method, that filtering would apply to the ``all()`` call.
@@ -1481,7 +1788,19 @@ method, that filtering would apply to the ``all()`` call.
 Specifying a custom reverse manager also enables you to call its custom
 methods::
 
-    b.entry_set(manager='entries').is_published()
+    b.entry_set(manager="entries").is_published()
+
+.. admonition:: Interaction with prefetching
+
+    When calling :meth:`~django.db.models.query.QuerySet.prefetch_related` with
+    a reverse relation, the default manager will be used. If you want to
+    prefetch related objects using a custom reverse manager, use
+    :class:`Prefetch() <django.db.models.Prefetch>`. For example::
+
+        from django.db.models import Prefetch
+
+        prefetch_manager = Prefetch("entry_set", queryset=Entry.entries.all())
+        Blog.objects.prefetch_related(prefetch_manager)
 
 Additional methods to handle related objects
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1515,7 +1834,7 @@ instances::
     b = Blog.objects.get(id=1)
     b.entry_set.set([e1, e2])
 
-If the ``clear()`` method is available, any pre-existing objects will be
+If the ``clear()`` method is available, any preexisting objects will be
 removed from the ``entry_set`` before all objects in the iterable (in this
 case, a list) are added to the set. If the ``clear()`` method is *not*
 available, all objects in the iterable will be added without removing any
@@ -1541,12 +1860,12 @@ original model, plus ``'_set'`` (just like reverse one-to-many relationships).
 An example makes this easier to understand::
 
     e = Entry.objects.get(id=3)
-    e.authors.all() # Returns all Author objects for this Entry.
+    e.authors.all()  # Returns all Author objects for this Entry.
     e.authors.count()
-    e.authors.filter(name__contains='John')
+    e.authors.filter(name__contains="John")
 
     a = Author.objects.get(id=5)
-    a.entry_set.all() # Returns all Entry objects for this Author.
+    a.entry_set.all()  # Returns all Entry objects for this Author.
 
 Like :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.ManyToManyField` can specify
@@ -1578,8 +1897,9 @@ For example::
         entry = models.OneToOneField(Entry, on_delete=models.CASCADE)
         details = models.TextField()
 
+
     ed = EntryDetail.objects.get(id=2)
-    ed.entry # Returns the related Entry object.
+    ed.entry  # Returns the related Entry object.
 
 The difference comes in "reverse" queries. The related model in a one-to-one
 relationship also has access to a :class:`~django.db.models.Manager` object, but
@@ -1587,7 +1907,7 @@ that :class:`~django.db.models.Manager` represents a single object, rather than
 a collection of objects::
 
     e = Entry.objects.get(id=2)
-    e.entrydetail # returns the related EntryDetail object
+    e.entrydetail  # returns the related EntryDetail object
 
 If no object has been assigned to this relationship, Django will raise
 a ``DoesNotExist`` exception.
@@ -1629,9 +1949,9 @@ use either an object instance itself, or the primary key value for the object.
 For example, if you have a Blog object ``b`` with ``id=5``, the following
 three queries would be identical::
 
-    Entry.objects.filter(blog=b) # Query using object instance
-    Entry.objects.filter(blog=b.id) # Query using id from instance
-    Entry.objects.filter(blog=5) # Query using id directly
+    Entry.objects.filter(blog=b)  # Query using object instance
+    Entry.objects.filter(blog=b.id)  # Query using id from instance
+    Entry.objects.filter(blog=5)  # Query using id directly
 
 Falling back to raw SQL
 =======================

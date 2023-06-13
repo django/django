@@ -1,6 +1,10 @@
+import os
+import shutil
+
 from django.apps import apps
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+from django.core.management.utils import run_formatters
 from django.db import DEFAULT_DB_ALIAS, connections, migrations
 from django.db.migrations.loader import AmbiguityError, MigrationLoader
 from django.db.migrations.migration import SwappableTuple
@@ -10,54 +14,67 @@ from django.utils.version import get_docs_version
 
 
 class Command(BaseCommand):
-    help = "Squashes an existing set of migrations (from first until specified) into a single new one."
+    help = (
+        "Squashes an existing set of migrations (from first until specified) into a "
+        "single new one."
+    )
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'app_label',
-            help='App label of the application to squash migrations for.',
+            "app_label",
+            help="App label of the application to squash migrations for.",
         )
         parser.add_argument(
-            'start_migration_name', nargs='?',
-            help='Migrations will be squashed starting from and including this migration.',
+            "start_migration_name",
+            nargs="?",
+            help=(
+                "Migrations will be squashed starting from and including this "
+                "migration."
+            ),
         )
         parser.add_argument(
-            'migration_name',
-            help='Migrations will be squashed until and including this migration.',
+            "migration_name",
+            help="Migrations will be squashed until and including this migration.",
         )
         parser.add_argument(
-            '--no-optimize', action='store_true',
-            help='Do not try to optimize the squashed operations.',
+            "--no-optimize",
+            action="store_true",
+            help="Do not try to optimize the squashed operations.",
         )
         parser.add_argument(
-            '--noinput', '--no-input', action='store_false', dest='interactive',
-            help='Tells Django to NOT prompt the user for input of any kind.',
+            "--noinput",
+            "--no-input",
+            action="store_false",
+            dest="interactive",
+            help="Tells Django to NOT prompt the user for input of any kind.",
         )
         parser.add_argument(
-            '--squashed-name',
-            help='Sets the name of the new squashed migration.',
+            "--squashed-name",
+            help="Sets the name of the new squashed migration.",
         )
         parser.add_argument(
-            '--no-header', action='store_false', dest='include_header',
-            help='Do not add a header comment to the new squashed migration.',
+            "--no-header",
+            action="store_false",
+            dest="include_header",
+            help="Do not add a header comment to the new squashed migration.",
         )
 
     def handle(self, **options):
-
-        self.verbosity = options['verbosity']
-        self.interactive = options['interactive']
-        app_label = options['app_label']
-        start_migration_name = options['start_migration_name']
-        migration_name = options['migration_name']
-        no_optimize = options['no_optimize']
-        squashed_name = options['squashed_name']
-        include_header = options['include_header']
+        self.verbosity = options["verbosity"]
+        self.interactive = options["interactive"]
+        app_label = options["app_label"]
+        start_migration_name = options["start_migration_name"]
+        migration_name = options["migration_name"]
+        no_optimize = options["no_optimize"]
+        squashed_name = options["squashed_name"]
+        include_header = options["include_header"]
         # Validate app_label.
         try:
             apps.get_app_config(app_label)
         except LookupError as err:
             raise CommandError(str(err))
-        # Load the current graph state, check the app and migration they asked for exists
+        # Load the current graph state, check the app and migration they asked
+        # for exists.
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
         if app_label not in loader.migrated_apps:
             raise CommandError(
@@ -70,13 +87,19 @@ class Command(BaseCommand):
         # Work out the list of predecessor migrations
         migrations_to_squash = [
             loader.get_migration(al, mn)
-            for al, mn in loader.graph.forwards_plan((migration.app_label, migration.name))
+            for al, mn in loader.graph.forwards_plan(
+                (migration.app_label, migration.name)
+            )
             if al == migration.app_label
         ]
 
         if start_migration_name:
-            start_migration = self.find_migration(loader, app_label, start_migration_name)
-            start = loader.get_migration(start_migration.app_label, start_migration.name)
+            start_migration = self.find_migration(
+                loader, app_label, start_migration_name
+            )
+            start = loader.get_migration(
+                start_migration.app_label, start_migration.name
+            )
             try:
                 start_index = migrations_to_squash.index(start)
                 migrations_to_squash = migrations_to_squash[start_index:]
@@ -91,7 +114,9 @@ class Command(BaseCommand):
 
         # Tell them what we're doing and optionally ask if we should proceed
         if self.verbosity > 0 or self.interactive:
-            self.stdout.write(self.style.MIGRATE_HEADING("Will squash the following migrations:"))
+            self.stdout.write(
+                self.style.MIGRATE_HEADING("Will squash the following migrations:")
+            )
             for migration in migrations_to_squash:
                 self.stdout.write(" - %s" % migration.name)
 
@@ -118,9 +143,9 @@ class Command(BaseCommand):
         for smigration in migrations_to_squash:
             if smigration.replaces:
                 raise CommandError(
-                    "You cannot squash squashed migrations! Please transition "
-                    "it to a normal migration first: "
-                    "https://docs.djangoproject.com/en/%s/topics/migrations/#squashing-migrations" % get_docs_version()
+                    "You cannot squash squashed migrations! Please transition it to a "
+                    "normal migration first: https://docs.djangoproject.com/en/%s/"
+                    "topics/migrations/#squashing-migrations" % get_docs_version()
                 )
             operations.extend(smigration.operations)
             for dependency in smigration.dependencies:
@@ -135,7 +160,9 @@ class Command(BaseCommand):
 
         if no_optimize:
             if self.verbosity > 0:
-                self.stdout.write(self.style.MIGRATE_HEADING("(Skipping optimization.)"))
+                self.stdout.write(
+                    self.style.MIGRATE_HEADING("(Skipping optimization.)")
+                )
             new_operations = operations
         else:
             if self.verbosity > 0:
@@ -149,8 +176,8 @@ class Command(BaseCommand):
                     self.stdout.write("  No optimizations possible.")
                 else:
                     self.stdout.write(
-                        "  Optimized from %s operations to %s operations." %
-                        (len(operations), len(new_operations))
+                        "  Optimized from %s operations to %s operations."
+                        % (len(operations), len(new_operations))
                     )
 
         # Work out the value of replaces (any squashed ones we're re-squashing)
@@ -163,45 +190,67 @@ class Command(BaseCommand):
                 replaces.append((migration.app_label, migration.name))
 
         # Make a new migration with those operations
-        subclass = type("Migration", (migrations.Migration,), {
-            "dependencies": dependencies,
-            "operations": new_operations,
-            "replaces": replaces,
-        })
+        subclass = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "dependencies": dependencies,
+                "operations": new_operations,
+                "replaces": replaces,
+            },
+        )
         if start_migration_name:
             if squashed_name:
                 # Use the name from --squashed-name.
-                prefix, _ = start_migration.name.split('_', 1)
-                name = '%s_%s' % (prefix, squashed_name)
+                prefix, _ = start_migration.name.split("_", 1)
+                name = "%s_%s" % (prefix, squashed_name)
             else:
                 # Generate a name.
-                name = '%s_squashed_%s' % (start_migration.name, migration.name)
+                name = "%s_squashed_%s" % (start_migration.name, migration.name)
             new_migration = subclass(name, app_label)
         else:
-            name = '0001_%s' % (squashed_name or 'squashed_%s' % migration.name)
+            name = "0001_%s" % (squashed_name or "squashed_%s" % migration.name)
             new_migration = subclass(name, app_label)
             new_migration.initial = True
 
         # Write out the new migration file
         writer = MigrationWriter(new_migration, include_header)
-        with open(writer.path, "w", encoding='utf-8') as fh:
+        if os.path.exists(writer.path):
+            raise CommandError(
+                f"Migration {new_migration.name} already exists. Use a different name."
+            )
+        with open(writer.path, "w", encoding="utf-8") as fh:
             fh.write(writer.as_string())
+        run_formatters([writer.path])
 
         if self.verbosity > 0:
             self.stdout.write(
-                self.style.MIGRATE_HEADING('Created new squashed migration %s' % writer.path) + '\n'
-                '  You should commit this migration but leave the old ones in place;\n'
-                '  the new migration will be used for new installs. Once you are sure\n'
-                '  all instances of the codebase have applied the migrations you squashed,\n'
-                '  you can delete them.'
+                self.style.MIGRATE_HEADING(
+                    "Created new squashed migration %s" % writer.path
+                )
+                + "\n"
+                "  You should commit this migration but leave the old ones in place;\n"
+                "  the new migration will be used for new installs. Once you are sure\n"
+                "  all instances of the codebase have applied the migrations you "
+                "squashed,\n"
+                "  you can delete them."
             )
             if writer.needs_manual_porting:
                 self.stdout.write(
-                    self.style.MIGRATE_HEADING('Manual porting required') + '\n'
-                    '  Your migrations contained functions that must be manually copied over,\n'
-                    '  as we could not safely copy their implementation.\n'
-                    '  See the comment at the top of the squashed migration for details.'
+                    self.style.MIGRATE_HEADING("Manual porting required") + "\n"
+                    "  Your migrations contained functions that must be manually "
+                    "copied over,\n"
+                    "  as we could not safely copy their implementation.\n"
+                    "  See the comment at the top of the squashed migration for "
+                    "details."
                 )
+                if shutil.which("black"):
+                    self.stdout.write(
+                        self.style.WARNING(
+                            "Squashed migration couldn't be formatted using the "
+                            '"black" command. You can call it manually.'
+                        )
+                    )
 
     def find_migration(self, loader, app_label, name):
         try:
@@ -213,6 +262,6 @@ class Command(BaseCommand):
             )
         except KeyError:
             raise CommandError(
-                "Cannot find a migration matching '%s' from app '%s'." %
-                (name, app_label)
+                "Cannot find a migration matching '%s' from app '%s'."
+                % (name, app_label)
             )

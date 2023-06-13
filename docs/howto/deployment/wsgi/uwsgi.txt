@@ -2,8 +2,6 @@
 How to use Django with uWSGI
 ============================
 
-.. highlight:: bash
-
 uWSGI_ is a fast, self-healing and developer/sysadmin-friendly application
 container server coded in pure C.
 
@@ -37,7 +35,7 @@ command. For example:
 uWSGI model
 -----------
 
-uWSGI operates on a client-server model. Your Web server (e.g., nginx, Apache)
+uWSGI operates on a client-server model. Your web server (e.g., nginx, Apache)
 communicates with a ``django-uwsgi`` "worker" process to serve dynamic content.
 
 Configuring and starting the uWSGI server for Django
@@ -48,7 +46,9 @@ uWSGI supports multiple ways to configure the process. See uWSGI's
 
 .. _configuration documentation: https://uwsgi.readthedocs.io/en/latest/Configuration.html
 
-Here's an example command to start a uWSGI server::
+Here's an example command to start a uWSGI server:
+
+.. code-block:: shell
 
     uwsgi --chdir=/path/to/your/project \
         --module=mysite.wsgi:application \
@@ -80,7 +80,9 @@ The Django-specific options here are:
 * ``env``: Should probably contain at least :envvar:`DJANGO_SETTINGS_MODULE`.
 * ``home``: Optional path to your project virtual environment.
 
-Example ini configuration file::
+Example ini configuration file:
+
+.. code-block:: ini
 
     [uwsgi]
     chdir=/path/to/your/project
@@ -91,7 +93,9 @@ Example ini configuration file::
     max-requests=5000
     daemonize=/var/log/uwsgi/yourproject.log
 
-Example ini configuration file usage::
+Example ini configuration file usage:
+
+.. code-block:: shell
 
     uwsgi --ini uwsgi.ini
 
@@ -99,7 +103,9 @@ Example ini configuration file usage::
 
     If you get a ``UnicodeEncodeError`` when uploading files with file names
     that contain non-ASCII characters, make sure uWSGI is configured to accept
-    non-ASCII file names by adding this to your ``uwsgi.ini``::
+    non-ASCII file names by adding this to your ``uwsgi.ini``:
+
+    .. code-block:: ini
 
         env = LANG=en_US.UTF-8
 

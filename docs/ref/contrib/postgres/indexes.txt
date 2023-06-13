@@ -28,11 +28,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     .. _bloom: https://www.postgresql.org/docs/current/bloom.html
 
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
-
 ``BrinIndex``
 =============
 
@@ -46,11 +41,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     The ``pages_per_range`` argument takes a positive integer.
 
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
-
     .. _automatic summarization: https://www.postgresql.org/docs/current/brin-intro.html#BRIN-OPERATION
 
 ``BTreeIndex``
@@ -62,11 +52,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
-
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
 
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
@@ -88,14 +73,9 @@ available from the ``django.contrib.postgres.indexes`` module.
     Set the ``fastupdate`` parameter to ``False`` to disable the `GIN Fast
     Update Technique`_ that's enabled by default in PostgreSQL.
 
-    Provide an integer number of bytes to the gin_pending_list_limit_ parameter
-    to tune the maximum size of the GIN pending list which is used when
-    ``fastupdate`` is enabled.
-
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
+    Provide an integer number of kilobytes to the gin_pending_list_limit_
+    parameter to tune the maximum size of the GIN pending list which is used
+    when ``fastupdate`` is enabled.
 
     .. _GIN Fast Update Technique: https://www.postgresql.org/docs/current/gin-implementation.html#GIN-FAST-UPDATE
     .. _gin_pending_list_limit: https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT
@@ -127,11 +107,6 @@ available from the ``django.contrib.postgres.indexes`` module.
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
-
     .. _buffering build: https://www.postgresql.org/docs/current/gist-implementation.html#GIST-BUFFERING-BUILD
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
@@ -144,16 +119,6 @@ available from the ``django.contrib.postgres.indexes`` module.
 
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
-
-    .. admonition:: Use this index only on PostgreSQL 10 and later
-
-        Hash indexes have been available in PostgreSQL for a long time, but
-        they suffer from a number of data integrity issues in older versions.
-
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
 
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
@@ -168,47 +133,45 @@ available from the ``django.contrib.postgres.indexes`` module.
     Provide an integer value from 10 to 100 to the fillfactor_ parameter to
     tune how packed the index pages will be. PostgreSQL's default is 90.
 
-    .. versionchanged:: 3.2
-
-        Positional argument ``*expressions`` was added in order to support
-        functional indexes.
-
     .. _fillfactor: https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS
 
 ``OpClass()`` expressions
 =========================
 
-.. versionadded:: 3.2
-
 .. class:: OpClass(expression, name)
 
     An ``OpClass()`` expression represents the ``expression`` with a custom
-    `operator class`_ that can be used to define functional indexes or unique
-    constraints. To use it, you need to add ``'django.contrib.postgres'`` in
-    your :setting:`INSTALLED_APPS`. Set the ``name`` parameter to the name of
-    the `operator class`_.
+    `operator class`_ that can be used to define functional indexes, functional
+    unique constraints, or exclusion constraints. To use it, you need to add
+    ``'django.contrib.postgres'`` in your :setting:`INSTALLED_APPS`. Set the
+    ``name`` parameter to the name of the `operator class`_.
 
     For example::
 
         Index(
-            OpClass(Lower('username'), name='varchar_pattern_ops'),
-            name='lower_username_idx',
+            OpClass(Lower("username"), name="varchar_pattern_ops"),
+            name="lower_username_idx",
         )
 
     creates an index on ``Lower('username')`` using ``varchar_pattern_ops``.
-
-    Another example::
+    ::
 
         UniqueConstraint(
-            OpClass(Upper('description'), name='text_pattern_ops'),
-            name='upper_description_unique',
+            OpClass(Upper("description"), name="text_pattern_ops"),
+            name="upper_description_unique",
         )
 
     creates a unique constraint on ``Upper('description')`` using
     ``text_pattern_ops``.
+    ::
 
-    .. versionchanged:: 4.0
+        ExclusionConstraint(
+            name="exclude_overlapping_ops",
+            expressions=[
+                (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
+            ],
+        )
 
-        Support for functional unique constraints was added.
+    creates an exclusion constraint on ``circle`` using ``circle_ops``.
 
     .. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html

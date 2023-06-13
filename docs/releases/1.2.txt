@@ -16,32 +16,28 @@ Overview
 
 Django 1.2 introduces several large, important new features, including:
 
-* Support for `multiple database connections`_ in a single Django instance.
+* Support for :ref:`multiple database connections
+  <support-for-multiple-databases>` in a single Django instance.
 
 * `Model validation`_ inspired by Django's form validation.
 
-* Vastly `improved protection against Cross-Site Request Forgery`_ (CSRF).
+* Vastly :ref:`improved protection against Cross-Site Request Forgery
+  <improved-csrf-protection>` (CSRF).
 
-* A new `user "messages" framework`_ with support for cookie- and session-based
-  message for both anonymous and authenticated users.
+* A new :ref:`user "messages" framework <messages-framework>` with support for
+  cookie- and session-based message for both anonymous and authenticated users.
 
 * Hooks for `object-level permissions`_, `permissions for anonymous users`_,
-  and `more flexible username requirements`_.
+  and :ref:`more flexible username requirements
+  <relaxed-requirements-for-usernames>`.
 
 * Customization of email sending via `email backends`_.
 
 * New :ref:`"smart" if template tag <new-in-1.2-smart-if>` which supports
   comparison operators.
 
-.. _multiple database connections: `support for multiple databases`_
-.. _improved protection against Cross-Site Request Forgery: `improved CSRF protection`_
-.. _user "messages" framework: `messages framework`_
-.. _more flexible username requirements: `relaxed requirements for usernames`_
-
-These are just the highlights; full details and a complete list of features `may
-be found below`_.
-
-.. _may be found below: `What's new in Django 1.2`_
+These are just the highlights; full details and a complete list of features
+:ref:`may be found below <whats-new-1.2>`.
 
 .. seealso::
 
@@ -80,9 +76,8 @@ backwards-incompatible. The big changes are:
   :func:`~django.contrib.auth.decorators.login_required`, and
   :func:`~django.contrib.auth.decorators.permission_required`, decorators
   from :mod:`django.contrib.auth` only apply to functions and no longer
-  work on methods. There's a simple one-line fix `detailed below`_.
-
-.. _detailed below: `user_passes_test, login_required and permission_required`_
+  work on methods. There's a simple one-line fix :ref:`detailed below
+  <user-passes-test-login-required-permission-required>`.
 
 Again, these are just the big features that will affect the most users. Users
 upgrading from previous versions of Django are heavily encouraged to consult
@@ -118,6 +113,8 @@ announced prior to the release of Django 1.3.
 What's new in Django 1.2
 ========================
 
+.. _support-for-multiple-databases:
+
 Support for multiple databases
 ------------------------------
 
@@ -137,6 +134,8 @@ validation behavior. Note, however, that validation must still be performed
 explicitly. Simply invoking a model instance's ``save()`` method will not
 perform any validation of the instance's data.
 
+.. _improved-csrf-protection:
+
 Improved CSRF protection
 ------------------------
 
@@ -147,6 +146,8 @@ perform some action on your website, using the credentials of a logged-in user
 who visits the malicious site in their browser. A related type of attack, "login
 CSRF," where an attacking site tricks a user's browser into logging into a site
 with someone else's credentials, is also covered.
+
+.. _messages-framework:
 
 Messages framework
 ------------------
@@ -176,6 +177,8 @@ User already did.  This is useful for centralizing permission handling - apps
 can always delegate the question of whether something is allowed or not to
 the authorization/authentication backend. See the :doc:`authentication
 docs </topics/auth/index>` for more details.
+
+.. _relaxed-requirements-for-usernames:
 
 Relaxed requirements for usernames
 ----------------------------------
@@ -450,42 +453,43 @@ several functions to support conversion of Python values into
 database-compatible values. A custom field might look something like::
 
     class CustomModelField(models.Field):
-        # ...
+        ...
+
         def db_type(self):
-            # ...
+            ...
 
         def get_db_prep_save(self, value):
-            # ...
+            ...
 
         def get_db_prep_value(self, value):
-            # ...
+            ...
 
         def get_db_prep_lookup(self, lookup_type, value):
-            # ...
+            ...
 
 In 1.2, these three methods have undergone a change in prototype, and
 two extra methods have been introduced::
 
     class CustomModelField(models.Field):
-        # ...
+        ...
 
         def db_type(self, connection):
-            # ...
+            ...
 
         def get_prep_value(self, value):
-            # ...
+            ...
 
         def get_prep_lookup(self, lookup_type, value):
-            # ...
+            ...
 
         def get_db_prep_save(self, value, connection):
-            # ...
+            ...
 
         def get_db_prep_value(self, value, connection, prepared=False):
-            # ...
+            ...
 
         def get_db_prep_lookup(self, lookup_type, value, connection, prepared=False):
-            # ...
+            ...
 
 These changes are required to support multiple databases --
 ``db_type`` and ``get_db_prep_*`` can no longer make any assumptions
@@ -534,21 +538,29 @@ You may also need to update your templates if you were relying on the
 implementation of Django's template tags *not* being thread safe. The
 :ttag:`cycle` tag is the most likely to be affected in this way,
 especially when used in conjunction with the :ttag:`include` tag.
-Consider the following template fragment::
+Consider the following template fragment:
+
+.. code-block:: html+django
 
     {% for object in object_list %}
         {% include "subtemplate.html" %}
     {% endfor %}
 
-with a ``subtemplate.html`` that reads::
+with a ``subtemplate.html`` that reads:
+
+.. code-block:: html+django
 
     {% cycle 'even' 'odd' %}
 
-Using the non-thread-safe, pre-Django 1.2 renderer, this would output::
+Using the non-thread-safe, pre-Django 1.2 renderer, this would output:
+
+.. code-block:: text
 
     even odd even odd ...
 
-Using the thread-safe Django 1.2 renderer, you will instead get::
+Using the thread-safe Django 1.2 renderer, you will instead get:
+
+.. code-block:: text
 
     even even even even ...
 
@@ -557,6 +569,8 @@ independent rendering. When the :ttag:`cycle` tag was not thread safe,
 the state of the :ttag:`cycle` tag would leak between multiple
 renderings of the same :ttag:`include`. Now that the :ttag:`cycle` tag
 is thread safe, this leakage no longer occurs.
+
+.. _user-passes-test-login-required-permission-required:
 
 ``user_passes_test``, ``login_required`` and ``permission_required``
 --------------------------------------------------------------------
@@ -578,7 +592,6 @@ decorator to one that works with methods. For example, you would
 change code from this::
 
     class MyClass(object):
-
         @login_required
         def my_view(self, request):
             pass
@@ -587,8 +600,8 @@ to this::
 
     from django.utils.decorators import method_decorator
 
-    class MyClass(object):
 
+    class MyClass(object):
         @method_decorator(login_required)
         def my_view(self, request):
             pass
@@ -599,8 +612,8 @@ or::
 
     login_required_m = method_decorator(login_required)
 
-    class MyClass(object):
 
+    class MyClass(object):
         @login_required_m
         def my_view(self, request):
             pass
@@ -785,10 +798,10 @@ automatically translated to the new-style format.
 In the old-style (pre 1.2) format, you had a number of ``DATABASE_``
 settings in your settings file. For example::
 
-    DATABASE_NAME = 'test_db'
-    DATABASE_ENGINE = 'postgresql_psycopg2'
-    DATABASE_USER = 'myusername'
-    DATABASE_PASSWORD = 's3krit'
+    DATABASE_NAME = "test_db"
+    DATABASE_ENGINE = "postgresql_psycopg2"
+    DATABASE_USER = "myusername"
+    DATABASE_PASSWORD = "s3krit"
 
 These settings are now in a dictionary named
 :setting:`DATABASES`. Each item in the dictionary corresponds to a
@@ -797,11 +810,11 @@ default database connection. The setting names have also been
 shortened. The previous sample settings would now look like this::
 
     DATABASES = {
-        'default': {
-            'NAME': 'test_db',
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'USER': 'myusername',
-            'PASSWORD': 's3krit',
+        "default": {
+            "NAME": "test_db",
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "USER": "myusername",
+            "PASSWORD": "s3krit",
         }
     }
 
@@ -870,6 +883,7 @@ email backend API. Old code that explicitly instantiated an instance
 of an SMTPConnection::
 
     from django.core.mail import SMTPConnection
+
     connection = SMTPConnection()
     messages = get_notification_email()
     connection.send_messages(messages)
@@ -878,6 +892,7 @@ of an SMTPConnection::
 instantiate a generic email connection::
 
     from django.core.mail import get_connection
+
     connection = get_connection()
     messages = get_notification_email()
     connection.send_messages(messages)
@@ -888,7 +903,8 @@ connection with which to send email, you can explicitly request an
 SMTP connection::
 
     from django.core.mail import get_connection
-    connection = get_connection('django.core.mail.backends.smtp.EmailBackend')
+
+    connection = get_connection("django.core.mail.backends.smtp.EmailBackend")
     messages = get_notification_email()
     connection.send_messages(messages)
 
@@ -896,7 +912,9 @@ If your call to construct an instance of ``SMTPConnection`` required
 additional arguments, those arguments can be passed to the
 :meth:`~django.core.mail.get_connection()` call::
 
-    connection = get_connection('django.core.mail.backends.smtp.EmailBackend', hostname='localhost', port=1234)
+    connection = get_connection(
+        "django.core.mail.backends.smtp.EmailBackend", hostname="localhost", port=1234
+    )
 
 User Messages API
 -----------------
@@ -907,12 +925,13 @@ The API for storing messages in the user ``Message`` model (via
 
 To upgrade your code, you need to replace any instances of this::
 
-    user.message_set.create('a message')
+    user.message_set.create("a message")
 
 ...with the following::
 
     from django.contrib import messages
-    messages.add_message(request, messages.INFO, 'a message')
+
+    messages.add_message(request, messages.INFO, "a message")
 
 Additionally, if you make use of the method, you need to replace the
 following::
@@ -923,6 +942,7 @@ following::
 ...with::
 
     from django.contrib import messages
+
     for message in messages.get_messages(request):
         ...
 
@@ -936,25 +956,28 @@ Date format helper functions
 ``django.utils.translation.get_date_formats()`` and
 ``django.utils.translation.get_partial_date_formats()`` have been deprecated
 in favor of the appropriate calls to ``django.utils.formats.get_format()``,
-which is locale-aware when :setting:`USE_L10N` is set to ``True``, and falls
+which is locale-aware when ``USE_L10N`` is set to ``True``, and falls
 back to default settings if set to ``False``.
 
 To get the different date formats, instead of writing this::
 
     from django.utils.translation import get_date_formats
+
     date_format, datetime_format, time_format = get_date_formats()
 
 ...use::
 
     from django.utils import formats
-    date_format = formats.get_format('DATE_FORMAT')
-    datetime_format = formats.get_format('DATETIME_FORMAT')
-    time_format = formats.get_format('TIME_FORMAT')
+
+    date_format = formats.get_format("DATE_FORMAT")
+    datetime_format = formats.get_format("DATETIME_FORMAT")
+    time_format = formats.get_format("TIME_FORMAT")
 
 Or, when directly formatting a date value::
 
     from django.utils import formats
-    value_formatted = formats.date_format(value, 'DATETIME_FORMAT')
+
+    value_formatted = formats.date_format(value, "DATETIME_FORMAT")
 
 The same applies to the globals found in ``django.forms.fields``:
 
@@ -990,14 +1013,18 @@ the following :doc:`URLconf </topics/http/urls>`::
     from myproject.feeds import LatestEntries, LatestEntriesByCategory
 
     feeds = {
-        'latest': LatestEntries,
-        'categories': LatestEntriesByCategory,
+        "latest": LatestEntries,
+        "categories": LatestEntriesByCategory,
     }
 
-    urlpatterns = patterns('',
+    urlpatterns = patterns(
+        "",
         # ...
-        (r'^feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed',
-            {'feed_dict': feeds}),
+        (
+            r"^feeds/(?P<url>.*)/$",
+            "django.contrib.syndication.views.feed",
+            {"feed_dict": feeds},
+        ),
         # ...
     )
 
@@ -1006,10 +1033,11 @@ Using the new Feed class, these feeds can be deployed directly as views::
     from django.conf.urls.defaults import *
     from myproject.feeds import LatestEntries, LatestEntriesByCategory
 
-    urlpatterns = patterns('',
+    urlpatterns = patterns(
+        "",
         # ...
-        (r'^feeds/latest/$', LatestEntries()),
-        (r'^feeds/categories/(?P<category_id>\d+)/$', LatestEntriesByCategory()),
+        (r"^feeds/latest/$", LatestEntries()),
+        (r"^feeds/categories/(?P<category_id>\d+)/$", LatestEntriesByCategory()),
         # ...
     )
 
@@ -1031,6 +1059,7 @@ URL, so it would look like this::
     from django.contrib.syndication.views import Feed
     from django.shortcuts import get_object_or_404
     from myproject.models import Category
+
 
     class LatestEntriesByCategory(Feed):
         def get_object(self, request, category_id):
@@ -1108,6 +1137,7 @@ below::
 Would need to be changed::
 
     from django.db import connection
+
     PostGISAdaptor = connection.ops.Adapter
 
 ``SpatialRefSys`` and ``GeometryColumns`` models
@@ -1128,18 +1158,22 @@ is using a supported spatial database backend.
     differs across spatial databases, the ``SpatialRefSys`` and
     ``GeometryColumns`` models can no longer be associated with
     the ``gis`` application name.  Thus, no models will be returned
-    when using the ``get_models`` method in the following example::
+    when using the ``get_models`` method in the following example:
+
+    .. code-block:: pycon
 
         >>> from django.db.models import get_app, get_models
-        >>> get_models(get_app('gis'))
+        >>> get_models(get_app("gis"))
         []
 
 To get the correct ``SpatialRefSys`` and ``GeometryColumns``
-for your spatial database use the methods provided by the spatial backend::
+for your spatial database use the methods provided by the spatial backend:
+
+    .. code-block:: pycon
 
      >>> from django.db import connections
-     >>> SpatialRefSys = connections['my_spatialite'].ops.spatial_ref_sys()
-     >>> GeometryColumns = connections['my_postgis'].ops.geometry_columns()
+     >>> SpatialRefSys = connections["my_spatialite"].ops.spatial_ref_sys()
+     >>> GeometryColumns = connections["my_postgis"].ops.geometry_columns()
 
 .. note::
 
@@ -1149,8 +1183,8 @@ for your spatial database use the methods provided by the spatial backend::
     In other words, to ensure that the models in the example above
     use the correct database::
 
-        sr_qs = SpatialRefSys.objects.using('my_spatialite').filter(...)
-        gc_qs = GeometryColumns.objects.using('my_postgis').filter(...)
+        sr_qs = SpatialRefSys.objects.using("my_spatialite").filter(...)
+        gc_qs = GeometryColumns.objects.using("my_postgis").filter(...)
 
 Language code ``no``
 --------------------

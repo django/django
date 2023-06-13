@@ -8,28 +8,35 @@ from .admin import ArticleForm
 
 # To verify that the login form rejects inactive users, use an authentication
 # backend that allows them.
-@override_settings(AUTHENTICATION_BACKENDS=['django.contrib.auth.backends.AllowAllUsersModelBackend'])
+@override_settings(
+    AUTHENTICATION_BACKENDS=["django.contrib.auth.backends.AllowAllUsersModelBackend"]
+)
 class AdminAuthenticationFormTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        User.objects.create_user(username='inactive', password='password', is_active=False)
+        User.objects.create_user(
+            username="inactive", password="password", is_active=False
+        )
 
     def test_inactive_user(self):
         data = {
-            'username': 'inactive',
-            'password': 'password',
+            "username": "inactive",
+            "password": "password",
         }
         form = AdminAuthenticationForm(None, data)
-        self.assertEqual(form.non_field_errors(), ['This account is inactive.'])
+        self.assertEqual(form.non_field_errors(), ["This account is inactive."])
 
 
 class AdminFormTests(SimpleTestCase):
     def test_repr(self):
         fieldsets = (
-            ('My fields', {
-                'classes': ['collapse'],
-                'fields': ('url', 'title', 'content', 'sites'),
-            }),
+            (
+                "My fields",
+                {
+                    "classes": ["collapse"],
+                    "fields": ("url", "title", "content", "sites"),
+                },
+            ),
         )
         form = ArticleForm()
         admin_form = AdminForm(form, fieldsets, {})

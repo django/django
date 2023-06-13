@@ -1,5 +1,7 @@
+import multiprocessing
 import sys
 from io import StringIO
+from unittest import skipIf
 
 from django.apps import apps
 from django.core import checks
@@ -10,9 +12,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.db import models
 from django.test import SimpleTestCase
-from django.test.utils import (
-    isolate_apps, override_settings, override_system_checks,
-)
+from django.test.utils import isolate_apps, override_settings, override_system_checks
 
 from .models import SimpleModel, my_check
 
@@ -23,9 +23,7 @@ class DummyObj:
 
 
 class SystemCheckFrameworkTests(SimpleTestCase):
-
     def test_register_and_run_checks(self):
-
         def f(**kwargs):
             calls[0] += 1
             return [1, 2, 3]
@@ -62,15 +60,20 @@ class SystemCheckFrameworkTests(SimpleTestCase):
         self.assertEqual(errors, errors2)
         self.assertEqual(sorted(errors), [4])
 
-        errors = registry.run_checks(tags=["tag1", "tag2"], include_deployment_checks=True)
-        errors2 = registry2.run_checks(tags=["tag1", "tag2"], include_deployment_checks=True)
+        errors = registry.run_checks(
+            tags=["tag1", "tag2"], include_deployment_checks=True
+        )
+        errors2 = registry2.run_checks(
+            tags=["tag1", "tag2"], include_deployment_checks=True
+        )
         self.assertEqual(errors, errors2)
         self.assertEqual(sorted(errors), [4, 5])
 
     def test_register_no_kwargs_error(self):
         registry = CheckRegistry()
-        msg = 'Check functions must accept keyword arguments (**kwargs).'
+        msg = "Check functions must accept keyword arguments (**kwargs)."
         with self.assertRaisesMessage(TypeError, msg):
+
             @registry.register
             def no_kwargs(app_configs, databases):
                 pass
@@ -80,18 +83,17 @@ class SystemCheckFrameworkTests(SimpleTestCase):
 
         @registry.register
         def return_non_iterable(**kwargs):
-            return Error('Message')
+            return Error("Message")
 
         msg = (
-            'The function %r did not return a list. All functions registered '
-            'with the checks registry must return a list.' % return_non_iterable
+            "The function %r did not return a list. All functions registered "
+            "with the checks registry must return a list." % return_non_iterable
         )
         with self.assertRaisesMessage(TypeError, msg):
             registry.run_checks()
 
 
 class MessageTests(SimpleTestCase):
-
     def test_printing(self):
         e = Error("Message", hint="Hint", obj=DummyObj())
         expected = "obj: Message\n\tHINT: Hint"
@@ -113,7 +115,7 @@ class MessageTests(SimpleTestCase):
         self.assertEqual(str(e), expected)
 
     def test_printing_field_error(self):
-        field = SimpleModel._meta.get_field('field')
+        field = SimpleModel._meta.get_field("field")
         e = Error("Error", obj=field)
         expected = "check_framework.SimpleModel.field: Error"
         self.assertEqual(str(e), expected)
@@ -145,12 +147,12 @@ class MessageTests(SimpleTestCase):
 
     def test_not_equal_to_non_check(self):
         e = Error("Error", obj=DummyObj())
-        self.assertNotEqual(e, 'a string')
+        self.assertNotEqual(e, "a string")
 
     def test_invalid_level(self):
-        msg = 'The first argument should be level.'
+        msg = "The first argument should be level."
         with self.assertRaisesMessage(TypeError, msg):
-            CheckMessage('ERROR', 'Message')
+            CheckMessage("ERROR", "Message")
 
 
 def simple_system_check(**kwargs):
@@ -160,22 +162,21 @@ def simple_system_check(**kwargs):
 
 def tagged_system_check(**kwargs):
     tagged_system_check.kwargs = kwargs
-    return [checks.Warning('System Check')]
+    return [checks.Warning("System Check")]
 
 
-tagged_system_check.tags = ['simpletag']
+tagged_system_check.tags = ["simpletag"]
 
 
 def deployment_system_check(**kwargs):
     deployment_system_check.kwargs = kwargs
-    return [checks.Warning('Deployment Check')]
+    return [checks.Warning("Deployment Check")]
 
 
-deployment_system_check.tags = ['deploymenttag']
+deployment_system_check.tags = ["deploymenttag"]
 
 
 class CheckCommandTests(SimpleTestCase):
-
     def setUp(self):
         simple_system_check.kwargs = None
         tagged_system_check.kwargs = None
@@ -187,77 +188,96 @@ class CheckCommandTests(SimpleTestCase):
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_simple_call(self):
-        call_command('check')
-        self.assertEqual(simple_system_check.kwargs, {'app_configs': None, 'databases': None})
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None, 'databases': None})
+        call_command("check")
+        self.assertEqual(
+            simple_system_check.kwargs, {"app_configs": None, "databases": None}
+        )
+        self.assertEqual(
+            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+        )
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_app(self):
-        call_command('check', 'auth', 'admin')
-        auth_config = apps.get_app_config('auth')
-        admin_config = apps.get_app_config('admin')
-        self.assertEqual(simple_system_check.kwargs, {'app_configs': [auth_config, admin_config], 'databases': None})
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': [auth_config, admin_config], 'databases': None})
+        call_command("check", "auth", "admin")
+        auth_config = apps.get_app_config("auth")
+        admin_config = apps.get_app_config("admin")
+        self.assertEqual(
+            simple_system_check.kwargs,
+            {"app_configs": [auth_config, admin_config], "databases": None},
+        )
+        self.assertEqual(
+            tagged_system_check.kwargs,
+            {"app_configs": [auth_config, admin_config], "databases": None},
+        )
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_given_tag(self):
-        call_command('check', tags=['simpletag'])
+        call_command("check", tags=["simpletag"])
         self.assertIsNone(simple_system_check.kwargs)
-        self.assertEqual(tagged_system_check.kwargs, {'app_configs': None, 'databases': None})
+        self.assertEqual(
+            tagged_system_check.kwargs, {"app_configs": None, "databases": None}
+        )
 
     @override_system_checks([simple_system_check, tagged_system_check])
     def test_invalid_tag(self):
         msg = 'There is no system check with the "missingtag" tag.'
         with self.assertRaisesMessage(CommandError, msg):
-            call_command('check', tags=['missingtag'])
+            call_command("check", tags=["missingtag"])
 
     @override_system_checks([simple_system_check])
     def test_list_tags_empty(self):
-        call_command('check', list_tags=True)
-        self.assertEqual('\n', sys.stdout.getvalue())
+        call_command("check", list_tags=True)
+        self.assertEqual("\n", sys.stdout.getvalue())
 
     @override_system_checks([tagged_system_check])
     def test_list_tags(self):
-        call_command('check', list_tags=True)
-        self.assertEqual('simpletag\n', sys.stdout.getvalue())
+        call_command("check", list_tags=True)
+        self.assertEqual("simpletag\n", sys.stdout.getvalue())
 
-    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    @override_system_checks(
+        [tagged_system_check], deployment_checks=[deployment_system_check]
+    )
     def test_list_deployment_check_omitted(self):
-        call_command('check', list_tags=True)
-        self.assertEqual('simpletag\n', sys.stdout.getvalue())
+        call_command("check", list_tags=True)
+        self.assertEqual("simpletag\n", sys.stdout.getvalue())
 
-    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    @override_system_checks(
+        [tagged_system_check], deployment_checks=[deployment_system_check]
+    )
     def test_list_deployment_check_included(self):
-        call_command('check', deploy=True, list_tags=True)
-        self.assertEqual('deploymenttag\nsimpletag\n', sys.stdout.getvalue())
+        call_command("check", deploy=True, list_tags=True)
+        self.assertEqual("deploymenttag\nsimpletag\n", sys.stdout.getvalue())
 
-    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    @override_system_checks(
+        [tagged_system_check], deployment_checks=[deployment_system_check]
+    )
     def test_tags_deployment_check_omitted(self):
         msg = 'There is no system check with the "deploymenttag" tag.'
         with self.assertRaisesMessage(CommandError, msg):
-            call_command('check', tags=['deploymenttag'])
+            call_command("check", tags=["deploymenttag"])
 
-    @override_system_checks([tagged_system_check], deployment_checks=[deployment_system_check])
+    @override_system_checks(
+        [tagged_system_check], deployment_checks=[deployment_system_check]
+    )
     def test_tags_deployment_check_included(self):
-        call_command('check', deploy=True, tags=['deploymenttag'])
-        self.assertIn('Deployment Check', sys.stderr.getvalue())
+        call_command("check", deploy=True, tags=["deploymenttag"])
+        self.assertIn("Deployment Check", sys.stderr.getvalue())
 
     @override_system_checks([tagged_system_check])
     def test_fail_level(self):
         with self.assertRaises(CommandError):
-            call_command('check', fail_level='WARNING')
+            call_command("check", fail_level="WARNING")
 
 
 def custom_error_system_check(app_configs, **kwargs):
-    return [Error('Error', id='myerrorcheck.E001')]
+    return [Error("Error", id="myerrorcheck.E001")]
 
 
 def custom_warning_system_check(app_configs, **kwargs):
-    return [Warning('Warning', id='mywarningcheck.E001')]
+    return [Warning("Warning", id="mywarningcheck.E001")]
 
 
 class SilencingCheckTests(SimpleTestCase):
-
     def setUp(self):
         self.old_stdout, self.old_stderr = sys.stdout, sys.stderr
         self.stdout, self.stderr = StringIO(), StringIO()
@@ -266,27 +286,31 @@ class SilencingCheckTests(SimpleTestCase):
     def tearDown(self):
         sys.stdout, sys.stderr = self.old_stdout, self.old_stderr
 
-    @override_settings(SILENCED_SYSTEM_CHECKS=['myerrorcheck.E001'])
+    @override_settings(SILENCED_SYSTEM_CHECKS=["myerrorcheck.E001"])
     @override_system_checks([custom_error_system_check])
     def test_silenced_error(self):
         out = StringIO()
         err = StringIO()
-        call_command('check', stdout=out, stderr=err)
-        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
-        self.assertEqual(err.getvalue(), '')
+        call_command("check", stdout=out, stderr=err)
+        self.assertEqual(
+            out.getvalue(), "System check identified no issues (1 silenced).\n"
+        )
+        self.assertEqual(err.getvalue(), "")
 
-    @override_settings(SILENCED_SYSTEM_CHECKS=['mywarningcheck.E001'])
+    @override_settings(SILENCED_SYSTEM_CHECKS=["mywarningcheck.E001"])
     @override_system_checks([custom_warning_system_check])
     def test_silenced_warning(self):
         out = StringIO()
         err = StringIO()
-        call_command('check', stdout=out, stderr=err)
-        self.assertEqual(out.getvalue(), 'System check identified no issues (1 silenced).\n')
-        self.assertEqual(err.getvalue(), '')
+        call_command("check", stdout=out, stderr=err)
+        self.assertEqual(
+            out.getvalue(), "System check identified no issues (1 silenced).\n"
+        )
+        self.assertEqual(err.getvalue(), "")
 
 
 class CheckFrameworkReservedNamesTests(SimpleTestCase):
-    @isolate_apps('check_framework', kwarg_name='apps')
+    @isolate_apps("check_framework", kwarg_name="apps")
     @override_system_checks([checks.model_checks.check_all_models])
     def test_model_check_method_not_shadowed(self, apps):
         class ModelWithAttributeCalledCheck(models.Model):
@@ -299,11 +323,13 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
             pass
 
         class ModelWithDescriptorCalledCheck(models.Model):
-            check = models.ForeignKey(ModelWithRelatedManagerCalledCheck, models.CASCADE)
+            check = models.ForeignKey(
+                ModelWithRelatedManagerCalledCheck, models.CASCADE
+            )
             article = models.ForeignKey(
                 ModelWithRelatedManagerCalledCheck,
                 models.CASCADE,
-                related_name='check',
+                related_name="check",
             )
 
         errors = checks.run_checks(app_configs=apps.get_app_configs())
@@ -312,30 +338,38 @@ class CheckFrameworkReservedNamesTests(SimpleTestCase):
                 "The 'ModelWithAttributeCalledCheck.check()' class method is "
                 "currently overridden by 42.",
                 obj=ModelWithAttributeCalledCheck,
-                id='models.E020'
+                id="models.E020",
             ),
             Error(
                 "The 'ModelWithFieldCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithFieldCalledCheck.check,
                 obj=ModelWithFieldCalledCheck,
-                id='models.E020'
+                id="models.E020",
             ),
             Error(
                 "The 'ModelWithRelatedManagerCalledCheck.check()' class method is "
-                "currently overridden by %r." % ModelWithRelatedManagerCalledCheck.check,
+                "currently overridden by %r."
+                % ModelWithRelatedManagerCalledCheck.check,
                 obj=ModelWithRelatedManagerCalledCheck,
-                id='models.E020'
+                id="models.E020",
             ),
             Error(
                 "The 'ModelWithDescriptorCalledCheck.check()' class method is "
                 "currently overridden by %r." % ModelWithDescriptorCalledCheck.check,
                 obj=ModelWithDescriptorCalledCheck,
-                id='models.E020'
+                id="models.E020",
             ),
         ]
         self.assertEqual(errors, expected)
 
 
+@skipIf(
+    multiprocessing.get_start_method() == "spawn",
+    "Spawning reimports modules, overwriting my_check.did_run to False, making this "
+    "test useless.",
+)
 class ChecksRunDuringTests(SimpleTestCase):
+    databases = "__all__"
+
     def test_registered_check_did_run(self):
         self.assertTrue(my_check.did_run)

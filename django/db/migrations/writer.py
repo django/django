@@ -1,10 +1,10 @@
-
 import os
 import re
 from importlib import import_module
 
 from django import get_version
 from django.apps import apps
+
 # SettingsReference imported for backwards compatibility in Django 2.2.
 from django.conf import SettingsReference  # NOQA
 from django.db import migrations
@@ -22,30 +22,30 @@ class OperationWriter:
         self.indentation = indentation
 
     def serialize(self):
-
         def _write(_arg_name, _arg_value):
-            if (_arg_name in self.operation.serialization_expand_args and
-                    isinstance(_arg_value, (list, tuple, dict))):
+            if _arg_name in self.operation.serialization_expand_args and isinstance(
+                _arg_value, (list, tuple, dict)
+            ):
                 if isinstance(_arg_value, dict):
-                    self.feed('%s={' % _arg_name)
+                    self.feed("%s={" % _arg_name)
                     self.indent()
                     for key, value in _arg_value.items():
                         key_string, key_imports = MigrationWriter.serialize(key)
                         arg_string, arg_imports = MigrationWriter.serialize(value)
                         args = arg_string.splitlines()
                         if len(args) > 1:
-                            self.feed('%s: %s' % (key_string, args[0]))
+                            self.feed("%s: %s" % (key_string, args[0]))
                             for arg in args[1:-1]:
                                 self.feed(arg)
-                            self.feed('%s,' % args[-1])
+                            self.feed("%s," % args[-1])
                         else:
-                            self.feed('%s: %s,' % (key_string, arg_string))
+                            self.feed("%s: %s," % (key_string, arg_string))
                         imports.update(key_imports)
                         imports.update(arg_imports)
                     self.unindent()
-                    self.feed('},')
+                    self.feed("},")
                 else:
-                    self.feed('%s=[' % _arg_name)
+                    self.feed("%s=[" % _arg_name)
                     self.indent()
                     for item in _arg_value:
                         arg_string, arg_imports = MigrationWriter.serialize(item)
@@ -53,22 +53,22 @@ class OperationWriter:
                         if len(args) > 1:
                             for arg in args[:-1]:
                                 self.feed(arg)
-                            self.feed('%s,' % args[-1])
+                            self.feed("%s," % args[-1])
                         else:
-                            self.feed('%s,' % arg_string)
+                            self.feed("%s," % arg_string)
                         imports.update(arg_imports)
                     self.unindent()
-                    self.feed('],')
+                    self.feed("],")
             else:
                 arg_string, arg_imports = MigrationWriter.serialize(_arg_value)
                 args = arg_string.splitlines()
                 if len(args) > 1:
-                    self.feed('%s=%s' % (_arg_name, args[0]))
+                    self.feed("%s=%s" % (_arg_name, args[0]))
                     for arg in args[1:-1]:
                         self.feed(arg)
-                    self.feed('%s,' % args[-1])
+                    self.feed("%s," % args[-1])
                 else:
-                    self.feed('%s=%s,' % (_arg_name, arg_string))
+                    self.feed("%s=%s," % (_arg_name, arg_string))
                 imports.update(arg_imports)
 
         imports = set()
@@ -79,10 +79,10 @@ class OperationWriter:
         # We can just use the fact we already have that imported,
         # otherwise, we need to add an import for the operation class.
         if getattr(migrations, name, None) == self.operation.__class__:
-            self.feed('migrations.%s(' % name)
+            self.feed("migrations.%s(" % name)
         else:
-            imports.add('import %s' % (self.operation.__class__.__module__))
-            self.feed('%s.%s(' % (self.operation.__class__.__module__, name))
+            imports.add("import %s" % (self.operation.__class__.__module__))
+            self.feed("%s.%s(" % (self.operation.__class__.__module__, name))
 
         self.indent()
 
@@ -99,7 +99,7 @@ class OperationWriter:
                 _write(arg_name, arg_value)
 
         self.unindent()
-        self.feed('),')
+        self.feed("),")
         return self.render(), imports
 
     def indent(self):
@@ -109,10 +109,10 @@ class OperationWriter:
         self.indentation -= 1
 
     def feed(self, line):
-        self.buff.append(' ' * (self.indentation * 4) + line)
+        self.buff.append(" " * (self.indentation * 4) + line)
 
     def render(self):
-        return '\n'.join(self.buff)
+        return "\n".join(self.buff)
 
 
 class MigrationWriter:
@@ -147,7 +147,10 @@ class MigrationWriter:
         dependencies = []
         for dependency in self.migration.dependencies:
             if dependency[0] == "__setting__":
-                dependencies.append("        migrations.swappable_dependency(settings.%s)," % dependency[1])
+                dependencies.append(
+                    "        migrations.swappable_dependency(settings.%s),"
+                    % dependency[1]
+                )
                 imports.add("from django.conf import settings")
             else:
                 dependencies.append("        %s," % self.serialize(dependency)[0])
@@ -172,7 +175,10 @@ class MigrationWriter:
 
         # Sort imports by the package / module to be imported (the part after
         # "from" in "from ... import ..." or after "import" in "import ...").
-        sorted_imports = sorted(imports, key=lambda i: i.split()[1])
+        # First group the "import" statements, then "from ... import ...".
+        sorted_imports = sorted(
+            imports, key=lambda i: (i.split()[0] == "from", i.split()[1])
+        )
         items["imports"] = "\n".join(sorted_imports) + "\n" if imports else ""
         if migration_imports:
             items["imports"] += (
@@ -183,24 +189,28 @@ class MigrationWriter:
             ) % "\n# ".join(sorted(migration_imports))
         # If there's a replaces, make a string for it
         if self.migration.replaces:
-            items['replaces_str'] = "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+            items["replaces_str"] = (
+                "\n    replaces = %s\n" % self.serialize(self.migration.replaces)[0]
+            )
         # Hinting that goes into comment
         if self.include_header:
-            items['migration_header'] = MIGRATION_HEADER_TEMPLATE % {
-                'version': get_version(),
-                'timestamp': now().strftime("%Y-%m-%d %H:%M"),
+            items["migration_header"] = MIGRATION_HEADER_TEMPLATE % {
+                "version": get_version(),
+                "timestamp": now().strftime("%Y-%m-%d %H:%M"),
             }
         else:
-            items['migration_header'] = ""
+            items["migration_header"] = ""
 
         if self.migration.initial:
-            items['initial_str'] = "\n    initial = True\n"
+            items["initial_str"] = "\n    initial = True\n"
 
         return MIGRATION_TEMPLATE % items
 
     @property
     def basedir(self):
-        migrations_package_name, _ = MigrationLoader.migrations_module(self.migration.app_label)
+        migrations_package_name, _ = MigrationLoader.migrations_module(
+            self.migration.app_label
+        )
 
         if migrations_package_name is None:
             raise ValueError(
@@ -222,7 +232,11 @@ class MigrationWriter:
 
         # Alright, see if it's a direct submodule of the app
         app_config = apps.get_app_config(self.migration.app_label)
-        maybe_app_name, _, migrations_package_basename = migrations_package_name.rpartition(".")
+        (
+            maybe_app_name,
+            _,
+            migrations_package_basename,
+        ) = migrations_package_name.rpartition(".")
         if app_config.name == maybe_app_name:
             return os.path.join(app_config.path, migrations_package_basename)
 
@@ -246,8 +260,8 @@ class MigrationWriter:
             raise ValueError(
                 "Could not locate an appropriate location to create "
                 "migrations package %s. Make sure the toplevel "
-                "package exists and can be imported." %
-                migrations_package_name)
+                "package exists and can be imported." % migrations_package_name
+            )
 
         final_dir = os.path.join(base_dir, *missing_dirs)
         os.makedirs(final_dir, exist_ok=True)

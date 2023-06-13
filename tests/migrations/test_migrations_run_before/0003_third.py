@@ -15,7 +15,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
         migrations.CreateModel(
             "Author",
             [
@@ -25,5 +24,4 @@ class Migration(migrations.Migration):
                 ("age", models.IntegerField(default=0)),
             ],
         )
-
     ]

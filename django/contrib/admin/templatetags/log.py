@@ -1,26 +1,26 @@
 from django import template
-from django.contrib.admin.models import LogEntry
 
 register = template.Library()
 
 
 class AdminLogNode(template.Node):
     def __init__(self, limit, varname, user):
-        self.limit, self.varname, self.user = limit, varname, user
+        self.limit = limit
+        self.varname = varname
+        self.user = user
 
     def __repr__(self):
         return "<GetAdminLog Node>"
 
     def render(self, context):
-        if self.user is None:
-            entries = LogEntry.objects.all()
-        else:
+        entries = context["log_entries"]
+        if self.user is not None:
             user_id = self.user
             if not user_id.isdigit():
                 user_id = context[self.user].pk
-            entries = LogEntry.objects.filter(user__pk=user_id)
-        context[self.varname] = entries.select_related('content_type', 'user')[:int(self.limit)]
-        return ''
+            entries = entries.filter(user__pk=user_id)
+        context[self.varname] = entries[: int(self.limit)]
+        return ""
 
 
 @register.tag
@@ -30,7 +30,7 @@ def get_admin_log(parser, token):
 
     Usage::
 
-        {% get_admin_log [limit] as [varname] for_user [context_var_containing_user_obj] %}
+        {% get_admin_log [limit] as [varname] for_user [context_var_with_user_obj] %}
 
     Examples::
 
@@ -45,15 +45,23 @@ def get_admin_log(parser, token):
     tokens = token.contents.split()
     if len(tokens) < 4:
         raise template.TemplateSyntaxError(
-            "'get_admin_log' statements require two arguments")
+            "'get_admin_log' statements require two arguments"
+        )
     if not tokens[1].isdigit():
         raise template.TemplateSyntaxError(
-            "First argument to 'get_admin_log' must be an integer")
-    if tokens[2] != 'as':
+            "First argument to 'get_admin_log' must be an integer"
+        )
+    if tokens[2] != "as":
         raise template.TemplateSyntaxError(
-            "Second argument to 'get_admin_log' must be 'as'")
+            "Second argument to 'get_admin_log' must be 'as'"
+        )
     if len(tokens) > 4:
-        if tokens[4] != 'for_user':
+        if tokens[4] != "for_user":
             raise template.TemplateSyntaxError(
-                "Fourth argument to 'get_admin_log' must be 'for_user'")
-    return AdminLogNode(limit=tokens[1], varname=tokens[3], user=(tokens[5] if len(tokens) > 5 else None))
+                "Fourth argument to 'get_admin_log' must be 'for_user'"
+            )
+    return AdminLogNode(
+        limit=tokens[1],
+        varname=tokens[3],
+        user=(tokens[5] if len(tokens) > 5 else None),
+    )

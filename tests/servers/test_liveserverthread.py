@@ -7,7 +7,6 @@ from django.test.testcases import LiveServerThread
 # otherwise closing the connection would implicitly rollback and not set the
 # connection to None.
 class LiveServerThreadTest(TransactionTestCase):
-
     available_apps = []
 
     def run_live_server_thread(self, connections_override=None):

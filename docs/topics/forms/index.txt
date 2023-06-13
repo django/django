@@ -77,7 +77,7 @@ should be used only for requests that do not affect the state of the system.
 ``GET`` would also be unsuitable for a password form, because the password
 would appear in the URL, and thus, also in browser history and server logs,
 all in plain text. Neither would it be suitable for large quantities of data,
-or for binary data, such as an image. A Web application that uses ``GET``
+or for binary data, such as an image. A web application that uses ``GET``
 requests for admin forms is a security risk: it can be easy for an attacker to
 mimic a form's request to gain access to sensitive parts of the system.
 ``POST``, coupled with other protections like Django's :doc:`CSRF protection
@@ -115,7 +115,7 @@ Forms in Django
 We've described HTML forms briefly, but an HTML ``<form>`` is just one part of
 the machinery required.
 
-In the context of a Web application, 'form' might refer to that HTML
+In the context of a web application, 'form' might refer to that HTML
 ``<form>``, or to the Django :class:`Form` that produces it, or to the
 structured data returned when it is submitted, or to the end-to-end working
 collection of these parts.
@@ -164,7 +164,7 @@ So when we handle a model instance in a view, we typically retrieve it from the
 database. When we're dealing with a form we typically instantiate it in the
 view.
 
-When we instantiate a form, we can opt to leave it empty or pre-populate it, for
+When we instantiate a form, we can opt to leave it empty or prepopulate it, for
 example with:
 
 * data from a saved model instance (as in the case of admin forms for editing)
@@ -207,7 +207,7 @@ Now you'll also need a view corresponding to that ``/your-name/`` URL which will
 find the appropriate key/value pairs in the request, and then process them.
 
 This is a very simple form. In practice, a form might contain dozens or
-hundreds of fields, many of which might need to be pre-populated, and we might
+hundreds of fields, many of which might need to be prepopulated, and we might
 expect the user to work through the edit-submit cycle several times before
 concluding the operation.
 
@@ -227,12 +227,13 @@ We already know what we want our HTML form to look like. Our starting point for
 it in Django is this:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
 
+
     class NameForm(forms.Form):
-        your_name = forms.CharField(label='Your name', max_length=100)
+        your_name = forms.CharField(label="Your name", max_length=100)
 
 This defines a :class:`Form` class with a single field (``your_name``). We've
 applied a human-friendly label to the field, which will appear in the
@@ -277,16 +278,17 @@ To handle the form we need to instantiate it in the view for the URL where we
 want it to be published:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.http import HttpResponseRedirect
     from django.shortcuts import render
 
     from .forms import NameForm
 
+
     def get_name(request):
         # if this is a POST request we need to process the form data
-        if request.method == 'POST':
+        if request.method == "POST":
             # create a form instance and populate it with data from the request:
             form = NameForm(request.POST)
             # check whether it's valid:
@@ -294,13 +296,13 @@ want it to be published:
                 # process the data in form.cleaned_data as required
                 # ...
                 # redirect to a new URL:
-                return HttpResponseRedirect('/thanks/')
+                return HttpResponseRedirect("/thanks/")
 
         # if a GET (or any other method) we'll create a blank form
         else:
             form = NameForm()
 
-        return render(request, 'name.html', {'form': form})
+        return render(request, "name.html", {"form": form})
 
 If we arrive at this view with a ``GET`` request, it will create an empty form
 instance and place it in the template context to be rendered. This is what we
@@ -404,9 +406,10 @@ Consider a more useful form than our minimal example above, which we could use
 to implement "contact me" functionality on a personal website:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
+
 
     class ContactForm(forms.Form):
         subject = forms.CharField(max_length=100)
@@ -453,22 +456,22 @@ values to a Python ``int`` and ``float`` respectively.
 Here's how the form data could be processed in the view that handles this form:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.core.mail import send_mail
 
     if form.is_valid():
-        subject = form.cleaned_data['subject']
-        message = form.cleaned_data['message']
-        sender = form.cleaned_data['sender']
-        cc_myself = form.cleaned_data['cc_myself']
+        subject = form.cleaned_data["subject"]
+        message = form.cleaned_data["message"]
+        sender = form.cleaned_data["sender"]
+        cc_myself = form.cleaned_data["cc_myself"]
 
-        recipients = ['info@example.com']
+        recipients = ["info@example.com"]
         if cc_myself:
             recipients.append(sender)
 
         send_mail(subject, message, sender, recipients)
-        return HttpResponseRedirect('/thanks/')
+        return HttpResponseRedirect("/thanks/")
 
 .. tip::
 
@@ -487,55 +490,142 @@ instance into the template context. So if your form is called ``form`` in the
 context, ``{{ form }}`` will render its ``<label>`` and ``<input>`` elements
 appropriately.
 
-Form rendering options
-----------------------
-
 .. admonition:: Additional form template furniture
 
     Don't forget that a form's output does *not* include the surrounding
     ``<form>`` tags, or the form's ``submit`` control. You will have to provide
     these yourself.
 
-There are other output options though for the ``<label>``/``<input>`` pairs:
+.. _reusable-form-templates:
 
-* ``{{ form.as_table }}`` will render them as table cells wrapped in ``<tr>``
-  tags
+Reusable form templates
+-----------------------
 
-* ``{{ form.as_p }}`` will render them wrapped in ``<p>`` tags
+The HTML output when rendering a form is itself generated via a template. You
+can control this by creating an appropriate template file and setting a custom
+:setting:`FORM_RENDERER` to use that
+:attr:`~django.forms.renderers.BaseRenderer.form_template_name` site-wide. You
+can also customize per-form by overriding the form's
+:attr:`~django.forms.Form.template_name` attribute to render the form using the
+custom template, or by passing the template name directly to
+:meth:`.Form.render`.
 
-* ``{{ form.as_ul }}`` will render them wrapped in ``<li>`` tags
+The example below will result in ``{{ form }}`` being rendered as the output of
+the ``form_snippet.html`` template.
 
-Note that you'll have to provide the surrounding ``<table>`` or ``<ul>``
-elements yourself.
-
-Here's the output of ``{{ form.as_p }}`` for our ``ContactForm`` instance:
+In your templates:
 
 .. code-block:: html+django
 
-    <p><label for="id_subject">Subject:</label>
-        <input id="id_subject" type="text" name="subject" maxlength="100" required></p>
-    <p><label for="id_message">Message:</label>
-        <textarea name="message" id="id_message" required></textarea></p>
-    <p><label for="id_sender">Sender:</label>
-        <input type="email" name="sender" id="id_sender" required></p>
-    <p><label for="id_cc_myself">Cc myself:</label>
-        <input type="checkbox" name="cc_myself" id="id_cc_myself"></p>
+    # In your template:
+    {{ form }}
 
-Note that each form field has an ID attribute set to ``id_<field-name>``, which
-is referenced by the accompanying label tag. This is important in ensuring that
-forms are accessible to assistive technology such as screen reader software.
-You can also :ref:`customize the way in which labels and ids are generated
-<ref-forms-api-configuring-label>`.
+    # In form_snippet.html:
+    {% for field in form %}
+        <div class="fieldWrapper">
+            {{ field.errors }}
+            {{ field.label_tag }} {{ field }}
+        </div>
+    {% endfor %}
 
-See :ref:`ref-forms-api-outputting-html` for more on this.
+Then you can configure the :setting:`FORM_RENDERER` setting:
+
+.. code-block:: python
+    :caption: ``settings.py``
+
+    from django.forms.renderers import TemplatesSetting
+
+
+    class CustomFormRenderer(TemplatesSetting):
+        form_template_name = "form_snippet.html"
+
+
+    FORM_RENDERER = "project.settings.CustomFormRenderer"
+
+… or for a single form::
+
+    class MyForm(forms.Form):
+        template_name = "form_snippet.html"
+        ...
+
+… or for a single render of a form instance, passing in the template name to
+the :meth:`.Form.render`. Here's an example of this being used in a view::
+
+    def index(request):
+        form = MyForm()
+        rendered_form = form.render("form_snippet.html")
+        context = {"form": rendered_form}
+        return render(request, "index.html", context)
+
+See :ref:`ref-forms-api-outputting-html` for more details.
+
+.. _reusable-field-group-templates:
+
+Reusable field group templates
+------------------------------
+
+.. versionadded:: 5.0
+
+Each field is available as an attribute of the form, using
+``{{form.name_of_field }}`` in a template. A field has a
+:meth:`~django.forms.BoundField.as_field_group` method which renders the
+related elements of the field as a group, its label, widget, errors, and help
+text.
+
+This allows generic templates to be written that arrange fields elements in the
+required layout. For example:
+
+.. code-block:: html+django
+
+    {{ form.non_field_errors }}
+    <div class="fieldWrapper">
+      {{ form.subject.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.message.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.sender.as_field_group }}
+    </div>
+    <div class="fieldWrapper">
+      {{ form.cc_myself.as_field_group }}
+    </div>
+
+By default Django uses the ``"django/forms/field.html"`` template which is
+designed for use with the default ``"django/forms/div.html"`` form style.
+
+The default template can be customized by by setting
+:attr:`~django.forms.renderers.BaseRenderer.field_template_name` in your
+project-level :setting:`FORM_RENDERER`::
+
+    from django.forms.renderers import TemplatesSetting
+
+
+    class CustomFormRenderer(TemplatesSetting):
+        field_template_name = "field_snippet.html"
+
+… or on a single field::
+
+    class MyForm(forms.Form):
+        subject = forms.CharField(template_name="my_custom_template.html")
+        ...
+
+… or on a per-request basis by calling
+:meth:`.BoundField.render` and supplying a template name::
+
+    def index(request):
+        form = ContactForm()
+        subject = form["subject"]
+        context = {"subject": subject.render("my_custom_template.html")}
+        return render(request, "index.html", context)
 
 Rendering fields manually
 -------------------------
 
-We don't have to let Django unpack the form's fields; we can do it manually if
-we like (allowing us to reorder the fields, for example). Each field is
-available as an attribute of the form using ``{{ form.name_of_field }}``, and
-in a Django template, will be rendered appropriately. For example:
+More fine grained control over field rendering is also possible. Likely this
+will be in a custom field template, to allow the template to be written once
+and reused for each field. However, it can also be directly accessed from the
+field attribute on the form. For example:
 
 .. code-block:: html+django
 
@@ -640,37 +730,30 @@ loop:
 
 Useful attributes on ``{{ field }}`` include:
 
-``{{ field.label }}``
-    The label of the field, e.g. ``Email address``.
+``{{ field.errors }}``
+    Outputs a ``<ul class="errorlist">`` containing any validation errors
+    corresponding to this field. You can customize the presentation of
+    the errors with a ``{% for error in field.errors %}`` loop. In this
+    case, each object in the loop is a string containing the error message.
 
-``{{ field.label_tag }}``
-    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
-    includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
-    the default ``label_suffix`` is a colon::
+``{{ field.field }}``
+    The :class:`~django.forms.Field` instance from the form class that
+    this :class:`~django.forms.BoundField` wraps. You can use it to access
+    :class:`~django.forms.Field` attributes, e.g.
+    ``{{ char_field.field.max_length }}``.
 
-        <label for="id_email">Email address:</label>
+``{{ field.help_text }}``
+    Any help text that has been associated with the field.
+
+``{{ field.html_name }}``
+    The name of the field that will be used in the input element's name
+    field. This takes the form prefix into account, if it has been set.
 
 ``{{ field.id_for_label }}``
     The ID that will be used for this field (``id_email`` in the example
     above). If you are constructing the label manually, you may want to use
     this in lieu of ``label_tag``. It's also useful, for example, if you have
     some inline JavaScript and want to avoid hardcoding the field's ID.
-
-``{{ field.value }}``
-    The value of the field. e.g ``someone@example.com``.
-
-``{{ field.html_name }}``
-    The name of the field that will be used in the input element's name
-    field. This takes the form prefix into account, if it has been set.
-
-``{{ field.help_text }}``
-    Any help text that has been associated with the field.
-
-``{{ field.errors }}``
-    Outputs a ``<ul class="errorlist">`` containing any validation errors
-    corresponding to this field. You can customize the presentation of
-    the errors with a ``{% for error in field.errors %}`` loop. In this
-    case, each object in the loop is a string containing the error message.
 
 ``{{ field.is_hidden }}``
     This attribute is ``True`` if the form field is a hidden field and
@@ -683,11 +766,42 @@ Useful attributes on ``{{ field }}`` include:
        {# Do something special #}
     {% endif %}
 
-``{{ field.field }}``
-    The :class:`~django.forms.Field` instance from the form class that
-    this :class:`~django.forms.BoundField` wraps. You can use it to access
-    :class:`~django.forms.Field` attributes, e.g.
-    ``{{ char_field.field.max_length }}``.
+``{{ field.label }}``
+    The label of the field, e.g. ``Email address``.
+
+``{{ field.label_tag }}``
+    The field's label wrapped in the appropriate HTML ``<label>`` tag. This
+    includes the form's :attr:`~django.forms.Form.label_suffix`. For example,
+    the default ``label_suffix`` is a colon:
+
+    .. code-block:: html+django
+
+        <label for="id_email">Email address:</label>
+
+``{{ field.legend_tag }}``
+
+    Similar to ``field.label_tag`` but uses a ``<legend>`` tag in place of
+    ``<label>``, for widgets with multiple inputs wrapped in a ``<fieldset>``.
+
+``{{ field.use_fieldset }}``
+
+    This attribute is ``True`` if the form field's widget contains multiple
+    inputs that should be semantically grouped in a ``<fieldset>`` with a
+    ``<legend>`` to improve accessibility. An example use in a template:
+
+.. code-block:: html+django
+
+    {% if field.use_fieldset %}
+      <fieldset>
+      {% if field.label %}{{ field.legend_tag }}{% endif %}
+    {% else %}
+      {% if field.label %}{{ field.label_tag }}{% endif %}
+    {% endif %}
+    {{ field }}
+    {% if field.use_fieldset %}</fieldset>{% endif %}
+
+``{{ field.value }}``
+    The value of the field. e.g ``someone@example.com``.
 
 .. seealso::
 
@@ -727,37 +841,6 @@ This example does not handle any errors in the hidden fields. Usually, an
 error in a hidden field is a sign of form tampering, since normal form
 interaction won't alter them. However, you could easily insert some error
 displays for those form errors, as well.
-
-Reusable form templates
------------------------
-
-If your site uses the same rendering logic for forms in multiple places, you
-can reduce duplication by saving the form's loop in a standalone template and
-using the :ttag:`include` tag to reuse it in other templates:
-
-.. code-block:: html+django
-
-    # In your form template:
-    {% include "form_snippet.html" %}
-
-    # In form_snippet.html:
-    {% for field in form %}
-        <div class="fieldWrapper">
-            {{ field.errors }}
-            {{ field.label_tag }} {{ field }}
-        </div>
-    {% endfor %}
-
-If the form object passed to a template has a different name within the
-context, you can alias it using the ``with`` argument of the :ttag:`include`
-tag:
-
-.. code-block:: html+django
-
-    {% include "form_snippet.html" with form=comment_form %}
-
-If you find yourself doing this often, you might consider creating a custom
-:ref:`inclusion tag<howto-custom-template-tags-inclusion-tags>`.
 
 Further topics
 ==============

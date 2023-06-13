@@ -3,12 +3,12 @@
 # Translators:
 # captain_m4l <qotsaman@gmail.com>, 2012
 # Igor Melnyk, 2014-2015
-# Illia Volochii <illia.volochii@gmail.com>, 2021
+# Illia Volochii <illia.volochii@gmail.com>, 2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Kirill Gagarski <gagarin.gtn@gmail.com>, 2015
 # Max V. Stotsky <transifex@ms.pereslavl.ru>, 2014
 # captain_m4l <qotsaman@gmail.com>, 2012
-# Mykola Zamkovoi <nickzam@gmail.com>, 2014
+# Mykola Zamkovoi <nickzam@gmail.com>, 2014,2021
 # Alex Bolotov <oleksandr.bolotov@gmail.com>, 2013
 # Vitaliy Kozlovskyi <ubombi@gmail.com>, 2015
 # Zoriana Zaiats, 2016-2017
@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2021-01-19 23:40+0000\n"
-"Last-Translator: Illia Volochii <illia.volochii@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Illia Volochii <illia.volochii@gmail.com>, 2021,2023\n"
 "Language-Team: Ukrainian (http://www.transifex.com/django/django/language/"
 "uk/)\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr ""
 "(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 msgid "Personal info"
-msgstr "Персональна інформація"
+msgstr "Особиста інформація"
 
 msgid "Permissions"
 msgstr "Дозволи"
@@ -147,6 +147,9 @@ msgstr "робочий фактор"
 
 msgid "checksum"
 msgstr "контрольна сума"
+
+msgid "block size"
+msgstr "розмір блоку"
 
 msgid "name"
 msgstr "ім'я"
@@ -282,11 +285,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Скидання пароля на %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
 "Введіть коректне ім'я користувача. Значення цього поля може складатися лише "
-"з англійських літер, цифр, а також з символів: @/./+/-/_."
+"з малих літер a‒z і великих A‒Z, цифр, а також з символів @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

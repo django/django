@@ -10,7 +10,6 @@ from django.db import models
 
 
 class CategoryMetaDataManager(models.Manager):
-
     def get_by_natural_key(self, kind, name):
         return self.get(kind=kind, name=name)
 
@@ -22,10 +21,10 @@ class CategoryMetaData(models.Model):
     objects = CategoryMetaDataManager()
 
     class Meta:
-        unique_together = (('kind', 'name'),)
+        unique_together = (("kind", "name"),)
 
     def __str__(self):
-        return '[%s:%s]=%s' % (self.kind, self.name, self.value)
+        return "[%s:%s]=%s" % (self.kind, self.name, self.value)
 
     def natural_key(self):
         return (self.kind, self.name)
@@ -33,10 +32,12 @@ class CategoryMetaData(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=20)
-    meta_data = models.ForeignKey(CategoryMetaData, models.SET_NULL, null=True, default=None)
+    meta_data = models.ForeignKey(
+        CategoryMetaData, models.SET_NULL, null=True, default=None
+    )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -46,10 +47,21 @@ class Author(models.Model):
     name = models.CharField(max_length=20)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
+
+
+class TopicManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related("category")
+
+
+class Topic(models.Model):
+    name = models.CharField(max_length=255)
+    category = models.ForeignKey(Category, models.CASCADE, null=True)
+    objects = TopicManager()
 
 
 class Article(models.Model):
@@ -58,9 +70,10 @@ class Article(models.Model):
     pub_date = models.DateTimeField()
     categories = models.ManyToManyField(Category)
     meta_data = models.ManyToManyField(CategoryMetaData)
+    topics = models.ManyToManyField(Topic)
 
     class Meta:
-        ordering = ('pub_date',)
+        ordering = ("pub_date",)
 
     def __str__(self):
         return self.headline
@@ -78,7 +91,7 @@ class Actor(models.Model):
     name = models.CharField(max_length=20, primary_key=True)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ("name",)
 
     def __str__(self):
         return self.name
@@ -87,10 +100,10 @@ class Actor(models.Model):
 class Movie(models.Model):
     actor = models.ForeignKey(Actor, models.CASCADE)
     title = models.CharField(max_length=50)
-    price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal('0.00'))
+    price = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal("0.00"))
 
     class Meta:
-        ordering = ('title',)
+        ordering = ("title",)
 
     def __str__(self):
         return self.title
@@ -112,7 +125,6 @@ class Team:
 
 
 class TeamField(models.CharField):
-
     def __init__(self):
         super().__init__(max_length=100)
 
@@ -132,7 +144,7 @@ class TeamField(models.CharField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        del kwargs['max_length']
+        del kwargs["max_length"]
         return name, path, args, kwargs
 
 
@@ -142,7 +154,7 @@ class Player(models.Model):
     team = TeamField()
 
     def __str__(self):
-        return '%s (%d) playing for %s' % (self.name, self.rank, self.team.to_string())
+        return "%s (%d) playing for %s" % (self.name, self.rank, self.team.to_string())
 
 
 class BaseModel(models.Model):

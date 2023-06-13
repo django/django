@@ -69,11 +69,6 @@ PostgreSQL
 PostgreSQL is the most capable of all the databases here in terms of schema
 support.
 
-The only caveat is that prior to PostgreSQL 11, adding columns with default
-values causes a full rewrite of the table, for a time proportional to its size.
-For this reason, it's recommended you always create new columns with
-``null=True``, as this way they will be added immediately.
-
 MySQL
 -----
 
@@ -115,7 +110,9 @@ Workflow
 ========
 
 Django can create migrations for you. Make changes to your models - say, add a
-field and remove a model - and then run :djadmin:`makemigrations`::
+field and remove a model - and then run :djadmin:`makemigrations`:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations
     Migrations for 'books':
@@ -129,7 +126,9 @@ will be written out. Make sure to read the output to see what
 complex changes it might not be detecting what you expect.
 
 Once you have your new migration files, you should apply them to your
-database to make sure they work as expected::
+database to make sure they work as expected:
+
+.. code-block:: shell
 
     $ python manage.py migrate
     Operations to perform:
@@ -145,7 +144,9 @@ get both the changes to your models and the accompanying migration at the
 same time.
 
 If you want to give the migration(s) a meaningful name instead of a generated
-one, you can use the :option:`makemigrations --name` option::
+one, you can use the :option:`makemigrations --name` option:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations --name changed_my_model your_app_label
 
@@ -182,6 +183,7 @@ You can prevent a migration from running in a transaction by setting the
 
     from django.db import migrations
 
+
     class Migration(migrations.Migration):
         atomic = False
 
@@ -201,7 +203,7 @@ migration will contain a dependency on a migration in ``authors``.
 
 This means that when you run the migrations, the ``authors`` migration runs
 first and creates the table the ``ForeignKey`` references, and then the migration
-that makes the ``ForeignKey`` column runs afterwards and creates the constraint.
+that makes the ``ForeignKey`` column runs afterward and creates the constraint.
 If this didn't happen, the migration would try to create the ``ForeignKey``
 column without the table it's referencing existing and your database would
 throw an error.
@@ -216,6 +218,26 @@ Apps without migrations must not have relations (``ForeignKey``,
 ``ManyToManyField``, etc.) to apps with migrations. Sometimes it may work, but
 it's not supported.
 
+Swappable dependencies
+----------------------
+
+.. function:: django.db.migrations.swappable_dependency(value)
+
+The ``swappable_dependency()`` function is used in migrations to declare
+"swappable" dependencies on migrations in the app of the swapped-in model,
+currently, on the first migration of this app. As a consequence, the swapped-in
+model should be created in the initial migration. The argument ``value`` is a
+string ``"<app label>.<model>"`` describing an app label and a model name, e.g.
+``"myapp.MyModel"``.
+
+By using ``swappable_dependency()``, you inform the migration framework that
+the migration relies on another migration which sets up a swappable model,
+allowing for the possibility of substituting the model with a different
+implementation in the future. This is typically used for referencing models
+that are subject to customization or replacement, such as the custom user
+model (``settings.AUTH_USER_MODEL``, which defaults to ``"auth.User"``) in
+Django's authentication system.
+
 .. _migration-files:
 
 Migration files
@@ -229,13 +251,13 @@ A basic migration file looks like this::
 
     from django.db import migrations, models
 
-    class Migration(migrations.Migration):
 
-        dependencies = [('migrations', '0001_initial')]
+    class Migration(migrations.Migration):
+        dependencies = [("migrations", "0001_initial")]
 
         operations = [
-            migrations.DeleteModel('Tribble'),
-            migrations.AddField('Author', 'rating', models.IntegerField(default=0)),
+            migrations.DeleteModel("Tribble"),
+            migrations.AddField("Author", "rating", models.IntegerField(default=0)),
         ]
 
 What Django looks for when it loads a migration file (as a Python module) is
@@ -285,6 +307,7 @@ by defining a ``use_in_migrations`` attribute on the manager class::
     class MyManager(models.Manager):
         use_in_migrations = True
 
+
     class MyModel(models.Model):
         objects = MyManager()
 
@@ -294,6 +317,7 @@ class to make it importable::
 
     class MyManager(MyBaseManager.from_queryset(CustomQuerySet)):
         use_in_migrations = True
+
 
     class MyModel(models.Model):
         objects = MyManager()
@@ -347,7 +371,9 @@ by running :djadmin:`makemigrations` once you've made some changes.
 
 If your app already has models and database tables, and doesn't have migrations
 yet (for example, you created it against a previous Django version), you'll
-need to convert it to use migrations by running::
+need to convert it to use migrations by running:
+
+.. code-block:: shell
 
     $ python manage.py makemigrations your_app_label
 
@@ -426,7 +452,7 @@ historical model versions rather than importing them directly.
 
   If you import models directly rather than using the historical models,
   your migrations *may work initially* but will fail in the future when you
-  try to re-run old migrations (commonly, when you set up a new installation
+  try to rerun old migrations (commonly, when you set up a new installation
   and run through all the migrations to set up the database).
 
   This means that historical model problems may not be immediately obvious.
@@ -479,12 +505,12 @@ similar to the following::
 
     class IPAddressField(Field):
         system_check_deprecated_details = {
-            'msg': (
-                'IPAddressField has been deprecated. Support for it (except '
-                'in historical migrations) will be removed in Django 1.9.'
+            "msg": (
+                "IPAddressField has been deprecated. Support for it (except "
+                "in historical migrations) will be removed in Django 1.9."
             ),
-            'hint': 'Use GenericIPAddressField instead.',  # optional
-            'id': 'fields.W900',  # pick a unique ID for your field.
+            "hint": "Use GenericIPAddressField instead.",  # optional
+            "id": "fields.W900",  # pick a unique ID for your field.
         }
 
 After a deprecation period of your choosing (two or three feature releases for
@@ -494,12 +520,12 @@ to::
 
     class IPAddressField(Field):
         system_check_removed_details = {
-            'msg': (
-                'IPAddressField has been removed except for support in '
-                'historical migrations.'
+            "msg": (
+                "IPAddressField has been removed except for support in "
+                "historical migrations."
             ),
-            'hint': 'Use GenericIPAddressField instead.',
-            'id': 'fields.E900',  # pick a unique ID for your field.
+            "hint": "Use GenericIPAddressField instead.",
+            "id": "fields.E900",  # pick a unique ID for your field.
         }
 
 You should keep the field's methods that are required for it to operate in
@@ -526,7 +552,9 @@ the main operation you use for data migrations is
 :class:`~django.db.migrations.operations.RunPython`.
 
 To start, make an empty migration file you can work from (Django will put
-the file in the right place, suggest a name, and add dependencies for you)::
+the file in the right place, suggest a name, and add dependencies for you):
+
+.. code-block:: shell
 
     python manage.py makemigrations --empty yourappname
 
@@ -535,14 +563,13 @@ Then, open up the file; it should look something like this::
     # Generated by Django A.B on YYYY-MM-DD HH:MM
     from django.db import migrations
 
+
     class Migration(migrations.Migration):
-
         dependencies = [
-            ('yourappname', '0001_initial'),
+            ("yourappname", "0001_initial"),
         ]
 
-        operations = [
-        ]
+        operations = []
 
 Now, all you need to do is create a new function and have
 :class:`~django.db.migrations.operations.RunPython` use it.
@@ -561,18 +588,19 @@ the historical model and iterate over the rows::
 
     from django.db import migrations
 
+
     def combine_names(apps, schema_editor):
         # We can't import the Person model directly as it may be a newer
         # version than this migration expects. We use the historical version.
-        Person = apps.get_model('yourappname', 'Person')
+        Person = apps.get_model("yourappname", "Person")
         for person in Person.objects.all():
-            person.name = '%s %s' % (person.first_name, person.last_name)
+            person.name = f"{person.first_name} {person.last_name}"
             person.save()
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = [
-            ('yourappname', '0001_initial'),
+            ("yourappname", "0001_initial"),
         ]
 
         operations = [
@@ -603,11 +631,10 @@ than the fact it will need to access models from both apps. Therefore we've
 added a dependency that specifies the last migration of ``app2``::
 
     class Migration(migrations.Migration):
-
         dependencies = [
-            ('app1', '0001_initial'),
+            ("app1", "0001_initial"),
             # added dependency to enable using models from app2 in move_m1
-            ('app2', '0004_foobar'),
+            ("app2", "0004_foobar"),
         ]
 
         operations = [
@@ -665,7 +692,9 @@ releases in order without skipping any), and then remove the old files, commit
 and do a second release.
 
 The command that backs all this is :djadmin:`squashmigrations` - pass it the
-app label and migration name you want to squash up to, and it'll get to work::
+app label and migration name you want to squash up to, and it'll get to work:
+
+.. code-block:: shell
 
   $ ./manage.py squashmigrations myapp 0004
   Will squash the following migrations:
@@ -715,6 +744,11 @@ You must then transition the squashed migration to a normal migration by:
     Once you've squashed a migration, you should not then re-squash that squashed
     migration until you have fully transitioned it to a normal migration.
 
+.. admonition:: Pruning references to deleted migrations
+
+    If it is likely that you may reuse the name of a deleted migration in the
+    future, you should remove references to it from Django’s migrations table
+    with the :option:`migrate --prune` option.
 
 .. _migration-serializing:
 
@@ -737,7 +771,7 @@ Django can serialize the following:
 - ``datetime.date``, ``datetime.time``, and ``datetime.datetime`` instances
   (include those that are timezone-aware)
 - ``decimal.Decimal`` instances
-- ``enum.Enum`` instances
+- ``enum.Enum``  and ``enum.Flag`` instances
 - ``uuid.UUID`` instances
 - :func:`functools.partial` and :class:`functools.partialmethod` instances
   which have serializable ``func``, ``args``, and ``keywords`` values.
@@ -754,10 +788,9 @@ Django can serialize the following:
 - Any class reference (must be in module's top-level scope)
 - Anything with a custom ``deconstruct()`` method (:ref:`see below <custom-deconstruct-method>`)
 
-.. versionchanged:: 3.2
+.. versionchanged:: 4.2
 
-    Serialization support for pure and concrete path objects from
-    :mod:`pathlib`, and :class:`os.PathLike` instances was added.
+    Serialization support for ``enum.Flag`` was added.
 
 Django cannot serialize:
 
@@ -779,9 +812,11 @@ this::
     from django.db.migrations.serializer import BaseSerializer
     from django.db.migrations.writer import MigrationWriter
 
+
     class DecimalSerializer(BaseSerializer):
         def serialize(self):
-            return repr(self.value), {'from decimal import Decimal'}
+            return repr(self.value), {"from decimal import Decimal"}
+
 
     MigrationWriter.register_serializer(Decimal, DecimalSerializer)
 
@@ -831,9 +866,9 @@ serializable, you can use the ``@deconstructible`` class decorator from
 
     from django.utils.deconstruct import deconstructible
 
+
     @deconstructible
     class MyCustomClass:
-
         def __init__(self, foo=1):
             self.foo = foo
             ...

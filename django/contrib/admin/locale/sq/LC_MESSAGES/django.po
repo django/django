@@ -2,15 +2,15 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011,2015
-# Besnik Bleta <besnik@programeshqip.org>, 2020
+# Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2023
 # Besnik Bleta <besnik@programeshqip.org>, 2015,2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020,2022-2023\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: sq\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Fshiji %(verbose_name_plural)s e përzgjedhur"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -29,10 +33,6 @@ msgstr "S’mund të fshijë %(name)s"
 
 msgid "Are you sure?"
 msgstr "Jeni i sigurt?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Fshiji %(verbose_name_plural)s e përzgjedhur"
 
 msgid "Administration"
 msgstr "Administrim"
@@ -268,8 +268,9 @@ msgstr "0 nga %(cnt)s të përzgjedhur"
 msgid "Change history: %s"
 msgstr "Ndryshoni historikun: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -366,15 +367,17 @@ msgid "Change password"
 msgstr "Ndryshoni fjalëkalimin"
 
 msgid "Please correct the error below."
-msgstr "Ju lutemi, ndreqni gabimin më poshtë."
-
-msgid "Please correct the errors below."
-msgstr "Ju lutemi, ndreqni gabimet më poshtë."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Ju lutemi, ndreqni gabimin më poshtë."
+msgstr[1] "Ju lutemi, ndreqni gabimet më poshtë."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr ""
 "Jepni një fjalëkalim të ri për përdoruesin <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Kalo te lënda bazë"
 
 msgid "Welcome,"
 msgstr "Mirë se vini,"
@@ -387,6 +390,9 @@ msgstr "Dokumentim"
 
 msgid "Log out"
 msgstr "Dilni"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -413,6 +419,15 @@ msgstr "Përparësi renditjesh: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Shfaq/fshih renditjen"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Ndërroni temën (temë e tanishme: auto)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Ndërroni temën (temë e tanishme: e çelët)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Ndërroni temën (temë e tanishme: e errët)"
 
 msgid "Delete"
 msgstr "Fshije"
@@ -524,7 +539,16 @@ msgid "Forgotten your password or username?"
 msgstr "Harruat fjalëkalimin ose emrin tuaj të përdoruesit?"
 
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Shfaqni/fshihni lëvizjen"
+
+msgid "Sidebar"
+msgstr "Anështyllë"
+
+msgid "Start typing to filter…"
+msgstr "Që të bëhet filtrim, filloni të shtypni…"
+
+msgid "Filter navigation items"
+msgstr "Filtroni elementë lëvizjeje"
 
 msgid "Date/time"
 msgstr "Datë/kohë"
@@ -534,6 +558,11 @@ msgstr "Përdorues"
 
 msgid "Action"
 msgstr "Veprim"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "zë"
+msgstr[1] "zëra"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -591,8 +620,12 @@ msgstr "Shtoni një %(model)s tjetër"
 msgid "Delete selected %(model)s"
 msgstr "Fshije %(model)s e përzgjedhur"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Faleminderit që shpenzoni sot pak kohë të çmuar me sajtin Web."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Shihni %(model)s e përzgjedhur"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Faleminderit që harxhoni pak kohë me sajtin sot."
 
 msgid "Log in again"
 msgstr "Hyni sërish"

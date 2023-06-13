@@ -22,11 +22,9 @@ GeoDjango currently provides the following spatial database backends:
 MySQL Spatial Limitations
 -------------------------
 
-Before MySQL 5.6.1, spatial extensions only support bounding box operations
-(what MySQL calls minimum bounding rectangles, or MBR). Specifically, MySQL did
-not conform to the OGC standard. Django supports spatial functions operating on
-real geometries available in modern MySQL versions. However, the spatial
-functions are not as rich as other backends like PostGIS.
+Django supports spatial functions operating on real geometries available in
+modern MySQL versions. However, the spatial functions are not as rich as other
+backends like PostGIS.
 
 Raster Support
 --------------
@@ -39,29 +37,39 @@ Creating and Saving Models with Geometry Fields
 ===============================================
 
 Here is an example of how to create a geometry object (assuming the ``Zipcode``
-model)::
+model):
+
+.. code-block:: pycon
 
     >>> from zipcode.models import Zipcode
-    >>> z = Zipcode(code=77096, poly='POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> z = Zipcode(code=77096, poly="POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))")
     >>> z.save()
 
-:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models::
+:class:`~django.contrib.gis.geos.GEOSGeometry` objects may also be used to save geometric models:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> poly = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))')
+    >>> poly = GEOSGeometry("POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))")
     >>> z = Zipcode(code=77096, poly=poly)
     >>> z.save()
 
 Moreover, if the ``GEOSGeometry`` is in a different coordinate system (has a
 different SRID value) than that of the field, then it will be implicitly
 transformed into the SRID of the model's field, using the spatial database's
-transform procedure::
+transform procedure:
 
-    >>> poly_3084 = GEOSGeometry('POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))', srid=3084)  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
+.. code-block:: pycon
+
+    >>> poly_3084 = GEOSGeometry(
+    ...     "POLYGON(( 10 10, 10 20, 20 20, 20 15, 10 10))", srid=3084
+    ... )  # SRID 3084 is 'NAD83(HARN) / Texas Centric Lambert Conformal'
     >>> z = Zipcode(code=78212, poly=poly_3084)
     >>> z.save()
     >>> from django.db import connection
-    >>> print(connection.queries[-1]['sql']) # printing the last SQL statement executed (requires DEBUG=True)
+    >>> print(
+    ...     connection.queries[-1]["sql"]
+    ... )  # printing the last SQL statement executed (requires DEBUG=True)
     INSERT INTO "geoapp_zipcode" ("code", "poly") VALUES (78212, ST_Transform(ST_GeomFromWKB('\\001 ... ', 3084), 4326))
 
 Thus, geometry parameters may be passed in using the ``GEOSGeometry`` object, WKT
@@ -84,27 +92,47 @@ The raster field will therefore accept any input that is accepted by the
 :class:`~django.contrib.gis.gdal.GDALRaster` constructor.
 
 Here is an example of how to create a raster object from a raster file
-``volcano.tif`` (assuming the ``Elevation`` model)::
+``volcano.tif`` (assuming the ``Elevation`` model):
+
+.. code-block:: pycon
 
     >>> from elevation.models import Elevation
-    >>> dem = Elevation(name='Volcano', rast='/path/to/raster/volcano.tif')
+    >>> dem = Elevation(name="Volcano", rast="/path/to/raster/volcano.tif")
     >>> dem.save()
 
 :class:`~django.contrib.gis.gdal.GDALRaster` objects may also be used to save
-raster models::
+raster models:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import GDALRaster
-    >>> rast = GDALRaster({'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...                    'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]})
-    >>> dem = Elevation(name='Canyon', rast=rast)
+    >>> rast = GDALRaster(
+    ...     {
+    ...         "width": 10,
+    ...         "height": 10,
+    ...         "name": "Canyon",
+    ...         "srid": 4326,
+    ...         "scale": [0.1, -0.1],
+    ...         "bands": [{"data": range(100)}],
+    ...     }
+    ... )
+    >>> dem = Elevation(name="Canyon", rast=rast)
     >>> dem.save()
 
-Note that this equivalent to::
+Note that this equivalent to:
+
+.. code-block:: pycon
 
     >>> dem = Elevation.objects.create(
-    ...     name='Canyon',
-    ...     rast={'width': 10, 'height': 10, 'name': 'Canyon', 'srid': 4326,
-    ...           'scale': [0.1, -0.1], 'bands': [{"data": range(100)}]},
+    ...     name="Canyon",
+    ...     rast={
+    ...         "width": 10,
+    ...         "height": 10,
+    ...         "name": "Canyon",
+    ...         "srid": 4326,
+    ...         "scale": [0.1, -0.1],
+    ...         "bands": [{"data": range(100)}],
+    ...     },
     ... )
 
 .. _spatial-lookups-intro:
@@ -127,12 +155,16 @@ Geometry Lookups
 ----------------
 
 Geographic queries with geometries take the following general form (assuming
-the ``Zipcode`` model used in the :doc:`model-api`)::
+the ``Zipcode`` model used in the :doc:`model-api`):
+
+.. code-block:: text
 
     >>> qs = Zipcode.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Zipcode.objects.exclude(...)
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> qs = Zipcode.objects.filter(poly__contains=pnt)
     >>> qs = Elevation.objects.filter(poly__contains=rst)
@@ -159,13 +191,17 @@ used to pass a band index. On the right hand side, a tuple of the raster and
 band index can be specified.
 
 This results in the following general form for lookups involving rasters
-(assuming the ``Elevation`` model used in the :doc:`model-api`)::
+(assuming the ``Elevation`` model used in the :doc:`model-api`):
+
+.. code-block:: text
 
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<band_index>__<lookup_type>=<parameter>)
     >>> qs = Elevation.objects.filter(<field>__<lookup_type>=(<raster_input, <band_index>)
 
-For example::
+For example:
+
+.. code-block:: pycon
 
     >>> qs = Elevation.objects.filter(rast__contains=geom)
     >>> qs = Elevation.objects.filter(rast__contains=rst)
@@ -252,19 +288,22 @@ For example, let's say we have a ``SouthTexasCity`` model (from the
 
     from django.contrib.gis.db import models
 
+
     class SouthTexasCity(models.Model):
         name = models.CharField(max_length=30)
         # A projected coordinate system (only valid for South Texas!)
         # is used, units are in meters.
         point = models.PointField(srid=32140)
 
-Then distance queries may be performed as follows::
+Then distance queries may be performed as follows:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.geos import GEOSGeometry
-    >>> from django.contrib.gis.measure import D # ``D`` is a shortcut for ``Distance``
+    >>> from django.contrib.gis.measure import D  # ``D`` is a shortcut for ``Distance``
     >>> from geoapp.models import SouthTexasCity
     # Distances will be calculated from this point, which does not have to be projected.
-    >>> pnt = GEOSGeometry('POINT(-96.876369 29.905320)', srid=4326)
+    >>> pnt = GEOSGeometry("POINT(-96.876369 29.905320)", srid=4326)
     # If numeric parameter, units of field (meters in this case) are assumed.
     >>> qs = SouthTexasCity.objects.filter(point__distance_lte=(pnt, 7000))
     # Find all Cities within 7 km, > 20 miles away, and > 100 chains away (an obscure unit)
@@ -275,7 +314,9 @@ Then distance queries may be performed as follows::
 Raster queries work the same way by replacing the geometry field ``point`` with
 a raster field, or the ``pnt`` object with a raster object, or both. To specify
 the band index of a raster input on the right hand side, a 3-tuple can be
-passed to the lookup as follows::
+passed to the lookup as follows:
+
+.. code-block:: pycon
 
     >>> qs = SouthTexasCity.objects.filter(point__distance_gte=(rst, 2, D(km=7)))
 
@@ -318,7 +359,8 @@ Lookup Type                        PostGIS    Oracle   MariaDB   MySQL [#]_   Sp
 :lookup:`equals`                   X          X        X         X            X          C
 :lookup:`exact <same_as>`          X          X        X         X            X          B
 :lookup:`intersects`               X          X        X         X            X          B
-:lookup:`isvalid`                  X          X                  X (≥ 5.7.5)  X
+:lookup:`isempty`                  X
+:lookup:`isvalid`                  X          X                  X            X
 :lookup:`overlaps`                 X          X        X         X            X          B
 :lookup:`relate`                   X          X        X                      X          C
 :lookup:`same_as`                  X          X        X         X            X          B
@@ -348,7 +390,7 @@ functions are available on each spatial backend.
 Function                              PostGIS  Oracle         MariaDB      MySQL       SpatiaLite
 ====================================  =======  ============== ============ =========== =================
 :class:`Area`                         X        X              X            X           X
-:class:`AsGeoJSON`                    X        X              X (≥ 10.2.4) X (≥ 5.7.5) X
+:class:`AsGeoJSON`                    X        X              X            X           X
 :class:`AsGML`                        X        X                                       X
 :class:`AsKML`                        X                                                X
 :class:`AsSVG`                        X                                                X
@@ -357,13 +399,17 @@ Function                              PostGIS  Oracle         MariaDB      MySQL
 :class:`Azimuth`                      X                                                X (LWGEOM/RTTOPO)
 :class:`BoundingCircle`               X        X
 :class:`Centroid`                     X        X              X            X           X
+:class:`ClosestPoint`                 X                                                X
 :class:`Difference`                   X        X              X            X           X
 :class:`Distance`                     X        X              X            X           X
 :class:`Envelope`                     X        X              X            X           X
 :class:`ForcePolygonCW`               X                                                X
-:class:`GeoHash`                      X                                    X (≥ 5.7.5) X (LWGEOM/RTTOPO)
+:class:`FromWKB`                      X        X              X            X           X
+:class:`FromWKT`                      X        X              X            X           X
+:class:`GeoHash`                      X                                    X           X (LWGEOM/RTTOPO)
 :class:`Intersection`                 X        X              X            X           X
-:class:`IsValid`                      X        X                           X (≥ 5.7.5) X
+:class:`IsEmpty`                      X
+:class:`IsValid`                      X        X                           X           X
 :class:`Length`                       X        X              X            X           X
 :class:`LineLocatePoint`              X                                                X
 :class:`MakeValid`                    X                                                X (LWGEOM/RTTOPO)

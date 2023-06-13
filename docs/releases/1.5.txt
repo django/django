@@ -155,7 +155,9 @@ Caching of related model instances
 ----------------------------------
 
 When traversing relations, the ORM will avoid re-fetching objects that were
-previously loaded. For example, with the tutorial's models::
+previously loaded. For example, with the tutorial's models:
+
+.. code-block:: pycon
 
     >>> first_poll = Poll.objects.all()[0]
     >>> first_choice = first_poll.choice_set.all()[0]
@@ -263,7 +265,7 @@ Django 1.5 also includes several smaller improvements worth noting:
 * The :djadmin:`dumpdata` management command outputs one row at a time,
   preventing out-of-memory errors when dumping large datasets.
 
-* In the localflavor for Canada, "pq" was added to the acceptable codes for
+* In the localflavor for Canada, ``pq`` was added to the acceptable codes for
   Quebec. It's an old abbreviation.
 
 * The :ref:`receiver <connecting-receiver-functions>` decorator is now able to
@@ -403,7 +405,9 @@ Context in year and month archive class-based views
 provide a ``date_list`` sorted in ascending order in the context, like their
 function-based predecessors, but it actually was in descending order. In 1.5,
 the documented order was restored. You may want to add (or remove) the
-``reversed`` keyword when you're iterating on ``date_list`` in a template::
+``reversed`` keyword when you're iterating on ``date_list`` in a template:
+
+.. code-block:: html+django
 
     {% for date in date_list reversed %}
 
@@ -485,10 +489,10 @@ in some circumstances.
 JSON-related features in Django 1.4 always used ``django.utils.simplejson``.
 This module was actually:
 
-- A system version of ``simplejson``, if one was available (ie. ``import
+- A system version of ``simplejson``, if one was available (i.e. ``import
   simplejson`` works), if it was more recent than Django's built-in copy or it
   had the C speedups, or
-- The :mod:`json` module from the standard library, if it was available (ie.
+- The :mod:`json` module from the standard library, if it was available (i.e.
   Python 2.6 or greater), or
 - A built-in copy of version 2.0.7 of ``simplejson``.
 

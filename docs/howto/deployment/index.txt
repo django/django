@@ -1,8 +1,8 @@
-================
-Deploying Django
-================
+====================
+How to deploy Django
+====================
 
-Django is full of shortcuts to make Web developers' lives easier, but all
+Django is full of shortcuts to make web developers' lives easier, but all
 those tools are of no use if you can't easily deploy your sites. Since Django's
 inception, ease of deployment has been a major goal.
 
@@ -16,7 +16,7 @@ make that communication happen.
 
 Django currently supports two interfaces: WSGI and ASGI.
 
-* `WSGI`_ is the main Python standard for communicating between Web servers and
+* `WSGI`_ is the main Python standard for communicating between web servers and
   applications, but it only supports synchronous code.
 
 * `ASGI`_ is the new, asynchronous-friendly standard that will allow your

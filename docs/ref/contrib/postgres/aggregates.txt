@@ -12,15 +12,17 @@ module. They are described in more detail in the `PostgreSQL docs
 .. note::
 
     All functions come without default aliases, so you must explicitly provide
-    one. For example::
+    one. For example:
 
-        >>> SomeModel.objects.aggregate(arr=ArrayAgg('somefield'))
+    .. code-block:: pycon
+
+        >>> SomeModel.objects.aggregate(arr=ArrayAgg("somefield"))
         {'arr': [0, 1, 2]}
 
 .. admonition:: Common aggregate options
 
-    All aggregates have the :ref:`filter <aggregate-filter>` keyword
-    argument.
+    All aggregates have the :ref:`filter <aggregate-filter>` keyword argument
+    and most also have the :ref:`default <aggregate-default>` keyword argument.
 
 General-purpose aggregation functions
 =====================================
@@ -28,9 +30,10 @@ General-purpose aggregation functions
 ``ArrayAgg``
 ------------
 
-.. class:: ArrayAgg(expression, distinct=False, filter=None, ordering=(), **extra)
+.. class:: ArrayAgg(expression, distinct=False, filter=None, default=None, ordering=(), **extra)
 
-    Returns a list of values, including nulls, concatenated into an array.
+    Returns a list of values, including nulls, concatenated into an array, or
+    ``default`` if there are no values.
 
     .. attribute:: distinct
 
@@ -46,34 +49,49 @@ General-purpose aggregation functions
 
         Examples::
 
-            'some_field'
-            '-some_field'
+            "some_field"
+            "-some_field"
             from django.db.models import F
-            F('some_field').desc()
+
+            F("some_field").desc()
+
+    .. versionchanged:: 5.0
+
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``ArrayAgg`` returned an empty list instead of ``None``. If
+        you need it, explicitly set ``default`` to ``Value([])``.
 
 ``BitAnd``
 ----------
 
-.. class:: BitAnd(expression, filter=None, **extra)
+.. class:: BitAnd(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``AND`` of all non-null input values, or
-    ``None`` if all values are null.
+    ``default`` if all values are null.
 
 ``BitOr``
 ---------
 
-.. class:: BitOr(expression, filter=None, **extra)
+.. class:: BitOr(expression, filter=None, default=None, **extra)
 
     Returns an ``int`` of the bitwise ``OR`` of all non-null input values, or
-    ``None`` if all values are null.
+    ``default`` if all values are null.
+
+``BitXor``
+----------
+
+.. class:: BitXor(expression, filter=None, default=None, **extra)
+
+    Returns an ``int`` of the bitwise ``XOR`` of all non-null input values, or
+    ``default`` if all values are null. It requires PostgreSQL 14+.
 
 ``BoolAnd``
 -----------
 
-.. class:: BoolAnd(expression, filter=None, **extra)
+.. class:: BoolAnd(expression, filter=None, default=None, **extra)
 
-    Returns ``True``, if all input values are true, ``None`` if all values are
-    null or if there are no values, otherwise ``False`` .
+    Returns ``True``, if all input values are true, ``default`` if all values
+    are null or if there are no values, otherwise ``False``.
 
     Usage example::
 
@@ -82,9 +100,11 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
+    .. code-block:: pycon
+
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolAnd
-        >>> Comment.objects.aggregate(booland=BoolAnd('published'))
+        >>> Comment.objects.aggregate(booland=BoolAnd("published"))
         {'booland': False}
         >>> Comment.objects.aggregate(booland=BoolAnd(Q(rank__lt=100)))
         {'booland': True}
@@ -92,9 +112,9 @@ General-purpose aggregation functions
 ``BoolOr``
 ----------
 
-.. class:: BoolOr(expression, filter=None, **extra)
+.. class:: BoolOr(expression, filter=None, default=None, **extra)
 
-    Returns ``True`` if at least one input value is true, ``None`` if all
+    Returns ``True`` if at least one input value is true, ``default`` if all
     values are null or if there are no values, otherwise ``False``.
 
     Usage example::
@@ -104,9 +124,11 @@ General-purpose aggregation functions
             published = models.BooleanField()
             rank = models.IntegerField()
 
+    .. code-block:: pycon
+
         >>> from django.db.models import Q
         >>> from django.contrib.postgres.aggregates import BoolOr
-        >>> Comment.objects.aggregate(boolor=BoolOr('published'))
+        >>> Comment.objects.aggregate(boolor=BoolOr("published"))
         {'boolor': True}
         >>> Comment.objects.aggregate(boolor=BoolOr(Q(rank__gt=2)))
         {'boolor': False}
@@ -114,20 +136,18 @@ General-purpose aggregation functions
 ``JSONBAgg``
 ------------
 
-.. class:: JSONBAgg(expressions, distinct=False, filter=None, ordering=(), **extra)
+.. class:: JSONBAgg(expressions, distinct=False, filter=None, default=None, ordering=(), **extra)
 
-    Returns the input values as a ``JSON`` array.
+    Returns the input values as a ``JSON`` array, or ``default`` if there are
+    no values. You can query the result using :lookup:`key and index lookups
+    <jsonfield.key>`.
 
     .. attribute:: distinct
-
-        .. versionadded:: 3.2
 
         An optional boolean argument that determines if array values will be
         distinct. Defaults to ``False``.
 
     .. attribute:: ordering
-
-        .. versionadded:: 3.2
 
         An optional string of a field name (with an optional ``"-"`` prefix
         which indicates descending order) or an expression (or a tuple or list
@@ -136,13 +156,45 @@ General-purpose aggregation functions
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
 
+    Usage example::
+
+        class Room(models.Model):
+            number = models.IntegerField(unique=True)
+
+
+        class HotelReservation(models.Model):
+            room = models.ForeignKey("Room", on_delete=models.CASCADE)
+            start = models.DateTimeField()
+            end = models.DateTimeField()
+            requirements = models.JSONField(blank=True, null=True)
+
+    .. code-block:: pycon
+
+        >>> from django.contrib.postgres.aggregates import JSONBAgg
+        >>> Room.objects.annotate(
+        ...     requirements=JSONBAgg(
+        ...         "hotelreservation__requirements",
+        ...         ordering="-hotelreservation__start",
+        ...     )
+        ... ).filter(requirements__0__sea_view=True).values("number", "requirements")
+        <QuerySet [{'number': 102, 'requirements': [
+            {'parking': False, 'sea_view': True, 'double_bed': False},
+            {'parking': True, 'double_bed': True}
+        ]}]>
+
+    .. versionchanged:: 5.0
+
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``JSONBAgg`` returned an empty list instead of ``None``. If
+        you need it, explicitly set ``default`` to ``Value([])``.
+
 ``StringAgg``
 -------------
 
-.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, ordering=())
+.. class:: StringAgg(expression, delimiter, distinct=False, filter=None, default=None, ordering=())
 
     Returns the input values concatenated into a string, separated by
-    the ``delimiter`` string.
+    the ``delimiter`` string, or ``default`` if there are no values.
 
     .. attribute:: delimiter
 
@@ -162,6 +214,41 @@ General-purpose aggregation functions
 
         Examples are the same as for :attr:`ArrayAgg.ordering`.
 
+    Usage example::
+
+        class Publication(models.Model):
+            title = models.CharField(max_length=30)
+
+
+        class Article(models.Model):
+            headline = models.CharField(max_length=100)
+            publications = models.ManyToManyField(Publication)
+
+    .. code-block:: pycon
+
+        >>> article = Article.objects.create(headline="NASA uses Python")
+        >>> article.publications.create(title="The Python Journal")
+        <Publication: Publication object (1)>
+        >>> article.publications.create(title="Science News")
+        <Publication: Publication object (2)>
+        >>> from django.contrib.postgres.aggregates import StringAgg
+        >>> Article.objects.annotate(
+        ...     publication_names=StringAgg(
+        ...         "publications__title",
+        ...         delimiter=", ",
+        ...         ordering="publications__title",
+        ...     )
+        ... ).values("headline", "publication_names")
+        <QuerySet [{
+            'headline': 'NASA uses Python', 'publication_names': 'Science News, The Python Journal'
+        }]>
+
+    .. versionchanged:: 5.0
+
+        In older versions, if there are no rows and ``default`` is not
+        provided, ``StringAgg`` returned an empty string instead of ``None``.
+        If you need it, explicitly set ``default`` to ``Value("")``.
+
 Aggregate functions for statistics
 ==================================
 
@@ -174,42 +261,40 @@ field or an expression returning a numeric data. Both are required.
 ``Corr``
 --------
 
-.. class:: Corr(y, x, filter=None)
+.. class:: Corr(y, x, filter=None, default=None)
 
-    Returns the correlation coefficient as a ``float``, or ``None`` if there
+    Returns the correlation coefficient as a ``float``, or ``default`` if there
     aren't any matching rows.
 
 ``CovarPop``
 ------------
 
-.. class:: CovarPop(y, x, sample=False, filter=None)
+.. class:: CovarPop(y, x, sample=False, filter=None, default=None)
 
-    Returns the population covariance as a ``float``, or ``None`` if there
+    Returns the population covariance as a ``float``, or ``default`` if there
     aren't any matching rows.
-
-    Has one optional argument:
 
     .. attribute:: sample
 
-        By default ``CovarPop`` returns the general population covariance.
-        However, if ``sample=True``, the return value will be the sample
-        population covariance.
+        Optional. By default ``CovarPop`` returns the general population
+        covariance. However, if ``sample=True``, the return value will be the
+        sample population covariance.
 
 ``RegrAvgX``
 ------------
 
-.. class:: RegrAvgX(y, x, filter=None)
+.. class:: RegrAvgX(y, x, filter=None, default=None)
 
     Returns the average of the independent variable (``sum(x)/N``) as a
-    ``float``, or ``None`` if there aren't any matching rows.
+    ``float``, or ``default`` if there aren't any matching rows.
 
 ``RegrAvgY``
 ------------
 
-.. class:: RegrAvgY(y, x, filter=None)
+.. class:: RegrAvgY(y, x, filter=None, default=None)
 
     Returns the average of the dependent variable (``sum(y)/N``) as a
-    ``float``, or ``None`` if there aren't any matching rows.
+    ``float``, or ``default`` if there aren't any matching rows.
 
 ``RegrCount``
 -------------
@@ -219,61 +304,67 @@ field or an expression returning a numeric data. Both are required.
     Returns an ``int`` of the number of input rows in which both expressions
     are not null.
 
+    .. note::
+
+        The ``default`` argument is not supported.
+
 ``RegrIntercept``
 -----------------
 
-.. class:: RegrIntercept(y, x, filter=None)
+.. class:: RegrIntercept(y, x, filter=None, default=None)
 
     Returns the y-intercept of the least-squares-fit linear equation determined
-    by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
+    by the ``(x, y)`` pairs as a ``float``, or ``default`` if there aren't any
     matching rows.
 
 ``RegrR2``
 ----------
 
-.. class:: RegrR2(y, x, filter=None)
+.. class:: RegrR2(y, x, filter=None, default=None)
 
     Returns the square of the correlation coefficient as a ``float``, or
-    ``None`` if there aren't any matching rows.
+    ``default`` if there aren't any matching rows.
 
 ``RegrSlope``
 -------------
 
-.. class:: RegrSlope(y, x, filter=None)
+.. class:: RegrSlope(y, x, filter=None, default=None)
 
     Returns the slope of the least-squares-fit linear equation determined
-    by the ``(x, y)`` pairs as a ``float``, or ``None`` if there aren't any
+    by the ``(x, y)`` pairs as a ``float``, or ``default`` if there aren't any
     matching rows.
 
 ``RegrSXX``
 -----------
 
-.. class:: RegrSXX(y, x, filter=None)
+.. class:: RegrSXX(y, x, filter=None, default=None)
 
     Returns ``sum(x^2) - sum(x)^2/N`` ("sum of squares" of the independent
-    variable) as a ``float``, or ``None`` if there aren't any matching rows.
+    variable) as a ``float``, or ``default`` if there aren't any matching rows.
 
 ``RegrSXY``
 -----------
 
-.. class:: RegrSXY(y, x, filter=None)
+.. class:: RegrSXY(y, x, filter=None, default=None)
 
     Returns ``sum(x*y) - sum(x) * sum(y)/N`` ("sum of products" of independent
-    times dependent variable) as a ``float``, or ``None`` if there aren't any
-    matching rows.
+    times dependent variable) as a ``float``, or ``default`` if there aren't
+    any matching rows.
 
 ``RegrSYY``
 -----------
 
-.. class:: RegrSYY(y, x, filter=None)
+.. class:: RegrSYY(y, x, filter=None, default=None)
 
     Returns ``sum(y^2) - sum(y)^2/N`` ("sum of squares" of the dependent
-    variable)  as a ``float``, or ``None`` if there aren't any matching rows.
+    variable) as a ``float``, or ``default`` if there aren't any matching rows.
 
 Usage examples
 ==============
 
-We will use this example table::
+We will use this example table:
+
+.. code-block:: text
 
     | FIELD1 | FIELD2 | FIELD3 |
     |--------|--------|--------|
@@ -281,22 +372,26 @@ We will use this example table::
     |    bar |      2 | (null) |
     |   test |      3 |     13 |
 
+Here's some examples of some of the general-purpose aggregation functions:
 
-Here's some examples of some of the general-purpose aggregation functions::
+.. code-block:: pycon
 
-    >>> TestModel.objects.aggregate(result=StringAgg('field1', delimiter=';'))
+    >>> TestModel.objects.aggregate(result=StringAgg("field1", delimiter=";"))
     {'result': 'foo;bar;test'}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field2'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field2"))
     {'result': [1, 2, 3]}
-    >>> TestModel.objects.aggregate(result=ArrayAgg('field1'))
+    >>> TestModel.objects.aggregate(result=ArrayAgg("field1"))
     {'result': ['foo', 'bar', 'test']}
 
 The next example shows the usage of statistical aggregate functions. The
 underlying math will be not described (you can read about this, for example, at
-`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_)::
+`wikipedia <https://en.wikipedia.org/wiki/Regression_analysis>`_):
 
-    >>> TestModel.objects.aggregate(count=RegrCount(y='field3', x='field2'))
+.. code-block:: pycon
+
+    >>> TestModel.objects.aggregate(count=RegrCount(y="field3", x="field2"))
     {'count': 2}
-    >>> TestModel.objects.aggregate(avgx=RegrAvgX(y='field3', x='field2'),
-    ...                             avgy=RegrAvgY(y='field3', x='field2'))
+    >>> TestModel.objects.aggregate(
+    ...     avgx=RegrAvgX(y="field3", x="field2"), avgy=RegrAvgY(y="field3", x="field2")
+    ... )
     {'avgx': 2, 'avgy': 13}

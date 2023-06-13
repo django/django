@@ -12,7 +12,7 @@ PostgreSQL supports additional data integrity constraints available from the
 ``ExclusionConstraint``
 =======================
 
-.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, opclasses=())
+.. class:: ExclusionConstraint(*, name, expressions, index_type=None, condition=None, deferrable=None, include=None, violation_error_code=None, violation_error_message=None)
 
     Creates an exclusion constraint in the database. Internally, PostgreSQL
     implements exclusion constraints using indexes. The default index type is
@@ -27,12 +27,15 @@ PostgreSQL supports additional data integrity constraints available from the
     :exc:`~django.db.IntegrityError` is raised. Similarly, when update
     conflicts with an existing row.
 
+    Exclusion constraints are checked during the :ref:`model validation
+    <validating-objects>`.
+
 ``name``
 --------
 
 .. attribute:: ExclusionConstraint.name
 
-The name of the constraint.
+See :attr:`.BaseConstraint.name`.
 
 ``expressions``
 ---------------
@@ -44,14 +47,26 @@ second element is an SQL operator represented as a string. To avoid typos, you
 may use :class:`~django.contrib.postgres.fields.RangeOperators` which maps the
 operators with strings. For example::
 
-    expressions=[
-        ('timespan', RangeOperators.ADJACENT_TO),
-        (F('room'), RangeOperators.EQUAL),
+    expressions = [
+        ("timespan", RangeOperators.ADJACENT_TO),
+        (F("room"), RangeOperators.EQUAL),
     ]
 
 .. admonition:: Restrictions on operators.
 
     Only commutative operators can be used in exclusion constraints.
+
+The :class:`OpClass() <django.contrib.postgres.indexes.OpClass>` expression can
+be used to specify a custom `operator class`_ for the constraint expressions.
+For example::
+
+    expressions = [
+        (OpClass("circle", name="circle_ops"), RangeOperators.OVERLAPS),
+    ]
+
+creates an exclusion constraint on ``circle`` using ``circle_ops``.
+
+.. _operator class: https://www.postgresql.org/docs/current/indexes-opclass.html
 
 ``index_type``
 --------------
@@ -88,9 +103,9 @@ are ``Deferrable.DEFERRED`` or ``Deferrable.IMMEDIATE``. For example::
 
 
     ExclusionConstraint(
-        name='exclude_overlapping_deferred',
+        name="exclude_overlapping_deferred",
         expressions=[
-            ('timespan', RangeOperators.OVERLAPS),
+            ("timespan", RangeOperators.OVERLAPS),
         ],
         deferrable=Deferrable.DEFERRED,
     )
@@ -109,37 +124,31 @@ enforced immediately after every command.
 
 .. attribute:: ExclusionConstraint.include
 
-.. versionadded:: 3.2
-
 A list or tuple of the names of the fields to be included in the covering
 exclusion constraint as non-key columns. This allows index-only scans to be
 used for queries that select only included fields
 (:attr:`~ExclusionConstraint.include`) and filter only by indexed fields
 (:attr:`~ExclusionConstraint.expressions`).
 
-``include`` is supported only for GiST indexes on PostgreSQL 12+.
+``include`` is supported for GiST indexes. PostgreSQL 14+ also supports
+``include`` for SP-GiST indexes.
 
-``opclasses``
--------------
+``violation_error_code``
+------------------------
 
-.. attribute:: ExclusionConstraint.opclasses
+.. versionadded:: 5.0
 
-.. versionadded:: 3.2
+.. attribute:: ExclusionConstraint.violation_error_code
 
-The names of the `PostgreSQL operator classes
-<https://www.postgresql.org/docs/current/indexes-opclass.html>`_ to use for
-this constraint. If you require a custom operator class, you must provide one
-for each expression in the constraint.
+The error code used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to ``None``.
 
-For example::
+``violation_error_message``
+---------------------------
 
-    ExclusionConstraint(
-        name='exclude_overlapping_opclasses',
-        expressions=[('circle', RangeOperators.OVERLAPS)],
-        opclasses=['circle_ops'],
-    )
-
-creates an exclusion constraint on ``circle`` using ``circle_ops``.
+The error message used when ``ValidationError`` is raised during
+:ref:`model validation <validating-objects>`. Defaults to
+:attr:`.BaseConstraint.violation_error_message`.
 
 Examples
 --------
@@ -152,22 +161,23 @@ taking canceled reservations into account::
     from django.db import models
     from django.db.models import Q
 
+
     class Room(models.Model):
         number = models.IntegerField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         timespan = DateTimeRangeField()
         cancelled = models.BooleanField(default=False)
 
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
+                    name="exclude_overlapping_reservations",
                     expressions=[
-                        ('timespan', RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
+                        ("timespan", RangeOperators.OVERLAPS),
+                        ("room", RangeOperators.EQUAL),
                     ],
                     condition=Q(cancelled=False),
                 ),
@@ -193,12 +203,12 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
 
 
     class TsTzRange(Func):
-        function = 'TSTZRANGE'
+        function = "TSTZRANGE"
         output_field = DateTimeRangeField()
 
 
     class Reservation(models.Model):
-        room = models.ForeignKey('Room', on_delete=models.CASCADE)
+        room = models.ForeignKey("Room", on_delete=models.CASCADE)
         start = models.DateTimeField()
         end = models.DateTimeField()
         cancelled = models.BooleanField(default=False)
@@ -206,11 +216,14 @@ current/rangetypes.html#RANGETYPES-INCLUSIVITY>`_. For example::
         class Meta:
             constraints = [
                 ExclusionConstraint(
-                    name='exclude_overlapping_reservations',
-                    expressions=(
-                        (TsTzRange('start', 'end', RangeBoundary()), RangeOperators.OVERLAPS),
-                        ('room', RangeOperators.EQUAL),
-                    ),
+                    name="exclude_overlapping_reservations",
+                    expressions=[
+                        (
+                            TsTzRange("start", "end", RangeBoundary()),
+                            RangeOperators.OVERLAPS,
+                        ),
+                        ("room", RangeOperators.EQUAL),
+                    ],
                     condition=Q(cancelled=False),
                 ),
             ]

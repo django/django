@@ -2,17 +2,17 @@
 #
 # Translators:
 # André Hagenbruch, 2011-2012
-# Florian Apolloner <florian@apolloner.eu>, 2020
-# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016
-# Jannis Vajen, 2016
+# Florian Apolloner <florian@apolloner.eu>, 2020-2023
+# Jannis Leidel <jannis@leidel.info>, 2011,2013-2016,2023
+# jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-11 20:56+0200\n"
-"PO-Revision-Date: 2020-06-16 13:07+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Jannis Leidel <jannis@leidel.info>, 2011,2013-2016,2023\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -66,12 +66,23 @@ msgstr ""
 "Dies ist die Liste der ausgewählten %s. Einfach im unten stehenden Feld "
 "markieren und mithilfe des „Entfernen“-Pfeils wieder entfernen."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+"In diesem Feld tippen, um die Liste der ausgewählten %s einzuschränken."
+
 msgid "Remove all"
 msgstr "Alle entfernen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klicken, um alle ausgewählten %s auf einmal zu entfernen."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s ausgewählte Option nicht sichtbar"
+msgstr[1] "%s ausgewählte Optionen nicht sichtbar"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -187,6 +198,54 @@ msgstr "November"
 
 msgid "December"
 msgstr "Dezember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mrz"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mai"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Dez"
 
 msgctxt "one letter Sunday"
 msgid "S"

@@ -1,5 +1,7 @@
 [run]
 branch = True
+concurrency = multiprocessing,thread
+data_file = .coverages/.coverage
 omit =
     */django/utils/autoreload.py
 source = django

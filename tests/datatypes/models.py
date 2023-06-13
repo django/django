@@ -16,7 +16,7 @@ class Donut(models.Model):
     review = models.TextField()
 
     class Meta:
-        ordering = ('consumed_at',)
+        ordering = ("consumed_at",)
 
 
 class RumBaba(models.Model):

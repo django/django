@@ -2,28 +2,30 @@
 #
 # Translators:
 # angularcircle, 2011
+# Darek505, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janusz Harkot <jh@trilab.pl>, 2014-2015
 # 0d5641585fd67fbdb97037c19ab83e4c_18c98b0 <f6e7dac08616696bd890d93a38e13b13_5231>, 2011
-# m_aciek <maciej.olko@gmail.com>, 2016,2018,2020
-# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021
+# Maciej Olko <maciej.olko@gmail.com>, 2016,2018,2020
+# Maciej Olko <maciej.olko@gmail.com>, 2023
+# Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023
 # Roman Barczyński, 2012
 # Tomasz Kajtoch <tomekkaj@tomekkaj.pl>, 2016-2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-19 11:03+0000\n"
-"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Mariusz Felisiak <felisiak.mariusz@gmail.com>, 2021,2023\n"
 "Language-Team: Polish (http://www.transifex.com/django/django/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
-"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
-"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && "
+"(n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && "
+"n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -69,12 +71,24 @@ msgstr ""
 "To lista wybranych %s. Aby usunąć, zaznacz pozycje wybrane do usunięcia i "
 "kliknij strzałkę „Usuń” pomiędzy listami."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Wpisz coś tutaj, aby wyfiltrować listę wybranych %s."
+
 msgid "Remove all"
 msgstr "Usuń wszystkie"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Kliknij, aby usunąć jednocześnie wszystkie wybrane %s."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s wybrana opcja jest ukryta"
+msgstr[1] "%s wybrane opcje są ukryte"
+msgstr[2] "%s wybranych opcji jest ukrytych"
+msgstr[3] "%s wybranych opcji jest ukrytych"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"

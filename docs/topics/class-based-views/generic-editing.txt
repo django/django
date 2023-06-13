@@ -19,9 +19,10 @@ Basic forms
 Given a contact form:
 
 .. code-block:: python
-    :caption: forms.py
+    :caption: ``forms.py``
 
     from django import forms
+
 
     class ContactForm(forms.Form):
         name = forms.CharField()
@@ -34,15 +35,16 @@ Given a contact form:
 The view can be constructed using a ``FormView``:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from myapp.forms import ContactForm
     from django.views.generic.edit import FormView
 
+
     class ContactFormView(FormView):
-        template_name = 'contact.html'
+        template_name = "contact.html"
         form_class = ContactForm
-        success_url = '/thanks/'
+        success_url = "/thanks/"
 
         def form_valid(self, form):
             # This method is called when valid form data has been POSTed.
@@ -97,39 +99,43 @@ First we need to add :meth:`~django.db.models.Model.get_absolute_url()` to our
 ``Author`` class:
 
 .. code-block:: python
-    :caption: models.py
+    :caption: ``models.py``
 
     from django.db import models
     from django.urls import reverse
+
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
 
         def get_absolute_url(self):
-            return reverse('author-detail', kwargs={'pk': self.pk})
+            return reverse("author-detail", kwargs={"pk": self.pk})
 
 Then we can use :class:`CreateView` and friends to do the actual
 work. Notice how we're just configuring the generic class-based views
 here; we don't have to write any logic ourselves:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.urls import reverse_lazy
     from django.views.generic.edit import CreateView, DeleteView, UpdateView
     from myapp.models import Author
 
+
     class AuthorCreateView(CreateView):
         model = Author
-        fields = ['name']
+        fields = ["name"]
+
 
     class AuthorUpdateView(UpdateView):
         model = Author
-        fields = ['name']
+        fields = ["name"]
+
 
     class AuthorDeleteView(DeleteView):
         model = Author
-        success_url = reverse_lazy('author-list')
+        success_url = reverse_lazy("author-list")
 
 .. note::
     We have to use :func:`~django.urls.reverse_lazy` instead of
@@ -147,16 +153,16 @@ and :attr:`~django.views.generic.edit.FormMixin.form_class` attributes, an
 Finally, we hook these new views into the URLconf:
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import path
     from myapp.views import AuthorCreateView, AuthorDeleteView, AuthorUpdateView
 
     urlpatterns = [
         # ...
-        path('author/add/', AuthorCreateView.as_view(), name='author-add'),
-        path('author/<int:pk>/', AuthorUpdateView.as_view(), name='author-update'),
-        path('author/<int:pk>/delete/', AuthorDeleteView.as_view(), name='author-delete'),
+        path("author/add/", AuthorCreateView.as_view(), name="author-add"),
+        path("author/<int:pk>/", AuthorUpdateView.as_view(), name="author-update"),
+        path("author/<int:pk>/delete/", AuthorDeleteView.as_view(), name="author-delete"),
     ]
 
 .. note::
@@ -188,10 +194,11 @@ you can use a custom :class:`~django.forms.ModelForm` to do this. First, add
 the foreign key relation to the model:
 
 .. code-block:: python
-    :caption: models.py
+    :caption: ``models.py``
 
     from django.contrib.auth.models import User
     from django.db import models
+
 
     class Author(models.Model):
         name = models.CharField(max_length=200)
@@ -204,15 +211,16 @@ to edit, and override
 :meth:`~django.views.generic.edit.ModelFormMixin.form_valid()` to add the user:
 
 .. code-block:: python
-    :caption: views.py
+    :caption: ``views.py``
 
     from django.contrib.auth.mixins import LoginRequiredMixin
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
+
     class AuthorCreateView(LoginRequiredMixin, CreateView):
         model = Author
-        fields = ['name']
+        fields = ["name"]
 
         def form_valid(self, form):
             form.instance.created_by = self.request.user
@@ -234,14 +242,16 @@ works with an API-based workflow as well as 'normal' form POSTs::
     from django.views.generic.edit import CreateView
     from myapp.models import Author
 
+
     class JsonableResponseMixin:
         """
         Mixin to add JSON support to a form.
         Must be used with an object-based FormView (e.g. CreateView)
         """
+
         def form_invalid(self, form):
             response = super().form_invalid(form)
-            if self.request.accepts('text/html'):
+            if self.request.accepts("text/html"):
                 return response
             else:
                 return JsonResponse(form.errors, status=400)
@@ -251,14 +261,15 @@ works with an API-based workflow as well as 'normal' form POSTs::
             # it might do some processing (in the case of CreateView, it will
             # call form.save() for example).
             response = super().form_valid(form)
-            if self.request.accepts('text/html'):
+            if self.request.accepts("text/html"):
                 return response
             else:
                 data = {
-                    'pk': self.object.pk,
+                    "pk": self.object.pk,
                 }
                 return JsonResponse(data)
 
+
     class AuthorCreateView(JsonableResponseMixin, CreateView):
         model = Author
-        fields = ['name']
+        fields = ["name"]

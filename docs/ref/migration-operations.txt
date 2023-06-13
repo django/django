@@ -88,6 +88,17 @@ lose any data in the old table.
 Changes the model's table name (the :attr:`~django.db.models.Options.db_table`
 option on the ``Meta`` subclass).
 
+``AlterModelTableComment``
+--------------------------
+
+.. versionadded:: 4.2
+
+.. class:: AlterModelTableComment(name, table_comment)
+
+Changes the model's table comment (the
+:attr:`~django.db.models.Options.db_table_comment` option on the ``Meta``
+subclass).
+
 ``AlterUniqueTogether``
 -----------------------
 
@@ -102,9 +113,17 @@ subclass).
 
 .. class:: AlterIndexTogether(name, index_together)
 
-Changes the model's set of custom indexes (the
-:attr:`~django.db.models.Options.index_together` option on the ``Meta``
-subclass).
+Changes the model's set of custom indexes (the ``index_together`` option on the
+``Meta`` subclass).
+
+.. warning::
+
+    ``AlterIndexTogether`` is officially supported only for pre-Django 4.2
+    migration files. For backward compatibility reasons, it's still part of the
+    public API, and there's no plan to deprecate or remove it, but it should
+    not be used for new migrations. Use
+    :class:`~django.db.migrations.operations.AddIndex` and
+    :class:`~django.db.migrations.operations.RemoveIndex` operations instead.
 
 ``AlterOrderWithRespectTo``
 ---------------------------
@@ -222,6 +241,20 @@ Creates an index in the database table for the model with ``model_name``.
 
 Removes the index named ``name`` from the model with ``model_name``.
 
+``RenameIndex``
+---------------
+
+.. class:: RenameIndex(model_name, new_name, old_name=None, old_fields=None)
+
+Renames an index in the database table for the model with ``model_name``.
+Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
+is an iterable of the strings, often corresponding to fields of
+:attr:`~django.db.models.Options.index_together`.
+
+On databases that don't support an index renaming statement (SQLite and MariaDB
+< 10.5.2), the operation will drop and recreate the index, which can be
+expensive.
+
 ``AddConstraint``
 -----------------
 
@@ -264,7 +297,7 @@ queries and parameters in the same way as :ref:`cursor.execute()
 
     migrations.RunSQL("INSERT INTO musician (name) VALUES ('Reinhardt');")
     migrations.RunSQL([("INSERT INTO musician (name) VALUES ('Reinhardt');", None)])
-    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])])
+    migrations.RunSQL([("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])])
 
 If you want to include literal percent signs in the query, you have to double
 them if you are passing parameters.
@@ -274,8 +307,8 @@ should undo what is done by the ``sql`` queries. For example, to undo the above
 insertion with a deletion::
 
     migrations.RunSQL(
-        sql=[("INSERT INTO musician (name) VALUES (%s);", ['Reinhardt'])],
-        reverse_sql=[("DELETE FROM musician where name=%s;", ['Reinhardt'])],
+        sql=[("INSERT INTO musician (name) VALUES (%s);", ["Reinhardt"])],
+        reverse_sql=[("DELETE FROM musician where name=%s;", ["Reinhardt"])],
     )
 
 If ``reverse_sql`` is ``None`` (the default), the ``RunSQL`` operation is
@@ -292,8 +325,8 @@ operation that adds that field and so will try to run it again. For example::
         "ALTER TABLE musician ADD COLUMN name varchar(255) NOT NULL;",
         state_operations=[
             migrations.AddField(
-                'musician',
-                'name',
+                "musician",
+                "name",
                 models.CharField(max_length=255),
             ),
         ],
@@ -344,15 +377,19 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
 
     from django.db import migrations
 
+
     def forwards_func(apps, schema_editor):
         # We get the model from the versioned app registry;
         # if we directly import it, it'll be the wrong version
         Country = apps.get_model("myapp", "Country")
         db_alias = schema_editor.connection.alias
-        Country.objects.using(db_alias).bulk_create([
-            Country(name="USA", code="us"),
-            Country(name="France", code="fr"),
-        ])
+        Country.objects.using(db_alias).bulk_create(
+            [
+                Country(name="USA", code="us"),
+                Country(name="France", code="fr"),
+            ]
+        )
+
 
     def reverse_func(apps, schema_editor):
         # forwards_func() creates two Country instances,
@@ -362,8 +399,8 @@ using ``RunPython`` to create some initial objects on a ``Country`` model::
         Country.objects.using(db_alias).filter(name="USA", code="us").delete()
         Country.objects.using(db_alias).filter(name="France", code="fr").delete()
 
-    class Migration(migrations.Migration):
 
+    class Migration(migrations.Migration):
         dependencies = []
 
         operations = [
@@ -451,8 +488,8 @@ structure of an ``Operation`` looks like this::
 
     from django.db.migrations.operations.base import Operation
 
-    class MyCustomOperation(Operation):
 
+    class MyCustomOperation(Operation):
         # If this is False, it means that this operation will be ignored by
         # sqlmigrate; if true, it will be run and the SQL collected for its output.
         reduces_to_sql = False
@@ -489,10 +526,6 @@ structure of an ``Operation`` looks like this::
             # Optional. A filename part suitable for automatically naming a
             # migration containing this operation, or None if not applicable.
             return "custom_operation_%s_%s" % (self.arg1, self.arg2)
-
-.. versionadded:: 3.2
-
-    The ``migration_name_fragment`` property was added.
 
 You can take this template and work from it, though we suggest looking at the
 built-in Django operations in ``django.db.migrations.operations`` - they cover
@@ -545,8 +578,8 @@ state changes, all it does is run one command::
 
     from django.db.migrations.operations.base import Operation
 
-    class LoadExtension(Operation):
 
+    class LoadExtension(Operation):
         reversible = True
 
         def __init__(self, name):

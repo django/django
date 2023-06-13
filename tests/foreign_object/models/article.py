@@ -7,6 +7,7 @@ class ArticleTranslationDescriptor(ForwardManyToOneDescriptor):
     """
     The set of articletranslation should not set any local fields.
     """
+
     def __set__(self, instance, value):
         if instance is None:
             raise AttributeError("%s must be accessed via instance" % self.field.name)
@@ -22,7 +23,7 @@ class ColConstraint:
 
     def as_sql(self, compiler, connection):
         qn = compiler.quote_name_unless_alias
-        return '%s.%s = %%s' % (qn(self.alias), qn(self.col)), [self.value]
+        return "%s.%s = %%s" % (qn(self.alias), qn(self.col)), [self.value]
 
 
 class ActiveTranslationField(models.ForeignObject):
@@ -30,13 +31,14 @@ class ActiveTranslationField(models.ForeignObject):
     This field will allow querying and fetching the currently active translation
     for Article from ArticleTranslation.
     """
+
     requires_unique_target = False
 
-    def get_extra_restriction(self, where_class, alias, related_alias):
-        return ColConstraint(alias, 'lang', get_language())
+    def get_extra_restriction(self, alias, related_alias):
+        return ColConstraint(alias, "lang", get_language())
 
     def get_extra_descriptor_filter(self, instance):
-        return {'lang': get_language()}
+        return {"lang": get_language()}
 
     def contribute_to_class(self, cls, name):
         super().contribute_to_class(cls, name)
@@ -50,18 +52,18 @@ class ActiveTranslationFieldWithQ(ActiveTranslationField):
 
 class Article(models.Model):
     active_translation = ActiveTranslationField(
-        'ArticleTranslation',
-        from_fields=['id'],
-        to_fields=['article'],
-        related_name='+',
+        "ArticleTranslation",
+        from_fields=["id"],
+        to_fields=["article"],
+        related_name="+",
         on_delete=models.CASCADE,
         null=True,
     )
     active_translation_q = ActiveTranslationFieldWithQ(
-        'ArticleTranslation',
-        from_fields=['id'],
-        to_fields=['article'],
-        related_name='+',
+        "ArticleTranslation",
+        from_fields=["id"],
+        to_fields=["article"],
+        related_name="+",
         on_delete=models.CASCADE,
         null=True,
     )
@@ -71,7 +73,7 @@ class Article(models.Model):
         try:
             return self.active_translation.title
         except ArticleTranslation.DoesNotExist:
-            return '[No translation found]'
+            return "[No translation found]"
 
 
 class NewsArticle(Article):
@@ -86,15 +88,15 @@ class ArticleTranslation(models.Model):
     abstract = models.TextField(null=True)
 
     class Meta:
-        unique_together = ('article', 'lang')
+        unique_together = ("article", "lang")
 
 
 class ArticleTag(models.Model):
     article = models.ForeignKey(
         Article,
         models.CASCADE,
-        related_name='tags',
-        related_query_name='tag',
+        related_name="tags",
+        related_query_name="tag",
     )
     name = models.CharField(max_length=255)
 
@@ -102,7 +104,7 @@ class ArticleTag(models.Model):
 class ArticleIdea(models.Model):
     articles = models.ManyToManyField(
         Article,
-        related_name='ideas',
-        related_query_name='idea_things',
+        related_name="ideas",
+        related_query_name="idea_things",
     )
     name = models.CharField(max_length=255)

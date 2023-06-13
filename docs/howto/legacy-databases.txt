@@ -1,6 +1,6 @@
-=========================================
-Integrating Django with a legacy database
-=========================================
+==============================================
+How to integrate Django with a legacy database
+==============================================
 
 While Django is best suited for developing new applications, it's quite
 possible to integrate it into legacy databases. Django includes a couple of
@@ -30,15 +30,17 @@ connection:
 Auto-generate the models
 ========================
 
-.. highlight:: bash
-
 Django comes with a utility called :djadmin:`inspectdb` that can create models
 by introspecting an existing database. You can view the output by running this
-command::
+command:
+
+.. code-block:: shell
 
     $ python manage.py inspectdb
 
-Save this as a file by using standard Unix output redirection::
+Save this as a file by using standard Unix output redirection:
+
+.. code-block:: shell
 
     $ python manage.py inspectdb > models.py
 
@@ -56,9 +58,10 @@ each table's creation, modification, and deletion::
     class Person(models.Model):
         id = models.IntegerField(primary_key=True)
         first_name = models.CharField(max_length=70)
+
         class Meta:
-           managed = False
-           db_table = 'CENSUS_PERSONS'
+            managed = False
+            db_table = "CENSUS_PERSONS"
 
 If you do want to allow Django to manage the table's lifecycle, you'll need to
 change the :attr:`~django.db.models.Options.managed` option above to ``True``
@@ -68,7 +71,9 @@ Install the core Django tables
 ==============================
 
 Next, run the :djadmin:`migrate` command to install any extra needed database
-records such as admin permissions and content types::
+records such as admin permissions and content types:
+
+.. code-block:: shell
 
     $ python manage.py migrate
 

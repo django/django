@@ -1,6 +1,6 @@
-==========================
-Outputting CSV with Django
-==========================
+========================
+How to create CSV output
+========================
 
 This document explains how to output CSV (Comma Separated Values) dynamically
 using Django views. To do this, you can either use the Python CSV library or the
@@ -18,16 +18,17 @@ Here's an example::
     import csv
     from django.http import HttpResponse
 
+
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(
-            content_type='text/csv',
-            headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )
 
         writer = csv.writer(response)
-        writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-        writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+        writer.writerow(["First row", "Foo", "Bar", "Baz"])
+        writer.writerow(["Second row", "A", "B", "C", '"Testing"', "Here's a quote"])
 
         return response
 
@@ -72,13 +73,16 @@ the assembly and transmission of a large CSV file::
 
     from django.http import StreamingHttpResponse
 
+
     class Echo:
         """An object that implements just the write method of the file-like
         interface.
         """
+
         def write(self, value):
             """Write the value by returning it, instead of storing in a buffer."""
             return value
+
 
     def some_streaming_csv_view(request):
         """A view that streams a large CSV file."""
@@ -91,7 +95,7 @@ the assembly and transmission of a large CSV file::
         return StreamingHttpResponse(
             (writer.writerow(row) for row in rows),
             content_type="text/csv",
-            headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+            headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )
 
 Using the template system
@@ -109,22 +113,23 @@ Here's an example, which generates the same CSV file as above::
     from django.http import HttpResponse
     from django.template import loader
 
+
     def some_view(request):
         # Create the HttpResponse object with the appropriate CSV header.
         response = HttpResponse(
-            content_type='text/csv'
-            headers={'Content-Disposition': 'attachment; filename="somefilename.csv"'},
+            content_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="somefilename.csv"'},
         )
 
         # The data is hard-coded here, but you could load it from a database or
         # some other source.
         csv_data = (
-            ('First row', 'Foo', 'Bar', 'Baz'),
-            ('Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"),
+            ("First row", "Foo", "Bar", "Baz"),
+            ("Second row", "A", "B", "C", '"Testing"', "Here's a quote"),
         )
 
-        t = loader.get_template('my_template_name.txt')
-        c = {'data': csv_data}
+        t = loader.get_template("my_template_name.txt")
+        c = {"data": csv_data}
         response.write(t.render(c))
         return response
 

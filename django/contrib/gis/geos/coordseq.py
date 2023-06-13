@@ -20,7 +20,7 @@ class GEOSCoordSeq(GEOSBase):
     def __init__(self, ptr, z=False):
         "Initialize from a GEOS pointer."
         if not isinstance(ptr, CS_PTR):
-            raise TypeError('Coordinate sequence should initialize with a CS_PTR.')
+            raise TypeError("Coordinate sequence should initialize with a CS_PTR.")
         self._ptr = ptr
         self._z = z
 
@@ -50,7 +50,9 @@ class GEOSCoordSeq(GEOSBase):
         elif numpy and isinstance(value, numpy.ndarray):
             pass
         else:
-            raise TypeError('Must set coordinate with a sequence (list, tuple, or numpy array).')
+            raise TypeError(
+                "Must set coordinate with a sequence (list, tuple, or numpy array)."
+            )
         # Checking the dims of the input
         if self.dims == 3 and self._z:
             n_args = 3
@@ -59,7 +61,7 @@ class GEOSCoordSeq(GEOSBase):
             n_args = 2
             point_setter = self._set_point_2d
         if len(value) != n_args:
-            raise TypeError('Dimension of value does not match.')
+            raise TypeError("Dimension of value does not match.")
         self._checkindex(index)
         point_setter(index, value)
 
@@ -67,7 +69,7 @@ class GEOSCoordSeq(GEOSBase):
     def _checkindex(self, index):
         "Check the given index."
         if not (0 <= index < self.size):
-            raise IndexError('invalid GEOS Geometry index: %s' % index)
+            raise IndexError("invalid GEOS Geometry index: %s" % index)
 
     def _checkdim(self, dim):
         "Check the given dimension."
@@ -180,11 +182,13 @@ class GEOSCoordSeq(GEOSBase):
         # Getting the substitution string depending on whether the coordinates have
         #  a Z dimension.
         if self.hasz:
-            substr = '%s,%s,%s '
+            substr = "%s,%s,%s "
         else:
-            substr = '%s,%s,0 '
-        return '<coordinates>%s</coordinates>' % \
-            ''.join(substr % self[i] for i in range(len(self))).strip()
+            substr = "%s,%s,0 "
+        return (
+            "<coordinates>%s</coordinates>"
+            % "".join(substr % self[i] for i in range(len(self))).strip()
+        )
 
     @property
     def tuple(self):

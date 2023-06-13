@@ -1,6 +1,6 @@
-===========================
-Outputting PDFs with Django
-===========================
+=======================
+How to create PDF files
+=======================
 
 This document explains how to output PDF files dynamically using Django views.
 This is made possible by the excellent, open-source ReportLab_ Python PDF
@@ -14,27 +14,28 @@ For example, Django was used at kusports.com_ to generate customized,
 printer-friendly NCAA tournament brackets, as PDF files, for people
 participating in a March Madness contest.
 
-.. _ReportLab: https://www.reportlab.com/opensource/
+.. _ReportLab: https://docs.reportlab.com/
 .. _kusports.com: http://www2.kusports.com/
 
 Install ReportLab
 =================
 
-The ReportLab library is `available on PyPI`_. A `user guide`_ (not
-coincidentally, a PDF file) is also available for download.
+The ReportLab library is :pypi:`available on PyPI <reportlab>`. A `user guide`_
+(not coincidentally, a PDF file) is also available for download.
 You can install ReportLab with ``pip``:
 
 .. console::
 
     $ python -m pip install reportlab
 
-Test your installation by importing it in the Python interactive interpreter::
+Test your installation by importing it in the Python interactive interpreter:
+
+.. code-block:: pycon
 
     >>> import reportlab
 
 If that command doesn't raise any errors, the installation worked.
 
-.. _available on PyPI: https://pypi.org/project/reportlab/
 .. _user guide: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 Write your view
@@ -49,6 +50,7 @@ Here's a "Hello World" example::
     import io
     from django.http import FileResponse
     from reportlab.pdfgen import canvas
+
 
     def some_view(request):
         # Create a file-like buffer to receive PDF data.
@@ -68,7 +70,7 @@ Here's a "Hello World" example::
         # FileResponse sets the Content-Disposition header so that browsers
         # present the option to save the file.
         buffer.seek(0)
-        return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
+        return FileResponse(buffer, as_attachment=True, filename="hello.pdf")
 
 The code and comments should be self-explanatory, but a few things deserve a
 mention:
@@ -79,7 +81,7 @@ mention:
   :mimetype:`application/octet-stream` binary content.
 
 * When ``as_attachment=True`` is passed to ``FileResponse``, it sets the
-  appropriate ``Content-Disposition`` header and that tells Web browsers to
+  appropriate ``Content-Disposition`` header and that tells web browsers to
   pop-up a dialog box prompting/confirming how to handle the document even if a
   default is set on the machine. If the ``as_attachment`` parameter is omitted,
   browsers will handle the PDF using whatever program/plugin they've been

@@ -152,7 +152,9 @@ using the project name prefix (e.g. ``myproject.settings``, ``ROOT_URLCONF =
 directory up, so it is outside the project package rather than adjacent to
 ``settings.py`` and ``urls.py``.
 
-For instance, with the following layout::
+For instance, with the following layout:
+
+.. code-block:: text
 
     manage.py
     mysite/
@@ -167,8 +169,10 @@ You could import ``mysite.settings``, ``mysite.urls``, and ``mysite.myapp``,
 but not ``settings``, ``urls``, or ``myapp`` as top-level modules.
 
 Anything imported as a top-level module can be placed adjacent to the new
-``manage.py``. For instance, to decouple "myapp" from the project module and
-import it as just ``myapp``, place it outside the ``mysite/`` directory::
+``manage.py``. For instance, to decouple ``myapp`` from the project module and
+import it as just ``myapp``, place it outside the ``mysite/`` directory:
+
+.. code-block:: text
 
     manage.py
     myapp/
@@ -191,12 +195,16 @@ now have a ``--template`` option for specifying a path or URL to a custom app
 or project template.
 
 For example, Django will use the ``/path/to/my_project_template`` directory
-when you run the following command::
+when you run the following command:
+
+.. code-block:: shell
 
     django-admin.py startproject --template=/path/to/my_project_template myproject
 
 You can also now provide a destination directory as the second
-argument to both :djadmin:`startapp` and :djadmin:`startproject`::
+argument to both :djadmin:`startapp` and :djadmin:`startproject`:
+
+.. code-block:: shell
 
     django-admin.py startapp myapp /path/to/new/app
     django-admin.py startproject myproject /path/to/new/project
@@ -331,7 +339,7 @@ Tools for cryptographic signing
 
 Django 1.4 adds both a low-level API for signing values and a high-level API
 for setting and reading signed cookies, one of the most common uses of
-signing in Web applications.
+signing in web applications.
 
 See the :doc:`cryptographic signing </topics/signing>` docs for more
 information.
@@ -418,8 +426,8 @@ number of positional or keyword arguments. For example::
 
     @register.simple_tag
     def my_tag(a, b, *args, **kwargs):
-        warning = kwargs['warning']
-        profile = kwargs['profile']
+        warning = kwargs["warning"]
+        profile = kwargs["profile"]
         ...
         return ...
 
@@ -548,11 +556,11 @@ Please make sure to update your :ref:`custom format files
 string. For example a Spanish localization format previously only escaped the
 ``d`` format character::
 
-  DATE_FORMAT = r'j \de F \de Y'
+  DATE_FORMAT = r"j \de F \de Y"
 
 But now it needs to also escape ``e`` and ``o``::
 
-  DATE_FORMAT = r'j \d\e F \d\e Y'
+  DATE_FORMAT = r"j \d\e F \d\e Y"
 
 For more information, see the :tfilter:`date` documentation.
 
@@ -591,9 +599,8 @@ Django 1.4 also includes several smaller improvements worth noting:
   for more information.
 
 * The :djadmin:`makemessages` command uses a new and more accurate lexer,
-  `JsLex`_, for extracting translatable strings from JavaScript files.
-
-.. _JsLex: https://pypi.org/project/jslex/
+  :pypi:`JsLex <jslex>`, for extracting translatable strings from JavaScript
+  files.
 
 * The :ttag:`trans` template tag now takes an optional ``as`` argument to
   be able to retrieve a translation string without displaying it but setting
@@ -634,7 +641,7 @@ Django 1.4 also includes several smaller improvements worth noting:
   :meth:`~django.db.models.query.QuerySet.distinct`.
 
 * The admin login page will add a password reset link if you include a URL with
-  the name ``'admin_password_reset'`` in your urls.py, so plugging in the
+  the name ``'admin_password_reset'`` in your ``urls.py``, so plugging in the
   built-in password reset mechanism and making it available is now much easier.
   For details, see :ref:`auth_password_reset`.
 
@@ -688,14 +695,14 @@ files included in apps.
 Starting in Django 1.4, the admin's static files also follow this
 convention, to make the files easier to deploy. In previous versions of Django,
 it was also common to define an ``ADMIN_MEDIA_PREFIX`` setting to point to the
-URL where the admin's static files live on a Web server. This setting has now
+URL where the admin's static files live on a web server. This setting has now
 been deprecated and replaced by the more general setting :setting:`STATIC_URL`.
 Django will now expect to find the admin static files under the URL
 ``<STATIC_URL>/admin/``.
 
 If you've previously used a URL path for ``ADMIN_MEDIA_PREFIX`` (e.g.
 ``/media/``) simply make sure :setting:`STATIC_URL` and :setting:`STATIC_ROOT`
-are configured and your Web server serves those files correctly. The
+are configured and your web server serves those files correctly. The
 development server continues to serve the admin files just like before. Read
 the :doc:`static files howto </howto/static-files/index>` for more details.
 
@@ -719,7 +726,7 @@ admin app. Our new policy formalizes existing practices: `YUI's A-grade`_
 browsers should provide a fully-functional admin experience, with the notable
 exception of Internet Explorer 6, which is no longer supported.
 
-Released over 10 years ago, IE6 imposes many limitations on modern Web
+Released over 10 years ago, IE6 imposes many limitations on modern web
 development. The practical implications of this policy are that contributors
 are free to improve the admin without consideration for these limitations.
 
@@ -900,8 +907,8 @@ object, use ``django.db.connections[DEFAULT_DB_ALIAS]`` instead.
 
 As part of this change, all underlying SQLite connections are now enabled for
 potential thread-sharing (by passing the ``check_same_thread=False`` attribute
-to pysqlite). ``DatabaseWrapper`` however preserves the previous behavior by
-disabling thread-sharing by default, so this does not affect any existing
+to ``pysqlite``). ``DatabaseWrapper`` however preserves the previous behavior
+by disabling thread-sharing by default, so this does not affect any existing
 code that purely relies on the ORM or on ``DatabaseWrapper.cursor()``.
 
 Finally, while it's now possible to pass connections between threads, Django
@@ -924,11 +931,14 @@ comment model manager to exclude the user group, like this::
     from django.conf import settings
     from django.contrib.comments.managers import CommentManager
 
+
     class BanningCommentManager(CommentManager):
         def get_query_set(self):
             qs = super().get_query_set()
-            if getattr(settings, 'COMMENTS_BANNED_USERS_GROUP', None):
-                where = ['user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)']
+            if getattr(settings, "COMMENTS_BANNED_USERS_GROUP", None):
+                where = [
+                    "user_id NOT IN (SELECT user_id FROM auth_user_groups WHERE group_id = %s)"
+                ]
                 params = [settings.COMMENTS_BANNED_USERS_GROUP]
                 qs = qs.extra(where=where, params=params)
             return qs
@@ -940,6 +950,7 @@ Save this model manager in your custom comment app (e.g., in
     from django.contrib.comments.models import Comment
 
     from my_comments_app.managers import BanningCommentManager
+
 
     class CommentWithTitle(Comment):
         title = models.CharField(max_length=300)
@@ -960,9 +971,15 @@ of them.
 
 Furthermore, the previous settings had some rather arbitrary default values::
 
-    IGNORABLE_404_STARTS = ('/cgi-bin/', '/_vti_bin', '/_vti_inf')
-    IGNORABLE_404_ENDS = ('mail.pl', 'mailform.pl', 'mail.cgi', 'mailform.cgi',
-                          'favicon.ico', '.php')
+    IGNORABLE_404_STARTS = ("/cgi-bin/", "/_vti_bin", "/_vti_inf")
+    IGNORABLE_404_ENDS = (
+        "mail.pl",
+        "mailform.pl",
+        "mail.cgi",
+        "mailform.cgi",
+        "favicon.ico",
+        ".php",
+    )
 
 It's not Django's role to decide if your website has a legacy ``/cgi-bin/``
 section or a ``favicon.ico``. As a consequence, the default values of
@@ -974,11 +991,12 @@ if you want to keep the old default value, you should add the following lines
 in your settings file::
 
     import re
+
     IGNORABLE_404_URLS = (
         # for each <prefix> in IGNORABLE_404_STARTS
-        re.compile(r'^<prefix>'),
+        re.compile(r"^<prefix>"),
         # for each <suffix> in IGNORABLE_404_ENDS
-        re.compile(r'<suffix>$'),
+        re.compile(r"<suffix>$"),
     )
 
 Don't forget to escape characters that have a special meaning in a regular
@@ -1031,18 +1049,22 @@ method, like this::
     from django.core.files import File
     from django.core.files.storage import FileSystemStorage
 
+
     class Spam(File):
         """
         Spam, spam, spam, spam and spam.
         """
+
         def ham(self):
-            return 'eggs'
+            return "eggs"
+
 
     class SpamStorage(FileSystemStorage):
         """
         A custom file storage backend.
         """
-        def open(self, name, mode='rb'):
+
+        def open(self, name, mode="rb"):
             return Spam(open(self.path(name), mode))
 
 YAML deserializer now uses ``yaml.safe_load``
@@ -1060,7 +1082,7 @@ Session cookies now have the ``httponly`` flag by default
 
 Session cookies now include the ``httponly`` attribute by default to
 help reduce the impact of potential XSS attacks. As a consequence of
-this change, session cookie data, including sessionid, is no longer
+this change, session cookie data, including ``sessionid``, is no longer
 accessible from JavaScript in many browsers. For strict backwards
 compatibility, use ``SESSION_COOKIE_HTTPONLY = False`` in your
 settings file.
@@ -1082,10 +1104,10 @@ code with :meth:`~django.test.SimpleTestCase.assertTemplateUsed` and
 :meth:`~django.test.SimpleTestCase.assertTemplateNotUsed`. And they
 can be used as a context manager::
 
-    with self.assertTemplateUsed('index.html'):
-        render_to_string('index.html')
-    with self.assertTemplateNotUsed('base.html'):
-        render_to_string('index.html')
+    with self.assertTemplateUsed("index.html"):
+        render_to_string("index.html")
+    with self.assertTemplateNotUsed("base.html"):
+        render_to_string("index.html")
 
 See the :ref:`assertion documentation<assertions>` for more.
 
@@ -1136,7 +1158,9 @@ Development Server Multithreading
 
 The development server is now is multithreaded by default. Use the
 :option:`runserver --nothreading` option to disable the use of threading in the
-development server::
+development server:
+
+.. code-block:: shell
 
     django-admin.py runserver --nothreading
 
@@ -1199,18 +1223,21 @@ To increase the flexibility of error logging for requests, the
 separate filter attached to :class:`django.utils.log.AdminEmailHandler` to
 prevent admin error emails in ``DEBUG`` mode::
 
-   'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse'
-        }
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
+    LOGGING = {
+        # ...
+        "filters": {
+            "require_debug_false": {
+                "()": "django.utils.log.RequireDebugFalse",
+            }
+        },
+        "handlers": {
+            "mail_admins": {
+                "level": "ERROR",
+                "filters": ["require_debug_false"],
+                "class": "django.utils.log.AdminEmailHandler",
+            }
+        },
+    }
 
 If your project was created prior to this change, your :setting:`LOGGING`
 setting will not include this new filter. In order to maintain
@@ -1281,6 +1308,8 @@ the filter function::
     @register.filter
     def noop(value):
         return value
+
+
     noop.is_safe = True
 
 However, this technique caused some problems in combination with decorators,

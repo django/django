@@ -2,19 +2,21 @@
 #
 # Translators:
 # edgars <edgars.jekabsons@gmail.com>, 2011
-# NullIsNot0 <nullisnot0@inbox.lv>, 2017
-# NullIsNot0 <nullisnot0@inbox.lv>, 2018
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2023
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2017,2022
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2018
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Māris Nartišs <maris.gis@gmail.com>, 2016
-# NullIsNot0 <nullisnot0@inbox.lv>, 2019-2020
+# Edgars Voroboks <edgars.voroboks@gmail.com>, 2019-2021
 # peterisb <pb@sungis.lv>, 2016
+# Pēteris Caune, 2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-22 17:27+0000\n"
-"Last-Translator: NullIsNot0 <nullisnot0@inbox.lv>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Pēteris Caune, 2023\n"
 "Language-Team: Latvian (http://www.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
@@ -23,6 +25,10 @@ msgstr ""
 "Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +40,6 @@ msgstr "Nevar izdzēst %(name)s"
 
 msgid "Are you sure?"
 msgstr "Vai esat pārliecināts?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Izdzēst izvēlēto %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administrācija"
@@ -87,7 +89,7 @@ msgid ""
 "that both fields may be case-sensitive."
 msgstr ""
 "Lūdzu ievadi korektu %(username)s un paroli personāla kontam. Ņem vērā, ka "
-"abi ievades lauki ir reģistr jūtīgi."
+"abi ievades lauki ir reģistrjutīgi."
 
 msgid "Action:"
 msgstr "Darbība:"
@@ -269,8 +271,9 @@ msgstr "0 no %(cnt)s izvēlēti"
 msgid "Change history: %s"
 msgstr "Izmaiņu vēsture: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -367,14 +370,17 @@ msgid "Change password"
 msgstr "Paroles maiņa"
 
 msgid "Please correct the error below."
-msgstr "Lūdzu izlabojiet zemāk redzamo kļūdu."
-
-msgid "Please correct the errors below."
-msgstr "Lūdzu labo kļūdas zemāk."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
+msgstr[1] "Lūdzu, izlabojiet zemāk norādīto kļūdu."
+msgstr[2] "Lūdzu, izlabojiet zemāk norādītās kļūdas."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Ievadiet jaunu paroli lietotājam <strong>%(username)s</strong>."
+
+msgid "Skip to main content"
+msgstr "Pāriet uz galveno saturu"
 
 msgid "Welcome,"
 msgstr "Sveicināti,"
@@ -387,6 +393,9 @@ msgstr "Dokumentācija"
 
 msgid "Log out"
 msgstr "Atslēgties"
+
+msgid "Breadcrumbs"
+msgstr "Atpakaļceļi"
 
 #, python-format
 msgid "Add %(name)s"
@@ -414,6 +423,15 @@ msgstr "Kārtošanas prioritāte: %(priority_number)s"
 msgid "Toggle sorting"
 msgstr "Pārslēgt kārtošanu"
 
+msgid "Toggle theme (current theme: auto)"
+msgstr "Pārslēgt motīvu (pašreizējais motīvs: automātisks)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Pārslēgt motīvu (pašreizējais motīvs: gaišs)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Pārslēgt motīvu (pašreizējais motīvs: tumšs)"
+
 msgid "Delete"
 msgstr "Dzēst"
 
@@ -439,8 +457,8 @@ msgid ""
 "Are you sure you want to delete the %(object_name)s \"%(escaped_object)s\"? "
 "All of the following related items will be deleted:"
 msgstr ""
-"Vai esat pārliecināts, ka vēlaties dzēst %(object_name)s \"%(escaped_object)s"
-"\"? Tiks dzēsti arī sekojoši saistītie objekti:"
+"Vai esat pārliecināts, ka vēlaties dzēst %(object_name)s "
+"\"%(escaped_object)s\"? Tiks dzēsti arī sekojoši saistītie objekti:"
 
 msgid "Objects"
 msgstr "Objekti"
@@ -523,6 +541,15 @@ msgstr "Aizmirsi paroli vai lietotājvārdu?"
 msgid "Toggle navigation"
 msgstr "Pārslēgt navigāciju"
 
+msgid "Sidebar"
+msgstr "Sānjosla"
+
+msgid "Start typing to filter…"
+msgstr "Sāciet rakstīt, lai atlasītu…"
+
+msgid "Filter navigation items"
+msgstr "Atlasīt navigācijas vienības"
+
 msgid "Date/time"
 msgstr "Datums/laiks"
 
@@ -531,6 +558,12 @@ msgstr "Lietotājs"
 
 msgid "Action"
 msgstr "Darbība"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "ieraksti"
+msgstr[1] "ieraksts"
+msgstr[2] "ieraksti"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,8 +622,12 @@ msgstr "Pievienot citu %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Dzēst izvēlēto %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Paldies par pavadīto laiku mājas lapā."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Apskatīt atzīmētos %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr "Paldies, ka šodien vietnei veltījāt kvalitatīvu laiku."
 
 msgid "Log in again"
 msgstr "Pieslēgties vēlreiz"
@@ -612,13 +649,13 @@ msgid "Change my password"
 msgstr "Nomainīt manu paroli"
 
 msgid "Password reset"
-msgstr "Paroles pārstatīšana(reset)"
+msgstr "Paroles atiestatīšana"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Jūsu parole ir uzstādīta. Varat pieslēgties."
+msgstr "Jūsu parole ir iestatīta. Varat pieslēgties."
 
 msgid "Password reset confirmation"
-msgstr "Paroles pārstatīšanas apstiprinājums"
+msgstr "Paroles atiestatīšanas apstiprinājums"
 
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
@@ -637,7 +674,7 @@ msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Paroles pārstatīšanas saite bija nekorekta, iespējams, tā jau ir izmantota. "
+"Paroles atiestatīšanas saite bija nekorekta, iespējams, tā jau ir izmantota. "
 "Lūdzu pieprasiet paroles pārstatīšanu vēlreiz."
 
 msgid ""
@@ -687,7 +724,7 @@ msgid "Email address:"
 msgstr "E-pasta adrese:"
 
 msgid "Reset my password"
-msgstr "Paroles pārstatīšana"
+msgstr "Paroles atiestatīšana"
 
 msgid "All dates"
 msgstr "Visi datumi"

@@ -24,6 +24,7 @@ a :class:`django.http.HttpResponseNotAllowed` if the conditions are not met.
 
         from django.views.decorators.http import require_http_methods
 
+
         @require_http_methods(["GET", "POST"])
         def my_view(request):
             # I can assume now that only GET or POST requests make it this far
@@ -116,18 +117,28 @@ client-side caching.
     :func:`~django.utils.cache.patch_cache_control` for the details of the
     transformation.
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: never_cache(view_func)
+
+    This decorator adds an ``Expires`` header to the current date/time.
 
     This decorator adds a ``Cache-Control: max-age=0, no-cache, no-store,
     must-revalidate, private`` header to a response to indicate that a page
     should never be cached.
 
+    Each header is only added if it isn't already set.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. module:: django.views.decorators.common
 
 Common
 ======
-
-.. versionadded:: 3.2
 
 The decorators in :mod:`django.views.decorators.common` allow per-view
 customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
@@ -136,3 +147,7 @@ customization of :class:`~django.middleware.common.CommonMiddleware` behavior.
 
     This decorator allows individual views to be excluded from
     :setting:`APPEND_SLASH` URL normalization.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.

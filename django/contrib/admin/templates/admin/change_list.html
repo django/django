@@ -3,9 +3,9 @@
 
 {% block extrastyle %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
+  <link rel="stylesheet" href="{% static "admin/css/changelists.css" %}">
   {% if cl.formset %}
-    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+    <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
   {% endif %}
   {% if cl.formset or action_form %}
     <script src="{% url 'admin:jsi18n' %}"></script>
@@ -21,6 +21,7 @@
 {% block extrahead %}
 {{ block.super }}
 {{ media.js }}
+<script src="{% static 'admin/js/filters.js' %}" defer></script>
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
@@ -48,7 +49,7 @@
     {% endblock %}
     {% if cl.formset and cl.formset.errors %}
         <p class="errornote">
-        {% if cl.formset.total_error_count == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+        {% blocktranslate count counter=cl.formset.total_error_count %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
         </p>
         {{ cl.formset.non_form_errors }}
     {% endif %}
@@ -74,9 +75,15 @@
         {% if cl.has_filters %}
           <div id="changelist-filter">
             <h2>{% translate 'Filter' %}</h2>
-            {% if cl.has_active_filters %}<h3 id="changelist-filter-clear">
-              <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
-            </h3>{% endif %}
+            {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
+              {% if cl.is_facets_optional %}<h3>
+                {% if cl.add_facets %}<a href="{{ cl.remove_facet_link }}" class="hidelink">{% translate "Hide counts" %}</a>
+                {% else %}<a href="{{ cl.add_facet_link }}" class="viewlink">{% translate "Show counts" %}</a>{% endif %}
+              </h3>{% endif %}
+              {% if cl.has_active_filters %}<h3>
+                <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
+              </h3>{% endif %}
+            </div>{% endif %}
             {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
           </div>
         {% endif %}

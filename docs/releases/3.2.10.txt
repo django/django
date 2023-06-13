@@ -1,0 +1,20 @@
+===========================
+Django 3.2.10 release notes
+===========================
+
+*December 7, 2021*
+
+Django 3.2.10 fixes a security issue with severity "low" and a bug in 3.2.9.
+
+CVE-2021-44420: Potential bypass of an upstream access control based on URL paths
+=================================================================================
+
+HTTP requests for URLs with trailing newlines could bypass an upstream access
+control based on URL paths.
+
+Bugfixes
+========
+
+* Fixed a regression in Django 3.2 that caused a crash of ``setUpTestData()``
+  with ``BinaryField`` on PostgreSQL, which is ``memoryview``-backed
+  (:ticket:`33333`).

@@ -4,25 +4,29 @@
 # André Hagenbruch, 2012
 # Florian Apolloner <florian@apolloner.eu>, 2011
 # Dimitris Glezos <glezos@transifex.com>, 2012
-# Florian Apolloner <florian@apolloner.eu>, 2020
-# Jannis Vajen, 2013
+# Florian Apolloner <florian@apolloner.eu>, 2020-2023
+# jnns, 2013
 # Jannis Leidel <jannis@leidel.info>, 2013-2018,2020
-# Jannis Vajen, 2016
+# jnns, 2016
 # Markus Holtermann <info@markusholtermann.eu>, 2020
 # Markus Holtermann <info@markusholtermann.eu>, 2013,2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-17 07:47+0000\n"
-"Last-Translator: Florian Apolloner <florian@apolloner.eu>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Florian Apolloner <florian@apolloner.eu>, 2020-2023\n"
 "Language-Team: German (http://www.transifex.com/django/django/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Ausgewählte %(verbose_name_plural)s löschen"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Kann %(name)s nicht löschen"
 
 msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Ausgewählte %(verbose_name_plural)s löschen"
 
 msgid "Administration"
 msgstr "Administration"
@@ -276,8 +276,9 @@ msgstr "0 von %(cnt)s ausgewählt"
 msgid "Change history: %s"
 msgstr "Änderungsgeschichte: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -377,10 +378,9 @@ msgid "Change password"
 msgstr "Passwort ändern"
 
 msgid "Please correct the error below."
-msgstr "Bitte den unten aufgeführten Fehler korrigieren."
-
-msgid "Please correct the errors below."
-msgstr "Bitte die unten aufgeführten Fehler korrigieren."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Bitte den unten aufgeführten Fehler korrigieren."
+msgstr[1] "Bitte die unten aufgeführten Fehler korrigieren."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
@@ -388,17 +388,23 @@ msgstr ""
 "Bitte geben Sie ein neues Passwort für den Benutzer <strong>%(username)s</"
 "strong> ein."
 
+msgid "Skip to main content"
+msgstr "Zum Hauptinhalt springen"
+
 msgid "Welcome,"
 msgstr "Willkommen,"
 
 msgid "View site"
-msgstr "Auf der Website anzeigen"
+msgstr "Website anzeigen"
 
 msgid "Documentation"
 msgstr "Dokumentation"
 
 msgid "Log out"
 msgstr "Abmelden"
+
+msgid "Breadcrumbs"
+msgstr "„Brotkrümel“"
 
 #, python-format
 msgid "Add %(name)s"
@@ -425,6 +431,15 @@ msgstr "Sortierung: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sortierung ein-/ausschalten"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Design wechseln (aktuelles Design: automatisch)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Design wechseln (aktuelles Design: hell)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Design wechseln (aktuelles Design: dunkel)"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -538,6 +553,15 @@ msgstr "Benutzername oder Passwort vergessen?"
 msgid "Toggle navigation"
 msgstr "Navigation ein-/ausblenden"
 
+msgid "Sidebar"
+msgstr "Seitenleiste"
+
+msgid "Start typing to filter…"
+msgstr "Eingabe beginnen um zu filtern…"
+
+msgid "Filter navigation items"
+msgstr "Navigationselemente filtern"
+
 msgid "Date/time"
 msgstr "Datum/Zeit"
 
@@ -546,6 +570,11 @@ msgstr "Benutzer"
 
 msgid "Action"
 msgstr "Aktion"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "Eintrag"
+msgstr[1] "Einträge"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -603,8 +632,14 @@ msgstr "%(model)s hinzufügen"
 msgid "Delete selected %(model)s"
 msgstr "Ausgewählte %(model)s löschen"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Vielen Dank, dass Sie hier ein paar nette Minuten verbracht haben."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Ausgewählte %(model)s ansehen"
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
+"Vielen Dank, dass Sie heute ein paar nette Minuten auf dieser Webseite "
+"verbracht haben."
 
 msgid "Log in again"
 msgstr "Erneut anmelden"

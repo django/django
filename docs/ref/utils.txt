@@ -21,7 +21,7 @@ by managing the ``Vary`` header of responses. It includes functions to patch
 the header of response objects directly and decorators that change functions to
 do that header-patching themselves.
 
-For information on the ``Vary`` header, see :rfc:`7231#section-7.1.4`.
+For information on the ``Vary`` header, see :rfc:`9110#section-12.5.5`.
 
 Essentially, the ``Vary`` HTTP header defines which headers a cache should take
 into account when building its cache key. Requests with the same path but
@@ -62,16 +62,20 @@ need to distinguish caches by the ``Accept-language`` header.
 
 .. function:: add_never_cache_headers(response)
 
+    Adds an ``Expires`` header to the current date/time.
+
     Adds a ``Cache-Control: max-age=0, no-cache, no-store, must-revalidate,
     private`` header to a response to indicate that a page should never be
     cached.
+
+    Each header is only added if it isn't already set.
 
 .. function:: patch_vary_headers(response, newheaders)
 
     Adds (or updates) the ``Vary`` header in the given ``HttpResponse`` object.
     ``newheaders`` is a list of header names that should be in ``Vary``. If
     headers contains an asterisk, then ``Vary`` header will consist of a single
-    asterisk ``'*'``, according to :rfc:`7231#section-7.1.4`. Otherwise,
+    asterisk ``'*'``, according to :rfc:`9110#section-12.5.5`. Otherwise,
     existing headers in ``Vary`` aren't removed.
 
 .. function:: get_cache_key(request, key_prefix=None, method='GET', cache=None)
@@ -179,6 +183,7 @@ The functions defined in this module share the following properties:
     decorator is created from the ``CacheMiddleware`` like this::
 
          cache_page = decorator_from_middleware_with_args(CacheMiddleware)
+
 
          @cache_page(3600)
          def my_view(request):
@@ -294,13 +299,15 @@ The functions defined in this module share the following properties:
 .. module:: django.utils.feedgenerator
    :synopsis: Syndication feed generation library -- used for generating RSS, etc.
 
-Sample usage::
+Sample usage:
+
+.. code-block:: pycon
 
     >>> from django.utils import feedgenerator
     >>> feed = feedgenerator.Rss201rev2Feed(
     ...     title="Poynter E-Media Tidbits",
     ...     link="http://www.poynter.org/column.asp?id=31",
-    ...     description="A group Weblog by the sharpest minds in online media/journalism/publishing.",
+    ...     description="A group blog by the sharpest minds in online media/journalism/publishing.",
     ...     language="en",
     ... )
     >>> feed.add_item(
@@ -308,8 +315,9 @@ Sample usage::
     ...     link="http://www.holovaty.com/test/",
     ...     description="Testing.",
     ... )
-    >>> with open('test.rss', 'w') as fp:
-    ...     feed.write(fp, 'utf-8')
+    >>> with open("test.rss", "w") as fp:
+    ...     feed.write(fp, "utf-8")
+    ...
 
 For simplifying the selection of a generator use ``feedgenerator.DefaultFeed``
 which is currently ``Rss201rev2Feed``
@@ -328,7 +336,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
 .. class:: SyndicationFeed
 
-    Base class for all syndication feeds. Subclasses should provide write().
+    Base class for all syndication feeds. Subclasses should provide
+    ``write()``.
 
     .. method:: __init__(title, link, description, language=None, author_email=None, author_name=None, author_link=None, subtitle=None, categories=None, feed_url=None, feed_copyright=None, feed_guid=None, ttl=None, **kwargs)
 
@@ -422,7 +431,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 .. module:: django.utils.functional
     :synopsis: Functional programming tools.
 
-.. class:: cached_property(func, name=None)
+.. class:: cached_property(func)
 
     The ``@cached_property`` decorator caches the result of a method with a
     single ``self`` argument as a property. The cached result will persist
@@ -435,11 +444,11 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         # the model
         class Person(models.Model):
-
             def friends(self):
                 # expensive computation
                 ...
                 return friends
+
 
         # in the view:
         if person.friends():
@@ -457,8 +466,8 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import cached_property
 
-        class Person(models.Model):
 
+        class Person(models.Model):
             @cached_property
             def friends(self):
                 ...
@@ -473,7 +482,7 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     The cached value can be treated like an ordinary attribute of the instance::
 
         # clear it, requiring re-computation next time it's called
-        del person.friends # or delattr(person, "friends")
+        del person.friends  # or delattr(person, "friends")
 
         # set a value manually, that will persist on the instance until cleared
         person.friends = ["Huckleberry Finn", "Tom Sawyer"]
@@ -499,10 +508,10 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
     value of the cached property will persist until you delete it as described
     above::
 
-        x = person.friends         # calls first time
-        y = person.get_friends()   # calls again
-        z = person.friends         # does not call
-        x is z                     # is True
+        x = person.friends  # calls first time
+        y = person.get_friends()  # calls again
+        z = person.friends  # does not call
+        x is z  # is True
 
 .. class:: classproperty(method=None)
 
@@ -532,14 +541,18 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
-        def fancy_utility_function(s, ...):
+
+        def fancy_utility_function(s, *args, **kwargs):
             # Do some conversion on string 's'
             ...
+
+
         fancy_utility_function = keep_lazy(str)(fancy_utility_function)
+
 
         # Or more succinctly:
         @keep_lazy(str)
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
 
     The ``keep_lazy()`` decorator takes a number of extra arguments (``*args``)
@@ -562,14 +575,16 @@ https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004
 
         from django.utils.functional import keep_lazy, keep_lazy_text
 
+
         # Our previous example was:
         @keep_lazy(str)
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
+
 
         # Which can be rewritten as:
         @keep_lazy_text
-        def fancy_utility_function(s, ...):
+        def fancy_utility_function(s, *args, **kwargs):
             ...
 
 ``django.utils.html``
@@ -591,14 +606,16 @@ escaping HTML.
 
 .. function:: conditional_escape(text)
 
-    Similar to ``escape()``, except that it doesn't operate on pre-escaped
+    Similar to ``escape()``, except that it doesn't operate on preescaped
     strings, so it will not double escape.
 
 .. function:: format_html(format_string, *args, **kwargs)
 
     This is similar to :meth:`str.format`, except that it is appropriate for
-    building up HTML fragments. All args and kwargs are passed through
+    building up HTML fragments. The first argument ``format_string`` is not
+    escaped but all other args and kwargs are passed through
     :func:`conditional_escape` before being passed to ``str.format()``.
+    Finally, the output has :func:`~django.utils.safestring.mark_safe` applied.
 
     For the case of building up small HTML fragments, this function is to be
     preferred over string interpolation using ``%`` or ``str.format()``
@@ -607,15 +624,19 @@ escaping HTML.
 
     So, instead of writing::
 
-        mark_safe("%s <b>%s</b> %s" % (
-            some_html,
-            escape(some_text),
-            escape(some_other_text),
-        ))
+        mark_safe(
+            "%s <b>%s</b> %s"
+            % (
+                some_html,
+                escape(some_text),
+                escape(some_other_text),
+            )
+        )
 
     You should instead use::
 
-        format_html("{} <b>{}</b> {}",
+        format_html(
+            "{} <b>{}</b> {}",
             mark_safe(some_html),
             some_text,
             some_other_text,
@@ -630,6 +651,11 @@ escaping HTML.
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_str` on the values.
 
+    .. deprecated:: 5.0
+
+        Support for calling ``format_html()`` without passing args or kwargs is
+        deprecated.
+
 .. function:: format_html_join(sep, format_string, args_generator)
 
     A wrapper of :func:`format_html`, for the common case of a group of
@@ -640,10 +666,28 @@ escaping HTML.
     ``args_generator`` should be an iterator that returns the sequence of
     ``args`` that will be passed to :func:`format_html`. For example::
 
-        format_html_join(
-            '\n', "<li>{} {}</li>",
-            ((u.first_name, u.last_name) for u in users)
-        )
+        format_html_join("\n", "<li>{} {}</li>", ((u.first_name, u.last_name) for u in users))
+
+.. function:: json_script(value, element_id=None, encoder=None)
+
+    Escapes all HTML/XML special characters with their Unicode escapes, so
+    value is safe for use with JavaScript. Also wraps the escaped JSON in a
+    ``<script>`` tag. If the ``element_id`` parameter is not ``None``, the
+    ``<script>`` tag is given the passed id. For example:
+
+    .. code-block:: pycon
+
+        >>> json_script({"hello": "world"}, element_id="hello-data")
+        '<script id="hello-data" type="application/json">{"hello": "world"}</script>'
+
+    The ``encoder``, which defaults to
+    :class:`django.core.serializers.json.DjangoJSONEncoder`, will be used to
+    serialize the data. See :ref:`JSON serialization
+    <serialization-formats-json>` for more details about this serializer.
+
+    .. versionchanged:: 4.2
+
+        The ``encoder`` argument was added.
 
 .. function:: strip_tags(value)
 
@@ -661,8 +705,8 @@ escaping HTML.
     If ``value`` is ``"<b>Joel</b> <button>is</button> a <span>slug</span>"``
     the return value will be ``"Joel is a slug"``.
 
-    If you are looking for a more robust solution, take a look at the `bleach
-    <https://pypi.org/project/bleach/>`_ Python library.
+    If you are looking for a more robust solution, consider using a third-party
+    HTML sanitizing tool.
 
 .. function:: html_safe()
 
@@ -688,13 +732,22 @@ escaping HTML.
 .. function:: http_date(epoch_seconds=None)
 
     Formats the time to match the :rfc:`1123#section-5.2.14` date format as
-    specified by HTTP :rfc:`7231#section-7.1.1.1`.
+    specified by HTTP :rfc:`9110#section-5.6.7`.
 
     Accepts a floating point number expressed in seconds since the epoch in
     UTC--such as that outputted by ``time.time()``. If set to ``None``,
     defaults to the current time.
 
     Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
+
+.. function:: content_disposition_header(as_attachment, filename)
+
+    .. versionadded:: 4.2
+
+    Constructs a ``Content-Disposition`` HTTP header value from the given
+    ``filename`` as specified by :rfc:`6266`. Returns ``None`` if
+    ``as_attachment`` is ``False`` and ``filename`` is ``None``, otherwise
+    returns a string suitable for the ``Content-Disposition`` HTTP header.
 
 .. function:: base36_to_int(s)
 
@@ -729,7 +782,8 @@ Functions for working with Python modules.
     example::
 
         from django.utils.module_loading import import_string
-        ValidationError = import_string('django.core.exceptions.ValidationError')
+
+        ValidationError = import_string("django.core.exceptions.ValidationError")
 
     is equivalent to::
 
@@ -764,9 +818,11 @@ appropriate entities.
     For building up fragments of HTML, you should normally be using
     :func:`django.utils.html.format_html` instead.
 
-    String marked safe will become unsafe again if modified. For example::
+    String marked safe will become unsafe again if modified. For example:
 
-        >>> mystr = '<b>Hello World</b>   '
+    .. code-block:: pycon
+
+        >>> mystr = "<b>Hello World</b>   "
         >>> mystr = mark_safe(mystr)
         >>> type(mystr)
         <class 'django.utils.safestring.SafeString'>
@@ -791,8 +847,10 @@ appropriate entities.
         from django.utils.translation import pgettext_lazy
 
         urlpatterns = [
-            path(format_lazy('{person}/<int:pk>/', person=pgettext_lazy('URL', 'person')),
-                 PersonDetailView.as_view()),
+            path(
+                format_lazy("{person}/<int:pk>/", person=pgettext_lazy("URL", "person")),
+                PersonDetailView.as_view(),
+            ),
         ]
 
     This example allows translators to translate part of the URL. If "person"
@@ -810,21 +868,20 @@ appropriate entities.
     #. Replacing any whitespace or repeated dashes with single dashes.
     #. Removing leading and trailing whitespace, dashes, and underscores.
 
-    For example::
+    For example:
 
-        >>> slugify(' Joel is a slug ')
+    .. code-block:: pycon
+
+        >>> slugify(" Joel is a slug ")
         'joel-is-a-slug'
 
     If you want to allow Unicode characters, pass ``allow_unicode=True``. For
-    example::
+    example:
 
-        >>> slugify('你好 World', allow_unicode=True)
+    .. code-block:: pycon
+
+        >>> slugify("你好 World", allow_unicode=True)
         '你好-world'
-
-    .. versionchanged:: 3.2
-
-        In older versions, leading and trailing dashes and underscores are not
-        removed.
 
 .. _time-zone-selection-functions:
 
@@ -833,10 +890,6 @@ appropriate entities.
 
 .. module:: django.utils.timezone
     :synopsis: Timezone support.
-
-.. data:: utc
-
-    :class:`~datetime.tzinfo` instance that represents UTC.
 
 .. function:: get_fixed_timezone(offset)
 
@@ -934,31 +987,12 @@ appropriate entities.
     Returns ``True`` if ``value`` is naive, ``False`` if it is aware. This
     function assumes that ``value`` is a :class:`~datetime.datetime`.
 
-.. function:: make_aware(value, timezone=None, is_dst=None)
+.. function:: make_aware(value, timezone=None)
 
     Returns an aware :class:`~datetime.datetime` that represents the same
     point in time as ``value`` in ``timezone``, ``value`` being a naive
     :class:`~datetime.datetime`. If ``timezone`` is set to ``None``, it
     defaults to the :ref:`current time zone <default-current-time-zone>`.
-
-    When using ``pytz``, the ``pytz.AmbiguousTimeError`` exception is raised if
-    you try to make ``value`` aware during a DST transition where the same time
-    occurs twice (when reverting from DST). Setting ``is_dst`` to ``True`` or
-    ``False`` will avoid the exception by choosing if the time is
-    pre-transition or post-transition respectively.
-
-    When using ``pytz``, the ``pytz.NonExistentTimeError`` exception is raised
-    if you try to make ``value`` aware during a DST transition such that the
-    time never occurred. For example, if the 2:00 hour is skipped during a DST
-    transition, trying to make 2:30 aware in that time zone will raise an
-    exception. To avoid that you can use ``is_dst`` to specify how
-    ``make_aware()`` should interpret such a nonexistent time. If
-    ``is_dst=True`` then the above time would be interpreted as 2:30 DST time
-    (equivalent to 1:30 local time). Conversely, if ``is_dst=False`` the time
-    would be interpreted as 2:30 standard time (equivalent to 3:30 local time).
-
-    The ``is_dst`` parameter has no effect when using non-``pytz`` timezone
-    implementations.
 
 .. function:: make_naive(value, timezone=None)
 

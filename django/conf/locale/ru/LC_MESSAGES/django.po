@@ -7,6 +7,7 @@
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
 # eigrad <andrew@ei-grad.ru>, 2012
 # Eugene <eugene.mechanism@gmail.com>, 2013
+# Eugene Morozov <transifex@emorozov.net>, 2021
 # eXtractor <evg.kirov@gmail.com>, 2015
 # crazyzubr <hjcnbckfd@gmail.com>, 2020
 # Igor Melnyk, 2014
@@ -14,28 +15,29 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # lilo.panic, 2016
 # Mikhail Zholobov <legal90@gmail.com>, 2013
-# Nikolay Korotkiy <sikmir@gmail.com>, 2018
+# Nikolay Korotkiy <sikmir@disroot.org>, 2018
 # Panasoft, 2021
 # Вася Аникин <anikin.vasya@gmail.com>, 2017
 # SeryiMysh <vital@dorokhin.kz>, 2020
-# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020
-# Дмитрий Шатера <mr.bobsans@gmail.com>, 2016,2018
+# Алексей Борискин <sun.void@gmail.com>, 2013-2017,2019-2020,2022
+# Bobsans <mr.bobsans@gmail.com>, 2016,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-03-16 22:50+0000\n"
-"Last-Translator: Panasoft\n"
+"POT-Creation-Date: 2022-05-17 05:23-0500\n"
+"PO-Revision-Date: 2022-05-25 06:49+0000\n"
+"Last-Translator: Алексей Борискин <sun.void@gmail.com>, "
+"2013-2017,2019-2020,2022\n"
 "Language-Team: Russian (http://www.transifex.com/django/django/language/"
 "ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ru\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Afrikaans"
 msgstr "Бурский"
@@ -226,6 +228,9 @@ msgstr "Монгольский"
 msgid "Marathi"
 msgstr "Маратхи"
 
+msgid "Malay"
+msgstr "Малайский"
+
 msgid "Burmese"
 msgstr "Бирманский"
 
@@ -403,6 +408,10 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Убедитесь, что это значение больше либо равно %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Убедитесь, что это значение кратно числу %(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -491,6 +500,10 @@ msgstr ""
 "%(model_name)s с такими значениями полей %(field_labels)s уже существует."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Нарушено ограничение \"%(name)s\"."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Значения %(value)r нет среди допустимых вариантов."
 
@@ -504,8 +517,8 @@ msgstr "Это поле не может быть пустым."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "%(model_name)s с таким %(field_label)s уже существует."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -708,7 +721,7 @@ msgstr "Связь %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr "Связьи %(from)s-%(to)s"
+msgstr "Связи %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Связь \"многие ко многим\""
@@ -813,20 +826,20 @@ msgstr ""
 "отправить отчет об ошибке."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Пожалуйста, отправляйте не больше %d формы."
-msgstr[1] "Пожалуйста, отправляйте не больше %d форм."
-msgstr[2] "Пожалуйста, отправляйте не больше %d форм."
-msgstr[3] "Пожалуйста, отправляйте не больше %d форм."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Пожалуйста, отправьте не больше %(num)d формы."
+msgstr[1] "Пожалуйста, отправьте не больше %(num)d форм."
+msgstr[2] "Пожалуйста, отправьте не больше %(num)d форм."
+msgstr[3] "Пожалуйста, отправьте не больше %(num)d форм."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Пожалуйста, отправьте хотя бы %d форму."
-msgstr[1] "Пожалуйста, отправьте хотя бы %d форм."
-msgstr[2] "Пожалуйста, отправьте хотя бы %d форм."
-msgstr[3] "Пожалуйста, отправьте хотя бы %d форм."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Пожалуйста, отправьте %(num)d форму."
+msgstr[1] "Пожалуйста, отправьте %(num)d формы."
+msgstr[2] "Пожалуйста, отправьте %(num)d форм."
+msgstr[3] "Пожалуйста, отправьте %(num)d форм."
 
 msgid "Order"
 msgstr "Порядок"
@@ -1168,52 +1181,52 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d год"
-msgstr[1] "%d года"
-msgstr[2] "%d лет"
-msgstr[3] "%d лет"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d год"
+msgstr[1] "%(num)d года"
+msgstr[2] "%(num)d лет"
+msgstr[3] "%(num)d лет"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d месяц"
-msgstr[1] "%d месяца"
-msgstr[2] "%d месяцев"
-msgstr[3] "%d месяцев"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d месяц"
+msgstr[1] "%(num)d месяца"
+msgstr[2] "%(num)d месяцев"
+msgstr[3] "%(num)d месяцев"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d неделя"
-msgstr[1] "%d недели"
-msgstr[2] "%d недель"
-msgstr[3] "%d недель"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d неделя"
+msgstr[1] "%(num)d недели"
+msgstr[2] "%(num)d недель"
+msgstr[3] "%(num)d недель"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d день"
-msgstr[1] "%d дня"
-msgstr[2] "%d дней"
-msgstr[3] "%d дней"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d день"
+msgstr[1] "%(num)d дня"
+msgstr[2] "%(num)d дней"
+msgstr[3] "%(num)d дней"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-msgstr[2] "%d часов"
-msgstr[3] "%d часов"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d час"
+msgstr[1] "%(num)d часа"
+msgstr[2] "%(num)d часов"
+msgstr[3] "%(num)d часов"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d минута"
-msgstr[1] "%d минуты"
-msgstr[2] "%d минут"
-msgstr[3] "%d минут"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d минута"
+msgstr[1] "%(num)d минуты"
+msgstr[2] "%(num)d минут"
+msgstr[3] "%(num)d минут"
 
 msgid "Forbidden"
 msgstr "Ошибка доступа"
@@ -1223,15 +1236,15 @@ msgstr "Ошибка проверки CSRF. Запрос отклонён."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
-"Вы видите это сообщение, потому что данный сайт использует защищённое "
-"соединение и требует, чтобы заголовок “Referer” был передан вашим браузером, "
-"но он не был им передан. Данный заголовок необходим по соображениям "
-"безопасности, чтобы убедиться, что ваш браузер не был взломан, а запрос к "
-"серверу не был перехвачен или подменён."
+"Вы видите это сообщение потому что этот сайт работает по защищённому "
+"протоколу HTTPS и требует, чтобы при запросе вашим браузером был передан "
+"заголовок \"Referer\", но он не был передан. Этот заголовок необходим из "
+"соображений безопасности: мы должны убедиться что запрос оправляете именно "
+"вы."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1248,15 +1261,15 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
-"Если Вы используете HTML-тэг <meta name=\"referrer\" content=\"no-referrer"
-"\"> или добавили HTTP-заголовок “Referrer-Policy: no-referrer”, пожалуйста "
-"удалите их. CSRF защите необходим заголовок “Referer” для строгой проверки "
-"адреса ссылающейся страницы. Если Вы беспокоитесь о приватности, используйте "
-"альтернативы, например <a rel=\"noreferrer\" …>, для ссылок на сайты третьих "
-"лиц."
+"Если Вы используете HTML-тэг <meta name=\"referrer\" content=\"no-"
+"referrer\"> или добавили HTTP-заголовок “Referrer-Policy: no-referrer”, "
+"пожалуйста удалите их. CSRF защите необходим заголовок “Referer” для строгой "
+"проверки адреса ссылающейся страницы. Если Вы беспокоитесь о приватности, "
+"используйте альтернативы, например <a rel=\"noreferrer\" …>, для ссылок на "
+"сайты третьих лиц."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1358,13 +1371,13 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Вы видите данную страницу, потому что указали <a href=\"https://docs."
-"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" rel="
-"\"noopener\">DEBUG=True</a> в файле настроек и не настроили ни одного "
+"djangoproject.com/en/%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> в файле настроек и не настроили ни одного "
 "обработчика URL-адресов."
 
 msgid "Django Documentation"

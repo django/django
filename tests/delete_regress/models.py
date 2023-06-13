@@ -1,6 +1,4 @@
-from django.contrib.contenttypes.fields import (
-    GenericForeignKey, GenericRelation,
-)
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
@@ -24,7 +22,7 @@ class Person(models.Model):
 
 class Book(models.Model):
     pagecount = models.IntegerField()
-    owner = models.ForeignKey('Child', models.CASCADE, null=True)
+    owner = models.ForeignKey("Child", models.CASCADE, null=True)
 
 
 class Toy(models.Model):
@@ -33,13 +31,13 @@ class Toy(models.Model):
 
 class Child(models.Model):
     name = models.CharField(max_length=50)
-    toys = models.ManyToManyField(Toy, through='PlayedWith')
+    toys = models.ManyToManyField(Toy, through="PlayedWith")
 
 
 class PlayedWith(models.Model):
     child = models.ForeignKey(Child, models.CASCADE)
     toy = models.ForeignKey(Toy, models.CASCADE)
-    date = models.DateField(db_column='date_col')
+    date = models.DateField(db_column="date_col")
 
 
 class PlayedWithNote(models.Model):
@@ -57,8 +55,12 @@ class Email(Contact):
 
 class Researcher(models.Model):
     contacts = models.ManyToManyField(Contact, related_name="research_contacts")
-    primary_contact = models.ForeignKey(Contact, models.SET_NULL, null=True, related_name='primary_contacts')
-    secondary_contact = models.ForeignKey(Contact, models.SET_NULL, null=True, related_name='secondary_contacts')
+    primary_contact = models.ForeignKey(
+        Contact, models.SET_NULL, null=True, related_name="primary_contacts"
+    )
+    secondary_contact = models.ForeignKey(
+        Contact, models.SET_NULL, null=True, related_name="secondary_contacts"
+    )
 
 
 class Food(models.Model):
@@ -88,6 +90,13 @@ class Location(models.Model):
 class Item(models.Model):
     version = models.ForeignKey(Version, models.CASCADE)
     location = models.ForeignKey(Location, models.SET_NULL, blank=True, null=True)
+    location_value = models.ForeignKey(
+        Location, models.SET(42), default=1, db_constraint=False, related_name="+"
+    )
+    location_default = models.ForeignKey(
+        Location, models.SET_DEFAULT, default=1, db_constraint=False, related_name="+"
+    )
+
 
 # Models for #16128
 
@@ -141,4 +150,4 @@ class OrderedPerson(models.Model):
     lives_in = models.ForeignKey(House, models.CASCADE)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]

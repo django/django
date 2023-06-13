@@ -3,27 +3,41 @@
 .selector {
     width: 800px;
     float: left;
+    display: flex;
 }
 
 .selector select {
     width: 380px;
     height: 17.2em;
+    flex: 1 0 auto;
 }
 
 .selector-available, .selector-chosen {
-    float: left;
     width: 380px;
     text-align: center;
     margin-bottom: 5px;
-}
-
-.selector-chosen select {
-    border-top: none;
+    display: flex;
+    flex-direction: column;
 }
 
 .selector-available h2, .selector-chosen h2 {
     border: 1px solid var(--border-color);
     border-radius: 4px 4px 0 0;
+}
+
+.selector-chosen .list-footer-display {
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin: 0 0 10px;
+    padding: 8px;
+    text-align: center;
+    background: var(--primary);
+    color: var(--header-link-color);
+    cursor: pointer;
+}
+.selector-chosen .list-footer-display__clear {
+    color: var(--breadcrumbs-fg);
 }
 
 .selector-chosen h2 {
@@ -41,7 +55,7 @@
     border-width: 0 1px;
     padding: 8px;
     color: var(--body-quiet-color);
-    font-size: 10px;
+    font-size: 0.625rem;
     margin: 0;
     text-align: left;
 }
@@ -57,18 +71,20 @@
     line-height: 1;
 }
 
-.selector .selector-available input {
+.selector .selector-available input,
+.selector .selector-chosen input {
     width: 320px;
     margin-left: 8px;
 }
 
 .selector ul.selector-chooser {
-    float: left;
+    align-self: center;
     width: 22px;
     background-color: var(--selected-bg);
     border-radius: 10px;
-    margin: 10em 5px 0 5px;
+    margin: 0 5px;
     padding: 0;
+    transform: translateY(-17px);
 }
 
 .selector-chooser li {
@@ -81,6 +97,15 @@
     padding: 0 10px;
     margin: 0 0 10px;
     border-radius: 0 0 4px 4px;
+}
+.selector .selector-chosen--with-filtered select {
+    margin: 0;
+    border-radius: 0;
+    height: 14em;
+}
+
+.selector .selector-chosen:not(.selector-chosen--with-filtered) .list-footer-display {
+    display: none;
 }
 
 .selector-add, .selector-remove {
@@ -168,6 +193,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .stacked {
     float: left;
     width: 490px;
+    display: block;
 }
 
 .stacked select {
@@ -193,6 +219,7 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
     margin: 0 0 10px 40%;
     background-color: #eee;
     border-radius: 10px;
+    transform: none;
 }
 
 .stacked .selector-chooser li {
@@ -250,8 +277,8 @@ a.active.selector-clearall:focus, a.active.selector-clearall:hover {
 .selector .search-label-icon {
     background: url(../img/search.svg) 0 0 no-repeat;
     display: inline-block;
-    height: 18px;
-    width: 18px;
+    height: 1.125rem;
+    width: 1.125rem;
 }
 
 /* DATE AND TIME */
@@ -267,7 +294,7 @@ p.datetime {
 .datetime span {
     white-space: nowrap;
     font-weight: normal;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -277,7 +304,7 @@ p.datetime {
 }
 
 table p.datetime {
-    font-size: 11px;
+    font-size: 0.6875rem;
     margin-left: 0;
     padding-left: 0;
 }
@@ -311,7 +338,7 @@ table p.datetime {
 }
 
 .timezonewarning {
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--body-quiet-color);
 }
 
@@ -322,7 +349,7 @@ p.url {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
 }
 
@@ -337,12 +364,8 @@ p.file-upload {
     margin: 0;
     padding: 0;
     color: var(--body-quiet-color);
-    font-size: 11px;
+    font-size: 0.6875rem;
     font-weight: bold;
-}
-
-.aligned p.file-upload {
-    margin-left: 170px;
 }
 
 .file-upload a {
@@ -355,7 +378,7 @@ p.file-upload {
 
 span.clearable-file-input label {
     color: var(--body-fg);
-    font-size: 11px;
+    font-size: 0.6875rem;
     display: inline;
     float: none;
 }
@@ -364,7 +387,7 @@ span.clearable-file-input label {
 
 .calendarbox, .clockbox {
     margin: 5px auto;
-    font-size: 12px;
+    font-size: 0.75rem;
     width: 19em;
     text-align: center;
     background: var(--body-bg);
@@ -398,7 +421,7 @@ span.clearable-file-input label {
     text-align: center;
     border-top: none;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #333;
     background: var(--accent);
 }
@@ -408,14 +431,14 @@ span.clearable-file-input label {
     background: var(--darkened-bg);
     border-bottom: 1px solid var(--border-color);
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     color: var(--body-quiet-color);
 }
 
 .calendar td {
     font-weight: 400;
-    font-size: 12px;
+    font-size: 0.75rem;
     text-align: center;
     padding: 0;
     border-top: 1px solid var(--hairline-color);
@@ -455,7 +478,7 @@ span.clearable-file-input label {
 }
 
 .calendarnav {
-    font-size: 10px;
+    font-size: 0.625rem;
     text-align: center;
     color: #ccc;
     margin: 0;
@@ -470,8 +493,8 @@ span.clearable-file-input label {
 .calendar-shortcuts {
     background: var(--body-bg);
     color: var(--body-quiet-color);
-    font-size: 11px;
-    line-height: 11px;
+    font-size: 0.6875rem;
+    line-height: 0.6875rem;
     border-top: 1px solid var(--hairline-color);
     padding: 8px 0;
 }
@@ -509,7 +532,7 @@ span.clearable-file-input label {
 .calendar-cancel {
     margin: 0;
     padding: 4px 0;
-    font-size: 12px;
+    font-size: 0.75rem;
     background: #eee;
     border-top: 1px solid var(--border-color);
     color: var(--body-fg);
@@ -556,19 +579,22 @@ ul.timelist, .timelist li {
 }
 
 .related-widget-wrapper-link {
-    opacity: 0.3;
+    opacity: .6;
+    filter: grayscale(1);
 }
 
 .related-widget-wrapper-link:link {
-    opacity: .8;
-}
-
-.related-widget-wrapper-link:link:focus,
-.related-widget-wrapper-link:link:hover {
     opacity: 1;
+    filter: grayscale(0);
 }
 
 select + .related-widget-wrapper-link,
 .related-widget-wrapper-link + .related-widget-wrapper-link {
     margin-left: 7px;
+}
+
+/* GIS MAPS */
+.dj_map {
+    width: 600px;
+    height: 400px;
 }

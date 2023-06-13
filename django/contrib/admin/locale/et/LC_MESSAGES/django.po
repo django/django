@@ -2,20 +2,20 @@
 #
 # Translators:
 # eallik <eallik@gmail.com>, 2011
-# Erlend Eelmets <debcf78e@opayq.com>, 2020
+# Erlend <debcf78e@opayq.com>, 2020
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janno Liivak <jannolii@gmail.com>, 2013-2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2015
-# Martin Pajuste <martinpajuste@gmail.com>, 2016,2019-2020
+# Martin <martinpajuste@gmail.com>, 2015,2022-2023
+# Martin <martinpajuste@gmail.com>, 2016,2019-2020
 # Marti Raudsepp <marti@juffo.org>, 2016
 # Ragnar Rebase <rrebase@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-09-03 15:38+0000\n"
-"Last-Translator: Erlend Eelmets <debcf78e@opayq.com>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"Last-Translator: Martin <martinpajuste@gmail.com>, 2015,2022-2023\n"
 "Language-Team: Estonian (http://www.transifex.com/django/django/language/"
 "et/)\n"
 "MIME-Version: 1.0\n"
@@ -23,6 +23,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: et\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Kustuta valitud %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -34,10 +38,6 @@ msgstr "Ei saa kustutada %(name)s"
 
 msgid "Are you sure?"
 msgstr "Kas olete kindel?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Kustuta valitud %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administreerimine"
@@ -268,8 +268,9 @@ msgstr "valitud 0/%(cnt)s"
 msgid "Change history: %s"
 msgstr "Muudatuste ajalugu: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -366,14 +367,16 @@ msgid "Change password"
 msgstr "Muuda salasõna"
 
 msgid "Please correct the error below."
-msgstr "Palun parandage allolev viga."
-
-msgid "Please correct the errors below."
-msgstr "Palun parandage allolevad vead."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Palun parandage allolev viga."
+msgstr[1] "Palun parandage allolevad vead."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Sisestage uus salasõna kasutajale <strong>%(username)s</strong>"
+
+msgid "Skip to main content"
+msgstr ""
 
 msgid "Welcome,"
 msgstr "Tere tulemast,"
@@ -386,6 +389,9 @@ msgstr "Dokumentatsioon"
 
 msgid "Log out"
 msgstr "Logi välja"
+
+msgid "Breadcrumbs"
+msgstr ""
 
 #, python-format
 msgid "Add %(name)s"
@@ -412,6 +418,15 @@ msgstr "Sorteerimisjärk: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Sorteerimine"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr ""
+
+msgid "Toggle theme (current theme: light)"
+msgstr ""
+
+msgid "Toggle theme (current theme: dark)"
+msgstr ""
 
 msgid "Delete"
 msgstr "Kustuta"
@@ -524,6 +539,15 @@ msgstr "Unustasite oma parooli või kasutajanime?"
 msgid "Toggle navigation"
 msgstr "Lülita navigeerimine sisse"
 
+msgid "Sidebar"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr ""
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Kuupäev/kellaaeg"
 
@@ -532,6 +556,11 @@ msgstr "Kasutaja"
 
 msgid "Action"
 msgstr "Toiming"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "sissekanne"
+msgstr[1] "sissekanded"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,7 +618,11 @@ msgstr "Lisa veel üks %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Kustuta valitud %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Vaata valitud %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr "Tänan, et veetsite aega meie lehel."
 
 msgid "Log in again"

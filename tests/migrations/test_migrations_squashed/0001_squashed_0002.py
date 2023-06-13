@@ -2,14 +2,12 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     replaces = [
         ("migrations", "0001_initial"),
         ("migrations", "0002_second"),
     ]
 
     operations = [
-
         migrations.CreateModel(
             "Author",
             [
@@ -20,13 +18,14 @@ class Migration(migrations.Migration):
                 ("rating", models.IntegerField(default=0)),
             ],
         ),
-
         migrations.CreateModel(
             "Book",
             [
                 ("id", models.AutoField(primary_key=True)),
-                ("author", models.ForeignKey("migrations.Author", models.SET_NULL, null=True)),
+                (
+                    "author",
+                    models.ForeignKey("migrations.Author", models.SET_NULL, null=True),
+                ),
             ],
         ),
-
     ]

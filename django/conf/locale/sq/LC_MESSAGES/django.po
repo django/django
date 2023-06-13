@@ -2,16 +2,16 @@
 #
 # Translators:
 # Besnik Bleta <besnik@programeshqip.org>, 2011-2014
-# Besnik Bleta <besnik@programeshqip.org>, 2020-2021
+# Besnik Bleta <besnik@programeshqip.org>, 2020-2023
 # Besnik Bleta <besnik@programeshqip.org>, 2015-2019
 # Jannis Leidel <jannis@leidel.info>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 13:59+0000\n"
-"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
+"POT-Creation-Date: 2023-01-17 02:13-0600\n"
+"PO-Revision-Date: 2023-04-25 06:49+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>, 2020-2023\n"
 "Language-Team: Albanian (http://www.transifex.com/django/django/language/"
 "sq/)\n"
 "MIME-Version: 1.0\n"
@@ -52,6 +52,9 @@ msgstr "Boshnjake"
 
 msgid "Catalan"
 msgstr "Katalane"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "Kurdishte e Qendrës (Sorani)"
 
 msgid "Czech"
 msgstr "Çeke"
@@ -208,6 +211,9 @@ msgstr "Mongoliane"
 
 msgid "Marathi"
 msgstr "Marati"
+
+msgid "Malay"
+msgstr ""
 
 msgid "Burmese"
 msgstr "Burmeze"
@@ -385,6 +391,12 @@ msgid "Ensure this value is greater than or equal to %(limit_value)s."
 msgstr "Siguroni që kjo vlerë është më e madhe ose baras me %(limit_value)s."
 
 #, python-format
+msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+"Garantoni që vlera të jetë një shumëfish i madhësisë së hapit "
+"%(limit_value)s."
+
+#, python-format
 msgid ""
 "Ensure this value has at least %(limit_value)d character (it has "
 "%(show_value)d)."
@@ -456,6 +468,10 @@ msgid "%(model_name)s with this %(field_labels)s already exists."
 msgstr "Ka tashmë %(model_name)s me këtë %(field_labels)s."
 
 #, python-format
+msgid "Constraint “%(name)s” is violated."
+msgstr "Është cenuar kufizimi “%(name)s”."
+
+#, python-format
 msgid "Value %(value)r is not a valid choice."
 msgstr "Vlera %(value)r s’është zgjedhje e vlefshme."
 
@@ -469,8 +485,8 @@ msgstr "Kjo fushë s’mund të jetë e paplotësuar."
 msgid "%(model_name)s with this %(field_label)s already exists."
 msgstr "Ka tashmë një %(model_name)s me këtë %(field_label)s."
 
-#. Translators: The 'lookup_type' is one of 'date', 'year' or 'month'.
-#. Eg: "Title must be unique for pub_date year"
+#. Translators: The 'lookup_type' is one of 'date', 'year' or
+#. 'month'. Eg: "Title must be unique for pub_date year"
 #, python-format
 msgid ""
 "%(field_label)s must be unique for %(date_field_label)s %(lookup_type)s."
@@ -495,6 +511,9 @@ msgstr "Buleane (Ose True, ose False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "Varg (deri në %(max_length)s)"
+
+msgid "String (unlimited)"
+msgstr "Varg (i pakufizuar)"
 
 msgid "Comma-separated integers"
 msgstr "Numra të plotë të ndarë me presje"
@@ -772,16 +791,16 @@ msgstr ""
 "parashtroni një raport të mete."
 
 #, python-format
-msgid "Please submit at most %d form."
-msgid_plural "Please submit at most %d forms."
-msgstr[0] "Ju lutemi, parashtroni e shumta 1%d  formular."
-msgstr[1] "Ju lutemi, parashtroni e shumta %d formularë."
+msgid "Please submit at most %(num)d form."
+msgid_plural "Please submit at most %(num)d forms."
+msgstr[0] "Ju lutemi, parashtroni e shumta %(num)d formular."
+msgstr[1] "Ju lutemi, parashtroni e shumta %(num)d formularë."
 
 #, python-format
-msgid "Please submit at least %d form."
-msgid_plural "Please submit at least %d forms."
-msgstr[0] "Ju lutemi, parashtroni të paktën 1%d formular."
-msgstr[1] "Ju lutemi, parashtroni të paktën 1%d formularë."
+msgid "Please submit at least %(num)d form."
+msgid_plural "Please submit at least %(num)d forms."
+msgstr[0] "Ju lutemi, parashtroni të paktën %(num)d formular."
+msgstr[1] "Ju lutemi, parashtroni të paktën %(num)d formularë."
 
 msgid "Order"
 msgstr "Renditi"
@@ -1122,40 +1141,40 @@ msgid ", "
 msgstr ", "
 
 #, python-format
-msgid "%d year"
-msgid_plural "%d years"
-msgstr[0] "%d vit"
-msgstr[1] "%d vjet"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d vit"
+msgstr[1] "%(num)d vjet"
 
 #, python-format
-msgid "%d month"
-msgid_plural "%d months"
-msgstr[0] "%d muaj"
-msgstr[1] "%d muaj"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d muaj"
+msgstr[1] "%(num)d muaj"
 
 #, python-format
-msgid "%d week"
-msgid_plural "%d weeks"
-msgstr[0] "%d javë"
-msgstr[1] "%d javë"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d javë"
+msgstr[1] "%(num)d javë"
 
 #, python-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d ditë"
-msgstr[1] "%d ditë"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d ditë"
+msgstr[1] "%(num)d ditë"
 
 #, python-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d orë"
-msgstr[1] "%d orë"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d orë"
+msgstr[1] "%(num)d orë"
 
 #, python-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minutë"
-msgstr[1] "%d minuta"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d minutë"
+msgstr[1] "%(num)d minuta"
 
 msgid "Forbidden"
 msgstr "E ndaluar"
@@ -1165,7 +1184,7 @@ msgstr "Verifikimi CSRF dështoi. Kërkesa u ndërpre."
 
 msgid ""
 "You are seeing this message because this HTTPS site requires a “Referer "
-"header” to be sent by your Web browser, but none was sent. This header is "
+"header” to be sent by your web browser, but none was sent. This header is "
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
@@ -1186,8 +1205,8 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
 "Nëse përdorni etiketën <meta name=\"referrer\" content=\"no-referrer\"> "
 "etiketën ose përfshini kryet “Referrer-Policy: no-referrer”, ju lutemi, "
@@ -1287,13 +1306,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
-"Po e shihni këtë faqe ngaqë te kartela juaj e rregullimeve gjendet <a href="
-"\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" target="
-"\"_blank\" rel=\"noopener\">DEBUG=True</a> dhe s’keni formësuar ndonjë URL."
+"Po e shihni këtë faqe ngaqë te kartela juaj e rregullimeve gjendet <a "
+"href=\"https://docs.djangoproject.com/en/%(version)s/ref/settings/#debug\" "
+"target=\"_blank\" rel=\"noopener\">DEBUG=True</a> dhe s’keni formësuar "
+"ndonjë URL."
 
 msgid "Django Documentation"
 msgstr "Dokumentim i Django-s"

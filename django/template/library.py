@@ -1,4 +1,4 @@
-import functools
+from functools import wraps
 from importlib import import_module
 from inspect import getfullargspec, unwrap
 
@@ -20,6 +20,7 @@ class Library:
     The filter, simple_tag, and inclusion_tag methods provide a convenient
     way to register callables as tags.
     """
+
     def __init__(self):
         self.filters = {}
         self.tags = {}
@@ -36,6 +37,7 @@ class Library:
                 # @register.tag('somename') or @register.tag(name='somename')
                 def dec(func):
                     return self.tag(name, func)
+
                 return dec
         elif name is not None and compile_function is not None:
             # register.tag('somename', somefunc)
@@ -43,12 +45,12 @@ class Library:
             return compile_function
         else:
             raise ValueError(
-                "Unsupported arguments to Library.tag: (%r, %r)" %
-                (name, compile_function),
+                "Unsupported arguments to Library.tag: (%r, %r)"
+                % (name, compile_function),
             )
 
     def tag_function(self, func):
-        self.tags[getattr(func, "_decorated_function", func).__name__] = func
+        self.tags[func.__name__] = func
         return func
 
     def filter(self, name=None, filter_func=None, **flags):
@@ -63,6 +65,7 @@ class Library:
             # @register.filter()
             def dec(func):
                 return self.filter_function(func, **flags)
+
             return dec
         elif name is not None and filter_func is None:
             if callable(name):
@@ -72,30 +75,29 @@ class Library:
                 # @register.filter('somename') or @register.filter(name='somename')
                 def dec(func):
                     return self.filter(name, func, **flags)
+
                 return dec
         elif name is not None and filter_func is not None:
             # register.filter('somename', somefunc)
             self.filters[name] = filter_func
-            for attr in ('expects_localtime', 'is_safe', 'needs_autoescape'):
+            for attr in ("expects_localtime", "is_safe", "needs_autoescape"):
                 if attr in flags:
                     value = flags[attr]
                     # set the flag on the filter for FilterExpression.resolve
                     setattr(filter_func, attr, value)
                     # set the flag on the innermost decorated function
                     # for decorators that need it, e.g. stringfilter
-                    if hasattr(filter_func, "_decorated_function"):
-                        setattr(filter_func._decorated_function, attr, value)
+                    setattr(unwrap(filter_func), attr, value)
             filter_func._filter_name = name
             return filter_func
         else:
             raise ValueError(
-                "Unsupported arguments to Library.filter: (%r, %r)" %
-                (name, filter_func),
+                "Unsupported arguments to Library.filter: (%r, %r)"
+                % (name, filter_func),
             )
 
     def filter_function(self, func, **flags):
-        name = getattr(func, "_decorated_function", func).__name__
-        return self.filter(name, func, **flags)
+        return self.filter(func.__name__, func, **flags)
 
     def simple_tag(self, func=None, takes_context=None, name=None):
         """
@@ -105,22 +107,40 @@ class Library:
         def hello(*args, **kwargs):
             return 'world'
         """
-        def dec(func):
-            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
-            function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
-            @functools.wraps(func)
+        def dec(func):
+            (
+                params,
+                varargs,
+                varkw,
+                defaults,
+                kwonly,
+                kwonly_defaults,
+                _,
+            ) = getfullargspec(unwrap(func))
+            function_name = name or func.__name__
+
+            @wraps(func)
             def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 target_var = None
-                if len(bits) >= 2 and bits[-2] == 'as':
+                if len(bits) >= 2 and bits[-2] == "as":
                     target_var = bits[-1]
                     bits = bits[:-2]
                 args, kwargs = parse_bits(
-                    parser, bits, params, varargs, varkw, defaults,
-                    kwonly, kwonly_defaults, takes_context, function_name,
+                    parser,
+                    bits,
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    takes_context,
+                    function_name,
                 )
                 return SimpleNode(func, takes_context, args, kwargs, target_var)
+
             self.tag(function_name, compile_func)
             return func
 
@@ -142,22 +162,45 @@ class Library:
             choices = poll.choice_set.all()
             return {'choices': choices}
         """
-        def dec(func):
-            params, varargs, varkw, defaults, kwonly, kwonly_defaults, _ = getfullargspec(unwrap(func))
-            function_name = (name or getattr(func, '_decorated_function', func).__name__)
 
-            @functools.wraps(func)
+        def dec(func):
+            (
+                params,
+                varargs,
+                varkw,
+                defaults,
+                kwonly,
+                kwonly_defaults,
+                _,
+            ) = getfullargspec(unwrap(func))
+            function_name = name or func.__name__
+
+            @wraps(func)
             def compile_func(parser, token):
                 bits = token.split_contents()[1:]
                 args, kwargs = parse_bits(
-                    parser, bits, params, varargs, varkw, defaults,
-                    kwonly, kwonly_defaults, takes_context, function_name,
+                    parser,
+                    bits,
+                    params,
+                    varargs,
+                    varkw,
+                    defaults,
+                    kwonly,
+                    kwonly_defaults,
+                    takes_context,
+                    function_name,
                 )
                 return InclusionNode(
-                    func, takes_context, args, kwargs, filename,
+                    func,
+                    takes_context,
+                    args,
+                    kwargs,
+                    filename,
                 )
+
             self.tag(function_name, compile_func)
             return func
+
         return dec
 
 
@@ -167,6 +210,7 @@ class TagHelperNode(Node):
     Manages the positional and keyword arguments to be passed to the decorated
     function.
     """
+
     def __init__(self, func, takes_context, args, kwargs):
         self.func = func
         self.takes_context = takes_context
@@ -182,6 +226,7 @@ class TagHelperNode(Node):
 
 
 class SimpleNode(TagHelperNode):
+    child_nodelists = ()
 
     def __init__(self, func, takes_context, args, kwargs, target_var):
         super().__init__(func, takes_context, args, kwargs)
@@ -192,14 +237,13 @@ class SimpleNode(TagHelperNode):
         output = self.func(*resolved_args, **resolved_kwargs)
         if self.target_var is not None:
             context[self.target_var] = output
-            return ''
+            return ""
         if context.autoescape:
             output = conditional_escape(output)
         return output
 
 
 class InclusionNode(TagHelperNode):
-
     def __init__(self, func, takes_context, args, kwargs, filename):
         super().__init__(func, takes_context, args, kwargs)
         self.filename = filename
@@ -217,7 +261,7 @@ class InclusionNode(TagHelperNode):
         if t is None:
             if isinstance(self.filename, Template):
                 t = self.filename
-            elif isinstance(getattr(self.filename, 'template', None), Template):
+            elif isinstance(getattr(self.filename, "template", None), Template):
                 t = self.filename.template
             elif not isinstance(self.filename, str) and is_iterable(self.filename):
                 t = context.template.engine.select_template(self.filename)
@@ -228,32 +272,42 @@ class InclusionNode(TagHelperNode):
         # Copy across the CSRF token, if present, because inclusion tags are
         # often used for forms, and we need instructions for using CSRF
         # protection to be as simple as possible.
-        csrf_token = context.get('csrf_token')
+        csrf_token = context.get("csrf_token")
         if csrf_token is not None:
-            new_context['csrf_token'] = csrf_token
+            new_context["csrf_token"] = csrf_token
         return t.render(new_context)
 
 
-def parse_bits(parser, bits, params, varargs, varkw, defaults,
-               kwonly, kwonly_defaults, takes_context, name):
+def parse_bits(
+    parser,
+    bits,
+    params,
+    varargs,
+    varkw,
+    defaults,
+    kwonly,
+    kwonly_defaults,
+    takes_context,
+    name,
+):
     """
     Parse bits for template tag helpers simple_tag and inclusion_tag, in
     particular by detecting syntax errors and by extracting positional and
     keyword arguments.
     """
     if takes_context:
-        if params[0] == 'context':
+        if params and params[0] == "context":
             params = params[1:]
         else:
             raise TemplateSyntaxError(
                 "'%s' is decorated with takes_context=True so it must "
-                "have a first argument of 'context'" % name)
+                "have a first argument of 'context'" % name
+            )
     args = []
     kwargs = {}
     unhandled_params = list(params)
     unhandled_kwargs = [
-        kwarg for kwarg in kwonly
-        if not kwonly_defaults or kwarg not in kwonly_defaults
+        kwarg for kwarg in kwonly if not kwonly_defaults or kwarg not in kwonly_defaults
     ]
     for bit in bits:
         # First we try to extract a potential kwarg from the bit
@@ -264,13 +318,14 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
             if param not in params and param not in kwonly and varkw is None:
                 # An unexpected keyword argument was supplied
                 raise TemplateSyntaxError(
-                    "'%s' received unexpected keyword argument '%s'" %
-                    (name, param))
+                    "'%s' received unexpected keyword argument '%s'" % (name, param)
+                )
             elif param in kwargs:
                 # The keyword argument has already been supplied once
                 raise TemplateSyntaxError(
-                    "'%s' received multiple values for keyword argument '%s'" %
-                    (name, param))
+                    "'%s' received multiple values for keyword argument '%s'"
+                    % (name, param)
+                )
             else:
                 # All good, record the keyword argument
                 kwargs[str(param)] = value
@@ -285,7 +340,8 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
             if kwargs:
                 raise TemplateSyntaxError(
                     "'%s' received some positional argument(s) after some "
-                    "keyword argument(s)" % name)
+                    "keyword argument(s)" % name
+                )
             else:
                 # Record the positional argument
                 args.append(parser.compile_filter(bit))
@@ -295,17 +351,18 @@ def parse_bits(parser, bits, params, varargs, varkw, defaults,
                 except IndexError:
                     if varargs is None:
                         raise TemplateSyntaxError(
-                            "'%s' received too many positional arguments" %
-                            name)
+                            "'%s' received too many positional arguments" % name
+                        )
     if defaults is not None:
         # Consider the last n params handled, where n is the
         # number of defaults.
-        unhandled_params = unhandled_params[:-len(defaults)]
+        unhandled_params = unhandled_params[: -len(defaults)]
     if unhandled_params or unhandled_kwargs:
         # Some positional arguments were not supplied
         raise TemplateSyntaxError(
-            "'%s' did not receive value(s) for the argument(s): %s" %
-            (name, ", ".join("'%s'" % p for p in unhandled_params + unhandled_kwargs)))
+            "'%s' did not receive value(s) for the argument(s): %s"
+            % (name, ", ".join("'%s'" % p for p in unhandled_params + unhandled_kwargs))
+        )
     return args, kwargs
 
 

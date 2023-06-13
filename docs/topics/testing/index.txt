@@ -3,7 +3,7 @@ Testing in Django
 =================
 
 Automated testing is an extremely useful bug-killing tool for the modern
-Web developer. You can use a collection of tests -- a **test suite** -- to
+web developer. You can use a collection of tests -- a **test suite** -- to
 solve, or avoid, a number of problems:
 
 * When you're writing new code, you can use tests to validate your code
@@ -13,7 +13,7 @@ solve, or avoid, a number of problems:
   ensure your changes haven't affected your application's behavior
   unexpectedly.
 
-Testing a Web application is a complex task, because a Web application is made
+Testing a web application is a complex task, because a web application is made
 of several layers of logic -- from HTTP-level request handling, to form
 validation and processing, to template rendering. With Django's test-execution
 framework and assorted utilities, you can simulate requests, insert test data,

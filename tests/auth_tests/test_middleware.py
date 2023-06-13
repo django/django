@@ -8,7 +8,9 @@ from django.test import TestCase
 class TestAuthenticationMiddleware(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = User.objects.create_user('test_user', 'test@example.com', 'test_password')
+        cls.user = User.objects.create_user(
+            "test_user", "test@example.com", "test_password"
+        )
 
     def setUp(self):
         self.middleware = AuthenticationMiddleware(lambda req: HttpResponse())
@@ -24,7 +26,7 @@ class TestAuthenticationMiddleware(TestCase):
 
     def test_changed_password_invalidates_session(self):
         # After password change, user should be anonymous
-        self.user.set_password('new_password')
+        self.user.set_password("new_password")
         self.user.save()
         self.middleware(self.request)
         self.assertIsNotNone(self.request.user)
@@ -41,3 +43,10 @@ class TestAuthenticationMiddleware(TestCase):
         )
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             self.middleware(HttpRequest())
+
+    async def test_auser(self):
+        self.middleware(self.request)
+        auser = await self.request.auser()
+        self.assertEqual(auser, self.user)
+        auser_second = await self.request.auser()
+        self.assertIs(auser, auser_second)

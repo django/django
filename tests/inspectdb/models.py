@@ -1,13 +1,15 @@
 from django.db import connection, models
+from django.db.models.functions import Lower
 
 
 class People(models.Model):
     name = models.CharField(max_length=255)
-    parent = models.ForeignKey('self', models.CASCADE)
+    parent = models.ForeignKey("self", models.CASCADE)
 
 
 class Message(models.Model):
-    from_field = models.ForeignKey(People, models.CASCADE, db_column='from_id')
+    from_field = models.ForeignKey(People, models.CASCADE, db_column="from_id")
+    author = models.ForeignKey(People, models.CASCADE, related_name="message_authors")
 
 
 class PeopleData(models.Model):
@@ -21,24 +23,37 @@ class PeopleMoreData(models.Model):
     license = models.CharField(max_length=255)
 
 
+class ForeignKeyToField(models.Model):
+    to_field_fk = models.ForeignKey(
+        PeopleMoreData,
+        models.CASCADE,
+        to_field="people_unique",
+    )
+
+
 class DigitsInColumnName(models.Model):
-    all_digits = models.CharField(max_length=11, db_column='123')
-    leading_digit = models.CharField(max_length=11, db_column='4extra')
-    leading_digits = models.CharField(max_length=11, db_column='45extra')
+    all_digits = models.CharField(max_length=11, db_column="123")
+    leading_digit = models.CharField(max_length=11, db_column="4extra")
+    leading_digits = models.CharField(max_length=11, db_column="45extra")
 
 
 class SpecialName(models.Model):
-    field = models.IntegerField(db_column='field')
+    field = models.IntegerField(db_column="field")
     # Underscores
-    field_field_0 = models.IntegerField(db_column='Field_')
-    field_field_1 = models.IntegerField(db_column='Field__')
-    field_field_2 = models.IntegerField(db_column='__field')
+    field_field_0 = models.IntegerField(db_column="Field_")
+    field_field_1 = models.IntegerField(db_column="Field__")
+    field_field_2 = models.IntegerField(db_column="__field")
     # Other chars
-    prc_x = models.IntegerField(db_column='prc(%) x')
-    non_ascii = models.IntegerField(db_column='tamaño')
+    prc_x = models.IntegerField(db_column="prc(%) x")
+    non_ascii = models.IntegerField(db_column="tamaño")
 
     class Meta:
         db_table = "inspectdb_special.table name"
+
+
+class PascalCaseName(models.Model):
+    class Meta:
+        db_table = "inspectdb_pascal.PascalCase"
 
 
 class ColumnTypes(models.Model):
@@ -74,38 +89,66 @@ class JSONFieldColumnType(models.Model):
 
     class Meta:
         required_db_features = {
-            'can_introspect_json_field',
-            'supports_json_field',
+            "can_introspect_json_field",
+            "supports_json_field",
         }
 
 
-test_collation = connection.features.test_collations.get('non_default')
+test_collation = connection.features.test_collations.get("non_default")
 
 
 class CharFieldDbCollation(models.Model):
     char_field = models.CharField(max_length=10, db_collation=test_collation)
 
     class Meta:
-        required_db_features = {'supports_collation_on_charfield'}
+        required_db_features = {"supports_collation_on_charfield"}
 
 
 class TextFieldDbCollation(models.Model):
     text_field = models.TextField(db_collation=test_collation)
 
     class Meta:
-        required_db_features = {'supports_collation_on_textfield'}
+        required_db_features = {"supports_collation_on_textfield"}
+
+
+class CharFieldUnlimited(models.Model):
+    char_field = models.CharField(max_length=None)
+
+    class Meta:
+        required_db_features = {"supports_unlimited_charfield"}
 
 
 class UniqueTogether(models.Model):
     field1 = models.IntegerField()
     field2 = models.CharField(max_length=10)
-    from_field = models.IntegerField(db_column='from')
-    non_unique = models.IntegerField(db_column='non__unique_column')
-    non_unique_0 = models.IntegerField(db_column='non_unique__column')
+    from_field = models.IntegerField(db_column="from")
+    non_unique = models.IntegerField(db_column="non__unique_column")
+    non_unique_0 = models.IntegerField(db_column="non_unique__column")
 
     class Meta:
         unique_together = [
-            ('field1', 'field2'),
-            ('from_field', 'field1'),
-            ('non_unique', 'non_unique_0'),
+            ("field1", "field2"),
+            ("from_field", "field1"),
+            ("non_unique", "non_unique_0"),
         ]
+
+
+class FuncUniqueConstraint(models.Model):
+    name = models.CharField(max_length=255)
+    rank = models.IntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"), models.F("rank"), name="index_lower_name"
+            )
+        ]
+        required_db_features = {"supports_expression_indexes"}
+
+
+class DbComment(models.Model):
+    rank = models.IntegerField(db_comment="'Rank' column comment")
+
+    class Meta:
+        db_table_comment = "Custom table comment"
+        required_db_features = {"supports_comments"}

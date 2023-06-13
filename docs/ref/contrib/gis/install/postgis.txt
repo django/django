@@ -7,19 +7,24 @@ into a spatial database. :ref:`geosbuild`, :ref:`proj4` and
 :ref:`gdalbuild` should be installed prior to building PostGIS. You
 might also need additional libraries, see `PostGIS requirements`_.
 
-The `psycopg2`_ module is required for use as the database adapter when using
-GeoDjango with PostGIS.
+The `psycopg`_ or `psycopg2`_ module is required for use as the database
+adapter when using GeoDjango with PostGIS.
 
 On Debian/Ubuntu, you are advised to install the following packages:
-postgresql-x.x, postgresql-x.x-postgis, postgresql-server-dev-x.x,
-python-psycopg2 (x.x matching the PostgreSQL version you want to install).
-Alternately, you can `build from source`_. Consult the platform-specific
-instructions if you are on :ref:`macos` or :ref:`windows`.
+``postgresql-x``, ``postgresql-x-postgis-3``, ``postgresql-server-dev-x``,
+and ``python3-psycopg3`` (x matching the PostgreSQL version you want to
+install). Alternately, you can `build from source`_. Consult the
+platform-specific instructions if you are on :ref:`macos` or :ref:`windows`.
 
 .. _PostGIS: https://postgis.net/
+.. _psycopg: https://www.psycopg.org/psycopg3/
 .. _psycopg2: https://www.psycopg.org/
 .. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
 .. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
+
+.. versionchanged:: 4.2
+
+    Support for ``psycopg`` 3.1.8+ was added.
 
 Post-installation
 =================
@@ -30,7 +35,9 @@ Creating a spatial database
 ---------------------------
 
 PostGIS 2 includes an extension for PostgreSQL that's used to enable spatial
-functionality::
+functionality:
+
+.. code-block:: shell
 
     $ createdb  <db name>
     $ psql <db name>
@@ -43,12 +50,9 @@ process. An alternative is to use a migration operation in your project::
     from django.contrib.postgres.operations import CreateExtension
     from django.db import migrations
 
-    class Migration(migrations.Migration):
 
-        operations = [
-            CreateExtension('postgis'),
-            ...
-        ]
+    class Migration(migrations.Migration):
+        operations = [CreateExtension("postgis"), ...]
 
 If you plan to use PostGIS raster functionality on PostGIS 3+, you should also
 activate the ``postgis_raster`` extension. You can install the extension using
@@ -69,7 +73,9 @@ To administer the database, you can either use the pgAdmin III program
 (:menuselection:`Start --> PostgreSQL X --> pgAdmin III`) or the SQL Shell
 (:menuselection:`Start --> PostgreSQL X --> SQL Shell`). For example, to create
 a ``geodjango`` spatial database and user, the following may be executed from
-the SQL Shell as the ``postgres`` user::
+the SQL Shell as the ``postgres`` user:
+
+.. code-block:: psql
 
     postgres# CREATE USER geodjango PASSWORD 'my_passwd';
     postgres# CREATE DATABASE geodjango OWNER geodjango;

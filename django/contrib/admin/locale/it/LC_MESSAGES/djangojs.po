@@ -8,14 +8,15 @@
 # Mirco Grillo <mirco.grillomg@gmail.com>, 2020
 # Nicola Larosa <transifex@teknico.net>, 2011-2012
 # palmux <palmux@gmail.com>, 2015,2021
+# Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023
 # Stefano Brentegani <sbrentegani@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 15:58+0000\n"
-"Last-Translator: palmux <palmux@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
 "Language-Team: Italian (http://www.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
@@ -70,6 +71,10 @@ msgstr ""
 "casella qui sotto e poi facendo clic sulla freccia \"Elimina\" tra le due "
 "caselle."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Scrivi in questa casella per filtrare l'elenco dei %s selezionati."
+
 msgid "Remove all"
 msgstr "Elimina tutti"
 
@@ -77,10 +82,18 @@ msgstr "Elimina tutti"
 msgid "Click to remove all chosen %s at once."
 msgstr "Fai clic per eliminare tutti i %s in una volta."
 
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opzione selezionata non visibile"
+msgstr[1] "%s opzioni selezionate non visibili"
+msgstr[2] "%s opzioni selezionate non visibili"
+
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
 msgstr[0] "%(sel)s di %(cnt)s selezionato"
 msgstr[1] "%(sel)s di %(cnt)s selezionati"
+msgstr[2] "%(sel)s di %(cnt)s selezionati"
 
 msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
@@ -125,12 +138,14 @@ msgid "Note: You are %s hour ahead of server time."
 msgid_plural "Note: You are %s hours ahead of server time."
 msgstr[0] "Nota: Sei %s ora in anticipo rispetto al server."
 msgstr[1] "Nota: Sei %s ore in anticipo rispetto al server."
+msgstr[2] "Nota: Sei %s ore in anticipo rispetto al server."
 
 #, javascript-format
 msgid "Note: You are %s hour behind server time."
 msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] "Nota: Sei %s ora in ritardo rispetto al server."
 msgstr[1] "Nota: Sei %s ore in ritardo rispetto al server."
+msgstr[2] "Nota: Sei %s ore in ritardo rispetto al server."
 
 msgid "Choose a Time"
 msgstr "Scegli un orario"

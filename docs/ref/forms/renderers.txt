@@ -26,15 +26,56 @@ A custom renderer can be specified by updating the :setting:`FORM_RENDERER`
 setting. It defaults to
 ``'``:class:`django.forms.renderers.DjangoTemplates`\ ``'``.
 
-You can also provide a custom renderer by setting the
+By specifying a custom form renderer and overriding
+:attr:`~.BaseRenderer.form_template_name` you can adjust the default form
+markup across your project from a single place.
+
+You can also provide a custom renderer per-form or per-widget by setting the
 :attr:`.Form.default_renderer` attribute or by using the ``renderer`` argument
-of :meth:`.Widget.render`.
+of :meth:`.Form.render`, or :meth:`.Widget.render`.
+
+Matching points apply to formset rendering. See :ref:`formset-rendering` for
+discussion.
 
 Use one of the :ref:`built-in template form renderers
 <built-in-template-form-renderers>` or implement your own. Custom renderers
 must implement a ``render(template_name, context, request=None)`` method. It
 should return a rendered templates (as a string) or raise
 :exc:`~django.template.TemplateDoesNotExist`.
+
+.. class:: BaseRenderer
+
+    The base class for the built-in form renderers.
+
+    .. attribute:: form_template_name
+
+        The default name of the template to use to render a form.
+
+        Defaults to ``"django/forms/div.html"`` template.
+
+    .. attribute:: formset_template_name
+
+        The default name of the template to use to render a formset.
+
+        Defaults to ``"django/forms/formsets/div.html"`` template.
+
+    .. attribute:: field_template_name
+
+        .. versionadded:: 5.0
+
+        The default name of the template used to render a ``BoundField``.
+
+        Defaults to ``"django/forms/field.html"``
+
+    .. method:: get_template(template_name)
+
+        Subclasses must implement this method with the appropriate template
+        finding logic.
+
+    .. method:: render(template_name, context, request=None)
+
+        Renders the given template, or raises
+        :exc:`~django.template.TemplateDoesNotExist`.
 
 .. _built-in-template-form-renderers:
 
@@ -50,13 +91,19 @@ This renderer uses a standalone
 :class:`~django.template.backends.django.DjangoTemplates`
 engine (unconnected to what you might have configured in the
 :setting:`TEMPLATES` setting). It loads templates first from the built-in form
-templates directory in ``django/forms/templates`` and then from the installed
-apps' templates directories using the :class:`app_directories
+templates directory in :source:`django/forms/templates` and then from the
+installed apps' templates directories using the :class:`app_directories
 <django.template.loaders.app_directories.Loader>` loader.
 
 If you want to render templates with customizations from your
 :setting:`TEMPLATES` setting, such as context processors for example, use the
 :class:`TemplatesSetting` renderer.
+
+.. class:: DjangoDivFormRenderer
+
+.. deprecated:: 5.0
+
+The alias of :class:`DjangoTemplates`.
 
 ``Jinja2``
 ----------
@@ -65,37 +112,73 @@ If you want to render templates with customizations from your
 
 This renderer is the same as the :class:`DjangoTemplates` renderer except that
 it uses a :class:`~django.template.backends.jinja2.Jinja2` backend. Templates
-for the built-in widgets are located in ``django/forms/jinja2`` and installed
-apps can provide templates in a ``jinja2`` directory.
+for the built-in widgets are located in :source:`django/forms/jinja2` and
+installed apps can provide templates in a ``jinja2`` directory.
 
-To use this backend, all the widgets in your project and its third-party apps
-must have Jinja2 templates. Unless you provide your own Jinja2 templates for
-widgets that don't have any, you can't use this renderer. For example,
-:mod:`django.contrib.admin` doesn't include Jinja2 templates for its widgets
-due to their usage of Django template tags.
+To use this backend, all the forms and widgets in your project and its
+third-party apps must have Jinja2 templates. Unless you provide your own Jinja2
+templates for widgets that don't have any, you can't use this renderer. For
+example, :mod:`django.contrib.admin` doesn't include Jinja2 templates for its
+widgets due to their usage of Django template tags.
+
+.. class:: Jinja2DivFormRenderer
+
+.. deprecated:: 5.0
+
+The alias of :class:`Jinja2`.
 
 ``TemplatesSetting``
 --------------------
 
 .. class:: TemplatesSetting
 
-This renderer gives you complete control of how widget templates are sourced.
-It uses :func:`~django.template.loader.get_template` to find widget
-templates based on what's configured in the :setting:`TEMPLATES` setting.
+This renderer gives you complete control of how form and widget templates are
+sourced. It uses :func:`~django.template.loader.get_template` to find templates
+based on what's configured in the :setting:`TEMPLATES` setting.
 
-Using this renderer along with the built-in widget templates requires either:
+Using this renderer along with the built-in templates requires either:
 
 * ``'django.forms'`` in :setting:`INSTALLED_APPS` and at least one engine
   with :setting:`APP_DIRS=True <TEMPLATES-APP_DIRS>`.
 
-* Adding the built-in widgets templates directory in :setting:`DIRS
-  <TEMPLATES-DIRS>` of one of your template engines. To generate that path::
+* Adding the built-in templates directory in :setting:`DIRS <TEMPLATES-DIRS>`
+  of one of your template engines. To generate that path::
 
     import django
-    django.__path__[0] + '/forms/templates'  # or '/forms/jinja2'
+
+    django.__path__[0] + "/forms/templates"  # or '/forms/jinja2'
 
 Using this renderer requires you to make sure the form templates your project
 needs can be located.
+
+Context available in formset templates
+======================================
+
+Formset templates receive a context from :meth:`.BaseFormSet.get_context`. By
+default, formsets receive a dictionary with the following values:
+
+* ``formset``: The formset instance.
+
+Context available in form templates
+===================================
+
+Form templates receive a context from :meth:`.Form.get_context`. By default,
+forms receive a dictionary with the following values:
+
+* ``form``: The bound form.
+* ``fields``: All bound fields, except the hidden fields.
+* ``hidden_fields``: All hidden bound fields.
+* ``errors``: All non field related or hidden field related form errors.
+
+Context available in field templates
+====================================
+
+.. versionadded:: 5.0
+
+Field templates receive a context from :meth:`.BoundField.get_context`. By
+default, fields receive a dictionary with the following values:
+
+* ``field``: The :class:`~django.forms.BoundField`.
 
 Context available in widget templates
 =====================================
@@ -113,6 +196,41 @@ dictionary that contains values like:
 Some widgets add further information to the context. For instance, all widgets
 that subclass ``Input`` defines ``widget['type']`` and :class:`.MultiWidget`
 defines ``widget['subwidgets']`` for looping purposes.
+
+.. _overriding-built-in-formset-templates:
+
+Overriding built-in formset templates
+=====================================
+
+:attr:`.BaseFormSet.template_name`
+
+To override formset templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding formset templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.
+
+.. _overriding-built-in-form-templates:
+
+Overriding built-in form templates
+==================================
+
+:attr:`.Form.template_name`
+
+To override form templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding form templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.
+
+.. _overriding-built-in-field-templates:
+
+Overriding built-in field templates
+===================================
+
+.. versionadded:: 5.0
+
+:attr:`.Field.template_name`
+
+To override field templates, you must use the :class:`TemplatesSetting`
+renderer. Then overriding field templates works :doc:`the same as
+</howto/overriding-templates>` overriding any other template in your project.
 
 .. _overriding-built-in-widget-templates:
 

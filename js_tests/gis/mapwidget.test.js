@@ -33,7 +33,7 @@ QUnit.test('MapWidget.defaultCenter', function(assert) {
         '6.81,47.08',
         'Default center at 6.81, 47.08'
     );
-    assert.equal(widget.map.getView().getZoom(), 12);
+    assert.equal(Math.round(widget.map.getView().getZoom()), 17);
 });
 
 QUnit.test('MapWidget.interactions', function(assert) {

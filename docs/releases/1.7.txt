@@ -178,15 +178,17 @@ class method can now directly :ref:`create Manager with QuerySet methods
 
     class FoodQuerySet(models.QuerySet):
         def pizzas(self):
-            return self.filter(kind='pizza')
+            return self.filter(kind="pizza")
 
         def vegetarian(self):
             return self.filter(vegetarian=True)
+
 
     class Food(models.Model):
         kind = models.CharField(max_length=50)
         vegetarian = models.BooleanField(default=False)
         objects = FoodQuerySet.as_manager()
+
 
     Food.objects.pizzas().vegetarian()
 
@@ -199,14 +201,16 @@ It is now possible to :ref:`specify a custom manager
     class Blog(models.Model):
         pass
 
+
     class Entry(models.Model):
         blog = models.ForeignKey(Blog)
 
         objects = models.Manager()  # Default Manager
-        entries = EntryManager()    # Custom Manager
+        entries = EntryManager()  # Custom Manager
+
 
     b = Blog.objects.get(id=1)
-    b.entry_set(manager='entries').all()
+    b.entry_set(manager="entries").all()
 
 New system check framework
 --------------------------
@@ -675,7 +679,7 @@ Internationalization
   beginning and end of a line and merge all lines into one using a space
   character to separate them. This is quite useful for indenting the content of
   a ``{% blocktrans %}`` tag without having the indentation characters end up
-  in the corresponding entry in the PO file, which makes the translation
+  in the corresponding entry in the ``.po`` file, which makes the translation
   process easier.
 
 * When you run :djadmin:`makemessages` from the root directory of your project,
@@ -685,7 +689,7 @@ Internationalization
 
 * The :djadmin:`makemessages` command now always adds the ``--previous``
   command line flag to the ``msgmerge`` command, keeping previously translated
-  strings in po files for fuzzy strings.
+  strings in ``.po`` files for fuzzy strings.
 
 * The following settings to adjust the language cookie options were introduced:
   :setting:`LANGUAGE_COOKIE_AGE`, :setting:`LANGUAGE_COOKIE_DOMAIN`
@@ -711,12 +715,10 @@ Management Commands
 
 * The :djadmin:`runserver` command received several improvements:
 
-  * On Linux systems, if pyinotify_ is installed, the development server will
-    reload immediately when a file is changed. Previously, it polled the
+  * On Linux systems, if :pypi:`pyinotify` is installed, the development server
+    will reload immediately when a file is changed. Previously, it polled the
     filesystem for changes every second. That caused a small delay before
     reloads and reduced battery life on laptops.
-
-    .. _pyinotify: https://pypi.org/project/pyinotify/
 
   * In addition, the development server automatically reloads when a
     translation file is updated, i.e. after running
@@ -731,14 +733,12 @@ Management Commands
 * :djadmin:`collectstatic` command with symlink option is now supported on
   Windows NT 6 (Windows Vista and newer).
 
-* Initial SQL data now works better if the sqlparse_ Python library is
+* Initial SQL data now works better if the :pypi:`sqlparse` Python library is
   installed.
 
   Note that it's deprecated in favor of the
   :class:`~django.db.migrations.operations.RunSQL` operation of migrations,
   which benefits from the improved behavior.
-
-.. _sqlparse: https://pypi.org/project/sqlparse/
 
 Models
 ~~~~~~
@@ -976,12 +976,12 @@ every time you change the schema.
 Additionally, like the rest of Django's old ``syncdb`` code, ``initial_data``
 has been started down the deprecation path and will be removed in Django 1.9.
 
-deconstruct() and serializability
----------------------------------
+``deconstruct()`` and serializability
+-------------------------------------
 
 Django now requires all Field classes and all of their constructor arguments
 to be serializable. If you modify the constructor signature in your custom
-Field in any way, you'll need to implement a deconstruct() method;
+Field in any way, you'll need to implement a ``deconstruct()`` method;
 we've expanded the custom field documentation with :ref:`instructions
 on implementing this method <custom-field-deconstruct-method>`.
 
@@ -1009,7 +1009,9 @@ Standalone scripts
 If you're using Django in a plain Python script — rather than a management
 command — and you rely on the :envvar:`DJANGO_SETTINGS_MODULE` environment
 variable, you must now explicitly initialize Django at the beginning of your
-script with::
+script with:
+
+.. code-block:: pycon
 
     >>> import django
     >>> django.setup()
@@ -1022,11 +1024,13 @@ WSGI scripts
 Until Django 1.3, the recommended way to create a WSGI application was::
 
     import django.core.handlers.wsgi
+
     application = django.core.handlers.wsgi.WSGIHandler()
 
 In Django 1.4, support for WSGI was improved and the API changed to::
 
     from django.core.wsgi import get_wsgi_application
+
     application = get_wsgi_application()
 
 If you're still using the former style in your WSGI script, you need to
@@ -1134,13 +1138,13 @@ method::
 
     # Old pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
     # New pattern:
     try:
-        # ...
+        ...
     except ValidationError as e:
         self.add_error(None, e)
 
@@ -1150,7 +1154,7 @@ wasn't available before Django 1.7, but you can use the following
 workaround to convert any ``list`` into ``ErrorList``::
 
     try:
-        # ...
+        ...
     except ValidationError as e:
         self._errors = e.update_error_dict(self._errors)
 
@@ -1195,15 +1199,13 @@ manager will *not* be reset. This was necessary to resolve an inconsistency in
 the way routing information cascaded over joins. See :ticket:`13724` for more
 details.
 
-pytz may be required
---------------------
+``pytz`` may be required
+------------------------
 
 If your project handles datetimes before 1970 or after 2037 and Django raises
-a :exc:`ValueError` when encountering them, you will have to install pytz_. You
-may be affected by this problem if you use Django's time zone-related date
-formats or :mod:`django.contrib.syndication`.
-
-.. _pytz: https://pypi.org/project/pytz/
+a :exc:`ValueError` when encountering them, you will have to install
+:pypi:`pytz`. You may be affected by this problem if you use Django's time
+zone-related date formats or :mod:`django.contrib.syndication`.
 
 ``remove()`` and ``clear()`` methods of related managers
 --------------------------------------------------------
@@ -1526,7 +1528,7 @@ for a particular form instance. For example (from Django itself)::
 
     PasswordChangeForm.base_fields = OrderedDict(
         (k, PasswordChangeForm.base_fields[k])
-        for k in ['old_password', 'new_password1', 'new_password2']
+        for k in ["old_password", "new_password1", "new_password2"]
     )
 
 Custom SQL location for models package
@@ -1658,7 +1660,7 @@ deprecated language codes will be removed in Django 1.9.
 --------------------------------------------
 
 The function ``memoize`` is deprecated and should be replaced by the
-``functools.lru_cache`` decorator (available from Python 3.2 onwards).
+``functools.lru_cache`` decorator (available from Python 3.2 onward).
 
 Django ships a backport of this decorator for older Python versions and it's
 available at ``django.utils.lru_cache.lru_cache``. The deprecated function will

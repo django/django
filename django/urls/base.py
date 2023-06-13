@@ -36,16 +36,16 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
     if not isinstance(viewname, str):
         view = viewname
     else:
-        *path, view = viewname.split(':')
+        *path, view = viewname.split(":")
 
         if current_app:
-            current_path = current_app.split(':')
+            current_path = current_app.split(":")
             current_path.reverse()
         else:
             current_path = None
 
         resolved_path = []
-        ns_pattern = ''
+        ns_pattern = ""
         ns_converters = {}
         for ns in path:
             current_ns = current_path.pop() if current_path else None
@@ -70,18 +70,20 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None):
             try:
                 extra, resolver = resolver.namespace_dict[ns]
                 resolved_path.append(ns)
-                ns_pattern = ns_pattern + extra
+                ns_pattern += extra
                 ns_converters.update(resolver.pattern.converters)
             except KeyError as key:
                 if resolved_path:
                     raise NoReverseMatch(
-                        "%s is not a registered namespace inside '%s'" %
-                        (key, ':'.join(resolved_path))
+                        "%s is not a registered namespace inside '%s'"
+                        % (key, ":".join(resolved_path))
                     )
                 else:
                     raise NoReverseMatch("%s is not a registered namespace" % key)
         if ns_pattern:
-            resolver = get_ns_resolver(ns_pattern, resolver, tuple(ns_converters.items()))
+            resolver = get_ns_resolver(
+                ns_pattern, resolver, tuple(ns_converters.items())
+            )
 
     return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
 
@@ -99,8 +101,8 @@ def set_script_prefix(prefix):
     """
     Set the script prefix for the current thread.
     """
-    if not prefix.endswith('/'):
-        prefix += '/'
+    if not prefix.endswith("/"):
+        prefix += "/"
     _prefixes.value = prefix
 
 
@@ -110,7 +112,7 @@ def get_script_prefix():
     wishes to construct their own URLs manually (although accessing the request
     instance is normally going to be a lot cleaner).
     """
-    return getattr(_prefixes, "value", '/')
+    return getattr(_prefixes, "value", "/")
 
 
 def clear_script_prefix():
@@ -168,12 +170,18 @@ def translate_url(url, lang_code):
     except Resolver404:
         pass
     else:
-        to_be_reversed = "%s:%s" % (match.namespace, match.url_name) if match.namespace else match.url_name
+        to_be_reversed = (
+            "%s:%s" % (match.namespace, match.url_name)
+            if match.namespace
+            else match.url_name
+        )
         with override(lang_code):
             try:
                 url = reverse(to_be_reversed, args=match.args, kwargs=match.kwargs)
             except NoReverseMatch:
                 pass
             else:
-                url = urlunsplit((parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment))
+                url = urlunsplit(
+                    (parsed.scheme, parsed.netloc, url, parsed.query, parsed.fragment)
+                )
     return url

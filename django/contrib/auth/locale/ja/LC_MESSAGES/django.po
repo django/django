@@ -5,14 +5,14 @@
 # arupakan125 <koh@arupaka.net>, 2020
 # Masashi SHIBATA <contact@c-bata.link>, 2017
 # Nikita K <hiyori.amatsuki@gmail.com>, 2019
-# Shinya Okano <tokibito@gmail.com>, 2013-2016
+# Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2020-01-20 06:25+0000\n"
-"Last-Translator: arupakan125 <koh@arupaka.net>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: Shinya Okano <tokibito@gmail.com>, 2013-2016,2021,2023\n"
 "Language-Team: Japanese (http://www.transifex.com/django/django/language/"
 "ja/)\n"
 "MIME-Version: 1.0\n"
@@ -137,6 +137,9 @@ msgstr "ワークファクター"
 
 msgid "checksum"
 msgstr "チェックサム"
+
+msgid "block size"
+msgstr "ブロックサイズ"
 
 msgid "name"
 msgstr "名前"
@@ -263,10 +266,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "%(site_name)s のパスワードリセット"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"有効なユーザー名を入力してください。半角英数、 @/./+/-/_ を使用できます。"
+"有効なユーザー名を入力してください。アクセント記号を除いた半角英数、 @/./+/-/"
+"_ を使用できます。"
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

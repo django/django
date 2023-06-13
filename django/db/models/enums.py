@@ -2,9 +2,8 @@ import enum
 from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
-from django.utils.version import PY310
 
-__all__ = ['Choices', 'IntegerChoices', 'TextChoices']
+__all__ = ["Choices", "IntegerChoices", "TextChoices"]
 
 
 class ChoicesMeta(enum.EnumMeta):
@@ -15,14 +14,14 @@ class ChoicesMeta(enum.EnumMeta):
         for key in classdict._member_names:
             value = classdict[key]
             if (
-                isinstance(value, (list, tuple)) and
-                len(value) > 1 and
-                isinstance(value[-1], (Promise, str))
+                isinstance(value, (list, tuple))
+                and len(value) > 1
+                and isinstance(value[-1], (Promise, str))
             ):
                 *value, label = value
                 value = tuple(value)
             else:
-                label = key.replace('_', ' ').title()
+                label = key.replace("_", " ").title()
             labels.append(label)
             # Use dict.__setitem__() to suppress defenses against double
             # assignment in enum's classdict.
@@ -40,12 +39,12 @@ class ChoicesMeta(enum.EnumMeta):
 
     @property
     def names(cls):
-        empty = ['__empty__'] if hasattr(cls, '__empty__') else []
+        empty = ["__empty__"] if hasattr(cls, "__empty__") else []
         return empty + [member.name for member in cls]
 
     @property
     def choices(cls):
-        empty = [(None, cls.__empty__)] if hasattr(cls, '__empty__') else []
+        empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []
         return empty + [(member.value, member.label) for member in cls]
 
     @property
@@ -75,14 +74,14 @@ class Choices(enum.Enum, metaclass=ChoicesMeta):
         """
         return str(self.value)
 
-    # A similar format is used in Python 3.10+.
-    if not PY310:
-        def __repr__(self):
-            return '%s.%s' % (self.__class__.__qualname__, self._name_)
+    # A similar format was proposed for Python 3.10.
+    def __repr__(self):
+        return f"{self.__class__.__qualname__}.{self._name_}"
 
 
 class IntegerChoices(int, Choices):
     """Class for creating enumerated integer choices."""
+
     pass
 
 

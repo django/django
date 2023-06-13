@@ -2,7 +2,7 @@
 Deployment checklist
 ====================
 
-The Internet is a hostile environment. Before deploying your Django project,
+The internet is a hostile environment. Before deploying your Django project,
 you should take some time to review your settings, with security, performance,
 and operations in mind.
 
@@ -52,12 +52,25 @@ Instead of hardcoding the secret key in your settings module, consider loading
 it from an environment variable::
 
     import os
-    SECRET_KEY = os.environ['SECRET_KEY']
+
+    SECRET_KEY = os.environ["SECRET_KEY"]
 
 or from a file::
 
-    with open('/etc/secret_key.txt') as f:
+    with open("/etc/secret_key.txt") as f:
         SECRET_KEY = f.read().strip()
+
+If rotating secret keys, you may use :setting:`SECRET_KEY_FALLBACKS`::
+
+    import os
+
+    SECRET_KEY = os.environ["CURRENT_SECRET_KEY"]
+    SECRET_KEY_FALLBACKS = [
+        os.environ["OLD_SECRET_KEY"],
+    ]
+
+Ensure that old secret keys are removed from ``SECRET_KEY_FALLBACKS`` in a
+timely manner.
 
 :setting:`DEBUG`
 ----------------
@@ -85,11 +98,11 @@ you use a wildcard, you must perform your own validation of the ``Host`` HTTP
 header, or otherwise ensure that you aren't vulnerable to this category of
 attacks.
 
-You should also configure the Web server that sits in front of Django to
+You should also configure the web server that sits in front of Django to
 validate the host. It should respond with a static error page or ignore
 requests for incorrect hosts instead of forwarding the request to Django. This
 way you'll avoid spurious errors in your Django logs (or emails if you have
-error reporting configured that way). For example, on nginx you might setup a
+error reporting configured that way). For example, on nginx you might set up a
 default server to return "444 No Response" on an unrecognized host:
 
 .. code-block:: nginx
@@ -207,8 +220,10 @@ This helps a lot on virtualized hosts with limited network performance.
 --------------------
 
 Enabling the cached template loader often improves performance drastically, as
-it avoids compiling each template every time it needs to be rendered. See the
-:ref:`template loaders docs <template-loaders>` for more information.
+it avoids compiling each template every time it needs to be rendered. When
+:setting:`DEBUG = False <DEBUG>`, the cached template loader is enabled
+automatically. See :class:`django.template.loaders.cached.Loader` for more
+information.
 
 Error reporting
 ===============
@@ -249,5 +264,5 @@ Django includes default views and templates for several HTTP error codes. You
 may want to override the default templates by creating the following templates
 in your root template directory: ``404.html``, ``500.html``, ``403.html``, and
 ``400.html``. The :ref:`default error views <error-views>` that use these
-templates should suffice for 99% of Web applications, but you can
+templates should suffice for 99% of web applications, but you can
 :ref:`customize them <customizing-error-views>` as well.

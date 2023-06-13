@@ -1,5 +1,5 @@
 {% load i18n static %}
-<div class="related-widget-wrapper">
+<div class="related-widget-wrapper" {% if not model_has_limit_choices_to %}data-model-ref="{{ model }}"{% endif %}>
     {{ rendered_widget }}
     {% block links %}
         {% spaceless %}
@@ -7,23 +7,33 @@
         {% if can_change_related %}
         <a class="related-widget-wrapper-link change-related" id="change_id_{{ name }}"
             data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+            data-popup="yes"
             title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
-            <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="{% translate 'Change' %}">
+            <img src="{% static 'admin/img/icon-changelink.svg' %}" alt="" width="20" height="20">
         </a>
         {% endif %}
         {% if can_add_related %}
         <a class="related-widget-wrapper-link add-related" id="add_id_{{ name }}"
+            data-popup="yes"
             href="{{ add_related_url }}?{{ url_params }}"
             title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
-            <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="{% translate 'Add' %}">
+            <img src="{% static 'admin/img/icon-addlink.svg' %}" alt="" width="20" height="20">
         </a>
         {% endif %}
         {% if can_delete_related %}
         <a class="related-widget-wrapper-link delete-related" id="delete_id_{{ name }}"
             data-href-template="{{ delete_related_template_url }}?{{ url_params }}"
+            data-popup="yes"
             title="{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}">
-            <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="{% translate 'Delete' %}">
+            <img src="{% static 'admin/img/icon-deletelink.svg' %}" alt="" width="20" height="20">
         </a>
+        {% endif %}
+        {% if can_view_related %}
+          <a class="related-widget-wrapper-link view-related" id="view_id_{{ name }}"
+             data-href-template="{{ change_related_template_url }}?{{ view_related_url_params }}"
+             title="{% blocktranslate %}View selected {{ model }}{% endblocktranslate %}">
+            <img src="{% static 'admin/img/icon-viewlink.svg' %}" alt="" width="20" height="20">
+          </a>
         {% endif %}
         {% endif %}
         {% endspaceless %}

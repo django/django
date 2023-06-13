@@ -1,4 +1,3 @@
-import functools
 import itertools
 import logging
 import os
@@ -10,6 +9,7 @@ import time
 import traceback
 import weakref
 from collections import defaultdict
+from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
@@ -24,9 +24,9 @@ from django.utils.version import get_version_tuple
 autoreload_started = Signal()
 file_changed = Signal()
 
-DJANGO_AUTORELOAD_ENV = 'RUN_MAIN'
+DJANGO_AUTORELOAD_ENV = "RUN_MAIN"
 
-logger = logging.getLogger('django.utils.autoreload')
+logger = logging.getLogger("django.utils.autoreload")
 
 # If an error is raised while importing a file, it's not placed in sys.modules.
 # This means that any future modifications aren't caught. Keep a list of these
@@ -48,7 +48,7 @@ except ImportError:
 
 def is_django_module(module):
     """Return True if the given module is nested under Django."""
-    return module.__name__.startswith('django.')
+    return module.__name__.startswith("django.")
 
 
 def is_django_path(path):
@@ -57,7 +57,7 @@ def is_django_path(path):
 
 
 def check_errors(fn):
-    @functools.wraps(fn)
+    @wraps(fn)
     def wrapper(*args, **kwargs):
         global _exception
         try:
@@ -67,7 +67,7 @@ def check_errors(fn):
 
             et, ev, tb = _exception
 
-            if getattr(ev, 'filename', None) is None:
+            if getattr(ev, "filename", None) is None:
                 # get the filename from the last item in the stack
                 filename = traceback.extract_tb(tb)[-1][0]
             else:
@@ -97,7 +97,7 @@ def ensure_echo_on():
     attr_list = termios.tcgetattr(sys.stdin)
     if not attr_list[3] & termios.ECHO:
         attr_list[3] |= termios.ECHO
-        if hasattr(signal, 'SIGTTOU'):
+        if hasattr(signal, "SIGTTOU"):
             old_handler = signal.signal(signal.SIGTTOU, signal.SIG_IGN)
         else:
             old_handler = None
@@ -112,11 +112,15 @@ def iter_all_python_module_files():
     # This ensures cached results are returned in the usual case that modules
     # aren't loaded on the fly.
     keys = sorted(sys.modules)
-    modules = tuple(m for m in map(sys.modules.__getitem__, keys) if not isinstance(m, weakref.ProxyTypes))
+    modules = tuple(
+        m
+        for m in map(sys.modules.__getitem__, keys)
+        if not isinstance(m, weakref.ProxyTypes)
+    )
     return iter_modules_and_files(modules, frozenset(_error_files))
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def iter_modules_and_files(modules, extra_files):
     """Iterate through all modules needed to be watched."""
     sys_file_paths = []
@@ -126,21 +130,25 @@ def iter_modules_and_files(modules, extra_files):
         # cause issues here.
         if not isinstance(module, ModuleType):
             continue
-        if module.__name__ == '__main__':
+        if module.__name__ in ("__main__", "__mp_main__"):
             # __main__ (usually manage.py) doesn't always have a __spec__ set.
             # Handle this by falling back to using __file__, resolved below.
             # See https://docs.python.org/reference/import.html#main-spec
             # __file__ may not exists, e.g. when running ipdb debugger.
-            if hasattr(module, '__file__'):
+            if hasattr(module, "__file__"):
                 sys_file_paths.append(module.__file__)
             continue
-        if getattr(module, '__spec__', None) is None:
+        if getattr(module, "__spec__", None) is None:
             continue
         spec = module.__spec__
         # Modules could be loaded from places without a concrete location. If
         # this is the case, skip them.
         if spec.has_location:
-            origin = spec.loader.archive if isinstance(spec.loader, zipimporter) else spec.origin
+            origin = (
+                spec.loader.archive
+                if isinstance(spec.loader, zipimporter)
+                else spec.origin
+            )
             sys_file_paths.append(origin)
 
     results = set()
@@ -162,7 +170,7 @@ def iter_modules_and_files(modules, extra_files):
     return frozenset(results)
 
 
-@functools.lru_cache(maxsize=1)
+@lru_cache(maxsize=1)
 def common_roots(paths):
     """
     Return a tuple of common roots that are shared between the given paths.
@@ -217,44 +225,50 @@ def get_child_arguments():
     on reloading.
     """
     import __main__
+
     py_script = Path(sys.argv[0])
 
-    args = [sys.executable] + ['-W%s' % o for o in sys.warnoptions]
+    args = [sys.executable] + ["-W%s" % o for o in sys.warnoptions]
+    if sys.implementation.name == "cpython":
+        args.extend(
+            f"-X{key}" if value is True else f"-X{key}={value}"
+            for key, value in sys._xoptions.items()
+        )
     # __spec__ is set when the server was started with the `-m` option,
     # see https://docs.python.org/3/reference/import.html#main-spec
     # __spec__ may not exist, e.g. when running in a Conda env.
-    if getattr(__main__, '__spec__', None) is not None:
+    if getattr(__main__, "__spec__", None) is not None:
         spec = __main__.__spec__
-        if (spec.name == '__main__' or spec.name.endswith('.__main__')) and spec.parent:
+        if (spec.name == "__main__" or spec.name.endswith(".__main__")) and spec.parent:
             name = spec.parent
         else:
             name = spec.name
-        args += ['-m', name]
+        args += ["-m", name]
         args += sys.argv[1:]
     elif not py_script.exists():
         # sys.argv[0] may not exist for several reasons on Windows.
         # It may exist with a .exe extension or have a -script.py suffix.
-        exe_entrypoint = py_script.with_suffix('.exe')
+        exe_entrypoint = py_script.with_suffix(".exe")
         if exe_entrypoint.exists():
             # Should be executed directly, ignoring sys.executable.
             return [exe_entrypoint, *sys.argv[1:]]
-        script_entrypoint = py_script.with_name('%s-script.py' % py_script.name)
+        script_entrypoint = py_script.with_name("%s-script.py" % py_script.name)
         if script_entrypoint.exists():
             # Should be executed as usual.
             return [*args, script_entrypoint, *sys.argv[1:]]
-        raise RuntimeError('Script %s does not exist.' % py_script)
+        raise RuntimeError("Script %s does not exist." % py_script)
     else:
         args += sys.argv
     return args
 
 
 def trigger_reload(filename):
-    logger.info('%s changed, reloading.', filename)
+    logger.info("%s changed, reloading.", filename)
     sys.exit(3)
 
 
 def restart_with_reloader():
-    new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: 'true'}
+    new_environ = {**os.environ, DJANGO_AUTORELOAD_ENV: "true"}
     args = get_child_arguments()
     while True:
         p = subprocess.run(args, env=new_environ, close_fds=False)
@@ -274,12 +288,12 @@ class BaseReloader:
             path = path.absolute()
         except FileNotFoundError:
             logger.debug(
-                'Unable to watch directory %s as it cannot be resolved.',
+                "Unable to watch directory %s as it cannot be resolved.",
                 path,
                 exc_info=True,
             )
             return
-        logger.debug('Watching dir %s with glob %s.', path, glob)
+        logger.debug("Watching dir %s with glob %s.", path, glob)
         self.directory_globs[path].add(glob)
 
     def watched_files(self, include_globs=True):
@@ -309,11 +323,11 @@ class BaseReloader:
             if app_reg.ready_event.wait(timeout=0.1):
                 return True
         else:
-            logger.debug('Main Django thread has terminated before apps are ready.')
+            logger.debug("Main Django thread has terminated before apps are ready.")
             return False
 
     def run(self, django_main_thread):
-        logger.debug('Waiting for apps ready_event.')
+        logger.debug("Waiting for apps ready_event.")
         self.wait_for_apps_ready(apps, django_main_thread)
         from django.urls import get_resolver
 
@@ -325,7 +339,7 @@ class BaseReloader:
             # Loading the urlconf can result in errors during development.
             # If this occurs then swallow the error and continue.
             pass
-        logger.debug('Apps ready_event triggered. Sending autoreload_started signal.')
+        logger.debug("Apps ready_event triggered. Sending autoreload_started signal.")
         autoreload_started.send(sender=self)
         self.run_loop()
 
@@ -346,15 +360,15 @@ class BaseReloader:
         testability of the reloader implementations by decoupling the work they
         do from the loop.
         """
-        raise NotImplementedError('subclasses must implement tick().')
+        raise NotImplementedError("subclasses must implement tick().")
 
     @classmethod
     def check_availability(cls):
-        raise NotImplementedError('subclasses must implement check_availability().')
+        raise NotImplementedError("subclasses must implement check_availability().")
 
     def notify_file_changed(self, path):
         results = file_changed.send(sender=self, file_path=path)
-        logger.debug('%s notified as changed. Signal results: %s.', path, results)
+        logger.debug("%s notified as changed. Signal results: %s.", path, results)
         if not any(res[1] for res in results):
             trigger_reload(path)
 
@@ -377,10 +391,15 @@ class StatReloader(BaseReloader):
                 old_time = mtimes.get(filepath)
                 mtimes[filepath] = mtime
                 if old_time is None:
-                    logger.debug('File %s first seen with mtime %s', filepath, mtime)
+                    logger.debug("File %s first seen with mtime %s", filepath, mtime)
                     continue
                 elif mtime > old_time:
-                    logger.debug('File %s previous mtime: %s, current mtime: %s', filepath, old_time, mtime)
+                    logger.debug(
+                        "File %s previous mtime: %s, current mtime: %s",
+                        filepath,
+                        old_time,
+                        mtime,
+                    )
                     self.notify_file_changed(filepath)
 
             time.sleep(self.SLEEP_TIME)
@@ -413,7 +432,7 @@ class WatchmanReloader(BaseReloader):
     def __init__(self):
         self.roots = defaultdict(set)
         self.processed_request = threading.Event()
-        self.client_timeout = int(os.environ.get('DJANGO_WATCHMAN_TIMEOUT', 5))
+        self.client_timeout = int(os.environ.get("DJANGO_WATCHMAN_TIMEOUT", 5))
         super().__init__()
 
     @cached_property
@@ -432,52 +451,63 @@ class WatchmanReloader(BaseReloader):
         # now, watching its parent, if possible, is sufficient.
         if not root.exists():
             if not root.parent.exists():
-                logger.warning('Unable to watch root dir %s as neither it or its parent exist.', root)
+                logger.warning(
+                    "Unable to watch root dir %s as neither it or its parent exist.",
+                    root,
+                )
                 return
             root = root.parent
-        result = self.client.query('watch-project', str(root.absolute()))
-        if 'warning' in result:
-            logger.warning('Watchman warning: %s', result['warning'])
-        logger.debug('Watchman watch-project result: %s', result)
-        return result['watch'], result.get('relative_path')
+        result = self.client.query("watch-project", str(root.absolute()))
+        if "warning" in result:
+            logger.warning("Watchman warning: %s", result["warning"])
+        logger.debug("Watchman watch-project result: %s", result)
+        return result["watch"], result.get("relative_path")
 
-    @functools.lru_cache()
+    @lru_cache
     def _get_clock(self, root):
-        return self.client.query('clock', root)['clock']
+        return self.client.query("clock", root)["clock"]
 
     def _subscribe(self, directory, name, expression):
         root, rel_path = self._watch_root(directory)
         # Only receive notifications of files changing, filtering out other types
         # like special files: https://facebook.github.io/watchman/docs/type
         only_files_expression = [
-            'allof',
-            ['anyof', ['type', 'f'], ['type', 'l']],
-            expression
+            "allof",
+            ["anyof", ["type", "f"], ["type", "l"]],
+            expression,
         ]
         query = {
-            'expression': only_files_expression,
-            'fields': ['name'],
-            'since': self._get_clock(root),
-            'dedup_results': True,
+            "expression": only_files_expression,
+            "fields": ["name"],
+            "since": self._get_clock(root),
+            "dedup_results": True,
         }
         if rel_path:
-            query['relative_root'] = rel_path
-        logger.debug('Issuing watchman subscription %s, for root %s. Query: %s', name, root, query)
-        self.client.query('subscribe', root, name, query)
+            query["relative_root"] = rel_path
+        logger.debug(
+            "Issuing watchman subscription %s, for root %s. Query: %s",
+            name,
+            root,
+            query,
+        )
+        self.client.query("subscribe", root, name, query)
 
     def _subscribe_dir(self, directory, filenames):
         if not directory.exists():
             if not directory.parent.exists():
-                logger.warning('Unable to watch directory %s as neither it or its parent exist.', directory)
+                logger.warning(
+                    "Unable to watch directory %s as neither it or its parent exist.",
+                    directory,
+                )
                 return
-            prefix = 'files-parent-%s' % directory.name
-            filenames = ['%s/%s' % (directory.name, filename) for filename in filenames]
+            prefix = "files-parent-%s" % directory.name
+            filenames = ["%s/%s" % (directory.name, filename) for filename in filenames]
             directory = directory.parent
-            expression = ['name', filenames, 'wholename']
+            expression = ["name", filenames, "wholename"]
         else:
-            prefix = 'files'
-            expression = ['name', filenames]
-        self._subscribe(directory, '%s:%s' % (prefix, directory), expression)
+            prefix = "files"
+            expression = ["name", filenames]
+        self._subscribe(directory, "%s:%s" % (prefix, directory), expression)
 
     def _watch_glob(self, directory, patterns):
         """
@@ -488,19 +518,22 @@ class WatchmanReloader(BaseReloader):
         overwrite the named subscription, so it must include all possible glob
         expressions.
         """
-        prefix = 'glob'
+        prefix = "glob"
         if not directory.exists():
             if not directory.parent.exists():
-                logger.warning('Unable to watch directory %s as neither it or its parent exist.', directory)
+                logger.warning(
+                    "Unable to watch directory %s as neither it or its parent exist.",
+                    directory,
+                )
                 return
-            prefix = 'glob-parent-%s' % directory.name
-            patterns = ['%s/%s' % (directory.name, pattern) for pattern in patterns]
+            prefix = "glob-parent-%s" % directory.name
+            patterns = ["%s/%s" % (directory.name, pattern) for pattern in patterns]
             directory = directory.parent
 
-        expression = ['anyof']
+        expression = ["anyof"]
         for pattern in patterns:
-            expression.append(['match', pattern, 'wholename'])
-        self._subscribe(directory, '%s:%s' % (prefix, directory), expression)
+            expression.append(["match", pattern, "wholename"])
+        self._subscribe(directory, "%s:%s" % (prefix, directory), expression)
 
     def watched_roots(self, watched_files):
         extra_directories = self.directory_globs.keys()
@@ -511,8 +544,8 @@ class WatchmanReloader(BaseReloader):
     def _update_watches(self):
         watched_files = list(self.watched_files(include_globs=False))
         found_roots = common_roots(self.watched_roots(watched_files))
-        logger.debug('Watching %s files', len(watched_files))
-        logger.debug('Found common roots: %s', found_roots)
+        logger.debug("Watching %s files", len(watched_files))
+        logger.debug("Found common roots: %s", found_roots)
         # Setup initial roots for performance, shortest roots first.
         for root in sorted(found_roots):
             self._watch_root(root)
@@ -522,7 +555,9 @@ class WatchmanReloader(BaseReloader):
         sorted_files = sorted(watched_files, key=lambda p: p.parent)
         for directory, group in itertools.groupby(sorted_files, key=lambda p: p.parent):
             # These paths need to be relative to the parent directory.
-            self._subscribe_dir(directory, [str(p.relative_to(directory)) for p in group])
+            self._subscribe_dir(
+                directory, [str(p.relative_to(directory)) for p in group]
+            )
 
     def update_watches(self):
         try:
@@ -536,19 +571,19 @@ class WatchmanReloader(BaseReloader):
         subscription = self.client.getSubscription(sub)
         if not subscription:
             return
-        logger.debug('Watchman subscription %s has results.', sub)
+        logger.debug("Watchman subscription %s has results.", sub)
         for result in subscription:
             # When using watch-project, it's not simple to get the relative
             # directory without storing some specific state. Store the full
             # path to the directory in the subscription name, prefixed by its
             # type (glob, files).
-            root_directory = Path(result['subscription'].split(':', 1)[1])
-            logger.debug('Found root directory %s', root_directory)
-            for file in result.get('files', []):
+            root_directory = Path(result["subscription"].split(":", 1)[1])
+            logger.debug("Found root directory %s", root_directory)
+            for file in result.get("files", []):
                 self.notify_file_changed(root_directory / file)
 
     def request_processed(self, **kwargs):
-        logger.debug('Request processed. Setting update_watches event.')
+        logger.debug("Request processed. Setting update_watches event.")
         self.processed_request.set()
 
     def tick(self):
@@ -563,7 +598,7 @@ class WatchmanReloader(BaseReloader):
             except pywatchman.SocketTimeout:
                 pass
             except pywatchman.WatchmanError as ex:
-                logger.debug('Watchman error: %s, checking server status.', ex)
+                logger.debug("Watchman error: %s, checking server status.", ex)
                 self.check_server_status(ex)
             else:
                 for sub in list(self.client.subs.keys()):
@@ -579,7 +614,7 @@ class WatchmanReloader(BaseReloader):
     def check_server_status(self, inner_ex=None):
         """Return True if the server is available."""
         try:
-            self.client.query('version')
+            self.client.query("version")
         except Exception:
             raise WatchmanUnavailable(str(inner_ex)) from inner_ex
         return True
@@ -587,19 +622,19 @@ class WatchmanReloader(BaseReloader):
     @classmethod
     def check_availability(cls):
         if not pywatchman:
-            raise WatchmanUnavailable('pywatchman not installed.')
+            raise WatchmanUnavailable("pywatchman not installed.")
         client = pywatchman.client(timeout=0.1)
         try:
             result = client.capabilityCheck()
         except Exception:
             # The service is down?
-            raise WatchmanUnavailable('Cannot connect to the watchman service.')
-        version = get_version_tuple(result['version'])
+            raise WatchmanUnavailable("Cannot connect to the watchman service.")
+        version = get_version_tuple(result["version"])
         # Watchman 4.9 includes multiple improvements to watching project
         # directories as well as case insensitive filesystems.
-        logger.debug('Watchman version %s', version)
+        logger.debug("Watchman version %s", version)
         if version < (4, 9):
-            raise WatchmanUnavailable('Watchman 4.9 or later is required.')
+            raise WatchmanUnavailable("Watchman 4.9 or later is required.")
 
 
 def get_reloader():
@@ -615,27 +650,24 @@ def start_django(reloader, main_func, *args, **kwargs):
     ensure_echo_on()
 
     main_func = check_errors(main_func)
-    django_main_thread = threading.Thread(target=main_func, args=args, kwargs=kwargs, name='django-main-thread')
+    django_main_thread = threading.Thread(
+        target=main_func, args=args, kwargs=kwargs, name="django-main-thread"
+    )
     django_main_thread.daemon = True
     django_main_thread.start()
 
     while not reloader.should_stop:
-        try:
-            reloader.run(django_main_thread)
-        except WatchmanUnavailable as ex:
-            # It's possible that the watchman service shuts down or otherwise
-            # becomes unavailable. In that case, use the StatReloader.
-            reloader = StatReloader()
-            logger.error('Error connecting to Watchman: %s', ex)
-            logger.info('Watching for file changes with %s', reloader.__class__.__name__)
+        reloader.run(django_main_thread)
 
 
 def run_with_reloader(main_func, *args, **kwargs):
     signal.signal(signal.SIGTERM, lambda *args: sys.exit(0))
     try:
-        if os.environ.get(DJANGO_AUTORELOAD_ENV) == 'true':
+        if os.environ.get(DJANGO_AUTORELOAD_ENV) == "true":
             reloader = get_reloader()
-            logger.info('Watching for file changes with %s', reloader.__class__.__name__)
+            logger.info(
+                "Watching for file changes with %s", reloader.__class__.__name__
+            )
             start_django(reloader, main_func, *args, **kwargs)
         else:
             exit_code = restart_with_reloader()

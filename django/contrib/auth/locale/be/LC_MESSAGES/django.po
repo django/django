@@ -2,23 +2,23 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016-2017,2019
+# znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-08 17:27+0200\n"
-"PO-Revision-Date: 2019-10-16 18:29+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 08:09+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016-2017,2019,2021,2023\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 msgid "Personal info"
 msgstr "Асабістыя зьвесткі"
@@ -72,8 +72,8 @@ msgid ""
 "password, but you can change the password using <a href=\"{}\">this form</a>."
 msgstr ""
 "Паролі не захоўваюцца ў такім выглядзе, як іх набралі, таму ўбачыць пароль "
-"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы<a href="
-"\"{}\">гэту форму </a>."
+"карыстальніка нельга, але яго можна зьмяніць выкарыстоўваючы<a "
+"href=\"{}\">гэту форму </a>."
 
 #, python-format
 msgid ""
@@ -136,6 +136,9 @@ msgstr "множнік працы"
 
 msgid "checksum"
 msgstr "кантрольная сума"
+
+msgid "block size"
+msgstr "памер блока"
 
 msgid "name"
 msgstr "назва"
@@ -272,11 +275,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Узнавіць пароль на %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі Ангельскія "
-"літары, лічбы і сімвалы @/./+/-/_."
+"Увядзіце імя карыстальніка. Гэта значэнне можа ўтрымліваць толькі малыя "
+"літары a-z і вялікія літары A-Z, лічбы і сімвалы @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

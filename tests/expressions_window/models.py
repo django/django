@@ -11,12 +11,21 @@ class Employee(models.Model):
     department = models.CharField(max_length=40, blank=False, null=False)
     hire_date = models.DateField(blank=False, null=False)
     age = models.IntegerField(blank=False, null=False)
-    classification = models.ForeignKey('Classification', on_delete=models.CASCADE, null=True)
+    classification = models.ForeignKey(
+        "Classification", on_delete=models.CASCADE, null=True
+    )
     bonus = models.DecimalField(decimal_places=2, max_digits=15, null=True)
+
+
+class PastEmployeeDepartment(models.Model):
+    employee = models.ForeignKey(
+        Employee, related_name="past_departments", on_delete=models.CASCADE
+    )
+    department = models.CharField(max_length=40, blank=False, null=False)
 
 
 class Detail(models.Model):
     value = models.JSONField()
 
     class Meta:
-        required_db_features = {'supports_json_field'}
+        required_db_features = {"supports_json_field"}

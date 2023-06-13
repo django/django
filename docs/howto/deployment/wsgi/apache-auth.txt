@@ -1,6 +1,6 @@
-=========================================================
-Authenticating against Django's user database from Apache
-=========================================================
+==============================================================
+How to authenticate against Django's user database from Apache
+==============================================================
 
 Since keeping multiple authentication databases in sync is a common problem when
 dealing with Apache, you can configure Apache to authenticate against Django's
@@ -37,7 +37,7 @@ Authentication with ``mod_wsgi``
     information about this setting.
 
 Make sure that mod_wsgi is installed and activated and that you have
-followed the steps to setup :doc:`Apache with mod_wsgi
+followed the steps to set up :doc:`Apache with mod_wsgi
 </howto/deployment/wsgi/modwsgi>`.
 
 Next, edit your Apache configuration to add a location that you want
@@ -84,11 +84,12 @@ function::
 
     import os
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
     from django.contrib.auth.handlers.modwsgi import check_password
 
     from django.core.handlers.wsgi import WSGIHandler
+
     application = WSGIHandler()
 
 

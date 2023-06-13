@@ -20,7 +20,7 @@ A fundamental goal of Django's stack is `loose coupling and tight cohesion`_.
 The various layers of the framework shouldn't "know" about each other unless
 absolutely necessary.
 
-For example, the template system knows nothing about Web requests, the database
+For example, the template system knows nothing about web requests, the database
 layer knows nothing about data display and the view system doesn't care which
 template system a programmer uses.
 
@@ -43,8 +43,8 @@ introspection.
 Quick development
 -----------------
 
-The point of a Web framework in the 21st century is to make the tedious aspects
-of Web development fast. Django should allow for incredibly quick Web
+The point of a web framework in the 21st century is to make the tedious aspects
+of web development fast. Django should allow for incredibly quick web
 development.
 
 .. _dry:
@@ -173,7 +173,7 @@ Encourage best practices
 The framework should make it just as easy (or even easier) for a developer to
 design pretty URLs than ugly ones.
 
-File extensions in Web-page URLs should be avoided.
+File extensions in web-page URLs should be avoided.
 
 Vignette-style commas in URLs deserve severe punishment.
 
@@ -185,7 +185,7 @@ Definitive URLs
 .. index:: urls; definitive
 
 Technically, ``foo.com/bar`` and ``foo.com/bar/`` are two different URLs, and
-search-engine robots (and some Web traffic-analyzing tools) would treat them as
+search-engine robots (and some web traffic-analyzing tools) would treat them as
 separate pages. Django should make an effort to "normalize" URLs so that
 search-engine robots don't get confused.
 

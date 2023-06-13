@@ -2,8 +2,6 @@
 GeoDjango Installation
 ======================
 
-.. highlight:: console
-
 Overview
 ========
 In general, GeoDjango installation requires:
@@ -58,10 +56,10 @@ supported versions, and any notes for each of the supported database backends:
 ==================  ==============================  ==================  =========================================
 Database            Library Requirements            Supported Versions  Notes
 ==================  ==============================  ==================  =========================================
-PostgreSQL          GEOS, GDAL, PROJ, PostGIS       10+                 Requires PostGIS.
-MySQL               GEOS, GDAL                      5.7+                :ref:`Limited functionality <mysql-spatial-limitations>`.
+PostgreSQL          GEOS, GDAL, PROJ, PostGIS       12+                 Requires PostGIS.
+MySQL               GEOS, GDAL                      8+                  :ref:`Limited functionality <mysql-spatial-limitations>`.
 Oracle              GEOS, GDAL                      19+                 XE not supported.
-SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.9.0+              Requires SpatiaLite 4.3+
+SQLite              GEOS, GDAL, PROJ, SpatiaLite    3.21.0+             Requires SpatiaLite 4.3+
 ==================  ==============================  ==================  =========================================
 
 See also `this comparison matrix`__ on the OSGeo Wiki for
@@ -112,12 +110,12 @@ community!  You can:
 * Join the ``#django-geo`` IRC channel on Libera.Chat. Please be patient and
   polite -- while you may not get an immediate response, someone will attempt
   to answer your question as soon as they see it.
-* Ask your question on the `GeoDjango`__ mailing list.
+* Ask your question on the `GeoDjango`__ forum.
 * File a ticket on the `Django trac`__ if you think there's a bug.  Make
   sure to provide a complete description of the problem, versions used,
   and specify the component as "GIS".
 
-__ https://groups.google.com/g/geodjango
+__ https://forum.djangoproject.com/c/internals/geodjango/13
 __ https://code.djangoproject.com/newticket
 
 .. _libsettings:
@@ -141,7 +139,9 @@ A user may set this environment variable to customize the library paths
 they want to use.  The typical library directory for software
 built from source is ``/usr/local/lib``.  Thus, ``/usr/local/lib`` needs
 to be included in the ``LD_LIBRARY_PATH`` variable.  For example, the user
-could place the following in their bash profile::
+could place the following in their bash profile:
+
+.. code-block:: shell
 
     export LD_LIBRARY_PATH=/usr/local/lib
 
@@ -151,7 +151,9 @@ Setting system library path
 On GNU/Linux systems, there is typically a file in ``/etc/ld.so.conf``, which may include
 additional paths from files in another directory, such as ``/etc/ld.so.conf.d``.
 As the root user, add the custom library path (like ``/usr/local/lib``) on a
-new line in ``ld.so.conf``.  This is *one* example of how to do so::
+new line in ``ld.so.conf``.  This is *one* example of how to do so:
+
+.. code-block:: shell
 
     $ sudo echo /usr/local/lib >> /etc/ld.so.conf
     $ sudo ldconfig
@@ -159,7 +161,9 @@ new line in ``ld.so.conf``.  This is *one* example of how to do so::
 For OpenSolaris users, the system library path may be modified using the
 ``crle`` utility.  Run ``crle`` with no options to see the current configuration
 and use ``crle -l`` to set with the new library path.  Be *very* careful when
-modifying the system library path::
+modifying the system library path:
+
+.. code-block:: shell
 
     # crle -l $OLD_PATH:/usr/local/lib
 
@@ -176,11 +180,15 @@ Linux system then Python's ctypes may not be able to find your library even if
 your library path is set correctly and geospatial libraries were built perfectly.
 
 The ``binutils`` package may be installed on Debian and Ubuntu systems using the
-following command::
+following command:
+
+.. code-block:: shell
 
     $ sudo apt-get install binutils
 
-Similarly, on Red Hat and CentOS systems::
+Similarly, on Red Hat and CentOS systems:
+
+.. code-block:: shell
 
     $ sudo yum install binutils
 
@@ -197,7 +205,6 @@ several different options for installing GeoDjango. These options are:
 
 * :ref:`postgresapp` (easiest and recommended)
 * :ref:`homebrew`
-* :ref:`kyngchaos`
 * :ref:`fink`
 * :ref:`macports`
 * :ref:`build_from_source`
@@ -222,7 +229,9 @@ __ https://www.python.org/ftp/python/
 
     You will need to modify the ``PATH`` environment variable in your
     ``.profile`` file so that the new version of Python is used when
-    ``python`` is entered at the command-line::
+    ``python`` is entered at the command-line:
+
+    .. code-block:: shell
 
         export PATH=/Library/Frameworks/Python.framework/Versions/Current/bin:$PATH
 
@@ -256,7 +265,9 @@ It provides recipes for the GeoDjango prerequisites on Macintosh computers
 running macOS. Because Homebrew still builds the software from source, `Xcode`_
 is required.
 
-Summary::
+Summary:
+
+.. code-block:: shell
 
     $ brew install postgresql
     $ brew install postgis
@@ -265,63 +276,6 @@ Summary::
 
 __ https://brew.sh/
 .. _Xcode: https://developer.apple.com/xcode/
-
-.. _kyngchaos:
-
-KyngChaos packages
-~~~~~~~~~~~~~~~~~~
-
-William Kyngesburye provides a number of `geospatial library binary packages`__
-that help to get GeoDjango installed on macOS without compiling them from
-source.  However, `Xcode`_ is still necessary for compiling the Python database
-adapters :ref:`psycopg2_kyngchaos` (for PostGIS).
-
-.. note::
-
-    SpatiaLite users should consult the :ref:`spatialite_macos` section
-    after installing the packages for additional instructions.
-
-Download the framework packages for:
-
-* UnixImageIO
-* PROJ
-* GEOS
-* SQLite3 (includes the SpatiaLite library)
-* GDAL
-
-Install the packages in the order they are listed above, as the GDAL and SQLite
-packages require the packages listed before them.
-
-Afterwards, you can also install the KyngChaos binary packages for `PostgreSQL
-and PostGIS`__.
-
-After installing the binary packages, you'll want to add the following to
-your ``.profile`` to be able to run the package programs from the command-line::
-
-    export PATH=/Library/Frameworks/UnixImageIO.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/PROJ.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/GEOS.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/SQLite3.framework/Programs:$PATH
-    export PATH=/Library/Frameworks/GDAL.framework/Programs:$PATH
-    export PATH=/usr/local/pgsql/bin:$PATH
-
-__ https://www.kyngchaos.com/software/frameworks
-__ https://www.kyngchaos.com/software/postgres
-
-.. _psycopg2_kyngchaos:
-
-psycopg2
-^^^^^^^^
-
-After you've installed the KyngChaos binaries and modified your ``PATH``, as
-described above, ``psycopg2`` may be installed using the following command::
-
-    $ python -m pip install psycopg2
-
-.. note::
-
-    If you don't have ``pip``, follow the :ref:`installation instructions
-    <installing-official-release>` to install it.
 
 .. _fink:
 
@@ -345,7 +299,9 @@ MacPorts
 running macOS.  Because MacPorts still builds the software from source,
 `Xcode`_ is required.
 
-Summary::
+Summary:
+
+.. code-block:: shell
 
     $ sudo port install postgresql13-server
     $ sudo port install geos
@@ -357,12 +313,16 @@ Summary::
 .. note::
 
     You will also have to modify the ``PATH`` in your ``.profile`` so
-    that the MacPorts programs are accessible from the command-line::
+    that the MacPorts programs are accessible from the command-line:
+
+    .. code-block:: shell
 
         export PATH=/opt/local/bin:/opt/local/lib/postgresql13/bin
 
     In addition, add the ``DYLD_FALLBACK_LIBRARY_PATH`` setting so that
-    the libraries can be found by Python::
+    the libraries can be found by Python:
+
+    .. code-block:: shell
 
         export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local/lib/postgresql13
 
@@ -386,7 +346,7 @@ for further information.
 PostgreSQL
 ~~~~~~~~~~
 
-Download the latest `PostgreSQL 12.x installer`__ from the
+Download the latest `PostgreSQL 15.x installer`__ from the
 `EnterpriseDB`__ website.  After downloading, run the installer, follow the
 on-screen directions, and keep the default options unless you know the
 consequences of changing them.
@@ -403,7 +363,7 @@ keep this checked, as it is necessary to install :ref:`postgisasb`.
 
     If installed successfully, the PostgreSQL server will run in the background
     each time the system as started as a Windows service. A
-    :menuselection:`PostgreSQL 12` start menu group will created and contains
+    :menuselection:`PostgreSQL 15` start menu group will created and contains
     shortcuts for the Application Stack Builder (ASB) as well as the
     'SQL Shell', which will launch a ``psql`` command window.
 
@@ -416,17 +376,17 @@ PostGIS
 ~~~~~~~
 
 From within the Stack Builder (to run outside of the installer,
-:menuselection:`Start --> PostgreSQL 12 --> Application Stack Builder`), select
-:menuselection:`PostgreSQL 12 (x64) on port 5432` from the drop down
+:menuselection:`Start --> PostgreSQL 15 --> Application Stack Builder`), select
+:menuselection:`PostgreSQL 15 (x64) on port 5432` from the drop down
 menu and click next. Expand the
 :menuselection:`Categories --> Spatial Extensions` menu tree and select
-:menuselection:`PostGIS X.Y for PostgreSQL 12`.
+:menuselection:`PostGIS X.Y for PostgreSQL 15`.
 
 After clicking next, you will be prompted to confirm the selected package and
 "Download directory". Click next again, this will download PostGIS and you will
 be asked to click next to begin the PostGIS installer. Select the default
-options during install. The install process includes three Yes/No dialog boxes,
-the default option for all three is "No".
+options during install. The install process includes four Yes/No dialog boxes,
+the default option for all four is "No".
 
 .. _osgeo4w:
 
@@ -434,12 +394,13 @@ OSGeo4W
 ~~~~~~~
 
 The `OSGeo4W installer`_ helps to install the PROJ, GDAL, and GEOS libraries
-required by GeoDjango. First, download the `OSGeo4W installer`_ (64bit), and
+required by GeoDjango. First, download the `OSGeo4W installer`_, and
 run it. Select :menuselection:`Express Web-GIS Install` and click next.  In the
-'Select Packages' list, ensure that GDAL is selected; MapServer is also enabled
-by default, but is not required by GeoDjango and may be unchecked safely. After
-clicking next and accepting the license agreements, the packages will be
-automatically downloaded and installed, after which you may exit the installer.
+'Select Packages' list, ensure that GDAL is selected. If any other packages are
+enabled by default, they are not required by GeoDjango and may be unchecked
+safely. After clicking next and accepting the license agreements, the packages
+will be automatically downloaded and installed, after which you may exit the
+installer.
 
 .. _OSGeo4W installer: https://trac.osgeo.org/osgeo4w/
 
@@ -454,19 +415,13 @@ once this is complete for new environment variables to be recognized:
 
 .. code-block:: bat
 
-    set OSGEO4W_ROOT=C:\OSGeo4W64
-    set GDAL_DATA=%OSGEO4W_ROOT%\share\gdal
+    set OSGEO4W_ROOT=C:\OSGeo4W
+    set GDAL_DATA=%OSGEO4W_ROOT%\apps\gdal\share\gdal
     set PROJ_LIB=%OSGEO4W_ROOT%\share\proj
     set PATH=%PATH%;%OSGEO4W_ROOT%\bin
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_EXPAND_SZ /f /d "%PATH%"
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v GDAL_DATA /t REG_EXPAND_SZ /f /d "%GDAL_DATA%"
     reg ADD "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v PROJ_LIB /t REG_EXPAND_SZ /f /d "%PROJ_LIB%"
-
-.. note::
-
-    This assumes 64bit version of OSGeo4W is installed. If you have installed
-    the 32bit version you will need to change the first command to
-    ``set OSGEO4W_ROOT=C:\OSGeo4W``.
 
 .. note::
 
@@ -483,18 +438,20 @@ once this is complete for new environment variables to be recognized:
 Install Django and set up database
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:ref:`install Django <installing-official-release>` on your system. It is
+:ref:`Install Django <installing-official-release>` on your system. It is
 recommended that you create a :doc:`virtual environment
 <python:tutorial/venv>` for each project you create.
 
-psycopg2
-~~~~~~~~
+psycopg
+~~~~~~~
 
-The ``psycopg2`` Python module provides the interface between Python and the
-PostgreSQL database. ``psycopg2`` can be installed via pip within your Python
-virtual environment::
+The ``psycopg`` Python module provides the interface between Python and the
+PostgreSQL database. ``psycopg`` can be installed via pip within your Python
+virtual environment:
 
-    ...\> py -m pip install psycopg2
+.. code-block:: doscon
+
+    ...\> py -m pip install psycopg
 
 .. rubric:: Footnotes
 .. [#] GeoDjango uses the :func:`~ctypes.util.find_library` routine from

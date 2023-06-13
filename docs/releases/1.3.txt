@@ -81,7 +81,7 @@ Django 1.3 adds framework-level support for Python's ``logging``
 module.  This means you can now easily configure and control logging
 as part of your Django project. A number of logging handlers and
 logging calls have been added to Django's own code as well -- most
-notably, the error emails sent on a HTTP 500 server error are now
+notably, the error emails sent on an HTTP 500 server error are now
 handled as a logging activity. See :doc:`the documentation on Django's
 logging interface </topics/logging>` for more details.
 
@@ -112,8 +112,8 @@ for more details or learn how to :doc:`manage static files
 Python 2.7 introduced some major changes to the ``unittest`` library,
 adding some extremely useful features. To ensure that every Django
 project can benefit from these new features, Django ships with a copy
-of unittest2_, a copy of the Python 2.7 ``unittest`` library, backported
-for Python 2.4 compatibility.
+of :pypi:`unittest2`, a copy of the Python 2.7 ``unittest`` library,
+backported for Python 2.4 compatibility.
 
 To access this library, Django provides the ``django.utils.unittest``
 module alias. If you are using Python 2.7, or you have installed
@@ -132,8 +132,6 @@ wherever you would have historically used::
 If you want to continue to use the base ``unittest`` library, you can --
 you just won't get any of the nice new ``unittest2`` features.
 
-.. _unittest2: https://pypi.org/project/unittest2/
-
 Transaction context managers
 ----------------------------
 
@@ -141,7 +139,7 @@ Users of Python 2.5 and above may now use transaction management functions as
 context managers. For example::
 
     with transaction.autocommit():
-        # ...
+        ...
 
 Configurable delete-cascade
 ---------------------------
@@ -401,10 +399,11 @@ To return to the previous rendering (without the ability to clear the
     from django import forms
     from myapp.models import Document
 
+
     class DocumentForm(forms.ModelForm):
         class Meta:
             model = Document
-            widgets = {'document': forms.FileInput}
+            widgets = {"document": forms.FileInput}
 
 New index on database session table
 -----------------------------------
@@ -419,7 +418,9 @@ If you have an existing project that is using the database session
 backend, you don't have to do anything to accommodate this change.
 However, you may get a significant performance boost if you manually
 add the new index to the session table. The SQL that will add the
-index can be found by running the ``sqlindexes`` admin command::
+index can be found by running the ``sqlindexes`` admin command:
+
+.. code-block:: shell
 
     python manage.py sqlindexes sessions
 
@@ -476,14 +477,19 @@ passed empty dictionary. This was inconsistent with behavior in other parts of
 the framework. Starting with 1.3 if you pass in empty dictionary the
 ``FormSet`` will raise a ``ValidationError``.
 
-For example with a ``FormSet``::
+For example with a ``FormSet``:
+
+.. code-block:: pycon
 
     >>> class ArticleForm(Form):
     ...     title = CharField()
     ...     pub_date = DateField()
+    ...
     >>> ArticleFormSet = formset_factory(ArticleForm)
 
-the following code will raise a ``ValidationError``::
+the following code will raise a ``ValidationError``:
+
+.. code-block:: pycon
 
     >>> ArticleFormSet({})
     Traceback (most recent call last):
@@ -491,7 +497,9 @@ the following code will raise a ``ValidationError``::
     ValidationError: [u'ManagementForm data is missing or has been tampered with']
 
 if you need to instantiate an empty ``FormSet``, don't pass in the data or use
-``None``::
+``None``:
+
+.. code-block:: pycon
 
     >>> formset = ArticleFormSet()
     >>> formset = ArticleFormSet(data=None)
@@ -502,11 +510,13 @@ Callables in templates
 Previously, a callable in a template would only be called automatically as part
 of the variable resolution process if it was retrieved via attribute
 lookup. This was an inconsistency that could result in confusing and unhelpful
-behavior::
+behavior:
 
-    >>> Template("{{ user.get_full_name }}").render(Context({'user': user}))
+.. code-block:: pycon
+
+    >>> Template("{{ user.get_full_name }}").render(Context({"user": user}))
     u'Joe Bloggs'
-    >>> Template("{{ full_name }}").render(Context({'full_name': user.get_full_name}))
+    >>> Template("{{ full_name }}").render(Context({"full_name": user.get_full_name}))
     u'&lt;bound method User.get_full_name of &lt;...
 
 This has been resolved in Django 1.3 - the result in both cases will be ``u'Joe
@@ -616,7 +626,7 @@ transactions that are being managed using ``commit_manually()``. For example::
       @transaction.commit_manually
       def my_view(request, name):
           obj = get_object_or_404(MyObject, name__iexact=name)
-          return render_to_response('template', {'object':obj})
+          return render_to_response("template", {"object": obj})
 
 Prior to Django 1.3, this would work without error. However, under
 Django 1.3, this will raise a
@@ -720,12 +730,16 @@ Changes to ``url`` and ``ssi``
 ------------------------------
 
 Most template tags will allow you to pass in either constants or
-variables as arguments -- for example::
+variables as arguments -- for example:
+
+.. code-block:: html+django
 
     {% extends "base.html" %}
 
 allows you to specify a base template as a constant, but if you have a
-context variable ``templ`` that contains the value ``base.html``::
+context variable ``templ`` that contains the value ``base.html``:
+
+.. code-block:: html+django
 
     {% extends templ %}
 
@@ -741,11 +755,15 @@ accident. Django 1.3 adds a new template library -- ``future`` -- that
 provides alternate implementations of the ``url`` and ``ssi``
 template tags. This ``future`` library implement behavior that makes
 the handling of the first argument consistent with the handling of all
-other variables. So, an existing template that contains::
+other variables. So, an existing template that contains:
+
+.. code-block:: html+django
 
     {% url sample %}
 
-should be replaced with::
+should be replaced with:
+
+.. code-block:: html+django
 
     {% load url from future %}
     {% url 'sample' %}
@@ -840,7 +858,9 @@ Rationale for this decision:
   generate spurious error messages when the project directory is added
   to the Python path (``manage.py runserver`` does this) and then it
   clashes with the equally named standard library module, this is a
-  typical warning message::
+  typical warning message:
+
+  .. code-block:: pytb
 
      /usr/lib/python2.6/gettext.py:49: ImportWarning: Not importing directory '/path/to/project/locale': missing __init__.py.
      import locale, copy, os, re, struct, sys

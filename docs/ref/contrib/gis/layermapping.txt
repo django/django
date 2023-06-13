@@ -32,18 +32,20 @@ Example
 =======
 
 #. You need a GDAL-supported data source, like a shapefile (here we're using
-   a simple polygon shapefile, ``test_poly.shp``, with three features)::
+   a simple polygon shapefile, ``test_poly.shp``, with three features):
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.gdal import DataSource
-    >>> ds = DataSource('test_poly.shp')
+    >>> ds = DataSource("test_poly.shp")
     >>> layer = ds[0]
-    >>> print(layer.fields) # Exploring the fields in the layer, we only want the 'str' field.
+    >>> print(layer.fields)  # Exploring the fields in the layer, we only want the 'str' field.
     ['float', 'int', 'str']
-    >>> print(len(layer)) # getting the number of features in the layer (should be 3)
+    >>> print(len(layer))  # getting the number of features in the layer (should be 3)
     3
-    >>> print(layer.geom_type) # Should be 'Polygon'
+    >>> print(layer.geom_type)  # Should be 'Polygon'
     Polygon
-    >>> print(layer.srs) # WGS84 in WKT
+    >>> print(layer.srs)  # WGS84 in WKT
     GEOGCS["GCS_WGS_1984",
         DATUM["WGS_1984",
             SPHEROID["WGS_1984",6378137,298.257223563]],
@@ -54,23 +56,27 @@ Example
 
     from django.contrib.gis.db import models
 
+
     class TestGeo(models.Model):
-        name = models.CharField(max_length=25) # corresponds to the 'str' field
-        poly = models.PolygonField(srid=4269) # we want our model in a different SRID
+        name = models.CharField(max_length=25)  # corresponds to the 'str' field
+        poly = models.PolygonField(srid=4269)  # we want our model in a different SRID
 
         def __str__(self):
-            return 'Name: %s' % self.name
+            return "Name: %s" % self.name
 
 #. Use :class:`LayerMapping` to extract all the features and place them in the
-   database::
+   database:
+
+.. code-block:: pycon
 
     >>> from django.contrib.gis.utils import LayerMapping
     >>> from geoapp.models import TestGeo
-    >>> mapping = {'name' : 'str', # The 'name' model field maps to the 'str' layer field.
-                   'poly' : 'POLYGON', # For geometry fields use OGC name.
-                   } # The mapping is a dictionary
-    >>> lm = LayerMapping(TestGeo, 'test_poly.shp', mapping)
-    >>> lm.save(verbose=True) # Save the layermap, imports the data.
+    >>> mapping = {
+    ...     "name": "str",  # The 'name' model field maps to the 'str' layer field.
+    ...     "poly": "POLYGON",  # For geometry fields use OGC name.
+    ... }  # The mapping is a dictionary
+    >>> lm = LayerMapping(TestGeo, "test_poly.shp", mapping)
+    >>> lm.save(verbose=True)  # Save the layermap, imports the data.
     Saved: Name: 1
     Saved: Name: 2
     Saved: Name: 3
@@ -142,10 +148,6 @@ Keyword Arguments
                        Default is ``'default'``.
 =====================  =====================================================
 
-.. versionchanged:: 3.2
-
-    Support for :class:`pathlib.Path` ``data_source`` was added.
-
 ``save()`` Keyword Arguments
 ----------------------------
 
@@ -210,13 +212,17 @@ should stop excessive memory use when running ``LayerMapping`` scripts.
 MySQL: ``max_allowed_packet`` error
 -----------------------------------
 
-If you encounter the following error when using ``LayerMapping`` and MySQL::
+If you encounter the following error when using ``LayerMapping`` and MySQL:
+
+.. code-block:: pytb
 
     OperationalError: (1153, "Got a packet bigger than 'max_allowed_packet' bytes")
 
 Then the solution is to increase the value of the ``max_allowed_packet``
 setting in your MySQL configuration.  For example, the default value may
 be something low like one megabyte -- the setting may be modified in MySQL's
-configuration file (``my.cnf``) in the ``[mysqld]`` section::
+configuration file (``my.cnf``) in the ``[mysqld]`` section:
+
+.. code-block:: ini
 
     max_allowed_packet = 10M

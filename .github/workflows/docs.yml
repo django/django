@@ -4,32 +4,58 @@ on:
   pull_request:
     paths:
       - 'docs/**'
+      - '.github/workflows/docs.yml'
   push:
     branches:
       - main
     paths:
       - 'docs/**'
+      - '.github/workflows/docs.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
   docs:
-    runs-on: ubuntu-latest
+    # OS must be the same as on djangoproject.com.
+    runs-on: ubuntu-20.04
     name: docs
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
-      - name: Cache dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'docs/requirements.txt'
       - run: python -m pip install -r docs/requirements.txt
       - name: Build docs
         run: |
           cd docs
           sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
+
+  blacken-docs:
+    runs-on: ubuntu-latest
+    name: blacken-docs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - run: python -m pip install blacken-docs
+      - name: Build docs
+        run: |
+          cd docs
+          make black
+          RESULT=`cat _build/black/output.txt`
+          if [ "$RESULT" -gt 0 ]; then
+              echo "💥 📢 Code blocks in documentation must be reformatted with blacken-docs 📢 💥"
+          fi;
+          exit $RESULT

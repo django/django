@@ -9,7 +9,8 @@ class KMLSitemap(Sitemap):
     """
     A minimal hook to produce KML sitemaps.
     """
-    geo_format = 'kml'
+
+    geo_format = "kml"
 
     def __init__(self, locations=None):
         # If no locations specified, then we try to build for
@@ -31,15 +32,22 @@ class KMLSitemap(Sitemap):
             if isinstance(source, models.base.ModelBase):
                 for field in source._meta.fields:
                     if isinstance(field, GeometryField):
-                        kml_sources.append((source._meta.app_label,
-                                            source._meta.model_name,
-                                            field.name))
+                        kml_sources.append(
+                            (
+                                source._meta.app_label,
+                                source._meta.model_name,
+                                field.name,
+                            )
+                        )
             elif isinstance(source, (list, tuple)):
                 if len(source) != 3:
-                    raise ValueError('Must specify a 3-tuple of (app_label, module_name, field_name).')
+                    raise ValueError(
+                        "Must specify a 3-tuple of (app_label, module_name, "
+                        "field_name)."
+                    )
                 kml_sources.append(source)
             else:
-                raise TypeError('KML Sources must be a model or a 3-tuple.')
+                raise TypeError("KML Sources must be a model or a 3-tuple.")
         return kml_sources
 
     def get_urls(self, page=1, site=None, protocol=None):
@@ -49,7 +57,7 @@ class KMLSitemap(Sitemap):
         """
         urls = Sitemap.get_urls(self, page=page, site=site, protocol=protocol)
         for url in urls:
-            url['geo_format'] = self.geo_format
+            url["geo_format"] = self.geo_format
         return urls
 
     def items(self):
@@ -57,14 +65,14 @@ class KMLSitemap(Sitemap):
 
     def location(self, obj):
         return reverse(
-            'django.contrib.gis.sitemaps.views.%s' % self.geo_format,
+            "django.contrib.gis.sitemaps.views.%s" % self.geo_format,
             kwargs={
-                'label': obj[0],
-                'model': obj[1],
-                'field_name': obj[2],
+                "label": obj[0],
+                "model": obj[1],
+                "field_name": obj[2],
             },
         )
 
 
 class KMZSitemap(KMLSitemap):
-    geo_format = 'kmz'
+    geo_format = "kmz"

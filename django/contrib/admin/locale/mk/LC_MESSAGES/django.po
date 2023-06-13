@@ -1,8 +1,10 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
+# Dimce Grozdanoski <dimce.grozdanoski@gmail.com>, 2021
 # dekomote <dr.mote@gmail.com>, 2015
 # Jannis Leidel <jannis@leidel.info>, 2011
+# Martino Nikolovski, 2022
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2016-2017,2019,2021
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2013-2015
 # Vasil Vangelovski <vvangelovski@gmail.com>, 2011-2013
@@ -10,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-06-11 17:28+0000\n"
-"Last-Translator: Vasil Vangelovski <vvangelovski@gmail.com>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-05-25 07:05+0000\n"
+"Last-Translator: Martino Nikolovski, 2022\n"
 "Language-Team: Macedonian (http://www.transifex.com/django/django/language/"
 "mk/)\n"
 "MIME-Version: 1.0\n"
@@ -73,7 +75,7 @@ msgid "Has date"
 msgstr "Има датум"
 
 msgid "Empty"
-msgstr ""
+msgstr "Празно"
 
 msgid "Not empty"
 msgstr ""
@@ -136,7 +138,7 @@ msgstr "ставки во записникот"
 
 #, python-format
 msgid "Added “%(object)s”."
-msgstr ""
+msgstr "Додадено “%(object)s”."
 
 #, python-format
 msgid "Changed “%(object)s” — %(changes)s"
@@ -144,7 +146,7 @@ msgstr ""
 
 #, python-format
 msgid "Deleted “%(object)s.”"
-msgstr ""
+msgstr "Избришано “%(object)s.”"
 
 msgid "LogEntry Object"
 msgstr "Запис во дневник"
@@ -264,8 +266,9 @@ msgstr "0 од %(cnt)s избрани"
 msgid "Change history: %s"
 msgstr "Историја на измени: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -298,7 +301,7 @@ msgid "Page not found"
 msgstr "Страницата не е најдена"
 
 msgid "We’re sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Се извинуваме, страница која ја побаравте не е пронајдена"
 
 msgid "Home"
 msgstr "Дома"
@@ -316,6 +319,8 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Наидовте на грешка. Известени се администраторите на страницата преку имејл "
+"и би требало наскоро да биде поправена. Ви благодариме на трпението."
 
 msgid "Run the selected action"
 msgstr "Изврши ја избраната акција"
@@ -344,12 +349,14 @@ msgid "View"
 msgstr "Погледни"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr ""
+msgstr "Немате дозвола да прегледате или промените ништо"
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
+"Прво внесете корисничко име и лозинка па потоа ќе можете да уредувате повеќе "
+"опции за корисникот"
 
 msgid "Enter a username and password."
 msgstr "Внесете корисничко име и лозинка."
@@ -393,7 +400,7 @@ msgid "Filter"
 msgstr "Филтер"
 
 msgid "Clear all filters"
-msgstr ""
+msgstr "Ресетирај ги сите филтри"
 
 msgid "Remove from sorting"
 msgstr "Отстрани од сортирање"
@@ -438,7 +445,7 @@ msgid "Objects"
 msgstr "Предмети"
 
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Да, сигурен сум"
 
 msgid "No, take me back"
 msgstr "Не, врати ме назад"
@@ -498,6 +505,9 @@ msgid ""
 "database tables have been created, and make sure the database is readable by "
 "the appropriate user."
 msgstr ""
+"Нешто не е во ред со инсталацијата на базата на податоци. Уверете се дека "
+"соодветните табели се создадени, и дека базата на податоци е пристапна до "
+"соодветниот корисник."
 
 #, python-format
 msgid ""
@@ -513,6 +523,12 @@ msgstr "Ја заборавивте вашата лозинка или кори�
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Start typing to filter…"
+msgstr "Започнете со пишување за да филтрирате..."
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Датум/час"
 
@@ -521,6 +537,12 @@ msgstr "Корисник"
 
 msgid "Action"
 msgstr "Акција"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -576,9 +598,12 @@ msgstr "Додади уште %(model)s"
 msgid "Delete selected %(model)s"
 msgstr "Избриши ги избраните %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
 msgstr ""
-"Ви благодариме што денеска поминавте квалитетно време со интернет страницава."
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Најавете се повторно"
@@ -648,7 +673,7 @@ msgid "Please go to the following page and choose a new password:"
 msgstr "Ве молам одете на следната страница и внесете нова лозинка:"
 
 msgid "Your username, in case you’ve forgotten:"
-msgstr ""
+msgstr "Вашето корисничко име, во случај да сте заборавиле:"
 
 msgid "Thanks for using our site!"
 msgstr "Ви благодариме што го користите овој сајт!"
@@ -661,6 +686,8 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Ја заборавивте вашата лозинка? Внесете го вашиот имејл и ќе ви пратиме "
+"инструкции да подесите нова лозинка. "
 
 msgid "Email address:"
 msgstr "Email адреса:"

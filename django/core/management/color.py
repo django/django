@@ -10,6 +10,7 @@ from django.utils import termcolors
 
 try:
     import colorama
+
     colorama.init()
 except (ImportError, OSError):
     HAS_COLORAMA = False
@@ -22,6 +23,7 @@ def supports_color():
     Return True if the running system's terminal supports color,
     and False otherwise.
     """
+
     def vt_codes_enabled_in_windows_registry():
         """
         Check the Windows Registry to see if VT code handling has been enabled
@@ -33,26 +35,28 @@ def supports_color():
         except ImportError:
             return False
         else:
-            reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'Console')
             try:
-                reg_key_value, _ = winreg.QueryValueEx(reg_key, 'VirtualTerminalLevel')
+                reg_key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Console")
+                reg_key_value, _ = winreg.QueryValueEx(reg_key, "VirtualTerminalLevel")
             except FileNotFoundError:
                 return False
             else:
                 return reg_key_value == 1
 
     # isatty is not always implemented, #6223.
-    is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
+    is_a_tty = hasattr(sys.stdout, "isatty") and sys.stdout.isatty()
 
     return is_a_tty and (
-        sys.platform != 'win32' or
-        HAS_COLORAMA or
-        'ANSICON' in os.environ or
+        sys.platform != "win32"
+        or HAS_COLORAMA
+        or "ANSICON" in os.environ
+        or
         # Windows Terminal supports VT codes.
-        'WT_SESSION' in os.environ or
+        "WT_SESSION" in os.environ
+        or
         # Microsoft Visual Studio Code's built-in terminal supports colors.
-        os.environ.get('TERM_PROGRAM') == 'vscode' or
-        vt_codes_enabled_in_windows_registry()
+        os.environ.get("TERM_PROGRAM") == "vscode"
+        or vt_codes_enabled_in_windows_registry()
     )
 
 
@@ -60,7 +64,7 @@ class Style:
     pass
 
 
-def make_style(config_string=''):
+def make_style(config_string=""):
     """
     Create a Style object from the given config_string.
 
@@ -79,8 +83,10 @@ def make_style(config_string=''):
             format = color_settings.get(role, {})
             style_func = termcolors.make_style(**format)
         else:
+
             def style_func(x):
                 return x
+
         setattr(style, role, style_func)
 
     # For backwards compatibility,
@@ -90,12 +96,12 @@ def make_style(config_string=''):
     return style
 
 
-@functools.lru_cache(maxsize=None)
+@functools.cache
 def no_style():
     """
     Return a Style object with no color scheme.
     """
-    return make_style('nocolor')
+    return make_style("nocolor")
 
 
 def color_style(force_color=False):
@@ -104,4 +110,4 @@ def color_style(force_color=False):
     """
     if not force_color and not supports_color():
         return no_style()
-    return make_style(os.environ.get('DJANGO_COLORS', ''))
+    return make_style(os.environ.get("DJANGO_COLORS", ""))

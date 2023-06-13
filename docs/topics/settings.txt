@@ -13,9 +13,9 @@ A settings file is just a Python module with module-level variables.
 
 Here are a couple of example settings::
 
-    ALLOWED_HOSTS = ['www.example.com']
+    ALLOWED_HOSTS = ["www.example.com"]
     DEBUG = False
-    DEFAULT_FROM_EMAIL = 'webmaster@example.com'
+    DEFAULT_FROM_EMAIL = "webmaster@example.com"
 
 .. note::
 
@@ -55,17 +55,23 @@ When using :doc:`django-admin </ref/django-admin>`, you can either set the
 environment variable once, or explicitly pass in the settings module each time
 you run the utility.
 
-Example (Unix Bash shell)::
+Example (Unix Bash shell):
+
+.. code-block:: shell
 
     export DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin runserver
 
-Example (Windows shell)::
+Example (Windows shell):
+
+.. code-block:: doscon
 
     set DJANGO_SETTINGS_MODULE=mysite.settings
     django-admin runserver
 
-Use the ``--settings`` command-line argument to specify the settings manually::
+Use the ``--settings`` command-line argument to specify the settings manually:
+
+.. code-block:: shell
 
     django-admin runserver --settings=mysite.settings
 
@@ -79,7 +85,7 @@ application what settings file to use. Do that with ``os.environ``::
 
     import os
 
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "mysite.settings"
 
 Read the :doc:`Django mod_wsgi documentation
 </howto/deployment/wsgi/modwsgi>` for more information and other common
@@ -90,7 +96,7 @@ Default settings
 
 A Django settings file doesn't have to define any settings if it doesn't need
 to. Each setting has a sensible default value. These defaults live in the
-module :file:`django/conf/global_settings.py`.
+module :source:`django/conf/global_settings.py`.
 
 Here's the algorithm Django uses in compiling settings:
 
@@ -119,6 +125,7 @@ In your Django apps, use settings by importing the object
 
     if settings.DEBUG:
         # Do something
+        ...
 
 Note that ``django.conf.settings`` isn't a module -- it's an object. So
 importing individual settings is not possible::
@@ -139,7 +146,7 @@ don't do this in a view::
 
     from django.conf import settings
 
-    settings.DEBUG = True   # Don't do this!
+    settings.DEBUG = True  # Don't do this!
 
 The only place you should assign to settings is in a settings file.
 
@@ -148,7 +155,7 @@ Security
 
 Because a settings file contains sensitive information, such as the database
 password, you should make every attempt to limit access to it. For example,
-change its file permissions so that only you and your Web server's user can
+change its file permissions so that only you and your web server's user can
 read it. This is especially important in a shared-hosting environment.
 
 Available settings
@@ -231,7 +238,7 @@ Normally, you will not need to override the defaults in this fashion. The
 Django defaults are sufficiently tame that you can safely use them. Be aware
 that if you do pass in a new default module, it entirely *replaces* the Django
 defaults, so you must specify a value for every possible setting that might be
-used in that code you are importing. Check in
+used in the code you are importing. Check in
 ``django.conf.settings.global_settings`` for the full list.
 
 Either ``configure()`` or :envvar:`DJANGO_SETTINGS_MODULE` is required
@@ -250,11 +257,12 @@ If you set :envvar:`DJANGO_SETTINGS_MODULE`, access settings values somehow,
 that settings have already been configured. There is a property for this
 purpose:
 
-.. attribute: django.conf.settings.configured
+.. attribute:: django.conf.settings.configured
 
 For example::
 
     from django.conf import settings
+
     if not settings.configured:
         settings.configure(myapp_defaults, DEBUG=True)
 
@@ -287,7 +295,7 @@ settings and populate Django's application registry. For example::
     from myapp import models
 
 Note that calling ``django.setup()`` is only necessary if your code is truly
-standalone. When invoked by your Web server, or through :doc:`django-admin
+standalone. When invoked by your web server, or through :doc:`django-admin
 </ref/django-admin>`, Django will handle this for you.
 
 .. admonition:: ``django.setup()`` may only be called once.
@@ -297,8 +305,9 @@ standalone. When invoked by your Web server, or through :doc:`django-admin
     If you can't avoid that, put the call to ``django.setup()`` inside an
     ``if`` block::
 
-        if __name__ == '__main__':
+        if __name__ == "__main__":
             import django
+
             django.setup()
 
 .. seealso::

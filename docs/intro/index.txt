@@ -2,7 +2,7 @@
 Getting started
 ===============
 
-New to Django? Or to Web development in general? Well, you came to the right
+New to Django? Or to web development in general? Well, you came to the right
 place: read this material to quickly get up and running.
 
 .. toctree::
@@ -17,6 +17,7 @@ place: read this material to quickly get up and running.
    tutorial05
    tutorial06
    tutorial07
+   tutorial08
    reusable-apps
    whatsnext
    contributing

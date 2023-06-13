@@ -20,11 +20,11 @@ Otherwise, before reporting a bug or requesting a new feature on the
   |django-users| list or the `#django`_ IRC channel for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
-  to do so on |django-developers|.
+  to do so on the `Django Forum`_ or |django-developers| list.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to |django-developers|.
+  discussion to the `Django Forum`_ or |django-developers| list.
 
 .. _reporting-bugs:
 
@@ -64,14 +64,14 @@ If your bug or feature request touches on anything visual in nature, there
 are a few additional guidelines to follow:
 
 * Include screenshots in your ticket which are the visual equivalent of a
-  minimal testcase. Show off the issue, not the crazy customizations
+  minimal test case. Show off the issue, not the crazy customizations
   you've made to your browser.
 
 * If the issue is difficult to show off using a still image, consider
   capturing a *brief* screencast. If your software permits it, capture only
   the relevant area of the screen.
 
-* If you're offering a patch which changes the look or behavior of Django's
+* If you're offering a patch that changes the look or behavior of Django's
   UI, you **must** attach before *and* after screenshots/screencasts.
   Tickets lacking these are difficult for triagers to assess quickly.
 
@@ -94,11 +94,10 @@ part of that. Here are some tips on how to make a request most effectively:
   suggest that you develop it independently. Then, if your project gathers
   sufficient community support, we may consider it for inclusion in Django.
 
-* First request the feature on the |django-developers| list, not in the
-  ticket tracker. It'll get read more closely if it's on the mailing list.
-  This is even more important for large-scale feature requests. We like to
-  discuss any big changes to Django's core on the mailing list before
-  actually working on them.
+* First request the feature on the `Django Forum`_ or |django-developers| list,
+  not in the ticket tracker. It'll get read more closely if it's on the mailing
+  list. This is even more important for large-scale feature requests. We like
+  to discuss any big changes to Django's core before actually working on them.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -109,8 +108,7 @@ part of that. Here are some tips on how to make a request most effectively:
   achieving the same thing.
 
 If there's a consensus agreement on the feature, then it's appropriate to
-create a ticket. Include a link the discussion on |django-developers| in the
-ticket description.
+create a ticket. Include a link to the discussion in the ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
@@ -125,9 +123,10 @@ How we make decisions
 =====================
 
 Whenever possible, we strive for a rough consensus. To that end, we'll often
-have informal votes on |django-developers| about a feature. In these votes we
-follow the voting style invented by Apache and used on Python itself, where
-votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
+have informal votes on |django-developers| or the Django Forum about a feature.
+In these votes we follow the voting style invented by Apache and used on Python
+itself, where votes are given as +1, +0, -0, or -1.
+Roughly translated, these votes mean:
 
 * +1: "I love the idea and I'm strongly committed to it."
 
@@ -138,30 +137,30 @@ votes are given as +1, +0, -0, or -1. Roughly translated, these votes mean:
 * -1: "I strongly disagree and would be very unhappy to see the idea turn
   into reality."
 
-Although these votes on |django-developers| are informal, they'll be taken very
-seriously. After a suitable voting period, if an obvious consensus arises we'll
-follow the votes.
+Although these votes are informal, they'll be taken very seriously. After a
+suitable voting period, if an obvious consensus arises we'll follow the votes.
 
 However, consensus is not always possible. If consensus cannot be reached, or
-if the discussion towards a consensus fizzles out without a concrete decision,
-the decision may be deferred to the :ref:`technical board <technical-board>`.
+if the discussion toward a consensus fizzles out without a concrete decision,
+the decision may be deferred to the :ref:`steering council <steering-council>`.
 
-Internally, the technical board will use the same voting mechanism. A
+Internally, the steering council will use the same voting mechanism. A
 proposition will be considered carried if:
 
-* There are at least three "+1" votes from members of the technical board.
+* There are at least three "+1" votes from members of the steering council.
 
-* There is no "-1" vote from any member of the technical board.
+* There is no "-1" vote from any member of the steering council.
 
 Votes should be submitted within a week.
 
-Since this process allows any technical board member to veto a proposal, a
+Since this process allows any steering council member to veto a proposal, a
 "-1" vote should be accompanied by an explanation of what it would take to
 convert that "-1" into at least a "+0".
 
 Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list.
+|django-developers| mailing list or on the `Django Forum`_.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _#django: https://web.libera.chat/#django
+.. _Django Forum: https://forum.djangoproject.com/

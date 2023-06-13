@@ -1,10 +1,9 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.conf import settings
 from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
 from django.core.files import storage
-from django.utils import timezone
 
 
 class DummyStorage(storage.Storage):
@@ -12,8 +11,9 @@ class DummyStorage(storage.Storage):
     A storage class that implements get_modified_time() but raises
     NotImplementedError for path().
     """
+
     def _save(self, name, content):
-        return 'dummy'
+        return "dummy"
 
     def delete(self, name):
         pass
@@ -26,9 +26,8 @@ class DummyStorage(storage.Storage):
 
 
 class PathNotImplementedStorage(storage.Storage):
-
     def _save(self, name, content):
-        return 'dummy'
+        return "dummy"
 
     def _path(self, name):
         return os.path.join(settings.STATIC_ROOT, name)
@@ -62,19 +61,19 @@ class NeverCopyRemoteStorage(PathNotImplementedStorage):
     """
     Return a future modified time for all files so that nothing is collected.
     """
+
     def get_modified_time(self, name):
         return datetime.now() + timedelta(days=30)
 
 
 class QueryStringStorage(storage.Storage):
     def url(self, path):
-        return path + '?a=b&c=d'
+        return path + "?a=b&c=d"
 
 
 class SimpleStorage(ManifestStaticFilesStorage):
-
     def file_hash(self, name, content=None):
-        return 'deploy12345'
+        return "deploy12345"
 
 
 class ExtraPatternsStorage(ManifestStaticFilesStorage):
@@ -82,9 +81,11 @@ class ExtraPatternsStorage(ManifestStaticFilesStorage):
     A storage class to test pattern substitutions with more than one pattern
     entry. The added pattern rewrites strings like "url(...)" to JS_URL("...").
     """
+
     patterns = tuple(ManifestStaticFilesStorage.patterns) + (
         (
-            "*.js", (
+            "*.js",
+            (
                 (
                     r"""(?P<matched>url\(['"]{0,1}\s*(?P<url>.*?)["']{0,1}\))""",
                     'JS_URL("%(url)s")',

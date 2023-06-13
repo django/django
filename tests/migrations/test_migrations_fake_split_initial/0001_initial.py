@@ -2,7 +2,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     operations = [
@@ -24,7 +23,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.AlterUniqueTogether(
-            name='author',
-            unique_together={('name', 'slug')},
+            name="author",
+            unique_together={("name", "slug")},
         ),
     ]

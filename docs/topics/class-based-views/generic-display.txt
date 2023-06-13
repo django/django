@@ -2,9 +2,9 @@
 Built-in class-based generic views
 ==================================
 
-Writing Web applications can be monotonous, because we repeat certain patterns
+Writing web applications can be monotonous, because we repeat certain patterns
 again and again. Django tries to take away some of that monotony at the model
-and template layers, but Web developers also experience this boredom at the view
+and template layers, but web developers also experience this boredom at the view
 level.
 
 Django's *generic views* were developed to ease that pain. They take certain
@@ -68,12 +68,11 @@ of built-in generic views to help generate list and detail views of objects.
 Let's start by looking at some examples of showing a list of objects or an
 individual object.
 
-.. comment: link here to the other topic pages (form handling, date based, mixins)
-
 We'll be using these models::
 
     # models.py
     from django.db import models
+
 
     class Publisher(models.Model):
         name = models.CharField(max_length=30)
@@ -89,18 +88,20 @@ We'll be using these models::
         def __str__(self):
             return self.name
 
+
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
         name = models.CharField(max_length=200)
         email = models.EmailField()
-        headshot = models.ImageField(upload_to='author_headshots')
+        headshot = models.ImageField(upload_to="author_headshots")
 
         def __str__(self):
             return self.name
 
+
     class Book(models.Model):
         title = models.CharField(max_length=100)
-        authors = models.ManyToManyField('Author')
+        authors = models.ManyToManyField("Author")
         publisher = models.ForeignKey(Publisher, on_delete=models.CASCADE)
         publication_date = models.DateField()
 
@@ -109,6 +110,7 @@ Now we need to define a view::
     # views.py
     from django.views.generic import ListView
     from books.models import Publisher
+
 
     class PublisherListView(ListView):
         model = Publisher
@@ -120,7 +122,7 @@ Finally hook that view into your urls::
     from books.views import PublisherListView
 
     urlpatterns = [
-        path('publishers/', PublisherListView.as_view()),
+        path("publishers/", PublisherListView.as_view()),
     ]
 
 That's all the Python code we need to write. We still need to write a template,
@@ -183,9 +185,10 @@ specifies the context variable to use::
     from django.views.generic import ListView
     from books.models import Publisher
 
+
     class PublisherListView(ListView):
         model = Publisher
-        context_object_name = 'my_favorite_publishers'
+        context_object_name = "my_favorite_publishers"
 
 Providing a useful ``context_object_name`` is always a good idea. Your
 coworkers who design templates will thank you.
@@ -210,15 +213,15 @@ you can override it to send more::
     from django.views.generic import DetailView
     from books.models import Book, Publisher
 
-    class PublisherDetailView(DetailView):
 
+    class PublisherDetailView(DetailView):
         model = Publisher
 
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
             context = super().get_context_data(**kwargs)
             # Add in a QuerySet of all the books
-            context['book_list'] = Book.objects.all()
+            context["book_list"] = Book.objects.all()
             return context
 
 .. note::
@@ -254,9 +257,9 @@ specify the list of objects using the ``queryset`` argument::
     from django.views.generic import DetailView
     from books.models import Publisher
 
-    class PublisherDetailView(DetailView):
 
-        context_object_name = 'publisher'
+    class PublisherDetailView(DetailView):
+        context_object_name = "publisher"
         queryset = Publisher.objects.all()
 
 Specifying ``model = Publisher`` is shorthand for saying ``queryset =
@@ -273,9 +276,10 @@ with the most recent first::
     from django.views.generic import ListView
     from books.models import Book
 
+
     class BookListView(ListView):
-        queryset = Book.objects.order_by('-publication_date')
-        context_object_name = 'book_list'
+        queryset = Book.objects.order_by("-publication_date")
+        context_object_name = "book_list"
 
 That's a pretty minimal example, but it illustrates the idea nicely. You'll
 usually want to do more than just reorder objects. If you want to present a
@@ -284,11 +288,11 @@ list of books by a particular publisher, you can use the same technique::
     from django.views.generic import ListView
     from books.models import Book
 
-    class AcmeBookListView(ListView):
 
-        context_object_name = 'book_list'
-        queryset = Book.objects.filter(publisher__name='ACME Publishing')
-        template_name = 'books/acme_list.html'
+    class AcmeBookListView(ListView):
+        context_object_name = "book_list"
+        queryset = Book.objects.filter(publisher__name="ACME Publishing")
+        template_name = "books/acme_list.html"
 
 Notice that along with a filtered ``queryset``, we're also using a custom
 template name. If we didn't, the generic view would use the same template as the
@@ -333,7 +337,7 @@ Here, we have a URLconf with a single captured group::
     from books.views import PublisherBookListView
 
     urlpatterns = [
-        path('books/<publisher>/', PublisherBookListView.as_view()),
+        path("books/<publisher>/", PublisherBookListView.as_view()),
     ]
 
 Next, we'll write the ``PublisherBookListView`` view itself::
@@ -343,12 +347,12 @@ Next, we'll write the ``PublisherBookListView`` view itself::
     from django.views.generic import ListView
     from books.models import Book, Publisher
 
-    class PublisherBookListView(ListView):
 
-        template_name = 'books/books_by_publisher.html'
+    class PublisherBookListView(ListView):
+        template_name = "books/books_by_publisher.html"
 
         def get_queryset(self):
-            self.publisher = get_object_or_404(Publisher, name=self.kwargs['publisher'])
+            self.publisher = get_object_or_404(Publisher, name=self.kwargs["publisher"])
             return Book.objects.filter(publisher=self.publisher)
 
 Using ``get_queryset`` to add logic to the queryset selection is as convenient
@@ -361,11 +365,12 @@ use it in the template::
 
         # ...
 
+
         def get_context_data(self, **kwargs):
             # Call the base implementation first to get a context
             context = super().get_context_data(**kwargs)
             # Add in the publisher
-            context['publisher'] = self.publisher
+            context["publisher"] = self.publisher
             return context
 
 .. _generic-views-extra-work:
@@ -382,11 +387,12 @@ using to keep track of the last time anybody looked at that author::
     # models.py
     from django.db import models
 
+
     class Author(models.Model):
         salutation = models.CharField(max_length=10)
         name = models.CharField(max_length=200)
         email = models.EmailField()
-        headshot = models.ImageField(upload_to='author_headshots')
+        headshot = models.ImageField(upload_to="author_headshots")
         last_accessed = models.DateTimeField()
 
 The generic ``DetailView`` class wouldn't know anything about this field, but
@@ -399,8 +405,8 @@ custom view::
     from books.views import AuthorDetailView
 
     urlpatterns = [
-        #...
-        path('authors/<int:pk>/', AuthorDetailView.as_view(), name='author-detail'),
+        # ...
+        path("authors/<int:pk>/", AuthorDetailView.as_view(), name="author-detail"),
     ]
 
 Then we'd write our new view -- ``get_object`` is the method that retrieves the
@@ -410,8 +416,8 @@ object -- so we override it and wrap the call::
     from django.views.generic import DetailView
     from books.models import Author
 
-    class AuthorDetailView(DetailView):
 
+    class AuthorDetailView(DetailView):
         queryset = Author.objects.all()
 
         def get_object(self):

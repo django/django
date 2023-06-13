@@ -1,6 +1,6 @@
-====================================================
-Managing static files (e.g. images, JavaScript, CSS)
-====================================================
+=========================================================
+How to manage static files (e.g. images, JavaScript, CSS)
+=========================================================
 
 Websites generally need to serve additional files such as images, JavaScript,
 or CSS. In Django, we refer to these files as "static files".  Django provides
@@ -16,10 +16,11 @@ Configuring static files
 
 #. In your settings file, define :setting:`STATIC_URL`, for example::
 
-      STATIC_URL = 'static/'
+      STATIC_URL = "static/"
 
 #. In your templates, use the :ttag:`static` template tag to build the URL for
-   the given relative path using the configured :setting:`STATICFILES_STORAGE`.
+   the given relative path using the configured ``staticfiles``
+   :setting:`STORAGES` alias.
 
    .. _staticfiles-in-templates:
 
@@ -53,7 +54,7 @@ settings file where Django will also look for static files. For example::
 
     STATICFILES_DIRS = [
         BASE_DIR / "static",
-        '/var/www/static/',
+        "/var/www/static/",
     ]
 
 See the documentation for the :setting:`STATICFILES_FINDERS` setting for
@@ -89,7 +90,7 @@ This is not suitable for production use! For some common deployment
 strategies, see :doc:`/howto/static-files/deployment`.
 
 For example, if your :setting:`STATIC_URL` is defined as ``static/``, you can
-do this by adding the following snippet to your urls.py::
+do this by adding the following snippet to your ``urls.py``::
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -107,6 +108,10 @@ do this by adding the following snippet to your urls.py::
     Also this helper function only serves the actual :setting:`STATIC_ROOT`
     folder; it doesn't perform static files discovery like
     :mod:`django.contrib.staticfiles`.
+
+    Finally, static files are served via a wrapper at the WSGI application
+    layer. As a consequence, static files requests do not pass through the
+    normal :doc:`middleware chain </topics/http/middleware>`.
 
 .. _serving-uploaded-files-in-development:
 
@@ -167,7 +172,9 @@ for gathering static files in a single directory so you can serve them easily.
 
        STATIC_ROOT = "/var/www/example.com/static/"
 
-#. Run the :djadmin:`collectstatic` management command::
+#. Run the :djadmin:`collectstatic` management command:
+
+   .. code-block:: shell
 
        $ python manage.py collectstatic
 

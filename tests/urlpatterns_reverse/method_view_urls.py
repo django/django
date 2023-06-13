@@ -14,6 +14,6 @@ view_container = ViewContainer()
 
 
 urlpatterns = [
-    path('', view_container.method_view, name='instance-method-url'),
-    path('', ViewContainer.classmethod_view, name='instance-method-url'),
+    path("", view_container.method_view, name="instance-method-url"),
+    path("", ViewContainer.classmethod_view, name="instance-method-url"),
 ]

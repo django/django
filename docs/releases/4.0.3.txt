@@ -1,0 +1,19 @@
+==========================
+Django 4.0.3 release notes
+==========================
+
+*March 1, 2022*
+
+Django 4.0.3 fixes several bugs in 4.0.2. Also, all Python code in Django is
+reformatted with :pypi:`black`.
+
+Bugfixes
+========
+
+* Prevented, following a regression in Django 4.0.1, :djadmin:`makemigrations`
+  from generating infinite migrations for a model with ``ManyToManyField`` to
+  a lowercased swappable model such as ``'auth.user'`` (:ticket:`33515`).
+
+* Fixed a regression in Django 4.0 that caused a crash when rendering invalid
+  inlines with :attr:`~django.contrib.admin.ModelAdmin.readonly_fields` in the
+  admin (:ticket:`33547`).

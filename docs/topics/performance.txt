@@ -120,9 +120,13 @@ do them faster than the template language can::
     # of the Python objects
     len(my_bicycles)
 
-    # Django template filter
-    # slower still, because it will have to count them in Python anyway,
-    # and because of template language overheads
+.. code-block:: html+django
+
+    <!--
+    Django template filter
+    slower still, because it will have to count them in Python anyway,
+    and because of template language overheads
+    -->
     {{ my_bicycles|length }}
 
 Generally speaking, the most appropriate level for the job is the lowest-level
@@ -166,7 +170,7 @@ produce, or even an entire site.
 
 Implementing caching should not be regarded as an alternative to improving code
 that's performing poorly because it has been written badly. It's one of the
-final steps towards producing well-performing code, not a shortcut.
+final steps toward producing well-performing code, not a shortcut.
 
 :class:`~django.utils.functional.cached_property`
 -------------------------------------------------

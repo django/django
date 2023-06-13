@@ -3,19 +3,16 @@ Query subclasses which provide extra functionality beyond simple data retrieval.
 """
 
 from django.core.exceptions import FieldError
-from django.db.models.query_utils import Q
-from django.db.models.sql.constants import (
-    CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS,
-)
+from django.db.models.sql.constants import CURSOR, GET_ITERATOR_CHUNK_SIZE, NO_RESULTS
 from django.db.models.sql.query import Query
 
-__all__ = ['DeleteQuery', 'UpdateQuery', 'InsertQuery', 'AggregateQuery']
+__all__ = ["DeleteQuery", "UpdateQuery", "InsertQuery", "AggregateQuery"]
 
 
 class DeleteQuery(Query):
     """A DELETE SQL query."""
 
-    compiler = 'SQLDeleteCompiler'
+    compiler = "SQLDeleteCompiler"
 
     def do_query(self, table, where, using):
         self.alias_map = {table: self.alias_map[table]}
@@ -37,17 +34,21 @@ class DeleteQuery(Query):
         num_deleted = 0
         field = self.get_meta().pk
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
-            self.add_q(Q(
-                **{field.attname + '__in': pk_list[offset:offset + GET_ITERATOR_CHUNK_SIZE]}))
-            num_deleted += self.do_query(self.get_meta().db_table, self.where, using=using)
+            self.clear_where()
+            self.add_filter(
+                f"{field.attname}__in",
+                pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE],
+            )
+            num_deleted += self.do_query(
+                self.get_meta().db_table, self.where, using=using
+            )
         return num_deleted
 
 
 class UpdateQuery(Query):
     """An UPDATE SQL query."""
 
-    compiler = 'SQLUpdateCompiler'
+    compiler = "SQLUpdateCompiler"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,8 +71,10 @@ class UpdateQuery(Query):
     def update_batch(self, pk_list, values, using):
         self.add_update_values(values)
         for offset in range(0, len(pk_list), GET_ITERATOR_CHUNK_SIZE):
-            self.where = self.where_class()
-            self.add_q(Q(pk__in=pk_list[offset: offset + GET_ITERATOR_CHUNK_SIZE]))
+            self.clear_where()
+            self.add_filter(
+                "pk__in", pk_list[offset : offset + GET_ITERATOR_CHUNK_SIZE]
+            )
             self.get_compiler(using).execute_sql(NO_RESULTS)
 
     def add_update_values(self, values):
@@ -83,12 +86,14 @@ class UpdateQuery(Query):
         values_seq = []
         for name, val in values.items():
             field = self.get_meta().get_field(name)
-            direct = not (field.auto_created and not field.concrete) or not field.concrete
+            direct = (
+                not (field.auto_created and not field.concrete) or not field.concrete
+            )
             model = field.model._meta.concrete_model
             if not direct or (field.is_relation and field.many_to_many):
                 raise FieldError(
-                    'Cannot update model field %r (only non-relations and '
-                    'foreign keys permitted).' % field
+                    "Cannot update model field %r (only non-relations and "
+                    "foreign keys permitted)." % field
                 )
             if model is not self.get_meta().concrete_model:
                 self.add_related_update(model, field, val)
@@ -103,7 +108,7 @@ class UpdateQuery(Query):
         called add_update_targets() to hint at the extra information here.
         """
         for field, model, val in values_seq:
-            if hasattr(val, 'resolve_expression'):
+            if hasattr(val, "resolve_expression"):
                 # Resolve expressions here so that annotations are no longer needed
                 val = val.resolve_expression(self, allow_joins=False, for_save=True)
             self.values.append((field, model, val))
@@ -129,19 +134,23 @@ class UpdateQuery(Query):
             query = UpdateQuery(model)
             query.values = values
             if self.related_ids is not None:
-                query.add_filter(('pk__in', self.related_ids))
+                query.add_filter("pk__in", self.related_ids[model])
             result.append(query)
         return result
 
 
 class InsertQuery(Query):
-    compiler = 'SQLInsertCompiler'
+    compiler = "SQLInsertCompiler"
 
-    def __init__(self, *args, ignore_conflicts=False, **kwargs):
+    def __init__(
+        self, *args, on_conflict=None, update_fields=None, unique_fields=None, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.fields = []
         self.objs = []
-        self.ignore_conflicts = ignore_conflicts
+        self.on_conflict = on_conflict
+        self.update_fields = update_fields or []
+        self.unique_fields = unique_fields or []
 
     def insert_values(self, fields, objs, raw=False):
         self.fields = fields
@@ -155,7 +164,7 @@ class AggregateQuery(Query):
     elements in the provided list.
     """
 
-    compiler = 'SQLAggregateCompiler'
+    compiler = "SQLAggregateCompiler"
 
     def __init__(self, model, inner_query):
         self.inner_query = inner_query

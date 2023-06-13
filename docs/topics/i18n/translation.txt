@@ -20,7 +20,7 @@ the equivalent of the translation strings in the target language. Once the
 translators have filled in the message file, it must be compiled. This process
 relies on the GNU gettext toolset.
 
-Once this is done, Django takes care of translating Web apps on the fly in each
+Once this is done, Django takes care of translating web apps on the fly in each
 available language, according to users' language preferences.
 
 Django's internationalization hooks are on by default, and that means there's a
@@ -28,12 +28,6 @@ bit of i18n-related overhead in certain places of the framework. If you don't
 use internationalization, you should take the two seconds to set
 :setting:`USE_I18N = False <USE_I18N>` in your settings file. Then Django will
 make some optimizations so as not to load the internationalization machinery.
-
-.. note::
-
-    There is also an independent but related :setting:`USE_L10N` setting that
-    controls if Django should implement format localization. See
-    :doc:`/topics/i18n/formatting` for more details.
 
 .. note::
 
@@ -81,6 +75,7 @@ string::
     from django.http import HttpResponse
     from django.utils.translation import gettext as _
 
+
     def my_view(request):
         output = _("Welcome to my site.")
         return HttpResponse(output)
@@ -91,6 +86,7 @@ previous one::
     from django.http import HttpResponse
     from django.utils.translation import gettext
 
+
     def my_view(request):
         output = gettext("Welcome to my site.")
         return HttpResponse(output)
@@ -99,14 +95,14 @@ Translation works on computed values. This example is identical to the previous
 two::
 
     def my_view(request):
-        words = ['Welcome', 'to', 'my', 'site.']
-        output = _(' '.join(words))
+        words = ["Welcome", "to", "my", "site."]
+        output = _(" ".join(words))
         return HttpResponse(output)
 
 Translation works on variables. Again, here's an identical example::
 
     def my_view(request):
-        sentence = 'Welcome to my site.'
+        sentence = "Welcome to my site."
         output = _(sentence)
         return HttpResponse(output)
 
@@ -119,7 +115,7 @@ The strings you pass to ``_()`` or ``gettext()`` can take placeholders,
 specified with Python's standard named-string interpolation syntax. Example::
 
     def my_view(request, m, d):
-        output = _('Today is %(month)s %(day)s.') % {'month': m, 'day': d}
+        output = _("Today is %(month)s %(day)s.") % {"month": m, "day": d}
         return HttpResponse(output)
 
 This technique lets language-specific translations reorder the placeholder
@@ -200,13 +196,14 @@ For example::
     from django.http import HttpResponse
     from django.utils.translation import ngettext
 
+
     def hello_world(request, count):
         page = ngettext(
-            'there is %(count)d object',
-            'there are %(count)d objects',
+            "there is %(count)d object",
+            "there are %(count)d objects",
             count,
         ) % {
-            'count': count,
+            "count": count,
         }
         return HttpResponse(page)
 
@@ -227,24 +224,21 @@ sophisticated, but will produce incorrect results for some languages::
         name = Report._meta.verbose_name_plural
 
     text = ngettext(
-        'There is %(count)d %(name)s available.',
-        'There are %(count)d %(name)s available.',
+        "There is %(count)d %(name)s available.",
+        "There are %(count)d %(name)s available.",
         count,
-    ) % {
-        'count': count,
-        'name': name
-    }
+    ) % {"count": count, "name": name}
 
 Don't try to implement your own singular-or-plural logic; it won't be correct.
 In a case like this, consider something like the following::
 
     text = ngettext(
-        'There is %(count)d %(name)s object available.',
-        'There are %(count)d %(name)s objects available.',
+        "There is %(count)d %(name)s object available.",
+        "There are %(count)d %(name)s objects available.",
         count,
     ) % {
-        'count': count,
-        'name': Report._meta.verbose_name,
+        "count": count,
+        "name": Report._meta.verbose_name,
     }
 
 .. _pluralization-var-notes:
@@ -258,17 +252,19 @@ In a case like this, consider something like the following::
     fail::
 
         text = ngettext(
-            'There is %(count)d %(name)s available.',
-            'There are %(count)d %(plural_name)s available.',
+            "There is %(count)d %(name)s available.",
+            "There are %(count)d %(plural_name)s available.",
             count,
         ) % {
-            'count': Report.objects.count(),
-            'name': Report._meta.verbose_name,
-            'plural_name': Report._meta.verbose_name_plural,
+            "count": Report.objects.count(),
+            "name": Report._meta.verbose_name,
+            "plural_name": Report._meta.verbose_name_plural,
         }
 
     You would get an error when running :djadmin:`django-admin
-    compilemessages <compilemessages>`::
+    compilemessages <compilemessages>`:
+
+    .. code-block:: pytb
 
         a format specification for argument 'name', as in 'msgstr[0]', doesn't exist in 'msgid'
 
@@ -300,9 +296,11 @@ or::
     from django.db import models
     from django.utils.translation import pgettext_lazy
 
+
     class MyThing(models.Model):
-        name = models.CharField(help_text=pgettext_lazy(
-            'help text for MyThing model', 'This is the help text'))
+        name = models.CharField(
+            help_text=pgettext_lazy("help text for MyThing model", "This is the help text")
+        )
 
 will appear in the ``.po`` file as:
 
@@ -346,8 +344,9 @@ model, do the following::
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class MyThing(models.Model):
-        name = models.CharField(help_text=_('This is the help text'))
+        name = models.CharField(help_text=_("This is the help text"))
 
 You can mark names of :class:`~django.db.models.ForeignKey`,
 :class:`~django.db.models.ManyToManyField` or
@@ -358,8 +357,8 @@ their :attr:`~django.db.models.Options.verbose_name` options::
         kind = models.ForeignKey(
             ThingKind,
             on_delete=models.CASCADE,
-            related_name='kinds',
-            verbose_name=_('kind'),
+            related_name="kinds",
+            verbose_name=_("kind"),
         )
 
 Just like you would do in :attr:`~django.db.models.Options.verbose_name` you
@@ -378,12 +377,13 @@ verbose names Django performs by looking at the model's class name::
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class MyThing(models.Model):
-        name = models.CharField(_('name'), help_text=_('This is the help text'))
+        name = models.CharField(_("name"), help_text=_("This is the help text"))
 
         class Meta:
-            verbose_name = _('my thing')
-            verbose_name_plural = _('my things')
+            verbose_name = _("my thing")
+            verbose_name_plural = _("my things")
 
 Model methods ``description`` argument to the ``@display`` decorator
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -396,15 +396,16 @@ decorator::
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class MyThing(models.Model):
         kind = models.ForeignKey(
             ThingKind,
             on_delete=models.CASCADE,
-            related_name='kinds',
-            verbose_name=_('kind'),
+            related_name="kinds",
+            verbose_name=_("kind"),
         )
 
-        @admin.display(description=_('Is it a mouse?'))
+        @admin.display(description=_("Is it a mouse?"))
         def is_mouse(self):
             return self.kind.type == MOUSE_TYPE
 
@@ -414,16 +415,15 @@ Working with lazy translation objects
 The result of a ``gettext_lazy()`` call can be used wherever you would use a
 string (a :class:`str` object) in other Django code, but it may not work with
 arbitrary Python code. For example, the following won't work because the
-`requests <https://pypi.org/project/requests/>`_ library doesn't handle
-``gettext_lazy`` objects::
+:pypi:`requests` library doesn't handle ``gettext_lazy`` objects::
 
     body = gettext_lazy("I \u2764 Django")  # (Unicode :heart:)
-    requests.post('https://example.com/send', data={'body': body})
+    requests.post("https://example.com/send", data={"body": body})
 
 You can avoid such problems by casting ``gettext_lazy()`` objects to text
 strings before passing them to non-Django code::
 
-    requests.post('https://example.com/send', data={'body': str(body)})
+    requests.post("https://example.com/send", data={"body": str(body)})
 
 If you don't like the long ``gettext_lazy`` name, you can alias it as ``_``
 (underscore), like so::
@@ -431,8 +431,9 @@ If you don't like the long ``gettext_lazy`` name, you can alias it as ``_``
     from django.db import models
     from django.utils.translation import gettext_lazy as _
 
+
     class MyThing(models.Model):
-        name = models.CharField(help_text=_('This is the help text'))
+        name = models.CharField(help_text=_("This is the help text"))
 
 Using ``gettext_lazy()`` and ``ngettext_lazy()`` to mark strings in models
 and utility functions is a common operation. When you're working with these
@@ -456,14 +457,18 @@ dictionary under that key during string interpolation. Here's example::
     from django.core.exceptions import ValidationError
     from django.utils.translation import ngettext_lazy
 
+
     class MyForm(forms.Form):
-        error_message = ngettext_lazy("You only provided %(num)d argument",
-            "You only provided %(num)d arguments", 'num')
+        error_message = ngettext_lazy(
+            "You only provided %(num)d argument",
+            "You only provided %(num)d arguments",
+            "num",
+        )
 
         def clean(self):
             # ...
             if error:
-                raise ValidationError(self.error_message % {'num': number})
+                raise ValidationError(self.error_message % {"num": number})
 
 If the string contains exactly one unnamed placeholder, you can interpolate
 directly with the ``number`` argument::
@@ -492,10 +497,11 @@ in a string. For example::
 
     from django.utils.text import format_lazy
     from django.utils.translation import gettext_lazy
+
     ...
-    name = gettext_lazy('John Lennon')
-    instrument = gettext_lazy('guitar')
-    result = format_lazy('{name}: {instrument}', name=name, instrument=instrument)
+    name = gettext_lazy("John Lennon")
+    instrument = gettext_lazy("guitar")
+    result = format_lazy("{name}: {instrument}", name=name, instrument=instrument)
 
 In this case, the lazy translations in ``result`` will only be converted to
 strings when ``result`` itself is used in a string (usually at template
@@ -521,15 +527,17 @@ And then later::
 Localized names of languages
 ----------------------------
 
-.. function:: get_language_info
+.. function:: get_language_info(lang_code)
 
 The ``get_language_info()`` function provides detailed information about
-languages::
+languages:
+
+.. code-block:: pycon
 
     >>> from django.utils.translation import activate, get_language_info
-    >>> activate('fr')
-    >>> li = get_language_info('de')
-    >>> print(li['name'], li['name_local'], li['name_translated'], li['bidi'])
+    >>> activate("fr")
+    >>> li = get_language_info("de")
+    >>> print(li["name"], li["name_local"], li["name_translated"], li["bidi"])
     German Deutsch Allemand False
 
 The ``name``, ``name_local``, and ``name_translated`` attributes of the
@@ -544,8 +552,6 @@ Similar access to this information is available for template code. See below.
 
 Internationalization: in template code
 ======================================
-
-.. highlight:: html+django
 
 Translations in :doc:`Django templates </ref/templates/language>` uses two template
 tags and a slightly different syntax than in Python code. To give your template
@@ -568,18 +574,22 @@ have already loaded the ``i18n`` tag.
 --------------------------
 
 The ``{% translate %}`` template tag translates either a constant string
-(enclosed in single or double quotes) or variable content::
+(enclosed in single or double quotes) or variable content:
+
+.. code-block:: html+django
 
     <title>{% translate "This is the title." %}</title>
     <title>{% translate myvar %}</title>
 
 If the ``noop`` option is present, variable lookup still takes place but the
 translation is skipped. This is useful when "stubbing out" content that will
-require translation in the future::
+require translation in the future:
+
+.. code-block:: html+django
 
     <title>{% translate "myvar" noop %}</title>
 
-Internally, inline translations use an
+Internally, inline translations use a
 :func:`~django.utils.translation.gettext` call.
 
 In case a template var (``myvar`` above) is passed to the tag, the tag will
@@ -591,7 +601,9 @@ It's not possible to mix a template variable inside a string within
 (placeholders), use :ttag:`{% blocktranslate %}<blocktranslate>` instead.
 
 If you'd like to retrieve a translated string without displaying it, you can
-use the following syntax::
+use the following syntax:
+
+.. code-block:: html+django
 
     {% translate "This is the title" as the_title %}
 
@@ -600,7 +612,9 @@ use the following syntax::
 
 In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
-filters::
+filters:
+
+.. code-block:: html+django
 
     {% translate "starting point" as start %}
     {% translate "end point" as end %}
@@ -630,13 +644,17 @@ using the ``context`` keyword:
 
 Contrarily to the :ttag:`translate` tag, the ``blocktranslate`` tag allows you
 to mark complex sentences consisting of literals and variable content for
-translation by making use of placeholders::
+translation by making use of placeholders:
+
+.. code-block:: html+django
 
     {% blocktranslate %}This string will have {{ value }} inside.{% endblocktranslate %}
 
 To translate a template expression -- say, accessing object attributes or
 using template filters -- you need to bind the expression to a local variable
-for use within the translation block. Examples::
+for use within the translation block. Examples:
+
+.. code-block:: html+django
 
     {% blocktranslate with amount=article.price %}
     That will cost $ {{ amount }}.
@@ -646,7 +664,9 @@ for use within the translation block. Examples::
     This will have {{ myvar }} inside.
     {% endblocktranslate %}
 
-You can use multiple expressions inside a single ``blocktranslate`` tag::
+You can use multiple expressions inside a single ``blocktranslate`` tag:
+
+.. code-block:: html+django
 
     {% blocktranslate with book_t=book|title author_t=author|title %}
     This is {{ book_t }} by {{ author_t }}
@@ -655,8 +675,8 @@ You can use multiple expressions inside a single ``blocktranslate`` tag::
 .. note:: The previous more verbose format is still supported:
    ``{% blocktranslate with book|title as book_t and author|title as author_t %}``
 
-Other block tags (for example ``{% for %}`` or ``{% if %}``) are not allowed
-inside a ``blocktranslate`` tag.
+Other block tags (for example :ttag:`{% for %}<for>` or :ttag:`{% if %}<if>`) are
+not allowed inside a ``blocktranslate`` tag.
 
 If resolving one of the block arguments fails, ``blocktranslate`` will fall
 back to the default language by deactivating the currently active language
@@ -672,7 +692,9 @@ This tag also provides for pluralization. To use it:
   ``{% plural %}`` tag within the ``{% blocktranslate %}`` and
   ``{% endblocktranslate %}`` tags.
 
-An example::
+An example:
+
+.. code-block:: html+django
 
     {% blocktranslate count counter=list|length %}
     There is only one {{ name }} object.
@@ -680,7 +702,9 @@ An example::
     There are {{ counter }} {{ name }} objects.
     {% endblocktranslate %}
 
-A more complex example::
+A more complex example:
+
+.. code-block:: html+django
 
     {% blocktranslate with amount=article.price count years=i.length %}
     That will cost $ {{ amount }} per year.
@@ -695,7 +719,9 @@ same :ref:`notes regarding ngettext variables <pluralization-var-notes>`
 apply.
 
 Reverse URL lookups cannot be carried out within the ``blocktranslate`` and
-should be retrieved (and stored) beforehand::
+should be retrieved (and stored) beforehand:
+
+.. code-block:: html+django
 
     {% url 'path.to.view' arg arg2 as the_url %}
     {% blocktranslate %}
@@ -703,7 +729,9 @@ should be retrieved (and stored) beforehand::
     {% endblocktranslate %}
 
 If you'd like to retrieve a translated string without displaying it, you can
-use the following syntax::
+use the following syntax:
+
+.. code-block:: html+django
 
     {% blocktranslate asvar the_title %}The title is {{ title }}.{% endblocktranslate %}
     <title>{{ the_title }}</title>
@@ -712,6 +740,11 @@ use the following syntax::
 In practice you'll use this to get a string you can use in multiple places in a
 template or so you can use the output as an argument for other template tags or
 filters.
+
+.. versionchanged:: 4.2
+
+    In older versions, ``asvar`` instances weren't marked as safe for (HTML)
+    output purposes.
 
 ``{% blocktranslate %}`` also supports :ref:`contextual
 markers<contextual-markers>` using the ``context`` keyword:
@@ -726,25 +759,29 @@ the content of the ``{% blocktranslate %}`` tag, replace any whitespace at the
 beginning and end of a line and merge all lines into one using a space
 character to separate them. This is quite useful for indenting the content of a
 ``{% blocktranslate %}`` tag without having the indentation characters end up
-in the corresponding entry in the PO file, which makes the translation process
-easier.
+in the corresponding entry in the ``.po`` file, which makes the translation
+process easier.
 
-For instance, the following ``{% blocktranslate %}`` tag::
+For instance, the following ``{% blocktranslate %}`` tag:
+
+.. code-block:: html+django
 
     {% blocktranslate trimmed %}
       First sentence.
       Second paragraph.
     {% endblocktranslate %}
 
-will result in the entry ``"First sentence. Second paragraph."`` in the PO file,
-compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
+will result in the entry ``"First sentence. Second paragraph."`` in the ``.po``
+file, compared to ``"\n  First sentence.\n  Second paragraph.\n"``, if the
 ``trimmed`` option had not been specified.
 
 String literals passed to tags and filters
 ------------------------------------------
 
 You can translate string literals passed as arguments to tags and filters
-by using the familiar ``_()`` syntax::
+by using the familiar ``_()`` syntax:
+
+.. code-block:: html+django
 
     {% some_tag _("Page not found") value|yesno:_("yes,no") %}
 
@@ -892,12 +929,16 @@ processor, then each ``RequestContext`` will have access to ``LANGUAGES``,
 
 You can also retrieve information about any of the available languages using
 provided template tags and filters. To get information about a single language,
-use the ``{% get_language_info %}`` tag::
+use the ``{% get_language_info %}`` tag:
+
+.. code-block:: html+django
 
     {% get_language_info for LANGUAGE_CODE as lang %}
     {% get_language_info for "pl" as lang %}
 
-You can then access the information::
+You can then access the information:
+
+.. code-block:: html+django
 
     Language code: {{ lang.code }}<br>
     Name of language: {{ lang.name_local }}<br>
@@ -922,10 +963,12 @@ If you do this in your view:
 
 .. code-block:: python
 
-    context = {'available_languages': ['en', 'es', 'fr']}
-    return render(request, 'mytemplate.html', context)
+    context = {"available_languages": ["en", "es", "fr"]}
+    return render(request, "mytemplate.html", context)
 
-you can iterate over those languages in the template::
+you can iterate over those languages in the template:
+
+.. code-block:: html+django
 
   {% get_language_info_list for available_languages as langs %}
   {% for lang in langs %} ... {% endfor %}
@@ -947,8 +990,6 @@ There are also some filters available for convenience:
 
 Internationalization: in JavaScript code
 ========================================
-
-.. highlight:: python
 
 Adding translations to JavaScript poses some problems:
 
@@ -1000,15 +1041,17 @@ The ``JavaScriptCatalog`` view
         from django.views.i18n import JavaScriptCatalog
 
         urlpatterns = [
-            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
         ]
 
     **Example with custom packages**::
 
         urlpatterns = [
-            path('jsi18n/myapp/',
-                 JavaScriptCatalog.as_view(packages=['your.app.label']),
-                 name='javascript-catalog'),
+            path(
+                "jsi18n/myapp/",
+                JavaScriptCatalog.as_view(packages=["your.app.label"]),
+                name="javascript-catalog",
+            ),
         ]
 
     If your root URLconf uses :func:`~django.conf.urls.i18n.i18n_patterns`,
@@ -1020,7 +1063,7 @@ The ``JavaScriptCatalog`` view
         from django.conf.urls.i18n import i18n_patterns
 
         urlpatterns = i18n_patterns(
-            path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+            path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
         )
 
 The precedence of translations is such that the packages appearing later in the
@@ -1034,8 +1077,6 @@ precedence.
 
 Using the JavaScript translation catalog
 ----------------------------------------
-
-.. highlight:: javascript
 
 To use the catalog, pull in the dynamically generated script like this:
 
@@ -1061,13 +1102,15 @@ When the catalog is loaded, your JavaScript code can use the following methods:
 The ``gettext`` function behaves similarly to the standard ``gettext``
 interface within your Python code::
 
-    document.write(gettext('this is to be translated'));
+    document.write(gettext("this is to be translated"))
 
 ``ngettext``
 ~~~~~~~~~~~~
 
 The ``ngettext`` function provides an interface to pluralize words and
-phrases::
+phrases:
+
+.. code-block:: javascript
 
     const objectCount = 1 // or 0, or 2, or 3, ...
     const string = ngettext(
@@ -1086,7 +1129,9 @@ function supports both positional and named interpolation:
 * Positional interpolation: ``obj`` contains a JavaScript Array object
   whose elements values are then sequentially interpolated in their
   corresponding ``fmt`` placeholders in the same order they appear.
-  For example::
+  For example:
+
+  .. code-block:: javascript
 
     const formats = ngettext(
       'There is %s object. Remaining: %s',
@@ -1098,7 +1143,9 @@ function supports both positional and named interpolation:
 
 * Named interpolation: This mode is selected by passing the optional
   boolean ``named`` parameter as ``true``. ``obj`` contains a JavaScript
-  object or associative array. For example::
+  object or associative array. For example:
+
+  .. code-block:: javascript
 
     const data = {
       count: 10,
@@ -1122,7 +1169,9 @@ to produce proper pluralizations).
 ~~~~~~~~~~~~~~
 
 The ``get_format`` function has access to the configured i18n formatting
-settings and can retrieve the format string for a given setting name::
+settings and can retrieve the format string for a given setting name:
+
+.. code-block:: javascript
 
     document.write(get_format('DATE_FORMAT'));
     // 'N j, Y'
@@ -1153,7 +1202,7 @@ values.
 This emulates the ``gettext`` function but does nothing, returning whatever
 is passed to it::
 
-    document.write(gettext_noop('this will not be translated'));
+    document.write(gettext_noop("this will not be translated"))
 
 This is useful for stubbing out portions of the code that will need translation
 in the future.
@@ -1165,14 +1214,16 @@ The ``pgettext`` function behaves like the Python variant
 (:func:`~django.utils.translation.pgettext()`), providing a contextually
 translated word::
 
-    document.write(pgettext('month name', 'May'));
+    document.write(pgettext("month name", "May"))
 
 ``npgettext``
 ~~~~~~~~~~~~~
 
 The ``npgettext`` function also behaves like the Python variant
 (:func:`~django.utils.translation.npgettext()`), providing a **pluralized**
-contextually translated word::
+contextually translated word:
+
+.. code-block:: javascript
 
     document.write(npgettext('group', 'party', 1));
     // party
@@ -1184,7 +1235,9 @@ contextually translated word::
 
 The ``pluralidx`` function works in a similar way to the :tfilter:`pluralize`
 template filter, determining if a given ``count`` should use a plural form of
-a word or not::
+a word or not:
+
+.. code-block:: javascript
 
     document.write(pluralidx(0));
     // true
@@ -1202,8 +1255,6 @@ not support pluralization, an empty value is provided.
 Additionally, if there are complex rules around pluralization, the catalog view
 will render a conditional expression. This will evaluate to either a ``true``
 (should pluralize) or ``false`` (should **not** pluralize) value.
-
-.. highlight:: python
 
 The ``JSONCatalog`` view
 ------------------------
@@ -1252,9 +1303,13 @@ URL::
 
     # The value returned by get_version() must change when translations change.
     urlpatterns = [
-        path('jsi18n/',
-             cache_page(86400, key_prefix='js18n-%s' % get_version())(JavaScriptCatalog.as_view()),
-             name='javascript-catalog'),
+        path(
+            "jsi18n/",
+            cache_page(86400, key_prefix="jsi18n-%s" % get_version())(
+                JavaScriptCatalog.as_view()
+            ),
+            name="javascript-catalog",
+        ),
     ]
 
 Client-side caching will save bandwidth and make your site load faster. If
@@ -1270,16 +1325,20 @@ whenever you restart your application server::
     last_modified_date = timezone.now()
 
     urlpatterns = [
-        path('jsi18n/',
-             last_modified(lambda req, **kw: last_modified_date)(JavaScriptCatalog.as_view()),
-             name='javascript-catalog'),
+        path(
+            "jsi18n/",
+            last_modified(lambda req, **kw: last_modified_date)(
+                JavaScriptCatalog.as_view()
+            ),
+            name="javascript-catalog",
+        ),
     ]
 
 You can even pre-generate the JavaScript catalog as part of your deployment
 procedure and serve it as a static file. This radical technique is implemented
 in django-statici18n_.
 
-.. _django-statici18n: https://django-statici18n.readthedocs.io/en/latest/
+.. _django-statici18n: https://django-statici18n.readthedocs.io/
 
 .. _url-internationalization:
 
@@ -1327,46 +1386,53 @@ Example URL patterns::
     from sitemap.views import sitemap
 
     urlpatterns = [
-        path('sitemap.xml', sitemap, name='sitemap-xml'),
+        path("sitemap.xml", sitemap, name="sitemap-xml"),
     ]
 
-    news_patterns = ([
-        path('', news_views.index, name='index'),
-        path('category/<slug:slug>/', news_views.category, name='category'),
-        path('<slug:slug>/', news_views.details, name='detail'),
-    ], 'news')
+    news_patterns = (
+        [
+            path("", news_views.index, name="index"),
+            path("category/<slug:slug>/", news_views.category, name="category"),
+            path("<slug:slug>/", news_views.details, name="detail"),
+        ],
+        "news",
+    )
 
     urlpatterns += i18n_patterns(
-        path('about/', about_views.main, name='about'),
-        path('news/', include(news_patterns, namespace='news')),
+        path("about/", about_views.main, name="about"),
+        path("news/", include(news_patterns, namespace="news")),
     )
 
 After defining these URL patterns, Django will automatically add the
 language prefix to the URL patterns that were added by the ``i18n_patterns``
-function. Example::
+function. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
 
-    >>> activate('en')
-    >>> reverse('sitemap-xml')
+    >>> activate("en")
+    >>> reverse("sitemap-xml")
     '/sitemap.xml'
-    >>> reverse('news:index')
+    >>> reverse("news:index")
     '/en/news/'
 
-    >>> activate('nl')
-    >>> reverse('news:detail', kwargs={'slug': 'news-slug'})
+    >>> activate("nl")
+    >>> reverse("news:detail", kwargs={"slug": "news-slug"})
     '/nl/news/news-slug/'
 
 With ``prefix_default_language=False`` and  ``LANGUAGE_CODE='en'``, the URLs
-will be::
+will be:
 
-    >>> activate('en')
-    >>> reverse('news:index')
+.. code-block:: pycon
+
+    >>> activate("en")
+    >>> reverse("news:index")
     '/news/'
 
-    >>> activate('nl')
-    >>> reverse('news:index')
+    >>> activate("nl")
+    >>> reverse("news:index")
     '/nl/news/'
 
 .. warning::
@@ -1397,32 +1463,37 @@ URL patterns can also be marked translatable using the
     from sitemaps.views import sitemap
 
     urlpatterns = [
-        path('sitemap.xml', sitemap, name='sitemap-xml'),
+        path("sitemap.xml", sitemap, name="sitemap-xml"),
     ]
 
-    news_patterns = ([
-        path('', news_views.index, name='index'),
-        path(_('category/<slug:slug>/'), news_views.category, name='category'),
-        path('<slug:slug>/', news_views.details, name='detail'),
-    ], 'news')
+    news_patterns = (
+        [
+            path("", news_views.index, name="index"),
+            path(_("category/<slug:slug>/"), news_views.category, name="category"),
+            path("<slug:slug>/", news_views.details, name="detail"),
+        ],
+        "news",
+    )
 
     urlpatterns += i18n_patterns(
-        path(_('about/'), about_views.main, name='about'),
-        path(_('news/'), include(news_patterns, namespace='news')),
+        path(_("about/"), about_views.main, name="about"),
+        path(_("news/"), include(news_patterns, namespace="news")),
     )
 
 After you've created the translations, the :func:`~django.urls.reverse`
-function will return the URL in the active language. Example::
+function will return the URL in the active language. Example:
+
+.. code-block:: pycon
 
     >>> from django.urls import reverse
     >>> from django.utils.translation import activate
 
-    >>> activate('en')
-    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    >>> activate("en")
+    >>> reverse("news:category", kwargs={"slug": "recent"})
     '/en/news/category/recent/'
 
-    >>> activate('nl')
-    >>> reverse('news:category', kwargs={'slug': 'recent'})
+    >>> activate("nl")
+    >>> reverse("news:category", kwargs={"slug": "recent"})
     '/nl/nieuws/categorie/recent/'
 
 .. warning::
@@ -1485,7 +1556,9 @@ Django comes with a tool, :djadmin:`django-admin makemessages
 
     The minimum version of the ``gettext`` utilities supported is 0.15.
 
-To create or update a message file, run this command::
+To create or update a message file, run this command:
+
+.. code-block:: shell
 
     django-admin makemessages -l de
 
@@ -1517,12 +1590,16 @@ will generate an error if :setting:`LOCALE_PATHS` is empty.
 By default :djadmin:`django-admin makemessages <makemessages>` examines every
 file that has the ``.html``, ``.txt`` or ``.py`` file extension. If you want to
 override that default, use the :option:`--extension <makemessages --extension>`
-or ``-e`` option to specify the file extensions to examine::
+or ``-e`` option to specify the file extensions to examine:
+
+.. code-block:: shell
 
     django-admin makemessages -l de -e txt
 
 Separate multiple extensions with commas and/or use ``-e`` or ``--extension``
-multiple times::
+multiple times:
+
+.. code-block:: shell
 
     django-admin makemessages -l de -e html,txt -e xml
 
@@ -1538,7 +1615,9 @@ multiple times::
     To extract strings from a project containing Jinja2 templates, use `Message
     Extracting`_ from Babel_ instead.
 
-    Here's an example ``babel.cfg`` configuration file::
+    Here's an example ``babel.cfg`` configuration file:
+
+    .. code-block:: ini
 
         # Extraction from Python source files
         [python: **.py]
@@ -1613,9 +1692,9 @@ otherwise, they'll be tacked together without whitespace!
 
     Due to the way the ``gettext`` tools work internally and because we want to
     allow non-ASCII source strings in Django's core and your applications, you
-    **must** use UTF-8 as the encoding for your PO files (the default when PO
-    files are created).  This means that everybody will be using the same
-    encoding, which is important when Django processes the PO files.
+    **must** use UTF-8 as the encoding for your ``.po`` files (the default when
+    ``.po`` files are created).  This means that everybody will be using the
+    same encoding, which is important when Django processes the ``.po`` files.
 
 .. admonition:: Fuzzy entries
 
@@ -1625,7 +1704,9 @@ otherwise, they'll be tacked together without whitespace!
     :djadmin:`compilemessages`.
 
 To reexamine all source code and templates for new translation strings and
-update all message files for **all** languages, run this::
+update all message files for **all** languages, run this:
+
+.. code-block:: shell
 
     django-admin makemessages -a
 
@@ -1640,7 +1721,9 @@ utility.
 This tool runs over all available ``.po`` files and creates ``.mo`` files, which
 are binary files optimized for use by ``gettext``. In the same directory from
 which you ran :djadmin:`django-admin makemessages <makemessages>`, run
-:djadmin:`django-admin compilemessages <compilemessages>` like this::
+:djadmin:`django-admin compilemessages <compilemessages>` like this:
+
+.. code-block:: shell
 
    django-admin compilemessages
 
@@ -1652,7 +1735,7 @@ That's it. Your translations are ready for use.
    :djadmin:`django-admin compilemessages <compilemessages>` works see
    :ref:`gettext_on_windows` for more information.
 
-.. admonition:: .po files: Encoding and BOM usage.
+.. admonition:: ``.po`` files: Encoding and BOM usage.
 
    Django only supports ``.po`` files encoded in UTF-8 and without any BOM
    (Byte Order Mark) so if your text editor adds such marks to the beginning of
@@ -1675,6 +1758,7 @@ To workaround this, you can escape percent signs by adding a second percent
 sign::
 
     from django.utils.translation import gettext as _
+
     output = _("10%% interest")
 
 Or you can use ``no-python-format`` so that all percent signs are treated as
@@ -1692,7 +1776,9 @@ You create and update the message files the same way as the other Django message
 files -- with the :djadmin:`django-admin makemessages <makemessages>` tool.
 The only difference is you need to explicitly specify what in gettext parlance
 is known as a domain in this case the ``djangojs`` domain, by providing a ``-d
-djangojs`` parameter, like this::
+djangojs`` parameter, like this:
+
+.. code-block:: shell
 
     django-admin makemessages -d djangojs -l de
 
@@ -1715,7 +1801,7 @@ You may also use ``gettext`` binaries you have obtained elsewhere, so long as
 the ``xgettext --version`` command works properly. Do not attempt to use Django
 translation utilities with a ``gettext`` package if the command ``xgettext
 --version`` entered at a Windows command prompt causes a popup window saying
-"xgettext.exe has generated errors and will be closed by Windows".
+"``xgettext.exe`` has generated errors and will be closed by Windows".
 
 .. _customizing-makemessages:
 
@@ -1728,31 +1814,31 @@ attribute::
 
     from django.core.management.commands import makemessages
 
+
     class Command(makemessages.Command):
-        xgettext_options = makemessages.Command.xgettext_options + ['--keyword=mytrans']
+        xgettext_options = makemessages.Command.xgettext_options + ["--keyword=mytrans"]
 
 If you need more flexibility, you could also add a new argument to your custom
 :djadmin:`makemessages` command::
 
     from django.core.management.commands import makemessages
 
-    class Command(makemessages.Command):
 
+    class Command(makemessages.Command):
         def add_arguments(self, parser):
             super().add_arguments(parser)
             parser.add_argument(
-                '--extra-keyword',
-                dest='xgettext_keywords',
-                action='append',
+                "--extra-keyword",
+                dest="xgettext_keywords",
+                action="append",
             )
 
         def handle(self, *args, **options):
-            xgettext_keywords = options.pop('xgettext_keywords')
+            xgettext_keywords = options.pop("xgettext_keywords")
             if xgettext_keywords:
-                self.xgettext_options = (
-                    makemessages.Command.xgettext_options[:] +
-                    ['--keyword=%s' % kwd for kwd in xgettext_keywords]
-                )
+                self.xgettext_options = makemessages.Command.xgettext_options[:] + [
+                    "--keyword=%s" % kwd for kwd in xgettext_keywords
+                ]
             super().handle(*args, **options)
 
 Miscellaneous
@@ -1773,7 +1859,7 @@ back to the previous page.
 
 Activate this view by adding the following line to your URLconf::
 
-    path('i18n/', include('django.conf.urls.i18n')),
+    path("i18n/", include("django.conf.urls.i18n")),
 
 (Note that this example makes the view available at ``/i18n/setlang/``.)
 
@@ -1832,8 +1918,6 @@ redirected in the ``redirect_to`` context variable.
 Explicitly setting the active language
 --------------------------------------
 
-.. highlight:: python
-
 You may want to set the active language for the current session explicitly. Perhaps
 a user's language preference is retrieved from another system, for example.
 You've already been introduced to :func:`django.utils.translation.activate()`. That
@@ -1844,7 +1928,8 @@ response::
     from django.conf import settings
     from django.http import HttpResponse
     from django.utils import translation
-    user_language = 'fr'
+
+    user_language = "fr"
     translation.activate(user_language)
     response = HttpResponse(...)
     response.set_cookie(settings.LANGUAGE_COOKIE_NAME, user_language)
@@ -1869,11 +1954,12 @@ For example::
 
     from django.utils import translation
 
+
     def welcome_translated(language):
         cur_language = translation.get_language()
         try:
             translation.activate(language)
-            text = translation.gettext('welcome')
+            text = translation.gettext("welcome")
         finally:
             translation.activate(cur_language)
         return text
@@ -1894,9 +1980,10 @@ enter and restores it on exit. With it, the above example becomes::
 
     from django.utils import translation
 
+
     def welcome_translated(language):
         with translation.override(language):
-            return translation.gettext('welcome')
+            return translation.gettext("welcome")
 
 Language cookie
 ---------------
@@ -1973,9 +2060,9 @@ these guidelines:
 For example, your :setting:`MIDDLEWARE` might look like this::
 
     MIDDLEWARE = [
-       'django.contrib.sessions.middleware.SessionMiddleware',
-       'django.middleware.locale.LocaleMiddleware',
-       'django.middleware.common.CommonMiddleware',
+        "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.locale.LocaleMiddleware",
+        "django.middleware.common.CommonMiddleware",
     ]
 
 (For more on middleware, see the :doc:`middleware documentation
@@ -2020,8 +2107,8 @@ Notes:
   set :setting:`LANGUAGES` to a list of languages. For example::
 
       LANGUAGES = [
-          ('de', _('German')),
-          ('en', _('English')),
+          ("de", _("German")),
+          ("en", _("English")),
       ]
 
   This example restricts languages that are available for automatic
@@ -2038,8 +2125,8 @@ Notes:
       from django.utils.translation import gettext_lazy as _
 
       LANGUAGES = [
-          ('de', _('German')),
-          ('en', _('English')),
+          ("de", _("German")),
+          ("en", _("English")),
       ]
 
 Once ``LocaleMiddleware`` determines the user's preference, it makes this
@@ -2049,8 +2136,9 @@ code. Here's an example::
 
     from django.http import HttpResponse
 
+
     def hello_world(request, count):
-        if request.LANGUAGE_CODE == 'de-at':
+        if request.LANGUAGE_CODE == "de-at":
             return HttpResponse("You prefer to read Austrian German.")
         else:
             return HttpResponse("You prefer to read another language.")
@@ -2081,7 +2169,7 @@ translations for the same literal:
 #. Then, it looks for and uses if it exists a ``locale`` directory in each
    of the installed apps listed in :setting:`INSTALLED_APPS`.  The ones
    appearing first have higher precedence than the ones appearing later.
-#. Finally, the Django-provided base translation in ``django/conf/locale``
+#. Finally, the Django-provided base translation in :source:`django/conf/locale`
    is used as a fallback.
 
 .. seealso::

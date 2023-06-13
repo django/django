@@ -2,7 +2,7 @@
 URL dispatcher
 ==============
 
-A clean, elegant URL scheme is an important detail in a high-quality Web
+A clean, elegant URL scheme is an important detail in a high-quality web
 application. Django lets you design URLs however you want, with no framework
 limitations.
 
@@ -75,10 +75,10 @@ Here's a sample URLconf::
     from . import views
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        path('articles/<int:year>/', views.year_archive),
-        path('articles/<int:year>/<int:month>/', views.month_archive),
-        path('articles/<int:year>/<int:month>/<slug:slug>/', views.article_detail),
+        path("articles/2003/", views.special_case_2003),
+        path("articles/<int:year>/", views.year_archive),
+        path("articles/<int:year>/<int:month>/", views.month_archive),
+        path("articles/<int:year>/<int:month>/<slug:slug>/", views.article_detail),
     ]
 
 Notes:
@@ -160,13 +160,13 @@ A converter is a class that includes the following:
 For example::
 
     class FourDigitYearConverter:
-        regex = '[0-9]{4}'
+        regex = "[0-9]{4}"
 
         def to_python(self, value):
             return int(value)
 
         def to_url(self, value):
-            return '%04d' % value
+            return "%04d" % value
 
 Register custom converter classes in your URLconf using
 :func:`~django.urls.register_converter`::
@@ -175,12 +175,12 @@ Register custom converter classes in your URLconf using
 
     from . import converters, views
 
-    register_converter(converters.FourDigitYearConverter, 'yyyy')
+    register_converter(converters.FourDigitYearConverter, "yyyy")
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        path('articles/<yyyy:year>/', views.year_archive),
-        ...
+        path("articles/2003/", views.special_case_2003),
+        path("articles/<yyyy:year>/", views.year_archive),
+        ...,
     ]
 
 Using regular expressions
@@ -201,10 +201,13 @@ Here's the example URLconf from earlier, rewritten using regular expressions::
     from . import views
 
     urlpatterns = [
-        path('articles/2003/', views.special_case_2003),
-        re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
-        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$', views.month_archive),
-        re_path(r'^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$', views.article_detail),
+        path("articles/2003/", views.special_case_2003),
+        re_path(r"^articles/(?P<year>[0-9]{4})/$", views.year_archive),
+        re_path(r"^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/$", views.month_archive),
+        re_path(
+            r"^articles/(?P<year>[0-9]{4})/(?P<month>[0-9]{2})/(?P<slug>[\w-]+)/$",
+            views.article_detail,
+        ),
     ]
 
 This accomplishes roughly the same thing as the previous example, except:
@@ -246,8 +249,8 @@ following URL patterns which optionally take a page argument::
     from django.urls import re_path
 
     urlpatterns = [
-        re_path(r'^blog/(page-(\d+)/)?$', blog_articles),                  # bad
-        re_path(r'^comments/(?:page-(?P<page_number>\d+)/)?$', comments),  # good
+        re_path(r"^blog/(page-([0-9]+)/)?$", blog_articles),  # bad
+        re_path(r"^comments/(?:page-(?P<page_number>[0-9]+)/)?$", comments),  # good
     ]
 
 Both patterns use nested arguments and will resolve: for example,
@@ -299,9 +302,10 @@ Here's an example URLconf and view::
     from . import views
 
     urlpatterns = [
-        path('blog/', views.page),
-        path('blog/page<int:num>/', views.page),
+        path("blog/", views.page),
+        path("blog/page<int:num>/", views.page),
     ]
+
 
     # View (in blog/views.py)
     def page(request, num=1):
@@ -317,8 +321,9 @@ default argument for ``num``, ``1``. If the second pattern matches,
 Performance
 ===========
 
-Each regular expression in a ``urlpatterns`` is compiled the first time it's
-accessed. This makes the system blazingly fast.
+Django processes regular expressions in the ``urlpatterns`` list which is
+compiled the first time it's accessed. Subsequent requests use the cached
+configuration via the URL resolver.
 
 Syntax of the ``urlpatterns`` variable
 ======================================
@@ -367,8 +372,8 @@ itself. It includes a number of other URLconfs::
 
     urlpatterns = [
         # ... snip ...
-        path('community/', include('aggregator.urls')),
-        path('contact/', include('contact.urls')),
+        path("community/", include("aggregator.urls")),
+        path("contact/", include("contact.urls")),
         # ... snip ...
     ]
 
@@ -385,15 +390,15 @@ Another possibility is to include additional URL patterns by using a list of
     from credit import views as credit_views
 
     extra_patterns = [
-        path('reports/', credit_views.report),
-        path('reports/<int:id>/', credit_views.report),
-        path('charge/', credit_views.charge),
+        path("reports/", credit_views.report),
+        path("reports/<int:id>/", credit_views.report),
+        path("charge/", credit_views.charge),
     ]
 
     urlpatterns = [
-        path('', main_views.homepage),
-        path('help/', include('apps.help.urls')),
-        path('credit/', include(extra_patterns)),
+        path("", main_views.homepage),
+        path("help/", include("apps.help.urls")),
+        path("credit/", include(extra_patterns)),
     ]
 
 In this example, the ``/credit/reports/`` URL will be handled by the
@@ -406,10 +411,10 @@ prefix is used repeatedly. For example, consider this URLconf::
     from . import views
 
     urlpatterns = [
-        path('<page_slug>-<page_id>/history/', views.history),
-        path('<page_slug>-<page_id>/edit/', views.edit),
-        path('<page_slug>-<page_id>/discuss/', views.discuss),
-        path('<page_slug>-<page_id>/permissions/', views.permissions),
+        path("<page_slug>-<page_id>/history/", views.history),
+        path("<page_slug>-<page_id>/edit/", views.edit),
+        path("<page_slug>-<page_id>/discuss/", views.discuss),
+        path("<page_slug>-<page_id>/permissions/", views.permissions),
     ]
 
 We can improve this by stating the common path prefix only once and grouping
@@ -419,12 +424,17 @@ the suffixes that differ::
     from . import views
 
     urlpatterns = [
-        path('<page_slug>-<page_id>/', include([
-            path('history/', views.history),
-            path('edit/', views.edit),
-            path('discuss/', views.discuss),
-            path('permissions/', views.permissions),
-        ])),
+        path(
+            "<page_slug>-<page_id>/",
+            include(
+                [
+                    path("history/", views.history),
+                    path("edit/", views.edit),
+                    path("discuss/", views.discuss),
+                    path("permissions/", views.permissions),
+                ]
+            ),
+        ),
     ]
 
 .. _`Django website`: https://www.djangoproject.com/
@@ -439,7 +449,7 @@ the following example is valid::
     from django.urls import include, path
 
     urlpatterns = [
-        path('<username>/blog/', include('foo.urls.blog')),
+        path("<username>/blog/", include("foo.urls.blog")),
     ]
 
     # In foo/urls/blog.py
@@ -447,8 +457,8 @@ the following example is valid::
     from . import views
 
     urlpatterns = [
-        path('', views.blog.index),
-        path('archive/', views.blog.archive),
+        path("", views.blog.index),
+        path("archive/", views.blog.archive),
     ]
 
 In the above example, the captured ``"username"`` variable is passed to the
@@ -472,7 +482,7 @@ For example::
     from . import views
 
     urlpatterns = [
-        path('blog/<int:year>/', views.year_archive, {'foo': 'bar'}),
+        path("blog/<int:year>/", views.year_archive, {"foo": "bar"}),
     ]
 
 In this example, for a request to ``/blog/2005/``, Django will call
@@ -503,7 +513,7 @@ Set one::
     from django.urls import include, path
 
     urlpatterns = [
-        path('blog/', include('inner'), {'blog_id': 3}),
+        path("blog/", include("inner"), {"blog_id": 3}),
     ]
 
     # inner.py
@@ -511,8 +521,8 @@ Set one::
     from mysite import views
 
     urlpatterns = [
-        path('archive/', views.archive),
-        path('about/', views.about),
+        path("archive/", views.archive),
+        path("about/", views.about),
     ]
 
 Set two::
@@ -522,15 +532,15 @@ Set two::
     from mysite import views
 
     urlpatterns = [
-        path('blog/', include('inner')),
+        path("blog/", include("inner")),
     ]
 
     # inner.py
     from django.urls import path
 
     urlpatterns = [
-        path('archive/', views.archive, {'blog_id': 3}),
-        path('about/', views.about, {'blog_id': 3}),
+        path("archive/", views.archive, {"blog_id": 3}),
+        path("about/", views.about, {"blog_id": 3}),
     ]
 
 Note that extra options will *always* be passed to *every* line in the included
@@ -595,9 +605,9 @@ Consider again this URLconf entry::
     from . import views
 
     urlpatterns = [
-        #...
-        path('articles/<int:year>/', views.year_archive, name='news-year-archive'),
-        #...
+        # ...
+        path("articles/<int:year>/", views.year_archive, name="news-year-archive"),
+        # ...
     ]
 
 According to this design, the URL for the archive corresponding to year *nnnn*
@@ -620,11 +630,12 @@ Or in Python code::
     from django.http import HttpResponseRedirect
     from django.urls import reverse
 
+
     def redirect_to_year(request):
         # ...
         year = 2006
         # ...
-        return HttpResponseRedirect(reverse('news-year-archive', args=(year,)))
+        return HttpResponseRedirect(reverse("news-year-archive", args=(year,)))
 
 If, for some reason, it was decided that the URLs where content for yearly
 article archives are published at should be changed then you would only need to
@@ -767,27 +778,27 @@ so that it takes the instance namespace into consideration when creating and
 displaying polls.
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 
     urlpatterns = [
-        path('author-polls/', include('polls.urls', namespace='author-polls')),
-        path('publisher-polls/', include('polls.urls', namespace='publisher-polls')),
+        path("author-polls/", include("polls.urls", namespace="author-polls")),
+        path("publisher-polls/", include("polls.urls", namespace="publisher-polls")),
     ]
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        ...
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ...,
     ]
 
 Using this setup, the following lookups are possible:
@@ -799,7 +810,7 @@ Using this setup, the following lookups are possible:
 
   In the method of a class-based view::
 
-    reverse('polls:index', current_app=self.request.resolver_match.namespace)
+    reverse("polls:index", current_app=self.request.resolver_match.namespace)
 
   and in the template:
 
@@ -836,26 +847,26 @@ module, or a string reference to the module, to :func:`~django.urls.include`,
 not the list of ``urlpatterns`` itself.
 
 .. code-block:: python
-    :caption: polls/urls.py
+    :caption: ``polls/urls.py``
 
     from django.urls import path
 
     from . import views
 
-    app_name = 'polls'
+    app_name = "polls"
     urlpatterns = [
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-        ...
+        path("", views.IndexView.as_view(), name="index"),
+        path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ...,
     ]
 
 .. code-block:: python
-    :caption: urls.py
+    :caption: ``urls.py``
 
     from django.urls import include, path
 
     urlpatterns = [
-        path('polls/', include('polls.urls')),
+        path("polls/", include("polls.urls")),
     ]
 
 The URLs defined in ``polls.urls`` will have an application namespace ``polls``.
@@ -864,7 +875,9 @@ Secondly, you can include an object that contains embedded namespace data. If
 you ``include()`` a list of :func:`~django.urls.path` or
 :func:`~django.urls.re_path` instances, the URLs contained in that object
 will be added to the global namespace. However, you can also ``include()`` a
-2-tuple containing::
+2-tuple containing:
+
+.. code-block:: text
 
     (<list of path()/re_path() instances>, <application namespace>)
 
@@ -874,13 +887,16 @@ For example::
 
     from . import views
 
-    polls_patterns = ([
-        path('', views.IndexView.as_view(), name='index'),
-        path('<int:pk>/', views.DetailView.as_view(), name='detail'),
-    ], 'polls')
+    polls_patterns = (
+        [
+            path("", views.IndexView.as_view(), name="index"),
+            path("<int:pk>/", views.DetailView.as_view(), name="detail"),
+        ],
+        "polls",
+    )
 
     urlpatterns = [
-        path('polls/', include(polls_patterns)),
+        path("polls/", include(polls_patterns)),
     ]
 
 This will include the nominated URL patterns into the given application

@@ -49,8 +49,6 @@ namespace.
 The Django template language
 ============================
 
-.. highlight:: html+django
-
 Syntax
 ------
 
@@ -75,17 +73,23 @@ Variables
 A variable outputs a value from the context, which is a dict-like object
 mapping keys to values.
 
-Variables are surrounded by ``{{`` and ``}}`` like this::
+Variables are surrounded by ``{{`` and ``}}`` like this:
+
+.. code-block:: html+django
 
     My first name is {{ first_name }}. My last name is {{ last_name }}.
 
 With a context of ``{'first_name': 'John', 'last_name': 'Doe'}``, this template
-renders to::
+renders to:
+
+.. code-block:: html+django
 
     My first name is John. My last name is Doe.
 
 Dictionary lookup, attribute lookup and list-index lookups are implemented with
-a dot notation::
+a dot notation:
+
+.. code-block:: html+django
 
     {{ my_dict.key }}
     {{ my_object.attribute }}
@@ -103,15 +107,21 @@ This definition is deliberately vague. For example, a tag can output content,
 serve as a control structure e.g. an "if" statement or a "for" loop, grab
 content from a database, or even enable access to other template tags.
 
-Tags are surrounded by ``{%`` and ``%}`` like this::
+Tags are surrounded by ``{%`` and ``%}`` like this:
+
+.. code-block:: html+django
 
     {% csrf_token %}
 
-Most tags accept arguments::
+Most tags accept arguments:
+
+.. code-block:: html+django
 
     {% cycle 'odd' 'even' %}
 
-Some tags require beginning and ending tags::
+Some tags require beginning and ending tags:
+
+.. code-block:: html+django
 
     {% if user.is_authenticated %}Hello, {{ user.username }}.{% endif %}
 
@@ -124,16 +134,22 @@ Filters
 
 Filters transform the values of variables and tag arguments.
 
-They look like this::
+They look like this:
+
+.. code-block:: html+django
 
      {{ django|title }}
 
 With a context of ``{'django': 'the web framework for perfectionists with
-deadlines'}``, this template renders to::
+deadlines'}``, this template renders to:
+
+.. code-block:: html+django
 
     The Web Framework For Perfectionists With Deadlines
 
-Some filters take an argument::
+Some filters take an argument:
+
+.. code-block:: html+django
 
     {{ my_date|date:"Y-m-d" }}
 
@@ -144,7 +160,9 @@ available as well as :ref:`instructions for writing custom filters
 Comments
 ~~~~~~~~
 
-Comments look like this::
+Comments look like this:
+
+.. code-block:: html+django
 
     {# this won't be rendered #}
 
@@ -219,8 +237,6 @@ and you can implement your own additional context processors, too.
 Support for template engines
 ============================
 
-.. highlight:: python
-
 Configuration
 -------------
 
@@ -231,10 +247,10 @@ more useful value::
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [],
-            'APP_DIRS': True,
-            'OPTIONS': {
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [],
+            "APP_DIRS": True,
+            "OPTIONS": {
                 # ... some options here ...
             },
         },
@@ -261,10 +277,10 @@ backend with different options. In that case you should define a unique
 
 :setting:`OPTIONS <TEMPLATES-OPTIONS>` contains backend-specific settings.
 
+.. _template-loading:
+
 Usage
 -----
-
-.. _template-loading:
 
 .. module:: django.template.loader
 
@@ -347,16 +363,16 @@ Here's an example of the search algorithm. For this example the
 
     TEMPLATES = [
         {
-            'BACKEND': 'django.template.backends.django.DjangoTemplates',
-            'DIRS': [
-                '/home/html/example.com',
-                '/home/html/default',
+            "BACKEND": "django.template.backends.django.DjangoTemplates",
+            "DIRS": [
+                "/home/html/example.com",
+                "/home/html/default",
             ],
         },
         {
-            'BACKEND': 'django.template.backends.jinja2.Jinja2',
-            'DIRS': [
-                '/home/html/jinja2',
+            "BACKEND": "django.template.backends.jinja2.Jinja2",
+            "DIRS": [
+                "/home/html/jinja2",
             ],
         },
     ]
@@ -380,7 +396,7 @@ here's what Django will look for:
 
 When Django finds a template that exists, it stops looking.
 
-.. admonition:: Tip
+.. admonition:: Use ``django.template.loader.select_template()`` for more flexibility
 
     You can use :func:`~django.template.loader.select_template()` for flexible
     template loading. For example, if you've written a news story and want
@@ -400,7 +416,7 @@ single directory gets messy.
 
 To load a template that's within a subdirectory, use a slash, like so::
 
-    get_template('news/story_detail.html')
+    get_template("news/story_detail.html")
 
 Using the same :setting:`TEMPLATES` option as above, this will attempt to load
 the following templates:
@@ -439,7 +455,8 @@ templates, Django provides a shortcut function which automates the process.
     Usage example::
 
         from django.template.loader import render_to_string
-        rendered = render_to_string('my_template.html', {'foo': 'bar'})
+
+        rendered = render_to_string("my_template.html", {"foo": "bar"})
 
 See also the :func:`~django.shortcuts.render()` shortcut which calls
 :func:`render_to_string()` and feeds the result into an
@@ -453,7 +470,7 @@ Finally, you can use configured engines directly:
 
         from django.template import engines
 
-        django_engine = engines['django']
+        django_engine = engines["django"]
         template = django_engine.from_string("Hello {{ name }}!")
 
     The lookup key — ``'django'`` in this example — is the engine's
@@ -530,10 +547,10 @@ applications. This generic name was kept for backwards-compatibility.
   tag modules to register with the template engine. This can be used to add
   new libraries or provide alternate labels for existing ones. For example::
 
-      OPTIONS={
-          'libraries': {
-              'myapp_tags': 'path.to.myapp.tags',
-              'admin.urls': 'django.contrib.admin.templatetags.admin_urls',
+      OPTIONS = {
+          "libraries": {
+              "myapp_tags": "path.to.myapp.tags",
+              "admin.urls": "django.contrib.admin.templatetags.admin_urls",
           },
       }
 
@@ -543,8 +560,8 @@ applications. This generic name was kept for backwards-compatibility.
 * ``'builtins'``: A list of dotted Python paths of template tag modules to
   add to :doc:`built-ins </ref/templates/builtins>`. For example::
 
-      OPTIONS={
-          'builtins': ['myapp.builtins'],
+      OPTIONS = {
+          "builtins": ["myapp.builtins"],
       }
 
   Tags and filters from built-in libraries can be used without first calling
@@ -632,10 +649,12 @@ For example, you can create ``myproject/jinja2.py`` with this content::
 
     def environment(**options):
         env = Environment(**options)
-        env.globals.update({
-            'static': static,
-            'url': reverse,
-        })
+        env.globals.update(
+            {
+                "static": static,
+                "url": reverse,
+            }
+        )
         return env
 
 and set the ``'environment'`` option to ``'myproject.jinja2.environment'``.

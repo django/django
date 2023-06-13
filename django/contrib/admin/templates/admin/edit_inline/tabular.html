@@ -15,11 +15,9 @@
      <thead><tr>
        <th class="original"></th>
      {% for field in inline_admin_formset.fields %}
-       {% if not field.widget.is_hidden %}
-         <th class="column-{{ field.name }}{% if field.required %} required{% endif %}">{{ field.label|capfirst }}
-         {% if field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}">{% endif %}
-         </th>
-       {% endif %}
+       <th class="column-{{ field.name }}{% if field.required %} required{% endif %}{% if field.widget.is_hidden %} hidden{% endif %}">{{ field.label|capfirst }}
+       {% if field.help_text %}<img src="{% static "admin/img/icon-unknown.svg" %}" class="help help-tooltip" width="10" height="10" alt="({{ field.help_text|striptags }})" title="{{ field.help_text|striptags }}">{% endif %}
+       </th>
      {% endfor %}
      {% if inline_admin_formset.formset.can_delete and inline_admin_formset.has_delete_permission %}<th>{% translate "Delete?" %}</th>{% endif %}
      </tr></thead>
@@ -30,32 +28,22 @@
         <tr class="row-form-errors"><td colspan="{{ inline_admin_form|cell_count }}">{{ inline_admin_form.form.non_field_errors }}</td></tr>
         {% endif %}
         <tr class="form-row {% if inline_admin_form.original or inline_admin_form.show_url %}has_original{% endif %}{% if forloop.last and inline_admin_formset.has_add_permission %} empty-form{% endif %}"
-             id="{{ inline_admin_formset.formset.prefix }}-{% if not forloop.last %}{{ forloop.counter0 }}{% else %}empty{% endif %}">
+             id="{{ inline_admin_formset.formset.prefix }}-{% if forloop.last and inline_admin_formset.has_add_permission %}empty{% else %}{{ forloop.counter0 }}{% endif %}">
         <td class="original">
           {% if inline_admin_form.original or inline_admin_form.show_url %}<p>
           {% if inline_admin_form.original %}
           {{ inline_admin_form.original }}
-          {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="{% if inline_admin_formset.has_change_permission %}inlinechangelink{% else %}inlineviewlink{% endif %}">{% if inline_admin_formset.has_change_permission %}{% translate "Change" %}{% else %}{% translate "View" %}{% endif %}</a>{% endif %}
+          {% if inline_admin_form.model_admin.show_change_link and inline_admin_form.model_admin.has_registered_model %}<a href="{% url inline_admin_form.model_admin.opts|admin_urlname:'change' inline_admin_form.original.pk|admin_urlquote %}" class="{{ inline_admin_formset.has_change_permission|yesno:'inlinechangelink,inlineviewlink' }}">{% if inline_admin_formset.has_change_permission %}{% translate "Change" %}{% else %}{% translate "View" %}{% endif %}</a>{% endif %}
           {% endif %}
           {% if inline_admin_form.show_url %}<a href="{{ inline_admin_form.absolute_url }}">{% translate "View on site" %}</a>{% endif %}
             </p>{% endif %}
           {% if inline_admin_form.needs_explicit_pk_field %}{{ inline_admin_form.pk_field.field }}{% endif %}
           {% if inline_admin_form.fk_field %}{{ inline_admin_form.fk_field.field }}{% endif %}
-          {% spaceless %}
-          {% for fieldset in inline_admin_form %}
-            {% for line in fieldset %}
-              {% for field in line %}
-                {% if not field.is_readonly and field.field.is_hidden %}{{ field.field }}{% endif %}
-              {% endfor %}
-            {% endfor %}
-          {% endfor %}
-          {% endspaceless %}
         </td>
         {% for fieldset in inline_admin_form %}
           {% for line in fieldset %}
             {% for field in line %}
-              {% if field.is_readonly or not field.field.is_hidden %}
-              <td{% if field.field.name %} class="field-{{ field.field.name }}"{% endif %}>
+              <td class="{% if field.field.name %}field-{{ field.field.name }}{% endif %}{% if field.field.is_hidden %} hidden{% endif %}">
               {% if field.is_readonly %}
                   <p>{{ field.contents }}</p>
               {% else %}
@@ -63,7 +51,6 @@
                   {{ field.field }}
               {% endif %}
               </td>
-              {% endif %}
             {% endfor %}
           {% endfor %}
         {% endfor %}

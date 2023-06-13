@@ -4,14 +4,15 @@
 # Emin Mastizada <emin@linux.com>, 2018,2020
 # Emin Mastizada <emin@linux.com>, 2016
 # Konul Allahverdiyeva <english.koni@gmail.com>, 2016
+# Nicat Məmmədov <n1c4t97@gmail.com>, 2022
 # Zulfugar Ismayilzadeh <zulfuqar.ismayilzada@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-14 22:38+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2022-05-17 05:10-0500\n"
+"PO-Revision-Date: 2022-07-25 07:05+0000\n"
+"Last-Translator: Nicat Məmmədov <n1c4t97@gmail.com>\n"
 "Language-Team: Azerbaijani (http://www.transifex.com/django/django/language/"
 "az/)\n"
 "MIME-Version: 1.0\n"
@@ -19,6 +20,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: az\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Seçilmiş %(verbose_name_plural)s-ləri sil"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -30,10 +35,6 @@ msgstr "%(name)s silinmir"
 
 msgid "Are you sure?"
 msgstr "Əminsiniz?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Seçilmiş %(verbose_name_plural)s-ləri sil"
 
 msgid "Administration"
 msgstr "Administrasiya"
@@ -271,8 +272,9 @@ msgstr "%(cnt)s-dan 0 seçilib"
 msgid "Change history: %s"
 msgstr "Dəyişmə tarixi: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -323,6 +325,9 @@ msgid ""
 "There’s been an error. It’s been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Xəta baş verdi. Problem sayt administratorlarına epoçt vasitəsi ilə  "
+"bildirildi və qısa bir zamanda həll olunacaq. Anlayışınız üçün təşəkkür "
+"edirik."
 
 msgid "Run the selected action"
 msgstr "Seçdiyim əməliyyatı yerinə yetir"
@@ -357,12 +362,14 @@ msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
 "options."
 msgstr ""
+"Əvvəlcə istifacəçi adı və şifrəni daxil edin. Daha sonra siz daha çox "
+"istifadəçi seçimlərinə düzəliş edə biləcəksiniz."
 
 msgid "Enter a username and password."
-msgstr "İstifadəçi adını və parolu daxil edin."
+msgstr "İstifadəçi adını və şifrəni daxil edin."
 
 msgid "Change password"
-msgstr "Parolu dəyiş"
+msgstr "Şifrəni dəyiş"
 
 msgid "Please correct the error below."
 msgstr "Lütfən aşağıdakı xətanı düzəldin."
@@ -372,7 +379,7 @@ msgstr "Lütfən aşağıdakı səhvləri düzəldin."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
-msgstr "<strong>%(username)s</strong> üçün yeni parol daxil edin."
+msgstr "<strong>%(username)s</strong> üçün yeni şifrə daxil edin."
 
 msgid "Welcome,"
 msgstr "Xoş gördük,"
@@ -516,9 +523,15 @@ msgstr ""
 "bir hesaba daxil olmaq istərdiniz?"
 
 msgid "Forgotten your password or username?"
-msgstr "Parol və ya istifadəçi adını unutmusan?"
+msgstr "Şifrə və ya istifadəçi adını unutmusuz?"
 
 msgid "Toggle navigation"
+msgstr ""
+
+msgid "Start typing to filter…"
+msgstr "Filterləmək üçün yazın..."
+
+msgid "Filter navigation items"
 msgstr ""
 
 msgid "Date/time"
@@ -529,6 +542,12 @@ msgstr "İstifadəçi"
 
 msgid "Action"
 msgstr "Əməliyyat"
+
+msgid "entry"
+msgstr ""
+
+msgid "entries"
+msgstr ""
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -584,17 +603,21 @@ msgstr "Başqa %(model)s əlavə et"
 msgid "Delete selected %(model)s"
 msgstr "Seçilmiş %(model)s sil"
 
-msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Sayt ilə səmərəli vaxt keçirdiyiniz üçün təşəkkür."
+#, python-format
+msgid "View selected %(model)s"
+msgstr ""
+
+msgid "Thanks for spending some quality time with the web site today."
+msgstr ""
 
 msgid "Log in again"
 msgstr "Yenidən daxil ol"
 
 msgid "Password change"
-msgstr "Parol dəyişmək"
+msgstr "Şifrəni dəyişmək"
 
 msgid "Your password was changed."
-msgstr "Sizin parolunuz dəyişdi."
+msgstr "Sizin şifrəniz dəyişdirildi."
 
 msgid ""
 "Please enter your old password, for security’s sake, and then enter your new "
@@ -602,39 +625,42 @@ msgid ""
 msgstr ""
 
 msgid "Change my password"
-msgstr "Mənim parolumu dəyiş"
+msgstr "Şifrəmi dəyiş"
 
 msgid "Password reset"
-msgstr "Parolun sıfırlanması"
+msgstr "Şifrənin sıfırlanması"
 
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr "Yeni parol artıq qüvvədədir.  Yenidən daxil ola bilərsiniz."
+msgstr "Yeni şifrə artıq qüvvədədir. Yenidən daxil ola bilərsiniz."
 
 msgid "Password reset confirmation"
-msgstr "Parolun sıfırlanması üçün təsdiq"
+msgstr "Şifrə sıfırlanmasının təsdiqi"
 
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
-msgstr "Yeni parolu iki dəfə daxil edin ki, səhv etmədiyinizə əmin olaq."
+msgstr "Yeni şifrəni iki dəfə daxil edin ki, səhv etmədiyinizə əmin olaq."
 
 msgid "New password:"
-msgstr "Yeni parol:"
+msgstr "Yeni şifrə:"
 
 msgid "Confirm password:"
-msgstr "Yeni parol (bir daha):"
+msgstr "Yeni şifrə (bir daha):"
 
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
-"Parolun sıfırlanması üçün olan keçid, yəqin ki, artıq istifadə olunub.  "
-"Parolu sıfırlamaq üçün yenə müraciət edin."
+"Şifrənin sıfırlanması üçün olan keçid, yəqin ki, artıq istifadə olunub.  "
+"Şifrəni sıfırlamaq üçün yenə müraciət edin."
 
 msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Şifrəni təyin etmək üçün lazım olan addımlar sizə göndərildi (əgər bu epoçt "
+"ünvanı ilə hesab varsa təbii ki). Elektron məktub qısa bir müddət ərzində "
+"sizə çatacaq."
 
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
@@ -646,11 +672,11 @@ msgid ""
 "You're receiving this email because you requested a password reset for your "
 "user account at %(site_name)s."
 msgstr ""
-"%(site_name)s saytında parolu yeniləmək istədiyinizə görə bu məktubu "
+"%(site_name)s saytında şifrəni yeniləmək istədiyinizə görə bu məktubu "
 "göndərdik."
 
 msgid "Please go to the following page and choose a new password:"
-msgstr "Növbəti səhifəyə keçid alın və yeni parolu seçin:"
+msgstr "Növbəti səhifəyə keçid alın və yeni şifrəni seçin:"
 
 msgid "Your username, in case you’ve forgotten:"
 msgstr "İstifadəçi adınız, əgər unutmusunuzsa:"
@@ -666,12 +692,14 @@ msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Şifrəni unutmusuz? Epoçt ünvanınızı daxil edin və biz sizə yeni şifrə təyin "
+"etmək üçün nə etmək lazım olduğunu göndərəcəyik."
 
 msgid "Email address:"
 msgstr "E-poçt:"
 
 msgid "Reset my password"
-msgstr "Parolumu sıfırla"
+msgstr "Şifrəmi sıfırla"
 
 msgid "All dates"
 msgstr "Bütün tarixlərdə"

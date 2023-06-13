@@ -17,7 +17,7 @@ class Article(models.Model):
     reporter = models.ForeignKey(Reporter, models.SET_NULL, null=True)
 
     class Meta:
-        ordering = ('headline',)
+        ordering = ("headline",)
 
     def __str__(self):
         return self.headline
@@ -28,4 +28,6 @@ class Car(models.Model):
 
 
 class Driver(models.Model):
-    car = models.ForeignKey(Car, models.SET_NULL, to_field='make', null=True, related_name='drivers')
+    car = models.ForeignKey(
+        Car, models.SET_NULL, to_field="make", null=True, related_name="drivers"
+    )

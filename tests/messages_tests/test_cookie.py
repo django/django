@@ -1,14 +1,17 @@
-import binascii
 import json
 import random
+from unittest import TestCase
 
 from django.conf import settings
 from django.contrib.messages import constants
 from django.contrib.messages.storage.base import Message
 from django.contrib.messages.storage.cookie import (
-    CookieStorage, MessageDecoder, MessageEncoder,
+    CookieStorage,
+    MessageDecoder,
+    MessageEncoder,
+    bisect_keep_left,
+    bisect_keep_right,
 )
-from django.core.signing import b64_decode, get_cookie_signer
 from django.test import SimpleTestCase, override_settings
 from django.utils.crypto import get_random_string
 from django.utils.safestring import SafeData, mark_safe
@@ -26,7 +29,7 @@ def set_cookie_data(storage, messages, invalid=False, encode_empty=False):
         # Truncate the first character so that the hash is invalid.
         encoded_data = encoded_data[1:]
     storage.request.COOKIES = {CookieStorage.cookie_name: encoded_data}
-    if hasattr(storage, '_loaded_data'):
+    if hasattr(storage, "_loaded_data"):
         del storage._loaded_data
 
 
@@ -37,7 +40,7 @@ def stored_cookie_messages_count(storage, response):
     # Get a list of cookies, excluding ones with a max-age of 0 (because
     # they have been marked for deletion).
     cookie = response.cookies.get(storage.cookie_name)
-    if not cookie or cookie['max-age'] == 0:
+    if not cookie or cookie["max-age"] == 0:
         return 0
     data = storage._decode(cookie.value)
     if not data:
@@ -47,23 +50,33 @@ def stored_cookie_messages_count(storage, response):
     return len(data)
 
 
-@override_settings(SESSION_COOKIE_DOMAIN='.example.com', SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True)
+@override_settings(
+    SESSION_COOKIE_DOMAIN=".example.com",
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+)
 class CookieTests(BaseTests, SimpleTestCase):
     storage_class = CookieStorage
 
     def stored_messages_count(self, storage, response):
         return stored_cookie_messages_count(storage, response)
 
+    def encode_decode(self, *args, **kwargs):
+        storage = self.get_storage()
+        message = [Message(constants.DEBUG, *args, **kwargs)]
+        encoded = storage._encode(message)
+        return storage._decode(encoded)[0]
+
     def test_get(self):
         storage = self.storage_class(self.get_request())
         # Set initial data.
-        example_messages = ['test', 'me']
+        example_messages = ["test", "me"]
         set_cookie_data(storage, example_messages)
         # The message contains what's expected.
         self.assertEqual(list(storage), example_messages)
 
-    @override_settings(SESSION_COOKIE_SAMESITE='Strict')
-    def test_cookie_setings(self):
+    @override_settings(SESSION_COOKIE_SAMESITE="Strict")
+    def test_cookie_settings(self):
         """
         CookieStorage honors SESSION_COOKIE_DOMAIN, SESSION_COOKIE_SECURE, and
         SESSION_COOKIE_HTTPONLY (#15618, #20972).
@@ -71,29 +84,32 @@ class CookieTests(BaseTests, SimpleTestCase):
         # Test before the messages have been consumed
         storage = self.get_storage()
         response = self.get_response()
-        storage.add(constants.INFO, 'test')
+        storage.add(constants.INFO, "test")
         storage.update(response)
-        messages = storage._decode(response.cookies['messages'].value)
+        messages = storage._decode(response.cookies["messages"].value)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].message, 'test')
-        self.assertEqual(response.cookies['messages']['domain'], '.example.com')
-        self.assertEqual(response.cookies['messages']['expires'], '')
-        self.assertIs(response.cookies['messages']['secure'], True)
-        self.assertIs(response.cookies['messages']['httponly'], True)
-        self.assertEqual(response.cookies['messages']['samesite'], 'Strict')
+        self.assertEqual(messages[0].message, "test")
+        self.assertEqual(response.cookies["messages"]["domain"], ".example.com")
+        self.assertEqual(response.cookies["messages"]["expires"], "")
+        self.assertIs(response.cookies["messages"]["secure"], True)
+        self.assertIs(response.cookies["messages"]["httponly"], True)
+        self.assertEqual(response.cookies["messages"]["samesite"], "Strict")
 
-        # Test deletion of the cookie (storing with an empty value) after the messages have been consumed
+        # Deletion of the cookie (storing with an empty value) after the
+        # messages have been consumed.
         storage = self.get_storage()
         response = self.get_response()
-        storage.add(constants.INFO, 'test')
+        storage.add(constants.INFO, "test")
         for m in storage:
             pass  # Iterate through the storage to simulate consumption of messages.
         storage.update(response)
-        self.assertEqual(response.cookies['messages'].value, '')
-        self.assertEqual(response.cookies['messages']['domain'], '.example.com')
-        self.assertEqual(response.cookies['messages']['expires'], 'Thu, 01 Jan 1970 00:00:00 GMT')
+        self.assertEqual(response.cookies["messages"].value, "")
+        self.assertEqual(response.cookies["messages"]["domain"], ".example.com")
         self.assertEqual(
-            response.cookies['messages']['samesite'],
+            response.cookies["messages"]["expires"], "Thu, 01 Jan 1970 00:00:00 GMT"
+        )
+        self.assertEqual(
+            response.cookies["messages"]["samesite"],
             settings.SESSION_COOKIE_SAMESITE,
         )
 
@@ -101,7 +117,7 @@ class CookieTests(BaseTests, SimpleTestCase):
         request = self.get_request()
         storage = self.storage_class(request)
         # Set initial (invalid) data.
-        example_messages = ['test', 'me']
+        example_messages = ["test", "me"]
         set_cookie_data(storage, example_messages, invalid=True)
         # The message actually contains what we expect.
         self.assertEqual(list(storage), [])
@@ -138,8 +154,8 @@ class CookieTests(BaseTests, SimpleTestCase):
         self.assertEqual(unstored_messages[0].message, first_msg)
 
     def test_message_rfc6265(self):
-        non_compliant_chars = ['\\', ',', ';', '"']
-        messages = ['\\te,st', ';m"e', '\u2019', '123"NOTRECEIVED"']
+        non_compliant_chars = ["\\", ",", ";", '"']
+        messages = ["\\te,st", ';m"e', "\u2019", '123"NOTRECEIVED"']
         storage = self.get_storage()
         encoded = storage._encode(messages)
         for illegal in non_compliant_chars:
@@ -153,12 +169,13 @@ class CookieTests(BaseTests, SimpleTestCase):
         """
         messages = [
             {
-                'message': Message(constants.INFO, 'Test message'),
-                'message_list': [
-                    Message(constants.INFO, 'message %s') for x in range(5)
-                ] + [{'another-message': Message(constants.ERROR, 'error')}],
+                "message": Message(constants.INFO, "Test message"),
+                "message_list": [
+                    Message(constants.INFO, "message %s") for x in range(5)
+                ]
+                + [{"another-message": Message(constants.ERROR, "error")}],
             },
-            Message(constants.INFO, 'message %s'),
+            Message(constants.INFO, "message %s"),
         ]
         encoder = MessageEncoder()
         value = encoder.encode(messages)
@@ -170,27 +187,40 @@ class CookieTests(BaseTests, SimpleTestCase):
         A message containing SafeData is keeping its safe status when
         retrieved from the message storage.
         """
-        def encode_decode(data):
-            message = Message(constants.DEBUG, data)
-            encoded = storage._encode(message)
-            decoded = storage._decode(encoded)
-            return decoded.message
+        self.assertIsInstance(
+            self.encode_decode(mark_safe("<b>Hello Django!</b>")).message,
+            SafeData,
+        )
+        self.assertNotIsInstance(
+            self.encode_decode("<b>Hello Django!</b>").message,
+            SafeData,
+        )
 
-        storage = self.get_storage()
-        self.assertIsInstance(encode_decode(mark_safe("<b>Hello Django!</b>")), SafeData)
-        self.assertNotIsInstance(encode_decode("<b>Hello Django!</b>"), SafeData)
+    def test_extra_tags(self):
+        """
+        A message's extra_tags attribute is correctly preserved when retrieved
+        from the message storage.
+        """
+        for extra_tags in ["", None, "some tags"]:
+            with self.subTest(extra_tags=extra_tags):
+                self.assertEqual(
+                    self.encode_decode("message", extra_tags=extra_tags).extra_tags,
+                    extra_tags,
+                )
 
-    def test_legacy_encode_decode(self):
-        # RemovedInDjango41Warning: pre-Django 3.2 encoded messages will be
-        # invalid.
-        storage = self.storage_class(self.get_request())
-        messages = ['this', Message(0, 'Successfully signed in as admin@example.org')]
-        # Encode/decode a message using the pre-Django 3.2 format.
-        encoder = MessageEncoder()
-        value = encoder.encode(messages)
-        with self.assertRaises(binascii.Error):
-            b64_decode(value.encode())
-        signer = get_cookie_signer(salt=storage.key_salt)
-        encoded_messages = signer.sign(value)
-        decoded_messages = storage._decode(encoded_messages)
-        self.assertEqual(messages, decoded_messages)
+
+class BisectTests(TestCase):
+    def test_bisect_keep_left(self):
+        self.assertEqual(bisect_keep_left([1, 1, 1], fn=lambda arr: sum(arr) != 2), 2)
+        self.assertEqual(bisect_keep_left([1, 1, 1], fn=lambda arr: sum(arr) != 0), 0)
+        self.assertEqual(bisect_keep_left([], fn=lambda arr: sum(arr) != 0), 0)
+
+    def test_bisect_keep_right(self):
+        self.assertEqual(bisect_keep_right([1, 1, 1], fn=lambda arr: sum(arr) != 2), 1)
+        self.assertEqual(
+            bisect_keep_right([1, 1, 1, 1], fn=lambda arr: sum(arr) != 2), 2
+        )
+        self.assertEqual(
+            bisect_keep_right([1, 1, 1, 1, 1], fn=lambda arr: sum(arr) != 1), 4
+        )
+        self.assertEqual(bisect_keep_right([], fn=lambda arr: sum(arr) != 0), 0)

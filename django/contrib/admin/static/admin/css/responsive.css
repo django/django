@@ -14,11 +14,11 @@ input[type="submit"], button {
 
     td, th {
         padding: 10px;
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .small {
-        font-size: 12px;
+        font-size: 0.75rem;
     }
 
     /* Layout */
@@ -28,7 +28,7 @@ input[type="submit"], button {
     }
 
     #content {
-        padding: 20px 30px 30px;
+        padding: 15px 20px 20px;
     }
 
     div.breadcrumbs {
@@ -43,9 +43,8 @@ input[type="submit"], button {
         justify-content: flex-start;
     }
 
-    #branding h1 {
+    #site-name {
         margin: 0 0 8px;
-        font-size: 20px;
         line-height: 1.2;
     }
 
@@ -88,7 +87,7 @@ input[type="submit"], button {
     }
 
     td .changelink, td .addlink {
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     /* Changelist */
@@ -105,13 +104,13 @@ input[type="submit"], button {
     }
 
     #changelist-search label {
-        line-height: 22px;
+        line-height: 1.375rem;
     }
 
     #toolbar form #searchbar {
         flex: 1 0 auto;
         width: 0;
-        height: 22px;
+        height: 1.375rem;
         margin: 0 10px 0 6px;
     }
 
@@ -131,10 +130,6 @@ input[type="submit"], button {
         padding: 15px 0;
     }
 
-    #changelist .actions.selected {
-        border: none;
-    }
-
     #changelist .actions label {
         display: flex;
     }
@@ -152,7 +147,7 @@ input[type="submit"], button {
     #changelist .actions span.clear,
     #changelist .actions span.question,
     #changelist .actions span.action-counter {
-        font-size: 11px;
+        font-size: 0.6875rem;
         margin: 0 10px 0 0;
     }
 
@@ -176,7 +171,7 @@ input[type="submit"], button {
     /* Forms */
 
     label {
-        font-size: 14px;
+        font-size: 0.875rem;
     }
 
     .form-row input[type=text],
@@ -191,23 +186,17 @@ input[type="submit"], button {
         box-sizing: border-box;
         margin: 0;
         padding: 6px 8px;
-        min-height: 36px;
-        font-size: 14px;
+        min-height: 2.25rem;
+        font-size: 0.875rem;
     }
 
     .form-row select {
-        height: 36px;
+        height: 2.25rem;
     }
 
     .form-row select[multiple] {
         height: auto;
         min-height: 0;
-    }
-
-    fieldset .fieldBox {
-        float: none;
-        margin: 0 -10px;
-        padding: 0 10px;
     }
 
     fieldset .fieldBox + .fieldBox {
@@ -232,8 +221,20 @@ input[type="submit"], button {
         margin-left: 15px;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
         margin-left: 2px;
+    }
+
+    .submit-row {
+        padding: 8px;
+    }
+
+    .submit-row a.deletelink {
+        padding: 10px 7px;
+    }
+
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        padding: 7px;
     }
 
     /* Related widget */
@@ -383,22 +384,18 @@ input[type="submit"], button {
         display: none;
     }
 
-    form .form-row p.datetime {
-        width: 100%;
-    }
-
     .datetime input {
         width: 50%;
         max-width: 120px;
     }
 
     .datetime span {
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     .datetime .timezonewarning {
         display: block;
-        font-size: 11px;
+        font-size: 0.6875rem;
         color: var(--body-quiet-color);
     }
 
@@ -435,7 +432,7 @@ input[type="submit"], button {
         padding: 15px 20px;
     }
 
-    .login #branding h1 {
+    .login #site-name {
         margin: 0;
     }
 
@@ -496,7 +493,7 @@ input[type="submit"], button {
 
     #content-related .module h2 {
         padding: 10px 15px;
-        font-size: 16px;
+        font-size: 1rem;
     }
 
     /* Changelist */
@@ -557,13 +554,15 @@ input[type="submit"], button {
 
     .aligned .form-row,
     .aligned .form-row > div {
-        display: flex;
-        flex-wrap: wrap;
         max-width: 100vw;
     }
 
     .aligned .form-row > div {
         width: calc(100vw - 30px);
+    }
+
+    .flex-container {
+        flex-flow: column;
     }
 
     textarea {
@@ -621,8 +620,7 @@ input[type="submit"], button {
     }
 
     .aligned p.file-upload {
-        margin-left: 0;
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     span.clearable-file-input {
@@ -630,7 +628,7 @@ input[type="submit"], button {
     }
 
     span.clearable-file-input label {
-        font-size: 13px;
+        font-size: 0.8125rem;
         padding-bottom: 0;
     }
 
@@ -645,17 +643,19 @@ input[type="submit"], button {
         padding: 0;
     }
 
-    form .aligned ul {
+    form .aligned ul,
+    form .aligned ul.errorlist {
         margin-left: 0;
         padding-left: 0;
     }
 
-    form .aligned ul.radiolist {
+    form .aligned div.radiolist {
+        margin-top: 5px;
         margin-right: 15px;
         margin-bottom: -3px;
     }
 
-    form .aligned ul.radiolist:not(.inline) li + li {
+    form .aligned div.radiolist:not(.inline) div + div {
         margin-top: 5px;
     }
 
@@ -811,28 +811,23 @@ input[type="submit"], button {
     /* Submit row */
 
     .submit-row {
-        padding: 10px 10px 0;
+        padding: 10px;
         margin: 0 0 15px;
-        display: flex;
         flex-direction: column;
+        gap: 8px;
     }
 
-    .submit-row > * {
-        width: 100%;
-    }
-
-    .submit-row input, .submit-row input.default, .submit-row a, .submit-row a.closelink {
-        float: none;
-        margin: 0 0 10px;
+    .submit-row input, .submit-row input.default, .submit-row a {
         text-align: center;
     }
 
     .submit-row a.closelink {
         padding: 10px 0;
+        text-align: center;
     }
 
-    .submit-row p.deletelink-box {
-        order: 4;
+    .submit-row a.deletelink {
+        margin: 0;
     }
 
     /* Messages */
@@ -906,7 +901,7 @@ input[type="submit"], button {
     .errornote {
         margin: 0 0 20px;
         padding: 8px 12px;
-        font-size: 13px;
+        font-size: 0.8125rem;
     }
 
     /* Calendar and clock */
@@ -953,8 +948,8 @@ input[type="submit"], button {
 
     .calendar-shortcuts {
         padding: 10px 0;
-        font-size: 12px;
-        line-height: 12px;
+        font-size: 0.75rem;
+        line-height: 0.75rem;
     }
 
     .calendar-shortcuts a {
@@ -986,7 +981,7 @@ input[type="submit"], button {
     /* History */
 
     table#change-history tbody th, table#change-history tbody td {
-        font-size: 13px;
+        font-size: 0.8125rem;
         word-break: break-word;
     }
 
@@ -997,7 +992,7 @@ input[type="submit"], button {
     /* Docs */
 
     table.model tbody th, table.model tbody td {
-        font-size: 13px;
+        font-size: 0.8125rem;
         word-break: break-word;
     }
 }

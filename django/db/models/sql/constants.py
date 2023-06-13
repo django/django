@@ -9,16 +9,16 @@ GET_ITERATOR_CHUNK_SIZE = 100
 # Namedtuples for sql.* internal use.
 
 # How many results to expect from a cursor.execute call
-MULTI = 'multi'
-SINGLE = 'single'
-CURSOR = 'cursor'
-NO_RESULTS = 'no results'
+MULTI = "multi"
+SINGLE = "single"
+CURSOR = "cursor"
+NO_RESULTS = "no results"
 
 ORDER_DIR = {
-    'ASC': ('ASC', 'DESC'),
-    'DESC': ('DESC', 'ASC'),
+    "ASC": ("ASC", "DESC"),
+    "DESC": ("DESC", "ASC"),
 }
 
 # SQL join types.
-INNER = 'INNER JOIN'
-LOUTER = 'LEFT OUTER JOIN'
+INNER = "INNER JOIN"
+LOUTER = "LEFT OUTER JOIN"

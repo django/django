@@ -11,6 +11,7 @@ class Node:
     A single node in the migration graph. Contains direct links to adjacent
     nodes in either direction.
     """
+
     def __init__(self, key):
         self.key = key
         self.children = set()
@@ -32,7 +33,7 @@ class Node:
         return str(self.key)
 
     def __repr__(self):
-        return '<%s: (%r, %r)>' % (self.__class__.__name__, self.key[0], self.key[1])
+        return "<%s: (%r, %r)>" % (self.__class__.__name__, self.key[0], self.key[1])
 
     def add_child(self, child):
         self.children.add(child)
@@ -49,6 +50,7 @@ class DummyNode(Node):
     After the migration graph is processed, all dummy nodes should be removed.
     If there are any left, a nonexistent dependency error is raised.
     """
+
     def __init__(self, key, origin, error_message):
         super().__init__(key)
         self.origin = origin
@@ -100,7 +102,7 @@ class MigrationGraph:
         """
         This may create dummy nodes if they don't yet exist. If
         `skip_validation=True`, validate_consistency() should be called
-        afterwards.
+        afterward.
         """
         if child not in self.nodes:
             error_message = (
@@ -133,7 +135,7 @@ class MigrationGraph:
             raise NodeNotFoundError(
                 "Unable to find replacement node %r. It was either never added"
                 " to the migration graph, or has been removed." % (replacement,),
-                replacement
+                replacement,
             ) from err
         for replaced_key in replaced:
             self.nodes.pop(replaced_key, None)
@@ -167,8 +169,9 @@ class MigrationGraph:
         except KeyError as err:
             raise NodeNotFoundError(
                 "Unable to remove replacement node %r. It was either never added"
-                " to the migration graph, or has been removed already." % (replacement,),
-                replacement
+                " to the migration graph, or has been removed already."
+                % (replacement,),
+                replacement,
             ) from err
         replaced_nodes = set()
         replaced_nodes_parents = set()
@@ -228,7 +231,10 @@ class MigrationGraph:
                 visited.append(node.key)
             else:
                 stack.append((node, True))
-                stack += [(n, False) for n in sorted(node.parents if forwards else node.children)]
+                stack += [
+                    (n, False)
+                    for n in sorted(node.parents if forwards else node.children)
+                ]
         return visited
 
     def root_nodes(self, app=None):
@@ -238,7 +244,9 @@ class MigrationGraph:
         """
         roots = set()
         for node in self.nodes:
-            if all(key[0] != node[0] for key in self.node_map[node].parents) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].parents) and (
+                not app or app == node[0]
+            ):
                 roots.add(node)
         return sorted(roots)
 
@@ -252,7 +260,9 @@ class MigrationGraph:
         """
         leaves = set()
         for node in self.nodes:
-            if all(key[0] != node[0] for key in self.node_map[node].children) and (not app or app == node[0]):
+            if all(key[0] != node[0] for key in self.node_map[node].children) and (
+                not app or app == node[0]
+            ):
                 leaves.add(node)
         return sorted(leaves)
 
@@ -270,8 +280,10 @@ class MigrationGraph:
                     # hashing.
                     node = child.key
                     if node in stack:
-                        cycle = stack[stack.index(node):]
-                        raise CircularDependencyError(", ".join("%s.%s" % n for n in cycle))
+                        cycle = stack[stack.index(node) :]
+                        raise CircularDependencyError(
+                            ", ".join("%s.%s" % n for n in cycle)
+                        )
                     if node in todo:
                         stack.append(node)
                         todo.remove(node)
@@ -280,14 +292,16 @@ class MigrationGraph:
                     node = stack.pop()
 
     def __str__(self):
-        return 'Graph: %s nodes, %s edges' % self._nodes_and_edges()
+        return "Graph: %s nodes, %s edges" % self._nodes_and_edges()
 
     def __repr__(self):
         nodes, edges = self._nodes_and_edges()
-        return '<%s: nodes=%s, edges=%s>' % (self.__class__.__name__, nodes, edges)
+        return "<%s: nodes=%s, edges=%s>" % (self.__class__.__name__, nodes, edges)
 
     def _nodes_and_edges(self):
-        return len(self.nodes), sum(len(node.parents) for node in self.node_map.values())
+        return len(self.nodes), sum(
+            len(node.parents) for node in self.node_map.values()
+        )
 
     def _generate_plan(self, nodes, at_end):
         plan = []

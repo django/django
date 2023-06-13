@@ -1,9 +1,7 @@
 from django.contrib import admin
 from django.contrib.contenttypes.admin import GenericTabularInline
 
-from .models import (
-    Category, Contact, Episode, EpisodePermanent, Media, PhoneNumber,
-)
+from .models import Category, Contact, Episode, EpisodePermanent, Media, PhoneNumber
 
 site = admin.AdminSite(name="admin")
 

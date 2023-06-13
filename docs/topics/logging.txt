@@ -1,10 +1,13 @@
+.. _logging-explanation:
+
 =======
 Logging
 =======
 
 .. seealso::
 
-    :ref:`Django logging reference <logging_ref>`.
+    * :ref:`logging-how-to`
+    * :ref:`Django logging reference <logging-ref>`
 
 Python programmers will often use ``print()`` in their code as a quick and
 convenient debugging tool. Using the logging framework is only a little more
@@ -163,17 +166,13 @@ and has access to the information, and so on.
 Configuring logging
 ===================
 
-It isn't enough to just put logging calls into your code. You also need to
-configure the loggers, handlers, filters, and formatters to ensure you can use
-the logging output.
-
 Python's logging library provides several techniques to configure
 logging, ranging from a programmatic interface to configuration files.
 By default, Django uses the :ref:`dictConfig format
 <logging-config-dictschema>`.
 
 In order to configure logging, you use :setting:`LOGGING` to define a
-dictionary of logging settings. These settings describes the loggers,
+dictionary of logging settings. These settings describe the loggers,
 handlers, filters and formatters that you want in your logging setup,
 and the log levels and other properties that you want those components
 to have.
@@ -208,21 +207,21 @@ To begin, here's a small configuration that will allow you to output all log
 messages to the console:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     import os
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
         },
-        'root': {
-            'handlers': ['console'],
-            'level': 'WARNING',
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
         },
     }
 
@@ -236,27 +235,27 @@ logging system print more messages from just the :ref:`django-logger` named
 logger:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     import os
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'class': 'logging.StreamHandler',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
             },
         },
-        'root': {
-            'handlers': ['console'],
-            'level': 'WARNING',
+        "root": {
+            "handlers": ["console"],
+            "level": "WARNING",
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-                'propagate': False,
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+                "propagate": False,
             },
         },
     }
@@ -273,23 +272,23 @@ You don't have to log to the console. Here's a configuration which writes all
 logging from the :ref:`django-logger` named logger to a local file:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/path/to/django/debug.log',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "handlers": {
+            "file": {
+                "level": "DEBUG",
+                "class": "logging.FileHandler",
+                "filename": "/path/to/django/debug.log",
             },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
+        "loggers": {
+            "django": {
+                "handlers": ["file"],
+                "level": "DEBUG",
+                "propagate": True,
             },
         },
     }
@@ -300,59 +299,59 @@ location that's writable by the user that's running the Django application.
 Finally, here's an example of a fairly complex logging setup:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'formatters': {
-            'verbose': {
-                'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-                'style': '{',
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "verbose": {
+                "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+                "style": "{",
             },
-            'simple': {
-                'format': '{levelname} {message}',
-                'style': '{',
-            },
-        },
-        'filters': {
-            'special': {
-                '()': 'project.logging.SpecialFilter',
-                'foo': 'bar',
-            },
-            'require_debug_true': {
-                '()': 'django.utils.log.RequireDebugTrue',
+            "simple": {
+                "format": "{levelname} {message}",
+                "style": "{",
             },
         },
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'filters': ['require_debug_true'],
-                'class': 'logging.StreamHandler',
-                'formatter': 'simple'
+        "filters": {
+            "special": {
+                "()": "project.logging.SpecialFilter",
+                "foo": "bar",
             },
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'filters': ['special']
-            }
+            "require_debug_true": {
+                "()": "django.utils.log.RequireDebugTrue",
+            },
         },
-        'loggers': {
-            'django': {
-                'handlers': ['console'],
-                'propagate': True,
+        "handlers": {
+            "console": {
+                "level": "INFO",
+                "filters": ["require_debug_true"],
+                "class": "logging.StreamHandler",
+                "formatter": "simple",
             },
-            'django.request': {
-                'handlers': ['mail_admins'],
-                'level': 'ERROR',
-                'propagate': False,
+            "mail_admins": {
+                "level": "ERROR",
+                "class": "django.utils.log.AdminEmailHandler",
+                "filters": ["special"],
             },
-            'myproject.custom': {
-                'handlers': ['console', 'mail_admins'],
-                'level': 'INFO',
-                'filters': ['special']
-            }
-        }
+        },
+        "loggers": {
+            "django": {
+                "handlers": ["console"],
+                "propagate": True,
+            },
+            "django.request": {
+                "handlers": ["mail_admins"],
+                "level": "ERROR",
+                "propagate": False,
+            },
+            "myproject.custom": {
+                "handlers": ["console", "mail_admins"],
+                "level": "INFO",
+                "filters": ["special"],
+            },
+        },
     }
 
 This logging configuration does the following things:
@@ -445,11 +444,12 @@ Here's an example that disables Django's logging configuration and then
 manually configures logging:
 
 .. code-block:: python
-    :caption: settings.py
+    :caption: ``settings.py``
 
     LOGGING_CONFIG = None
 
     import logging.config
+
     logging.config.dictConfig(...)
 
 Note that the default configuration process only calls
@@ -457,96 +457,3 @@ Note that the default configuration process only calls
 configuring the logging in your settings file will load your logging config
 immediately. As such, your logging config must appear *after* any settings on
 which it depends.
-
-.. _logging-how-to:
-
-How to use logging
-==================
-
-Django provides a :ref:`default logging configuration
-<default-logging-configuration>`, so you don't need to provide any additional
-configuration in order to start using logging (it's the default configuration
-that for example generates the messages that appear in the console when using
-the :djadmin:`runserver`).
-
-Make a basic logging call
--------------------------
-
-To send a log message from within your code, you place a logging call into it.
-
-.. admonition:: Don't be tempted to use logging calls in ``settings.py``
-
-    The way that Django logging is configured as part of the ``setup()``
-    function means that logging calls placed in ``settings.py`` may not work as
-    expected, because *logging will not be set up at that point*. To explore
-    logging, use a view function as suggested in the example below.
-
-First, import the Python logging library, and then obtain a logger instance
-with :py:func:`logging.getLogger`. The ``getLogger()`` method must be provided
-with a name. A good option is to use ``__name__``, which will provide the name
-of the current Python module (see :ref:`naming-loggers` for use of explicit
-naming)::
-
-    import logging
-
-    logger = logging.getLogger(__name__)
-
-And then in a function, for example in a view, send a message to the logger::
-
-    def some_view(request):
-        ...
-        if some_risky_state:
-            logger.warning('Platform is running at risk')
-
-When this code is executed, that message will be sent to the logger (and if
-you're using Django's default logging configuration, it will appear in the
-console).
-
-The ``WARNING`` level used in the example above is one of several
-:ref:`logging severity levels <topic-logging-parts-loggers>`: ``DEBUG``,
-``INFO``, ``WARNING``, ``ERROR``, ``CRITICAL``. So, another example might be::
-
-    logger.critical('Payment system is not responding')
-
-The default logging configuration, which Django inherits from the Python
-logging module, prints all messages of level ``WARNING`` and higher to the
-console. Django's own defaults will *not* pass ``INFO`` or lower severity
-messages from applications other than Django itself to the console - that will
-need to be configured explicitly.
-
-.. _naming-loggers:
-
-Name logger instances
----------------------
-
-Every logger instance has a name. By convention, the logger name is usually
-``__name__``, the name of the Python module in which
-:func:`logging.getLogger()` is called. This allows you to filter and handle
-logging calls on a per-module basis. However, if you have some other way of
-organizing your logging messages, you can provide any dot-separated name to
-identify your logger::
-
-    # Get an instance of a specific named logger
-    logger = logging.getLogger('project.interesting.stuff')
-
-.. _naming-loggers-hierarchy:
-
-Logger hierarchy
-~~~~~~~~~~~~~~~~
-
-The dotted paths of logger names define a hierarchy. The
-``project.interesting`` logger is considered to be a parent of the
-``project.interesting.stuff`` logger; the ``project`` logger is a parent of the
-``project.interesting`` logger. (Note that this hierarchy does not need to
-reflect the actual Python module hierarchy.)
-
-Why is the hierarchy important? Well, because loggers can be set to
-*propagate* their logging calls to their parents. In this way, you can
-define a single set of handlers at the root of a logger tree, and
-capture all logging calls in the subtree of loggers. A logger defined
-in the ``project`` namespace will catch all logging messages issued on
-the ``project.interesting`` and ``project.interesting.stuff`` loggers.
-
-This propagation can be controlled on a per-logger basis. If
-you don't want a particular logger to propagate to its parents, you
-can turn off this behavior.

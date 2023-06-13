@@ -7,57 +7,66 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
-from django.core.servers.basehttp import (
-    WSGIServer, get_internal_wsgi_application, run,
-)
+from django.core.servers.basehttp import WSGIServer, get_internal_wsgi_application, run
 from django.utils import autoreload
 from django.utils.regex_helper import _lazy_re_compile
 
-naiveip_re = _lazy_re_compile(r"""^(?:
+naiveip_re = _lazy_re_compile(
+    r"""^(?:
 (?P<addr>
     (?P<ipv4>\d{1,3}(?:\.\d{1,3}){3}) |         # IPv4 address
     (?P<ipv6>\[[a-fA-F0-9:]+\]) |               # IPv6 address
     (?P<fqdn>[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*) # FQDN
-):)?(?P<port>\d+)$""", re.X)
+):)?(?P<port>\d+)$""",
+    re.X,
+)
 
 
 class Command(BaseCommand):
-    help = "Starts a lightweight Web server for development."
+    help = "Starts a lightweight web server for development."
 
     # Validation is called explicitly each time the server is reloaded.
     requires_system_checks = []
-    stealth_options = ('shutdown_message',)
+    stealth_options = ("shutdown_message",)
+    suppressed_base_arguments = {"--verbosity", "--traceback"}
 
-    default_addr = '127.0.0.1'
-    default_addr_ipv6 = '::1'
-    default_port = '8000'
-    protocol = 'http'
+    default_addr = "127.0.0.1"
+    default_addr_ipv6 = "::1"
+    default_port = "8000"
+    protocol = "http"
     server_cls = WSGIServer
 
     def add_arguments(self, parser):
         parser.add_argument(
-            'addrport', nargs='?',
-            help='Optional port number, or ipaddr:port'
+            "addrport", nargs="?", help="Optional port number, or ipaddr:port"
         )
         parser.add_argument(
-            '--ipv6', '-6', action='store_true', dest='use_ipv6',
-            help='Tells Django to use an IPv6 address.',
+            "--ipv6",
+            "-6",
+            action="store_true",
+            dest="use_ipv6",
+            help="Tells Django to use an IPv6 address.",
         )
         parser.add_argument(
-            '--nothreading', action='store_false', dest='use_threading',
-            help='Tells Django to NOT use threading.',
+            "--nothreading",
+            action="store_false",
+            dest="use_threading",
+            help="Tells Django to NOT use threading.",
         )
         parser.add_argument(
-            '--noreload', action='store_false', dest='use_reloader',
-            help='Tells Django to NOT use the auto-reloader.',
+            "--noreload",
+            action="store_false",
+            dest="use_reloader",
+            help="Tells Django to NOT use the auto-reloader.",
         )
         parser.add_argument(
-            '--skip-checks', action='store_true',
-            help='Skip system checks.',
+            "--skip-checks",
+            action="store_true",
+            help="Skip system checks.",
         )
 
     def execute(self, *args, **options):
-        if options['no_color']:
+        if options["no_color"]:
             # We rely on the environment because it's currently the only
             # way to reach WSGIRequestHandler. This seems an acceptable
             # compromise considering `runserver` runs indefinitely.
@@ -70,20 +79,22 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not settings.DEBUG and not settings.ALLOWED_HOSTS:
-            raise CommandError('You must set settings.ALLOWED_HOSTS if DEBUG is False.')
+            raise CommandError("You must set settings.ALLOWED_HOSTS if DEBUG is False.")
 
-        self.use_ipv6 = options['use_ipv6']
+        self.use_ipv6 = options["use_ipv6"]
         if self.use_ipv6 and not socket.has_ipv6:
-            raise CommandError('Your Python does not support IPv6.')
+            raise CommandError("Your Python does not support IPv6.")
         self._raw_ipv6 = False
-        if not options['addrport']:
-            self.addr = ''
+        if not options["addrport"]:
+            self.addr = ""
             self.port = self.default_port
         else:
-            m = re.match(naiveip_re, options['addrport'])
+            m = re.match(naiveip_re, options["addrport"])
             if m is None:
-                raise CommandError('"%s" is not a valid port number '
-                                   'or address:port pair.' % options['addrport'])
+                raise CommandError(
+                    '"%s" is not a valid port number '
+                    "or address:port pair." % options["addrport"]
+                )
             self.addr, _ipv4, _ipv6, _fqdn, self.port = m.groups()
             if not self.port.isdigit():
                 raise CommandError("%r is not a valid port number." % self.port)
@@ -101,7 +112,7 @@ class Command(BaseCommand):
 
     def run(self, **options):
         """Run the server, using the autoreloader if needed."""
-        use_reloader = options['use_reloader']
+        use_reloader = options["use_reloader"]
 
         if use_reloader:
             autoreload.run_with_reloader(self.inner_run, **options)
@@ -113,36 +124,28 @@ class Command(BaseCommand):
         # to be raised in the child process, raise it now.
         autoreload.raise_last_exception()
 
-        threading = options['use_threading']
+        threading = options["use_threading"]
         # 'shutdown_message' is a stealth option.
-        shutdown_message = options.get('shutdown_message', '')
-        quit_command = 'CTRL-BREAK' if sys.platform == 'win32' else 'CONTROL-C'
+        shutdown_message = options.get("shutdown_message", "")
 
-        if not options['skip_checks']:
-            self.stdout.write('Performing system checks...\n\n')
+        if not options["skip_checks"]:
+            self.stdout.write("Performing system checks...\n\n")
             self.check(display_num_errors=True)
         # Need to check migrations here, so can't use the
         # requires_migrations_check attribute.
         self.check_migrations()
-        now = datetime.now().strftime('%B %d, %Y - %X')
-        self.stdout.write(now)
-        self.stdout.write((
-            "Django version %(version)s, using settings %(settings)r\n"
-            "Starting development server at %(protocol)s://%(addr)s:%(port)s/\n"
-            "Quit the server with %(quit_command)s."
-        ) % {
-            "version": self.get_version(),
-            "settings": settings.SETTINGS_MODULE,
-            "protocol": self.protocol,
-            "addr": '[%s]' % self.addr if self._raw_ipv6 else self.addr,
-            "port": self.port,
-            "quit_command": quit_command,
-        })
 
         try:
             handler = self.get_handler(*args, **options)
-            run(self.addr, int(self.port), handler,
-                ipv6=self.use_ipv6, threading=threading, server_cls=self.server_cls)
+            run(
+                self.addr,
+                int(self.port),
+                handler,
+                ipv6=self.use_ipv6,
+                threading=threading,
+                on_bind=self.on_bind,
+                server_cls=self.server_cls,
+            )
         except OSError as e:
             # Use helpful error messages instead of ugly tracebacks.
             ERRORS = {
@@ -161,3 +164,23 @@ class Command(BaseCommand):
             if shutdown_message:
                 self.stdout.write(shutdown_message)
             sys.exit(0)
+
+    def on_bind(self, server_port):
+        quit_command = "CTRL-BREAK" if sys.platform == "win32" else "CONTROL-C"
+
+        if self._raw_ipv6:
+            addr = f"[{self.addr}]"
+        elif self.addr == "0":
+            addr = "0.0.0.0"
+        else:
+            addr = self.addr
+
+        now = datetime.now().strftime("%B %d, %Y - %X")
+        version = self.get_version()
+        print(
+            f"{now}\n"
+            f"Django version {version}, using settings {settings.SETTINGS_MODULE!r}\n"
+            f"Starting development server at {self.protocol}://{addr}:{server_port}/\n"
+            f"Quit the server with {quit_command}.",
+            file=self.stdout,
+        )

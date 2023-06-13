@@ -100,7 +100,7 @@ Generic Views
 
 * The new :meth:`View.setup <django.views.generic.base.View.setup>` hook
   initializes view attributes before calling
-  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to setup
+  :meth:`~django.views.generic.base.View.dispatch`. It allows mixins to set up
   instance attributes for reuse in child classes.
 
 Internationalization
@@ -298,11 +298,13 @@ For example, in older versions of Django::
 
     from django.contrib import admin
 
+
     class BaseAdmin(admin.ModelAdmin):
-        actions = ['a']
+        actions = ["a"]
+
 
     class SubAdmin(BaseAdmin):
-        actions = ['b']
+        actions = ["b"]
 
 ``SubAdmin`` would have actions ``'a'`` and ``'b'``.
 
@@ -310,7 +312,7 @@ Now ``actions`` follows standard Python inheritance. To get the same result as
 before::
 
     class SubAdmin(BaseAdmin):
-        actions = BaseAdmin.actions + ['b']
+        actions = BaseAdmin.actions + ["b"]
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -331,9 +333,9 @@ change shouldn't have an impact on your tests unless you've customized
 ``sqlparse`` is required dependency
 -----------------------------------
 
-To simplify a few parts of Django's database handling, `sqlparse 0.2.2+
-<https://pypi.org/project/sqlparse/>`_ is now a required dependency. It's
-automatically installed along with Django.
+To simplify a few parts of Django's database handling, :pypi:`sqlparse 0.2.2+
+<sqlparse>` is now a required dependency. It's automatically installed along
+with Django.
 
 ``cached_property`` aliases
 ---------------------------
@@ -342,8 +344,8 @@ In usage like::
 
     from django.utils.functional import cached_property
 
-    class A:
 
+    class A:
         @cached_property
         def base(self):
             return ...
@@ -358,11 +360,11 @@ Use this instead::
 
     import operator
 
-    class A:
 
+    class A:
         ...
 
-        alias = property(operator.attrgetter('base'))
+        alias = property(operator.attrgetter("base"))
 
 Permissions for proxy models
 ----------------------------

@@ -18,14 +18,17 @@ class CustomPermissionsUserManager(CustomUserManager):
 
 
 with RemoveGroupsAndPermissions():
+
     class CustomPermissionsUser(AbstractBaseUser, PermissionsMixin):
-        email = models.EmailField(verbose_name='email address', max_length=255, unique=True)
+        email = models.EmailField(
+            verbose_name="email address", max_length=255, unique=True
+        )
         date_of_birth = models.DateField()
 
         custom_objects = CustomPermissionsUserManager()
 
-        USERNAME_FIELD = 'email'
-        REQUIRED_FIELDS = ['date_of_birth']
+        USERNAME_FIELD = "email"
+        REQUIRED_FIELDS = ["date_of_birth"]
 
         def __str__(self):
             return self.email

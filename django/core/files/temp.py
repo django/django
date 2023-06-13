@@ -21,10 +21,14 @@ import tempfile
 
 from django.core.files.utils import FileProxyMixin
 
-__all__ = ('NamedTemporaryFile', 'gettempdir',)
+__all__ = (
+    "NamedTemporaryFile",
+    "gettempdir",
+)
 
 
-if os.name == 'nt':
+if os.name == "nt":
+
     class TemporaryFile(FileProxyMixin):
         """
         Temporary file object constructor that supports reopening of the
@@ -34,7 +38,8 @@ if os.name == 'nt':
         __init__() doesn't support the 'delete', 'buffering', 'encoding', or
         'newline' keyword arguments.
         """
-        def __init__(self, mode='w+b', bufsize=-1, suffix='', prefix='', dir=None):
+
+        def __init__(self, mode="w+b", bufsize=-1, suffix="", prefix="", dir=None):
             fd, name = tempfile.mkstemp(suffix=suffix, prefix=prefix, dir=dir)
             self.name = name
             self.file = os.fdopen(fd, mode, bufsize)

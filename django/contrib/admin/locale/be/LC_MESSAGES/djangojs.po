@@ -2,23 +2,23 @@
 #
 # Translators:
 # Viktar Palstsiuk <vipals@gmail.com>, 2015
-# znotdead <zhirafchik@gmail.com>, 2016,2020-2021
+# znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-15 09:00+0100\n"
-"PO-Revision-Date: 2021-01-15 18:10+0000\n"
-"Last-Translator: znotdead <zhirafchik@gmail.com>\n"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"Last-Translator: znotdead <zhirafchik@gmail.com>, 2016,2020-2021,2023\n"
 "Language-Team: Belarusian (http://www.transifex.com/django/django/language/"
 "be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: be\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || (n"
-"%100>=11 && n%100<=14)? 2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<12 || n%100>14) ? 1 : n%10==0 || (n%10>=5 && n%10<=9) || "
+"(n%100>=11 && n%100<=14)? 2 : 3);\n"
 
 #, javascript-format
 msgid "Available %s"
@@ -64,12 +64,24 @@ msgstr ""
 "Сьпіс абраных %s. Каб нешта прыбраць, пазначце патрэбнае ў полі ніжэй і "
 "пстрыкніце па стрэлцы «Прыбраць» між двума палямі."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Друкуйце ў гэтым полі, каб прасеяць спіс выбраных %s."
+
 msgid "Remove all"
 msgstr "Прыбраць усё"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Каб прыбраць усе %s, пстрыкніце тут."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s абраная можнасьць нябачна"
+msgstr[1] "%s абраныя можнасьці нябачны"
+msgstr[2] "%s абраныя можнасьці нябачны"
+msgstr[3] "%s абраныя можнасьці нябачны"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
