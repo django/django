@@ -476,6 +476,9 @@ Tests
 
 * :class:`~django.test.AsyncClient` now supports the ``follow`` parameter.
 
+* The new :option:`test --durations` option allows showing the duration of the
+  slowest tests on Python 3.12+.
+
 URLs
 ~~~~
 

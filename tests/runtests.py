@@ -33,6 +33,7 @@ else:
         RemovedInDjango60Warning,
     )
     from django.utils.log import DEFAULT_LOGGING
+    from django.utils.version import PY312
 
 try:
     import MySQLdb
@@ -380,6 +381,7 @@ def django_tests(
     buffer,
     timing,
     shuffle,
+    durations=None,
 ):
     if parallel in {0, "auto"}:
         max_parallel = get_max_test_processes()
@@ -425,6 +427,7 @@ def django_tests(
         buffer=buffer,
         timing=timing,
         shuffle=shuffle,
+        durations=durations,
     )
     failures = test_runner.run_tests(test_labels)
     teardown_run_tests(state)
@@ -688,6 +691,15 @@ if __name__ == "__main__":
             "Same as unittest -k option. Can be used multiple times."
         ),
     )
+    if PY312:
+        parser.add_argument(
+            "--durations",
+            dest="durations",
+            type=int,
+            default=None,
+            metavar="N",
+            help="Show the N slowest test cases (N=0 for all).",
+        )
 
     options = parser.parse_args()
 
@@ -785,6 +797,7 @@ if __name__ == "__main__":
                 options.buffer,
                 options.timing,
                 options.shuffle,
+                getattr(options, "durations", None),
             )
         time_keeper.print_results()
         if failures:
