@@ -8,8 +8,9 @@ from . import FormFieldAssertionsMixin
 class EmailFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
     def test_emailfield_1(self):
         f = EmailField()
+        self.assertEqual(f.max_length, 320)
         self.assertWidgetRendersTo(
-            f, '<input type="email" name="f" id="id_f" required>'
+            f, '<input type="email" name="f" id="id_f" maxlength="320" required>'
         )
         with self.assertRaisesMessage(ValidationError, "'This field is required.'"):
             f.clean("")

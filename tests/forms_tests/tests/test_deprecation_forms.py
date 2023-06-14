@@ -65,7 +65,8 @@ class DeprecatedTests(SimpleTestCase):
             '<p>Name: <input type="text" name="name" maxlength="50"></p>'
             '<div class="errorlist">'
             '<div class="error">Enter a valid email address.</div></div>'
-            '<p>Email: <input type="email" name="email" value="invalid" required></p>'
+            '<p>Email: <input type="email" name="email" value="invalid" '
+            'maxlength="320" required></p>'
             '<div class="errorlist">'
             '<div class="error">This field is required.</div></div>'
             '<p>Comment: <input type="text" name="comment" required></p>',
