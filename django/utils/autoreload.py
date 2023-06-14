@@ -14,8 +14,7 @@ from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
-from pathlib import Path
-from typing import Callable, Generator, List, Set, Union
+from typing import Callable, Generator, List, Set
 from django.utils.autoreload import BaseReloader, common_roots, sys_path_directories
 
 import django
