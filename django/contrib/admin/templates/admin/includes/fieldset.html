@@ -10,15 +10,22 @@
     {% endif %}
     {% for line in fieldset %}
         <div class="form-row{% if line.fields|length == 1 and line.errors %} errors{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}">
-            {% if line.fields|length == 1 %}{{ line.errors }}{% else %}<div class="flex-container form-multiline">{% endif %}
+            {% if not line.fields|length == 1 %}<div class="flex-container form-multiline">{% endif %}
             {% for field in line %}
                 <div>
                     {% if not line.fields|length == 1 and not field.is_readonly %}{{ field.errors }}{% endif %}
                         <div class="flex-container{% if not line.fields|length == 1 %} fieldBox{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% if not field.is_readonly and field.errors %} errors{% endif %}{% if field.field.is_hidden %} hidden{% endif %}{% endif %}{% if field.is_checkbox %} checkbox-row{% endif %}">
                             {% if field.is_checkbox %}
+                                {% if line.fields|length == 1 %}{{ line.errors }}{% endif %}
                                 {{ field.field }}{{ field.label_tag }}
                             {% else %}
                                 {{ field.label_tag }}
+                                {% if field.field.help_text %}
+                                    <div class="help"{% if field.field.id_for_label %} id="{{ field.field.id_for_label }}_helptext"{% endif %}>
+                                        <div>{{ field.field.help_text|safe }}</div>
+                                    </div>
+                                {% endif %}
+                                {% if line.fields|length == 1 %}{{ line.errors }}{% endif %}
                                 {% if field.is_readonly %}
                                     <div class="readonly">{{ field.contents }}</div>
                                 {% else %}
@@ -26,7 +33,7 @@
                                 {% endif %}
                             {% endif %}
                         </div>
-                    {% if field.field.help_text %}
+                    {% if field.is_checkbox and field.field.help_text %}
                         <div class="help"{% if field.field.id_for_label %} id="{{ field.field.id_for_label }}_helptext"{% endif %}>
                             <div>{{ field.field.help_text|safe }}</div>
                         </div>

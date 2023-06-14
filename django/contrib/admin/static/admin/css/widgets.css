@@ -574,6 +574,7 @@ ul.timelist, .timelist li {
     flex-grow: 1;
     flex-wrap: wrap;
     margin-bottom: 5px;
+    width: 100%;
 }
 
 .related-widget-wrapper-link {
