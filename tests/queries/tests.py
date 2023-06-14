@@ -3231,7 +3231,7 @@ class ExcludeTests(TestCase):
             [self.r2],
         )
 
-    def test_ticket14511(self):
+    def test_exclude_m2m_through(self):
         alex = Person.objects.get_or_create(name="Alex")[0]
         jane = Person.objects.get_or_create(name="Jane")[0]
 
@@ -3267,7 +3267,16 @@ class ExcludeTests(TestCase):
             .distinct()
             .order_by("name")
         )
-        self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
+        with self.assertNumQueries(1) as ctx:
+            self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
+        sql = ctx.captured_queries[0]["sql"]
+        # Company's ID should appear in SELECT and INNER JOIN, not in EXISTS as
+        # the outer query reference is not necessary when an alias is reused.
+        company_id = "%s.%s" % (
+            connection.ops.quote_name(Company._meta.db_table),
+            connection.ops.quote_name(Company._meta.get_field("id").column),
+        )
+        self.assertEqual(sql.count(company_id), 2)
 
     def test_exclude_reverse_fk_field_ref(self):
         tag = Tag.objects.create()

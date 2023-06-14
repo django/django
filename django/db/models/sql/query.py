@@ -2020,10 +2020,11 @@ class Query(BaseExpression):
             lookup = lookup_class(pk.get_col(query.select[0].alias), pk.get_col(alias))
             query.where.add(lookup, AND)
             query.external_aliases[alias] = True
+        else:
+            lookup_class = select_field.get_lookup("exact")
+            lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
+            query.where.add(lookup, AND)
 
-        lookup_class = select_field.get_lookup("exact")
-        lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
-        query.where.add(lookup, AND)
         condition, needed_inner = self.build_filter(Exists(query))
 
         if contains_louter:
