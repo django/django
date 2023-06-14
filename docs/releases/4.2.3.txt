@@ -7,6 +7,13 @@ Django 4.2.3 release notes
 Django 4.2.3 fixes a security issue with severity "moderate" and several bugs
 in 4.2.2.
 
+CVE-2023-36053: Potential regular expression denial of service vulnerability in ``EmailValidator``/``URLValidator``
+===================================================================================================================
+
+``EmailValidator`` and ``URLValidator`` were subject to potential regular
+expression denial of service attack via a very large number of domain name
+labels of emails and URLs.
+
 Bugfixes
 ========
 

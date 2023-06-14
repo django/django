@@ -106,6 +106,7 @@ VALID_URLS = [
     "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
     "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
     "ddddddddddddddddd:password@example.com:8080",
+    "http://userid:password" + "d" * 2000 + "@example.aaaaaaaaaaaaa.com",
     "http://142.42.1.1/",
     "http://142.42.1.1:8080/",
     "http://➡.ws/䨹",
@@ -236,6 +237,7 @@ INVALID_URLS = [
     "aaaaaa.com",
     "http://example.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
     "aaaaaa",
+    "http://example." + ("a" * 63 + ".") * 1000 + "com",
     "http://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaa."
     "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaa"
     "aaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.aaaaaaaaaaaaaa"
@@ -291,6 +293,7 @@ TEST_DATA = [
     (validate_email, "example@%s.%s.atm" % ("a" * 63, "b" * 10), None),
     (validate_email, "example@atm.%s" % ("a" * 64), ValidationError),
     (validate_email, "example@%s.atm.%s" % ("b" * 64, "a" * 63), ValidationError),
+    (validate_email, "example@%scom" % (("a" * 63 + ".") * 100), ValidationError),
     (validate_email, None, ValidationError),
     (validate_email, "", ValidationError),
     (validate_email, "abc", ValidationError),
