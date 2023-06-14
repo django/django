@@ -1,21 +1,14 @@
-import copy
 import datetime
 
-from django.forms import ChoiceField, Form, Select
+from django.forms import ChoiceField, Form, MultiWidget, Select, TextInput
 from django.test import override_settings
 from django.utils.safestring import mark_safe
 
-from .base import WidgetTest
+from .test_choicewidget import ChoiceWidgetTest
 
 
-class SelectTest(WidgetTest):
+class SelectTest(ChoiceWidgetTest):
     widget = Select
-    nested_widget = Select(
-        choices=(
-            ("outer1", "Outer 1"),
-            ('Group "1"', (("inner1", "Inner 1"), ("inner2", "Inner 2"))),
-        )
-    )
 
     def test_render(self):
         self.check_html(
@@ -319,27 +312,6 @@ class SelectTest(WidgetTest):
         """
         self.check_html(self.widget(choices=choices), "time", None, html=html)
 
-    def test_options(self):
-        options = list(
-            self.widget(choices=self.beatles).options(
-                "name",
-                ["J"],
-                attrs={"class": "super"},
-            )
-        )
-        self.assertEqual(len(options), 4)
-        self.assertEqual(options[0]["name"], "name")
-        self.assertEqual(options[0]["value"], "J")
-        self.assertEqual(options[0]["label"], "John")
-        self.assertEqual(options[0]["index"], "0")
-        self.assertIs(options[0]["selected"], True)
-        # Template-related attributes
-        self.assertEqual(options[1]["name"], "name")
-        self.assertEqual(options[1]["value"], "P")
-        self.assertEqual(options[1]["label"], "Paul")
-        self.assertEqual(options[1]["index"], "1")
-        self.assertIs(options[1]["selected"], False)
-
     def test_optgroups(self):
         choices = [
             (
@@ -446,45 +418,34 @@ class SelectTest(WidgetTest):
         )
         self.assertEqual(index, 2)
 
-    def test_optgroups_integer_choices(self):
-        """The option 'value' is the same type as what's in `choices`."""
-        groups = list(
-            self.widget(choices=[[0, "choice text"]]).optgroups("name", ["vhs"])
-        )
-        label, options, index = groups[0]
-        self.assertEqual(options[0]["value"], 0)
-
-    def test_deepcopy(self):
-        """
-        __deepcopy__() should copy all attributes properly (#25085).
-        """
-        widget = Select()
-        obj = copy.deepcopy(widget)
-        self.assertIsNot(widget, obj)
-        self.assertEqual(widget.choices, obj.choices)
-        self.assertIsNot(widget.choices, obj.choices)
-        self.assertEqual(widget.attrs, obj.attrs)
-        self.assertIsNot(widget.attrs, obj.attrs)
-
     def test_doesnt_render_required_when_impossible_to_select_empty_field(self):
         widget = self.widget(choices=[("J", "John"), ("P", "Paul")])
         self.assertIs(widget.use_required_attribute(initial=None), False)
 
-    def test_renders_required_when_possible_to_select_empty_field_str(self):
-        widget = self.widget(choices=[("", "select please"), ("P", "Paul")])
-        self.assertIs(widget.use_required_attribute(initial=None), True)
-
-    def test_renders_required_when_possible_to_select_empty_field_list(self):
-        widget = self.widget(choices=[["", "select please"], ["P", "Paul"]])
-        self.assertIs(widget.use_required_attribute(initial=None), True)
-
-    def test_renders_required_when_possible_to_select_empty_field_none(self):
-        widget = self.widget(choices=[(None, "select please"), ("P", "Paul")])
-        self.assertIs(widget.use_required_attribute(initial=None), True)
-
     def test_doesnt_render_required_when_no_choices_are_available(self):
         widget = self.widget(choices=[])
         self.assertIs(widget.use_required_attribute(initial=None), False)
+
+    def test_render_as_subwidget(self):
+        """A RadioSelect as a subwidget of MultiWidget."""
+        choices = (("", "------"),) + self.beatles
+        self.check_html(
+            MultiWidget([self.widget(choices=choices), TextInput()]),
+            "beatle",
+            ["J", "Some text"],
+            html=(
+                """
+                <select name="beatle_0">
+                  <option value="">------</option>
+                  <option value="J" selected>John</option>
+                  <option value="P">Paul</option>
+                  <option value="G">George</option>
+                  <option value="R">Ringo</option>
+                </select>
+                <input name="beatle_1" type="text" value="Some text">
+                """
+            ),
+        )
 
     def test_fieldset(self):
         class TestForm(Form):
