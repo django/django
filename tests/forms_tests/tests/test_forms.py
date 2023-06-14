@@ -422,11 +422,18 @@ class FormsTestCase(SimpleTestCase):
             get_spam = BooleanField()
 
         f = SignupForm(auto_id=False)
-        self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" required>')
+        self.assertHTMLEqual(
+            str(f["email"]),
+            '<input type="email" name="email" maxlength="320" required>',
+        )
         self.assertHTMLEqual(str(f['get_spam']), '<input type="checkbox" name="get_spam" required>')
 
         f = SignupForm({'email': 'test@example.com', 'get_spam': True}, auto_id=False)
-        self.assertHTMLEqual(str(f['email']), '<input type="email" name="email" value="test@example.com" required>')
+        self.assertHTMLEqual(
+            str(f["email"]),
+            '<input type="email" name="email" maxlength="320" value="test@example.com" '
+            "required>",
+        )
         self.assertHTMLEqual(
             str(f['get_spam']),
             '<input checked type="checkbox" name="get_spam" required>',
@@ -2824,7 +2831,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 <option value="true">Yes</option>
 <option value="false">No</option>
 </select></li>
-<li><label for="id_email">Email:</label> <input type="email" name="email" id="id_email"></li>
+<li><label for="id_email">Email:</label> <input type="email" name="email" id="id_email" maxlength="320"></li>
 <li class="required error"><ul class="errorlist"><li>This field is required.</li></ul>
 <label class="required" for="id_age">Age:</label> <input type="number" name="age" id="id_age" required></li>"""
         )
@@ -2840,7 +2847,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 <option value="true">Yes</option>
 <option value="false">No</option>
 </select></p>
-<p><label for="id_email">Email:</label> <input type="email" name="email" id="id_email"></p>
+<p><label for="id_email">Email:</label> <input type="email" name="email" id="id_email" maxlength="320"></p>
 <ul class="errorlist"><li>This field is required.</li></ul>
 <p class="required error"><label class="required" for="id_age">Age:</label>
 <input type="number" name="age" id="id_age" required></p>"""
@@ -2859,7 +2866,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
 <option value="false">No</option>
 </select></td></tr>
 <tr><th><label for="id_email">Email:</label></th><td>
-<input type="email" name="email" id="id_email"></td></tr>
+<input type="email" name="email" id="id_email" maxlength="320"></td></tr>
 <tr class="required error"><th><label class="required" for="id_age">Age:</label></th>
 <td><ul class="errorlist"><li>This field is required.</li></ul>
 <input type="number" name="age" id="id_age" required></td></tr>"""
@@ -3489,7 +3496,7 @@ Good luck picking a username that doesn&#x27;t already exist.</p>
         f = CommentForm(data, auto_id=False, error_class=DivErrorList)
         self.assertHTMLEqual(f.as_p(), """<p>Name: <input type="text" name="name" maxlength="50"></p>
 <div class="errorlist"><div class="error">Enter a valid email address.</div></div>
-<p>Email: <input type="email" name="email" value="invalid" required></p>
+<p>Email: <input type="email" name="email" value="invalid" maxlength="320" required></p>
 <div class="errorlist"><div class="error">This field is required.</div></div>
 <p>Comment: <input type="text" name="comment" required></p>""")
 

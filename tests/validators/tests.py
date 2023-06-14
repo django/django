@@ -59,6 +59,7 @@ TEST_DATA = [
 
     (validate_email, 'example@atm.%s' % ('a' * 64), ValidationError),
     (validate_email, 'example@%s.atm.%s' % ('b' * 64, 'a' * 63), ValidationError),
+    (validate_email, "example@%scom" % (("a" * 63 + ".") * 100), ValidationError),
     (validate_email, None, ValidationError),
     (validate_email, '', ValidationError),
     (validate_email, 'abc', ValidationError),
@@ -246,6 +247,16 @@ TEST_DATA = [
     (URLValidator(), None, ValidationError),
     (URLValidator(), 56, ValidationError),
     (URLValidator(), 'no_scheme', ValidationError),
+    (
+        URLValidator(),
+        "http://example." + ("a" * 63 + ".") * 1000 + "com",
+        ValidationError,
+    ),
+    (
+        URLValidator(),
+        "http://userid:password" + "d" * 2000 + "@example.aaaaaaaaaaaaa.com",
+        None,
+    ),
     # Newlines and tabs are not accepted.
     (URLValidator(), 'http://www.djangoproject.com/\n', ValidationError),
     (URLValidator(), 'http://[::ffff:192.9.5.5]\n', ValidationError),

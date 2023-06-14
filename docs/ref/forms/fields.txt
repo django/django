@@ -592,7 +592,12 @@ For each field, we describe the default widget used if you don't specify
     * Error message keys: ``required``, ``invalid``
 
     Has three optional arguments ``max_length``, ``min_length``, and
-    ``empty_value`` which work just as they do for :class:`CharField`.
+    ``empty_value`` which work just as they do for :class:`CharField`. The
+    ``max_length`` argument defaults to 320 (see :rfc:`3696#section-3`).
+
+    .. versionchanged:: 3.2.20
+
+        The default value for ``max_length`` was changed to 320 characters.
 
 ``FileField``
 -------------

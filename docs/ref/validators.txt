@@ -130,6 +130,11 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
+    An :class:`EmailValidator` ensures that a value looks like an email, and
+    raises a :exc:`~django.core.exceptions.ValidationError` with
+    :attr:`message` and :attr:`code` if it doesn't. Values longer than 320
+    characters are always considered invalid.
+
     .. attribute:: message
 
         The error message used by
@@ -158,13 +163,19 @@ to, or in lieu of custom ``field.clean()`` methods.
         The undocumented ``domain_whitelist`` attribute is deprecated. Use
         ``domain_allowlist`` instead.
 
+    .. versionchanged:: 3.2.20
+
+        In older versions, values longer than 320 characters could be
+        considered valid.
+
 ``URLValidator``
 ----------------
 
 .. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
     A :class:`RegexValidator` subclass that ensures a value looks like a URL,
-    and raises an error code of ``'invalid'`` if it doesn't.
+    and raises an error code of ``'invalid'`` if it doesn't. Values longer than
+    :attr:`max_length` characters are always considered invalid.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
     IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both
@@ -180,6 +191,18 @@ to, or in lieu of custom ``field.clean()`` methods.
         website provides a full list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+
+    .. attribute:: max_length
+
+        .. versionadded:: 3.2.20
+
+        The maximum length of values that could be considered valid. Defaults
+        to 2048 characters.
+
+    .. versionchanged:: 3.2.20
+
+        In older versions, values longer than 2048 characters could be
+        considered valid.
 
 ``validate_email``
 ------------------
