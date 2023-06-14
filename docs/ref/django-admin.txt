@@ -1559,6 +1559,16 @@ tests, which allows it to print a traceback if the interpreter crashes. Pass
 
 Outputs timings, including database setup and total run time.
 
+.. django-admin-option:: --durations N
+
+.. versionadded:: 5.0
+
+Shows the N slowest test cases (N=0 for all).
+
+.. admonition:: Python 3.12 and later
+
+    This feature is only available for Python 3.12 and later.
+
 ``testserver``
 --------------
 

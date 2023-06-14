@@ -14,7 +14,7 @@ from django import db
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
-from django.core.management.base import SystemCheckError
+from django.core.management.base import CommandError, SystemCheckError
 from django.test import SimpleTestCase, TransactionTestCase, skipUnlessDBFeature
 from django.test.runner import (
     DiscoverRunner,
@@ -31,6 +31,7 @@ from django.test.utils import (
     get_unique_databases_and_mirrors,
     iter_test_cases,
 )
+from django.utils.version import PY312
 
 from .models import B, Person, Through
 
@@ -451,6 +452,8 @@ class MockTestRunner:
     def __init__(self, *args, **kwargs):
         if parallel := kwargs.get("parallel"):
             sys.stderr.write(f"parallel={parallel}")
+        if durations := kwargs.get("durations"):
+            sys.stderr.write(f"durations={durations}")
 
 
 MockTestRunner.run_tests = mock.Mock(return_value=[])
@@ -474,6 +477,28 @@ class ManageCommandTests(unittest.TestCase):
                 testrunner="test_runner.tests.MockTestRunner",
             )
         self.assertIn("Total run took", stderr.getvalue())
+
+    @unittest.skipUnless(PY312, "unittest --durations option requires Python 3.12")
+    def test_durations(self):
+        with captured_stderr() as stderr:
+            call_command(
+                "test",
+                "--durations=10",
+                "sites",
+                testrunner="test_runner.tests.MockTestRunner",
+            )
+        self.assertIn("durations=10", stderr.getvalue())
+
+    @unittest.skipIf(PY312, "unittest --durations option requires Python 3.12")
+    def test_durations_lt_py312(self):
+        msg = "Error: unrecognized arguments: --durations=10"
+        with self.assertRaises(CommandError, msg=msg):
+            call_command(
+                "test",
+                "--durations=10",
+                "sites",
+                testrunner="test_runner.tests.MockTestRunner",
+            )
 
 
 # Isolate from the real environment.

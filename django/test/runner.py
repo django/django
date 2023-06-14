@@ -29,6 +29,7 @@ from django.test.utils import setup_test_environment
 from django.test.utils import teardown_databases as _teardown_databases
 from django.test.utils import teardown_test_environment
 from django.utils.datastructures import OrderedSet
+from django.utils.version import PY312
 
 try:
     import ipdb as pdb
@@ -284,6 +285,10 @@ failure and get a correct traceback.
     def stopTest(self, test):
         super().stopTest(test)
         self.events.append(("stopTest", self.test_index))
+
+    def addDuration(self, test, elapsed):
+        super().addDuration(test, elapsed)
+        self.events.append(("addDuration", self.test_index, elapsed))
 
     def addError(self, test, err):
         self.check_picklable(test, err)
@@ -655,6 +660,7 @@ class DiscoverRunner:
         timing=False,
         shuffle=False,
         logger=None,
+        durations=None,
         **kwargs,
     ):
         self.pattern = pattern
@@ -692,6 +698,7 @@ class DiscoverRunner:
         self.shuffle = shuffle
         self._shuffler = None
         self.logger = logger
+        self.durations = durations
 
     @classmethod
     def add_arguments(cls, parser):
@@ -791,6 +798,15 @@ class DiscoverRunner:
                 "unittest -k option."
             ),
         )
+        if PY312:
+            parser.add_argument(
+                "--durations",
+                dest="durations",
+                type=int,
+                default=None,
+                metavar="N",
+                help="Show the N slowest test cases (N=0 for all).",
+            )
 
     @property
     def shuffle_seed(self):
@@ -953,12 +969,15 @@ class DiscoverRunner:
             return PDBDebugResult
 
     def get_test_runner_kwargs(self):
-        return {
+        kwargs = {
             "failfast": self.failfast,
             "resultclass": self.get_resultclass(),
             "verbosity": self.verbosity,
             "buffer": self.buffer,
         }
+        if PY312:
+            kwargs["durations"] = self.durations
+        return kwargs
 
     def run_checks(self, databases):
         # Checks are run after database creation since some checks require
