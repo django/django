@@ -34,6 +34,9 @@ The short version of the steps involved is:
 
 #. Upload the package(s) to the ``djangoproject.com`` server.
 
+#. Verify package(s) signatures, check if they can be installed, and ensure
+   minimal functionality.
+
 #. Upload the new version(s) to PyPI.
 
 #. Declare the new version in the admin on ``djangoproject.com``.
@@ -52,7 +55,7 @@ You'll need a few things before getting started:
 * A GPG key. If the key you want to use is not your default signing key, you'll
   need to add ``-u you@example.com`` to every GPG signing command below, where
   ``you@example.com`` is the email address associated with the key you want to
-  use.
+  use. You will also need to add ``-i you@example.com`` to the ``twine`` call.
 
 * An install of some required Python packages:
 
@@ -60,14 +63,26 @@ You'll need a few things before getting started:
 
       $ python -m pip install wheel twine
 
-* Access to Django's record on PyPI. Create a file with your credentials:
+* Access to Django's project on PyPI. Create a project-scoped token following
+  the `official documentation <https://pypi.org/help/#apitoken>`_ and set up
+  your ``$HOME/.pypirc`` file like this:
 
   .. code-block:: ini
-    :caption: ``~/.pypirc``
+     :caption: ``~/.pypirc``
 
-    [pypi]
-    username:YourUsername
-    password:YourPassword
+     [distutils]
+       index-servers =
+         pypi
+         django
+
+     [pypi]
+       username = __token__
+       password = # User-scoped or project-scoped token, to set as the default.
+
+     [django]
+       repository = https://upload.pypi.org/legacy/
+       username = __token__
+       password = # A project token.
 
 * Access to the ``djangoproject.com`` server to upload files.
 
