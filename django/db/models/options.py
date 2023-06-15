@@ -864,7 +864,7 @@ class Options:
         reverse=True,
         include_parents=True,
         include_hidden=False,
-        seen_models=None,
+        topmost_call=True,
     ):
         """
         Internal helper function to return fields of the model.
@@ -885,13 +885,6 @@ class Options:
         # implementation and to provide a fast way for Django's internals to
         # access specific subsets of fields.
 
-        # We must keep track of which models we have already seen. Otherwise we
-        # could include the same field multiple times from different models.
-        topmost_call = seen_models is None
-        if topmost_call:
-            seen_models = set()
-        seen_models.add(self.model)
-
         # Creates a cache key composed of all arguments
         cache_key = (forward, reverse, include_parents, include_hidden, topmost_call)
 
@@ -906,12 +899,11 @@ class Options:
         # Recursively call _get_fields() on each parent, with the same
         # options provided in this call.
         if include_parents is not False:
+            # In diamond inheritance it is possible that we see the same model
+            # from two different routes. In that case, avoid adding fields from
+            # the same parent again.
+            parent_fields = set()
             for parent in self.parents:
-                # In diamond inheritance it is possible that we see the same
-                # model from two different routes. In that case, avoid adding
-                # fields from the same parent again.
-                if parent in seen_models:
-                    continue
                 if (
                     parent._meta.concrete_model != self.concrete_model
                     and include_parents == PROXY_PARENTS
@@ -922,13 +914,15 @@ class Options:
                     reverse=reverse,
                     include_parents=include_parents,
                     include_hidden=include_hidden,
-                    seen_models=seen_models,
+                    topmost_call=False,
                 ):
                     if (
                         not getattr(obj, "parent_link", False)
                         or obj.model == self.concrete_model
-                    ):
+                    ) and obj not in parent_fields:
                         fields.append(obj)
+                        parent_fields.add(obj)
+
         if reverse and not self.proxy:
             # Tree is computed once and cached until the app cache is expired.
             # It is composed of a list of fields pointing to the current model

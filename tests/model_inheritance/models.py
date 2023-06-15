@@ -106,6 +106,12 @@ class ItalianRestaurant(Restaurant):
     serves_gnocchi = models.BooleanField(default=False)
 
 
+class ItalianRestaurantCommonParent(ItalianRestaurant, Place):
+    place_ptr_two = models.OneToOneField(
+        Place, on_delete=models.CASCADE, parent_link=True
+    )
+
+
 class Supplier(Place):
     customers = models.ManyToManyField(Restaurant, related_name="provider")
 
