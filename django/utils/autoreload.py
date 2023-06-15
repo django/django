@@ -15,7 +15,7 @@ from pathlib import Path
 from types import ModuleType
 from zipimport import zipimporter
 from typing import Callable, Generator, List, Set
-from django.utils.autoreload import BaseReloader, common_roots, sys_path_directories
+
 
 import django
 from django.apps import apps
@@ -645,6 +645,7 @@ class WatchmanReloader(BaseReloader):
         if version < (4, 9):
             raise WatchmanUnavailable("Watchman 4.9 or later is required.")
 
+
 class MutableWatcher:
     """
     Watchfiles doesn't give us a way to adjust watches at runtime, but it does give us a way to stop the watcher
@@ -652,7 +653,6 @@ class MutableWatcher:
     This class wraps this to provide a single iterator that may replace the underlying watchfiles iterator when
     roots are added or removed.
     """
-
 
     def __init__(self, filter_func: Callable[[watchfiles.Change, str], bool]):
         self.change_event = threading.Event()
@@ -724,6 +724,7 @@ class WatchfilesReloader(BaseReloader):
                 logger.debug(f"File changed: {path}")
                 self.notify_file_changed(Path(path))
             yield
+
 
 def get_reloader():
     """Return the most suitable reloader for this environment."""
