@@ -653,6 +653,7 @@ class MutableWatcher:
     roots are added or removed.
     """
 
+
     def __init__(self, filter_func: Callable[[watchfiles.Change, str], bool]):
         self.change_event = threading.Event()
         self.stop_event = threading.Event()
