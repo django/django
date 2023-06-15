@@ -645,14 +645,14 @@ class WatchmanReloader(BaseReloader):
         if version < (4, 9):
             raise WatchmanUnavailable("Watchman 4.9 or later is required.")
 
-
 class MutableWatcher:
     """
-    Watchfiles doesn't give us a way to adjust watches at runtime, but it does give us a way to stop the watcher
-    when a condition is set.
-    This class wraps this to provide a single iterator that may replace the underlying watchfiles iterator when
-    roots are added or removed.
+    Watchfiles doesn't give us a way to adjust watches at runtime, but it does give us
+    a way to stop the watcherwhen a condition is set.
+    This class wraps this to provide a single iterator that may replace the underlying
+    watchfiles iterator when roots are added or removed.
     """
+
 
     def __init__(self, filter_func: Callable[[watchfiles.Change, str], bool]):
         self.change_event = threading.Event()
