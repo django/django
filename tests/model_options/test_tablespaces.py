@@ -97,14 +97,19 @@ class TablespacesTests(TransactionTestCase):
         sql = sql_for_table(Authors).lower()
         # The join table of the ManyToManyField goes to the model's tablespace,
         # and its indexes too, unless DEFAULT_INDEX_TABLESPACE is set.
+        expected_through_indexes = (
+            1 if connection.features.composite_index_supports_prefix_search else 2
+        )
         if settings.DEFAULT_INDEX_TABLESPACE:
             # 1 for the table
             self.assertNumContains(sql, "tbl_tbsp", 1)
             # 1 for the primary key
-            self.assertNumContains(sql, settings.DEFAULT_INDEX_TABLESPACE, 1)
+            self.assertNumContains(
+                sql, settings.DEFAULT_INDEX_TABLESPACE, expected_through_indexes
+            )
         else:
             # 1 for the table + 1 for the index on the primary key
-            self.assertNumContains(sql, "tbl_tbsp", 2)
+            self.assertNumContains(sql, "tbl_tbsp", expected_through_indexes)
         self.assertNumContains(sql, "idx_tbsp", 0)
 
         sql = sql_for_index(Authors).lower()

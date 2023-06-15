@@ -360,6 +360,9 @@ class BaseDatabaseFeatures:
     # Does the backend support unlimited character columns?
     supports_unlimited_charfield = False
 
+    # Does this backend use composite index to search by any prefix of its key?
+    composite_index_supports_prefix_search = True
+
     # Collation names for use by the Django test suite.
     test_collations = {
         "ci": None,  # Case-insensitive.

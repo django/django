@@ -1308,6 +1308,7 @@ def create_many_to_many_intermediary_model(field, klass):
                 related_name="%s+" % name,
                 db_tablespace=field.db_tablespace,
                 db_constraint=field.remote_field.db_constraint,
+                db_index=not connection.features.composite_index_supports_prefix_search,
                 on_delete=CASCADE,
             ),
             to: models.ForeignKey(

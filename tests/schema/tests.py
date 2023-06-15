@@ -2362,6 +2362,66 @@ class SchemaTests(TransactionTestCase):
     def test_m2m_custom(self):
         self._test_m2m(CustomManyToManyField)
 
+    def test_m2m_optimization_through_indexes(self):
+        class LocalAuthorWithM2M(Model):
+            name = CharField(max_length=255)
+            tags = ManyToManyField(Tag, related_name="authors")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalAuthorWithM2M]
+
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(LocalAuthorWithM2M)
+
+        through = LocalAuthorWithM2M._meta.get_field("tags").remote_field.through
+        indexes = [
+            constraint["columns"]
+            for constraint in self.get_constraints(through._meta.db_table).values()
+            if constraint["index"] or constraint["unique"]
+        ]
+        self.assertIn(["tag_id"], indexes)
+        self.assertIn(["localauthorwithm2m_id", "tag_id"], indexes)
+        if connection.features.composite_index_supports_prefix_search:
+            self.assertNotIn(["localauthorwithm2m_id"], indexes)
+        else:
+            self.assertIn(["localauthorwithm2m_id"], indexes)
+
+    def test_m2m_optimization_through_indexes_false(self):
+        # Mocking the variable to false to test expected behaviour
+        # As django has no DB that has the following set to false
+        # We can remove this test once django supports one such case
+        connection.features.composite_index_supports_prefix_search = False
+
+        class LocalAuthorWithM2MFalse(Model):
+            name = CharField(max_length=255)
+            tags = ManyToManyField(Tag, related_name="authors")
+
+            class Meta:
+                app_label = "schema"
+                apps = new_apps
+
+        self.local_models = [LocalAuthorWithM2MFalse]
+
+        # Create the table
+        with connection.schema_editor() as editor:
+            editor.create_model(Tag)
+            editor.create_model(LocalAuthorWithM2MFalse)
+
+        through = LocalAuthorWithM2MFalse._meta.get_field("tags").remote_field.through
+        indexes = [
+            constraint["columns"]
+            for constraint in self.get_constraints(through._meta.db_table).values()
+            if constraint["index"] or constraint["unique"]
+        ]
+        self.assertIn(["tag_id"], indexes)
+        self.assertIn(["localauthorwithm2mfalse_id", "tag_id"], indexes)
+        self.assertIn(["localauthorwithm2mfalse_id"], indexes)
+
     def test_m2m_inherited(self):
         self._test_m2m(InheritedManyToManyField)
 
