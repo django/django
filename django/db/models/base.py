@@ -1775,6 +1775,21 @@ class Model(AltersData, metaclass=ModelBase):
                 if f not in used_fields:
                     used_fields[f.name] = f
 
+        # Check that parent links in diamond-shaped MTI models don't clash.
+        for parent_link in cls._meta.parents.values():
+            if not parent_link:
+                continue
+            clash = used_fields.get(parent_link.name) or None
+            if clash:
+                errors.append(
+                    checks.Error(
+                        f"The field '{parent_link.name}' clashes with the field "
+                        f"'{clash.name}' from model '{clash.model._meta}'.",
+                        obj=cls,
+                        id="models.E006",
+                    )
+                )
+
         for f in cls._meta.local_fields:
             clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
             # Note that we may detect clash between user-defined non-unique
