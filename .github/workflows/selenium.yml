@@ -24,7 +24,7 @@ jobs:
     name: SQLite
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: start-measurement
 
@@ -45,13 +45,13 @@ jobs:
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
       
       - name: Eco-CI Measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: get-measurement
           label: 'selenium sqlite'
 
       - name: Eco-CI Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: display-results
 
@@ -75,7 +75,7 @@ jobs:
           --health-retries 5
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: start-measurement
 
@@ -98,12 +98,12 @@ jobs:
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
 
       - name: Eco-CI Measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: get-measurement
           label: 'selenium postgresql'
 
       - name: Eco-CI Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: display-results

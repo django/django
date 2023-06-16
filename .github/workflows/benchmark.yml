@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: start-measurement
 
@@ -49,12 +49,12 @@ jobs:
           fi
 
       - name: Eco-CI Measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: get-measurement
           label: 'benchmark'
 
       - name: Eco-CI Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
         with:
           task: display-results
