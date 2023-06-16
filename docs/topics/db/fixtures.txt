@@ -30,7 +30,7 @@ Fixtures can be used to pre-populate database with data for
 :ref:`tests <topics-testing-fixtures>` or to provide some :ref:`initial data
 <initial-data-via-fixtures>`.
 
-Were Django looks for fixtures?
+Where Django looks for fixtures?
 ===============================
 
 Django will search in three locations for fixtures:
