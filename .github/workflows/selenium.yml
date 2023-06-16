@@ -2,6 +2,9 @@ name: Selenium Tests
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
   pull_request:
     types: [labeled, synchronize, opened, reopened]
     paths-ignore:
@@ -16,10 +19,15 @@ permissions:
 
 jobs:
   selenium-sqlite:
-    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+    # if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
     name: SQLite
     steps:
+      - name: Eco-CI Init
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: start-measurement
+
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Python
@@ -35,9 +43,20 @@ jobs:
         working-directory: ./tests/
         run: |
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
+      
+      - name: Eco-CI Measurement
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: get-measurement
+          label: 'selenium sqlite'
+
+      - name: Eco-CI Results
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: display-results
 
   selenium-postgresql:
-    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+    # if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
     name: PostgreSQL
     services:
@@ -55,6 +74,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
+      - name: Eco-CI Init
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: start-measurement
+
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Python
@@ -72,3 +96,14 @@ jobs:
         working-directory: ./tests/
         run: |
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2
+
+      - name: Eco-CI Measurement
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: get-measurement
+          label: 'selenium postgresql'
+
+      - name: Eco-CI Results
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: display-results
