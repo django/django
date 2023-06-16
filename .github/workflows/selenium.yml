@@ -1,6 +1,7 @@
 name: Selenium Tests
 
 on:
+  workflow_dispatch:
   pull_request:
     types: [labeled, synchronize, opened, reopened]
     paths-ignore:
