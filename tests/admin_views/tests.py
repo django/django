@@ -6,6 +6,7 @@ import zoneinfo
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
+from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -16,6 +17,8 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -25,6 +28,7 @@ from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
+    RequestFactory,
     TestCase,
     ignore_warnings,
     modify_settings,
@@ -1651,6 +1655,29 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             '<div class="help" id="id_password2_helptext">'
             "Enter the same password as before, for verification.</div>",
         )
+
+    def test_change_password_template_helptext_no_id(self):
+        user = User.objects.get(username="super")
+
+        class EmptyIdForLabelTextInput(forms.TextInput):
+            def id_for_label(self, id):
+                return None
+
+        class EmptyIdForLabelHelpTextPasswordChangeForm(AdminPasswordChangeForm):
+            password1 = forms.CharField(
+                help_text="Your new password", widget=EmptyIdForLabelTextInput()
+            )
+
+        class CustomUserAdmin(UserAdmin):
+            change_password_form = EmptyIdForLabelHelpTextPasswordChangeForm
+
+        request = RequestFactory().get(
+            reverse("admin:auth_user_password_change", args=(user.id,))
+        )
+        request.user = user
+        user_admin = CustomUserAdmin(User, site)
+        response = user_admin.user_change_password(request, str(user.pk))
+        self.assertContains(response, '<div class="help">')
 
     def test_extended_bodyclass_template_index(self):
         """
