@@ -4,7 +4,7 @@ from django.contrib.gis.db.models.fields import (
     GeometryField,
     LineStringField,
 )
-from django.db.models import Aggregate, Value
+from django.db.models import Aggregate, Func, Value
 from django.utils.functional import cached_property
 
 __all__ = ["Collect", "Extent", "Extent3D", "MakeLine", "Union"]
@@ -33,16 +33,20 @@ class GeoAggregate(Aggregate):
         if not self.is_extent:
             tolerance = self.extra.get("tolerance") or getattr(self, "tolerance", 0.05)
             clone = self.copy()
-            clone.set_source_expressions(
-                [
-                    *self.get_source_expressions(),
-                    Value(tolerance),
-                ]
+            source_expressions = self.get_source_expressions()
+            if self.filter:
+                source_expressions.pop()
+            spatial_type_expr = Func(
+                *source_expressions,
+                Value(tolerance),
+                function="SDOAGGRTYPE",
+                output_field=self.output_field,
             )
-            template = "%(function)s(SDOAGGRTYPE(%(expressions)s))"
-            return clone.as_sql(
-                compiler, connection, template=template, **extra_context
-            )
+            source_expressions = [spatial_type_expr]
+            if self.filter:
+                source_expressions.append(self.filter)
+            clone.set_source_expressions(source_expressions)
+            return clone.as_sql(compiler, connection, **extra_context)
         return self.as_sql(compiler, connection, **extra_context)
 
     def resolve_expression(
