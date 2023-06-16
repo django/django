@@ -31,7 +31,7 @@ Fixtures can be used to pre-populate database with data for
 <initial-data-via-fixtures>`.
 
 Where Django looks for fixtures?
-===============================
+================================
 
 Django will search in three locations for fixtures:
 
