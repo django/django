@@ -22,6 +22,11 @@ jobs:
     name: flake8
     runs-on: ubuntu-latest
     steps:
+      - name: Eco-CI Init
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: start-measurement
+          
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Python
@@ -35,10 +40,26 @@ jobs:
         with:
           linters: flake8
           run: flake8
+          
+      - name: Eco-CI Measurement
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: get-measurement
+          label: 'flake8'
+          
+      - name: Eco-CI Show Result
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: display-results
 
   isort:
     runs-on: ubuntu-latest
     steps:
+      - name: Eco-CI Init
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: start-measurement
+          
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set up Python
@@ -52,11 +73,38 @@ jobs:
         with:
           linters: isort
           run: isort --check --diff django tests scripts
+          
+      - name: Eco-CI Measurement
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: get-measurement
+          label: 'isort'
+          
+      - name: Eco-CI Show Result
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: display-results
 
   black:
     runs-on: ubuntu-latest
     steps:
+      - name: Eco-CI Init
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: start-measurement
+          
       - name: Checkout
         uses: actions/checkout@v3
       - name: black
         uses: psf/black@stable
+        
+      - name: Eco-CI Measurement
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: get-measurement
+          label: 'black'
+          
+      - name: Eco-CI Show Result
+        uses: green-coding-berlin/eco-ci-energy-estimation@v1
+        with:
+          task: display-results
