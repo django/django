@@ -58,7 +58,7 @@ def get_random_string(length, allowed_chars=RANDOM_STRING_CHARS):
       * length: 12, bit length =~ 71 bits
       * length: 22, bit length =~ 131 bits
     """
-    return "".join(secrets.choice(allowed_chars) for i in range(length))
+    return "".join(secrets.choice(allowed_chars) for _ in range(length))
 
 
 def constant_time_compare(val1, val2):
