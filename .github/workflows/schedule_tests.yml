@@ -53,7 +53,7 @@ jobs:
 
   selenium-sqlite:
     runs-on: ubuntu-latest
-    name: SQLite
+    name: Selenium tests, SQLite
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -73,7 +73,7 @@ jobs:
 
   selenium-postgresql:
     runs-on: ubuntu-latest
-    name: PostgreSQL
+    name: Selenium tests, PostgreSQL
     services:
       postgres:
         image: postgres:12-alpine
