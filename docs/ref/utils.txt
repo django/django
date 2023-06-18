@@ -651,6 +651,11 @@ escaping HTML.
     through :func:`conditional_escape` which (ultimately) calls
     :func:`~django.utils.encoding.force_str` on the values.
 
+    .. deprecated:: 5.0
+
+        Support for calling ``format_html()`` without passing args or kwargs is
+        deprecated.
+
 .. function:: format_html_join(sep, format_string, args_generator)
 
     A wrapper of :func:`format_html`, for the common case of a group of

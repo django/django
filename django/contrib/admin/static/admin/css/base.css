@@ -937,7 +937,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: flex;
 }
 
-#branding h1 {
+#site-name {
     padding: 0;
     margin: 0;
     margin-inline-end: 20px;
@@ -946,7 +946,7 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--header-branding-color);
 }
 
-#branding h1 a:link, #branding h1 a:visited {
+#site-name a:link, #site-name a:visited {
     color: var(--accent);
 }
 

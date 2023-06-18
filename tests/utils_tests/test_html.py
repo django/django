@@ -3,6 +3,7 @@ from datetime import datetime
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import lazystr
 from django.utils.html import (
     conditional_escape,
@@ -64,6 +65,15 @@ class TestUtilsHtml(SimpleTestCase):
             ),
             "&lt; Dangerous &gt; <b>safe</b> &lt; dangerous again <i>safe again</i>",
         )
+
+    def test_format_html_no_params(self):
+        msg = "Calling format_html() without passing args or kwargs is deprecated."
+        # RemovedInDjango60Warning: when the deprecation ends, replace with:
+        # msg = "args or kwargs must be provided."
+        # with self.assertRaisesMessage(ValueError, msg):
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            name = "Adam"
+            self.assertEqual(format_html(f"<i>{name}</i>"), "<i>Adam</i>")
 
     def test_linebreaks(self):
         items = (

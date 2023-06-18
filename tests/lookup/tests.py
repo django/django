@@ -691,15 +691,14 @@ class LookupTests(TestCase):
         )
 
     def test_exclude(self):
-        pub_date = datetime(2005, 11, 20)
         a8 = Article.objects.create(
-            headline="Article_ with underscore", pub_date=pub_date
+            headline="Article_ with underscore", pub_date=datetime(2005, 11, 20)
         )
         a9 = Article.objects.create(
-            headline="Article% with percent sign", pub_date=pub_date
+            headline="Article% with percent sign", pub_date=datetime(2005, 11, 21)
         )
         a10 = Article.objects.create(
-            headline="Article with \\ backslash", pub_date=pub_date
+            headline="Article with \\ backslash", pub_date=datetime(2005, 11, 22)
         )
         # exclude() is the opposite of filter() when doing lookups:
         self.assertSequenceEqual(

@@ -9,6 +9,7 @@ from django.test.utils import CaptureQueriesContext, isolate_apps
 from .models import (
     Base,
     Chef,
+    CommonChild,
     CommonInfo,
     CustomSupplier,
     GrandChild,
@@ -148,6 +149,14 @@ class ModelInheritanceTests(TestCase):
         # Higher level test for correct query values (title foof not
         # accidentally found).
         self.assertSequenceEqual(s.titles.all(), [])
+
+    def test_create_diamond_mti_default_pk(self):
+        # 1 INSERT for each base.
+        with self.assertNumQueries(4):
+            common_child = CommonChild.objects.create()
+        # 3 SELECTs for the parents, 1 UPDATE for the child.
+        with self.assertNumQueries(4):
+            common_child.save()
 
     def test_update_parent_filtering(self):
         """

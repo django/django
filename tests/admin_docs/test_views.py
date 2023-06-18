@@ -27,7 +27,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
         self.assertContains(response, "<h1>Documentation</h1>", html=True)
         self.assertContains(
             response,
-            '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+            '<div id="site-name"><a href="/admin/">Django administration</a></div>',
         )
         self.client.logout()
         response = self.client.get(reverse("django-admindocs-docroot"), follow=True)
@@ -153,7 +153,7 @@ class AdminDocViewTests(TestDataMixin, AdminDocsTestCase):
             )
             self.assertContains(
                 response,
-                '<h1 id="site-name"><a href="/admin/">Django administration</a></h1>',
+                '<div id="site-name"><a href="/admin/">Django administration</a></div>',
             )
         finally:
             utils.docutils_is_available = True

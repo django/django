@@ -6149,6 +6149,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_and_switch_to_popup()
         self.selenium.find_element(By.ID, "id_title").send_keys("test")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         uuid_id = str(ParentWithUUIDPK.objects.first().id)

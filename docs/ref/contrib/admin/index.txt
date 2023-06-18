@@ -2848,8 +2848,12 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_header
 
-    The text to put at the top of each admin page, as an ``<h1>`` (a string).
+    The text to put at the top of each admin page, as a ``<div>`` (a string).
     By default, this is "Django administration".
+
+    .. versionchanged:: 5.0
+
+        In older versions, ``site_header`` was using an ``<h1>`` tag.
 
 .. attribute:: AdminSite.site_title
 

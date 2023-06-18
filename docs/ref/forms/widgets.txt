@@ -603,7 +603,8 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATE_INPUT_FORMATS` and respects
-    :doc:`/topics/i18n/formatting`.
+    :doc:`/topics/i18n/formatting`. ``%U``, ``%W``, and ``%j`` formats are not
+    supported by this widget.
 
 ``DateTimeInput``
 ~~~~~~~~~~~~~~~~~
@@ -622,7 +623,8 @@ These widgets make use of the HTML elements ``input`` and ``textarea``.
 
     If no ``format`` argument is provided, the default format is the first
     format found in :setting:`DATETIME_INPUT_FORMATS` and respects
-    :doc:`/topics/i18n/formatting`.
+    :doc:`/topics/i18n/formatting`. ``%U``, ``%W``, and ``%j`` formats are not
+    supported by this widget.
 
     By default, the microseconds part of the time value is always set to ``0``.
     If microseconds are required, use a subclass with the

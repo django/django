@@ -562,7 +562,9 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: step_size
 
-        Limit valid inputs to an integral multiple of ``step_size``.
+        Limit valid inputs to an integral multiple of ``step_size``. If
+        ``min_value`` is also provided, it's added as an offset to determine if
+        the step size matches.
 
 ``DurationField``
 -----------------
@@ -695,7 +697,9 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: step_size
 
-        Limit valid inputs to an integral multiple of ``step_size``.
+        Limit valid inputs to an integral multiple of ``step_size``. If
+        ``min_value`` is also provided, it's added as an offset to determine if
+        the step size matches.
 
 ``GenericIPAddressField``
 -------------------------
@@ -831,7 +835,9 @@ For each field, we describe the default widget used if you don't specify
 
     .. attribute:: step_size
 
-        Limit valid inputs to an integral multiple of ``step_size``.
+        Limit valid inputs to an integral multiple of ``step_size``. If
+        ``min_value`` is also provided, it's added as an offset to determine if
+        the step size matches.
 
 ``JSONField``
 -------------

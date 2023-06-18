@@ -1,59 +1,23 @@
-name: Schedule tests
+name: Selenium Tests
 
 on:
-  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize, opened, reopened]
+    paths-ignore:
+      - 'docs/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+   contents: read
 
 jobs:
-  windows:
-    runs-on: windows-latest
-    strategy:
-      matrix:
-        python-version:
-          - '3.10'
-          - '3.11'
-          - '3.12-dev'
-    name: Windows, SQLite, Python ${{ matrix.python-version }}
-    continue-on-error: true
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'pip'
-          cache-dependency-path: 'tests/requirements/py3.txt'
-      - name: Install and upgrade packaging tools
-        run: python -m pip install --upgrade pip setuptools wheel
-      - run: python -m pip install -r tests/requirements/py3.txt -e .
-      - name: Run tests
-        run: python tests/runtests.py -v2
-
-  javascript-tests:
-    runs-on: ubuntu-latest
-    name: JavaScript tests
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '14'
-          cache: 'npm'
-          cache-dependency-path: '**/package.json'
-      - run: npm install
-      - run: npm test
-
   selenium-sqlite:
+    if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
-    name: Selenium tests, SQLite
+    name: SQLite
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -72,8 +36,9 @@ jobs:
           python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
 
   selenium-postgresql:
+    if: contains(github.event.pull_request.labels.*.name, 'selenium')
     runs-on: ubuntu-latest
-    name: Selenium tests, PostgreSQL
+    name: PostgreSQL
     services:
       postgres:
         image: postgres:12-alpine
