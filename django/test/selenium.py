@@ -115,15 +115,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium = cls.create_webdriver()
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
+        cls.addClassCleanup(cls._quit_selenium)
 
     @classmethod
-    def _tearDownClassInternal(cls):
+    def _quit_selenium(cls):
         # quit() the WebDriver before attempting to terminate and join the
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
         if hasattr(cls, "selenium"):
             cls.selenium.quit()
-        super()._tearDownClassInternal()
 
     @contextmanager
     def disable_implicit_wait(self):

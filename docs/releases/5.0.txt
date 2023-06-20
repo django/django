@@ -170,6 +170,9 @@ Minor features
   function returns a 2-dimensional point on the geometry that is closest to
   another geometry.
 
+* :ref:`GIS aggregates <gis-aggregation-functions>` now support the ``filter``
+  argument.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
