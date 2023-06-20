@@ -637,7 +637,7 @@ with the admin site:
 * **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
-* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
+* **admin.E013**: The value of ``fields[n]/fieldsets[n][m]`` cannot include the
   ``ManyToManyField`` ``<field name>``, because that field manually specifies a
   relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
