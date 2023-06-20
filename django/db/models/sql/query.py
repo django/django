@@ -929,7 +929,7 @@ class Query(BaseExpression):
         assert set(change_map).isdisjoint(change_map.values())
 
         # 1. Update references in "select" (normal columns plus aliases),
-        # "group by" and "where".
+        # "group by", "where" and "order by".
         self.where.relabel_aliases(change_map)
         if isinstance(self.group_by, tuple):
             self.group_by = tuple(
@@ -940,6 +940,12 @@ class Query(BaseExpression):
             key: col.relabeled_clone(change_map)
             for key, col in self.annotations.items()
         }
+        self.order_by = tuple(
+            expr.relabeled_clone(change_map)
+            if hasattr(expr, "relabeled_clone")
+            else expr
+            for expr in self.order_by
+        )
 
         # 2. Rename the alias in the internal table/alias datastructures.
         for old_alias, new_alias in change_map.items():
@@ -1150,6 +1156,14 @@ class Query(BaseExpression):
 
     def resolve_expression(self, query, *args, **kwargs):
         clone = self.clone()
+        # Order by clause is still composed of raw expressions, those needs to be
+        # resolved to not be interpreted as outer query expressions
+        clone.order_by = tuple(
+            expr.resolve_expression(self, *args, *kwargs)
+            if hasattr(expr, "resolve_expression")
+            else expr
+            for expr in clone.order_by
+        )
         # Subqueries need to use a different set of aliases than the outer query.
         clone.bump_prefix(query)
         clone.subquery = True
@@ -1167,6 +1181,12 @@ class Query(BaseExpression):
             if hasattr(resolved, "external_aliases"):
                 resolved.external_aliases.update(clone.external_aliases)
             clone.annotations[key] = resolved
+        clone.order_by = tuple(
+            expr.resolve_expression(query, *args, *kwargs)
+            if hasattr(expr, "resolve_expression")
+            else expr
+            for expr in clone.order_by
+        )
         # Outer query's aliases are considered external.
         for alias, table in query.alias_map.items():
             clone.external_aliases[alias] = (

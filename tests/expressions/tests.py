@@ -870,6 +870,21 @@ class BasicExpressionsTests(TestCase):
         ).filter(ceo_company__isnull=False)
         self.assertEqual(qs.get().ceo_company, "Test GmbH")
 
+    def test_order_by_with_f(self):
+        inner = Company.objects.order_by(F("num_employees"))
+        qs = Company.objects.annotate(next_bigger=Subquery(inner.values("pk")[:1]))
+        inner = Company.objects.order_by("num_employees")
+        qs2 = Company.objects.annotate(next_bigger=Subquery(inner.values("pk")[:1]))
+        self.assertEqual(str(qs.query), str(qs2.query))
+
+    def test_order_by_with_outerref(self):
+        inner = Company.objects.filter(
+            num_employees__gt=OuterRef("num_employees")
+        ).order_by(F("num_employees") - OuterRef("num_employees"))
+        qs = Company.objects.annotate(next_bigger=Subquery(inner.values("pk")[:1]))
+        foobar_ltd = qs.get(pk=self.foobar_ltd.pk)
+        self.assertEqual(foobar_ltd.next_bigger, self.gmbh.pk)
+
     def test_pickle_expression(self):
         expr = Value(1)
         expr.convert_value  # populate cached property
