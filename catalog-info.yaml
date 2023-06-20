@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: backstage-test
+  description: django library
+  annotations:
+    github.com/project-slug: sendbird/django
+spec:
+  type: library
+  lifecycle: production
+  owner: server-foundation-team
+  system: sendbird-chat
