@@ -990,6 +990,13 @@ class TestValidation(PostgreSQLSimpleTestCase):
             "List contains 4 items, it should contain no more than 3.",
         )
 
+    def test_with_size_singular(self):
+        field = ArrayField(models.IntegerField(), size=1)
+        field.clean([1], None)
+        msg = "List contains 2 items, it should contain no more than 1."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            field.clean([1, 2], None)
+
     def test_nested_array_mismatch(self):
         field = ArrayField(ArrayField(models.IntegerField()))
         field.clean([[1, 2], [3, 4]], None)
@@ -1131,6 +1138,13 @@ class TestSimpleFormField(PostgreSQLSimpleTestCase):
             cm.exception.messages[0],
             "List contains 3 items, it should contain no fewer than 4.",
         )
+
+    def test_min_length_singular(self):
+        field = SimpleArrayField(forms.IntegerField(), min_length=2)
+        field.clean([1, 2])
+        msg = "List contains 1 item, it should contain no fewer than 2."
+        with self.assertRaisesMessage(exceptions.ValidationError, msg):
+            field.clean([1])
 
     def test_required(self):
         field = SimpleArrayField(forms.CharField(), required=True)

@@ -16,7 +16,7 @@ class ArrayMaxLengthValidator(MaxLengthValidator):
         "%(limit_value)d.",
         "List contains %(show_value)d items, it should contain no more than "
         "%(limit_value)d.",
-        "limit_value",
+        "show_value",
     )
 
 
@@ -26,7 +26,7 @@ class ArrayMinLengthValidator(MinLengthValidator):
         "%(limit_value)d.",
         "List contains %(show_value)d items, it should contain no fewer than "
         "%(limit_value)d.",
-        "limit_value",
+        "show_value",
     )
 
 

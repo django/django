@@ -1,4 +1,5 @@
-from django.contrib.gis.db.models import Collect, Count, Extent, F, Union
+from django.contrib.gis.db.models import Collect, Count, Extent, F, MakeLine, Q, Union
+from django.contrib.gis.db.models.functions import Centroid
 from django.contrib.gis.geos import GEOSGeometry, MultiPoint, Point
 from django.db import NotSupportedError, connection
 from django.test import TestCase, skipUnlessDBFeature
@@ -303,6 +304,116 @@ class RelatedGeoModelTest(TestCase):
         # consolidate -- that's why 4 points in MultiPoint.
         self.assertEqual(4, len(coll))
         self.assertTrue(ref_geom.equals(coll))
+
+    @skipUnlessDBFeature("supports_collect_aggr")
+    def test_collect_filter(self):
+        qs = City.objects.annotate(
+            parcel_center=Collect(
+                "parcel__center1",
+                filter=~Q(parcel__name__icontains="ignore"),
+            ),
+            parcel_center_nonexistent=Collect(
+                "parcel__center1",
+                filter=Q(parcel__name__icontains="nonexistent"),
+            ),
+            parcel_center_single=Collect(
+                "parcel__center1",
+                filter=Q(parcel__name__contains="Alpha"),
+            ),
+        )
+        city = qs.get(name="Aurora")
+        self.assertEqual(
+            city.parcel_center.wkt, "MULTIPOINT (1.7128 -2.006, 4.7128 5.006)"
+        )
+        self.assertIsNone(city.parcel_center_nonexistent)
+        self.assertIn(
+            city.parcel_center_single.wkt,
+            [
+                "MULTIPOINT (1.7128 -2.006)",
+                "POINT (1.7128 -2.006)",  # SpatiaLite collapse to POINT.
+            ],
+        )
+
+    @skipUnlessDBFeature("has_Centroid_function", "supports_collect_aggr")
+    def test_centroid_collect_filter(self):
+        qs = City.objects.annotate(
+            parcel_centroid=Centroid(
+                Collect(
+                    "parcel__center1",
+                    filter=~Q(parcel__name__icontains="ignore"),
+                )
+            )
+        )
+        city = qs.get(name="Aurora")
+        self.assertEqual(city.parcel_centroid.wkt, "POINT (3.2128 1.5)")
+
+    @skipUnlessDBFeature("supports_make_line_aggr")
+    def test_make_line_filter(self):
+        qs = City.objects.annotate(
+            parcel_line=MakeLine(
+                "parcel__center1",
+                filter=~Q(parcel__name__icontains="ignore"),
+            ),
+            parcel_line_nonexistent=MakeLine(
+                "parcel__center1",
+                filter=Q(parcel__name__icontains="nonexistent"),
+            ),
+        )
+        city = qs.get(name="Aurora")
+        self.assertIn(
+            city.parcel_line.wkt,
+            # The default ordering is flaky, so check both.
+            [
+                "LINESTRING (1.7128 -2.006, 4.7128 5.006)",
+                "LINESTRING (4.7128 5.006, 1.7128 -2.006)",
+            ],
+        )
+        self.assertIsNone(city.parcel_line_nonexistent)
+
+    @skipUnlessDBFeature("supports_extent_aggr")
+    def test_extent_filter(self):
+        qs = City.objects.annotate(
+            parcel_border=Extent(
+                "parcel__border1",
+                filter=~Q(parcel__name__icontains="ignore"),
+            ),
+            parcel_border_nonexistent=Extent(
+                "parcel__border1",
+                filter=Q(parcel__name__icontains="nonexistent"),
+            ),
+            parcel_border_no_filter=Extent("parcel__border1"),
+        )
+        city = qs.get(name="Aurora")
+        self.assertEqual(city.parcel_border, (0.0, 0.0, 22.0, 22.0))
+        self.assertIsNone(city.parcel_border_nonexistent)
+        self.assertEqual(city.parcel_border_no_filter, (0.0, 0.0, 32.0, 32.0))
+
+    @skipUnlessDBFeature("supports_union_aggr")
+    def test_union_filter(self):
+        qs = City.objects.annotate(
+            parcel_point_union=Union(
+                "parcel__center2",
+                filter=~Q(parcel__name__icontains="ignore"),
+            ),
+            parcel_point_nonexistent=Union(
+                "parcel__center2",
+                filter=Q(parcel__name__icontains="nonexistent"),
+            ),
+            parcel_point_union_single=Union(
+                "parcel__center2",
+                filter=Q(parcel__name__contains="Alpha"),
+            ),
+        )
+        city = qs.get(name="Aurora")
+        self.assertIn(
+            city.parcel_point_union.wkt,
+            [
+                "MULTIPOINT (12.75 10.05, 3.7128 -5.006)",
+                "MULTIPOINT (3.7128 -5.006, 12.75 10.05)",
+            ],
+        )
+        self.assertIsNone(city.parcel_point_nonexistent)
+        self.assertEqual(city.parcel_point_union_single.wkt, "POINT (3.7128 -5.006)")
 
     def test15_invalid_select_related(self):
         """
