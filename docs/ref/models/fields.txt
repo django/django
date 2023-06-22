@@ -227,7 +227,7 @@ modifications:
   concrete data type. Django supports adding an extra string value to the end
   of this tuple to be used as the human-readable name, or ``label``. The
   ``label`` can be a lazy translatable string. Thus, in most cases, the member
-  value will be a ``(value, label)`` two-tuple. See below for :ref:`an example
+  value will be a ``(value, label)`` 2-tuple. See below for :ref:`an example
   of subclassing choices <field-choices-enum-subclassing>` using a more complex
   data type. If a tuple is not provided, or the last item is not a (lazy)
   string, the ``label`` is :ref:`automatically generated

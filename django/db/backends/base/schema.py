@@ -1346,7 +1346,7 @@ class BaseDatabaseSchemaEditor:
         for cases when a creation type is different to an alteration type
         (e.g. SERIAL in PostgreSQL, PostGIS fields).
 
-        Return a two-tuple of: an SQL fragment of (sql, params) to insert into
+        Return a 2-tuple of: an SQL fragment of (sql, params) to insert into
         an ALTER TABLE statement and a list of extra (sql, params) tuples to
         run once the field is altered.
         """

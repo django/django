@@ -893,7 +893,7 @@ caring about dissolving boundaries.
 *Availability*: `PostGIS <https://postgis.net/docs/ST_Extent.html>`__,
 Oracle, SpatiaLite
 
-Returns the extent of all ``geo_field`` in the ``QuerySet`` as a four-tuple,
+Returns the extent of all ``geo_field`` in the ``QuerySet`` as a 4-tuple,
 comprising the lower left coordinate and the upper right coordinate.
 
 Example:
@@ -915,7 +915,7 @@ Example:
 
 *Availability*: `PostGIS <https://postgis.net/docs/ST_3DExtent.html>`__
 
-Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a six-tuple,
+Returns the 3D extent of all ``geo_field`` in the ``QuerySet`` as a 6-tuple,
 comprising the lower left coordinate and upper right coordinate (each with x, y,
 and z coordinates).
 

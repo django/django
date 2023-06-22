@@ -456,7 +456,7 @@ def extract_views_from_urlpatterns(urlpatterns, base="", namespace=None):
     """
     Return a list of views from a list of urlpatterns.
 
-    Each object in the returned list is a four-tuple:
+    Each object in the returned list is a 4-tuple:
     (view_func, regex, namespace, name)
     """
     views = []

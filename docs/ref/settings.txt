@@ -1959,7 +1959,7 @@ and including a copy here would inevitably become rapidly out of date. You can
 see the current list of translated languages by looking in
 :source:`django/conf/global_settings.py`.
 
-The list is a list of two-tuples in the format
+The list is a list of 2-tuples in the format
 (:term:`language code<language code>`, ``language name``) -- for example,
 ``('ja', 'Japanese')``.
 This specifies which languages are available for language selection. See

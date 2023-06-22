@@ -342,11 +342,11 @@ subclass::
 
     Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
 
-    ``fieldsets`` is a list of two-tuples, in which each two-tuple represents a
+    ``fieldsets`` is a list of 2-tuples, in which each 2-tuple represents a
     ``<fieldset>`` on the admin form page. (A ``<fieldset>`` is a "section" of
     the form.)
 
-    The two-tuples are in the format ``(name, field_options)``, where ``name``
+    The 2-tuples are in the format ``(name, field_options)``, where ``name``
     is a string representing the title of the fieldset and ``field_options`` is
     a dictionary of information about the fieldset, including a list of fields
     to be displayed in it.
@@ -1556,7 +1556,7 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
-    of two-tuples, in which each two-tuple represents a ``<fieldset>`` on the
+    of 2-tuples, in which each 2-tuple represents a ``<fieldset>`` on the
     admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
 
 .. method:: ModelAdmin.get_list_filter(request)

@@ -765,7 +765,7 @@ first item is the first field, etc. For example:
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
-rather than one-tuples. An example should make the difference clearer:
+rather than 1-tuples. An example should make the difference clearer:
 
 .. code-block:: pycon
 
