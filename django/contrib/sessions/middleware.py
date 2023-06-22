@@ -7,6 +7,7 @@ from django.contrib.sessions.exceptions import SessionInterrupted
 from django.utils.cache import patch_vary_headers
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.http import http_date
+from django.core.signing import Signer
 
 
 class SessionMiddleware(MiddlewareMixin):
@@ -17,6 +18,9 @@ class SessionMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         session_key = request.COOKIES.get(settings.SESSION_COOKIE_NAME)
+        if session_key:
+            signer = Signer()
+            session_key = signer.unsign(session_key)
         request.session = self.SessionStore(session_key)
 
     def process_response(self, request, response):
@@ -63,9 +67,10 @@ class SessionMiddleware(MiddlewareMixin):
                             "request completed. The user may have logged "
                             "out in a concurrent request, for example."
                         )
+                    signer = Signer()
                     response.set_cookie(
                         settings.SESSION_COOKIE_NAME,
-                        request.session.session_key,
+                        signer.sign(request.session.session_key),
                         max_age=max_age,
                         expires=expires,
                         domain=settings.SESSION_COOKIE_DOMAIN,
