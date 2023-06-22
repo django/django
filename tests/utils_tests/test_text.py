@@ -167,7 +167,7 @@ class TestUtilsText(SimpleTestCase):
 
         # Test html entities
         truncator = text.Truncator(
-            "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;?</i>"
+            "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo est&aacute;s?</i>"
         )
         self.assertEqual(
             "<i>Buenos d&iacute;as! &#x00bf;C&oacute;mo…</i>",
