@@ -335,6 +335,10 @@ Models
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
+* The :ref:`force_insert <ref-models-force-insert>` argument of
+  :meth:`.Model.save` now allows specifying a tuple of parent classes that must
+  be forced to be inserted.
+
 Pagination
 ~~~~~~~~~~
 

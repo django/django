@@ -832,6 +832,26 @@ class Model(AltersData, metaclass=ModelBase):
 
     asave.alters_data = True
 
+    @classmethod
+    def _validate_force_insert(cls, force_insert):
+        if force_insert is False:
+            return ()
+        if force_insert is True:
+            return (cls,)
+        if not isinstance(force_insert, tuple):
+            raise TypeError("force_insert must be a bool or tuple.")
+        for member in force_insert:
+            if not isinstance(member, ModelBase):
+                raise TypeError(
+                    f"Invalid force_insert member. {member!r} must be a model subclass."
+                )
+            if not issubclass(cls, member):
+                raise TypeError(
+                    f"Invalid force_insert member. {member.__qualname__} must be a "
+                    f"base of {cls.__qualname__}."
+                )
+        return force_insert
+
     def save_base(
         self,
         raw=False,
@@ -873,7 +893,11 @@ class Model(AltersData, metaclass=ModelBase):
         with context_manager:
             parent_inserted = False
             if not raw:
-                parent_inserted = self._save_parents(cls, using, update_fields)
+                # Validate force insert only when parents are inserted.
+                force_insert = self._validate_force_insert(force_insert)
+                parent_inserted = self._save_parents(
+                    cls, using, update_fields, force_insert
+                )
             updated = self._save_table(
                 raw,
                 cls,
@@ -900,7 +924,9 @@ class Model(AltersData, metaclass=ModelBase):
 
     save_base.alters_data = True
 
-    def _save_parents(self, cls, using, update_fields, updated_parents=None):
+    def _save_parents(
+        self, cls, using, update_fields, force_insert, updated_parents=None
+    ):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
         inserted = False
@@ -919,13 +945,14 @@ class Model(AltersData, metaclass=ModelBase):
                     cls=parent,
                     using=using,
                     update_fields=update_fields,
+                    force_insert=force_insert,
                     updated_parents=updated_parents,
                 )
                 updated = self._save_table(
                     cls=parent,
                     using=using,
                     update_fields=update_fields,
-                    force_insert=parent_inserted,
+                    force_insert=parent_inserted or issubclass(parent, force_insert),
                 )
                 if not updated:
                     inserted = True

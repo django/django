@@ -1,9 +1,11 @@
-from django.db import DatabaseError, IntegrityError, transaction
+from django.db import DatabaseError, IntegrityError, models, transaction
 from django.test import TestCase
 
 from .models import (
     Counter,
+    DiamondSubSubCounter,
     InheritedCounter,
+    OtherSubCounter,
     ProxyCounter,
     SubCounter,
     SubSubCounter,
@@ -76,6 +78,29 @@ class InheritanceTests(TestCase):
 
 
 class ForceInsertInheritanceTests(TestCase):
+    def test_force_insert_not_bool_or_tuple(self):
+        msg = "force_insert must be a bool or tuple."
+        with self.assertRaisesMessage(TypeError, msg), transaction.atomic():
+            Counter().save(force_insert=1)
+        with self.assertRaisesMessage(TypeError, msg), transaction.atomic():
+            Counter().save(force_insert="test")
+        with self.assertRaisesMessage(TypeError, msg), transaction.atomic():
+            Counter().save(force_insert=[])
+
+    def test_force_insert_not_model(self):
+        msg = f"Invalid force_insert member. {object!r} must be a model subclass."
+        with self.assertRaisesMessage(TypeError, msg), transaction.atomic():
+            Counter().save(force_insert=(object,))
+        instance = Counter()
+        msg = f"Invalid force_insert member. {instance!r} must be a model subclass."
+        with self.assertRaisesMessage(TypeError, msg), transaction.atomic():
+            Counter().save(force_insert=(instance,))
+
+    def test_force_insert_not_base(self):
+        msg = "Invalid force_insert member. SubCounter must be a base of Counter."
+        with self.assertRaisesMessage(TypeError, msg):
+            Counter().save(force_insert=(SubCounter,))
+
     def test_force_insert_false(self):
         with self.assertNumQueries(3):
             obj = SubCounter.objects.create(pk=1, value=0)
@@ -87,6 +112,10 @@ class ForceInsertInheritanceTests(TestCase):
             SubCounter(pk=obj.pk, value=2).save(force_insert=False)
         obj.refresh_from_db()
         self.assertEqual(obj.value, 2)
+        with self.assertNumQueries(2):
+            SubCounter(pk=obj.pk, value=3).save(force_insert=())
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, 3)
 
     def test_force_insert_false_with_existing_parent(self):
         parent = Counter.objects.create(pk=1, value=1)
@@ -96,13 +125,59 @@ class ForceInsertInheritanceTests(TestCase):
     def test_force_insert_parent(self):
         with self.assertNumQueries(3):
             SubCounter(pk=1, value=1).save(force_insert=True)
+        # Force insert a new parent and don't UPDATE first.
+        with self.assertNumQueries(2):
+            SubCounter(pk=2, value=1).save(force_insert=(Counter,))
+        with self.assertNumQueries(2):
+            SubCounter(pk=3, value=1).save(force_insert=(models.Model,))
 
     def test_force_insert_with_grandparent(self):
         with self.assertNumQueries(4):
             SubSubCounter(pk=1, value=1).save(force_insert=True)
+        # Force insert parents on all levels and don't UPDATE first.
+        with self.assertNumQueries(3):
+            SubSubCounter(pk=2, value=1).save(force_insert=(models.Model,))
+        with self.assertNumQueries(3):
+            SubSubCounter(pk=3, value=1).save(force_insert=(Counter,))
+        # Force insert only the last parent.
+        with self.assertNumQueries(4):
+            SubSubCounter(pk=4, value=1).save(force_insert=(SubCounter,))
 
     def test_force_insert_with_existing_grandparent(self):
         # Force insert only the last child.
         grandparent = Counter.objects.create(pk=1, value=1)
         with self.assertNumQueries(4):
             SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=True)
+        # Force insert a parent, and don't force insert a grandparent.
+        grandparent = Counter.objects.create(pk=2, value=1)
+        with self.assertNumQueries(3):
+            SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=(SubCounter,))
+        # Force insert parents on all levels, grandparent conflicts.
+        grandparent = Counter.objects.create(pk=3, value=1)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=(Counter,))
+
+    def test_force_insert_diamond_mti(self):
+        # Force insert all parents.
+        with self.assertNumQueries(4):
+            DiamondSubSubCounter(pk=1, value=1).save(
+                force_insert=(Counter, SubCounter, OtherSubCounter)
+            )
+        with self.assertNumQueries(4):
+            DiamondSubSubCounter(pk=2, value=1).save(force_insert=(models.Model,))
+        # Force insert parents, and don't force insert a common grandparent.
+        with self.assertNumQueries(5):
+            DiamondSubSubCounter(pk=3, value=1).save(
+                force_insert=(SubCounter, OtherSubCounter)
+            )
+        grandparent = Counter.objects.create(pk=4, value=1)
+        with self.assertNumQueries(4):
+            DiamondSubSubCounter(pk=grandparent.pk, value=1).save(
+                force_insert=(SubCounter, OtherSubCounter),
+            )
+        # Force insert all parents, grandparent conflicts.
+        grandparent = Counter.objects.create(pk=5, value=1)
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            DiamondSubSubCounter(pk=grandparent.pk, value=1).save(
+                force_insert=(models.Model,)
+            )

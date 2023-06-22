@@ -30,3 +30,13 @@ class SubSubCounter(SubCounter):
 class WithCustomPK(models.Model):
     name = models.IntegerField(primary_key=True)
     value = models.IntegerField()
+
+
+class OtherSubCounter(Counter):
+    other_counter_ptr = models.OneToOneField(
+        Counter, primary_key=True, parent_link=True, on_delete=models.CASCADE
+    )
+
+
+class DiamondSubSubCounter(SubCounter, OtherSubCounter):
+    pass
