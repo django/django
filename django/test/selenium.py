@@ -87,14 +87,15 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         return options
 
     def create_webdriver(self):
+        options = self.create_options()
         if self.selenium_hub:
             from selenium import webdriver
 
-            return webdriver.Remote(
-                command_executor=self.selenium_hub,
-                desired_capabilities=self.get_capability(self.browser),
-            )
-        return self.import_webdriver(self.browser)(options=self.create_options())
+            for key, value in self.get_capability(self.browser).items():
+                options.set_capability(key, value)
+
+            return webdriver.Remote(command_executor=self.selenium_hub, options=options)
+        return self.import_webdriver(self.browser)(options=options)
 
 
 @tag("selenium")
