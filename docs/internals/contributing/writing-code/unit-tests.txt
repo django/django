@@ -279,7 +279,7 @@ dependencies:
 
 * :pypi:`aiosmtpd`
 * :pypi:`argon2-cffi` 19.2.0+
-* :pypi:`asgiref` 3.6.0+ (required)
+* :pypi:`asgiref` 3.7.0+ (required)
 * :pypi:`bcrypt`
 * :pypi:`colorama`
 * :pypi:`docutils`

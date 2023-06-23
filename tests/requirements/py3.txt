@@ -1,5 +1,5 @@
 aiosmtpd
-asgiref >= 3.6.0
+asgiref >= 3.7.0
 argon2-cffi >= 19.2.0
 bcrypt
 black
