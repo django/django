@@ -39,10 +39,7 @@ def sensitive_variables(*variables):
 
     def decorator(func):
         if iscoroutinefunction(func):
-
-            @wraps(func)
-            async def sensitive_variables_wrapper(*func_args, **func_kwargs):
-                return await func(*func_args, **func_kwargs)
+            sensitive_variables_wrapper = func
 
             wrapped_func = func
             while getattr(wrapped_func, "__wrapped__", None) is not None:
