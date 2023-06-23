@@ -438,6 +438,9 @@ Miscellaneous
   odd number of operands rather than exactly one operand. This is consistent
   with the behavior of MySQL, MariaDB, and Python.
 
+* The minimum supported version of ``asgiref`` is increased from 3.6.0 to
+  3.7.0.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
