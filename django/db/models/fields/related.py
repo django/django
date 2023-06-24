@@ -1188,7 +1188,23 @@ class ForeignKey(ForeignObject):
                 output_field = output_field.target_field
                 if output_field is self:
                     raise ValueError("Cannot resolve output_field.")
-        return super().get_col(alias, output_field)
+        return self._get_col(alias, output_field)
+
+    @functools.lru_cache(maxsize=128)
+    def _get_col(self, alias, output_field=None):
+        from django.db.models.expressions import Col
+
+        if alias == self.model._meta.db_table and (
+            output_field is None or output_field == self
+        ):
+            return Col(alias, self, output_field)
+
+        # print("miss")
+        return Col(alias, self, output_field)
+
+    @cached_property
+    def _targets(self):
+        return [x[1] for x in getattr(self, "related_fields", [])]
 
 
 class OneToOneField(ForeignKey):
