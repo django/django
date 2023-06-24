@@ -123,9 +123,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
         if object_type == "VIEW":
             # For a view, use user_views for collation
-            table_join = (
-                "user_views ON user_views.view_name = user_tab_cols.table_name"
-            )
+            table_join = "user_views ON user_views.view_name = user_tab_cols.table_name"
             collation = "user_tab_cols.collation = user_views.default_collation"
         else:
             # For a table, use user_tables for collation
@@ -176,7 +174,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_col_comments.table_name = user_tab_cols.table_name
         WHERE user_tab_cols.table_name = UPPER(%s)
         """
-        cursor.execute(query, [table_name],)
+        cursor.execute(
+            query,
+            [table_name],
+        )
         field_map = {
             column: (
                 display_size,
