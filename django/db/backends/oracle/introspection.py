@@ -123,11 +123,15 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
 
     if object_type == "VIEW":
         # For a view, use user_views for collation
-        table_join = "user_views ON user_views.view_name = user_tab_cols.table_name"
+        table_join = (
+            "user_views ON user_views.view_name = user_tab_cols.table_name"
+        )
         collation = "user_tab_cols.collation = user_views.default_collation"
     else:
         # For a table, use user_tables for collation
-        table_join = "user_tables ON user_tables.table_name = user_tab_cols.table_name"
+        table_join = (
+            "user_tables ON user_tables.table_name = user_tab_cols.table_name"
+        )
         collation = "user_tab_cols.collation = user_tables.default_collation"
 
     # user_tab_cols gives data default for columns
@@ -154,7 +158,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 SELECT 1
                 FROM user_json_columns
                 WHERE
-                    user_json_columns.table_name = user_tab_cols.table_name AND
+                    user_json_columns.table_name = user_tab_cols.table_name
+                    AND
                     user_json_columns.column_name = user_tab_cols.column_name
             )
             THEN 1
@@ -166,12 +171,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         {table_join}
     LEFT OUTER JOIN
         user_col_comments ON
-            user_col_comments.column_name = user_tab_cols.column_name AND
+            user_col_comments.column_name = user_tab_cols.column_name
+            AND
             user_col_comments.table_name = user_tab_cols.table_name
     WHERE user_tab_cols.table_name = UPPER(%s)
     """
-    cursor.execute(query, [table_name],
-                   )
+    cursor.execute(query, [table_name],)
         field_map = {
             column: (
                 display_size,
