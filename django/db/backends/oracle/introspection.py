@@ -110,47 +110,72 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface.
         """
-        # user_tab_columns gives data default for columns
+        # Check if table_name is a table or a view
         cursor.execute(
             """
-            SELECT
-                user_tab_cols.column_name,
-                user_tab_cols.data_default,
-                CASE
-                    WHEN user_tab_cols.collation = user_tables.default_collation
-                    THEN NULL
-                    ELSE user_tab_cols.collation
-                END collation,
-                CASE
-                    WHEN user_tab_cols.char_used IS NULL
-                    THEN user_tab_cols.data_length
-                    ELSE user_tab_cols.char_length
-                END as display_size,
-                CASE
-                    WHEN user_tab_cols.identity_column = 'YES' THEN 1
-                    ELSE 0
-                END as is_autofield,
-                CASE
-                    WHEN EXISTS (
-                        SELECT  1
-                        FROM user_json_columns
-                        WHERE
-                            user_json_columns.table_name = user_tab_cols.table_name AND
-                            user_json_columns.column_name = user_tab_cols.column_name
-                    )
-                    THEN 1
-                    ELSE 0
-                END as is_json,
-                user_col_comments.comments as col_comment
-            FROM user_tab_cols
-            LEFT OUTER JOIN
-                user_tables ON user_tables.table_name = user_tab_cols.table_name
-            LEFT OUTER JOIN
-                user_col_comments ON
-                user_col_comments.column_name = user_tab_cols.column_name AND
-                user_col_comments.table_name = user_tab_cols.table_name
-            WHERE user_tab_cols.table_name = UPPER(%s)
+            SELECT object_type
+            FROM user_objects
+            WHERE object_name = UPPER(%s)
             """,
+            [table_name],
+        )
+        object_type = cursor.fetchone()[0]
+
+        if object_type == "VIEW":
+            # For a view, use user_views for collation
+            table_join = "user_views ON user_views.view_name = user_tab_cols.table_name"
+            collation = "user_tab_cols.collation = user_views.default_collation"
+        else:
+            # For a table, use user_tables for collation
+            table_join = (
+                "user_tables ON user_tables.table_name = user_tab_cols.table_name"
+            )
+            collation = "user_tab_cols.collation = user_tables.default_collation"
+
+        # user_tab_cols gives data default for columns
+        query = f"""
+        SELECT
+            user_tab_cols.column_name,
+            user_tab_cols.data_default,
+            CASE
+                WHEN {collation}
+                THEN NULL
+                ELSE user_tab_cols.collation
+            END collation,
+            CASE
+                WHEN user_tab_cols.char_used IS NULL
+                THEN user_tab_cols.data_length
+                ELSE user_tab_cols.char_length
+            END as display_size,
+            CASE
+                WHEN user_tab_cols.identity_column = 'YES' THEN 1
+                ELSE 0
+            END as is_autofield,
+            CASE
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM user_json_columns
+                    WHERE
+                        user_json_columns.table_name = user_tab_cols.table_name
+                        AND
+                        user_json_columns.column_name = user_tab_cols.column_name
+                )
+                THEN 1
+                ELSE 0
+            END as is_json,
+            user_col_comments.comments as col_comment
+        FROM user_tab_cols
+        LEFT OUTER JOIN
+            {table_join}
+        LEFT OUTER JOIN
+            user_col_comments ON
+                user_col_comments.column_name = user_tab_cols.column_name
+                AND
+                user_col_comments.table_name = user_tab_cols.table_name
+        WHERE user_tab_cols.table_name = UPPER(%s)
+        """
+        cursor.execute(
+            query,
             [table_name],
         )
         field_map = {
