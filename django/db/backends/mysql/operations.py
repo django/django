@@ -332,7 +332,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return value
 
     def convert_uuidfield_value(self, value, expression, connection):
-        if value is not None:
+        if value is not None and value.strip():
             value = uuid.UUID(value)
         return value
 
