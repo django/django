@@ -105,11 +105,12 @@ class File(FileProxyMixin):
     def __exit__(self, exc_type, exc_value, tb):
         self.close()
 
-    def open(self, mode=None):
+    def open(self, mode=None, encoding=None):
         if not self.closed:
             self.seek(0)
         elif self.name and os.path.exists(self.name):
-            self.file = open(self.name, mode or self.mode)
+            # Use encoding argument here
+            self.file = open(self.name, mode or self.mode, encoding=encoding)
         else:
             raise ValueError("The file cannot be reopened.")
         return self
