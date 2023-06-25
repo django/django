@@ -310,7 +310,7 @@ class BaseHandler:
         else:
             resolver = get_resolver()
         # Resolve the view, and assign the match object back to the request.
-        resolver_match = resolver.resolve(request.path_info)
+        resolver_match = resolver.resolve(request.path_info, traceback=False)
         request.resolver_match = resolver_match
         return resolver_match
 

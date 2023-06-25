@@ -17,6 +17,7 @@ from django.core.exceptions import (
 from django.http import Http404
 from django.http.multipartparser import MultiPartParserError
 from django.urls import get_resolver, get_urlconf
+from django.urls.exceptions import Resolver404
 from django.utils.log import log_response
 from django.views import debug
 
@@ -61,7 +62,21 @@ def convert_exception_to_response(get_response):
 
 
 def response_for_exception(request, exc):
-    if isinstance(exc, Http404):
+    if isinstance(exc, Resolver404):
+        if settings.DEBUG:
+            if exc.traceback:
+                response = debug.technical_500_response(
+                    request, *sys.exc_info(), status_code=404
+                )
+            else:
+                response = debug.technical_404_response(request, exc)
+
+        else:
+            response = get_exception_response(
+                request, get_resolver(get_urlconf()), 404, exc
+            )
+
+    elif isinstance(exc, Http404):
         if settings.DEBUG:
             response = debug.technical_404_response(request, exc)
         else:

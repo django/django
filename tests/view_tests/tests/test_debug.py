@@ -152,17 +152,17 @@ class DebugViewTests(SimpleTestCase):
 
     def test_404(self):
         response = self.client.get("/raises404/")
-        self.assertNotContains(
-            response,
-            '<pre class="exception_value">',
-            status_code=404,
-        )
         self.assertContains(
+            response,
+            "<th>Raised during:</th><td>view_tests.views.raises404</td>",
+            status_code=404,
+            html=True,
+        )
+        self.assertNotContains(
             response,
             "<p>The current path, <code>not-in-urls</code>, didn’t match any "
             "of these.</p>",
             status_code=404,
-            html=True,
         )
 
     def test_404_not_in_urls(self):
@@ -191,6 +191,12 @@ class DebugViewTests(SimpleTestCase):
         # Pattern and view name of a RoutePattern appear.
         self.assertContains(response, r"path-post/&lt;int:pk&gt;/", status_code=404)
         self.assertContains(response, "[name='path-post']", status_code=404)
+        self.assertContains(
+            response,
+            "<!-- technical_500.html -->",
+            status_code=404,
+            html=True,
+        )
 
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
@@ -201,9 +207,16 @@ class DebugViewTests(SimpleTestCase):
             status_code=404,
             html=True,
         )
+        self.assertContains(
+            response,
+            "<!-- technical_500.html -->",
+            status_code=404,
+            html=True,
+        )
 
     def test_technical_404(self):
         response = self.client.get("/technical404/")
+        self.assertNotIn(response.content.decode(), "<!-- technical_500.html -->")
         self.assertContains(
             response,
             '<pre class="exception_value">Testing technical 404.</pre>',
@@ -226,6 +239,7 @@ class DebugViewTests(SimpleTestCase):
 
     def test_classbased_technical_404(self):
         response = self.client.get("/classbased404/")
+        self.assertNotIn(response.content.decode(), "<!-- technical_500.html -->")
         self.assertContains(
             response,
             "<th>Raised by:</th><td>view_tests.views.Http404View</td>",
@@ -242,6 +256,13 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
             html=True,
         )
+        self.assertContains(
+            response,
+            "<!-- technical_500.html -->",
+            status_code=500,
+            html=True,
+        )
+
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(

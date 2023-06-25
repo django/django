@@ -652,7 +652,7 @@ class URLResolver:
             self._populate()
         return name in self._callback_strs
 
-    def resolve(self, path):
+    def resolve(self, path, traceback=True):
         path = str(path)  # path may be a reverse_lazy object
         tried = []
         match = self.pattern.match(path)
@@ -697,8 +697,8 @@ class URLResolver:
                             },
                         )
                     tried.append([pattern])
-            raise Resolver404({"tried": tried, "path": new_path})
-        raise Resolver404({"path": path})
+            raise Resolver404({"tried": tried, "path": new_path}, traceback=traceback)
+        raise Resolver404({"path": path}, traceback=traceback)
 
     @cached_property
     def urlconf_module(self):
