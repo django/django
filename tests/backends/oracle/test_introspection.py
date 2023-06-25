@@ -36,10 +36,24 @@ class DatabaseSequenceTests(TransactionTestCase):
 
     def test_get_table_description(self):
         with connection.cursor() as cursor:
-            cursor.execute("SELECT * FROM %s" % Square._meta.db_table)
-            description = connection.introspection.get_table_description(
-                cursor, Square._meta.db_table
+            # First, we create a test table
+            cursor.execute(
+                """
+                CREATE TABLE TEST_TABLE (
+                    TEST_FIELD VARCHAR2(100) COLLATE BINARY_CI
+                )
+            """
             )
-            self.assertEqual(len(description), 2)
-            self.assertEqual(description[0][0], "ID")
-            self.assertEqual(description[1][0], "NAME")
+            try:
+                # Then we get the description of the table
+                description = connection.introspection.get_table_description(
+                    cursor, "TEST_TABLE"
+                )
+
+                # Finally, we make assertions about the table description
+                self.assertEqual(len(description), 1)
+                self.assertEqual(description[0][0], "TEST_FIELD")
+                self.assertEqual(description[0][1], "VARCHAR2")
+            finally:
+                # Clean up after ourselves by removing the test table
+                cursor.execute("DROP TABLE TEST_TABLE")
