@@ -33,3 +33,33 @@ class DatabaseSequenceTests(TransactionTestCase):
                 # Recreate model, because adding identity is impossible.
                 editor.delete_model(Square)
                 editor.create_model(Square)
+
+    def test_table_introspection(self):
+        """
+        Test to check that the 'get_table_description' method of Django's
+        database introspection for Oracle does not return a 'db_collation' argument
+        for any field when applied to a table.
+        """
+        with connection.cursor() as cursor:
+            # Assumption: 'MY_TABLE' exists in the test database
+            description = connection.introspection.get_table_description(
+                cursor, "default"
+            )
+            for field in description:
+                # Check that none of the fields have a db_collation argument
+                self.assertIsNone(field.db_collation)
+
+    def test_view_introspection(self):
+        """
+        Test to check that the 'get_table_description' method of Django's
+        database introspection for Oracle does not return a 'db_collation' argument
+        for any field when applied to a view.
+        """
+        with connection.cursor() as cursor:
+            # Assumption: 'MY_VIEW' exists in the test database
+            description = connection.introspection.get_table_description(
+                cursor, "default"
+            )
+            for field in description:
+                # Check that none of the fields have a db_collation argument
+                self.assertIsNone(field.db_collation)
