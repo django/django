@@ -106,7 +106,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         ]
 
     def get_table_description(self, cursor, table_name):
-        # Primero, obtenemos default_collation en una consulta separada
+        # First, we get default_collation in a separate query
         cursor.execute(
             """
             SELECT default_collation
@@ -118,7 +118,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         row = cursor.fetchone()
         default_collation = row[0] if row else None
 
-        # Luego, pasamos default_collation a la consulta principal
+        # Then we pass default_collation to the main query
         cursor.execute(
             """
             SELECT column_name, data_type, data_default, nullable,
