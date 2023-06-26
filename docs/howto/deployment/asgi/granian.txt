@@ -1,0 +1,38 @@
+=====================================
+How to use Django with Granian (ASGI)
+=====================================
+
+Granian_ is an ASGI server written in Rust that supports HTTP/1 and HTTP/2,
+with an emphasis on speed.
+
+Installing Granian
+==================
+
+You can install Granian with ``pip``:
+
+.. code-block:: shell
+
+    python -m pip install granian
+
+Running Django in Granian as a generic ASGI application
+=======================================================
+
+When Granian is installed, a ``granian`` command is available which runs ASGI
+applications. Granian needs to be called with the interface option for the ASGI
+protocol and the location of a module containing an ASGI application object,
+followed by what the application is called (separated by a colon).
+
+For a typical Django project, invoking Granian would look like:
+
+.. code-block:: shell
+
+    granian --interface asgi myproject.asgi:application
+
+This will start one process listening on ``127.0.0.1:8000``. It
+requires that your project be on the Python path; to ensure that
+run this command from the same directory as your ``manage.py`` file.
+
+For more advanced usage, please read the `Granian repository
+<Granian_>`_.
+
+.. _Granian: https://github.com/emmett-framework/granian
