@@ -10,7 +10,7 @@ from django.utils.functional import cached_property
 
 
 def is_hashed_session_keys_enabled():
-    return getattr(settings, 'SESSION_HASHED_KEYS_IN_BACKEND', False)
+    return getattr(settings, "SESSION_HASHED_KEYS_IN_BACKEND", False)
 
 
 class SessionStore(SessionBase):
@@ -34,7 +34,7 @@ class SessionStore(SessionBase):
         return self.get_model_class()
 
     def get_backend_key(self, session_key):
-        if (is_hashed_session_keys_enabled()):
+        if is_hashed_session_keys_enabled():
             return sha256(session_key.encode("utf-8")).hexdigest()
         return session_key
 
@@ -42,7 +42,7 @@ class SessionStore(SessionBase):
         try:
             return self.model.objects.get(
                 session_key=self.get_backend_key(self.session_key),
-                expire_date__gt=timezone.now()
+                expire_date__gt=timezone.now(),
             )
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
