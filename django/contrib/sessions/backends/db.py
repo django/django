@@ -1,10 +1,15 @@
+from hashlib import sha256
 import logging
 
+from django.conf import settings
 from django.contrib.sessions.backends.base import CreateError, SessionBase, UpdateError
 from django.core.exceptions import SuspiciousOperation
 from django.db import DatabaseError, IntegrityError, router, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
+
+def is_hashed_session_keys_enabled():
+    return getattr(settings, 'SESSION_HASHED_KEYS_IN_BACKEND', False)
 
 
 class SessionStore(SessionBase):
@@ -27,10 +32,15 @@ class SessionStore(SessionBase):
     def model(self):
         return self.get_model_class()
 
+    def get_backend_key(self, session_key):
+        if (is_hashed_session_keys_enabled()):
+            return sha256(session_key.encode("utf-8")).hexdigest()
+        return session_key
+
     def _get_session_from_db(self):
         try:
             return self.model.objects.get(
-                session_key=self.session_key, expire_date__gt=timezone.now()
+                session_key=self.get_backend_key(self.session_key), expire_date__gt=timezone.now()
             )
         except (self.model.DoesNotExist, SuspiciousOperation) as e:
             if isinstance(e, SuspiciousOperation):
@@ -43,7 +53,7 @@ class SessionStore(SessionBase):
         return self.decode(s.session_data) if s else {}
 
     def exists(self, session_key):
-        return self.model.objects.filter(session_key=session_key).exists()
+        return self.model.objects.filter(session_key=self.get_backend_key(session_key)).exists()
 
     def create(self):
         while True:
@@ -65,7 +75,7 @@ class SessionStore(SessionBase):
         to the database.
         """
         return self.model(
-            session_key=self._get_or_create_session_key(),
+            session_key=self.get_backend_key(self._get_or_create_session_key()),
             session_data=self.encode(data),
             expire_date=self.get_expiry_date(),
         )
@@ -101,7 +111,7 @@ class SessionStore(SessionBase):
                 return
             session_key = self.session_key
         try:
-            self.model.objects.get(session_key=session_key).delete()
+            self.model.objects.get(session_key=self.get_backend_key(session_key)).delete()
         except self.model.DoesNotExist:
             pass
 
