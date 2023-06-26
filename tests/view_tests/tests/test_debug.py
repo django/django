@@ -260,7 +260,6 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
             html=True,
         )
-
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(
