@@ -892,3 +892,29 @@ class TestCollectionHashedFilesCache(CollectionTestCase):
                 content = relfile.read()
                 self.assertIn(b"foo.57a5cb9ba68d.png", content)
                 self.assertIn(b"xyz.57a5cb9ba68d.png", content)
+
+
+@override_settings(
+    STORAGES={
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+        },
+    }
+)
+class TestManifestStaticFilesStorageUnsupportedVersion(CollectionTestCase):
+    run_collectstatic_in_setUp = False
+
+    def test_collectstatic_with_unsupported_version(self):
+        manifest_path = (
+            Path(settings.STATIC_ROOT)
+            / storage.ManifestStaticFilesStorage.manifest_name
+        )
+        manifest = {"version": "0.0"}
+        with manifest_path.open("w") as manifest_file:
+            json.dump(manifest, manifest_file)
+        self.run_collectstatic()
+        with manifest_path.open("r") as manifest_file:
+            manifest = json.load(manifest_file)
+            self.assertEqual(
+                manifest["version"], storage.staticfiles_storage.manifest_version
+            )

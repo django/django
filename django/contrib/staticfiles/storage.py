@@ -460,7 +460,28 @@ class ManifestFilesMixin(HashedFilesMixin):
         if manifest_storage is None:
             manifest_storage = self
         self.manifest_storage = manifest_storage
-        self.hashed_files, self.manifest_hash = self.load_manifest()
+        self._hashed_files = None
+        self._manifest_hash = None
+
+    @property
+    def hashed_files(self):
+        if self._hashed_files is None:
+            self._hashed_files, self._manifest_hash = self.load_manifest()
+        return self._hashed_files
+
+    @hashed_files.setter
+    def hashed_files(self, value):
+        self._hashed_files = value
+
+    @property
+    def manifest_hash(self):
+        if self._manifest_hash is None:
+            self._hashed_files, self._manifest_hash = self.load_manifest()
+        return self._manifest_hash
+
+    @manifest_hash.setter
+    def manifest_hash(self, value):
+        self._manifest_hash = value
 
     def read_manifest(self):
         try:
