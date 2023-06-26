@@ -110,6 +110,31 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface.
         """
+        # A default collation for the given table/view/materialized view.
+        cursor.execute(
+            """
+            SELECT user_tables.default_collation
+            FROM user_tables
+            WHERE
+                user_tables.table_name = UPPER(%s) AND
+                NOT EXISTS (
+                    SELECT 1
+                    FROM user_mviews
+                    WHERE user_mviews.mview_name = user_tables.table_name
+                )
+            UNION ALL
+            SELECT user_views.default_collation
+            FROM user_views
+            WHERE user_views.view_name = UPPER(%s)
+            UNION ALL
+            SELECT user_mviews.default_collation
+            FROM user_mviews
+            WHERE user_mviews.mview_name = UPPER(%s)
+            """,
+            [table_name, table_name, table_name],
+        )
+        row = cursor.fetchone()
+        default_table_collation = row[0] if row else ""
         # user_tab_columns gives data default for columns
         cursor.execute(
             """
@@ -117,7 +142,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_tab_cols.column_name,
                 user_tab_cols.data_default,
                 CASE
-                    WHEN user_tab_cols.collation = user_tables.default_collation
+                    WHEN user_tab_cols.collation = %s
                     THEN NULL
                     ELSE user_tab_cols.collation
                 END collation,
@@ -144,14 +169,12 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_col_comments.comments as col_comment
             FROM user_tab_cols
             LEFT OUTER JOIN
-                user_tables ON user_tables.table_name = user_tab_cols.table_name
-            LEFT OUTER JOIN
                 user_col_comments ON
                 user_col_comments.column_name = user_tab_cols.column_name AND
                 user_col_comments.table_name = user_tab_cols.table_name
             WHERE user_tab_cols.table_name = UPPER(%s)
             """,
-            [table_name],
+            [default_table_collation, table_name],
         )
         field_map = {
             column: (
