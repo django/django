@@ -22,7 +22,7 @@ urlpatterns = [
     path("raises400/", views.raises400),
     path("raises400_bad_request/", views.raises400_bad_request),
     path("raises403/", views.raises403),
-    path("raises404/", views.raises404),
+    path("raises_resolver404/", views.raises_resolver404),
     path("raises500/", views.raises500),
     path("custom_reporter_class_view/", views.custom_reporter_class_view),
     path("technical404/", views.technical404, name="my404"),

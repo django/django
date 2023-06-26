@@ -150,11 +150,18 @@ class DebugViewTests(SimpleTestCase):
         self.assertContains(response, "test template", status_code=403)
         self.assertContains(response, "(Insufficient Permissions).", status_code=403)
 
-    def test_404(self):
-        response = self.client.get("/raises404/")
+    def test_resolver404(self):
+        """Ensure Resolver404 raised in a view renders a technical 500 error page"""
+        response = self.client.get("/raises_resolver404/")
         self.assertContains(
             response,
-            "<th>Raised during:</th><td>view_tests.views.raises404</td>",
+            "<th>Raised during:</th><td>view_tests.views.raises_resolver404</td>",
+            status_code=404,
+            html=True,
+        )
+        self.assertContains(
+            response,
+            "<th>Exception Type:</th><td>Resolver404</td>",
             status_code=404,
             html=True,
         )
@@ -163,9 +170,11 @@ class DebugViewTests(SimpleTestCase):
             "<p>The current path, <code>not-in-urls</code>, didn’t match any "
             "of these.</p>",
             status_code=404,
+            html=True,
         )
 
     def test_404_not_in_urls(self):
+        """Ensure a technical 404 error is rendered, not a technical 500"""
         response = self.client.get("/not-in-urls")
         self.assertNotContains(response, "Raised by:", status_code=404)
         self.assertNotContains(
@@ -191,12 +200,6 @@ class DebugViewTests(SimpleTestCase):
         # Pattern and view name of a RoutePattern appear.
         self.assertContains(response, r"path-post/&lt;int:pk&gt;/", status_code=404)
         self.assertContains(response, "[name='path-post']", status_code=404)
-        self.assertContains(
-            response,
-            "<!-- technical_500.html -->",
-            status_code=404,
-            html=True,
-        )
 
     @override_settings(ROOT_URLCONF=WithoutEmptyPathUrls)
     def test_404_empty_path_not_in_urls(self):
@@ -207,16 +210,10 @@ class DebugViewTests(SimpleTestCase):
             status_code=404,
             html=True,
         )
-        self.assertContains(
-            response,
-            "<!-- technical_500.html -->",
-            status_code=404,
-            html=True,
-        )
 
     def test_technical_404(self):
+        """Test raising Http404 in a view displays the technical 404 page"""
         response = self.client.get("/technical404/")
-        self.assertNotIn(response.content.decode(), "<!-- technical_500.html -->")
         self.assertContains(
             response,
             '<pre class="exception_value">Testing technical 404.</pre>',
@@ -238,11 +235,18 @@ class DebugViewTests(SimpleTestCase):
         )
 
     def test_classbased_technical_404(self):
+        """Test raising Http404 in a class based view displays the technical 404 page"""
         response = self.client.get("/classbased404/")
-        self.assertNotIn(response.content.decode(), "<!-- technical_500.html -->")
         self.assertContains(
             response,
             "<th>Raised by:</th><td>view_tests.views.Http404View</td>",
+            status_code=404,
+            html=True,
+        )
+        self.assertContains(
+            response,
+            "<p>The current path, <code>classbased404/</code>, matched the "
+            "last one.</p>",
             status_code=404,
             html=True,
         )
@@ -256,18 +260,17 @@ class DebugViewTests(SimpleTestCase):
             status_code=500,
             html=True,
         )
-        self.assertContains(
-            response,
-            "<!-- technical_500.html -->",
-            status_code=500,
-            html=True,
-        )
 
         with self.assertLogs("django.request", "ERROR"):
             response = self.client.get("/raises500/", headers={"accept": "text/plain"})
         self.assertContains(
             response,
             "Raised during: view_tests.views.raises500",
+            status_code=500,
+        )
+        self.assertContains(
+            response,
+            "Exception Type: Exception",
             status_code=500,
         )
 
@@ -287,6 +290,11 @@ class DebugViewTests(SimpleTestCase):
         self.assertContains(
             response,
             "Raised during: view_tests.views.Raises500View",
+            status_code=500,
+        )
+        self.assertContains(
+            response,
+            "Exception Type: Exception",
             status_code=500,
         )
 

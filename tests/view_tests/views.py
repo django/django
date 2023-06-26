@@ -70,7 +70,7 @@ def raises403(request):
     raise PermissionDenied("Insufficient Permissions")
 
 
-def raises404(request):
+def raises_resolver404(request):
     resolver = get_resolver(None)
     resolver.resolve("/not-in-urls")
 
