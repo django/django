@@ -296,7 +296,7 @@ dependencies:
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
-* :pypi:`selenium` 3.8.0+
+* :pypi:`selenium` 4.8.0+
 * :pypi:`sqlparse` 0.3.1+ (required)
 * :pypi:`tblib` 1.5.0+
 
