@@ -147,9 +147,16 @@ class BaseUserCreationForm(forms.ModelForm):
 
 
 class UserCreationForm(BaseUserCreationForm):
+    def contains_unwanted_characters(self, username):
+        """Check if the username contains characters that normalize to whitespace."""
+        normalized_username = unicodedata.normalize("NFKC", username)
+        return username != normalized_username.strip()
+
     def clean_username(self):
-        """Reject usernames that differ only in case."""
+        """Reject usernames that differ only in case or contain unwanted characters."""
         username = self.cleaned_data.get("username")
+
+        # Check for case-insensitive duplicates
         if (
             username
             and self._meta.model.objects.filter(username__iexact=username).exists()
@@ -162,6 +169,11 @@ class UserCreationForm(BaseUserCreationForm):
                         )
                     }
                 )
+            )
+        # Check for unwanted characters
+        elif self.contains_unwanted_characters(username):
+            self._update_errors(
+                ValidationError({"username": "Username has misleading characters."})
             )
         else:
             return username
