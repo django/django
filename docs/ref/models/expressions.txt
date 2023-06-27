@@ -18,6 +18,25 @@ Django supports negation, addition, subtraction, multiplication, division,
 modulo arithmetic, and the power operator on query expressions, using Python
 constants, variables, and even other expressions.
 
+.. _output-field:
+
+Output field
+============
+
+Many of the expressions documented in this section support an optional
+``output_field`` parameter. If given, Django will load the value into that
+field after retrieving it from the database.
+
+``output_field`` takes a model field instance, like ``IntegerField()`` or
+``BooleanField()``. Usually, the field doesn't need any arguments, like
+``max_length``, since field arguments relate to data validation which will not
+be performed on the expression's output value.
+
+``output_field`` is only required when Django is unable to automatically
+determine the result's field type, such as complex expressions that mix field
+types. For example, adding a ``DecimalField()`` and a ``FloatField()`` requires
+an output field, like ``output_field=FloatField()``.
+
 Some examples
 =============
 
@@ -220,10 +239,10 @@ different fields with arithmetic::
 
     company = Company.objects.annotate(chairs_needed=F("num_employees") - F("num_chairs"))
 
-If the fields that you're combining are of different types you'll need
-to tell Django what kind of field will be returned. Since ``F()`` does not
-directly support ``output_field`` you will need to wrap the expression with
-:class:`ExpressionWrapper`::
+If the fields that you're combining are of different types you'll need to tell
+Django what kind of field will be returned. Most expressions support
+:ref:`output_field<output-field>` for this case, but since ``F()`` does not, you
+will need to wrap the expression with :class:`ExpressionWrapper`::
 
     from django.db.models import DateTimeField, ExpressionWrapper, F
 
@@ -389,7 +408,8 @@ driver would escape them.
 
 The ``function``, ``template``, and ``arg_joiner`` keywords can be used to
 replace the attributes of the same name without having to define your own
-class. ``output_field`` can be used to define the expected return type.
+class. :ref:`output_field<output-field>` can be used to define the expected
+return type.
 
 ``Aggregate()`` expressions
 ---------------------------
@@ -443,19 +463,6 @@ The ``Aggregate`` API is as follows:
 The ``expressions`` positional arguments can include expressions, transforms of
 the model field, or the names of model fields. They will be converted to a
 string and used as the ``expressions`` placeholder within the ``template``.
-
-The ``output_field`` argument requires a model field instance, like
-``IntegerField()`` or ``BooleanField()``, into which Django will load the value
-after it's retrieved from the database. Usually no arguments are needed when
-instantiating the model field as any arguments relating to data validation
-(``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
-output value.
-
-Note that ``output_field`` is only required when Django is unable to determine
-what field type the result should be. Complex expressions that mix field types
-should define the desired ``output_field``. For example, adding an
-``IntegerField()`` and a ``FloatField()`` together should probably have
-``output_field=FloatField()`` defined.
 
 The ``distinct`` argument determines whether or not the aggregate function
 should be invoked for each distinct value of ``expressions`` (or set of
@@ -515,15 +522,10 @@ The ``value`` argument describes the value to be included in the expression,
 such as ``1``, ``True``, or ``None``. Django knows how to convert these Python
 values into their corresponding database type.
 
-The ``output_field`` argument should be a model field instance, like
-``IntegerField()`` or ``BooleanField()``, into which Django will load the value
-after it's retrieved from the database. Usually no arguments are needed when
-instantiating the model field as any arguments relating to data validation
-(``max_length``, ``max_digits``, etc.) will not be enforced on the expression's
-output value. If no ``output_field`` is specified it will be tentatively
-inferred from the :py:class:`type` of the provided ``value``, if possible. For
-example, passing an instance of :py:class:`datetime.datetime` as ``value``
-would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
+If no :ref:`output_field<output-field>` is specified, it will be inferred from
+the type of the provided ``value`` for many common types. For example, passing
+an instance of :py:class:`datetime.datetime` as ``value`` defaults
+``output_field`` to :class:`~django.db.models.DateTimeField`.
 
 ``ExpressionWrapper()`` expressions
 -----------------------------------
@@ -531,9 +533,9 @@ would default ``output_field`` to :class:`~django.db.models.DateTimeField`.
 .. class:: ExpressionWrapper(expression, output_field)
 
 ``ExpressionWrapper`` surrounds another expression and provides access to
-properties, such as ``output_field``, that may not be available on other
-expressions. ``ExpressionWrapper`` is necessary when using arithmetic on
-``F()`` expressions with different types as described in
+properties, such as :ref:`output_field<output-field>`, that may not be
+available on other expressions. ``ExpressionWrapper`` is necessary when using
+arithmetic on ``F()`` expressions with different types as described in
 :ref:`using-f-with-annotations`.
 
 Conditional expressions
@@ -795,7 +797,8 @@ expressions (column names should be wrapped in an ``F``-object) that control
 the partitioning of the rows.  Partitioning narrows which rows are used to
 compute the result set.
 
-The ``output_field`` is specified either as an argument or by the expression.
+The :ref:`output_field<output-field>` is specified either as an argument or by
+the expression.
 
 The ``order_by`` argument accepts an expression on which you can call
 :meth:`~django.db.models.Expression.asc` and
@@ -1155,10 +1158,10 @@ an ``__init__()`` method to set some attributes::
                   raise TypeError("%r is not an Expression" % expression)
           self.expressions = expressions
 
-We do some basic validation on the parameters, including requiring at least
-2 columns or values, and ensuring they are expressions. We are requiring
-``output_field`` here so that Django knows what kind of model field to assign
-the eventual result to.
+We do some basic validation on the parameters, including requiring at least 2
+columns or values, and ensuring they are expressions. We are requiring
+:ref:`output_field<output-field>` here so that Django knows what kind of model
+field to assign the eventual result to.
 
 Now we implement the preprocessing and validation. Since we do not have
 any of our own validation at this point, we delegate to the nested
