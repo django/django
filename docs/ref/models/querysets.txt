@@ -34,7 +34,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   Note: Don't use this if all you want to do is determine if at least one
   result exists. It's more efficient to use :meth:`~QuerySet.exists`.
 
-* **Asynchronous iteration.**. A ``QuerySet`` can also be iterated over using
+* **Asynchronous iteration.** A ``QuerySet`` can also be iterated over using
   ``async for``::
 
       async for e in Entry.objects.all():
