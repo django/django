@@ -26,7 +26,7 @@ jobs:
     name: docs
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: start-measurement
 
@@ -45,13 +45,13 @@ jobs:
           sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling
 
       - name: Eco-CI Measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: get-measurement
           label: 'docs'
 
       - name: Eco-CI Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: display-results
 
@@ -60,7 +60,7 @@ jobs:
     name: blacken-docs
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: start-measurement
 
@@ -82,12 +82,12 @@ jobs:
           exit $RESULT
 
       - name: Eco-CI Measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: get-measurement
           label: 'blacken-docs'
 
       - name: Eco-CI Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: display-results

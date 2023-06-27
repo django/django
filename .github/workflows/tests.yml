@@ -45,7 +45,7 @@ jobs:
     name: JavaScript tests
     steps:
       - name: Eco-CI Init
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: start-measurement
           
@@ -61,12 +61,12 @@ jobs:
       - run: npm test
       
       - name: Tests measurement
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: get-measurement
           label: 'javascript tests'
 
       - name: Show Energy Results
-        uses: green-coding-berlin/eco-ci-energy-estimation@318-refactor-standalone-scripts
+        uses: green-coding-berlin/eco-ci-energy-estimation@test
         with:
           task: display-results

@@ -1,8 +1,8 @@
 name: New contributor message
 
 on:
-  pull_request_target:
-    types: [opened]
+  # pull_request_target:
+  #   types: [opened]
 
 permissions:
   pull-requests: write
