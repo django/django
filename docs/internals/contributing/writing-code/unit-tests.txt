@@ -247,6 +247,8 @@ Note that the ``--reverse`` option doesn't impact on ``--start-at`` or
 ``--start-after`` options. Moreover these options cannot be used with test
 labels.
 
+.. _running-selenium-tests:
+
 Running the Selenium tests
 --------------------------
 
