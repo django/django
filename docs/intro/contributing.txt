@@ -188,7 +188,11 @@ have to create a new virtual environment, :ref:`install the previously cloned
 local copy of Django in editable mode <intro-contributing-install-local-copy>`,
 and create a new Django project outside of your local copy of Django. You will
 immediately see any changes you make to Django in your new project, which is
-of great help when writing your first patch.
+of great help when writing your first patch, especially if testing any changes
+to the UI.
+
+You can follow the :doc:`tutorial</intro/tutorial01>` for help in creating a
+Django project.
 
 Running Django's test suite for the first time
 ==============================================
@@ -259,7 +263,8 @@ __ https://djangoci.com
     For this tutorial and the ticket we're working on, testing against SQLite
     is sufficient, however, it's possible (and sometimes necessary) to
     :ref:`run the tests using a different database
-    <running-unit-tests-settings>`.
+    <running-unit-tests-settings>`. When making UI changes, you will need to
+    :ref:`run the Selenium tests <running-selenium-tests>`.
 
 Working on a feature
 ====================
