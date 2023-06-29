@@ -417,6 +417,11 @@ backends.
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
   ``INSERT`` queries.
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for GDAL 2.2 and 2.3 is removed.
+
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
 

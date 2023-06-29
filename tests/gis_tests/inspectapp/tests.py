@@ -89,8 +89,7 @@ class OGRInspectTest(SimpleTestCase):
         # Same test with a 25D-type geometry field
         shp_file = os.path.join(TEST_DATA, "gas_lines", "gas_leitung.shp")
         model_def = ogrinspect(shp_file, "MyModel", multi_geom=True)
-        srid = "-1" if GDAL_VERSION < (2, 3) else "31253"
-        self.assertIn("geom = models.MultiLineStringField(srid=%s)" % srid, model_def)
+        self.assertIn("geom = models.MultiLineStringField(srid=31253)", model_def)
 
     def test_date_field(self):
         shp_file = os.path.join(TEST_DATA, "cities", "cities.shp")
