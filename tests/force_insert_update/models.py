@@ -23,6 +23,10 @@ class SubCounter(Counter):
     pass
 
 
+class SubSubCounter(SubCounter):
+    pass
+
+
 class WithCustomPK(models.Model):
     name = models.IntegerField(primary_key=True)
     value = models.IntegerField()
