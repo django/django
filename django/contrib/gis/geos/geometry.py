@@ -11,7 +11,7 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
+from django.contrib.gis.geos.libgeos import GEOM_PTR
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
 from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
@@ -238,8 +238,6 @@ class GEOSGeometryBase(GEOSBase):
         Attempt to create a valid representation of a given invalid geometry
         without losing any of the input vertices.
         """
-        if geos_version_tuple() < (3, 8):
-            raise GEOSException("GEOSGeometry.make_valid() requires GEOS >= 3.8.0.")
         return GEOSGeometry(capi.geos_makevalid(self.ptr), srid=self.srid)
 
     # #### Unary predicates ####

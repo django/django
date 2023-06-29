@@ -1,7 +1,14 @@
 from django.db import DatabaseError, IntegrityError, transaction
 from django.test import TestCase
 
-from .models import Counter, InheritedCounter, ProxyCounter, SubCounter, WithCustomPK
+from .models import (
+    Counter,
+    InheritedCounter,
+    ProxyCounter,
+    SubCounter,
+    SubSubCounter,
+    WithCustomPK,
+)
 
 
 class ForceTests(TestCase):
@@ -66,3 +73,36 @@ class InheritanceTests(TestCase):
         a.save()
         a.value = 2
         a.save(force_update=True)
+
+
+class ForceInsertInheritanceTests(TestCase):
+    def test_force_insert_false(self):
+        with self.assertNumQueries(3):
+            obj = SubCounter.objects.create(pk=1, value=0)
+        with self.assertNumQueries(2):
+            SubCounter(pk=obj.pk, value=1).save()
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, 1)
+        with self.assertNumQueries(2):
+            SubCounter(pk=obj.pk, value=2).save(force_insert=False)
+        obj.refresh_from_db()
+        self.assertEqual(obj.value, 2)
+
+    def test_force_insert_false_with_existing_parent(self):
+        parent = Counter.objects.create(pk=1, value=1)
+        with self.assertNumQueries(2):
+            SubCounter.objects.create(pk=parent.pk, value=2)
+
+    def test_force_insert_parent(self):
+        with self.assertNumQueries(3):
+            SubCounter(pk=1, value=1).save(force_insert=True)
+
+    def test_force_insert_with_grandparent(self):
+        with self.assertNumQueries(4):
+            SubSubCounter(pk=1, value=1).save(force_insert=True)
+
+    def test_force_insert_with_existing_grandparent(self):
+        # Force insert only the last child.
+        grandparent = Counter.objects.create(pk=1, value=1)
+        with self.assertNumQueries(4):
+            SubSubCounter(pk=grandparent.pk, value=1).save(force_insert=True)
