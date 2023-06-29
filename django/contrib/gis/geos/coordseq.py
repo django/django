@@ -8,7 +8,7 @@ from ctypes import byref, c_byte, c_double, c_uint
 from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import CS_PTR, geos_version_tuple
+from django.contrib.gis.geos.libgeos import CS_PTR
 from django.contrib.gis.shortcuts import numpy
 
 
@@ -202,16 +202,6 @@ class GEOSCoordSeq(GEOSBase):
     @property
     def is_counterclockwise(self):
         """Return whether this coordinate sequence is counterclockwise."""
-        if geos_version_tuple() < (3, 7):
-            # A modified shoelace algorithm to determine polygon orientation.
-            # See https://en.wikipedia.org/wiki/Shoelace_formula.
-            area = 0.0
-            n = len(self)
-            for i in range(n):
-                j = (i + 1) % n
-                area += self[i][0] * self[j][1]
-                area -= self[j][0] * self[i][1]
-            return area > 0.0
         ret = c_byte()
         if not capi.cs_is_ccw(self.ptr, byref(ret)):
             raise GEOSException(
