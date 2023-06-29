@@ -1358,6 +1358,20 @@ class ModelFormsetTest(TestCase):
             'id="id_location_set-0-id"></p>',
         )
 
+    def test_unique_true_max_num_less_than_one(self):
+        # ForeignKey with unique=True and max_num
+        # less than one shouldn't enforce max_num=1
+
+        place = Place.objects.create(pk=1, name="Giordanos", city="Chicago")
+
+        FormSet = inlineformset_factory(
+            Place, Location, can_delete=False, fields="__all__", max_num=0
+        )
+        self.assertEqual(FormSet.max_num, 0)
+
+        formset = FormSet(instance=place)
+        self.assertEqual(len(formset.forms), 0)
+
     def test_foreign_keys_in_parents(self):
         self.assertEqual(type(_get_foreign_key(Restaurant, Owner)), models.ForeignKey)
         self.assertEqual(

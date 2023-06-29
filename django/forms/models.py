@@ -1302,7 +1302,8 @@ def inlineformset_factory(
     fk = _get_foreign_key(parent_model, model, fk_name=fk_name)
     # enforce a max_num=1 when the foreign key to the parent model is unique.
     if fk.unique:
-        max_num = 1
+        max_num = 1 if max_num is None else max_num
+        max_num = min(max_num, 1)
     kwargs = {
         "form": form,
         "formfield_callback": formfield_callback,
