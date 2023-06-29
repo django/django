@@ -5,7 +5,7 @@ import pickle
 import random
 from binascii import a2b_hex
 from io import BytesIO
-from unittest import mock, skipIf
+from unittest import mock
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import (
@@ -393,7 +393,7 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             line.ewkt, "SRID=4326;LINESTRING (151.2607 -33.887, 144.963 -37.8143)"
         )
 
-    def _test_is_counterclockwise(self):
+    def test_is_counterclockwise(self):
         lr = LinearRing((0, 0), (1, 0), (0, 1), (0, 0))
         self.assertIs(lr.is_counterclockwise, True)
         lr.reverse()
@@ -402,11 +402,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         with self.assertRaisesMessage(ValueError, msg):
             LinearRing().is_counterclockwise
 
-    @skipIf(geos_version_tuple() < (3, 7), "GEOS >= 3.7.0 is required")
-    def test_is_counterclockwise(self):
-        self._test_is_counterclockwise()
-
-    @skipIf(geos_version_tuple() < (3, 7), "GEOS >= 3.7.0 is required")
     def test_is_counterclockwise_geos_error(self):
         with mock.patch("django.contrib.gis.geos.prototypes.cs_is_ccw") as mocked:
             mocked.return_value = 0
@@ -414,10 +409,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
             msg = 'Error encountered in GEOS C function "GEOSCoordSeq_isCCW".'
             with self.assertRaisesMessage(GEOSException, msg):
                 LinearRing((0, 0), (1, 0), (0, 1), (0, 0)).is_counterclockwise
-
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.6.9")
-    def test_is_counterclockwise_fallback(self):
-        self._test_is_counterclockwise()
 
     def test_multilinestring(self):
         "Testing MultiLineString objects."
@@ -1543,7 +1534,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         self.assertEqual(multipoint_2, normalized)
         self.assertNotEqual(multipoint, normalized)
 
-    @skipIf(geos_version_tuple() < (3, 8), "GEOS >= 3.8.0 is required")
     def test_make_valid(self):
         poly = GEOSGeometry("POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))")
         self.assertIs(poly.valid, False)
@@ -1554,13 +1544,6 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         valid_poly2 = valid_poly.make_valid()
         self.assertIs(valid_poly2.valid, True)
         self.assertEqual(valid_poly, valid_poly2)
-
-    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.7.3")
-    def test_make_valid_geos_version(self):
-        msg = "GEOSGeometry.make_valid() requires GEOS >= 3.8.0."
-        poly = GEOSGeometry("POLYGON((0 0, 0 23, 23 0, 23 23, 0 0))")
-        with self.assertRaisesMessage(GEOSException, msg):
-            poly.make_valid()
 
     def test_empty_point(self):
         p = Point(srid=4326)

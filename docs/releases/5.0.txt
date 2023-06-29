@@ -422,6 +422,8 @@ backends.
 
 * Support for GDAL 2.2 and 2.3 is removed.
 
+* Support for GEOS 3.6 and 3.7 is removed.
+
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
 
