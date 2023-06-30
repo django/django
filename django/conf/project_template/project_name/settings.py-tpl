@@ -80,6 +80,11 @@ DATABASES = {
     }
 }
 
+# Your custom User model
+# https://docs.djangoproject.com/en/{{ docs_version }}/topics/auth/customizing/#substituting-a-custom-user-model
+
+AUTH_USER_MODEL = '{{ project_name }}.users.User'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/{{ docs_version }}/ref/settings/#auth-password-validators
