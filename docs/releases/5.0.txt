@@ -139,6 +139,15 @@ Minor features
 
 * ``XRegExp`` is upgraded from version 3.2.0 to 5.1.1.
 
+* The ``admin/edit_inline/stacked.html`` template has been updated with two new
+  blocks, ``title`` for customizing the inline's title and ``field-elements``
+  for customizing the row elements within the inline.
+
+* The ``admin/edit_inline/tabular.html`` template has been updated with three
+  new blocks, ``title`` to customize the title of the inline, ``table-headers``
+  to customize the table headers of the inline table and ``table-body`` to
+  customize the table body of the inline table.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
