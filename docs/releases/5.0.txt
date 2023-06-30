@@ -179,6 +179,8 @@ Minor features
 * :ref:`GIS aggregates <gis-aggregation-functions>` now support the ``filter``
   argument.
 
+* Added support for GDAL 3.7.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
