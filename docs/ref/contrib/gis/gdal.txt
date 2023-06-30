@@ -1844,8 +1844,8 @@ Key               Default  Usage
     converted to the correct string format upon creation.
 
     The following example uses some of the options available for the
-    `GTiff driver`__. The result is a compressed signed byte raster with an
-    internal tiling scheme. The internal tiles have a block size of 23 by 23:
+    `GTiff driver`__. The result is a compressed raster with an internal tiling
+    scheme. The internal tiles have a block size of 23 by 23:
 
     .. code-block:: pycon
 
@@ -1859,7 +1859,6 @@ Key               Default  Usage
         ...         "nr_of_bands": 1,
         ...         "papsz_options": {
         ...             "compress": "packbits",
-        ...             "pixeltype": "signedbyte",
         ...             "tiled": "yes",
         ...             "blockxsize": 23,
         ...             "blockysize": 23,

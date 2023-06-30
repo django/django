@@ -373,6 +373,7 @@ class Apps:
 
         This is mostly used in tests.
         """
+        self.get_swappable_settings_name.cache_clear()
         # Call expire cache on each model. This will purge
         # the relation tree and the fields cache.
         self.get_models.cache_clear()

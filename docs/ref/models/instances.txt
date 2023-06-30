@@ -589,12 +589,29 @@ row. In these cases you can pass the ``force_insert=True`` or
 Passing both parameters is an error: you cannot both insert *and* update at the
 same time!
 
+When using :ref:`multi-table inheritance <multi-table-inheritance>`, it's also
+possible to provide a tuple of parent classes to ``force_insert`` in order to
+force ``INSERT`` statements for each base. For example::
+
+    Restaurant(pk=1, name="Bob's Cafe").save(force_insert=(Place,))
+
+    Restaurant(pk=1, name="Bob's Cafe", rating=4).save(force_insert=(Place, Rating))
+
+You can pass ``force_insert=(models.Model,)`` to force an ``INSERT`` statement
+for all parents. By default, ``force_insert=True`` only forces the insertion of
+a new row for the current model.
+
 It should be very rare that you'll need to use these parameters. Django will
 almost always do the right thing and trying to override that will lead to
 errors that are difficult to track down. This feature is for advanced use
 only.
 
 Using ``update_fields`` will force an update similarly to ``force_update``.
+
+.. versionchanged:: 5.0
+
+    Support for passing a tuple of parent classes to ``force_insert`` was
+    added.
 
 .. _ref-models-field-updates-using-f-expressions:
 

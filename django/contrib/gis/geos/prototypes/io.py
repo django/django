@@ -259,24 +259,14 @@ class WKBWriter(IOBase):
 
     def write(self, geom):
         "Return the WKB representation of the given geometry."
-        from django.contrib.gis.geos import Polygon
-
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
-        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
-            # Fix GEOS output for empty polygon.
-            # See https://trac.osgeo.org/geos/ticket/680.
-            wkb = wkb[:-8] + b"\0" * 4
         return memoryview(wkb)
 
     def write_hex(self, geom):
         "Return the HEXEWKB representation of the given geometry."
-        from django.contrib.gis.geos.polygon import Polygon
-
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
-        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
-            wkb = wkb[:-16] + b"0" * 8
         return wkb
 
     # ### WKBWriter Properties ###

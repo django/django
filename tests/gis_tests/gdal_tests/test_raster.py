@@ -6,7 +6,7 @@ import zipfile
 from pathlib import Path
 from unittest import mock
 
-from django.contrib.gis.gdal import GDALRaster, SpatialReference
+from django.contrib.gis.gdal import GDAL_VERSION, GDALRaster, SpatialReference
 from django.contrib.gis.gdal.error import GDALException
 from django.contrib.gis.gdal.raster.band import GDALBand
 from django.contrib.gis.shortcuts import numpy
@@ -415,9 +415,19 @@ class GDALRasterTests(SimpleTestCase):
         # Check physically if compression worked.
         self.assertLess(os.path.getsize(compressed.name), os.path.getsize(self.rs.name))
         # Create file-based raster with options from scratch.
+        papsz_options = {
+            "compress": "packbits",
+            "blockxsize": 23,
+            "blockysize": 23,
+        }
+        if GDAL_VERSION < (3, 7):
+            datatype = 1
+            papsz_options["pixeltype"] = "signedbyte"
+        else:
+            datatype = 14
         compressed = GDALRaster(
             {
-                "datatype": 1,
+                "datatype": datatype,
                 "driver": "tif",
                 "name": rstfile.name,
                 "width": 40,
@@ -432,12 +442,7 @@ class GDALRasterTests(SimpleTestCase):
                         "nodata_value": 255,
                     }
                 ],
-                "papsz_options": {
-                    "compress": "packbits",
-                    "pixeltype": "signedbyte",
-                    "blockxsize": 23,
-                    "blockysize": 23,
-                },
+                "papsz_options": papsz_options,
             }
         )
         # Check if options used on creation are stored in metadata.
@@ -448,9 +453,12 @@ class GDALRasterTests(SimpleTestCase):
             compressed.metadata["IMAGE_STRUCTURE"]["COMPRESSION"],
             "PACKBITS",
         )
-        self.assertEqual(
-            compressed.bands[0].metadata["IMAGE_STRUCTURE"]["PIXELTYPE"], "SIGNEDBYTE"
-        )
+        self.assertEqual(compressed.bands[0].datatype(), datatype)
+        if GDAL_VERSION < (3, 7):
+            self.assertEqual(
+                compressed.bands[0].metadata["IMAGE_STRUCTURE"]["PIXELTYPE"],
+                "SIGNEDBYTE",
+            )
         self.assertIn("Block=40x23", compressed.info)
 
     def test_raster_warp(self):

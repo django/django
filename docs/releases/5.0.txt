@@ -179,6 +179,8 @@ Minor features
 * :ref:`GIS aggregates <gis-aggregation-functions>` now support the ``filter``
   argument.
 
+* Added support for GDAL 3.7.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -335,6 +337,10 @@ Models
   :ref:`Choices classes <field-choices-enum-types>` directly instead of
   requiring expansion with the ``choices`` attribute.
 
+* The :ref:`force_insert <ref-models-force-insert>` argument of
+  :meth:`.Model.save` now allows specifying a tuple of parent classes that must
+  be forced to be inserted.
+
 Pagination
 ~~~~~~~~~~
 
@@ -421,6 +427,8 @@ backends.
 -------------------------
 
 * Support for GDAL 2.2 and 2.3 is removed.
+
+* Support for GEOS 3.6 and 3.7 is removed.
 
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
