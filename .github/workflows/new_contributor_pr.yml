@@ -3,6 +3,7 @@ name: New contributor message
 on:
   # pull_request_target:
   #   types: [opened]
+  workflow_dispatch:
 
 permissions:
   pull-requests: write

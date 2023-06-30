@@ -1,6 +1,7 @@
 name: Linters
 
 on:
+  workflow_dispatch:
   # pull_request:
   #   paths-ignore:
   #     - 'docs/**'
