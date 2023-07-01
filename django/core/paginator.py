@@ -118,7 +118,7 @@ class Paginator:
         hits = max(1, self.count - self.orphans)
         return ceil(hits / self.per_page)
 
-    def page_range(self, page_current, page_group=11):
+    def page_range(self, page_current, page_group=7):
         """
         Return a 1-based range of pages for iterating through within
         a template for loop.
