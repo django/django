@@ -118,13 +118,23 @@ class Paginator:
         hits = max(1, self.count - self.orphans)
         return ceil(hits / self.per_page)
 
-    @property
-    def page_range(self):
+    def page_range(self, page_current, page_group=11):
         """
         Return a 1-based range of pages for iterating through within
         a template for loop.
         """
-        return range(1, self.num_pages + 1)
+        if self.num_pages < page_group:
+            page_range = range(1, self.num_pages)
+            return page_range
+        if page_current - (page_group // 2) < 1:
+            page_range = range(1, page_group + 1)
+        elif page_current + (page_group // 2) > self.num_pages:
+            page_range = range(self.num_pages - page_group, self.num_pages + 1)
+        else:
+            page_range = range(page_current - (page_group // 2),
+                               page_current + (page_group // 2) + 1)
+
+        return page_range
 
     def _check_object_list_is_ordered(self):
         """
