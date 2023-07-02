@@ -455,10 +455,10 @@ Miscellaneous
   passed as a value to encode because ``None`` can't be encoded in GET and POST
   data. Either pass an empty string or omit the value.
 
-* The :djadmin:`ping_google` management command now defaults to ``https``
+* The ``ping_google`` management command now defaults to ``https``
   instead of ``http`` for the sitemap's URL. If your site uses http, use the
-  new :option:`ping_google --sitemap-uses-http` option. If you use the
-  :func:`~django.contrib.sitemaps.ping_google` function, set the new
+  new ``ping_google --sitemap-uses-http`` option. If you use the
+  ``django.contrib.sitemaps.ping_google`` function, set the new
   ``sitemap_uses_https`` argument to ``False``.
 
 * :djadmin:`runserver` no longer supports ``pyinotify`` (replaced by Watchman).

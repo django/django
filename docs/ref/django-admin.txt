@@ -1759,18 +1759,6 @@ documentation.
 
 Can be run as a cron job or directly to clean out expired sessions.
 
-``django.contrib.sitemaps``
----------------------------
-
-``ping_google``
-~~~~~~~~~~~~~~~
-
-This command is only available if the :doc:`Sitemaps framework
-</ref/contrib/sitemaps>` (``django.contrib.sitemaps``) is installed.
-
-Please refer to its :djadmin:`description <ping_google>` in the Sitemaps
-documentation.
-
 ``django.contrib.staticfiles``
 ------------------------------
 

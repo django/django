@@ -443,6 +443,15 @@ backends.
 
 * Support for GEOS 3.6 and 3.7 is removed.
 
+:mod:`django.contrib.sitemaps`
+------------------------------
+
+* The ``django.contrib.sitemaps.ping_google()`` function and the
+  ``ping_google`` management command are removed as the Google
+  Sitemaps ping endpoint is deprecated and will be removed in January 2024.
+
+* The ``django.contrib.sitemaps.SitemapNotFound`` exception class is removed.
+
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
 
