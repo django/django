@@ -27,12 +27,15 @@ class ContentTypesTests(TestCase):
 
         # A second hit, though, won't hit the DB, nor will a lookup by ID
         # or natural key
+        # or table name
         with self.assertNumQueries(0):
             ct = ContentType.objects.get_for_model(ContentType)
         with self.assertNumQueries(0):
             ContentType.objects.get_for_id(ct.id)
         with self.assertNumQueries(0):
             ContentType.objects.get_by_natural_key("contenttypes", "contenttype")
+        with self.assertNumQueries(0):
+            ContentType.objects.get_by_table_name("contenttypes_contenttype")
 
         # Once we clear the cache, another lookup will again hit the DB
         ContentType.objects.clear_cache()

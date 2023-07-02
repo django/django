@@ -3,6 +3,9 @@ from collections import defaultdict
 from django.apps import apps
 from django.db import models
 from django.db.models import Q
+from django.db.models import Value as V
+from django.db.models import CharField
+from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _
 
 
@@ -23,6 +26,16 @@ class ContentTypeManager(models.Manager):
             self._add_to_cache(self.db, ct)
         return ct
 
+    def get_by_table_name(self, table_name):
+        try:
+            ct = self._cache[self.db][table_name]
+        except KeyError:
+            ct = self.annotate(
+                serach_for_table_name=Concat('app_label', V('_'), 'model', output_field=CharField())).\
+                get(serach_for_table_name=table_name)
+            self._add_to_cache(self.db, ct)
+        return ct
+        
     def _get_opts(self, model, for_concrete_model):
         if for_concrete_model:
             model = model._meta.concrete_model
