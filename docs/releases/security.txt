@@ -36,6 +36,17 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+July 3, 2023 - :cve:`2023-36053`
+--------------------------------
+
+Potential regular expression denial of service vulnerability in
+``EmailValidator``/``URLValidator``. `Full description
+<https://www.djangoproject.com/weblog/2023/jul/03/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <b7c5feb35a31799de6e582ad6a5a91a9de74e0f9>`
+* Django 4.1 :commit:`(patch) <beb3f3d55940d9aa7198bf9d424ab74e873aec3d>`
+* Django 3.2 :commit:`(patch) <454f2fb93437f98917283336201b4048293f7582>`
+
 May 3, 2023 - :cve:`2023-31047`
 -------------------------------
 
