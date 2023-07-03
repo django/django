@@ -47,6 +47,11 @@ class ContentTypesTests(TestCase):
         with self.assertNumQueries(0):
             ContentType.objects.get_by_natural_key("contenttypes", "contenttype")
 
+        # The same should happen with a lookup by table_title
+        ContentType.objects.clear_cache()
+        with self.assertNumQueries(1):
+            ContentType.objects.get_by_table_name("contenttypes_contenttype")
+
     def test_get_for_models_creation(self):
         ContentType.objects.all().delete()
         with self.assertNumQueries(4):
