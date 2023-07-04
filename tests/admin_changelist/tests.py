@@ -467,7 +467,7 @@ class ChangeListTests(TestCase):
         cl.get_results(request)
         self.assertIsInstance(cl.paginator, CustomPaginator)
 
-    def test_no_duplicates_for_m2m_in_list_filter(self):
+    def test_distinct_for_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Basic ManyToMany.
@@ -488,11 +488,10 @@ class ChangeListTests(TestCase):
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_through_m2m_in_list_filter(self):
+    def test_distinct_for_through_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. With an intermediate model.
@@ -512,14 +511,14 @@ class ChangeListTests(TestCase):
         # There's only one Group instance
         self.assertEqual(cl.result_count, 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_through_m2m_at_second_level_in_list_filter(self):
+    def test_distinct_for_through_m2m_at_second_level_in_list_filter(self):
         """
         When using a ManyToMany in list_filter at the second level behind a
-        ForeignKey, results shouldn't appear more than once.
+        ForeignKey, distinct() must be called and results shouldn't appear more
+        than once.
         """
         lead = Musician.objects.create(name="Vox")
         band = Group.objects.create(name="The Hype")
@@ -537,11 +536,10 @@ class ChangeListTests(TestCase):
         # There's only one Concert instance
         self.assertEqual(cl.result_count, 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_inherited_m2m_in_list_filter(self):
+    def test_distinct_for_inherited_m2m_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Model managed in the
@@ -562,11 +560,10 @@ class ChangeListTests(TestCase):
         # There's only one Quartet instance
         self.assertEqual(cl.result_count, 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_m2m_to_inherited_in_list_filter(self):
+    def test_distinct_for_m2m_to_inherited_in_list_filter(self):
         """
         Regression test for #13902: When using a ManyToMany in list_filter,
         results shouldn't appear more than once. Target of the relationship
@@ -586,15 +583,11 @@ class ChangeListTests(TestCase):
 
         # There's only one ChordsBand instance
         self.assertEqual(cl.result_count, 1)
-        # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
-        cl.queryset.delete()
-        self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_non_unique_related_object_in_list_filter(self):
+    def test_distinct_for_non_unique_related_object_in_list_filter(self):
         """
-        Regressions tests for #15819: If a field listed in list_filters is a
-        non-unique related object, results shouldn't appear more than once.
+        Regressions tests for #15819: If a field listed in list_filters
+        is a non-unique related object, distinct() must be called.
         """
         parent = Parent.objects.create(name="Mary")
         # Two children with the same name
@@ -606,10 +599,9 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
-        # Exists() is applied.
+        # Make sure distinct() was called
         self.assertEqual(cl.queryset.count(), 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
@@ -629,10 +621,10 @@ class ChangeListTests(TestCase):
                 self.assertEqual(1, len(messages))
                 self.assertEqual(error, messages[0])
 
-    def test_no_duplicates_for_non_unique_related_object_in_search_fields(self):
+    def test_distinct_for_non_unique_related_object_in_search_fields(self):
         """
         Regressions tests for #15819: If a field listed in search_fields
-        is a non-unique related object, Exists() must be applied.
+        is a non-unique related object, distinct() must be called.
         """
         parent = Parent.objects.create(name="Mary")
         Child.objects.create(parent=parent, name="Danielle")
@@ -643,17 +635,16 @@ class ChangeListTests(TestCase):
         request.user = self.superuser
 
         cl = m.get_changelist_instance(request)
-        # Exists() is applied.
+        # Make sure distinct() was called
         self.assertEqual(cl.queryset.count(), 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
-    def test_no_duplicates_for_many_to_many_at_second_level_in_search_fields(self):
+    def test_distinct_for_many_to_many_at_second_level_in_search_fields(self):
         """
         When using a ManyToMany in search_fields at the second level behind a
-        ForeignKey, Exists() must be applied and results shouldn't appear more
+        ForeignKey, distinct() must be called and results shouldn't appear more
         than once.
         """
         lead = Musician.objects.create(name="Vox")
@@ -670,7 +661,6 @@ class ChangeListTests(TestCase):
         # There's only one Concert instance
         self.assertEqual(cl.queryset.count(), 1)
         # Queryset must be deletable.
-        self.assertIs(cl.queryset.query.distinct, False)
         cl.queryset.delete()
         self.assertEqual(cl.queryset.count(), 0)
 
@@ -820,23 +810,23 @@ class ChangeListTests(TestCase):
         cl = m.get_changelist_instance(request)
         self.assertCountEqual(cl.queryset, [abcd])
 
-    def test_no_exists_for_m2m_in_list_filter_without_params(self):
+    def test_no_distinct_for_m2m_in_list_filter_without_params(self):
         """
         If a ManyToManyField is in list_filter but isn't in any lookup params,
-        the changelist's query shouldn't have Exists().
+        the changelist's query shouldn't have distinct.
         """
         m = BandAdmin(Band, custom_site)
         for lookup_params in ({}, {"name": "test"}):
             request = self.factory.get("/band/", lookup_params)
             request.user = self.superuser
             cl = m.get_changelist_instance(request)
-            self.assertNotIn(" EXISTS", str(cl.queryset.query))
+            self.assertIs(cl.queryset.query.distinct, False)
 
-        # A ManyToManyField in params does have Exists() applied.
+        # A ManyToManyField in params does have distinct applied.
         request = self.factory.get("/band/", {"genres": "0"})
         request.user = self.superuser
         cl = m.get_changelist_instance(request)
-        self.assertIn(" EXISTS", str(cl.queryset.query))
+        self.assertIs(cl.queryset.query.distinct, True)
 
     def test_pagination(self):
         """
