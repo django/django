@@ -1135,8 +1135,8 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("delete")
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with delete().")
-        if self.query.distinct or self.query.distinct_fields:
-            raise TypeError("Cannot call delete() after .distinct().")
+        if self.query.distinct_fields:
+            raise TypeError("Cannot call delete() after .distinct(*fields).")
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
 
