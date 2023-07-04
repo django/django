@@ -6111,6 +6111,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input.clear()
         name_input.send_keys("<i>edited section</i>")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         # Hide sidebar.
         toggle_button = self.selenium.find_element(
@@ -6133,6 +6134,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_text("#content h1", "Add section")
         self.selenium.find_element(By.ID, "id_name").send_keys("new section")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_form-0-section"))
         self.assertEqual(select.first_selected_option.text, "new section")
