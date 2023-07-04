@@ -506,6 +506,37 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(request.data, {"json": [{"key": "value"}], "name": ["value"]})
 
+    def test_behaviour_of_POST(self):
+        """Test to ensure request.POST returns string and not dictionary"""
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="json"',
+                    "Content-Type: application/json",
+                    "",
+                    '{"key": "value"}',
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        # print(request.data)
+        self.assertEqual(
+            request.POST, {"json": ['{"key": "value"}'], "name": ["value"]}
+        )
+
     def test_non_ascii_POST(self):
         payload = FakePayload(urlencode({"key": "España"}))
         request = WSGIRequest(

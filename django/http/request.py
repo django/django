@@ -1,5 +1,6 @@
 import codecs
 import copy
+import json
 from io import BytesIO
 from itertools import chain
 from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
@@ -421,11 +422,20 @@ class HttpRequest:
 
     @property
     def POST(self):
-        # change this and add supporting functions
-
         if self.method != "POST":
             return QueryDict(encoding=self._encoding)
-        return self.data
+        if not hasattr(self, "_post"):
+            self._load_post_and_files()
+        if self.content_type == "application/x-www-form-urlencoded":
+            return self.data
+        elif self.content_type == "multipart/form-data":
+            self._post_copy = self._post.copy()
+            for key, value in self._post_copy.items():
+                if isinstance(value, dict):
+                    self._post_copy[key] = json.dumps(value)
+            self._post_copy._mutable = False
+            return self._post_copy
+        return QueryDict(encoding=self._encoding)
 
     @POST.setter
     def POST(self, post):
