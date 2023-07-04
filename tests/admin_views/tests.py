@@ -6437,6 +6437,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("South America")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6473,6 +6474,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("Europe")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6514,6 +6516,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         favorite_name_input.clear()
         favorite_name_input.send_keys("Italy")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6554,10 +6557,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("Asia")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         # Submit the new Traveler.
-        self.selenium.find_element(By.CSS_SELECTOR, '[name="_save"]').click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.CSS_SELECTOR, '[name="_save"]').click()
         traveler = Traveler.objects.get()
         self.assertEqual(traveler.born_country.name, "Argentina")
         self.assertEqual(traveler.living_country.name, "Italy")
