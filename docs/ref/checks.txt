@@ -609,6 +609,8 @@ The following checks are performed on your URL configuration:
   imported.
 * **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
   ``<view>.as_view()`` instead of ``<view>``.
+* **urls.W010**: Your URL pattern ``<pattern>` has an unmatched
+  ``<angle bracket>``.
 
 ``contrib`` app checks
 ======================

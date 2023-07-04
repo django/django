@@ -318,7 +318,10 @@ class RoutePattern(CheckURLMixin):
         return None
 
     def check(self):
-        warnings = self._check_pattern_startswith_slash()
+        warnings = [
+            *self._check_pattern_startswith_slash(),
+            *self._check_pattern_unmatched_angle_brackets(),
+        ]
         route = self._route
         if "(?P<" in route or route.startswith("^") or route.endswith("$"):
             warnings.append(
@@ -329,6 +332,34 @@ class RoutePattern(CheckURLMixin):
                     id="2_0.W001",
                 )
             )
+        return warnings
+
+    def _check_pattern_unmatched_angle_brackets(self):
+        warnings = []
+        segments = self._route.split("/")
+        for segment in segments:
+            open_bracket_counter = 0
+            unmatched_angle_bracket = None
+            for char in segment:
+                if char == "<":
+                    open_bracket_counter += 1
+                elif char == ">":
+                    open_bracket_counter -= 1
+                    if open_bracket_counter < 0:
+                        unmatched_angle_bracket = ">"
+                        break
+            else:
+                if open_bracket_counter > 0:
+                    unmatched_angle_bracket = "<"
+
+            if unmatched_angle_bracket is not None:
+                warnings.append(
+                    Warning(
+                        "Your URL pattern %s has an unmatched '%s' bracket."
+                        % (self.describe(), unmatched_angle_bracket),
+                        id="urls.W010",
+                    )
+                )
         return warnings
 
     def _compile(self, route):
