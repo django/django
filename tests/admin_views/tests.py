@@ -5635,6 +5635,10 @@ class PrePopulatedTest(TestCase):
         self.assertContains(response, '<div class="readonly">%s</div>' % self.p1.slug)
 
 
+def _clean_sidebar_state(driver):
+    driver.execute_script("localStorage.removeItem('django.admin.navSidebarIsOpen')")
+
+
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
@@ -6113,6 +6117,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             By.CSS_SELECTOR, "#toggle-nav-sidebar"
         )
         toggle_button.click()
+        self.addCleanup(_clean_sidebar_state, self.selenium)
         select = Select(self.selenium.find_element(By.ID, "id_form-0-section"))
         self.assertEqual(select.first_selected_option.text, "<i>edited section</i>")
         # Rendered select2 input.
@@ -6291,6 +6296,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         person_url = reverse("admin:admin_views_person_changelist") + "?q=Gui"
         self.selenium.get(self.live_server_url + person_url)
+        # Hide sidebar.
+        toggle_button = self.selenium.find_element(
+            By.CSS_SELECTOR, "#toggle-nav-sidebar"
+        )
+        toggle_button.click()
+        self.addCleanup(_clean_sidebar_state, self.selenium)
         self.assertGreater(
             self.selenium.find_element(By.ID, "searchbar").rect["width"],
             50,
