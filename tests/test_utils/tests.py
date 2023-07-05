@@ -46,6 +46,7 @@ from django.test.utils import (
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
 from django.utils.deprecation import RemovedInDjango51Warning
+from django.utils.html import VOID_ELEMENTS
 from django.utils.version import PY311
 
 from .models import Car, Person, PossessedCar
@@ -657,27 +658,8 @@ class HTMLEqualTests(SimpleTestCase):
         self.assertEqual(len(dom.children), 1)
         self.assertEqual(dom.children[0], "<p>foo</p> '</scr'+'ipt>' <span>bar</span>")
 
-    def test_self_closing_tags(self):
-        self_closing_tags = [
-            "area",
-            "base",
-            "br",
-            "col",
-            "embed",
-            "hr",
-            "img",
-            "input",
-            "link",
-            "meta",
-            "param",
-            "source",
-            "track",
-            "wbr",
-            # Deprecated tags
-            "frame",
-            "spacer",
-        ]
-        for tag in self_closing_tags:
+    def test_void_elements(self):
+        for tag in VOID_ELEMENTS:
             with self.subTest(tag):
                 dom = parse_html("<p>Hello <%s> world</p>" % tag)
                 self.assertEqual(len(dom.children), 3)
