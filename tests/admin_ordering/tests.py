@@ -148,7 +148,7 @@ class TestRelatedFieldsAdminOrdering(TestCase):
 
     def tearDown(self):
         site.unregister(Song)
-        if Band in site._registry:
+        if site.is_registered(Band):
             site.unregister(Band)
 
     def check_ordering_of_field_choices(self, correct_ordering):

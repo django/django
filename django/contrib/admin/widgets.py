@@ -145,7 +145,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         rel_to = self.rel.model
-        if rel_to in self.admin_site._registry:
+        if self.admin_site.is_registered(rel_to):
             # The related object is registered with the same AdminSite
             related_url = reverse(
                 "admin:%s_%s_changelist"
@@ -222,7 +222,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        if self.rel.model in self.admin_site._registry:
+        if self.admin_site.is_registered(self.rel.model):
             # The related object is registered with the same AdminSite
             context["widget"]["attrs"]["class"] = "vManyToManyRawIdAdminField"
         return context
@@ -268,7 +268,7 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel.model in admin_site._registry
+            can_add_related = admin_site.is_registered(rel.model)
         self.can_add_related = can_add_related
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, "allow_multiple_selected", False)

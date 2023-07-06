@@ -120,7 +120,7 @@ class AdminSite:
                     % model.__name__
                 )
 
-            if model in self._registry:
+            if self.is_registered(model):
                 registered_admin = str(self._registry[model])
                 msg = "The model %s is already registered " % model.__name__
                 if registered_admin.endswith(".ModelAdmin"):
@@ -156,7 +156,7 @@ class AdminSite:
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
-            if model not in self._registry:
+            if not self.is_registered(model):
                 raise NotRegistered("The model %s is not registered" % model.__name__)
             del self._registry[model]
 
