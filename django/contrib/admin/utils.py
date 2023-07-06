@@ -139,12 +139,11 @@ def get_deleted_objects(objs, request, admin_site):
 
     def format_callback(obj):
         model = obj.__class__
-        has_admin = model in admin_site._registry
         opts = obj._meta
 
         no_edit_link = "%s: %s" % (capfirst(opts.verbose_name), obj)
 
-        if has_admin:
+        if admin_site.is_registered(model):
             if not admin_site._registry[model].has_delete_permission(request, obj):
                 perms_needed.add(opts.verbose_name)
             try:
