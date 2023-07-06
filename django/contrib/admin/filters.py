@@ -257,10 +257,16 @@ class RelatedFieldListFilter(FieldListFilter):
         """
         Return the model admin's ordering for related field, if provided.
         """
-        related_admin = model_admin.admin_site._registry.get(field.remote_field.model)
-        if related_admin is not None:
+        from django.contrib.admin.sites import NotRegistered
+
+        try:
+            related_admin = model_admin.admin_site.get_model_admin(
+                field.remote_field.model
+            )
+        except NotRegistered:
+            return ()
+        else:
             return related_admin.get_ordering(request)
-        return ()
 
     def field_choices(self, field, request, model_admin):
         ordering = self.field_admin_ordering(field, request, model_admin)

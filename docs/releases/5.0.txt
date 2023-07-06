@@ -145,6 +145,9 @@ Minor features
 
 * ``XRegExp`` is upgraded from version 3.2.0 to 5.1.1.
 
+* The new :meth:`.AdminSite.get_model_admin` method returns an admin class for
+  the given model class.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

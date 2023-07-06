@@ -121,7 +121,7 @@ class AdminSite:
                 )
 
             if self.is_registered(model):
-                registered_admin = str(self._registry[model])
+                registered_admin = str(self.get_model_admin(model))
                 msg = "The model %s is already registered " % model.__name__
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
@@ -165,6 +165,12 @@ class AdminSite:
         Check if a model class is registered with this `AdminSite`.
         """
         return model in self._registry
+
+    def get_model_admin(self, model):
+        try:
+            return self._registry[model]
+        except KeyError:
+            raise NotRegistered(f"The model {model.__name__} is not registered.")
 
     def add_action(self, action, name=None):
         """

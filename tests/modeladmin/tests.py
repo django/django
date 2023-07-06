@@ -871,7 +871,7 @@ class ModelAdminTests(TestCase):
             username="bob", email="bob@test.com", password="test"
         )
         self.site.register(Band, ModelAdmin)
-        ma = self.site._registry[Band]
+        ma = self.site.get_model_admin(Band)
         (
             deletable_objects,
             model_count,
@@ -898,7 +898,7 @@ class ModelAdminTests(TestCase):
                 return False
 
         self.site.register(Band, TestModelAdmin)
-        ma = self.site._registry[Band]
+        ma = self.site.get_model_admin(Band)
         (
             deletable_objects,
             model_count,

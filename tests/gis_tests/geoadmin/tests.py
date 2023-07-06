@@ -9,7 +9,7 @@ class GeoAdminTest(SimpleTestCase):
     admin_site = site  # ModelAdmin
 
     def test_widget_empty_string(self):
-        geoadmin = self.admin_site._registry[City]
+        geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": ""})
         with self.assertRaisesMessage(AssertionError, "no logs"):
             with self.assertLogs("django.contrib.gis", "ERROR"):
@@ -21,7 +21,7 @@ class GeoAdminTest(SimpleTestCase):
         )
 
     def test_widget_invalid_string(self):
-        geoadmin = self.admin_site._registry[City]
+        geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)({"point": "INVALID()"})
         with self.assertLogs("django.contrib.gis", "ERROR") as cm:
             output = str(form["point"])
@@ -38,7 +38,7 @@ class GeoAdminTest(SimpleTestCase):
         )
 
     def test_widget_has_changed(self):
-        geoadmin = self.admin_site._registry[City]
+        geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)()
         has_changed = form.fields["point"].has_changed
 
@@ -59,7 +59,7 @@ class GISAdminTests(GeoAdminTest):
     admin_site = site_gis  # GISModelAdmin
 
     def test_default_gis_widget_kwargs(self):
-        geoadmin = self.admin_site._registry[City]
+        geoadmin = self.admin_site.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)()
         widget = form["point"].field.widget
         self.assertEqual(widget.attrs["default_lat"], 47)
@@ -67,7 +67,7 @@ class GISAdminTests(GeoAdminTest):
         self.assertEqual(widget.attrs["default_zoom"], 12)
 
     def test_custom_gis_widget_kwargs(self):
-        geoadmin = site_gis_custom._registry[City]
+        geoadmin = site_gis_custom.get_model_admin(City)
         form = geoadmin.get_changelist_form(None)()
         widget = form["point"].field.widget
         self.assertEqual(widget.attrs["default_lat"], 55)

@@ -3024,6 +3024,13 @@ Templates can override or extend base admin templates as described in
     Raises ``django.contrib.admin.sites.NotRegistered`` if a model isn't
     already registered.
 
+.. method:: AdminSite.get_model_admin(model)
+
+    .. versionadded:: 5.0
+
+    Returns an admin class for the given model class. Raises
+    ``django.contrib.admin.sites.NotRegistered`` if a model isn't registered.
+
 .. method:: AdminSite.get_log_entries(request)
 
     .. versionadded:: 5.0
