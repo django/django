@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.admin.decorators import register
+from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
 from django.contrib.admin.sites import site
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
@@ -35,7 +36,7 @@ class TestRegistration(SimpleTestCase):
     def test_prevent_double_registration(self):
         self.site.register(Person)
         msg = "The model Person is already registered in app 'admin_registration'."
-        with self.assertRaisesMessage(admin.sites.AlreadyRegistered, msg):
+        with self.assertRaisesMessage(AlreadyRegistered, msg):
             self.site.register(Person)
 
     def test_prevent_double_registration_for_custom_admin(self):
@@ -47,12 +48,12 @@ class TestRegistration(SimpleTestCase):
             "The model Person is already registered with "
             "'admin_registration.PersonAdmin'."
         )
-        with self.assertRaisesMessage(admin.sites.AlreadyRegistered, msg):
+        with self.assertRaisesMessage(AlreadyRegistered, msg):
             self.site.register(Person, PersonAdmin)
 
     def test_unregister_unregistered_model(self):
         msg = "The model Person is not registered"
-        with self.assertRaisesMessage(admin.sites.NotRegistered, msg):
+        with self.assertRaisesMessage(NotRegistered, msg):
             self.site.unregister(Person)
 
     def test_registration_with_star_star_options(self):
@@ -61,7 +62,7 @@ class TestRegistration(SimpleTestCase):
 
     def test_get_model_admin_unregister_model(self):
         msg = "The model Person is not registered."
-        with self.assertRaisesMessage(admin.sites.NotRegistered, msg):
+        with self.assertRaisesMessage(NotRegistered, msg):
             self.site.get_model_admin(Person)
 
     def test_star_star_overrides(self):

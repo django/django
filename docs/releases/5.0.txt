@@ -487,6 +487,9 @@ Miscellaneous
 * The minimum supported version of ``selenium`` is increased from 3.8.0 to
   4.8.0.
 
+* The ``AlreadyRegistered`` and ``NotRegistered`` exceptions are moved from
+  ``django.contrib.admin.sites`` to ``django.contrib.admin.exceptions``.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
