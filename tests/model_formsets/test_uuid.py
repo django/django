@@ -43,6 +43,8 @@ class InlineFormsetTests(TestCase):
             }
         )
         self.assertTrue(formset.is_valid())
+        self.assertIsNone(formset.instance.uuid)
+        self.assertIsNone(formset.forms[0].instance.parent_id)
 
     def test_inlineformset_factory_nulls_default_pks_uuid_parent_auto_child(self):
         """
