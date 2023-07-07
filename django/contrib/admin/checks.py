@@ -220,6 +220,8 @@ class BaseModelAdminChecks:
         ManyToManyField and that the item has a related ModelAdmin with
         search_fields defined.
         """
+        from django.contrib.admin.sites import NotRegistered
+
         try:
             field = obj.model._meta.get_field(field_name)
         except FieldDoesNotExist:
@@ -234,8 +236,9 @@ class BaseModelAdminChecks:
                     obj=obj,
                     id="admin.E038",
                 )
-            related_admin = obj.admin_site._registry.get(field.remote_field.model)
-            if related_admin is None:
+            try:
+                related_admin = obj.admin_site.get_model_admin(field.remote_field.model)
+            except NotRegistered:
                 return [
                     checks.Error(
                         'An admin for model "%s" has to be registered '
@@ -248,19 +251,20 @@ class BaseModelAdminChecks:
                         id="admin.E039",
                     )
                 ]
-            elif not related_admin.search_fields:
-                return [
-                    checks.Error(
-                        '%s must define "search_fields", because it\'s '
-                        "referenced by %s.autocomplete_fields."
-                        % (
-                            related_admin.__class__.__name__,
-                            type(obj).__name__,
-                        ),
-                        obj=obj.__class__,
-                        id="admin.E040",
-                    )
-                ]
+            else:
+                if not related_admin.search_fields:
+                    return [
+                        checks.Error(
+                            '%s must define "search_fields", because it\'s '
+                            "referenced by %s.autocomplete_fields."
+                            % (
+                                related_admin.__class__.__name__,
+                                type(obj).__name__,
+                            ),
+                            obj=obj.__class__,
+                            id="admin.E040",
+                        )
+                    ]
             return []
 
     def _check_raw_id_fields(self, obj):

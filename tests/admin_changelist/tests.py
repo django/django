@@ -878,7 +878,7 @@ class ChangeListTests(TestCase):
         user_parents = self._create_superuser("parents")
 
         # Test with user 'noparents'
-        m = custom_site._registry[Child]
+        m = custom_site.get_model_admin(Child)
         request = self._mocked_authenticated_request("/child/", user_noparents)
         response = m.changelist_view(request)
         self.assertNotContains(response, "Parent object")
@@ -903,7 +903,7 @@ class ChangeListTests(TestCase):
 
         # Test default implementation
         custom_site.register(Child, ChildAdmin)
-        m = custom_site._registry[Child]
+        m = custom_site.get_model_admin(Child)
         request = self._mocked_authenticated_request("/child/", user_noparents)
         response = m.changelist_view(request)
         self.assertContains(response, "Parent object")

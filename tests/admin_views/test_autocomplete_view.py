@@ -3,6 +3,7 @@ import json
 from contextlib import contextmanager
 
 from django.contrib import admin
+from django.contrib.admin.sites import NotRegistered
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
@@ -61,8 +62,11 @@ site.register(Toy, autocomplete_fields=["child"])
 
 @contextmanager
 def model_admin(model, model_admin, admin_site=site):
-    org_admin = admin_site._registry.get(model)
-    if org_admin:
+    try:
+        org_admin = admin_site.get_model_admin(model)
+    except NotRegistered:
+        org_admin = None
+    else:
         admin_site.unregister(model)
     admin_site.register(model, model_admin)
     try:

@@ -74,6 +74,8 @@ class AutocompleteJsonView(BaseListView):
         Raise Http404 if the target model admin is not configured properly with
         search_fields.
         """
+        from django.contrib.admin.sites import NotRegistered
+
         term = request.GET.get("term", "")
         try:
             app_label = request.GET["app_label"]
@@ -97,8 +99,8 @@ class AutocompleteJsonView(BaseListView):
         except AttributeError as e:
             raise PermissionDenied from e
         try:
-            model_admin = self.admin_site._registry[remote_model]
-        except KeyError as e:
+            model_admin = self.admin_site.get_model_admin(remote_model)
+        except NotRegistered as e:
             raise PermissionDenied from e
 
         # Validate suitability of objects.

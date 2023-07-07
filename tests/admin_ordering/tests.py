@@ -152,10 +152,10 @@ class TestRelatedFieldsAdminOrdering(TestCase):
             site.unregister(Band)
 
     def check_ordering_of_field_choices(self, correct_ordering):
-        fk_field = site._registry[Song].formfield_for_foreignkey(
+        fk_field = site.get_model_admin(Song).formfield_for_foreignkey(
             Song.band.field, request=None
         )
-        m2m_field = site._registry[Song].formfield_for_manytomany(
+        m2m_field = site.get_model_admin(Song).formfield_for_manytomany(
             Song.other_interpreters.field, request=None
         )
         self.assertEqual(list(fk_field.queryset), correct_ordering)
