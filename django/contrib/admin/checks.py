@@ -3,6 +3,7 @@ from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.utils import NotRelationField, flatten, get_fields_from_path
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
@@ -220,8 +221,6 @@ class BaseModelAdminChecks:
         ManyToManyField and that the item has a related ModelAdmin with
         search_fields defined.
         """
-        from django.contrib.admin.sites import NotRegistered
-
         try:
             field = obj.model._meta.get_field(field_name)
         except FieldDoesNotExist:

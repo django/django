@@ -4,6 +4,7 @@ from weakref import WeakSet
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
@@ -23,14 +24,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.i18n import JavaScriptCatalog
 
 all_sites = WeakSet()
-
-
-class AlreadyRegistered(Exception):
-    pass
-
-
-class NotRegistered(Exception):
-    pass
 
 
 class AdminSite:

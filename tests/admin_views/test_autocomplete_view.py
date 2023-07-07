@@ -3,7 +3,7 @@ import json
 from contextlib import contextmanager
 
 from django.contrib import admin
-from django.contrib.admin.sites import NotRegistered
+from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User

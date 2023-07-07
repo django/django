@@ -14,7 +14,7 @@ from django.contrib.admin.checks import (
     InlineModelAdminChecks,
     ModelAdminChecks,
 )
-from django.contrib.admin.exceptions import DisallowedModelAdminToField
+from django.contrib.admin.exceptions import DisallowedModelAdminToField, NotRegistered
 from django.contrib.admin.templatetags.admin_urls import add_preserved_filters
 from django.contrib.admin.utils import (
     NestedObjects,
@@ -160,8 +160,6 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
 
         If kwargs are given, they're passed to the form Field's constructor.
         """
-        from django.contrib.admin.sites import NotRegistered
-
         # If the field specifies choices, we don't need to look for special
         # admin widgets - we just need to use a select widget of some kind.
         if db_field.choices:
@@ -252,8 +250,6 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
         ordering.  Otherwise don't specify the queryset, let the field decide
         (return None in that case).
         """
-        from django.contrib.admin.sites import NotRegistered
-
         try:
             related_admin = self.admin_site.get_model_admin(db_field.remote_field.model)
         except NotRegistered:

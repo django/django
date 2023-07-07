@@ -7,6 +7,7 @@ certain test -- e.g. being a DateField or ForeignKey.
 """
 import datetime
 
+from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.options import IncorrectLookupParameters
 from django.contrib.admin.utils import (
     build_q_object_from_lookup_parameters,
@@ -257,8 +258,6 @@ class RelatedFieldListFilter(FieldListFilter):
         """
         Return the model admin's ordering for related field, if provided.
         """
-        from django.contrib.admin.sites import NotRegistered
-
         try:
             related_admin = model_admin.admin_site.get_model_admin(
                 field.remote_field.model
