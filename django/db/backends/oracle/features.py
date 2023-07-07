@@ -70,6 +70,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_ignore_conflicts = False
     max_query_params = 2**16 - 1
     supports_partial_indexes = False
+    supports_stored_generated_columns = False
+    supports_virtual_generated_columns = True
     can_rename_index = True
     supports_slicing_ordering_in_compound = True
     requires_compound_order_by_subquery = True

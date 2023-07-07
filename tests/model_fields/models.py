@@ -6,14 +6,22 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import connection, models
+from django.db.models import F, Value
 from django.db.models.fields.files import ImageFieldFile
+from django.db.models.functions import Lower
+from django.utils.functional import SimpleLazyObject
 from django.utils.translation import gettext_lazy as _
 
 try:
     from PIL import Image
 except ImportError:
     Image = None
+
+
+test_collation = SimpleLazyObject(
+    lambda: connection.features.test_collations.get("non_default")
+)
 
 
 class Foo(models.Model):
@@ -468,3 +476,91 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class GeneratedModel(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=True)
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelVirtual(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=False)
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelParams(models.Model):
+    field = models.GeneratedField(
+        expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelParamsVirtual(models.Model):
+    field = models.GeneratedField(
+        expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        db_persist=False,
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}
+
+
+class GeneratedModelOutputField(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=models.CharField(db_collation=test_collation, max_length=11),
+        db_persist=True,
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_stored_generated_columns",
+            "supports_collation_on_charfield",
+        }
+
+
+class GeneratedModelOutputFieldVirtual(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        db_persist=False,
+        output_field=models.CharField(db_collation=test_collation, max_length=11),
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_virtual_generated_columns",
+            "supports_collation_on_charfield",
+        }
+
+
+class GeneratedModelNull(models.Model):
+    name = models.CharField(max_length=10, null=True)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"), db_persist=True, null=True
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}
+
+
+class GeneratedModelNullVirtual(models.Model):
+    name = models.CharField(max_length=10, null=True)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"), db_persist=False, null=True
+    )
+
+    class Meta:
+        required_db_features = {"supports_virtual_generated_columns"}

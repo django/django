@@ -129,6 +129,13 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
+Database generated model field
+------------------------------
+
+The new :class:`~django.db.models.GeneratedField` allows creation of database
+generated columns. This field can be used on all supported database backends
+to create a field that is always computed from other fields.
+
 More options for declaring field choices
 ----------------------------------------
 
