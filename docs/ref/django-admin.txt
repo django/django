@@ -1477,7 +1477,7 @@ Using ``--parallel`` without a value, or with the value ``auto``, runs one test
 process per core according to :func:`multiprocessing.cpu_count()`. You can
 override this by passing the desired number of processes, e.g.
 ``--parallel 4``, or by setting the :envvar:`DJANGO_TEST_PROCESSES` environment
-variable.
+variable. If both are given, then ``--parallel 4`` takes precedence.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
 subprocesses. If there are fewer test cases than configured processes, Django

@@ -550,6 +550,16 @@ class ManageCommandParallelTests(SimpleTestCase):
                     )
                 self.assertIn("parallel=7", stderr.getvalue())
 
+    @mock.patch.dict(os.environ, {"DJANGO_TEST_PROCESSES": "7"})
+    def test_django_test_processes_parallel_override_env(self, *mocked_objects):
+        with captured_stderr() as stderr:
+            call_command(
+                "test",
+                "--parallel=8",
+                testrunner="test_runner.tests.MockTestRunner",
+            )
+        self.assertIn("parallel=8", stderr.getvalue())
+
 
 class CustomTestRunnerOptionsSettingsTests(AdminScriptTestCase):
     """
