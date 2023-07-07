@@ -353,6 +353,11 @@ class BaseDatabaseFeatures:
     # Does the backend support column comments in ADD COLUMN statements?
     supports_comments_inline = False
 
+    # Does the backend support stored generated columns?
+    supports_stored_generated_columns = False
+    # Does the backend support virtual generated columns?
+    supports_virtual_generated_columns = False
+
     # Does the backend support the logical XOR operator?
     supports_logical_xor = False
 

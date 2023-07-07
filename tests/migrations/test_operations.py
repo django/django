@@ -5,6 +5,7 @@ from django.db import IntegrityError, connection, migrations, models, transactio
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
+from django.db.models import F
 from django.db.models.expressions import Value
 from django.db.models.functions import Abs, Pi
 from django.db.transaction import atomic
@@ -5740,6 +5741,130 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
         assertModelsAndTables(after_db=False)
+
+    def _test_invalid_generated_field_changes(self, db_persist):
+        regular = models.IntegerField(default=1)
+        generated_1 = models.GeneratedField(
+            expression=F("pink") + F("pink"), db_persist=db_persist
+        )
+        generated_2 = models.GeneratedField(
+            expression=F("pink") + F("pink") + F("pink"), db_persist=db_persist
+        )
+        tests = [
+            ("test_igfc_1", regular, generated_1),
+            ("test_igfc_2", generated_1, regular),
+            ("test_igfc_3", generated_1, generated_2),
+        ]
+        for app_label, add_field, alter_field in tests:
+            project_state = self.set_up_test_model(app_label)
+            operations = [
+                migrations.AddField("Pony", "modified_pink", add_field),
+                migrations.AlterField("Pony", "modified_pink", alter_field),
+            ]
+            msg = (
+                "Modifying GeneratedFields is not supported - the field "
+                f"{app_label}.Pony.modified_pink must be removed and re-added with the "
+                "new definition."
+            )
+            with self.assertRaisesMessage(ValueError, msg):
+                self.apply_operations(app_label, project_state, operations)
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_invalid_generated_field_changes_stored(self):
+        self._test_invalid_generated_field_changes(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_invalid_generated_field_changes_virtual(self):
+        self._test_invalid_generated_field_changes(db_persist=False)
+
+    @skipUnlessDBFeature(
+        "supports_stored_generated_columns",
+        "supports_virtual_generated_columns",
+    )
+    def test_invalid_generated_field_persistency_change(self):
+        app_label = "test_igfpc"
+        project_state = self.set_up_test_model(app_label)
+        operations = [
+            migrations.AddField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(expression=F("pink"), db_persist=True),
+            ),
+            migrations.AlterField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(expression=F("pink"), db_persist=False),
+            ),
+        ]
+        msg = (
+            "Modifying GeneratedFields is not supported - the field "
+            f"{app_label}.Pony.modified_pink must be removed and re-added with the "
+            "new definition."
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            self.apply_operations(app_label, project_state, operations)
+
+    def _test_add_generated_field(self, db_persist):
+        app_label = "test_agf"
+        operation = migrations.AddField(
+            "Pony",
+            "modified_pink",
+            models.GeneratedField(
+                expression=F("pink") + F("pink"), db_persist=db_persist
+            ),
+        )
+        project_state, new_state = self.make_test_state(app_label, operation)
+        self.assertEqual(len(new_state.models[app_label, "pony"].fields), 6)
+        # Add generated column.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnExists(f"{app_label}_pony", "modified_pink")
+        Pony = new_state.apps.get_model(app_label, "Pony")
+        obj = Pony.objects.create(pink=5, weight=3.23)
+        self.assertEqual(obj.modified_pink, 10)
+        # Reversal.
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+        self.assertColumnNotExists(f"{app_label}_pony", "modified_pink")
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_add_generated_field_stored(self):
+        self._test_add_generated_field(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_add_generated_field_virtual(self):
+        self._test_add_generated_field(db_persist=False)
+
+    def _test_remove_generated_field(self, db_persist):
+        app_label = "test_rgf"
+        operation = migrations.AddField(
+            "Pony",
+            "modified_pink",
+            models.GeneratedField(
+                expression=F("pink") + F("pink"), db_persist=db_persist
+            ),
+        )
+        project_state, new_state = self.make_test_state(app_label, operation)
+        self.assertEqual(len(new_state.models[app_label, "pony"].fields), 6)
+        # Add generated column.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        project_state = new_state
+        new_state = project_state.clone()
+        operation = migrations.RemoveField("Pony", "modified_pink")
+        operation.state_forwards(app_label, new_state)
+        # Remove generated column.
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+        self.assertColumnNotExists(f"{app_label}_pony", "modified_pink")
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_remove_generated_field_stored(self):
+        self._test_remove_generated_field(db_persist=True)
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_remove_generated_field_virtual(self):
+        self._test_remove_generated_field(db_persist=False)
 
 
 class SwappableOperationTests(OperationTestBase):

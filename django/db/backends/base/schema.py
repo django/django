@@ -332,7 +332,9 @@ class BaseDatabaseSchemaEditor:
             and self.connection.features.interprets_empty_strings_as_nulls
         ):
             null = True
-        if not null:
+        if field.generated:
+            yield self._column_generated_sql(field)
+        elif not null:
             yield "NOT NULL"
         elif not self.connection.features.implied_column_null:
             yield "NULL"
@@ -422,11 +424,21 @@ class BaseDatabaseSchemaEditor:
             params = []
         return sql % default_sql, params
 
+    def _column_generated_sql(self, field):
+        """Return the SQL to use in a GENERATED ALWAYS clause."""
+        expression_sql, params = field.generated_sql(self.connection)
+        persistency_sql = "STORED" if field.db_persist else "VIRTUAL"
+        if params:
+            expression_sql = expression_sql % tuple(self.quote_value(p) for p in params)
+        return f"GENERATED ALWAYS AS ({expression_sql}) {persistency_sql}"
+
     @staticmethod
     def _effective_default(field):
         # This method allows testing its logic without a connection.
         if field.has_default():
             default = field.get_default()
+        elif field.generated:
+            default = None
         elif not field.null and field.blank and field.empty_strings_allowed:
             if field.get_internal_type() == "BinaryField":
                 default = b""
@@ -847,6 +859,18 @@ class BaseDatabaseSchemaEditor:
                 "Cannot alter field %s into %s - they are not compatible types "
                 "(you cannot alter to or from M2M fields, or add or remove "
                 "through= on M2M fields)" % (old_field, new_field)
+            )
+        elif old_field.generated != new_field.generated or (
+            new_field.generated
+            and (
+                old_field.db_persist != new_field.db_persist
+                or old_field.generated_sql(self.connection)
+                != new_field.generated_sql(self.connection)
+            )
+        ):
+            raise ValueError(
+                f"Modifying GeneratedFields is not supported - the field {new_field} "
+                "must be removed and re-added with the new definition."
             )
 
         self._alter_field(
