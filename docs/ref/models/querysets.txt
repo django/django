@@ -2411,9 +2411,13 @@ On databases that support it (all except Oracle and SQLite < 3.24), setting the
 SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may
 be in conflict must be provided.
 
-Enabling the ``ignore_conflicts`` or ``update_conflicts`` parameter disable
-setting the primary key on each model instance (if the database normally
-support it).
+Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
+each model instance (if the database normally supports it).
+
+.. versionchanged:: 5.0
+
+    In older versions, enabling the ``update_conflicts`` parameter prevented
+    setting the primary key on each model instance.
 
 .. warning::
 

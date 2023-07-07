@@ -357,6 +357,10 @@ Models
   :meth:`.Model.save` now allows specifying a tuple of parent classes that must
   be forced to be inserted.
 
+* :meth:`.QuerySet.bulk_create` and :meth:`.QuerySet.abulk_create` methods now
+  set the primary key on each model instance when the ``update_conflicts``
+  parameter is enabled (if the database supports it).
+
 Pagination
 ~~~~~~~~~~
 
