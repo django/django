@@ -560,6 +560,18 @@ class UniqueConstraintTests(TestCase):
             "opclasses=['text_pattern_ops', 'varchar_pattern_ops']>",
         )
 
+    def test_repr_with_nulls_distinct(self):
+        constraint = models.UniqueConstraint(
+            fields=["foo", "bar"],
+            name="nulls_distinct_fields",
+            nulls_distinct=False,
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='nulls_distinct_fields' "
+            "nulls_distinct=False>",
+        )
+
     def test_repr_with_expressions(self):
         constraint = models.UniqueConstraint(
             Lower("title"),
@@ -676,6 +688,24 @@ class UniqueConstraintTests(TestCase):
                 "fields": tuple(fields),
                 "name": name,
                 "opclasses": opclasses,
+            },
+        )
+
+    def test_deconstruction_with_nulls_distinct(self):
+        fields = ["foo", "bar"]
+        name = "unique_fields"
+        constraint = models.UniqueConstraint(
+            fields=fields, name=name, nulls_distinct=False
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {
+                "fields": tuple(fields),
+                "name": name,
+                "nulls_distinct": False,
             },
         )
 

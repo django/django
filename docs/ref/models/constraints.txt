@@ -254,6 +254,26 @@ creates a unique index on ``username`` using ``varchar_pattern_ops``.
 
 ``opclasses`` are ignored for databases besides PostgreSQL.
 
+``nulls_distinct``
+------------------
+
+.. versionadded:: 5.0
+
+.. attribute:: UniqueConstraint.nulls_distinct
+
+Whether or not rows containing null values covered by the unique constraint
+should be considered distinct from each other. The default value is ``None`` which
+uses the database default which is ``True`` on most backends.
+
+For example::
+
+    UniqueConstraint(name="ordering", fields=["ordering"], nulls_distinct=False)
+
+will create a unique constraint that only allows one row to store a ``NULL``
+value in the ``ordering`` column.
+
+``nulls_distinct`` is ignored for databases besides PostgreSQL 15+.
+
 ``violation_error_code``
 ------------------------
 

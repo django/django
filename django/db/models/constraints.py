@@ -186,6 +186,7 @@ class UniqueConstraint(BaseConstraint):
         deferrable=None,
         include=None,
         opclasses=(),
+        nulls_distinct=None,
         violation_error_code=None,
         violation_error_message=None,
     ):
@@ -233,6 +234,7 @@ class UniqueConstraint(BaseConstraint):
         self.deferrable = deferrable
         self.include = tuple(include) if include else ()
         self.opclasses = opclasses
+        self.nulls_distinct = nulls_distinct
         self.expressions = tuple(
             F(expression) if isinstance(expression, str) else expression
             for expression in expressions
@@ -284,6 +286,7 @@ class UniqueConstraint(BaseConstraint):
             include=include,
             opclasses=self.opclasses,
             expressions=expressions,
+            nulls_distinct=self.nulls_distinct,
         )
 
     def create_sql(self, model, schema_editor):
@@ -302,6 +305,7 @@ class UniqueConstraint(BaseConstraint):
             include=include,
             opclasses=self.opclasses,
             expressions=expressions,
+            nulls_distinct=self.nulls_distinct,
         )
 
     def remove_sql(self, model, schema_editor):
@@ -318,10 +322,11 @@ class UniqueConstraint(BaseConstraint):
             include=include,
             opclasses=self.opclasses,
             expressions=expressions,
+            nulls_distinct=self.nulls_distinct,
         )
 
     def __repr__(self):
-        return "<%s:%s%s%s%s%s%s%s%s%s>" % (
+        return "<%s:%s%s%s%s%s%s%s%s%s%s>" % (
             self.__class__.__qualname__,
             "" if not self.fields else " fields=%s" % repr(self.fields),
             "" if not self.expressions else " expressions=%s" % repr(self.expressions),
@@ -330,6 +335,11 @@ class UniqueConstraint(BaseConstraint):
             "" if self.deferrable is None else " deferrable=%r" % self.deferrable,
             "" if not self.include else " include=%s" % repr(self.include),
             "" if not self.opclasses else " opclasses=%s" % repr(self.opclasses),
+            (
+                ""
+                if self.nulls_distinct is None
+                else " nulls_distinct=%s" % repr(self.nulls_distinct)
+            ),
             (
                 ""
                 if self.violation_error_code is None
@@ -370,6 +380,8 @@ class UniqueConstraint(BaseConstraint):
             kwargs["include"] = self.include
         if self.opclasses:
             kwargs["opclasses"] = self.opclasses
+        if self.nulls_distinct is not None:
+            kwargs["nulls_distinct"] = self.nulls_distinct
         return path, self.expressions, kwargs
 
     def validate(self, model, instance, exclude=None, using=DEFAULT_DB_ALIAS):
@@ -381,9 +393,15 @@ class UniqueConstraint(BaseConstraint):
                     return
                 field = model._meta.get_field(field_name)
                 lookup_value = getattr(instance, field.attname)
-                if lookup_value is None or (
-                    lookup_value == ""
-                    and connections[using].features.interprets_empty_strings_as_nulls
+                if (
+                    self.nulls_distinct is not False
+                    and lookup_value is None
+                    or (
+                        lookup_value == ""
+                        and connections[
+                            using
+                        ].features.interprets_empty_strings_as_nulls
+                    )
                 ):
                     # A composite constraint containing NULL value cannot cause
                     # a violation since NULL != NULL in SQL.

@@ -354,6 +354,10 @@ Models
   :meth:`.Model.save` now allows specifying a tuple of parent classes that must
   be forced to be inserted.
 
+* The new ``nulls_distinct`` attribute of
+  :class:`~django.db.models.UniqueConstraint` allows customizing the treatment
+  of ``NULL`` values on PostgreSQL 15+.
+
 Pagination
 ~~~~~~~~~~
 

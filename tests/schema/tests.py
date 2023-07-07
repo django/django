@@ -3318,6 +3318,41 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
+    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_unique_constraint_nulls_distinct(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        nulls_distinct = UniqueConstraint(
+            F("height"), name="distinct_height", nulls_distinct=True
+        )
+        nulls_not_distinct = UniqueConstraint(
+            F("weight"), name="not_distinct_weight", nulls_distinct=False
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, nulls_distinct)
+            editor.add_constraint(Author, nulls_not_distinct)
+        Author.objects.create(
+            name="",
+            height=None,
+            weight=None,
+        )
+        Author.objects.create(name="", height=None, weight=1)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="", height=1, weight=None)
+
+    @skipIfDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_unique_constraint_nulls_distinct_unsupported(self):
+        # UniqueConstraint is ignored on databases that don't support
+        # NULLS [NOT] DISTINCT.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            F("name"), name="func_name_uq", nulls_distinct=True
+        )
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            self.assertIsNone(editor.add_constraint(Author, constraint))
+            self.assertIsNone(editor.remove_constraint(Author, constraint))
+
     @ignore_warnings(category=RemovedInDjango51Warning)
     def test_index_together(self):
         """
