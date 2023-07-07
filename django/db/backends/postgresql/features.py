@@ -70,6 +70,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
     supports_covering_indexes = True
+    supports_generated_columns = True
+    supports_generated_columns_params = True
+    supports_virtual_generated_columns = False
     can_rename_index = True
     test_collations = {
         "non_default": "sv-x-icu",

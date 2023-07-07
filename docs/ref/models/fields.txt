@@ -1185,6 +1185,49 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     information on the difference between the two, see Python's documentation
     for the :mod:`decimal` module.
 
+``GeneratedField``
+------------------
+
+.. versionadded:: 5.0
+
+.. class:: GeneratedField(expression, output_field=None, db_persist=True, **kwargs)
+
+A field which is computed based on other fields in the model. Similar to a
+database view, this field is managed and updated by the database itself. Uses
+the ``GENERATED`` SQL syntax.
+
+There are two kinds of generated columns: stored and virtual. A stored generated
+column is computed when it is written (inserted or updated) and occupies storage
+as if it were a normal column. A virtual generated column occupies no storage and
+is computed when it is read. Thus, a virtual generated column is similar to a view
+and a stored generated column is similar to a materialized view.
+
+``GeneratedField`` is supported on MariaDB, MySQL, PostgreSQL, and SQLite. SQLite
+does not support parameters in generated column definitions.
+
+.. attribute:: GeneratedField.expression
+
+    An :class:`Expression` used by the database to automatically set the field
+    value whenever the model is changed.
+
+    The expressions should be deterministic and only reference fields within
+    the model (in one database table). Generated fields cannot reference other
+    generated fields. Database backends can impose further restrictions.
+
+.. attribute:: GeneratedField.output_field
+
+    An optional :class:`Field` to define the field's data type. This can be
+    used to customize attributes like the field's collation. By default, the
+    output field is derived from ``expression``.
+
+.. attribute:: GeneratedField.db_persist
+
+    Determines if the database column should occupy storage as if it were a real
+    column. If ``False``, the column acts as a virtual column and does
+    not occupy database storage space.
+
+    Default is ``True``. PostgreSQL only supports persisted columns.
+
 ``GenericIPAddressField``
 -------------------------
 

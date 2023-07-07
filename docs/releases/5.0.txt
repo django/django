@@ -389,6 +389,8 @@ Models
 * Django now supports `oracledb`_ version 1.3.2 or higher. Support for
   ``cx_Oracle`` is deprecated as of this release and will be removed in Django
   6.0.
+* The new :class:`~django.db.models.GeneratedField` allows creation of
+  database generated columns.
 
 Pagination
 ~~~~~~~~~~

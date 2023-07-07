@@ -628,6 +628,19 @@ class Options:
         )
 
     @cached_property
+    def generated_fields(self):
+        """
+        Return a list of all fields on the model that are derived from other columns.
+
+        Private API intended only to be used by Django itself; get_fields()
+        combined with filtering of field properties is the public API for
+        obtaining this field list.
+        """
+        return make_immutable_fields_list(
+            "generated_fields", (f for f in self.fields if f.generated)
+        )
+
+    @cached_property
     def _forward_fields_map(self):
         res = {}
         fields = self._get_fields(reverse=False)

@@ -5,6 +5,7 @@ from django.db import IntegrityError, connection, migrations, models, transactio
 from django.db.migrations.migration import Migration
 from django.db.migrations.operations.fields import FieldOperation
 from django.db.migrations.state import ModelState, ProjectState
+from django.db.models import F
 from django.db.models.expressions import Value
 from django.db.models.functions import Abs, Pi
 from django.db.transaction import atomic
@@ -5740,6 +5741,68 @@ class OperationTests(OperationTestBase):
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
         assertModelsAndTables(after_db=False)
+
+    @skipUnlessDBFeature("supports_generated_columns")
+    def test_invalid_generated_field_changes(self):
+        regular = models.IntegerField(default=1)
+        generated_1 = models.GeneratedField(expression=F("pink"))
+        generated_2 = models.GeneratedField(expression=F("pink") + F("pink"))
+        invalid_field_changes = [
+            ("test_slsoeecpz_1", regular, generated_1),
+            ("test_slsoeecpz_2", generated_1, regular),
+            ("test_slsoeecpz_3", generated_1, generated_2),
+        ]
+
+        for app_label, add_field, alter_field in invalid_field_changes:
+            project_state = self.set_up_test_model(
+                app_label,
+                mti_model=True,
+                related_model=True,
+            )
+            operations = [
+                migrations.AddField(
+                    "Pony",
+                    "modified_pink",
+                    add_field,
+                ),
+                migrations.AlterField(
+                    "Pony",
+                    "modified_pink",
+                    alter_field,
+                ),
+            ]
+            with self.assertRaisesMessage(
+                ValueError, "Modifying GeneratedFields is not supported"
+            ):
+                self.apply_operations(app_label, project_state, operations)
+
+    @skipUnlessDBFeature("supports_generated_columns")
+    def test_valid_generated_field_operations(self):
+        app_label = "test_apsdqlocl"
+        project_state = self.set_up_test_model(
+            app_label,
+            mti_model=True,
+            related_model=True,
+        )
+        operations = [
+            migrations.AddField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(expression=F("pink") + F("pink")),
+            ),
+            migrations.AlterField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(expression=F("pink") + F("pink")),
+            ),
+            migrations.RemoveField("Pony", "modified_pink"),
+            migrations.AddField(
+                "Pony",
+                "modified_pink",
+                models.GeneratedField(expression=F("pink") + F("pink")),
+            ),
+        ]
+        self.apply_operations(app_label, project_state, operations)
 
 
 class SwappableOperationTests(OperationTestBase):

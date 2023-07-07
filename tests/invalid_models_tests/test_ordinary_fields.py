@@ -4,6 +4,7 @@ import uuid
 from django.core.checks import Error
 from django.core.checks import Warning as DjangoWarning
 from django.db import connection, models
+from django.db.models import F, Value
 from django.db.models.functions import Coalesce, Pi
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings
@@ -1199,3 +1200,65 @@ class InvalidDBDefaultTests(TestCase):
         msg = f"{expression} cannot be used in db_default."
         expected_error = Error(msg=msg, obj=field, id="fields.E012")
         self.assertEqual(errors, [expected_error])
+
+
+@isolate_apps("invalid_models_tests")
+class GeneratedFieldTests(TestCase):
+    def test_field_not_supported(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=F("name"))
+
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            [
+                Error(
+                    "%s does not support GeneratedFields." % connection.display_name,
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E220",
+                ),
+            ]
+            if not connection.features.supports_generated_columns
+            else [],
+        )
+
+    def test_params_not_supported(self):
+        class Model(models.Model):
+            field = models.GeneratedField(expression=Value("value"))
+
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            [
+                Error(
+                    "%s does not support GeneratedFields with parameters."
+                    % connection.display_name,
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E221",
+                ),
+            ]
+            if connection.features.supports_generated_columns
+            and not connection.features.supports_generated_columns_params
+            else [],
+        )
+
+    def test_virtual_not_supported(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=F("name"), db_persist=False)
+            a = models.TextField()
+
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            [
+                Error(
+                    "%s does not support non-persisted GeneratedFields."
+                    % connection.display_name,
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E222",
+                    hint="remove the persisted=False argument",
+                ),
+            ]
+            if connection.features.supports_generated_columns
+            and not connection.features.supports_virtual_generated_columns
+            else [],
+        )

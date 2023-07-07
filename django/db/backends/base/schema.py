@@ -287,7 +287,14 @@ class BaseDatabaseSchemaEditor:
     # Field <-> database mapping functions
 
     def _iter_column_sql(
-        self, column_db_type, params, model, field, field_db_params, include_default
+        self,
+        column_db_type,
+        params,
+        model,
+        field,
+        field_db_params,
+        include_default,
+        generated_sql,
     ):
         yield column_db_type
         if collation := field_db_params.get("collation"):
@@ -332,7 +339,9 @@ class BaseDatabaseSchemaEditor:
             and self.connection.features.interprets_empty_strings_as_nulls
         ):
             null = True
-        if not null:
+        if generated_sql:
+            yield generated_sql
+        elif not null:
             yield "NOT NULL"
         elif not self.connection.features.implied_column_null:
             yield "NULL"
@@ -361,20 +370,26 @@ class BaseDatabaseSchemaEditor:
         if column_db_type is None:
             return None, None
         params = []
-        return (
-            " ".join(
-                # This appends to the params being returned.
-                self._iter_column_sql(
-                    column_db_type,
-                    params,
-                    model,
-                    field,
-                    field_db_params,
-                    include_default,
-                )
-            ),
-            params,
+        generated_sql = None
+        if generated_parameters := field_db_params.get("generated_parameters"):
+            generated_expression_sql, persisted, generated_params = generated_parameters
+            generated_sql = self._column_generated_sql(
+                generated_expression_sql, persisted
+            )
+            params += generated_params
+        sql = " ".join(
+            # This appends to the params being returned.
+            self._iter_column_sql(
+                column_db_type,
+                params,
+                model,
+                field,
+                field_db_params,
+                include_default,
+                generated_sql,
+            )
         )
+        return sql, params
 
     def skip_default(self, field):
         """
@@ -421,6 +436,11 @@ class BaseDatabaseSchemaEditor:
             default_sql %= tuple(self.prepare_default(p) for p in params)
             params = []
         return sql % default_sql, params
+
+    def _column_generated_sql(self, expression_sql, persisted):
+        """Return the SQL to use in a GENERATED ALWAYS clause."""
+        persistency_sql = "STORED" if persisted else "VIRTUAL"
+        return "GENERATED ALWAYS AS (%s) %s" % (expression_sql, persistency_sql)
 
     @staticmethod
     def _effective_default(field):
@@ -811,6 +831,8 @@ class BaseDatabaseSchemaEditor:
         old_type = old_db_params["type"]
         new_db_params = new_field.db_parameters(connection=self.connection)
         new_type = new_db_params["type"]
+        old_generated_parameters = old_db_params.get("generated_parameters")
+        new_generated_parameters = new_db_params.get("generated_parameters")
         if (old_type is None and old_field.remote_field is None) or (
             new_type is None and new_field.remote_field is None
         ):
@@ -847,6 +869,11 @@ class BaseDatabaseSchemaEditor:
                 "Cannot alter field %s into %s - they are not compatible types "
                 "(you cannot alter to or from M2M fields, or add or remove "
                 "through= on M2M fields)" % (old_field, new_field)
+            )
+        elif old_generated_parameters != new_generated_parameters:
+            raise ValueError(
+                "Modifying GeneratedFields is not supported - the field %s must "
+                "be removed and re-added with the new definition." % new_field
             )
 
         self._alter_field(

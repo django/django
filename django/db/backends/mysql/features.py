@@ -60,6 +60,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     order_by_nulls_first = True
     supports_logical_xor = True
 
+    supports_generated_columns = True
+    supports_generated_columns_params = True
+    supports_virtual_generated_columns = True
+
     @cached_property
     def minimum_database_version(self):
         if self.connection.mysql_is_mariadb:

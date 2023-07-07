@@ -1829,6 +1829,9 @@ class QuerySet(AltersData):
         Insert a new record for the given model. This provides an interface to
         the InsertQuery class and is how Model.save() is implemented.
         """
+        if self.model._meta.generated_fields and fields:
+            fields = [f for f in fields if not f.generated]
+
         self._for_write = True
         if using is None:
             using = self.db

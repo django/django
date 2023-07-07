@@ -6,8 +6,10 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import connection, models
+from django.db.models import CharField, F, TextField, Value
 from django.db.models.fields.files import ImageFieldFile
+from django.db.models.functions import Lower
 from django.utils.translation import gettext_lazy as _
 
 try:
@@ -469,3 +471,66 @@ class UUIDChild(PrimaryKeyUUIDModel):
 
 class UUIDGrandchild(UUIDChild):
     pass
+
+
+class GeneratedModel(models.Model):
+    a = models.IntegerField()
+    b = models.IntegerField()
+    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=True)
+
+    class Meta:
+        required_db_features = {"supports_generated_columns"}
+
+
+class GeneratedModelParams(models.Model):
+    field = models.GeneratedField(
+        expression=Value("Constant", output_field=CharField(max_length=10))
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_generated_columns",
+            "supports_generated_columns_params",
+        }
+
+
+class GeneratedModelVirtual(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name", output_field=TextField()), db_persist=False
+    )
+
+    class Meta:
+        required_db_features = {
+            "supports_generated_columns",
+            "supports_virtual_generated_columns",
+        }
+
+
+class GeneratedModeOutputField(models.Model):
+    name = models.CharField(max_length=10)
+    lower_name = models.GeneratedField(
+        expression=Lower("name"),
+        output_field=TextField(
+            db_collation=connection.features.test_collations.get("non_default")
+        ),
+    )
+
+    class Meta:
+        required_db_features = {"supports_generated_columns"}
+
+
+class GeneratedModelNotNull(models.Model):
+    name = models.CharField(max_length=10, null=False)
+    lower_name = models.GeneratedField(expression=Lower("name"), null=False)
+
+    class Meta:
+        required_db_features = {"supports_generated_columns"}
+
+
+class GeneratedModelNull(models.Model):
+    name = models.CharField(max_length=10, null=True)
+    lower_name = models.GeneratedField(expression=Lower("name"), null=True)
+
+    class Meta:
+        required_db_features = {"supports_generated_columns"}

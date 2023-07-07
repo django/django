@@ -237,6 +237,9 @@ Model fields
 * **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
   deprecated. Support for it (except in historical migrations) will be removed
   in Django 5.1.
+* **fields.E220**: ``<database>`` does not support ``GeneratedField``\s.
+* **fields.E221**: ``<database>`` does not support ``GeneratedField``\s with constant parameters.
+* **fields.E222**: ``<database>`` does not support ``GeneratedField``\s with no persistence.
 
 File fields
 ~~~~~~~~~~~

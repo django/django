@@ -40,6 +40,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_json_field_contains = False
     supports_update_conflicts = True
     supports_update_conflicts_with_target = True
+    supports_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
+    supports_generated_columns_params = False
+    supports_virtual_generated_columns = True
     test_collations = {
         "ci": "nocase",
         "cs": "binary",
