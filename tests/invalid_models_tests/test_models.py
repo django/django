@@ -2753,6 +2753,52 @@ class ConstraintsTests(TestCase):
 
         self.assertEqual(Model.check(databases=self.databases), [])
 
+    def test_unique_constraint_nulls_distinct(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=10)
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=["name"],
+                        name="name_uq_distinct_null",
+                        nulls_distinct=True,
+                    ),
+                ]
+
+        warn = Warning(
+            f"{connection.display_name} does not support unique constraints with nulls "
+            "distinct.",
+            hint=(
+                "A constraint won't be created. Silence this warning if you don't care "
+                "about it."
+            ),
+            obj=Model,
+            id="models.W047",
+        )
+        expected = (
+            []
+            if connection.features.supports_nulls_distinct_unique_constraints
+            else [warn]
+        )
+        self.assertEqual(Model.check(databases=self.databases), expected)
+
+    def test_unique_constraint_nulls_distinct_required_db_features(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=10)
+
+            class Meta:
+                constraints = [
+                    models.UniqueConstraint(
+                        fields=["name"],
+                        name="name_uq_distinct_null",
+                        nulls_distinct=True,
+                    ),
+                ]
+                required_db_features = {"supports_nulls_distinct_unique_constraints"}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
     @skipUnlessDBFeature("supports_expression_indexes")
     def test_func_unique_constraint_expression_custom_lookup(self):
         class Model(models.Model):

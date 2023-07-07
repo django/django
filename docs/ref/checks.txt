@@ -408,6 +408,8 @@ Models
   expression and won't be validated during the model ``full_clean()``.
 * **models.W046**: ``<database>`` does not support comments on tables
   (``db_table_comment``).
+* **models.W047**: ``<database>`` does not support unique constraints with
+  nulls distinct.
 
 Security
 --------

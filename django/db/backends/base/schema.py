@@ -129,7 +129,7 @@ class BaseDatabaseSchemaEditor:
     )
     sql_create_unique_index = (
         "CREATE UNIQUE INDEX %(name)s ON %(table)s "
-        "(%(columns)s)%(include)s%(condition)s"
+        "(%(columns)s)%(include)s%(condition)s%(nulls_distinct)s"
     )
     sql_rename_index = "ALTER INDEX %(old_name)s RENAME TO %(new_name)s"
     sql_delete_index = "DROP INDEX %(name)s"
@@ -1675,12 +1675,20 @@ class BaseDatabaseSchemaEditor:
         if deferrable == Deferrable.IMMEDIATE:
             return " DEFERRABLE INITIALLY IMMEDIATE"
 
+    def _unique_index_nulls_distinct_sql(self, nulls_distinct):
+        if nulls_distinct is False:
+            return " NULLS NOT DISTINCT"
+        elif nulls_distinct is True:
+            return " NULLS DISTINCT"
+        return ""
+
     def _unique_supported(
         self,
         condition=None,
         deferrable=None,
         include=None,
         expressions=None,
+        nulls_distinct=None,
     ):
         return (
             (not condition or self.connection.features.supports_partial_indexes)
@@ -1691,6 +1699,10 @@ class BaseDatabaseSchemaEditor:
             and (not include or self.connection.features.supports_covering_indexes)
             and (
                 not expressions or self.connection.features.supports_expression_indexes
+            )
+            and (
+                nulls_distinct is None
+                or self.connection.features.supports_nulls_distinct_unique_constraints
             )
         )
 
@@ -1704,17 +1716,26 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
         if not self._unique_supported(
             condition=condition,
             deferrable=deferrable,
             include=include,
             expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
-        if condition or include or opclasses or expressions:
-            # Databases support conditional, covering, and functional unique
-            # constraints via a unique index.
+
+        if (
+            condition
+            or include
+            or opclasses
+            or expressions
+            or nulls_distinct is not None
+        ):
+            # Databases support conditional, covering, functional unique,
+            # and nulls distinct constraints via a unique index.
             sql = self._create_unique_sql(
                 model,
                 fields,
@@ -1723,6 +1744,7 @@ class BaseDatabaseSchemaEditor:
                 include=include,
                 opclasses=opclasses,
                 expressions=expressions,
+                nulls_distinct=nulls_distinct,
             )
             if sql:
                 self.deferred_sql.append(sql)
@@ -1746,12 +1768,14 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
         if not self._unique_supported(
             condition=condition,
             deferrable=deferrable,
             include=include,
             expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
 
@@ -1782,6 +1806,7 @@ class BaseDatabaseSchemaEditor:
             condition=self._index_condition_sql(condition),
             deferrable=self._deferrable_constraint_sql(deferrable),
             include=self._index_include_sql(model, include),
+            nulls_distinct=self._unique_index_nulls_distinct_sql(nulls_distinct),
         )
 
     def _unique_constraint_name(self, table, columns, quote=True):
@@ -1804,12 +1829,14 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
         if not self._unique_supported(
             condition=condition,
             deferrable=deferrable,
             include=include,
             expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
         if condition or include or opclasses or expressions:

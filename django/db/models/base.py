@@ -2442,6 +2442,29 @@ class Model(AltersData, metaclass=ModelBase):
                         id="models.W044",
                     )
                 )
+            if not (
+                connection.features.supports_nulls_distinct_unique_constraints
+                or (
+                    "supports_nulls_distinct_unique_constraints"
+                    in cls._meta.required_db_features
+                )
+            ) and any(
+                isinstance(constraint, UniqueConstraint)
+                and constraint.nulls_distinct is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        "%s does not support unique constraints with "
+                        "nulls distinct." % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id="models.W047",
+                    )
+                )
             fields = set(
                 chain.from_iterable(
                     (*constraint.fields, *constraint.include)
