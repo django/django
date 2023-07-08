@@ -1,5 +1,7 @@
 from functools import wraps
 
+from asgiref.sync import iscoroutinefunction
+
 from django.utils.cache import patch_vary_headers
 
 
@@ -16,13 +18,21 @@ def vary_on_headers(*headers):
     """
 
     def decorator(func):
-        @wraps(func)
-        def inner_func(*args, **kwargs):
-            response = func(*args, **kwargs)
-            patch_vary_headers(response, headers)
-            return response
+        if iscoroutinefunction(func):
 
-        return inner_func
+            async def _view_wrapper(request, *args, **kwargs):
+                response = await func(request, *args, **kwargs)
+                patch_vary_headers(response, headers)
+                return response
+
+        else:
+
+            def _view_wrapper(request, *args, **kwargs):
+                response = func(request, *args, **kwargs)
+                patch_vary_headers(response, headers)
+                return response
+
+        return wraps(func)(_view_wrapper)
 
     return decorator
 
