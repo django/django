@@ -84,6 +84,7 @@ view functions:
 * :func:`~django.views.decorators.cache.cache_control`
 * :func:`~django.views.decorators.cache.never_cache`
 * :func:`~django.views.decorators.common.no_append_slash`
+* :func:`~django.views.decorators.csrf.csrf_exempt`
 * :func:`~django.views.decorators.http.condition`
 * :func:`~django.views.decorators.http.etag`
 * :func:`~django.views.decorators.http.last_modified`

@@ -258,6 +258,7 @@ Decorators
   * :func:`~django.views.decorators.cache.cache_control`
   * :func:`~django.views.decorators.cache.never_cache`
   * :func:`~django.views.decorators.common.no_append_slash`
+  * :func:`~django.views.decorators.csrf.csrf_exempt`
   * :func:`~django.views.decorators.debug.sensitive_variables`
   * :func:`~django.views.decorators.debug.sensitive_post_parameters`
   * :func:`~django.views.decorators.http.condition`
