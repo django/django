@@ -105,6 +105,10 @@ compression on a per-view basis.
     It sets the ``Vary`` header accordingly, so that caches will base their
     storage on the ``Accept-Encoding`` header.
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. module:: django.views.decorators.vary
 
 Vary headers

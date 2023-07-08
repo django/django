@@ -170,6 +170,10 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: requires_csrf_token(view)
 
     Normally the :ttag:`csrf_token` template tag will not work if
@@ -190,9 +194,17 @@ class-based views<decorating-class-based-views>`.
             # ...
             return render(request, "a_template.html", c)
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: ensure_csrf_cookie(view)
 
     This decorator forces a view to send the CSRF cookie.
+
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
 
 Settings
 ========

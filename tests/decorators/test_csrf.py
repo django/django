@@ -24,6 +24,20 @@ class CsrfTestMixin:
 
 
 class CsrfProtectTests(CsrfTestMixin, SimpleTestCase):
+    def test_wrapped_sync_function_is_not_coroutine_function(self):
+        def sync_view(request):
+            return HttpResponse()
+
+        wrapped_view = csrf_protect(sync_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), False)
+
+    def test_wrapped_async_function_is_coroutine_function(self):
+        async def async_view(request):
+            return HttpResponse()
+
+        wrapped_view = csrf_protect(async_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), True)
+
     def test_csrf_protect_decorator(self):
         @csrf_protect
         def sync_view(request):
@@ -39,8 +53,37 @@ class CsrfProtectTests(CsrfTestMixin, SimpleTestCase):
             response = sync_view(request)
             self.assertEqual(response.status_code, 403)
 
+    async def test_csrf_protect_decorator_async_view(self):
+        @csrf_protect
+        async def async_view(request):
+            return HttpResponse()
+
+        request = self.get_request()
+        response = await async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(request.csrf_processing_done, True)
+
+        with self.assertLogs("django.security.csrf", "WARNING"):
+            request = self.get_request(token=None)
+            response = await async_view(request)
+            self.assertEqual(response.status_code, 403)
+
 
 class RequiresCsrfTokenTests(CsrfTestMixin, SimpleTestCase):
+    def test_wrapped_sync_function_is_not_coroutine_function(self):
+        def sync_view(request):
+            return HttpResponse()
+
+        wrapped_view = requires_csrf_token(sync_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), False)
+
+    def test_wrapped_async_function_is_coroutine_function(self):
+        async def async_view(request):
+            return HttpResponse()
+
+        wrapped_view = requires_csrf_token(async_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), True)
+
     def test_requires_csrf_token_decorator(self):
         @requires_csrf_token
         def sync_view(request):
@@ -56,8 +99,37 @@ class RequiresCsrfTokenTests(CsrfTestMixin, SimpleTestCase):
             response = sync_view(request)
             self.assertEqual(response.status_code, 200)
 
+    async def test_requires_csrf_token_decorator_async_view(self):
+        @requires_csrf_token
+        async def async_view(request):
+            return HttpResponse()
+
+        request = self.get_request()
+        response = await async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(request.csrf_processing_done, True)
+
+        with self.assertNoLogs("django.security.csrf", "WARNING"):
+            request = self.get_request(token=None)
+            response = await async_view(request)
+            self.assertEqual(response.status_code, 200)
+
 
 class EnsureCsrfCookieTests(CsrfTestMixin, SimpleTestCase):
+    def test_wrapped_sync_function_is_not_coroutine_function(self):
+        def sync_view(request):
+            return HttpResponse()
+
+        wrapped_view = ensure_csrf_cookie(sync_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), False)
+
+    def test_wrapped_async_function_is_coroutine_function(self):
+        async def async_view(request):
+            return HttpResponse()
+
+        wrapped_view = ensure_csrf_cookie(async_view)
+        self.assertIs(iscoroutinefunction(wrapped_view), True)
+
     def test_ensure_csrf_cookie_decorator(self):
         @ensure_csrf_cookie
         def sync_view(request):
@@ -71,6 +143,21 @@ class EnsureCsrfCookieTests(CsrfTestMixin, SimpleTestCase):
         with self.assertNoLogs("django.security.csrf", "WARNING"):
             request = self.get_request(token=None)
             response = sync_view(request)
+            self.assertEqual(response.status_code, 200)
+
+    async def test_ensure_csrf_cookie_decorator_async_view(self):
+        @ensure_csrf_cookie
+        async def async_view(request):
+            return HttpResponse()
+
+        request = self.get_request()
+        response = await async_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIs(request.csrf_processing_done, True)
+
+        with self.assertNoLogs("django.security.csrf", "WARNING"):
+            request = self.get_request(token=None)
+            response = await async_view(request)
             self.assertEqual(response.status_code, 200)
 
 
