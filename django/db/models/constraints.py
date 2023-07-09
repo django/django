@@ -217,15 +217,15 @@ class UniqueConstraint(BaseConstraint):
                 "Use django.contrib.postgres.indexes.OpClass() instead."
             )
         if not isinstance(deferrable, (NoneType, Deferrable)):
-            raise ValueError(
+            raise TypeError(
                 "UniqueConstraint.deferrable must be a Deferrable instance."
             )
         if not isinstance(include, (NoneType, list, tuple)):
-            raise ValueError("UniqueConstraint.include must be a list or tuple.")
+            raise TypeError("UniqueConstraint.include must be a list or tuple.")
         if not isinstance(opclasses, (list, tuple)):
-            raise ValueError("UniqueConstraint.opclasses must be a list or tuple.")
+            raise TypeError("UniqueConstraint.opclasses must be a list or tuple.")
         if not isinstance(nulls_distinct, (NoneType, bool)):
-            raise ValueError("UniqueConstraint.nulls_distinct must be a bool.")
+            raise TypeError("UniqueConstraint.nulls_distinct must be a bool.")
         if opclasses and len(fields) != len(opclasses):
             raise ValueError(
                 "UniqueConstraint.fields and UniqueConstraint.opclasses must "

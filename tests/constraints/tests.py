@@ -1046,7 +1046,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_defer_argument(self):
         message = "UniqueConstraint.deferrable must be a Deferrable instance."
-        with self.assertRaisesMessage(ValueError, message):
+        with self.assertRaisesMessage(TypeError, message):
             models.UniqueConstraint(
                 fields=["name"],
                 name="name_invalid",
@@ -1064,7 +1064,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_include_argument(self):
         msg = "UniqueConstraint.include must be a list or tuple."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             models.UniqueConstraint(
                 name="uniq_include",
                 fields=["field"],
@@ -1073,7 +1073,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_opclasses_argument(self):
         msg = "UniqueConstraint.opclasses must be a list or tuple."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             models.UniqueConstraint(
                 name="uniq_opclasses",
                 fields=["field"],
@@ -1082,7 +1082,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_nulls_distinct_argument(self):
         msg = "UniqueConstraint.nulls_distinct must be a bool."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             models.UniqueConstraint(
                 name="uniq_opclasses", fields=["field"], nulls_distinct="NULLS DISTINCT"
             )
