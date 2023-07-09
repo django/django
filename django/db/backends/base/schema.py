@@ -1675,6 +1675,25 @@ class BaseDatabaseSchemaEditor:
         if deferrable == Deferrable.IMMEDIATE:
             return " DEFERRABLE INITIALLY IMMEDIATE"
 
+    def _unique_supported(
+        self,
+        condition=None,
+        deferrable=None,
+        include=None,
+        expressions=None,
+    ):
+        return (
+            (not condition or self.connection.features.supports_partial_indexes)
+            and (
+                not deferrable
+                or self.connection.features.supports_deferrable_unique_constraints
+            )
+            and (not include or self.connection.features.supports_covering_indexes)
+            and (
+                not expressions or self.connection.features.supports_expression_indexes
+            )
+        )
+
     def _unique_sql(
         self,
         model,
@@ -1686,9 +1705,11 @@ class BaseDatabaseSchemaEditor:
         opclasses=None,
         expressions=None,
     ):
-        if (
-            deferrable
-            and not self.connection.features.supports_deferrable_unique_constraints
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
         ):
             return None
         if condition or include or opclasses or expressions:
@@ -1726,16 +1747,11 @@ class BaseDatabaseSchemaEditor:
         opclasses=None,
         expressions=None,
     ):
-        if (
-            (
-                deferrable
-                and not self.connection.features.supports_deferrable_unique_constraints
-            )
-            or (condition and not self.connection.features.supports_partial_indexes)
-            or (include and not self.connection.features.supports_covering_indexes)
-            or (
-                expressions and not self.connection.features.supports_expression_indexes
-            )
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
         ):
             return None
 
@@ -1789,16 +1805,11 @@ class BaseDatabaseSchemaEditor:
         opclasses=None,
         expressions=None,
     ):
-        if (
-            (
-                deferrable
-                and not self.connection.features.supports_deferrable_unique_constraints
-            )
-            or (condition and not self.connection.features.supports_partial_indexes)
-            or (include and not self.connection.features.supports_covering_indexes)
-            or (
-                expressions and not self.connection.features.supports_expression_indexes
-            )
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
         ):
             return None
         if condition or include or opclasses or expressions:
