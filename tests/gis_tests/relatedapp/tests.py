@@ -323,14 +323,15 @@ class RelatedGeoModelTest(TestCase):
         )
         city = qs.get(name="Aurora")
         self.assertEqual(
-            city.parcel_center.wkt, "MULTIPOINT (1.7128 -2.006, 4.7128 5.006)"
+            city.parcel_center.wkt,
+            GEOSGeometry("MULTIPOINT (1.7128 -2.006, 4.7128 5.006)"),
         )
         self.assertIsNone(city.parcel_center_nonexistent)
         self.assertIn(
             city.parcel_center_single.wkt,
             [
-                "MULTIPOINT (1.7128 -2.006)",
-                "POINT (1.7128 -2.006)",  # SpatiaLite collapse to POINT.
+                GEOSGeometry("MULTIPOINT (1.7128 -2.006)"),
+                GEOSGeometry("POINT (1.7128 -2.006)"),  # SpatiaLite collapse to POINT.
             ],
         )
 
@@ -410,8 +411,8 @@ class RelatedGeoModelTest(TestCase):
         self.assertIn(
             city.parcel_point_union.wkt,
             [
-                "MULTIPOINT (12.75 10.05, 3.7128 -5.006)",
-                "MULTIPOINT (3.7128 -5.006, 12.75 10.05)",
+                GEOSGeometry("MULTIPOINT (12.75 10.05, 3.7128 -5.006)"),
+                GEOSGeometry("MULTIPOINT (3.7128 -5.006, 12.75 10.05)"),
             ],
         )
         self.assertIsNone(city.parcel_point_nonexistent)
