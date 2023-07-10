@@ -190,6 +190,8 @@ Minor features
 
 * Added support for GDAL 3.7.
 
+* Added support for GEOS 3.12.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
