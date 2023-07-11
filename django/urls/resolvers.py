@@ -336,30 +336,21 @@ class RoutePattern(CheckURLMixin):
 
     def _check_pattern_unmatched_angle_brackets(self):
         warnings = []
-        segments = self._route.split("/")
-        for segment in segments:
-            open_bracket_counter = 0
-            unmatched_angle_bracket = None
-            for char in segment:
-                if char == "<":
-                    open_bracket_counter += 1
-                elif char == ">":
-                    open_bracket_counter -= 1
-                    if open_bracket_counter < 0:
-                        unmatched_angle_bracket = ">"
-                        break
-            else:
-                if open_bracket_counter > 0:
-                    unmatched_angle_bracket = "<"
-
-            if unmatched_angle_bracket is not None:
-                warnings.append(
-                    Warning(
-                        "Your URL pattern %s has an unmatched '%s' bracket."
-                        % (self.describe(), unmatched_angle_bracket),
-                        id="urls.W010",
+        msg = "Your URL pattern %s has an unmatched '%s' bracket."
+        brackets = re.findall(r"[<>]", str(self._route))
+        open_bracket_counter = 0
+        for bracket in brackets:
+            if bracket == "<":
+                open_bracket_counter += 1
+            elif bracket == ">":
+                open_bracket_counter -= 1
+                if open_bracket_counter < 0:
+                    warnings.append(
+                        Warning(msg % (self.describe(), ">"), id="urls.W010")
                     )
-                )
+                    open_bracket_counter = 0
+        if open_bracket_counter > 0:
+            warnings.append(Warning(msg % (self.describe(), "<"), id="urls.W010"))
         return warnings
 
     def _compile(self, route):
