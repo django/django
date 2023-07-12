@@ -1,5 +1,3 @@
-import operator
-
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils.html import escape, format_html
@@ -138,11 +136,9 @@ simple_only_unlimited_args.anything = "Expected simple_only_unlimited_args __dic
 @register.simple_tag
 def simple_unlimited_args_kwargs(one, two="hi", *args, **kwargs):
     """Expected simple_unlimited_args_kwargs __doc__"""
-    # Sort the dictionary by key to guarantee the order for testing.
-    sorted_kwarg = sorted(kwargs.items(), key=operator.itemgetter(0))
     return "simple_unlimited_args_kwargs - Expected result: %s / %s" % (
         ", ".join(str(arg) for arg in [one, two, *args]),
-        ", ".join("%s=%s" % (k, v) for (k, v) in sorted_kwarg),
+        ", ".join("%s=%s" % (k, v) for (k, v) in kwargs.items()),
     )
 
 
