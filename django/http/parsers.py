@@ -1,5 +1,9 @@
 import json
 
+from django.utils.module_loading import import_string
+
+# from django.http import QueryDict
+
 
 class ParserException(Exception):
     """
@@ -26,3 +30,10 @@ class JSONParser(BaseParser):
             return json.loads(stream)
         except ValueError as e:
             raise ParserException(f"JSON parse error - {e}")
+
+
+def load_parser(path, *args, **kwargs):
+    """
+    Given a path to a parser, return an instance of that parser.
+    """
+    return import_string(path)(*args, **kwargs)

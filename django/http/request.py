@@ -19,7 +19,7 @@ from django.http.multipartparser import (
     MultiPartParserError,
     TooManyFilesSent,
 )
-from django.http.parsers import JSONParser
+from django.http.parsers import ParserException, load_parser
 from django.utils.datastructures import (
     CaseInsensitiveMapping,
     ImmutableList,
@@ -56,6 +56,7 @@ class HttpRequest:
     # The encoding used in GET/POST dicts. None means use default setting.
     _encoding = None
     _upload_handlers = []
+    _parser_classes = []
 
     def __init__(self):
         # WARNING: The `WSGIRequest` subclass doesn't call `super`.
@@ -320,6 +321,30 @@ class HttpRequest:
         parser = MultiPartParser(META, post_data, self.upload_handlers, self.encoding)
         return parser.parse()
 
+    def initialize_parsers(self):
+        self._parser_classes = [
+            load_parser(parser) for parser in settings.PARSER_CLASSES
+        ]
+
+    @property
+    def parser_classes(self):
+        if not self._parser_classes:
+            self.initialize_parsers()
+        return self._parser_classes
+
+    @parser_classes.setter
+    def parser_classes(self, parser_classes):
+        if hasattr(self, "_post"):
+            raise AttributeError("cannot change parsers after request has been parsed.")
+        self._parser_classes = parser_classes
+
+    def _select_parser(self):
+        for parser in self.parser_classes:
+            if parser.can_accept(self.content_type):
+                return parser
+
+        return None
+
     @property
     def body(self):
         if not hasattr(self, "_body"):
@@ -357,6 +382,8 @@ class HttpRequest:
             self._mark_post_parse_error()
             return
 
+        parser = self._select_parser()
+
         if self.content_type == "multipart/form-data":
             if hasattr(self, "_body"):
                 # Use already read data
@@ -377,10 +404,13 @@ class HttpRequest:
                 QueryDict(self.body, encoding=self._encoding),
                 MultiValueDict(),
             )
-        elif self.content_type == "application/json":
-            parser = JSONParser()
-            self._post = parser.parse(self.body)
-            self._files = MultiValueDict()
+        elif parser:
+            try:
+                self._post = parser.parse(self.body)
+                self._files = MultiValueDict()
+            except Exception:
+                raise ParserException()
+
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),

@@ -301,6 +301,8 @@ FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
 
+PARSER_CLASSES = ["django.http.parsers.JSONParser"]
+
 # Maximum size, in bytes, of a request before it will be streamed to the
 # file system instead of into memory.
 FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440  # i.e. 2.5 MB
