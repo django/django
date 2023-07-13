@@ -677,6 +677,10 @@ is:
 
 Requires ``gettext`` 0.19 or newer.
 
+.. django-admin-option:: --no-obsolete
+
+Removes obsolete message strings from the ``.po`` files.
+
 .. django-admin-option:: --keep-pot
 
 Prevents deleting the temporary ``.pot`` files generated before creating the
