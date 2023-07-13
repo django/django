@@ -1854,8 +1854,8 @@ For example::
 
     from django.db import transaction
 
-    entries = Entry.objects.select_for_update().filter(author=request.user)
     with transaction.atomic():
+        entries = Entry.objects.select_for_update().filter(author=request.user)
         for entry in entries:
             ...
 
