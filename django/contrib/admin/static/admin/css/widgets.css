@@ -41,7 +41,7 @@
 }
 
 .selector-chosen h2 {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--header-link-color);
 }
 
@@ -446,7 +446,7 @@ span.clearable-file-input label {
 }
 
 .calendar td.selected a {
-    background: var(--primary);
+    background: var(--secondary);
     color: var(--button-fg);
 }
 
