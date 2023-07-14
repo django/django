@@ -78,12 +78,12 @@ class CommonMiddleware(MiddlewareMixin):
         Return the full path of the request with a trailing slash appended.
 
         Raise a RuntimeError if settings.DEBUG is True and request.method is
-        POST, PUT, or PATCH.
+        POST, PUT, PATCH, or DELETE.
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
         new_path = escape_leading_slashes(new_path)
-        if settings.DEBUG and request.method in ("POST", "PUT", "PATCH"):
+        if settings.DEBUG and request.method in ("POST", "PUT", "PATCH", "DELETE"):
             raise RuntimeError(
                 "You called this URL via %(method)s, but the URL doesn't end "
                 "in a slash and you have APPEND_SLASH set. Django can't "
