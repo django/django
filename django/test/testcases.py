@@ -534,7 +534,8 @@ class SimpleTestCase(unittest.TestCase):
             )
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "%s not found in %s" % (safe_repr(text_repr), safe_repr(response.content))
+                real_count != 0, msg_prefix + "%s not found in %s" % (safe_repr(text_repr), 
+                                                                      safe_repr(response.content))
             )
 
     def assertNotContains(
@@ -900,7 +901,8 @@ class SimpleTestCase(unittest.TestCase):
             )
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "%s not found in %s" % (safe_repr(needle), safe_repr(haystack))
+                real_count != 0, msg_prefix + "%s not found in %s" % (safe_repr(needle), 
+                                                                      safe_repr(haystack))
             )
 
     def assertJSONEqual(self, raw, expected_data, msg=None):
