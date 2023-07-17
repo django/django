@@ -451,7 +451,7 @@ key. For example:
     >>> Entry.objects.filter(blog_id=4)
 
 If you pass an invalid keyword argument, a lookup function will raise
-``TypeError``.
+``ValueError``.
 
 The database API supports about two dozen lookup types; a complete reference
 can be found in the :ref:`field lookup reference <field-lookups>`. To give you
