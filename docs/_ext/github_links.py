@@ -42,7 +42,7 @@ class CodeLocator(ast.NodeVisitor):
 
 @functools.lru_cache(maxsize=1024)
 def get_locator(file: pathlib.Path) -> CodeLocator:
-    file_contents = file.read_text()
+    file_contents = file.read_text(encoding="utf-8")
     return CodeLocator.from_code(file_contents)
 
 
