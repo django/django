@@ -911,3 +911,5 @@ configured:
   :setting:`STATICFILES_DIRS` setting must not end with a slash.
 * **staticfiles.W004**: The directory ``<directory>`` in the
   :setting:`STATICFILES_DIRS` does not exist.
+* **staticfiles.E005**: The :setting:`STORAGES` setting must define a
+  ``staticfiles`` storage.
