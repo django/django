@@ -9,4 +9,6 @@ Django 4.2.4 fixes several bugs in 4.2.3.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with aggregates referencing window functions
+  (:ticket:`34717`).
