@@ -2644,6 +2644,11 @@ A ready-to-use instance of the storage backends can be retrieved from
 :data:`django.core.files.storage.storages`. Use a key corresponding to the
 backend definition in :setting:`STORAGES`.
 
+.. admonition:: Is my value merged with the default value?
+
+    Defining this setting overrides the default value and is *not* merged with
+    it.
+
 .. setting:: TEMPLATES
 
 ``TEMPLATES``
