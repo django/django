@@ -97,6 +97,8 @@ def sanitize_address(addr, encoding):
             domain = token.domain or ""
     else:
         nm, address = addr
+        if "@" not in address:
+            raise ValueError(f'Invalid address "{address}"')
         localpart, domain = address.rsplit("@", 1)
 
     address_parts = nm + localpart + domain
