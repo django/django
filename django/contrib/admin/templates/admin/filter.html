@@ -1,5 +1,5 @@
 {% load i18n %}
-<details data-filter-title="{{ title }}" open>
+<details data-filter-title="{{ title }}"{% if not details_collapsed %} open{% endif %}>
   <summary>
     {% blocktranslate with filter_title=title %} By {{ filter_title }} {% endblocktranslate %}
   </summary>

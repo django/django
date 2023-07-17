@@ -499,6 +499,7 @@ def admin_list_filter(cl, spec):
             "title": spec.title,
             "choices": list(spec.choices(cl)),
             "spec": spec,
+            "details_collapsed": spec.details_collapsed,
         }
     )
 

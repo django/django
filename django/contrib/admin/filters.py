@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 class ListFilter:
     title = None  # Human-readable title to appear in the right sidebar.
     template = "admin/filter.html"
+    details_collapsed = False
 
     def __init__(self, request, params, model, model_admin):
         self.request = request
