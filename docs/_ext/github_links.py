@@ -3,8 +3,6 @@ import functools
 import importlib.util
 import pathlib
 
-BASE_PATH = pathlib.Path(__file__).parents[2]
-
 
 class CodeLocator(ast.NodeVisitor):
     def __init__(self):
@@ -55,7 +53,7 @@ def module_name_to_file_path(module_name):
     # parent, which would trigger import side effects.
 
     for suffix in [".py", "/__init__.py"]:
-        file_path = BASE_PATH / (module_name.replace(".", "/") + suffix)
+        file_path = pathlib.Path(__file__).parents[2] / (module_name.replace(".", "/") + suffix)
         if file_path.exists():
             return file_path
 
@@ -129,7 +127,7 @@ def github_linkcode_resolve(domain, info, *, version, next_version):
 
     branch = get_branch(version=version, next_version=next_version)
 
-    relative_path = path.relative_to(BASE_PATH)
+    relative_path = path.relative_to(pathlib.Path(__file__).parents[2])
     # Use a /-separated path otherwise on windows, str(file) returns \-separated path.
     url_path = "/".join(relative_path.parts)
 
