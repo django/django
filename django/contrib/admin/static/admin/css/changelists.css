@@ -153,6 +153,7 @@
     font-weight: 400;
     padding: 0 15px;
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 #changelist-filter details summary > * {
