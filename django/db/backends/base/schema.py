@@ -1601,10 +1601,20 @@ class BaseDatabaseSchemaEditor:
         # - changing an attribute that doesn't affect the schema
         # - changing an attribute in the provided set of ignored attributes
         # - adding only a db_column and the column name is not changed
+        # - db_table does not change for model referenced by foreign keys
         for attr in ignore.union(old_field.non_db_attrs):
             old_kwargs.pop(attr, None)
         for attr in ignore.union(new_field.non_db_attrs):
             new_kwargs.pop(attr, None)
+        if (
+            not new_field.many_to_many
+            and old_field.remote_field
+            and new_field.remote_field
+            and old_field.remote_field.model._meta.db_table
+            == new_field.remote_field.model._meta.db_table
+        ):
+            old_kwargs.pop("to", None)
+            new_kwargs.pop("to", None)
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
