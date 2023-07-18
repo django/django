@@ -168,7 +168,7 @@ class FunctionTypeSerializer(BaseSerializer):
         ):
             klass = self.value.__self__
             module = klass.__module__
-            return "%s.%s.%s" % (module, klass.__name__, self.value.__name__), {
+            return "%s.%s.%s" % (module, klass.__qualname__, self.value.__name__), {
                 "import %s" % module
             }
         # Further error checking

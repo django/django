@@ -211,6 +211,10 @@ class WriterTests(SimpleTestCase):
         X = "X", "X value"
         Y = "Y", "Y value"
 
+        @classmethod
+        def method(cls):
+            return cls.X
+
     def safe_exec(self, string, value=None):
         d = {}
         try:
@@ -467,6 +471,15 @@ class WriterTests(SimpleTestCase):
                         {"import migrations.test_writer"},
                     ),
                 )
+
+    def test_serialize_nested_class_method(self):
+        self.assertSerializedResultEqual(
+            self.NestedChoices.method,
+            (
+                "migrations.test_writer.WriterTests.NestedChoices.method",
+                {"import migrations.test_writer"},
+            ),
+        )
 
     def test_serialize_uuid(self):
         self.assertSerializedEqual(uuid.uuid1())
