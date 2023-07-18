@@ -449,6 +449,12 @@ For each field, we describe the default widget used if you don't specify
         time the field's form is initialized, in addition to during rendering.
         Defaults to an empty list.
 
+    .. admonition:: Choice type
+
+        This field normalizes choices to strings, so if choices are required in
+        other data types, such as integers or booleans, consider using
+        :class:`TypedChoiceField` instead.
+
 ``DateField``
 -------------
 
