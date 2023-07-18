@@ -285,7 +285,7 @@ class BaseReloader:
     def watch_dir(self, path, glob):
         path = Path(path)
         try:
-            path = path.absolute()
+            path = path.resolve(strict=True)
         except FileNotFoundError:
             logger.debug(
                 "Unable to watch directory %s as it cannot be resolved.",
