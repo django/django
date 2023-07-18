@@ -114,8 +114,7 @@ class BaseArchive:
             os.chmod(filename, mode)
 
     def split_leading_dir(self, path):
-        path = str(path)
-        path = path.lstrip("/").lstrip("\\")
+        path = str(path).lstrip("/").lstrip("\\")
         if "/" in path and (
             ("\\" in path and path.find("/") < path.find("\\")) or "\\" not in path
         ):
