@@ -139,6 +139,11 @@ class SpatialiteSchemaEditor(DatabaseSchemaEditor):
     ):
         from django.contrib.gis.db.models import GeometryField
 
+        if old_db_table == new_db_table or (
+            self.connection.features.ignores_table_name_case
+            and old_db_table.lower() == new_db_table.lower()
+        ):
+            return
         # Remove geometry-ness from temp table
         for field in model._meta.local_fields:
             if isinstance(field, GeometryField):
