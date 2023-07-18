@@ -54,3 +54,19 @@ class ValidationTestModel(models.Model):
 
 class ValidationTestInlineModel(models.Model):
     parent = models.ForeignKey(ValidationTestModel, models.CASCADE)
+
+
+class BooleanTestModel(models.Model):
+    name = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def my_property(self):
+        return self.is_active
+
+    my_property.boolean = True
+    my_property.short_description = "Is Active?"
+    my_property.admin_order_field = "name"
+    my_property = property(my_property)

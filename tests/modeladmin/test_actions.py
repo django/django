@@ -1,9 +1,10 @@
 from django.contrib import admin
+from django.contrib.admin.templatetags.admin_list import items_for_result
 from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 
-from .models import Band
+from .models import Band, BooleanTestModel
 
 
 class AdminActionsTests(TestCase):
@@ -148,3 +149,23 @@ class AdminActionsTests(TestCase):
                 "Local admin action 2.",
             ],
         )
+
+    def test_items_for_result(self):
+        my_model = BooleanTestModel.objects.create(name="Test Model")
+        rf = RequestFactory()
+        request = rf.get("/admin/myapp/BooleanTestModel/")
+        request.user = self.superuser
+        site = admin.AdminSite(name="admin")
+        model_admin = admin.ModelAdmin(BooleanTestModel, site)
+        cl = model_admin.get_changelist_instance(request)
+        results = items_for_result(cl=cl, result=my_model, form=None)
+        for result in results:
+            if "action-checkbox" in result:
+                found_action_checkbox = True
+
+            if "field-__str__" in result:
+                self.assertIn("Test Model", result)
+                found_name_field = True
+
+        self.assertTrue(found_name_field)
+        self.assertTrue(found_action_checkbox)
