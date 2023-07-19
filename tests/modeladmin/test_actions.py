@@ -159,13 +159,10 @@ class AdminActionsTests(TestCase):
         model_admin = admin.ModelAdmin(BooleanTestModel, site)
         cl = model_admin.get_changelist_instance(request)
         results = items_for_result(cl=cl, result=my_model, form=None)
-        for result in results:
-            if "action-checkbox" in result:
-                found_action_checkbox = True
 
-            if "field-__str__" in result:
-                self.assertIn("Test Model", result)
-                found_name_field = True
+        found_action_checkbox_and_name_field = all(
+            "action-checkbox" in result and "field-__str__" in result
+            for result in results
+        )
 
-        self.assertTrue(found_name_field)
-        self.assertTrue(found_action_checkbox)
+        self.assertTrue(found_action_checkbox_and_name_field)

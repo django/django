@@ -816,6 +816,7 @@ subclass::
 
           my_property.short_description = "Full name of the person"
           my_property.admin_order_field = "last_name"
+          my_property.boolean = True
 
           full_name = property(my_property)
 

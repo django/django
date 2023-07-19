@@ -201,21 +201,6 @@ def items_for_result(cl, result, form):
     Generate the actual list of data.
     """
 
-    def is_property_boolean(attr):
-        if isinstance(attr, property) and hasattr(attr, "fget"):
-            fget = attr.fget
-            return getattr(fget, "boolean", False)
-        return False
-
-    def get_result_repr(attr, value, empty_value_display):
-        if is_property_boolean(attr):
-            return display_for_value(
-                value, empty_value_display, True
-            )  # Set boolean argument to True for properties
-        return display_for_value(
-            value, empty_value_display, getattr(attr, "boolean", False)
-        )
-
     def link_in_col(is_first, field_name, cl):
         if cl.list_display_links is None:
             return False
@@ -239,7 +224,10 @@ def items_for_result(cl, result, form):
             if f is None or f.auto_created:
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
-                result_repr = get_result_repr(attr, value, empty_value_display)
+                boolean = getattr(attr, "boolean", False)
+                if isinstance(attr, property) and hasattr(attr, "fget"):
+                    boolean = getattr(attr.fget, "boolean", False)
+                result_repr = display_for_value(value, empty_value_display, boolean)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append("nowrap")
             else:
