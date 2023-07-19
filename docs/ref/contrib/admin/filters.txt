@@ -211,6 +211,20 @@ It is possible to specify a custom template for rendering a list filter::
 See the default template provided by Django (``admin/filter.html``) for a
 concrete example.
 
+It is also possible to define custom CSS and JS using the ``Media </topics/forms/media>`` class::
+
+    from django.forms import Media
+
+
+    class FilterWithCustomTemplate(admin.SimpleListFilter):
+        @property
+        def media(self):
+            return Media(
+                js=("path/to/script.js",),
+                css={"screen": ("path/to/stylesheet.css",)},
+            )
+
+
 .. _facet-filters:
 
 Facets

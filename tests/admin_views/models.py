@@ -524,6 +524,13 @@ class Gadget(models.Model):
         return self.name
 
 
+class Voltage(models.Model):
+    value = models.IntegerField(default=0)
+
+    def __str__(self):
+        return str(self.value)
+
+
 class Villain(models.Model):
     name = models.CharField(max_length=100)
 

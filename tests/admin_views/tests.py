@@ -139,6 +139,7 @@ from .models import (
     UserProxy,
     Villain,
     Vodcast,
+    Voltage,
     Whatsit,
     Widget,
     Worker,
@@ -4780,6 +4781,35 @@ class TestCustomChangeList(TestCase):
         # Data is still not visible on the page
         response = self.client.get(reverse("admin:admin_views_gadget_changelist"))
         self.assertNotContains(response, "First Gadget")
+
+
+@override_settings(ROOT_URLCONF="admin_views.urls")
+class TestMediaDefiningListFilter(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = User.objects.create_superuser(
+            username="super", password="secret", email="super@example.com"
+        )
+
+        cls.model = Voltage.objects.create(value=10)
+
+    def setUp(self):
+        self.client.force_login(self.superuser)
+
+    def test_custom_filter(self):
+        """
+        Validate that a ChangeList with a media defining filter
+        sources medias correctly (#17093)
+        """
+        response = self.client.get(reverse("admin:admin_views_voltage_changelist"))
+        self.assertContains(
+            response, '<script src="/static/path/to/script.js"></script>'
+        )
+        self.assertContains(
+            response,
+            '<link href="/static/path/to/stylesheet.css" '
+            'media="screen" rel="stylesheet">',
+        )
 
 
 @override_settings(ROOT_URLCONF="admin_views.urls")

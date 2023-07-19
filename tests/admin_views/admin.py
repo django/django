@@ -11,6 +11,7 @@ from django.contrib.auth.models import Group, User
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
+from django.forms import Media
 from django.forms.models import BaseModelFormSet
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.urls import path
@@ -135,6 +136,7 @@ from .models import (
     UserProxy,
     Villain,
     Vodcast,
+    Voltage,
     Whatsit,
     Widget,
     Worker,
@@ -645,6 +647,28 @@ class CustomChangeList(ChangeList):
 class GadgetAdmin(admin.ModelAdmin):
     def get_changelist(self, request, **kwargs):
         return CustomChangeList
+
+
+class CustomMediaFilter(admin.filters.SimpleListFilter):
+    title = "voltage"
+    parameter_name = "voltage"
+
+    def lookups(self, request, model_admin):
+        return (("All", "All"),)
+
+    def queryset(self, request, queryset):
+        return queryset
+
+    @property
+    def media(self):
+        return Media(
+            js=("path/to/script.js",),
+            css={"screen": ("path/to/stylesheet.css",)},
+        )
+
+
+class CustomMediaAdmin(admin.ModelAdmin):
+    list_filter = (CustomMediaFilter,)
 
 
 class ToppingAdmin(admin.ModelAdmin):
@@ -1212,6 +1236,7 @@ site.register(Category, CategoryAdmin)
 site.register(Post, PostAdmin)
 site.register(FieldOverridePost, FieldOverridePostAdmin)
 site.register(Gadget, GadgetAdmin)
+site.register(Voltage, CustomMediaAdmin)
 site.register(Villain)
 site.register(SuperVillain)
 site.register(Plot)

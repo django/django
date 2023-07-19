@@ -18,11 +18,12 @@ from django.contrib.admin.utils import (
 )
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.forms import MediaDefiningClass
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 
-class ListFilter:
+class ListFilter(metaclass=MediaDefiningClass):
     title = None  # Human-readable title to appear in the right sidebar.
     template = "admin/filter.html"
 

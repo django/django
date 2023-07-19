@@ -2083,6 +2083,13 @@ class ModelAdmin(BaseModelAdmin):
         else:
             action_form = None
 
+        # Source medias from filters
+        filter_specs = getattr(cl, "filter_specs", None)
+        if not filter_specs:
+            filter_specs, *_rest = cl.get_filters(request)
+        for filter_spec in filter_specs:
+            media = media + filter_spec.media
+
         selection_note_all = ngettext(
             "%(total_count)s selected", "All %(total_count)s selected", cl.result_count
         )
