@@ -1723,6 +1723,11 @@ never defer the loading of the primary key. If you are using
 loading of the field that connects from the primary model to the related
 one, doing so will result in an error.
 
+Similarly, calling ``defer()`` (or its counterpart :meth:`only()`) including an
+argument from an aggregation (e.g. using the result of :meth:`annotate()`)
+doesn't make sense: doing so will raise an exception. The aggregated values
+will always be fetched into the resulting queryset.
+
 .. note::
 
     The ``defer()`` method (and its cousin, :meth:`only()`, below) are only for
@@ -1817,8 +1822,9 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
-Using :meth:`only` and omitting a field requested using :meth:`select_related`
-is an error as well.
+Using ``only()`` and omitting a field requested using :meth:`select_related` is
+an error as well. On the other hand, invoking ``only()`` without any arguments,
+will return every field (including annotations) fetched by the queryset.
 
 As with ``defer()``, you cannot access the non-loaded fields from asynchronous
 code and expect them to load. Instead, you will get a
