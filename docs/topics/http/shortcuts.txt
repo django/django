@@ -162,10 +162,13 @@ will be returned::
 =======================
 
 .. function:: get_object_or_404(klass, *args, **kwargs)
+.. function:: aget_object_or_404(klass, *args, **kwargs)
 
-   Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model manager,
-   but it raises :class:`~django.http.Http404` instead of the model's
-   :class:`~django.db.models.Model.DoesNotExist` exception.
+    *Asynchronous version*: ``aget_object_or_404()``
+
+    Calls :meth:`~django.db.models.query.QuerySet.get()` on a given model
+    manager, but it raises :class:`~django.http.Http404` instead of the model's
+    :class:`~django.db.models.Model.DoesNotExist` exception.
 
 Arguments
 ---------
@@ -236,14 +239,21 @@ Note: As with ``get()``, a
 :class:`~django.core.exceptions.MultipleObjectsReturned` exception
 will be raised if more than one object is found.
 
+.. versionchanged:: 5.0
+
+    ``aget_object_or_404()`` function was added.
+
 ``get_list_or_404()``
 =====================
 
 .. function:: get_list_or_404(klass, *args, **kwargs)
+.. function:: aget_list_or_404(klass, *args, **kwargs)
 
-   Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on a
-   given model manager cast to a list, raising :class:`~django.http.Http404` if
-   the resulting list is empty.
+    *Asynchronous version*: ``aget_list_or_404()``
+
+    Returns the result of :meth:`~django.db.models.query.QuerySet.filter()` on
+    a given model manager cast to a list, raising :class:`~django.http.Http404`
+    if the resulting list is empty.
 
 Arguments
 ---------
@@ -280,3 +290,7 @@ This example is equivalent to::
         my_objects = list(MyModel.objects.filter(published=True))
         if not my_objects:
             raise Http404("No MyModel matches the given query.")
+
+.. versionchanged:: 5.0
+
+    ``aget_list_or_404()`` function was added.
