@@ -1,6 +1,8 @@
+import copy
 import datetime
 
 from django.forms import ChoiceField, Form, MultiWidget, RadioSelect
+from django.utils.safestring import mark_safe
 from django.test import override_settings
 
 from .base import WidgetTest
@@ -26,6 +28,102 @@ class RadioSelectTest(WidgetTest):
             <div><label><input type="radio" name="beatle" value="R"> Ringo</label></div>
             </div>
         """,
+        )
+
+    def test_render_none(self):
+        """
+        If the value is None, empty choice is selected.
+        """
+        choices = (("", "------"),) + self.beatles
+        self.check_html(
+            self.widget(choices=choices),
+            "beatle",
+            None,
+            html="""
+            <div>
+            <div><label><input checked type="radio" name="beatle" value=""> ------</label></div>
+            <div><label>
+            <input type="radio" name="beatle" value="J"> John</label></div>
+            <div><label><input type="radio" name="beatle" value="P"> Paul</label></div>
+            <div><label>
+            <input type="radio" name="beatle" value="G"> George</label></div>
+            <div><label><input type="radio" name="beatle" value="R"> Ringo</label></div>
+            </div>
+        """,
+        )
+    
+    def test_compare_to_str(self):
+        """
+        The value is compared to its str().
+        """
+        self.check_html(
+            self.widget(choices=[("1", "1"), ("2", "2"), ("3", "3")]),
+            "num",
+            2,
+            html="""
+            <div>
+            <div><label><input type="radio" name="num" value="1"> 1</label></div>
+            <div><label><input checked type="radio" name="num" value="2"> 2</label></div>
+            <div><label><input type="radio" name="num" value="3"> 3</label></div>
+            </div>
+        """, 
+        )
+        self.check_html(
+            self.widget(choices=[(1, 1), (2, 2), (3, 3)]),
+            "num",
+            "2",
+            html="""
+            <div>
+            <div><label><input type="radio" name="num" value="1"> 1</label></div>
+            <div><label><input checked type="radio" name="num" value="2"> 2</label></div>
+            <div><label><input type="radio" name="num" value="3"> 3</label></div>
+            </div>
+        """,  
+        )
+    
+    def test_choices_constructor(self):
+        widget = RadioSelect(choices=[(1, 1), (2, 2), (3, 3)])
+        self.check_html(
+            widget,
+            "num",
+            2,
+            html="""
+            <div>
+            <div><label><input type="radio" name="num" value="1"> 1</label></div>
+            <div><label><input checked type="radio" name="num" value="2"> 2</label></div>
+            <div><label><input type="radio" name="num" value="3"> 3</label></div>
+            </div>
+        """,
+        )
+
+    def test_choices_unicode(self):
+        self.check_html(
+            self.widget(choices=[("ŠĐĆŽćžšđ", "ŠĐabcĆŽćžšđ"), ("ćžšđ", "abcćžšđ")]),
+            "email",
+            "ŠĐĆŽćžšđ",
+            html="""
+            <div>
+            <div><label>
+            <input checked type="radio" name="email" value="\u0160\u0110\u0106\u017d\u0107\u017e\u0161\u0111"> 
+             \u0160\u0110abc\u0106\u017d\u0107\u017e\u0161\u0111</label></div>
+            <div><label><input type="radio" name="email" value="\u0107\u017e\u0161\u0111"> 
+             abc\u0107\u017e\u0161\u0111</label></div>
+            </div>
+            """,
+        )
+    
+    def test_choices_escaping(self):
+        choices = (("bad", "you & me"), ("good", mark_safe("you &gt; me")))
+        self.check_html(
+            self.widget(choices=choices),
+            "escape",
+            None,
+            html="""
+            <div>
+            <div><label><input type="radio" name="escape" value="bad"> you & me</label></div>
+            <div><label><input type="radio" name="escape" value="good"> you &gt; me</label></div>
+            </div>
+            """,
         )
 
     def test_nested_choices(self):
@@ -199,6 +297,18 @@ class RadioSelectTest(WidgetTest):
             </div>
         """,
         )
+    
+    def test_deepcopy(self):
+        """
+        __deepcopy__() should copy all attributes properly.
+        """
+        widget = RadioSelect()
+        obj = copy.deepcopy(widget)
+        self.assertIsNot(widget, obj)
+        self.assertEqual(widget.choices, obj.choices)
+        self.assertIsNot(widget.choices, obj.choices)
+        self.assertEqual(widget.attrs, obj.attrs)
+        self.assertIsNot(widget.attrs, obj.attrs)
 
     def test_fieldset(self):
         class TestForm(Form):
