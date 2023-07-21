@@ -661,7 +661,7 @@ will fail with the error "current transaction is aborted, queries ignored
 until end of transaction block". While the basic use of ``save()`` is unlikely
 to raise an exception in PostgreSQL, there are more advanced usage patterns
 which might, such as saving objects with unique fields, saving using the
-force_insert/force_update flag, or invoking custom SQL.
+``force_insert``/``force_update`` flag, or invoking custom SQL.
 
 There are several ways to recover from this sort of error.
 
