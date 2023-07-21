@@ -73,14 +73,17 @@ def get_children_from_q(q):
             yield child
 
 
+def get_child_with_renamed_prefix(prefix, replacement, child):
+    if isinstance(child, Node):
+        return rename_prefix_from_q(prefix, replacement, child)
+    lhs, rhs = child
+    lhs = lhs.replace(prefix, replacement, 1)
+    return lhs, rhs
+
+
 def rename_prefix_from_q(prefix, replacement, q):
     return Q.create(
-        [
-            rename_prefix_from_q(prefix, replacement, c)
-            if isinstance(c, Node)
-            else (c[0].replace(prefix, replacement, 1), c[1])
-            for c in q.children
-        ],
+        [get_child_with_renamed_prefix(prefix, replacement, c) for c in q.children],
         q.connector,
         q.negated,
     )
