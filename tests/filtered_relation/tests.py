@@ -649,7 +649,7 @@ class FilteredRelationTests(TestCase):
                 ),
             ),
         ).filter(book_editor__isnull=False)
-        self.assertEquals(qs.count(), 1)
+        self.assertEqual(qs.count(), 1)
 
     def test_condition_deeper_relation_name(self):
         msg = (
