@@ -557,7 +557,7 @@ msgid "Sidebar"
 msgstr "Seitenleiste"
 
 msgid "Start typing to filter…"
-msgstr "Eingabe beginnen um zu filtern…"
+msgstr "Eingabe beginnen, um zu filtern…"
 
 msgid "Filter navigation items"
 msgstr "Navigationselemente filtern"
