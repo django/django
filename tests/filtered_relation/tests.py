@@ -11,8 +11,10 @@ from django.db.models import (
     FilteredRelation,
     Q,
     Sum,
+    Value,
     When,
 )
+from django.db.models.functions import Concat
 from django.test import TestCase
 from django.test.testcases import skipUnlessDBFeature
 
@@ -628,6 +630,26 @@ class FilteredRelationTests(TestCase):
                     condition=Q(book__author__name__icontains="book"),
                 ),
             )
+
+    def test_condition_with_exact_lookup_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(book__author__name="book"),
+            ),
+        ).filter(book_editor__isnull=True)
+        self.assertEqual(qs.count(), 4)
+
+    def test_condition_with_func_and_lookup_outside_relation_name(self):
+        qs = Author.objects.annotate(
+            book_editor=FilteredRelation(
+                "book__editor",
+                condition=Q(
+                    book__title=Concat(Value("The book by "), F("book__author__name"))
+                ),
+            ),
+        ).filter(book_editor__isnull=False)
+        self.assertEquals(qs.count(), 1)
 
     def test_condition_deeper_relation_name(self):
         msg = (
