@@ -6,6 +6,7 @@
 *.pot
 *.py[co]
 .tox/
+.idea/
 __pycache__
 MANIFEST
 dist/
