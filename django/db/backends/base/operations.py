@@ -266,10 +266,10 @@ class BaseDatabaseOperations:
         statement.
         """
         if operation in ["CASCADE", "SET NULL", "RESTRICT"]:
-            return " ON DELETE %s " % operation
+            return f" ON DELETE {operation} "
         if operation == "":
             return ""
-        raise NotImplementedError("ON DELETE %s is not supported." % operation)
+        raise NotImplementedError(f"ON DELETE {operation} is not supported.")
 
     def last_executed_query(self, cursor, sql, params):
         """

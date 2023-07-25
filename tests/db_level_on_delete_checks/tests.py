@@ -26,10 +26,9 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             baz_field.check(),
             [
                 Error(
-                    "Using normal cascading with DB cascading referenced model is "
-                    "prohibited "
-                    f"Related model is {related_model_status.get('model')} "
-                    f"Related field is {related_model_status.get('field')}",
+                    "Using python based on_delete with database "
+                    "level on_delete referenced model is prohibited "
+                    f"Related field is {related_model_status.get('field')}.",
                     hint="Use database level cascading for foreignkeys",
                     obj=baz_field,
                     id="fields.E323",
@@ -96,10 +95,9 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             field.check(),
             [
                 Error(
-                    "Using normal cascading with DB cascading referenced model is "
-                    "prohibited "
-                    f"Related model is {GrandParent} "
-                    f"Related field is {rel_field}",
+                    "Using python based on_delete with database "
+                    "level on_delete referenced model is prohibited "
+                    f"Related field is {rel_field}.",
                     hint="Use database level cascading for foreignkeys",
                     obj=field,
                     id="fields.E323",

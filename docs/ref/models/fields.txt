@@ -1627,6 +1627,10 @@ Django perform the relevant actions. The database variants are normally more
 efficient because they require less data to be fetched, but they don’t call
 any custom methods or send any signals.
 
+.. versionchanged:: 5.0
+
+    Support for ``DB_*`` variants of on_delete attribute is added
+
 * .. attribute:: CASCADE
 
     Cascade deletes. Django emulates the behavior of the SQL constraint ON

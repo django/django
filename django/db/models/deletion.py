@@ -87,9 +87,11 @@ class DatabaseOnDelete:
     def __init__(self, operation, name):
         self.operation = operation
         self.name = name
+        self.__name__ = name
 
-    def __call__(self, collector, field, sub_objs, using):
-        pass
+    # These objects must be callable, as we are calling it in the collect
+    # method of Collector
+    __call__ = DO_NOTHING
 
     def as_sql(self, connection):
         return connection.ops.fk_on_delete_sql(self.operation)
@@ -343,7 +345,7 @@ class Collector:
                 continue
             field = related.field
             on_delete = field.remote_field.on_delete
-            if on_delete in [DO_NOTHING, DB_CASCADE, DB_SET_NULL, DB_RESTRICT]:
+            if on_delete == DO_NOTHING or isinstance(on_delete, DatabaseOnDelete):
                 continue
             related_model = related.related_model
             if self.can_fast_delete(related_model, from_field=field):

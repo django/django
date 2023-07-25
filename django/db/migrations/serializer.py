@@ -258,6 +258,11 @@ class PathSerializer(BaseSerializer):
         return "pathlib.%s%r" % (prefix, self.value), {"import pathlib"}
 
 
+class DatabaseOnDeleteSerializer(BaseSerializer):
+    def serialize(self):
+        return f"models.{self.value.name}", {}
+
+
 class RegexSerializer(BaseSerializer):
     def serialize(self):
         regex_pattern, pattern_imports = serializer_factory(
@@ -351,6 +356,7 @@ class Serializer:
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
+        models.DatabaseOnDelete: DatabaseOnDeleteSerializer,
     }
 
     @classmethod
