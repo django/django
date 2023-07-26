@@ -1057,7 +1057,7 @@ class ForeignKey(ForeignObject):
                     "declaring a GenericForeignKey.",
                     hint="Change the on_delete rule to a non DB_* method",
                     obj=self,
-                    id="fields.E345",
+                    id="fields.E322",
                 )
             ]
         elif related_model_field := self._has_related_models_with_db_cascading(

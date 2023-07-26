@@ -280,9 +280,14 @@ Related fields
   referenced by a ``ForeignKey``.
 * **fields.E312**: The ``to_field`` ``<field name>`` doesn't exist on the
   related model ``<app label>.<model>``.
-* **fields.E320**: Field specifies ``on_delete=SET_NULL``, but cannot be null.
+* **fields.E320**: Field specifies ``on_delete=SET_NULL``, or
+  ``on_delete=DB_SET_NULL`` but cannot be null.
 * **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
   default value.
+* **fields.E322**: The field specifies unsuported database level ``on_delete``
+  on model declaring a GenericForeignKey.
+* **fields.E323**: Using python based on_delete with database level on_delete
+  referenced parent model is prohibited.
 * **fields.E330**: ``ManyToManyField``\s cannot be unique.
 * **fields.E331**: Field specifies a many-to-many relation through model
   ``<model>``, which has not been installed.

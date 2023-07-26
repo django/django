@@ -143,7 +143,7 @@ class DatabaseLevelCascadeCheckTests(TestCase):
                     "declaring a GenericForeignKey.",
                     hint="Change the on_delete rule to a non DB_* method",
                     obj=comment_field,
-                    id="fields.E345",
+                    id="fields.E322",
                 )
             ],
         )
