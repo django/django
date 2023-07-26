@@ -90,6 +90,7 @@ class Options:
         "concrete_fields",
         "local_concrete_fields",
         "_non_pk_concrete_field_names",
+        "_reverse_one_to_one_field_names",
         "_forward_fields_map",
         "managers",
         "managers_map",
@@ -991,6 +992,16 @@ class Options:
                 if field.name != field.attname:
                     names.append(field.attname)
         return frozenset(names)
+
+    @cached_property
+    def _reverse_one_to_one_field_names(self):
+        """
+        Return a set of reverse one to one field names pointing to the current
+        model.
+        """
+        return frozenset(
+            field.name for field in self.related_objects if field.one_to_one
+        )
 
     @cached_property
     def db_returning_fields(self):

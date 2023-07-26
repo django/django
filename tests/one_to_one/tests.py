@@ -524,6 +524,29 @@ class OneToOneTests(TestCase):
             Director._meta.base_manager_name = None
             Director._meta._expire_cache()
 
+    def test_create_reverse_o2o_error(self):
+        msg = "The following fields do not exist in this model: restaurant"
+        with self.assertRaisesMessage(ValueError, msg):
+            Place.objects.create(restaurant=self.r1)
+
+    def test_get_or_create_reverse_o2o_error(self):
+        msg = "The following fields do not exist in this model: restaurant"
+        r2 = Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Place.objects.get_or_create(name="nonexistent", defaults={"restaurant": r2})
+
+    def test_update_or_create_reverse_o2o_error(self):
+        msg = "The following fields do not exist in this model: restaurant"
+        r2 = Restaurant.objects.create(
+            place=self.p2, serves_hot_dogs=True, serves_pizza=False
+        )
+        with self.assertRaisesMessage(ValueError, msg):
+            Place.objects.update_or_create(
+                name="nonexistent", defaults={"restaurant": r2}
+            )
+
     def test_hasattr_related_object(self):
         # The exception raised on attribute access when a related object
         # doesn't exist should be an instance of a subclass of `AttributeError`
