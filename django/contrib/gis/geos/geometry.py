@@ -11,7 +11,7 @@ from django.contrib.gis.geos import prototypes as capi
 from django.contrib.gis.geos.base import GEOSBase
 from django.contrib.gis.geos.coordseq import GEOSCoordSeq
 from django.contrib.gis.geos.error import GEOSException
-from django.contrib.gis.geos.libgeos import GEOM_PTR
+from django.contrib.gis.geos.libgeos import GEOM_PTR, geos_version_tuple
 from django.contrib.gis.geos.mutable_list import ListMixin
 from django.contrib.gis.geos.prepared import PreparedGeometry
 from django.contrib.gis.geos.prototypes.io import ewkb_w, wkb_r, wkb_w, wkt_r, wkt_w
@@ -317,6 +317,16 @@ class GEOSGeometryBase(GEOSBase):
         specified tolerance.
         """
         return capi.geos_equalsexact(self.ptr, other.ptr, float(tolerance))
+
+    def equals_identical(self, other):
+        """
+        Return true if the two Geometries are point-wise equivalent.
+        """
+        if geos_version_tuple() < (3, 12):
+            raise GEOSException(
+                "GEOSGeometry.equals_identical() requires GEOS >= 3.12.0."
+            )
+        return capi.geos_equalsidentical(self.ptr, other.ptr)
 
     def intersects(self, other):
         "Return true if disjoint return false."

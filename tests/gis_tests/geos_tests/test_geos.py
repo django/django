@@ -1,11 +1,12 @@
 import ctypes
 import itertools
 import json
+import math
 import pickle
 import random
 from binascii import a2b_hex
 from io import BytesIO
-from unittest import mock
+from unittest import mock, skipIf
 
 from django.contrib.gis import gdal
 from django.contrib.gis.geos import (
@@ -240,6 +241,75 @@ class GEOSTest(SimpleTestCase, TestDataMixin):
         # SRID of 0
         self.assertEqual(p0, "SRID=0;POINT (5 23)")
         self.assertNotEqual(p1, "SRID=0;POINT (5 23)")
+
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_equals_identical(self):
+        tests = [
+            # Empty inputs of different types are not equals_identical.
+            ("POINT EMPTY", "LINESTRING EMPTY", False),
+            # Empty inputs of different dimensions are not equals_identical.
+            ("POINT EMPTY", "POINT Z EMPTY", False),
+            # Non-empty inputs of different dimensions are not equals_identical.
+            ("POINT Z (1 2 3)", "POINT M (1 2 3)", False),
+            ("POINT ZM (1 2 3 4)", "POINT Z (1 2 3)", False),
+            # Inputs with different structure are not equals_identical.
+            ("LINESTRING (1 1, 2 2)", "MULTILINESTRING ((1 1, 2 2))", False),
+            # Inputs with different types are not equals_identical.
+            (
+                "GEOMETRYCOLLECTION (LINESTRING (1 1, 2 2))",
+                "MULTILINESTRING ((1 1, 2 2))",
+                False,
+            ),
+            # Same lines are equals_identical.
+            ("LINESTRING M (1 1 0, 2 2 1)", "LINESTRING M (1 1 0, 2 2 1)", True),
+            # Different lines are not equals_identical.
+            ("LINESTRING M (1 1 0, 2 2 1)", "LINESTRING M (1 1 1, 2 2 1)", False),
+            # Same polygons are equals_identical.
+            ("POLYGON ((0 0, 1 0, 1 1, 0 0))", "POLYGON ((0 0, 1 0, 1 1, 0 0))", True),
+            # Different polygons are not equals_identical.
+            ("POLYGON ((0 0, 1 0, 1 1, 0 0))", "POLYGON ((1 0, 1 1, 0 0, 1 0))", False),
+            # Different polygons (number of holes) are not equals_identical.
+            (
+                "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 2 1, 2 2, 1 1))",
+                (
+                    "POLYGON ((0 0, 10 0, 10 10, 0 10, 0 0), (1 1, 2 1, 2 2, 1 1), "
+                    "(3 3, 4 3, 4 4, 3 3))"
+                ),
+                False,
+            ),
+            # Same collections are equals_identical.
+            (
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                True,
+            ),
+            # Different collections (structure) are not equals_identical.
+            (
+                "MULTILINESTRING ((1 1, 2 2), (2 2, 3 3))",
+                "MULTILINESTRING ((2 2, 3 3), (1 1, 2 2))",
+                False,
+            ),
+        ]
+        for g1, g2, is_equal_identical in tests:
+            with self.subTest(g1=g1, g2=g2):
+                self.assertIs(
+                    fromstr(g1).equals_identical(fromstr(g2)), is_equal_identical
+                )
+
+    @skipIf(geos_version_tuple() < (3, 12), "GEOS >= 3.12.0 is required")
+    def test_infinite_values_equals_identical(self):
+        # Input with identical infinite values are equals_identical.
+        g1 = Point(x=float("nan"), y=math.inf)
+        g2 = Point(x=float("nan"), y=math.inf)
+        self.assertIs(g1.equals_identical(g2), True)
+
+    @mock.patch("django.contrib.gis.geos.libgeos.geos_version", lambda: b"3.11.0")
+    def test_equals_identical_geos_version(self):
+        g1 = fromstr("POINT (1 2 3)")
+        g2 = fromstr("POINT (1 2 3)")
+        msg = "GEOSGeometry.equals_identical() requires GEOS >= 3.12.0"
+        with self.assertRaisesMessage(GEOSException, msg):
+            g1.equals_identical(g2)
 
     def test_points(self):
         "Testing Point objects."

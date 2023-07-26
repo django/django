@@ -38,6 +38,7 @@ geos_equals = BinaryPredicate("GEOSEquals")
 geos_equalsexact = BinaryPredicate(
     "GEOSEqualsExact", argtypes=[GEOM_PTR, GEOM_PTR, c_double]
 )
+geos_equalsidentical = BinaryPredicate("GEOSEqualsIdentical")
 geos_intersects = BinaryPredicate("GEOSIntersects")
 geos_overlaps = BinaryPredicate("GEOSOverlaps")
 geos_relatepattern = BinaryPredicate(
