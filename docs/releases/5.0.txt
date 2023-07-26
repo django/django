@@ -192,6 +192,9 @@ Minor features
 
 * Added support for GEOS 3.12.
 
+* The new :meth:`.GEOSGeometry.equals_identical` method allows point-wise
+  equivalence checking of geometries.
+
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

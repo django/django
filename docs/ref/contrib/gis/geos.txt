@@ -483,6 +483,15 @@ return a boolean.
     ``poly1.equals_exact(poly2, 0.001)`` will compare equality to within
     one thousandth of a unit.
 
+.. method:: GEOSGeometry.equals_identical(other)
+
+    .. versionadded:: 5.0
+
+    Returns ``True`` if the two geometries are point-wise equivalent by
+    checking that the structure, ordering, and values of all vertices are
+    identical in all dimensions. ``NaN`` values are considered to be equal to
+    other ``NaN`` values. Requires GEOS 3.12.
+
 .. method:: GEOSGeometry.intersects(other)
 
     Returns ``True`` if :meth:`GEOSGeometry.disjoint` is ``False``.
