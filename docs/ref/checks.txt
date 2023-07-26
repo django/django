@@ -284,7 +284,7 @@ Related fields
   ``on_delete=DB_SET_NULL`` but cannot be null.
 * **fields.E321**: The field specifies ``on_delete=SET_DEFAULT``, but has no
   default value.
-* **fields.E322**: The field specifies unsuported database level ``on_delete``
+* **fields.E322**: The field specifies unsupported database level ``on_delete``
   on model declaring a GenericForeignKey.
 * **fields.E323**: Using python based on_delete with database level on_delete
   referenced parent model is prohibited.
