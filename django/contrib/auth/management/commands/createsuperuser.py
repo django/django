@@ -230,9 +230,7 @@ class Command(BaseCommand):
                             pk.strip() for pk in user_data[field_name].split(",")
                         ]
 
-            self.UserModel._default_manager.db_manager(database).create_superuser(
-                **user_data
-            )
+            self.create_superuser(database, user_data)
             if options["verbosity"] >= 1:
                 self.stdout.write("Superuser created successfully.")
         except KeyboardInterrupt:
@@ -305,3 +303,8 @@ class Command(BaseCommand):
             self.username_field.clean(username, None)
         except exceptions.ValidationError as e:
             return "; ".join(e.messages)
+
+    def create_superuser(self, database, user_data):
+        return self.UserModel._default_manager.db_manager(database).create_superuser(
+            **user_data
+        )
