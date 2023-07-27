@@ -30,7 +30,7 @@ from django.utils.regex_helper import _lazy_re_compile
 
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
-    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
+    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
 
@@ -698,19 +698,11 @@ def split_domain_port(host):
     Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
-    host = host.lower()
-
-    if not host_validation_re.match(host):
-        return "", ""
-
-    if host[-1] == "]":
-        # It's an IPv6 address without a port.
-        return host, ""
-    bits = host.rsplit(":", 1)
-    domain, port = bits if len(bits) == 2 else (bits[0], "")
-    # Remove a trailing dot (if present) from the domain.
-    domain = domain.removesuffix(".")
-    return domain, port
+    if match := host_validation_re.fullmatch(host.lower()):
+        domain, port = match.groups(default="")
+        # Remove a trailing dot (if present) from the domain.
+        return domain.removesuffix("."), port
+    return "", ""
 
 
 def validate_host(host, allowed_hosts):
