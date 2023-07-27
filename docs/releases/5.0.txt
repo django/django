@@ -368,6 +368,12 @@ Models
   :func:`~django.shortcuts.aget_list_or_404` asynchronous shortcuts allow
   asynchronous getting objects.
 
+* The new :func:`~django.db.models.aprefetch_related_objects` function allows
+  asynchronous prefetching of model instances.
+
+* :meth:`.QuerySet.aiterator` now supports previous calls to
+  ``prefetch_related()``.
+
 Pagination
 ~~~~~~~~~~
 

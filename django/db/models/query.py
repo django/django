@@ -544,19 +544,36 @@ class QuerySet(AltersData):
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if self._prefetch_related_lookups:
-            raise NotSupportedError(
-                "Using QuerySet.aiterator() after prefetch_related() is not supported."
-            )
         if chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
         use_chunked_fetch = not connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
-        async for item in self._iterable_class(
+        iterable = self._iterable_class(
             self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
-        ):
-            yield item
+        )
+        if self._prefetch_related_lookups:
+            results = []
+
+            async for item in iterable:
+                results.append(item)
+                if len(results) >= chunk_size:
+                    await aprefetch_related_objects(
+                        results, *self._prefetch_related_lookups
+                    )
+                    for result in results:
+                        yield result
+                    results.clear()
+
+            if results:
+                await aprefetch_related_objects(
+                    results, *self._prefetch_related_lookups
+                )
+                for result in results:
+                    yield result
+        else:
+            async for item in iterable:
+                yield item
 
     def aggregate(self, *args, **kwargs):
         """
@@ -2385,6 +2402,13 @@ def prefetch_related_objects(model_instances, *related_lookups):
                     else:
                         new_obj_list.append(new_obj)
                 obj_list = new_obj_list
+
+
+async def aprefetch_related_objects(model_instances, *related_lookups):
+    """See prefetch_related_objects()."""
+    return await sync_to_async(prefetch_related_objects)(
+        model_instances, *related_lookups
+    )
 
 
 def get_prefetcher(instance, through_attr, to_attr):

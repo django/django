@@ -2579,10 +2579,10 @@ evaluated will force it to evaluate again, repeating the query.
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
 
-.. note::
+.. versionchanged:: 5.0
 
-    ``aiterator()`` is *not* compatible with previous calls to
-    ``prefetch_related()``.
+    Support for ``aiterator()`` with previous calls to ``prefetch_related()``
+    was added.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -4073,6 +4073,9 @@ attribute:
 ------------------------------
 
 .. function:: prefetch_related_objects(model_instances, *related_lookups)
+.. function:: aprefetch_related_objects(model_instances, *related_lookups)
+
+*Asynchronous version*: ``aprefetch_related_objects()``
 
 Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;
@@ -4090,6 +4093,10 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.
+
+.. versionchanged:: 5.0
+
+    ``aprefetch_related_objects()`` function was added.
 
 ``FilteredRelation()`` objects
 ------------------------------
