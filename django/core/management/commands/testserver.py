@@ -45,7 +45,7 @@ class Command(BaseCommand):
         )
 
         # Import the fixture data into the test database.
-        call_command("loaddata", *fixture_labels, **{"verbosity": verbosity})
+        call_command("loaddata", *fixture_labels, verbosity=verbosity)
 
         # Run the development server. Turn off auto-reloading because it causes
         # a strange error -- it causes this handle() method to be called

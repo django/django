@@ -2075,7 +2075,7 @@ Running management commands from your code
 
 .. function:: django.core.management.call_command(name, *args, **options)
 
-To call a management command from code use ``call_command``.
+To call a management command from code use ``call_command()``.
 
 ``name``
   the name of the command to call or a command object. Passing the name is
