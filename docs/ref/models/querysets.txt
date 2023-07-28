@@ -2148,7 +2148,7 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
 ~~~~~~~~~~~~
 
 .. method:: create(**kwargs)
-.. method:: acreate(*args, **kwargs)
+.. method:: acreate(**kwargs)
 
 *Asynchronous version*: ``acreate()``
 
