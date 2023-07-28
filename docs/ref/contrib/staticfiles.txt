@@ -214,39 +214,6 @@ Overrides the core :djadmin:`runserver` command if the ``staticfiles`` app
 is :setting:`installed<INSTALLED_APPS>` and adds automatic serving of static
 files. File serving doesn't run through :setting:`MIDDLEWARE`.
 
-The command adds these options:
-
-.. django-admin-option:: --nostatic
-
-Use the ``--nostatic`` option to disable serving of static files with the
-:doc:`staticfiles </ref/contrib/staticfiles>` app entirely. This option is
-only available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting.
-
-Example usage:
-
-.. console::
-
-    $ django-admin runserver --nostatic
-
-.. django-admin-option:: --insecure
-
-Use the ``--insecure`` option to force serving of static files with the
-:doc:`staticfiles </ref/contrib/staticfiles>` app even if the :setting:`DEBUG`
-setting is ``False``. By using this you acknowledge the fact that it's
-**grossly inefficient** and probably **insecure**. This is only intended for
-local development, should **never be used in production** and is only
-available if the :doc:`staticfiles </ref/contrib/staticfiles>` app is
-in your project's :setting:`INSTALLED_APPS` setting.
-
-``--insecure`` doesn't work with :class:`~.storage.ManifestStaticFilesStorage`.
-
-Example usage:
-
-.. console::
-
-    $ django-admin runserver --insecure
-
 .. _staticfiles-storages:
 
 Storages
