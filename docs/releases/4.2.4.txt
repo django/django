@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with aggregates referencing window functions
   (:ticket:`34717`).
+
+* Fixed a regression in Django 4.2 that caused a crash when grouping by a
+  reference in a subquery (:ticket:`34748`).
