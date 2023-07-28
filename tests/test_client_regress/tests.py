@@ -80,11 +80,11 @@ class AssertContainsTests(SimpleTestCase):
         try:
             self.assertNotContains(response, "once")
         except AssertionError as e:
-            self.assertIn("Response should not contain 'once'", str(e))
+            self.assertIn("1 != 0 : \"'once'\" not found in 'once'", str(e))
         try:
             self.assertNotContains(response, "once", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Response should not contain 'once'", str(e))
+            self.assertIn("1 != 0 : abc: \"'once'\" not found in 'once'", str(e))
 
         try:
             self.assertContains(response, "never", 1)
@@ -141,11 +141,15 @@ class AssertContainsTests(SimpleTestCase):
         try:
             self.assertContains(response, "thrice")
         except AssertionError as e:
-            self.assertIn("Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                "False is not true : \"'thrice'\" not found in 'thrice'", str(e)
+            )
         try:
             self.assertContains(response, "thrice", msg_prefix="abc")
         except AssertionError as e:
-            self.assertIn("abc: Couldn't find 'thrice' in response", str(e))
+            self.assertIn(
+                "False is not true : abc: \"'thrice'\" not found in 'thrice'", str(e)
+            )
 
         try:
             self.assertContains(response, "thrice", 3)
