@@ -2,16 +2,15 @@ import functools
 import inspect
 import itertools
 import re
+import reprlib
 import sys
 import types
 import warnings
-import reprlib
 from pathlib import Path
 
 from django.conf import settings
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.template import Context, Engine, TemplateDoesNotExist
-from django.template.defaultfilters import pprint
 from django.urls import resolve
 from django.utils import timezone
 from django.utils.datastructures import MultiValueDict
@@ -348,14 +347,12 @@ class ExceptionReporter:
             self.template_does_not_exist = True
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
-
-
         # Limits the size of returning string to reduce memory usage
         repr_instance = reprlib.Repr()
         repr_instance.maxstring
         repr_instance.maxlist
         repr_instance.maxdict
-        
+
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
             if "vars" in frame:
