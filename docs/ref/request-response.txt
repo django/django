@@ -1282,6 +1282,36 @@ Attributes
     This is useful for middleware needing to wrap
     :attr:`StreamingHttpResponse.streaming_content`.
 
+.. _request-response-streaming-disconnect:
+
+Handling disconnects
+--------------------
+
+.. versionadded:: 5.0
+
+If the client disconnects during a streaming response, Django will cancel the
+coroutine that is handling the response. If you want to clean up resources
+manually, you can do so by catching the ``asyncio.CancelledError``::
+
+    async def streaming_response():
+        try:
+            # Do some work here
+            async for chunk in my_streaming_iterator():
+                yield chunk
+        except asyncio.CancelledError:
+            # Handle disconnect
+            ...
+            raise
+
+
+    async def my_streaming_view(request):
+        return StreamingHttpResponse(streaming_response())
+
+This example only shows how to handle client disconnection while the response
+is streaming. If you perform long-running operations in your view before
+returning the ``StreamingHttpResponse`` object, then you may also want to
+:ref:`handle disconnections in the view <async-handling-disconnect>` itself.
+
 ``FileResponse`` objects
 ========================
 
