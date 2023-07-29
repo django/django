@@ -197,6 +197,9 @@ cleanup::
             # Handle disconnect
             raise
 
+You can also :ref:`handle client disconnects in streaming responses
+<request-response-streaming-disconnect>`.
+
 .. _async-safety:
 
 Async safety
