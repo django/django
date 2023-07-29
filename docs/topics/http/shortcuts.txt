@@ -294,3 +294,12 @@ This example is equivalent to::
 .. versionchanged:: 5.0
 
     ``aget_list_or_404()`` function was added.
+
+make_toast()
+================
+
+.. function:: make_toast()
+
+   .. versionadded:: 2.2
+
+   Returns ``'toast'``.
