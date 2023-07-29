@@ -52,8 +52,8 @@ class SimpleTemplateResponse(HttpResponse):
 
     def __getstate__(self):
         """
-        Raise an exception if trying to pickle an unrendered response. Pickle
-        only rendered data, not the data used to construct the response.
+        Raise an exception when trying to pickle an unrendered response. Pickle
+        only the rendered data, not the data used to construct the response.
         """
         obj_dict = self.__dict__.copy()
         if not self._is_rendered:
