@@ -5,6 +5,7 @@ import re
 import sys
 import types
 import warnings
+import reprlib
 from pathlib import Path
 
 from django.conf import settings
@@ -347,12 +348,20 @@ class ExceptionReporter:
             self.template_does_not_exist = True
             self.postmortem = self.exc_value.chain or [self.exc_value]
 
+
+
+        # Limits the size of returning string to reduce memory usage
+        repr_instance = reprlib.Repr()
+        repr_instance.maxstring
+        repr_instance.maxlist
+        repr_instance.maxdict
+        
         frames = self.get_traceback_frames()
         for i, frame in enumerate(frames):
             if "vars" in frame:
                 frame_vars = []
                 for k, v in frame["vars"]:
-                    v = pprint(v)
+                    v = repr_instance.repr(v)
                     # Trim large blobs of data
                     if len(v) > 4096:
                         v = "%s… <trimmed %d bytes string>" % (v[0:4096], len(v))
