@@ -97,7 +97,7 @@ class Extract(TimezoneMixin, Transform):
                 "TimeField, or DurationField."
             )
         # Passing dates to functions expecting datetimes is most likely a mistake.
-        if type(field) == DateField and copy.lookup_name in (
+        if type(field) is DateField and copy.lookup_name in (
             "hour",
             "minute",
             "second",
@@ -310,7 +310,7 @@ class TruncBase(TimezoneMixin, Transform):
         has_explicit_output_field = (
             class_output_field or field.__class__ is not copy.output_field.__class__
         )
-        if type(field) == DateField and (
+        if type(field) is DateField and (
             isinstance(output_field, DateTimeField)
             or copy.kind in ("hour", "minute", "second", "time")
         ):
