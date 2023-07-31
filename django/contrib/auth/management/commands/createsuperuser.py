@@ -219,11 +219,15 @@ class Command(BaseCommand):
                 for field_name in self.UserModel.REQUIRED_FIELDS:
                     env_var = "DJANGO_SUPERUSER_" + field_name.upper()
                     value = options[field_name] or os.environ.get(env_var)
+                    field = self.UserModel._meta.get_field(field_name)
                     if not value:
+                        if field.blank and (
+                            options[field_name] == "" or os.environ.get(env_var) == ""
+                        ):
+                            continue
                         raise CommandError(
                             "You must use --%s with --noinput." % field_name
                         )
-                    field = self.UserModel._meta.get_field(field_name)
                     user_data[field_name] = field.clean(value, None)
                     if field.many_to_many and isinstance(user_data[field_name], str):
                         user_data[field_name] = [
