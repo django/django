@@ -498,6 +498,11 @@ class Query(BaseExpression):
                             annotation_mask |= expr.get_refs()
                     for aggregate in aggregates.values():
                         annotation_mask |= aggregate.get_refs()
+                    # Avoid eliding expressions that might have an incidence on
+                    # the implicit grouping logic.
+                    for annotation_alias, annotation in self.annotation_select.items():
+                        if annotation.get_group_by_cols():
+                            annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
 
             # Add aggregates to the outer AggregateQuery. This requires making
