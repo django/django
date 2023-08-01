@@ -2,7 +2,7 @@
 Django 4.2.4 release notes
 ==========================
 
-*Expected August 1, 2023*
+*August 1, 2023*
 
 Django 4.2.4 fixes several bugs in 4.2.3.
 
