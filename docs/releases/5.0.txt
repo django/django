@@ -243,7 +243,9 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.QuerySet.prefetch_related` now supports prefetching
+  :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
+  non-homogeneous set of results.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -710,6 +712,14 @@ Miscellaneous
 
 * The ``django.db.models.enums.ChoicesMeta`` metaclass is renamed to
   ``ChoicesType``.
+
+* The ``Prefetch.get_current_queryset()`` method is deprecated.
+
+* The ``get_prefetch_queryset()`` method of related managers and descriptors
+  is deprecated. Starting with Django 6.0, ``get_prefetcher()`` and
+  ``prefetch_related_objects()`` will no longer fallback to
+  ``get_prefetch_queryset()``. Subclasses should implement
+  ``get_prefetch_querysets()`` instead.
 
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
 
