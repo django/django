@@ -45,6 +45,14 @@ details on these changes.
 * The ``ChoicesMeta`` alias to ``django.db.models.enums.ChoicesType`` will be
   removed.
 
+* The ``Prefetch.get_current_queryset()`` method will be removed.
+
+* The ``get_prefetch_queryset()`` method of related managers and descriptors
+  will be removed.
+
+* ``get_prefetcher()`` and ``prefetch_related_objects()`` will no longer
+  fallback to ``get_prefetch_queryset()``.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
