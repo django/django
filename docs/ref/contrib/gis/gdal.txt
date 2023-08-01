@@ -548,7 +548,7 @@ coordinate transformation:
 
     .. code-block:: pycon
 
-        >> polygon.dimension
+        >>> polygon.dimension
         2
 
     .. attribute:: coord_dim
