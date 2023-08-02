@@ -108,7 +108,7 @@ class Collate(Func):
     allowed_default = False
     # Inspired from
     # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-    collation_re = _lazy_re_compile(r"^[\w\-]+$")
+    collation_re = _lazy_re_compile(r"^[\w-]+$")
 
     def __init__(self, expression, collation):
         if not (collation and self.collation_re.match(collation)):
