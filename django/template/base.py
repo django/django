@@ -632,7 +632,7 @@ filter_raw_string = r"""
          )?
  )""" % {
     "constant": constant_string,
-    "num": r"[-+\.]?\d[\d\.e]*",
+    "num": r"[-+.]?\d[\d.e]*",
     "var_chars": r"\w\.",
     "filter_sep": re.escape(FILTER_SEPARATOR),
     "arg_sep": re.escape(FILTER_ARGUMENT_SEPARATOR),

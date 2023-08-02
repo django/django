@@ -11,7 +11,7 @@ wkt_regex = _lazy_re_compile(
     r"(?P<wkt>"
     r"(?P<type>POINT|LINESTRING|LINEARRING|POLYGON|MULTIPOINT|"
     r"MULTILINESTRING|MULTIPOLYGON|GEOMETRYCOLLECTION)"
-    r"[ACEGIMLONPSRUTYZ0-9,\.\-\+\(\) ]+)$",
+    r"[ACEGIMLONPSRUTYZ0-9,.+() -]+)$",
     re.I,
 )
 json_regex = _lazy_re_compile(r"^(\s+)?\{.*}(\s+)?$", re.DOTALL)
