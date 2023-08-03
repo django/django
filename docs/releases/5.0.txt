@@ -127,11 +127,13 @@ Database-level values for ``ForeignKey.on_delete``
 --------------------------------------------------
 
 :attr:`ForeignKey.on_delete <django.db.models.ForeignKey.on_delete>` now
-supports three extra values to specify database-level actions:
+supports four extra values to specify database-level actions:
 
 * ``DB_CASCADE`` - deletes the referring object.
 * ``DB_RESTRICT`` - prevents deletion of referred-to objects.
 * ``DB_SET_NULL`` - sets the referring foreign key to SQL ``NULL``.
+* ``DB_SET_DEFAULT`` - the value of the foreign key column in the referencing
+  table will be set to its ``db_default`` value.
 
 Minor features
 --------------

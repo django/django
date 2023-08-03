@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
+    DB_SET_DEFAULT,
     DB_SET_NULL,
     SET_DEFAULT,
     SET_NULL,
@@ -1035,6 +1036,16 @@ class ForeignKey(ForeignObject):
                     hint="Set a default value, or change the on_delete rule.",
                     obj=self,
                     id="fields.E321",
+                )
+            ]
+        elif on_delete == DB_SET_DEFAULT and not self.has_db_default():
+            return [
+                checks.Error(
+                    "Field specifies on_delete=DB_SET_DEFAULT, but has "
+                    "no db_default value.",
+                    hint="Set a db_default value, or change the on_delete rule.",
+                    obj=self,
+                    id="fields.E324",
                 )
             ]
         elif (

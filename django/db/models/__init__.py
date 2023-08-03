@@ -8,6 +8,7 @@ from django.db.models.deletion import (
     CASCADE,
     DB_CASCADE,
     DB_RESTRICT,
+    DB_SET_DEFAULT,
     DB_SET_NULL,
     DO_NOTHING,
     PROTECT,
@@ -119,5 +120,6 @@ __all__ += [
     "DB_CASCADE",
     "DB_RESTRICT",
     "DB_SET_NULL",
+    "DB_SET_DEFAULT",
     "DatabaseOnDelete",
 ]

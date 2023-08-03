@@ -1764,6 +1764,17 @@ any custom methods or send any signals.
     ``ON DELETE SET NULL`` on a database level while creating or altering the
     ``ForeignKey``.
 
+* .. attribute:: DB_SET_DEFAULT
+
+    .. versionadded:: 5.0
+
+    Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value.
+    the respective field must have a :attr:`Field.db_default` value present.
+    This triggers SQL constraint ``ON DELETE SET DEFAULT`` on a database level
+    while creating or altering the ``ForeignKey``.if a row in the referenced
+    table is deleted, the foreign key values in the referencing table will be 
+    updated to their :attr:`Field.db_default` values.
+
 .. attribute:: ForeignKey.limit_choices_to
 
     Sets a limit to the available choices for this field when this field is

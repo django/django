@@ -153,3 +153,28 @@ class DatabaseLevelCascadeCheckTests(TestCase):
             photo_field.check(),
             [],
         )
+
+    def test_check_db_default_foreign_key(self):
+        class DBDefaultsPK(models.Model):
+            language_code = models.CharField(
+                primary_key=True, max_length=2, db_default="en"
+            )
+
+        class DBDefaultsFK(models.Model):
+            language_code = models.ForeignKey(
+                DBDefaultsPK, on_delete=models.DB_SET_DEFAULT
+            )
+
+        fk_field = DBDefaultsFK._meta.get_field("language_code")
+        self.assertEqual(
+            fk_field.check(),
+            [
+                Error(
+                    "Field specifies on_delete=DB_SET_DEFAULT, but has "
+                    "no db_default value.",
+                    hint="Set a db_default value, or change the on_delete rule.",
+                    obj=fk_field,
+                    id="fields.E324",
+                )
+            ],
+        )

@@ -6,10 +6,11 @@ from .models import (
     Bar,
     Baz,
     Child,
+    DBDefaultsFK,
+    DBDefaultsPK,
     DiamondChild,
     DiamondParent,
     Foo,
-    GrandParent,
     Parent,
     RestrictBar,
     RestrictBaz,
@@ -85,6 +86,15 @@ class DatabaseLevelOnDeleteTests(TestCase):
         self.assertEqual(baz.setnullbar, orphan_baz.setnullbar)
         self.assertIsNotNone(orphan_baz.setnullbar)
 
+    def test_foreign_key_db_default(self):
+        default_parent = DBDefaultsPK.objects.create(language_code="fr")
+        parent = DBDefaultsPK.objects.create(language_code="en")
+        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        with self.assertNumQueries(1):
+            parent.delete()
+        child1.refresh_from_db()
+        self.assertEqual(child1.language_code, default_parent)
+
 
 class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
     def test_queries_on_nested_cascade(self):
@@ -130,7 +140,7 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
             foo.delete()
 
     def test_queries_on_inherited_model(self):
-        gp = GrandParent.objects.create()
+        gp = Foo.objects.create()
         parent = Parent.objects.create(grandparent_ptr=gp)
         diamond_parent = DiamondParent.objects.create(gp_ptr=gp)
 
@@ -151,7 +161,7 @@ class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
             dc.refresh_from_db()
 
     def test_restrict_on_inherited_model(self):
-        gp = GrandParent.objects.create()
+        gp = Foo.objects.create()
         child = Child.objects.create(grandparent_ptr=gp)
 
         with transaction.atomic():

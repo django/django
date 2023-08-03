@@ -265,7 +265,7 @@ class BaseDatabaseOperations:
         Return the SQL to make an ON DELETE statement during a CREATE TABLE
         statement.
         """
-        if operation in ["CASCADE", "SET NULL", "RESTRICT"]:
+        if operation in ["CASCADE", "SET NULL", "RESTRICT", "SET DEFAULT"]:
             return f" ON DELETE {operation} "
         if operation == "":
             return ""

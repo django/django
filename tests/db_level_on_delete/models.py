@@ -76,25 +76,21 @@ class AnotherSetNullBaz(models.Model):
     another_field = models.CharField(max_length=20)
 
 
-class GrandParent(models.Model):
-    pass
-
-
-class Child(GrandParent):
+class Child(Foo):
     grandparent_ptr = models.OneToOneField(
-        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_RESTRICT
+        Foo, primary_key=True, parent_link=True, on_delete=models.DB_RESTRICT
     )
 
 
-class Parent(GrandParent):
+class Parent(Foo):
     grandparent_ptr = models.OneToOneField(
-        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+        Foo, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
     )
 
 
-class DiamondParent(GrandParent):
+class DiamondParent(Foo):
     gp_ptr = models.OneToOneField(
-        GrandParent, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
+        Foo, primary_key=True, parent_link=True, on_delete=models.DB_CASCADE
     )
 
 
@@ -105,4 +101,14 @@ class DiamondChild(Parent, DiamondParent):
 
     diamondparent_ptr = models.OneToOneField(
         DiamondParent, parent_link=True, on_delete=models.DB_CASCADE
+    )
+
+
+class DBDefaultsPK(models.Model):
+    language_code = models.CharField(primary_key=True, max_length=2, db_default="en")
+
+
+class DBDefaultsFK(models.Model):
+    language_code = models.ForeignKey(
+        DBDefaultsPK, db_default="fr", on_delete=models.DB_SET_DEFAULT
     )

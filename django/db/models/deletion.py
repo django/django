@@ -86,7 +86,6 @@ def DO_NOTHING(collector, field, sub_objs, using):
 class DatabaseOnDelete:
     def __init__(self, operation, name):
         self.operation = operation
-        self.name = name
         self.__name__ = name
 
     # These objects must be callable, as we are calling it in the collect
@@ -97,12 +96,13 @@ class DatabaseOnDelete:
         return connection.ops.fk_on_delete_sql(self.operation)
 
     def __str__(self):
-        return self.name
+        return self.__name__
 
 
 DB_CASCADE = DatabaseOnDelete("CASCADE", "DB_CASCADE")
 DB_SET_NULL = DatabaseOnDelete("SET NULL", "DB_SET_NULL")
 DB_RESTRICT = DatabaseOnDelete("RESTRICT", "DB_RESTRICT")
+DB_SET_DEFAULT = DatabaseOnDelete("SET DEFAULT", "DB_SET_DEFAULT")
 
 
 def get_candidate_relations_to_delete(opts):
