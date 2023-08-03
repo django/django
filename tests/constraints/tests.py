@@ -13,6 +13,7 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from .models import (
     ChildModel,
     ChildUniqueConstraintProduct,
+    JSONFieldModel,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -331,6 +332,25 @@ class CheckConstraintTests(TestCase):
             name="positive_price",
         )
         constraint.validate(Product, Product())
+
+    @skipUnlessDBFeature("supports_json_field")
+    def test_validate_nullable_jsonfield(self):
+        is_null_constraint = models.CheckConstraint(
+            check=models.Q(data__isnull=True),
+            name="nullable_data",
+        )
+        is_not_null_constraint = models.CheckConstraint(
+            check=models.Q(data__isnull=False),
+            name="nullable_data",
+        )
+        is_null_constraint.validate(JSONFieldModel, JSONFieldModel(data=None))
+        msg = f"Constraint “{is_null_constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_null_constraint.validate(JSONFieldModel, JSONFieldModel(data={}))
+        msg = f"Constraint “{is_not_null_constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_not_null_constraint.validate(JSONFieldModel, JSONFieldModel(data=None))
+        is_not_null_constraint.validate(JSONFieldModel, JSONFieldModel(data={}))
 
 
 class UniqueConstraintTests(TestCase):
