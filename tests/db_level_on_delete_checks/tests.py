@@ -165,6 +165,9 @@ class DatabaseLevelCascadeCheckTests(TestCase):
                 DBDefaultsPK, on_delete=models.DB_SET_DEFAULT
             )
 
+            class Meta:
+                abstract = True
+
         fk_field = DBDefaultsFK._meta.get_field("language_code")
         self.assertEqual(
             fk_field.check(),
