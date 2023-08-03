@@ -568,6 +568,11 @@ class IsNull(BuiltinLookup):
             raise ValueError(
                 "The QuerySet value for an isnull lookup must be True or False."
             )
+        if isinstance(self.lhs, Value) and self.lhs.value is None:
+            if self.rhs:
+                raise FullResultSet
+            else:
+                raise EmptyResultSet
         sql, params = self.process_lhs(compiler, connection)
         if self.rhs:
             return "%s IS NULL" % sql, params
