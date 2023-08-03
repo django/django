@@ -23,20 +23,6 @@ class TestFeatures(TestCase):
             self.assertFalse(connection.features.supports_transactions)
         del connection.features.supports_transactions
 
-    def test_skip_locked_no_wait(self):
-        with mock.MagicMock() as _connection:
-            _connection.mysql_version = (8, 0, 1)
-            _connection.mysql_is_mariadb = False
-            database_features = DatabaseFeatures(_connection)
-            self.assertTrue(database_features.has_select_for_update_skip_locked)
-            self.assertTrue(database_features.has_select_for_update_nowait)
-        with mock.MagicMock() as _connection:
-            _connection.mysql_version = (8, 0, 0)
-            _connection.mysql_is_mariadb = False
-            database_features = DatabaseFeatures(_connection)
-            self.assertFalse(database_features.has_select_for_update_skip_locked)
-            self.assertFalse(database_features.has_select_for_update_nowait)
-
     def test_allows_auto_pk_0(self):
         with mock.MagicMock() as _connection:
             _connection.sql_mode = {"NO_AUTO_VALUE_ON_ZERO"}

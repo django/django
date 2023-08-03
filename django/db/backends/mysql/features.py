@@ -11,6 +11,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     # MySQL doesn't support sliced subqueries with IN/ALL/ANY/SOME.
     allow_sliced_subqueries_with_in = False
     has_select_for_update = True
+    has_select_for_update_nowait = True
     supports_forward_references = False
     supports_regex_backreferencing = False
     supports_date_lookup_using_string = False
@@ -23,6 +24,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_temporal_subtraction = True
     supports_slicing_ordering_in_compound = True
     supports_index_on_text_field = False
+    supports_over_clause = True
+    supports_frame_range_fixed_distance = True
     supports_update_conflicts = True
     delete_can_self_reference_subquery = False
     create_test_procedure_without_params_sql = """
@@ -62,7 +65,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         if self.connection.mysql_is_mariadb:
             return (10, 4)
         else:
-            return (8,)
+            return (8, 0, 11)
 
     @cached_property
     def test_collations(self):
@@ -226,16 +229,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         return self.connection.mysql_server_data["sql_auto_is_null"]
 
     @cached_property
-    def supports_over_clause(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 2)
-
-    supports_frame_range_fixed_distance = property(
-        operator.attrgetter("supports_over_clause")
-    )
-
-    @cached_property
     def supports_column_check_constraints(self):
         if self.connection.mysql_is_mariadb:
             return True
@@ -255,20 +248,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def has_select_for_update_skip_locked(self):
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 6)
-        return self.connection.mysql_version >= (8, 0, 1)
-
-    @cached_property
-    def has_select_for_update_nowait(self):
-        if self.connection.mysql_is_mariadb:
-            return True
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def has_select_for_update_of(self):
-        return (
-            not self.connection.mysql_is_mariadb
-            and self.connection.mysql_version >= (8, 0, 1)
-        )
+        return not self.connection.mysql_is_mariadb
 
     @cached_property
     def supports_explain_analyze(self):
@@ -319,7 +303,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             return False
         if self.connection.mysql_is_mariadb:
             return self.connection.mysql_version >= (10, 8)
-        return self.connection.mysql_version >= (8, 0, 1)
+        return True
 
     @cached_property
     def supports_expression_indexes(self):

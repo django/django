@@ -412,7 +412,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 8 and higher.
+Django supports MySQL 8.0.11 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -755,14 +755,14 @@ MySQL and MariaDB do not support some options to the ``SELECT ... FOR UPDATE``
 statement. If ``select_for_update()`` is used with an unsupported option, then
 a :exc:`~django.db.NotSupportedError` is raised.
 
-=============== ========= ==========
+=============== ========= =====
 Option          MariaDB   MySQL
-=============== ========= ==========
-``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
-``NOWAIT``      X         X (≥8.0.1)
-``OF``                    X (≥8.0.1)
+=============== ========= =====
+``SKIP LOCKED`` X (≥10.6) X
+``NOWAIT``      X         X
+``OF``                    X
 ``NO KEY``
-=============== ========= ==========
+=============== ========= =====
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset
 against at least a set of fields contained in unique constraints or only

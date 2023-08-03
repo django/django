@@ -880,7 +880,7 @@ from groups to be included:
 
     Support for filtering against window functions was added.
 
-Among Django's built-in database backends, MySQL 8.0.2+, PostgreSQL, and Oracle
+Among Django's built-in database backends, MySQL, PostgreSQL, and Oracle
 support window expressions. Support for different window expression features
 varies among the different databases. For example, the options in
 :meth:`~django.db.models.Expression.asc` and
