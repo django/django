@@ -76,7 +76,8 @@ objects. These are:
 Called by ``Storage.open()``, this is the actual mechanism the storage class
 uses to open the file. This must return a ``File`` object, though in most cases,
 you'll want to return some subclass here that implements logic specific to the
-backend storage system.
+backend storage system. The :exc:`FileNotFoundError` exception should be raised
+when a file doesn't exist.
 
 .. method:: _save(name, content)
 
