@@ -184,11 +184,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     @cached_property
     def update_can_self_select(self):
-        return self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
-            10,
-            3,
-            2,
-        )
+        return self.connection.mysql_is_mariadb
 
     @cached_property
     def can_introspect_foreign_keys(self):
