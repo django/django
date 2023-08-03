@@ -463,6 +463,12 @@ backends.
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
   ``INSERT`` queries.
 
+Dropped support for MySQL < 8.0.11
+----------------------------------
+
+Support for pre-releases of MySQL 8.0.x series is removed. Django 5.0 supports
+MySQL 8.0.11 and higher.
+
 :mod:`django.contrib.gis`
 -------------------------
 

@@ -82,10 +82,10 @@ field's name.
 For example ``Index(fields=['headline', '-pub_date'])`` would create SQL with
 ``(headline, pub_date DESC)``.
 
-.. admonition:: MySQL and MariaDB
+.. admonition:: MariaDB
 
-    Index ordering isn't supported on MySQL < 8.0.1 and MariaDB < 10.8. In that
-    case, a descending index is created as a normal index.
+    Index ordering isn't supported on MariaDB < 10.8. In that case, a
+    descending index is created as a normal index.
 
 ``name``
 --------
