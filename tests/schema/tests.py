@@ -2075,9 +2075,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Book)
         new_field = CharField(max_length=255, unique=True)
         new_field.set_attributes_from_name("renamed")
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_field(Author, Author._meta.get_field("name"), new_field)
         # Ensure the foreign key reference was updated.
         self.assertForeignKeyExists(Book, "author_id", "schema_author", "renamed")
@@ -2122,9 +2120,7 @@ class SchemaTests(TransactionTestCase):
         new_field = IntegerField(db_default=1985)
         new_field.set_attributes_from_name("renamed_year")
         new_field.model = AuthorDbDefault
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_field(AuthorDbDefault, old_field, new_field, strict=True)
         columns = self.column_classes(AuthorDbDefault)
         self.assertEqual(columns["renamed_year"][1].default, "1985")
@@ -3550,9 +3546,7 @@ class SchemaTests(TransactionTestCase):
             connection.features.introspected_field_types["CharField"],
         )
         # Alter the table
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
@@ -3563,9 +3557,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the foreign key reference was updated
         self.assertForeignKeyExists(Book, "author_id", "schema_otherauthor")
         # Alter the table again
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
@@ -5130,8 +5122,7 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Book, author)
 
     def test_rename_table_renames_deferred_sql_references(self):
-        atomic_rename = connection.features.supports_atomic_references_rename
-        with connection.schema_editor(atomic=atomic_rename) as editor:
+        with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(Book)
             editor.alter_db_table(Author, "schema_author", "schema_renamed_author")
