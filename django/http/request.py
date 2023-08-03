@@ -403,7 +403,8 @@ class HttpRequest:
     def read(self, *args, **kwargs):
         self._read_started = True
         try:
-            return self._stream.read(*args, **kwargs)
+            self._body = self._stream.read(*args, **kwargs)
+            return self._body
         except OSError as e:
             raise UnreadablePostError(*e.args) from e
 
