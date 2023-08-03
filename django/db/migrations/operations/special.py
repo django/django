@@ -1,6 +1,6 @@
 from django.db import router
 
-from .base import Operation
+from .base import Operation, SeverityType
 
 
 class SeparateDatabaseAndState(Operation):
@@ -57,7 +57,10 @@ class SeparateDatabaseAndState(Operation):
             )
 
     def describe(self):
-        return "Custom state/database change combination"
+        return (
+            "Custom state/database change combination",
+            SeverityType.POSSIBLY_DESTRUCTIVE,
+        )
 
 
 class RunSQL(Operation):
@@ -114,7 +117,7 @@ class RunSQL(Operation):
             self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
-        return "Raw SQL operation"
+        return "Raw SQL operation", SeverityType.POSSIBLY_DESTRUCTIVE
 
     def _run_sql(self, schema_editor, sqls):
         if isinstance(sqls, (list, tuple)):
@@ -201,7 +204,7 @@ class RunPython(Operation):
             self.reverse_code(from_state.apps, schema_editor)
 
     def describe(self):
-        return "Raw Python operation"
+        return "Raw Python operation", SeverityType.POSSIBLY_DESTRUCTIVE
 
     @staticmethod
     def noop(apps, schema_editor):

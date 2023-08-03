@@ -5,7 +5,7 @@ from django.contrib.postgres.signals import (
 )
 from django.db import NotSupportedError, router
 from django.db.migrations import AddConstraint, AddIndex, RemoveIndex
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, SeverityType
 from django.db.models.constraints import CheckConstraint
 
 
@@ -60,7 +60,7 @@ class CreateExtension(Operation):
             return bool(cursor.fetchone())
 
     def describe(self):
-        return "Creates extension %s" % self.name
+        return "Creates extension %s" % self.name, SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -122,10 +122,14 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     atomic = False
 
     def describe(self):
-        return "Concurrently create index %s on field(s) %s of model %s" % (
-            self.index.name,
-            ", ".join(self.index.fields),
-            self.model_name,
+        return (
+            "Concurrently create index %s on field(s) %s of model %s"
+            % (
+                self.index.name,
+                ", ".join(self.index.fields),
+                self.model_name,
+            ),
+            SeverityType.SAFE,
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -147,7 +151,10 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     atomic = False
 
     def describe(self):
-        return "Concurrently remove index %s from %s" % (self.name, self.model_name)
+        return (
+            "Concurrently remove index %s from %s" % (self.name, self.model_name),
+            SeverityType.SAFE,
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
@@ -226,7 +233,7 @@ class CreateCollation(CollationOperation):
         self.remove_collation(schema_editor)
 
     def describe(self):
-        return f"Create collation {self.name}"
+        return f"Create collation {self.name}", SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -249,7 +256,7 @@ class RemoveCollation(CollationOperation):
         self.create_collation(schema_editor)
 
     def describe(self):
-        return f"Remove collation {self.name}"
+        return f"Remove collation {self.name}", SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -270,9 +277,13 @@ class AddConstraintNotValid(AddConstraint):
         super().__init__(model_name, constraint)
 
     def describe(self):
-        return "Create not valid constraint %s on model %s" % (
-            self.constraint.name,
-            self.model_name,
+        return (
+            "Create not valid constraint %s on model %s"
+            % (
+                self.constraint.name,
+                self.model_name,
+            ),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -298,7 +309,10 @@ class ValidateConstraint(Operation):
         self.name = name
 
     def describe(self):
-        return "Validate constraint %s on model %s" % (self.name, self.model_name)
+        return (
+            "Validate constraint %s on model %s" % (self.name, self.model_name),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
+        )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)

@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, SeverityType
 from django.db.migrations.state import ModelState
 from django.db.migrations.utils import field_references, resolve_relation
 from django.db.models.options import normalize_together
@@ -101,9 +101,13 @@ class CreateModel(ModelOperation):
             schema_editor.delete_model(model)
 
     def describe(self):
-        return "Create %smodel %s" % (
-            "proxy " if self.options.get("proxy", False) else "",
-            self.name,
+        return (
+            "Create %smodel %s"
+            % (
+                "proxy " if self.options.get("proxy", False) else "",
+                self.name,
+            ),
+            SeverityType.SAFE,
         )
 
     @property
@@ -399,7 +403,7 @@ class DeleteModel(ModelOperation):
         return True
 
     def describe(self):
-        return "Delete model %s" % self.name
+        return "Delete model %s" % self.name, SeverityType.DESTRUCTIVE
 
     @property
     def migration_name_fragment(self):
@@ -501,7 +505,10 @@ class RenameModel(ModelOperation):
         )
 
     def describe(self):
-        return "Rename model %s to %s" % (self.old_name, self.new_name)
+        return (
+            "Rename model %s to %s" % (self.old_name, self.new_name),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
+        )
 
     @property
     def migration_name_fragment(self):
@@ -576,9 +583,13 @@ class AlterModelTable(ModelOptionOperation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Rename table for %s to %s" % (
-            self.name,
-            self.table if self.table is not None else "(default)",
+        return (
+            "Rename table for %s to %s"
+            % (
+                self.name,
+                self.table if self.table is not None else "(default)",
+            ),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
         )
 
     @property
@@ -617,7 +628,7 @@ class AlterModelTableComment(ModelOptionOperation):
         return self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return f"Alter {self.name} table comment"
+        return f"Alter {self.name} table comment", SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -672,10 +683,14 @@ class AlterTogetherOptionOperation(ModelOptionOperation):
         )
 
     def describe(self):
-        return "Alter %s for %s (%s constraint(s))" % (
-            self.option_name,
-            self.name,
-            len(self.option_value or ""),
+        return (
+            "Alter %s for %s (%s constraint(s))"
+            % (
+                self.option_name,
+                self.name,
+                len(self.option_value or ""),
+            ),
+            SeverityType.SAFE,
         )
 
     @property
@@ -771,9 +786,13 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
         )
 
     def describe(self):
-        return "Set order_with_respect_to on %s to %s" % (
-            self.name,
-            self.order_with_respect_to,
+        return (
+            "Set order_with_respect_to on %s to %s"
+            % (
+                self.name,
+                self.order_with_respect_to,
+            ),
+            SeverityType.SAFE,
         )
 
     @property
@@ -829,7 +848,7 @@ class AlterModelOptions(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change Meta options on %s" % self.name
+        return "Change Meta options on %s" % self.name, SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -858,7 +877,7 @@ class AlterModelManagers(ModelOptionOperation):
         pass
 
     def describe(self):
-        return "Change managers on %s" % self.name
+        return "Change managers on %s" % self.name, SeverityType.POSSIBLY_DESTRUCTIVE
 
     @property
     def migration_name_fragment(self):
@@ -911,15 +930,25 @@ class AddIndex(IndexOperation):
 
     def describe(self):
         if self.index.expressions:
-            return "Create index %s on %s on model %s" % (
-                self.index.name,
-                ", ".join([str(expression) for expression in self.index.expressions]),
-                self.model_name,
+            return (
+                "Create index %s on %s on model %s"
+                % (
+                    self.index.name,
+                    ", ".join(
+                        [str(expression) for expression in self.index.expressions]
+                    ),
+                    self.model_name,
+                ),
+                SeverityType.SAFE,
             )
-        return "Create index %s on field(s) %s of model %s" % (
-            self.index.name,
-            ", ".join(self.index.fields),
-            self.model_name,
+        return (
+            "Create index %s on field(s) %s of model %s"
+            % (
+                self.index.name,
+                ", ".join(self.index.fields),
+                self.model_name,
+            ),
+            SeverityType.SAFE,
         )
 
     @property
@@ -971,7 +1000,10 @@ class RemoveIndex(IndexOperation):
         )
 
     def describe(self):
-        return "Remove index %s from %s" % (self.name, self.model_name)
+        return (
+            "Remove index %s from %s" % (self.name, self.model_name),
+            SeverityType.SAFE,
+        )
 
     @property
     def migration_name_fragment(self):
@@ -1093,11 +1125,11 @@ class RenameIndex(IndexOperation):
         if self.old_name:
             return (
                 f"Rename index {self.old_name} on {self.model_name} to {self.new_name}"
-            )
+            ), SeverityType.SAFE
         return (
             f"Rename unnamed index for {self.old_fields} on {self.model_name} to "
             f"{self.new_name}"
-        )
+        ), SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -1158,9 +1190,13 @@ class AddConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Create constraint %s on model %s" % (
-            self.constraint.name,
-            self.model_name,
+        return (
+            "Create constraint %s on model %s"
+            % (
+                self.constraint.name,
+                self.model_name,
+            ),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
         )
 
     @property
@@ -1212,7 +1248,10 @@ class RemoveConstraint(IndexOperation):
         )
 
     def describe(self):
-        return "Remove constraint %s from model %s" % (self.name, self.model_name)
+        return (
+            "Remove constraint %s from model %s" % (self.name, self.model_name),
+            SeverityType.SAFE,
+        )
 
     @property
     def migration_name_fragment(self):

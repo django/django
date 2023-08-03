@@ -2,7 +2,7 @@ from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
-from .base import Operation
+from .base import Operation, SeverityType
 
 
 class FieldOperation(Operation):
@@ -120,7 +120,7 @@ class AddField(FieldOperation):
             )
 
     def describe(self):
-        return "Add field %s to %s" % (self.name, self.model_name)
+        return "Add field %s to %s" % (self.name, self.model_name), SeverityType.SAFE
 
     @property
     def migration_name_fragment(self):
@@ -240,7 +240,10 @@ class AlterField(FieldOperation):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return "Alter field %s on %s" % (self.name, self.model_name)
+        return (
+            "Alter field %s on %s" % (self.name, self.model_name),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
+        )
 
     @property
     def migration_name_fragment(self):
@@ -317,10 +320,14 @@ class RenameField(FieldOperation):
             )
 
     def describe(self):
-        return "Rename field %s on %s to %s" % (
-            self.old_name,
-            self.model_name,
-            self.new_name,
+        return (
+            "Rename field %s on %s to %s"
+            % (
+                self.old_name,
+                self.model_name,
+                self.new_name,
+            ),
+            SeverityType.POSSIBLY_DESTRUCTIVE,
         )
 
     @property
