@@ -665,6 +665,7 @@ input[type="submit"], button {
         width: 100%;
         display: flex;
         align-items: flex-start;
+        flex-wrap: wrap;
     }
 
     .related-widget-wrapper .selector {
