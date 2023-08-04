@@ -566,6 +566,8 @@ Miscellaneous
 * The ``AlreadyRegistered`` and ``NotRegistered`` exceptions are moved from
   ``django.contrib.admin.sites`` to ``django.contrib.admin.exceptions``.
 
+* The minimum supported version of SQLite is increased from 3.21.0 to 3.27.0.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0

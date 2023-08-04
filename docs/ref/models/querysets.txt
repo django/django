@@ -2411,7 +2411,7 @@ On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
 that fail constraints such as duplicate unique values.
 
-On databases that support it (all except Oracle and SQLite < 3.24), setting the
+On databases that support it (all except Oracle), setting the
 ``update_conflicts`` parameter to ``True``, tells the database to update
 ``update_fields`` when a row insertion fails on conflicts. On PostgreSQL and
 SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may

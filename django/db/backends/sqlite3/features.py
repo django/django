@@ -9,7 +9,7 @@ from .base import Database
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (3, 21)
+    minimum_database_version = (3, 27)
     test_db_allows_multiple_connections = False
     supports_unspecified_pk = True
     supports_timezones = False
@@ -26,13 +26,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     time_cast_precision = 3
     can_release_savepoints = True
     has_case_insensitive_like = True
-    # Is "ALTER TABLE ... RENAME COLUMN" supported?
-    can_alter_table_rename_column = Database.sqlite_version_info >= (3, 25, 0)
     # Is "ALTER TABLE ... DROP COLUMN" supported?
     can_alter_table_drop_column = Database.sqlite_version_info >= (3, 35, 5)
     supports_parentheses_in_compound = False
     can_defer_constraint_checks = True
-    supports_over_clause = Database.sqlite_version_info >= (3, 25, 0)
+    supports_over_clause = True
     supports_frame_range_fixed_distance = Database.sqlite_version_info >= (3, 28, 0)
     supports_aggregate_filter_clause = Database.sqlite_version_info >= (3, 30, 1)
     supports_order_by_nulls_modifier = Database.sqlite_version_info >= (3, 30, 0)
@@ -40,8 +38,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     requires_compound_order_by_subquery = Database.sqlite_version_info < (3, 30)
     order_by_nulls_first = True
     supports_json_field_contains = False
-    supports_update_conflicts = Database.sqlite_version_info >= (3, 24, 0)
-    supports_update_conflicts_with_target = supports_update_conflicts
+    supports_update_conflicts = True
+    supports_update_conflicts_with_target = True
     test_collations = {
         "ci": "nocase",
         "cs": "binary",
@@ -88,15 +86,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "test_integer_with_negative_precision",
             },
         }
-        if Database.sqlite_version_info < (3, 27):
-            skips.update(
-                {
-                    "Nondeterministic failure on SQLite < 3.27.": {
-                        "expressions_window.tests.WindowFunctionTests."
-                        "test_subquery_row_range_rank",
-                    },
-                }
-            )
         if self.connection.is_in_memory_db():
             skips.update(
                 {
@@ -130,10 +119,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 }
             )
         return skips
-
-    @cached_property
-    def supports_atomic_references_rename(self):
-        return Database.sqlite_version_info >= (3, 26, 0)
 
     @cached_property
     def introspected_field_types(self):
