@@ -1,3 +1,5 @@
+import asyncio
+import fnmatch
 import itertools
 import logging
 import os
@@ -12,6 +14,7 @@ from collections import defaultdict
 from functools import lru_cache, wraps
 from pathlib import Path
 from types import ModuleType
+from typing import Generator
 from zipimport import zipimporter
 
 import django
@@ -39,11 +42,15 @@ try:
 except ImportError:
     termios = None
 
-
 try:
     import pywatchman
 except ImportError:
     pywatchman = None
+
+try:
+    import watchfiles
+except ImportError:
+    watchfiles = None
 
 
 def is_django_module(module):
@@ -492,23 +499,6 @@ class WatchmanReloader(BaseReloader):
         )
         self.client.query("subscribe", root, name, query)
 
-    def _subscribe_dir(self, directory, filenames):
-        if not directory.exists():
-            if not directory.parent.exists():
-                logger.warning(
-                    "Unable to watch directory %s as neither it or its parent exist.",
-                    directory,
-                )
-                return
-            prefix = "files-parent-%s" % directory.name
-            filenames = ["%s/%s" % (directory.name, filename) for filename in filenames]
-            directory = directory.parent
-            expression = ["name", filenames, "wholename"]
-        else:
-            prefix = "files"
-            expression = ["name", filenames]
-        self._subscribe(directory, "%s:%s" % (prefix, directory), expression)
-
     def _watch_glob(self, directory, patterns):
         """
         Watch a directory with a specific glob. If the directory doesn't yet
@@ -574,7 +564,7 @@ class WatchmanReloader(BaseReloader):
         logger.debug("Watchman subscription %s has results.", sub)
         for result in subscription:
             # When using watch-project, it's not simple to get the relative
-            # directory without storing some specific state. Store the full
+            # directory without storing some specific state. Store the ful
             # path to the directory in the subscription name, prefixed by its
             # type (glob, files).
             root_directory = Path(result["subscription"].split(":", 1)[1])
@@ -626,7 +616,7 @@ class WatchmanReloader(BaseReloader):
         client = pywatchman.client(timeout=0.1)
         try:
             result = client.capabilityCheck()
-        except Exception:
+        except Exception as e:
             # The service is down?
             raise WatchmanUnavailable("Cannot connect to the watchman service.")
         version = get_version_tuple(result["version"])
@@ -637,8 +627,96 @@ class WatchmanReloader(BaseReloader):
             raise WatchmanUnavailable("Watchman 4.9 or later is required.")
 
 
+class MutableWatcher:
+    """
+    Watchfiles doesn't give us a way to adjust watches at runtime, but it does give us a way to stop the watcher
+    when a condition is set.
+
+    This class wraps this to provide a single iterator that may replace the underlying watchfiles iterator when
+    roots are added or removed.
+    """
+
+    def __init__(self, filter):
+        self.change_event = threading.Event()
+        self.stop_event = threading.Event()
+        self.roots = set()
+        self.filter = filter
+
+    def set_roots(self, roots):
+        if set(roots) != self.roots:
+            self.roots = roots
+            self.change_event.set()
+
+    def stop(self):
+        self.stop_event.set()
+
+    def __iter__(self):
+        while True:
+            self.change_event.clear()
+            for changes in watchfiles.watch(*self.roots, watch_filter=self.filter,
+                                            stop_event=self.stop_event, debounce=0,
+                                            rust_timeout=100, yield_on_timeout=True):
+                if self.change_event.is_set():
+                    break
+                yield changes
+
+
+class WatchfilesReloader(BaseReloader):
+    def __init__(self):
+        self.watcher = MutableWatcher(self.file_filter)
+        self.processed_request = threading.Event()
+        super().__init__()
+
+    def file_filter(self, change: watchfiles.Change, path: str) -> bool:
+        path = Path(path)
+        # print(f"Path: {path} / {change}")
+        if path in set(self.watched_files(include_globs=False)):
+            # print("Path in watched files")
+            return True
+        for directory, globs in self.directory_globs.items():
+            if path.is_relative_to(directory):
+                # print("Path is sub dir")
+                for glob in globs:
+                    if fnmatch.fnmatch(path.relative_to(directory), glob):
+                        # print("Path is glob match")
+                        return True
+        # print("file filter", change, path)
+        return False
+
+    def watched_roots(self, watched_files: list[Path]) -> frozenset[Path]:
+        extra_directories = self.directory_globs.keys()
+        watched_file_dirs = {f.parent for f in watched_files}
+        sys_paths = set(sys_path_directories())
+        return frozenset((*extra_directories, *watched_file_dirs, *sys_paths))
+
+    def request_processed(self, **kwargs):
+        logger.debug("Request processed. Setting update_watches event.")
+        self.processed_request.set()
+
+    def update_watches(self):
+        watched_files = list(self.watched_files(include_globs=False))
+        roots = common_roots(self.watched_roots(watched_files))
+        self.watcher.set_roots(roots)
+
+    def tick(self) -> Generator[None, None, None]:
+        request_finished.connect(self.request_processed)
+        self.update_watches()
+
+        for changes in self.watcher:
+            if self.processed_request.is_set():
+                self.update_watches()
+                self.processed_request.clear()
+
+            for _, path in changes:
+                print(_, path)
+                self.notify_file_changed(Path(path))
+            yield
+
+
 def get_reloader():
     """Return the most suitable reloader for this environment."""
+    if watchfiles is not None:
+        return WatchfilesReloader()
     try:
         WatchmanReloader.check_availability()
     except WatchmanUnavailable:
