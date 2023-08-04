@@ -1,7 +1,7 @@
 import itertools
 import math
 
-from django.core.exceptions import EmptyResultSet
+from django.core.exceptions import EmptyResultSet, FullResultSet
 from django.db.models.expressions import Case, Expression, Func, Value, When
 from django.db.models.fields import (
     BooleanField,
