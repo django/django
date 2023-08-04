@@ -705,9 +705,6 @@ class AsyncRequestFactory(RequestFactory):
                 ]
             )
             s["_body_file"] = FakePayload(data)
-        follow = extra.pop("follow", None)
-        if follow is not None:
-            s["follow"] = follow
         if query_string := extra.pop("QUERY_STRING", None):
             s["query_string"] = query_string
         if headers:
@@ -1296,10 +1293,6 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         query environment, which can be overridden using the arguments to the
         request.
         """
-        if "follow" in request:
-            raise NotImplementedError(
-                "AsyncClient request methods do not accept the follow parameter."
-            )
         scope = self._base_scope(**request)
         # Curry a data dictionary into an instance of the template renderer
         # callback function.
@@ -1337,4 +1330,235 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
         # Update persistent cookie data.
         if response.cookies:
             self.cookies.update(response.cookies)
+        return response
+
+    async def get(
+        self,
+        path,
+        data=None,
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Request a response from the server using GET."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().get(
+            path, data=data, secure=secure, headers=headers, **extra
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, headers=headers, **extra
+            )
+        return response
+
+    async def post(
+        self,
+        path,
+        data=None,
+        content_type=MULTIPART_CONTENT,
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Request a response from the server using POST."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().post(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, content_type=content_type, headers=headers, **extra
+            )
+        return response
+
+    async def head(
+        self,
+        path,
+        data=None,
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Request a response from the server using HEAD."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().head(
+            path, data=data, secure=secure, headers=headers, **extra
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, headers=headers, **extra
+            )
+        return response
+
+    async def options(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Request a response from the server using OPTIONS."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().options(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, content_type=content_type, headers=headers, **extra
+            )
+        return response
+
+    async def put(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Send a resource to the server using PUT."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().put(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, content_type=content_type, headers=headers, **extra
+            )
+        return response
+
+    async def patch(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Send a resource to the server using PATCH."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().patch(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, content_type=content_type, headers=headers, **extra
+            )
+        return response
+
+    async def delete(
+        self,
+        path,
+        data="",
+        content_type="application/octet-stream",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Send a DELETE request to the server."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().delete(
+            path,
+            data=data,
+            content_type=content_type,
+            secure=secure,
+            headers=headers,
+            **extra,
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, content_type=content_type, headers=headers, **extra
+            )
+        return response
+
+    async def trace(
+        self,
+        path,
+        data="",
+        follow=False,
+        secure=False,
+        *,
+        headers=None,
+        **extra,
+    ):
+        """Send a TRACE request to the server."""
+        self.extra = extra
+        self.headers = headers
+        response = await super().trace(
+            path, data=data, secure=secure, headers=headers, **extra
+        )
+        if follow:
+            response = await self._ahandle_redirects(
+                response, data=data, headers=headers, **extra
+            )
+        return response
+
+    async def _ahandle_redirects(
+        self,
+        response,
+        data="",
+        content_type="",
+        headers=None,
+        **extra,
+    ):
+        """
+        Follow any redirects by requesting responses from the server using GET.
+        """
+        response.redirect_chain = []
+        while response.status_code in REDIRECT_STATUS_CODES:
+            redirect_chain = response.redirect_chain
+            response = await self._follow_redirect(
+                response,
+                data=data,
+                content_type=content_type,
+                headers=headers,
+                **extra,
+            )
+            response.redirect_chain = redirect_chain
+            self._ensure_redirects_not_cyclic(response)
         return response
