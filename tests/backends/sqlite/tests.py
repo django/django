@@ -7,17 +7,12 @@ from pathlib import Path
 from unittest import mock
 
 from django.db import NotSupportedError, connection, transaction
-from django.db.models import Aggregate, Avg, CharField, StdDev, Sum, Variance
+from django.db.models import Aggregate, Avg, StdDev, Sum, Variance
 from django.db.utils import ConnectionHandler
-from django.test import (
-    TestCase,
-    TransactionTestCase,
-    override_settings,
-    skipIfDBFeature,
-)
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.test.utils import isolate_apps
 
-from ..models import Author, Item, Object, Square
+from ..models import Item, Object, Square
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "SQLite tests")
@@ -106,9 +101,9 @@ class Tests(TestCase):
             connections["default"].close()
             self.assertTrue(os.path.isfile(os.path.join(tmp, "test.db")))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(3, 20))
+    @mock.patch.object(connection, "get_database_version", return_value=(3, 26))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "SQLite 3.21 or later is required (found 3.20)."
+        msg = "SQLite 3.27 or later is required (found 3.26)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)
@@ -166,39 +161,6 @@ class SchemaTests(TransactionTestCase):
                 self.assertFalse(constraint_checks_enabled())
             self.assertFalse(constraint_checks_enabled())
         self.assertTrue(constraint_checks_enabled())
-
-    @skipIfDBFeature("supports_atomic_references_rename")
-    def test_field_rename_inside_atomic_block(self):
-        """
-        NotImplementedError is raised when a model field rename is attempted
-        inside an atomic block.
-        """
-        new_field = CharField(max_length=255, unique=True)
-        new_field.set_attributes_from_name("renamed")
-        msg = (
-            "Renaming the 'backends_author'.'name' column while in a "
-            "transaction is not supported on SQLite < 3.26 because it would "
-            "break referential integrity. Try adding `atomic = False` to the "
-            "Migration class."
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with connection.schema_editor(atomic=True) as editor:
-                editor.alter_field(Author, Author._meta.get_field("name"), new_field)
-
-    @skipIfDBFeature("supports_atomic_references_rename")
-    def test_table_rename_inside_atomic_block(self):
-        """
-        NotImplementedError is raised when a table rename is attempted inside
-        an atomic block.
-        """
-        msg = (
-            "Renaming the 'backends_author' table while in a transaction is "
-            "not supported on SQLite < 3.26 because it would break referential "
-            "integrity. Try adding `atomic = False` to the Migration class."
-        )
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            with connection.schema_editor(atomic=True) as editor:
-                editor.alter_db_table(Author, "backends_author", "renamed_table")
 
 
 @unittest.skipUnless(connection.vendor == "sqlite", "Test only for SQLite")
