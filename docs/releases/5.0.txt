@@ -433,6 +433,8 @@ Tests
   :meth:`~django.test.Client.aforce_login`, and
   :meth:`~django.test.Client.alogout`.
 
+* :class:`~django.test.AsyncClient` now supports the ``follow`` parameter.
+
 URLs
 ~~~~
 

@@ -2032,7 +2032,6 @@ test client, with the following exceptions:
 
 * In the initialization, arbitrary keyword arguments in ``defaults`` are added
   directly into the ASGI scope.
-* The ``follow`` parameter is not supported.
 * Headers passed as ``extra`` keyword arguments should not have the ``HTTP_``
   prefix required by the synchronous client (see :meth:`Client.get`). For
   example, here is how to set an HTTP ``Accept`` header:
@@ -2045,6 +2044,10 @@ test client, with the following exceptions:
 .. versionchanged:: 4.2
 
     The ``headers`` parameter was added.
+
+.. versionchanged:: 5.0
+
+    Support for the ``follow`` parameter was added to the ``AsyncClient``.
 
 Using ``AsyncClient`` any method that makes a request must be awaited::
 
