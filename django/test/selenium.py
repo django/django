@@ -1,3 +1,4 @@
+import subprocess
 import sys
 import unittest
 from contextlib import contextmanager
@@ -102,6 +103,10 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
+    counter = {}
+
+    # We have to fix the port number due to the structure of baseline folder
+    port = 12345
 
     @classproperty
     def live_server_url(cls):
@@ -134,3 +139,17 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             yield
         finally:
             self.selenium.implicitly_wait(self.implicit_wait)
+
+    def is_page_accessible(self):
+        # id is used as an identifier here to accessibility test different states of
+        # the same URL, or we can restrict having only one is_page_accessible call on
+        # each unique URL
+        id = self.counter.get(self.selenium.current_url, 0)
+        self.counter[self.selenium.current_url] = id + 1
+
+        command = ["npx", "achecker", self.selenium.current_url + "#" + str(id)]
+        output = subprocess.run(command, capture_output=True, text=True)
+
+        # achecker, IBM's equal access compares the current run with baseline tests and
+        # returns accordingly
+        self.assertEqual(output.returncode, 0, output.stdout)
