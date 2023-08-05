@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.utils import quote
-from django.contrib.auth.models import User, Permission
+from django.contrib.auth.models import Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -273,7 +273,9 @@ class LogEntryTests(TestCase):
 
         # Add permission to view articles. Log is a link.
         logentry = LogEntry.objects.get(content_type__model__iexact="article")
-        view_permission_name = f"{logentry.content_type.app_label}.view_{logentry.content_type.model}"
+        view_permission_name = (
+            f"{logentry.content_type.app_label}.view_{logentry.content_type.model}"
+        )
         view_article_permission = Permission.objects.create(
             name=f"Can view {logentry.content_type.model}",
             content_type=logentry.content_type,
