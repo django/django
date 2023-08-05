@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.admin.utils import quote
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -264,6 +264,32 @@ class LogEntryTests(TestCase):
         response = self.client.get(reverse("admin:index"))
         counted_presence_after = response.content.count(should_contain)
         self.assertEqual(counted_presence_before - 1, counted_presence_after)
+
+    def test_recent_actions_user_lacks_view_permission(self):
+        # No permission to view articles. Log is a span with no link.
+        response = self.client.get(reverse("admin:index"))
+        should_contain = """<span class="mini quiet">Article</span>"""
+        self.assertContains(response, should_contain)
+
+        # Add permission to view articles. Log is a link.
+        logentry = LogEntry.objects.get(content_type__model__iexact="article")
+        view_permission_name = f"{logentry.content_type.app_label}.view_{logentry.content_type.model}"
+        view_article_permission = Permission.objects.create(
+            name=f"Can view {logentry.content_type.model}",
+            content_type=logentry.content_type,
+            codename=view_permission_name,
+        )
+        self.user.user_permissions.add(view_article_permission)
+
+        response = self.client.get(reverse("admin:index"))
+        expected_log_entry_link = reverse(
+            "admin:admin_utils_article_change", args=(quote(self.a1.pk),)
+        )
+        should_contain = """<a href="%s">%s</a>""" % (
+            escape(expected_log_entry_link),
+            escape(repr(self.a1)),
+        )
+        self.assertContains(response, should_contain)
 
     def test_proxy_model_content_type_is_used_for_log_entries(self):
         """

@@ -19,7 +19,22 @@ class AdminLogNode(template.Node):
             if not user_id.isdigit():
                 user_id = context[self.user].pk
             entries = entries.filter(user__pk=user_id)
-        context[self.varname] = entries[: int(self.limit)]
+        filtered_context = entries.select_related("content_type", "user")[
+                           : int(self.limit)
+                           ]
+        for entry in filtered_context:
+            content_type = entry.content_type
+            if not content_type:
+                entry.url = entry.get_admin_url()
+                continue
+            user = entry.user
+            view_permission_name = f"{content_type.app_label}.view_{content_type.model}"
+            user_has_permission = user.has_perm(view_permission_name)
+            if user_has_permission:
+                entry.url = entry.get_admin_url()
+            else:
+                entry.url = None
+        context[self.varname] = filtered_context
         return ""
 
 
