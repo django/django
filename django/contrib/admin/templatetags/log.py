@@ -20,8 +20,8 @@ class AdminLogNode(template.Node):
                 user_id = context[self.user].pk
             entries = entries.filter(user__pk=user_id)
         filtered_context = entries.select_related("content_type", "user")[
-                           : int(self.limit)
-                           ]
+            : int(self.limit)
+        ]
         for entry in filtered_context:
             content_type = entry.content_type
             if not content_type:
