@@ -703,6 +703,17 @@ class SymlinkExtractorTests(ExtractorTests):
         )
 
 
+class MultilineTranslationTests(ExtractorTests):
+    LOCALE = "de"
+
+    @requires_gettext_019
+    def test_windows_new_lines_in_po_file(self):
+        management.call_command(
+            "makemessages", locale=[LOCALE], verbosity=0, keep_pot=True
+        )
+        self.assertTrue(os.path.exists(self.PO_FILE))
+
+
 class CopyPluralFormsExtractorTests(ExtractorTests):
     PO_FILE_ES = "locale/es/LC_MESSAGES/django.po"
 
