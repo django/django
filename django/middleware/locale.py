@@ -31,7 +31,11 @@ class LocaleMiddleware(MiddlewareMixin):
             if not language_from_path:
                 language = settings.LANGUAGE_CODE
         else:
-            if not language_from_path and i18n_patterns_used and not prefixed_default_language:
+            if (
+            not language_from_path
+            and i18n_patterns_used
+            and not prefixed_default_language
+                ):
                 language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
