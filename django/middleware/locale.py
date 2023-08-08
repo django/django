@@ -26,12 +26,13 @@ class LocaleMiddleware(MiddlewareMixin):
             request, check_path=i18n_patterns_used
         )
         language_from_path = translation.get_language_from_path(request.path_info)
-        if (
-            not language_from_path
-            and i18n_patterns_used
-            and not prefixed_default_language
-        ):
-            language = settings.LANGUAGE_CODE
+        # In order to skip the preferred browser language, you can add Force_language = True to your settings.
+        if settings.FORCE_LANGUAGES:
+            if not language_from_path:
+                language = settings.LANGUAGE_CODE
+        else:
+            if not language_from_path and i18n_patterns_used and not prefixed_default_language:
+                language = settings.LANGUAGE_CODE
         translation.activate(language)
         request.LANGUAGE_CODE = translation.get_language()
 
