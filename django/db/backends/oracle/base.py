@@ -343,10 +343,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def cx_oracle_version(self):
-        return tuple(int(x) for x in Database.version.split("."))
-
-    @cached_property
     def oracle_version(self):
         with self.temporary_connection():
             return tuple(int(x) for x in self.connection.version.split("."))

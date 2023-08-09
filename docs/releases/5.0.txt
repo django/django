@@ -571,6 +571,8 @@ Miscellaneous
 
 * The minimum supported version of SQLite is increased from 3.21.0 to 3.27.0.
 
+* Support for ``cx_Oracle`` < 8.3 is removed.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
