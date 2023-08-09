@@ -919,7 +919,7 @@ To enable the JSON1 extension you can follow the instruction on
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 19c and higher. Version 7.0
+Django supports `Oracle Database Server`_ versions 19c and higher. Version 8.3
 or higher of the `cx_Oracle`_ Python driver is required.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
