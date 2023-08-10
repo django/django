@@ -76,7 +76,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     allows_multiple_constraints_on_same_fields = False
     supports_boolean_expr_in_select_clause = False
     supports_comparing_boolean_expr = False
-    supports_primitives_in_json_field = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
     test_collations = {
@@ -157,3 +156,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     return False
                 raise
             return True
+
+    @cached_property
+    def supports_primitives_in_json_field(self):
+        return self.connection.oracle_version >= (21,)
