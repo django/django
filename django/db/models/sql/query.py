@@ -1670,7 +1670,7 @@ class Query(BaseExpression):
         path, names_with_path = [], []
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
-            if name == "pk":
+            if name == "pk" and opts is not None:
                 name = opts.pk.name
 
             field = None
