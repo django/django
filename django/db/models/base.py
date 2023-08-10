@@ -1235,11 +1235,14 @@ class Model(AltersData, metaclass=ModelBase):
         if exclude is None:
             exclude = set()
         meta = meta or self._meta
-        return {
+        field_map = {
             field.name: Value(getattr(self, field.attname), field)
             for field in meta.local_concrete_fields
             if field.name not in exclude
         }
+        if "pk" not in exclude:
+            field_map["pk"] = Value(self.pk, meta.pk)
+        return field_map
 
     def prepare_database_save(self, field):
         if self.pk is None:
