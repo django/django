@@ -270,13 +270,15 @@ class RelatedFieldWidgetWrapper(forms.Widget):
         if can_add_related is None:
             can_add_related = admin_site.is_registered(rel.model)
         self.can_add_related = can_add_related
-        # XXX: The UX does not support multiple selected values.
-        multiple = getattr(widget, "allow_multiple_selected", False)
-        self.can_change_related = not multiple and can_change_related
+        # Widgets that display multiple values are not supported.
+        supported = not getattr(
+            widget, "allow_multiple_selected", False
+        ) and not isinstance(widget, AdminRadioSelect)
+        self.can_change_related = supported and can_change_related
         # XXX: The deletion UX can be confusing when dealing with cascading deletion.
         cascade = getattr(rel, "on_delete", None) is CASCADE
-        self.can_delete_related = not multiple and not cascade and can_delete_related
-        self.can_view_related = not multiple and can_view_related
+        self.can_delete_related = supported and not cascade and can_delete_related
+        self.can_view_related = supported and can_view_related
         # so we can check if the related object is registered with this AdminSite
         self.admin_site = admin_site
 
