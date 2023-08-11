@@ -35,9 +35,9 @@ What does "Django" mean, and how do you pronounce it?
 Django is named after `Django Reinhardt`_, a jazz manouche guitarist from the 1930s
 to early 1950s. To this day, he's considered one of the best guitarists of all time.
 
-Listen to his music. You'll like it.
+You should listen to his music, you'll like it.
 
-Django is pronounced **JANG**-oh. Rhymes with FANG-oh. The "D" is silent.
+Django is pronounced **JANG**-oh which rhymes with FANG-oh. The "D" is silent.
 
 We've also recorded an `audio clip of the pronunciation`_.
 
