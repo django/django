@@ -918,9 +918,10 @@ class DiscoverRunner:
         suite = self.test_suite(all_tests)
 
         if self.parallel > 1:
-            subsuites = partition_suite_by_case(suite)
+            subsuites = partition_suite_by_test_class(suite)
             # Since tests are distributed across processes on a per-TestCase
-            # basis, there's no need for more processes than TestCases.
+            # *class* basis, there's no need for more processes than TestCase
+            # *classes*.
             processes = min(self.parallel, len(subsuites))
             # Update also "parallel" because it's used to determine the number
             # of test databases.
@@ -1179,7 +1180,7 @@ def reorder_tests(tests, classes, reverse=False, shuffler=None):
         yield from reorder_test_bin(tests, shuffler=shuffler, reverse=reverse)
 
 
-def partition_suite_by_case(suite):
+def partition_suite_by_test_class(suite):
     """Partition a test suite by test case, preserving the order of tests."""
     suite_class = type(suite)
     all_tests = iter_test_cases(suite)
