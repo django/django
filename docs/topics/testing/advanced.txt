@@ -569,10 +569,10 @@ and tear down the test suite.
     set to prior to running tests.
 
     ``parallel`` specifies the number of processes.  If ``parallel`` is greater
-    than ``1``, the test suite will run in ``parallel`` processes. If there are
-    fewer test cases than configured processes, Django will reduce the number
-    of processes accordingly. Each process gets its own database. This option
-    requires the third-party ``tblib`` package to display tracebacks correctly.
+    than ``1``, the test suite will run in ``parallel`` processes. If there are 
+    fewer test case classes than configured processes. Each process gets its own
+    database. This option requires the third-party ``tblib`` package to display
+    tracebacks correctly.
 
     ``tags`` can be used to specify a set of :ref:`tags for filtering tests
     <topics-tagging-tests>`. May be combined with ``exclude_tags``.

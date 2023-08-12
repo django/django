@@ -1484,8 +1484,7 @@ override this by passing the desired number of processes, e.g.
 variable.
 
 Django distributes test cases — :class:`unittest.TestCase` subclasses — to
-subprocesses. If there are fewer test cases than configured processes, Django
-will reduce the number of processes accordingly.
+subprocesses. If there are fewer test case classes than configured processes.
 
 Each process gets its own database. You must ensure that different test cases
 don't access the same resources. For instance, test cases that touch the
