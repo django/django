@@ -1,49 +1,50 @@
+from importlib import import_module
 from pathlib import Path
 
 from django.core.management import call_command
 from django.db import IntegrityError
-from django.test import TestCase, skipUnlessDBFeature
+from django.test import TransactionTestCase, override_settings, skipUnlessDBFeature
 
-from .models import ModelA, ModelC
+apps = [
+    "contribute_to_meta.apps.modelsimple",
+    "contribute_to_meta.apps.modelwithmeta",
+]
 
 
+@override_settings(INSTALLED_APPS=apps)
 @skipUnlessDBFeature("supports_table_check_constraints")
-class ConstraintsTests(TestCase):
+class ConstraintsTests(TransactionTestCase):
     """Check that the constraints allow valid values and reject invalid ones"""
 
-    def test_ModelA_constraint(self):
-        ModelA.objects.create(field="valid")
+    available_apps = apps
+
+    def _do_test(self, app_qualified_name):
+        app_name = app_qualified_name.split(".")[-1]
+
+        # Reset the migrations
+        folder = Path(__file__).parent / "apps" / app_name / "migrations"
+        migration_path = folder / "0001_initial.py"
+        migration_path.unlink(missing_ok=True)
+
+        # Run the migrations
+        call_command("makemigrations", app_name, "--verbosity", "0")
+        call_command("migrate", app_name, "--verbosity", "0")
+
+        # Check that the constraint behaves as expected
+        Model = import_module(app_qualified_name).models.Model
+        Model.objects.create(field="valid")
         with self.assertRaises(IntegrityError):
-            ModelA.objects.create(field="invalid")
+            Model.objects.create(field="invalid")
 
-    def test_ModelC_constraint(self):
-        ModelC.objects.create(field="valid")
-        with self.assertRaises(IntegrityError):
-            ModelC.objects.create(field="invalid")
-
-
-class ConstraintsMigrationsTests(TestCase):
-    """Check that migrations correctly generate the constraints"""
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        # Clean and recreate migration files for further inspection
-        init_file = Path(__file__).parent / "migrations" / "0001_initial.py"
-        init_file.unlink(missing_ok=True)
-        call_command("makemigrations", verbosity=0)
-        cls.migration_content = init_file.read_text()
-
-    def test_ModelA(self):
-        # check migration contents
+        # Check that the constraint is present in the migration file
+        migration_path = folder / "0001_initial.py"
+        content = migration_path.read_text()
         self.assertTrue(
-            "test_constraint_modela" in self.migration_content,
-            "Could not find constraint `test_constraint_modela` in migration",
+            "models.CheckConstraint" in content, f"No constraint in `{migration_path}`"
         )
 
-    def test_ModelC(self):
-        # check migration contents
-        self.assertTrue(
-            "test_constraint_modelc" in self.migration_content,
-            "Could not find constraint `test_constraint_modelc` in migration",
-        )
+    def test_modelsimple(self):
+        self._do_test("contribute_to_meta.apps.modelsimple")
+
+    def test_modelwithmeta(self):
+        self._do_test("contribute_to_meta.apps.modelwithmeta")
