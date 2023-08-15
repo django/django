@@ -60,7 +60,7 @@ class TopicManager(models.Manager):
 
 class Topic(models.Model):
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(Category, models.CASCADE, null=True)
+    category = models.ForeignKey(Category, models.CASCADE)
     objects = TopicManager()
 
 
