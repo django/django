@@ -720,3 +720,8 @@ to remove usage of these features.
 * Passing ``nulls_first=False`` or ``nulls_last=False`` to ``Expression.asc()``
   and ``Expression.desc()`` methods, and the ``OrderBy`` expression is no
   longer allowed.
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
