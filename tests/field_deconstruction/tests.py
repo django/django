@@ -97,6 +97,21 @@ class FieldDeconstructionTests(SimpleTestCase):
             kwargs, {"choices": [("A", "One"), ("B", "Two")], "max_length": 1}
         )
 
+    def test_choices_iterator(self):
+        field = models.IntegerField(choices=((i, str(i)) for i in range(3)))
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.IntegerField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": [(0, "0"), (1, "1"), (2, "2")]})
+
+    def test_choices_iterable(self):
+        # Pass an iterator (but not an iterable) to choices.
+        field = models.IntegerField(choices="012345")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.IntegerField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": ["0", "1", "2", "3", "4", "5"]})
+
     def test_csi_field(self):
         field = models.CommaSeparatedIntegerField(max_length=100)
         name, path, args, kwargs = field.deconstruct()

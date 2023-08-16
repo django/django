@@ -81,6 +81,7 @@ class Choiceful(models.Model):
     empty_choices_bool = models.BooleanField(choices=())
     empty_choices_text = models.TextField(choices=())
     choices_from_enum = models.IntegerField(choices=Suit)
+    choices_from_iterator = models.IntegerField(choices=((i, str(i)) for i in range(3)))
 
 
 class BigD(models.Model):
