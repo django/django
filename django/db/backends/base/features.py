@@ -118,6 +118,9 @@ class BaseDatabaseFeatures:
     # Can an object have an autoincrement primary key of 0?
     allows_auto_pk_0 = True
 
+    # Does the backend support multiple auto fields per table?
+    supports_multiple_auto_fields = False
+
     # Do we need to NULL a ForeignKey out, or can the constraint check be
     # deferred
     can_defer_constraint_checks = False

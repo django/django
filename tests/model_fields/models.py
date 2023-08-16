@@ -111,6 +111,16 @@ class SmallAutoModel(models.Model):
     value = models.SmallAutoField(primary_key=True)
 
 
+class TwoAutoModel(models.Model):
+    id = models.AutoField(primary_key=True)
+    auto2 = models.AutoField(primary_key=False)
+
+    class Meta:
+        required_db_features = {
+            "supports_multiple_auto_fields",
+        }
+
+
 class SmallIntegerModel(models.Model):
     value = models.SmallIntegerField()
 

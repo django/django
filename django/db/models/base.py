@@ -1052,7 +1052,7 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             fields = meta.local_concrete_fields
             if not pk_set:
-                fields = [f for f in fields if f is not meta.auto_field]
+                fields = [f for f in fields if f not in meta.auto_fields]
 
             returning_fields = meta.db_returning_fields
             results = self._do_insert(

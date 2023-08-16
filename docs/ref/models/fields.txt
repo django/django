@@ -605,6 +605,14 @@ according to available IDs. You usually won't need to use this directly; a
 primary key field will automatically be added to your model if you don't specify
 otherwise. See :ref:`automatic-primary-key-fields`.
 
+By default, ``AutoField`` sets :attr:`~Field.primary_key` to ``True``. Most
+database backends support only one ``AutoField`` per model.
+
+.. versionchanged:: 5.0
+
+    ``AutoField.primary_key`` is no longer forced to ``True``, even if it's
+    still the default value.
+
 ``BigAutoField``
 ----------------
 

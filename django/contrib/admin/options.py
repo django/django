@@ -473,9 +473,9 @@ class BaseModelAdmin(metaclass=forms.MediaDefiningClass):
             if not prev_field or (
                 prev_field.is_relation
                 and field not in model._meta.parents.values()
-                and field is not model._meta.auto_field
+                and field not in model._meta.auto_fields
                 and (
-                    model._meta.auto_field is None
+                    model._meta.auto_fields == []
                     or part not in getattr(prev_field, "to_fields", [])
                 )
             ):

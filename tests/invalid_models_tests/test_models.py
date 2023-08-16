@@ -1931,15 +1931,24 @@ class DbTableCommentTests(TestCase):
 
 class MultipleAutoFieldsTests(TestCase):
     def test_multiple_autofields(self):
-        msg = (
-            "Model invalid_models_tests.MultipleAutoFields can't have more "
-            "than one auto-generated field."
-        )
-        with self.assertRaisesMessage(ValueError, msg):
+        class MultipleAutoFields(models.Model):
+            auto1 = models.AutoField(primary_key=True)
+            auto2 = models.AutoField(primary_key=False)
 
-            class MultipleAutoFields(models.Model):
-                auto1 = models.AutoField(primary_key=True)
-                auto2 = models.AutoField(primary_key=True)
+        errors = [
+            Error(
+                "This database backend does not support multiple AutoFields.",
+                obj=MultipleAutoFields,
+                id="fields.E100",
+            ),
+            Error(
+                "This database backend does not support multiple AutoFields.",
+                obj=MultipleAutoFields,
+                id="fields.E100",
+            ),
+        ]
+        expected = [] if connection.features.supports_multiple_auto_fields else errors
+        self.assertEqual(MultipleAutoFields.check(databases=self.databases), expected)
 
 
 @isolate_apps("invalid_models_tests")
