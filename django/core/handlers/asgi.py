@@ -10,7 +10,7 @@ from asgiref.sync import ThreadSensitiveContext, sync_to_async
 from django.conf import settings
 from django.core import signals
 from django.core.exceptions import RequestAborted, RequestDataTooBig
-from django.core.handlers import base
+from django.core.handlers import base, websocket
 from django.http import (
     FileResponse,
     HttpRequest,
@@ -66,7 +66,7 @@ class ASGIRequest(HttpRequest):
         else:
             self.path = scope["path"]
         # HTTP basics.
-        self.method = self.scope["method"].upper()
+        self.method = self.scope.get("method", "GET").upper()
         # Ensure query string is encoded correctly.
         query_string = self.scope.get("query_string", "")
         if isinstance(query_string, bytes):
@@ -111,6 +111,8 @@ class ASGIRequest(HttpRequest):
         self._stream = body_file
         # Other bits.
         self.resolver_match = None
+        if scope["type"] == "websocket":
+            self.sub_protocols = scope.get("subprotocols") or []
 
     @cached_property
     def GET(self):
@@ -161,7 +163,7 @@ class ASGIHandler(base.BaseHandler):
         """
         # Serve only HTTP connections.
         # FIXME: Allow to override this.
-        if scope["type"] != "http":
+        if scope["type"] not in ["http", "websocket"]:
             raise ValueError(
                 "Django can only handle ASGI/HTTP connections, not %s." % scope["type"]
             )
@@ -173,11 +175,19 @@ class ASGIHandler(base.BaseHandler):
         """
         Handles the ASGI request. Called via the __call__ method.
         """
-        # Receive the HTTP request body as a stream object.
-        try:
-            body_file = await self.read_body(receive)
-        except RequestAborted:
-            return
+        if scope["type"] == "websocket":
+            message = await receive()
+            if message["type"] != "websocket.connect":
+                return
+            body_file = tempfile.SpooledTemporaryFile(
+                max_size=settings.FILE_UPLOAD_MAX_MEMORY_SIZE, mode="w+b"
+            )
+        else:
+            # Receive the HTTP request body as a stream object.
+            try:
+                body_file = await self.read_body(receive)
+            except RequestAborted:
+                return
         # Request is complete and can be served.
         set_script_prefix(get_script_prefix(scope))
         await signals.request_started.asend(sender=self.__class__, scope=scope)
@@ -185,7 +195,10 @@ class ASGIHandler(base.BaseHandler):
         request, error_response = self.create_request(scope, body_file)
         if request is None:
             body_file.close()
-            await self.send_response(error_response, send)
+            if scope["type"] == "websocket":
+                await send({"type": "websocket.close"})
+            else:
+                await self.send_response(error_response, send)
             return
         # Try to catch a disconnect while getting response.
         tasks = [
@@ -209,8 +222,27 @@ class ASGIHandler(base.BaseHandler):
         except AssertionError:
             body_file.close()
             raise
+        if scope["type"] == "websocket":
+            return await self.handle_websocket(request, response, receive, send)
         # Send the response.
         await self.send_response(response, send)
+
+    async def handle_websocket(self, request, response, receive, send):
+        if isinstance(response, websocket.HttpResponseUpgrade):
+            ws = websocket.WebSocket(request, receive, send)
+            await ws.accept(response)
+            async with ws:
+                await response.handler(ws)
+        elif isinstance(response, websocket.HttpResponseWSClose):
+            await send(
+                {
+                    "type": "websocket.close",
+                    "code": response.close_code,
+                    "reason": response.reason_phrase,
+                }
+            )
+        else:
+            await send({"type": "websocket.close"})
 
     async def listen_for_disconnect(self, receive):
         """Listen for disconnect from the client."""
