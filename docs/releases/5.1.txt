@@ -146,6 +146,13 @@ CSRF
 
 * ...
 
+Database backends
+~~~~~~~~~~~~~~~~~
+
+* ``"init_command"`` option is now supported in :setting:`OPTIONS` on SQLite
+  to allow specifying :ref:`pragma options <sqlite-init-command>` to set upon
+  connection.
+
 Decorators
 ~~~~~~~~~~
 
