@@ -40,6 +40,8 @@ details on these changes.
 
 * Support for ``cx_Oracle`` will be removed.
 
+* ``BaseDatabaseOperations.field_cast_sql()`` will be removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1

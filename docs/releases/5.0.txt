@@ -663,6 +663,11 @@ Miscellaneous
 * Support for ``cx_Oracle`` is deprecated in favor of `oracledb`_ 1.3.2+ Python
   driver.
 
+* ``DatabaseOperations.field_cast_sql()`` is deprecated in favor of
+  ``DatabaseOperations.lookup_cast()``. Starting with Django 6.0,
+  ``BuiltinLookup.process_lhs()`` will no longer call ``field_cast_sql()``.
+  Third-party database backends should implement ``lookup_cast()`` instead.
+
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
 
 Features removed in 5.0
