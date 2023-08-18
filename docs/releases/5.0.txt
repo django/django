@@ -352,7 +352,8 @@ Error Reporting
 File Storage
 ~~~~~~~~~~~~
 
-* ...
+* :meth:`.File.open` now passes all positional (``*args``) and keyword
+  arguments (``**kwargs``) to Python's built-in :func:`python:open`.
 
 File Uploads
 ~~~~~~~~~~~~
