@@ -12,3 +12,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused an incorrect validation of
   ``CheckConstraints`` on ``__isnull`` lookups against ``JSONField``
   (:ticket:`34754`).
+
+* Fixed a bug in Django 4.2 where the deprecated ``DEFAULT_FILE_STORAGE`` and
+  ``STATICFILES_STORAGE`` settings were not synced with ``STORAGES``
+  (:ticket:`34773`).

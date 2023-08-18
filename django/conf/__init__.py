@@ -271,6 +271,9 @@ class Settings:
                 raise ImproperlyConfigured(
                     "DEFAULT_FILE_STORAGE/STORAGES are mutually exclusive."
                 )
+            self.STORAGES[DEFAULT_STORAGE_ALIAS] = {
+                "BACKEND": self.DEFAULT_FILE_STORAGE
+            }
             warnings.warn(DEFAULT_FILE_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
 
         if self.is_overridden("STATICFILES_STORAGE"):
@@ -278,7 +281,22 @@ class Settings:
                 raise ImproperlyConfigured(
                     "STATICFILES_STORAGE/STORAGES are mutually exclusive."
                 )
+            self.STORAGES[STATICFILES_STORAGE_ALIAS] = {
+                "BACKEND": self.STATICFILES_STORAGE
+            }
             warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
+        # RemovedInDjango51Warning.
+        if self.is_overridden("STORAGES"):
+            setattr(
+                self,
+                "DEFAULT_FILE_STORAGE",
+                self.STORAGES.get(DEFAULT_STORAGE_ALIAS, {}).get("BACKEND"),
+            )
+            setattr(
+                self,
+                "STATICFILES_STORAGE",
+                self.STORAGES.get(STATICFILES_STORAGE_ALIAS, {}).get("BACKEND"),
+            )
 
     def is_overridden(self, setting):
         return setting in self._explicit_settings
@@ -331,14 +349,28 @@ class UserSettingsHolder:
             warnings.warn(USE_DEPRECATED_PYTZ_DEPRECATED_MSG, RemovedInDjango50Warning)
         # RemovedInDjango51Warning.
         if name == "STORAGES":
-            self.STORAGES.setdefault(
-                DEFAULT_STORAGE_ALIAS,
-                {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-            )
-            self.STORAGES.setdefault(
-                STATICFILES_STORAGE_ALIAS,
-                {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
-            )
+            if default_file_storage := self.STORAGES.get(DEFAULT_STORAGE_ALIAS):
+                super().__setattr__(
+                    "DEFAULT_FILE_STORAGE", default_file_storage.get("BACKEND")
+                )
+            else:
+                self.STORAGES.setdefault(
+                    DEFAULT_STORAGE_ALIAS,
+                    {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+                )
+            if staticfiles_storage := self.STORAGES.get(STATICFILES_STORAGE_ALIAS):
+                super().__setattr__(
+                    "STATICFILES_STORAGE", staticfiles_storage.get("BACKEND")
+                )
+            else:
+                self.STORAGES.setdefault(
+                    STATICFILES_STORAGE_ALIAS,
+                    {
+                        "BACKEND": (
+                            "django.contrib.staticfiles.storage.StaticFilesStorage"
+                        ),
+                    },
+                )
 
     def __delattr__(self, name):
         self._deleted.add(name)
