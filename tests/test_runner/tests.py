@@ -779,16 +779,21 @@ class SQLiteInMemoryTestDbs(TransactionTestCase):
             )
             with mock.patch("django.test.utils.connections", new=tested_connections):
                 other = tested_connections["other"]
-                DiscoverRunner(verbosity=0).setup_databases()
-                msg = (
-                    "DATABASES setting '%s' option set to sqlite3's ':memory:' value "
-                    "shouldn't interfere with transaction support detection."
-                    % option_key
-                )
-                # Transaction support is properly initialized for the 'other' DB.
-                self.assertTrue(other.features.supports_transactions, msg)
-                # And all the DBs report that they support transactions.
-                self.assertTrue(connections_support_transactions(), msg)
+                try:
+                    new_test_connections = DiscoverRunner(verbosity=0).setup_databases()
+                    msg = (
+                        f"DATABASES setting '{option_key}' option set to sqlite3's "
+                        "':memory:' value shouldn't interfere with transaction support "
+                        "detection."
+                    )
+                    # Transaction support is properly initialized for the
+                    # 'other' DB.
+                    self.assertTrue(other.features.supports_transactions, msg)
+                    # And all the DBs report that they support transactions.
+                    self.assertTrue(connections_support_transactions(), msg)
+                finally:
+                    for test_connection, _, _ in new_test_connections:
+                        test_connection._close()
 
 
 class DummyBackendTest(unittest.TestCase):

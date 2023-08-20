@@ -6,7 +6,13 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
-from django.db import NotSupportedError, connection, transaction
+from django.db import (
+    DEFAULT_DB_ALIAS,
+    NotSupportedError,
+    connection,
+    connections,
+    transaction,
+)
 from django.db.models import Aggregate, Avg, StdDev, Sum, Variance
 from django.db.utils import ConnectionHandler
 from django.test import TestCase, TransactionTestCase, override_settings
@@ -222,11 +228,20 @@ class ThreadSharing(TransactionTestCase):
     available_apps = ["backends"]
 
     def test_database_sharing_in_threads(self):
+        thread_connections = []
+
         def create_object():
             Object.objects.create()
+            thread_connections.append(connections[DEFAULT_DB_ALIAS].connection)
 
-        create_object()
-        thread = threading.Thread(target=create_object)
-        thread.start()
-        thread.join()
-        self.assertEqual(Object.objects.count(), 2)
+        main_connection = connections[DEFAULT_DB_ALIAS].connection
+        try:
+            create_object()
+            thread = threading.Thread(target=create_object)
+            thread.start()
+            thread.join()
+            self.assertEqual(Object.objects.count(), 2)
+        finally:
+            for conn in thread_connections:
+                if conn is not main_connection:
+                    conn.close()
