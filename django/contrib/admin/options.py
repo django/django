@@ -1105,8 +1105,8 @@ class ModelAdmin(BaseModelAdmin):
         ):
             return self.list_display_links
         else:
-            # Use only the first item in list_display as link
-            return list(list_display)[:1]
+            # Use the difference set of list_display and list_editable as link
+            return set(list_display).difference(self.list_editable)
 
     def get_list_filter(self, request):
         """
