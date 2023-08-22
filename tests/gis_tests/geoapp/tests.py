@@ -660,8 +660,8 @@ class GeoQuerySetTest(TestCase):
         # flaky.
         for point, ref_city in zip(sorted(line), sorted(ref_points)):
             point_x, point_y = point
-            self.assertAlmostEqual(point_x, ref_city.x, 5),
-            self.assertAlmostEqual(point_y, ref_city.y, 5),
+            self.assertAlmostEqual(point_x, ref_city.x, 5)
+            self.assertAlmostEqual(point_y, ref_city.y, 5)
 
     @skipUnlessDBFeature("supports_union_aggr")
     def test_unionagg(self):
