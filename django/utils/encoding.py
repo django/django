@@ -219,6 +219,7 @@ def repercent_broken_unicode(path):
     repercent-encode any octet produced that is not part of a strictly legal
     UTF-8 octet sequence.
     """
+    changed_parts = []
     while True:
         try:
             path.decode()
@@ -226,9 +227,10 @@ def repercent_broken_unicode(path):
             # CVE-2019-14235: A recursion shouldn't be used since the exception
             # handling uses massive amounts of memory
             repercent = quote(path[e.start : e.end], safe=b"/#%[]=:;$&()+,!?*@'~")
-            path = path[: e.start] + repercent.encode() + path[e.end :]
+            changed_parts.append(path[: e.start] + repercent.encode())
+            path = path[e.end :]
         else:
-            return path
+            return b"".join(changed_parts) + path
 
 
 def filepath_to_uri(path):
