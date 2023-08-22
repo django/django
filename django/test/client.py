@@ -45,6 +45,16 @@ CONTENT_TYPE_RE = _lazy_re_compile(r".*; charset=([\w-]+);?")
 # Structured suffix spec: https://tools.ietf.org/html/rfc6838#section-4.2.8
 JSON_CONTENT_TYPE_RE = _lazy_re_compile(r"^application\/(.+\+)?json")
 
+REDIRECT_STATUS_CODES = frozenset(
+    [
+        HTTPStatus.MOVED_PERMANENTLY,
+        HTTPStatus.FOUND,
+        HTTPStatus.SEE_OTHER,
+        HTTPStatus.TEMPORARY_REDIRECT,
+        HTTPStatus.PERMANENT_REDIRECT,
+    ]
+)
+
 
 class RedirectCycleError(Exception):
     """The test client has been asked to follow a redirect loop."""
@@ -881,6 +891,69 @@ class ClientMixin:
             )
         return response._json
 
+    def _follow_redirect(
+        self, response, *, data="", content_type="", headers=None, **extra
+    ):
+        """Follow a single redirect contained in response using GET."""
+        response_url = response.url
+        redirect_chain = response.redirect_chain
+        redirect_chain.append((response_url, response.status_code))
+
+        url = urlsplit(response_url)
+        if url.scheme:
+            extra["wsgi.url_scheme"] = url.scheme
+        if url.hostname:
+            extra["SERVER_NAME"] = url.hostname
+        if url.port:
+            extra["SERVER_PORT"] = str(url.port)
+
+        path = url.path
+        # RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
+        if not path and url.netloc:
+            path = "/"
+        # Prepend the request path to handle relative path redirects
+        if not path.startswith("/"):
+            path = urljoin(response.request["PATH_INFO"], path)
+
+        if response.status_code in (
+            HTTPStatus.TEMPORARY_REDIRECT,
+            HTTPStatus.PERMANENT_REDIRECT,
+        ):
+            # Preserve request method and query string (if needed)
+            # post-redirect for 307/308 responses.
+            request_method = response.request["REQUEST_METHOD"].lower()
+            if request_method not in ("get", "head"):
+                extra["QUERY_STRING"] = url.query
+            request_method = getattr(self, request_method)
+        else:
+            request_method = self.get
+            data = QueryDict(url.query)
+            content_type = None
+
+        return request_method(
+            path,
+            data=data,
+            content_type=content_type,
+            follow=False,
+            headers=headers,
+            **extra,
+        )
+
+    def _ensure_redirects_not_cyclic(self, response):
+        """
+        Raise a RedirectCycleError if response contains too many redirects.
+        """
+        redirect_chain = response.redirect_chain
+        if redirect_chain[-1] in redirect_chain[:-1]:
+            # Check that we're not redirecting to somewhere we've already been
+            # to, to prevent loops.
+            raise RedirectCycleError("Redirect loop detected.", last_response=response)
+        if len(redirect_chain) > 20:
+            # Such a lengthy chain likely also means a loop, but one with a
+            # growing path, changing view, or changing query argument. 20 is
+            # the value of "network.http.redirection-limit" from Firefox.
+            raise RedirectCycleError("Too many redirects.", last_response=response)
+
 
 class Client(ClientMixin, RequestFactory):
     """
@@ -1179,71 +1252,17 @@ class Client(ClientMixin, RequestFactory):
         Follow any redirects by requesting responses from the server using GET.
         """
         response.redirect_chain = []
-        redirect_status_codes = (
-            HTTPStatus.MOVED_PERMANENTLY,
-            HTTPStatus.FOUND,
-            HTTPStatus.SEE_OTHER,
-            HTTPStatus.TEMPORARY_REDIRECT,
-            HTTPStatus.PERMANENT_REDIRECT,
-        )
-        while response.status_code in redirect_status_codes:
-            response_url = response.url
+        while response.status_code in REDIRECT_STATUS_CODES:
             redirect_chain = response.redirect_chain
-            redirect_chain.append((response_url, response.status_code))
-
-            url = urlsplit(response_url)
-            if url.scheme:
-                extra["wsgi.url_scheme"] = url.scheme
-            if url.hostname:
-                extra["SERVER_NAME"] = url.hostname
-            if url.port:
-                extra["SERVER_PORT"] = str(url.port)
-
-            path = url.path
-            # RFC 3986 Section 6.2.3: Empty path should be normalized to "/".
-            if not path and url.netloc:
-                path = "/"
-            # Prepend the request path to handle relative path redirects
-            if not path.startswith("/"):
-                path = urljoin(response.request["PATH_INFO"], path)
-
-            if response.status_code in (
-                HTTPStatus.TEMPORARY_REDIRECT,
-                HTTPStatus.PERMANENT_REDIRECT,
-            ):
-                # Preserve request method and query string (if needed)
-                # post-redirect for 307/308 responses.
-                request_method = response.request["REQUEST_METHOD"].lower()
-                if request_method not in ("get", "head"):
-                    extra["QUERY_STRING"] = url.query
-                request_method = getattr(self, request_method)
-            else:
-                request_method = self.get
-                data = QueryDict(url.query)
-                content_type = None
-
-            response = request_method(
-                path,
+            response = self._follow_redirect(
+                response,
                 data=data,
                 content_type=content_type,
-                follow=False,
                 headers=headers,
                 **extra,
             )
             response.redirect_chain = redirect_chain
-
-            if redirect_chain[-1] in redirect_chain[:-1]:
-                # Check that we're not redirecting to somewhere we've already
-                # been to, to prevent loops.
-                raise RedirectCycleError(
-                    "Redirect loop detected.", last_response=response
-                )
-            if len(redirect_chain) > 20:
-                # Such a lengthy chain likely also means a loop, but one with
-                # a growing path, changing view, or changing query argument;
-                # 20 is the value of "network.http.redirection-limit" from Firefox.
-                raise RedirectCycleError("Too many redirects.", last_response=response)
-
+            self._ensure_redirects_not_cyclic(response)
         return response
 
 
