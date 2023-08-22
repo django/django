@@ -195,7 +195,7 @@ class CustomPKTests(TestCase):
         self.assertEqual(f.bar, new_bar)
 
         f = Foo.objects.get(bar=new_bar)
-        self.assertEqual(f, new_foo),
+        self.assertEqual(f, new_foo)
         self.assertEqual(f.bar, new_bar)
 
     # SQLite lets objects be saved with an empty primary key, even though an
