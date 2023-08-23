@@ -2,6 +2,7 @@ import enum
 from types import DynamicClassAttribute
 
 from django.utils.functional import Promise
+from django.utils.version import PY312
 
 __all__ = ["Choices", "IntegerChoices", "TextChoices"]
 
@@ -31,11 +32,13 @@ class ChoicesMeta(enum.EnumMeta):
             member._label_ = label
         return enum.unique(cls)
 
-    def __contains__(cls, member):
-        if not isinstance(member, enum.Enum):
-            # Allow non-enums to match against member values.
-            return any(x.value == member for x in cls)
-        return super().__contains__(member)
+    if not PY312:
+
+        def __contains__(cls, member):
+            if not isinstance(member, enum.Enum):
+                # Allow non-enums to match against member values.
+                return any(x.value == member for x in cls)
+            return super().__contains__(member)
 
     @property
     def names(cls):
