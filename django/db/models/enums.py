@@ -1,15 +1,27 @@
 import enum
 import warnings
-from types import DynamicClassAttribute
 
 from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import Promise
 from django.utils.version import PY311, PY312
 
 if PY311:
-    from enum import EnumType
+    from enum import EnumType, IntEnum, StrEnum
+    from enum import property as enum_property
 else:
     from enum import EnumMeta as EnumType
+    from types import DynamicClassAttribute as enum_property
+
+    class ReprEnum(enum.Enum):
+        def __str__(self):
+            return str(self.value)
+
+    class IntEnum(int, ReprEnum):
+        pass
+
+    class StrEnum(str, ReprEnum):
+        pass
+
 
 __all__ = ["Choices", "IntegerChoices", "TextChoices"]
 
@@ -69,33 +81,30 @@ class ChoicesType(EnumType):
 class Choices(enum.Enum, metaclass=ChoicesType):
     """Class for creating enumerated choices."""
 
-    @DynamicClassAttribute
+    if PY311:
+        do_not_call_in_templates = enum.nonmember(True)
+    else:
+
+        @property
+        def do_not_call_in_templates(self):
+            return True
+
+    @enum_property
     def label(self):
         return self._label_
-
-    @property
-    def do_not_call_in_templates(self):
-        return True
-
-    def __str__(self):
-        """
-        Use value when cast to str, so that Choices set as model instance
-        attributes are rendered as expected in templates and similar contexts.
-        """
-        return str(self.value)
 
     # A similar format was proposed for Python 3.10.
     def __repr__(self):
         return f"{self.__class__.__qualname__}.{self._name_}"
 
 
-class IntegerChoices(int, Choices):
+class IntegerChoices(Choices, IntEnum):
     """Class for creating enumerated integer choices."""
 
     pass
 
 
-class TextChoices(str, Choices):
+class TextChoices(Choices, StrEnum):
     """Class for creating enumerated string choices."""
 
     @staticmethod
