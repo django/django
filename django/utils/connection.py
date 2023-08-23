@@ -17,6 +17,11 @@ class ConnectionProxy:
     def __setattr__(self, name, value):
         return setattr(self._connections[self._alias], name, value)
 
+    def __dir__(self):
+        new_dir = set(super().__dir__())
+        new_dir.update(dir(self._connections[self._alias]))
+        return new_dir
+
     def __delattr__(self, name):
         return delattr(self._connections[self._alias], name)
 
