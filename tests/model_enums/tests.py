@@ -6,6 +6,7 @@ import uuid
 from django.db import models
 from django.template import Context, Template
 from django.test import SimpleTestCase
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 
@@ -315,3 +316,12 @@ class CustomChoicesTests(SimpleTestCase):
 
             class Identifier(uuid.UUID, models.Choices):
                 A = "972ce4eb-a95f-4a56-9339-68c208a76f18"
+
+
+class ChoicesMetaDeprecationTests(SimpleTestCase):
+    def test_deprecation_warning(self):
+        from django.db.models import enums
+
+        msg = "ChoicesMeta is deprecated in favor of ChoicesType."
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            enums.ChoicesMeta

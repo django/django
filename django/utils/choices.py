@@ -20,7 +20,7 @@ class CallableChoiceIterator(BaseChoiceIterator):
 def normalize_choices(value, *, depth=0):
     """Normalize choices values consistently for fields and widgets."""
     # Avoid circular import when importing django.forms.
-    from django.db.models.enums import ChoicesMeta
+    from django.db.models.enums import ChoicesType
 
     match value:
         case BaseChoiceIterator() | Promise() | bytes() | str():
@@ -28,7 +28,7 @@ def normalize_choices(value, *, depth=0):
             # Because string-like types are iterable, return early to avoid
             # iterating over them in the guard for the Iterable case below.
             return value
-        case ChoicesMeta():
+        case ChoicesType():
             # Choices enumeration helpers already output in canonical form.
             return value.choices
         case Mapping() if depth < 2:
