@@ -98,6 +98,7 @@ class IntegerChoices(int, Choices):
 class TextChoices(str, Choices):
     """Class for creating enumerated string choices."""
 
+    @staticmethod
     def _generate_next_value_(name, start, count, last_values):
         return name
 
