@@ -685,6 +685,9 @@ Miscellaneous
   ``BuiltinLookup.process_lhs()`` will no longer call ``field_cast_sql()``.
   Third-party database backends should implement ``lookup_cast()`` instead.
 
+* The ``django.db.models.enums.ChoicesMeta`` metaclass is renamed to
+  ``ChoicesType``.
+
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
 
 Features removed in 5.0

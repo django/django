@@ -42,6 +42,9 @@ details on these changes.
 
 * ``BaseDatabaseOperations.field_cast_sql()`` will be removed.
 
+* The ``ChoicesMeta`` alias to ``django.db.models.enums.ChoicesType`` will be
+  removed.
+
 .. _deprecation-removed-in-5.1:
 
 5.1
