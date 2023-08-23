@@ -164,7 +164,7 @@ Messages to this logger have the following extra context:
 
 * ``status_code``: The HTTP response code associated with the request.
 
-* ``request``: The request object that generated the logging message.
+* ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
 
 .. _django-template-logger:
 
