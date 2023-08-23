@@ -1208,18 +1208,16 @@ class StorageHandlerTests(SimpleTestCase):
         self.assertIs(cache1, cache2)
 
     def test_defaults(self):
-        storages = StorageHandler()
-        self.assertEqual(
-            storages.backends,
-            {
-                DEFAULT_STORAGE_ALIAS: {
-                    "BACKEND": "django.core.files.storage.FileSystemStorage",
-                },
-                STATICFILES_STORAGE_ALIAS: {
-                    "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-                },
-            },
-        )
+    storages = StorageHandler()
+    expected_backends = {
+        DEFAULT_STORAGE_ALIAS: {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        STATICFILES_STORAGE_ALIAS: {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    self.assertDictEqual(storages.backends, expected_backends)
 
     def test_nonexistent_alias(self):
         msg = "Could not find config for 'nonexistent' in settings.STORAGES."
@@ -1228,16 +1226,17 @@ class StorageHandlerTests(SimpleTestCase):
             storages["nonexistent"]
 
     def test_nonexistent_backend(self):
-        test_storages = StorageHandler(
-            {
-                "invalid_backend": {
-                    "BACKEND": "django.nonexistent.NonexistentBackend",
-                },
-            }
-        )
+        invalid_backend_settings = {
+            "invalid_backend": {
+                "BACKEND": "django.nonexistent.NonexistentBackend",
+            },
+        }
         msg = (
             "Could not find backend 'django.nonexistent.NonexistentBackend': "
             "No module named 'django.nonexistent'"
         )
+        
         with self.assertRaisesMessage(InvalidStorageError, msg):
-            test_storages["invalid_backend"]
+            with StorageHandler(invalid_backend_settings) as test_storages:
+                test_storages["invalid_backend"]
+
