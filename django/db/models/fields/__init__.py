@@ -15,7 +15,7 @@ from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
-from django.utils.choices import normalize_choices
+from django.utils.choices import CallableChoiceIterator, normalize_choices
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date,
@@ -315,7 +315,9 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        if not is_iterable(self.choices) or isinstance(self.choices, str):
+        if not is_iterable(self.choices) or isinstance(
+            self.choices, (str, CallableChoiceIterator)
+        ):
             return [
                 checks.Error(
                     "'choices' must be a mapping (e.g. a dictionary) or an iterable "
