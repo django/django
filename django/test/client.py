@@ -623,8 +623,8 @@ class AsyncRequestFactory(RequestFactory):
     testing. Usage:
 
     rf = AsyncRequestFactory()
-    get_request = await rf.get('/hello/')
-    post_request = await rf.post('/submit/', {'foo': 'bar'})
+    get_request = rf.get("/hello/")
+    post_request = rf.post("/submit/", {"foo": "bar"})
 
     Once you have a request object you can pass it to any view function,
     including synchronous ones. The reason we have a separate class here is:
