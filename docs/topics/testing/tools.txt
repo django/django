@@ -2028,7 +2028,7 @@ or as ``self.async_client`` on any test.
 .. class:: AsyncClient(enforce_csrf_checks=False, raise_request_exception=True, *, headers=None, **defaults)
 
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
-test client, with two exceptions:
+test client, with the following exceptions:
 
 * In the initialization, arbitrary keyword arguments in ``defaults`` are added
   directly into the ASGI scope.
