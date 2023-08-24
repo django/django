@@ -1,0 +1,9 @@
+===========================
+Django 3.2.21 release notes
+===========================
+
+*September 4, 2023*
+
+Django 3.2.21 fixes a security issue with severity "moderate" in 3.2.20.
+
+...
