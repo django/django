@@ -970,10 +970,10 @@ class QuerySet(AltersData):
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
+        update_defaults = defaults or {}
         if create_defaults is None:
-            update_defaults = create_defaults = defaults or {}
-        else:
-            update_defaults = defaults or {}
+            create_defaults = update_defaults
+
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
