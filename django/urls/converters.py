@@ -1,6 +1,6 @@
 import functools
-import uuid
 import re
+import uuid
 
 
 class IntConverter:
@@ -25,7 +25,12 @@ class StringConverter:
 
 class UUIDConverter:
     # Regex to capture canonical, hex, integer, and URN formats
-    regex = r'([0-9a-f]{32}|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|[0-9]+|urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})'
+    regex = (
+        r'([0-9a-f]{32}|'
+        r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|'
+        r'urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|'
+        r'[0-9]+)'
+    )
 
     def to_python(self, value):
         try:
