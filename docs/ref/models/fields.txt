@@ -1463,8 +1463,8 @@ Like all :class:`CharField` subclasses, :class:`URLField` takes the optional
 .. class:: UUIDField(**options)
 
 A field for storing universally unique identifiers. Uses Python's
-:class:`~python:uuid.UUID` class. When used on PostgreSQL, this stores in a
-``uuid`` datatype, otherwise in a ``char(32)``.
+:class:`~python:uuid.UUID` class. When used on PostgreSQL and MariaDB 10.7+,
+this stores in a ``uuid`` datatype, otherwise in a ``char(32)``.
 
 Universally unique identifiers are a good alternative to :class:`AutoField` for
 :attr:`~Field.primary_key`. The database will not generate the UUID for you, so
@@ -1481,12 +1481,13 @@ it is recommended to use :attr:`~Field.default`::
 Note that a callable (with the parentheses omitted) is passed to ``default``,
 not an instance of ``UUID``.
 
-.. admonition:: Lookups on PostgreSQL
+.. admonition:: Lookups on PostgreSQL and MariaDB 10.7+
 
     Using :lookup:`iexact`, :lookup:`contains`, :lookup:`icontains`,
     :lookup:`startswith`, :lookup:`istartswith`, :lookup:`endswith`, or
     :lookup:`iendswith` lookups on PostgreSQL don't work for values without
-    hyphens, because PostgreSQL stores them in a hyphenated uuid datatype type.
+    hyphens, because PostgreSQL and MariaDB 10.7+ store them in a hyphenated
+    uuid datatype type.
 
 Relationship fields
 ===================
