@@ -260,7 +260,7 @@ class PathSerializer(BaseSerializer):
 
 class DatabaseOnDeleteSerializer(BaseSerializer):
     def serialize(self):
-        return f"models.{self.value.name}", {}
+        return f"models.{self.value.__name__}", {}
 
 
 class RegexSerializer(BaseSerializer):
