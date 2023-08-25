@@ -580,6 +580,10 @@ Miscellaneous
 * Executing SQL queries before the app registry has been fully populated now
   raises :exc:`RuntimeWarning`.
 
+* :exc:`~django.core.exceptions.BadRequest` is raised for non-UTF-8 encoded
+  requests with the :mimetype:`application/x-www-form-urlencoded` content type.
+  See :rfc:`1866` for more details.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
