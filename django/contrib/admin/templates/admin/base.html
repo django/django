@@ -1,4 +1,4 @@
-{% load i18n static %}<!DOCTYPE html>
+{% load i18n static register_links %}<!DOCTYPE html>
 {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
 <html lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
 <head>
@@ -47,8 +47,9 @@
                 {% if site_url %}
                     <a href="{{ site_url }}">{% translate 'View site' %}</a> /
                 {% endif %}
-                {% if registered_urls.navbar %}
-                  {% for link in registered_urls.navbar %}
+                {% register_link registered_urls "navbar" as registered_links %}
+                {% if registered_links %}
+                  {% for link in registered_links %}
                     <a href="{{ link.url }}">{{ link.name }}</a> /
                   {% endfor %}
                 {% endif %}
