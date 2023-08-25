@@ -95,9 +95,7 @@ class Combinable:
     def __and__(self, other):
         if getattr(self, "conditional", False) and getattr(other, "conditional", False):
             return Q(self) & Q(other)
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def bitand(self, other):
         return self._combine(other, self.BITAND, False)
@@ -111,9 +109,7 @@ class Combinable:
     def __xor__(self, other):
         if getattr(self, "conditional", False) and getattr(other, "conditional", False):
             return Q(self) ^ Q(other)
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def bitxor(self, other):
         return self._combine(other, self.BITXOR, False)
@@ -121,9 +117,7 @@ class Combinable:
     def __or__(self, other):
         if getattr(self, "conditional", False) and getattr(other, "conditional", False):
             return Q(self) | Q(other)
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def bitor(self, other):
         return self._combine(other, self.BITOR, False)
@@ -147,19 +141,13 @@ class Combinable:
         return self._combine(other, self.POW, True)
 
     def __rand__(self, other):
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def __ror__(self, other):
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def __rxor__(self, other):
-        raise NotImplementedError(
-            "Use .bitand(), .bitor(), and .bitxor() for bitwise logical operations."
-        )
+        return NotImplemented
 
     def __invert__(self):
         return NegatedExpression(self)
