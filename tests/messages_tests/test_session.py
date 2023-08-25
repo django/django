@@ -1,5 +1,4 @@
-from django.contrib.messages import constants
-from django.contrib.messages.storage.base import Message
+from django.contrib.messages import Message, constants
 from django.contrib.messages.storage.session import SessionStorage
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpRequest

@@ -3,8 +3,7 @@ import random
 from unittest import TestCase
 
 from django.conf import settings
-from django.contrib.messages import constants
-from django.contrib.messages.storage.base import Message
+from django.contrib.messages import Message, constants
 from django.contrib.messages.storage.cookie import (
     CookieStorage,
     MessageDecoder,
