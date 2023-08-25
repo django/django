@@ -26,15 +26,15 @@ class StringConverter:
 class UUIDConverter:
     # Regex to capture canonical, hex, integer, and URN formats
     regex = (
-        r'([0-9a-f]{32}|'
-        r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|'
-        r'urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|'
-        r'[0-9]+)'
+        r"([0-9a-f]{32}|"
+        r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|"
+        r"urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|"
+        r"[0-9]+)"
     )
 
     def to_python(self, value):
         try:
-            if re.match(r'[0-9]+$', value):  # Integer format
+            if re.match(r"[0-9]+$", value):  # Integer format
                 return uuid.UUID(int=int(value))
             return uuid.UUID(value)
         except ValueError:
