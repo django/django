@@ -66,6 +66,7 @@ class AdminSite:
         self.name = name
         self._actions = {"delete_selected": actions.delete_selected}
         self._global_actions = self._actions.copy()
+        self._registered_urls = {}
         all_sites.add(self)
 
     def __repr__(self):
@@ -185,6 +186,25 @@ class AdminSite:
         not. Raise KeyError for invalid names.
         """
         return self._global_actions[name]
+
+    def register_url(self, url, name=None, location="links_module"):
+        """
+        let an app display urls to various areas in the admin.
+
+        url - link href
+        name - display name of link (if absent will use url)
+
+        There are two locations
+        * links_module (default) - creates a quick links section on the admin index page
+        * navbar - adds link to navbar
+
+        """
+        if not name:
+            name = url
+        if self._registered_urls.get(location):
+            self._registered_urls[location].append({"url": url, "name": name})
+        else:
+            self._registered_urls[location] = [{"url": url, "name": name}]
 
     @property
     def actions(self):
@@ -328,14 +348,15 @@ class AdminSite:
             script_name if self.site_url == "/" and script_name else self.site_url
         )
         return {
-            "site_title": self.site_title,
-            "site_header": self.site_header,
-            "site_url": site_url,
-            "has_permission": self.has_permission(request),
-            "available_apps": self.get_app_list(request),
-            "is_popup": False,
+            "site_title"            : self.site_title,
+            "site_header"           : self.site_header,
+            "site_url"              : site_url,
+            "has_permission"        : self.has_permission(request),
+            "available_apps"        : self.get_app_list(request),
+            "is_popup"              : False,
             "is_nav_sidebar_enabled": self.enable_nav_sidebar,
-            "log_entries": self.get_log_entries(request),
+            "log_entries"           : self.get_log_entries(request),
+            "registered_urls"       : self._registered_urls,
         }
 
     def password_change(self, request, extra_context=None):
@@ -347,8 +368,8 @@ class AdminSite:
 
         url = reverse("admin:password_change_done", current_app=self.name)
         defaults = {
-            "form_class": AdminPasswordChangeForm,
-            "success_url": url,
+            "form_class"   : AdminPasswordChangeForm,
+            "success_url"  : url,
             "extra_context": {**self.each_context(request), **(extra_context or {})},
         }
         if self.password_change_template is not None:
@@ -419,7 +440,7 @@ class AdminSite:
 
         context = {
             **self.each_context(request),
-            "title": _("Log in"),
+            "title"   : _("Log in"),
             "subtitle": None,
             "app_path": request.get_full_path(),
             "username": request.user.get_username(),
@@ -432,9 +453,9 @@ class AdminSite:
         context.update(extra_context or {})
 
         defaults = {
-            "extra_context": context,
+            "extra_context"      : context,
             "authentication_form": self.login_form or AdminAuthenticationForm,
-            "template_name": self.login_template or "admin/login.html",
+            "template_name"      : self.login_template or "admin/login.html",
         }
         request.current_app = self.name
         return LoginView.as_view(**defaults)(request)
@@ -489,12 +510,12 @@ class AdminSite:
 
             info = (app_label, model._meta.model_name)
             model_dict = {
-                "model": model,
-                "name": capfirst(model._meta.verbose_name_plural),
+                "model"      : model,
+                "name"       : capfirst(model._meta.verbose_name_plural),
                 "object_name": model._meta.object_name,
-                "perms": perms,
-                "admin_url": None,
-                "add_url": None,
+                "perms"      : perms,
+                "admin_url"  : None,
+                "add_url"    : None,
             }
             if perms.get("change") or perms.get("view"):
                 model_dict["view_only"] = not perms.get("change")
@@ -516,15 +537,15 @@ class AdminSite:
                 app_dict[app_label]["models"].append(model_dict)
             else:
                 app_dict[app_label] = {
-                    "name": apps.get_app_config(app_label).verbose_name,
-                    "app_label": app_label,
-                    "app_url": reverse(
+                    "name"            : apps.get_app_config(app_label).verbose_name,
+                    "app_label"       : app_label,
+                    "app_url"         : reverse(
                         "admin:app_list",
                         kwargs={"app_label": app_label},
                         current_app=self.name,
                     ),
                     "has_module_perms": has_module_perms,
-                    "models": [model_dict],
+                    "models"          : [model_dict],
                 }
 
         return app_dict
@@ -554,7 +575,7 @@ class AdminSite:
 
         context = {
             **self.each_context(request),
-            "title": self.index_title,
+            "title"   : self.index_title,
             "subtitle": None,
             "app_list": app_list,
             **(extra_context or {}),
@@ -574,9 +595,9 @@ class AdminSite:
 
         context = {
             **self.each_context(request),
-            "title": _("%(app)s administration") % {"app": app_list[0]["name"]},
-            "subtitle": None,
-            "app_list": app_list,
+            "title"    : _("%(app)s administration") % {"app": app_list[0]["name"]},
+            "subtitle" : None,
+            "app_list" : app_list,
             "app_label": app_label,
             **(extra_context or {}),
         }

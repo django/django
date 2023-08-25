@@ -19,6 +19,16 @@
 
 {% block sidebar %}
 <div id="content-related">
+    {% if registered_urls.links_module %}
+      <div class="module" id="registered-links-module">
+        <h2>{% translate 'Quick links' %}</h2>
+        <div>
+          {% for link in registered_urls.links_module %}
+              <p><a href="{{ link.url }}">{{ link.name }}</a></p>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
     <div class="module" id="recent-actions-module">
         <h2>{% translate 'Recent actions' %}</h2>
         <h3>{% translate 'My actions' %}</h3>

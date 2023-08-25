@@ -47,6 +47,11 @@
                 {% if site_url %}
                     <a href="{{ site_url }}">{% translate 'View site' %}</a> /
                 {% endif %}
+                {% if registered_urls.navbar %}
+                  {% for link in registered_urls.navbar %}
+                    <a href="{{ link.url }}">{{ link.name }}</a> /
+                  {% endfor %}
+                {% endif %}
                 {% if user.is_active and user.is_staff %}
                     {% url 'django-admindocs-docroot' as docsroot %}
                     {% if docsroot %}
