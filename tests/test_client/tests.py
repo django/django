@@ -42,6 +42,19 @@ from django.views.generic import RedirectView
 
 from .views import TwoArgException, get_view, post_view, trace_view
 
+from datetime import date
+from django.test import TestCase
+from model_meta.models import User
+
+class UserModelTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username='testuser', birthdate=date(1990, 5, 10))
+
+    def test_calculate_age(self):
+        age = self.user.calculate_age()
+        self.assertEqual(age, 33)  # This might need adjustment based on the current year.
+
+
 
 def middleware_urlconf(get_response):
     def middleware(request):

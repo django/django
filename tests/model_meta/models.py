@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from datetime import datetime
 
 
 class Relation(models.Model):
@@ -87,6 +88,38 @@ class BasePerson(AbstractPerson):
 
     # GR fields
     generic_relation_base = GenericRelation(Relation)
+
+
+class User(models.Model):
+    # Existing fields and methods
+    """
+    Represents a user in the system.
+
+    Fields:
+        username (CharField): The username of the user.
+        birthdate (DateField): The birthdate of the user.
+
+    Methods:
+        calculate_age: Calculates the age of the user based on the birthdate.
+
+    """
+
+    def calculate_age(self):
+        """
+        Calculate the age of the user based on the birthdate.
+
+        Returns:
+            int: The calculated age of the user.
+
+        Example:
+            >>> user = User.objects.get(id=1)
+            >>> user.calculate_age()
+            30
+        """
+        today = datetime.now().date()
+        age = today.year - self.birthdate.year - ((today.month, today.day) < (self.birthdate.month, self.birthdate.day))
+        return age
+
 
 
 class Person(BasePerson):
