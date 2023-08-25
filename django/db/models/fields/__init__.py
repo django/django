@@ -631,6 +631,8 @@ class Field(RegisterLookupMixin):
         equals_comparison = {"choices", "validators"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
+            if isinstance(value, CallableChoiceIterator):
+                value = value.func
             # Do correct kind of comparison
             if name in equals_comparison:
                 if value != default:
