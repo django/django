@@ -118,7 +118,8 @@ class User(models.Model):
             30
         """
         today = datetime.now().date()
-        age = today.year - self.birthdate.year - ((today.month, today.day) < (self.birthdate.month, self.birthdate.day))
+        age = today.year - self.birthdate.year - ((today.month, today.day) 
+                                                  < (self.birthdate.month, self.birthdate.day))
         return age
 
 

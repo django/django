@@ -20,7 +20,6 @@ rather than the HTML rendered to the end-user.
 
 """
 import copy
-import itertools
 import tempfile
 from unittest import mock
 
