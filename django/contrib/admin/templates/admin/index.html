@@ -19,11 +19,11 @@
 
 {% block sidebar %}
 <div id="content-related">
-    {% if registered_urls.links_module %}
+    {% register_link registered_urls "links_module" as registered_links %}
+    {% if registered_links %}
       <div class="module" id="registered-links-module">
         <h2>{% translate 'Quick links' %}</h2>
         <div>
-        {% register_link registered_urls "links_module" as registered_links %}
           {% for link in registered_links %}
               <p><a href="{{ link.url }}">{{ link.name }}</a></p>
           {% endfor %}
