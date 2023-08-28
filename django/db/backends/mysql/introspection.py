@@ -198,6 +198,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM information_schema.key_column_usage
             WHERE table_name = %s
                 AND table_schema = DATABASE()
+                AND referenced_table_schema = DATABASE()
                 AND referenced_table_name IS NOT NULL
                 AND referenced_column_name IS NOT NULL
             """,
@@ -257,6 +258,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 information_schema.table_constraints AS c
             WHERE
                 kc.table_schema = DATABASE() AND
+                (
+                    kc.referenced_table_schema = DATABASE() OR
+                    kc.referenced_table_schema IS NULL
+                ) AND
                 c.table_schema = kc.table_schema AND
                 c.constraint_name = kc.constraint_name AND
                 c.constraint_type != 'CHECK' AND
