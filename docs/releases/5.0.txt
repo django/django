@@ -214,6 +214,8 @@ Minor features
 * Properties in :attr:`.ModelAdmin.list_display` now support ``boolean``
   attribute.
 
+* jQuery is upgraded from version 3.6.4 to 3.7.1.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
