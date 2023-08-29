@@ -1015,7 +1015,6 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "are mutually exclusive."
         )
         with self.assertRaisesMessage(ValueError, msg):
-
             class BookAdmin(admin.ModelAdmin):
                 @admin.display(boolean=True, empty_value="(Missing)")
                 def is_published(self, obj):
@@ -3004,8 +3003,8 @@ class AdminViewPermissionsTest(TestCase):
         def get_change_related(response):
             return (
                 response.context["adminform"]
-                .form.fields["section"]
-                .widget.can_change_related
+                    .form.fields["section"]
+                    .widget.can_change_related
             )
 
         self.client.force_login(self.adduser)
@@ -3034,8 +3033,8 @@ class AdminViewPermissionsTest(TestCase):
         def get_delete_related(response):
             return (
                 response.context["adminform"]
-                .form.fields["sub_section"]
-                .widget.can_delete_related
+                    .form.fields["sub_section"]
+                    .widget.can_delete_related
             )
 
         self.client.force_login(self.adduser)
@@ -5053,7 +5052,7 @@ class AdminInlineFileUploadTest(TestCase):
             username="super", password="secret", email="super@example.com"
         )
         file1 = tempfile.NamedTemporaryFile(suffix=".file1")
-        file1.write(b"a" * (2**21))
+        file1.write(b"a" * (2 ** 21))
         filename = file1.name
         file1.close()
         cls.gallery = Gallery.objects.create(name="Test Gallery")
@@ -7078,8 +7077,10 @@ class UserAdminTest(TestCase):
         response.
         """
         response = self.client.get(reverse("admin:admin_views_album_add"))
+        print("response", response)
+
         self.assertContains(
-            response, reverse("admin:auth_user_change", args=("__fk__",))
+            response, reverse("admin:auth_user_change", args=(quote("__fk__"),))
         )
         self.assertContains(
             response,

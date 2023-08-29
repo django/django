@@ -1822,6 +1822,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         # Create a new House with a PK that needs quoting
         house = House.objects.create(name="_40")
         house_name = str(house.name)
+        quoted_house_pk = quote(house.name)
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_house_add")
         )
@@ -1835,11 +1836,13 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         )
         self.assertIn(house_name, self.selenium.page_source)
 
+        # Find and interact with the select element for choosing a House
         select_house = Select(self.selenium.find_element(By.ID, "id_house"))
         select_house.select_by_index(0)
-        select_house.select_by_value(house.pk)
+        select_house.select_by_value(
+            quoted_house_pk)  # Use the manually encoded primary key
         self.assertEqual(
-            select_house.first_selected_option.get_attribute("value"), house.pk
+            select_house.first_selected_option.get_attribute("value"), quoted_house_pk
         )
 
         # Create a new Room and associate it with the House created above

@@ -11,7 +11,7 @@
         relatedWindows.forEach(function(win) {
             if(!win.closed) {
                 win.dismissChildPopups();
-                win.close();    
+                win.close();
             }
         });
     }
@@ -19,7 +19,7 @@
     function setPopupIndex() {
         if(document.getElementsByName("_popup").length > 0) {
             const index = window.name.lastIndexOf("__") + 2;
-            popupIndex = parseInt(window.name.substring(index));   
+            popupIndex = parseInt(window.name.substring(index));
         } else {
             popupIndex = 0;
         }
@@ -117,6 +117,7 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
+        newId = customDecodeURIComponent(newId);
         const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem) {
@@ -147,6 +148,7 @@
     }
 
     function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
+        objId = customDecodeURIComponent(objId);// unquote objId
         const id = removePopupIndex(win.name.replace(/^edit_/, ''));
         const selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         const selects = $(selectsSelector);
@@ -219,6 +221,44 @@
 
     }
 
+
+
+    function customDecodeURIComponent(s) {
+        const UNQUOTE_MAP = {};
+        const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
+
+        for (let i = 0; i < specialChars.length; i++) {
+            const charCode = specialChars.charCodeAt(i);
+            // Line feed \n character
+            if (charCode === 10) {
+                UNQUOTE_MAP[charCode] = '_0A';
+            } else {
+                const encodedChar = '_' + charCode.toString(16).toUpperCase();
+                UNQUOTE_MAP[encodedChar] = String.fromCharCode(charCode);
+            }
+        }
+
+        if (typeof s === 'string') {
+            let result = '';
+            let i = 0;
+            while (i < s.length) {
+                if (s[i] === '_' && i < s.length - 2) {
+                    const encodedChar = s.substr(i, 3);
+                    const decodedChar = UNQUOTE_MAP[encodedChar] || s[i];
+                    result += decodedChar;
+                    i += 3;
+                } else {
+                    result += s[i];
+                    i += 1;
+                }
+            }
+            return result;
+        } else {
+            return s;
+        }
+    }
+
+    window.customDecodeURIComponent = customDecodeURIComponent;
     window.customEncodeURIComponent = customEncodeURIComponent;
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;

@@ -45,3 +45,11 @@ QUnit.test('updateRelatedObjectLinks properly quotes URL value', function(assert
     assert.equal(href, expectedValue, 'URL value is properly quoted');
 });
 
+
+
+QUnit.test('customDecodeURIComponent is a function that decodes URI components', function(assert) {
+    const encoded = customEncodeURIComponent('_40');
+    console.log(encoded, "encoded");
+    const decoded = customDecodeURIComponent(encoded);
+    assert.equal(decoded, '_40', 'customDecodeURIComponent properly decodes URI components');
+});
