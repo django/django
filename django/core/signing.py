@@ -201,7 +201,7 @@ class Signer:
             self.__class__.__module__,
             self.__class__.__name__,
         )
-        self.algorithm = algorithm or "sha256"
+        self.algorithm = algorithm or settings.DEFAULT_HASHING_ALGORITHM
         # RemovedInDjango51Warning.
         if args:
             warnings.warn(
