@@ -77,6 +77,9 @@ class Choiceful(models.Model):
         HEART = 3, "Heart"
         CLUB = 4, "Club"
 
+    def get_choices():
+        return [(i, str(i)) for i in range(3)]
+
     no_choices = models.IntegerField(null=True)
     empty_choices = models.IntegerField(choices=(), null=True)
     with_choices = models.IntegerField(choices=[(1, "A")], null=True)
@@ -88,6 +91,7 @@ class Choiceful(models.Model):
     empty_choices_text = models.TextField(choices=())
     choices_from_enum = models.IntegerField(choices=Suit)
     choices_from_iterator = models.IntegerField(choices=((i, str(i)) for i in range(3)))
+    choices_from_callable = models.IntegerField(choices=get_choices)
 
 
 class BigD(models.Model):

@@ -31,6 +31,10 @@ from django.utils.translation import gettext_lazy as _
 from .models import FoodManager, FoodQuerySet
 
 
+def get_choices():
+    return [(i, str(i)) for i in range(3)]
+
+
 class DeconstructibleInstances:
     def deconstruct(self):
         return ("DeconstructibleInstances", [], {})
@@ -492,6 +496,14 @@ class WriterTests(SimpleTestCase):
                     string,
                     "models.IntegerField(choices=[('Group', [(2, '2'), (1, '1')])])",
                 )
+
+    def test_serialize_callable_choices(self):
+        field = models.IntegerField(choices=get_choices)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.IntegerField(choices=migrations.test_writer.get_choices)",
+        )
 
     def test_serialize_nested_class(self):
         for nested_cls in [self.NestedEnum, self.NestedChoices]:
