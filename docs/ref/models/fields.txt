@@ -115,9 +115,32 @@ human-readable name. For example::
         ("GR", "Graduate"),
     ]
 
+``choices`` can also be defined as a callable that expects no arguments and
+returns any of the formats described above. For example::
+
+    def get_currencies():
+        return {i: i for i in settings.CURRENCIES}
+
+
+    class Expense(models.Model):
+        amount = models.DecimalField(max_digits=10, decimal_places=2)
+        currency = models.CharField(max_length=3, choices=get_currencies)
+
+Passing a callable for ``choices`` can be particularly handy when, for example,
+the choices are:
+
+* the result of I/O-bound operations (which could potentially be cached), such
+  as querying a table in the same or an external database, or accessing the
+  choices from a static file.
+
+* a list that is mostly stable but could vary from time to time or from
+  project to project. Examples in this category are using third-party apps that
+  provide a well-known inventory of values, such as currencies, countries,
+  languages, time zones, etc.
+
 .. versionchanged:: 5.0
 
-    Support for mappings was added.
+    Support for mappings and callables was added.
 
 Generally, it's best to define choices inside a model class, and to
 define a suitably-named constant for each value::

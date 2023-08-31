@@ -157,14 +157,14 @@ form::
     ]
 
 
-    class Winners(models.Model):
+    class Winner(models.Model):
         name = models.CharField(...)
         medal = models.CharField(..., choices=Medal.choices)
         sport = models.CharField(..., choices=SPORT_CHOICES)
 
-Django 5.0 supports providing a mapping instead of an iterable, and also no
-longer requires ``.choices`` to be used directly to expand :ref:`enumeration
-types <field-choices-enum-types>`::
+Django 5.0 adds support for accepting a mapping or a callable instead of an
+iterable, and also no longer requires ``.choices`` to be used directly to
+expand :ref:`enumeration types <field-choices-enum-types>`::
 
     from django.db import models
 
@@ -177,13 +177,20 @@ types <field-choices-enum-types>`::
     }
 
 
-    class Winners(models.Model):
+    def get_scores():
+        return [(i, str(i)) for i in range(10)]
+
+
+    class Winner(models.Model):
         name = models.CharField(...)
         medal = models.CharField(..., choices=Medal)  # Using `.choices` not required.
         sport = models.CharField(..., choices=SPORT_CHOICES)
+        score = models.IntegerField(choices=get_scores)  # A callable is allowed.
 
 Under the hood the provided ``choices`` are normalized into a list of 2-tuples
-as the canonical form whenever the ``choices`` value is updated.
+as the canonical form whenever the ``choices`` value is updated. For more
+information, please check the :ref:`model field reference on choices
+<field-choices>`.
 
 Minor features
 --------------

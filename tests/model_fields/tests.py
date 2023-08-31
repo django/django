@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.test import SimpleTestCase, TestCase
+from django.utils.choices import CallableChoiceIterator
 from django.utils.functional import lazy
 
 from .models import (
@@ -162,6 +163,7 @@ class ChoicesTests(SimpleTestCase):
         )
         cls.choices_from_enum = Choiceful._meta.get_field("choices_from_enum")
         cls.choices_from_iterator = Choiceful._meta.get_field("choices_from_iterator")
+        cls.choices_from_callable = Choiceful._meta.get_field("choices_from_callable")
 
     def test_choices(self):
         self.assertIsNone(self.no_choices.choices)
@@ -174,6 +176,12 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(
             self.choices_from_iterator.choices, [(0, "0"), (1, "1"), (2, "2")]
         )
+        self.assertIsInstance(
+            self.choices_from_callable.choices, CallableChoiceIterator
+        )
+        self.assertEqual(
+            self.choices_from_callable.choices.func(), [(0, "0"), (1, "1"), (2, "2")]
+        )
 
     def test_flatchoices(self):
         self.assertEqual(self.no_choices.flatchoices, [])
@@ -185,6 +193,9 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(self.with_choices_nested_dict.flatchoices, [(1, "A")])
         self.assertEqual(
             self.choices_from_iterator.flatchoices, [(0, "0"), (1, "1"), (2, "2")]
+        )
+        self.assertEqual(
+            self.choices_from_callable.flatchoices, [(0, "0"), (1, "1"), (2, "2")]
         )
 
     def test_check(self):
@@ -204,9 +215,14 @@ class ChoicesTests(SimpleTestCase):
         self.assertIsInstance(no_choices_formfield, forms.IntegerField)
         fields = (
             self.empty_choices,
-            self.with_choices,
             self.empty_choices_bool,
             self.empty_choices_text,
+            self.with_choices,
+            self.with_choices_dict,
+            self.with_choices_nested_dict,
+            self.choices_from_enum,
+            self.choices_from_iterator,
+            self.choices_from_callable,
         )
         for field in fields:
             with self.subTest(field=field):
