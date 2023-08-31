@@ -55,7 +55,7 @@ class ProgressBar:
     def update(self, count):
         if not self.output:
             return
-        perc = count * 100 // self.total_count
+        perc = min(count * 100 // self.total_count, 100)
         done = perc * self.progress_width // 100
         if self.prev_done >= done:
             return
@@ -64,7 +64,7 @@ class ProgressBar:
         self.output.write(
             cr + "[" + "." * done + " " * (self.progress_width - done) + "]"
         )
-        if done == self.progress_width:
+        if done >= self.progress_width:
             self.output.write("\n")
         self.output.flush()
 
