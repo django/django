@@ -4,8 +4,8 @@ Sets up the terminal color scheme.
 
 import functools
 import os
-import sys
 import platform
+import sys
 
 from django.utils import termcolors
 
