@@ -281,7 +281,7 @@ dependencies:
 * :pypi:`argon2-cffi` 19.2.0+
 * :pypi:`asgiref` 3.7.0+ (required)
 * :pypi:`bcrypt`
-* :pypi:`colorama`
+* :pypi:`colorama` 0.4.6+
 * :pypi:`docutils`
 * :pypi:`geoip2`
 * :pypi:`Jinja2` 2.11+

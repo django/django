@@ -630,6 +630,8 @@ Miscellaneous
   requests with the :mimetype:`application/x-www-form-urlencoded` content type.
   See :rfc:`1866` for more details.
 
+* The minimum supported version of ``colorama`` is increased to 0.4.6.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
