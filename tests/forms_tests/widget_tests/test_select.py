@@ -11,19 +11,17 @@ class SelectTest(ChoiceWidgetTest):
     widget = Select
 
     def test_render(self):
-        self.check_html(
-            self.widget(choices=self.beatles),
-            "beatle",
-            "J",
-            html=(
-                """<select name="beatle">
-            <option value="J" selected>John</option>
-            <option value="P">Paul</option>
-            <option value="G">George</option>
-            <option value="R">Ringo</option>
-            </select>"""
-            ),
-        )
+        html = """
+        <select name="beatle">
+          <option value="J" selected>John</option>
+          <option value="P">Paul</option>
+          <option value="G">George</option>
+          <option value="R">Ringo</option>
+        </select>
+        """
+        for choices in (self.beatles, dict(self.beatles)):
+            with self.subTest(choices):
+                self.check_html(self.widget(choices=choices), "beatle", "J", html=html)
 
     def test_render_none(self):
         """
@@ -237,52 +235,46 @@ class SelectTest(ChoiceWidgetTest):
         """
         Choices can be nested one level in order to create HTML optgroups.
         """
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            None,
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1">Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1">Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        html = """
+        <select name="nestchoice">
+          <option value="outer1">Outer 1</option>
+          <optgroup label="Group &quot;1&quot;">
+          <option value="inner1">Inner 1</option>
+          <option value="inner2">Inner 2</option>
+          </optgroup>
+        </select>
+        """
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", None, html=html)
 
     def test_choices_select_outer(self):
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            "outer1",
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1" selected>Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1">Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        html = """
+        <select name="nestchoice">
+          <option value="outer1" selected>Outer 1</option>
+          <optgroup label="Group &quot;1&quot;">
+          <option value="inner1">Inner 1</option>
+          <option value="inner2">Inner 2</option>
+          </optgroup>
+        </select>
+        """
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", "outer1", html=html)
 
     def test_choices_select_inner(self):
-        self.check_html(
-            self.nested_widget,
-            "nestchoice",
-            "inner1",
-            html=(
-                """<select name="nestchoice">
-            <option value="outer1">Outer 1</option>
-            <optgroup label="Group &quot;1&quot;">
-            <option value="inner1" selected>Inner 1</option>
-            <option value="inner2">Inner 2</option>
-            </optgroup>
-            </select>"""
-            ),
-        )
+        html = """
+        <select name="nestchoice">
+          <option value="outer1">Outer 1</option>
+          <optgroup label="Group &quot;1&quot;">
+          <option value="inner1" selected>Inner 1</option>
+          <option value="inner2">Inner 2</option>
+          </optgroup>
+        </select>
+        """
+        for widget in self.nested_widgets:
+            with self.subTest(widget):
+                self.check_html(widget, "nestchoice", "inner1", html=html)
 
     @override_settings(USE_THOUSAND_SEPARATOR=True)
     def test_doesnt_localize_option_value(self):
@@ -312,24 +304,7 @@ class SelectTest(ChoiceWidgetTest):
         """
         self.check_html(self.widget(choices=choices), "time", None, html=html)
 
-    def test_optgroups(self):
-        choices = [
-            (
-                "Audio",
-                [
-                    ("vinyl", "Vinyl"),
-                    ("cd", "CD"),
-                ],
-            ),
-            (
-                "Video",
-                [
-                    ("vhs", "VHS Tape"),
-                    ("dvd", "DVD"),
-                ],
-            ),
-            ("unknown", "Unknown"),
-        ]
+    def _test_optgroups(self, choices):
         groups = list(
             self.widget(choices=choices).optgroups(
                 "name",
@@ -417,6 +392,27 @@ class SelectTest(ChoiceWidgetTest):
             ],
         )
         self.assertEqual(index, 2)
+
+    def test_optgroups(self):
+        choices_dict = {
+            "Audio": [
+                ("vinyl", "Vinyl"),
+                ("cd", "CD"),
+            ],
+            "Video": [
+                ("vhs", "VHS Tape"),
+                ("dvd", "DVD"),
+            ],
+            "unknown": "Unknown",
+        }
+        choices_list = list(choices_dict.items())
+        choices_nested_dict = {
+            k: dict(v) if isinstance(v, list) else v for k, v in choices_dict.items()
+        }
+
+        for choices in (choices_dict, choices_list, choices_nested_dict):
+            with self.subTest(choices):
+                self._test_optgroups(choices)
 
     def test_doesnt_render_required_when_impossible_to_select_empty_field(self):
         widget = self.widget(choices=[("J", "John"), ("P", "Paul")])

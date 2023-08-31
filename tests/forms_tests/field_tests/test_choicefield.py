@@ -65,6 +65,51 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
         f = ChoiceField(choices=choices)
         self.assertEqual("J", f.clean("J"))
 
+    def test_choicefield_callable_mapping(self):
+        def choices():
+            return {"J": "John", "P": "Paul"}
+
+        f = ChoiceField(choices=choices)
+        self.assertEqual("J", f.clean("J"))
+
+    def test_choicefield_callable_grouped_mapping(self):
+        def choices():
+            return {
+                "Numbers": {"1": "One", "2": "Two"},
+                "Letters": {"3": "A", "4": "B"},
+            }
+
+        f = ChoiceField(choices=choices)
+        for i in ("1", "2", "3", "4"):
+            with self.subTest(i):
+                self.assertEqual(i, f.clean(i))
+
+    def test_choicefield_mapping(self):
+        f = ChoiceField(choices={"J": "John", "P": "Paul"})
+        self.assertEqual("J", f.clean("J"))
+
+    def test_choicefield_grouped_mapping(self):
+        f = ChoiceField(
+            choices={
+                "Numbers": (("1", "One"), ("2", "Two")),
+                "Letters": (("3", "A"), ("4", "B")),
+            }
+        )
+        for i in ("1", "2", "3", "4"):
+            with self.subTest(i):
+                self.assertEqual(i, f.clean(i))
+
+    def test_choicefield_grouped_mapping_inner_dict(self):
+        f = ChoiceField(
+            choices={
+                "Numbers": {"1": "One", "2": "Two"},
+                "Letters": {"3": "A", "4": "B"},
+            }
+        )
+        for i in ("1", "2", "3", "4"):
+            with self.subTest(i):
+                self.assertEqual(i, f.clean(i))
+
     def test_choicefield_callable_may_evaluate_to_different_values(self):
         choices = []
 
@@ -76,11 +121,13 @@ class ChoiceFieldTest(FormFieldAssertionsMixin, SimpleTestCase):
 
         choices = [("J", "John")]
         form = ChoiceFieldForm()
-        self.assertEqual([("J", "John")], list(form.fields["choicefield"].choices))
+        self.assertEqual(choices, list(form.fields["choicefield"].choices))
+        self.assertEqual(choices, list(form.fields["choicefield"].widget.choices))
 
         choices = [("P", "Paul")]
         form = ChoiceFieldForm()
-        self.assertEqual([("P", "Paul")], list(form.fields["choicefield"].choices))
+        self.assertEqual(choices, list(form.fields["choicefield"].choices))
+        self.assertEqual(choices, list(form.fields["choicefield"].widget.choices))
 
     def test_choicefield_disabled(self):
         f = ChoiceField(choices=[("J", "John"), ("P", "Paul")], disabled=True)
