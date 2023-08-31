@@ -978,6 +978,31 @@ class CustomPrefetchTests(TestCase):
         with self.assertNumQueries(5):
             self.traverse_qs(list(houses), [["occupants", "houses", "main_room"]])
 
+    def test_nested_prefetch_related_with_duplicate_prefetch_and_depth(self):
+        people = Person.objects.prefetch_related(
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+            "houses__main_room",
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        people = Person.objects.prefetch_related(
+            "houses__main_room",
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        self.assertEqual(main_room.main_room, self.room1_1)
+
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
         with self.assertRaisesMessage(ValueError, msg):
