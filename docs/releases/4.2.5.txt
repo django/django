@@ -21,3 +21,6 @@ Bugfixes
 * Fixed a regression in Django 4.2.2 that caused an unnecessary selection of a
   non-nullable ``ManyToManyField`` without a natural key during serialization
   (:ticket:`34779`).
+
+* Fixed a regression in Django 4.2 that caused a crash of a queryset when
+  filtering against deeply nested ``OuterRef()`` annotations (:ticket:`34803`).
