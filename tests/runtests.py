@@ -790,7 +790,7 @@ if __name__ == "__main__":
                 options.parallel,
                 options.tags,
                 options.exclude_tags,
-                getattr(options, "test_name_patterns", None),
+                options.test_name_patterns,
                 options.start_at,
                 options.start_after,
                 options.pdb,
