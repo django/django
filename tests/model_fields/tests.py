@@ -156,15 +156,21 @@ class ChoicesTests(SimpleTestCase):
         cls.empty_choices_bool = Choiceful._meta.get_field("empty_choices_bool")
         cls.empty_choices_text = Choiceful._meta.get_field("empty_choices_text")
         cls.with_choices = Choiceful._meta.get_field("with_choices")
+        cls.with_choices_dict = Choiceful._meta.get_field("with_choices_dict")
+        cls.with_choices_nested_dict = Choiceful._meta.get_field(
+            "with_choices_nested_dict"
+        )
         cls.choices_from_enum = Choiceful._meta.get_field("choices_from_enum")
         cls.choices_from_iterator = Choiceful._meta.get_field("choices_from_iterator")
 
     def test_choices(self):
         self.assertIsNone(self.no_choices.choices)
-        self.assertEqual(self.empty_choices.choices, ())
-        self.assertEqual(self.empty_choices_bool.choices, ())
-        self.assertEqual(self.empty_choices_text.choices, ())
+        self.assertEqual(self.empty_choices.choices, [])
+        self.assertEqual(self.empty_choices_bool.choices, [])
+        self.assertEqual(self.empty_choices_text.choices, [])
         self.assertEqual(self.with_choices.choices, [(1, "A")])
+        self.assertEqual(self.with_choices_dict.choices, [(1, "A")])
+        self.assertEqual(self.with_choices_nested_dict.choices, [("Thing", [(1, "A")])])
         self.assertEqual(
             self.choices_from_iterator.choices, [(0, "0"), (1, "1"), (2, "2")]
         )
@@ -175,6 +181,8 @@ class ChoicesTests(SimpleTestCase):
         self.assertEqual(self.empty_choices_bool.flatchoices, [])
         self.assertEqual(self.empty_choices_text.flatchoices, [])
         self.assertEqual(self.with_choices.flatchoices, [(1, "A")])
+        self.assertEqual(self.with_choices_dict.flatchoices, [(1, "A")])
+        self.assertEqual(self.with_choices_nested_dict.flatchoices, [(1, "A")])
         self.assertEqual(
             self.choices_from_iterator.flatchoices, [(0, "0"), (1, "1"), (2, "2")]
         )
@@ -290,11 +298,11 @@ class GetChoicesTests(SimpleTestCase):
             ("b", "Bar"),
             (
                 "Group",
-                (
+                [
                     ("", "No Preference"),
                     ("fg", "Foo"),
                     ("bg", "Bar"),
-                ),
+                ],
             ),
         ]
         f = models.CharField(choices=choices)
@@ -302,7 +310,7 @@ class GetChoicesTests(SimpleTestCase):
 
     def test_lazy_strings_not_evaluated(self):
         lazy_func = lazy(lambda x: 0 / 0, int)  # raises ZeroDivisionError if evaluated.
-        f = models.CharField(choices=[(lazy_func("group"), (("a", "A"), ("b", "B")))])
+        f = models.CharField(choices=[(lazy_func("group"), [("a", "A"), ("b", "B")])])
         self.assertEqual(f.get_choices(include_blank=True)[0], ("", "---------"))
 
 

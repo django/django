@@ -1,4 +1,3 @@
-import collections.abc
 import copy
 import datetime
 import decimal
@@ -14,9 +13,9 @@ from django.conf import settings
 from django.core import checks, exceptions, validators
 from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
-from django.db.models.enums import ChoicesMeta
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
+from django.utils.choices import CallableChoiceIterator, normalize_choices
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date,
@@ -225,10 +224,6 @@ class Field(RegisterLookupMixin):
         self.unique_for_date = unique_for_date
         self.unique_for_month = unique_for_month
         self.unique_for_year = unique_for_year
-        if isinstance(choices, ChoicesMeta):
-            choices = choices.choices
-        if isinstance(choices, collections.abc.Iterator):
-            choices = list(choices)
         self.choices = choices
         self.help_text = help_text
         self.db_index = db_index
@@ -320,10 +315,13 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        if not is_iterable(self.choices) or isinstance(self.choices, str):
+        if not is_iterable(self.choices) or isinstance(
+            self.choices, (str, CallableChoiceIterator)
+        ):
             return [
                 checks.Error(
-                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
                     obj=self,
                     id="fields.E004",
                 )
@@ -381,8 +379,8 @@ class Field(RegisterLookupMixin):
 
         return [
             checks.Error(
-                "'choices' must be an iterable containing "
-                "(actual value, human readable name) tuples.",
+                "'choices' must be a mapping of actual values to human readable names "
+                "or an iterable containing (actual value, human readable name) tuples.",
                 obj=self,
                 id="fields.E005",
             )
@@ -543,6 +541,14 @@ class Field(RegisterLookupMixin):
 
         return Col(alias, self, output_field)
 
+    @property
+    def choices(self):
+        return self._choices
+
+    @choices.setter
+    def choices(self, value):
+        self._choices = normalize_choices(value)
+
     @cached_property
     def cached_col(self):
         from django.db.models.expressions import Col
@@ -625,9 +631,8 @@ class Field(RegisterLookupMixin):
         equals_comparison = {"choices", "validators"}
         for name, default in possibles.items():
             value = getattr(self, attr_overrides.get(name, name))
-            # Unroll anything iterable for choices into a concrete list
-            if name == "choices" and isinstance(value, collections.abc.Iterable):
-                value = list(value)
+            if isinstance(value, CallableChoiceIterator):
+                value = value.func
             # Do correct kind of comparison
             if name in equals_comparison:
                 if value != default:

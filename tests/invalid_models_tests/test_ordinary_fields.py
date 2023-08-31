@@ -199,7 +199,8 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -217,8 +218,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -260,8 +262,9 @@ class CharFieldTests(TestCase):
                     field.check(),
                     [
                         Error(
-                            "'choices' must be an iterable containing (actual "
-                            "value, human readable name) tuples.",
+                            "'choices' must be a mapping of actual values to human "
+                            "readable names or an iterable containing (actual value, "
+                            "human readable name) tuples.",
                             obj=field,
                             id="fields.E005",
                         ),
@@ -309,8 +312,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -337,8 +341,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -385,6 +390,26 @@ class CharFieldTests(TestCase):
                         ),
                     ],
                 )
+
+    def test_choices_callable(self):
+        def get_choices():
+            return [(i, i) for i in range(3)]
+
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=get_choices)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
 
     def test_bad_db_index_value(self):
         class Model(models.Model):
@@ -854,7 +879,8 @@ class IntegerFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -872,8 +898,9 @@ class IntegerFieldTests(SimpleTestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, human "
-                    "readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),

@@ -262,7 +262,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     ):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
-        self.choices = widget.choices
         self.widget = widget
         self.rel = rel
         # Backwards compatible check for whether a user can add related
@@ -295,6 +294,14 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def media(self):
         return self.widget.media
 
+    @property
+    def choices(self):
+        return self.widget.choices
+
+    @choices.setter
+    def choices(self, value):
+        self.widget.choices = value
+
     def get_related_url(self, info, action, *args):
         return reverse(
             "admin:%s_%s_%s" % (info + (action,)),
@@ -307,7 +314,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
-        self.widget.choices = self.choices
         related_field_name = self.rel.get_related_field().name
         url_params = "&".join(
             "%s=%s" % param
