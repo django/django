@@ -1,6 +1,5 @@
 from collections.abc import Callable, Iterable, Iterator, Mapping
 
-from django.db.models.enums import ChoicesMeta
 from django.utils.functional import Promise
 
 
@@ -20,6 +19,8 @@ class CallableChoiceIterator(ChoiceIterator):
 
 def normalize_choices(value, *, depth=0):
     """Normalize choices values consistently for fields and widgets."""
+    # Avoid circular import when importing django.forms.
+    from django.db.models.enums import ChoicesMeta
 
     match value:
         case ChoiceIterator() | Promise() | bytes() | str():
