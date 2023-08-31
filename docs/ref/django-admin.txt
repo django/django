@@ -1931,7 +1931,7 @@ two third-party libraries are needed:
 
   .. code-block:: doscon
 
-    ...\> py -m pip install colorama
+    ...\> py -m pip install "colorama >= 0.4.6"
 
 * Install `ANSICON`_, a third-party tool that allows ``cmd.exe`` to process
   ANSI color codes. Django commands will detect its presence and will make use

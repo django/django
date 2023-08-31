@@ -103,12 +103,12 @@ terminal. In modern terminals this should work for both CMD and PowerShell. If
 for some reason this needs to be disabled, set the environmental variable
 :envvar:`DJANGO_COLORS` to ``nocolor``.
 
-On older Windows versions, or legacy terminals, :pypi:`colorama` must be
+On older Windows versions, or legacy terminals, :pypi:`colorama` 0.4.6+ must be
 installed to enable syntax coloring:
 
 .. code-block:: doscon
 
-    ...\> py -m pip install colorama
+    ...\> py -m pip install "colorama >= 0.4.6"
 
 See :ref:`syntax-coloring` for more information on color settings.
 
