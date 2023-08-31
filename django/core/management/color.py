@@ -5,17 +5,21 @@ Sets up the terminal color scheme.
 import functools
 import os
 import sys
+import platform
 
 from django.utils import termcolors
 
-try:
-    import colorama
+if platform.system() == "Windows":
+    try:
+        import colorama
 
-    colorama.init()
-except (ImportError, OSError):
-    HAS_COLORAMA = False
+        colorama.init()
+    except (ImportError, OSError):
+        HAS_COLORAMA = False
+    else:
+        HAS_COLORAMA = True
 else:
-    HAS_COLORAMA = True
+    HAS_COLORAMA = False
 
 
 def supports_color():
