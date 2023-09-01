@@ -760,6 +760,7 @@ class Select(ChoiceWidget):
         context = super().get_context(name, value, attrs)
         if self.allow_multiple_selected:
             context["widget"]["attrs"]["multiple"] = True
+            context["widget"]["attrs"]["data-context"] = "available-source"
         return context
 
     @staticmethod

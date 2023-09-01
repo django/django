@@ -1536,7 +1536,7 @@ class ModelFormBasicTests(TestCase):
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required></textarea></li>
-            <li>Categories: <select multiple name="categories">
+            <li>Categories: <select data-context="available-source" multiple name="categories">
             <option value="%s" selected>Entertainment</option>
             <option value="%s" selected>It&#x27;s a test</option>
             <option value="%s">Third test</option>
@@ -1590,7 +1590,7 @@ class ModelFormBasicTests(TestCase):
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-            <li>Categories: <select multiple name="categories">
+            <li>Categories: <select data-context="available-source" multiple name="categories">
             <option value="%s">Entertainment</option>
             <option value="%s">It&#x27;s a test</option>
             <option value="%s">Third test</option>
@@ -1647,7 +1647,7 @@ class ModelFormBasicTests(TestCase):
             """<li><label for="id_headline">Headline:</label>
 <input id="id_headline" type="text" name="headline" maxlength="50" required></li>
 <li><label for="id_categories">Categories:</label>
-<select multiple name="categories" id="id_categories">
+<select multiple name="categories" data-context="available-source" id="id_categories">
 <option value="%d" selected>Entertainment</option>
 <option value="%d" selected>It&#x27;s a test</option>
 <option value="%d">Third test</option>
@@ -1738,7 +1738,7 @@ class ModelFormBasicTests(TestCase):
                 <textarea name="article" cols="40" rows="10" required></textarea>
             </div>
             <div>Categories:
-                <select name="categories" multiple>
+                <select data-context="available-source" name="categories" multiple>
                     <option value="%s">Entertainment</option>
                     <option value="%s">It&#x27;s a test</option>
                     <option value="%s">Third test</option>
@@ -1785,7 +1785,7 @@ class ModelFormBasicTests(TestCase):
             </select></li>
             <li>Article:
             <textarea rows="10" cols="40" name="article" required>Hello.</textarea></li>
-            <li>Categories: <select multiple name="categories">
+            <li>Categories: <select data-context="available-source" multiple name="categories">
             <option value="%s" selected>Entertainment</option>
             <option value="%s">It&#x27;s a test</option>
             <option value="%s">Third test</option>
@@ -1959,7 +1959,7 @@ class ModelFormBasicTests(TestCase):
             "</select></li>"
             '<li>Article: <textarea rows="10" cols="40" name="article" required>'
             "</textarea></li>"
-            '<li>Categories: <select multiple name="categories">'
+            '<li>Categories: <select data-context="available-source" multiple name="categories">'
             '<option value="%s">Entertainment</option>'
             '<option value="%s">It&#x27;s a test</option>'
             '<option value="%s">Third test</option>'
@@ -1989,7 +1989,7 @@ class ModelFormBasicTests(TestCase):
             "</select></li>"
             '<li>Article: <textarea rows="10" cols="40" name="article" required>'
             "</textarea></li>"
-            '<li>Categories: <select multiple name="categories">'
+            '<li>Categories: <select data-context="available-source" multiple name="categories">'
             '<option value="%s">Entertainment</option>'
             '<option value="%s">It&#x27;s a test</option>'
             '<option value="%s">Third test</option>'
@@ -3076,7 +3076,7 @@ class OtherModelFormTests(TestCase):
             <label for="id_name">Name:</label>
             <input id="id_name" type="text" name="name" maxlength="50" required></p>
             <p><label for="id_colours">Colours:</label>
-            <select multiple name="colours" id="id_colours" required>
+            <select multiple data-context="available-source" name="colours" id="id_colours" required>
             <option value="%(blue_pk)s">Blue</option>
             </select></p>
             """

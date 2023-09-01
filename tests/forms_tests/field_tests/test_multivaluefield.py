@@ -159,7 +159,7 @@ class MultiValueFieldTest(SimpleTestCase):
             """
             <tr><th><label>Field1:</label></th>
             <td><input type="text" name="field1_0" id="id_field1_0" required>
-            <select multiple name="field1_1" id="id_field1_1" required>
+            <select data-context="available-source" multiple name="field1_1" id="id_field1_1" required>
             <option value="J">John</option>
             <option value="P">Paul</option>
             <option value="G">George</option>
@@ -185,7 +185,7 @@ class MultiValueFieldTest(SimpleTestCase):
             <tr><th><label>Field1:</label></th>
             <td><input type="text" name="field1_0" value="some text" id="id_field1_0"
                 required>
-            <select multiple name="field1_1" id="id_field1_1" required>
+            <select data-context="available-source" multiple name="field1_1" id="id_field1_1" required>
             <option value="J" selected>John</option>
             <option value="P" selected>Paul</option>
             <option value="G">George</option>
