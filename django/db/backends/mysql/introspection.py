@@ -11,7 +11,8 @@ from django.utils.datastructures import OrderedSet
 
 FieldInfo = namedtuple(
     "FieldInfo",
-    BaseFieldInfo._fields + ("extra", "is_unsigned", "has_json_constraint", "comment"),
+    BaseFieldInfo._fields
+    + ("extra", "is_unsigned", "has_json_constraint", "comment", "data_type"),
 )
 InfoLine = namedtuple(
     "InfoLine",
@@ -62,6 +63,8 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 return "PositiveIntegerField"
             elif field_type == "SmallIntegerField":
                 return "PositiveSmallIntegerField"
+        if description.data_type.upper() == "UUID":
+            return "UUIDField"
         # JSON data type is an alias for LONGTEXT in MariaDB, use check
         # constraints clauses to introspect JSONField.
         if description.has_json_constraint:
@@ -172,6 +175,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     info.is_unsigned,
                     line[0] in json_constraints,
                     info.comment,
+                    info.data_type,
                 )
             )
         return fields
@@ -194,6 +198,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
             FROM information_schema.key_column_usage
             WHERE table_name = %s
                 AND table_schema = DATABASE()
+                AND referenced_table_schema = DATABASE()
                 AND referenced_table_name IS NOT NULL
                 AND referenced_column_name IS NOT NULL
             """,
@@ -253,6 +258,10 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 information_schema.table_constraints AS c
             WHERE
                 kc.table_schema = DATABASE() AND
+                (
+                    kc.referenced_table_schema = DATABASE() OR
+                    kc.referenced_table_schema IS NULL
+                ) AND
                 c.table_schema = kc.table_schema AND
                 c.constraint_name = kc.constraint_name AND
                 c.constraint_type != 'CHECK' AND

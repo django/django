@@ -1135,8 +1135,11 @@ class AsyncClientTest(TestCase):
         response = await self.async_client.get("/middleware_urlconf_view/")
         self.assertEqual(response.resolver_match.url_name, "middleware_urlconf_view")
 
-    async def test_follow_parameter_not_implemented(self):
-        msg = "AsyncClient request methods do not accept the follow parameter."
+    async def test_redirect(self):
+        response = await self.async_client.get("/redirect_view/")
+        self.assertEqual(response.status_code, 302)
+
+    async def test_follow_redirect(self):
         tests = (
             "get",
             "post",
@@ -1150,8 +1153,16 @@ class AsyncClientTest(TestCase):
         for method_name in tests:
             with self.subTest(method=method_name):
                 method = getattr(self.async_client, method_name)
-                with self.assertRaisesMessage(NotImplementedError, msg):
-                    await method("/redirect_view/", follow=True)
+                response = await method("/redirect_view/", follow=True)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.resolver_match.url_name, "get_view")
+
+    async def test_follow_double_redirect(self):
+        response = await self.async_client.get("/double_redirect_view/", follow=True)
+        self.assertRedirects(
+            response, "/get_view/", status_code=302, target_status_code=200
+        )
+        self.assertEqual(len(response.redirect_chain), 2)
 
     async def test_get_data(self):
         response = await self.async_client.get("/get_view/", {"var": "val"})

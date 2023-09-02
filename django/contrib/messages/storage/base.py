@@ -32,6 +32,10 @@ class Message:
     def __str__(self):
         return str(self.message)
 
+    def __repr__(self):
+        extra_tags = f", extra_tags={self.extra_tags!r}" if self.extra_tags else ""
+        return f"Message(level={self.level}, message={self.message!r}{extra_tags})"
+
     @property
     def tags(self):
         return " ".join(tag for tag in [self.extra_tags, self.level_tag] if tag)

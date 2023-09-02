@@ -1,7 +1,5 @@
 from functools import partial
 
-from asgiref.sync import sync_to_async
-
 from django.contrib import auth
 from django.contrib.auth import load_backend
 from django.contrib.auth.backends import RemoteUserBackend
@@ -18,7 +16,7 @@ def get_user(request):
 
 async def auser(request):
     if not hasattr(request, "_acached_user"):
-        request._acached_user = await sync_to_async(auth.get_user)(request)
+        request._acached_user = await auth.aget_user(request)
     return request._acached_user
 
 

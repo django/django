@@ -91,7 +91,10 @@ class DecimalFieldTests(TestCase):
         Really big values can be used in a filter statement.
         """
         # This should not crash.
-        Foo.objects.filter(d__gte=100000000000)
+        self.assertSequenceEqual(Foo.objects.filter(d__gte=100000000000), [])
+
+    def test_lookup_decimal_larger_than_max_digits(self):
+        self.assertSequenceEqual(Foo.objects.filter(d__lte=Decimal("123456")), [])
 
     def test_max_digits_validation(self):
         field = models.DecimalField(max_digits=2)

@@ -52,7 +52,7 @@ FORBIDDEN_ALIAS_PATTERN = _lazy_re_compile(r"['`\"\]\[;\s]|--|/\*|\*/")
 
 # Inspired from
 # https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w\-]+")
+EXPLAIN_OPTIONS_PATTERN = _lazy_re_compile(r"[\w-]+")
 
 
 def get_field_names_from_opts(opts):
@@ -65,22 +65,57 @@ def get_field_names_from_opts(opts):
     )
 
 
+def get_paths_from_expression(expr):
+    if isinstance(expr, F):
+        yield expr.name
+    elif hasattr(expr, "flatten"):
+        for child in expr.flatten():
+            if isinstance(child, F):
+                yield child.name
+            elif isinstance(child, Q):
+                yield from get_children_from_q(child)
+
+
 def get_children_from_q(q):
     for child in q.children:
         if isinstance(child, Node):
             yield from get_children_from_q(child)
-        else:
-            yield child
+        elif isinstance(child, tuple):
+            lhs, rhs = child
+            yield lhs
+            if hasattr(rhs, "resolve_expression"):
+                yield from get_paths_from_expression(rhs)
+        elif hasattr(child, "resolve_expression"):
+            yield from get_paths_from_expression(child)
+
+
+def get_child_with_renamed_prefix(prefix, replacement, child):
+    if isinstance(child, Node):
+        return rename_prefix_from_q(prefix, replacement, child)
+    if isinstance(child, tuple):
+        lhs, rhs = child
+        lhs = lhs.replace(prefix, replacement, 1)
+        if not isinstance(rhs, F) and hasattr(rhs, "resolve_expression"):
+            rhs = get_child_with_renamed_prefix(prefix, replacement, rhs)
+        return lhs, rhs
+
+    if isinstance(child, F):
+        child = child.copy()
+        child.name = child.name.replace(prefix, replacement, 1)
+    elif hasattr(child, "resolve_expression"):
+        child = child.copy()
+        child.set_source_expressions(
+            [
+                get_child_with_renamed_prefix(prefix, replacement, grand_child)
+                for grand_child in child.get_source_expressions()
+            ]
+        )
+    return child
 
 
 def rename_prefix_from_q(prefix, replacement, q):
     return Q.create(
-        [
-            rename_prefix_from_q(prefix, replacement, c)
-            if isinstance(c, Node)
-            else (c[0].replace(prefix, replacement, 1), c[1])
-            for c in q.children
-        ],
+        [get_child_with_renamed_prefix(prefix, replacement, c) for c in q.children],
         q.connector,
         q.negated,
     )
@@ -400,7 +435,12 @@ class Query(BaseExpression):
         """
         if not aggregate_exprs:
             return {}
-        aggregates = {}
+        # Store annotation mask prior to temporarily adding aggregations for
+        # resolving purpose to facilitate their subsequent removal.
+        refs_subquery = False
+        refs_window = False
+        replacements = {}
+        annotation_select_mask = self.annotation_select_mask
         for alias, aggregate_expr in aggregate_exprs.items():
             self.check_alias(alias)
             aggregate = aggregate_expr.resolve_expression(
@@ -408,7 +448,24 @@ class Query(BaseExpression):
             )
             if not aggregate.contains_aggregate:
                 raise TypeError("%s is not an aggregate expression" % alias)
-            aggregates[alias] = aggregate
+            # Temporarily add aggregate to annotations to allow remaining
+            # members of `aggregates` to resolve against each others.
+            self.append_annotation_mask([alias])
+            refs_subquery |= any(
+                getattr(self.annotations[ref], "subquery", False)
+                for ref in aggregate.get_refs()
+            )
+            refs_window |= any(
+                getattr(self.annotations[ref], "contains_over_clause", True)
+                for ref in aggregate.get_refs()
+            )
+            aggregate = aggregate.replace_expressions(replacements)
+            self.annotations[alias] = aggregate
+            replacements[Ref(alias, aggregate)] = aggregate
+        # Stash resolved aggregates now that they have been allowed to resolve
+        # against each other.
+        aggregates = {alias: self.annotations.pop(alias) for alias in aggregate_exprs}
+        self.set_annotation_mask(annotation_select_mask)
         # Existing usage of aggregation can be determined by the presence of
         # selected aggregates but also by filters against aliased aggregates.
         _, having, qualify = self.where.split_having_qualify()
@@ -433,6 +490,8 @@ class Query(BaseExpression):
             isinstance(self.group_by, tuple)
             or self.is_sliced
             or has_existing_aggregation
+            or refs_subquery
+            or refs_window
             or qualify
             or self.distinct
             or self.combinator
@@ -471,6 +530,11 @@ class Query(BaseExpression):
                             annotation_mask |= expr.get_refs()
                     for aggregate in aggregates.values():
                         annotation_mask |= aggregate.get_refs()
+                    # Avoid eliding expressions that might have an incidence on
+                    # the implicit grouping logic.
+                    for annotation_alias, annotation in self.annotation_select.items():
+                        if annotation.get_group_by_cols():
+                            annotation_mask.add(annotation_alias)
                     inner_query.set_annotation_mask(annotation_mask)
 
             # Add aggregates to the outer AggregateQuery. This requires making
@@ -738,7 +802,15 @@ class Query(BaseExpression):
                 field_select_mask = select_mask.setdefault((field_name, relation), {})
                 field = relation.field
             else:
-                field = opts.get_field(field_name).field
+                reverse_rel = opts.get_field(field_name)
+                # While virtual fields such as many-to-many and generic foreign
+                # keys cannot be effectively deferred we've historically
+                # allowed them to be passed to QuerySet.defer(). Ignore such
+                # field references until a layer of validation at mask
+                # alteration time will be implemented eventually.
+                if not hasattr(reverse_rel, "field"):
+                    continue
+                field = reverse_rel.field
                 field_select_mask = select_mask.setdefault(field, {})
             related_model = field.model._meta.concrete_model
             self._get_defer_select_mask(
@@ -753,7 +825,13 @@ class Query(BaseExpression):
         # Only include fields mentioned in the mask.
         for field_name, field_mask in mask.items():
             field = opts.get_field(field_name)
-            field_select_mask = select_mask.setdefault(field, {})
+            # Retrieve the actual field associated with reverse relationships
+            # as that's what is expected in the select mask.
+            if field in opts.related_objects:
+                field_key = field.field
+            else:
+                field_key = field
+            field_select_mask = select_mask.setdefault(field_key, {})
             if field_mask:
                 if not field.is_relation:
                     raise FieldError(next(iter(field_mask)))
@@ -1572,7 +1650,6 @@ class Query(BaseExpression):
 
     def add_filtered_relation(self, filtered_relation, alias):
         filtered_relation.alias = alias
-        lookups = dict(get_children_from_q(filtered_relation.condition))
         relation_lookup_parts, relation_field_parts, _ = self.solve_lookup_type(
             filtered_relation.relation_name
         )
@@ -1581,7 +1658,7 @@ class Query(BaseExpression):
                 "FilteredRelation's relation_name cannot contain lookups "
                 "(got %r)." % filtered_relation.relation_name
             )
-        for lookup in chain(lookups):
+        for lookup in get_children_from_q(filtered_relation.condition):
             lookup_parts, lookup_field_parts, _ = self.solve_lookup_type(lookup)
             shift = 2 if not lookup_parts else 1
             lookup_field_path = lookup_field_parts[:-shift]
@@ -1624,7 +1701,7 @@ class Query(BaseExpression):
         path, names_with_path = [], []
         for pos, name in enumerate(names):
             cur_names_with_path = (name, [])
-            if name == "pk":
+            if name == "pk" and opts is not None:
                 name = opts.pk.name
 
             field = None
@@ -1988,10 +2065,11 @@ class Query(BaseExpression):
             lookup = lookup_class(pk.get_col(query.select[0].alias), pk.get_col(alias))
             query.where.add(lookup, AND)
             query.external_aliases[alias] = True
+        else:
+            lookup_class = select_field.get_lookup("exact")
+            lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
+            query.where.add(lookup, AND)
 
-        lookup_class = select_field.get_lookup("exact")
-        lookup = lookup_class(col, ResolvedOuterRef(trimmed_prefix))
-        query.where.add(lookup, AND)
         condition, needed_inner = self.build_filter(Exists(query))
 
         if contains_louter:
@@ -2003,11 +2081,10 @@ class Query(BaseExpression):
             )
             condition.add(or_null_condition, OR)
             # Note that the end result will be:
-            # (outercol NOT IN innerq AND outercol IS NOT NULL) OR outercol IS NULL.
-            # This might look crazy but due to how IN works, this seems to be
-            # correct. If the IS NOT NULL check is removed then outercol NOT
-            # IN will return UNKNOWN. If the IS NULL check is removed, then if
-            # outercol IS NULL we will not match the row.
+            #   NOT EXISTS (inner_q) OR outercol IS NULL
+            # this might look crazy but due to how NULL works, this seems to be
+            # correct. If the IS NULL check is removed, then if outercol
+            # IS NULL we will not match the row.
         return condition, needed_inner
 
     def set_empty(self):

@@ -79,21 +79,23 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
     def create_options(self):
         options = self.import_options(self.browser)()
         if self.headless:
-            try:
-                options.headless = True
-            except AttributeError:
-                pass  # Only Chrome and Firefox support the headless mode.
+            match self.browser:
+                case "chrome":
+                    options.add_argument("--headless=new")
+                case "firefox":
+                    options.add_argument("-headless")
         return options
 
     def create_webdriver(self):
+        options = self.create_options()
         if self.selenium_hub:
             from selenium import webdriver
 
-            return webdriver.Remote(
-                command_executor=self.selenium_hub,
-                desired_capabilities=self.get_capability(self.browser),
-            )
-        return self.import_webdriver(self.browser)(options=self.create_options())
+            for key, value in self.get_capability(self.browser).items():
+                options.set_capability(key, value)
+
+            return webdriver.Remote(command_executor=self.selenium_hub, options=options)
+        return self.import_webdriver(self.browser)(options=options)
 
 
 @tag("selenium")
@@ -114,15 +116,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium = cls.create_webdriver()
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
+        cls.addClassCleanup(cls._quit_selenium)
 
     @classmethod
-    def _tearDownClassInternal(cls):
+    def _quit_selenium(cls):
         # quit() the WebDriver before attempting to terminate and join the
         # single-threaded LiveServerThread to avoid a dead lock if the browser
         # kept a connection alive.
         if hasattr(cls, "selenium"):
             cls.selenium.quit()
-        super()._tearDownClassInternal()
 
     @contextmanager
     def disable_implicit_wait(self):

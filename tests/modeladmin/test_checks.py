@@ -4,10 +4,11 @@ from django.contrib.admin import BooleanFieldListFilter, SimpleListFilter
 from django.contrib.admin.options import VERTICAL, ModelAdmin, TabularInline
 from django.contrib.admin.sites import AdminSite
 from django.core.checks import Error
-from django.db.models import CASCADE, F, Field, ForeignKey, Model
+from django.db.models import CASCADE, F, Field, ForeignKey, ManyToManyField, Model
 from django.db.models.functions import Upper
 from django.forms.models import BaseModelFormSet
 from django.test import SimpleTestCase
+from django.test.utils import isolate_apps
 
 from .models import Band, Song, User, ValidationTestInlineModel, ValidationTestModel
 
@@ -321,6 +322,26 @@ class FilterVerticalCheckTests(CheckTestCase):
             "admin.E020",
         )
 
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_vertical = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_vertical[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
+        )
+
     def test_valid_case(self):
         class TestModelAdmin(ModelAdmin):
             filter_vertical = ("users",)
@@ -361,6 +382,26 @@ class FilterHorizontalCheckTests(CheckTestCase):
             ValidationTestModel,
             "The value of 'filter_horizontal[0]' must be a many-to-many field.",
             "admin.E020",
+        )
+
+    @isolate_apps("modeladmin")
+    def test_invalid_m2m_field_with_through(self):
+        class Artist(Model):
+            bands = ManyToManyField("Band", through="BandArtist")
+
+        class BandArtist(Model):
+            artist = ForeignKey("Artist", on_delete=CASCADE)
+            band = ForeignKey("Band", on_delete=CASCADE)
+
+        class TestModelAdmin(ModelAdmin):
+            filter_horizontal = ["bands"]
+
+        self.assertIsInvalid(
+            TestModelAdmin,
+            Artist,
+            "The value of 'filter_horizontal[0]' cannot include the ManyToManyField "
+            "'bands', because that field manually specifies a relationship model.",
+            "admin.E013",
         )
 
     def test_valid_case(self):

@@ -3,6 +3,7 @@ import json
 from contextlib import contextmanager
 
 from django.contrib import admin
+from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth.models import Permission, User
@@ -61,8 +62,11 @@ site.register(Toy, autocomplete_fields=["child"])
 
 @contextmanager
 def model_admin(model, model_admin, admin_site=site):
-    org_admin = admin_site._registry.get(model)
-    if org_admin:
+    try:
+        org_admin = admin_site.get_model_admin(model)
+    except NotRegistered:
+        org_admin = None
+    else:
         admin_site.unregister(model)
     admin_site.register(model, model_admin)
     try:
@@ -431,17 +435,20 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.live_server_url + reverse("autocomplete_admin:admin_views_answer_add")
         )
         elem = self.selenium.find_element(By.CSS_SELECTOR, ".select2-selection")
-        elem.click()  # Open the autocomplete dropdown.
+        with self.select2_ajax_wait():
+            elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
         self.assertTrue(results.is_displayed())
         option = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results__option")
         self.assertEqual(option.text, "No results found")
-        elem.click()  # Close the autocomplete dropdown.
+        with self.select2_ajax_wait():
+            elem.click()  # Close the autocomplete dropdown.
         q1 = Question.objects.create(question="Who am I?")
         Question.objects.bulk_create(
             Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10)
         )
-        elem.click()  # Reopen the dropdown now that some objects exist.
+        with self.select2_ajax_wait():
+            elem.click()  # Reopen the dropdown now that some objects exist.
         result_container = self.selenium.find_element(
             By.CSS_SELECTOR, ".select2-results"
         )
@@ -478,7 +485,8 @@ class SeleniumTests(AdminSeleniumTestCase):
             ".select2-results__option", 1, root_element=result_container
         )
         # Select the result.
-        search.send_keys(Keys.RETURN)
+        with self.select2_ajax_wait():
+            search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element(By.ID, "id_question"))
         self.assertEqual(
             select.first_selected_option.get_attribute("value"), str(q1.pk)
@@ -494,17 +502,20 @@ class SeleniumTests(AdminSeleniumTestCase):
             + reverse("autocomplete_admin:admin_views_question_add")
         )
         elem = self.selenium.find_element(By.CSS_SELECTOR, ".select2-selection")
-        elem.click()  # Open the autocomplete dropdown.
+        with self.select2_ajax_wait():
+            elem.click()  # Open the autocomplete dropdown.
         results = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results")
         self.assertTrue(results.is_displayed())
         option = self.selenium.find_element(By.CSS_SELECTOR, ".select2-results__option")
         self.assertEqual(option.text, "No results found")
-        elem.click()  # Close the autocomplete dropdown.
+        with self.select2_ajax_wait():
+            elem.click()  # Close the autocomplete dropdown.
         Question.objects.create(question="Who am I?")
         Question.objects.bulk_create(
             Question(question=str(i)) for i in range(PAGINATOR_SIZE + 10)
         )
-        elem.click()  # Reopen the dropdown now that some objects exist.
+        with self.select2_ajax_wait():
+            elem.click()  # Reopen the dropdown now that some objects exist.
         result_container = self.selenium.find_element(
             By.CSS_SELECTOR, ".select2-results"
         )
@@ -535,12 +546,13 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertCountSeleniumElements(
             ".select2-results__option", 1, root_element=result_container
         )
-        # Select the result.
-        search.send_keys(Keys.RETURN)
-        # Reopen the dropdown and add the first result to the selection.
-        elem.click()
-        search.send_keys(Keys.ARROW_DOWN)
-        search.send_keys(Keys.RETURN)
+        with self.select2_ajax_wait():
+            # Select the result.
+            search.send_keys(Keys.RETURN)
+            # Reopen the dropdown and add the first result to the selection.
+            elem.click()
+            search.send_keys(Keys.ARROW_DOWN)
+            search.send_keys(Keys.RETURN)
         select = Select(self.selenium.find_element(By.ID, "id_related_questions"))
         self.assertEqual(len(select.all_selected_options), 2)
 

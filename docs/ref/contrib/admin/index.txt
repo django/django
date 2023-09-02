@@ -342,11 +342,11 @@ subclass::
 
     Set ``fieldsets`` to control the layout of admin "add" and "change" pages.
 
-    ``fieldsets`` is a list of two-tuples, in which each two-tuple represents a
+    ``fieldsets`` is a list of 2-tuples, in which each 2-tuple represents a
     ``<fieldset>`` on the admin form page. (A ``<fieldset>`` is a "section" of
     the form.)
 
-    The two-tuples are in the format ``(name, field_options)``, where ``name``
+    The 2-tuples are in the format ``(name, field_options)``, where ``name``
     is a string representing the title of the fieldset and ``field_options`` is
     a dictionary of information about the fieldset, including a list of fields
     to be displayed in it.
@@ -1556,7 +1556,7 @@ templates used by the :class:`ModelAdmin` views:
 
     The ``get_fieldsets`` method is given the ``HttpRequest`` and the ``obj``
     being edited (or ``None`` on an add form) and is expected to return a list
-    of two-tuples, in which each two-tuple represents a ``<fieldset>`` on the
+    of 2-tuples, in which each 2-tuple represents a ``<fieldset>`` on the
     admin form page, as described above in the :attr:`ModelAdmin.fieldsets` section.
 
 .. method:: ModelAdmin.get_list_filter(request)
@@ -2848,8 +2848,12 @@ Templates can override or extend base admin templates as described in
 
 .. attribute:: AdminSite.site_header
 
-    The text to put at the top of each admin page, as an ``<h1>`` (a string).
+    The text to put at the top of each admin page, as a ``<div>`` (a string).
     By default, this is "Django administration".
+
+    .. versionchanged:: 5.0
+
+        In older versions, ``site_header`` was using an ``<h1>`` tag.
 
 .. attribute:: AdminSite.site_title
 
@@ -3010,15 +3014,22 @@ Templates can override or extend base admin templates as described in
     as options to the admin class.
 
     Raises :class:`~django.core.exceptions.ImproperlyConfigured` if a model is
-    abstract. and ``django.contrib.admin.sites.AlreadyRegistered`` if a model
-    is already registered.
+    abstract. and ``django.contrib.admin.exceptions.AlreadyRegistered`` if a
+    model is already registered.
 
 .. method:: AdminSite.unregister(model_or_iterable)
 
     Unregisters the given model class (or iterable of classes).
 
-    Raises ``django.contrib.admin.sites.NotRegistered`` if a model isn't
+    Raises ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't
     already registered.
+
+.. method:: AdminSite.get_model_admin(model)
+
+    .. versionadded:: 5.0
+
+    Returns an admin class for the given model class. Raises
+    ``django.contrib.admin.exceptions.NotRegistered`` if a model isn't registered.
 
 .. method:: AdminSite.get_log_entries(request)
 
@@ -3186,26 +3197,35 @@ Adding a password reset feature
 You can add a password reset feature to the admin site by adding a few lines to
 your URLconf. Specifically, add these four patterns::
 
+    from django.contrib import admin
     from django.contrib.auth import views as auth_views
 
     path(
         "admin/password_reset/",
-        auth_views.PasswordResetView.as_view(),
+        auth_views.PasswordResetView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
         name="admin_password_reset",
     ),
     path(
         "admin/password_reset/done/",
-        auth_views.PasswordResetDoneView.as_view(),
+        auth_views.PasswordResetDoneView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
         name="password_reset_done",
     ),
     path(
         "reset/<uidb64>/<token>/",
-        auth_views.PasswordResetConfirmView.as_view(),
+        auth_views.PasswordResetConfirmView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
         name="password_reset_confirm",
     ),
     path(
         "reset/done/",
-        auth_views.PasswordResetCompleteView.as_view(),
+        auth_views.PasswordResetCompleteView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
         name="password_reset_complete",
     ),
 

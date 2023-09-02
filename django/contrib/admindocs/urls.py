@@ -38,7 +38,7 @@ urlpatterns = [
         name="django-admindocs-models-index",
     ),
     re_path(
-        r"^models/(?P<app_label>[^\.]+)\.(?P<model_name>[^/]+)/$",
+        r"^models/(?P<app_label>[^.]+)\.(?P<model_name>[^/]+)/$",
         views.ModelDetailView.as_view(),
         name="django-admindocs-models-detail",
     ),

@@ -445,7 +445,7 @@ not be looking at your Django code. For example::
         unique_together = ["driver", "restaurant"]
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
-    unique_together. (It's not clear what that would even mean!) If you
+    ``unique_together``. (It's not clear what that would even mean!) If you
     need to validate uniqueness related to a
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.

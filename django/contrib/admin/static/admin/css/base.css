@@ -22,11 +22,11 @@ html[data-theme="light"],
 
     --breadcrumbs-fg: #c4dce8;
     --breadcrumbs-link-fg: var(--body-bg);
-    --breadcrumbs-bg: var(--primary);
+    --breadcrumbs-bg: #264b5d;
 
     --link-fg: #417893;
     --link-hover-color: #036;
-    --link-selected-fg: #5b80b2;
+    --link-selected-fg: var(--secondary);
 
     --hairline-color: #e8e8e8;
     --border-color: #ccc;
@@ -42,10 +42,10 @@ html[data-theme="light"],
     --selected-row: #ffc;
 
     --button-fg: #fff;
-    --button-bg: var(--primary);
-    --button-hover-bg: #609ab6;
-    --default-button-bg: var(--secondary);
-    --default-button-hover-bg: #205067;
+    --button-bg: var(--secondary);
+    --button-hover-bg: #205067;
+    --default-button-bg: #205067;
+    --default-button-hover-bg: var(--secondary);
     --close-button-bg: #747474;
     --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;
@@ -56,8 +56,6 @@ html[data-theme="light"],
     --object-tools-hover-bg: var(--close-button-hover-bg);
 
     --font-family-primary:
-        -apple-system,
-        BlinkMacSystemFont,
         "Segoe UI",
         system-ui,
         Roboto,
@@ -104,7 +102,7 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: var(--link-fg);
+    color: var(--body-fg);
     text-decoration: none;
     transition: color 0.15s, background 0.15s;
 }
@@ -586,7 +584,7 @@ input[type=button][disabled].default {
     font-weight: 400;
     font-size: 0.8125rem;
     text-align: left;
-    background: var(--primary);
+    background: var(--header-bg);
     color: var(--header-link-color);
 }
 
@@ -939,7 +937,7 @@ a.deletelink:focus, a.deletelink:hover {
     display: flex;
 }
 
-#branding h1 {
+#site-name {
     padding: 0;
     margin: 0;
     margin-inline-end: 20px;
@@ -948,7 +946,7 @@ a.deletelink:focus, a.deletelink:hover {
     color: var(--header-branding-color);
 }
 
-#branding h1 a:link, #branding h1 a:visited {
+#site-name a:link, #site-name a:visited {
     color: var(--accent);
 }
 
@@ -1140,4 +1138,17 @@ a.deletelink:focus, a.deletelink:hover {
 
 .base-svgs {
     display: none;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+    color: var(--body-fg);
+    background-color: var(--body-bg);
 }

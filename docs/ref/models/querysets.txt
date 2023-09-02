@@ -34,7 +34,7 @@ You can evaluate a ``QuerySet`` in the following ways:
   Note: Don't use this if all you want to do is determine if at least one
   result exists. It's more efficient to use :meth:`~QuerySet.exists`.
 
-* **Asynchronous iteration.**. A ``QuerySet`` can also be iterated over using
+* **Asynchronous iteration.** A ``QuerySet`` can also be iterated over using
   ``async for``::
 
       async for e in Entry.objects.all():
@@ -765,7 +765,7 @@ first item is the first field, etc. For example:
 
 If you only pass in a single field, you can also pass in the ``flat``
 parameter. If ``True``, this will mean the returned results are single values,
-rather than one-tuples. An example should make the difference clearer:
+rather than 1-tuples. An example should make the difference clearer:
 
 .. code-block:: pycon
 
@@ -1709,6 +1709,11 @@ never defer the loading of the primary key. If you are using
 loading of the field that connects from the primary model to the related
 one, doing so will result in an error.
 
+Similarly, calling ``defer()`` (or its counterpart :meth:`only()`) including an
+argument from an aggregation (e.g. using the result of :meth:`annotate()`)
+doesn't make sense: doing so will raise an exception. The aggregated values
+will always be fetched into the resulting queryset.
+
 .. note::
 
     The ``defer()`` method (and its cousin, :meth:`only()`, below) are only for
@@ -1803,8 +1808,9 @@ All of the cautions in the note for the :meth:`defer` documentation apply to
 ``only()`` as well. Use it cautiously and only after exhausting your other
 options.
 
-Using :meth:`only` and omitting a field requested using :meth:`select_related`
-is an error as well.
+Using ``only()`` and omitting a field requested using :meth:`select_related` is
+an error as well. On the other hand, invoking ``only()`` without any arguments,
+will return every field (including annotations) fetched by the queryset.
 
 As with ``defer()``, you cannot access the non-loaded fields from asynchronous
 code and expect them to load. Instead, you will get a
@@ -1922,8 +1928,8 @@ them:
 The ``postgresql``, ``oracle``, and ``mysql`` database backends support
 ``select_for_update()``. However, MariaDB only supports the ``nowait``
 argument, MariaDB 10.6+ also supports the ``skip_locked`` argument, and MySQL
-8.0.1+ supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The
-``no_key`` argument is only supported on PostgreSQL.
+supports the ``nowait``, ``skip_locked``, and ``of`` arguments. The ``no_key``
+argument is only supported on PostgreSQL.
 
 Passing ``nowait=True``, ``skip_locked=True``, ``no_key=True``, or ``of`` to
 ``select_for_update()`` using database backends that do not support these
@@ -2021,7 +2027,8 @@ may be generated.
 XOR (``^``)
 ~~~~~~~~~~~
 
-Combines two ``QuerySet``\s using the SQL ``XOR`` operator.
+Combines two ``QuerySet``\s using the SQL ``XOR`` operator. A ``XOR``
+expression matches rows that are matched by an odd number of operands.
 
 The following are equivalent::
 
@@ -2044,12 +2051,20 @@ SQL equivalent:
     .. code-block:: sql
 
         (x OR y OR ... OR z) AND
-        1=(
+        1=MOD(
             (CASE WHEN x THEN 1 ELSE 0 END) +
             (CASE WHEN y THEN 1 ELSE 0 END) +
             ...
-            (CASE WHEN z THEN 1 ELSE 0 END) +
+            (CASE WHEN z THEN 1 ELSE 0 END),
+            2
         )
+
+   .. versionchanged:: 5.0
+
+        In older versions, on databases without native support for the SQL
+        ``XOR`` operator, ``XOR`` returned rows that were matched by exactly
+        one operand. The previous behavior was not consistent with MySQL,
+        MariaDB, and Python behavior.
 
 Methods that do not return ``QuerySet``\s
 -----------------------------------------
@@ -2118,7 +2133,7 @@ can use :exc:`django.core.exceptions.ObjectDoesNotExist`  to handle
 ~~~~~~~~~~~~
 
 .. method:: create(**kwargs)
-.. method:: acreate(*args, **kwargs)
+.. method:: acreate(**kwargs)
 
 *Asynchronous version*: ``acreate()``
 
@@ -2396,15 +2411,19 @@ On databases that support it (all but Oracle), setting the ``ignore_conflicts``
 parameter to ``True`` tells the database to ignore failure to insert any rows
 that fail constraints such as duplicate unique values.
 
-On databases that support it (all except Oracle and SQLite < 3.24), setting the
+On databases that support it (all except Oracle), setting the
 ``update_conflicts`` parameter to ``True``, tells the database to update
 ``update_fields`` when a row insertion fails on conflicts. On PostgreSQL and
 SQLite, in addition to ``update_fields``, a list of ``unique_fields`` that may
 be in conflict must be provided.
 
-Enabling the ``ignore_conflicts`` or ``update_conflicts`` parameter disable
-setting the primary key on each model instance (if the database normally
-support it).
+Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
+each model instance (if the database normally supports it).
+
+.. versionchanged:: 5.0
+
+    In older versions, enabling the ``update_conflicts`` parameter prevented
+    setting the primary key on each model instance.
 
 .. warning::
 
@@ -2560,10 +2579,10 @@ evaluated will force it to evaluate again, repeating the query.
 long as ``chunk_size`` is given. Larger values will necessitate fewer queries
 to accomplish the prefetching at the cost of greater memory usage.
 
-.. note::
+.. versionchanged:: 5.0
 
-    ``aiterator()`` is *not* compatible with previous calls to
-    ``prefetch_related()``.
+    Support for ``aiterator()`` with previous calls to ``prefetch_related()``
+    was added.
 
 On some databases (e.g. Oracle, `SQLite
 <https://www.sqlite.org/limits.html#max_variable_number>`_), the maximum number
@@ -2750,7 +2769,7 @@ number of authors that have contributed blog entries:
 .. code-block:: pycon
 
     >>> from django.db.models import Count
-    >>> q = Blog.objects.aggregate(Count("entry"))
+    >>> Blog.objects.aggregate(Count("entry"))
     {'entry__count': 16}
 
 By using a keyword argument to specify the aggregate function, you can
@@ -2758,7 +2777,7 @@ control the name of the aggregation value that is returned:
 
 .. code-block:: pycon
 
-    >>> q = Blog.objects.aggregate(number_of_entries=Count("entry"))
+    >>> Blog.objects.aggregate(number_of_entries=Count("entry"))
     {'number_of_entries': 16}
 
 For an in-depth discussion of aggregation, see :doc:`the topic guide on
@@ -4054,6 +4073,9 @@ attribute:
 ------------------------------
 
 .. function:: prefetch_related_objects(model_instances, *related_lookups)
+.. function:: aprefetch_related_objects(model_instances, *related_lookups)
+
+*Asynchronous version*: ``aprefetch_related_objects()``
 
 Prefetches the given lookups on an iterable of model instances. This is useful
 in code that receives a list of model instances as opposed to a ``QuerySet``;
@@ -4071,6 +4093,10 @@ lookups or :class:`Prefetch` objects you want to prefetch for. For example:
 When using multiple databases with ``prefetch_related_objects``, the prefetch
 query will use the database associated with the model instance. This can be
 overridden by using a custom queryset in a related lookup.
+
+.. versionchanged:: 5.0
+
+    ``aprefetch_related_objects()`` function was added.
 
 ``FilteredRelation()`` objects
 ------------------------------

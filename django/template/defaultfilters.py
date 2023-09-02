@@ -445,6 +445,16 @@ def escape_filter(value):
 
 
 @register.filter(is_safe=True)
+def escapeseq(value):
+    """
+    An "escape" filter for sequences. Mark each element in the sequence,
+    individually, as a string that should be auto-escaped. Return a list with
+    the results.
+    """
+    return [conditional_escape(obj) for obj in value]
+
+
+@register.filter(is_safe=True)
 @stringfilter
 def force_escape(value):
     """
@@ -586,8 +596,9 @@ def join(value, arg, autoescape=True):
     """Join a list with a string, like Python's ``str.join(list)``."""
     try:
         if autoescape:
-            value = [conditional_escape(v) for v in value]
-        data = conditional_escape(arg).join(value)
+            data = conditional_escape(arg).join([conditional_escape(v) for v in value])
+        else:
+            data = arg.join(value)
     except TypeError:  # Fail silently if arg isn't iterable.
         return value
     return mark_safe(data)

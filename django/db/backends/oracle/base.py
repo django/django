@@ -1,7 +1,7 @@
 """
 Oracle database backend for Django.
 
-Requires cx_Oracle: https://oracle.github.io/python-cx_Oracle/
+Requires oracledb: https://oracle.github.io/python-oracledb/
 """
 import datetime
 import decimal
@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
 from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.oracle.oracledb_any import oracledb as Database
 from django.db.backends.utils import debug_transaction
 from django.utils.asyncio import async_unsafe
 from django.utils.encoding import force_bytes, force_str
@@ -49,12 +50,8 @@ _setup_environment(
 )
 
 
-try:
-    import cx_Oracle as Database
-except ImportError as e:
-    raise ImproperlyConfigured("Error loading cx_Oracle module: %s" % e)
-
-# Some of these import cx_Oracle, so import them after checking if it's installed.
+# Some of these import oracledb, so import them after checking if it's
+# installed.
 from .client import DatabaseClient  # NOQA
 from .creation import DatabaseCreation  # NOQA
 from .features import DatabaseFeatures  # NOQA
@@ -70,7 +67,7 @@ def wrap_oracle_errors():
     try:
         yield
     except Database.DatabaseError as e:
-        # cx_Oracle raises a cx_Oracle.DatabaseError exception with the
+        # oracledb raises a oracledb.DatabaseError exception with the
         # following attributes and values:
         #  code = 2091
         #  message = 'ORA-02091: transaction rolled back
@@ -343,10 +340,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
             return True
 
     @cached_property
-    def cx_oracle_version(self):
-        return tuple(int(x) for x in Database.version.split("."))
-
-    @cached_property
     def oracle_version(self):
         with self.temporary_connection():
             return tuple(int(x) for x in self.connection.version.split("."))
@@ -518,7 +511,7 @@ class FormatStylePlaceholderCursor:
             return [p.force_bytes for p in params]
 
     def _fix_for_params(self, query, params, unify_by_values=False):
-        # cx_Oracle wants no trailing ';' for SQL statements.  For PL/SQL, it
+        # oracledb wants no trailing ';' for SQL statements.  For PL/SQL, it
         # it does want a trailing ';' but not a trailing '/'.  However, these
         # characters must be included in the original query in case the query
         # is being passed to SQL*Plus.

@@ -22,6 +22,7 @@ if lib_path:
 elif os.name == "nt":
     # Windows NT shared libraries
     lib_names = [
+        "gdal307",
         "gdal306",
         "gdal305",
         "gdal304",
@@ -30,14 +31,13 @@ elif os.name == "nt":
         "gdal301",
         "gdal300",
         "gdal204",
-        "gdal203",
-        "gdal202",
     ]
 elif os.name == "posix":
     # *NIX library names.
     lib_names = [
         "gdal",
         "GDAL",
+        "gdal3.7.0",
         "gdal3.6.0",
         "gdal3.5.0",
         "gdal3.4.0",
@@ -46,8 +46,6 @@ elif os.name == "posix":
         "gdal3.1.0",
         "gdal3.0.0",
         "gdal2.4.0",
-        "gdal2.3.0",
-        "gdal2.2.0",
     ]
 else:
     raise ImproperlyConfigured('GDAL is unsupported on OS "%s".' % os.name)

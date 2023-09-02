@@ -331,7 +331,9 @@ class SQLCompiler:
             default_order, _ = ORDER_DIR["DESC"]
 
         selected_exprs = {}
-        if select := self.select:
+        # Avoid computing `selected_exprs` if there is no `ordering` as it's
+        # relatively expensive.
+        if ordering and (select := self.select):
             for ordinal, (expr, _, alias) in enumerate(select, start=1):
                 pos_expr = PositionRef(ordinal, alias, expr)
                 if alias:

@@ -23,6 +23,7 @@ from django.db.models import (
     UUIDField,
 )
 from django.test import SimpleTestCase, TestCase, ignore_warnings, override_settings
+from django.test.utils import requires_tz_support
 from django.urls import reverse
 from django.utils import translation
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -398,15 +399,17 @@ class AdminDateWidgetTest(SimpleTestCase):
         w = widgets.AdminDateWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="date">'
             '<input value="2007-12-01" type="text" class="vDateField" name="test" '
-            'size="10">',
+            'size="10"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminDateWidget(attrs={"size": 20, "class": "myDateField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="date">'
             '<input value="2007-12-01" type="text" class="myDateField" name="test" '
-            'size="20">',
+            'size="20"></p>',
         )
 
 
@@ -415,15 +418,17 @@ class AdminTimeWidgetTest(SimpleTestCase):
         w = widgets.AdminTimeWidget()
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="time">'
             '<input value="09:30:00" type="text" class="vTimeField" name="test" '
-            'size="8">',
+            'size="8"></p>',
         )
         # pass attrs to widget
         w = widgets.AdminTimeWidget(attrs={"size": 20, "class": "myTimeField"})
         self.assertHTMLEqual(
             w.render("test", datetime(2007, 12, 1, 9, 30)),
+            '<p class="time">'
             '<input value="09:30:00" type="text" class="myTimeField" name="test" '
-            'size="20">',
+            'size="20"></p>',
         )
 
 
@@ -1116,6 +1121,7 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
                 self.wait_for_text("#calendarin0 caption", expected_caption)
 
 
+@requires_tz_support
 @override_settings(TIME_ZONE="Asia/Singapore")
 class DateTimePickerShortcutsSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_date_time_picker_shortcuts(self):

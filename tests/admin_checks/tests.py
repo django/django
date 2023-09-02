@@ -276,8 +276,7 @@ class SystemChecksTestCase(SimpleTestCase):
         class MyBookAdmin(admin.ModelAdmin):
             def check(self, **kwargs):
                 errors = super().check(**kwargs)
-                author_admin = self.admin_site._registry.get(Author)
-                if author_admin is None:
+                if not self.admin_site.is_registered(Author):
                     errors.append("AuthorAdmin missing!")
                 return errors
 
@@ -798,8 +797,9 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = SongAdmin(Song, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'readonly_fields[1]' is not a callable, an attribute "
-                "of 'SongAdmin', or an attribute of 'admin_checks.Song'.",
+                "The value of 'readonly_fields[1]' refers to 'nonexistent', which is "
+                "not a callable, an attribute of 'SongAdmin', or an attribute of "
+                "'admin_checks.Song'.",
                 obj=SongAdmin,
                 id="admin.E035",
             )
@@ -814,8 +814,9 @@ class SystemChecksTestCase(SimpleTestCase):
         errors = CityInline(State, AdminSite()).check()
         expected = [
             checks.Error(
-                "The value of 'readonly_fields[0]' is not a callable, an attribute "
-                "of 'CityInline', or an attribute of 'admin_checks.City'.",
+                "The value of 'readonly_fields[0]' refers to 'i_dont_exist', which is "
+                "not a callable, an attribute of 'CityInline', or an attribute of "
+                "'admin_checks.City'.",
                 obj=CityInline,
                 id="admin.E035",
             )

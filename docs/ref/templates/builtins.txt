@@ -21,21 +21,48 @@ Controls the current auto-escaping behavior. This tag takes either ``on`` or
 ``off`` as an argument and that determines whether auto-escaping is in effect
 inside the block. The block is closed with an ``endautoescape`` ending tag.
 
-When auto-escaping is in effect, all variable content has HTML escaping applied
-to it before placing the result into the output (but after any filters have
-been applied). This is equivalent to manually applying the :tfilter:`escape`
-filter to each variable.
-
-The only exceptions are variables that are already marked as "safe" from
-escaping, either by the code that populated the variable, or because it has had
-the :tfilter:`safe` or :tfilter:`escape` filters applied.
-
 Sample usage:
 
 .. code-block:: html+django
 
     {% autoescape on %}
         {{ body }}
+    {% endautoescape %}
+
+When auto-escaping is in effect, all content derived from variables has HTML
+escaping applied before placing the result into the output (but after any
+filters are applied). This is equivalent to manually applying the
+:tfilter:`escape` filter to each variable.
+
+The only exceptions are variables already marked as "safe" from escaping.
+Variables could be marked as "safe" by the code which populated the variable,
+by applying the :tfilter:`safe` or :tfilter:`escape` filters, or because it's
+the result of a previous filter that marked the string as "safe".
+
+Within the scope of disabled auto-escaping, chaining filters, including
+:tfilter:`escape`, may cause unexpected (but documented) results such as the
+following:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|join:", "|escape }}
+    {% endautoescape %}
+
+The above code will output the joined elements of ``my_list`` unescaped. This
+is because the filter chaining sequence executes first :tfilter:`join` on
+``my_list`` (without applying escaping to each item since ``autoescape`` is
+``off``), marking the result as safe. Subsequently, this safe result will be
+fed to :tfilter:`escape` filter, which does not apply a second round of
+escaping.
+
+In order to properly escape every element in a sequence, use the
+:tfilter:`escapeseq` filter:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|escapeseq|join:", " }}
     {% endautoescape %}
 
 .. templatetag:: block
@@ -1831,23 +1858,55 @@ For example, you can apply ``escape`` to fields when :ttag:`autoescape` is off:
         {{ title|escape }}
     {% endautoescape %}
 
+.. admonition:: Chaining ``escape`` with other filters
+
+    As mentioned in the :ttag:`autoescape` section, when filters including
+    ``escape`` are chained together, it can result in unexpected outcomes if
+    preceding filters mark a potentially unsafe string as safe due to the lack
+    of escaping caused by :ttag:`autoescape` being ``off``.
+
+    In such cases, chaining ``escape`` would not reescape strings that have
+    already been marked as safe.
+
+    This is especially important when using filters that operate on sequences,
+    for example :tfilter:`join`. If you need to escape each element in a
+    sequence, use the dedicated :tfilter:`escapeseq` filter.
+
 .. templatefilter:: escapejs
 
 ``escapejs``
 ------------
 
-Escapes characters for use in JavaScript strings. This does *not* make the
-string safe for use in HTML or JavaScript template literals, but does protect
-you from syntax errors when using templates to generate JavaScript/JSON.
+Escapes characters for use as a whole JavaScript string literal, within single
+or double quotes, as below. This filter does not make the string safe for use
+in *"JavaScript template literals"* (the JavaScript backtick syntax). Any other
+uses not listed above are not supported. It is generally recommended that data
+should be passed using HTML ``data-`` attributes, or the :tfilter:`json_script`
+filter, rather than in embedded JavaScript.
 
 For example:
 
 .. code-block:: html+django
 
-    {{ value|escapejs }}
+    <script>
+    let myValue = '{{ value|escapejs }}'
 
-If ``value`` is ``"testing\r\njavascript 'string\" <b>escaping</b>"``,
-the output will be ``"testing\\u000D\\u000Ajavascript \\u0027string\\u0022 \\u003Cb\\u003Eescaping\\u003C/b\\u003E"``.
+.. templatefilter:: escapeseq
+
+``escapeseq``
+-------------
+
+.. versionadded:: 5.0
+
+Applies the :tfilter:`escape` filter to each element of a sequence. Useful in
+conjunction with other filters that operate on sequences, such as
+:tfilter:`join`. For example:
+
+.. code-block:: html+django
+
+    {% autoescape off %}
+        {{ my_list|escapeseq|join:", " }}
+    {% endautoescape %}
 
 .. templatefilter:: filesizeformat
 
@@ -2449,10 +2508,7 @@ output will be ``"Joel is a slug"``.
     Note that ``striptags`` doesn't give any guarantee about its output being
     HTML safe, particularly with non valid HTML input. So **NEVER** apply the
     ``safe`` filter to a ``striptags`` output. If you are looking for something
-    more robust, you can use the ``bleach`` Python library, notably its
-    `clean`_ method.
-
-.. _clean: https://bleach.readthedocs.io/en/latest/clean.html
+    more robust, consider using a third-party HTML sanitizing tool.
 
 .. templatefilter:: time
 
