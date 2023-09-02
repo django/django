@@ -76,9 +76,17 @@ Once your cache is configured, you have to choose between a database-backed
 cache or a non-persistent cache.
 
 The cached database backend (``cached_db``) uses a write-through cache --
-session writes are applied to both the cache and the database. Session reads
-use the cache, or the database if the data has been evicted from the cache. To
-use this backend, set :setting:`SESSION_ENGINE` to
+session writes are applied to both the database and cache, in that order. If
+writing to the cache fails, the exception is handled and logged via the
+:ref:`sessions logger <django-contrib-sessions-logger>`, to avoid failing an
+otherwise successful write operation.
+
+.. versionchanged:: 5.1
+
+    Handling and logging of exceptions when writing to the cache was added.
+
+Session reads use the cache, or the database if the data has been evicted from
+the cache. To use this backend, set :setting:`SESSION_ENGINE` to
 ``"django.contrib.sessions.backends.cached_db"``, and follow the configuration
 instructions for the `using database-backed sessions`_.
 
