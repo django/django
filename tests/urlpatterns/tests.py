@@ -4,7 +4,15 @@ import uuid
 from django.core.exceptions import ImproperlyConfigured
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.urls import NoReverseMatch, Resolver404, path, re_path, resolve, reverse
+from django.urls import (
+    NoReverseMatch,
+    Resolver404,
+    include,
+    path,
+    re_path,
+    resolve,
+    reverse,
+)
 from django.views import View
 
 from .converters import DynamicConverter
@@ -192,6 +200,11 @@ class SimplifiedURLTests(SimpleTestCase):
         msg = "URL route 'foo/<nonexistent:var>/' uses invalid converter 'nonexistent'."
         with self.assertRaisesMessage(ImproperlyConfigured, msg):
             path("foo/<nonexistent:var>/", empty_view)
+
+    def test_invalid_urlconf_module(self):
+        msg = "Could not find urlpatterns object in module urlpatterns.bad_urlconf."
+        with self.assertRaisesMessage(ImproperlyConfigured, msg):
+            include("urlpatterns.bad_urlconf")
 
     def test_invalid_view(self):
         msg = "view must be a callable or a list/tuple in the case of include()."

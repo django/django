@@ -1,6 +1,7 @@
 """Functions for use in URLsconfs."""
 from functools import partial
 from importlib import import_module
+from types import ModuleType
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -46,6 +47,11 @@ def include(arg, namespace=None):
             "app_name instead.",
         )
     namespace = namespace or app_name
+    # Ensure the user did not include a module without urlpatterns.
+    if isinstance(patterns, ModuleType):
+        raise ImproperlyConfigured(
+            "Could not find urlpatterns object in module %s." % arg
+        )
     # Make sure the patterns can be iterated through (without this, some
     # testcases will break).
     if isinstance(patterns, (list, tuple)):
