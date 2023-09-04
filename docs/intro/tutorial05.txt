@@ -480,6 +480,9 @@ class:
 
 .. code-block:: python
     :caption: ``polls/tests.py``
+    ...
+    from django.test import TestCase, TransactionTestCase
+    ...
 
     def create_question(question_text, days):
         """
@@ -491,7 +494,7 @@ class:
         return Question.objects.create(question_text=question_text, pub_date=time)
 
 
-    class QuestionIndexViewTests(TestCase):
+    class QuestionIndexViewTests(TransactionTestCase):
         def test_no_questions(self):
             """
             If no questions exist, an appropriate message is displayed.
