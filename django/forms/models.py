@@ -21,7 +21,7 @@ from django.forms.widgets import (
     RadioSelect,
     SelectMultiple,
 )
-from django.utils.choices import ChoiceIterator
+from django.utils.choices import BaseChoiceIterator
 from django.utils.text import capfirst, get_text_list
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
@@ -1403,7 +1403,7 @@ class ModelChoiceIteratorValue:
         return self.value == other
 
 
-class ModelChoiceIterator(ChoiceIterator):
+class ModelChoiceIterator(BaseChoiceIterator):
     def __init__(self, field):
         self.field = field
         self.queryset = field.queryset
