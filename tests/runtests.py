@@ -50,10 +50,6 @@ warnings.simplefilter("error", RemovedInDjango51Warning)
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
 warnings.simplefilter("error", RuntimeWarning)
-# Ignore known warnings in test dependencies.
-warnings.filterwarnings(
-    "ignore", "'U' mode is deprecated", DeprecationWarning, module="docutils.io"
-)
 
 # Reduce garbage collection frequency to improve performance. Since CPython
 # uses refcounting, garbage collection only collects objects with cyclic

@@ -632,6 +632,8 @@ Miscellaneous
 
 * The minimum supported version of ``colorama`` is increased to 0.4.6.
 
+* The minimum supported version of ``docutils`` is increased to 0.19.
+
 .. _deprecated-features-5.0:
 
 Features deprecated in 5.0
