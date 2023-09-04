@@ -282,7 +282,7 @@ dependencies:
 * :pypi:`asgiref` 3.7.0+ (required)
 * :pypi:`bcrypt`
 * :pypi:`colorama` 0.4.6+
-* :pypi:`docutils`
+* :pypi:`docutils` 0.19+
 * :pypi:`geoip2`
 * :pypi:`Jinja2` 2.11+
 * :pypi:`numpy`
