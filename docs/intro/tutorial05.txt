@@ -480,9 +480,10 @@ class:
 
 .. code-block:: python
     :caption: ``polls/tests.py``
-    ...
+    
+    # ...
     from django.test import TestCase, TransactionTestCase
-    ...
+    # ...
 
     def create_question(question_text, days):
         """
@@ -601,7 +602,7 @@ is not:
 .. code-block:: python
     :caption: ``polls/tests.py``
 
-    class QuestionDetailViewTests(TestCase):
+    class QuestionDetailViewTests(TransactionTestCase):
         def test_future_question(self):
             """
             The detail view of a question with a pub_date in the future
