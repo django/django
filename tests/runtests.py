@@ -71,6 +71,10 @@ tempfile.tempdir = os.environ["TMPDIR"] = TMPDIR
 # Removing the temporary TMPDIR.
 atexit.register(shutil.rmtree, TMPDIR)
 
+# Add variables enabling coverage to trace code in subprocesses.
+os.environ["RUNTESTS_DIR"] = RUNTESTS_DIR
+os.environ["COVERAGE_PROCESS_START"] = os.path.join(RUNTESTS_DIR, ".coveragerc")
+
 
 # This is a dict mapping RUNTESTS_DIR subdirectory to subdirectories of that
 # directory to skip when searching for test modules.
