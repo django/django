@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Benchmark Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: django/django-asv
           path: "."
