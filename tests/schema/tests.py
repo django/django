@@ -4303,7 +4303,9 @@ class SchemaTests(TransactionTestCase):
                         "name": editor.quote_name(constraint_name),
                         "column": editor.quote_name(column),
                         "to_table": editor.quote_name(table),
-                        "to_column": editor.quote_name(model._meta.auto_field.column),
+                        "to_column": editor.quote_name(
+                            model._meta.auto_fields[0].column
+                        ),
                         "deferrable": connection.ops.deferrable_sql(),
                     }
                 )

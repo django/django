@@ -132,7 +132,7 @@ class Options:
         self.required_db_vendor = None
         self.meta = meta
         self.pk = None
-        self.auto_field = None
+        self.auto_fields = []
         self.abstract = False
         self.managed = True
         self.proxy = False

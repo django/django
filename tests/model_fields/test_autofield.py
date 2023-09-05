@@ -1,7 +1,7 @@
 from django.db import models
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 
-from .models import AutoModel, BigAutoModel, SmallAutoModel
+from .models import AutoModel, BigAutoModel, SmallAutoModel, TwoAutoModel
 from .test_integerfield import (
     BigIntegerFieldTests,
     IntegerFieldTests,
@@ -22,6 +22,15 @@ class BigAutoFieldTests(BigIntegerFieldTests):
 class SmallAutoFieldTests(SmallIntegerFieldTests):
     model = SmallAutoModel
     rel_db_type_class = models.SmallIntegerField
+
+
+@skipUnlessDBFeature("supports_multiple_auto_fields")
+class MultipleAutoFieldTests(TestCase):
+    def test_instance_with_two_autofields(self):
+        instance1 = TwoAutoModel.objects.create()
+        instance2 = TwoAutoModel.objects.create()
+        self.assertGreater(instance2.id, instance1.id)
+        self.assertGreater(instance2.auto2, instance1.auto2)
 
 
 class AutoFieldInheritanceTests(SimpleTestCase):

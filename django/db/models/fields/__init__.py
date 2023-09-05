@@ -2768,32 +2768,37 @@ class UUIDField(Field):
 class AutoFieldMixin:
     db_returning = True
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, primary_key=True, **kwargs):
         kwargs["blank"] = True
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, primary_key=primary_key, **kwargs)
 
     def check(self, **kwargs):
         return [
             *super().check(**kwargs),
-            *self._check_primary_key(),
+            *self._check_only_one_autofield(**kwargs),
         ]
 
-    def _check_primary_key(self):
-        if not self.primary_key:
-            return [
-                checks.Error(
-                    "AutoFields must set primary_key=True.",
-                    obj=self,
-                    id="fields.E100",
-                ),
-            ]
-        else:
+    def _check_only_one_autofield(self, databases=None, **kwargs):
+        if (
+            len(self.model._meta.auto_fields) < 2
+            or "supports_multiple_auto_fields" in self.model._meta.required_db_features
+        ):
             return []
+        errors = []
+        for db in databases:
+            if not router.allow_migrate_model(db, self.model):
+                continue
+            connection = connections[db]
+
+            if not connection.features.supports_multiple_auto_fields:
+                msg = "This database backend does not support multiple AutoFields."
+                errors.append(checks.Error(msg, obj=self.model, id="fields.E100"))
+        return errors
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
         del kwargs["blank"]
-        kwargs["primary_key"] = True
+        kwargs["primary_key"] = self.primary_key
         return name, path, args, kwargs
 
     def validate(self, value, model_instance):
@@ -2806,13 +2811,8 @@ class AutoFieldMixin:
         return value
 
     def contribute_to_class(self, cls, name, **kwargs):
-        if cls._meta.auto_field:
-            raise ValueError(
-                "Model %s can't have more than one auto-generated field."
-                % cls._meta.label
-            )
         super().contribute_to_class(cls, name, **kwargs)
-        cls._meta.auto_field = self
+        cls._meta.auto_fields.append(self)
 
     def formfield(self, **kwargs):
         return None
