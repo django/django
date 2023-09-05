@@ -1,8 +1,7 @@
-from django.contrib.messages import constants, get_level, set_level
+from django.contrib.messages import Message, constants, get_level, set_level
 from django.contrib.messages.api import MessageFailure
 from django.contrib.messages.constants import DEFAULT_LEVELS
 from django.contrib.messages.storage import default_storage
-from django.contrib.messages.storage.base import Message
 from django.http import HttpRequest, HttpResponse
 from django.test import modify_settings, override_settings
 from django.urls import reverse

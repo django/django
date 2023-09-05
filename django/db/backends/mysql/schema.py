@@ -45,19 +45,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
 
     @property
     def sql_rename_column(self):
-        # MariaDB >= 10.5.2 and MySQL >= 8.0.4 support an
-        # "ALTER TABLE ... RENAME COLUMN" statement.
-        if self.connection.mysql_is_mariadb:
-            if self.connection.mysql_version >= (10, 5, 2):
-                return super().sql_rename_column
-        elif self.connection.mysql_version >= (8, 0, 4):
-            return super().sql_rename_column
-        return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+        is_mariadb = self.connection.mysql_is_mariadb
+        if is_mariadb and self.connection.mysql_version < (10, 5, 2):
+            # MariaDB < 10.5.2 doesn't support an
+            # "ALTER TABLE ... RENAME COLUMN" statement.
+            return "ALTER TABLE %(table)s CHANGE %(old_column)s %(new_column)s %(type)s"
+        return super().sql_rename_column
 
     def quote_value(self, value):
         self.connection.ensure_connection()
-        if isinstance(value, str):
-            value = value.replace("%", "%%")
         # MySQLdb escapes to string, PyMySQL to bytes.
         quoted = self.connection.connection.escape(
             value, self.connection.connection.encoders
@@ -211,11 +207,15 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         self._create_missing_fk_index(model, fields=fields)
         return super()._delete_composed_index(model, fields, *args)
 
-    def _set_field_new_type_null_status(self, field, new_type):
+    def _set_field_new_type(self, field, new_type):
         """
-        Keep the null property of the old field. If it has changed, it will be
-        handled separately.
+        Keep the NULL and DEFAULT properties of the old field. If it has
+        changed, it will be handled separately.
         """
+        if field.db_default is not NOT_PROVIDED:
+            default_sql, params = self.db_default_sql(field)
+            default_sql %= tuple(self.quote_value(p) for p in params)
+            new_type += f" DEFAULT {default_sql}"
         if field.null:
             new_type += " NULL"
         else:
@@ -225,7 +225,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _alter_column_type_sql(
         self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
-        new_type = self._set_field_new_type_null_status(old_field, new_type)
+        new_type = self._set_field_new_type(old_field, new_type)
         return super()._alter_column_type_sql(
             model, old_field, new_field, new_type, old_collation, new_collation
         )
@@ -244,7 +244,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
         return field_db_params["check"]
 
     def _rename_field_sql(self, table, old_field, new_field, new_type):
-        new_type = self._set_field_new_type_null_status(old_field, new_type)
+        new_type = self._set_field_new_type(old_field, new_type)
         return super()._rename_field_sql(table, old_field, new_field, new_type)
 
     def _alter_column_comment_sql(self, model, new_field, new_type, new_db_comment):
@@ -254,3 +254,18 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
     def _comment_sql(self, comment):
         comment_sql = super()._comment_sql(comment)
         return f" COMMENT {comment_sql}"
+
+    def _alter_column_null_sql(self, model, old_field, new_field):
+        if new_field.db_default is NOT_PROVIDED:
+            return super()._alter_column_null_sql(model, old_field, new_field)
+
+        new_db_params = new_field.db_parameters(connection=self.connection)
+        type_sql = self._set_field_new_type(new_field, new_db_params["type"])
+        return (
+            "MODIFY %(column)s %(type)s"
+            % {
+                "column": self.quote_name(new_field.column),
+                "type": type_sql,
+            },
+            [],
+        )

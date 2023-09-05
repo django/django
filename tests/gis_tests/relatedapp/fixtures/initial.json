@@ -135,5 +135,53 @@
       "title": "Patry on Copyright",
       "author": 2
     }
- }
+  },
+  {
+    "model": "relatedapp.parcel",
+    "pk": 1,
+    "fields": {
+      "name": "Aurora Parcel Alpha",
+      "city": 1,
+      "center1": "POINT (1.7128 -2.0060)",
+      "center2": "POINT (3.7128 -5.0060)",
+      "border1": "POLYGON((0 0, 5 5, 12 12, 0 0))",
+      "border2": "POLYGON((0 0, 5 5, 8 8, 0 0))"
+    }
+  },
+  {
+    "model": "relatedapp.parcel",
+    "pk": 2,
+    "fields": {
+      "name": "Aurora Parcel Beta",
+      "city": 1,
+      "center1": "POINT (4.7128 5.0060)",
+      "center2": "POINT (12.75 10.05)",
+      "border1": "POLYGON((10 10, 15 15, 22 22, 10 10))",
+      "border2": "POLYGON((10 10, 15 15, 22 22, 10 10))"
+    }
+  },
+  {
+    "model": "relatedapp.parcel",
+    "pk": 3,
+    "fields": {
+      "name": "Aurora Parcel Ignore",
+      "city": 1,
+      "center1": "POINT (9.7128 12.0060)",
+      "center2": "POINT (1.7128 -2.0060)",
+      "border1": "POLYGON ((24 23, 25 25, 32 32, 24 23))",
+      "border2": "POLYGON ((24 23, 25 25, 32 32, 24 23))"
+    }
+  },
+  {
+    "model": "relatedapp.parcel",
+    "pk": 4,
+    "fields": {
+      "name": "Roswell Parcel Ignore",
+      "city": 2,
+      "center1": "POINT (-9.7128 -12.0060)",
+      "center2": "POINT (-1.7128 2.0060)",
+      "border1": "POLYGON ((30 30, 35 35, 42 32, 30 30))",
+      "border2": "POLYGON ((30 30, 35 35, 42 32, 30 30))"
+    }
+  }
 ]

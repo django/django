@@ -4,6 +4,7 @@ import uuid
 from django.core.checks import Error
 from django.core.checks import Warning as DjangoWarning
 from django.db import connection, models
+from django.db.models.functions import Coalesce, Pi
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
@@ -198,7 +199,8 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -216,8 +218,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -259,8 +262,9 @@ class CharFieldTests(TestCase):
                     field.check(),
                     [
                         Error(
-                            "'choices' must be an iterable containing (actual "
-                            "value, human readable name) tuples.",
+                            "'choices' must be a mapping of actual values to human "
+                            "readable names or an iterable containing (actual value, "
+                            "human readable name) tuples.",
                             obj=field,
                             id="fields.E005",
                         ),
@@ -308,8 +312,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -336,8 +341,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -384,6 +390,26 @@ class CharFieldTests(TestCase):
                         ),
                     ],
                 )
+
+    def test_choices_callable(self):
+        def get_choices():
+            return [(i, i) for i in range(3)]
+
+        class Model(models.Model):
+            field = models.CharField(max_length=10, choices=get_choices)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
 
     def test_bad_db_index_value(self):
         class Model(models.Model):
@@ -844,6 +870,43 @@ class IntegerFieldTests(SimpleTestCase):
                     ],
                 )
 
+    def test_non_iterable_choices(self):
+        class Model(models.Model):
+            field = models.IntegerField(choices=123)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
+
+    def test_non_iterable_choices_number(self):
+        """An integer isn't a valid choice pair."""
+
+        class Model(models.Model):
+            field = models.IntegerField(choices=[123])
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
+                    obj=field,
+                    id="fields.E005",
+                ),
+            ],
+        )
+
 
 @isolate_apps("invalid_models_tests")
 class TimeFieldTests(SimpleTestCase):
@@ -1057,3 +1120,109 @@ class DbCommentTests(TestCase):
 
         errors = Model._meta.get_field("field").check(databases=self.databases)
         self.assertEqual(errors, [])
+
+
+@isolate_apps("invalid_models_tests")
+class InvalidDBDefaultTests(TestCase):
+    def test_db_default(self):
+        class Model(models.Model):
+            field = models.FloatField(db_default=Pi())
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            expected_errors = []
+        else:
+            msg = (
+                f"{connection.display_name} does not support default database values "
+                "with expressions (db_default)."
+            )
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E011")]
+        self.assertEqual(errors, expected_errors)
+
+    def test_db_default_literal(self):
+        class Model(models.Model):
+            field = models.IntegerField(db_default=1)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+        self.assertEqual(errors, [])
+
+    def test_db_default_required_db_features(self):
+        class Model(models.Model):
+            field = models.FloatField(db_default=Pi())
+
+            class Meta:
+                required_db_features = {"supports_expression_defaults"}
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+        self.assertEqual(errors, [])
+
+    def test_db_default_expression_invalid(self):
+        expression = models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            msg = f"{expression} cannot be used in db_default."
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E012")]
+        else:
+            msg = (
+                f"{connection.display_name} does not support default database values "
+                "with expressions (db_default)."
+            )
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E011")]
+        self.assertEqual(errors, expected_errors)
+
+    def test_db_default_expression_required_db_features(self):
+        expression = models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+            class Meta:
+                required_db_features = {"supports_expression_defaults"}
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        if connection.features.supports_expression_defaults:
+            msg = f"{expression} cannot be used in db_default."
+            expected_errors = [Error(msg=msg, obj=field, id="fields.E012")]
+        else:
+            expected_errors = []
+        self.assertEqual(errors, expected_errors)
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_db_default_combined_invalid(self):
+        expression = models.Value(4.5) + models.F("field_name")
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        msg = f"{expression} cannot be used in db_default."
+        expected_error = Error(msg=msg, obj=field, id="fields.E012")
+        self.assertEqual(errors, [expected_error])
+
+    @skipUnlessDBFeature("supports_expression_defaults")
+    def test_db_default_function_arguments_invalid(self):
+        expression = Coalesce(models.Value(4.5), models.F("field_name"))
+
+        class Model(models.Model):
+            field = models.FloatField(db_default=expression)
+
+        field = Model._meta.get_field("field")
+        errors = field.check(databases=self.databases)
+
+        msg = f"{expression} cannot be used in db_default."
+        expected_error = Error(msg=msg, obj=field, id="fields.E012")
+        self.assertEqual(errors, [expected_error])

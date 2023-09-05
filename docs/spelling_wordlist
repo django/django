@@ -40,6 +40,7 @@ backends
 backport
 backported
 backports
+backtick
 backtraces
 balancer
 basename
@@ -415,6 +416,7 @@ redisplayed
 redisplaying
 redisplays
 reenable
+reescape
 referer
 referers
 reflow
@@ -585,6 +587,7 @@ util
 utils
 Uvicorn
 uWSGI
+Uyghur
 validator
 validators
 variadic

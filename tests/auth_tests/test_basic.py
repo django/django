@@ -1,5 +1,7 @@
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
-from django.contrib.auth import get_user, get_user_model
+from django.contrib.auth import aget_user, get_user, get_user_model
 from django.contrib.auth.models import AnonymousUser, User
 from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
@@ -129,6 +131,12 @@ class TestGetUser(TestCase):
         user = get_user(request)
         self.assertIsInstance(user, AnonymousUser)
 
+    async def test_aget_user_anonymous(self):
+        request = HttpRequest()
+        request.session = await self.client.asession()
+        user = await aget_user(request)
+        self.assertIsInstance(user, AnonymousUser)
+
     def test_get_user(self):
         created_user = User.objects.create_user(
             "testuser", "test@example.com", "testpw"
@@ -162,3 +170,14 @@ class TestGetUser(TestCase):
             user = get_user(request)
             self.assertIsInstance(user, User)
             self.assertEqual(user.username, created_user.username)
+
+    async def test_aget_user(self):
+        created_user = await sync_to_async(User.objects.create_user)(
+            "testuser", "test@example.com", "testpw"
+        )
+        await self.client.alogin(username="testuser", password="testpw")
+        request = HttpRequest()
+        request.session = await self.client.asession()
+        user = await aget_user(request)
+        self.assertIsInstance(user, User)
+        self.assertEqual(user.username, created_user.username)

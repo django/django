@@ -2373,18 +2373,18 @@ class SubqueryTests(TestCase):
         """
         query = DumbCategory.objects.filter(
             id__in=DumbCategory.objects.order_by("-id")[0:2]
-        )[0:2]
-        self.assertEqual({x.id for x in query}, {3, 4})
+        ).order_by("id")[0:2]
+        self.assertSequenceEqual([x.id for x in query], [3, 4])
 
         query = DumbCategory.objects.filter(
             id__in=DumbCategory.objects.order_by("-id")[1:3]
-        )[1:3]
-        self.assertEqual({x.id for x in query}, {3})
+        ).order_by("id")[1:3]
+        self.assertSequenceEqual([x.id for x in query], [3])
 
         query = DumbCategory.objects.filter(
             id__in=DumbCategory.objects.order_by("-id")[2:]
-        )[1:]
-        self.assertEqual({x.id for x in query}, {2})
+        ).order_by("id")[1:]
+        self.assertSequenceEqual([x.id for x in query], [2])
 
     def test_related_sliced_subquery(self):
         """
@@ -3231,7 +3231,7 @@ class ExcludeTests(TestCase):
             [self.r2],
         )
 
-    def test_ticket14511(self):
+    def test_exclude_m2m_through(self):
         alex = Person.objects.get_or_create(name="Alex")[0]
         jane = Person.objects.get_or_create(name="Jane")[0]
 
@@ -3267,7 +3267,16 @@ class ExcludeTests(TestCase):
             .distinct()
             .order_by("name")
         )
-        self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
+        with self.assertNumQueries(1) as ctx:
+            self.assertSequenceEqual(alex_nontech_employers, [google, intel, microsoft])
+        sql = ctx.captured_queries[0]["sql"]
+        # Company's ID should appear in SELECT and INNER JOIN, not in EXISTS as
+        # the outer query reference is not necessary when an alias is reused.
+        company_id = "%s.%s" % (
+            connection.ops.quote_name(Company._meta.db_table),
+            connection.ops.quote_name(Company._meta.get_field("id").column),
+        )
+        self.assertEqual(sql.count(company_id), 2)
 
     def test_exclude_reverse_fk_field_ref(self):
         tag = Tag.objects.create()

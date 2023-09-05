@@ -1084,9 +1084,10 @@ class MailTests(HeadersCheckMixin, SimpleTestCase):
             "@",
             "to@",
             "@example.com",
+            ("", ""),
         ):
             with self.subTest(email_address=email_address):
-                with self.assertRaises(ValueError):
+                with self.assertRaisesMessage(ValueError, "Invalid address"):
                     sanitize_address(email_address, encoding="utf-8")
 
     def test_sanitize_address_header_injection(self):

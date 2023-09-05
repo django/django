@@ -1,12 +1,10 @@
 from collections import namedtuple
 
-import cx_Oracle
-
 from django.db import models
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 from django.db.backends.base.introspection import FieldInfo as BaseFieldInfo
 from django.db.backends.base.introspection import TableInfo as BaseTableInfo
-from django.utils.functional import cached_property
+from django.db.backends.oracle.oracledb_any import oracledb
 
 FieldInfo = namedtuple(
     "FieldInfo", BaseFieldInfo._fields + ("is_autofield", "is_json", "comment")
@@ -18,41 +16,23 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
     cache_bust_counter = 1
 
     # Maps type objects to Django Field types.
-    @cached_property
-    def data_types_reverse(self):
-        if self.connection.cx_oracle_version < (8,):
-            return {
-                cx_Oracle.BLOB: "BinaryField",
-                cx_Oracle.CLOB: "TextField",
-                cx_Oracle.DATETIME: "DateField",
-                cx_Oracle.FIXED_CHAR: "CharField",
-                cx_Oracle.FIXED_NCHAR: "CharField",
-                cx_Oracle.INTERVAL: "DurationField",
-                cx_Oracle.NATIVE_FLOAT: "FloatField",
-                cx_Oracle.NCHAR: "CharField",
-                cx_Oracle.NCLOB: "TextField",
-                cx_Oracle.NUMBER: "DecimalField",
-                cx_Oracle.STRING: "CharField",
-                cx_Oracle.TIMESTAMP: "DateTimeField",
-            }
-        else:
-            return {
-                cx_Oracle.DB_TYPE_DATE: "DateField",
-                cx_Oracle.DB_TYPE_BINARY_DOUBLE: "FloatField",
-                cx_Oracle.DB_TYPE_BLOB: "BinaryField",
-                cx_Oracle.DB_TYPE_CHAR: "CharField",
-                cx_Oracle.DB_TYPE_CLOB: "TextField",
-                cx_Oracle.DB_TYPE_INTERVAL_DS: "DurationField",
-                cx_Oracle.DB_TYPE_NCHAR: "CharField",
-                cx_Oracle.DB_TYPE_NCLOB: "TextField",
-                cx_Oracle.DB_TYPE_NVARCHAR: "CharField",
-                cx_Oracle.DB_TYPE_NUMBER: "DecimalField",
-                cx_Oracle.DB_TYPE_TIMESTAMP: "DateTimeField",
-                cx_Oracle.DB_TYPE_VARCHAR: "CharField",
-            }
+    data_types_reverse = {
+        oracledb.DB_TYPE_DATE: "DateField",
+        oracledb.DB_TYPE_BINARY_DOUBLE: "FloatField",
+        oracledb.DB_TYPE_BLOB: "BinaryField",
+        oracledb.DB_TYPE_CHAR: "CharField",
+        oracledb.DB_TYPE_CLOB: "TextField",
+        oracledb.DB_TYPE_INTERVAL_DS: "DurationField",
+        oracledb.DB_TYPE_NCHAR: "CharField",
+        oracledb.DB_TYPE_NCLOB: "TextField",
+        oracledb.DB_TYPE_NVARCHAR: "CharField",
+        oracledb.DB_TYPE_NUMBER: "DecimalField",
+        oracledb.DB_TYPE_TIMESTAMP: "DateTimeField",
+        oracledb.DB_TYPE_VARCHAR: "CharField",
+    }
 
     def get_field_type(self, data_type, description):
-        if data_type == cx_Oracle.NUMBER:
+        if data_type == oracledb.NUMBER:
             precision, scale = description[4:6]
             if scale == 0:
                 if precision > 11:
@@ -71,7 +51,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                     return "IntegerField"
             elif scale == -127:
                 return "FloatField"
-        elif data_type == cx_Oracle.NCLOB and description.is_json:
+        elif data_type == oracledb.NCLOB and description.is_json:
             return "JSONField"
 
         return super().get_field_type(data_type, description)
@@ -110,6 +90,31 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
         Return a description of the table with the DB-API cursor.description
         interface.
         """
+        # A default collation for the given table/view/materialized view.
+        cursor.execute(
+            """
+            SELECT user_tables.default_collation
+            FROM user_tables
+            WHERE
+                user_tables.table_name = UPPER(%s) AND
+                NOT EXISTS (
+                    SELECT 1
+                    FROM user_mviews
+                    WHERE user_mviews.mview_name = user_tables.table_name
+                )
+            UNION ALL
+            SELECT user_views.default_collation
+            FROM user_views
+            WHERE user_views.view_name = UPPER(%s)
+            UNION ALL
+            SELECT user_mviews.default_collation
+            FROM user_mviews
+            WHERE user_mviews.mview_name = UPPER(%s)
+            """,
+            [table_name, table_name, table_name],
+        )
+        row = cursor.fetchone()
+        default_table_collation = row[0] if row else ""
         # user_tab_columns gives data default for columns
         cursor.execute(
             """
@@ -117,7 +122,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_tab_cols.column_name,
                 user_tab_cols.data_default,
                 CASE
-                    WHEN user_tab_cols.collation = user_tables.default_collation
+                    WHEN user_tab_cols.collation = %s
                     THEN NULL
                     ELSE user_tab_cols.collation
                 END collation,
@@ -144,19 +149,17 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 user_col_comments.comments as col_comment
             FROM user_tab_cols
             LEFT OUTER JOIN
-                user_tables ON user_tables.table_name = user_tab_cols.table_name
-            LEFT OUTER JOIN
                 user_col_comments ON
                 user_col_comments.column_name = user_tab_cols.column_name AND
                 user_col_comments.table_name = user_tab_cols.table_name
             WHERE user_tab_cols.table_name = UPPER(%s)
             """,
-            [table_name],
+            [default_table_collation, table_name],
         )
         field_map = {
             column: (
                 display_size,
-                default if default != "NULL" else None,
+                default.rstrip() if default and default != "NULL" else None,
                 collation,
                 is_autofield,
                 is_json,
@@ -189,7 +192,7 @@ class DatabaseIntrospection(BaseDatabaseIntrospection):
                 is_json,
                 comment,
             ) = field_map[name]
-            name %= {}  # cx_Oracle, for some reason, doubles percent signs.
+            name %= {}  # oracledb, for some reason, doubles percent signs.
             description.append(
                 FieldInfo(
                     self.identifier_converter(name),

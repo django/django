@@ -20,11 +20,11 @@ Otherwise, before reporting a bug or requesting a new feature on the
   |django-users| list or the `#django`_ IRC channel for that.
 
 * Don't reopen issues that have been marked "wontfix" without finding consensus
-  to do so on |django-developers|.
+  to do so on the `Django Forum`_ or |django-developers| list.
 
 * Don't use the ticket tracker for lengthy discussions, because they're
   likely to get lost. If a particular ticket is controversial, please move the
-  discussion to |django-developers|.
+  discussion to the `Django Forum`_ or |django-developers| list.
 
 .. _reporting-bugs:
 
@@ -94,11 +94,10 @@ part of that. Here are some tips on how to make a request most effectively:
   suggest that you develop it independently. Then, if your project gathers
   sufficient community support, we may consider it for inclusion in Django.
 
-* First request the feature on the |django-developers| list, not in the
-  ticket tracker. It'll get read more closely if it's on the mailing list.
-  This is even more important for large-scale feature requests. We like to
-  discuss any big changes to Django's core on the mailing list before
-  actually working on them.
+* First request the feature on the `Django Forum`_ or |django-developers| list,
+  not in the ticket tracker. It'll get read more closely if it's on the mailing
+  list. This is even more important for large-scale feature requests. We like
+  to discuss any big changes to Django's core before actually working on them.
 
 * Describe clearly and concisely what the missing feature is and how you'd
   like to see it implemented. Include example code (non-functional is OK)
@@ -109,8 +108,7 @@ part of that. Here are some tips on how to make a request most effectively:
   achieving the same thing.
 
 If there's a consensus agreement on the feature, then it's appropriate to
-create a ticket. Include a link to the discussion on |django-developers| in the
-ticket description.
+create a ticket. Include a link to the discussion in the ticket description.
 
 As with most open-source projects, code talks. If you are willing to write the
 code for the feature yourself or, even better, if you've already written it,
@@ -160,8 +158,9 @@ Since this process allows any steering council member to veto a proposal, a
 convert that "-1" into at least a "+0".
 
 Votes on technical matters should be announced and held in public on the
-|django-developers| mailing list or on the Django Forum.
+|django-developers| mailing list or on the `Django Forum`_.
 
 .. _searching: https://code.djangoproject.com/search
 .. _custom queries: https://code.djangoproject.com/query
 .. _#django: https://web.libera.chat/#django
+.. _Django Forum: https://forum.djangoproject.com/

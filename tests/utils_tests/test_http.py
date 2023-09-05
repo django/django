@@ -34,18 +34,7 @@ class URLEncodeTests(SimpleTestCase):
 
     def test_dict(self):
         result = urlencode({"a": 1, "b": 2, "c": 3})
-        # Dictionaries are treated as unordered.
-        self.assertIn(
-            result,
-            [
-                "a=1&b=2&c=3",
-                "a=1&c=3&b=2",
-                "b=2&a=1&c=3",
-                "b=2&c=3&a=1",
-                "c=3&a=1&b=2",
-                "c=3&b=2&a=1",
-            ],
-        )
+        self.assertEqual(result, "a=1&b=2&c=3")
 
     def test_dict_containing_sequence_not_doseq(self):
         self.assertEqual(urlencode({"a": [1, 2]}, doseq=False), "a=%5B1%2C+2%5D")
@@ -79,14 +68,7 @@ class URLEncodeTests(SimpleTestCase):
             ),
             doseq=True,
         )
-        # MultiValueDicts are similarly unordered.
-        self.assertIn(
-            result,
-            [
-                "name=Adrian&name=Simon&position=Developer",
-                "position=Developer&name=Adrian&name=Simon",
-            ],
-        )
+        self.assertEqual(result, "name=Adrian&name=Simon&position=Developer")
 
     def test_dict_with_bytes_values(self):
         self.assertEqual(urlencode({"a": b"abc"}, doseq=True), "a=abc")

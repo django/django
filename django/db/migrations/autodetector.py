@@ -1040,6 +1040,7 @@ class MigrationAutodetector:
         preserve_default = (
             field.null
             or field.has_default()
+            or field.db_default is not models.NOT_PROVIDED
             or field.many_to_many
             or (field.blank and field.empty_strings_allowed)
             or (isinstance(field, time_fields) and field.auto_now)
@@ -1187,6 +1188,7 @@ class MigrationAutodetector:
                         old_field.null
                         and not new_field.null
                         and not new_field.has_default()
+                        and new_field.db_default is models.NOT_PROVIDED
                         and not new_field.many_to_many
                     ):
                         field = new_field.clone()

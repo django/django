@@ -17,7 +17,7 @@ class GeoJSONSerializerTests(TestCase):
         all_formats = set(serializers.get_serializer_formats())
         public_formats = set(serializers.get_public_serializer_formats())
 
-        self.assertIn("geojson", all_formats),
+        self.assertIn("geojson", all_formats)
         self.assertIn("geojson", public_formats)
 
     def test_serialization_base(self):

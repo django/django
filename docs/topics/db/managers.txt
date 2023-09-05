@@ -154,9 +154,7 @@ For example::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(
-            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
-        )
+        role = models.CharField(max_length=1, choices={"A": _("Author"), "E": _("Editor")})
         people = models.Manager()
         authors = AuthorManager()
         editors = EditorManager()
@@ -259,9 +257,7 @@ custom ``QuerySet`` if you also implement them on the ``Manager``::
     class Person(models.Model):
         first_name = models.CharField(max_length=50)
         last_name = models.CharField(max_length=50)
-        role = models.CharField(
-            max_length=1, choices=[("A", _("Author")), ("E", _("Editor"))]
-        )
+        role = models.CharField(max_length=1, choices={"A": _("Author"), "E": _("Editor")})
         people = PersonManager()
 
 This example allows you to call both ``authors()`` and ``editors()`` directly from

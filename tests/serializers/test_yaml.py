@@ -113,6 +113,7 @@ class YamlSerializerTestCase(SerializersTestBase, TestCase):
         )
         + """
     meta_data: []
+    topics: []
 """
     )
 

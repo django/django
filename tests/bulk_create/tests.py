@@ -10,7 +10,7 @@ from django.db import (
     connection,
 )
 from django.db.models import FileField, Value
-from django.db.models.functions import Lower
+from django.db.models.functions import Lower, Now
 from django.test import (
     TestCase,
     override_settings,
@@ -301,6 +301,19 @@ class BulkCreateTests(TestCase):
         self.assertEqual(bbb.count(), 1)
 
     @skipUnlessDBFeature("has_bulk_insert")
+    def test_bulk_insert_now(self):
+        NullableFields.objects.bulk_create(
+            [
+                NullableFields(datetime_field=Now()),
+                NullableFields(datetime_field=Now()),
+            ]
+        )
+        self.assertEqual(
+            NullableFields.objects.filter(datetime_field__isnull=False).count(),
+            2,
+        )
+
+    @skipUnlessDBFeature("has_bulk_insert")
     def test_bulk_insert_nullable_fields(self):
         fk_to_auto_fields = {
             "auto_field": NoFields.objects.create(),
@@ -569,12 +582,16 @@ class BulkCreateTests(TestCase):
             TwoFields(f1=1, f2=1, name="c"),
             TwoFields(f1=2, f2=2, name="d"),
         ]
-        TwoFields.objects.bulk_create(
+        results = TwoFields.objects.bulk_create(
             conflicting_objects,
             update_conflicts=True,
             unique_fields=unique_fields,
             update_fields=["name"],
         )
+        self.assertEqual(len(results), len(conflicting_objects))
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(TwoFields.objects.count(), 2)
         self.assertCountEqual(
             TwoFields.objects.values("f1", "f2", "name"),
@@ -606,7 +623,6 @@ class BulkCreateTests(TestCase):
                 TwoFields(f1=2, f2=2, name="b"),
             ]
         )
-        self.assertEqual(TwoFields.objects.count(), 2)
 
         obj1 = TwoFields.objects.get(f1=1)
         obj2 = TwoFields.objects.get(f1=2)
@@ -614,12 +630,16 @@ class BulkCreateTests(TestCase):
             TwoFields(pk=obj1.pk, f1=3, f2=3, name="c"),
             TwoFields(pk=obj2.pk, f1=4, f2=4, name="d"),
         ]
-        TwoFields.objects.bulk_create(
+        results = TwoFields.objects.bulk_create(
             conflicting_objects,
             update_conflicts=True,
             unique_fields=["pk"],
             update_fields=["name"],
         )
+        self.assertEqual(len(results), len(conflicting_objects))
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(TwoFields.objects.count(), 2)
         self.assertCountEqual(
             TwoFields.objects.values("f1", "f2", "name"),
@@ -667,12 +687,16 @@ class BulkCreateTests(TestCase):
                 description=("Japan is an island country in East Asia."),
             ),
         ]
-        Country.objects.bulk_create(
+        results = Country.objects.bulk_create(
             new_data,
             update_conflicts=True,
             update_fields=["description"],
             unique_fields=unique_fields,
         )
+        self.assertEqual(len(results), len(new_data))
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(Country.objects.count(), 6)
         self.assertCountEqual(
             Country.objects.values("iso_two_letter", "description"),
@@ -730,12 +754,16 @@ class BulkCreateTests(TestCase):
             UpsertConflict(number=2, rank=2, name="Olivia"),
             UpsertConflict(number=3, rank=1, name="Hannah"),
         ]
-        UpsertConflict.objects.bulk_create(
+        results = UpsertConflict.objects.bulk_create(
             conflicting_objects,
             update_conflicts=True,
             update_fields=["name", "rank"],
             unique_fields=unique_fields,
         )
+        self.assertEqual(len(results), len(conflicting_objects))
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(UpsertConflict.objects.count(), 3)
         self.assertCountEqual(
             UpsertConflict.objects.values("number", "rank", "name"),
@@ -746,12 +774,16 @@ class BulkCreateTests(TestCase):
             ],
         )
 
-        UpsertConflict.objects.bulk_create(
+        results = UpsertConflict.objects.bulk_create(
             conflicting_objects + [UpsertConflict(number=4, rank=4, name="Mark")],
             update_conflicts=True,
             update_fields=["name", "rank"],
             unique_fields=unique_fields,
         )
+        self.assertEqual(len(results), 4)
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(UpsertConflict.objects.count(), 4)
         self.assertCountEqual(
             UpsertConflict.objects.values("number", "rank", "name"),
@@ -790,12 +822,16 @@ class BulkCreateTests(TestCase):
             FieldsWithDbColumns(rank=1, name="c"),
             FieldsWithDbColumns(rank=2, name="d"),
         ]
-        FieldsWithDbColumns.objects.bulk_create(
+        results = FieldsWithDbColumns.objects.bulk_create(
             conflicting_objects,
             update_conflicts=True,
             unique_fields=["rank"],
             update_fields=["name"],
         )
+        self.assertEqual(len(results), len(conflicting_objects))
+        if connection.features.can_return_rows_from_bulk_insert:
+            for instance in results:
+                self.assertIsNotNone(instance.pk)
         self.assertEqual(FieldsWithDbColumns.objects.count(), 2)
         self.assertCountEqual(
             FieldsWithDbColumns.objects.values("rank", "name"),

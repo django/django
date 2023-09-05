@@ -154,7 +154,9 @@ class MigrationWriter:
                 imports.add("from django.conf import settings")
             else:
                 dependencies.append("        %s," % self.serialize(dependency)[0])
-        items["dependencies"] = "\n".join(dependencies) + "\n" if dependencies else ""
+        items["dependencies"] = (
+            "\n".join(sorted(dependencies)) + "\n" if dependencies else ""
+        )
 
         # Format imports nicely, swapping imports of functions from migration files
         # for comments

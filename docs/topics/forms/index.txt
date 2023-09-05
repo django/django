@@ -567,7 +567,7 @@ Reusable field group templates
 .. versionadded:: 5.0
 
 Each field is available as an attribute of the form, using
-``{{form.name_of_field }}`` in a template. A field has a
+``{{ form.name_of_field }}`` in a template. A field has a
 :meth:`~django.forms.BoundField.as_field_group` method which renders the
 related elements of the field as a group, its label, widget, errors, and help
 text.
@@ -723,7 +723,9 @@ loop:
             {{ field.errors }}
             {{ field.label_tag }} {{ field }}
             {% if field.help_text %}
-            <p class="help">{{ field.help_text|safe }}</p>
+              <p class="help" id="{{ field.id_for_label }}_helptext">
+                {{ field.help_text|safe }}
+              </p>
             {% endif %}
         </div>
     {% endfor %}

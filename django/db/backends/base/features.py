@@ -27,6 +27,11 @@ class BaseDatabaseFeatures:
     # Does the backend allow inserting duplicate rows when a unique_together
     # constraint exists and some fields are nullable but not all of them?
     supports_partially_nullable_unique_constraints = True
+
+    # Does the backend supports specifying whether NULL values should be
+    # considered distinct in unique constraints?
+    supports_nulls_distinct_unique_constraints = False
+
     # Does the backend support initially deferrable unique constraints?
     supports_deferrable_unique_constraints = False
 
@@ -169,9 +174,6 @@ class BaseDatabaseFeatures:
 
     schema_editor_uses_clientside_param_binding = False
 
-    # Does it support operations requiring references rename in a transaction?
-    supports_atomic_references_rename = True
-
     # Can we issue more than one ALTER COLUMN clause in an ALTER TABLE?
     supports_combined_alters = False
 
@@ -200,6 +202,15 @@ class BaseDatabaseFeatures:
 
     # Does the backend require literal defaults, rather than parameterized ones?
     requires_literal_defaults = False
+
+    # Does the backend support functions in defaults?
+    supports_expression_defaults = True
+
+    # Does the backend support the DEFAULT keyword in insert queries?
+    supports_default_keyword_in_insert = True
+
+    # Does the backend support the DEFAULT keyword in bulk insert queries?
+    supports_default_keyword_in_bulk_insert = True
 
     # Does the backend require a connection reset after each material schema change?
     connection_persists_old_columns = False
@@ -360,6 +371,9 @@ class BaseDatabaseFeatures:
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None
+
+    # SQL to create a model instance using the database defaults.
+    insert_test_table_with_defaults = None
 
     # A set of dotted paths to tests in Django's test suite that are expected
     # to fail on this database.

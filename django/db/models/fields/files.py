@@ -458,8 +458,10 @@ class ImageField(FileField):
         Dimensions can be forced to update with force=True, which is how
         ImageFileDescriptor.__set__ calls this method.
         """
-        # Nothing to update if the field is deferred.
-        if self.attname not in instance.__dict__:
+        # Nothing to update if the field doesn't have dimension fields or if
+        # the field is deferred.
+        has_dimension_fields = self.width_field or self.height_field
+        if not has_dimension_fields or self.attname not in instance.__dict__:
             return
 
         # getattr will call the ImageFileDescriptor's __get__ method, which

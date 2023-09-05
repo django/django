@@ -12,7 +12,7 @@ from django.db.backends.ddl_references import (
     Table,
 )
 from django.db.backends.utils import names_digest, split_identifier, truncate_name
-from django.db.models import Deferrable, Index
+from django.db.models import NOT_PROVIDED, Deferrable, Index
 from django.db.models.sql import Query
 from django.db.transaction import TransactionManagementError, atomic
 from django.utils import timezone
@@ -129,7 +129,7 @@ class BaseDatabaseSchemaEditor:
     )
     sql_create_unique_index = (
         "CREATE UNIQUE INDEX %(name)s ON %(table)s "
-        "(%(columns)s)%(include)s%(condition)s"
+        "(%(columns)s)%(include)s%(condition)s%(nulls_distinct)s"
     )
     sql_rename_index = "ALTER INDEX %(old_name)s RENAME TO %(new_name)s"
     sql_delete_index = "DROP INDEX %(name)s"
@@ -296,6 +296,12 @@ class BaseDatabaseSchemaEditor:
             yield self._comment_sql(field.db_comment)
         # Work out nullability.
         null = field.null
+        # Add database default.
+        if field.db_default is not NOT_PROVIDED:
+            default_sql, default_params = self.db_default_sql(field)
+            yield f"DEFAULT {default_sql}"
+            params.extend(default_params)
+            include_default = False
         # Include a default value, if requested.
         include_default = (
             include_default
@@ -399,6 +405,22 @@ class BaseDatabaseSchemaEditor:
         contain a '%s' placeholder for a default value.
         """
         return "%s"
+
+    def db_default_sql(self, field):
+        """Return the sql and params for the field's database default."""
+        from django.db.models.expressions import Value
+
+        sql = "%s" if isinstance(field.db_default, Value) else "(%s)"
+        query = Query(model=field.model)
+        compiler = query.get_compiler(connection=self.connection)
+        default_sql, params = compiler.compile(field.db_default)
+        if self.connection.features.requires_literal_defaults:
+            # Some databases doesn't support parameterized defaults (Oracle,
+            # SQLite). If this is the case, the individual schema backend
+            # should implement prepare_default().
+            default_sql %= tuple(self.prepare_default(p) for p in params)
+            params = []
+        return sql % default_sql, params
 
     @staticmethod
     def _effective_default(field):
@@ -1025,6 +1047,21 @@ class BaseDatabaseSchemaEditor:
             )
             actions.append(fragment)
             post_actions.extend(other_actions)
+
+        if new_field.db_default is not NOT_PROVIDED:
+            if (
+                old_field.db_default is NOT_PROVIDED
+                or new_field.db_default != old_field.db_default
+            ):
+                actions.append(
+                    self._alter_column_database_default_sql(model, old_field, new_field)
+                )
+        elif old_field.db_default is not NOT_PROVIDED:
+            actions.append(
+                self._alter_column_database_default_sql(
+                    model, old_field, new_field, drop=True
+                )
+            )
         # When changing a column NULL constraint to NOT NULL with a given
         # default value, we need to perform 4 steps:
         #  1. Add a default for new incoming writes
@@ -1033,7 +1070,11 @@ class BaseDatabaseSchemaEditor:
         #  4. Drop the default again.
         # Default change?
         needs_database_default = False
-        if old_field.null and not new_field.null:
+        if (
+            old_field.null
+            and not new_field.null
+            and new_field.db_default is NOT_PROVIDED
+        ):
             old_default = self.effective_default(old_field)
             new_default = self.effective_default(new_field)
             if (
@@ -1051,9 +1092,9 @@ class BaseDatabaseSchemaEditor:
             if fragment:
                 null_actions.append(fragment)
         # Only if we have a default and there is a change from NULL to NOT NULL
-        four_way_default_alteration = new_field.has_default() and (
-            old_field.null and not new_field.null
-        )
+        four_way_default_alteration = (
+            new_field.has_default() or new_field.db_default is not NOT_PROVIDED
+        ) and (old_field.null and not new_field.null)
         if actions or null_actions:
             if not four_way_default_alteration:
                 # If we don't have to do a 4-way default alteration we can
@@ -1074,15 +1115,20 @@ class BaseDatabaseSchemaEditor:
                     params,
                 )
             if four_way_default_alteration:
+                if new_field.db_default is NOT_PROVIDED:
+                    default_sql = "%s"
+                    params = [new_default]
+                else:
+                    default_sql, params = self.db_default_sql(new_field)
                 # Update existing rows with default value
                 self.execute(
                     self.sql_update_with_default
                     % {
                         "table": self.quote_name(model._meta.db_table),
                         "column": self.quote_name(new_field.column),
-                        "default": "%s",
+                        "default": default_sql,
                     },
-                    [new_default],
+                    params,
                 )
                 # Since we didn't run a NOT NULL change before we need to do it
                 # now
@@ -1264,6 +1310,34 @@ class BaseDatabaseSchemaEditor:
             params,
         )
 
+    def _alter_column_database_default_sql(
+        self, model, old_field, new_field, drop=False
+    ):
+        """
+        Hook to specialize column database default alteration.
+
+        Return a (sql, params) fragment to add or drop (depending on the drop
+        argument) a default to new_field's column.
+        """
+        if drop:
+            sql = self.sql_alter_column_no_default
+            default_sql = ""
+            params = []
+        else:
+            sql = self.sql_alter_column_default
+            default_sql, params = self.db_default_sql(new_field)
+
+        new_db_params = new_field.db_parameters(connection=self.connection)
+        return (
+            sql
+            % {
+                "column": self.quote_name(new_field.column),
+                "type": new_db_params["type"],
+                "default": default_sql,
+            },
+            params,
+        )
+
     def _alter_column_type_sql(
         self, model, old_field, new_field, new_type, old_collation, new_collation
     ):
@@ -1272,7 +1346,7 @@ class BaseDatabaseSchemaEditor:
         for cases when a creation type is different to an alteration type
         (e.g. SERIAL in PostgreSQL, PostGIS fields).
 
-        Return a two-tuple of: an SQL fragment of (sql, params) to insert into
+        Return a 2-tuple of: an SQL fragment of (sql, params) to insert into
         an ALTER TABLE statement and a list of extra (sql, params) tuples to
         run once the field is altered.
         """
@@ -1527,10 +1601,20 @@ class BaseDatabaseSchemaEditor:
         # - changing an attribute that doesn't affect the schema
         # - changing an attribute in the provided set of ignored attributes
         # - adding only a db_column and the column name is not changed
+        # - db_table does not change for model referenced by foreign keys
         for attr in ignore.union(old_field.non_db_attrs):
             old_kwargs.pop(attr, None)
         for attr in ignore.union(new_field.non_db_attrs):
             new_kwargs.pop(attr, None)
+        if (
+            not new_field.many_to_many
+            and old_field.remote_field
+            and new_field.remote_field
+            and old_field.remote_field.model._meta.db_table
+            == new_field.remote_field.model._meta.db_table
+        ):
+            old_kwargs.pop("to", None)
+            new_kwargs.pop("to", None)
         return self.quote_name(old_field.column) != self.quote_name(
             new_field.column
         ) or (old_path, old_args, old_kwargs) != (new_path, new_args, new_kwargs)
@@ -1601,6 +1685,37 @@ class BaseDatabaseSchemaEditor:
         if deferrable == Deferrable.IMMEDIATE:
             return " DEFERRABLE INITIALLY IMMEDIATE"
 
+    def _unique_index_nulls_distinct_sql(self, nulls_distinct):
+        if nulls_distinct is False:
+            return " NULLS NOT DISTINCT"
+        elif nulls_distinct is True:
+            return " NULLS DISTINCT"
+        return ""
+
+    def _unique_supported(
+        self,
+        condition=None,
+        deferrable=None,
+        include=None,
+        expressions=None,
+        nulls_distinct=None,
+    ):
+        return (
+            (not condition or self.connection.features.supports_partial_indexes)
+            and (
+                not deferrable
+                or self.connection.features.supports_deferrable_unique_constraints
+            )
+            and (not include or self.connection.features.supports_covering_indexes)
+            and (
+                not expressions or self.connection.features.supports_expression_indexes
+            )
+            and (
+                nulls_distinct is None
+                or self.connection.features.supports_nulls_distinct_unique_constraints
+            )
+        )
+
     def _unique_sql(
         self,
         model,
@@ -1611,15 +1726,26 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
-        if (
-            deferrable
-            and not self.connection.features.supports_deferrable_unique_constraints
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
-        if condition or include or opclasses or expressions:
-            # Databases support conditional, covering, and functional unique
-            # constraints via a unique index.
+
+        if (
+            condition
+            or include
+            or opclasses
+            or expressions
+            or nulls_distinct is not None
+        ):
+            # Databases support conditional, covering, functional unique,
+            # and nulls distinct constraints via a unique index.
             sql = self._create_unique_sql(
                 model,
                 fields,
@@ -1628,6 +1754,7 @@ class BaseDatabaseSchemaEditor:
                 include=include,
                 opclasses=opclasses,
                 expressions=expressions,
+                nulls_distinct=nulls_distinct,
             )
             if sql:
                 self.deferred_sql.append(sql)
@@ -1651,17 +1778,14 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
-        if (
-            (
-                deferrable
-                and not self.connection.features.supports_deferrable_unique_constraints
-            )
-            or (condition and not self.connection.features.supports_partial_indexes)
-            or (include and not self.connection.features.supports_covering_indexes)
-            or (
-                expressions and not self.connection.features.supports_expression_indexes
-            )
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
 
@@ -1692,6 +1816,7 @@ class BaseDatabaseSchemaEditor:
             condition=self._index_condition_sql(condition),
             deferrable=self._deferrable_constraint_sql(deferrable),
             include=self._index_include_sql(model, include),
+            nulls_distinct=self._unique_index_nulls_distinct_sql(nulls_distinct),
         )
 
     def _unique_constraint_name(self, table, columns, quote=True):
@@ -1714,17 +1839,14 @@ class BaseDatabaseSchemaEditor:
         include=None,
         opclasses=None,
         expressions=None,
+        nulls_distinct=None,
     ):
-        if (
-            (
-                deferrable
-                and not self.connection.features.supports_deferrable_unique_constraints
-            )
-            or (condition and not self.connection.features.supports_partial_indexes)
-            or (include and not self.connection.features.supports_covering_indexes)
-            or (
-                expressions and not self.connection.features.supports_expression_indexes
-            )
+        if not self._unique_supported(
+            condition=condition,
+            deferrable=deferrable,
+            include=include,
+            expressions=expressions,
+            nulls_distinct=nulls_distinct,
         ):
             return None
         if condition or include or opclasses or expressions:

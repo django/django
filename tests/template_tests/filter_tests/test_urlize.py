@@ -158,7 +158,7 @@ class FunctionTests(SimpleTestCase):
         )
 
     def test_word_with_dot(self):
-        self.assertEqual(urlize("some.organization"), "some.organization"),
+        self.assertEqual(urlize("some.organization"), "some.organization")
 
     def test_https(self):
         self.assertEqual(

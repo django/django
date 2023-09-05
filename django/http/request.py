@@ -7,6 +7,7 @@ from urllib.parse import parse_qsl, quote, urlencode, urljoin, urlsplit
 from django.conf import settings
 from django.core import signing
 from django.core.exceptions import (
+    BadRequest,
     DisallowedHost,
     ImproperlyConfigured,
     RequestDataTooBig,
@@ -30,7 +31,7 @@ from django.utils.regex_helper import _lazy_re_compile
 
 RAISE_ERROR = object()
 host_validation_re = _lazy_re_compile(
-    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:[0-9]+)?$"
+    r"^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9.:]+\])(?::([0-9]+))?$"
 )
 
 
@@ -377,10 +378,16 @@ class HttpRequest:
                 self._mark_post_parse_error()
                 raise
         elif self.content_type == "application/x-www-form-urlencoded":
-            self._post, self._files = (
-                QueryDict(self.body, encoding=self._encoding),
-                MultiValueDict(),
-            )
+            # According to RFC 1866, the "application/x-www-form-urlencoded"
+            # content type does not have a charset and should be always treated
+            # as UTF-8.
+            if self._encoding is not None and self._encoding.lower() != "utf-8":
+                raise BadRequest(
+                    "HTTP requests with the 'application/x-www-form-urlencoded' "
+                    "content type must be UTF-8 encoded."
+                )
+            self._post = QueryDict(self.body, encoding="utf-8")
+            self._files = MultiValueDict()
         else:
             self._post, self._files = (
                 QueryDict(encoding=self._encoding),
@@ -698,19 +705,11 @@ def split_domain_port(host):
     Returned domain is lowercased. If the host is invalid, the domain will be
     empty.
     """
-    host = host.lower()
-
-    if not host_validation_re.match(host):
-        return "", ""
-
-    if host[-1] == "]":
-        # It's an IPv6 address without a port.
-        return host, ""
-    bits = host.rsplit(":", 1)
-    domain, port = bits if len(bits) == 2 else (bits[0], "")
-    # Remove a trailing dot (if present) from the domain.
-    domain = domain.removesuffix(".")
-    return domain, port
+    if match := host_validation_re.fullmatch(host.lower()):
+        domain, port = match.groups(default="")
+        # Remove a trailing dot (if present) from the domain.
+        return domain.removesuffix("."), port
+    return "", ""
 
 
 def validate_host(host, allowed_hosts):
