@@ -1851,7 +1851,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "id_name").send_keys(room_name)
 
         self.selenium.find_element(By.NAME, "_continue").click()
-        #
+
         save_button_css_selector = ".submit-row > input[type=submit]"
 
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
