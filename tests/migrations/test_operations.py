@@ -199,27 +199,26 @@ class OperationTests(OperationTestBase):
         project_state = self.apply_operations(app_label, ProjectState(), operations)
         # ForeignKey.
         new_state = project_state.clone()
-        operation = migrations.CreateModel(
-            "Rider",
-            [
-                ("id", models.AutoField(primary_key=True)),
-                ("number", models.IntegerField(default=1)),
-                (
-                    "pony_cascade",
-                    models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_CASCADE),
+        operation_list = [
+            ("id", models.AutoField(primary_key=True)),
+            ("number", models.IntegerField(default=1)),
+            (
+                "pony_cascade",
+                models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_CASCADE),
+            ),
+            (
+                "pony_set_null",
+                models.ForeignKey(
+                    f"{app_label}.Pony", null=True, on_delete=models.DB_SET_NULL
                 ),
-                (
-                    "pony_set_null",
-                    models.ForeignKey(
-                        f"{app_label}.Pony", null=True, on_delete=models.DB_SET_NULL
-                    ),
-                ),
-                (
-                    "pony_restrict",
-                    models.ForeignKey(
-                        f"{app_label}.Pony", on_delete=models.DB_RESTRICT
-                    ),
-                ),
+            ),
+            (
+                "pony_restrict",
+                models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_RESTRICT),
+            ),
+        ]
+        if connection.features.has_on_delete_db_default:
+            operation_list.append(
                 (
                     "pony_default",
                     models.ForeignKey(
@@ -227,9 +226,9 @@ class OperationTests(OperationTestBase):
                         db_default="bn",
                         on_delete=models.DB_SET_DEFAULT,
                     ),
-                ),
-            ],
-        )
+                )
+            )
+        operation = migrations.CreateModel("Rider", operation_list)
         operation.state_forwards(app_label, new_state)
         self.assertTableNotExists(f"{app_label}_rider")
         with connection.schema_editor() as editor:
@@ -238,7 +237,8 @@ class OperationTests(OperationTestBase):
         self.assertColumnExists(f"{app_label}_rider", "pony_cascade_id")
         self.assertColumnExists(f"{app_label}_rider", "pony_set_null_id")
         self.assertColumnExists(f"{app_label}_rider", "pony_restrict_id")
-        self.assertColumnExists(f"{app_label}_rider", "pony_default_id")
+        if connection.features.has_on_delete_db_default:
+            self.assertColumnExists(f"{app_label}_rider", "pony_default_id")
 
     def test_alter_field_with_db_level_fk(self):
         app_label = "test_alterfwdblfk"
@@ -331,6 +331,11 @@ class OperationTests(OperationTestBase):
             project_state = self.apply_operations(app_label, ProjectState(), operations)
             # ForeignKey.
             for db_level_on_delete_type in db_level_cascade_options.keys():
+                if (
+                    db_level_on_delete_type == "set_default"
+                    and not connection.features.has_on_delete_db_default
+                ):
+                    continue
                 Rider = project_state.apps.get_model(
                     app_label, f"Rider_{on_delete_type}"
                 )
@@ -410,6 +415,11 @@ class OperationTests(OperationTestBase):
             ],
         }
         for primary_on_delete_type in db_cascade_options_primary.keys():
+            if (
+                primary_on_delete_type == "set_default"
+                and not connection.features.has_on_delete_db_default
+            ):
+                continue
             db_level_cascade_options_secondary = {
                 "cascade": [
                     models.DB_CASCADE,
@@ -471,6 +481,11 @@ class OperationTests(OperationTestBase):
             # ForeignKey.
             for secondary_on_delete_type in db_level_cascade_options_secondary.keys():
                 if primary_on_delete_type == secondary_on_delete_type:
+                    continue
+                if (
+                    secondary_on_delete_type == "set_default"
+                    and not connection.features.has_on_delete_db_default
+                ):
                     continue
                 Rider = project_state.apps.get_model(
                     app_label, f"Rider_{primary_on_delete_type}"
@@ -571,6 +586,11 @@ class OperationTests(OperationTestBase):
         ]
         project_state = self.apply_operations(app_label, ProjectState(), operations)
         for db_cascade_option in db_cascade_options_primary.keys():
+            if (
+                db_cascade_option == "set_default"
+                and not connection.features.has_on_delete_db_default
+            ):
+                continue
             operation = migrations.AddField(
                 "Rider",
                 f"pony_{db_cascade_option}",
