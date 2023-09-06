@@ -150,6 +150,10 @@ class-based views<decorating-class-based-views>`.
         def my_view(request):
             return HttpResponse("Hello world")
 
+    .. versionchanged:: 5.0
+
+        Support for wrapping asynchronous view functions was added.
+
 .. function:: csrf_protect(view)
 
     Decorator that provides the protection of ``CsrfViewMiddleware`` to a view.

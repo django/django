@@ -22,11 +22,11 @@ We'll be using the following model in the subsequent examples::
         REGULAR = "R"
         GOLD = "G"
         PLATINUM = "P"
-        ACCOUNT_TYPE_CHOICES = [
-            (REGULAR, "Regular"),
-            (GOLD, "Gold"),
-            (PLATINUM, "Platinum"),
-        ]
+        ACCOUNT_TYPE_CHOICES = {
+            REGULAR: "Regular",
+            GOLD: "Gold",
+            PLATINUM: "Platinum",
+        }
         name = models.CharField(max_length=50)
         registered_on = models.DateField()
         account_type = models.CharField(

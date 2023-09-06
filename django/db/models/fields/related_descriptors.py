@@ -1118,7 +1118,10 @@ def create_forward_many_to_many_manager(superclass, rel, reverse):
             return (
                 queryset,
                 lambda result: tuple(
-                    getattr(result, "_prefetch_related_val_%s" % f.attname)
+                    f.get_db_prep_value(
+                        getattr(result, f"_prefetch_related_val_{f.attname}"),
+                        connection,
+                    )
                     for f in fk.local_related_fields
                 ),
                 lambda inst: tuple(

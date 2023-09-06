@@ -832,6 +832,26 @@ class Model(AltersData, metaclass=ModelBase):
 
     asave.alters_data = True
 
+    @classmethod
+    def _validate_force_insert(cls, force_insert):
+        if force_insert is False:
+            return ()
+        if force_insert is True:
+            return (cls,)
+        if not isinstance(force_insert, tuple):
+            raise TypeError("force_insert must be a bool or tuple.")
+        for member in force_insert:
+            if not isinstance(member, ModelBase):
+                raise TypeError(
+                    f"Invalid force_insert member. {member!r} must be a model subclass."
+                )
+            if not issubclass(cls, member):
+                raise TypeError(
+                    f"Invalid force_insert member. {member.__qualname__} must be a "
+                    f"base of {cls.__qualname__}."
+                )
+        return force_insert
+
     def save_base(
         self,
         raw=False,
@@ -873,7 +893,11 @@ class Model(AltersData, metaclass=ModelBase):
         with context_manager:
             parent_inserted = False
             if not raw:
-                parent_inserted = self._save_parents(cls, using, update_fields)
+                # Validate force insert only when parents are inserted.
+                force_insert = self._validate_force_insert(force_insert)
+                parent_inserted = self._save_parents(
+                    cls, using, update_fields, force_insert
+                )
             updated = self._save_table(
                 raw,
                 cls,
@@ -900,10 +924,14 @@ class Model(AltersData, metaclass=ModelBase):
 
     save_base.alters_data = True
 
-    def _save_parents(self, cls, using, update_fields):
+    def _save_parents(
+        self, cls, using, update_fields, force_insert, updated_parents=None
+    ):
         """Save all the parents of cls using values from self."""
         meta = cls._meta
         inserted = False
+        if updated_parents is None:
+            updated_parents = {}
         for parent, field in meta.parents.items():
             # Make sure the link fields are synced between parent and self.
             if (
@@ -912,16 +940,24 @@ class Model(AltersData, metaclass=ModelBase):
                 and getattr(self, field.attname) is not None
             ):
                 setattr(self, parent._meta.pk.attname, getattr(self, field.attname))
-            parent_inserted = self._save_parents(
-                cls=parent, using=using, update_fields=update_fields
-            )
-            updated = self._save_table(
-                cls=parent,
-                using=using,
-                update_fields=update_fields,
-                force_insert=parent_inserted,
-            )
-            if not updated:
+            if (parent_updated := updated_parents.get(parent)) is None:
+                parent_inserted = self._save_parents(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    force_insert=force_insert,
+                    updated_parents=updated_parents,
+                )
+                updated = self._save_table(
+                    cls=parent,
+                    using=using,
+                    update_fields=update_fields,
+                    force_insert=parent_inserted or issubclass(parent, force_insert),
+                )
+                if not updated:
+                    inserted = True
+                updated_parents[parent] = updated
+            elif not parent_updated:
                 inserted = True
             # Set the parent's PK value to self.
             if field:
@@ -971,8 +1007,10 @@ class Model(AltersData, metaclass=ModelBase):
             not raw
             and not force_insert
             and self._state.adding
-            and meta.pk.default
-            and meta.pk.default is not NOT_PROVIDED
+            and (
+                (meta.pk.default and meta.pk.default is not NOT_PROVIDED)
+                or (meta.pk.db_default and meta.pk.db_default is not NOT_PROVIDED)
+            )
         ):
             force_insert = True
         # If possible, try an UPDATE. If that doesn't update anything, do an INSERT.
@@ -1197,11 +1235,14 @@ class Model(AltersData, metaclass=ModelBase):
         if exclude is None:
             exclude = set()
         meta = meta or self._meta
-        return {
+        field_map = {
             field.name: Value(getattr(self, field.attname), field)
             for field in meta.local_concrete_fields
             if field.name not in exclude
         }
+        if "pk" not in exclude:
+            field_map["pk"] = Value(self.pk, meta.pk)
+        return field_map
 
     def prepare_database_save(self, field):
         if self.pk is None:
@@ -1763,6 +1804,21 @@ class Model(AltersData, metaclass=ModelBase):
             for f in parent._meta.get_fields():
                 if f not in used_fields:
                     used_fields[f.name] = f
+
+        # Check that parent links in diamond-shaped MTI models don't clash.
+        for parent_link in cls._meta.parents.values():
+            if not parent_link:
+                continue
+            clash = used_fields.get(parent_link.name) or None
+            if clash:
+                errors.append(
+                    checks.Error(
+                        f"The field '{parent_link.name}' clashes with the field "
+                        f"'{clash.name}' from model '{clash.model._meta}'.",
+                        obj=cls,
+                        id="models.E006",
+                    )
+                )
 
         for f in cls._meta.local_fields:
             clash = used_fields.get(f.name) or used_fields.get(f.attname) or None
@@ -2387,6 +2443,29 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                         obj=cls,
                         id="models.W044",
+                    )
+                )
+            if not (
+                connection.features.supports_nulls_distinct_unique_constraints
+                or (
+                    "supports_nulls_distinct_unique_constraints"
+                    in cls._meta.required_db_features
+                )
+            ) and any(
+                isinstance(constraint, UniqueConstraint)
+                and constraint.nulls_distinct is not None
+                for constraint in cls._meta.constraints
+            ):
+                errors.append(
+                    checks.Warning(
+                        "%s does not support unique constraints with "
+                        "nulls distinct." % connection.display_name,
+                        hint=(
+                            "A constraint won't be created. Silence this "
+                            "warning if you don't care about it."
+                        ),
+                        obj=cls,
+                        id="models.W047",
                     )
                 )
             fields = set(

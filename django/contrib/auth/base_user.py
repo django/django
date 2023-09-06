@@ -8,6 +8,7 @@ import warnings
 from django.conf import settings
 from django.contrib.auth import password_validation
 from django.contrib.auth.hashers import (
+    acheck_password,
     check_password,
     is_password_usable,
     make_password,
@@ -121,6 +122,17 @@ class AbstractBaseUser(models.Model):
             self.save(update_fields=["password"])
 
         return check_password(raw_password, self.password, setter)
+
+    async def acheck_password(self, raw_password):
+        """See check_password()."""
+
+        async def setter(raw_password):
+            self.set_password(raw_password)
+            # Password hash upgrades shouldn't be considered password changes.
+            self._password = None
+            await self.asave(update_fields=["password"])
+
+        return await acheck_password(raw_password, self.password, setter)
 
     def set_unusable_password(self):
         # Set a value that will never be a valid hash

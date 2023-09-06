@@ -792,7 +792,8 @@ class ThreadTests(TransactionTestCase):
             # closed on teardown).
             for conn in connections_dict.values():
                 if conn is not connection and conn.allow_thread_sharing:
-                    conn.close()
+                    conn.validate_thread_sharing()
+                    conn._close()
                     conn.dec_thread_sharing()
 
     def test_connections_thread_local(self):

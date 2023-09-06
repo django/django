@@ -458,7 +458,7 @@ Arguments sent with this signal:
 ``plan``
     The migration plan that is going to be used for the migration run. While
     the plan is not public API, this allows for the rare cases when it is
-    necessary to know the plan. A plan is a list of two-tuples with the first
+    necessary to know the plan. A plan is a list of 2-tuples with the first
     item being the instance of a migration class and the second item showing
     if the migration was rolled back (``True``) or applied (``False``).
 
@@ -516,7 +516,7 @@ Arguments sent with this signal:
 ``plan``
     The migration plan that was used for the migration run. While the plan is
     not public API, this allows for the rare cases when it is necessary to
-    know the plan. A plan is a list of two-tuples with the first item being
+    know the plan. A plan is a list of 2-tuples with the first item being
     the instance of a migration class and the second item showing if the
     migration was rolled back (``True``) or applied (``False``).
 

@@ -247,7 +247,7 @@ END;
             value = bool(value)
         return value
 
-    # cx_Oracle always returns datetime.datetime objects for
+    # oracledb always returns datetime.datetime objects for
     # DATE and TIMESTAMP columns, but Django wants to see a
     # python datetime.date, .time, or .datetime.
 
@@ -296,12 +296,6 @@ END;
             columns.append(value[0])
         return tuple(columns)
 
-    def field_cast_sql(self, db_type, internal_type):
-        if db_type and db_type.endswith("LOB") and internal_type != "JSONField":
-            return "DBMS_LOB.SUBSTR(%s)"
-        else:
-            return "%s"
-
     def no_limit_value(self):
         return None
 
@@ -317,10 +311,10 @@ END;
         )
 
     def last_executed_query(self, cursor, sql, params):
-        # https://cx-oracle.readthedocs.io/en/latest/api_manual/cursor.html#Cursor.statement
+        # https://python-oracledb.readthedocs.io/en/latest/api_manual/cursor.html#Cursor.statement
         # The DB API definition does not define this attribute.
         statement = cursor.statement
-        # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, cx_Oracle's
+        # Unlike Psycopg's `query` and MySQLdb`'s `_executed`, oracledb's
         # `statement` doesn't contain the query parameters. Substitute
         # parameters manually.
         if params:
@@ -344,7 +338,9 @@ END;
     def lookup_cast(self, lookup_type, internal_type=None):
         if lookup_type in ("iexact", "icontains", "istartswith", "iendswith"):
             return "UPPER(%s)"
-        if internal_type == "JSONField" and lookup_type == "exact":
+        if (
+            lookup_type != "isnull" and internal_type in ("BinaryField", "TextField")
+        ) or (lookup_type == "exact" and internal_type == "JSONField"):
             return "DBMS_LOB.SUBSTR(%s)"
         return "%s"
 
@@ -596,7 +592,7 @@ END;
         if hasattr(value, "resolve_expression"):
             return value
 
-        # cx_Oracle doesn't support tz-aware datetimes
+        # oracledb doesn't support tz-aware datetimes
         if timezone.is_aware(value):
             if settings.USE_TZ:
                 value = timezone.make_naive(value, self.connection.timezone)

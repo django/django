@@ -572,7 +572,7 @@ class modify_settings(override_settings):
             except KeyError:
                 value = list(getattr(settings, name, []))
             for action, items in operations.items():
-                # items my be a single value or an iterable.
+                # items may be a single value or an iterable.
                 if isinstance(items, str):
                     items = [items]
                 if action == "append":

@@ -279,10 +279,10 @@ dependencies:
 
 * :pypi:`aiosmtpd`
 * :pypi:`argon2-cffi` 19.2.0+
-* :pypi:`asgiref` 3.6.0+ (required)
+* :pypi:`asgiref` 3.7.0+ (required)
 * :pypi:`bcrypt`
-* :pypi:`colorama`
-* :pypi:`docutils`
+* :pypi:`colorama` 0.4.6+
+* :pypi:`docutils` 0.19+
 * :pypi:`geoip2`
 * :pypi:`Jinja2` 2.11+
 * :pypi:`numpy`
@@ -292,11 +292,11 @@ dependencies:
 * :pypi:`pywatchman`
 * :pypi:`redis` 3.4+
 * :pypi:`setuptools`
-* :pypi:`memcached`, plus a `supported Python binding
+* :pypi:`python-memcached`, plus a `supported Python binding
   <https://memcached.org/>`_
 * `gettext <https://www.gnu.org/software/gettext/manual/gettext.html>`_
   (:ref:`gettext_on_windows`)
-* :pypi:`selenium`
+* :pypi:`selenium` 4.8.0+
 * :pypi:`sqlparse` 0.3.1+ (required)
 * :pypi:`tblib` 1.5.0+
 

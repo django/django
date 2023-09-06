@@ -464,9 +464,8 @@ Minor features
 * The :ref:`messages context processor <message-displaying>` now adds a
   dictionary of default levels under the name ``DEFAULT_MESSAGE_LEVELS``.
 
-* :class:`~django.contrib.messages.storage.base.Message` objects now have a
-  ``level_tag`` attribute that contains the string representation of the
-  message level.
+* :class:`~django.contrib.messages.Message` objects now have a ``level_tag``
+  attribute that contains the string representation of the message level.
 
 :mod:`django.contrib.redirects`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

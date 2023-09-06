@@ -60,10 +60,11 @@ Then from the ``docs`` directory, build the HTML:
 To get started contributing, you'll want to read the :ref:`reStructuredText
 reference <sphinx:rst-index>`.
 
-Your locally-built documentation will be themed differently than the
-documentation at `docs.djangoproject.com <https://docs.djangoproject.com/>`_.
-This is OK! If your changes look good on your local machine, they'll look good
-on the website.
+Your locally-built documentation will be accessible at
+``docs/_build/html/index.html`` and it can be viewed in any web browser, though
+it will be themed differently than the documentation at
+`docs.djangoproject.com <https://docs.djangoproject.com/>`_. This is OK! If
+your changes look good on your local machine, they'll look good on the website.
 
 How the documentation is organized
 ==================================

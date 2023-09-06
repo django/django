@@ -5,10 +5,10 @@ from datetime import datetime
 from asgiref.sync import async_to_sync, sync_to_async
 
 from django.db import NotSupportedError, connection
-from django.db.models import Sum
+from django.db.models import Prefetch, Sum
 from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
 
-from .models import SimpleModel
+from .models import RelatedModel, SimpleModel
 
 
 class AsyncQuerySetTest(TestCase):
@@ -26,6 +26,9 @@ class AsyncQuerySetTest(TestCase):
             field=3,
             created=datetime(2022, 1, 1, 0, 0, 2),
         )
+        cls.r1 = RelatedModel.objects.create(simple=cls.s1)
+        cls.r2 = RelatedModel.objects.create(simple=cls.s2)
+        cls.r3 = RelatedModel.objects.create(simple=cls.s3)
 
     @staticmethod
     def _get_db_feature(connection_, feature_name):
@@ -48,11 +51,12 @@ class AsyncQuerySetTest(TestCase):
         self.assertCountEqual(results, [self.s1, self.s2, self.s3])
 
     async def test_aiterator_prefetch_related(self):
-        qs = SimpleModel.objects.prefetch_related("relatedmodels").aiterator()
-        msg = "Using QuerySet.aiterator() after prefetch_related() is not supported."
-        with self.assertRaisesMessage(NotSupportedError, msg):
-            async for m in qs:
-                pass
+        results = []
+        async for s in SimpleModel.objects.prefetch_related(
+            Prefetch("relatedmodel_set", to_attr="prefetched_relatedmodel")
+        ).aiterator():
+            results.append(s.prefetched_relatedmodel)
+        self.assertCountEqual(results, [[self.r1], [self.r2], [self.r3]])
 
     async def test_aiterator_invalid_chunk_size(self):
         msg = "Chunk size must be strictly positive."

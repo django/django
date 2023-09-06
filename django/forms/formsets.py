@@ -99,6 +99,8 @@ class BaseFormSet(RenderableFormMixin):
         self.error_class = error_class
         self._errors = None
         self._non_form_errors = None
+        self.form_renderer = self.renderer
+        self.renderer = self.renderer or get_default_renderer()
 
         messages = {}
         for cls in reversed(type(self).__mro__):
@@ -224,7 +226,7 @@ class BaseFormSet(RenderableFormMixin):
             # incorrect validation for extra, optional, and deleted
             # forms in the formset.
             "use_required_attribute": False,
-            "renderer": self.renderer,
+            "renderer": self.form_renderer,
         }
         if self.is_bound:
             defaults["data"] = self.data
@@ -261,7 +263,7 @@ class BaseFormSet(RenderableFormMixin):
             "prefix": self.add_prefix("__prefix__"),
             "empty_permitted": True,
             "use_required_attribute": False,
-            "renderer": self.renderer,
+            "renderer": self.form_renderer,
         }
         form = self.form(**form_kwargs)
         self.add_fields(form, None)
@@ -566,7 +568,7 @@ def formset_factory(
         "absolute_max": absolute_max,
         "validate_min": validate_min,
         "validate_max": validate_max,
-        "renderer": renderer or get_default_renderer(),
+        "renderer": renderer,
     }
     return type(form.__name__ + "FormSet", (formset,), attrs)
 

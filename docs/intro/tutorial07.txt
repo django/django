@@ -367,7 +367,7 @@ a section of code like:
 .. code-block:: html+django
 
     {% block branding %}
-    <h1 id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a></h1>
+    <div id="site-name"><a href="{% url 'admin:index' %}">Polls Administration</a><div>
     {% endblock %}
 
 We use this approach to teach you how to override templates. In an actual

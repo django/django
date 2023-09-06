@@ -238,6 +238,17 @@ class TestChildArguments(SimpleTestCase):
                     autoreload.get_child_arguments(), [exe_path, "runserver"]
                 )
 
+    @mock.patch("sys.warnoptions", [])
+    @mock.patch.dict(sys.modules, {"__main__": django.__main__})
+    def test_use_exe_when_main_spec(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            exe_path = Path(tmpdir) / "django-admin.exe"
+            exe_path.touch()
+            with mock.patch("sys.argv", [exe_path.with_suffix(""), "runserver"]):
+                self.assertEqual(
+                    autoreload.get_child_arguments(), [exe_path, "runserver"]
+                )
+
     @mock.patch("__main__.__spec__", None)
     @mock.patch("sys.warnoptions", [])
     @mock.patch("sys._xoptions", {})

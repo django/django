@@ -120,6 +120,9 @@ Authenticating users
 --------------------
 
 .. function:: authenticate(request=None, **credentials)
+.. function:: aauthenticate(request=None, **credentials)
+
+    *Asynchronous version*: ``aauthenticate()``
 
     Use :func:`~django.contrib.auth.authenticate()` to verify a set of
     credentials. It takes credentials as keyword arguments, ``username`` and
@@ -151,6 +154,10 @@ Authenticating users
         you are writing your own authentication system, you probably won't use
         this. Rather if you're looking for a way to login a user, use the
         :class:`~django.contrib.auth.views.LoginView`.
+
+    .. versionchanged:: 5.0
+
+        ``aauthenticate()`` function was added.
 
 .. _topic-authorization:
 
@@ -407,6 +414,9 @@ If you have an authenticated user you want to attach to the current session
 - this is done with a :func:`~django.contrib.auth.login` function.
 
 .. function:: login(request, user, backend=None)
+.. function:: alogin(request, user, backend=None)
+
+    *Asynchronous version*: ``alogin()``
 
     To log a user in, from a view, use :func:`~django.contrib.auth.login()`. It
     takes an :class:`~django.http.HttpRequest` object and a
@@ -436,6 +446,10 @@ If you have an authenticated user you want to attach to the current session
                 # Return an 'invalid login' error message.
                 ...
 
+    .. versionchanged:: 5.0
+
+        ``alogin()`` function was added.
+
 Selecting the authentication backend
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -463,6 +477,9 @@ How to log a user out
 ---------------------
 
 .. function:: logout(request)
+.. function:: alogout(request)
+
+    *Asynchronous version*: ``alogout()``
 
     To log out a user who has been logged in via
     :func:`django.contrib.auth.login()`, use
@@ -487,6 +504,10 @@ How to log a user out
     to put anything into the session that will be available to the user
     immediately after logging out, do that *after* calling
     :func:`django.contrib.auth.logout()`.
+
+    .. versionchanged:: 5.0
+
+        ``alogout()`` function was added.
 
 Limiting access to logged-in users
 ----------------------------------
@@ -935,6 +956,9 @@ and wish to have similar behavior, use the :func:`update_session_auth_hash`
 function.
 
 .. function:: update_session_auth_hash(request, user)
+.. function:: aupdate_session_auth_hash(request, user)
+
+    *Asynchronous version*: ``aupdate_session_auth_hash()``
 
     This function takes the current request and the updated user object from
     which the new session hash will be derived and updates the session hash
@@ -954,6 +978,10 @@ function.
                     update_session_auth_hash(request, form.user)
             else:
                 ...
+
+    .. versionchanged:: 5.0
+
+        ``aupdate_session_auth_hash()`` function was added.
 
 .. note::
 

@@ -211,6 +211,10 @@ class WriterTests(SimpleTestCase):
         X = "X", "X value"
         Y = "Y", "Y value"
 
+        @classmethod
+        def method(cls):
+            return cls.X
+
     def safe_exec(self, string, value=None):
         d = {}
         try:
@@ -456,6 +460,16 @@ class WriterTests(SimpleTestCase):
             "default=datetime.date(1969, 11, 19))",
         )
 
+    def test_serialize_dictionary_choices(self):
+        for choices in ({"Group": [(2, "2"), (1, "1")]}, {"Group": {2: "2", 1: "1"}}):
+            with self.subTest(choices):
+                field = models.IntegerField(choices=choices)
+                string = MigrationWriter.serialize(field)[0]
+                self.assertEqual(
+                    string,
+                    "models.IntegerField(choices=[('Group', [(2, '2'), (1, '1')])])",
+                )
+
     def test_serialize_nested_class(self):
         for nested_cls in [self.NestedEnum, self.NestedChoices]:
             cls_name = nested_cls.__name__
@@ -467,6 +481,15 @@ class WriterTests(SimpleTestCase):
                         {"import migrations.test_writer"},
                     ),
                 )
+
+    def test_serialize_nested_class_method(self):
+        self.assertSerializedResultEqual(
+            self.NestedChoices.method,
+            (
+                "migrations.test_writer.WriterTests.NestedChoices.method",
+                {"import migrations.test_writer"},
+            ),
+        )
 
     def test_serialize_uuid(self):
         self.assertSerializedEqual(uuid.uuid1())
@@ -768,12 +791,17 @@ class WriterTests(SimpleTestCase):
     def test_serialize_frozensets(self):
         self.assertSerializedEqual(frozenset())
         self.assertSerializedEqual(frozenset("let it go"))
+        self.assertSerializedResultEqual(
+            frozenset("cba"), ("frozenset(['a', 'b', 'c'])", set())
+        )
 
     def test_serialize_set(self):
         self.assertSerializedEqual(set())
         self.assertSerializedResultEqual(set(), ("set()", set()))
         self.assertSerializedEqual({"a"})
         self.assertSerializedResultEqual({"a"}, ("{'a'}", set()))
+        self.assertSerializedEqual({"c", "b", "a"})
+        self.assertSerializedResultEqual({"c", "b", "a"}, ("{'a', 'b', 'c'}", set()))
 
     def test_serialize_timedelta(self):
         self.assertSerializedEqual(datetime.timedelta())
@@ -889,6 +917,33 @@ class WriterTests(SimpleTestCase):
         self.assertNotEqual(
             result["custom_migration_operations"].operations.TestOperation,
             result["custom_migration_operations"].more_operations.TestOperation,
+        )
+
+    def test_sorted_dependencies(self):
+        migration = type(
+            "Migration",
+            (migrations.Migration,),
+            {
+                "operations": [
+                    migrations.AddField("mymodel", "myfield", models.IntegerField()),
+                ],
+                "dependencies": [
+                    ("testapp10", "0005_fifth"),
+                    ("testapp02", "0005_third"),
+                    ("testapp02", "0004_sixth"),
+                    ("testapp01", "0001_initial"),
+                ],
+            },
+        )
+        output = MigrationWriter(migration, include_header=False).as_string()
+        self.assertIn(
+            "    dependencies = [\n"
+            "        ('testapp01', '0001_initial'),\n"
+            "        ('testapp02', '0004_sixth'),\n"
+            "        ('testapp02', '0005_third'),\n"
+            "        ('testapp10', '0005_fifth'),\n"
+            "    ]",
+            output,
         )
 
     def test_sorted_imports(self):

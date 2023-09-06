@@ -4,6 +4,7 @@ from weakref import WeakSet
 from django.apps import apps
 from django.conf import settings
 from django.contrib.admin import ModelAdmin, actions
+from django.contrib.admin.exceptions import AlreadyRegistered, NotRegistered
 from django.contrib.admin.views.autocomplete import AutocompleteJsonView
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.exceptions import ImproperlyConfigured
@@ -25,14 +26,6 @@ from django.views.i18n import JavaScriptCatalog
 all_sites = WeakSet()
 
 
-class AlreadyRegistered(Exception):
-    pass
-
-
-class NotRegistered(Exception):
-    pass
-
-
 class AdminSite:
     """
     An AdminSite object encapsulates an instance of the Django admin application, ready
@@ -45,7 +38,7 @@ class AdminSite:
     # Text to put at the end of each page's <title>.
     site_title = gettext_lazy("Django site admin")
 
-    # Text to put in each page's <h1>.
+    # Text to put in each page's <div id="site-name">.
     site_header = gettext_lazy("Django administration")
 
     # Text to put at the top of the admin index page.
@@ -120,8 +113,8 @@ class AdminSite:
                     % model.__name__
                 )
 
-            if model in self._registry:
-                registered_admin = str(self._registry[model])
+            if self.is_registered(model):
+                registered_admin = str(self.get_model_admin(model))
                 msg = "The model %s is already registered " % model.__name__
                 if registered_admin.endswith(".ModelAdmin"):
                     # Most likely registered without a ModelAdmin subclass.
@@ -156,7 +149,7 @@ class AdminSite:
         if isinstance(model_or_iterable, ModelBase):
             model_or_iterable = [model_or_iterable]
         for model in model_or_iterable:
-            if model not in self._registry:
+            if not self.is_registered(model):
                 raise NotRegistered("The model %s is not registered" % model.__name__)
             del self._registry[model]
 
@@ -165,6 +158,12 @@ class AdminSite:
         Check if a model class is registered with this `AdminSite`.
         """
         return model in self._registry
+
+    def get_model_admin(self, model):
+        try:
+            return self._registry[model]
+        except KeyError:
+            raise NotRegistered(f"The model {model.__name__} is not registered.")
 
     def add_action(self, action, name=None):
         """

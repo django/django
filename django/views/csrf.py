@@ -6,14 +6,6 @@ from django.template import Context, Engine, TemplateDoesNotExist, loader
 from django.utils.translation import gettext as _
 from django.utils.version import get_docs_version
 
-# We include the template inline since we need to be able to reliably display
-# this error message, especially for the sake of developers, and there isn't any
-# other way of making it available independent of what is in the settings file.
-
-# Only the text appearing with DEBUG=False is translated. Normal translation
-# tags cannot be used with this inline templates as makemessages would not be
-# able to discover the strings.
-
 CSRF_FAILURE_TEMPLATE_NAME = "403_csrf.html"
 
 

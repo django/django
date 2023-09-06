@@ -46,6 +46,11 @@ class BaseSequenceSerializer(BaseSerializer):
         return value % (", ".join(strings)), imports
 
 
+class BaseUnorderedSequenceSerializer(BaseSequenceSerializer):
+    def __init__(self, value):
+        super().__init__(sorted(value, key=repr))
+
+
 class BaseSimpleSerializer(BaseSerializer):
     def serialize(self):
         return repr(self.value), set()
@@ -151,7 +156,7 @@ class FloatSerializer(BaseSimpleSerializer):
         return super().serialize()
 
 
-class FrozensetSerializer(BaseSequenceSerializer):
+class FrozensetSerializer(BaseUnorderedSequenceSerializer):
     def _format(self):
         return "frozenset([%s])"
 
@@ -163,7 +168,7 @@ class FunctionTypeSerializer(BaseSerializer):
         ):
             klass = self.value.__self__
             module = klass.__module__
-            return "%s.%s.%s" % (module, klass.__name__, self.value.__name__), {
+            return "%s.%s.%s" % (module, klass.__qualname__, self.value.__name__), {
                 "import %s" % module
             }
         # Further error checking
@@ -279,7 +284,7 @@ class SequenceSerializer(BaseSequenceSerializer):
         return "[%s]"
 
 
-class SetSerializer(BaseSequenceSerializer):
+class SetSerializer(BaseUnorderedSequenceSerializer):
     def _format(self):
         # Serialize as a set literal except when value is empty because {}
         # is an empty dict.

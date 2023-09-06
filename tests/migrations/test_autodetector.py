@@ -269,6 +269,14 @@ class AutodetectorTests(BaseAutodetectorTests):
             ("name", models.CharField(max_length=200, default="Ada Lovelace")),
         ],
     )
+    author_name_db_default = ModelState(
+        "testapp",
+        "Author",
+        [
+            ("id", models.AutoField(primary_key=True)),
+            ("name", models.CharField(max_length=200, db_default="Ada Lovelace")),
+        ],
+    )
     author_name_check_constraint = ModelState(
         "testapp",
         "Author",
@@ -1293,6 +1301,21 @@ class AutodetectorTests(BaseAutodetectorTests):
         "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition",
         side_effect=AssertionError("Should not have prompted for not null addition"),
     )
+    def test_add_not_null_field_with_db_default(self, mocked_ask_method):
+        changes = self.get_changes([self.author_empty], [self.author_name_db_default])
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AddField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", preserve_default=True
+        )
+        self.assertOperationFieldAttributes(
+            changes, "testapp", 0, 0, db_default=models.Value("Ada Lovelace")
+        )
+
+    @mock.patch(
+        "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_addition",
+        side_effect=AssertionError("Should not have prompted for not null addition"),
+    )
     def test_add_date_fields_with_auto_now_not_asking_for_default(
         self, mocked_ask_method
     ):
@@ -1476,6 +1499,23 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertOperationFieldAttributes(
             changes, "testapp", 0, 0, default="Ada Lovelace"
+        )
+
+    @mock.patch(
+        "django.db.migrations.questioner.MigrationQuestioner.ask_not_null_alteration",
+        side_effect=AssertionError("Should not have prompted for not null alteration"),
+    )
+    def test_alter_field_to_not_null_with_db_default(self, mocked_ask_method):
+        changes = self.get_changes(
+            [self.author_name_null], [self.author_name_db_default]
+        )
+        self.assertNumberMigrations(changes, "testapp", 1)
+        self.assertOperationTypes(changes, "testapp", 0, ["AlterField"])
+        self.assertOperationAttributes(
+            changes, "testapp", 0, 0, name="name", preserve_default=True
+        )
+        self.assertOperationFieldAttributes(
+            changes, "testapp", 0, 0, db_default=models.Value("Ada Lovelace")
         )
 
     @mock.patch(
@@ -2752,6 +2792,43 @@ class AutodetectorTests(BaseAutodetectorTests):
             0,
             ["CreateModel", "AddField", "AddConstraint"],
         )
+
+    def test_add_constraints_with_dict_keys(self):
+        book_types = {"F": "Fantasy", "M": "Mystery"}
+        book_with_type = ModelState(
+            "testapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("type", models.CharField(max_length=1)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(type__in=book_types.keys()),
+                        name="book_type_check",
+                    ),
+                ],
+            },
+        )
+        book_with_resolved_type = ModelState(
+            "testapp",
+            "Book",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("type", models.CharField(max_length=1)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(("type__in", tuple(book_types))),
+                        name="book_type_check",
+                    ),
+                ],
+            },
+        )
+        changes = self.get_changes([book_with_type], [book_with_resolved_type])
+        self.assertEqual(len(changes), 0)
 
     def test_add_index_with_new_model(self):
         book_with_index_title_and_pony = ModelState(

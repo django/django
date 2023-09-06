@@ -1,7 +1,18 @@
 """
 GDAL - Constant definitions
 """
-from ctypes import c_double, c_float, c_int16, c_int32, c_ubyte, c_uint16, c_uint32
+from ctypes import (
+    c_double,
+    c_float,
+    c_int8,
+    c_int16,
+    c_int32,
+    c_int64,
+    c_ubyte,
+    c_uint16,
+    c_uint32,
+    c_uint64,
+)
 
 # See https://gdal.org/api/raster_c_api.html#_CPPv412GDALDataType
 GDAL_PIXEL_TYPES = {
@@ -17,10 +28,13 @@ GDAL_PIXEL_TYPES = {
     9: "GDT_CInt32",  # Complex Int32
     10: "GDT_CFloat32",  # Complex Float32
     11: "GDT_CFloat64",  # Complex Float64
+    12: "GDT_UInt64",  # 64 bit unsigned integer (GDAL 3.5+).
+    13: "GDT_Int64",  # 64 bit signed integer (GDAL 3.5+).
+    14: "GDT_Int8",  # 8 bit signed integer (GDAL 3.7+).
 }
 
 # A list of gdal datatypes that are integers.
-GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5]
+GDAL_INTEGER_TYPES = [1, 2, 3, 4, 5, 12, 13, 14]
 
 # Lookup values to convert GDAL pixel type indices into ctypes objects.
 # The GDAL band-io works with ctypes arrays to hold data to be written
@@ -39,6 +53,9 @@ GDAL_TO_CTYPES = [
     None,
     None,
     None,
+    c_uint64,
+    c_int64,
+    c_int8,
 ]
 
 # List of resampling algorithms that can be used to warp a GDALRaster.

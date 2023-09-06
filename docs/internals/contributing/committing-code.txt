@@ -109,14 +109,14 @@ Django's Git repository:
   discuss the situation with the team.
 
 * For any medium-to-big changes, where "medium-to-big" is according to
-  your judgment, please bring things up on the |django-developers|
-  mailing list before making the change.
+  your judgment, please bring things up on the `Django Forum`_ or
+  |django-developers| mailing list before making the change.
 
-  If you bring something up on |django-developers| and nobody responds,
-  please don't take that to mean your idea is great and should be
-  implemented immediately because nobody contested it. Everyone doesn't always
-  have a lot of time to read mailing list discussions immediately, so you may
-  have to wait a couple of days before getting a response.
+  If you bring something up and nobody responds, please don't take that
+  to mean your idea is great and should be implemented immediately because
+  nobody contested it. Everyone doesn't always have a lot of time to read
+  mailing list discussions immediately, so you may have to wait a couple of
+  days before getting a response.
 
 * Write detailed commit messages in the past tense, not present tense.
 
@@ -227,15 +227,15 @@ When a mistaken commit is discovered, please follow these guidelines:
 
 * If the original author can't be reached (within a reasonable amount
   of time -- a day or so) and the problem is severe -- crashing bug,
-  major test failures, etc. -- then ask for objections on the
-  |django-developers| mailing list then revert if there are none.
+  major test failures, etc. -- then ask for objections on the `Django Forum`_
+  or |django-developers| mailing list then revert if there are none.
 
 * If the problem is small (a feature commit after feature freeze,
   say), wait it out.
 
 * If there's a disagreement between the merger and the reverter-to-be then try
-  to work it out on the |django-developers| mailing list. If an agreement can't
-  be reached then it should be put to a vote.
+  to work it out on the `Django Forum`_ or |django-developers| mailing list. If
+  an agreement can't be reached then it should be put to a vote.
 
 * If the commit introduced a confirmed, disclosed security
   vulnerability then the commit may be reverted immediately without
@@ -249,3 +249,4 @@ When a mistaken commit is discovered, please follow these guidelines:
   do a reverse push: ``git push upstream :feature_antigravity``.
 
 .. _ticket tracker: https://code.djangoproject.com/
+.. _Django Forum: https://forum.djangoproject.com/

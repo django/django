@@ -94,7 +94,7 @@ class GetStorageClassTests(SimpleTestCase):
     def test_deprecation_warning(self):
         msg = GET_STORAGE_CLASS_DEPRECATED_MSG
         with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            get_storage_class("django.core.files.storage.FileSystemStorage"),
+            get_storage_class("django.core.files.storage.FileSystemStorage")
 
 
 class FileSystemStorageTests(unittest.TestCase):

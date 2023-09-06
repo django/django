@@ -34,23 +34,21 @@ def is_password_usable(encoded):
     return encoded is None or not encoded.startswith(UNUSABLE_PASSWORD_PREFIX)
 
 
-def check_password(password, encoded, setter=None, preferred="default"):
+def verify_password(password, encoded, preferred="default"):
     """
-    Return a boolean of whether the raw password matches the three
-    part encoded digest.
-
-    If setter is specified, it'll be called when you need to
-    regenerate the password.
+    Return two booleans. The first is whether the raw password matches the
+    three part encoded digest, and the second whether to regenerate the
+    password.
     """
     if password is None or not is_password_usable(encoded):
-        return False
+        return False, False
 
     preferred = get_hasher(preferred)
     try:
         hasher = identify_hasher(encoded)
     except ValueError:
         # encoded is gibberish or uses a hasher that's no longer installed.
-        return False
+        return False, False
 
     hasher_changed = hasher.algorithm != preferred.algorithm
     must_update = hasher_changed or preferred.must_update(encoded)
@@ -63,8 +61,28 @@ def check_password(password, encoded, setter=None, preferred="default"):
     if not is_correct and not hasher_changed and must_update:
         hasher.harden_runtime(password, encoded)
 
+    return is_correct, must_update
+
+
+def check_password(password, encoded, setter=None, preferred="default"):
+    """
+    Return a boolean of whether the raw password matches the three part encoded
+    digest.
+
+    If setter is specified, it'll be called when you need to regenerate the
+    password.
+    """
+    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
     if setter and is_correct and must_update:
         setter(password)
+    return is_correct
+
+
+async def acheck_password(password, encoded, setter=None, preferred="default"):
+    """See check_password()."""
+    is_correct, must_update = verify_password(password, encoded, preferred=preferred)
+    if setter and is_correct and must_update:
+        await setter(password)
     return is_correct
 
 

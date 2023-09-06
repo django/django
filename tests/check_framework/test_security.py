@@ -4,6 +4,7 @@ from django.core.checks.security import base, csrf, sessions
 from django.core.management.utils import get_random_secret_key
 from django.test import SimpleTestCase
 from django.test.utils import override_settings
+from django.views.generic import View
 
 
 class CheckSessionCookieSecureTest(SimpleTestCase):
@@ -609,6 +610,9 @@ def failure_view_with_invalid_signature():
     pass
 
 
+good_class_based_csrf_failure_view = View.as_view()
+
+
 class CSRFFailureViewTest(SimpleTestCase):
     @override_settings(CSRF_FAILURE_VIEW="")
     def test_failure_view_import_error(self):
@@ -637,6 +641,14 @@ class CSRFFailureViewTest(SimpleTestCase):
             csrf.check_csrf_failure_view(None),
             [Error(msg, id="security.E101")],
         )
+
+    @override_settings(
+        CSRF_FAILURE_VIEW=(
+            "check_framework.test_security.good_class_based_csrf_failure_view"
+        ),
+    )
+    def test_failure_view_valid_class_based(self):
+        self.assertEqual(csrf.check_csrf_failure_view(None), [])
 
 
 class CheckCrossOriginOpenerPolicyTest(SimpleTestCase):

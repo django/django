@@ -279,6 +279,14 @@ class ValidationTests(SimpleTestCase):
         f = models.IntegerField(choices=(("group", ((10, "A"), (20, "B"))), (30, "C")))
         self.assertEqual(10, f.clean(10, None))
 
+    def test_choices_validation_supports_named_groups_dicts(self):
+        f = models.IntegerField(choices={"group": ((10, "A"), (20, "B")), 30: "C"})
+        self.assertEqual(10, f.clean(10, None))
+
+    def test_choices_validation_supports_named_groups_nested_dicts(self):
+        f = models.IntegerField(choices={"group": {10: "A", 20: "B"}, 30: "C"})
+        self.assertEqual(10, f.clean(10, None))
+
     def test_nullable_integerfield_raises_error_with_blank_false(self):
         f = models.IntegerField(null=True, blank=False)
         with self.assertRaises(ValidationError):

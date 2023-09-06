@@ -929,6 +929,9 @@ class AddIndex(IndexOperation):
     def reduce(self, operation, app_label):
         if isinstance(operation, RemoveIndex) and self.index.name == operation.name:
             return []
+        if isinstance(operation, RenameIndex) and self.index.name == operation.old_name:
+            self.index.name = operation.new_name
+            return [AddIndex(model_name=self.model_name, index=self.index)]
         return super().reduce(operation, app_label)
 
 
@@ -1163,6 +1166,15 @@ class AddConstraint(IndexOperation):
     @property
     def migration_name_fragment(self):
         return "%s_%s" % (self.model_name_lower, self.constraint.name.lower())
+
+    def reduce(self, operation, app_label):
+        if (
+            isinstance(operation, RemoveConstraint)
+            and self.model_name_lower == operation.model_name_lower
+            and self.constraint.name == operation.name
+        ):
+            return []
+        return super().reduce(operation, app_label)
 
 
 class RemoveConstraint(IndexOperation):

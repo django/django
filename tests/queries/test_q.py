@@ -200,6 +200,44 @@ class QTests(SimpleTestCase):
         path, args, kwargs = q.deconstruct()
         self.assertEqual(Q(*args, **kwargs), q)
 
+    def test_equal(self):
+        self.assertEqual(Q(), Q())
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(("pk__in", [1, 2])),
+        )
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(pk__in=[1, 2]),
+        )
+        self.assertEqual(
+            Q(("pk__in", (1, 2))),
+            Q(("pk__in", {1: "first", 2: "second"}.keys())),
+        )
+        self.assertNotEqual(
+            Q(name__iexact=F("other_name")),
+            Q(name=Lower(F("other_name"))),
+        )
+
+    def test_hash(self):
+        self.assertEqual(hash(Q()), hash(Q()))
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(("pk__in", [1, 2]))),
+        )
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(pk__in=[1, 2])),
+        )
+        self.assertEqual(
+            hash(Q(("pk__in", (1, 2)))),
+            hash(Q(("pk__in", {1: "first", 2: "second"}.keys()))),
+        )
+        self.assertNotEqual(
+            hash(Q(name__iexact=F("other_name"))),
+            hash(Q(name=Lower(F("other_name")))),
+        )
+
     def test_flatten(self):
         q = Q()
         self.assertEqual(list(q.flatten()), [q])

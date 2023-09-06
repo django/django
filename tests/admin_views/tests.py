@@ -6,6 +6,7 @@ import zoneinfo
 from unittest import mock
 from urllib.parse import parse_qsl, urljoin, urlparse
 
+from django import forms
 from django.contrib import admin
 from django.contrib.admin import AdminSite, ModelAdmin
 from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
@@ -16,6 +17,8 @@ from django.contrib.admin.tests import AdminSeleniumTestCase
 from django.contrib.admin.utils import quote
 from django.contrib.admin.views.main import IS_POPUP_VAR
 from django.contrib.auth import REDIRECT_FIELD_NAME, get_permission_codename
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.forms import AdminPasswordChangeForm
 from django.contrib.auth.models import Group, Permission, User
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -25,6 +28,7 @@ from django.db import connection
 from django.forms.utils import ErrorList
 from django.template.response import TemplateResponse
 from django.test import (
+    RequestFactory,
     TestCase,
     ignore_warnings,
     modify_settings,
@@ -1504,6 +1508,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             response, '<div class="help" id="id_new_password1_helptext">'
         )
 
+    def test_enable_zooming_on_mobile(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(
+            response,
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+        )
+
 
 @override_settings(
     AUTH_PASSWORD_VALIDATORS=[
@@ -1643,6 +1654,29 @@ class AdminCustomTemplateTests(AdminViewBasicTestCase):
             '<div class="help" id="id_password2_helptext">'
             "Enter the same password as before, for verification.</div>",
         )
+
+    def test_change_password_template_helptext_no_id(self):
+        user = User.objects.get(username="super")
+
+        class EmptyIdForLabelTextInput(forms.TextInput):
+            def id_for_label(self, id):
+                return None
+
+        class EmptyIdForLabelHelpTextPasswordChangeForm(AdminPasswordChangeForm):
+            password1 = forms.CharField(
+                help_text="Your new password", widget=EmptyIdForLabelTextInput()
+            )
+
+        class CustomUserAdmin(UserAdmin):
+            change_password_form = EmptyIdForLabelHelpTextPasswordChangeForm
+
+        request = RequestFactory().get(
+            reverse("admin:auth_user_password_change", args=(user.id,))
+        )
+        request.user = user
+        user_admin = CustomUserAdmin(User, site)
+        response = user_admin.user_change_password(request, str(user.pk))
+        self.assertContains(response, '<div class="help">')
 
     def test_extended_bodyclass_template_index(self):
         """
@@ -3696,6 +3730,22 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             2,
             change_message="Changed something",
         )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            1,
+            change_message="Added something",
+        )
+        LogEntry.objects.log_action(
+            user_pk,
+            content_type_pk,
+            cls.pk,
+            cls.pk,
+            3,
+            change_message="Deleted something",
+        )
 
     def setUp(self):
         self.client.force_login(self.superuser)
@@ -3753,6 +3803,14 @@ class AdminViewStringPrimaryKeyTest(TestCase):
         )
         should_contain = """<a href="%s">%s</a>""" % (escape(link), escape(self.pk))
         self.assertContains(response, should_contain)
+
+    def test_recentactions_description(self):
+        response = self.client.get(reverse("admin:index"))
+        for operation in ["Added", "Changed", "Deleted"]:
+            with self.subTest(operation):
+                self.assertContains(
+                    response, f'<span class="visually-hidden">{operation}:'
+                )
 
     def test_deleteconfirmation_link(self):
         """ "
@@ -5576,6 +5634,10 @@ class PrePopulatedTest(TestCase):
         self.assertContains(response, '<div class="readonly">%s</div>' % self.p1.slug)
 
 
+def _clean_sidebar_state(driver):
+    driver.execute_script("localStorage.removeItem('django.admin.navSidebarIsOpen')")
+
+
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class SeleniumTests(AdminSeleniumTestCase):
     available_apps = ["admin_views"] + AdminSeleniumTestCase.available_apps
@@ -6048,12 +6110,14 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input.clear()
         name_input.send_keys("<i>edited section</i>")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         # Hide sidebar.
         toggle_button = self.selenium.find_element(
             By.CSS_SELECTOR, "#toggle-nav-sidebar"
         )
         toggle_button.click()
+        self.addCleanup(_clean_sidebar_state, self.selenium)
         select = Select(self.selenium.find_element(By.ID, "id_form-0-section"))
         self.assertEqual(select.first_selected_option.text, "<i>edited section</i>")
         # Rendered select2 input.
@@ -6069,6 +6133,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_text("#content h1", "Add section")
         self.selenium.find_element(By.ID, "id_name").send_keys("new section")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_form-0-section"))
         self.assertEqual(select.first_selected_option.text, "new section")
@@ -6117,6 +6182,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.wait_for_and_switch_to_popup()
         self.selenium.find_element(By.ID, "id_title").send_keys("test")
         self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
         select = Select(self.selenium.find_element(By.ID, "id_parent"))
         uuid_id = str(ParentWithUUIDPK.objects.first().id)
@@ -6208,8 +6274,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(
             fonts,
             [
-                "-apple-system",
-                "BlinkMacSystemFont",
                 "Segoe UI",
                 "system-ui",
                 "Roboto",
@@ -6233,6 +6297,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         person_url = reverse("admin:admin_views_person_changelist") + "?q=Gui"
         self.selenium.get(self.live_server_url + person_url)
+        # Hide sidebar.
+        toggle_button = self.selenium.find_element(
+            By.CSS_SELECTOR, "#toggle-nav-sidebar"
+        )
+        toggle_button.click()
+        self.addCleanup(_clean_sidebar_state, self.selenium)
         self.assertGreater(
             self.selenium.find_element(By.ID, "searchbar").rect["width"],
             50,
@@ -6379,6 +6449,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("South America")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6415,6 +6486,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("Europe")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6456,6 +6528,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         favorite_name_input.clear()
         favorite_name_input.send_keys("Italy")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         self.assertHTMLEqual(
@@ -6496,10 +6569,12 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         continent_select.select_by_visible_text("Asia")
         self.selenium.find_element(By.CSS_SELECTOR, '[type="submit"]').click()
+        self.wait_until(lambda d: len(d.window_handles) == 1, 1)
         self.selenium.switch_to.window(self.selenium.window_handles[0])
 
         # Submit the new Traveler.
-        self.selenium.find_element(By.CSS_SELECTOR, '[name="_save"]').click()
+        with self.wait_page_loaded():
+            self.selenium.find_element(By.CSS_SELECTOR, '[name="_save"]').click()
         traveler = Traveler.objects.get()
         self.assertEqual(traveler.born_country.name, "Argentina")
         self.assertEqual(traveler.living_country.name, "Italy")

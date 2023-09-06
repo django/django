@@ -316,9 +316,8 @@ class Command(BaseCommand):
             )
             # Update name.
             previous_migration_path = MigrationWriter(leaf_migration).path
-            suggested_name = (
-                leaf_migration.name[:4] + "_" + leaf_migration.suggest_name()
-            )
+            name_fragment = self.migration_name or leaf_migration.suggest_name()
+            suggested_name = leaf_migration.name[:4] + f"_{name_fragment}"
             if leaf_migration.name == suggested_name:
                 new_name = leaf_migration.name + "_updated"
             else:
