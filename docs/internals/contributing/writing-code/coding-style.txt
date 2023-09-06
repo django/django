@@ -298,16 +298,23 @@ Model style
   * Any custom methods
 
 * If ``choices`` is defined for a given model field, define each choice as a
-  list of tuples, with an all-uppercase name as a class attribute on the model.
+  mapping, with an all-uppercase name as a class attribute on the model.
   Example::
 
     class MyModel(models.Model):
         DIRECTION_UP = "U"
         DIRECTION_DOWN = "D"
-        DIRECTION_CHOICES = [
-            (DIRECTION_UP, "Up"),
-            (DIRECTION_DOWN, "Down"),
-        ]
+        DIRECTION_CHOICES = {
+            DIRECTION_UP: "Up",
+            DIRECTION_DOWN: "Down",
+        }
+
+  Alternatively, consider using :ref:`field-choices-enum-types`::
+
+    class MyModel(models.Model):
+        class Direction(models.TextChoices):
+            UP = U, "Up"
+            DOWN = D, "Down"
 
 Use of ``django.conf.settings``
 ===============================

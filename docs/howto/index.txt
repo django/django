@@ -31,6 +31,7 @@ you quickly accomplish common tasks.
    static-files/deployment
    windows
    writing-migrations
+   delete-app
 
 .. seealso::
 

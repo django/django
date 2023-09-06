@@ -56,6 +56,23 @@ class TemplateReloadTests(SimpleTestCase):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
         mock_reset.assert_not_called()
 
+    @mock.patch("django.forms.renderers.get_default_renderer")
+    def test_form_template_reset_template_change(self, mock_renderer):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_renderer.assert_called_once()
+
+    @mock.patch("django.template.loaders.cached.Loader.reset")
+    def test_form_template_reset_template_change_reset_call(self, mock_loader_reset):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_loader_reset.assert_called_once()
+
+    @mock.patch("django.forms.renderers.get_default_renderer")
+    def test_form_template_reset_non_template_change(self, mock_renderer):
+        self.assertIsNone(autoreload.template_changed(None, Path(__file__)))
+        mock_renderer.assert_not_called()
+
     def test_watch_for_template_changes(self):
         mock_reloader = mock.MagicMock()
         autoreload.watch_for_template_changes(mock_reloader)

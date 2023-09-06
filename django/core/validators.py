@@ -104,6 +104,7 @@ class URLValidator(RegexValidator):
     message = _("Enter a valid URL.")
     schemes = ["http", "https", "ftp", "ftps"]
     unsafe_chars = frozenset("\t\r\n")
+    max_length = 2048
 
     def __init__(self, schemes=None, **kwargs):
         super().__init__(**kwargs)
@@ -111,7 +112,7 @@ class URLValidator(RegexValidator):
             self.schemes = schemes
 
     def __call__(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str) or len(value) > self.max_length:
             raise ValidationError(self.message, code=self.code, params={"value": value})
         if self.unsafe_chars.intersection(value):
             raise ValidationError(self.message, code=self.code, params={"value": value})
@@ -203,7 +204,9 @@ class EmailValidator:
             self.domain_allowlist = allowlist
 
     def __call__(self, value):
-        if not value or "@" not in value:
+        # The maximum length of an email is 320 characters per RFC 3696
+        # section 3.
+        if not value or "@" not in value or len(value) > 320:
             raise ValidationError(self.message, code=self.code, params={"value": value})
 
         user_part, domain_part = value.rsplit("@", 1)
@@ -397,8 +400,37 @@ class StepValueValidator(BaseValidator):
     message = _("Ensure this value is a multiple of step size %(limit_value)s.")
     code = "step_size"
 
+    def __init__(self, limit_value, message=None, offset=None):
+        super().__init__(limit_value, message)
+        if offset is not None:
+            self.message = _(
+                "Ensure this value is a multiple of step size %(limit_value)s, "
+                "starting from %(offset)s, e.g. %(offset)s, %(valid_value1)s, "
+                "%(valid_value2)s, and so on."
+            )
+        self.offset = offset
+
+    def __call__(self, value):
+        if self.offset is None:
+            super().__call__(value)
+        else:
+            cleaned = self.clean(value)
+            limit_value = (
+                self.limit_value() if callable(self.limit_value) else self.limit_value
+            )
+            if self.compare(cleaned, limit_value):
+                offset = cleaned.__class__(self.offset)
+                params = {
+                    "limit_value": limit_value,
+                    "offset": offset,
+                    "valid_value1": offset + limit_value,
+                    "valid_value2": offset + 2 * limit_value,
+                }
+                raise ValidationError(self.message, code=self.code, params=params)
+
     def compare(self, a, b):
-        return not math.isclose(math.remainder(a, b), 0, abs_tol=1e-9)
+        offset = 0 if self.offset is None else self.offset
+        return not math.isclose(math.remainder(a - offset, b), 0, abs_tol=1e-9)
 
 
 @deconstructible

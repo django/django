@@ -2,6 +2,7 @@ from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_lru_cache
+from django.utils.choices import normalize_choices
 
 
 class FieldDeconstructionTests(SimpleTestCase):
@@ -96,6 +97,31 @@ class FieldDeconstructionTests(SimpleTestCase):
         self.assertEqual(
             kwargs, {"choices": [("A", "One"), ("B", "Two")], "max_length": 1}
         )
+
+    def test_choices_iterator(self):
+        field = models.IntegerField(choices=((i, str(i)) for i in range(3)))
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.IntegerField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": [(0, "0"), (1, "1"), (2, "2")]})
+
+    def test_choices_iterable(self):
+        # Pass an iterable (but not an iterator) to choices.
+        field = models.IntegerField(choices="012345")
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.IntegerField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": normalize_choices("012345")})
+
+    def test_choices_callable(self):
+        def get_choices():
+            return [(i, str(i)) for i in range(3)]
+
+        field = models.IntegerField(choices=get_choices)
+        name, path, args, kwargs = field.deconstruct()
+        self.assertEqual(path, "django.db.models.IntegerField")
+        self.assertEqual(args, [])
+        self.assertEqual(kwargs, {"choices": get_choices})
 
     def test_csi_field(self):
         field = models.CommaSeparatedIntegerField(max_length=100)

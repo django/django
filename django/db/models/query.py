@@ -544,19 +544,36 @@ class QuerySet(AltersData):
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if self._prefetch_related_lookups:
-            raise NotSupportedError(
-                "Using QuerySet.aiterator() after prefetch_related() is not supported."
-            )
         if chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
         use_chunked_fetch = not connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
-        async for item in self._iterable_class(
+        iterable = self._iterable_class(
             self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
-        ):
-            yield item
+        )
+        if self._prefetch_related_lookups:
+            results = []
+
+            async for item in iterable:
+                results.append(item)
+                if len(results) >= chunk_size:
+                    await aprefetch_related_objects(
+                        results, *self._prefetch_related_lookups
+                    )
+                    for result in results:
+                        yield result
+                    results.clear()
+
+            if results:
+                await aprefetch_related_objects(
+                    results, *self._prefetch_related_lookups
+                )
+                for result in results:
+                    yield result
+        else:
+            async for item in iterable:
+                yield item
 
     def aggregate(self, *args, **kwargs):
         """
@@ -645,6 +662,15 @@ class QuerySet(AltersData):
         Create a new object with the given kwargs, saving it to the database
         and returning the created object.
         """
+        reverse_one_to_one_fields = frozenset(kwargs).intersection(
+            self.model._meta._reverse_one_to_one_field_names
+        )
+        if reverse_one_to_one_fields:
+            raise ValueError(
+                "The following fields do not exist in this model: %s"
+                % ", ".join(reverse_one_to_one_fields)
+            )
+
         obj = self.model(**kwargs)
         self._for_write = True
         obj.save(force_insert=True, using=self.db)
@@ -944,10 +970,10 @@ class QuerySet(AltersData):
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
+        update_defaults = defaults or {}
         if create_defaults is None:
-            update_defaults = create_defaults = defaults or {}
-        else:
-            update_defaults = defaults or {}
+            create_defaults = update_defaults
+
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
@@ -1135,8 +1161,8 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("delete")
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with delete().")
-        if self.query.distinct or self.query.distinct_fields:
-            raise TypeError("Cannot call delete() after .distinct().")
+        if self.query.distinct_fields:
+            raise TypeError("Cannot call delete() after .distinct(*fields).")
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
 
@@ -1837,12 +1863,17 @@ class QuerySet(AltersData):
         inserted_rows = []
         bulk_return = connection.features.can_return_rows_from_bulk_insert
         for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and on_conflict is None:
+            if bulk_return and (
+                on_conflict is None or on_conflict == OnConflict.UPDATE
+            ):
                 inserted_rows.extend(
                     self._insert(
                         item,
                         fields=fields,
                         using=self.db,
+                        on_conflict=on_conflict,
+                        update_fields=update_fields,
+                        unique_fields=unique_fields,
                         returning_fields=self.model._meta.db_returning_fields,
                     )
                 )
@@ -2380,6 +2411,13 @@ def prefetch_related_objects(model_instances, *related_lookups):
                     else:
                         new_obj_list.append(new_obj)
                 obj_list = new_obj_list
+
+
+async def aprefetch_related_objects(model_instances, *related_lookups):
+    """See prefetch_related_objects()."""
+    return await sync_to_async(prefetch_related_objects)(
+        model_instances, *related_lookups
+    )
 
 
 def get_prefetcher(instance, through_attr, to_attr):

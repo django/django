@@ -48,7 +48,7 @@ class FilteredSelectMultiple(forms.SelectMultiple):
         return context
 
 
-class AdminDateWidget(forms.DateInput):
+class BaseAdminDateWidget(forms.DateInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -60,7 +60,11 @@ class AdminDateWidget(forms.DateInput):
         super().__init__(attrs=attrs, format=format)
 
 
-class AdminTimeWidget(forms.TimeInput):
+class AdminDateWidget(BaseAdminDateWidget):
+    template_name = "admin/widgets/date.html"
+
+
+class BaseAdminTimeWidget(forms.TimeInput):
     class Media:
         js = [
             "admin/js/calendar.js",
@@ -72,6 +76,10 @@ class AdminTimeWidget(forms.TimeInput):
         super().__init__(attrs=attrs, format=format)
 
 
+class AdminTimeWidget(BaseAdminTimeWidget):
+    template_name = "admin/widgets/time.html"
+
+
 class AdminSplitDateTime(forms.SplitDateTimeWidget):
     """
     A SplitDateTime Widget that has some admin-specific styling.
@@ -80,7 +88,7 @@ class AdminSplitDateTime(forms.SplitDateTimeWidget):
     template_name = "admin/widgets/split_datetime.html"
 
     def __init__(self, attrs=None):
-        widgets = [AdminDateWidget, AdminTimeWidget]
+        widgets = [BaseAdminDateWidget, BaseAdminTimeWidget]
         # Note that we're calling MultiWidget, not SplitDateTimeWidget, because
         # we want to define widgets.
         forms.MultiWidget.__init__(self, widgets, attrs)
@@ -137,7 +145,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
         rel_to = self.rel.model
-        if rel_to in self.admin_site._registry:
+        if self.admin_site.is_registered(rel_to):
             # The related object is registered with the same AdminSite
             related_url = reverse(
                 "admin:%s_%s_changelist"
@@ -214,7 +222,7 @@ class ManyToManyRawIdWidget(ForeignKeyRawIdWidget):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        if self.rel.model in self.admin_site._registry:
+        if self.admin_site.is_registered(self.rel.model):
             # The related object is registered with the same AdminSite
             context["widget"]["attrs"]["class"] = "vManyToManyRawIdAdminField"
         return context
@@ -254,13 +262,12 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     ):
         self.needs_multipart_form = widget.needs_multipart_form
         self.attrs = widget.attrs
-        self.choices = widget.choices
         self.widget = widget
         self.rel = rel
         # Backwards compatible check for whether a user can add related
         # objects.
         if can_add_related is None:
-            can_add_related = rel.model in admin_site._registry
+            can_add_related = admin_site.is_registered(rel.model)
         self.can_add_related = can_add_related
         # XXX: The UX does not support multiple selected values.
         multiple = getattr(widget, "allow_multiple_selected", False)
@@ -287,6 +294,14 @@ class RelatedFieldWidgetWrapper(forms.Widget):
     def media(self):
         return self.widget.media
 
+    @property
+    def choices(self):
+        return self.widget.choices
+
+    @choices.setter
+    def choices(self, value):
+        self.widget.choices = value
+
     def get_related_url(self, info, action, *args):
         return reverse(
             "admin:%s_%s_%s" % (info + (action,)),
@@ -299,7 +314,6 @@ class RelatedFieldWidgetWrapper(forms.Widget):
 
         rel_opts = self.rel.model._meta
         info = (rel_opts.app_label, rel_opts.model_name)
-        self.widget.choices = self.choices
         related_field_name = self.rel.get_related_field().name
         url_params = "&".join(
             "%s=%s" % param

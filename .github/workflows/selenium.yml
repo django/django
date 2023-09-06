@@ -1,0 +1,73 @@
+name: Selenium Tests
+
+on:
+  pull_request:
+    types: [labeled, synchronize, opened, reopened]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+   contents: read
+
+jobs:
+  selenium-sqlite:
+    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+    runs-on: ubuntu-latest
+    name: SQLite
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Run Selenium tests
+        working-directory: ./tests/
+        run: |
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_sqlite --parallel 2
+
+  selenium-postgresql:
+    if: contains(github.event.pull_request.labels.*.name, 'selenium')
+    runs-on: ubuntu-latest
+    name: PostgreSQL
+    services:
+      postgres:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_DB: django
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -r tests/requirements/postgres.txt -e .
+      - name: Create PostgreSQL settings file
+        run: mv ./.github/workflows/data/test_postgres.py.tpl ./tests/test_postgres.py
+      - name: Run Selenium tests
+        working-directory: ./tests/
+        run: |
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --settings=test_postgres --parallel 2

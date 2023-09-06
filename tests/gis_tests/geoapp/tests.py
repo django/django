@@ -31,6 +31,7 @@ from .models import (
     NonConcreteModel,
     PennsylvaniaCity,
     State,
+    ThreeDimensionalFeature,
     Track,
 )
 
@@ -252,7 +253,13 @@ class GeoModelTest(TestCase):
         ]
         for klass in geometry_classes:
             g = klass(srid=4326)
-            feature = Feature.objects.create(name="Empty %s" % klass.__name__, geom=g)
+            model_class = Feature
+            if g.hasz:
+                if not connection.features.supports_3d_storage:
+                    continue
+                else:
+                    model_class = ThreeDimensionalFeature
+            feature = model_class.objects.create(name=f"Empty {klass.__name__}", geom=g)
             feature.refresh_from_db()
             if klass is LinearRing:
                 # LinearRing isn't representable in WKB, so GEOSGeomtry.wkb
@@ -653,8 +660,8 @@ class GeoQuerySetTest(TestCase):
         # flaky.
         for point, ref_city in zip(sorted(line), sorted(ref_points)):
             point_x, point_y = point
-            self.assertAlmostEqual(point_x, ref_city.x, 5),
-            self.assertAlmostEqual(point_y, ref_city.y, 5),
+            self.assertAlmostEqual(point_x, ref_city.x, 5)
+            self.assertAlmostEqual(point_y, ref_city.y, 5)
 
     @skipUnlessDBFeature("supports_union_aggr")
     def test_unionagg(self):

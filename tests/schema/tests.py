@@ -242,7 +242,7 @@ class SchemaTests(TransactionTestCase):
                 "SELECT {} FROM {};".format(field_name, model._meta.db_table)
             )
             database_default = cursor.fetchall()[0][0]
-            if cast_function and type(database_default) != type(expected_default):
+            if cast_function and type(database_default) is not type(expected_default):
                 database_default = cast_function(database_default)
             self.assertEqual(database_default, expected_default)
 
@@ -2075,9 +2075,7 @@ class SchemaTests(TransactionTestCase):
             editor.create_model(Book)
         new_field = CharField(max_length=255, unique=True)
         new_field.set_attributes_from_name("renamed")
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_field(Author, Author._meta.get_field("name"), new_field)
         # Ensure the foreign key reference was updated.
         self.assertForeignKeyExists(Book, "author_id", "schema_author", "renamed")
@@ -2122,9 +2120,7 @@ class SchemaTests(TransactionTestCase):
         new_field = IntegerField(db_default=1985)
         new_field.set_attributes_from_name("renamed_year")
         new_field.model = AuthorDbDefault
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_field(AuthorDbDefault, old_field, new_field, strict=True)
         columns = self.column_classes(AuthorDbDefault)
         self.assertEqual(columns["renamed_year"][1].default, "1985")
@@ -3318,6 +3314,43 @@ class SchemaTests(TransactionTestCase):
             with self.assertRaises(DatabaseError):
                 editor.add_constraint(Author, constraint)
 
+    @skipUnlessDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_unique_constraint_nulls_distinct(self):
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        nulls_distinct = UniqueConstraint(
+            F("height"), name="distinct_height", nulls_distinct=True
+        )
+        nulls_not_distinct = UniqueConstraint(
+            F("weight"), name="not_distinct_weight", nulls_distinct=False
+        )
+        with connection.schema_editor() as editor:
+            editor.add_constraint(Author, nulls_distinct)
+            editor.add_constraint(Author, nulls_not_distinct)
+        Author.objects.create(name="", height=None, weight=None)
+        Author.objects.create(name="", height=None, weight=1)
+        with self.assertRaises(IntegrityError):
+            Author.objects.create(name="", height=1, weight=None)
+        with connection.schema_editor() as editor:
+            editor.remove_constraint(Author, nulls_distinct)
+            editor.remove_constraint(Author, nulls_not_distinct)
+        constraints = self.get_constraints(Author._meta.db_table)
+        self.assertNotIn(nulls_distinct.name, constraints)
+        self.assertNotIn(nulls_not_distinct.name, constraints)
+
+    @skipIfDBFeature("supports_nulls_distinct_unique_constraints")
+    def test_unique_constraint_nulls_distinct_unsupported(self):
+        # UniqueConstraint is ignored on databases that don't support
+        # NULLS [NOT] DISTINCT.
+        with connection.schema_editor() as editor:
+            editor.create_model(Author)
+        constraint = UniqueConstraint(
+            F("name"), name="func_name_uq", nulls_distinct=True
+        )
+        with connection.schema_editor() as editor, self.assertNumQueries(0):
+            self.assertIsNone(editor.add_constraint(Author, constraint))
+            self.assertIsNone(editor.remove_constraint(Author, constraint))
+
     @ignore_warnings(category=RemovedInDjango51Warning)
     def test_index_together(self):
         """
@@ -3513,9 +3546,7 @@ class SchemaTests(TransactionTestCase):
             connection.features.introspected_field_types["CharField"],
         )
         # Alter the table
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_db_table(Author, "schema_author", "schema_otherauthor")
         Author._meta.db_table = "schema_otherauthor"
         columns = self.column_classes(Author)
@@ -3526,9 +3557,7 @@ class SchemaTests(TransactionTestCase):
         # Ensure the foreign key reference was updated
         self.assertForeignKeyExists(Book, "author_id", "schema_otherauthor")
         # Alter the table again
-        with connection.schema_editor(
-            atomic=connection.features.supports_atomic_references_rename
-        ) as editor:
+        with connection.schema_editor() as editor:
             editor.alter_db_table(Author, "schema_otherauthor", "schema_author")
         # Ensure the table is still there
         Author._meta.db_table = "schema_author"
@@ -5094,8 +5123,7 @@ class SchemaTests(TransactionTestCase):
             editor.add_field(Book, author)
 
     def test_rename_table_renames_deferred_sql_references(self):
-        atomic_rename = connection.features.supports_atomic_references_rename
-        with connection.schema_editor(atomic=atomic_rename) as editor:
+        with connection.schema_editor() as editor:
             editor.create_model(Author)
             editor.create_model(Book)
             editor.alter_db_table(Author, "schema_author", "schema_renamed_author")

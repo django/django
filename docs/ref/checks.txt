@@ -165,9 +165,11 @@ Model fields
 * **fields.E002**: Field names must not contain ``"__"``.
 * **fields.E003**: ``pk`` is a reserved word that cannot be used as a field
   name.
-* **fields.E004**: ``choices`` must be an iterable (e.g., a list or tuple).
-* **fields.E005**: ``choices`` must be an iterable containing ``(actual value,
-  human readable name)`` tuples.
+* **fields.E004**: ``choices`` must be a mapping (e.g. a dictionary) or an
+  iterable (e.g. a list or tuple).
+* **fields.E005**: ``choices`` must be a mapping of actual values to human
+  readable names or an iterable containing ``(actual value, human readable
+  name)`` tuples.
 * **fields.E006**: ``db_index`` must be ``None``, ``True`` or ``False``.
 * **fields.E007**: Primary keys must not have ``null=True``.
 * **fields.E008**: All ``validators`` must be callable.
@@ -415,6 +417,8 @@ Models
   expression and won't be validated during the model ``full_clean()``.
 * **models.W046**: ``<database>`` does not support comments on tables
   (``db_table_comment``).
+* **models.W047**: ``<database>`` does not support unique constraints with
+  nulls distinct.
 
 Security
 --------
@@ -616,6 +620,8 @@ The following checks are performed on your URL configuration:
   imported.
 * **urls.E009**: Your URL pattern ``<pattern>`` has an invalid view, pass
   ``<view>.as_view()`` instead of ``<view>``.
+* **urls.W010**: Your URL pattern ``<pattern>`` has an unmatched
+  ``<angle bracket>``.
 
 ``contrib`` app checks
 ======================
@@ -644,9 +650,10 @@ with the admin site:
 * **admin.E011**: The value of ``fieldsets[n][1]`` must contain the key
   ``fields``.
 * **admin.E012**: There are duplicate field(s) in ``fieldsets[n][1]``.
-* **admin.E013**: ``fields[n]/fieldsets[n][m]`` cannot include the
-  ``ManyToManyField`` ``<field name>``, because that field manually specifies a
-  relationship model.
+* **admin.E013**: The value of
+  ``fields[n]/filter_horizontal[n]/filter_vertical[n]/fieldsets[n][m]`` cannot
+  include the ``ManyToManyField`` ``<field name>``, because that field manually
+  specifies a relationship model.
 * **admin.E014**: The value of ``exclude`` must be a list or tuple.
 * **admin.E015**: The value of ``exclude`` contains duplicate field(s).
 * **admin.E016**: The value of ``form`` must inherit from ``BaseModelForm``.
@@ -682,8 +689,9 @@ with the admin site:
 * **admin.E033**: The value of ``ordering`` refers to ``<field name>``, which
   is not a field of ``<model>``.
 * **admin.E034**: The value of ``readonly_fields`` must be a list or tuple.
-* **admin.E035**: The value of ``readonly_fields[n]`` is not a callable, an
-  attribute of ``<ModelAdmin class>``, or an attribute of ``<model>``.
+* **admin.E035**: The value of ``readonly_fields[n]`` refers to
+  ``<field_name>``, which is not a callable, an attribute of
+  ``<ModelAdmin class>``, or an attribute of ``<model>``.
 * **admin.E036**: The value of ``autocomplete_fields`` must be a list or tuple.
 * **admin.E037**: The value of ``autocomplete_fields[n]`` refers to
   ``<field name>``, which is not a field of ``<model>``.
@@ -910,3 +918,5 @@ configured:
   :setting:`STATICFILES_DIRS` setting must not end with a slash.
 * **staticfiles.W004**: The directory ``<directory>`` in the
   :setting:`STATICFILES_DIRS` does not exist.
+* **staticfiles.E005**: The :setting:`STORAGES` setting must define a
+  ``staticfiles`` storage.

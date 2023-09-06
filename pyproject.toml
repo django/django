@@ -3,5 +3,5 @@ requires = ['setuptools>=40.8.0']
 build-backend = 'setuptools.build_meta'
 
 [tool.black]
-target-version = ['py38']
+target-version = ['py310']
 force-exclude = 'tests/test_runner_apps/tagged/tests_syntax_error.py'

@@ -1,11 +1,11 @@
 from pathlib import Path
 from unittest import mock
 
-from django.conf import settings
-from django.contrib.staticfiles.checks import check_finders
+from django.conf import DEFAULT_STORAGE_ALIAS, STATICFILES_STORAGE_ALIAS, settings
+from django.contrib.staticfiles.checks import E005, check_finders, check_storages
 from django.contrib.staticfiles.finders import BaseFinder, get_finder
 from django.core.checks import Error, Warning
-from django.test import override_settings
+from django.test import SimpleTestCase, override_settings
 
 from .cases import CollectionTestCase
 from .settings import TEST_ROOT
@@ -132,3 +132,50 @@ class FindersCheckTests(CollectionTestCase):
             # Nonexistent directories are skipped.
             finder = get_finder("django.contrib.staticfiles.finders.FileSystemFinder")
             self.assertEqual(list(finder.list(None)), [])
+
+
+class StoragesCheckTests(SimpleTestCase):
+    @override_settings(STORAGES={})
+    def test_error_empty_storages(self):
+        # DEFAULT_STORAGE_ALIAS and STATICFILES_STORAGE_ALIAS need to be
+        # popped from STORAGES since UserSettingsHolder has code to maintain
+        # backward compatibility until 5.1 is out.
+        settings.STORAGES.clear()  # RemovedInDjango51Warning
+        assert settings.STORAGES == {}  # RemovedInDjango51Warning
+        errors = check_storages(None)
+        self.assertEqual(errors, [E005])
+
+    @override_settings(
+        STORAGES={
+            DEFAULT_STORAGE_ALIAS: {
+                "BACKEND": "django.core.files.storage.FileSystemStorage",
+            },
+            "example": {
+                "BACKEND": "ignore.me",
+            },
+        }
+    )
+    def test_error_missing_staticfiles(self):
+        # Check out the previous comment about UserSettingsHolder compat code.
+        settings.STORAGES.pop(STATICFILES_STORAGE_ALIAS)  # RemovedInDjango51Warning
+        assert (
+            STATICFILES_STORAGE_ALIAS not in settings.STORAGES
+        )  # RemovedInDjango51Warning
+        errors = check_storages(None)
+        self.assertEqual(errors, [E005])
+
+    @override_settings(
+        STORAGES={
+            STATICFILES_STORAGE_ALIAS: {
+                "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+            },
+        }
+    )
+    def test_staticfiles_no_errors(self):
+        # Check out the previous comment about UserSettingsHolder compat code.
+        settings.STORAGES.pop(DEFAULT_STORAGE_ALIAS)  # RemovedInDjango51Warning
+        assert (
+            DEFAULT_STORAGE_ALIAS not in settings.STORAGES
+        )  # RemovedInDjango51Warning
+        errors = check_storages(None)
+        self.assertEqual(errors, [])

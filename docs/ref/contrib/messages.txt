@@ -238,7 +238,7 @@ instance of the configured storage backend.
 The ``Message`` class
 ---------------------
 
-.. class:: storage.base.Message
+.. class:: Message
 
     When you loop over the list of messages in a template, what you get are
     instances of the ``Message`` class. They have only a few attributes:

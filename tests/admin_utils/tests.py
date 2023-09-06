@@ -325,7 +325,7 @@ class UtilsTests(SimpleTestCase):
         )
         msg = "Unable to lookup 'nonexistent' on Article or ArticleForm"
         with self.assertRaisesMessage(AttributeError, msg):
-            label_for_field("nonexistent", Article, form=ArticleForm()),
+            label_for_field("nonexistent", Article, form=ArticleForm())
 
     def test_label_for_property(self):
         class MockModelAdmin:
