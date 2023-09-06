@@ -882,6 +882,7 @@ class DatabaseLevelOnDeleteTests(TestCase):
         self.assertEqual(baz.setnullbar, orphan_baz.setnullbar)
         self.assertIsNotNone(orphan_baz.setnullbar)
 
+    @skipUnlessDBFeature("has_on_delete_db_default")
     def test_foreign_key_db_default(self):
         default_parent = Foo.objects.create(pk=1)
         parent = Foo.objects.create(pk=2)

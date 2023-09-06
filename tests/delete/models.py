@@ -1,6 +1,6 @@
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import connection, models
 
 
 class P(models.Model):
@@ -350,3 +350,6 @@ class DBDefaultsFK(models.Model):
     language_code = models.ForeignKey(
         Foo, db_default=1, on_delete=models.DB_SET_DEFAULT
     )
+
+    class Meta:
+        managed = getattr(connection.features, "has_on_delete_db_default", False)

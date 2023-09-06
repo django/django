@@ -1775,6 +1775,21 @@ any custom methods or send any signals.
     table is deleted, the foreign key values in the referencing table will be 
     updated to their :attr:`Field.db_default` values.
 
+.. admonition:: Support for DB_SET_DEFAULT in MySQL
+
+    The ``on_delete=DB_SET_DEFAULT`` attribute is not supported in mysql
+    database because Both ``InnoDB`` and ``NDB`` mysql engines reject
+    table definitions containing ``ON DELETE SET DEFAULT`` clauses and for
+    storage engines that support foreign keys, MySQL rejects any ``INSERT``
+    or ``UPDATE`` operation that attempts to create a foreign key value in
+    a child table if there is no matching candidate key value in the 
+    parent table.
+
+    For more details, visit `MySQL foreignkey documentation`_.
+
+.. _MySQL foreignkey documentation: https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html
+
+
 .. attribute:: ForeignKey.limit_choices_to
 
     Sets a limit to the available choices for this field when this field is
