@@ -79,8 +79,8 @@
             const quotedValue = customEncodeURIComponent(value);
             siblings.each(function() {
                 const elm = $(this);
-                elm.attr('href', elm.attr('data-href-template').replace('__fk__', quotedValue));
-
+                elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+                elm.removeAttr('aria-disabled');
             });
         } else {
             siblings.removeAttr('href');
