@@ -16,3 +16,6 @@ tests/coverage_html/
 tests/.coverage*
 build/
 tests/report/
+requirements.txt
+/.idea
+venv
