@@ -241,6 +241,274 @@ class OperationTests(OperationTestBase):
         if connection.features.has_on_delete_db_default:
             self.assertColumnExists(f"{app_label}_rider", "pony_default_id")
 
+    def change_to_db_cascade_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}", on_delete=models.DB_CASCADE
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        Rider.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            pony.delete()
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_restrict_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}", on_delete=models.DB_RESTRICT
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        Rider.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            pony.delete()
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_set_null_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}",
+                null=True,
+                on_delete=models.DB_SET_NULL,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        rider = Rider.objects.create(**kwargs)
+
+        with self.assertNumQueries(1):
+            pony.delete()
+
+        rider.refresh_from_db()
+        self.assertEqual(getattr(rider, fk_fieldname), None)
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_db_set_default_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}",
+                db_default=1,
+                on_delete=models.DB_SET_DEFAULT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony1 = Pony.objects.create(id=1)
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        rider = Rider.objects.create(**kwargs)
+
+        # Extra begin and commit queries
+        with self.assertNumQueries(3):
+            pony.delete()
+
+        rider.refresh_from_db()
+        pony1.refresh_from_db()
+        self.assertEqual(getattr(rider, fk_fieldname), pony1)
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_cascade_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}", on_delete=models.CASCADE
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        Rider.objects.create(**kwargs)
+
+        with self.assertNumQueries(4):
+            pony.delete()
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_restrict_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}", on_delete=models.RESTRICT
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        Rider.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            pony.delete()
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_set_null_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}", null=True, on_delete=models.SET_NULL
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        rider = Rider.objects.create(**kwargs)
+
+        with self.assertNumQueries(4):
+            pony.delete()
+
+        rider.refresh_from_db()
+        self.assertEqual(getattr(rider, fk_fieldname), None)
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
+    def change_to_non_db_set_default_test(
+        self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
+    ):
+        operation = migrations.AlterField(
+            fk_child_model,
+            fk_fieldname,
+            models.ForeignKey(
+                f"{app_label}.{fk_parent_model}",
+                default=1,
+                on_delete=models.SET_DEFAULT,
+            ),
+        )
+        new_state = project_state.clone()
+        operation.state_forwards(app_label, new_state)
+
+        with connection.schema_editor() as editor:
+            operation.database_forwards(app_label, editor, project_state, new_state)
+
+        Rider = new_state.apps.get_model(app_label, fk_child_model)
+        Pony = new_state.apps.get_model(app_label, fk_parent_model)
+
+        pony1 = Pony.objects.create(id=1)
+        pony = Pony.objects.create()
+        kwargs = {fk_fieldname: pony}
+        rider = Rider.objects.create(**kwargs)
+        pony.delete()
+        rider.refresh_from_db()
+        pony1.refresh_from_db()
+        self.assertEqual(getattr(rider, fk_fieldname), pony1)
+
+        Rider.objects.all().delete()
+        Pony.objects.all().delete()
+        with connection.schema_editor() as editor:
+            operation.database_backwards(app_label, editor, new_state, project_state)
+
     def test_alter_field_with_db_level_fk(self):
         app_label = "test_alterfwdblfk"
         non_db_cascade_options = {
@@ -266,122 +534,78 @@ class OperationTests(OperationTestBase):
                 models.SET_DEFAULT,
                 models.ForeignKey(
                     f"{app_label}.Pony_set_default",
-                    default="bn",
+                    default=1,
                     on_delete=models.SET_DEFAULT,
                 ),
             ],
         }
         for on_delete_type in non_db_cascade_options.keys():
-            db_level_cascade_options = {
-                "cascade": [
-                    models.DB_CASCADE,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{on_delete_type}",
-                        on_delete=models.DB_CASCADE,
+            with self.subTest(non_db_cascade_option=on_delete_type):
+                operations = [
+                    migrations.CreateModel(
+                        f"Pony_{on_delete_type}",
+                        [
+                            ("id", models.AutoField(primary_key=True)),
+                        ],
                     ),
-                ],
-                "set_null": [
-                    models.DB_SET_NULL,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{on_delete_type}",
-                        null=True,
-                        on_delete=models.DB_SET_NULL,
-                    ),
-                ],
-                "restrict": [
-                    models.DB_RESTRICT,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{on_delete_type}",
-                        on_delete=models.DB_RESTRICT,
-                    ),
-                ],
-                "set_default": [
-                    models.DB_SET_DEFAULT,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{on_delete_type}",
-                        db_default="bn",
-                        on_delete=models.DB_SET_DEFAULT,
-                    ),
-                ],
-            }
-            operations = [
-                migrations.CreateModel(
-                    f"Pony_{on_delete_type}",
-                    [
-                        (
-                            "id",
-                            models.CharField(
-                                primary_key=True,
-                                max_length=10,
+                    migrations.CreateModel(
+                        f"Rider_{on_delete_type}",
+                        [
+                            ("id", models.AutoField(primary_key=True)),
+                            ("number", models.IntegerField(default=1)),
+                            (
+                                f"pony_{on_delete_type}",
+                                non_db_cascade_options[on_delete_type][1],
                             ),
-                        ),
-                    ],
-                ),
-                migrations.CreateModel(
-                    f"Rider_{on_delete_type}",
-                    [
-                        ("id", models.AutoField(primary_key=True)),
-                        ("number", models.IntegerField(default=1)),
-                        (
-                            f"pony_{on_delete_type}",
-                            non_db_cascade_options[on_delete_type][1],
-                        ),
-                    ],
-                ),
-            ]
-            project_state = self.apply_operations(app_label, ProjectState(), operations)
-            # ForeignKey.
-            for db_level_on_delete_type in db_level_cascade_options.keys():
-                if (
-                    db_level_on_delete_type == "set_default"
-                    and not connection.features.has_on_delete_db_default
-                ):
-                    continue
-                Rider = project_state.apps.get_model(
-                    app_label, f"Rider_{on_delete_type}"
+                        ],
+                    ),
+                ]
+                project_state = self.apply_operations(
+                    app_label, ProjectState(), operations
                 )
+                fk_fieldname = f"pony_{on_delete_type}"
+                fk_parent_model = f"Pony_{on_delete_type}"
+                fk_child_model = f"Rider_{on_delete_type}"
+
+                Rider = project_state.apps.get_model(app_label, fk_child_model)
                 self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{on_delete_type}"
-                    ).remote_field.on_delete,
+                    Rider._meta.get_field(fk_fieldname).remote_field.on_delete,
                     non_db_cascade_options[on_delete_type][0],
                 )
-
-                operation = migrations.AlterField(
-                    f"Rider_{on_delete_type}",
-                    f"pony_{on_delete_type}",
-                    db_level_cascade_options[db_level_on_delete_type][1],
+                # Test migrations for db to non db changes
+                # Test with db set null
+                self.change_to_db_set_null_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
-                new_state = project_state.clone()
-                operation.state_forwards(app_label, new_state)
-
-                with connection.schema_editor() as editor:
-                    operation.database_forwards(
-                        app_label, editor, project_state, new_state
+                # Test with db restrict
+                self.change_to_db_restrict_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
+                )
+                # Test with db cascade
+                self.change_to_db_cascade_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
+                )
+                # Test with db_set default
+                if connection.features.has_on_delete_db_default:
+                    self.change_to_db_set_default_test(
+                        app_label,
+                        fk_parent_model,
+                        fk_child_model,
+                        fk_fieldname,
+                        project_state,
                     )
-
-                Rider = new_state.apps.get_model(app_label, f"Rider_{on_delete_type}")
-                self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{on_delete_type}"
-                    ).remote_field.on_delete,
-                    db_level_cascade_options[db_level_on_delete_type][0],
-                )
-
-                with connection.schema_editor() as editor:
-                    operation.database_backwards(
-                        app_label, editor, new_state, project_state
-                    )
-
-                Rider = project_state.apps.get_model(
-                    app_label, f"Rider_{on_delete_type}"
-                )
-                self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{on_delete_type}"
-                    ).remote_field.on_delete,
-                    non_db_cascade_options[on_delete_type][0],
-                )
 
     def test_alter_field_among_db_level_fk(self):
         app_label = "test_alterfadblfk"
@@ -406,134 +630,122 @@ class OperationTests(OperationTestBase):
                     f"{app_label}.Pony_restrict", on_delete=models.DB_RESTRICT
                 ),
             ],
-            "set_default": [
+        }
+        if connection.features.has_on_delete_db_default:
+            db_cascade_options_primary["set_default"] = [
                 models.DB_SET_DEFAULT,
                 models.ForeignKey(
                     f"{app_label}.Pony_set_default",
                     default="bn",
                     on_delete=models.DB_SET_DEFAULT,
                 ),
-            ],
-        }
-        for primary_on_delete_type in db_cascade_options_primary.keys():
-            if (
-                primary_on_delete_type == "set_default"
-                and not connection.features.has_on_delete_db_default
-            ):
-                continue
-            db_level_cascade_options_secondary = {
-                "cascade": [
-                    models.DB_CASCADE,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{primary_on_delete_type}",
-                        on_delete=models.DB_CASCADE,
-                    ),
-                ],
-                "set_null": [
-                    models.DB_SET_NULL,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{primary_on_delete_type}",
-                        null=True,
-                        on_delete=models.DB_SET_NULL,
-                    ),
-                ],
-                "restrict": [
-                    models.DB_RESTRICT,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{primary_on_delete_type}",
-                        on_delete=models.DB_RESTRICT,
-                    ),
-                ],
-                "set_default": [
-                    models.DB_SET_DEFAULT,
-                    models.ForeignKey(
-                        f"{app_label}.Pony_{primary_on_delete_type}",
-                        db_default="bn",
-                        on_delete=models.DB_SET_DEFAULT,
-                    ),
-                ],
-            }
-            operations = [
-                migrations.CreateModel(
-                    f"Pony_{primary_on_delete_type}",
-                    [
-                        (
-                            "id",
-                            models.CharField(
-                                primary_key=True,
-                                max_length=10,
-                            ),
-                        ),
-                    ],
-                ),
-                migrations.CreateModel(
-                    f"Rider_{primary_on_delete_type}",
-                    [
-                        ("id", models.AutoField(primary_key=True)),
-                        ("number", models.IntegerField(default=1)),
-                        (
-                            f"pony_{primary_on_delete_type}",
-                            db_cascade_options_primary[primary_on_delete_type][1],
-                        ),
-                    ],
-                ),
             ]
-            project_state = self.apply_operations(app_label, ProjectState(), operations)
-            # ForeignKey.
-            for secondary_on_delete_type in db_level_cascade_options_secondary.keys():
-                if primary_on_delete_type == secondary_on_delete_type:
-                    continue
-                if (
-                    secondary_on_delete_type == "set_default"
-                    and not connection.features.has_on_delete_db_default
-                ):
-                    continue
-                Rider = project_state.apps.get_model(
-                    app_label, f"Rider_{primary_on_delete_type}"
+        for primary_on_delete_type in db_cascade_options_primary.keys():
+            with self.subTest(primary_db_cascade_option=primary_on_delete_type):
+                operations = [
+                    migrations.CreateModel(
+                        f"Pony_{primary_on_delete_type}",
+                        [
+                            (
+                                "id",
+                                models.CharField(
+                                    primary_key=True,
+                                    max_length=10,
+                                ),
+                            ),
+                        ],
+                    ),
+                    migrations.CreateModel(
+                        f"Rider_{primary_on_delete_type}",
+                        [
+                            ("id", models.AutoField(primary_key=True)),
+                            ("number", models.IntegerField(default=1)),
+                            (
+                                f"pony_{primary_on_delete_type}",
+                                db_cascade_options_primary[primary_on_delete_type][1],
+                            ),
+                        ],
+                    ),
+                ]
+                project_state = self.apply_operations(
+                    app_label, ProjectState(), operations
                 )
+                fk_fieldname = f"pony_{primary_on_delete_type}"
+                fk_parent_model = f"Pony_{primary_on_delete_type}"
+                fk_child_model = f"Rider_{primary_on_delete_type}"
+                Rider = project_state.apps.get_model(app_label, fk_child_model)
                 self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{primary_on_delete_type}"
-                    ).remote_field.on_delete,
+                    Rider._meta.get_field(fk_fieldname).remote_field.on_delete,
                     db_cascade_options_primary[primary_on_delete_type][0],
                 )
 
-                operation = migrations.AlterField(
-                    f"Rider_{primary_on_delete_type}",
-                    f"pony_{primary_on_delete_type}",
-                    db_level_cascade_options_secondary[secondary_on_delete_type][1],
+                # Test Migrations for non db to non db changes
+                # Test with db set null
+                self.change_to_db_set_null_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
-                new_state = project_state.clone()
-                operation.state_forwards(app_label, new_state)
-
-                with connection.schema_editor() as editor:
-                    operation.database_forwards(
-                        app_label, editor, project_state, new_state
+                # Test with db restrict
+                self.change_to_db_restrict_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
+                )
+                # Test with db cascade
+                self.change_to_db_cascade_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
+                )
+                # Test with db_set default
+                if connection.features.has_on_delete_db_default:
+                    self.change_to_db_set_default_test(
+                        app_label,
+                        fk_parent_model,
+                        fk_child_model,
+                        fk_fieldname,
+                        project_state,
                     )
 
-                Rider = new_state.apps.get_model(
-                    app_label, f"Rider_{primary_on_delete_type}"
+                # Test Migrations for db to non db changes
+                # Test with non db set null
+                self.change_to_non_db_set_null_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
-                self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{primary_on_delete_type}"
-                    ).remote_field.on_delete,
-                    db_level_cascade_options_secondary[secondary_on_delete_type][0],
+                # Test with non db restrict
+                self.change_to_non_db_restrict_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
-
-                with connection.schema_editor() as editor:
-                    operation.database_backwards(
-                        app_label, editor, new_state, project_state
-                    )
-
-                Rider = project_state.apps.get_model(
-                    app_label, f"Rider_{primary_on_delete_type}"
+                # Test with non db cascade
+                self.change_to_non_db_cascade_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
-                self.assertEqual(
-                    Rider._meta.get_field(
-                        f"pony_{primary_on_delete_type}"
-                    ).remote_field.on_delete,
-                    db_cascade_options_primary[primary_on_delete_type][0],
+                # Test with non db_set default
+                self.change_to_non_db_set_default_test(
+                    app_label,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                    project_state,
                 )
 
     def test_add_field_db_level_fk(self):
@@ -555,15 +767,17 @@ class OperationTests(OperationTestBase):
                 models.DB_RESTRICT,
                 models.ForeignKey(f"{app_label}.Pony", on_delete=models.DB_RESTRICT),
             ],
-            "set_default": [
+        }
+
+        if connection.features.has_on_delete_db_default:
+            db_cascade_options_primary["set_default"] = [
                 models.DB_SET_DEFAULT,
                 models.ForeignKey(
                     f"{app_label}.Pony",
                     default="bn",
                     on_delete=models.DB_SET_DEFAULT,
                 ),
-            ],
-        }
+            ]
         operations = [
             migrations.CreateModel(
                 "Pony",
@@ -587,35 +801,33 @@ class OperationTests(OperationTestBase):
         ]
         project_state = self.apply_operations(app_label, ProjectState(), operations)
         for db_cascade_option in db_cascade_options_primary.keys():
-            if (
-                db_cascade_option == "set_default"
-                and not connection.features.has_on_delete_db_default
-            ):
-                continue
-            operation = migrations.AddField(
-                "Rider",
-                f"pony_{db_cascade_option}",
-                db_cascade_options_primary[db_cascade_option][1],
-            )
-            new_state = project_state.clone()
-            operation.state_forwards(app_label, new_state)
-            self.assertColumnNotExists(
-                f"{app_label}_rider", f"pony_{db_cascade_option}_id"
-            )
-
-            with connection.schema_editor() as editor:
-                operation.database_forwards(app_label, editor, project_state, new_state)
-            self.assertColumnExists(
-                f"{app_label}_rider", f"pony_{db_cascade_option}_id"
-            )
-
-            with connection.schema_editor() as editor:
-                operation.database_backwards(
-                    app_label, editor, new_state, project_state
+            with self.subTest(db_cascade_option=db_cascade_option):
+                operation = migrations.AddField(
+                    "Rider",
+                    f"pony_{db_cascade_option}",
+                    db_cascade_options_primary[db_cascade_option][1],
                 )
-            self.assertColumnNotExists(
-                f"{app_label}_rider", f"pony_{db_cascade_option}_id"
-            )
+                new_state = project_state.clone()
+                operation.state_forwards(app_label, new_state)
+                self.assertColumnNotExists(
+                    f"{app_label}_rider", f"pony_{db_cascade_option}_id"
+                )
+
+                with connection.schema_editor() as editor:
+                    operation.database_forwards(
+                        app_label, editor, project_state, new_state
+                    )
+                self.assertColumnExists(
+                    f"{app_label}_rider", f"pony_{db_cascade_option}_id"
+                )
+
+                with connection.schema_editor() as editor:
+                    operation.database_backwards(
+                        app_label, editor, new_state, project_state
+                    )
+                self.assertColumnNotExists(
+                    f"{app_label}_rider", f"pony_{db_cascade_option}_id"
+                )
 
     def test_create_model_with_unique_after(self):
         """

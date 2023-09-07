@@ -1723,7 +1723,7 @@ Django perform the relevant actions. The database variants are normally more
 efficient because they require less data to be fetched, but they don’t call
 any custom methods or send any signals.
 
-.. versionchanged:: 5.0
+.. versionchanged:: 5.1
 
     Support for ``DB_*`` variants of on_delete attribute is added
 
@@ -1826,7 +1826,7 @@ any custom methods or send any signals.
 
 * .. attribute:: DB_CASCADE
 
-    .. versionadded:: 5.0
+    .. versionadded:: 5.1
 
     ``DB_CASCADE`` is a custom option introduced in Django that allows the
     database to handle cascading deletes. This action triggers the SQL
@@ -1842,7 +1842,7 @@ any custom methods or send any signals.
 
 * .. attribute:: DB_RESTRICT
 
-    .. versionadded:: 5.0
+    .. versionadded:: 5.1
 
     It prevents the deletion of the referenced object by raising the
     :class:`~django.db.IntegrityError` exception. This action triggers the SQL
@@ -1852,7 +1852,7 @@ any custom methods or send any signals.
 
 * .. attribute:: DB_SET_NULL
 
-    .. versionadded:: 5.0
+    .. versionadded:: 5.1
 
     Set the :class:`ForeignKey` value to ``null``; this is only possible if
     :attr:`~Field.null` is ``True``. This works on a database level instead of
@@ -1862,7 +1862,7 @@ any custom methods or send any signals.
 
 * .. attribute:: DB_SET_DEFAULT
 
-    .. versionadded:: 5.0
+    .. versionadded:: 5.1
 
     Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value.
     the respective field must have a :attr:`Field.db_default` value present.

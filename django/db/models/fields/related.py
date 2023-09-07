@@ -1127,17 +1127,14 @@ class ForeignKey(ForeignObject):
             # if they have DB level deletion return True
             # Our current model already has non_db cascade
             for rel in rel_model._meta.get_fields():
-                related_on_delete = None
-                related_remote_field = rel
-                if isinstance(rel, OneToOneRel) and hasattr(rel, "on_delete"):
-                    related_on_delete = rel.on_delete
-                    related_remote_field = rel.remote_field
-                elif (
-                    isinstance(rel, ForeignKey) or isinstance(rel, OneToOneField)
-                ) and hasattr(rel.remote_field, "on_delete"):
-                    related_on_delete = rel.remote_field.on_delete
-                if isinstance(related_on_delete, DatabaseOnDelete):
-                    return related_remote_field
+                if isinstance(rel, OneToOneRel) and isinstance(
+                    rel.on_delete, DatabaseOnDelete
+                ):
+                    return rel.remote_field
+                elif (isinstance(rel, (ForeignKey, OneToOneField))) and isinstance(
+                    getattr(rel.remote_field, "on_delete", None), DatabaseOnDelete
+                ):
+                    return rel
         return None
 
     def deconstruct(self):

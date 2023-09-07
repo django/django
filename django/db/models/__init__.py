@@ -16,7 +16,6 @@ from django.db.models.deletion import (
     SET,
     SET_DEFAULT,
     SET_NULL,
-    DatabaseOnDelete,
     ProtectedError,
     RestrictedError,
 )
@@ -123,5 +122,4 @@ __all__ += [
     "DB_RESTRICT",
     "DB_SET_NULL",
     "DB_SET_DEFAULT",
-    "DatabaseOnDelete",
 ]

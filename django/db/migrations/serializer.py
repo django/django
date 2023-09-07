@@ -15,6 +15,7 @@ from django.conf import SettingsReference
 from django.db import models
 from django.db.migrations.operations.base import Operation
 from django.db.migrations.utils import COMPILED_REGEX_TYPE, RegexObject
+from django.db.models.deletion import DatabaseOnDelete
 from django.utils.functional import LazyObject, Promise
 from django.utils.version import PY311, get_docs_version
 
@@ -361,7 +362,7 @@ class Serializer:
         uuid.UUID: UUIDSerializer,
         pathlib.PurePath: PathSerializer,
         os.PathLike: PathLikeSerializer,
-        models.DatabaseOnDelete: DatabaseOnDeleteSerializer,
+        DatabaseOnDelete: DatabaseOnDeleteSerializer,
     }
 
     @classmethod

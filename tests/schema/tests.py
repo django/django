@@ -4491,7 +4491,8 @@ class SchemaTests(TransactionTestCase):
             error_messages={"invalid": "error message"},
             help_text="help text",
             limit_choices_to={"limit": "choice"},
-            on_delete=PROTECT,
+            # on_delete is required, so kept same as earlier
+            on_delete=CASCADE,
             related_name="related_name",
             related_query_name="related_query_name",
             validators=[lambda x: x],
