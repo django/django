@@ -348,7 +348,7 @@ class GenericRelationTests(TestCase):
         )
         charlink.object_id = board.pk
         charlink.content_type_id = ContentType.objects.get_for_model(Board).id
-        self.assertEqual(type(charlink.content_object), Board)
+        self.assertEqual(charlink.content_object, board)
         self.assertEqual(
             charlink.content_object, charlink._state.fields_cache["content_object"]
         )
