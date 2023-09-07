@@ -60,8 +60,13 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     order_by_nulls_first = True
     supports_logical_xor = True
 
+
     # Features related to database level on delete
     has_on_delete_db_default = False
+    
+    supports_stored_generated_columns = True
+    supports_virtual_generated_columns = True
+
 
     @cached_property
     def minimum_database_version(self):

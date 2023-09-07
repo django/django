@@ -165,6 +165,7 @@ class Field(RegisterLookupMixin):
     one_to_many = None
     one_to_one = None
     related_model = None
+    generated = False
 
     descriptor_class = DeferredAttribute
 
@@ -646,6 +647,8 @@ class Field(RegisterLookupMixin):
             path = path.replace("django.db.models.fields.related", "django.db.models")
         elif path.startswith("django.db.models.fields.files"):
             path = path.replace("django.db.models.fields.files", "django.db.models")
+        elif path.startswith("django.db.models.fields.generated"):
+            path = path.replace("django.db.models.fields.generated", "django.db.models")
         elif path.startswith("django.db.models.fields.json"):
             path = path.replace("django.db.models.fields.json", "django.db.models")
         elif path.startswith("django.db.models.fields.proxy"):

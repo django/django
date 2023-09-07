@@ -1,17 +1,7 @@
 from django.contrib import messages
 from django.test import RequestFactory, SimpleTestCase
 
-
-class DummyStorage:
-    """
-    dummy message-store to test the api methods
-    """
-
-    def __init__(self):
-        self.store = []
-
-    def add(self, level, message, extra_tags=""):
-        self.store.append(message)
+from .utils import DummyStorage
 
 
 class ApiTests(SimpleTestCase):
@@ -25,7 +15,8 @@ class ApiTests(SimpleTestCase):
         msg = "some message"
         self.request._messages = self.storage
         messages.add_message(self.request, messages.DEBUG, msg)
-        self.assertIn(msg, self.storage.store)
+        [message] = self.storage.store
+        self.assertEqual(msg, message.message)
 
     def test_request_is_none(self):
         msg = "add_message() argument must be an HttpRequest object, not 'NoneType'."

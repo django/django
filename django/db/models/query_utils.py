@@ -198,6 +198,10 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
+                if instance.pk is None and self.field.generated:
+                    raise FieldError(
+                        "Cannot read a generated field from an unsaved model."
+                    )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val

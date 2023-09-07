@@ -689,6 +689,8 @@ class QuerySet(AltersData):
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
             if not connection.features.supports_default_keyword_in_bulk_insert:
                 for field in obj._meta.fields:
+                    if field.generated:
+                        continue
                     value = getattr(obj, field.attname)
                     if isinstance(value, DatabaseDefault):
                         setattr(obj, field.attname, field.db_default)
@@ -804,7 +806,7 @@ class QuerySet(AltersData):
             unique_fields,
         )
         self._for_write = True
-        fields = opts.concrete_fields
+        fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):

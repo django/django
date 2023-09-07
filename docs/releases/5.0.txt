@@ -129,6 +129,7 @@ sets a database-computed default value. For example::
         created = models.DateTimeField(db_default=Now())
         circumference = models.FloatField(db_default=2 * Pi())
 
+
 Database-level values for ``ForeignKey.on_delete``
 --------------------------------------------------
 
@@ -140,6 +141,15 @@ supports four extra values to specify database-level actions:
 * ``DB_SET_NULL`` - sets the referring foreign key to SQL ``NULL``.
 * ``DB_SET_DEFAULT`` - the value of the foreign key column in the referencing
   table will be set to its ``db_default`` value.
+
+
+Database generated model field
+------------------------------
+
+The new :class:`~django.db.models.GeneratedField` allows creation of database
+generated columns. This field can be used on all supported database backends
+to create a field that is always computed from other fields.
+
 
 More options for declaring field choices
 ----------------------------------------
@@ -259,7 +269,9 @@ Minor features
 :mod:`django.contrib.messages`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* The new :meth:`.MessagesTestMixin.assertMessages` assertion method allows
+  testing :mod:`~django.contrib.messages` added to a
+  :class:`response <django.http.HttpResponse>`.
 
 :mod:`django.contrib.postgres`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -643,6 +655,8 @@ Miscellaneous
   See :rfc:`1866` for more details.
 
 * The minimum supported version of ``colorama`` is increased to 0.4.6.
+
+* The minimum supported version of ``docutils`` is increased to 0.19.
 
 .. _deprecated-features-5.0:
 

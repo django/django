@@ -13,7 +13,13 @@ try:
 
     # Avoid initializing colorama in non-Windows platforms.
     colorama.just_fix_windows_console()
-except (ImportError, OSError):
+except (
+    AttributeError,  # colorama <= 0.4.6.
+    ImportError,  # colorama is not installed.
+    # If just_fix_windows_console() accesses sys.stdout with
+    # WSGIRestrictedStdout.
+    OSError,
+):
     HAS_COLORAMA = False
 else:
     HAS_COLORAMA = True
