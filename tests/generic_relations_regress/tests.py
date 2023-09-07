@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import ProtectedError, Q, Sum
 from django.forms.models import modelform_factory
 from django.test import TestCase, skipIfDBFeature
@@ -332,3 +333,22 @@ class GenericRelationTests(TestCase):
         self.assertSequenceEqual(qs, [link2])
         qs = Link.objects.exclude(places__name="Test Place 1")
         self.assertSequenceEqual(qs, [link2])
+
+    def test_ticket_34816_generic_fk_crash(self):
+        """
+        Ensure pk type change is handled when using GenericForeignKey.
+        """
+        board = Board.objects.create(name="some test")
+        oddrel = OddRelation1.objects.create(name="clink")
+        charlink = CharLink.objects.create(content_object=oddrel)
+        charlink = CharLink.objects.get(pk=charlink.pk)
+        self.assertEqual(type(charlink.content_object), OddRelation1)
+        self.assertEqual(
+            charlink.content_object, charlink._state.fields_cache["content_object"]
+        )
+        charlink.object_id = board.pk
+        charlink.content_type_id = ContentType.objects.get_for_model(Board).id
+        self.assertEqual(type(charlink.content_object), Board)
+        self.assertEqual(
+            charlink.content_object, charlink._state.fields_cache["content_object"]
+        )
