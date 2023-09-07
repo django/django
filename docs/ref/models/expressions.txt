@@ -152,8 +152,8 @@ operators to create an encapsulated SQL expression; in this case, one which
 instructs the database to increment the database field represented by
 ``reporter.stories_filed``.
 
-Whatever value is or was on ``reporter.stories_filed``, Python never gets to
-know about it - it is dealt with entirely by the database. All Python does,
+Whatever value is or was on ``reporter.stories_filed``,
+Python never uses and manipulates it - it is dealt with entirely by the database. All Python does,
 through Django's ``F()`` class, is create the SQL syntax to refer to the field
 and describe the operation.
 
