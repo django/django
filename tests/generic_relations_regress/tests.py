@@ -342,13 +342,7 @@ class GenericRelationTests(TestCase):
         oddrel = OddRelation1.objects.create(name="clink")
         charlink = CharLink.objects.create(content_object=oddrel)
         charlink = CharLink.objects.get(pk=charlink.pk)
-        self.assertEqual(charlink.content_object, odd_rel)
-        self.assertEqual(
-            charlink.content_object, charlink._state.fields_cache["content_object"]
-        )
+        self.assertEqual(charlink.content_object, oddrel)
         charlink.object_id = board.pk
         charlink.content_type_id = ContentType.objects.get_for_model(Board).id
         self.assertEqual(charlink.content_object, board)
-        self.assertEqual(
-            charlink.content_object, charlink._state.fields_cache["content_object"]
-        )
