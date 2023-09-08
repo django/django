@@ -334,7 +334,7 @@ class GenericRelationTests(TestCase):
         qs = Link.objects.exclude(places__name="Test Place 1")
         self.assertSequenceEqual(qs, [link2])
 
-    def test_ticket_34816_generic_fk_crash(self):
+    def test_check_cached_value_pk_different_type(self):
         """
         Ensure pk type change is handled when using GenericForeignKey.
         """
