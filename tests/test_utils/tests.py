@@ -26,6 +26,7 @@ from django.forms import (
     formset_factory,
 )
 from django.http import HttpResponse
+from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import (
     SimpleTestCase,
@@ -530,11 +531,19 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed("template_used/base.html"):
                 render_to_string("template_used/alternative.html")
 
-        with self.assertRaisesMessage(
-            AssertionError, "No templates used to render the response"
-        ):
+        msg = "No templates used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             response = self.client.get("/test_utils/no_template_used/")
             self.assertTemplateUsed(response, "template_used/base.html")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                self.client.get("/test_utils/no_template_used/")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                template = Template("template_used/alternative.html", name=None)
+                template.render(Context())
 
     def test_msg_prefix(self):
         msg_prefix = "Prefix"

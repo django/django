@@ -114,18 +114,16 @@ class _AssertTemplateUsedContext:
         self.count = count
 
         self.rendered_templates = []
-        self.rendered_template_names = []
         self.context = ContextList()
 
     def on_template_render(self, sender, signal, template, context, **kwargs):
         self.rendered_templates.append(template)
-        self.rendered_template_names.append(template.name)
         self.context.append(copy(context))
 
     def test(self):
         self.test_case._assert_template_used(
             self.template_name,
-            self.rendered_template_names,
+            [t.name for t in self.rendered_templates if t.name is not None],
             self.msg_prefix,
             self.count,
         )
@@ -143,8 +141,11 @@ class _AssertTemplateUsedContext:
 
 class _AssertTemplateNotUsedContext(_AssertTemplateUsedContext):
     def test(self):
+        rendered_template_names = [
+            t.name for t in self.rendered_templates if t.name is not None
+        ]
         self.test_case.assertFalse(
-            self.template_name in self.rendered_template_names,
+            self.template_name in rendered_template_names,
             f"{self.msg_prefix}Template '{self.template_name}' was used "
             f"unexpectedly in rendering the response",
         )
