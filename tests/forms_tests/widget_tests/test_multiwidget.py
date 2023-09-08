@@ -276,7 +276,8 @@ class MultiWidgetTest(WidgetTest):
             html=(
                 """
             <input type="text" name="name_0" value="some text">
-            <select data-context="available-source" multiple name="name_1">
+            <select data-context="available-source"
+            multiple name="name_1">
                 <option value="J" selected>John</option>
                 <option value="P" selected>Paul</option>
                 <option value="G">George</option>
@@ -319,7 +320,8 @@ class MultiWidgetTest(WidgetTest):
         self.assertHTMLEqual(
             "<div><fieldset><legend>Field:</legend>"
             '<input type="text" name="field_0" required id="id_field_0">'
-            '<select data-context="available-source" name="field_1" required id="id_field_1" multiple>'
+            '<select data-context="available-source" '
+            'name="field_1" required id="id_field_1" multiple>'
             '<option value="J">John</option><option value="P">Paul</option>'
             '<option value="G">George</option><option value="R">Ringo</option></select>'
             '<input type="text" name="field_2_0" required id="id_field_2_0">'

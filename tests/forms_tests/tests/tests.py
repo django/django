@@ -124,7 +124,8 @@ class ModelFormCallableModelDefault(TestCase):
                 id="initial-id_choice_int">
             </p>
             <p><label for="id_multi_choice">Multi choice:</label>
-            <select data-context="available-source" multiple name="multi_choice" id="id_multi_choice" required>
+            <select data-context="available-source"
+            multiple name="multi_choice" id="id_multi_choice" required>
             <option value="1" selected>ChoiceOption 1</option>
             <option value="2">ChoiceOption 2</option>
             <option value="3">ChoiceOption 3</option>
@@ -133,7 +134,8 @@ class ModelFormCallableModelDefault(TestCase):
                 id="initial-id_multi_choice_0">
             </p>
             <p><label for="id_multi_choice_int">Multi choice int:</label>
-            <select data-context="available-source" multiple name="multi_choice_int" id="id_multi_choice_int" required>
+            <select data-context="available-source"
+            multiple name="multi_choice_int" id="id_multi_choice_int" required>
             <option value="1" selected>ChoiceOption 1</option>
             <option value="2">ChoiceOption 2</option>
             <option value="3">ChoiceOption 3</option>
@@ -179,7 +181,8 @@ class ModelFormCallableModelDefault(TestCase):
                 id="initial-id_choice_int">
             </p>
             <p><label for="id_multi_choice">Multi choice:</label>
-            <select data-context="available-source" multiple name="multi_choice" id="id_multi_choice" required>
+            <select data-context="available-source"
+            multiple name="multi_choice" id="id_multi_choice" required>
             <option value="1">ChoiceOption 1</option>
             <option value="2" selected>ChoiceOption 2</option>
             <option value="3" selected>ChoiceOption 3</option>
@@ -190,7 +193,8 @@ class ModelFormCallableModelDefault(TestCase):
                 id="initial-id_multi_choice_1">
             </p>
             <p><label for="id_multi_choice_int">Multi choice int:</label>
-            <select data-context="available-source" multiple name="multi_choice_int" id="id_multi_choice_int" required>
+            <select data-context="available-source"
+            multiple name="multi_choice_int" id="id_multi_choice_int" required>
             <option value="1">ChoiceOption 1</option>
             <option value="2" selected>ChoiceOption 2</option>
             <option value="3" selected>ChoiceOption 3</option>
