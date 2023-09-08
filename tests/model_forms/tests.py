@@ -1976,8 +1976,9 @@ id="id_categories">
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
-            "</select></li>" %
-            (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk), )
+            "</select></li>"
+            % (self.w_woodward.pk, self.w_royko.pk, self.c1.pk, self.c2.pk, self.c3.pk),
+        )
 
         c4 = Category.objects.create(name="Fourth", url="4th")
         w_bernstein = Writer.objects.create(name="Carl Bernstein")
@@ -2007,15 +2008,16 @@ id="id_categories">
             '<option value="1">Draft</option>'
             '<option value="2">Pending</option>'
             '<option value="3">Live</option>'
-            "</select></li>" %
-            (self.w_woodward.pk,
+            "</select></li>"
+            % (
+                self.w_woodward.pk,
                 w_bernstein.pk,
                 self.w_royko.pk,
                 self.c1.pk,
                 self.c2.pk,
                 self.c3.pk,
                 c4.pk,
-             ),
+            ),
         )
 
     def test_recleaning_model_form_instance(self):
