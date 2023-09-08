@@ -335,9 +335,7 @@ class GenericRelationTests(TestCase):
         self.assertSequenceEqual(qs, [link2])
 
     def test_check_cached_value_pk_different_type(self):
-        """
-        Ensure pk type change is handled when using GenericForeignKey.
-        """
+        """Primary key is not checked if the content type doesn't match."""
         board = Board.objects.create(name="some test")
         oddrel = OddRelation1.objects.create(name="clink")
         charlink = CharLink.objects.create(content_object=oddrel)
