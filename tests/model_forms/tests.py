@@ -1966,7 +1966,6 @@ id="id_categories">
             "</textarea></li>"
             '<li>Categories: <select data-context="available-source" '
             'multiple name="categories">'
-            'multiple name="categories">'
             '<option value="%s">Entertainment</option>'
             '<option value="%s">It&#x27;s a test</option>'
             '<option value="%s">Third test</option>'
