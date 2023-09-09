@@ -1157,6 +1157,9 @@ class MigrationAutodetector:
                             for to_field in new_field.to_fields
                         ]
                     )
+                    if old_from_fields := getattr(old_field, "from_fields", None):
+                        old_field.from_fields = tuple(old_from_fields)
+                        old_field.to_fields = tuple(old_field.to_fields)
                 dependencies.extend(
                     self._get_dependencies_for_foreign_key(
                         app_label,
