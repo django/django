@@ -59,7 +59,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             PRIMARY KEY(column_1, column_2)
         )
     """
-    requires_casted_case_in_updates = True
+    requires_casted_case_in_updates = False
     supports_over_clause = True
     only_supports_unbounded_with_preceding_and_following = True
     supports_aggregate_filter_clause = True
