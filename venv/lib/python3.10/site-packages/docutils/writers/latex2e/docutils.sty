@@ -1,0 +1,223 @@
+%% docutils.sty: macros for Docutils LaTeX output.
+%%
+%%   Copyright © 2020 Günter Milde
+%%   Released under the terms of the `2-Clause BSD license`, in short:
+%%
+%%      Copying and distribution of this file, with or without modification,
+%%      are permitted in any medium without royalty provided the copyright
+%%      notice and this notice are preserved.
+%%      This file is offered as-is, without any warranty.
+
+% .. include:: README.md
+%
+% Implementation
+% ==============
+%
+% ::
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{docutils}
+  [2021/05/18 macros for Docutils LaTeX output]
+
+% Helpers
+% -------
+%
+% duclass::
+
+% class handling for environments (block-level elements)
+% \begin{DUclass}{spam} tries \DUCLASSspam and
+% \end{DUclass}{spam} tries \endDUCLASSspam
+\ifx\DUclass\undefined % poor man's "provideenvironment"
+ \newenvironment{DUclass}[1]%
+  {% "#1" does not work in end-part of environment.
+   \def\DocutilsClassFunctionName{DUCLASS#1}
+     \csname \DocutilsClassFunctionName \endcsname}%
+  {\csname end\DocutilsClassFunctionName \endcsname}%
+\fi
+
+% providelength::
+
+% Provide a length variable and set default, if it is new
+\providecommand*{\DUprovidelength}[2]{
+  \ifthenelse{\isundefined{#1}}{\newlength{#1}\setlength{#1}{#2}}{}
+}
+
+
+% Configuration defaults
+% ----------------------
+%
+% See `Docutils LaTeX Writer`_ for details.
+%
+% abstract::
+
+\providecommand*{\DUCLASSabstract}{
+  \renewcommand{\DUtitle}[1]{\centerline{\textbf{##1}}}
+}
+
+% dedication::
+
+% special topic for dedications
+\providecommand*{\DUCLASSdedication}{%
+  \renewenvironment{quote}{\begin{center}}{\end{center}}%
+}
+
+% TODO: add \em to set dedication text in italics?
+%
+% docinfo::
+
+% width of docinfo table
+\DUprovidelength{\DUdocinfowidth}{0.9\linewidth}
+
+% error::
+
+\providecommand*{\DUCLASSerror}{\color{red}}
+
+% highlight_rules::
+
+% basic code highlight:
+\providecommand*\DUrolecomment[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\providecommand*\DUroledeleted[1]{\textcolor[rgb]{0.40,0.40,0.40}{#1}}
+\providecommand*\DUrolekeyword[1]{\textbf{#1}}
+\providecommand*\DUrolestring[1]{\textit{#1}}
+
+% Elements
+% --------
+%
+% Definitions for unknown or to-be-configured Docutils elements.
+%
+% admonition::
+
+% admonition environment (specially marked topic)
+\ifx\DUadmonition\undefined % poor man's "provideenvironment"
+ \newbox{\DUadmonitionbox}
+ \newenvironment{DUadmonition}%
+  {\begin{center}
+     \begin{lrbox}{\DUadmonitionbox}
+       \begin{minipage}{0.9\linewidth}
+  }%
+  {    \end{minipage}
+     \end{lrbox}
+     \fbox{\usebox{\DUadmonitionbox}}
+   \end{center}
+  }
+\fi
+
+% fieldlist::
+
+% field list environment (for separate configuration of `field lists`)
+\ifthenelse{\isundefined{\DUfieldlist}}{
+  \newenvironment{DUfieldlist}%
+    {\quote\description}
+    {\enddescription\endquote}
+}{}
+
+% footnotes::
+
+% numerical or symbol footnotes with hyperlinks and backlinks
+\providecommand*{\DUfootnotemark}[3]{%
+  \raisebox{1em}{\hypertarget{#1}{}}%
+  \hyperlink{#2}{\textsuperscript{#3}}%
+}
+\providecommand{\DUfootnotetext}[4]{%
+  \begingroup%
+  \renewcommand{\thefootnote}{%
+    \protect\raisebox{1em}{\protect\hypertarget{#1}{}}%
+    \protect\hyperlink{#2}{#3}}%
+  \footnotetext{#4}%
+  \endgroup%
+}
+
+% inline::
+
+% custom inline roles: \DUrole{#1}{#2} tries \DUrole#1{#2}
+\providecommand*{\DUrole}[2]{%
+  \ifcsname DUrole#1\endcsname%
+    \csname DUrole#1\endcsname{#2}%
+  \else%
+    #2%
+  \fi%
+}
+
+% legend::
+
+% legend environment (in figures and formal tables)
+\ifthenelse{\isundefined{\DUlegend}}{
+  \newenvironment{DUlegend}{\small}{}
+}{}
+
+% lineblock::
+
+% line block environment
+\DUprovidelength{\DUlineblockindent}{2.5em}
+\ifthenelse{\isundefined{\DUlineblock}}{
+  \newenvironment{DUlineblock}[1]{%
+    \list{}{\setlength{\partopsep}{\parskip}
+            \addtolength{\partopsep}{\baselineskip}
+            \setlength{\topsep}{0pt}
+            \setlength{\itemsep}{0.15\baselineskip}
+            \setlength{\parsep}{0pt}
+            \setlength{\leftmargin}{#1}}
+    \raggedright
+  }
+  {\endlist}
+}{}
+
+% optionlist::
+
+% list of command line options
+\providecommand*{\DUoptionlistlabel}[1]{\bfseries #1 \hfill}
+\DUprovidelength{\DUoptionlistindent}{3cm}
+\ifthenelse{\isundefined{\DUoptionlist}}{
+  \newenvironment{DUoptionlist}{%
+    \list{}{\setlength{\labelwidth}{\DUoptionlistindent}
+            \setlength{\rightmargin}{1cm}
+            \setlength{\leftmargin}{\rightmargin}
+            \addtolength{\leftmargin}{\labelwidth}
+            \addtolength{\leftmargin}{\labelsep}
+            \renewcommand{\makelabel}{\DUoptionlistlabel}}
+  }
+  {\endlist}
+}{}
+
+% rubric::
+
+% informal heading
+\providecommand*{\DUrubric}[1]{\subsubsection*{\emph{#1}}}
+
+% sidebar::
+
+% text outside the main text flow
+\providecommand{\DUsidebar}[1]{%
+  \begin{center}
+    \colorbox[gray]{0.80}{\parbox{0.9\linewidth}{#1}}
+  \end{center}
+}
+
+% title::
+
+% title for topics, admonitions, unsupported section levels, and sidebar
+\providecommand*{\DUtitle}[1]{%
+  \smallskip\noindent\textbf{#1}\smallskip}
+
+% subtitle::
+
+% subtitle (for sidebar)
+\providecommand*{\DUsubtitle}[1]{\par\emph{#1}\smallskip}
+
+% documentsubtitle::
+
+% subtitle (in document title)
+\providecommand*{\DUdocumentsubtitle}[1]{{\large #1}}
+
+% titlereference::
+
+% titlereference standard role
+\providecommand*{\DUroletitlereference}[1]{\textsl{#1}}
+
+% transition::
+
+% transition (break / fancybreak / anonymous section)
+\providecommand*{\DUtransition}{%
+  \hspace*{\fill}\hrulefill\hspace*{\fill}
+  \vskip 0.5\baselineskip
+}

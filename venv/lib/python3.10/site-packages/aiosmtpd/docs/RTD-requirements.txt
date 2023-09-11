@@ -1,0 +1,14 @@
+### Sphinx deps
+pickle5 ; python_version < '3.8'
+# Sync the ver limit below with conf.py
+sphinx>=3.2
+sphinx-autofixture
+sphinx_rtd_theme
+
+### Required by Sphinx.autodoc
+pytest>=6.0
+pytest-mock
+
+### aiosmtpd deps
+atpublic
+attrs

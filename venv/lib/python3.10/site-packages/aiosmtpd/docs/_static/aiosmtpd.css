@@ -1,0 +1,72 @@
+.boldital {
+    font-weight: bold;
+    font-style: italic;
+}
+
+.parthead {
+    font-weight: bold;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    padding-right: 10em;
+    margin-top: 1em;
+}
+
+div.body h3 {
+    margin-left: -5px;
+    font-size: 125%;
+}
+
+div.body h4 {
+    margin-left: 0;
+    font-weight: bold;
+    background-color: transparent !important;
+    border-bottom-style: none !important;
+}
+
+.pre, pre, code {
+    font-family: "Fira Code",Menlo,Consolas,"Ubuntu Mono",Inconsolata,"Bitstream Vera Sans Mono","lucida console","Courier New",monospace;
+    font-size: 100%;
+}
+
+div.highlight pre {
+    font-size: 90%;
+}
+
+/*
+code.descname {
+    font-size: 100% !important;
+}
+*/
+
+dl.class > dt {
+    font-size: 100% !important;
+}
+
+dl.attribute > dt {
+    font-size: 100% !important;
+}
+
+dl.field-list {
+    margin-bottom: 0.25em !important;
+}
+
+dl.field-list ul.simple {
+    margin-bottom: 0.25em !important;
+}
+
+.sig-paren {
+    font-size: 100% !important;
+}
+
+div#news-for-aiosmtpd h3 {
+    background-color: transparent !important;
+    border-bottom-style: none !important;
+}
+
+em.sig-param > span.default_value, em.sig-param > span.o {
+    color: rgb(128, 128, 128);
+}
+
+a {
+    text-decoration: underline dotted !important;
+}

@@ -1,0 +1,32 @@
+#mesondefine NPY_HAVE_ENDIAN_H
+
+#mesondefine NPY_SIZEOF_SHORT
+#mesondefine NPY_SIZEOF_INT
+#mesondefine NPY_SIZEOF_LONG
+#mesondefine NPY_SIZEOF_FLOAT
+#mesondefine NPY_SIZEOF_COMPLEX_FLOAT
+#mesondefine NPY_SIZEOF_DOUBLE
+#mesondefine NPY_SIZEOF_COMPLEX_DOUBLE
+#mesondefine NPY_SIZEOF_LONGDOUBLE
+#mesondefine NPY_SIZEOF_COMPLEX_LONGDOUBLE
+#mesondefine NPY_SIZEOF_PY_INTPTR_T
+#mesondefine NPY_SIZEOF_OFF_T
+#mesondefine NPY_SIZEOF_PY_LONG_LONG
+#mesondefine NPY_SIZEOF_LONGLONG
+
+#mesondefine NPY_USE_C99_COMPLEX
+#mesondefine NPY_HAVE_COMPLEX_DOUBLE
+#mesondefine NPY_HAVE_COMPLEX_FLOAT
+#mesondefine NPY_HAVE_COMPLEX_LONG_DOUBLE
+#mesondefine NPY_USE_C99_FORMATS
+
+#mesondefine NPY_NO_SIGNAL
+#mesondefine NPY_NO_SMP
+
+#mesondefine NPY_VISIBILITY_HIDDEN
+#mesondefine NPY_ABI_VERSION
+#mesondefine NPY_API_VERSION
+
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS 1
+#endif
