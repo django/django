@@ -61,8 +61,6 @@ The ``trigram_word_similar`` lookup can be used on
 ``trigram_strict_word_similar``
 -------------------------------
 
-.. versionadded:: 4.2
-
 Similar to :lookup:`trigram_word_similar`, except that it forces extent
 boundaries to match word boundaries.
 

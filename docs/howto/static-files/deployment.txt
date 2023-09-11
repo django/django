@@ -106,10 +106,6 @@ provide storage backends for many common file storage APIs. A good starting
 point is the `overview at djangopackages.org
 <https://djangopackages.org/grids/g/storage-backends/>`_.
 
-.. versionchanged:: 4.2
-
-    The :setting:`STORAGES` setting was added.
-
 Learn more
 ==========
 

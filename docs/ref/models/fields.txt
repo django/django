@@ -392,8 +392,6 @@ scenes.
 ``db_comment``
 --------------
 
-.. versionadded:: 4.2
-
 .. attribute:: Field.db_comment
 
 The comment on the database column to use for this field. It is useful for
@@ -739,10 +737,6 @@ The default form widget for this field is a :class:`~django.forms.TextInput`.
         database backends, you should be aware that there are restrictions on
         ``max_length`` for some backends. Refer to the :doc:`database backend
         notes </ref/databases>` for details.
-
-    .. versionchanged:: 4.2
-
-        Support for unlimited ``VARCHAR`` columns was added on PostgreSQL.
 
 .. attribute:: CharField.db_collation
 
@@ -2468,11 +2462,6 @@ Registering and fetching lookups
 ``Field`` implements the :ref:`lookup registration API <lookup-registration-api>`.
 The API can be used to customize which lookups are available for a field class
 and its instances, and how lookups are fetched from a field.
-
-.. versionchanged:: 4.2
-
-    Support for registering lookups on :class:`~django.db.models.Field`
-    instances was added.
 
 .. _model-field-attributes:
 

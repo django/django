@@ -1067,8 +1067,6 @@ perform a similar check at that level.
 ``DATA_UPLOAD_MAX_NUMBER_FILES``
 --------------------------------
 
-.. versionadded:: 3.2.18
-
 Default: ``100``
 
 The maximum number of files that may be received via POST in a
@@ -2596,8 +2594,6 @@ See also the :doc:`/ref/checks` documentation.
 
 ``STORAGES``
 ------------
-
-.. versionadded:: 4.2
 
 Default::
 

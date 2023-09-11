@@ -2353,11 +2353,6 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
-.. versionchanged:: 4.2
-
-    In older versions, ``update_or_create()`` didn't specify ``update_fields``
-    when calling :meth:`Model.save() <django.db.models.Model.save>`.
-
 .. versionchanged:: 5.0
 
     The ``create_defaults`` argument was added.

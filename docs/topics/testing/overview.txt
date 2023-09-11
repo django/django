@@ -381,8 +381,6 @@ time to run tests.
 Avoiding disk access for media files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 4.2
-
 The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
 prevent disk access for media files. All data is kept in memory, then it gets
 discarded after tests run.

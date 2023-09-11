@@ -716,10 +716,6 @@ Utility functions
     backend's ``get_user()`` method, or if the session auth hash doesn't
     validate.
 
-    .. versionchanged:: 4.1.8
-
-        Fallback verification with :setting:`SECRET_KEY_FALLBACKS` was added.
-
     .. versionchanged:: 5.0
 
         ``aget_user()`` function was added.

@@ -82,11 +82,6 @@ For a class to be a lookup, it must follow the :ref:`Query Expression API
 <query-expression>`. :class:`~Lookup` and :class:`~Transform` naturally
 follow this API.
 
-.. versionchanged:: 4.2
-
-    Support for registering lookups on :class:`~django.db.models.Field`
-    instances was added.
-
 .. _query-expression:
 
 The Query Expression API
