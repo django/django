@@ -242,6 +242,7 @@ def log_response(
         message,
         *args,
         extra={
+            "response": response,
             "status_code": response.status_code,
             "request": request,
         },
