@@ -46,17 +46,22 @@ The ``File`` class
 
         The read/write mode for the file.
 
-    .. method:: open(mode=None)
+    .. method:: open(mode=None, *args, **kwargs)
 
         Open or reopen the file (which also does ``File.seek(0)``).
         The ``mode`` argument allows the same values
-        as Python's built-in :func:`python:open()`.
+        as Python's built-in :func:`python:open()`. ``*args`` and ``**kwargs``
+        are passed after ``mode`` to Python's built-in :func:`python:open`.
 
         When reopening a file, ``mode`` will override whatever mode the file
         was originally opened with; ``None`` means to reopen with the original
         mode.
 
         It can be used as a context manager, e.g. ``with file.open() as f:``.
+
+        .. versionchanged:: 5.0
+
+            Support for passing ``*args`` and ``**kwargs`` was added.
 
     .. method:: __iter__()
 

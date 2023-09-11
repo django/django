@@ -1215,6 +1215,71 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
     information on the difference between the two, see Python's documentation
     for the :mod:`decimal` module.
 
+``GeneratedField``
+------------------
+
+.. versionadded:: 5.0
+
+.. class:: GeneratedField(expression, db_persist=None, output_field=None, **kwargs)
+
+A field that is always computed based on other fields in the model. This field
+is managed and updated by the database itself. Uses the ``GENERATED ALWAYS``
+SQL syntax.
+
+There are two kinds of generated columns: stored and virtual. A stored
+generated column is computed when it is written (inserted or updated) and
+occupies storage as if it were a regular column. A virtual generated column
+occupies no storage and is computed when it is read. Thus, a virtual generated
+column is similar to a view and a stored generated column is similar to a
+materialized view.
+
+.. attribute:: GeneratedField.expression
+
+    An :class:`Expression` used by the database to automatically set the field
+    value each time the model is changed.
+
+    The expressions should be deterministic and only reference fields within
+    the model (in the same database table). Generated fields cannot reference
+    other generated fields. Database backends can impose further restrictions.
+
+.. attribute:: GeneratedField.db_persist
+
+    Determines if the database column should occupy storage as if it were a
+    real column. If ``False``, the column acts as a virtual column and does
+    not occupy database storage space.
+
+    PostgreSQL only supports persisted columns. Oracle only supports virtual
+    columns.
+
+.. attribute:: GeneratedField.output_field
+
+    An optional model field instance to define the field's data type. This can
+    be used to customize attributes like the field's collation. By default, the
+    output field is derived from ``expression``.
+
+.. admonition:: Refresh the data
+
+    Since the database always computed the value, the object must be reloaded
+    to access the new value after :meth:`~Model.save()`, for example, by using
+    :meth:`~Model.refresh_from_db()`.
+
+.. admonition:: Database limitations
+
+    There are many database-specific restrictions on generated fields that
+    Django doesn't validate and the database may raise an error e.g. PostgreSQL
+    requires functions and operators referenced in a generated columns to be
+    marked as ``IMMUTABLE`` .
+
+    You should always check that ``expression`` is supported on your database.
+    Check out `MariaDB`_, `MySQL`_, `Oracle`_, `PostgreSQL`_, or `SQLite`_
+    docs.
+
+.. _MariaDB: https://mariadb.com/kb/en/generated-columns/#expression-support
+.. _MySQL: https://dev.mysql.com/doc/refman/en/create-table-generated-columns.html
+.. _Oracle: https://docs.oracle.com/en/database/oracle/oracle-database/21/sqlrf/CREATE-TABLE.html#GUID-F9CE0CC3-13AE-4744-A43C-EAC7A71AAAB6__BABIIGBD
+.. _PostgreSQL: https://www.postgresql.org/docs/current/ddl-generated-columns.html
+.. _SQLite: https://www.sqlite.org/gencol.html#limitations
+
 ``GenericIPAddressField``
 -------------------------
 

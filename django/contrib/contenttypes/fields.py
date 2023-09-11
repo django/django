@@ -242,8 +242,8 @@ class GenericForeignKey(FieldCacheMixin):
             ct_match = (
                 ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
             )
-            pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
-            if ct_match and pk_match:
+            pk_match = ct_match and rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
+            if pk_match:
                 return rel_obj
             else:
                 rel_obj = None

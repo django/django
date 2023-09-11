@@ -135,7 +135,7 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             # Choose a default and insert it into the copy map
             if (
                 create_field.db_default is NOT_PROVIDED
-                and not create_field.many_to_many
+                and not (create_field.many_to_many or create_field.generated)
                 and create_field.concrete
             ):
                 mapping[create_field.column] = self.prepare_default(

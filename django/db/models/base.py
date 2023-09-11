@@ -508,7 +508,7 @@ class Model(AltersData, metaclass=ModelBase):
         for field in fields_iter:
             is_related_object = False
             # Virtual field
-            if field.attname not in kwargs and field.column is None:
+            if field.attname not in kwargs and field.column is None or field.generated:
                 continue
             if kwargs:
                 if isinstance(field.remote_field, ForeignObjectRel):
@@ -1050,10 +1050,11 @@ class Model(AltersData, metaclass=ModelBase):
                         ),
                     )["_order__max"]
                 )
-            fields = meta.local_concrete_fields
-            if not pk_set:
-                fields = [f for f in fields if f is not meta.auto_field]
-
+            fields = [
+                f
+                for f in meta.local_concrete_fields
+                if not f.generated and (pk_set or f is not meta.auto_field)
+            ]
             returning_fields = meta.db_returning_fields
             results = self._do_insert(
                 cls._base_manager, using, fields, returning_fields, raw
