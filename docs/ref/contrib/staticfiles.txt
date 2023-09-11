@@ -345,14 +345,7 @@ argument. For example::
     commented out. This :ticket:`may crash on the nonexistent paths <21080>`.
     You should check and eventually strip comments.
 
-.. versionchanged:: 4.2
-
-    Experimental optional support for finding paths to JavaScript modules in
-    ``import`` and ``export`` statements was added.
-
 .. attribute:: storage.ManifestStaticFilesStorage.manifest_hash
-
-.. versionadded:: 4.2
 
 This attribute provides a single hash that changes whenever a file in the
 manifest changes. This can be useful to communicate to SPAs that the assets on

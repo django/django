@@ -159,11 +159,6 @@ to, or in lieu of custom ``field.clean()`` methods.
         validation, so you'd need to add them to the ``allowlist`` as
         necessary.
 
-    .. versionchanged:: 3.2.20
-
-        In older versions, values longer than 320 characters could be
-        considered valid.
-
 ``URLValidator``
 ----------------
 
@@ -190,15 +185,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 
     .. attribute:: max_length
 
-        .. versionadded:: 3.2.20
-
         The maximum length of values that could be considered valid. Defaults
         to 2048 characters.
-
-    .. versionchanged:: 3.2.20
-
-        In older versions, values longer than 2048 characters could be
-        considered valid.
 
 ``validate_email``
 ------------------

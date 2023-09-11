@@ -272,7 +272,3 @@ use :data:`~django.core.files.storage.storages`::
 
     class MyModel(models.Model):
         upload = models.FileField(storage=select_storage)
-
-.. versionchanged:: 4.2
-
-    Support for ``storages`` was added.

@@ -158,10 +158,6 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. versionchanged:: 4.2
-
-        The ``headers`` parameter was added.
-
     .. method:: Client.get(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
@@ -233,10 +229,6 @@ Use the ``django.test.Client`` class to make requests.
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, **extra)
 
@@ -351,20 +343,12 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
         including the ``follow``, ``secure``, ``headers``, and ``extra``
         parameters, except it does not return a message body.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -377,10 +361,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
@@ -392,10 +372,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
@@ -403,10 +379,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -419,10 +391,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
@@ -434,10 +402,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -2040,10 +2004,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 4.2
-
-    The ``headers`` parameter was added.
 
 .. versionchanged:: 5.0
 

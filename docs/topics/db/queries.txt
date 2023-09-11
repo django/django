@@ -1085,11 +1085,6 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
 
-.. versionchanged:: 4.2
-
-    Support for expressing JSON ``null`` using ``Value(None, JSONField())`` was
-    added.
-
 .. deprecated:: 4.2
 
     Passing ``Value("null")`` to express JSON ``null`` is deprecated.
@@ -1161,8 +1156,6 @@ To query for missing keys, use the ``isnull`` lookup:
 
 ``KT()`` expressions
 ~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.2
 
 .. module:: django.db.models.fields.json
 

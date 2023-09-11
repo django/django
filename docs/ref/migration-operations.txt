@@ -91,8 +91,6 @@ option on the ``Meta`` subclass).
 ``AlterModelTableComment``
 --------------------------
 
-.. versionadded:: 4.2
-
 .. class:: AlterModelTableComment(name, table_comment)
 
 Changes the model's table comment (the

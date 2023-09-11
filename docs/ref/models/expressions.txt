@@ -282,8 +282,6 @@ is null) after companies that have been contacted::
 Using ``F()`` with logical operations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. versionadded:: 4.2
-
 ``F()`` expressions that output ``BooleanField`` can be logically negated with
 the inversion operator ``~F()``. For example, to swap the activation status of
 companies::
@@ -876,10 +874,6 @@ from groups to be included:
     NotImplementedError: Heterogeneous disjunctive predicates against window functions
     are not implemented when performing conditional aggregation.
 
-.. versionchanged:: 4.2
-
-    Support for filtering against window functions was added.
-
 Among Django's built-in database backends, MySQL, PostgreSQL, and Oracle
 support window expressions. Support for different window expression features
 varies among the different databases. For example, the options in
@@ -1099,10 +1093,6 @@ calling the appropriate methods on the wrapped expression.
         this expression. ``get_group_by_cols()`` should be called on any
         nested expressions. ``F()`` objects, in particular, hold a reference
         to a column.
-
-        .. versionchanged:: 4.2
-
-            The ``alias=None`` keyword argument was removed.
 
     .. method:: asc(nulls_first=None, nulls_last=None)
 
