@@ -26,7 +26,7 @@ rendered output of whatever was inside the loop, recursively.
 The Template class is a convenient wrapper that takes care of template
 compilation and rendering.
 
-Usage:
+Usage :
 
 The only thing you should ever use directly in this file is the Template class.
 Create a compiled template object with a template_string, then call render()
