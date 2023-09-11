@@ -676,10 +676,6 @@ the field declaratively and setting its ``validators`` parameter::
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
 
-.. versionchanged:: 4.2
-
-    The ``Meta.formfield_callback`` attribute was added.
-
 Enabling localization of fields
 -------------------------------
 

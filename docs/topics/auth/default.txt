@@ -1723,8 +1723,6 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
 
 .. class:: BaseUserCreationForm
 
-    .. versionadded:: 4.2
-
     A :class:`~django.forms.ModelForm` for creating a new user. This is the
     recommended base class if you need to customize the user creation form.
 
@@ -1740,13 +1738,6 @@ provides several built-in forms located in :mod:`django.contrib.auth.forms`:
     Inherits from :class:`BaseUserCreationForm`. To help prevent confusion with
     similar usernames, the form doesn't allow usernames that differ only in
     case.
-
-    .. versionchanged:: 4.2
-
-        In older versions, :class:`UserCreationForm` didn't save many-to-many
-        form fields for a custom user model.
-
-        In older versions, usernames that differ only in case are allowed.
 
 .. currentmodule:: django.contrib.auth
 

@@ -1246,10 +1246,6 @@ with the following notable differences:
 The :class:`HttpResponseBase` base class is common between
 :class:`HttpResponse` and :class:`StreamingHttpResponse`.
 
-.. versionchanged:: 4.2
-
-    Support for asynchronous iteration was added.
-
 Attributes
 ----------
 
@@ -1279,8 +1275,6 @@ Attributes
     This is always ``True``.
 
 .. attribute:: StreamingHttpResponse.is_async
-
-    .. versionadded:: 4.2
 
     Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
     is an asynchronous iterator or not.

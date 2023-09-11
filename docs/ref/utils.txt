@@ -685,10 +685,6 @@ escaping HTML.
     serialize the data. See :ref:`JSON serialization
     <serialization-formats-json>` for more details about this serializer.
 
-    .. versionchanged:: 4.2
-
-        The ``encoder`` argument was added.
-
 .. function:: strip_tags(value)
 
     Tries to remove anything that looks like an HTML tag from the string, that
@@ -741,8 +737,6 @@ escaping HTML.
     Outputs a string in the format ``Wdy, DD Mon YYYY HH:MM:SS GMT``.
 
 .. function:: content_disposition_header(as_attachment, filename)
-
-    .. versionadded:: 4.2
 
     Constructs a ``Content-Disposition`` HTTP header value from the given
     ``filename`` as specified by :rfc:`6266`. Returns ``None`` if

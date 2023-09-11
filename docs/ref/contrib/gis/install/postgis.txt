@@ -22,10 +22,6 @@ platform-specific instructions if you are on :ref:`macos` or :ref:`windows`.
 .. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
 .. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
 
-.. versionchanged:: 4.2
-
-    Support for ``psycopg`` 3.1.8+ was added.
-
 Post-installation
 =================
 

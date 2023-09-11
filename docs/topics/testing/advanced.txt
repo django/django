@@ -32,10 +32,6 @@ restricted subset of the test client API:
   attributes must be supplied by the test itself if required
   for the view to function properly.
 
-.. versionchanged:: 4.2
-
-    The ``headers`` parameter was added.
-
 Example
 -------
 
@@ -88,10 +84,6 @@ difference being that it returns ``ASGIRequest`` instances rather than
 
 Arbitrary keyword arguments in ``defaults`` are added directly into the ASGI
 scope.
-
-.. versionchanged:: 4.2
-
-    The ``headers`` parameter was added.
 
 Testing class-based views
 =========================

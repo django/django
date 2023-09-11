@@ -196,11 +196,6 @@ the SQL operator ``&&``. For example:
     >>> Post.objects.filter(tags__overlap=Post.objects.values_list("tags"))
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
-.. versionchanged:: 4.2
-
-    Support for ``QuerySet.values()`` and ``values_list()`` as a right-hand
-    side was added.
-
 .. fieldlookup:: arrayfield.len
 
 ``len``

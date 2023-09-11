@@ -94,8 +94,6 @@ Django quotes column and table names behind the scenes.
 ``db_table_comment``
 --------------------
 
-.. versionadded:: 4.2
-
 .. attribute:: Options.db_table_comment
 
 The comment on the database table to use for this model. It is useful for
