@@ -271,8 +271,9 @@ class Settings:
                 raise ImproperlyConfigured(
                     "DEFAULT_FILE_STORAGE/STORAGES are mutually exclusive."
                 )
-            self.STORAGES[DEFAULT_STORAGE_ALIAS] = {
-                "BACKEND": self.DEFAULT_FILE_STORAGE
+            self.STORAGES = {
+                **self.STORAGES,
+                DEFAULT_STORAGE_ALIAS: {"BACKEND": self.DEFAULT_FILE_STORAGE},
             }
             warnings.warn(DEFAULT_FILE_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
 
@@ -281,8 +282,9 @@ class Settings:
                 raise ImproperlyConfigured(
                     "STATICFILES_STORAGE/STORAGES are mutually exclusive."
                 )
-            self.STORAGES[STATICFILES_STORAGE_ALIAS] = {
-                "BACKEND": self.STATICFILES_STORAGE
+            self.STORAGES = {
+                **self.STORAGES,
+                STATICFILES_STORAGE_ALIAS: {"BACKEND": self.STATICFILES_STORAGE},
             }
             warnings.warn(STATICFILES_STORAGE_DEPRECATED_MSG, RemovedInDjango51Warning)
         # RemovedInDjango51Warning.

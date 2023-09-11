@@ -32,6 +32,7 @@ class StaticfilesStorageDeprecationTests(TestCase):
                 pass
 
     def test_settings_init(self):
+        old_staticfiles_storage = settings.STORAGES.get(STATICFILES_STORAGE_ALIAS)
         settings_module = ModuleType("fake_settings_module")
         settings_module.USE_TZ = True
         settings_module.STATICFILES_STORAGE = (
@@ -48,6 +49,11 @@ class StaticfilesStorageDeprecationTests(TestCase):
                         "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
                     ),
                 },
+            )
+            # settings.STORAGES is not mutated.
+            self.assertEqual(
+                settings.STORAGES.get(STATICFILES_STORAGE_ALIAS),
+                old_staticfiles_storage,
             )
         finally:
             del sys.modules["fake_settings_module"]
@@ -161,6 +167,7 @@ class DefaultStorageDeprecationTests(TestCase):
                 pass
 
     def test_settings_init(self):
+        old_default_storage = settings.STORAGES.get(DEFAULT_STORAGE_ALIAS)
         settings_module = ModuleType("fake_settings_module")
         settings_module.USE_TZ = True
         settings_module.DEFAULT_FILE_STORAGE = "django.core.files.storage.Storage"
@@ -171,6 +178,11 @@ class DefaultStorageDeprecationTests(TestCase):
             self.assertEqual(
                 fake_settings.STORAGES[DEFAULT_STORAGE_ALIAS],
                 {"BACKEND": "django.core.files.storage.Storage"},
+            )
+            # settings.STORAGES is not mutated.
+            self.assertEqual(
+                settings.STORAGES.get(DEFAULT_STORAGE_ALIAS),
+                old_default_storage,
             )
         finally:
             del sys.modules["fake_settings_module"]
