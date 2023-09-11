@@ -799,19 +799,6 @@ utility methods:
         Retrieves a user instance using the contents of the field
         nominated by ``USERNAME_FIELD``.
 
-    .. method:: models.BaseUserManager.make_random_password(length=10, allowed_chars='abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789')
-
-        .. deprecated:: 4.2
-
-        Returns a random password with the given length and given string of
-        allowed characters. Note that the default value of ``allowed_chars``
-        doesn't contain letters that can cause user confusion, including:
-
-        * ``i``, ``l``, ``I``, and ``1`` (lowercase letter i, lowercase
-          letter L, uppercase letter i, and the number one)
-        * ``o``, ``O``, and ``0`` (lowercase letter o, uppercase letter o,
-          and zero)
-
 Extending Django's default ``User``
 -----------------------------------
 

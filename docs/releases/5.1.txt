@@ -251,4 +251,4 @@ in Django 5.1.
 See :ref:`deprecated-features-4.2` for details on these changes, including how
 to remove usage of these features.
 
-* ...
+* The ``BaseUserManager.make_random_password()`` method is removed.
