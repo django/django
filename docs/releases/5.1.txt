@@ -256,3 +256,7 @@ to remove usage of these features.
 * The model's ``Meta.index_together`` option is removed.
 
 * The ``length_is`` template filter is removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are removed.

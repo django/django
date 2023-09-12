@@ -18,9 +18,8 @@ from django.contrib.auth.hashers import (
     is_password_usable,
     make_password,
 )
-from django.test import SimpleTestCase, ignore_warnings
+from django.test import SimpleTestCase
 from django.test.utils import override_settings
-from django.utils.deprecation import RemovedInDjango51Warning
 
 try:
     import bcrypt
@@ -103,40 +102,6 @@ class TestUtilsHashPass(SimpleTestCase):
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
 
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.SHA1PasswordHasher"]
-    )
-    def test_sha1(self):
-        encoded = make_password("lètmein", "seasalt", "sha1")
-        self.assertEqual(
-            encoded, "sha1$seasalt$cff36ea83f5706ce9aa7454e63e431fc726b2dc8"
-        )
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password("lètmein", encoded))
-        self.assertFalse(check_password("lètmeinz", encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "sha1")
-        # Blank passwords
-        blank_encoded = make_password("", "seasalt", "sha1")
-        self.assertTrue(blank_encoded.startswith("sha1$"))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password("", blank_encoded))
-        self.assertFalse(check_password(" ", blank_encoded))
-        # Salt entropy check.
-        hasher = get_hasher("sha1")
-        encoded_weak_salt = make_password("lètmein", "iodizedsalt", "sha1")
-        encoded_strong_salt = make_password("lètmein", hasher.salt(), "sha1")
-        self.assertIs(hasher.must_update(encoded_weak_salt), True)
-        self.assertIs(hasher.must_update(encoded_strong_salt), False)
-
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.SHA1PasswordHasher"]
-    )
-    def test_sha1_deprecation_warning(self):
-        msg = "django.contrib.auth.hashers.SHA1PasswordHasher is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            get_hasher("sha1")
-
     @override_settings(
         PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"]
     )
@@ -159,85 +124,6 @@ class TestUtilsHashPass(SimpleTestCase):
         encoded_strong_salt = make_password("lètmein", hasher.salt(), "md5")
         self.assertIs(hasher.must_update(encoded_weak_salt), True)
         self.assertIs(hasher.must_update(encoded_strong_salt), False)
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
-    )
-    def test_unsalted_md5(self):
-        encoded = make_password("lètmein", "", "unsalted_md5")
-        self.assertEqual(encoded, "88a434c88cca4e900f7874cd98123f43")
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password("lètmein", encoded))
-        self.assertFalse(check_password("lètmeinz", encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_md5")
-        # Alternate unsalted syntax
-        alt_encoded = "md5$$%s" % encoded
-        self.assertTrue(is_password_usable(alt_encoded))
-        self.assertTrue(check_password("lètmein", alt_encoded))
-        self.assertFalse(check_password("lètmeinz", alt_encoded))
-        # Blank passwords
-        blank_encoded = make_password("", "", "unsalted_md5")
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password("", blank_encoded))
-        self.assertFalse(check_password(" ", blank_encoded))
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
-    )
-    def test_unsalted_md5_encode_invalid_salt(self):
-        hasher = get_hasher("unsalted_md5")
-        msg = "salt must be empty."
-        with self.assertRaisesMessage(ValueError, msg):
-            hasher.encode("password", salt="salt")
-
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedMD5PasswordHasher"]
-    )
-    def test_unsalted_md5_deprecation_warning(self):
-        msg = "django.contrib.auth.hashers.UnsaltedMD5PasswordHasher is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            get_hasher("unsalted_md5")
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
-    )
-    def test_unsalted_sha1(self):
-        encoded = make_password("lètmein", "", "unsalted_sha1")
-        self.assertEqual(encoded, "sha1$$6d138ca3ae545631b3abd71a4f076ce759c5700b")
-        self.assertTrue(is_password_usable(encoded))
-        self.assertTrue(check_password("lètmein", encoded))
-        self.assertFalse(check_password("lètmeinz", encoded))
-        self.assertEqual(identify_hasher(encoded).algorithm, "unsalted_sha1")
-        # Raw SHA1 isn't acceptable
-        alt_encoded = encoded[6:]
-        self.assertFalse(check_password("lètmein", alt_encoded))
-        # Blank passwords
-        blank_encoded = make_password("", "", "unsalted_sha1")
-        self.assertTrue(blank_encoded.startswith("sha1$"))
-        self.assertTrue(is_password_usable(blank_encoded))
-        self.assertTrue(check_password("", blank_encoded))
-        self.assertFalse(check_password(" ", blank_encoded))
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
-    )
-    def test_unsalted_sha1_encode_invalid_salt(self):
-        hasher = get_hasher("unsalted_sha1")
-        msg = "salt must be empty."
-        with self.assertRaisesMessage(ValueError, msg):
-            hasher.encode("password", salt="salt")
-
-    @override_settings(
-        PASSWORD_HASHERS=["django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher"]
-    )
-    def test_unsalted_sha1_deprecation_warning(self):
-        msg = "django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            get_hasher("unsalted_sha1")
 
     @skipUnless(bcrypt, "bcrypt not installed")
     def test_bcrypt_sha256(self):
