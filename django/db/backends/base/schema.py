@@ -501,8 +501,7 @@ class BaseDatabaseSchemaEditor:
                                 model, field, field_type, field.db_comment
                             )
                         )
-        # Add any field index and index_together's (deferred as SQLite
-        # _remake_table needs it).
+        # Add any field index (deferred as SQLite _remake_table needs it).
         self.deferred_sql.extend(self._model_indexes_sql(model))
 
         # Make M2M tables
@@ -1585,19 +1584,14 @@ class BaseDatabaseSchemaEditor:
 
     def _model_indexes_sql(self, model):
         """
-        Return a list of all index SQL statements (field indexes,
-        index_together, Meta.indexes) for the specified model.
+        Return a list of all index SQL statements (field indexes, Meta.indexes)
+        for the specified model.
         """
         if not model._meta.managed or model._meta.proxy or model._meta.swapped:
             return []
         output = []
         for field in model._meta.local_fields:
             output.extend(self._field_indexes_sql(model, field))
-
-        # RemovedInDjango51Warning.
-        for field_names in model._meta.index_together:
-            fields = [model._meta.get_field(field) for field in field_names]
-            output.append(self._create_index_sql(model, fields=fields, suffix="_idx"))
 
         for index in model._meta.indexes:
             if (

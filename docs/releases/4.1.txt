@@ -317,7 +317,7 @@ Migrations
 * The new :class:`~django.db.migrations.operations.RenameIndex` operation
   allows renaming indexes defined in the
   :attr:`Meta.indexes <django.db.models.Options.indexes>` or
-  :attr:`~django.db.models.Options.index_together` options.
+  ``index_together`` options.
 
 * The migrations autodetector now generates
   :class:`~django.db.migrations.operations.RenameIndex` operations instead of
@@ -327,7 +327,7 @@ Migrations
 * The migrations autodetector now generates
   :class:`~django.db.migrations.operations.RenameIndex` operations instead of
   ``AlterIndexTogether`` and ``AddIndex``, when moving indexes defined in the
-  :attr:`Meta.index_together <django.db.models.Options.index_together>` to the
+  ``Meta.index_together`` to the
   :attr:`Meta.indexes <django.db.models.Options.indexes>`.
 
 Models
