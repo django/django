@@ -252,3 +252,5 @@ See :ref:`deprecated-features-4.2` for details on these changes, including how
 to remove usage of these features.
 
 * The ``BaseUserManager.make_random_password()`` method is removed.
+
+* The model's ``Meta.index_together`` option is removed.

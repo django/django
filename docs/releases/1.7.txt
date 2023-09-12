@@ -778,8 +778,8 @@ Models
   an error (before that, it would either result in a database error or
   incorrect data).
 
-* You can use a single list for :attr:`~django.db.models.Options.index_together`
-  (rather than a list of lists) when specifying a single set of fields.
+* You can use a single list for ``index_together`` (rather than a list of
+  lists) when specifying a single set of fields.
 
 * Custom intermediate models having more than one foreign key to any of the
   models participating in a many-to-many relationship are now permitted,

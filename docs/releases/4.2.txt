@@ -477,9 +477,8 @@ Features deprecated in 4.2
 ``index_together`` option is deprecated in favor of ``indexes``
 ---------------------------------------------------------------
 
-The :attr:`Meta.index_together <django.db.models.Options.index_together>`
-option is deprecated in favor of the :attr:`~django.db.models.Options.indexes`
-option.
+The ``Meta.index_together`` option is deprecated in favor of the
+:attr:`~django.db.models.Options.indexes` option.
 
 Migrating existing ``index_together`` should be handled as a migration. For
 example::

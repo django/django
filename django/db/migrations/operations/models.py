@@ -341,33 +341,6 @@ class CreateModel(ModelOperation):
                         managers=self.managers,
                     ),
                 ]
-            elif isinstance(operation, RenameIndex) and operation.old_fields:
-                options_index_together = {
-                    fields
-                    for fields in self.options.get("index_together", [])
-                    if fields != operation.old_fields
-                }
-                if options_index_together:
-                    self.options["index_together"] = options_index_together
-                else:
-                    self.options.pop("index_together", None)
-                return [
-                    CreateModel(
-                        self.name,
-                        fields=self.fields,
-                        options={
-                            **self.options,
-                            "indexes": [
-                                *self.options.get("indexes", []),
-                                models.Index(
-                                    fields=operation.old_fields, name=operation.new_name
-                                ),
-                            ],
-                        },
-                        bases=self.bases,
-                        managers=self.managers,
-                    ),
-                ]
         return super().reduce(operation, app_label)
 
 

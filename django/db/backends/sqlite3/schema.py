@@ -180,14 +180,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             for unique in model._meta.unique_together
         ]
 
-        # RemovedInDjango51Warning.
-        # Work out the new value for index_together, taking renames into
-        # account
-        index_together = [
-            [rename_mapping.get(n, n) for n in index]
-            for index in model._meta.index_together
-        ]
-
         indexes = model._meta.indexes
         if delete_field:
             indexes = [
@@ -210,7 +202,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             "app_label": model._meta.app_label,
             "db_table": model._meta.db_table,
             "unique_together": unique_together,
-            "index_together": index_together,  # RemovedInDjango51Warning.
             "indexes": indexes,
             "constraints": constraints,
             "apps": apps,
@@ -226,7 +217,6 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             "app_label": model._meta.app_label,
             "db_table": "new__%s" % strip_quotes(model._meta.db_table),
             "unique_together": unique_together,
-            "index_together": index_together,  # RemovedInDjango51Warning.
             "indexes": indexes,
             "constraints": constraints,
             "apps": apps,
