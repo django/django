@@ -114,9 +114,8 @@ the new value.
 
 .. method:: BaseDatabaseSchemaEditor.alter_index_together(model, old_index_together, new_index_together)
 
-Changes a model's :attr:`~django.db.models.Options.index_together` value; this
-will add or remove indexes from the model's table until they match the new
-value.
+Changes a model's ``index_together`` value; this will add or remove indexes
+from the model's table until they match the new value.
 
 ``alter_db_table()``
 --------------------

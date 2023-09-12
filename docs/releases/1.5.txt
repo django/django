@@ -329,8 +329,7 @@ Django 1.5 also includes several smaller improvements worth noting:
   session data in a non-default cache.
 
 * Multi-column indexes can now be created on models. Read the
-  :attr:`~django.db.models.Options.index_together` documentation for more
-  information.
+  ``index_together`` documentation for more information.
 
 * During Django's logging configuration verbose Deprecation warnings are
   enabled and warnings are captured into the logging system. Logged warnings

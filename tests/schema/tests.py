@@ -54,14 +54,8 @@ from django.db.models.fields.json import KeyTextTransform
 from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
 from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
-from django.test import (
-    TransactionTestCase,
-    ignore_warnings,
-    skipIfDBFeature,
-    skipUnlessDBFeature,
-)
+from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext, isolate_apps, register_lookup
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .fields import CustomManyToManyField, InheritedManyToManyField, MediumBlobField
 from .models import (
@@ -3351,7 +3345,6 @@ class SchemaTests(TransactionTestCase):
             self.assertIsNone(editor.add_constraint(Author, constraint))
             self.assertIsNone(editor.remove_constraint(Author, constraint))
 
-    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_index_together(self):
         """
         Tests removing and adding index_together constraints on a model.
@@ -3394,128 +3387,6 @@ class SchemaTests(TransactionTestCase):
             ),
             False,
         )
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_index_together_with_fk(self):
-        """
-        Tests removing and adding index_together constraints that include
-        a foreign key.
-        """
-        # Create the table
-        with connection.schema_editor() as editor:
-            editor.create_model(Author)
-            editor.create_model(Book)
-        # Ensure the fields are unique to begin with
-        self.assertEqual(Book._meta.index_together, ())
-        # Add the unique_together constraint
-        with connection.schema_editor() as editor:
-            editor.alter_index_together(Book, [], [["author", "title"]])
-        # Alter it back
-        with connection.schema_editor() as editor:
-            editor.alter_index_together(Book, [["author", "title"]], [])
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @isolate_apps("schema")
-    def test_create_index_together(self):
-        """
-        Tests creating models with index_together already defined
-        """
-
-        class TagIndexed(Model):
-            title = CharField(max_length=255)
-            slug = SlugField(unique=True)
-
-            class Meta:
-                app_label = "schema"
-                index_together = [["slug", "title"]]
-
-        # Create the table
-        with connection.schema_editor() as editor:
-            editor.create_model(TagIndexed)
-        self.isolated_local_models = [TagIndexed]
-        # Ensure there is an index
-        self.assertIs(
-            any(
-                c["index"]
-                for c in self.get_constraints("schema_tagindexed").values()
-                if c["columns"] == ["slug", "title"]
-            ),
-            True,
-        )
-
-    @skipUnlessDBFeature("allows_multiple_constraints_on_same_fields")
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @isolate_apps("schema")
-    def test_remove_index_together_does_not_remove_meta_indexes(self):
-        class AuthorWithIndexedNameAndBirthday(Model):
-            name = CharField(max_length=255)
-            birthday = DateField()
-
-            class Meta:
-                app_label = "schema"
-                index_together = [["name", "birthday"]]
-
-        with connection.schema_editor() as editor:
-            editor.create_model(AuthorWithIndexedNameAndBirthday)
-        self.isolated_local_models = [AuthorWithIndexedNameAndBirthday]
-        # Add the custom index
-        index = Index(fields=["name", "birthday"], name="author_name_birthday_idx")
-        custom_index_name = index.name
-        AuthorWithIndexedNameAndBirthday._meta.indexes = [index]
-        with connection.schema_editor() as editor:
-            editor.add_index(AuthorWithIndexedNameAndBirthday, index)
-        # Ensure the indexes exist
-        constraints = self.get_constraints(
-            AuthorWithIndexedNameAndBirthday._meta.db_table
-        )
-        self.assertIn(custom_index_name, constraints)
-        other_constraints = [
-            name
-            for name, details in constraints.items()
-            if details["columns"] == ["name", "birthday"]
-            and details["index"]
-            and name != custom_index_name
-        ]
-        self.assertEqual(len(other_constraints), 1)
-        # Remove index together
-        index_together = AuthorWithIndexedNameAndBirthday._meta.index_together
-        with connection.schema_editor() as editor:
-            editor.alter_index_together(
-                AuthorWithIndexedNameAndBirthday, index_together, []
-            )
-        constraints = self.get_constraints(
-            AuthorWithIndexedNameAndBirthday._meta.db_table
-        )
-        self.assertIn(custom_index_name, constraints)
-        other_constraints = [
-            name
-            for name, details in constraints.items()
-            if details["columns"] == ["name", "birthday"]
-            and details["index"]
-            and name != custom_index_name
-        ]
-        self.assertEqual(len(other_constraints), 0)
-        # Re-add index together
-        with connection.schema_editor() as editor:
-            editor.alter_index_together(
-                AuthorWithIndexedNameAndBirthday, [], index_together
-            )
-        constraints = self.get_constraints(
-            AuthorWithIndexedNameAndBirthday._meta.db_table
-        )
-        self.assertIn(custom_index_name, constraints)
-        other_constraints = [
-            name
-            for name, details in constraints.items()
-            if details["columns"] == ["name", "birthday"]
-            and details["index"]
-            and name != custom_index_name
-        ]
-        self.assertEqual(len(other_constraints), 1)
-        # Drop the index
-        with connection.schema_editor() as editor:
-            AuthorWithIndexedNameAndBirthday._meta.indexes = []
-            editor.remove_index(AuthorWithIndexedNameAndBirthday, index)
 
     @isolate_apps("schema")
     def test_db_table(self):

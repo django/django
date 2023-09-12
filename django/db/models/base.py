@@ -1595,7 +1595,6 @@ class Model(AltersData, metaclass=ModelBase):
             if not clash_errors:
                 errors.extend(cls._check_column_name_clashes())
             errors += [
-                *cls._check_index_together(),
                 *cls._check_unique_together(),
                 *cls._check_indexes(databases),
                 *cls._check_ordering(),
@@ -1927,36 +1926,6 @@ class Model(AltersData, metaclass=ModelBase):
                 )
             )
         return errors
-
-    # RemovedInDjango51Warning.
-    @classmethod
-    def _check_index_together(cls):
-        """Check the value of "index_together" option."""
-        if not isinstance(cls._meta.index_together, (tuple, list)):
-            return [
-                checks.Error(
-                    "'index_together' must be a list or tuple.",
-                    obj=cls,
-                    id="models.E008",
-                )
-            ]
-
-        elif any(
-            not isinstance(fields, (tuple, list)) for fields in cls._meta.index_together
-        ):
-            return [
-                checks.Error(
-                    "All 'index_together' elements must be lists or tuples.",
-                    obj=cls,
-                    id="models.E009",
-                )
-            ]
-
-        else:
-            errors = []
-            for fields in cls._meta.index_together:
-                errors.extend(cls._check_local_fields(fields, "index_together"))
-            return errors
 
     @classmethod
     def _check_unique_together(cls):

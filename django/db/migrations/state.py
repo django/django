@@ -310,14 +310,13 @@ class ProjectState:
                         for from_field_name in from_fields
                     ]
                 )
-        # Fix index/unique_together to refer to the new field.
+        # Fix unique_together to refer to the new field.
         options = model_state.options
-        for option in ("index_together", "unique_together"):
-            if option in options:
-                options[option] = [
-                    [new_name if n == old_name else n for n in together]
-                    for together in options[option]
-                ]
+        if "unique_together" in options:
+            options["unique_together"] = [
+                [new_name if n == old_name else n for n in together]
+                for together in options["unique_together"]
+            ]
         # Fix to_fields to refer to the new field.
         delay = True
         references = get_references(self, model_key, (old_name, found))

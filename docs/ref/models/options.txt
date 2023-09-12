@@ -451,29 +451,6 @@ not be looking at your Django code. For example::
     The ``ValidationError`` raised during model validation when the constraint
     is violated has the ``unique_together`` error code.
 
-``index_together``
-------------------
-
-.. attribute:: Options.index_together
-
-    Sets of field names that, taken together, are indexed::
-
-        index_together = [
-            ["pub_date", "deadline"],
-        ]
-
-    This list of fields will be indexed together (i.e. the appropriate
-    ``CREATE INDEX`` statement will be issued.)
-
-    For convenience, ``index_together`` can be a single list when dealing with a single
-    set of fields::
-
-        index_together = ["pub_date", "deadline"]
-
-    .. deprecated:: 4.2
-
-        Use the :attr:`~Options.indexes` option instead.
-
 ``constraints``
 ---------------
 

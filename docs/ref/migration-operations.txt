@@ -247,7 +247,7 @@ Removes the index named ``name`` from the model with ``model_name``.
 Renames an index in the database table for the model with ``model_name``.
 Exactly one of ``old_name`` and ``old_fields`` can be provided. ``old_fields``
 is an iterable of the strings, often corresponding to fields of
-:attr:`~django.db.models.Options.index_together`.
+``index_together`` (pre-Django 5.1 option).
 
 On databases that don't support an index renaming statement (SQLite and MariaDB
 < 10.5.2), the operation will drop and recreate the index, which can be
