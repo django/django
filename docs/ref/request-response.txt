@@ -800,10 +800,16 @@ Attributes
 
     A bytestring representing the content, encoded from a string if necessary.
 
+.. attribute:: HttpResponse.cookies
+
+    A :py:obj:`http.cookies.SimpleCookie` object holding the cookies included
+    in the response.
+
 .. attribute:: HttpResponse.headers
 
     A case insensitive, dict-like object that provides an interface to all
-    HTTP headers on the response. See :ref:`setting-header-fields`.
+    HTTP headers on the response, except a ``Set-Cookie`` header. See
+    :ref:`setting-header-fields` and :attr:`HttpResponse.cookies`.
 
 .. attribute:: HttpResponse.charset
 
