@@ -2161,24 +2161,6 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 
 The filter returns ``0`` for an undefined variable.
 
-.. templatefilter:: length_is
-
-``length_is``
--------------
-
-.. deprecated:: 4.2
-
-Returns ``True`` if the value's length is the argument, or ``False`` otherwise.
-
-For example:
-
-.. code-block:: html+django
-
-    {{ value|length_is:"4" }}
-
-If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
-``True``.
-
 .. templatefilter:: linebreaks
 
 ``linebreaks``
