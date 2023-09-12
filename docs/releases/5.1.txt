@@ -254,3 +254,5 @@ to remove usage of these features.
 * The ``BaseUserManager.make_random_password()`` method is removed.
 
 * The model's ``Meta.index_together`` option is removed.
+
+* The ``length_is`` template filter is removed.
