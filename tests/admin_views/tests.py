@@ -1516,6 +1516,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
         )
 
+    def test_header(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, '<header id="header">')
+        self.client.logout()
+        response = self.client.get(reverse("admin:login"))
+        self.assertContains(response, '<header id="header">')
+
 
 @override_settings(
     AUTH_PASSWORD_VALIDATORS=[
