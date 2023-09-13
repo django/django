@@ -159,9 +159,6 @@ class DatabaseOperations(BaseDatabaseOperations):
             "CharField",
             "EmailField",
             "TextField",
-            "CICharField",
-            "CIEmailField",
-            "CITextField",
         ):
             return "%s::text"
 
@@ -179,9 +176,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         ):
             if internal_type in ("IPAddressField", "GenericIPAddressField"):
                 lookup = "HOST(%s)"
-            # RemovedInDjango51Warning.
-            elif internal_type in ("CICharField", "CIEmailField", "CITextField"):
-                lookup = "%s::citext"
             else:
                 lookup = "%s::text"
 

@@ -237,13 +237,19 @@ Model fields
   except for support in historical migrations.
 * **fields.W905**: ``django.contrib.postgres.fields.CICharField`` is
   deprecated. Support for it (except in historical migrations) will be removed
-  in Django 5.1.
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E905**: ``django.contrib.postgres.fields.CICharField`` is removed
+  except for support in historical migrations.
 * **fields.W906**: ``django.contrib.postgres.fields.CIEmailField`` is
   deprecated. Support for it (except in historical migrations) will be removed
-  in Django 5.1.
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E906**: ``django.contrib.postgres.fields.CIEmailField`` is removed
+  except for support in historical migrations.
 * **fields.W907**: ``django.contrib.postgres.fields.CITextField`` is
   deprecated. Support for it (except in historical migrations) will be removed
-  in Django 5.1.
+  in Django 5.1. *This check appeared in Django 4.2 and 5.0*.
+* **fields.E907**: ``django.contrib.postgres.fields.CITextField`` is removed
+  except for support for historical migrations.
 
 File fields
 ~~~~~~~~~~~
