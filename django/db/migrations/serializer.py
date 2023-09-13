@@ -350,6 +350,7 @@ class Serializer:
             types.FunctionType,
             types.BuiltinFunctionType,
             types.MethodType,
+            functools._lru_cache_wrapper,
         ): FunctionTypeSerializer,
         collections.abc.Iterable: IterableSerializer,
         (COMPILED_REGEX_TYPE, RegexObject): RegexSerializer,
