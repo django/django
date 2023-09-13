@@ -4,7 +4,12 @@ from asgiref.sync import iscoroutinefunction
 
 from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
 from django.test import SimpleTestCase
-from django.views.decorators.http import condition, require_http_methods, require_safe
+from django.views.decorators.http import (
+    condition,
+    conditional_page,
+    require_http_methods,
+    require_safe,
+)
 
 
 class RequireHttpMethodsTest(SimpleTestCase):
@@ -155,3 +160,19 @@ class ConditionDecoratorTest(SimpleTestCase):
             response.headers["Last-Modified"],
             "Mon, 02 Jan 2023 23:21:47 GMT",
         )
+
+
+class ConditionalPageTests(SimpleTestCase):
+    def test_conditional_page_decorator_successful(self):
+        @conditional_page
+        def sync_view(request):
+            response = HttpResponse()
+            response.content = b"test"
+            response["Cache-Control"] = "public"
+            return response
+
+        request = HttpRequest()
+        request.method = "GET"
+        response = sync_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response.get("Etag"))
