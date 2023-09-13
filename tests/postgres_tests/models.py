@@ -3,9 +3,6 @@ from django.db import models
 from .fields import (
     ArrayField,
     BigIntegerRangeField,
-    CICharField,
-    CIEmailField,
-    CITextField,
     DateRangeField,
     DateTimeRangeField,
     DecimalRangeField,
@@ -117,14 +114,6 @@ class Scene(models.Model):
 
 class Character(models.Model):
     name = models.CharField(max_length=255)
-
-
-# RemovedInDjango51Warning.
-class CITestModel(PostgreSQLModel):
-    name = CICharField(primary_key=True, max_length=255)
-    email = CIEmailField()
-    description = CITextField()
-    array_field = ArrayField(CITextField(), null=True)
 
 
 class Line(PostgreSQLModel):
