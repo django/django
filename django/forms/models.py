@@ -1583,7 +1583,8 @@ class ModelMultipleChoiceField(ModelChoiceField):
         "invalid_pk_value": _("“%(pk)s” is not a valid value."),
     }
 
-    def __init__(self, queryset, **kwargs):
+    def __init__(self, queryset, *, ignore_invalid_choice=False, **kwargs):
+        self.ignore_invalid_choice = ignore_invalid_choice
         super().__init__(queryset, empty_label=None, **kwargs)
 
     def to_python(self, value):
@@ -1635,14 +1636,15 @@ class ModelMultipleChoiceField(ModelChoiceField):
                     params={"pk": pk},
                 )
         qs = self.queryset.filter(**{"%s__in" % key: value})
-        pks = {str(getattr(o, key)) for o in qs}
-        for val in value:
-            if str(val) not in pks:
-                raise ValidationError(
-                    self.error_messages["invalid_choice"],
-                    code="invalid_choice",
-                    params={"value": val},
-                )
+        if not self.ignore_invalid_choice:
+            pks = {str(getattr(o, key)) for o in qs}
+            for val in value:
+                if str(val) not in pks:
+                    raise ValidationError(
+                        self.error_messages["invalid_choice"],
+                        code="invalid_choice",
+                        params={"value": val},
+                    )
         return qs
 
     def prepare_value(self, value):
