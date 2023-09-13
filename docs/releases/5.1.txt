@@ -260,3 +260,10 @@ to remove usage of these features.
 * The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
   ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
   ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` are removed, except for
+  support in historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin is removed.
