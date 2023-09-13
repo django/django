@@ -632,3 +632,46 @@ aggregate that author count, referencing the annotation field:
     >>> from django.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count("authors")).aggregate(Avg("num_authors"))
     {'num_authors__avg': 1.66}
+
+Handling empty querysets using aggregate ``default`` 
+----------------------------------------------------
+
+.. versionadded:: 4.0
+
+Aggregation functions return ``None`` when used with an empty ``QuerySet``.
+The aggregate ``default`` is an optional argument that allows specifying a 
+value to use as a ``default`` value when the ``QuerySet`` has no entries, 
+or when the ``QuerySet`` values are empty. For example, the ``Sum`` aggregation 
+function returns ``None`` instead of ``0``, if the ``QuerySet`` or grouping 
+contains no entries. An exception is ``Count``, which does return ``0``, if the 
+``QuerySet`` or group is empty. Count does not support the ``default`` argument.
+
+For example, say you wanted to get the total price of all books containing "web" in name. 
+Without the ``default`` argument, If there are no books returned by the query, and 
+there are no values to compute the aggregate ``Sum``, ``None`` is returned as 
+the computed aggregate.
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Sum
+    >>> Book.objects.filter(name__contains="Web").aggregate(Sum('price'))
+    {'price__sum': None}
+
+However, you can pass ``0`` as a ``default`` to be returned if no books can be found.
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Sum
+    >>> Book.objects.filter(name__contains="Web").aggregate(Sum('price', default=0))
+    {'price__sum': Decimal('0')}
+
+.. admonition:: The aggregate ``default`` argument uses :class:`~django.db.models.functions.Coalesce` under the hood
+    
+    .. code-block:: pycon
+
+        >>> from django.db.models.functions import Coalesce
+        >>> Book.objects.filter(name__contains="Web").aggregate(
+        ...     pages_sum=Coalesce(Sum('pages'), 0)
+        ... )
+        {'pages_sum': 0}
+        
