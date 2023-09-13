@@ -788,6 +788,8 @@ Django can serialize the following:
 
   - Functions may be decorated if wrapped properly, i.e. using
     :func:`functools.wraps`
+  - The :func:`functools.cache` and :func:`functools.lru_cache` decorators are
+    explicitly supported
 
 - Unbound methods used from within the class body
 - Any class reference (must be in module's top-level scope)
@@ -796,6 +798,11 @@ Django can serialize the following:
 .. versionchanged:: 4.2
 
     Serialization support for ``enum.Flag`` was added.
+
+.. versionchanged:: 5.0
+
+    Serialization support for functions decorated with :func:`functools.cache`
+    or :func:`functools.lru_cache` was added.
 
 Django cannot serialize:
 
