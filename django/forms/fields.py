@@ -956,6 +956,10 @@ class MultipleChoiceField(ChoiceField):
         "invalid_list": _("Enter a list of values."),
     }
 
+    def __init__(self, *, ignore_invalid_choice=False, **kwargs):
+        self.ignore_invalid_choice = ignore_invalid_choice
+        super().__init__(**kwargs)
+
     def to_python(self, value):
         if not value:
             return []
@@ -969,14 +973,23 @@ class MultipleChoiceField(ChoiceField):
         """Validate that the input is a list or tuple."""
         if self.required and not value:
             raise ValidationError(self.error_messages["required"], code="required")
-        # Validate that each value in the value list is in self.choices.
-        for val in value:
-            if not self.valid_value(val):
-                raise ValidationError(
-                    self.error_messages["invalid_choice"],
-                    code="invalid_choice",
-                    params={"value": val},
-                )
+
+    def clean(self, value):
+        value = self.to_python(value)
+        if self.ignore_invalid_choice:
+            value = [val for val in value if self.valid_value(val)]
+        else:
+            # Validate that each value in the value list is in self.choices.
+            for val in value:
+                if not self.valid_value(val):
+                    raise ValidationError(
+                        self.error_messages["invalid_choice"],
+                        code="invalid_choice",
+                        params={"value": val},
+                    )
+        self.validate(value)
+        self.run_validators(value)
+        return value
 
     def has_changed(self, initial, data):
         if self.disabled:
