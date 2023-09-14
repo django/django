@@ -277,3 +277,6 @@ to remove usage of these features.
 
 * Support for passing encoded JSON string literals to ``JSONField`` and
   associated lookups and expressions is removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` is removed.
