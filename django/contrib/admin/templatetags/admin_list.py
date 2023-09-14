@@ -178,6 +178,7 @@ def result_headers(cl):
 
 
 def _boolean_icon(field_val):
+    field_val = bool(field_val)
     icon_url = static(
         "admin/img/icon-%s.svg" % {True: "yes", False: "no", None: "unknown"}[field_val]
     )
