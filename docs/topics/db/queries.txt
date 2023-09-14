@@ -1085,10 +1085,6 @@ Unless you are sure you wish to work with SQL ``NULL`` values, consider setting
     Storing JSON scalar ``null`` does not violate :attr:`null=False
     <django.db.models.Field.null>`.
 
-.. deprecated:: 4.2
-
-    Passing ``Value("null")`` to express JSON ``null`` is deprecated.
-
 .. fieldlookup:: jsonfield.key
 
 Key, index, and path transforms
