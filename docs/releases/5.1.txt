@@ -272,3 +272,5 @@ to remove usage of these features.
   removed.
 
 * The ``SimpleTestCase.assertFormsetError()`` method is removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method is removed.
