@@ -267,3 +267,6 @@ to remove usage of these features.
   support in historical migrations.
 
 * The ``django.contrib.postgres.fields.CIText`` mixin is removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget`` are
+  removed.
