@@ -1874,11 +1874,6 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-    .. deprecated:: 4.2
-
-        The ``assertQuerysetEqual()`` assertion method is deprecated. Use
-        ``assertQuerySetEqual()`` instead.
-
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that

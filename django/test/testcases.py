@@ -5,7 +5,6 @@ import posixpath
 import sys
 import threading
 import unittest
-import warnings
 from collections import Counter
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -51,7 +50,6 @@ from django.test.utils import (
     modify_settings,
     override_settings,
 )
-from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.functional import classproperty
 from django.views.static import serve
 
@@ -1132,15 +1130,6 @@ class TransactionTestCase(SimpleTestCase):
                 allow_cascade=self.available_apps is not None,
                 inhibit_post_migrate=inhibit_post_migrate,
             )
-
-    # RemovedInDjango51Warning.
-    def assertQuerysetEqual(self, *args, **kw):
-        warnings.warn(
-            "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual().",
-            category=RemovedInDjango51Warning,
-            stacklevel=2,
-        )
-        return self.assertQuerySetEqual(*args, **kw)
 
     def assertQuerySetEqual(self, qs, values, transform=None, ordered=True, msg=None):
         values = list(values)

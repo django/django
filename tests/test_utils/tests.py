@@ -39,13 +39,11 @@ from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
     CaptureQueriesContext,
     TestContextDecorator,
-    ignore_warnings,
     isolate_apps,
     override_settings,
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.html import VOID_ELEMENTS
 from django.utils.version import PY311
 
@@ -265,15 +263,6 @@ class AssertQuerySetEqualTests(TestCase):
     def setUpTestData(cls):
         cls.p1 = Person.objects.create(name="p1")
         cls.p2 = Person.objects.create(name="p2")
-
-    def test_rename_assertquerysetequal_deprecation_warning(self):
-        msg = "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual()."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            self.assertQuerysetEqual()
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_deprecated_assertquerysetequal(self):
-        self.assertQuerysetEqual(Person.objects.filter(name="p3"), [])
 
     def test_empty(self):
         self.assertQuerySetEqual(Person.objects.filter(name="p3"), [])
