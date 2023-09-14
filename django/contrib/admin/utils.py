@@ -302,6 +302,8 @@ def lookup_field(name, obj, model_admin=None):
                 value = attr()
             else:
                 value = attr
+            if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
+                attr = getattr(model_admin.model, name)
         f = None
     else:
         attr = None

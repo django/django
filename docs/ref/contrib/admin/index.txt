@@ -796,6 +796,7 @@ subclass::
               @admin.display(
                   ordering="last_name",
                   description="Full name of the person",
+                  boolean=False,
               )
               def full_name(self):
                   return self.first_name + " " + self.last_name
@@ -816,8 +817,13 @@ subclass::
 
           my_property.short_description = "Full name of the person"
           my_property.admin_order_field = "last_name"
+          my_property.boolean = False
 
           full_name = property(my_property)
+
+      .. versionchanged:: 5.0
+
+        Support for ``boolean`` attribute on properties was added.
 
     * The field names in ``list_display`` will also appear as CSS classes in
       the HTML output, in the form of ``column-<field_name>`` on each ``<th>``
