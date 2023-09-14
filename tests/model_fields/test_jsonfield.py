@@ -37,7 +37,6 @@ from django.db.models.fields.json import (
 from django.db.models.functions import Cast
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import CustomJSONDecoder, JSONModel, NullableJSONModel, RelatedJSONModel
 
@@ -215,30 +214,6 @@ class TestSaveLoad(TestCase):
         obj.save()
         obj.refresh_from_db()
         self.assertIsNone(obj.value)
-
-    def test_ambiguous_str_value_deprecation(self):
-        msg = (
-            "Providing an encoded JSON string via Value() is deprecated. Use Value([], "
-            "output_field=JSONField()) instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            obj = NullableJSONModel.objects.create(value=Value("[]"))
-        obj.refresh_from_db()
-        self.assertEqual(obj.value, [])
-
-    @skipUnlessDBFeature("supports_primitives_in_json_field")
-    def test_value_str_primitives_deprecation(self):
-        msg = (
-            "Providing an encoded JSON string via Value() is deprecated. Use "
-            "Value(None, output_field=JSONField()) instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            obj = NullableJSONModel.objects.create(value=Value("null"))
-        obj.refresh_from_db()
-        self.assertIsNone(obj.value)
-        obj = NullableJSONModel.objects.create(value=Value("invalid-json"))
-        obj.refresh_from_db()
-        self.assertEqual(obj.value, "invalid-json")
 
     @skipUnlessDBFeature("supports_primitives_in_json_field")
     def test_json_null_different_from_sql_null(self):

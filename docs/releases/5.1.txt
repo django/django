@@ -274,3 +274,6 @@ to remove usage of these features.
 * The ``SimpleTestCase.assertFormsetError()`` method is removed.
 
 * The ``TransactionTestCase.assertQuerysetEqual()`` method is removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions is removed.

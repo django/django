@@ -14,9 +14,8 @@ from django.db.models import (
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import Cast, Concat, Substr
 from django.test import skipUnlessDBFeature
-from django.test.utils import Approximate, ignore_warnings
+from django.test.utils import Approximate
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from . import PostgreSQLTestCase
 from .models import AggregateTestModel, HotelReservation, Room, StatTestModel
@@ -151,59 +150,6 @@ class TestGeneralAggregate(PostgreSQLTestCase):
                         aggregation=aggregation,
                     )
                     self.assertEqual(values, {"aggregation": expected_result})
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_jsonb_agg_default_str_value(self):
-        AggregateTestModel.objects.all().delete()
-        queryset = AggregateTestModel.objects.all()
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
-            ),
-            {"aggregation": "<empty>"},
-        )
-
-    def test_jsonb_agg_default_str_value_deprecation(self):
-        queryset = AggregateTestModel.objects.all()
-        msg = (
-            "Passing a Value() with an output_field that isn't a JSONField as "
-            "JSONBAgg(default) is deprecated. Pass default=Value('<empty>', "
-            "output_field=JSONField()) instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            queryset.aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
-            )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            queryset.none().aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("<empty>"))
-            ),
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_jsonb_agg_default_encoded_json_string(self):
-        AggregateTestModel.objects.all().delete()
-        queryset = AggregateTestModel.objects.all()
-        self.assertEqual(
-            queryset.aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("[]"))
-            ),
-            {"aggregation": []},
-        )
-
-    def test_jsonb_agg_default_encoded_json_string_deprecation(self):
-        queryset = AggregateTestModel.objects.all()
-        msg = (
-            "Passing an encoded JSON string as JSONBAgg(default) is deprecated. Pass "
-            "default=[] instead."
-        )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            queryset.aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("[]"))
-            )
-        with self.assertWarnsMessage(RemovedInDjango51Warning, msg):
-            queryset.none().aggregate(
-                aggregation=JSONBAgg("integer_field", default=Value("[]"))
-            )
 
     def test_array_agg_charfield(self):
         values = AggregateTestModel.objects.aggregate(arrayagg=ArrayAgg("char_field"))
