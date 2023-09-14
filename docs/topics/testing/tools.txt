@@ -1681,11 +1681,6 @@ your test suite.
     ``field`` and ``errors`` have the same meaning as the parameters to
     ``assertFormError()``.
 
-    .. deprecated:: 4.2
-
-        The ``assertFormsetError()`` assertion method is deprecated. Use
-        ``assertFormSetError()`` instead.
-
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the

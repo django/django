@@ -1425,15 +1425,6 @@ class AssertFormErrorTests(SimpleTestCase):
 
 
 class AssertFormSetErrorTests(SimpleTestCase):
-    def test_rename_assertformseterror_deprecation_warning(self):
-        msg = "assertFormsetError() is deprecated in favor of assertFormSetError()."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            self.assertFormsetError()
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_deprecated_assertformseterror(self):
-        self.assertFormsetError(TestFormset.invalid(), 0, "field", "invalid value")
-
     def test_single_error(self):
         self.assertFormSetError(TestFormset.invalid(), 0, "field", "invalid value")
 
