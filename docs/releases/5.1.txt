@@ -270,3 +270,5 @@ to remove usage of these features.
 
 * The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget`` are
   removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method is removed.

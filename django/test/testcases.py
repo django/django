@@ -601,15 +601,6 @@ class SimpleTestCase(unittest.TestCase):
         errors = to_list(errors)
         self._assert_form_error(form, field, errors, msg_prefix, f"form {form!r}")
 
-    # RemovedInDjango51Warning.
-    def assertFormsetError(self, *args, **kw):
-        warnings.warn(
-            "assertFormsetError() is deprecated in favor of assertFormSetError().",
-            category=RemovedInDjango51Warning,
-            stacklevel=2,
-        )
-        return self.assertFormSetError(*args, **kw)
-
     def assertFormSetError(self, formset, form_index, field, errors, msg_prefix=""):
         """
         Similar to assertFormError() but for formsets.
