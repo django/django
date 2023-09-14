@@ -211,6 +211,9 @@ Minor features
 * The new :meth:`.AdminSite.get_model_admin` method returns an admin class for
   the given model class.
 
+* Properties in :attr:`.ModelAdmin.list_display` now support ``boolean``
+  attribute.
+
 :mod:`django.contrib.admindocs`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

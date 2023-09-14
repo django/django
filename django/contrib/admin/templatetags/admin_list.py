@@ -225,6 +225,9 @@ def items_for_result(cl, result, form):
                 if field_name == "action_checkbox":
                     row_classes = ["action-checkbox"]
                 boolean = getattr(attr, "boolean", False)
+                # Set boolean for attr that is a property, if defined.
+                if isinstance(attr, property) and hasattr(attr, "fget"):
+                    boolean = getattr(attr.fget, "boolean", False)
                 result_repr = display_for_value(value, empty_value_display, boolean)
                 if isinstance(value, (datetime.date, datetime.time)):
                     row_classes.append("nowrap")

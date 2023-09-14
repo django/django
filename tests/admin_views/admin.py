@@ -216,6 +216,7 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
         "model_month",
         "order_by_f_expression",
         "order_by_orderby_expression",
+        "model_property_is_from_past",
     )
     list_editable = ("section",)
     list_filter = ("date", "section")
