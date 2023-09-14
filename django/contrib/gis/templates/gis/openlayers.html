@@ -1,8 +1,7 @@
 {% load i18n l10n %}
 
 <div id="{{ id }}_div_map" class="dj_map_wrapper">
-    {# RemovedInDjango51Warning: when the deprecation ends, remove data-width and data-height attributes. #}
-    <div id="{{ id }}_map" class="dj_map" data-width="{{ map_width }}" data-height="{{ map_height }}"></div>
+    <div id="{{ id }}_map" class="dj_map"></div>
     {% if not disabled %}<span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>{% endif %}
     {% if display_raw %}<p>{% translate "Debugging window (serialized value)" %}</p>{% endif %}
     <textarea id="{{ id }}" class="vSerializedField required" cols="150" rows="10" name="{{ name }}"
