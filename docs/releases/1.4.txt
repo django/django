@@ -466,7 +466,7 @@ more details.
 
 The :mod:`staticfiles<django.contrib.staticfiles>` contrib app has a new
 ``static`` template tag to refer to files saved with the
-:setting:`STATICFILES_STORAGE` storage backend. It uses the storage backend's
+``STATICFILES_STORAGE`` storage backend. It uses the storage backend's
 ``url`` method and therefore supports advanced features such as :ref:`serving
 files from a cloud service<staticfiles-from-cdn>`.
 

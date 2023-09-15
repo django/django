@@ -280,3 +280,7 @@ to remove usage of these features.
 
 * Support for passing positional arguments to ``Signer`` and
   ``TimestampSigner`` is removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings is removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function is removed.
