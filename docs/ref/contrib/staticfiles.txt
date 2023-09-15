@@ -27,7 +27,6 @@ following settings:
 * :setting:`STATIC_ROOT`
 * :setting:`STATIC_URL`
 * :setting:`STATICFILES_DIRS`
-* :setting:`STATICFILES_STORAGE`
 * :setting:`STATICFILES_FINDERS`
 
 Management Commands
