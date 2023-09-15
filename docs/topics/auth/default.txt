@@ -526,7 +526,7 @@ login page::
 
     def my_view(request):
         if not request.user.is_authenticated:
-            return redirect(f"{settings.LOGIN_URL}?next={request.path}")
+            return redirect_to_login(request.get_full_path())
         # ...
 
 ...or display an error message::
@@ -672,7 +672,7 @@ email in the desired domain and if not, redirects to the login page::
 
     def my_view(request):
         if not request.user.email.endswith("@example.com"):
-            return redirect("/login/?next=%s" % request.path)
+            return redirect_to_login(request.get_full_path())
         # ...
 
 .. function:: user_passes_test(test_func, login_url=None, redirect_field_name='next')
@@ -1608,7 +1608,7 @@ Helper functions
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
     * ``redirect_field_name``: The name of a ``GET`` field containing the
-      URL to redirect to after log out. Overrides ``next`` if the given
+      URL to redirect to after login. Overrides ``next`` if the given
       ``GET`` parameter is passed.
 
 .. _built-in-auth-forms:
