@@ -6861,6 +6861,11 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         field = self.get_admin_readonly_field(response, "plotdetails")
         self.assertEqual(field.contents(), "-")  # default empty value
 
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_readonly_unsaved_generated_field(self):
+        response = self.client.get(reverse("admin:admin_views_square_add"))
+        self.assertContains(response, '<div class="readonly">-</div>')
+
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):
         """

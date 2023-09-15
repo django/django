@@ -1,4 +1,3 @@
-from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection
 from django.db.models import F, FloatField, GeneratedField, IntegerField, Model
 from django.db.models.functions import Lower
@@ -93,7 +92,7 @@ class GeneratedFieldTestMixin:
     def test_unsaved_error(self):
         m = self.base_model(a=1, b=2)
         msg = "Cannot read a generated field from an unsaved model."
-        with self.assertRaisesMessage(FieldError, msg):
+        with self.assertRaisesMessage(AttributeError, msg):
             m.field
 
     def test_create(self):

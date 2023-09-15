@@ -1134,3 +1134,14 @@ class Traveler(models.Model):
         related_name="favorite_country_to_vacation_set",
         limit_choices_to={"continent": Country.ASIA},
     )
+
+
+class Square(models.Model):
+    side = models.IntegerField()
+    area = models.GeneratedField(
+        db_persist=True,
+        expression=models.F("side") * models.F("side"),
+    )
+
+    class Meta:
+        required_db_features = {"supports_stored_generated_columns"}

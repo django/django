@@ -199,7 +199,7 @@ class DeferredAttribute:
             val = self._check_parent_chain(instance)
             if val is None:
                 if instance.pk is None and self.field.generated:
-                    raise FieldError(
+                    raise AttributeError(
                         "Cannot read a generated field from an unsaved model."
                     )
                 instance.refresh_from_db(fields=[field_name])
