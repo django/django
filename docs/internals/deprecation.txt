@@ -53,6 +53,11 @@ details on these changes.
 * ``get_prefetcher()`` and ``prefetch_related_objects()`` will no longer
   fallback to ``get_prefetch_queryset()``.
 
+See the :ref:`Django 5.1 release notes <deprecated-features-5.1>` for more
+details on these changes.
+
+* ...
+
 .. _deprecation-removed-in-5.1:
 
 5.1
