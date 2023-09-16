@@ -346,7 +346,7 @@ class Command(BaseCommand):
                     migration_string = self.get_relative_path(writer.path)
                     self.log("  %s\n" % self.style.MIGRATE_LABEL(migration_string))
                     for operation in migration.operations:
-                        self.log("    %s" % operation.formatted_description(self.style))
+                        self.log("    %s" % operation.formatted_description(style=self.style))
                     if self.scriptable:
                         self.stdout.write(migration_string)
                 if not self.dry_run:
@@ -454,7 +454,7 @@ class Command(BaseCommand):
                 for migration in merge_migrations:
                     self.log(self.style.MIGRATE_LABEL("  Branch %s" % migration.name))
                     for operation in migration.merged_operations:
-                        self.log("    %s" % operation.formatted_description())
+                        self.log("    %s" % operation.formatted_description(style=self.style))
             if questioner.ask_merge(app_label):
                 # If they still want to merge it, then write out an empty
                 # file depending on the migrations needing merging.

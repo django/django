@@ -41,6 +41,8 @@ class Operation:
 
     serialization_expand_args = []
 
+    severity = SeverityType.SAFE
+
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
         self = object.__new__(cls)
@@ -97,10 +99,10 @@ class Operation:
         """
         Output the describe output in a more informative way.
         """
-        description, severity_type = self.describe()
-        if severity_type == SeverityType.SAFE:
+        description = self.describe()
+        if self.severity == SeverityType.SAFE:
             return style.SUCCESS("+ {}".format(description))
-        elif severity_type == SeverityType.DESTRUCTIVE:
+        elif self.severity == SeverityType.DESTRUCTIVE:
             return style.ERROR("- {}".format(description))
         return style.WARNING("~ {}".format(description))
 

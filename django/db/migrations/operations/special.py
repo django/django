@@ -11,6 +11,8 @@ class SeparateDatabaseAndState(Operation):
     that affect the state or not the database, or so on.
     """
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     serialization_expand_args = ["database_operations", "state_operations"]
 
     def __init__(self, database_operations=None, state_operations=None):
@@ -57,10 +59,7 @@ class SeparateDatabaseAndState(Operation):
             )
 
     def describe(self):
-        return (
-            "Custom state/database change combination",
-            SeverityType.POSSIBLY_DESTRUCTIVE,
-        )
+        return "Custom state/database change combination"
 
 
 class RunSQL(Operation):
@@ -72,6 +71,7 @@ class RunSQL(Operation):
     """
 
     noop = ""
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(
         self, sql, reverse_sql=None, state_operations=None, hints=None, elidable=False
@@ -117,7 +117,7 @@ class RunSQL(Operation):
             self._run_sql(schema_editor, self.reverse_sql)
 
     def describe(self):
-        return "Raw SQL operation", SeverityType.POSSIBLY_DESTRUCTIVE
+        return "Raw SQL operation"
 
     def _run_sql(self, schema_editor, sqls):
         if isinstance(sqls, (list, tuple)):
@@ -142,6 +142,7 @@ class RunPython(Operation):
     """
 
     reduces_to_sql = False
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(
         self, code, reverse_code=None, atomic=None, hints=None, elidable=False
@@ -204,7 +205,7 @@ class RunPython(Operation):
             self.reverse_code(from_state.apps, schema_editor)
 
     def describe(self):
-        return "Raw Python operation", SeverityType.POSSIBLY_DESTRUCTIVE
+        return "Raw Python operation"
 
     @staticmethod
     def noop(apps, schema_editor):

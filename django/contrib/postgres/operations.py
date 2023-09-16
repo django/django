@@ -60,7 +60,7 @@ class CreateExtension(Operation):
             return bool(cursor.fetchone())
 
     def describe(self):
-        return "Creates extension %s" % self.name, SeverityType.SAFE
+        return "Creates extension %s" % self.name,
 
     @property
     def migration_name_fragment(self):
@@ -119,6 +119,7 @@ class NotInTransactionMixin:
 class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     """Create an index using PostgreSQL's CREATE INDEX CONCURRENTLY syntax."""
 
+    severity = SeverityType.SAFE
     atomic = False
 
     def describe(self):
@@ -128,8 +129,7 @@ class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
                 self.index.name,
                 ", ".join(self.index.fields),
                 self.model_name,
-            ),
-            SeverityType.SAFE,
+            )
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -149,12 +149,10 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     """Remove an index using PostgreSQL's DROP INDEX CONCURRENTLY syntax."""
 
     atomic = False
+    severity = SeverityType.SAFE
 
     def describe(self):
-        return (
-            "Concurrently remove index %s from %s" % (self.name, self.model_name),
-            SeverityType.SAFE,
-        )
+        return "Concurrently remove index %s from %s" % (self.name, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         self._ensure_not_in_transaction(schema_editor)
@@ -220,6 +218,8 @@ class CollationOperation(Operation):
 class CreateCollation(CollationOperation):
     """Create a collation."""
 
+    severity = SeverityType.SAFE
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label
@@ -233,7 +233,7 @@ class CreateCollation(CollationOperation):
         self.remove_collation(schema_editor)
 
     def describe(self):
-        return f"Create collation {self.name}", SeverityType.SAFE
+        return f"Create collation {self.name}"
 
     @property
     def migration_name_fragment(self):
@@ -243,6 +243,8 @@ class CreateCollation(CollationOperation):
 class RemoveCollation(CollationOperation):
     """Remove a collation."""
 
+    severity = SeverityType.SAFE
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label
@@ -256,7 +258,7 @@ class RemoveCollation(CollationOperation):
         self.create_collation(schema_editor)
 
     def describe(self):
-        return f"Remove collation {self.name}", SeverityType.SAFE
+        return f"Remove collation {self.name}",
 
     @property
     def migration_name_fragment(self):
@@ -268,6 +270,7 @@ class AddConstraintNotValid(AddConstraint):
     Add a table constraint without enforcing validation, using PostgreSQL's
     NOT VALID syntax.
     """
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, model_name, constraint):
         if not isinstance(constraint, CheckConstraint):
@@ -282,8 +285,7 @@ class AddConstraintNotValid(AddConstraint):
             % (
                 self.constraint.name,
                 self.model_name,
-            ),
-            SeverityType.POSSIBLY_DESTRUCTIVE,
+            )
         )
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
@@ -304,15 +306,14 @@ class AddConstraintNotValid(AddConstraint):
 class ValidateConstraint(Operation):
     """Validate a table NOT VALID constraint."""
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
 
     def describe(self):
-        return (
-            "Validate constraint %s on model %s" % (self.name, self.model_name),
-            SeverityType.POSSIBLY_DESTRUCTIVE,
-        )
+        return "Validate constraint %s on model %s" % (self.name, self.model_name)
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         model = from_state.apps.get_model(app_label, self.model_name)

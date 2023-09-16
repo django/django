@@ -75,6 +75,8 @@ class FieldOperation(Operation):
 class AddField(FieldOperation):
     """Add a field to a model."""
 
+    severity = SeverityType.SAFE
+
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
         super().__init__(model_name, name, field)
@@ -120,7 +122,7 @@ class AddField(FieldOperation):
             )
 
     def describe(self):
-        return "Add field %s to %s" % (self.name, self.model_name), SeverityType.SAFE
+        return "Add field %s to %s" % (self.name, self.model_name)
 
     @property
     def migration_name_fragment(self):
@@ -201,6 +203,8 @@ class AlterField(FieldOperation):
     new field.
     """
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
         super().__init__(model_name, name, field)
@@ -240,10 +244,7 @@ class AlterField(FieldOperation):
         self.database_forwards(app_label, schema_editor, from_state, to_state)
 
     def describe(self):
-        return (
-            "Alter field %s on %s" % (self.name, self.model_name),
-            SeverityType.POSSIBLY_DESTRUCTIVE,
-        )
+        return "Alter field %s on %s" % (self.name, self.model_name)
 
     @property
     def migration_name_fragment(self):
@@ -272,6 +273,8 @@ class AlterField(FieldOperation):
 
 class RenameField(FieldOperation):
     """Rename a field on the model. Might affect db_column too."""
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, model_name, old_name, new_name):
         self.old_name = old_name
@@ -320,14 +323,10 @@ class RenameField(FieldOperation):
             )
 
     def describe(self):
-        return (
-            "Rename field %s on %s to %s"
-            % (
-                self.old_name,
-                self.model_name,
-                self.new_name,
-            ),
-            SeverityType.POSSIBLY_DESTRUCTIVE,
+        return "Rename field %s on %s to %s" % (
+            self.old_name,
+            self.model_name,
+            self.new_name,
         )
 
     @property
