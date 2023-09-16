@@ -2,7 +2,7 @@ from django.db.migrations.utils import field_references
 from django.db.models import NOT_PROVIDED
 from django.utils.functional import cached_property
 
-from .base import Operation
+from .base import Operation, SeverityType
 
 
 class FieldOperation(Operation):
@@ -74,6 +74,8 @@ class FieldOperation(Operation):
 
 class AddField(FieldOperation):
     """Add a field to a model."""
+
+    severity = SeverityType.SAFE
 
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
@@ -201,6 +203,8 @@ class AlterField(FieldOperation):
     new field.
     """
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     def __init__(self, model_name, name, field, preserve_default=True):
         self.preserve_default = preserve_default
         super().__init__(model_name, name, field)
@@ -269,6 +273,8 @@ class AlterField(FieldOperation):
 
 class RenameField(FieldOperation):
     """Rename a field on the model. Might affect db_column too."""
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, model_name, old_name, new_name):
         self.old_name = old_name
