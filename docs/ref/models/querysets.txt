@@ -1149,10 +1149,11 @@ one-to-one.
 
 ``prefetch_related``, on the other hand, does a separate lookup for each
 relationship, and does the 'joining' in Python. This allows it to prefetch
-many-to-many and many-to-one objects, which cannot be done using
-``select_related``, in addition to the foreign key and one-to-one relationships
-that are supported by ``select_related``. It also supports prefetching of
-:class:`~django.contrib.contenttypes.fields.GenericRelation` and
+many-to-many, many-to-one, and
+:class:`~django.contrib.contenttypes.fields.GenericRelation` objects which
+cannot be done using ``select_related``, in addition to the foreign key and
+one-to-one relationships that are supported by ``select_related``. It also
+supports prefetching of
 :class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
 must be restricted to a homogeneous set of results. For example, prefetching
 objects referenced by a ``GenericForeignKey`` is only supported if the query
