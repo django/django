@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, SeverityType
 from django.db.migrations.state import ModelState
 from django.db.migrations.utils import field_references, resolve_relation
 from django.db.models.options import normalize_together
@@ -40,6 +40,8 @@ class ModelOperation(Operation):
 
 class CreateModel(ModelOperation):
     """Create a model's table."""
+
+    severity = SeverityType.SAFE
 
     serialization_expand_args = ["fields", "options", "managers"]
 
@@ -374,6 +376,8 @@ class CreateModel(ModelOperation):
 class DeleteModel(ModelOperation):
     """Drop a model's table."""
 
+    severity = SeverityType.DESTRUCTIVE
+
     def deconstruct(self):
         kwargs = {
             "name": self.name,
@@ -408,6 +412,8 @@ class DeleteModel(ModelOperation):
 
 class RenameModel(ModelOperation):
     """Rename a model."""
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, old_name, new_name):
         self.old_name = old_name
@@ -538,6 +544,8 @@ class ModelOptionOperation(ModelOperation):
 class AlterModelTable(ModelOptionOperation):
     """Rename a model's table."""
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     def __init__(self, name, table):
         self.table = table
         super().__init__(name)
@@ -591,6 +599,8 @@ class AlterModelTableComment(ModelOptionOperation):
         self.table_comment = table_comment
         super().__init__(name)
 
+    severity = SeverityType.SAFE
+
     def deconstruct(self):
         kwargs = {
             "name": self.name,
@@ -626,6 +636,8 @@ class AlterModelTableComment(ModelOptionOperation):
 
 class AlterTogetherOptionOperation(ModelOptionOperation):
     option_name = None
+
+    severity = SeverityType.SAFE
 
     def __init__(self, name, option_value):
         if option_value:
@@ -718,6 +730,8 @@ class AlterOrderWithRespectTo(ModelOptionOperation):
 
     option_name = "order_with_respect_to"
 
+    severity = SeverityType.SAFE
+
     def __init__(self, name, order_with_respect_to):
         self.order_with_respect_to = order_with_respect_to
         super().__init__(name)
@@ -803,6 +817,8 @@ class AlterModelOptions(ModelOptionOperation):
         "verbose_name_plural",
     ]
 
+    severity = SeverityType.SAFE
+
     def __init__(self, name, options):
         self.options = options
         super().__init__(name)
@@ -840,6 +856,7 @@ class AlterModelManagers(ModelOptionOperation):
     """Alter the model's managers."""
 
     serialization_expand_args = ["managers"]
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, name, managers):
         self.managers = managers
@@ -875,6 +892,8 @@ class IndexOperation(Operation):
 
 class AddIndex(IndexOperation):
     """Add an index on a model."""
+
+    severity = SeverityType.SAFE
 
     def __init__(self, model_name, index):
         self.model_name = model_name
@@ -938,6 +957,8 @@ class AddIndex(IndexOperation):
 class RemoveIndex(IndexOperation):
     """Remove an index from a model."""
 
+    severity = SeverityType.DESTRUCTIVE
+
     def __init__(self, model_name, name):
         self.model_name = model_name
         self.name = name
@@ -980,6 +1001,8 @@ class RemoveIndex(IndexOperation):
 
 class RenameIndex(IndexOperation):
     """Rename an index."""
+
+    severity = SeverityType.SAFE
 
     def __init__(self, model_name, new_name, old_name=None, old_fields=None):
         if not old_name and not old_fields:
@@ -1130,6 +1153,8 @@ class RenameIndex(IndexOperation):
 class AddConstraint(IndexOperation):
     option_name = "constraints"
 
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
+
     def __init__(self, model_name, constraint):
         self.model_name = model_name
         self.constraint = constraint
@@ -1179,6 +1204,8 @@ class AddConstraint(IndexOperation):
 
 class RemoveConstraint(IndexOperation):
     option_name = "constraints"
+
+    severity = SeverityType.SAFE
 
     def __init__(self, model_name, name):
         self.model_name = model_name

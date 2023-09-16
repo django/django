@@ -2,6 +2,7 @@ import datetime
 import importlib
 import io
 import os
+import re
 import shutil
 import sys
 from unittest import mock
@@ -2141,7 +2142,7 @@ class MakeMigrationsTests(MigrationTestBase):
             )
 
         # Normal --dry-run output
-        self.assertIn("- Add field silly_char to sillymodel", out.getvalue())
+        self.assertIn("+ Add field silly_char to sillymodel", out.getvalue())
 
         # Additional output caused by verbosity 3
         # The complete migrations file that would be written
@@ -2171,7 +2172,9 @@ class MakeMigrationsTests(MigrationTestBase):
             )
         initial_file = os.path.join(migration_dir, "0001_initial.py")
         self.assertEqual(out.getvalue(), f"{initial_file}\n")
-        self.assertIn("    - Create model ModelWithCustomBase\n", err.getvalue())
+        color_pattern = r"\x1b\[[0-9;]*m"
+        actual_output_without_color = re.sub(color_pattern, "", err.getvalue())
+        self.assertIn("+ Create model ModelWithCustomBase", actual_output_without_color)
 
     @mock.patch("builtins.input", return_value="Y")
     def test_makemigrations_scriptable_merge(self, mock_input):
@@ -2216,7 +2219,9 @@ class MakeMigrationsTests(MigrationTestBase):
             self.assertTrue(os.path.exists(initial_file))
 
         # Command output indicates the migration is created.
-        self.assertIn(" - Create model SillyModel", out.getvalue())
+        color_pattern = r"\x1b\[[0-9;]*m"
+        actual_output_without_color = re.sub(color_pattern, "", out.getvalue())
+        self.assertIn("+ Create model SillyModel", actual_output_without_color)
 
     @override_settings(MIGRATION_MODULES={"migrations": "some.nonexistent.path"})
     def test_makemigrations_migrations_modules_nonexistent_toplevel_package(self):
@@ -2321,12 +2326,12 @@ class MakeMigrationsTests(MigrationTestBase):
                 out.getvalue().lower(),
                 "merging conflicting_app_with_dependencies\n"
                 "  branch 0002_conflicting_second\n"
-                "    - create model something\n"
+                "    + create model something\n"
                 "  branch 0002_second\n"
                 "    - delete model tribble\n"
                 "    - remove field silly_field from author\n"
-                "    - add field rating to author\n"
-                "    - create model book\n"
+                "    + add field rating to author\n"
+                "    + create model book\n"
                 "\n"
                 "merging will only work if the operations printed above do not "
                 "conflict\n"
