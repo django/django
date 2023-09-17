@@ -8,6 +8,7 @@ from django.db.models import CheckConstraint, Index, Q, UniqueConstraint
 from django.db.utils import ProgrammingError
 from django.test import modify_settings, override_settings
 from django.test.utils import CaptureQueriesContext
+from .models import CharArrayModel,AggregateTestModel
 
 from . import PostgreSQLTestCase
 
@@ -27,10 +28,31 @@ except ImportError:
     pass
 
 
+
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests.")
 @modify_settings(INSTALLED_APPS={"append": "migrations"})
 class AddIndexConcurrentlyTests(OperationTestBase):
     app_label = "test_add_concurrently"
+
+    def test_isnull_lookup_cast(self):
+        # Create a MyModel instance with a CharField
+        obj = CharArrayModel.objects.create(field=["hello"])
+        # Test "isnull" lookup for CharField
+        query = str(
+            CharArrayModel.objects.filter(field__isnull=True).query
+        )
+        # Assert that the query does NOT contain an explicit cast to text
+        self.assertNotIn("char_field::text IS NULL", query)
+
+    def test_isnull_lookup_no_cast(self):
+        # Create an AggregateTestModel instance with an IntegerField
+        obj = AggregateTestModel.objects.create(integer_field=42)
+        # Test "isnull" lookup for IntegerField
+        query = str(
+            AggregateTestModel.objects.filter(integer_field__isnull=True).query
+        )
+        # Assert that the query does NOT contain an explicit cast to text
+        self.assertNotIn("integer_field::text IS NULL", query)
 
     def test_requires_atomic_false(self):
         project_state = self.set_up_test_model(self.app_label)

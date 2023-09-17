@@ -163,7 +163,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             "CIEmailField",
             "CITextField",
         ):
-            return "%s::text"
+            return "%s"
 
         # Cast text lookups to text to allow things like filter(x__contains=4)
         if lookup_type in (
