@@ -216,10 +216,6 @@ Minor features
 
 * jQuery is upgraded from version 3.6.4 to 3.7.1.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,52 +276,12 @@ Minor features
   customizing the ``code`` of ``ValidationError`` raised during
   :ref:`model validation <validating-objects>`.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
 
 * Under ASGI, ``http.disconnect`` events are now handled. This allows views to
   perform any necessary cleanup if a client disconnects before the response is
   generated. See :ref:`async-handling-disconnect` for more details.
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Decorators
 ~~~~~~~~~~
@@ -356,11 +312,6 @@ Decorators
   * ``xframe_options_sameorigin()``
   * ``xframe_options_exempt()``
 
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
@@ -373,11 +324,6 @@ File Storage
 
 * :meth:`.File.open` now passes all positional (``*args``) and keyword
   arguments (``**kwargs``) to Python's built-in :func:`python:open`.
-
-File Uploads
-~~~~~~~~~~~~
-
-* ...
 
 Forms
 ~~~~~
@@ -392,25 +338,10 @@ Forms
 * In order to improve accessibility, the invalid form field now includes the
   ``aria-invalid="true"`` HTML attribute.
 
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
-
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
 * Added support and translations for the Uyghur language.
-
-Logging
-~~~~~~~
-
-* ...
-
-Management Commands
-~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 Migrations
 ~~~~~~~~~~
@@ -468,21 +399,6 @@ Pagination
 * The new :attr:`django.core.paginator.Paginator.error_messages` argument
   allows customizing the error messages raised by :meth:`.Paginator.page`.
 
-Requests and Responses
-~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
 Signals
 ~~~~~~~
 
@@ -509,16 +425,6 @@ Tests
 
 * The new :option:`test --durations` option allows showing the duration of the
   slowest tests on Python 3.12+.
-
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
 
 Validators
 ~~~~~~~~~~
