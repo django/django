@@ -1294,11 +1294,6 @@ implementation details see :ref:`using-the-views`.
     * ``login_url``: The URL of the login page to redirect to.
       Defaults to :setting:`settings.LOGIN_URL <LOGIN_URL>` if not supplied.
 
-    .. deprecated:: 4.1
-
-        Support for logging out on ``GET`` requests is deprecated and will be
-        removed in Django 5.0.
-
 .. class:: PasswordChangeView
 
     **URL name:** ``password_change``

@@ -85,8 +85,8 @@ Called by ``Storage.save()``. The ``name`` will already have gone through
 ``get_valid_name()`` and ``get_available_name()``, and the ``content`` will be a
 ``File`` object itself.
 
-Should return the actual name of name of the file saved (usually the ``name``
-passed in, but if the storage needs to change the file name return the new name
+Should return the actual name of the file saved (usually the ``name`` passed
+in, but if the storage needs to change the file name return the new name
 instead).
 
 .. method:: get_valid_name(name)
