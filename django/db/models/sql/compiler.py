@@ -1501,6 +1501,16 @@ class SQLCompiler:
                 row[pos] = value
             yield row
 
+    def _finish_results_iter(self, results, tuple_expected=False):
+        fields = [s[0] for s in self.select[0 : self.col_count]]
+        converters = self.get_converters(fields)
+        rows = chain.from_iterable(results)
+        if converters:
+            rows = self.apply_converters(rows, converters)
+            if tuple_expected:
+                rows = map(tuple, rows)
+        return rows
+
     def results_iter(
         self,
         results=None,
@@ -1513,14 +1523,21 @@ class SQLCompiler:
             results = self.execute_sql(
                 MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
             )
-        fields = [s[0] for s in self.select[0 : self.col_count]]
-        converters = self.get_converters(fields)
-        rows = chain.from_iterable(results)
-        if converters:
-            rows = self.apply_converters(rows, converters)
-            if tuple_expected:
-                rows = map(tuple, rows)
-        return rows
+        return self._finish_results_iter(results, tuple_expected)
+
+    async def async_results_iter(
+        self,
+        results=None,
+        tuple_expected=False,
+        chunked_fetch=False,
+        chunk_size=GET_ITERATOR_CHUNK_SIZE,
+    ):
+        """Return an iterator over the results from executing this query."""
+        if results is None:
+            results = await self.async_execute_sql(
+                MULTI, chunked_fetch=chunked_fetch, chunk_size=chunk_size
+            )
+        return self._finish_results_iter(results, tuple_expected)
 
     def has_results(self):
         """

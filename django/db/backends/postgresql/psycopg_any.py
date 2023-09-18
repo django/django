@@ -3,13 +3,13 @@ from functools import lru_cache
 
 try:
     from psycopg import (
+        AsyncClientCursor,
         ClientCursor,
         IsolationLevel,
         adapt,
         adapters,
         errors,
         sql,
-        AsyncClientCursor,
     )
     from psycopg.postgres import types
     from psycopg.types.datetime import TimestamptzLoader

@@ -1,18 +1,17 @@
+from psycopg import AsyncClientCursor, AsyncCursor, sql
+from psycopg.pq import Format
+
 from django.core.exceptions import ImproperlyConfigured
 from django.db.backends.base.base import BaseDatabaseWrapperAsync
+from django.db.backends.postgresql.base import (
+    TIMESTAMPTZ_OID,
+    PostgreSQLBaseDatabaseWrapper,
+)
+from django.db.backends.postgresql.psycopg_any import is_psycopg3, register_tzloader
 from django.db.backends.utils import (
     CursorDebugWrapperAsync as BaseCursorDebugWrapperAsync,
 )
 from django.utils.functional import cached_property
-
-from django.db.backends.postgresql.base import (
-    PostgreSQLBaseDatabaseWrapper,
-    TIMESTAMPTZ_OID,
-)
-from django.db.backends.postgresql.psycopg_any import is_psycopg3, register_tzloader
-
-from psycopg import AsyncCursor, AsyncClientCursor, sql
-from psycopg.pq import Format
 
 if not is_psycopg3:
     raise ImproperlyConfigured(

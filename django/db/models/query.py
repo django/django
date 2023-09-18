@@ -7,7 +7,7 @@ import operator
 import warnings
 from itertools import chain, islice
 
-from asgiref.sync import sync_to_async, async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 
 import django
 from django.conf import settings
@@ -299,6 +299,14 @@ class FlatValuesListIterable(BaseIterable):
         queryset = self.queryset
         compiler = queryset.query.get_compiler(queryset.db)
         for row in compiler.results_iter(
+            chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
+        ):
+            yield row[0]
+
+    async def __aiter__(self):
+        queryset = self.queryset
+        compiler = queryset.query.get_compiler(queryset.db)
+        for row in await compiler.async_results_iter(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         ):
             yield row[0]
@@ -653,11 +661,7 @@ class QuerySet(AltersData):
     def db_is_async(self):
         return connections[self.db].is_async
 
-    def get(self, *args, **kwargs):
-        """
-        Perform the query and return a single object matching the given
-        keyword arguments.
-        """
+    def _prepare_get(self, *args, **kwargs):
         if self.query.combinator and (args or kwargs):
             raise NotSupportedError(
                 "Calling QuerySet.get(...) with filters after %s() is not "
@@ -673,7 +677,9 @@ class QuerySet(AltersData):
         ):
             limit = MAX_GET_RESULTS
             clone.query.set_limits(high=limit)
-        num = len(clone)
+        return clone, limit
+
+    def _finish_get(self, clone, limit, num):
         if num == 1:
             return clone._result_cache[0]
         if not num:
@@ -688,8 +694,25 @@ class QuerySet(AltersData):
             )
         )
 
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.db_is_async:
+            return async_to_sync(self.aget)(*args, **kwargs)
+
+        clone, limit = self._prepare_get(*args, **kwargs)
+        num = len(clone)
+        return self._finish_get(clone, limit, num)
+
     async def aget(self, *args, **kwargs):
-        return await sync_to_async(self.get)(*args, **kwargs)
+        if not self.db_is_async:
+            return await sync_to_async(self.get)(*args, **kwargs)
+
+        clone, limit = self._prepare_get(*args, **kwargs)
+        num = len([obj async for obj in clone])
+        return self._finish_get(clone, limit, num)
 
     def create(self, **kwargs):
         """

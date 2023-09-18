@@ -7,7 +7,7 @@ import time
 import warnings
 import zoneinfo
 from collections import deque
-from contextlib import contextmanager, asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured

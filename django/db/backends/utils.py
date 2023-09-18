@@ -4,7 +4,7 @@ import functools
 import logging
 import time
 import warnings
-from contextlib import contextmanager, asynccontextmanager
+from contextlib import asynccontextmanager, contextmanager
 from hashlib import md5
 
 from django.apps import apps
