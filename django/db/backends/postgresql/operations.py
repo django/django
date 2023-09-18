@@ -236,6 +236,9 @@ class DatabaseOperations(BaseDatabaseOperations):
         else:
             return "TABLESPACE %s" % self.quote_name(tablespace)
 
+    def tuple_operation(self, expression):
+        return False
+
     def sequence_reset_sql(self, style, model_list):
         from django.db import models
 
