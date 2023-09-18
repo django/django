@@ -254,9 +254,7 @@ Minor features
 * :ref:`GIS aggregates <gis-aggregation-functions>` now support the ``filter``
   argument.
 
-* Added support for GDAL 3.7.
-
-* Added support for GEOS 3.12.
+* Support for GDAL 3.7 and GEOS 3.12 is added.
 
 * The new :meth:`.GEOSGeometry.equals_identical` method allows point-wise
   equivalence checking of geometries.
@@ -331,17 +329,16 @@ Forms
 * The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
   specifying a default URL scheme.
 
-* In order to improve accessibility and enable screen readers to associate form
-  fields with their help text, the form field now includes the
-  ``aria-describedby`` HTML attribute.
+* In order to improve accessibility, the following changes are made:
 
-* In order to improve accessibility, the invalid form field now includes the
-  ``aria-invalid="true"`` HTML attribute.
+  * Form fields now include the ``aria-describedby`` HTML attribute to enable
+    screen readers to associate form fields with their help text.
+  * Invalid form fields now include the ``aria-invalid="true"`` HTML attribute.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* Added support and translations for the Uyghur language.
+* Support and translations for the Uyghur language are now available.
 
 Migrations
 ~~~~~~~~~~
@@ -455,12 +452,6 @@ backends.
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
   ``INSERT`` queries.
 
-Dropped support for MySQL < 8.0.11
-----------------------------------
-
-Support for pre-releases of MySQL 8.0.x series is removed. Django 5.0 supports
-MySQL 8.0.11 and higher.
-
 :mod:`django.contrib.gis`
 -------------------------
 
@@ -476,6 +467,12 @@ MySQL 8.0.11 and higher.
   Sitemaps ping endpoint is deprecated and will be removed in January 2024.
 
 * The ``django.contrib.sitemaps.SitemapNotFound`` exception class is removed.
+
+Dropped support for MySQL < 8.0.11
+----------------------------------
+
+Support for pre-releases of MySQL 8.0.x series is removed. Django 5.0 supports
+MySQL 8.0.11 and higher.
 
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
@@ -586,7 +583,7 @@ Miscellaneous
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers are deprecated.
 
-* Passing positional arguments  ``name`` and ``violation_error_message`` to
+* Passing positional arguments ``name`` and ``violation_error_message`` to
   :class:`~django.db.models.BaseConstraint` is deprecated in favor of
   keyword-only arguments.
 
