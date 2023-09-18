@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-07 14:40+0200\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -19,205 +19,205 @@ msgid "Humanize"
 msgstr ""
 
 #. Translators: Ordinal format for 11 (11th), 12 (12th), and 13 (13th).
-#: contrib/humanize/templatetags/humanize.py:30
+#: contrib/humanize/templatetags/humanize.py:35
 msgctxt "ordinal 11, 12, 13"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 0, e.g. 80th.
-#: contrib/humanize/templatetags/humanize.py:34
+#: contrib/humanize/templatetags/humanize.py:39
 msgctxt "ordinal 0"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 1, e.g. 81st, except 11.
-#: contrib/humanize/templatetags/humanize.py:36
+#: contrib/humanize/templatetags/humanize.py:41
 msgctxt "ordinal 1"
 msgid "{}st"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 2, e.g. 82nd, except 12.
-#: contrib/humanize/templatetags/humanize.py:38
+#: contrib/humanize/templatetags/humanize.py:43
 msgctxt "ordinal 2"
 msgid "{}nd"
 msgstr ""
 
-#. Translators: Ordinal format when value ends with 3, e.g. 83th, except 13.
-#: contrib/humanize/templatetags/humanize.py:40
+#. Translators: Ordinal format when value ends with 3, e.g. 83rd, except 13.
+#: contrib/humanize/templatetags/humanize.py:45
 msgctxt "ordinal 3"
 msgid "{}rd"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 4, e.g. 84th.
-#: contrib/humanize/templatetags/humanize.py:42
+#: contrib/humanize/templatetags/humanize.py:47
 msgctxt "ordinal 4"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 5, e.g. 85th.
-#: contrib/humanize/templatetags/humanize.py:44
+#: contrib/humanize/templatetags/humanize.py:49
 msgctxt "ordinal 5"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 6, e.g. 86th.
-#: contrib/humanize/templatetags/humanize.py:46
+#: contrib/humanize/templatetags/humanize.py:51
 msgctxt "ordinal 6"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 7, e.g. 87th.
-#: contrib/humanize/templatetags/humanize.py:48
+#: contrib/humanize/templatetags/humanize.py:53
 msgctxt "ordinal 7"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 8, e.g. 88th.
-#: contrib/humanize/templatetags/humanize.py:50
+#: contrib/humanize/templatetags/humanize.py:55
 msgctxt "ordinal 8"
 msgid "{}th"
 msgstr ""
 
 #. Translators: Ordinal format when value ends with 9, e.g. 89th.
-#: contrib/humanize/templatetags/humanize.py:52
+#: contrib/humanize/templatetags/humanize.py:57
 msgctxt "ordinal 9"
 msgid "{}th"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:83
+#: contrib/humanize/templatetags/humanize.py:88
 #, python-format
 msgid "%(value)s million"
 msgid_plural "%(value)s million"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:84
+#: contrib/humanize/templatetags/humanize.py:89
 #, python-format
 msgid "%(value)s billion"
 msgid_plural "%(value)s billion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:85
+#: contrib/humanize/templatetags/humanize.py:90
 #, python-format
 msgid "%(value)s trillion"
 msgid_plural "%(value)s trillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:86
+#: contrib/humanize/templatetags/humanize.py:94
 #, python-format
 msgid "%(value)s quadrillion"
 msgid_plural "%(value)s quadrillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:87
+#: contrib/humanize/templatetags/humanize.py:100
 #, python-format
 msgid "%(value)s quintillion"
 msgid_plural "%(value)s quintillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:88
+#: contrib/humanize/templatetags/humanize.py:105
 #, python-format
 msgid "%(value)s sextillion"
 msgid_plural "%(value)s sextillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:89
+#: contrib/humanize/templatetags/humanize.py:109
 #, python-format
 msgid "%(value)s septillion"
 msgid_plural "%(value)s septillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:90
+#: contrib/humanize/templatetags/humanize.py:111
 #, python-format
 msgid "%(value)s octillion"
 msgid_plural "%(value)s octillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:91
+#: contrib/humanize/templatetags/humanize.py:112
 #, python-format
 msgid "%(value)s nonillion"
 msgid_plural "%(value)s nonillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:92
+#: contrib/humanize/templatetags/humanize.py:113
 #, python-format
 msgid "%(value)s decillion"
 msgid_plural "%(value)s decillion"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:93
+#: contrib/humanize/templatetags/humanize.py:114
 #, python-format
 msgid "%(value)s googol"
 msgid_plural "%(value)s googol"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:136
+#: contrib/humanize/templatetags/humanize.py:158
 msgid "one"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:136
+#: contrib/humanize/templatetags/humanize.py:159
 msgid "two"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:136
+#: contrib/humanize/templatetags/humanize.py:160
 msgid "three"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:136
+#: contrib/humanize/templatetags/humanize.py:161
 msgid "four"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:136
+#: contrib/humanize/templatetags/humanize.py:162
 msgid "five"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:137
+#: contrib/humanize/templatetags/humanize.py:163
 msgid "six"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:137
+#: contrib/humanize/templatetags/humanize.py:164
 msgid "seven"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:137
+#: contrib/humanize/templatetags/humanize.py:165
 msgid "eight"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:137
+#: contrib/humanize/templatetags/humanize.py:166
 msgid "nine"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:158
+#: contrib/humanize/templatetags/humanize.py:188
 msgid "today"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:160
+#: contrib/humanize/templatetags/humanize.py:190
 msgid "tomorrow"
 msgstr ""
 
-#: contrib/humanize/templatetags/humanize.py:162
+#: contrib/humanize/templatetags/humanize.py:192
 msgid "yesterday"
 msgstr ""
 
 #. Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
-#: contrib/humanize/templatetags/humanize.py:180
+#: contrib/humanize/templatetags/humanize.py:210
 #, python-format
 msgid "%(delta)s ago"
 msgstr ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:183
+#: contrib/humanize/templatetags/humanize.py:213
 #, python-format
 msgid "an hour ago"
 msgid_plural "%(count)s hours ago"
@@ -226,7 +226,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:186
+#: contrib/humanize/templatetags/humanize.py:216
 #, python-format
 msgid "a minute ago"
 msgid_plural "%(count)s minutes ago"
@@ -235,20 +235,20 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:189
+#: contrib/humanize/templatetags/humanize.py:219
 #, python-format
 msgid "a second ago"
 msgid_plural "%(count)s seconds ago"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:190
+#: contrib/humanize/templatetags/humanize.py:220
 msgid "now"
 msgstr ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:193
+#: contrib/humanize/templatetags/humanize.py:224
 #, python-format
 msgid "a second from now"
 msgid_plural "%(count)s seconds from now"
@@ -257,7 +257,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:196
+#: contrib/humanize/templatetags/humanize.py:229
 #, python-format
 msgid "a minute from now"
 msgid_plural "%(count)s minutes from now"
@@ -266,7 +266,7 @@ msgstr[1] ""
 
 #. Translators: please keep a non-breaking space (U+00A0) between count
 #. and time unit.
-#: contrib/humanize/templatetags/humanize.py:199
+#: contrib/humanize/templatetags/humanize.py:234
 #, python-format
 msgid "an hour from now"
 msgid_plural "%(count)s hours from now"
@@ -274,13 +274,13 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Translators: delta will contain a string like '2 months' or '1 month, 2 weeks'
-#: contrib/humanize/templatetags/humanize.py:201
+#: contrib/humanize/templatetags/humanize.py:237
 #, python-format
 msgid "%(delta)s from now"
 msgstr ""
 
 #. Translators: 'naturaltime-past' strings will be included in '%(delta)s ago'
-#: contrib/humanize/templatetags/humanize.py:205
+#: contrib/humanize/templatetags/humanize.py:242
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d year"
@@ -288,7 +288,7 @@ msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:206
+#: contrib/humanize/templatetags/humanize.py:245
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d month"
@@ -296,7 +296,7 @@ msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:207
+#: contrib/humanize/templatetags/humanize.py:248
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d week"
@@ -304,7 +304,7 @@ msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:208
+#: contrib/humanize/templatetags/humanize.py:250
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d day"
@@ -312,7 +312,7 @@ msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:209
+#: contrib/humanize/templatetags/humanize.py:252
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d hour"
@@ -320,7 +320,7 @@ msgid_plural "%(num)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:210
+#: contrib/humanize/templatetags/humanize.py:255
 #, python-format
 msgctxt "naturaltime-past"
 msgid "%(num)d minute"
@@ -329,7 +329,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. Translators: 'naturaltime-future' strings will be included in '%(delta)s from now'
-#: contrib/humanize/templatetags/humanize.py:214
+#: contrib/humanize/templatetags/humanize.py:262
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d year"
@@ -337,7 +337,7 @@ msgid_plural "%(num)d years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:215
+#: contrib/humanize/templatetags/humanize.py:265
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d month"
@@ -345,7 +345,7 @@ msgid_plural "%(num)d months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:216
+#: contrib/humanize/templatetags/humanize.py:268
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d week"
@@ -353,7 +353,7 @@ msgid_plural "%(num)d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:217
+#: contrib/humanize/templatetags/humanize.py:271
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d day"
@@ -361,7 +361,7 @@ msgid_plural "%(num)d days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:218
+#: contrib/humanize/templatetags/humanize.py:274
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d hour"
@@ -369,7 +369,7 @@ msgid_plural "%(num)d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: contrib/humanize/templatetags/humanize.py:219
+#: contrib/humanize/templatetags/humanize.py:277
 #, python-format
 msgctxt "naturaltime-future"
 msgid "%(num)d minute"
