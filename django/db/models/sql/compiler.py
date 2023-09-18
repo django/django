@@ -1595,6 +1595,60 @@ class SQLCompiler:
             return list(result)
         return result
 
+    async def async_execute_sql(
+        self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE
+    ):
+        result_type = result_type or NO_RESULTS
+        try:
+            sql, params = self.as_sql()
+            if not sql:
+                raise EmptyResultSet
+        except EmptyResultSet:
+            if result_type == MULTI:
+                return iter([])
+            else:
+                return
+        if chunked_fetch:
+            cursor = await self.connection.chunked_cursor()
+        else:
+            cursor = await self.connection.cursor()
+        try:
+            await cursor.execute(sql, params)
+        except Exception:
+            # Might fail for server-side cursors (e.g. connection closed)
+            await cursor.close()
+            raise
+
+        if result_type == CURSOR:
+            # Give the caller the cursor to process and close.
+            return cursor
+        if result_type == SINGLE:
+            try:
+                val = await cursor.fetchone()
+                if val:
+                    return val[0 : self.col_count]
+                return val
+            finally:
+                # done with the cursor
+                await cursor.close()
+        if result_type == NO_RESULTS:
+            await cursor.close()
+            return
+
+        result = async_cursor_iter(
+            cursor,
+            self.connection.features.empty_fetchmany_value,
+            self.col_count if self.has_extra_select else None,
+            chunk_size,
+        )
+        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
+            # If we are using non-chunked reads, we return the same data
+            # structure as normally, but ensure it is all read into memory
+            # before going any further. Use chunked_fetch if requested,
+            # unless the database doesn't support it.
+            return [item async for item in result]
+        return result
+
     def as_subquery_condition(self, alias, columns, compiler):
         qn = compiler.quote_name_unless_alias
         qn2 = self.connection.ops.quote_name
@@ -2097,3 +2151,11 @@ def cursor_iter(cursor, sentinel, col_count, itersize):
             yield rows if col_count is None else [r[:col_count] for r in rows]
     finally:
         cursor.close()
+
+
+async def async_cursor_iter(cursor, sentinel, col_count, itersize):
+    try:
+        while (rows := await cursor.fetchmany(itersize)) != sentinel:
+            yield rows if col_count is None else [r[:col_count] for r in rows]
+    finally:
+        await cursor.close()

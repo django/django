@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+
 from django.core import signals
 from django.db.utils import (
     DEFAULT_DB_ALIAS,
@@ -54,7 +56,10 @@ signals.request_started.connect(reset_queries)
 # their lifetime.
 def close_old_connections(**kwargs):
     for conn in connections.all(initialized_only=True):
-        conn.close_if_unusable_or_obsolete()
+        if conn.is_async:
+            return async_to_sync(conn.close_if_unusable_or_obsolete)()
+        else:
+            return conn.close_if_unusable_or_obsolete()
 
 
 signals.request_started.connect(close_old_connections)

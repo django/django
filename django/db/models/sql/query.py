@@ -429,10 +429,7 @@ class Query(BaseExpression):
             alias = None
         return target.get_col(alias, field)
 
-    def get_aggregation(self, using, aggregate_exprs):
-        """
-        Return the dictionary with the values of the existing aggregations.
-        """
+    def _init_get_aggregation(self, using, aggregate_exprs):
         if not aggregate_exprs:
             return {}
         # Store annotation mask prior to temporarily adding aggregations for
@@ -599,7 +596,10 @@ class Query(BaseExpression):
         outer_query.select_for_update = False
         outer_query.select_related = False
         compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
-        result = compiler.execute_sql(SINGLE)
+
+        return compiler, empty_set_result, outer_query
+
+    def _finish_get_aggregation(self, compiler, empty_set_result, outer_query, result):
         if result is None:
             result = empty_set_result
         else:
@@ -608,12 +608,42 @@ class Query(BaseExpression):
 
         return dict(zip(outer_query.annotation_select, result))
 
+    def get_aggregation(self, using, aggregate_exprs):
+        """
+        Return the dictionary with the values of the existing aggregations.
+        """
+        compiler, empty_set_result, outer_query = self._init_get_aggregation(
+            using, aggregate_exprs
+        )
+
+        result = compiler.execute_sql(SINGLE)
+
+        return self._finish_get_aggregation(
+            compiler, empty_set_result, outer_query, result
+        )
+
+    async def async_get_aggregation(self, using, aggregate_exprs):
+        compiler, empty_set_result, outer_query = self._init_get_aggregation(
+            using, aggregate_exprs
+        )
+
+        result = await compiler.async_execute_sql(SINGLE)
+
+        return self._finish_get_aggregation(
+            compiler, empty_set_result, outer_query, result
+        )
+
     def get_count(self, using):
         """
         Perform a COUNT() query using the current filter constraints.
         """
         obj = self.clone()
         return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+
+    async def async_get_count(self, using):
+        obj = self.clone()
+        data = await obj.async_get_aggregation(using, {"__count": Count("*")})
+        return data["__count"]
 
     def has_filters(self):
         return self.where

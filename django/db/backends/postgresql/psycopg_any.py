@@ -2,7 +2,15 @@ import ipaddress
 from functools import lru_cache
 
 try:
-    from psycopg import ClientCursor, IsolationLevel, adapt, adapters, errors, sql
+    from psycopg import (
+        ClientCursor,
+        IsolationLevel,
+        adapt,
+        adapters,
+        errors,
+        sql,
+        AsyncClientCursor,
+    )
     from psycopg.postgres import types
     from psycopg.types.datetime import TimestamptzLoader
     from psycopg.types.json import Jsonb
@@ -20,6 +28,10 @@ try:
     def mogrify(sql, params, connection):
         with connection.cursor() as cursor:
             return ClientCursor(cursor.connection).mogrify(sql, params)
+
+    async def mogrify_async(sql, params, connection):
+        async with await connection.cursor() as cursor:
+            return AsyncClientCursor(cursor.connection).mogrify(sql, params)
 
     # Adapters.
     class BaseTzLoader(TimestamptzLoader):

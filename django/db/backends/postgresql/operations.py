@@ -9,6 +9,7 @@ from django.db.backends.postgresql.psycopg_any import (
     errors,
     is_psycopg3,
     mogrify,
+    mogrify_async,
 )
 from django.db.backends.utils import split_tzname_delta
 from django.db.models.constants import OnConflict
@@ -191,6 +192,9 @@ class DatabaseOperations(BaseDatabaseOperations):
     def compose_sql(self, sql, params):
         return mogrify(sql, params, self.connection)
 
+    async def compose_sql_async(self, sql, params):
+        return await mogrify_async(sql, params, self.connection)
+
     def set_time_zone_sql(self):
         return "SELECT set_config('TimeZone', %s, false)"
 
@@ -297,6 +301,12 @@ class DatabaseOperations(BaseDatabaseOperations):
         def last_executed_query(self, cursor, sql, params):
             try:
                 return self.compose_sql(sql, params)
+            except errors.DataError:
+                return None
+
+        async def last_executed_query_async(self, cursor, sql, params):
+            try:
+                return await self.compose_sql_async(sql, params)
             except errors.DataError:
                 return None
 
