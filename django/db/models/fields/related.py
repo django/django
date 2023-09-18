@@ -773,20 +773,20 @@ class ForeignObject(RelatedField):
         attname, column = super().get_attname_column()
         return attname, None
 
-    def _get_joining_columns(self, source):
-        joining_columns = []
+    def _get_joining_fields(self, source):
+        joining_fields = []
         for lhs_field, rhs_field in source:
             if hasattr(lhs_field, "component_fields") and hasattr(
                 rhs_field, "component_fields"
             ):
-                joining_columns.extend(
-                    self._get_joining_columns(
+                joining_fields.extend(
+                    self._get_joining_fields(
                         zip(lhs_field.component_fields, rhs_field.component_fields)
                     )
                 )
             else:
-                joining_columns.append((lhs_field.column, rhs_field.column))
-        return joining_columns
+                joining_fields.append((lhs_field, rhs_field))
+        return joining_fields
 
     def get_joining_columns(self, reverse_join=False):
         warnings.warn(
@@ -794,8 +794,10 @@ class ForeignObject(RelatedField):
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
         )
-        source = self.reverse_related_fields if reverse_join else self.related_fields
-        return tuple(self._get_joining_columns(source))
+        joining_columns = []
+        for lhs_field, rhs_field in self.get_joining_fields(reverse_join):
+            joining_columns.append((lhs_field.column, rhs_field.column))
+        return tuple(joining_columns)
 
     def get_reverse_joining_columns(self):
         warnings.warn(
@@ -806,9 +808,8 @@ class ForeignObject(RelatedField):
         return self.get_joining_columns(reverse_join=True)
 
     def get_joining_fields(self, reverse_join=False):
-        return tuple(
-            self.reverse_related_fields if reverse_join else self.related_fields
-        )
+        source = self.reverse_related_fields if reverse_join else self.related_fields
+        return tuple(self._get_joining_fields(source))
 
     def get_reverse_joining_fields(self):
         return self.get_joining_fields(reverse_join=True)
