@@ -30,11 +30,6 @@ class Employee2(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-Employee2._meta.local_fields = [
-    f for f in Employee2._meta.local_fields if f != Employee2._meta.pk
-] + [Employee2._meta.pk]
-
-
 class User(models.Model):
     employee_id = models.CompositeField("employee_branch", "employee_code")
     employee_branch = models.CharField(max_length=255)
