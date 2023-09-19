@@ -79,10 +79,13 @@ class SeleniumTests(AdminSeleniumTestCase):
 
     def test_related_object_lookup_data_context(self):
         from selenium.webdriver.common.by import By
+
         album_add_url = reverse("admin:admin_views_album_add")
         self.selenium.get(self.live_server_url + album_add_url)
 
-        selects = self.selenium.find_elements(By.CSS_SELECTOR,
-                                              '[data-context="available-source"]')
-        self.assertGreater(len(selects), 0,
-                           "No select elements with data-context attribute found")
+        selects = self.selenium.find_elements(
+            By.CSS_SELECTOR, '[data-context="available-source"]'
+        )
+        self.assertGreater(
+            len(selects), 0, "No select elements with data-context attribute found"
+        )
