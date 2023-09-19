@@ -2385,8 +2385,8 @@ This has a number of caveats though:
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField`, the
   primary key attribute can only be retrieved on certain databases (currently
-  PostgreSQL, MariaDB 10.5+, and SQLite 3.35+). On other databases, it will not
-  be set.
+  PostgreSQL, MariaDB, and SQLite 3.35+). On other databases, it will not be
+  set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
