@@ -67,7 +67,13 @@ def wrap(text, width):
 class Truncator(SimpleLazyObject):
     """
     An object used to truncate text, either by characters or words.
+
+    When truncating HTML text (either chars or words), input will be limited to
+    at most `MAX_LENGTH_HTML` characters.
     """
+
+    # 5 million characters are approximately 4000 text pages or 3 web pages.
+    MAX_LENGTH_HTML = 5_000_000
 
     def __init__(self, text):
         super().__init__(lambda: str(text))
@@ -164,6 +170,11 @@ class Truncator(SimpleLazyObject):
         if words and length <= 0:
             return ""
 
+        size_limited = False
+        if len(text) > self.MAX_LENGTH_HTML:
+            text = text[: self.MAX_LENGTH_HTML]
+            size_limited = True
+
         html4_singlets = (
             "br",
             "col",
@@ -220,10 +231,14 @@ class Truncator(SimpleLazyObject):
                 # Add it to the start of the open tags list
                 open_tags.insert(0, tagname)
 
-        if current_len <= length:
-            return text
-        out = text[:end_text_pos]
         truncate_text = self.add_truncation_text("", truncate)
+
+        if current_len <= length:
+            if size_limited and truncate_text:
+                text += truncate_text
+            return text
+
+        out = text[:end_text_pos]
         if truncate_text:
             out += truncate_text
         # Close any tags still open
