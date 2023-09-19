@@ -18,10 +18,6 @@ class CompositePKTests(TestCase):
         self.assertEqual(Employee().pk, ("", None))
         self.assertEqual(Employee2().pk, ("", None))
 
-        # This won't throw, just like what other pk do
-        # self.assertRaises(TypeError, Employee, pk=("root", 1235), branch="")
-        # self.assertRaises(TypeError, Employee2, pk=("root", 1235), branch="")
-
         Employee.objects.create(
             branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
         )
@@ -41,6 +37,13 @@ class CompositePKTests(TestCase):
             TypeError, "Employee2() set field 'branch' twice, via field 'branch'."
         ):
             Employee2(composite_pk=("root", 1235), branch="")
+
+    def test_set_pk_and_component_edge_case(self):
+        employee = Employee(pk=("root", 1235), branch="other")
+        self.assertEqual(employee.branch, "root")
+
+        employee2 = Employee2(pk=("root", 1235), branch="other")
+        self.assertEqual(employee2.branch, "root")
 
     def test_relation(self):
         Employee.objects.create(
