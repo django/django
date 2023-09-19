@@ -186,8 +186,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return "`%s`" % name
 
     def return_insert_columns(self, fields):
-        # MySQL and MariaDB < 10.5.0 don't support an INSERT...RETURNING
-        # statement.
+        # MySQL doesn't support an INSERT...RETURNING statement.
         if not fields:
             return "", ()
         columns = [
