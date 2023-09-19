@@ -583,11 +583,7 @@ END;
         """
         Oracle doesn't support Exact for tuple
         """
-        if isinstance(expression, Exact):
-            return False
-        if isinstance(expression, ExpressionWrapper) and expression.conditional:
-            return self.tuple_operation(expression.expression)
-        return super().tuple_operation(expression)
+        return False
 
     def adapt_datefield_value(self, value):
         """
