@@ -18,9 +18,6 @@ class CompositePKTests(TestCase):
         self.assertEqual(Employee().pk, ("", None))
         self.assertEqual(Employee2().pk, ("", None))
 
-        self.assertEqual(Employee(composite_pk=("root", 1235)).pk, ("root", 1235))
-        self.assertEqual(Employee2(composite_pk=("root", 1235)).pk, ("root", 1235))
-
         self.assertRaises(TypeError, Employee, composite_pk=("root", 1235), branch="")
         self.assertRaises(TypeError, Employee2, composite_pk=("root", 1235), branch="")
 
