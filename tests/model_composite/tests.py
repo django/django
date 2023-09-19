@@ -18,8 +18,14 @@ class CompositePKTests(TestCase):
         self.assertEqual(Employee().pk, ("", None))
         self.assertEqual(Employee2().pk, ("", None))
 
-        self.assertRaises(TypeError, Employee, composite_pk=("root", 1235), branch="")
-        self.assertRaises(TypeError, Employee2, composite_pk=("root", 1235), branch="")
+        with self.assertRaisesMessage(
+            TypeError, "Employee() set field 'branch' twice, via field 'branch'."
+        ):
+            Employee(composite_pk=("root", 1235), branch="")
+        with self.assertRaisesMessage(
+            TypeError, "Employee2() set field 'branch' twice, via field 'branch'."
+        ):
+            Employee2(composite_pk=("root", 1235), branch="")
 
         # This won't throw, just like what other pk do
         # self.assertRaises(TypeError, Employee, pk=("root", 1235), branch="")
