@@ -37,7 +37,7 @@ class CompositeType:
         repr_fields = ", ".join(f"{name}=%r" for name in fields)
         class_namespace = {
             "__doc__": f"{name}({doc_fields})",
-            "_repr_fmt": "({repr_fields})",
+            "_repr_fmt": f"({repr_fields})",
             "__slots__": ("_instance",),
             "_fields": fields,
         }
