@@ -395,10 +395,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
                 "PositiveIntegerField": "`%(column)s` >= 0",
                 "PositiveSmallIntegerField": "`%(column)s` >= 0",
             }
-            if self.mysql_is_mariadb and self.mysql_version < (10, 4, 3):
-                # MariaDB < 10.4.3 doesn't automatically use the JSON_VALID as
-                # a check constraint.
-                check_constraints["JSONField"] = "JSON_VALID(`%(column)s`)"
             return check_constraints
         return {}
 
