@@ -448,7 +448,7 @@ backends.
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in
   ``INSERT`` queries.
 
-* ``DatabaseFeatures.supports_default_keyword_in_bulk insert`` should be set to
+* ``DatabaseFeatures.supports_default_keyword_in_bulk_insert`` should be set to
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
   ``INSERT`` queries.
 
