@@ -41,58 +41,115 @@ class CompositePKTests(TestCase):
         employee = Employee(pk=("root", 1235), branch="other")
         self.assertEqual(employee.branch, "root")
 
-    def test_relation(self):
+    def test_foreign_object_lookups(self):
         Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        user = User.objects.create(employee_branch="root", employee_code=1234)
+
+        self.assertEqual(user.employee.last_name, "Bar")
+        self.assertEqual(user.employee2.last_name, "Bar")
+
+    def test_get_component_lookup(self):
+        employee = Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        User.objects.create(employee_branch="root", employee_code=1234)
+
+        user = User.objects.get(employee__branch="root", employee__employee_code=1234)
+        self.assertEqual(user.employee_branch, "root")
+        self.assertEqual(user.employee_code, 1234)
+        self.assertEqual(user.employee, employee)
+        self.assertEqual(user.employee2, employee)
+
+        user2 = User.objects.get(
+            employee2__branch="root", employee2__employee_code=1234
+        )
+        self.assertEqual(user2.employee_branch, "root")
+        self.assertEqual(user2.employee_code, 1234)
+        self.assertEqual(user2.employee, employee)
+        self.assertEqual(user2.employee2, employee)
+
+    def test_get_local_and_remote_lookup(self):
+        employee = Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        User.objects.create(employee_branch="root", employee_code=1234)
+
+        user = User.objects.get(employee_branch="root", employee__employee_code=1234)
+        self.assertEqual(user.employee_branch, "root")
+        self.assertEqual(user.employee_code, 1234)
+        self.assertEqual(user.employee, employee)
+        self.assertEqual(user.employee2, employee)
+
+        user2 = User.objects.get(employee_branch="root", employee2__employee_code=1234)
+        self.assertEqual(user2.employee_branch, "root")
+        self.assertEqual(user2.employee_code, 1234)
+        self.assertEqual(user2.employee, employee)
+        self.assertEqual(user2.employee2, employee)
+
+    def test_get_foreign_object_pk_lookup(self):
+        employee = Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        User.objects.create(employee_branch="root", employee_code=1234)
+
+        user = User.objects.get(employee__pk=employee.pk)
+        self.assertEqual(user.employee_branch, "root")
+        self.assertEqual(user.employee_code, 1234)
+        self.assertEqual(user.employee, employee)
+        self.assertEqual(user.employee2, employee)
+
+        user2 = User.objects.get(employee2__pk=employee.pk)
+        self.assertEqual(user2.employee_branch, "root")
+        self.assertEqual(user2.employee_code, 1234)
+        self.assertEqual(user2.employee, employee)
+        self.assertEqual(user2.employee2, employee)
+
+    def test_get_mixed_lookup(self):
+        employee = Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        User.objects.create(employee_branch="root", employee_code=1234)
+
+        user = User.objects.get(employee__branch="root", employee2__employee_code=1234)
+        self.assertEqual(user.employee_branch, "root")
+        self.assertEqual(user.employee_code, 1234)
+        self.assertEqual(user.employee, employee)
+        self.assertEqual(user.employee2, employee)
+
+    def test_get_reverse(self):
+        employee = Employee.objects.create(
             branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
         )
         Employee.objects.create(
             branch="other", employee_code=1234, first_name="Foo", last_name="Baz"
         )
-        user_id = User.objects.create(employee_branch="root", employee_code=1234).id
+        user = User.objects.create(employee_branch="root", employee_code=1234)
+
+        self.assertEqual(Employee.objects.get(user=user), employee)
+        self.assertEqual(Employee.objects.get(user__id=user.pk), employee)
+        self.assertEqual(Employee.objects.get(user__pk=user.pk), employee)
+        self.assertEqual(Employee.objects.get(user__employee_id=employee.pk), employee)
+
+        self.assertEqual(Employee.objects.get(user2=user), employee)
+        self.assertEqual(Employee.objects.get(user2__id=user.pk), employee)
+        self.assertEqual(Employee.objects.get(user2__pk=user.pk), employee)
+        self.assertEqual(Employee.objects.get(user2__employee_id=employee.pk), employee)
+
+    def test_get_reverse_mixed(self):
+        employee = Employee.objects.create(
+            branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
+        )
+        Employee.objects.create(
+            branch="other", employee_code=1234, first_name="Foo", last_name="Baz"
+        )
+        user = User.objects.create(employee_branch="root", employee_code=1234)
 
         self.assertEqual(
-            User.objects.get(
-                employee_branch="root", employee_code=1234
-            ).employee.last_name,
-            "Bar",
-        )
-        self.assertEqual(
-            User.objects.get(
-                employee_branch="root", employee_code=1234
-            ).employee2.last_name,
-            "Bar",
+            Employee.objects.get(user2__id=user.id, user__employee_id=("root", 1234)),
+            employee,
         )
 
-        self.assertEqual(
-            User.objects.order_by("employee__pk")
-            .get(employee_code=1234, employee__branch="root")
-            .employee.last_name,
-            "Bar",
-        )
-        self.assertEqual(
-            User.objects.get(employee__pk=("root", 1234)).employee.last_name, "Bar"
-        )
-        self.assertEqual(
-            User.objects.order_by("employee2__pk")
-            .get(employee_code=1234, employee2__branch="root")
-            .employee2.last_name,
-            "Bar",
-        )
-        self.assertEqual(
-            User.objects.get(employee2__pk=("root", 1234)).employee.last_name, "Bar"
-        )
-
-        self.assertEqual(Employee.objects.get(user__id=user_id).last_name, "Bar")
-        self.assertEqual(
-            Employee.objects.get(user__employee_id=("root", 1234)).last_name, "Bar"
-        )
-        self.assertEqual(Employee.objects.get(user2__id=user_id).last_name, "Bar")
-        self.assertEqual(
-            Employee.objects.get(user2__employee_id=("root", 1234)).last_name, "Bar"
-        )
-        self.assertEqual(
-            Employee.objects.get(
-                user2__id=user_id, user__employee_id=("root", 1234)
-            ).last_name,
-            "Bar",
-        )
+        with self.assertRaises(Employee.DoesNotExist):
+            Employee.objects.get(user2__id=user.id, user__employee_id=("other", 1234))
