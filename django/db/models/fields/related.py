@@ -794,8 +794,9 @@ class ForeignObject(RelatedField):
             "get_joining_fields() instead.",
             RemovedInDjango60Warning,
         )
+        source = self.reverse_related_fields if reverse_join else self.related_fields
         joining_columns = []
-        for lhs_field, rhs_field in self.get_joining_fields(reverse_join):
+        for lhs_field, rhs_field in self._get_joining_fields(source):
             joining_columns.append((lhs_field.column, rhs_field.column))
         return tuple(joining_columns)
 
