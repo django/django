@@ -9,15 +9,6 @@ class CompositePKTests(TestCase):
         New objects can be created both with pk and the custom name
         """
 
-        self.assertEqual(Employee(pk=("root", 1235)).pk, ("root", 1235))
-        self.assertEqual(Employee2(pk=("root", 1235)).pk, ("root", 1235))
-
-        self.assertEqual(Employee(composite_pk=("root", 1235)).pk, ("root", 1235))
-        self.assertEqual(Employee2(composite_pk=("root", 1235)).pk, ("root", 1235))
-
-        self.assertEqual(Employee().pk, ("", None))
-        self.assertEqual(Employee2().pk, ("", None))
-
         Employee.objects.create(
             branch="root", employee_code=1234, first_name="Foo", last_name="Bar"
         )
@@ -27,6 +18,22 @@ class CompositePKTests(TestCase):
         Employee.objects.only("pk").get(pk=("root", 1235))
         Employee.objects.defer("pk").get(pk=("root", 1235))
         Employee.objects.filter(pk__in=[("root", 1234), ("root", 1235)]).last()
+
+    def test_set_composite_field(self):
+        self.assertEqual(Employee(composite_pk=("root", 1235)).pk, ("root", 1235))
+        self.assertEqual(Employee2(composite_pk=("root", 1235)).pk, ("root", 1235))
+
+    def test_set_pk(self):
+        self.assertEqual(Employee(pk=("root", 1235)).pk, ("root", 1235))
+        self.assertEqual(Employee2(pk=("root", 1235)).pk, ("root", 1235))
+
+    def test_composite_field_empty(self):
+        self.assertEqual(Employee().composite_pk, ("", None))
+        self.assertEqual(Employee2().composite_pk, ("", None))
+
+    def test_pk_empty(self):
+        self.assertEqual(Employee().pk, ("", None))
+        self.assertEqual(Employee2().pk, ("", None))
 
     def test_set_composite_field_and_component(self):
         with self.assertRaisesMessage(
