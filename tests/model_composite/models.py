@@ -16,20 +16,6 @@ class Employee(models.Model):
         return "%s %s" % (self.first_name, self.last_name)
 
 
-class Employee2(models.Model):
-    branch = models.CharField(max_length=255)
-    employee_code = models.IntegerField(db_column="code")
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
-    composite_pk = models.CompositeField("branch", "employee_code", primary_key=True)
-
-    class Meta:
-        ordering = ("last_name", "first_name")
-
-    def __str__(self):
-        return "%s %s" % (self.first_name, self.last_name)
-
-
 class User(models.Model):
     employee_id = models.CompositeField("employee_branch", "employee_code")
     employee_branch = models.CharField(max_length=255)

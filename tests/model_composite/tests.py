@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .models import Employee, Employee2, User
+from .models import Employee, User
 
 
 class CompositePKTests(TestCase):
@@ -21,36 +21,25 @@ class CompositePKTests(TestCase):
 
     def test_set_composite_field(self):
         self.assertEqual(Employee(composite_pk=("root", 1235)).pk, ("root", 1235))
-        self.assertEqual(Employee2(composite_pk=("root", 1235)).pk, ("root", 1235))
 
     def test_set_pk(self):
         self.assertEqual(Employee(pk=("root", 1235)).pk, ("root", 1235))
-        self.assertEqual(Employee2(pk=("root", 1235)).pk, ("root", 1235))
 
     def test_composite_field_empty(self):
         self.assertEqual(Employee().composite_pk, ("", None))
-        self.assertEqual(Employee2().composite_pk, ("", None))
 
     def test_pk_empty(self):
         self.assertEqual(Employee().pk, ("", None))
-        self.assertEqual(Employee2().pk, ("", None))
 
     def test_set_composite_field_and_component(self):
         with self.assertRaisesMessage(
             TypeError, "Employee() set field 'branch' twice, via field 'branch'."
         ):
             Employee(composite_pk=("root", 1235), branch="")
-        with self.assertRaisesMessage(
-            TypeError, "Employee2() set field 'branch' twice, via field 'branch'."
-        ):
-            Employee2(composite_pk=("root", 1235), branch="")
 
     def test_set_pk_and_component_edge_case(self):
         employee = Employee(pk=("root", 1235), branch="other")
         self.assertEqual(employee.branch, "root")
-
-        employee2 = Employee2(pk=("root", 1235), branch="other")
-        self.assertEqual(employee2.branch, "root")
 
     def test_relation(self):
         Employee.objects.create(
