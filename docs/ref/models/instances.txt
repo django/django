@@ -30,7 +30,9 @@ need to :meth:`~Model.save()`.
     You may be tempted to customize the model by overriding the ``__init__``
     method. If you do so, however, take care not to change the calling
     signature as any change may prevent the model instance from being saved.
-    Rather than overriding ``__init__``, try using one of these approaches:
+    Additionally, referring to model fields within ``__init__`` may potentially
+    result in infinite recursion errors in some circumstances.  Rather than
+    overriding ``__init__``, try using one of these approaches:
 
     #. Add a classmethod on the model class::
 
