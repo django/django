@@ -42,7 +42,10 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
     "sphinx.ext.autosectionlabel",
+    "sphinx_copybutton",
 ]
+copybutton_prompt_text = r"\.\.\.\\\> |\$ "
+copybutton_prompt_is_regexp = True
 
 # AutosectionLabel settings.
 # Uses a <page>:<label> schema which doesn't work for duplicate sub-section
