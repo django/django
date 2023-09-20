@@ -3840,14 +3840,15 @@ documentation to learn how to create your aggregates.
     currently emulates these features using a text field. Attempts to use
     aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
-.. admonition:: Empty queryset
+.. admonition:: Empty querysets or groups
 
-    Aggregation functions return ``None`` when used with an empty
-    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
-    instead of ``0`` if the ``QuerySet`` contains no entries. To return another
-    value instead, pass a value to the ``default`` argument. An exception is
-    ``Count``, which does return ``0`` if the ``QuerySet`` is empty. ``Count``
-    does not support the ``default`` argument.
+    Aggregation functions return ``None`` when used with an empty ``QuerySet``
+    or group. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries or for any empty
+    group in a non-empty ``QuerySet``. To return another value instead, define
+    the ``default`` argument. ``Count`` is an exception to this behavior; it
+    returns ``0`` if the ``QuerySet`` is empty since ``Count`` does not support
+    the ``default`` argument.
 
 All aggregates have the following parameters in common:
 
