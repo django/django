@@ -7,7 +7,7 @@ from django.utils.functional import cached_property
 
 
 class DatabaseFeatures(BaseDatabaseFeatures):
-    minimum_database_version = (12,)
+    minimum_database_version = (13,)
     allows_group_by_selected_pks = True
     can_return_columns_from_insert = True
     can_return_rows_from_bulk_insert = True
@@ -125,10 +125,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "PositiveIntegerField": "IntegerField",
             "PositiveSmallIntegerField": "SmallIntegerField",
         }
-
-    @cached_property
-    def is_postgresql_13(self):
-        return self.connection.pg_version >= 130000
 
     @cached_property
     def is_postgresql_14(self):

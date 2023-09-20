@@ -228,11 +228,22 @@ backends.
 
 * ...
 
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.5 is removed.
+
 Dropped support for MariaDB 10.4
 --------------------------------
 
 Upstream support for MariaDB 10.4 ends in June 2024. Django 5.1 supports
 MariaDB 10.5 and higher.
+
+Dropped support for PostgreSQL 12
+---------------------------------
+
+Upstream support for PostgreSQL 12 ends in November 2024. Django 5.1 supports
+PostgreSQL 13 and higher.
 
 Miscellaneous
 -------------
