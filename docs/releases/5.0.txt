@@ -134,7 +134,15 @@ Database generated model field
 
 The new :class:`~django.db.models.GeneratedField` allows creation of database
 generated columns. This field can be used on all supported database backends
-to create a field that is always computed from other fields.
+to create a field that is always computed from other fields. For example::
+
+    from django.db import models
+    from django.db.models import F
+
+
+    class Square(models.Model):
+        side = models.IntegerField()
+        area = models.GeneratedField(expression=F("side") * F("side"), db_persist=True)
 
 More options for declaring field choices
 ----------------------------------------
