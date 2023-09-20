@@ -392,6 +392,7 @@ class Command(BaseCommand):
         if os.path.isdir(os.path.join("conf", "locale")):
             self.locale_paths = [os.path.abspath(os.path.join("conf", "locale"))]
             self.default_locale_path = self.locale_paths[0]
+            self.ignore_patterns.append("views/templates/i18n_catalog.js")
             self.invoked_for_django = True
         else:
             if self.settings_available:
