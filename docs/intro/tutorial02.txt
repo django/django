@@ -189,8 +189,10 @@ this case, we've set the :attr:`~django.db.models.Field.default` value of
 
 Finally, note a relationship is defined, using
 :class:`~django.db.models.ForeignKey`. That tells Django each ``Choice`` is
-related to a single ``Question``. Django supports all the common database
-relationships: many-to-one, many-to-many, and one-to-one.
+related to a single ``Question``. Also note ``on_delete=models.CASCADE`` that says Django to
+delete all ``choice``s of a ``Question`` when the ``Question`` is deleted. 
+
+Django supports all the common database relationships: many-to-one, many-to-many, and one-to-one.
 
 Activating models
 =================
