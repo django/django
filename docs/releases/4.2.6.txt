@@ -12,3 +12,6 @@ Bugfixes
 * Fixed a regression in Django 4.2.5 where overriding the deprecated
   ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings in tests caused
   the main ``STORAGES`` to mutate (:ticket:`34821`).
+* Fixed a regression in Django 4.x where math expressions involving two
+  ``PositiveIntegerField``s resolve incorrectly resolve to an ``IntegerField``
+  instead of a ``PositiveIntegerField``.

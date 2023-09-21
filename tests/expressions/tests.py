@@ -34,6 +34,7 @@ from django.db.models import (
     Model,
     OrderBy,
     OuterRef,
+    PositiveIntegerField,
     Q,
     StdDev,
     Subquery,
@@ -2456,6 +2457,25 @@ class CombinableTests(SimpleTestCase):
 
 
 class CombinedExpressionTests(SimpleTestCase):
+    def test_resolve_output_field_positive_integer(self):
+        lhs = rhs = combined = PositiveIntegerField
+        connectors = [
+            Combinable.ADD,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        ]
+
+        for connector in connectors:
+            with self.subTest(lhs=lhs, connector=connector, rhs=rhs, combined=combined):
+                expr = CombinedExpression(
+                    Expression(lhs()),
+                    connector,
+                    Expression(rhs()),
+                )
+                self.assertIsInstance(expr.output_field, combined)
+
     def test_resolve_output_field_number(self):
         tests = [
             (IntegerField, AutoField, IntegerField),
