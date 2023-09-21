@@ -512,6 +512,25 @@ class Expression(BaseExpression, Combinable):
 
 _connector_combinations = [
     # Numeric operations - operands of same type.
+    # PositiveIntegerField should take precedence over IntegerField (except
+    # subtraction).
+    {
+        connector: [
+            (
+                fields.PositiveIntegerField,
+                fields.PositiveIntegerField,
+                fields.PositiveIntegerField,
+            ),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        )
+    },
+    # Other numeric operands.
     {
         connector: [
             (fields.IntegerField, fields.IntegerField, fields.IntegerField),
