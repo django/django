@@ -1,4 +1,5 @@
 import unicodedata
+import warnings
 
 from django import forms
 from django.contrib.auth import authenticate, get_user_model, password_validation
@@ -9,6 +10,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
 from django.template import loader
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.utils.text import capfirst
@@ -333,7 +335,7 @@ class PasswordResetForm(forms.Form):
         self,
         domain_override=None,
         subject_template_name="registration/password_reset_subject.txt",
-        email_template_name="registration/password_reset_email.html",
+        email_template_name=None,
         use_https=False,
         token_generator=default_token_generator,
         from_email=None,
@@ -345,6 +347,17 @@ class PasswordResetForm(forms.Form):
         Generate a one-use only link for resetting password and send it to the
         user.
         """
+        if email_template_name is None:
+            email_template_name = [
+                "registration/password_reset_email.txt",
+                "registration/password_reset_email.html",
+            ]
+        if email_template_name == "registration/password_reset_email.html":
+            warnings.warn(
+                "Template registration/password_reset_email.html is deprecated, please "
+                "use registration/password_reset_email.txt.",
+                category=RemovedInDjango60Warning,
+            )
         email = self.cleaned_data["email"]
         if not domain_override:
             current_site = get_current_site(request)

@@ -211,7 +211,11 @@ class PasswordContextMixin:
 
 
 class PasswordResetView(PasswordContextMixin, FormView):
-    email_template_name = "registration/password_reset_email.html"
+    # RemovedInDjango60Warning: remove html template
+    email_template_name = [
+        "registration/password_reset_email.txt",
+        "registration/password_reset_email.html",
+    ]
     extra_email_context = None
     form_class = PasswordResetForm
     from_email = None

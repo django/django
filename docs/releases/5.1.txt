@@ -258,7 +258,9 @@ Features deprecated in 5.1
 Miscellaneous
 -------------
 
-* ...
+* The template ``"registration/password_reset_email.html"`` has been renamed to
+  ``"registration/password_reset_email.txt"``. Referring to the html version is
+  deprecated.
 
 Features removed in 5.1
 =======================
