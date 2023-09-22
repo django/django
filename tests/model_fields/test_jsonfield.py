@@ -29,6 +29,7 @@ from django.db.models import (
 from django.db.models.expressions import RawSQL
 from django.db.models.fields.json import (
     KT,
+    K,
     KeyTextTransform,
     KeyTransform,
     KeyTransformFactory,
@@ -302,7 +303,7 @@ class TestQuerying(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.primitives = [True, False, "yes", 7, 9.6]
-        values = [
+        cls.values = [
             None,
             [],
             {},
@@ -329,7 +330,9 @@ class TestQuerying(TestCase):
                 "bax": {"foo": "bar"},
             },
         ]
-        cls.objs = [NullableJSONModel.objects.create(value=value) for value in values]
+        cls.objs = [
+            NullableJSONModel.objects.create(value=value) for value in cls.values
+        ]
         if connection.features.supports_primitives_in_json_field:
             cls.objs.extend(
                 [
@@ -1113,6 +1116,38 @@ class TestQuerying(TestCase):
             c__contains="uot",
         )
         self.assertSequenceEqual(qs, [self.objs[4]])
+
+    def test_key_transform_from_lookup(self):
+        qs = NullableJSONModel.objects.filter(value__o='"quoted"')
+        values = qs.values(
+            a=K("value__a"),
+            c=K("value__c"),
+            d=K("value__d"),
+            h=K("value__h"),
+            i=K("value__i"),
+            j=K("value__j"),
+            k=K("value__k"),
+            n=K("value__n"),
+            o=KT("value__o"),
+            p=K("value__p"),
+            r=K("value__r"),
+        )
+        self.assertDictEqual(values[0], self.values[4])
+        text_values = qs.values(
+            a=KT("value__a"),
+            c=KT("value__c"),
+            d=KT("value__d"),
+            h=KT("value__h"),
+            i=KT("value__i"),
+            j=KT("value__j"),
+            k=KT("value__k"),
+            n=KT("value__n"),
+            o=KT("value__o"),
+            p=KT("value__p"),
+            r=KT("value__r"),
+        )
+        self.assertNotEqual(text_values[0], values[0])
+        self.assertNotEqual(text_values[0], self.values[4])
 
     def test_key_text_transform_from_lookup_invalid(self):
         msg = "Lookup must contain key or index transforms."
