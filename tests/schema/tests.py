@@ -32,6 +32,7 @@ from django.db.models import (
     FloatField,
     ForeignKey,
     ForeignObject,
+    GeneratedField,
     Index,
     IntegerField,
     JSONField,
@@ -50,7 +51,7 @@ from django.db.models import (
     UUIDField,
     Value,
 )
-from django.db.models.fields.json import KeyTextTransform
+from django.db.models.fields.json import KT, KeyTextTransform
 from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
 from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
@@ -809,6 +810,24 @@ class SchemaTests(TransactionTestCase):
         columns = self.column_classes(Author)
         # Introspection treats BLOBs as TextFields
         self.assertEqual(columns["bits"][0], "TextField")
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_json_field", "supports_stored_generated_columns")
+    def test_add_generated_field_with_kt_model(self):
+        class GeneratedFieldKTModel(Model):
+            data = JSONField()
+            status = GeneratedField(expression=KT("data__status"), db_persist=True)
+
+            class Meta:
+                app_label = "schema"
+
+        with CaptureQueriesContext(connection) as ctx:
+            with connection.schema_editor() as editor:
+                editor.create_model(GeneratedFieldKTModel)
+        self.assertIs(
+            any("None" in query["sql"] for query in ctx.captured_queries),
+            False,
+        )
 
     @isolate_apps("schema")
     def test_add_auto_field(self):
