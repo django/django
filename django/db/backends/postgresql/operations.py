@@ -153,17 +153,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = "%s"
-
-        if lookup_type == "isnull" and internal_type in (
-            "CharField",
-            "EmailField",
-            "TextField",
-            "CICharField",
-            "CIEmailField",
-            "CITextField",
-        ):
-            return "%s::text"
-
         # Cast text lookups to text to allow things like filter(x__contains=4)
         if lookup_type in (
             "iexact",
