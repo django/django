@@ -77,6 +77,11 @@ above:
     ... )
     {'price_diff': 46.85}
 
+    # Provide default to be returned instead of None, if QuerySet is empty.
+    >>> from django.db.models import Sum
+    >>> Book.objects.aggregate(Sum("price", default=0))
+    {"price__sum": Decimal('0')}
+
     # All the following queries involve traversing the Book<->Publisher
     # foreign key relationship backwards.
 
