@@ -406,6 +406,7 @@ def _init_worker(
     process_setup=None,
     process_setup_args=None,
     debug_mode=None,
+    used_aliases=None,
 ):
     """
     Switch to databases dedicated to this worker.
@@ -430,7 +431,8 @@ def _init_worker(
         django.setup()
         setup_test_environment(debug=debug_mode)
 
-    for alias in connections:
+    db_aliases = used_aliases or connections
+    for alias in db_aliases:
         connection = connections[alias]
         if start_method == "spawn":
             # Restore initial settings in spawned processes.
@@ -491,6 +493,7 @@ class ParallelTestSuite(unittest.TestSuite):
         self.buffer = buffer
         self.initial_settings = None
         self.serialized_contents = None
+        self.used_aliases = None
         super().__init__()
 
     def run(self, result):
@@ -520,6 +523,7 @@ class ParallelTestSuite(unittest.TestSuite):
                 self.process_setup.__func__,
                 self.process_setup_args,
                 self.debug_mode,
+                self.used_aliases,
             ],
         )
         args = [
@@ -1052,6 +1056,7 @@ class DiscoverRunner:
         suite.serialized_aliases = set(
             alias for alias, serialize in databases.items() if serialize
         )
+        suite.used_aliases = set(databases)
         with self.time_keeper.timed("Total database setup"):
             old_config = self.setup_databases(
                 aliases=databases,
