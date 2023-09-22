@@ -12,3 +12,13 @@ Bugfixes
 * Fixed a regression in Django 4.2.5 where overriding the deprecated
   ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings in tests caused
   the main ``STORAGES`` to mutate (:ticket:`34821`).
+
+* Fixed a regression in Django 4.2 that caused unnecessary casting of string
+  based fields (``CharField``, ``EmailField``, ``TextField``, ``CICharField``,
+  ``CIEmailField``, and ``CITextField``) used with the ``__isnull`` lookup on
+  PostgreSQL. As a consequence, the pre-Django 4.2 indexes didn't match and
+  were not used by the query planner (:ticket:`34840`).
+
+  You may need to recreate indexes propagated to the database with Django
+  4.2 - 4.2.5 as they contain unnecessary ``::text`` casting that is avoided as
+  of this release.
