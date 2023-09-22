@@ -700,7 +700,10 @@ class TestQuerying(TestCase):
         query = NullableJSONModel.objects.distinct("value__k__l").values_list(
             "value__k__l"
         )
-        self.assertSequenceEqual(query, [("m",), (None,)])
+        expected = [("m",), (None,)]
+        if not connection.features.nulls_order_largest:
+            expected.reverse()
+        self.assertSequenceEqual(query, expected)
 
     def test_isnull_key(self):
         # key__isnull=False works the same as has_key='key'.
