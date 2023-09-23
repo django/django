@@ -425,7 +425,9 @@ class Tests(TestCase):
     def test_check_database_version_supported(self, mocked_get_database_version):
         msg = "PostgreSQL 13 or later is required (found 12)."
         with self.assertRaisesMessage(NotSupportedError, msg):
-            connection.check_database_version_supported()
+            connection.check_database_version_supported(
+                connection.get_database_version()
+            )
         self.assertTrue(mocked_get_database_version.called)
 
     def test_compose_sql_when_no_connection(self):

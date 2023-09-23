@@ -111,7 +111,9 @@ class Tests(TestCase):
     def test_check_database_version_supported(self, mocked_get_database_version):
         msg = "SQLite 3.27 or later is required (found 3.26)."
         with self.assertRaisesMessage(NotSupportedError, msg):
-            connection.check_database_version_supported()
+            connection.check_database_version_supported(
+                connection.get_database_version()
+            )
         self.assertTrue(mocked_get_database_version.called)
 
 

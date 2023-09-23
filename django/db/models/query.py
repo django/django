@@ -85,25 +85,43 @@ class ModelIterable(BaseIterable):
     def __iter__(self):
         queryset = self.queryset
         db = queryset.db
+        if not queryset.db_is_async:
+            compiler, results = self._get_results()
+        else:
+            compiler, results = async_to_sync(self._async_get_results)()
+        yield from self._generator(queryset, db, compiler, results)
+
+    async def __aiter__(self):
+        queryset = self.queryset
+        db = queryset.db
+        if queryset.db_is_async:
+            compiler, results = await self._async_get_results()
+        else:
+            compiler, results = await sync_to_async(self._get_results)()
+        for item in self._generator(queryset, db, compiler, results):
+            yield item
+
+    def _get_results(self):
+        queryset = self.queryset
+        db = queryset.db
         compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
         results = compiler.execute_sql(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         )
-        yield from self._generator(queryset, db, compiler, results)
+        return compiler, results
 
-    async def __aiter__(self):
+    async def _async_get_results(self):
         queryset = self.queryset
         db = queryset.db
         compiler = queryset.query.get_compiler(using=db)
         # Execute the query. This will also fill compiler.select, klass_info,
         # and annotations.
-        results = await compiler.async_execute_sql(
+        results = await compiler.execute_sql(
             chunked_fetch=self.chunked_fetch, chunk_size=self.chunk_size
         )
-        for obj in self._generator(queryset, db, compiler, results):
-            yield obj
+        return compiler, results
 
     @staticmethod
     def _generator(queryset, db, compiler, results):
@@ -2457,8 +2475,12 @@ def _prefetch_related_objects_generator(model_instances, *related_lookups):
                 obj_to_fetch = [obj for obj in obj_list if not is_fetched(obj)]
 
             if obj_to_fetch:
-                yield obj_to_fetch, prefetcher, lookup, level
-                obj_list, additional_lookups = yield
+                obj_list, additional_lookups = yield (
+                    obj_to_fetch,
+                    prefetcher,
+                    lookup,
+                    level,
+                )
                 # We need to ensure we don't keep adding lookups from the
                 # same relationships to stop infinite recursion. So, if we
                 # are already on an automatically added lookup, don't add
@@ -2514,21 +2536,31 @@ def prefetch_related_objects(model_instances, *related_lookups):
     if not model_instances:
         return  # nothing to do
 
-    if connections[model_instances[0]._state.db].is_async:
+    if (
+        hasattr(model_instances[0], "_state")
+        and connections[model_instances[0]._state.db].is_async
+    ):
         return async_to_sync(aprefetch_related_objects)(
             model_instances, *related_lookups
         )
 
-    g = _prefetch_related_objects_generator(model_instances, *related_lookups)
-    for obj_to_fetch, prefetcher, lookup, level in g:
-        g.send(
-            aprefetch_one_level(
+    generator = _prefetch_related_objects_generator(model_instances, *related_lookups)
+    try:
+        obj_to_fetch, prefetcher, lookup, level = next(generator)
+        while True:
+            all_related_objects, additional_lookups = prefetch_one_level(
                 obj_to_fetch,
                 prefetcher,
                 lookup,
                 level,
             )
-        )
+            obj_to_fetch, prefetcher, lookup, level = generator.send(
+                (all_related_objects, additional_lookups)
+            )
+    except StopIteration:
+        pass
+    finally:
+        generator.close()
 
 
 async def aprefetch_related_objects(model_instances, *related_lookups):
@@ -2536,21 +2568,31 @@ async def aprefetch_related_objects(model_instances, *related_lookups):
     if not model_instances:
         return  # nothing to do
 
-    if not connections[model_instances[0]._state.db].is_async:
+    if (
+        hasattr(model_instances[0], "_state")
+        and not connections[model_instances[0]._state.db].is_async
+    ):
         return await sync_to_async(prefetch_related_objects)(
             model_instances, *related_lookups
         )
 
-    g = _prefetch_related_objects_generator(model_instances, *related_lookups)
-    for obj_to_fetch, prefetcher, lookup, level in g:
-        g.send(
-            await aprefetch_one_level(
+    generator = _prefetch_related_objects_generator(model_instances, *related_lookups)
+    try:
+        obj_to_fetch, prefetcher, lookup, level = next(generator)
+        while True:
+            all_related_objects, additional_lookups = await aprefetch_one_level(
                 obj_to_fetch,
                 prefetcher,
                 lookup,
                 level,
             )
-        )
+            obj_to_fetch, prefetcher, lookup, level = generator.send(
+                (all_related_objects, additional_lookups)
+            )
+    except StopIteration:
+        pass
+    finally:
+        generator.close()
 
 
 def get_prefetcher(instance, through_attr, to_attr):

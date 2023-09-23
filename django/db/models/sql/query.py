@@ -430,8 +430,6 @@ class Query(BaseExpression):
         return target.get_col(alias, field)
 
     def _init_get_aggregation(self, using, aggregate_exprs):
-        if not aggregate_exprs:
-            return {}
         # Store annotation mask prior to temporarily adding aggregations for
         # resolving purpose to facilitate their subsequent removal.
         refs_subquery = False
@@ -612,6 +610,9 @@ class Query(BaseExpression):
         """
         Return the dictionary with the values of the existing aggregations.
         """
+        if not aggregate_exprs:
+            return {}
+
         compiler, empty_set_result, outer_query = self._init_get_aggregation(
             using, aggregate_exprs
         )
@@ -623,6 +624,10 @@ class Query(BaseExpression):
         )
 
     async def async_get_aggregation(self, using, aggregate_exprs):
+        """See get_aggregation()."""
+        if not aggregate_exprs:
+            return {}
+
         compiler, empty_set_result, outer_query = self._init_get_aggregation(
             using, aggregate_exprs
         )
