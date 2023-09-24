@@ -607,10 +607,9 @@ class QueryPerformingAppTests(TransactionTestCase):
         custom_settings = override_settings(
             INSTALLED_APPS=[f"apps.query_performing_app.apps.{app_config_name}"]
         )
-        # Ignore the RuntimeWarning, as override_settings.enable() calls
-        # AppConfig.ready() which will trigger the warning.
-        with self.assertWarnsMessage(RuntimeWarning, self.expected_msg):
-            custom_settings.enable()
+        custom_settings.enable()
+        old_stored_app_configs = apps.stored_app_configs
+        apps.stored_app_configs = []
         try:
             with patch.multiple(apps, ready=False, loading=False, app_configs={}):
                 with self.assertWarnsMessage(RuntimeWarning, self.expected_msg):
@@ -619,4 +618,5 @@ class QueryPerformingAppTests(TransactionTestCase):
                 app_config = apps.get_app_config("query_performing_app")
                 return app_config.query_results
         finally:
+            setattr(apps, "stored_app_configs", old_stored_app_configs)
             custom_settings.disable()
