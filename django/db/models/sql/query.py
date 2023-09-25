@@ -240,6 +240,11 @@ class Query(BaseExpression):
     high_mark = None  # Used for offset/limit.
     distinct = False
     distinct_fields = ()
+    select_for_share = False
+    select_for_share_nowait = False
+    select_for_share_skip_locked = False
+    select_for_share_of = ()
+    select_for_key_share = False
     select_for_update = False
     select_for_update_nowait = False
     select_for_update_skip_locked = False
@@ -501,6 +506,7 @@ class Query(BaseExpression):
             inner_query = self.clone()
             inner_query.subquery = True
             outer_query = AggregateQuery(self.model, inner_query)
+            inner_query.select_for_share = False
             inner_query.select_for_update = False
             inner_query.select_related = False
             inner_query.set_annotation_mask(self.annotation_select)
@@ -596,6 +602,7 @@ class Query(BaseExpression):
         elide_empty = not any(result is NotImplemented for result in empty_set_result)
         outer_query.clear_ordering(force=True)
         outer_query.clear_limits()
+        outer_query.select_for_share = False
         outer_query.select_for_update = False
         outer_query.select_related = False
         compiler = outer_query.get_compiler(using, elide_empty=elide_empty)
@@ -2259,7 +2266,10 @@ class Query(BaseExpression):
         query (not even the model's default).
         """
         if not force and (
-            self.is_sliced or self.distinct_fields or self.select_for_update
+            self.is_sliced
+            or self.distinct_fields
+            or self.select_for_share
+            or self.select_for_update
         ):
             return
         self.order_by = ()

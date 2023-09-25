@@ -168,7 +168,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* The new :meth:`.QuerySet.select_for_share()` method adds support for ``SELECT
+  ... FOR SHARE`` SQL queries.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -226,7 +227,8 @@ Database backend API
 This section describes changes that may be needed in third-party database
 backends.
 
-* ...
+* The ``BaseDatabaseOperations.for_update_sql()`` method now expects all
+  arguments to be keyword-only.
 
 :mod:`django.contrib.gis`
 -------------------------

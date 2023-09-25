@@ -886,9 +886,9 @@ to speed up the process of resetting the database to a known state at the
 beginning of each test. A consequence of this, however, is that some database
 behaviors cannot be tested within a Django ``TestCase`` class. For instance,
 you cannot test that a block of code is executing within a transaction, as is
-required when using
-:meth:`~django.db.models.query.QuerySet.select_for_update()`. In those cases,
-you should use ``TransactionTestCase``.
+required when using :meth:`~django.db.models.query.QuerySet.select_for_share()`
+or :meth:`~django.db.models.query.QuerySet.select_for_update()`. In those
+cases, you should use ``TransactionTestCase``.
 
 ``TransactionTestCase`` and ``TestCase`` are identical except for the manner
 in which the database is reset to a known state and the ability for test code

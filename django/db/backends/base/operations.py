@@ -238,7 +238,18 @@ class BaseDatabaseOperations:
         """
         return []
 
-    def for_update_sql(self, nowait=False, skip_locked=False, of=(), no_key=False):
+    def for_share_sql(self, *, nowait=False, skip_locked=False, of=(), key=False):
+        """
+        Return the FOR SHARE SQL clause to lock rows for an update operation.
+        """
+        return "FOR%s SHARE%s%s%s" % (
+            " KEY" if key else "",
+            " OF %s" % ", ".join(of) if of else "",
+            " NOWAIT" if nowait else "",
+            " SKIP LOCKED" if skip_locked else "",
+        )
+
+    def for_update_sql(self, *, nowait=False, skip_locked=False, of=(), no_key=False):
         """
         Return the FOR UPDATE SQL clause to lock rows for an update operation.
         """

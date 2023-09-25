@@ -136,28 +136,45 @@ class FilteredRelationTests(TestCase):
                 lambda x: (x, x.author_join),
             )
 
+    @skipUnlessDBFeature("has_select_for_share", "has_select_for_share_of")
+    def test_select_related_foreign_key_for_share_of(self):
+        qs = (
+            Book.objects.annotate(author_join=FilteredRelation("author"))
+            .select_related("author_join")
+            .select_for_share(of=("self",))
+            .order_by("pk")
+        )
+        with transaction.atomic(), self.assertNumQueries(1):
+            self.assertQuerySetEqual(
+                qs,
+                [
+                    (self.book1, self.author1),
+                    (self.book2, self.author2),
+                    (self.book3, self.author2),
+                    (self.book4, self.author1),
+                ],
+                lambda x: (x, x.author_join),
+            )
+
     @skipUnlessDBFeature("has_select_for_update", "has_select_for_update_of")
     def test_select_related_foreign_key_for_update_of(self):
-        with transaction.atomic():
-            qs = (
-                Book.objects.annotate(
-                    author_join=FilteredRelation("author"),
-                )
-                .select_related("author_join")
-                .select_for_update(of=("self",))
-                .order_by("pk")
+        qs = (
+            Book.objects.annotate(author_join=FilteredRelation("author"))
+            .select_related("author_join")
+            .select_for_update(of=("self",))
+            .order_by("pk")
+        )
+        with transaction.atomic(), self.assertNumQueries(1):
+            self.assertQuerySetEqual(
+                qs,
+                [
+                    (self.book1, self.author1),
+                    (self.book2, self.author2),
+                    (self.book3, self.author2),
+                    (self.book4, self.author1),
+                ],
+                lambda x: (x, x.author_join),
             )
-            with self.assertNumQueries(1):
-                self.assertQuerySetEqual(
-                    qs,
-                    [
-                        (self.book1, self.author1),
-                        (self.book2, self.author2),
-                        (self.book3, self.author2),
-                        (self.book4, self.author1),
-                    ],
-                    lambda x: (x, x.author_join),
-                )
 
     def test_without_join(self):
         self.assertCountEqual(
@@ -397,6 +414,18 @@ class FilteredRelationTests(TestCase):
             ),
         ).filter(book_jane__isnull=False)
         self.assertSequenceEqual(qs1.difference(qs2), [self.author1])
+
+    def test_select_for_share(self):
+        self.assertSequenceEqual(
+            Author.objects.annotate(
+                book_jane=FilteredRelation(
+                    "book", condition=Q(book__title__iexact="the book by jane a")
+                ),
+            )
+            .filter(book_jane__isnull=False)
+            .select_for_share(),
+            [self.author2],
+        )
 
     def test_select_for_update(self):
         self.assertSequenceEqual(
