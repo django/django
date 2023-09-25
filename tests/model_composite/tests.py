@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .models import Employee, User
+from .models import Employee, House, Owner, User
 
 
 class CompositePKTests(TestCase):
@@ -153,3 +153,11 @@ class CompositePKTests(TestCase):
 
         with self.assertRaises(Employee.DoesNotExist):
             Employee.objects.get(user2__id=user.id, user__employee_id=("other", 1234))
+
+    def test_set_composite_foreign_key(self):
+        house = House.objects.create(
+            street="Candlewood Lane",
+            number=698,
+        )
+
+        Owner.objects.create(name="Jessica Fletcher", home=house)

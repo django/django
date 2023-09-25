@@ -1161,6 +1161,35 @@ class ForeignKey(ForeignObject):
     def get_prep_value(self, value):
         return self.target_field.get_prep_value(value)
 
+    def contribute_to_class(self, cls, name, private_only=False):
+        from .composite import CompositeField
+
+        super().contribute_to_class(cls, name, private_only)
+        remote_name = self.remote_field.field_name
+        if remote_name:
+            if not isinstance(self.remote_field.model, str):
+                remote_field = self.remote_field.model._meta.get_field(remote_name)
+                if isinstance(remote_field, CompositeField):
+                    self.contribute_component_fields(cls)
+
+    def contribute_component_fields(self, cls):
+        from .composite import CompositeField
+
+        field = self.target_field
+        if isinstance(field, CompositeField):
+            new_field = CompositeField(
+                **dict(zip(field.component_names, field.component_fields)),
+                db_index=True,
+            )
+            new_field.contribute_to_class(cls, field.attname)
+
+    @property
+    def composite(self):
+        from .composite import CompositeField
+
+        field = self.target_field
+        return isinstance(field, CompositeField)
+
     def contribute_to_related_class(self, cls, related):
         super().contribute_to_related_class(cls, related)
         if self.remote_field.field_name is None:

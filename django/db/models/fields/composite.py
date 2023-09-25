@@ -129,18 +129,28 @@ class CompositeDeferredAttribute(DeferredAttribute):
 
 class CompositeField(Field):
     component_names = None
-    composite_columns = None
     python_type = tuple
+    composite = True
 
     descriptor_class = CompositeDeferredAttribute
 
     def __init__(self, *names, **kwargs):
         kwargs["db_column"] = None
         kwargs["editable"] = False
+        fields = {k: v for k, v in kwargs.items() if isinstance(v, Field)}
+        if names and fields:
+            raise ValueError(
+                "CompositeField components must be names or field instances, not both."
+            )
+        kwargs = {k: v for k, v in kwargs.items() if not isinstance(v, Field)}
         super().__init__(**kwargs)
-        self.component_names = tuple(names)
-        # this would deferred to post_init
-        self.component_fields = None
+        if names:
+            self.component_names = tuple(names)
+            # this would deferred to post_init
+            self.component_fields = None
+        else:
+            self.component_names = tuple(fields.keys())
+            self.component_fields = tuple(fields.values())
 
     def get_attname_column(self):
         return self.get_attname(), self.db_column
@@ -151,6 +161,7 @@ class CompositeField(Field):
             f"{cls.__name__}__{name}", self.component_names
         )
         result = super().contribute_to_class(cls, name, private_only)
+        self.contribute_component_fields(cls)
         setattr(cls, self.attname, self.descriptor_class(self))
 
         if self.primary_key:
@@ -163,9 +174,19 @@ class CompositeField(Field):
 
             # logger.info(f"{cls.__name__}: unique {cls._meta.unique_together}")
         if self.db_index:
-            cls._meta.index_together = (*cls._meta.index_together, self.component_names)
+            cls._meta.index_together = (
+                *getattr(cls._meta, "index_together", []),
+                self.component_names,
+            )
 
         return result
+
+    def contribute_component_fields(self, cls):
+        if not self.component_fields:
+            return
+
+        for name, field in zip(self.component_names, self.component_fields):
+            field.contribute_to_class(cls, name)
 
     def get_col(self, alias, output_field=None):
         if alias == self.model._meta.db_table and (
@@ -183,7 +204,7 @@ def resolve_columns(*args, **kwargs):
     cls = kwargs.pop("sender")
     for field in cls._meta.local_fields:
         # TODO: is local_fields enough?
-        if isinstance(field, CompositeField):
+        if isinstance(field, CompositeField) and field.component_fields is None:
             field.component_fields = tuple(
                 cls._meta.get_field(name) for name in field.component_names
             )

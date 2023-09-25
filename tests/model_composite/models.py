@@ -33,3 +33,16 @@ class User(models.Model):
         to_fields=("branch", "employee_code"),
         related_name="user2",
     )
+
+
+class House(models.Model):
+    address = models.CompositeField(
+        street=models.CharField(max_length=255),
+        number=models.PositiveIntegerField(),
+        primary_key=True
+    )
+
+
+class Owner(models.Model):
+    name = models.CharField(max_length=255)
+    home = models.ForeignKey(House, on_delete=models.DO_NOTHING)
