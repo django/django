@@ -1920,7 +1920,7 @@ class SQLUpdateCompiler(SQLCompiler):
         """
         if (
             self.query.update_returning
-            and not self.connection.features.can_return_columns_from_update
+            and not self.connection.can_return_columns_from_update
         ):
             raise NotSupportedError("This backend does not support UPDATE RETURNING")
 
