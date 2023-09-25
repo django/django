@@ -948,8 +948,8 @@ class Field(RegisterLookupMixin):
         If private_only is True, create a separate instance of this field
         for every subclass of cls, even if cls is not an abstract model.
         """
-        self.set_attributes_from_name(name)
         self.model = cls
+        self.set_attributes_from_name(name)
         cls._meta.add_field(self, private=private_only)
         if self.column:
             setattr(cls, self.attname, self.descriptor_class(self))
