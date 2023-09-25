@@ -63,9 +63,15 @@ class UpdateReturningTests(TestCase):
         assert updated.hits == obj.hits + 1, updated.hits
 
     def test_update_returning_values(self):
-        UpdateReturningModel.objects.create(key="key1", content="content", hits=1)
-        UpdateReturningModel.objects.create(key="key2", content="content", hits=2)
-        UpdateReturningModel.objects.create(key="key3", content="content", hits=3)
+        obj1 = UpdateReturningModel.objects.create(
+            key="key1", content="content", hits=1
+        )
+        obj2 = UpdateReturningModel.objects.create(
+            key="key2", content="content", hits=2
+        )
+        obj3 = UpdateReturningModel.objects.create(
+            key="key3", content="content", hits=3
+        )
 
         updated = UpdateReturningModel.objects.update_returning(
             hits=F("hits") + 1
@@ -75,9 +81,9 @@ class UpdateReturningTests(TestCase):
         assert len(updated) == 3
         updated.sort(key=lambda x: x["pk"])
         assert updated == [
-            {"pk": 1, "hits": 2},
-            {"pk": 2, "hits": 3},
-            {"pk": 3, "hits": 4},
+            {"pk": obj1.pk, "hits": 2},
+            {"pk": obj2.pk, "hits": 3},
+            {"pk": obj3.pk, "hits": 4},
         ]
 
     def test_update_returning_values_list(self):
