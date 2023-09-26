@@ -2205,7 +2205,7 @@ class IPAddressField(Field):
 class GenericIPAddressField(Field):
     empty_strings_allowed = False
     description = _("IP address")
-    default_error_messages = {"invalid": _("Enter a valid %(protocol)s address.")}
+    default_error_messages = {}
 
     def __init__(
         self,
@@ -2213,6 +2213,7 @@ class GenericIPAddressField(Field):
         name=None,
         protocol="both",
         unpack_ipv4=False,
+        error_messages=None,
         *args,
         **kwargs,
     ):
@@ -2222,7 +2223,10 @@ class GenericIPAddressField(Field):
             self.default_validators,
             invalid_error_message,
         ) = validators.ip_address_validators(protocol, unpack_ipv4)
+        _error_messages = {"invalid": invalid_error_message}
+        _error_messages.update(error_messages or {})
         kwargs["max_length"] = 39
+        kwargs["error_messages"] = _error_messages
         super().__init__(verbose_name, name, *args, **kwargs)
 
     def check(self, **kwargs):

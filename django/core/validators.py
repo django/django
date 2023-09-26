@@ -278,7 +278,7 @@ def validate_ipv4_address(value):
         raise ValidationError(
             _("Enter a valid IPv4 address."),
             code="invalid",
-            params={"value": value, "protocol": "IPv4"},
+            params={"value": value},
         )
 
 
@@ -287,7 +287,7 @@ def validate_ipv6_address(value):
         raise ValidationError(
             _("Enter a valid IPv6 address."),
             code="invalid",
-            params={"value": value, "protocol": "IPv6"},
+            params={"value": value},
         )
 
 
@@ -301,7 +301,7 @@ def validate_ipv46_address(value):
             raise ValidationError(
                 _("Enter a valid IPv4 or IPv6 address."),
                 code="invalid",
-                params={"value": value, "protocol": "IPv4 or IPv6"},
+                params={"value": value},
             )
 
 
