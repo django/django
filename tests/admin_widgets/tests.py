@@ -1864,16 +1864,16 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "view_id_house").click()
         self.selenium.back()
         time.sleep(60)
-        #
-        # # Check that the House is linked to the Room and listed in the change form
-        #
-        # self.selenium.find_element(By.ID, "id_name")
-        #
-        # save_button_css_selector = ".submit-row > input[type=submit]"
-        # self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
-        #
-        # self.selenium.find_element(By.ID, "view_id_house").click()
-        # self.wait_for_value("#id_name", house_pk)
+
+        # Check that the House is linked to the Room and listed in the change form
+
+        self.selenium.find_element(By.ID, "id_name")
+
+        save_button_css_selector = ".submit-row > input[type=submit]"
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+
+        self.selenium.find_element(By.ID, "view_id_house").click()
+        self.wait_for_value("#id_name", house_name)
 
 
 @skipUnless(Image, "Pillow not installed")
