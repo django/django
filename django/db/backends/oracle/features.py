@@ -88,6 +88,9 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     }
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
+    # For Oracle, `n` is used instead of `s` for newline-sensitive matching.
+    regexp_functions_flags_mapping = {"s": "n"}
+
     django_test_skips = {
         "Oracle doesn't support SHA224.": {
             "db_functions.text.test_sha224.SHA224Tests.test_basic",
@@ -124,6 +127,30 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         },
         "Oracle doesn't support comparing NCLOB to NUMBER.": {
             "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
+        },
+        "Oracle doesn't support lookahead/lookbehind assertions.": {
+            "db_functions.text.test_regexpcount.RegexpCountTests.test_lookahead",
+            "db_functions.text.test_regexpcount.RegexpCountTests.test_lookbehind",
+            "db_functions.text.test_regexplike.RegexpLikeTests.test_lookahead",
+            "db_functions.text.test_regexplike.RegexpLikeTests.test_lookbehind",
+            "db_functions.text.test_regexpreplace.RegexpReplaceTests.test_lookahead",
+            "db_functions.text.test_regexpreplace.RegexpReplaceTests.test_lookbehind",
+            "db_functions.text.test_regexpstrindex.RegexpStrIndexTests.test_lookahead",
+            "db_functions.text.test_regexpstrindex.RegexpStrIndexTests.test_lookbehind",
+            "db_functions.text.test_regexpsubstr.RegexpSubstrTests.test_lookahead",
+            "db_functions.text.test_regexpsubstr.RegexpSubstrTests.test_lookbehind",
+        },
+        "Oracle doesn't support comments in extended regular expressions.": {
+            "db_functions.text.test_regexpcount.RegexpCountFlagTests."
+            "test_extended_flag_with_comments",
+            "db_functions.text.test_regexplike.RegexpLikeFlagTests."
+            "test_extended_flag_with_comments",
+            "db_functions.text.test_regexpreplace.RegexpReplaceFlagTests."
+            "test_extended_flag_with_comments",
+            "db_functions.text.test_regexpstrindex.RegexpStrIndexFlagTests."
+            "test_extended_flag_with_comments",
+            "db_functions.text.test_regexpsubstr.RegexpSubstrFlagTests."
+            "test_extended_flag_with_comments",
         },
     }
     django_test_expected_failures = {

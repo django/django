@@ -90,6 +90,22 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
     test_now_utc_template = "UTC_TIMESTAMP(6)"
 
+    # Force case-sensitive matching for consistency with other backends.
+    regexp_functions_flags_default = "c"
+
+    @cached_property
+    def regexp_functions_flags_mapping(self):
+        # For MySQL, `n` is used instead of `s` for newline-sensitive matching.
+        return {} if self.connection.mysql_is_mariadb else {"s": "n"}
+
+    @cached_property
+    def regexp_functions_flags_inline(self):
+        return self.connection.mysql_is_mariadb
+
+    @cached_property
+    def regexp_functions_flags_inline_negated(self):
+        return {"c": "i"} if self.connection.mysql_is_mariadb else {}
+
     @cached_property
     def django_test_skips(self):
         skips = {
@@ -118,7 +134,36 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation",
                 "update.tests.AdvancedTests.test_update_ordered_by_m2m_annotation_desc",
             },
+            "MySQL & MariaDB don't support the extended flag.": {
+                "db_functions.text.test_regexpcount.RegexpCountFlagTests."
+                "test_extended_flag",
+                "db_functions.text.test_regexpcount.RegexpCountFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexplike.RegexpLikeFlagTests."
+                "test_extended_flag",
+                "db_functions.text.test_regexplike.RegexpLikeFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpreplace.RegexpReplaceFlagTests."
+                "test_extended_flag",
+                "db_functions.text.test_regexpreplace.RegexpReplaceFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpstrindex.RegexpStrIndexFlagTests."
+                "test_extended_flag",
+                "db_functions.text.test_regexpstrindex.RegexpStrIndexFlagTests."
+                "test_extended_flag_with_comments",
+                "db_functions.text.test_regexpsubstr.RegexpSubstrFlagTests."
+                "test_extended_flag",
+                "db_functions.text.test_regexpsubstr.RegexpSubstrFlagTests."
+                "test_extended_flag_with_comments",
+            },
         }
+        if self.connection.mysql_is_mariadb:
+            skips |= {
+                "MariaDB can only replace all occurrences.": {
+                    "db_functions.text.test_regexpreplace.RegexpReplaceTests."
+                    "test_first_occurrence",
+                },
+            }
         if self.connection.mysql_is_mariadb and (
             self.connection.mysql_version < (10, 5, 2)
         ):
