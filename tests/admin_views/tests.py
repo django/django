@@ -7175,7 +7175,7 @@ class UserAdminTest(TestCase):
         print("response", response)
 
         self.assertContains(
-            response, reverse("admin:auth_user_change", args=(quote("__fk__"),))
+            response, reverse("admin:auth_user_change", args=("__fk__",))
         )
         self.assertContains(
             response,
