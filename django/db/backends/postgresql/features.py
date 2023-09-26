@@ -134,6 +134,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     def is_postgresql_15(self):
         return self.connection.pg_version >= 150000
 
+    @cached_property
+    def is_postgresql_16(self):
+        return self.connection.pg_version >= 160000
+
     has_bit_xor = property(operator.attrgetter("is_postgresql_14"))
     supports_covering_spgist_indexes = property(operator.attrgetter("is_postgresql_14"))
     supports_unlimited_charfield = True

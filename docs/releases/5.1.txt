@@ -168,7 +168,8 @@ Migrations
 Models
 ~~~~~~
 
-* ...
+* :meth:`.QuerySet.explain` now supports the ``generic_plan`` option on
+  PostgreSQL 16+.
 
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
