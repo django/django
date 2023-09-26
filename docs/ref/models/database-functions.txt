@@ -567,11 +567,6 @@ Usage example:
     On Oracle, the SQL ``LOCALTIMESTAMP`` is used to avoid issues with casting
     ``CURRENT_TIMESTAMP`` to ``DateTimeField``.
 
-.. versionchanged:: 4.2
-
-    Support for microsecond precision on MySQL and millisecond precision on
-    SQLite were added.
-
 .. versionchanged:: 5.0
 
     In older versions, the SQL ``CURRENT_TIMESTAMP`` was used on Oracle instead

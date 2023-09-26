@@ -748,8 +748,9 @@ class TestRunnerInitializerTests(SimpleTestCase):
         # Initializer must be a function.
         self.assertIs(mocked_pool.call_args.kwargs["initializer"], _init_worker)
         initargs = mocked_pool.call_args.kwargs["initargs"]
-        self.assertEqual(len(initargs), 6)
+        self.assertEqual(len(initargs), 7)
         self.assertEqual(initargs[5], True)  # debug_mode
+        self.assertEqual(initargs[6], {db.DEFAULT_DB_ALIAS})  # Used database aliases.
 
 
 class Ticket17477RegressionTests(AdminScriptTestCase):

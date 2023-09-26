@@ -5,7 +5,7 @@ from django.db import connection
 from django.db.backends.signals import connection_created
 from django.db.migrations.writer import MigrationWriter
 from django.test import TestCase
-from django.test.utils import modify_settings
+from django.test.utils import CaptureQueriesContext, modify_settings, override_settings
 
 try:
     from django.contrib.postgres.fields import (
@@ -14,6 +14,7 @@ try:
         DecimalRangeField,
         IntegerRangeField,
     )
+    from django.contrib.postgres.signals import get_hstore_oids
     from django.db.backends.postgresql.psycopg_any import (
         DateRange,
         DateTimeRange,
@@ -27,6 +28,15 @@ except ImportError:
 
 @unittest.skipUnless(connection.vendor == "postgresql", "PostgreSQL specific tests")
 class PostgresConfigTests(TestCase):
+    def test_install_app_no_warning(self):
+        # Clear cache to force queries when (re)initializing the
+        # "django.contrib.postgres" app.
+        get_hstore_oids.cache_clear()
+        with CaptureQueriesContext(connection) as captured_queries:
+            with override_settings(INSTALLED_APPS=["django.contrib.postgres"]):
+                pass
+        self.assertGreaterEqual(len(captured_queries), 1)
+
     def test_register_type_handlers_connection(self):
         from django.contrib.postgres.signals import register_type_handlers
 

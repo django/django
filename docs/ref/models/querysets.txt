@@ -1154,10 +1154,15 @@ many-to-many, many-to-one, and
 cannot be done using ``select_related``, in addition to the foreign key and
 one-to-one relationships that are supported by ``select_related``. It also
 supports prefetching of
-:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, it
-must be restricted to a homogeneous set of results. For example, prefetching
-objects referenced by a ``GenericForeignKey`` is only supported if the query
-is restricted to one ``ContentType``.
+:class:`~django.contrib.contenttypes.fields.GenericForeignKey`, however, the
+queryset for each ``ContentType`` must be provided in the ``querysets``
+parameter of :class:`~django.contrib.contenttypes.prefetch.GenericPrefetch`.
+
+.. versionchanged:: 5.0
+
+    Support for prefetching
+    :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
+    non-homogeneous set of results was added.
 
 For example, suppose you have these models::
 
@@ -2348,11 +2353,6 @@ Like :meth:`get_or_create` and :meth:`create`, if you're using manually
 specified primary keys and an object needs to be created but the key already
 exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 
-.. versionchanged:: 4.2
-
-    In older versions, ``update_or_create()`` didn't specify ``update_fields``
-    when calling :meth:`Model.save() <django.db.models.Model.save>`.
-
 .. versionchanged:: 5.0
 
     The ``create_defaults`` argument was added.
@@ -2385,8 +2385,8 @@ This has a number of caveats though:
 * It does not work with child models in a multi-table inheritance scenario.
 * If the model's primary key is an :class:`~django.db.models.AutoField`, the
   primary key attribute can only be retrieved on certain databases (currently
-  PostgreSQL, MariaDB 10.5+, and SQLite 3.35+). On other databases, it will not
-  be set.
+  PostgreSQL, MariaDB, and SQLite 3.35+). On other databases, it will not be
+  set.
 * It does not work with many-to-many relationships.
 * It casts ``objs`` to a list, which fully evaluates ``objs`` if it's a
   generator. The cast allows inspecting all objects so that any objects with a
@@ -3840,14 +3840,15 @@ documentation to learn how to create your aggregates.
     currently emulates these features using a text field. Attempts to use
     aggregation on date/time fields in SQLite will raise ``NotSupportedError``.
 
-.. admonition:: Empty queryset
+.. admonition:: Empty querysets or groups
 
-    Aggregation functions return ``None`` when used with an empty
-    ``QuerySet``. For example, the ``Sum`` aggregation function returns ``None``
-    instead of ``0`` if the ``QuerySet`` contains no entries. To return another
-    value instead, pass a value to the ``default`` argument. An exception is
-    ``Count``, which does return ``0`` if the ``QuerySet`` is empty. ``Count``
-    does not support the ``default`` argument.
+    Aggregation functions return ``None`` when used with an empty ``QuerySet``
+    or group. For example, the ``Sum`` aggregation function returns ``None``
+    instead of ``0`` if the ``QuerySet`` contains no entries or for any empty
+    group in a non-empty ``QuerySet``. To return another value instead, define
+    the ``default`` argument. ``Count`` is an exception to this behavior; it
+    returns ``0`` if the ``QuerySet`` is empty since ``Count`` does not support
+    the ``default`` argument.
 
 All aggregates have the following parameters in common:
 

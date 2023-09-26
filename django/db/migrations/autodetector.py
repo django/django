@@ -190,14 +190,12 @@ class MigrationAutodetector:
         self.generate_renamed_indexes()
         # Generate removal of foo together.
         self.generate_removed_altered_unique_together()
-        self.generate_removed_altered_index_together()  # RemovedInDjango51Warning.
         # Generate field operations.
         self.generate_removed_fields()
         self.generate_added_fields()
         self.generate_altered_fields()
         self.generate_altered_order_with_respect_to()
         self.generate_altered_unique_together()
-        self.generate_altered_index_together()  # RemovedInDjango51Warning.
         self.generate_added_indexes()
         self.generate_added_constraints()
         self.generate_altered_db_table()
@@ -584,7 +582,7 @@ class MigrationAutodetector:
         possible).
 
         Defer any model options that refer to collections of fields that might
-        be deferred (e.g. unique_together, index_together).
+        be deferred (e.g. unique_together).
         """
         old_keys = self.old_model_keys | self.old_unmanaged_keys
         added_models = self.new_model_keys - old_keys
@@ -608,12 +606,10 @@ class MigrationAutodetector:
                     if getattr(field.remote_field, "through", None):
                         related_fields[field_name] = field
 
-            # Are there indexes/unique|index_together to defer?
+            # Are there indexes/unique_together to defer?
             indexes = model_state.options.pop("indexes")
             constraints = model_state.options.pop("constraints")
             unique_together = model_state.options.pop("unique_together", None)
-            # RemovedInDjango51Warning.
-            index_together = model_state.options.pop("index_together", None)
             order_with_respect_to = model_state.options.pop(
                 "order_with_respect_to", None
             )
@@ -742,16 +738,6 @@ class MigrationAutodetector:
                     ),
                     dependencies=related_dependencies,
                 )
-            # RemovedInDjango51Warning.
-            if index_together:
-                self.add_operation(
-                    app_label,
-                    operations.AlterIndexTogether(
-                        name=model_name,
-                        index_together=index_together,
-                    ),
-                    dependencies=related_dependencies,
-                )
             # Fix relationships if the model changed from a proxy model to a
             # concrete model.
             relations = self.to_state.relations
@@ -832,23 +818,12 @@ class MigrationAutodetector:
                         related_fields[field_name] = field
             # Generate option removal first
             unique_together = model_state.options.pop("unique_together", None)
-            # RemovedInDjango51Warning.
-            index_together = model_state.options.pop("index_together", None)
             if unique_together:
                 self.add_operation(
                     app_label,
                     operations.AlterUniqueTogether(
                         name=model_name,
                         unique_together=None,
-                    ),
-                )
-            # RemovedInDjango51Warning.
-            if index_together:
-                self.add_operation(
-                    app_label,
-                    operations.AlterIndexTogether(
-                        name=model_name,
-                        index_together=None,
                     ),
                 )
             # Then remove each related field
@@ -1525,10 +1500,6 @@ class MigrationAutodetector:
     def generate_removed_altered_unique_together(self):
         self._generate_removed_altered_foo_together(operations.AlterUniqueTogether)
 
-    # RemovedInDjango51Warning.
-    def generate_removed_altered_index_together(self):
-        self._generate_removed_altered_foo_together(operations.AlterIndexTogether)
-
     def _generate_altered_foo_together(self, operation):
         for (
             old_value,
@@ -1547,10 +1518,6 @@ class MigrationAutodetector:
 
     def generate_altered_unique_together(self):
         self._generate_altered_foo_together(operations.AlterUniqueTogether)
-
-    # RemovedInDjango51Warning.
-    def generate_altered_index_together(self):
-        self._generate_altered_foo_together(operations.AlterIndexTogether)
 
     def generate_altered_db_table(self):
         models_to_check = self.kept_model_keys.union(

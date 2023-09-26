@@ -273,10 +273,6 @@ asynchronous iterators. The wrapping function must match. Check
 <django.http.StreamingHttpResponse.is_async>` if your middleware needs to
 support both types of iterator.
 
-..  versionchanged:: 4.2
-
-    Support for streaming responses with asynchronous iterators was added.
-
 Exception handling
 ==================
 

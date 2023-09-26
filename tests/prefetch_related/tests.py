@@ -13,6 +13,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -1696,7 +1697,7 @@ class Ticket21760Tests(TestCase):
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], "house", "house")[0]
-        queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
+        queryset = prefetcher.get_prefetch_querysets(list(Room.objects.all()))[0]
         self.assertNotIn(" JOIN ", str(queryset.query))
 
 
@@ -1994,3 +1995,19 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
+
+
+class GetCurrentQuerySetDeprecation(TestCase):
+    def test_get_current_queryset_warning(self):
+        msg = (
+            "Prefetch.get_current_queryset() is deprecated. Use "
+            "get_current_querysets() instead."
+        )
+        authors = Author.objects.all()
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertEqual(
+                Prefetch("authors", authors).get_current_queryset(1),
+                authors,
+            )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertIsNone(Prefetch("authors").get_current_queryset(1))

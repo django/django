@@ -244,11 +244,6 @@ Outputs a whole load of debugging information, including the current context
 and imported modules. ``{% debug %}`` outputs nothing when the :setting:`DEBUG`
 setting is ``False``.
 
-.. versionchanged:: 2.2.27
-
-    In older versions, debugging information was displayed when the
-    :setting:`DEBUG` setting was ``False``.
-
 .. templatetag:: extends
 
 ``extends``
@@ -1803,11 +1798,6 @@ produce empty output:
 
 Ordering by elements at specified index is not supported on dictionaries.
 
-.. versionchanged:: 2.2.26
-
-    In older versions, ordering elements at specified index was supported on
-    dictionaries.
-
 .. templatefilter:: dictsortreversed
 
 ``dictsortreversed``
@@ -2170,24 +2160,6 @@ If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
 ``4``.
 
 The filter returns ``0`` for an undefined variable.
-
-.. templatefilter:: length_is
-
-``length_is``
--------------
-
-.. deprecated:: 4.2
-
-Returns ``True`` if the value's length is the argument, or ``False`` otherwise.
-
-For example:
-
-.. code-block:: html+django
-
-    {{ value|length_is:"4" }}
-
-If ``value`` is ``['a', 'b', 'c', 'd']`` or ``"abcd"``, the output will be
-``True``.
 
 .. templatefilter:: linebreaks
 

@@ -142,11 +142,12 @@ class TestConfiguration(StaticFilesTestCase):
             storage.staticfiles_storage._wrapped = empty
             with self.settings(
                 STORAGES={
+                    **settings.STORAGES,
                     STATICFILES_STORAGE_ALIAS: {
                         "BACKEND": (
                             "django.contrib.staticfiles.storage.StaticFilesStorage"
                         )
-                    }
+                    },
                 }
             ):
                 command = collectstatic.Command()
@@ -155,9 +156,10 @@ class TestConfiguration(StaticFilesTestCase):
             storage.staticfiles_storage._wrapped = empty
             with self.settings(
                 STORAGES={
+                    **settings.STORAGES,
                     STATICFILES_STORAGE_ALIAS: {
                         "BACKEND": "staticfiles_tests.storage.DummyStorage"
-                    }
+                    },
                 }
             ):
                 command = collectstatic.Command()
@@ -250,6 +252,7 @@ class TestCollectionVerbosity(CollectionTestCase):
 
     @override_settings(
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": (
                     "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
@@ -264,6 +267,7 @@ class TestCollectionVerbosity(CollectionTestCase):
 
     @override_settings(
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": (
                     "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
@@ -297,6 +301,7 @@ class TestCollectionClear(CollectionTestCase):
 
     @override_settings(
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": "staticfiles_tests.storage.PathNotImplementedStorage"
             },
@@ -416,6 +421,7 @@ class TestCollectionDryRun(TestNoFilesCreated, CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
         },
@@ -544,6 +550,7 @@ class TestCollectionOverwriteWarning(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.DummyStorage"
         },
@@ -571,6 +578,7 @@ class TestCollectionNonLocalStorage(TestNoFilesCreated, CollectionTestCase):
 class TestCollectionNeverCopyStorage(CollectionTestCase):
     @override_settings(
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": "staticfiles_tests.storage.NeverCopyRemoteStorage"
             },
@@ -642,9 +650,10 @@ class TestCollectionLinks(TestDefaults, CollectionTestCase):
 
     @override_settings(
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": "staticfiles_tests.storage.PathNotImplementedStorage"
-            }
+            },
         }
     )
     def test_no_remote_link(self):

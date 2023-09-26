@@ -306,10 +306,6 @@ following attributes and methods:
 
             re.compile(r"API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE", flags=re.IGNORECASE)
 
-        .. versionchanged:: 4.2
-
-            ``HTTP_COOKIE`` was added.
-
     .. method:: is_active(request)
 
         Returns ``True`` to activate the filtering in

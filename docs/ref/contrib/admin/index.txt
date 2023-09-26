@@ -2142,10 +2142,6 @@ forms or widgets depending on ``django.jQuery`` must specify
 ``js=['admin/js/jquery.init.js', …]`` when :ref:`declaring form media assets
 <assets-as-a-static-definition>`.
 
-.. versionchanged:: 4.2
-
-    jQuery was upgraded from 3.6.0 to 3.6.4.
-
 .. versionchanged:: 5.0
 
     jQuery was upgraded from 3.6.4 to 3.7.1.

@@ -158,10 +158,6 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. versionchanged:: 4.2
-
-        The ``headers`` parameter was added.
-
     .. method:: Client.get(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
@@ -233,10 +229,6 @@ Use the ``django.test.Client`` class to make requests.
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, **extra)
 
@@ -351,20 +343,12 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
         including the ``follow``, ``secure``, ``headers``, and ``extra``
         parameters, except it does not return a message body.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -377,10 +361,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
@@ -392,10 +372,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
@@ -403,10 +379,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -419,10 +391,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
@@ -434,10 +402,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -1533,15 +1497,15 @@ when settings are changed.
 
 Django itself uses this signal to reset various data:
 
-============================================================================ ========================
-Overridden settings                                                          Data reset
-============================================================================ ========================
-USE_TZ, TIME_ZONE                                                            Databases timezone
-TEMPLATES                                                                    Template engines
-SERIALIZATION_MODULES                                                        Serializers cache
-LOCALE_PATHS, LANGUAGE_CODE                                                  Default translation and loaded translations
-DEFAULT_FILE_STORAGE, STATICFILES_STORAGE, STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
-============================================================================ ========================
+================================= ========================
+Overridden settings               Data reset
+================================= ========================
+USE_TZ, TIME_ZONE                 Databases timezone
+TEMPLATES                         Template engines
+SERIALIZATION_MODULES             Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
+STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
+================================= ========================
 
 Isolating apps
 --------------
@@ -1716,11 +1680,6 @@ your test suite.
 
     ``field`` and ``errors`` have the same meaning as the parameters to
     ``assertFormError()``.
-
-    .. deprecated:: 4.2
-
-        The ``assertFormsetError()`` assertion method is deprecated. Use
-        ``assertFormSetError()`` instead.
 
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
@@ -1915,11 +1874,6 @@ your test suite.
 
     Output in case of error can be customized with the ``msg`` argument.
 
-    .. deprecated:: 4.2
-
-        The ``assertQuerysetEqual()`` assertion method is deprecated. Use
-        ``assertQuerySetEqual()`` instead.
-
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
     Asserts that when ``func`` is called with ``*args`` and ``**kwargs`` that
@@ -2040,10 +1994,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 4.2
-
-    The ``headers`` parameter was added.
 
 .. versionchanged:: 5.0
 

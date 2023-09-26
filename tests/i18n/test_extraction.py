@@ -638,6 +638,28 @@ class JavaScriptExtractorTests(ExtractorTests):
         _, po_contents = self._run_makemessages(domain="djangojs")
         self.assertMsgId("Static content inside app should be included.", po_contents)
 
+    def test_i18n_catalog_ignored_when_invoked_for_django(self):
+        # Create target file so it exists in the filesystem and can be ignored.
+        # "invoked_for_django" is True when "conf/locale" folder exists.
+        os.makedirs(os.path.join("conf", "locale"))
+        i18n_catalog_js_dir = os.path.join(os.path.curdir, "views", "templates")
+        os.makedirs(i18n_catalog_js_dir)
+        open(os.path.join(i18n_catalog_js_dir, "i18n_catalog.js"), "w").close()
+
+        out, _ = self._run_makemessages(domain="djangojs")
+        self.assertIn(f"ignoring file i18n_catalog.js in {i18n_catalog_js_dir}", out)
+
+    def test_i18n_catalog_not_ignored_when_not_invoked_for_django(self):
+        # Create target file so it exists in the filesystem but is NOT ignored.
+        # "invoked_for_django" is False when "conf/locale" folder does not exist.
+        self.assertIs(os.path.exists(os.path.join("conf", "locale")), False)
+        i18n_catalog_js = os.path.join("views", "templates", "i18n_catalog.js")
+        os.makedirs(os.path.dirname(i18n_catalog_js))
+        open(i18n_catalog_js, "w").close()
+
+        out, _ = self._run_makemessages(domain="djangojs")
+        self.assertNotIn("ignoring file i18n_catalog.js", out)
+
 
 class IgnoredExtractorTests(ExtractorTests):
     def test_ignore_directory(self):

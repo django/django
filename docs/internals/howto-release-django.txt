@@ -447,6 +447,10 @@ You're almost done! All that's left to do now is:
 
    __ https://github.com/django/code.djangoproject.com/blob/main/trac-env/conf/trac.ini
 
+#. If it's a final release, update the current stable branch and remove the
+   pre-release branch in the `Django release process
+   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
+
 #. If this was a security release, update :doc:`/releases/security` with
    details of the issues addressed.
 
@@ -493,6 +497,10 @@ need to be done by the releaser.
 #. `Request the new classifier on PyPI
    <https://github.com/pypa/trove-classifiers/issues/29>`_. For example
    ``Framework :: Django :: 3.1``.
+
+#. Update the current branch under active development and add pre-release
+   branch in the `Django release process
+   <https://code.djangoproject.com/#Djangoreleaseprocess>`_ on Trac.
 
 Notes on setting the VERSION tuple
 ==================================

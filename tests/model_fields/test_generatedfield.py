@@ -2,6 +2,7 @@ from django.db import IntegrityError, connection
 from django.db.models import F, FloatField, GeneratedField, IntegerField, Model
 from django.db.models.functions import Lower
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import (
     GeneratedModel,
@@ -48,6 +49,7 @@ class BaseGeneratedFieldTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"db_persist": True, "expression": F("a") + F("b")})
 
+    @isolate_apps("model_fields")
     def test_get_col(self):
         class Square(Model):
             side = IntegerField()
@@ -67,6 +69,7 @@ class BaseGeneratedFieldTests(SimpleTestCase):
         col = FloatSquare._meta.get_field("area").get_col("alias")
         self.assertIsInstance(col.output_field, FloatField)
 
+    @isolate_apps("model_fields")
     def test_cached_col(self):
         class Sum(Model):
             a = IntegerField()

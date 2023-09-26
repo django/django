@@ -2,9 +2,8 @@ import datetime
 
 from django.core import signing
 from django.test import SimpleTestCase, override_settings
-from django.test.utils import freeze_time, ignore_warnings
+from django.test.utils import freeze_time
 from django.utils.crypto import InvalidAlgorithm
-from django.utils.deprecation import RemovedInDjango51Warning
 
 
 class TestSigner(SimpleTestCase):
@@ -240,23 +239,3 @@ class TestBase62(SimpleTestCase):
         tests = [-(10**10), 10**10, 1620378259, *range(-100, 100)]
         for i in tests:
             self.assertEqual(i, signing.b62_decode(signing.b62_encode(i)))
-
-
-class SignerPositionalArgumentsDeprecationTests(SimpleTestCase):
-    def test_deprecation(self):
-        msg = "Passing positional arguments to Signer is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            signing.Signer("predictable-secret")
-        msg = "Passing positional arguments to TimestampSigner is deprecated."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            signing.TimestampSigner("predictable-secret")
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_positional_arguments(self):
-        signer = signing.Signer("secret", "/", "somesalt", "sha1", ["oldsecret"])
-        signed = signer.sign("xyz")
-        self.assertEqual(signed, "xyz/zzdO_8rk-NGnm8jNasXRTF2P5kY")
-        self.assertEqual(signer.unsign(signed), "xyz")
-        old_signer = signing.Signer("oldsecret", "/", "somesalt", "sha1")
-        signed = old_signer.sign("xyz")
-        self.assertEqual(signer.unsign(signed), "xyz")

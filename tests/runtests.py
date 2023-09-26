@@ -28,10 +28,7 @@ else:
     from django.test.runner import get_max_test_processes, parallel_type
     from django.test.selenium import SeleniumTestCaseBase
     from django.test.utils import NullTimeKeeper, TimeKeeper, get_runner
-    from django.utils.deprecation import (
-        RemovedInDjango51Warning,
-        RemovedInDjango60Warning,
-    )
+    from django.utils.deprecation import RemovedInDjango60Warning
     from django.utils.log import DEFAULT_LOGGING
     from django.utils.version import PY312
 
@@ -45,7 +42,6 @@ else:
 
 # Make deprecation warnings errors to ensure no usage of deprecated features.
 warnings.simplefilter("error", RemovedInDjango60Warning)
-warnings.simplefilter("error", RemovedInDjango51Warning)
 # Make resource and runtime warning errors to ensure no usage of error prone
 # patterns.
 warnings.simplefilter("error", ResourceWarning)
@@ -245,13 +241,6 @@ def setup_collect_tests(start_at, start_after, test_labels=None):
     settings.LOGGING = log_config
     settings.SILENCED_SYSTEM_CHECKS = [
         "fields.W342",  # ForeignKey(unique=True) -> OneToOneField
-        # django.contrib.postgres.fields.CICharField deprecated.
-        "fields.W905",
-        "postgres.W004",
-        # django.contrib.postgres.fields.CIEmailField deprecated.
-        "fields.W906",
-        # django.contrib.postgres.fields.CITextField deprecated.
-        "fields.W907",
     ]
 
     # Load all the ALWAYS_INSTALLED_APPS.

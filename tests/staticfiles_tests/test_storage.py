@@ -361,6 +361,7 @@ class TestHashedFiles:
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.ExtraPatternsStorage",
         },
@@ -396,6 +397,7 @@ class TestExtraPatternsStorage(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },
@@ -561,6 +563,7 @@ class TestCollectionManifestStorage(TestHashedFiles, CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.NoneHashStorage",
         },
@@ -576,6 +579,7 @@ class TestCollectionNoneHashStorage(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.NoPostProcessReplacedPathStorage",
         },
@@ -592,6 +596,7 @@ class TestCollectionNoPostProcessReplacedPaths(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "staticfiles_tests.storage.SimpleStorage",
         },
@@ -630,6 +635,7 @@ class JSModuleImportAggregationManifestStorage(storage.ManifestStaticFilesStorag
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": (
                 "staticfiles_tests.test_storage."
@@ -811,6 +817,7 @@ class TestStaticFilePermissions(CollectionTestCase):
         FILE_UPLOAD_PERMISSIONS=0o655,
         FILE_UPLOAD_DIRECTORY_PERMISSIONS=0o765,
         STORAGES={
+            **settings.STORAGES,
             STATICFILES_STORAGE_ALIAS: {
                 "BACKEND": "staticfiles_tests.test_storage.CustomStaticFilesStorage",
             },
@@ -835,6 +842,7 @@ class TestStaticFilePermissions(CollectionTestCase):
 
 @override_settings(
     STORAGES={
+        **settings.STORAGES,
         STATICFILES_STORAGE_ALIAS: {
             "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
         },

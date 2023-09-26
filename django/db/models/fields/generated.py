@@ -61,12 +61,10 @@ class GeneratedField(Field):
             self.register_lookup(lookup, lookup_name=lookup_name)
 
     def generated_sql(self, connection):
-        return self._resolved_expression.as_sql(
-            compiler=connection.ops.compiler("SQLCompiler")(
-                self._query, connection=connection, using=None
-            ),
-            connection=connection,
+        compiler = connection.ops.compiler("SQLCompiler")(
+            self._query, connection=connection, using=None
         )
+        return compiler.compile(self._resolved_expression)
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []

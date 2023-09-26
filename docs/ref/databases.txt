@@ -114,17 +114,13 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+Django supports PostgreSQL 13 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
 2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
 .. note::
 
     Support for ``psycopg2`` is likely to be deprecated and removed at some
     point in the future.
-
-.. versionchanged:: 4.2
-
-    Support for ``psycopg`` 3.1.8+ was added.
 
 .. _postgresql-connection-settings:
 
@@ -223,16 +219,10 @@ configuration in :setting:`DATABASES`::
 
 .. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
 
-.. versionchanged:: 4.2
-
-    ``IsolationLevel`` was added.
-
 .. _database-role:
 
 Role
 ----
-
-.. versionadded:: 4.2
 
 If you need to use a different role for database connections than the role use
 to establish the connection, set it in the :setting:`OPTIONS` part of your
@@ -252,8 +242,6 @@ database configuration in :setting:`DATABASES`::
 
 Server-side parameters binding
 ------------------------------
-
-.. versionadded:: 4.2
 
 With `psycopg`_ 3.1.8+, Django defaults to the :ref:`client-side binding
 cursors <psycopg:client-side-binding-cursors>`. If you want to use the
@@ -399,7 +387,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.4 and higher.
+Django supports MariaDB 10.5 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.

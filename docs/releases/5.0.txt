@@ -134,7 +134,15 @@ Database generated model field
 
 The new :class:`~django.db.models.GeneratedField` allows creation of database
 generated columns. This field can be used on all supported database backends
-to create a field that is always computed from other fields.
+to create a field that is always computed from other fields. For example::
+
+    from django.db import models
+    from django.db.models import F
+
+
+    class Square(models.Model):
+        side = models.IntegerField()
+        area = models.GeneratedField(expression=F("side") * F("side"), db_persist=True)
 
 More options for declaring field choices
 ----------------------------------------
@@ -216,10 +224,6 @@ Minor features
 
 * jQuery is upgraded from version 3.6.4 to 3.7.1.
 
-:mod:`django.contrib.admindocs`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
 
 :mod:`django.contrib.auth`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -243,7 +247,9 @@ Minor features
 :mod:`django.contrib.contenttypes`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* ...
+* :meth:`.QuerySet.prefetch_related` now supports prefetching
+  :class:`~django.contrib.contenttypes.fields.GenericForeignKey` with
+  non-homogeneous set of results.
 
 :mod:`django.contrib.gis`
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -256,9 +262,7 @@ Minor features
 * :ref:`GIS aggregates <gis-aggregation-functions>` now support the ``filter``
   argument.
 
-* Added support for GDAL 3.7.
-
-* Added support for GEOS 3.12.
+* Support for GDAL 3.7 and GEOS 3.12 is added.
 
 * The new :meth:`.GEOSGeometry.equals_identical` method allows point-wise
   equivalence checking of geometries.
@@ -278,52 +282,12 @@ Minor features
   customizing the ``code`` of ``ValidationError`` raised during
   :ref:`model validation <validating-objects>`.
 
-:mod:`django.contrib.redirects`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sessions`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sitemaps`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.sites`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.staticfiles`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-:mod:`django.contrib.syndication`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
 Asynchronous views
 ~~~~~~~~~~~~~~~~~~
 
 * Under ASGI, ``http.disconnect`` events are now handled. This allows views to
   perform any necessary cleanup if a client disconnects before the response is
   generated. See :ref:`async-handling-disconnect` for more details.
-
-Cache
-~~~~~
-
-* ...
-
-CSRF
-~~~~
-
-* ...
 
 Decorators
 ~~~~~~~~~~
@@ -354,11 +318,6 @@ Decorators
   * ``xframe_options_sameorigin()``
   * ``xframe_options_exempt()``
 
-Email
-~~~~~
-
-* ...
-
 Error Reporting
 ~~~~~~~~~~~~~~~
 
@@ -372,43 +331,22 @@ File Storage
 * :meth:`.File.open` now passes all positional (``*args``) and keyword
   arguments (``**kwargs``) to Python's built-in :func:`python:open`.
 
-File Uploads
-~~~~~~~~~~~~
-
-* ...
-
 Forms
 ~~~~~
 
 * The new ``assume_scheme`` argument for :class:`~django.forms.URLField` allows
   specifying a default URL scheme.
 
-* In order to improve accessibility and enable screen readers to associate form
-  fields with their help text, the form field now includes the
-  ``aria-describedby`` HTML attribute.
+* In order to improve accessibility, the following changes are made:
 
-* In order to improve accessibility, the invalid form field now includes the
-  ``aria-invalid="true"`` HTML attribute.
-
-Generic Views
-~~~~~~~~~~~~~
-
-* ...
+  * Form fields now include the ``aria-describedby`` HTML attribute to enable
+    screen readers to associate form fields with their help text.
+  * Invalid form fields now include the ``aria-invalid="true"`` HTML attribute.
 
 Internationalization
 ~~~~~~~~~~~~~~~~~~~~
 
-* Added support and translations for the Uyghur language.
-
-Logging
-~~~~~~~
-
-* ...
-
-Management Commands
-~~~~~~~~~~~~~~~~~~~
-
-* ...
+* Support and translations for the Uyghur language are now available.
 
 Migrations
 ~~~~~~~~~~
@@ -466,21 +404,6 @@ Pagination
 * The new :attr:`django.core.paginator.Paginator.error_messages` argument
   allows customizing the error messages raised by :meth:`.Paginator.page`.
 
-Requests and Responses
-~~~~~~~~~~~~~~~~~~~~~~
-
-* ...
-
-Security
-~~~~~~~~
-
-* ...
-
-Serialization
-~~~~~~~~~~~~~
-
-* ...
-
 Signals
 ~~~~~~~
 
@@ -508,16 +431,6 @@ Tests
 * The new :option:`test --durations` option allows showing the duration of the
   slowest tests on Python 3.12+.
 
-URLs
-~~~~
-
-* ...
-
-Utilities
-~~~~~~~~~
-
-* ...
-
 Validators
 ~~~~~~~~~~
 
@@ -543,15 +456,9 @@ backends.
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in
   ``INSERT`` queries.
 
-* ``DatabaseFeatures.supports_default_keyword_in_bulk insert`` should be set to
+* ``DatabaseFeatures.supports_default_keyword_in_bulk_insert`` should be set to
   ``False`` if the database doesn't support the ``DEFAULT`` keyword in bulk
   ``INSERT`` queries.
-
-Dropped support for MySQL < 8.0.11
-----------------------------------
-
-Support for pre-releases of MySQL 8.0.x series is removed. Django 5.0 supports
-MySQL 8.0.11 and higher.
 
 :mod:`django.contrib.gis`
 -------------------------
@@ -568,6 +475,12 @@ MySQL 8.0.11 and higher.
   Sitemaps ping endpoint is deprecated and will be removed in January 2024.
 
 * The ``django.contrib.sitemaps.SitemapNotFound`` exception class is removed.
+
+Dropped support for MySQL < 8.0.11
+----------------------------------
+
+Support for pre-releases of MySQL 8.0.x series is removed. Django 5.0 supports
+MySQL 8.0.11 and higher.
 
 Using ``create_defaults__exact`` may now be required with ``QuerySet.update_or_create()``
 -----------------------------------------------------------------------------------------
@@ -678,7 +591,7 @@ Miscellaneous
 * The ``DjangoDivFormRenderer`` and ``Jinja2DivFormRenderer`` transitional form
   renderers are deprecated.
 
-* Passing positional arguments  ``name`` and ``violation_error_message`` to
+* Passing positional arguments ``name`` and ``violation_error_message`` to
   :class:`~django.db.models.BaseConstraint` is deprecated in favor of
   keyword-only arguments.
 
@@ -710,6 +623,14 @@ Miscellaneous
 
 * The ``django.db.models.enums.ChoicesMeta`` metaclass is renamed to
   ``ChoicesType``.
+
+* The ``Prefetch.get_current_queryset()`` method is deprecated.
+
+* The ``get_prefetch_queryset()`` method of related managers and descriptors
+  is deprecated. Starting with Django 6.0, ``get_prefetcher()`` and
+  ``prefetch_related_objects()`` will no longer fallback to
+  ``get_prefetch_queryset()``. Subclasses should implement
+  ``get_prefetch_querysets()`` instead.
 
 .. _`oracledb`: https://oracle.github.io/python-oracledb/
 

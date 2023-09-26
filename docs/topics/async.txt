@@ -150,10 +150,6 @@ Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
-.. versionchanged:: 4.2
-
-    Asynchronous model and related manager interfaces were added.
-
 .. _async_performance:
 
 Performance

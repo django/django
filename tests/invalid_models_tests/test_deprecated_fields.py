@@ -104,46 +104,42 @@ class DeprecatedFieldsTests(SimpleTestCase):
         self.assertEqual(
             PostgresCIFieldsModel.check(),
             [
-                checks.Warning(
-                    "django.contrib.postgres.fields.CICharField is deprecated. Support "
-                    "for it (except in historical migrations) will be removed in "
-                    "Django 5.1.",
+                checks.Error(
+                    "django.contrib.postgres.fields.CICharField is removed except for "
+                    "support in historical migrations.",
                     hint=(
                         'Use CharField(db_collation="…") with a case-insensitive '
                         "non-deterministic collation instead."
                     ),
                     obj=PostgresCIFieldsModel._meta.get_field("ci_char"),
-                    id="fields.W905",
+                    id="fields.E905",
                 ),
-                checks.Warning(
-                    "django.contrib.postgres.fields.CIEmailField is deprecated. "
-                    "Support for it (except in historical migrations) will be removed "
-                    "in Django 5.1.",
+                checks.Error(
+                    "django.contrib.postgres.fields.CIEmailField is removed except for "
+                    "support in historical migrations.",
                     hint=(
                         'Use EmailField(db_collation="…") with a case-insensitive '
                         "non-deterministic collation instead."
                     ),
                     obj=PostgresCIFieldsModel._meta.get_field("ci_email"),
-                    id="fields.W906",
+                    id="fields.E906",
                 ),
-                checks.Warning(
-                    "django.contrib.postgres.fields.CITextField is deprecated. Support "
-                    "for it (except in historical migrations) will be removed in "
-                    "Django 5.1.",
+                checks.Error(
+                    "django.contrib.postgres.fields.CITextField is removed except for "
+                    "support in historical migrations.",
                     hint=(
                         'Use TextField(db_collation="…") with a case-insensitive '
                         "non-deterministic collation instead."
                     ),
                     obj=PostgresCIFieldsModel._meta.get_field("ci_text"),
-                    id="fields.W907",
+                    id="fields.E907",
                 ),
-                checks.Warning(
-                    "Base field for array has warnings:\n"
-                    "    django.contrib.postgres.fields.CITextField is deprecated. "
-                    "Support for it (except in historical migrations) will be removed "
-                    "in Django 5.1. (fields.W907)",
+                checks.Error(
+                    "Base field for array has errors:\n"
+                    "    django.contrib.postgres.fields.CITextField is removed except "
+                    "for support in historical migrations. (fields.E907)",
                     obj=PostgresCIFieldsModel._meta.get_field("array_ci_text"),
-                    id="postgres.W004",
+                    id="postgres.E001",
                 ),
             ],
         )

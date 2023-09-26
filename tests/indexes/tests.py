@@ -3,26 +3,16 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.db import connection
-from django.db.models import (
-    CASCADE,
-    CharField,
-    DateTimeField,
-    ForeignKey,
-    Index,
-    Model,
-    Q,
-)
+from django.db.models import CASCADE, ForeignKey, Index, Q
 from django.db.models.functions import Lower
 from django.test import (
     TestCase,
     TransactionTestCase,
-    ignore_warnings,
     skipIfDBFeature,
     skipUnlessDBFeature,
 )
-from django.test.utils import isolate_apps, override_settings
+from django.test.utils import override_settings
 from django.utils import timezone
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import Article, ArticleTranslation, IndexedArticle2
 
@@ -79,21 +69,6 @@ class SchemaIndexesTests(TestCase):
             connection.ops.quote_name(Article._meta.indexes[0].name),
             index_sql[0],
         )
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    @isolate_apps("indexes")
-    def test_index_together_single_list(self):
-        class IndexTogetherSingleList(Model):
-            headline = CharField(max_length=100)
-            pub_date = DateTimeField()
-
-            class Meta:
-                index_together = ["headline", "pub_date"]
-
-        index_sql = connection.schema_editor()._model_indexes_sql(
-            IndexTogetherSingleList
-        )
-        self.assertEqual(len(index_sql), 1)
 
     def test_columns_list_sql(self):
         index = Index(fields=["headline"], name="whitespace_idx")

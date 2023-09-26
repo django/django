@@ -590,3 +590,29 @@ information.
 
     Subclasses of :class:`GenericInlineModelAdmin` with stacked and tabular
     layouts, respectively.
+
+.. module:: django.contrib.contenttypes.prefetch
+
+``GenericPrefetch()``
+---------------------
+
+.. versionadded:: 5.0
+
+.. class:: GenericPrefetch(lookup, querysets=None, to_attr=None)
+
+This lookup is similar to ``Prefetch()`` and it should only be used on
+``GenericForeignKey``. The ``querysets`` argument accepts a list of querysets,
+each for a different ``ContentType``. This is useful for ``GenericForeignKey``
+with non-homogeneous set of results.
+
+.. code-block:: pycon
+
+    >>> bookmark = Bookmark.objects.create(url="https://www.djangoproject.com/")
+    >>> animal = Animal.objects.create(name="lion", weight=100)
+    >>> TaggedItem.objects.create(tag="great", content_object=bookmark)
+    >>> TaggedItem.objects.create(tag="awesome", content_object=animal)
+    >>> prefetch = GenericPrefetch(
+    ...     "content_object", [Bookmark.objects.all(), Animal.objects.only("name")]
+    ... )
+    >>> TaggedItem.objects.prefetch_related(prefetch).all()
+    <QuerySet [<TaggedItem: Great>, <TaggedItem: Awesome>]>

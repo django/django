@@ -84,10 +84,6 @@ Related objects reference
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
 
-        .. versionchanged:: 4.2
-
-            ``aadd()`` method was added.
-
     .. method:: create(through_defaults=None, **kwargs)
     .. method:: acreate(through_defaults=None, **kwargs)
 
@@ -168,10 +164,6 @@ Related objects reference
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
 
-        .. versionchanged:: 4.2
-
-            ``aremove()`` method was added.
-
     .. method:: clear(bulk=True)
     .. method:: aclear(bulk=True)
 
@@ -193,10 +185,6 @@ Related objects reference
 
         For many-to-many relationships, the ``bulk`` keyword argument doesn't
         exist.
-
-        .. versionchanged:: 4.2
-
-            ``aclear()`` method was added.
 
     .. method:: set(objs, bulk=True, clear=False, through_defaults=None)
     .. method:: aset(objs, bulk=True, clear=False, through_defaults=None)
@@ -235,10 +223,6 @@ Related objects reference
         needed. You can use callables as values in the ``through_defaults``
         dictionary and they will be evaluated once before creating any
         intermediate instance(s).
-
-        .. versionchanged:: 4.2
-
-            ``aset()`` method was added.
 
     .. note::
 
