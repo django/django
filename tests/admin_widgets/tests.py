@@ -1,6 +1,7 @@
 import gettext
 import os
 import re
+import time
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -11,6 +12,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin import widgets
 from django.contrib.admin.tests import AdminSeleniumTestCase
+from django.contrib.admin.utils import quote
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -37,6 +39,7 @@ from .models import (
     Company,
     Event,
     Honeycomb,
+    House,
     Image,
     Individual,
     Inventory,
@@ -44,6 +47,7 @@ from .models import (
     MyFileField,
     Profile,
     ReleaseEvent,
+    Room,
     School,
     Student,
     UnsafeLimitChoicesTo,
@@ -761,6 +765,39 @@ class ForeignKeyRawIdWidgetTest(TestCase):
             '<a href="/admin_widgets/releaseevent/?_to_field=album" '
             'class="related-lookup" id="lookup_id_test" title="Lookup"></a>',
         )
+
+    def test_quoted_pk_value_on_url(self):
+        house = House.objects.create(name="?a=b")
+        rel = Room._meta.get_field("house").remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+        rendered = w.render("test", house.pk, attrs={})
+
+        expected_url = "/admin_widgets/house/%s/change/" % quote(house.pk)
+
+        self.assertIn(expected_url, rendered)
+        self.assertHTMLEqual(
+            w.render("test", house.pk, attrs={}),
+            '<input class="vForeignKeyRawIdAdminField" name="test" type="text" '
+            'value="%(val)s"> '
+            '<a href="/admin_widgets/house/?_to_field=name" class="related-lookup" '
+            'id="lookup_id_test" title="Lookup"></a> '
+            '<strong><a href="/admin_widgets/house/%(pk)s/change/">%(val)s</a></strong>'
+            % {"val": house.pk, "pk": quote(house.pk)},
+        )
+
+    def test_foreign_key_raw_id_widget_renders_quoted_pk_in_change_url(self):
+        house = House.objects.create(name="_40")
+        rel = Room._meta.get_field("house").remote_field
+        w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
+
+        # apply quote function to primary key value
+        pk_quoted = quote(str(house.pk))
+
+        # render the widget
+        rendered = w.render("test", house.pk, attrs={})
+
+        # check that the primary key is properly quoted in the rendered HTML
+        self.assertIn(f'href="/admin_widgets/house/{pk_quoted}/change/"', rendered)
 
 
 @override_settings(ROOT_URLCONF="admin_widgets.urls")
@@ -1779,6 +1816,63 @@ class RelatedFieldWidgetSeleniumTests(AdminWidgetSeleniumTestCase):
         profiles = Profile.objects.all()
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0].user.username, username_value)
+
+
+class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
+    def test_create_houses_and_room(self):
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.select import Select
+
+        self.admin_login(username="super", password="secret", login_url="/")
+
+        # Create a new House with a PK that needs quoting
+        house = House.objects.create(name="_40")
+        house_name = str(house.name)
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_house_add")
+        )
+
+        self.selenium.find_element(By.ID, "id_name").send_keys(house_name)
+        self.selenium.find_element(By.NAME, "_continue").click()
+
+        # Check that the new House was created and listed in the change form
+        self.selenium.get(
+            self.live_server_url + reverse("admin:admin_widgets_room_add")
+        )
+        self.assertIn(house_name, self.selenium.page_source)
+
+        # Find and interact with the select element for choosing a House
+        select_house = Select(self.selenium.find_element(By.ID, "id_house"))
+        select_house.select_by_index(0)
+
+        select_house.select_by_value(house_name)
+        self.assertEqual(
+            select_house.first_selected_option.get_attribute("value"), house_name
+        )
+
+        # Create a new Room and associate it with the House created above
+        room = Room.objects.create(name="onebed", house=house)
+        room_name = str(room.name)
+        self.selenium.find_element(By.ID, "id_name").send_keys(room_name)
+
+        self.selenium.find_element(By.NAME, "_continue").click()
+
+        save_button_css_selector = ".submit-row > input[type=submit]"
+
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+        self.selenium.find_element(By.ID, "view_id_house").click()
+        self.selenium.back()
+        time.sleep(60)
+
+        # Check that the House is linked to the Room and listed in the change form
+
+        self.selenium.find_element(By.ID, "id_name")
+
+        save_button_css_selector = ".submit-row > input[type=submit]"
+        self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
+
+        self.selenium.find_element(By.ID, "view_id_house").click()
+        self.wait_for_value("#id_name", house_name)
 
 
 @skipUnless(Image, "Pillow not installed")

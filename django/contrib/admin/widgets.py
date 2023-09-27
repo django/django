@@ -6,6 +6,7 @@ import json
 
 from django import forms
 from django.conf import settings
+from django.contrib.admin.utils import quote
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
@@ -204,7 +205,7 @@ class ForeignKeyRawIdWidget(forms.TextInput):
                     obj._meta.app_label,
                     obj._meta.object_name.lower(),
                 ),
-                args=(obj.pk,),
+                args=(quote(obj.pk),),
             )
         except NoReverseMatch:
             url = ""  # Admin not registered for target model.
