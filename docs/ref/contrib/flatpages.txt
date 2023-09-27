@@ -164,6 +164,13 @@ For more on middleware, read the :doc:`middleware docs
 How to add, change and delete flatpages
 =======================================
 
+.. warning::
+
+    Permissions to add or edit flatpages should be restricted to trusted users.
+    Flatpages are defined by raw HTML and are **not sanitized** by Django. As a
+    consequence, a malicious flatpage can lead to various security
+    vulnerabilities, including permission escalation.
+
 .. _flatpages-admin:
 
 Via the admin interface
