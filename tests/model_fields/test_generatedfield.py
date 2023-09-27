@@ -181,6 +181,13 @@ class GeneratedFieldTestMixin:
             field._resolved_expression.output_field.db_type(connection),
         )
 
+    @skipUnlessDBFeature("supports_collation_on_charfield")
+    def test_db_type_parameters(self):
+        db_type_parameters = self.output_field_model._meta.get_field(
+            "lower_name"
+        ).db_type_parameters(connection)
+        self.assertEqual(db_type_parameters["max_length"], 11)
+
     def test_model_with_params(self):
         m = self.params_model.objects.create()
         m = self._refresh_if_needed(m)

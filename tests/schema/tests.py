@@ -2,6 +2,7 @@ import datetime
 import itertools
 import unittest
 from copy import copy
+from decimal import Decimal
 from unittest import mock
 
 from django.core.exceptions import FieldError
@@ -52,7 +53,7 @@ from django.db.models import (
     Value,
 )
 from django.db.models.fields.json import KT, KeyTextTransform
-from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Upper
+from django.db.models.functions import Abs, Cast, Collate, Lower, Random, Round, Upper
 from django.db.models.indexes import IndexExpression
 from django.db.transaction import TransactionManagementError, atomic
 from django.test import TransactionTestCase, skipIfDBFeature, skipUnlessDBFeature
@@ -828,6 +829,23 @@ class SchemaTests(TransactionTestCase):
             any("None" in query["sql"] for query in ctx.captured_queries),
             False,
         )
+
+    @isolate_apps("schema")
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_add_generated_field_with_output_field(self):
+        class GeneratedFieldOutputFieldModel(Model):
+            price = DecimalField(max_digits=7, decimal_places=2)
+            vat_price = GeneratedField(
+                expression=Round(F("price") * Value(Decimal("1.22")), 2),
+                db_persist=True,
+                output_field=DecimalField(max_digits=8, decimal_places=2),
+            )
+
+            class Meta:
+                app_label = "schema"
+
+        with connection.schema_editor() as editor:
+            editor.create_model(GeneratedFieldOutputFieldModel)
 
     @isolate_apps("schema")
     def test_add_auto_field(self):
