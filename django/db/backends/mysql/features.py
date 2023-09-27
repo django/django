@@ -154,6 +154,21 @@ class DatabaseFeatures(BaseDatabaseFeatures):
                     },
                 }
             )
+        if self.connection.mysql_is_mariadb and self.connection.mysql_version >= (
+            10,
+            5,
+            2,
+        ):
+            skips.update(
+                {
+                    "ALTER TABLE ... RENAME COLUMN statement doesn't rename inline "
+                    "constraints on MariaDB 10.5.2+, this is fixed in Django 5.0+ "
+                    "(#34320).": {
+                        "schema.tests.SchemaTests."
+                        "test_rename_field_with_check_to_truncated_name",
+                    },
+                }
+            )
         return skips
 
     @cached_property
