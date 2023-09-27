@@ -2,9 +2,10 @@
 Django 4.2.6 release notes
 ==========================
 
-*Expected October 2, 2023*
+*October 4, 2023*
 
-Django 4.2.6 fixes several bugs in 4.2.5.
+Django 4.2.6 fixes a security issue with severity "moderate" and several bugs
+in 4.2.5.
 
 Bugfixes
 ========

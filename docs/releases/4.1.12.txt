@@ -1,0 +1,9 @@
+===========================
+Django 4.1.12 release notes
+===========================
+
+*October 4, 2023*
+
+Django 4.1.12 fixes a security issue with severity "moderate" in 4.1.11.
+
+...
