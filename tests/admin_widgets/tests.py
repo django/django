@@ -1825,7 +1825,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
 
         self.admin_login(username="super", password="secret", login_url="/")
 
-        # Create a new House with a PK that needs quoting
+        # Create a new House with a PK that needs quoting.
         house = House.objects.create(name="_40")
         house_name = str(house.name)
         self.selenium.get(
