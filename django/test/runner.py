@@ -498,9 +498,9 @@ class ParallelTestSuite(unittest.TestSuite):
 
     def run(self, result):
         """
-        Distribute test cases across workers.
+        Distribute TestCases across workers.
 
-        Return an identifier of each test case with its result in order to use
+        Return an identifier of each TestCase with its result in order to use
         imap_unordered to show results as soon as they're available.
 
         To minimize pickling errors when getting results from workers:
@@ -1204,7 +1204,7 @@ def reorder_tests(tests, classes, reverse=False, shuffler=None):
 
 
 def partition_suite_by_case(suite):
-    """Partition a test suite by test case, preserving the order of tests."""
+    """Partition a test suite by TestCase, preserving the order of tests."""
     suite_class = type(suite)
     all_tests = iter_test_cases(suite)
     return [suite_class(tests) for _, tests in itertools.groupby(all_tests, type)]
