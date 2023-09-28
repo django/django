@@ -790,13 +790,8 @@ class ForeignKeyRawIdWidgetTest(TestCase):
         rel = Room._meta.get_field("house").remote_field
         w = widgets.ForeignKeyRawIdWidget(rel, widget_admin_site)
 
-        # apply quote function to primary key value
         pk_quoted = quote(str(house.pk))
-
-        # render the widget
         rendered = w.render("test", house.pk, attrs={})
-
-        # check that the primary key is properly quoted in the rendered HTML
         self.assertIn(f'href="/admin_widgets/house/{pk_quoted}/change/"', rendered)
 
 
