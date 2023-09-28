@@ -1195,8 +1195,8 @@ Fixture loading
 
 .. attribute:: TransactionTestCase.fixtures
 
-A test case for a database-backed website isn't much use if there isn't any
-data in the database. Tests are more readable and it's more maintainable to
+A test case class for a database-backed website isn't much use if there isn't
+any data in the database. Tests are more readable and it's more maintainable to
 create objects using the ORM, for example in :meth:`TestCase.setUpTestData`,
 however, you can also use :ref:`fixtures <fixtures-explanation>`.
 
@@ -1291,9 +1291,9 @@ For example::
         def test_index_page_view(self):
             call_some_test_code()
 
-This test case will flush the ``default`` and ``other`` test databases before
-running ``test_index_page_view``. You can also use ``'__all__'`` to specify
-that all of the test databases must be flushed.
+This test case class will flush the ``default`` and ``other`` test databases
+before running ``test_index_page_view``. You can also use ``'__all__'`` to
+specify that all of the test databases must be flushed.
 
 The ``databases`` flag also controls which databases the
 :attr:`TransactionTestCase.fixtures` are loaded into. By default, fixtures are
@@ -1925,7 +1925,7 @@ you might label fast or slow tests::
         def test_slow_but_core(self):
             ...
 
-You can also tag a test case::
+You can also tag a test case class::
 
     @tag("slow", "core")
     class SampleTestCase(TestCase):
