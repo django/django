@@ -203,6 +203,14 @@ def static_finders_changed(*, setting, **kwargs):
 
 
 @receiver(setting_changed)
+def form_renderer_changed(*, setting, **kwargs):
+    if setting == "FORM_RENDERER":
+        from django.forms.renderers import get_default_renderer
+
+        get_default_renderer.cache_clear()
+
+
+@receiver(setting_changed)
 def auth_password_validators_changed(*, setting, **kwargs):
     if setting == "AUTH_PASSWORD_VALIDATORS":
         from django.contrib.auth.password_validation import (

@@ -1502,10 +1502,16 @@ Overridden settings               Data reset
 ================================= ========================
 USE_TZ, TIME_ZONE                 Databases timezone
 TEMPLATES                         Template engines
+FORM_RENDERER                     Default renderer
 SERIALIZATION_MODULES             Serializers cache
 LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
 STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
 ================================= ========================
+
+.. versionchanged:: 5.1
+
+    Resetting the default renderer when the ``FORM_RENDERER`` setting is
+    changed was added.
 
 Isolating apps
 --------------
