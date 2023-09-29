@@ -822,7 +822,9 @@ class QuerySet(AltersData):
                     unique_fields=unique_fields,
                 )
                 for obj_with_pk, results in zip(objs_with_pk, returned_columns):
-                    for result, field in zip(results, opts.db_returning_fields):
+                    for result, field in zip(
+                        results, opts.db_returning_fields, strict=True
+                    ):
                         if field != opts.pk:
                             setattr(obj_with_pk, field.attname, result)
                 for obj_with_pk in objs_with_pk:
@@ -845,7 +847,9 @@ class QuerySet(AltersData):
                 ):
                     assert len(returned_columns) == len(objs_without_pk)
                 for obj_without_pk, results in zip(objs_without_pk, returned_columns):
-                    for result, field in zip(results, opts.db_returning_fields):
+                    for result, field in zip(
+                        results, opts.db_returning_fields, strict=True
+                    ):
                         setattr(obj_without_pk, field.attname, result)
                     obj_without_pk._state.adding = False
                     obj_without_pk._state.db = self.db

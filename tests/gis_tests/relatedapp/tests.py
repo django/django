@@ -54,7 +54,7 @@ class RelatedGeoModelTest(TestCase):
         # between the Oracle and PostGIS spatial backends on the extent calculation.
         tol = 4
         for ref, e in [(all_extent, e1), (txpa_extent, e2), (all_extent, e3)]:
-            for ref_val, e_val in zip(ref, e):
+            for ref_val, e_val in zip(ref, e, strict=True):
                 self.assertAlmostEqual(ref_val, e_val, tol)
 
     @skipUnlessDBFeature("supports_extent_aggr")
@@ -186,7 +186,7 @@ class RelatedGeoModelTest(TestCase):
 
         # Incrementing through each of the models, dictionaries, and tuples
         # returned by each QuerySet.
-        for m, d, t in zip(gqs, gvqs, gvlqs):
+        for m, d, t in zip(gqs, gvqs, gvlqs, strict=True):
             # The values should be Geometry objects and not raw strings returned
             # by the spatial database.
             self.assertIsInstance(d["point"], GEOSGeometry)
@@ -204,7 +204,7 @@ class RelatedGeoModelTest(TestCase):
         "Testing defer() and only() on Geographic models."
         qs = Location.objects.all().order_by("pk")
         def_qs = Location.objects.defer("point").order_by("pk")
-        for loc, def_loc in zip(qs, def_qs):
+        for loc, def_loc in zip(qs, def_qs, strict=True):
             self.assertEqual(loc.point, def_loc.point)
 
     def test09_pk_relations(self):

@@ -79,7 +79,7 @@ class NodeTests(unittest.TestCase):
         self.assertIsNot(a.children, b.children)
         self.assertEqual(a.children, b.children)
         # Child Node objects are the same objects.
-        for a_child, b_child in zip(a.children, b.children):
+        for a_child, b_child in zip(a.children, b.children, strict=True):
             if isinstance(a_child, Node):
                 self.assertIs(a_child, b_child)
             self.assertEqual(a_child, b_child)
@@ -91,7 +91,7 @@ class NodeTests(unittest.TestCase):
         # Children lists are the same object.
         self.assertIs(a.children, b.children)
         # Child Node objects are the same objects.
-        for a_child, b_child in zip(a.children, b.children):
+        for a_child, b_child in zip(a.children, b.children, strict=True):
             if isinstance(a_child, Node):
                 self.assertIs(a_child, b_child)
             self.assertEqual(a_child, b_child)
@@ -104,7 +104,7 @@ class NodeTests(unittest.TestCase):
         self.assertIsNot(a.children, b.children)
         self.assertEqual(a.children, b.children)
         # Child Node objects are not be the same objects.
-        for a_child, b_child in zip(a.children, b.children):
+        for a_child, b_child in zip(a.children, b.children, strict=True):
             if isinstance(a_child, Node):
                 self.assertIsNot(a_child, b_child)
             self.assertEqual(a_child, b_child)

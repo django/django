@@ -609,7 +609,7 @@ class Query(BaseExpression):
             converters = compiler.get_converters(outer_query.annotation_select.values())
             result = next(compiler.apply_converters((result,), converters))
 
-        return dict(zip(outer_query.annotation_select, result))
+        return dict(zip(outer_query.annotation_select, result, strict=True))
 
     def get_count(self, using):
         """
@@ -2285,7 +2285,7 @@ class Query(BaseExpression):
             # by moving them to annotations.
             group_by_annotations = {}
             values_select = {}
-            for alias, expr in zip(self.values_select, self.select):
+            for alias, expr in zip(self.values_select, self.select, strict=True):
                 if isinstance(expr, Col):
                     values_select[alias] = expr
                 else:

@@ -555,14 +555,18 @@ class SelectDateWidgetTest(WidgetTest):
                 with self.subTest(values=values):
                     data = {
                         "field_%s" % field: value
-                        for field, value in zip(("year", "month", "day"), values)
+                        for field, value in zip(
+                            ("year", "month", "day"), values, strict=True
+                        )
                     }
                     self.assertEqual(
                         w.value_from_datadict(data, {}, "field"), expected_value
                     )
                     expected_dict = {
                         field: int(value)
-                        for field, value in zip(("year", "month", "day"), values)
+                        for field, value in zip(
+                            ("year", "month", "day"), values, strict=True
+                        )
                     }
                     self.assertEqual(w.format_value(expected_value), expected_dict)
 

@@ -714,7 +714,9 @@ class ForeignObject(RelatedField):
                 "Related model %r cannot be resolved" % self.remote_field.model
             )
         related_fields = []
-        for from_field_name, to_field_name in zip(self.from_fields, self.to_fields):
+        for from_field_name, to_field_name in zip(
+            self.from_fields, self.to_fields, strict=True
+        ):
             from_field = (
                 self
                 if from_field_name == RECURSIVE_RELATIONSHIP_CONSTANT
