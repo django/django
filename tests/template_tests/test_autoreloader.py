@@ -1,7 +1,6 @@
 from pathlib import Path
 from unittest import mock
 
-from django.forms.renderers import get_default_renderer
 from django.template import autoreload
 from django.test import SimpleTestCase, override_settings
 from django.test.utils import require_jinja2
@@ -74,8 +73,6 @@ class TemplateReloadTests(SimpleTestCase):
     def test_form_template_reset_template_change_no_djangotemplates(
         self, mock_loader_reset
     ):
-        self.addCleanup(get_default_renderer.cache_clear)
-        get_default_renderer.cache_clear()
         template_path = Path(__file__).parent / "templates" / "index.html"
         self.assertIs(autoreload.template_changed(None, template_path), True)
         mock_loader_reset.assert_not_called()
