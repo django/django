@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import types
+from collections import deque
 
 from asgiref.sync import async_to_sync, iscoroutinefunction, sync_to_async
 
@@ -29,7 +30,7 @@ class BaseHandler:
 
         Must be called after the environment is fixed (see __call__ in subclasses).
         """
-        self._view_middleware = []
+        self._view_middleware = deque()
         self._template_response_middleware = []
         self._exception_middleware = []
 
@@ -75,8 +76,7 @@ class BaseHandler:
                 )
 
             if hasattr(mw_instance, "process_view"):
-                self._view_middleware.insert(
-                    0,
+                self._view_middleware.appendleft(
                     self.adapt_method_mode(is_async, mw_instance.process_view),
                 )
             if hasattr(mw_instance, "process_template_response"):
