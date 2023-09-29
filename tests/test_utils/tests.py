@@ -983,6 +983,13 @@ class HTMLEqualTests(SimpleTestCase):
         )
 
 
+class InHTMLTests(SimpleTestCase):
+    def test_needle_msg(self):
+        msg = "False is not true : Couldn't find '<b>Hello</b>' in response"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
+
+
 class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'

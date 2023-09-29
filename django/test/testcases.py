@@ -873,13 +873,13 @@ class SimpleTestCase(unittest.TestCase):
             self.fail(self._formatMessage(msg, standardMsg))
 
     def assertInHTML(self, needle, haystack, count=None, msg_prefix=""):
-        needle = assert_and_parse_html(
+        parsed_needle = assert_and_parse_html(
             self, needle, None, "First argument is not valid HTML:"
         )
-        haystack = assert_and_parse_html(
+        parsed_haystack = assert_and_parse_html(
             self, haystack, None, "Second argument is not valid HTML:"
         )
-        real_count = haystack.count(needle)
+        real_count = parsed_haystack.count(parsed_needle)
         if count is not None:
             self.assertEqual(
                 real_count,
