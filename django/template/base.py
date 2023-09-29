@@ -193,7 +193,9 @@ class Template:
         )
 
         try:
-            return parser.parse()
+            nodelist = parser.parse()
+            self.extra_data = parser.extra_data
+            return nodelist
         except Exception as e:
             if self.engine.debug:
                 e.template_debug = self.get_exception_info(e, e.token)
@@ -438,6 +440,12 @@ class Parser:
         self.tags = {}
         self.filters = {}
         self.command_stack = []
+
+        # Custom template tags may store additional data on the parser that
+        # will be made available on the template instance. Library authors
+        # should use a key to namespace any added data. The 'django' namespace
+        # is reserved for internal use.
+        self.extra_data = {}
 
         if libraries is None:
             libraries = {}

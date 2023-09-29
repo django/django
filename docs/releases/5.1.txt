@@ -194,7 +194,9 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* Custom tags may now set extra data on the ``Parser`` object that will later
+  be made available on the ``Template`` instance. Such data may be used, for
+  example, by the template loader, or other template clients.
 
 Tests
 ~~~~~
