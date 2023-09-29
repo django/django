@@ -165,7 +165,7 @@ class RelatedLookupMixin:
 
             root_constraint = WhereNode()
             for target, source, val in zip(
-                self.lhs.targets, self.lhs.sources, self.rhs
+                self.lhs.targets, self.lhs.sources, self.rhs, strict=False
             ):
                 lookup_class = target.get_lookup(self.lookup_name)
                 root_constraint.add(

@@ -821,7 +821,9 @@ class QuerySet(AltersData):
                     update_fields=update_fields,
                     unique_fields=unique_fields,
                 )
-                for obj_with_pk, results in zip(objs_with_pk, returned_columns):
+                for obj_with_pk, results in zip(
+                    objs_with_pk, returned_columns, strict=False
+                ):
                     for result, field in zip(
                         results, opts.db_returning_fields, strict=True
                     ):
@@ -846,7 +848,9 @@ class QuerySet(AltersData):
                     and on_conflict is None
                 ):
                     assert len(returned_columns) == len(objs_without_pk)
-                for obj_without_pk, results in zip(objs_without_pk, returned_columns):
+                for obj_without_pk, results in zip(
+                    objs_without_pk, returned_columns, strict=False
+                ):
                     for result, field in zip(
                         results, opts.db_returning_fields, strict=True
                     ):
