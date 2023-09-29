@@ -26,7 +26,7 @@ class RelatedGeoModelTest(TestCase):
         )
 
         for qs in (qs1, qs2, qs3):
-            for ref, c in zip(cities, qs):
+            for ref, c in zip(cities, qs[:3], strict=True):
                 nm, st, lon, lat = ref
                 self.assertEqual(nm, c.name)
                 self.assertEqual(st, c.state)
@@ -215,8 +215,8 @@ class RelatedGeoModelTest(TestCase):
         # ID column is selected instead of ID column for the city.
         city_ids = (1, 2, 3, 4, 5)
         loc_ids = (1, 2, 3, 5, 4)
-        ids_qs = City.objects.order_by("id").values("id", "location__id")
-        for val_dict, c_id, l_id in zip(ids_qs, city_ids, loc_ids):
+        ids_qs = City.objects.order_by("id").values("id", "location__id")[:5]
+        for val_dict, c_id, l_id in zip(ids_qs, city_ids, loc_ids, strict=True):
             self.assertEqual(val_dict["id"], c_id)
             self.assertEqual(val_dict["location__id"], l_id)
 

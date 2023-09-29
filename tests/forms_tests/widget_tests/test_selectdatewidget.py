@@ -612,7 +612,7 @@ class SelectDateWidgetTest(WidgetTest):
             (("", "12", "1"), "0-12-1"),
             (("2000", "", "1"), "2000-0-1"),
             (("2000", "12", ""), "2000-12-0"),
-            (("", "", "", ""), None),
+            (("", "", ""), None),
             ((None, "12", "1"), None),
             (("2000", None, "1"), None),
             (("2000", "12", None), None),
@@ -625,7 +625,9 @@ class SelectDateWidgetTest(WidgetTest):
         for values, expected in tests:
             with self.subTest(values=values):
                 data = {}
-                for field_name, value in zip(("year", "month", "day"), values):
+                for field_name, value in zip(
+                    ("year", "month", "day"), values, strict=True
+                ):
                     if value is not None:
                         data["field_%s" % field_name] = value
                 self.assertEqual(

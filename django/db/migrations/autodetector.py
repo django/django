@@ -432,7 +432,7 @@ class MigrationAutodetector:
     def _optimize_migrations(self):
         # Add in internal dependencies among the migrations
         for app_label, migrations in self.migrations.items():
-            for m1, m2 in zip(migrations, migrations[1:]):
+            for m1, m2 in zip(migrations[:-1], migrations[1:], strict=True):
                 m2.dependencies.append((app_label, m1.name))
 
         # De-dupe dependencies
