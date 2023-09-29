@@ -6,6 +6,8 @@
     const $ = django.jQuery;
     let popupIndex = 0;
     const relatedWindows = [];
+    const QUOTE_MAP = {};
+    const UNQUOTE_MAP = {};
 
     function dismissChildPopups() {
         relatedWindows.forEach(function(win) {
@@ -76,7 +78,7 @@
         }
         const value = $this.val();
         if (value) {
-            const quotedValue = customEncodeURIComponent(value);
+            const quotedValue = encodeURIComponent(value);
             siblings.each(function() {
                 const elm = $(this);
                 elm.attr('href', elm.attr('data-href-template').replace('__fk__', quotedValue));
@@ -119,7 +121,7 @@
     }
 
     function dismissAddRelatedObjectPopup(win, newId, newRepr) {
-        newId = customDecodeURIComponent(newId);
+        newId = decodeURIComponent(newId);
         const name = removePopupIndex(win.name);
         const elem = document.getElementById(name);
         if (elem) {
@@ -150,7 +152,7 @@
     }
 
     function dismissChangeRelatedObjectPopup(win, objId, newRepr, newId) {
-        objId = customDecodeURIComponent(objId);// unquote objId
+        objId = decodeURIComponent(objId);// unquote objId
         const id = removePopupIndex(win.name.replace(/^edit_/, ''));
         const selectsSelector = interpolate('#%s, #%s_from, #%s_to', [id, id, id]);
         const selects = $(selectsSelector);
@@ -190,21 +192,23 @@
         win.close();
     }
 
-    function customEncodeURIComponent(s) {
+    function encodeURIComponent(s) {
         // Ensure that primary key values do not confuse the admin URLs by
         // escaping problematic characters.
         // This is the JavaScript equivalent to django.contrib.admin.utils.quote().
-        const QUOTE_MAP = {};
-        const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
 
-        for (let i = 0; i < specialChars.length; i++) {
-            const charCode = specialChars.charCodeAt(i);
-            // Line feed \n character
-            if (charCode === 10) {
-                QUOTE_MAP[charCode] = '_0A';
-            } else {
-                const encodedChar = '_' + charCode.toString(16).toUpperCase();
-                QUOTE_MAP[charCode] = encodedChar;
+        if(Object.keys(QUOTE_MAP).length === 0) {
+            const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
+
+            for (let i = 0; i < specialChars.length; i++) {
+                const charCode = specialChars.charCodeAt(i);
+                // Line feed \n character
+                if (charCode === 10) {
+                    QUOTE_MAP[charCode] = '_0A';
+                } else {
+                    const encodedChar = '_' + charCode.toString(16).toUpperCase();
+                    QUOTE_MAP[charCode] = encodedChar;
+                }
             }
         }
 
@@ -225,18 +229,19 @@
 
 
 
-    function customDecodeURIComponent(s) {
-        const UNQUOTE_MAP = {};
-        const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
+    function decodeURIComponent(s) {
+        if(Object.keys(UNQUOTE_MAP).length === 0 ) {
+            const specialChars = '":/_#?;@&=+$,[]<>%\n\\';
 
-        for (let i = 0; i < specialChars.length; i++) {
-            const charCode = specialChars.charCodeAt(i);
-            // Line feed \n character
-            if (charCode === 10) {
-                UNQUOTE_MAP[charCode] = '_0A';
-            } else {
-                const encodedChar = '_' + charCode.toString(16).toUpperCase();
-                UNQUOTE_MAP[encodedChar] = String.fromCharCode(charCode);
+            for (let i = 0; i < specialChars.length; i++) {
+                const charCode = specialChars.charCodeAt(i);
+                // Line feed \n character
+                if (charCode === 10) {
+                    UNQUOTE_MAP[charCode] = '_0A';
+                } else {
+                    const encodedChar = '_' + charCode.toString(16).toUpperCase();
+                    UNQUOTE_MAP[encodedChar] = String.fromCharCode(charCode);
+                }
             }
         }
 
@@ -260,8 +265,8 @@
         }
     }
 
-    window.customDecodeURIComponent = customDecodeURIComponent;
-    window.customEncodeURIComponent = customEncodeURIComponent;
+    window.decodeURIComponent = decodeURIComponent;
+    window.encodeURIComponent = encodeURIComponent;
     window.showRelatedObjectLookupPopup = showRelatedObjectLookupPopup;
     window.dismissRelatedLookupPopup = dismissRelatedLookupPopup;
     window.showRelatedObjectPopup = showRelatedObjectPopup;

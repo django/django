@@ -1,7 +1,6 @@
 import gettext
 import os
 import re
-import time
 import zoneinfo
 from datetime import datetime, timedelta
 from importlib import import_module
@@ -1825,7 +1824,6 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
 
         self.admin_login(username="super", password="secret", login_url="/")
 
-        # Create a new House with a PK that needs quoting
         house = House.objects.create(name="_40")
         house_name = str(house.name)
         self.selenium.get(
@@ -1835,7 +1833,6 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.ID, "id_name").send_keys(house_name)
         self.selenium.find_element(By.NAME, "_continue").click()
 
-        # Check that the new House was created and listed in the change form
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_widgets_room_add")
         )
@@ -1845,8 +1842,7 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         select_house = Select(self.selenium.find_element(By.ID, "id_house"))
         select_house.select_by_index(0)
 
-        select_house.select_by_value(
-            house_name)
+        select_house.select_by_value(house_name)
         self.assertEqual(
             select_house.first_selected_option.get_attribute("value"), house_name
         )
@@ -1863,9 +1859,6 @@ class RelatedFieldWidgetSeleniumPrimaryKeyTests(AdminWidgetSeleniumTestCase):
         self.selenium.find_element(By.CSS_SELECTOR, save_button_css_selector)
         self.selenium.find_element(By.ID, "view_id_house").click()
         self.selenium.back()
-        time.sleep(60)
-
-        # Check that the House is linked to the Room and listed in the change form
 
         self.selenium.find_element(By.ID, "id_name")
 

@@ -3,7 +3,7 @@
 QUnit.module('admin.RelatedObjectLookups');
 
 QUnit.test('quote value', function(assert) {
-    const result = customEncodeURIComponent('_40');
+    const result = encodeURIComponent('_40');
     const expected = '_5F40';
     assert.equal(result, expected, "expected _5F40");
 
@@ -13,7 +13,7 @@ function quoteSpecialChars(specialCharsList = ['c>h<e%e[s]e_40', 'on/ion?t@w$mw+
     const quotedChars = [];
     for(let i = 0; i < specialCharsList.length; i++) {
         const charToQuote = specialCharsList[i];
-        const quotedChar = customEncodeURIComponent(charToQuote);
+        const quotedChar = encodeURIComponent(charToQuote);
         quotedChars.push(quotedChar);
     }
     return quotedChars;
@@ -47,9 +47,9 @@ QUnit.test('updateRelatedObjectLinks properly quotes URL value', function(assert
 
 
 
-QUnit.test('customDecodeURIComponent is a function that decodes URI components', function(assert) {
-    const encoded = customEncodeURIComponent('_40');
+QUnit.test('decodeURIComponent is a function that decodes URI components', function(assert) {
+    const encoded = encodeURIComponent('_40');
     console.log(encoded, "encoded");
-    const decoded = customDecodeURIComponent(encoded);
-    assert.equal(decoded, '_40', 'customDecodeURIComponent properly decodes URI components');
+    const decoded = decodeURIComponent(encoded);
+    assert.equal(decoded, '_40', 'decodeURIComponent properly decodes URI components');
 });
