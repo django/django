@@ -1,0 +1,306 @@
+============================================
+Django 5.1 release notes - UNDER DEVELOPMENT
+============================================
+
+*Expected August 2024*
+
+Welcome to Django 5.1!
+
+These release notes cover the :ref:`new features <whats-new-5.1>`, as well as
+some :ref:`backwards incompatible changes <backwards-incompatible-5.1>` you'll
+want to be aware of when upgrading from Django 5.0 or earlier. We've
+:ref:`begun the deprecation process for some features
+<deprecated-features-5.1>`.
+
+See the :doc:`/howto/upgrade-version` guide if you're updating an existing
+project.
+
+Python compatibility
+====================
+
+Django 5.1 supports Python 3.10, 3.11, and 3.12. We **highly recommend** and
+only officially support the latest release of each series.
+
+.. _whats-new-5.1:
+
+What's new in Django 5.1
+========================
+
+Minor features
+--------------
+
+:mod:`django.contrib.admin`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.admindocs`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.auth`
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* The default iteration count for the PBKDF2 password hasher is increased from
+  720,000 to 870,000.
+
+:mod:`django.contrib.contenttypes`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.gis`
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.messages`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.postgres`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.redirects`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sessions`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sitemaps`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.sites`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.staticfiles`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+:mod:`django.contrib.syndication`
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Asynchronous views
+~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Cache
+~~~~~
+
+* ...
+
+CSRF
+~~~~
+
+* ...
+
+Decorators
+~~~~~~~~~~
+
+* ...
+
+Email
+~~~~~
+
+* ...
+
+Error Reporting
+~~~~~~~~~~~~~~~
+
+* ...
+
+File Storage
+~~~~~~~~~~~~
+
+* ...
+
+File Uploads
+~~~~~~~~~~~~
+
+* ...
+
+Forms
+~~~~~
+
+* ...
+
+Generic Views
+~~~~~~~~~~~~~
+
+* ...
+
+Internationalization
+~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Logging
+~~~~~~~
+
+* ...
+
+Management Commands
+~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Migrations
+~~~~~~~~~~
+
+* ...
+
+Models
+~~~~~~
+
+* :meth:`.QuerySet.explain` now supports the ``generic_plan`` option on
+  PostgreSQL 16+.
+
+Requests and Responses
+~~~~~~~~~~~~~~~~~~~~~~
+
+* ...
+
+Security
+~~~~~~~~
+
+* ...
+
+Serialization
+~~~~~~~~~~~~~
+
+* ...
+
+Signals
+~~~~~~~
+
+* ...
+
+Templates
+~~~~~~~~~
+
+* ...
+
+Tests
+~~~~~
+
+* ...
+
+URLs
+~~~~
+
+* ...
+
+Utilities
+~~~~~~~~~
+
+* ...
+
+Validators
+~~~~~~~~~~
+
+* ...
+
+.. _backwards-incompatible-5.1:
+
+Backwards incompatible changes in 5.1
+=====================================
+
+Database backend API
+--------------------
+
+This section describes changes that may be needed in third-party database
+backends.
+
+* ...
+
+:mod:`django.contrib.gis`
+-------------------------
+
+* Support for PostGIS 2.5 is removed.
+
+Dropped support for MariaDB 10.4
+--------------------------------
+
+Upstream support for MariaDB 10.4 ends in June 2024. Django 5.1 supports
+MariaDB 10.5 and higher.
+
+Dropped support for PostgreSQL 12
+---------------------------------
+
+Upstream support for PostgreSQL 12 ends in November 2024. Django 5.1 supports
+PostgreSQL 13 and higher.
+
+Miscellaneous
+-------------
+
+* In order to improve accessibility, the admin's changelist filter is now
+  rendered in a ``<nav>`` tag instead of a ``<div>``.
+
+.. _deprecated-features-5.1:
+
+Features deprecated in 5.1
+==========================
+
+Miscellaneous
+-------------
+
+* ...
+
+Features removed in 5.1
+=======================
+
+These features have reached the end of their deprecation cycle and are removed
+in Django 5.1.
+
+See :ref:`deprecated-features-4.2` for details on these changes, including how
+to remove usage of these features.
+
+* The ``BaseUserManager.make_random_password()`` method is removed.
+
+* The model's ``Meta.index_together`` option is removed.
+
+* The ``length_is`` template filter is removed.
+
+* The ``django.contrib.auth.hashers.SHA1PasswordHasher``,
+  ``django.contrib.auth.hashers.UnsaltedSHA1PasswordHasher``, and
+  ``django.contrib.auth.hashers.UnsaltedMD5PasswordHasher`` are removed.
+
+* The model ``django.contrib.postgres.fields.CICharField``,
+  ``django.contrib.postgres.fields.CIEmailField``, and
+  ``django.contrib.postgres.fields.CITextField`` are removed, except for
+  support in historical migrations.
+
+* The ``django.contrib.postgres.fields.CIText`` mixin is removed.
+
+* The ``map_width`` and ``map_height`` attributes of ``BaseGeometryWidget`` are
+  removed.
+
+* The ``SimpleTestCase.assertFormsetError()`` method is removed.
+
+* The ``TransactionTestCase.assertQuerysetEqual()`` method is removed.
+
+* Support for passing encoded JSON string literals to ``JSONField`` and
+  associated lookups and expressions is removed.
+
+* Support for passing positional arguments to ``Signer`` and
+  ``TimestampSigner`` is removed.
+
+* The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings is removed.
+
+* The ``django.core.files.storage.get_storage_class()`` function is removed.

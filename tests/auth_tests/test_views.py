@@ -1361,7 +1361,10 @@ def get_perm(Model, perm):
 
 # Redirect in test_user_change_password will fail if session auth hash
 # isn't updated after password change (#21649)
-@override_settings(ROOT_URLCONF="auth_tests.urls_admin")
+@override_settings(
+    ROOT_URLCONF="auth_tests.urls_admin",
+    PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"],
+)
 class ChangelistTests(AuthViewsTestCase):
     @classmethod
     def setUpTestData(cls):

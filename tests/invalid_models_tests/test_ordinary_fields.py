@@ -199,7 +199,8 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable (e.g., a list or tuple).",
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
                     obj=field,
                     id="fields.E004",
                 ),
@@ -217,8 +218,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -260,8 +262,9 @@ class CharFieldTests(TestCase):
                     field.check(),
                     [
                         Error(
-                            "'choices' must be an iterable containing (actual "
-                            "value, human readable name) tuples.",
+                            "'choices' must be a mapping of actual values to human "
+                            "readable names or an iterable containing (actual value, "
+                            "human readable name) tuples.",
                             obj=field,
                             id="fields.E005",
                         ),
@@ -309,8 +312,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -337,8 +341,9 @@ class CharFieldTests(TestCase):
             field.check(),
             [
                 Error(
-                    "'choices' must be an iterable containing (actual value, "
-                    "human readable name) tuples.",
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
                     obj=field,
                     id="fields.E005",
                 ),
@@ -845,6 +850,43 @@ class IntegerFieldTests(SimpleTestCase):
                     ],
                 )
 
+    def test_non_iterable_choices(self):
+        class Model(models.Model):
+            field = models.IntegerField(choices=123)
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping (e.g. a dictionary) or an iterable "
+                    "(e.g. a list or tuple).",
+                    obj=field,
+                    id="fields.E004",
+                ),
+            ],
+        )
+
+    def test_non_iterable_choices_number(self):
+        """An integer isn't a valid choice pair."""
+
+        class Model(models.Model):
+            field = models.IntegerField(choices=[123])
+
+        field = Model._meta.get_field("field")
+        self.assertEqual(
+            field.check(),
+            [
+                Error(
+                    "'choices' must be a mapping of actual values to human readable "
+                    "names or an iterable containing (actual value, human readable "
+                    "name) tuples.",
+                    obj=field,
+                    id="fields.E005",
+                ),
+            ],
+        )
+
 
 @isolate_apps("invalid_models_tests")
 class TimeFieldTests(SimpleTestCase):
@@ -1164,3 +1206,115 @@ class InvalidDBDefaultTests(TestCase):
         msg = f"{expression} cannot be used in db_default."
         expected_error = Error(msg=msg, obj=field, id="fields.E012")
         self.assertEqual(errors, [expected_error])
+
+
+@isolate_apps("invalid_models_tests")
+class GeneratedFieldTests(TestCase):
+    def test_not_supported(self):
+        db_persist = connection.features.supports_stored_generated_columns
+
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(
+                expression=models.F("name"), db_persist=db_persist
+            )
+
+        expected_errors = []
+        if (
+            not connection.features.supports_stored_generated_columns
+            and not connection.features.supports_virtual_generated_columns
+        ):
+            expected_errors.append(
+                Error(
+                    f"{connection.display_name} does not support GeneratedFields.",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E220",
+                )
+            )
+        if (
+            not db_persist
+            and not connection.features.supports_virtual_generated_columns
+        ):
+            expected_errors.append(
+                Error(
+                    f"{connection.display_name} does not support non-persisted "
+                    "GeneratedFields.",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E221",
+                    hint="Set db_persist=True on the field.",
+                ),
+            )
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_errors,
+        )
+
+    def test_not_supported_stored_required_db_features(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=models.F("name"), db_persist=True)
+
+            class Meta:
+                required_db_features = {"supports_stored_generated_columns"}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    def test_not_supported_virtual_required_db_features(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=models.F("name"), db_persist=False)
+
+            class Meta:
+                required_db_features = {"supports_virtual_generated_columns"}
+
+        self.assertEqual(Model.check(databases=self.databases), [])
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_not_supported_virtual(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=models.F("name"), db_persist=False)
+            a = models.TextField()
+
+        excepted_errors = (
+            []
+            if connection.features.supports_virtual_generated_columns
+            else [
+                Error(
+                    f"{connection.display_name} does not support non-persisted "
+                    "GeneratedFields.",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E221",
+                    hint="Set db_persist=True on the field.",
+                ),
+            ]
+        )
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            excepted_errors,
+        )
+
+    @skipUnlessDBFeature("supports_virtual_generated_columns")
+    def test_not_supported_stored(self):
+        class Model(models.Model):
+            name = models.IntegerField()
+            field = models.GeneratedField(expression=models.F("name"), db_persist=True)
+            a = models.TextField()
+
+        expected_errors = (
+            []
+            if connection.features.supports_stored_generated_columns
+            else [
+                Error(
+                    f"{connection.display_name} does not support persisted "
+                    "GeneratedFields.",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E222",
+                    hint="Set db_persist=False on the field.",
+                ),
+            ]
+        )
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_errors,
+        )

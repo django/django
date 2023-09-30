@@ -114,17 +114,13 @@ below for information on how to set up your database correctly.
 PostgreSQL notes
 ================
 
-Django supports PostgreSQL 12 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
+Django supports PostgreSQL 13 and higher. `psycopg`_ 3.1.8+ or `psycopg2`_
 2.8.4+ is required, though the latest `psycopg`_ 3.1.8+ is recommended.
 
 .. note::
 
     Support for ``psycopg2`` is likely to be deprecated and removed at some
     point in the future.
-
-.. versionchanged:: 4.2
-
-    Support for ``psycopg`` 3.1.8+ was added.
 
 .. _postgresql-connection-settings:
 
@@ -223,16 +219,10 @@ configuration in :setting:`DATABASES`::
 
 .. _isolation level: https://www.postgresql.org/docs/current/transaction-iso.html
 
-.. versionchanged:: 4.2
-
-    ``IsolationLevel`` was added.
-
 .. _database-role:
 
 Role
 ----
-
-.. versionadded:: 4.2
 
 If you need to use a different role for database connections than the role use
 to establish the connection, set it in the :setting:`OPTIONS` part of your
@@ -252,8 +242,6 @@ database configuration in :setting:`DATABASES`::
 
 Server-side parameters binding
 ------------------------------
-
-.. versionadded:: 4.2
 
 With `psycopg`_ 3.1.8+, Django defaults to the :ref:`client-side binding
 cursors <psycopg:client-side-binding-cursors>`. If you want to use the
@@ -399,7 +387,7 @@ non-durable <https://www.postgresql.org/docs/current/non-durability.html>`_.
 MariaDB notes
 =============
 
-Django supports MariaDB 10.4 and higher.
+Django supports MariaDB 10.5 and higher.
 
 To use MariaDB, use the MySQL backend, which is shared between the two. See the
 :ref:`MySQL notes <mysql-notes>` for more details.
@@ -412,7 +400,7 @@ MySQL notes
 Version support
 ---------------
 
-Django supports MySQL 8 and higher.
+Django supports MySQL 8.0.11 and higher.
 
 Django's ``inspectdb`` feature uses the ``information_schema`` database, which
 contains detailed data on all database schemas.
@@ -755,14 +743,14 @@ MySQL and MariaDB do not support some options to the ``SELECT ... FOR UPDATE``
 statement. If ``select_for_update()`` is used with an unsupported option, then
 a :exc:`~django.db.NotSupportedError` is raised.
 
-=============== ========= ==========
+=============== ========= =====
 Option          MariaDB   MySQL
-=============== ========= ==========
-``SKIP LOCKED`` X (≥10.6) X (≥8.0.1)
-``NOWAIT``      X         X (≥8.0.1)
-``OF``                    X (≥8.0.1)
+=============== ========= =====
+``SKIP LOCKED`` X (≥10.6) X
+``NOWAIT``      X         X
+``OF``                    X
 ``NO KEY``
-=============== ========= ==========
+=============== ========= =====
 
 When using ``select_for_update()`` on MySQL, make sure you filter a queryset
 against at least a set of fields contained in unique constraints or only
@@ -792,7 +780,7 @@ appropriate typecasting.
 SQLite notes
 ============
 
-Django supports SQLite 3.21.0 and later.
+Django supports SQLite 3.27.0 and later.
 
 SQLite_ provides an excellent development alternative for applications that
 are predominantly read-only or require a smaller installation footprint. As
@@ -919,11 +907,15 @@ To enable the JSON1 extension you can follow the instruction on
 Oracle notes
 ============
 
-Django supports `Oracle Database Server`_ versions 19c and higher. Version 7.0
-or higher of the `cx_Oracle`_ Python driver is required.
+Django supports `Oracle Database Server`_ versions 19c and higher. Version
+1.3.2 or higher of the `oracledb`_ Python driver is required.
+
+.. deprecated:: 5.0
+
+    Support for ``cx_Oracle`` is deprecated.
 
 .. _`Oracle Database Server`: https://www.oracle.com/
-.. _`cx_Oracle`: https://oracle.github.io/python-cx_Oracle/
+.. _`oracledb`: https://oracle.github.io/python-oracledb/
 
 In order for the ``python manage.py migrate`` command to work, your Oracle
 database user must have privileges to run the following commands:

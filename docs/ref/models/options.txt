@@ -94,8 +94,6 @@ Django quotes column and table names behind the scenes.
 ``db_table_comment``
 --------------------
 
-.. versionadded:: 4.2
-
 .. attribute:: Options.db_table_comment
 
 The comment on the database table to use for this model. It is useful for
@@ -445,36 +443,13 @@ not be looking at your Django code. For example::
         unique_together = ["driver", "restaurant"]
 
     A :class:`~django.db.models.ManyToManyField` cannot be included in
-    unique_together. (It's not clear what that would even mean!) If you
+    ``unique_together``. (It's not clear what that would even mean!) If you
     need to validate uniqueness related to a
     :class:`~django.db.models.ManyToManyField`, try using a signal or
     an explicit :attr:`through <ManyToManyField.through>` model.
 
     The ``ValidationError`` raised during model validation when the constraint
     is violated has the ``unique_together`` error code.
-
-``index_together``
-------------------
-
-.. attribute:: Options.index_together
-
-    Sets of field names that, taken together, are indexed::
-
-        index_together = [
-            ["pub_date", "deadline"],
-        ]
-
-    This list of fields will be indexed together (i.e. the appropriate
-    ``CREATE INDEX`` statement will be issued.)
-
-    For convenience, ``index_together`` can be a single list when dealing with a single
-    set of fields::
-
-        index_together = ["pub_date", "deadline"]
-
-    .. deprecated:: 4.2
-
-        Use the :attr:`~Options.indexes` option instead.
 
 ``constraints``
 ---------------

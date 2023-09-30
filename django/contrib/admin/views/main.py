@@ -29,7 +29,7 @@ from django.core.exceptions import (
     SuspiciousOperation,
 )
 from django.core.paginator import InvalidPage
-from django.db.models import Exists, F, Field, ManyToOneRel, OrderBy, OuterRef
+from django.db.models import F, Field, ManyToOneRel, OrderBy
 from django.db.models.expressions import Combinable
 from django.urls import reverse
 from django.utils.deprecation import RemovedInDjango60Warning
@@ -566,6 +566,13 @@ class ChangeList:
             # ValueError, ValidationError, or ?.
             raise IncorrectLookupParameters(e)
 
+        if not qs.query.select_related:
+            qs = self.apply_select_related(qs)
+
+        # Set ordering.
+        ordering = self.get_ordering(request, qs)
+        qs = qs.order_by(*ordering)
+
         # Apply search results
         qs, search_may_have_duplicates = self.model_admin.get_search_results(
             request,
@@ -580,17 +587,9 @@ class ChangeList:
         )
         # Remove duplicates from results, if necessary
         if filters_may_have_duplicates | search_may_have_duplicates:
-            qs = qs.filter(pk=OuterRef("pk"))
-            qs = self.root_queryset.filter(Exists(qs))
-
-        # Set ordering.
-        ordering = self.get_ordering(request, qs)
-        qs = qs.order_by(*ordering)
-
-        if not qs.query.select_related:
-            qs = self.apply_select_related(qs)
-
-        return qs
+            return qs.distinct()
+        else:
+            return qs
 
     def apply_select_related(self, qs):
         if self.list_select_related is True:

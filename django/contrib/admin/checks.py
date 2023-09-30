@@ -3,6 +3,7 @@ from itertools import chain
 
 from django.apps import apps
 from django.conf import settings
+from django.contrib.admin.exceptions import NotRegistered
 from django.contrib.admin.utils import NotRelationField, flatten, get_fields_from_path
 from django.core import checks
 from django.core.exceptions import FieldDoesNotExist
@@ -234,8 +235,9 @@ class BaseModelAdminChecks:
                     obj=obj,
                     id="admin.E038",
                 )
-            related_admin = obj.admin_site._registry.get(field.remote_field.model)
-            if related_admin is None:
+            try:
+                related_admin = obj.admin_site.get_model_admin(field.remote_field.model)
+            except NotRegistered:
                 return [
                     checks.Error(
                         'An admin for model "%s" has to be registered '
@@ -248,19 +250,20 @@ class BaseModelAdminChecks:
                         id="admin.E039",
                     )
                 ]
-            elif not related_admin.search_fields:
-                return [
-                    checks.Error(
-                        '%s must define "search_fields", because it\'s '
-                        "referenced by %s.autocomplete_fields."
-                        % (
-                            related_admin.__class__.__name__,
-                            type(obj).__name__,
-                        ),
-                        obj=obj.__class__,
-                        id="admin.E040",
-                    )
-                ]
+            else:
+                if not related_admin.search_fields:
+                    return [
+                        checks.Error(
+                            '%s must define "search_fields", because it\'s '
+                            "referenced by %s.autocomplete_fields."
+                            % (
+                                related_admin.__class__.__name__,
+                                type(obj).__name__,
+                            ),
+                            obj=obj.__class__,
+                            id="admin.E040",
+                        )
+                    ]
             return []
 
     def _check_raw_id_fields(self, obj):
@@ -533,6 +536,16 @@ class BaseModelAdminChecks:
                 return must_be(
                     "a many-to-many field", option=label, obj=obj, id="admin.E020"
                 )
+            elif not field.remote_field.through._meta.auto_created:
+                return [
+                    checks.Error(
+                        f"The value of '{label}' cannot include the ManyToManyField "
+                        f"'{field_name}', because that field manually specifies a "
+                        f"relationship model.",
+                        obj=obj.__class__,
+                        id="admin.E013",
+                    )
+                ]
             else:
                 return []
 

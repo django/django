@@ -164,7 +164,7 @@ Messages to this logger have the following extra context:
 
 * ``status_code``: The HTTP response code associated with the request.
 
-* ``request``: The request object that generated the logging message.
+* ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
 
 .. _django-template-logger:
 
@@ -198,11 +198,6 @@ level or handlers that are installed.
 This logging does not include framework-level initialization (e.g.
 ``SET TIMEZONE``). Turn on query logging in your database if you wish to view
 all database queries.
-
-.. versionchanged:: 4.2
-
-    Support for logging transaction management queries (``BEGIN``, ``COMMIT``,
-    and ``ROLLBACK``) was added.
 
 .. _django-security-logger:
 

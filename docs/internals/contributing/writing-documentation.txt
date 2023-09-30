@@ -262,11 +262,6 @@ documentation:
   also need to define a reference to the documentation for that environment
   variable using :rst:dir:`.. envvar:: <envvar>`.
 
-.. versionchanged:: 4.2
-
-    All Python code blocks in the Django documentation were reformatted with
-    :pypi:`blacken-docs`.
-
 Django-specific markup
 ======================
 

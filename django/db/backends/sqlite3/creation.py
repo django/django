@@ -53,7 +53,7 @@ class DatabaseCreation(BaseDatabaseCreation):
 
     def get_test_db_clone_settings(self, suffix):
         orig_settings_dict = self.connection.settings_dict
-        source_database_name = orig_settings_dict["NAME"]
+        source_database_name = orig_settings_dict["NAME"] or ":memory:"
 
         if not self.is_in_memory_db(source_database_name):
             root, ext = os.path.splitext(source_database_name)
@@ -143,7 +143,7 @@ class DatabaseCreation(BaseDatabaseCreation):
                 f"file:memorydb_{alias}_{_worker_id}?mode=memory&cache=shared"
             )
             source_db = self.connection.Database.connect(
-                f"file:{alias}_{_worker_id}.sqlite3", uri=True
+                f"file:{alias}_{_worker_id}.sqlite3?mode=ro", uri=True
             )
             target_db = sqlite3.connect(connection_str, uri=True)
             source_db.backup(target_db)

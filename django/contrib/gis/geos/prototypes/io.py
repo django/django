@@ -14,6 +14,7 @@ from django.contrib.gis.geos.prototypes.errcheck import (
 )
 from django.contrib.gis.geos.prototypes.geom import c_uchar_p, geos_char_p
 from django.utils.encoding import force_bytes
+from django.utils.functional import SimpleLazyObject
 
 
 # ### The WKB/WKT Reader/Writer structures and pointers ###
@@ -178,19 +179,28 @@ class _WKBReader(IOBase):
             raise TypeError
 
 
+def default_trim_value():
+    """
+    GEOS changed the default value in 3.12.0. Can be replaced by True when
+    3.12.0 becomes the minimum supported version.
+    """
+    return geos_version_tuple() >= (3, 12)
+
+
+DEFAULT_TRIM_VALUE = SimpleLazyObject(default_trim_value)
+
+
 # ### WKB/WKT Writer Classes ###
 class WKTWriter(IOBase):
     _constructor = wkt_writer_create
     ptr_type = WKT_WRITE_PTR
     destructor = wkt_writer_destroy
-
-    _trim = False
     _precision = None
 
     def __init__(self, dim=2, trim=False, precision=None):
         super().__init__()
-        if bool(trim) != self._trim:
-            self.trim = trim
+        self._trim = DEFAULT_TRIM_VALUE
+        self.trim = trim
         if precision is not None:
             self.precision = precision
         self.outdim = dim
@@ -259,24 +269,14 @@ class WKBWriter(IOBase):
 
     def write(self, geom):
         "Return the WKB representation of the given geometry."
-        from django.contrib.gis.geos import Polygon
-
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write(self.ptr, geom.ptr, byref(c_size_t()))
-        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
-            # Fix GEOS output for empty polygon.
-            # See https://trac.osgeo.org/geos/ticket/680.
-            wkb = wkb[:-8] + b"\0" * 4
         return memoryview(wkb)
 
     def write_hex(self, geom):
         "Return the HEXEWKB representation of the given geometry."
-        from django.contrib.gis.geos.polygon import Polygon
-
         geom = self._handle_empty_point(geom)
         wkb = wkb_writer_write_hex(self.ptr, geom.ptr, byref(c_size_t()))
-        if self.geos_version < (3, 6, 1) and isinstance(geom, Polygon) and geom.empty:
-            wkb = wkb[:-16] + b"0" * 8
         return wkb
 
     # ### WKBWriter Properties ###

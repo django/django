@@ -1337,6 +1337,16 @@ class LookupTests(TestCase):
                 with self.assertRaisesMessage(ValueError, msg):
                     qs.exists()
 
+    def test_isnull_textfield(self):
+        self.assertSequenceEqual(
+            Author.objects.filter(bio__isnull=True),
+            [self.au2],
+        )
+        self.assertSequenceEqual(
+            Author.objects.filter(bio__isnull=False),
+            [self.au1],
+        )
+
     def test_lookup_rhs(self):
         product = Product.objects.create(name="GME", qty_target=5000)
         stock_1 = Stock.objects.create(product=product, short=True, qty_available=180)

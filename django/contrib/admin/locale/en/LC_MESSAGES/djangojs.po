@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
 "PO-Revision-Date: 2010-05-13 15:35+0200\n"
 "Last-Translator: Django team\n"
 "Language-Team: English <en@li.org>\n"
@@ -285,36 +285,99 @@ msgid "Dec"
 msgstr ""
 
 #: contrib/admin/static/admin/js/calendar.js:39
+msgid "Sunday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:40
+msgid "Monday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:41
+msgid "Tuesday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:42
+msgid "Wednesday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:43
+msgid "Thursday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:44
+msgid "Friday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:45
+msgid "Saturday"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:48
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:49
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:50
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:51
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:52
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:53
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:54
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
+#: contrib/admin/static/admin/js/calendar.js:57
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:40
+#: contrib/admin/static/admin/js/calendar.js:58
 msgctxt "one letter Monday"
 msgid "M"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:41
+#: contrib/admin/static/admin/js/calendar.js:59
 msgctxt "one letter Tuesday"
 msgid "T"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:42
+#: contrib/admin/static/admin/js/calendar.js:60
 msgctxt "one letter Wednesday"
 msgid "W"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:43
+#: contrib/admin/static/admin/js/calendar.js:61
 msgctxt "one letter Thursday"
 msgid "T"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:44
+#: contrib/admin/static/admin/js/calendar.js:62
 msgctxt "one letter Friday"
 msgid "F"
 msgstr ""
 
-#: contrib/admin/static/admin/js/calendar.js:45
+#: contrib/admin/static/admin/js/calendar.js:63
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr ""

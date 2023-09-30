@@ -351,7 +351,8 @@ class CommandTests(SimpleTestCase):
                     management.call_command(
                         command,
                         *args,
-                        **{**kwargs, "stdout": out},
+                        **kwargs,
+                        stdout=out,
                     )
                     self.assertIn("foo_list=[1, 2]", out.getvalue())
 
@@ -378,7 +379,7 @@ class CommandTests(SimpleTestCase):
         )
         self.assertIn(expected_output, out.getvalue())
         out.truncate(0)
-        management.call_command("required_constant_option", **{**args, "stdout": out})
+        management.call_command("required_constant_option", **args, stdout=out)
         self.assertIn(expected_output, out.getvalue())
 
     def test_subparser(self):

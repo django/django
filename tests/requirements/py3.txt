@@ -1,9 +1,9 @@
 aiosmtpd
-asgiref >= 3.6.0
+asgiref >= 3.7.0
 argon2-cffi >= 19.2.0
 bcrypt
 black
-docutils
+docutils >= 0.19
 geoip2; python_version < '3.12'
 jinja2 >= 2.11.0
 numpy; python_version < '3.12'
@@ -14,8 +14,8 @@ pymemcache >= 3.4.0
 pywatchman; sys.platform != 'win32'
 PyYAML
 redis >= 3.4.0
-selenium >= 3.8.0
+selenium >= 4.8.0
 sqlparse >= 0.3.1
 tblib >= 1.5.0
 tzdata
-colorama; sys.platform == 'win32'
+colorama >= 0.4.6; sys.platform == 'win32'

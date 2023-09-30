@@ -677,6 +677,10 @@ is:
 
 Requires ``gettext`` 0.19 or newer.
 
+.. django-admin-option:: --no-obsolete
+
+Removes obsolete message strings from the ``.po`` files.
+
 .. django-admin-option:: --keep-pot
 
 Prevents deleting the temporary ``.pot`` files generated before creating the
@@ -740,19 +744,12 @@ Generate migration files without Django version and timestamp header.
 Makes ``makemigrations`` exit with a non-zero status when model changes without
 migrations are detected.
 
-.. versionchanged:: 4.2
-
-    In older versions, the missing migrations were also created when using the
-    ``--check`` option.
-
 .. django-admin-option:: --scriptable
 
 Diverts log output and input prompts to ``stderr``, writing only paths of
 generated migration files to ``stdout``.
 
 .. django-admin-option:: --update
-
-.. versionadded:: 4.2
 
 Merges model changes into the latest migration and optimize the resulting
 operations.
@@ -1555,6 +1552,16 @@ tests, which allows it to print a traceback if the interpreter crashes. Pass
 
 Outputs timings, including database setup and total run time.
 
+.. django-admin-option:: --durations N
+
+.. versionadded:: 5.0
+
+Shows the N slowest test cases (N=0 for all).
+
+.. admonition:: Python 3.12 and later
+
+    This feature is only available for Python 3.12 and later.
+
 ``testserver``
 --------------
 
@@ -1759,18 +1766,6 @@ documentation.
 
 Can be run as a cron job or directly to clean out expired sessions.
 
-``django.contrib.sitemaps``
----------------------------
-
-``ping_google``
-~~~~~~~~~~~~~~~
-
-This command is only available if the :doc:`Sitemaps framework
-</ref/contrib/sitemaps>` (``django.contrib.sitemaps``) is installed.
-
-Please refer to its :djadmin:`description <ping_google>` in the Sitemaps
-documentation.
-
 ``django.contrib.staticfiles``
 ------------------------------
 
@@ -1929,7 +1924,7 @@ two third-party libraries are needed:
 
   .. code-block:: doscon
 
-    ...\> py -m pip install colorama
+    ...\> py -m pip install "colorama >= 0.4.6"
 
 * Install `ANSICON`_, a third-party tool that allows ``cmd.exe`` to process
   ANSI color codes. Django commands will detect its presence and will make use
@@ -2083,7 +2078,7 @@ Running management commands from your code
 
 .. function:: django.core.management.call_command(name, *args, **options)
 
-To call a management command from code use ``call_command``.
+To call a management command from code use ``call_command()``.
 
 ``name``
   the name of the command to call or a command object. Passing the name is

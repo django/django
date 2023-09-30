@@ -173,11 +173,11 @@ Consider this set of models::
     from django.db import models
     from django.forms import ModelForm
 
-    TITLE_CHOICES = [
-        ("MR", "Mr."),
-        ("MRS", "Mrs."),
-        ("MS", "Ms."),
-    ]
+    TITLE_CHOICES = {
+        "MR": "Mr.",
+        "MRS": "Mrs.",
+        "MS": "Ms.",
+    }
 
 
     class Author(models.Model):
@@ -675,10 +675,6 @@ the field declaratively and setting its ``validators`` parameter::
 
     See the :doc:`form field documentation </ref/forms/fields>` for more information
     on fields and their arguments.
-
-.. versionchanged:: 4.2
-
-    The ``Meta.formfield_callback`` attribute was added.
 
 Enabling localization of fields
 -------------------------------

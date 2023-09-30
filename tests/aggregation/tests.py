@@ -28,6 +28,7 @@ from django.db.models import (
     Value,
     Variance,
     When,
+    Window,
 )
 from django.db.models.expressions import Func, RawSQL
 from django.db.models.functions import (
@@ -2115,6 +2116,16 @@ class AggregateTestCase(TestCase):
             },
         )
 
+    def test_group_by_reference_subquery(self):
+        author_qs = (
+            Author.objects.annotate(publisher_id=F("book__publisher"))
+            .values("publisher_id")
+            .annotate(cnt=Count("*"))
+            .values("publisher_id")
+        )
+        qs = Publisher.objects.filter(pk__in=author_qs)
+        self.assertCountEqual(qs, [self.p1, self.p2, self.p3, self.p4])
+
 
 class AggregateAnnotationPruningTests(TestCase):
     @classmethod
@@ -2153,6 +2164,47 @@ class AggregateAnnotationPruningTests(TestCase):
         sql = ctx.captured_queries[0]["sql"].lower()
         self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
         self.assertNotIn("authors_count", sql)
+
+    def test_unused_aliased_aggregate_and_annotation_reverse_fk(self):
+        Book.objects.create(
+            name="b3",
+            publisher=self.p2,
+            pages=1000,
+            rating=4.2,
+            price=50,
+            contact=self.a2,
+            pubdate=datetime.date.today(),
+        )
+        qs = Publisher.objects.annotate(
+            total_pages=Sum("book__pages"),
+            good_book=Case(
+                When(book__rating__gt=4.0, then=Value(True)),
+                default=Value(False),
+            ),
+        )
+        self.assertEqual(qs.count(), 3)
+
+    def test_unused_aliased_aggregate_and_annotation_reverse_fk_grouped(self):
+        Book.objects.create(
+            name="b3",
+            publisher=self.p2,
+            pages=1000,
+            rating=4.2,
+            price=50,
+            contact=self.a2,
+            pubdate=datetime.date.today(),
+        )
+        qs = (
+            Publisher.objects.values("id", "name")
+            .annotate(total_pages=Sum("book__pages"))
+            .annotate(
+                good_book=Case(
+                    When(book__rating__gt=4.0, then=Value(True)),
+                    default=Value(False),
+                )
+            )
+        )
+        self.assertEqual(qs.count(), 3)
 
     def test_non_aggregate_annotation_pruned(self):
         with CaptureQueriesContext(connection) as ctx:
@@ -2207,3 +2259,23 @@ class AggregateAnnotationPruningTests(TestCase):
         sql = ctx.captured_queries[0]["sql"].lower()
         self.assertEqual(sql.count("select"), 3, "Subquery wrapping required")
         self.assertEqual(aggregate, {"sum_total_books": 3})
+
+    @skipUnlessDBFeature("supports_over_clause")
+    def test_referenced_window_requires_wrapping(self):
+        total_books_qs = Book.objects.annotate(
+            avg_publisher_pages=Coalesce(
+                Window(Avg("pages"), partition_by=F("publisher")),
+                0.0,
+            )
+        )
+        with self.assertNumQueries(1) as ctx:
+            aggregate = total_books_qs.aggregate(
+                sum_avg_publisher_pages=Sum("avg_publisher_pages"),
+                books_count=Count("id"),
+            )
+        sql = ctx.captured_queries[0]["sql"].lower()
+        self.assertEqual(sql.count("select"), 2, "Subquery wrapping required")
+        self.assertEqual(
+            aggregate,
+            {"sum_avg_publisher_pages": 1100.0, "books_count": 2},
+        )

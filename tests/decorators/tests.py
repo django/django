@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import (
     permission_required,
     user_passes_test,
 )
-from django.http import HttpRequest, HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 from django.test import SimpleTestCase
 from django.utils.decorators import method_decorator
 from django.utils.functional import keep_lazy, keep_lazy_text, lazy
@@ -116,29 +116,6 @@ class DecoratorsTest(TestCase):
         response = callback(request)
 
         self.assertEqual(response, ["test2", "test1"])
-
-    def test_require_safe_accepts_only_safe_methods(self):
-        """
-        Test for the require_safe decorator.
-        A view returns either a response or an exception.
-        Refs #15637.
-        """
-
-        def my_view(request):
-            return HttpResponse("OK")
-
-        my_safe_view = require_safe(my_view)
-        request = HttpRequest()
-        request.method = "GET"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = "HEAD"
-        self.assertIsInstance(my_safe_view(request), HttpResponse)
-        request.method = "POST"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = "PUT"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
-        request.method = "DELETE"
-        self.assertIsInstance(my_safe_view(request), HttpResponseNotAllowed)
 
 
 # For testing method_decorator, a decorator that assumes a single argument.

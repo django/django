@@ -133,6 +133,11 @@ to, or in lieu of custom ``field.clean()`` methods.
     :param code: If not ``None``, overrides :attr:`code`.
     :param allowlist: If not ``None``, overrides :attr:`allowlist`.
 
+    An :class:`EmailValidator` ensures that a value looks like an email, and
+    raises a :exc:`~django.core.exceptions.ValidationError` with
+    :attr:`message` and :attr:`code` if it doesn't. Values longer than 320
+    characters are always considered invalid.
+
     .. attribute:: message
 
         The error message used by
@@ -160,7 +165,8 @@ to, or in lieu of custom ``field.clean()`` methods.
 .. class:: URLValidator(schemes=None, regex=None, message=None, code=None)
 
     A :class:`RegexValidator` subclass that ensures a value looks like a URL,
-    and raises an error code of ``'invalid'`` if it doesn't.
+    and raises an error code of ``'invalid'`` if it doesn't. Values longer than
+    :attr:`max_length` characters are always considered invalid.
 
     Loopback addresses and reserved IP spaces are considered valid. Literal
     IPv6 addresses (:rfc:`3986#section-3.2.2`) and Unicode domains are both
@@ -176,6 +182,11 @@ to, or in lieu of custom ``field.clean()`` methods.
         website provides a full list of `valid URI schemes`_.
 
         .. _valid URI schemes: https://www.iana.org/assignments/uri-schemes/uri-schemes.xhtml
+
+    .. attribute:: max_length
+
+        The maximum length of values that could be considered valid. Defaults
+        to 2048 characters.
 
 ``validate_email``
 ------------------
@@ -340,9 +351,16 @@ to, or in lieu of custom ``field.clean()`` methods.
 ``StepValueValidator``
 ----------------------
 
-.. class:: StepValueValidator(limit_value, message=None)
+.. class:: StepValueValidator(limit_value, message=None, offset=None)
 
     Raises a :exc:`~django.core.exceptions.ValidationError` with a code of
     ``'step_size'`` if ``value`` is not an integral multiple of
     ``limit_value``, which can be a float, integer or decimal value or a
-    callable.
+    callable. When ``offset`` is set, the validation occurs against
+    ``limit_value`` plus ``offset``. For example, for
+    ``StepValueValidator(3, offset=1.4)`` valid values include ``1.4``,
+    ``4.4``, ``7.4``, ``10.4``, and so on.
+
+    .. versionchanged:: 5.0
+
+        The ``offset`` argument was added.

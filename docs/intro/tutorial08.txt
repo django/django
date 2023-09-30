@@ -83,7 +83,7 @@ depends on your needs and goals. Sometimes it's fine to use a package that's
 in its alpha state. Other times, you need to know it's production ready.
 `Adam Johnson has a blog post
 <https://adamj.eu/tech/2021/11/04/the-well-maintained-test/>`_ that outlines
-a set of characteristics a that qualifies a package as "well maintained".
+a set of characteristics that qualifies a package as "well maintained".
 Django Packages shows data for some of these characteristics, such as when the
 package was last updated.
 

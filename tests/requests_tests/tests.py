@@ -3,7 +3,7 @@ from io import BytesIO
 from itertools import chain
 from urllib.parse import urlencode
 
-from django.core.exceptions import DisallowedHost
+from django.core.exceptions import BadRequest, DisallowedHost
 from django.core.handlers.wsgi import LimitedStream, WSGIRequest
 from django.http import (
     HttpHeaders,
@@ -369,10 +369,7 @@ class RequestsTests(SimpleTestCase):
         )
         self.assertEqual(request.POST, {"key": ["España"]})
 
-    def test_alternate_charset_POST(self):
-        """
-        Test a POST with non-utf-8 payload encoding.
-        """
+    def test_non_utf8_charset_POST_bad_request(self):
         payload = FakePayload(urlencode({"key": "España".encode("latin-1")}))
         request = WSGIRequest(
             {
@@ -382,7 +379,30 @@ class RequestsTests(SimpleTestCase):
                 "wsgi.input": payload,
             }
         )
-        self.assertEqual(request.POST, {"key": ["España"]})
+        msg = (
+            "HTTP requests with the 'application/x-www-form-urlencoded' content type "
+            "must be UTF-8 encoded."
+        )
+        with self.assertRaisesMessage(BadRequest, msg):
+            request.POST
+        with self.assertRaisesMessage(BadRequest, msg):
+            request.FILES
+
+    def test_utf8_charset_POST(self):
+        for charset in ["utf-8", "UTF-8"]:
+            with self.subTest(charset=charset):
+                payload = FakePayload(urlencode({"key": "España"}))
+                request = WSGIRequest(
+                    {
+                        "REQUEST_METHOD": "POST",
+                        "CONTENT_LENGTH": len(payload),
+                        "CONTENT_TYPE": (
+                            f"application/x-www-form-urlencoded; charset={charset}"
+                        ),
+                        "wsgi.input": payload,
+                    }
+                )
+                self.assertEqual(request.POST, {"key": ["España"]})
 
     def test_body_after_POST_multipart_form_data(self):
         """
@@ -694,18 +714,31 @@ class RequestsTests(SimpleTestCase):
             request.body
 
     def test_set_encoding_clears_POST(self):
-        payload = FakePayload("name=Hello Günter")
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    f"--{BOUNDARY}",
+                    'Content-Disposition: form-data; name="name"',
+                    "",
+                    "Hello Günter",
+                    f"--{BOUNDARY}--",
+                    "",
+                ]
+            )
+        )
         request = WSGIRequest(
             {
                 "REQUEST_METHOD": "POST",
-                "CONTENT_TYPE": "application/x-www-form-urlencoded",
+                "CONTENT_TYPE": MULTIPART_CONTENT,
                 "CONTENT_LENGTH": len(payload),
                 "wsgi.input": payload,
             }
         )
         self.assertEqual(request.POST, {"name": ["Hello Günter"]})
         request.encoding = "iso-8859-16"
-        self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
+        # FIXME: POST should be accessible after changing the encoding
+        # (refs #14035).
+        # self.assertEqual(request.POST, {"name": ["Hello GĂŒnter"]})
 
     def test_set_encoding_clears_GET(self):
         payload = FakePayload("")
@@ -1013,10 +1046,37 @@ class HostValidationTests(SimpleTestCase):
         ):
             request.get_host()
 
-    def test_split_domain_port_removes_trailing_dot(self):
-        domain, port = split_domain_port("example.com.:8080")
-        self.assertEqual(domain, "example.com")
-        self.assertEqual(port, "8080")
+    def test_split_domain_port(self):
+        for host, expected in [
+            ("<invalid>", ("", "")),
+            ("<invalid>:8080", ("", "")),
+            ("example.com 8080", ("", "")),
+            ("example.com:invalid", ("", "")),
+            ("[::1]", ("[::1]", "")),
+            ("[::1]:8080", ("[::1]", "8080")),
+            ("[::ffff:127.0.0.1]", ("[::ffff:127.0.0.1]", "")),
+            ("[::ffff:127.0.0.1]:8080", ("[::ffff:127.0.0.1]", "8080")),
+            (
+                "[1851:0000:3238:DEF1:0177:0000:0000:0125]",
+                ("[1851:0000:3238:def1:0177:0000:0000:0125]", ""),
+            ),
+            (
+                "[1851:0000:3238:DEF1:0177:0000:0000:0125]:8080",
+                ("[1851:0000:3238:def1:0177:0000:0000:0125]", "8080"),
+            ),
+            ("127.0.0.1", ("127.0.0.1", "")),
+            ("127.0.0.1:8080", ("127.0.0.1", "8080")),
+            ("example.com", ("example.com", "")),
+            ("example.com:8080", ("example.com", "8080")),
+            ("example.com.", ("example.com", "")),
+            ("example.com.:8080", ("example.com", "8080")),
+            ("xn--n28h.test", ("xn--n28h.test", "")),
+            ("xn--n28h.test:8080", ("xn--n28h.test", "8080")),
+            ("subdomain.example.com", ("subdomain.example.com", "")),
+            ("subdomain.example.com:8080", ("subdomain.example.com", "8080")),
+        ]:
+            with self.subTest(host=host):
+                self.assertEqual(split_domain_port(host), expected)
 
 
 class BuildAbsoluteURITests(SimpleTestCase):

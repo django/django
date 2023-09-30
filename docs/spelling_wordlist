@@ -40,6 +40,7 @@ backends
 backport
 backported
 backports
+backtick
 backtraces
 balancer
 basename
@@ -586,6 +587,7 @@ util
 utils
 Uvicorn
 uWSGI
+Uyghur
 validator
 validators
 variadic

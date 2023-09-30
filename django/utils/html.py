@@ -15,6 +15,27 @@ from django.utils.regex_helper import _lazy_re_compile
 from django.utils.safestring import SafeData, SafeString, mark_safe
 from django.utils.text import normalize_newlines
 
+# https://html.spec.whatwg.org/#void-elements
+VOID_ELEMENTS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+    # Deprecated tags.
+    "frame",
+    "spacer",
+}
+
 
 @keep_lazy(SafeString)
 def escape(text):

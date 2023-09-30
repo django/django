@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType, ContentTypeManager
+from django.contrib.contenttypes.prefetch import GenericPrefetch
 from django.db import models
 from django.db.migrations.state import ProjectState
 from django.test import TestCase, override_settings
@@ -328,3 +329,17 @@ class ContentTypesMultidbTests(TestCase):
             1, using="other"
         ):
             ContentType.objects.get_for_model(Author)
+
+
+class GenericPrefetchTests(TestCase):
+    def test_values_queryset(self):
+        msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.values("pk")])
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.values_list("pk")])
+
+    def test_raw_queryset(self):
+        msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
+        with self.assertRaisesMessage(ValueError, msg):
+            GenericPrefetch("question", [Author.objects.raw("select pk from author")])

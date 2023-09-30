@@ -103,6 +103,8 @@ class TransactionalTests(TransactionTestCase):
                 cursor.execute('DROP TRIGGER "TRG_NO_DATA_FOUND"')
 
     def test_password_with_at_sign(self):
+        from django.db.backends.oracle.base import Database
+
         old_password = connection.settings_dict["PASSWORD"]
         connection.settings_dict["PASSWORD"] = "p@ssword"
         try:
@@ -110,8 +112,8 @@ class TransactionalTests(TransactionTestCase):
                 '/"p@ssword"@',
                 connection.client.connect_string(connection.settings_dict),
             )
-            with self.assertRaises(DatabaseError) as context:
-                connection.cursor()
+            with self.assertRaises(Database.DatabaseError) as context:
+                connection.connect()
             # Database exception: "ORA-01017: invalid username/password" is
             # expected.
             self.assertIn("ORA-01017", context.exception.args[0].message)

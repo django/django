@@ -139,13 +139,14 @@ def get_deleted_objects(objs, request, admin_site):
 
     def format_callback(obj):
         model = obj.__class__
-        has_admin = model in admin_site._registry
         opts = obj._meta
 
         no_edit_link = "%s: %s" % (capfirst(opts.verbose_name), obj)
 
-        if has_admin:
-            if not admin_site._registry[model].has_delete_permission(request, obj):
+        if admin_site.is_registered(model):
+            if not admin_site.get_model_admin(model).has_delete_permission(
+                request, obj
+            ):
                 perms_needed.add(opts.verbose_name)
             try:
                 admin_url = reverse(
@@ -301,6 +302,8 @@ def lookup_field(name, obj, model_admin=None):
                 value = attr()
             else:
                 value = attr
+            if hasattr(model_admin, "model") and hasattr(model_admin.model, name):
+                attr = getattr(model_admin.model, name)
         f = None
     else:
         attr = None

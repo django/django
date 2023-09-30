@@ -54,9 +54,9 @@ class RecorderTests(TestCase):
         query for the existence of the migrations table.
         """
         recorder = MigrationRecorder(connection)
-        with self.assertNumQueries(1):
-            self.assertEqual(recorder.has_table(), True)
-            self.assertEqual(recorder.has_table(), True)
+        self.assertIs(recorder.has_table(), True)
+        with self.assertNumQueries(0):
+            self.assertIs(recorder.has_table(), True)
 
 
 class LoaderTests(TestCase):

@@ -182,7 +182,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
         conn.execute("PRAGMA foreign_keys = ON")
         # The macOS bundled SQLite defaults legacy_alter_table ON, which
-        # prevents atomic table renames (feature supports_atomic_references_rename)
+        # prevents atomic table renames.
         conn.execute("PRAGMA legacy_alter_table = OFF")
         return conn
 

@@ -800,10 +800,16 @@ Attributes
 
     A bytestring representing the content, encoded from a string if necessary.
 
+.. attribute:: HttpResponse.cookies
+
+    A :py:obj:`http.cookies.SimpleCookie` object holding the cookies included
+    in the response.
+
 .. attribute:: HttpResponse.headers
 
     A case insensitive, dict-like object that provides an interface to all
-    HTTP headers on the response. See :ref:`setting-header-fields`.
+    HTTP headers on the response, except a ``Set-Cookie`` header. See
+    :ref:`setting-header-fields` and :attr:`HttpResponse.cookies`.
 
 .. attribute:: HttpResponse.charset
 
@@ -1240,10 +1246,6 @@ with the following notable differences:
 The :class:`HttpResponseBase` base class is common between
 :class:`HttpResponse` and :class:`StreamingHttpResponse`.
 
-.. versionchanged:: 4.2
-
-    Support for asynchronous iteration was added.
-
 Attributes
 ----------
 
@@ -1274,13 +1276,41 @@ Attributes
 
 .. attribute:: StreamingHttpResponse.is_async
 
-    .. versionadded:: 4.2
-
     Boolean indicating whether :attr:`StreamingHttpResponse.streaming_content`
     is an asynchronous iterator or not.
 
     This is useful for middleware needing to wrap
     :attr:`StreamingHttpResponse.streaming_content`.
+
+.. _request-response-streaming-disconnect:
+
+Handling disconnects
+--------------------
+
+.. versionadded:: 5.0
+
+If the client disconnects during a streaming response, Django will cancel the
+coroutine that is handling the response. If you want to clean up resources
+manually, you can do so by catching the ``asyncio.CancelledError``::
+
+    async def streaming_response():
+        try:
+            # Do some work here
+            async for chunk in my_streaming_iterator():
+                yield chunk
+        except asyncio.CancelledError:
+            # Handle disconnect
+            ...
+            raise
+
+
+    async def my_streaming_view(request):
+        return StreamingHttpResponse(streaming_response())
+
+This example only shows how to handle client disconnection while the response
+is streaming. If you perform long-running operations in your view before
+returning the ``StreamingHttpResponse`` object, then you may also want to
+:ref:`handle disconnections in the view <async-handling-disconnect>` itself.
 
 ``FileResponse`` objects
 ========================

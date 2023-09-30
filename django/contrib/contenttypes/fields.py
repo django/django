@@ -1,5 +1,6 @@
 import functools
 import itertools
+import warnings
 from collections import defaultdict
 
 from asgiref.sync import sync_to_async
@@ -19,6 +20,7 @@ from django.db.models.query_utils import PathInfo
 from django.db.models.sql import AND
 from django.db.models.sql.where import WhereNode
 from django.db.models.utils import AltersData
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property
 
 
@@ -163,20 +165,44 @@ class GenericForeignKey(FieldCacheMixin):
     def get_cache_name(self):
         return self.name
 
-    def get_content_type(self, obj=None, id=None, using=None):
+    def get_content_type(self, obj=None, id=None, using=None, model=None):
         if obj is not None:
             return ContentType.objects.db_manager(obj._state.db).get_for_model(
                 obj, for_concrete_model=self.for_concrete_model
             )
         elif id is not None:
             return ContentType.objects.db_manager(using).get_for_id(id)
+        elif model is not None:
+            return ContentType.objects.db_manager(using).get_for_model(
+                model, for_concrete_model=self.for_concrete_model
+            )
         else:
             # This should never happen. I love comments like this, don't you?
             raise Exception("Impossible arguments to GFK.get_content_type!")
 
     def get_prefetch_queryset(self, instances, queryset=None):
-        if queryset is not None:
-            raise ValueError("Custom queryset can't be used for this lookup.")
+        warnings.warn(
+            "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+            "instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        if queryset is None:
+            return self.get_prefetch_querysets(instances)
+        return self.get_prefetch_querysets(instances, [queryset])
+
+    def get_prefetch_querysets(self, instances, querysets=None):
+        custom_queryset_dict = {}
+        if querysets is not None:
+            for queryset in querysets:
+                ct_id = self.get_content_type(
+                    model=queryset.query.model, using=queryset.db
+                ).pk
+                if ct_id in custom_queryset_dict:
+                    raise ValueError(
+                        "Only one queryset is allowed for each content type."
+                    )
+                custom_queryset_dict[ct_id] = queryset
 
         # For efficiency, group the instances by content type and then do one
         # query per model
@@ -195,9 +221,13 @@ class GenericForeignKey(FieldCacheMixin):
 
         ret_val = []
         for ct_id, fkeys in fk_dict.items():
-            instance = instance_dict[ct_id]
-            ct = self.get_content_type(id=ct_id, using=instance._state.db)
-            ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
+            if ct_id in custom_queryset_dict:
+                # Return values from the custom queryset, if provided.
+                ret_val.extend(custom_queryset_dict[ct_id].filter(pk__in=fkeys))
+            else:
+                instance = instance_dict[ct_id]
+                ct = self.get_content_type(id=ct_id, using=instance._state.db)
+                ret_val.extend(ct.get_all_objects_for_this_type(pk__in=fkeys))
 
         # For doing the join in Python, we have to match both the FK val and the
         # content type, so we use a callable that returns a (fk, class) pair.
@@ -242,8 +272,8 @@ class GenericForeignKey(FieldCacheMixin):
             ct_match = (
                 ct_id == self.get_content_type(obj=rel_obj, using=instance._state.db).id
             )
-            pk_match = rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
-            if ct_match and pk_match:
+            pk_match = ct_match and rel_obj._meta.pk.to_python(pk_val) == rel_obj.pk
+            if pk_match:
                 return rel_obj
             else:
                 rel_obj = None
@@ -616,9 +646,23 @@ def create_generic_related_manager(superclass, rel):
                 return self._apply_rel_filters(queryset)
 
         def get_prefetch_queryset(self, instances, queryset=None):
+            warnings.warn(
+                "get_prefetch_queryset() is deprecated. Use get_prefetch_querysets() "
+                "instead.",
+                RemovedInDjango60Warning,
+                stacklevel=2,
+            )
             if queryset is None:
-                queryset = super().get_queryset()
+                return self.get_prefetch_querysets(instances)
+            return self.get_prefetch_querysets(instances, [queryset])
 
+        def get_prefetch_querysets(self, instances, querysets=None):
+            if querysets and len(querysets) != 1:
+                raise ValueError(
+                    "querysets argument of get_prefetch_querysets() should have a "
+                    "length of 1."
+                )
+            queryset = querysets[0] if querysets else super().get_queryset()
             queryset._add_hints(instance=instances[0])
             queryset = queryset.using(queryset._db or self._db)
             # Group instances by content types.

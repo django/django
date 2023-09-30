@@ -238,7 +238,7 @@ instance of the configured storage backend.
 The ``Message`` class
 ---------------------
 
-.. class:: storage.base.Message
+.. class:: Message
 
     When you loop over the list of messages in a template, what you get are
     instances of the ``Message`` class. They have only a few attributes:
@@ -452,3 +452,36 @@ the session cookie settings:
 * :setting:`SESSION_COOKIE_DOMAIN`
 * :setting:`SESSION_COOKIE_SECURE`
 * :setting:`SESSION_COOKIE_HTTPONLY`
+
+Testing
+=======
+
+.. versionadded:: 5.0
+
+This module offers a tailored test assertion method, for testing messages
+attached to an :class:`~.HttpResponse`.
+
+To benefit from this assertion, add ``MessagesTestMixin`` to the class
+hierarchy::
+
+    from django.contrib.messages.test import MessagesTestMixin
+    from django.test import TestCase
+
+
+    class MsgTestCase(MessagesTestMixin, TestCase):
+        pass
+
+Then, inherit from the ``MsgTestCase`` in your tests.
+
+.. module:: django.contrib.messages.test
+
+.. method:: MessagesTestMixin.assertMessages(response, expected_messages, ordered=True)
+
+    Asserts that :mod:`~django.contrib.messages` added to the :class:`response
+    <django.http.HttpResponse>` matches ``expected_messages``.
+
+    ``expected_messages`` is a list of
+    :class:`~django.contrib.messages.Message` objects.
+
+    By default, the comparison is ordering dependent. You can disable this by
+    setting the ``ordered`` argument to ``False``.

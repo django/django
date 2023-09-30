@@ -490,5 +490,5 @@ class GenericInlineModelAdminTest(SimpleTestCase):
             ("media", MediaInline),
         ):
             request.name = name
-            self.assertEqual(ma.get_inlines(request, None), (inline_class,)),
+            self.assertEqual(ma.get_inlines(request, None), (inline_class,))
             self.assertEqual(type(ma.get_inline_instances(request)[0]), inline_class)

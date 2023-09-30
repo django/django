@@ -13,9 +13,8 @@ from django.db.migrations.state import (
     ProjectState,
     get_related_models_recursive,
 )
-from django.test import SimpleTestCase, ignore_warnings, override_settings
+from django.test import SimpleTestCase, override_settings
 from django.test.utils import isolate_apps
-from django.utils.deprecation import RemovedInDjango51Warning
 
 from .models import (
     FoodManager,
@@ -31,9 +30,6 @@ class StateTests(SimpleTestCase):
     Tests state construction, rendering and modification by operations.
     """
 
-    # RemovedInDjango51Warning, when deprecation ends, only remove
-    # Meta.index_together from inline models.
-    @ignore_warnings(category=RemovedInDjango51Warning)
     def test_create(self):
         """
         Tests making a ProjectState from an Apps
@@ -50,7 +46,6 @@ class StateTests(SimpleTestCase):
                 app_label = "migrations"
                 apps = new_apps
                 unique_together = ["name", "bio"]
-                index_together = ["bio", "age"]  # RemovedInDjango51Warning.
 
         class AuthorProxy(Author):
             class Meta:
@@ -142,7 +137,6 @@ class StateTests(SimpleTestCase):
             author_state.options,
             {
                 "unique_together": {("name", "bio")},
-                "index_together": {("bio", "age")},  # RemovedInDjango51Warning.
                 "indexes": [],
                 "constraints": [],
             },

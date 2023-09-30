@@ -13,6 +13,7 @@ from django.test import (
     skipUnlessDBFeature,
 )
 from django.test.utils import CaptureQueriesContext
+from django.utils.deprecation import RemovedInDjango60Warning
 
 from .models import (
     Article,
@@ -978,6 +979,31 @@ class CustomPrefetchTests(TestCase):
         with self.assertNumQueries(5):
             self.traverse_qs(list(houses), [["occupants", "houses", "main_room"]])
 
+    def test_nested_prefetch_related_with_duplicate_prefetch_and_depth(self):
+        people = Person.objects.prefetch_related(
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+            "houses__main_room",
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        people = Person.objects.prefetch_related(
+            "houses__main_room",
+            Prefetch(
+                "houses__main_room",
+                queryset=Room.objects.filter(name="Dining room"),
+                to_attr="dining_room",
+            ),
+        )
+        with self.assertNumQueries(4):
+            main_room = people[0].houses.all()[0]
+
+        self.assertEqual(main_room.main_room, self.room1_1)
+
     def test_values_queryset(self):
         msg = "Prefetch querysets cannot use raw(), values(), and values_list()."
         with self.assertRaisesMessage(ValueError, msg):
@@ -1671,7 +1697,7 @@ class Ticket21760Tests(TestCase):
 
     def test_bug(self):
         prefetcher = get_prefetcher(self.rooms[0], "house", "house")[0]
-        queryset = prefetcher.get_prefetch_queryset(list(Room.objects.all()))[0]
+        queryset = prefetcher.get_prefetch_querysets(list(Room.objects.all()))[0]
         self.assertNotIn(" JOIN ", str(queryset.query))
 
 
@@ -1969,3 +1995,19 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
         )
         with self.assertRaisesMessage(NotSupportedError, msg):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
+
+
+class GetCurrentQuerySetDeprecation(TestCase):
+    def test_get_current_queryset_warning(self):
+        msg = (
+            "Prefetch.get_current_queryset() is deprecated. Use "
+            "get_current_querysets() instead."
+        )
+        authors = Author.objects.all()
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertEqual(
+                Prefetch("authors", authors).get_current_queryset(1),
+                authors,
+            )
+        with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
+            self.assertIsNone(Prefetch("authors").get_current_queryset(1))

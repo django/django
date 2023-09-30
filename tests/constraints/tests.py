@@ -13,6 +13,7 @@ from django.utils.deprecation import RemovedInDjango60Warning
 from .models import (
     ChildModel,
     ChildUniqueConstraintProduct,
+    JSONFieldModel,
     Product,
     UniqueConstraintConditionProduct,
     UniqueConstraintDeferrable,
@@ -332,6 +333,38 @@ class CheckConstraintTests(TestCase):
         )
         constraint.validate(Product, Product())
 
+    @skipUnlessDBFeature("supports_json_field")
+    def test_validate_nullable_jsonfield(self):
+        is_null_constraint = models.CheckConstraint(
+            check=models.Q(data__isnull=True),
+            name="nullable_data",
+        )
+        is_not_null_constraint = models.CheckConstraint(
+            check=models.Q(data__isnull=False),
+            name="nullable_data",
+        )
+        is_null_constraint.validate(JSONFieldModel, JSONFieldModel(data=None))
+        msg = f"Constraint “{is_null_constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_null_constraint.validate(JSONFieldModel, JSONFieldModel(data={}))
+        msg = f"Constraint “{is_not_null_constraint.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_not_null_constraint.validate(JSONFieldModel, JSONFieldModel(data=None))
+        is_not_null_constraint.validate(JSONFieldModel, JSONFieldModel(data={}))
+
+    def test_validate_pk_field(self):
+        constraint_with_pk = models.CheckConstraint(
+            check=~models.Q(pk=models.F("age")),
+            name="pk_not_age_check",
+        )
+        constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=2))
+        msg = f"Constraint “{constraint_with_pk.name}” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=1))
+        with self.assertRaisesMessage(ValidationError, msg):
+            constraint_with_pk.validate(ChildModel, ChildModel(id=1, age=1))
+        constraint_with_pk.validate(ChildModel, ChildModel(pk=1, age=1), exclude={"pk"})
+
 
 class UniqueConstraintTests(TestCase):
     @classmethod
@@ -503,6 +536,27 @@ class UniqueConstraintTests(TestCase):
         self.assertEqual(constraint, mock.ANY)
         self.assertNotEqual(constraint, another_constraint)
 
+    def test_eq_with_nulls_distinct(self):
+        constraint_1 = models.UniqueConstraint(
+            Lower("title"),
+            nulls_distinct=False,
+            name="book_func_nulls_distinct_uq",
+        )
+        constraint_2 = models.UniqueConstraint(
+            Lower("title"),
+            nulls_distinct=True,
+            name="book_func_nulls_distinct_uq",
+        )
+        constraint_3 = models.UniqueConstraint(
+            Lower("title"),
+            name="book_func_nulls_distinct_uq",
+        )
+        self.assertEqual(constraint_1, constraint_1)
+        self.assertEqual(constraint_1, mock.ANY)
+        self.assertNotEqual(constraint_1, constraint_2)
+        self.assertNotEqual(constraint_1, constraint_3)
+        self.assertNotEqual(constraint_2, constraint_3)
+
     def test_repr(self):
         fields = ["foo", "bar"]
         name = "unique_fields"
@@ -558,6 +612,18 @@ class UniqueConstraintTests(TestCase):
             repr(constraint),
             "<UniqueConstraint: fields=('foo', 'bar') name='opclasses_fields' "
             "opclasses=['text_pattern_ops', 'varchar_pattern_ops']>",
+        )
+
+    def test_repr_with_nulls_distinct(self):
+        constraint = models.UniqueConstraint(
+            fields=["foo", "bar"],
+            name="nulls_distinct_fields",
+            nulls_distinct=False,
+        )
+        self.assertEqual(
+            repr(constraint),
+            "<UniqueConstraint: fields=('foo', 'bar') name='nulls_distinct_fields' "
+            "nulls_distinct=False>",
         )
 
     def test_repr_with_expressions(self):
@@ -676,6 +742,24 @@ class UniqueConstraintTests(TestCase):
                 "fields": tuple(fields),
                 "name": name,
                 "opclasses": opclasses,
+            },
+        )
+
+    def test_deconstruction_with_nulls_distinct(self):
+        fields = ["foo", "bar"]
+        name = "unique_fields"
+        constraint = models.UniqueConstraint(
+            fields=fields, name=name, nulls_distinct=True
+        )
+        path, args, kwargs = constraint.deconstruct()
+        self.assertEqual(path, "django.db.models.UniqueConstraint")
+        self.assertEqual(args, ())
+        self.assertEqual(
+            kwargs,
+            {
+                "fields": tuple(fields),
+                "name": name,
+                "nulls_distinct": True,
             },
         )
 
@@ -911,6 +995,42 @@ class UniqueConstraintTests(TestCase):
             exclude={"name"},
         )
 
+    def test_validate_nullable_textfield_with_isnull_true(self):
+        is_null_constraint = models.UniqueConstraint(
+            "price",
+            "discounted_price",
+            condition=models.Q(unit__isnull=True),
+            name="uniq_prices_no_unit",
+        )
+        is_not_null_constraint = models.UniqueConstraint(
+            "price",
+            "discounted_price",
+            condition=models.Q(unit__isnull=False),
+            name="uniq_prices_unit",
+        )
+
+        Product.objects.create(price=2, discounted_price=1)
+        Product.objects.create(price=4, discounted_price=3, unit="ng/mL")
+
+        msg = "Constraint “uniq_prices_no_unit” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_null_constraint.validate(
+                Product, Product(price=2, discounted_price=1, unit=None)
+            )
+        is_null_constraint.validate(
+            Product, Product(price=2, discounted_price=1, unit="ng/mL")
+        )
+        is_null_constraint.validate(Product, Product(price=4, discounted_price=3))
+
+        msg = "Constraint “uniq_prices_unit” is violated."
+        with self.assertRaisesMessage(ValidationError, msg):
+            is_not_null_constraint.validate(
+                Product,
+                Product(price=4, discounted_price=3, unit="μg/mL"),
+            )
+        is_not_null_constraint.validate(Product, Product(price=4, discounted_price=3))
+        is_not_null_constraint.validate(Product, Product(price=2, discounted_price=1))
+
     def test_name(self):
         constraints = get_constraints(UniqueConstraintProduct._meta.db_table)
         expected_name = "name_color_uniq"
@@ -995,7 +1115,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_defer_argument(self):
         message = "UniqueConstraint.deferrable must be a Deferrable instance."
-        with self.assertRaisesMessage(ValueError, message):
+        with self.assertRaisesMessage(TypeError, message):
             models.UniqueConstraint(
                 fields=["name"],
                 name="name_invalid",
@@ -1013,7 +1133,7 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_include_argument(self):
         msg = "UniqueConstraint.include must be a list or tuple."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             models.UniqueConstraint(
                 name="uniq_include",
                 fields=["field"],
@@ -1022,11 +1142,18 @@ class UniqueConstraintTests(TestCase):
 
     def test_invalid_opclasses_argument(self):
         msg = "UniqueConstraint.opclasses must be a list or tuple."
-        with self.assertRaisesMessage(ValueError, msg):
+        with self.assertRaisesMessage(TypeError, msg):
             models.UniqueConstraint(
                 name="uniq_opclasses",
                 fields=["field"],
                 opclasses="jsonb_path_ops",
+            )
+
+    def test_invalid_nulls_distinct_argument(self):
+        msg = "UniqueConstraint.nulls_distinct must be a bool."
+        with self.assertRaisesMessage(TypeError, msg):
+            models.UniqueConstraint(
+                name="uniq_opclasses", fields=["field"], nulls_distinct="NULLS DISTINCT"
             )
 
     def test_opclasses_and_fields_same_length(self):

@@ -51,6 +51,7 @@ from django.contrib.gis.geos.prototypes.predicates import (  # NOQA
     geos_disjoint,
     geos_equals,
     geos_equalsexact,
+    geos_equalsidentical,
     geos_hasz,
     geos_intersects,
     geos_isclosed,

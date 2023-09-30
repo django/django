@@ -431,6 +431,11 @@ application registry.
     It must be called explicitly in other cases, for instance in plain Python
     scripts.
 
+    .. versionchanged:: 5.0
+
+        Raises a ``RuntimeWarning`` when apps interact with the database before
+        the app registry has been fully populated.
+
 .. currentmodule:: django.apps
 
 The application registry is initialized in three stages. At each stage, Django
@@ -509,3 +514,29 @@ Here are some common problems that you may encounter during initialization:
   :setting:`INSTALLED_APPS` to contain
   ``'django.contrib.admin.apps.SimpleAdminConfig'`` instead of
   ``'django.contrib.admin'``.
+
+* ``RuntimeWarning: Accessing the database during app initialization is
+  discouraged.`` This warning is triggered for database queries executed before
+  apps are ready, such as during module imports or in the
+  :meth:`AppConfig.ready` method. Such premature database queries are
+  discouraged because they will run during the startup of every management
+  command, which will slow down your project startup, potentially cache stale
+  data, and can even fail if migrations are pending.
+
+  For example, a common mistake is making a database query to populate form
+  field choices::
+
+    class LocationForm(forms.Form):
+        country = forms.ChoiceField(choices=[c.name for c in Country.objects.all()])
+
+  In the example above, the query from ``Country.objects.all()`` is executed
+  during module import, because the ``QuerySet`` is iterated over. To avoid the
+  warning, the form could use a :class:`~django.forms.ModelChoiceField`
+  instead::
+
+    class LocationForm(forms.Form):
+        country = forms.ModelChoiceField(queryset=Country.objects.all())
+
+  To make it easier to find the code that triggered this warning, you can make
+  Python :ref:`treat warnings as errors <python:warning-filter>` to reveal the
+  stack trace, for example with ``python -Werror manage.py shell``.

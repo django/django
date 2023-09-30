@@ -54,8 +54,8 @@ autosectionlabel_maxdepth = 2
 linkcheck_ignore = [
     # Special-use addresses and domain names. (RFC 6761/6890)
     r"^https?://(?:127\.0\.0\.1|\[::1\])(?::\d+)?/",
-    r"^https?://(?:[^/\.]+\.)*example\.(?:com|net|org)(?::\d+)?/",
-    r"^https?://(?:[^/\.]+\.)*(?:example|invalid|localhost|test)(?::\d+)?/",
+    r"^https?://(?:[^/.]+\.)*example\.(?:com|net|org)(?::\d+)?/",
+    r"^https?://(?:[^/.]+\.)*(?:example|invalid|localhost|test)(?::\d+)?/",
     # Pages that are inaccessible because they require authentication.
     r"^https://github\.com/[^/]+/[^/]+/fork",
     r"^https://code\.djangoproject\.com/github/login",
@@ -111,7 +111,7 @@ copyright = "Django Software Foundation and contributors"
 # built documents.
 #
 # The short X.Y version.
-version = "5.0"
+version = "5.1"
 # The full version, including alpha/beta/rc tags.
 try:
     from django import VERSION, get_version
@@ -128,7 +128,7 @@ else:
     release = django_release()
 
 # The "development version" of Django
-django_next_version = "5.0"
+django_next_version = "5.1"
 
 extlinks = {
     "bpo": ("https://bugs.python.org/issue?@action=redirect&bpo=%s", "bpo-%s"),

@@ -55,7 +55,7 @@ class PaginationTests(SimpleTestCase):
         ten = nine + [10]
         eleven = ten + [11]
         tests = (
-            # Each item is two tuples:
+            # Each item is 2-tuple:
             #     First tuple is Paginator parameters - object_list, per_page,
             #         orphans, and allow_empty_first_page.
             #     Second tuple is resulting Paginator attributes - count,
@@ -233,7 +233,7 @@ class PaginationTests(SimpleTestCase):
         """
         ten = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
         tests = (
-            # Each item is three tuples:
+            # Each item is 3-tuple:
             #     First tuple is Paginator parameters - object_list, per_page,
             #         orphans, and allow_empty_first_page.
             #     Second tuple is the start and end indexes of the first page.

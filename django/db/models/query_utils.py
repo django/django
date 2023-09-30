@@ -14,6 +14,8 @@ from django.core.exceptions import FieldError
 from django.db import DEFAULT_DB_ALIAS, DatabaseError, connections
 from django.db.models.constants import LOOKUP_SEP
 from django.utils import tree
+from django.utils.functional import cached_property
+from django.utils.hashable import make_hashable
 
 logger = logging.getLogger("django.db.models")
 
@@ -151,6 +153,27 @@ class Q(tree.Node):
             kwargs["_negated"] = True
         return path, args, kwargs
 
+    @cached_property
+    def identity(self):
+        path, args, kwargs = self.deconstruct()
+        identity = [path, *kwargs.items()]
+        for child in args:
+            if isinstance(child, tuple):
+                arg, value = child
+                value = make_hashable(value)
+                identity.append((arg, value))
+            else:
+                identity.append(child)
+        return tuple(identity)
+
+    def __eq__(self, other):
+        if not isinstance(other, Q):
+            return NotImplemented
+        return other.identity == self.identity
+
+    def __hash__(self):
+        return hash(self.identity)
+
 
 class DeferredAttribute:
     """
@@ -175,6 +198,10 @@ class DeferredAttribute:
             # might be able to reuse the already loaded value. Refs #18343.
             val = self._check_parent_chain(instance)
             if val is None:
+                if instance.pk is None and self.field.generated:
+                    raise AttributeError(
+                        "Cannot read a generated field from an unsaved model."
+                    )
                 instance.refresh_from_db(fields=[field_name])
             else:
                 data[field_name] = val

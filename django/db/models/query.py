@@ -33,6 +33,7 @@ from django.db.models.utils import (
     resolve_callables,
 )
 from django.utils import timezone
+from django.utils.deprecation import RemovedInDjango60Warning
 from django.utils.functional import cached_property, partition
 
 # The maximum number of results to fetch in a get() query.
@@ -544,19 +545,36 @@ class QuerySet(AltersData):
         An asynchronous iterator over the results from applying this QuerySet
         to the database.
         """
-        if self._prefetch_related_lookups:
-            raise NotSupportedError(
-                "Using QuerySet.aiterator() after prefetch_related() is not supported."
-            )
         if chunk_size <= 0:
             raise ValueError("Chunk size must be strictly positive.")
         use_chunked_fetch = not connections[self.db].settings_dict.get(
             "DISABLE_SERVER_SIDE_CURSORS"
         )
-        async for item in self._iterable_class(
+        iterable = self._iterable_class(
             self, chunked_fetch=use_chunked_fetch, chunk_size=chunk_size
-        ):
-            yield item
+        )
+        if self._prefetch_related_lookups:
+            results = []
+
+            async for item in iterable:
+                results.append(item)
+                if len(results) >= chunk_size:
+                    await aprefetch_related_objects(
+                        results, *self._prefetch_related_lookups
+                    )
+                    for result in results:
+                        yield result
+                    results.clear()
+
+            if results:
+                await aprefetch_related_objects(
+                    results, *self._prefetch_related_lookups
+                )
+                for result in results:
+                    yield result
+        else:
+            async for item in iterable:
+                yield item
 
     def aggregate(self, *args, **kwargs):
         """
@@ -645,6 +663,15 @@ class QuerySet(AltersData):
         Create a new object with the given kwargs, saving it to the database
         and returning the created object.
         """
+        reverse_one_to_one_fields = frozenset(kwargs).intersection(
+            self.model._meta._reverse_one_to_one_field_names
+        )
+        if reverse_one_to_one_fields:
+            raise ValueError(
+                "The following fields do not exist in this model: %s"
+                % ", ".join(reverse_one_to_one_fields)
+            )
+
         obj = self.model(**kwargs)
         self._for_write = True
         obj.save(force_insert=True, using=self.db)
@@ -663,6 +690,8 @@ class QuerySet(AltersData):
                 obj.pk = obj._meta.pk.get_pk_value_on_save(obj)
             if not connection.features.supports_default_keyword_in_bulk_insert:
                 for field in obj._meta.fields:
+                    if field.generated:
+                        continue
                     value = getattr(obj, field.attname)
                     if isinstance(value, DatabaseDefault):
                         setattr(obj, field.attname, field.db_default)
@@ -778,7 +807,7 @@ class QuerySet(AltersData):
             unique_fields,
         )
         self._for_write = True
-        fields = opts.concrete_fields
+        fields = [f for f in opts.concrete_fields if not f.generated]
         objs = list(objs)
         self._prepare_for_bulk_create(objs)
         with transaction.atomic(using=self.db, savepoint=False):
@@ -944,10 +973,10 @@ class QuerySet(AltersData):
         Return a tuple (object, created), where created is a boolean
         specifying whether an object was created.
         """
+        update_defaults = defaults or {}
         if create_defaults is None:
-            update_defaults = create_defaults = defaults or {}
-        else:
-            update_defaults = defaults or {}
+            create_defaults = update_defaults
+
         self._for_write = True
         with transaction.atomic(using=self.db):
             # Lock the row so that a concurrent update is blocked until
@@ -1135,8 +1164,8 @@ class QuerySet(AltersData):
         self._not_support_combined_queries("delete")
         if self.query.is_sliced:
             raise TypeError("Cannot use 'limit' or 'offset' with delete().")
-        if self.query.distinct or self.query.distinct_fields:
-            raise TypeError("Cannot call delete() after .distinct().")
+        if self.query.distinct_fields:
+            raise TypeError("Cannot call delete() after .distinct(*fields).")
         if self._fields is not None:
             raise TypeError("Cannot call delete() after .values() or .values_list()")
 
@@ -1837,12 +1866,17 @@ class QuerySet(AltersData):
         inserted_rows = []
         bulk_return = connection.features.can_return_rows_from_bulk_insert
         for item in [objs[i : i + batch_size] for i in range(0, len(objs), batch_size)]:
-            if bulk_return and on_conflict is None:
+            if bulk_return and (
+                on_conflict is None or on_conflict == OnConflict.UPDATE
+            ):
                 inserted_rows.extend(
                     self._insert(
                         item,
                         fields=fields,
                         using=self.db,
+                        on_conflict=on_conflict,
+                        update_fields=update_fields,
+                        unique_fields=unique_fields,
                         returning_fields=self.model._meta.db_returning_fields,
                     )
                 )
@@ -2203,8 +2237,21 @@ class Prefetch:
         return to_attr, as_attr
 
     def get_current_queryset(self, level):
-        if self.get_current_prefetch_to(level) == self.prefetch_to:
-            return self.queryset
+        warnings.warn(
+            "Prefetch.get_current_queryset() is deprecated. Use "
+            "get_current_querysets() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        querysets = self.get_current_querysets(level)
+        return querysets[0] if querysets is not None else None
+
+    def get_current_querysets(self, level):
+        if (
+            self.get_current_prefetch_to(level) == self.prefetch_to
+            and self.queryset is not None
+        ):
+            return [self.queryset]
         return None
 
     def __eq__(self, other):
@@ -2382,23 +2429,42 @@ def prefetch_related_objects(model_instances, *related_lookups):
                 obj_list = new_obj_list
 
 
+async def aprefetch_related_objects(model_instances, *related_lookups):
+    """See prefetch_related_objects()."""
+    return await sync_to_async(prefetch_related_objects)(
+        model_instances, *related_lookups
+    )
+
+
 def get_prefetcher(instance, through_attr, to_attr):
     """
     For the attribute 'through_attr' on the given instance, find
-    an object that has a get_prefetch_queryset().
+    an object that has a get_prefetch_querysets().
     Return a 4 tuple containing:
-    (the object with get_prefetch_queryset (or None),
+    (the object with get_prefetch_querysets (or None),
      the descriptor object representing this relationship (or None),
      a boolean that is False if the attribute was not found at all,
      a function that takes an instance and returns a boolean that is True if
      the attribute has already been fetched for that instance)
     """
 
-    def has_to_attr_attribute(instance):
-        return hasattr(instance, to_attr)
+    def is_to_attr_fetched(model, to_attr):
+        # Special case cached_property instances because hasattr() triggers
+        # attribute computation and assignment.
+        if isinstance(getattr(model, to_attr, None), cached_property):
+
+            def has_cached_property(instance):
+                return to_attr in instance.__dict__
+
+            return has_cached_property
+
+        def has_to_attr_attribute(instance):
+            return hasattr(instance, to_attr)
+
+        return has_to_attr_attribute
 
     prefetcher = None
-    is_fetched = has_to_attr_attribute
+    is_fetched = is_to_attr_fetched(instance.__class__, to_attr)
 
     # For singly related objects, we have to avoid getting the attribute
     # from the object, as this will trigger the query. So we first try
@@ -2410,29 +2476,31 @@ def get_prefetcher(instance, through_attr, to_attr):
         attr_found = True
         if rel_obj_descriptor:
             # singly related object, descriptor object has the
-            # get_prefetch_queryset() method.
-            if hasattr(rel_obj_descriptor, "get_prefetch_queryset"):
+            # get_prefetch_querysets() method.
+            if (
+                hasattr(rel_obj_descriptor, "get_prefetch_querysets")
+                # RemovedInDjango60Warning.
+                or hasattr(rel_obj_descriptor, "get_prefetch_queryset")
+            ):
                 prefetcher = rel_obj_descriptor
-                is_fetched = rel_obj_descriptor.is_cached
+                # If to_attr is set, check if the value has already been set,
+                # which is done with has_to_attr_attribute(). Do not use the
+                # method from the descriptor, as the cache_name it defines
+                # checks the field name, not the to_attr value.
+                if through_attr == to_attr:
+                    is_fetched = rel_obj_descriptor.is_cached
             else:
                 # descriptor doesn't support prefetching, so we go ahead and get
                 # the attribute on the instance rather than the class to
                 # support many related managers
                 rel_obj = getattr(instance, through_attr)
-                if hasattr(rel_obj, "get_prefetch_queryset"):
+                if (
+                    hasattr(rel_obj, "get_prefetch_querysets")
+                    # RemovedInDjango60Warning.
+                    or hasattr(rel_obj, "get_prefetch_queryset")
+                ):
                     prefetcher = rel_obj
-                if through_attr != to_attr:
-                    # Special case cached_property instances because hasattr
-                    # triggers attribute computation and assignment.
-                    if isinstance(
-                        getattr(instance.__class__, to_attr, None), cached_property
-                    ):
-
-                        def has_cached_property(instance):
-                            return to_attr in instance.__dict__
-
-                        is_fetched = has_cached_property
-                else:
+                if through_attr == to_attr:
 
                     def in_prefetched_cache(instance):
                         return through_attr in instance._prefetched_objects_cache
@@ -2451,7 +2519,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     Return the prefetched objects along with any additional prefetches that
     must be done due to prefetch_related lookups found from default managers.
     """
-    # prefetcher must have a method get_prefetch_queryset() which takes a list
+    # prefetcher must have a method get_prefetch_querysets() which takes a list
     # of instances, and returns a tuple:
 
     # (queryset of instances of self.model that are related to passed in instances,
@@ -2464,14 +2532,34 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
     # The 'values to be matched' must be hashable as they will be used
     # in a dictionary.
 
-    (
-        rel_qs,
-        rel_obj_attr,
-        instance_attr,
-        single,
-        cache_name,
-        is_descriptor,
-    ) = prefetcher.get_prefetch_queryset(instances, lookup.get_current_queryset(level))
+    if hasattr(prefetcher, "get_prefetch_querysets"):
+        (
+            rel_qs,
+            rel_obj_attr,
+            instance_attr,
+            single,
+            cache_name,
+            is_descriptor,
+        ) = prefetcher.get_prefetch_querysets(
+            instances, lookup.get_current_querysets(level)
+        )
+    else:
+        warnings.warn(
+            "The usage of get_prefetch_queryset() in prefetch_related_objects() is "
+            "deprecated. Implement get_prefetch_querysets() instead.",
+            RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        (
+            rel_qs,
+            rel_obj_attr,
+            instance_attr,
+            single,
+            cache_name,
+            is_descriptor,
+        ) = prefetcher.get_prefetch_queryset(
+            instances, lookup.get_current_querysets(level)
+        )
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need
