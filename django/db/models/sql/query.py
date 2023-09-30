@@ -975,7 +975,7 @@ class Query(BaseExpression):
         assert set(change_map).isdisjoint(change_map.values())
 
         # 1. Update references in "select" (normal columns plus aliases),
-        # "group by" and "where".
+        # "group by", "where" and "order by".
         self.where.relabel_aliases(change_map)
         if isinstance(self.group_by, tuple):
             self.group_by = tuple(
