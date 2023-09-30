@@ -551,12 +551,10 @@ class CheckFilesModification(ManifestFilesMixin):
             return len(name.split(os.sep))
         for name in sorted(paths, key=path_level, reverse=True):
             storage, path = paths[name]
-            with storage.open(path) as original_file:
-                cleaned_name = self.clean_name(name)
-                hash_key = self.hash_key(cleaned_name)
 
     def post_process(self, *args, **kwargs):
-        all_post_processed = super(ManifestFilesMixin, self).post_process(*args, **kwargs)
+        all_post_processed = super(
+            ManifestFilesMixin, self).post_process(*args, **kwargs)
         for post_processed in all_post_processed:
             yield post_processed
             self.save_manifest()
