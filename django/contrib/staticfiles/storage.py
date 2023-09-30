@@ -530,7 +530,7 @@ class CheckFilesModification(ManifestFilesMixin):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-    
+
     def ctime(self, paths):
         def path_level(name):
             return len(name.split(os.sep))
@@ -538,7 +538,7 @@ class CheckFilesModification(ManifestFilesMixin):
             path = paths[name]
             cached_stamp = os.path.getctime(path)
             return cached_stamp
-        
+
     def check(self, paths):
         stamp = os.stat(paths).st_mtime
         if stamp != self.ctime(paths):
