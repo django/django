@@ -555,13 +555,13 @@ class CheckFilesModification(ManifestFilesMixin):
                 cleaned_name = self.clean_name(name)
                 hash_key = self.hash_key(cleaned_name)
 
-                def post_process(self, *args, **kwargs):             
-                    all_post_processed = super(ManifestFilesMixin, self).post_process(*args, **kwargs)
-                    for post_processed in all_post_processed:
-                        yield post_processed
-                        self.save_manifest()
-                        for original_file in self.hashed_files:
-                            self.delete(original_file)
+    def post_process(self, *args, **kwargs):
+        all_post_processed = super(ManifestFilesMixin, self).post_process(*args, **kwargs)
+        for post_processed in all_post_processed:
+            yield post_processed
+            self.save_manifest()
+            for original_file in self.hashed_files:
+                self.delete(original_file)
 
 
 class ManifestStaticFilesStorage(ManifestFilesMixin, StaticFilesStorage):
