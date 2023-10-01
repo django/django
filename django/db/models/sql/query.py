@@ -2426,6 +2426,9 @@ class Query(BaseExpression):
         self._extra_select_cache = None
 
     def set_values(self, fields):
+        if self.combinator:
+            for comb in self.combined_queries:
+                comb.set_values(fields)
         self.select_related = False
         self.clear_deferred_loading()
         self.clear_select_fields()

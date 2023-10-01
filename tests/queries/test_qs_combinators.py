@@ -382,6 +382,13 @@ class QuerySetSetOperationTests(TestCase):
             [("c1", -10, "cb"), ("rn1", 10, "rn")],
         )
 
+    def test_union_same_model_with_annotations_subsequent_values_list(self):
+        ReservedName.objects.create(name="rn1", order=10)
+        qs1 = ReservedName.objects.annotate(row_type=Value("rn"))
+        self.assertSequenceEqual(
+            qs1.union(qs1).values_list("row_type", flat=True), ["rn"]
+        )
+
     def test_union_in_subquery(self):
         ReservedName.objects.bulk_create(
             [
