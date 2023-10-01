@@ -300,7 +300,7 @@ subscribers</option>
 <option value="redirect_to">Redirect to (Awesome action)</option>
 <option value="external_mail">External mail (Another awesome
 action)</option>
-<option value="download">Download subscription</option>
+<option value="download">Download selected subscriptions</option>
 <option value="no_perm">No permission to run</option>
 </select>""",
             html=True,
@@ -563,12 +563,8 @@ class AdminDetailActionsTest(TestCase):
 
     def test_available_detail_actions(self):
         """
-        - Action 1 has not description.
-        - Action 2 has custom description.
-        - Action 3 ("Detail download") is not displayed because user does not
-          have permission.
-        - "Delete" action is not displayed in change view because already
-          exists a button for it.
+        'Download' action with singular description and
+        'Delete' action present in dropdown.
         """
 
         response = self.client.get(
@@ -579,10 +575,35 @@ class AdminDetailActionsTest(TestCase):
             response,
             """<label>Action: <select name="action" required>
             <option value="" selected>---------</option>
+            <option value="delete_selected">Delete</option>
             <option value="redirect_to">Redirect to (Awesome action)</option>
-            <option value="external_mail">External mail (Another awesome
-            action)</option>
+            <option value="external_mail">External mail (Another awesome action)
+            </option>
             <option value="download">Download subscription</option>
+            <option value="no_perm">No permission to run</option>
+            </select>""",
+            html=True,
+        )
+
+    def test_available_list_actions(self):
+        """
+        'Download' action with plural description.
+        """
+
+        response = self.client.get(
+            reverse("admin:admin_views_externalsubscriber_changelist")
+        )
+
+        self.assertContains(
+            response,
+            """<label>Action: <select name="action" required>
+            <option value="" selected>---------</option>
+            <option value="delete_selected">Delete selected external subscribers
+            </option>
+            <option value="redirect_to">Redirect to (Awesome action)</option>
+            <option value="external_mail">External mail (Another awesome action)
+            </option>
+            <option value="download">Download selected subscriptions</option>
             <option value="no_perm">No permission to run</option>
             </select>""",
             html=True,
@@ -623,6 +644,7 @@ class AdminDetailActionsTest(TestCase):
         """
         Edit the Subscriber and then choose an action won't save the changes.
         """
+
         self.client.post(
             reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
             {
@@ -654,3 +676,24 @@ class AdminDetailActionsTest(TestCase):
             f"This is the content of the file written by {self.s1.name}".encode(),
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_delete_action_in_detail_view(self):
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {"action": "delete_selected"},
+        )
+        self.assertTrue(response.status_code, 200)
+        self.assertContains(
+            response,
+            "Are you sure you want to delete the selected external subscriber?",
+        )
+
+        response = self.client.post(
+            reverse("admin:admin_views_externalsubscriber_change", args=[self.s1.pk]),
+            {
+                "action": "delete_selected",
+                "post": "yes",
+            },
+        )
+        self.assertTrue(response.status_code, 200)
+        self.assertEqual(ExternalSubscriber.objects.count(), 0)

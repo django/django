@@ -993,16 +993,21 @@ class ModelAdmin(BaseModelAdmin):
         return checkbox.render(helpers.ACTION_CHECKBOX_NAME, str(obj.pk))
 
     @staticmethod
-    def _get_action_description(func, name):
+    def _get_action_description(func, name, change=False):
         try:
-            return func.short_description
+            if change:
+                return func.short_description
+            else:
+                return func.plural_description
         except AttributeError:
             return capfirst(name.replace("_", " "))
 
-    def _get_base_actions(self):
+    def _get_base_actions(self, change=False):
         """Return the list of actions, prior to any request-based filtering."""
         actions = []
-        base_actions = (self.get_action(action) for action in self.actions or [])
+        base_actions = (
+            self.get_action(action, change) for action in self.actions or []
+        )
         # get_action might have returned None, so filter any of those out.
         base_actions = [action for action in base_actions if action]
         base_action_names = {name for _, name, _ in base_actions}
@@ -1011,7 +1016,7 @@ class ModelAdmin(BaseModelAdmin):
         for name, func in self.admin_site.actions:
             if name in base_action_names:
                 continue
-            description = self._get_action_description(func, name)
+            description = self._get_action_description(func, name, change)
             actions.append((func, name, description))
         # Add actions from this ModelAdmin.
         actions.extend(base_actions)
@@ -1033,7 +1038,7 @@ class ModelAdmin(BaseModelAdmin):
                 filtered_actions.append(action)
         return filtered_actions
 
-    def get_actions(self, request):
+    def get_actions(self, request, change=False):
         """
         Return a dictionary mapping the names of all actions for this
         ModelAdmin to a tuple of (callable, name, description) for each action.
@@ -1042,21 +1047,25 @@ class ModelAdmin(BaseModelAdmin):
         # this page.
         if self.actions is None or IS_POPUP_VAR in request.GET:
             return {}
-        actions = self._filter_actions_by_permissions(request, self._get_base_actions())
+        actions = self._filter_actions_by_permissions(
+            request, self._get_base_actions(change)
+        )
         return {name: (func, name, desc) for func, name, desc in actions}
 
-    def get_action_choices(self, request, default_choices=models.BLANK_CHOICE_DASH):
+    def get_action_choices(
+        self, request, change=False, default_choices=models.BLANK_CHOICE_DASH
+    ):
         """
         Return a list of choices for use in a form object. Each choice is a
         tuple (name, description).
         """
         choices = [*default_choices]
-        for func, name, description in self.get_actions(request).values():
+        for func, name, description in self.get_actions(request, change).values():
             choice = (name, description % model_format_dict(self.opts))
             choices.append(choice)
         return choices
 
-    def get_action(self, action):
+    def get_action(self, action, change):
         """
         Return a given action from a parameter, which can either be a callable,
         or the name of a method on the ModelAdmin. Return is a tuple of
@@ -1080,7 +1089,7 @@ class ModelAdmin(BaseModelAdmin):
             except KeyError:
                 return None
 
-        description = self._get_action_description(func, action)
+        description = self._get_action_description(func, action, change)
         return func, action, description
 
     def get_list_display(self, request):
@@ -1928,11 +1937,9 @@ class ModelAdmin(BaseModelAdmin):
         # Build the action form and populate it with available actions.
         if actions and not add:
             action_form = self.action_form(auto_id=None)
-            action_choices = self.get_action_choices(request)
-            # Remove "delete" action; change view already has a button for
-            # that action.
-            action_choices.pop(1)
-            action_form.fields["action"].choices = action_choices
+            action_form.fields["action"].choices = self.get_action_choices(
+                request, change=True
+            )
             media += action_form.media
         else:
             action_form = None

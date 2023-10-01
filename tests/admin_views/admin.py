@@ -412,7 +412,10 @@ def redirect_to(modeladmin, request, selected):
     return HttpResponseRedirect("/some-where-else/")
 
 
-@admin.action(description="Download subscription")
+@admin.action(
+    description="Download subscription",
+    description_plural="Download selected subscriptions",
+)
 def download(modeladmin, request, selected):
     from django.db.models.query import QuerySet
 
