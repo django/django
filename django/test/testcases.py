@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from copy import copy, deepcopy
 from difflib import get_close_matches
 from functools import wraps
+from unittest import mock
 from unittest.suite import _DebugResult
 from unittest.util import safe_repr
 from urllib.parse import (
@@ -37,6 +38,7 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.core.servers.basehttp import ThreadedWSGIServer, WSGIRequestHandler
 from django.core.signals import setting_changed
 from django.db import DEFAULT_DB_ALIAS, connection, connections, transaction
+from django.db.backends.base.base import BaseDatabaseWrapper
 from django.forms.fields import CharField
 from django.http import QueryDict
 from django.http.request import split_domain_port, validate_host
@@ -198,7 +200,6 @@ class SimpleTestCase(unittest.TestCase):
             cls._cls_modified_context.enable()
             cls.addClassCleanup(cls._cls_modified_context.disable)
         cls._add_databases_failures()
-        cls.addClassCleanup(cls._remove_databases_failures)
 
     @classmethod
     def _validate_databases(cls):
@@ -236,9 +237,17 @@ class SimpleTestCase(unittest.TestCase):
                 }
                 method = getattr(connection, name)
                 setattr(connection, name, _DatabaseFailure(method, message))
+        cls.connection_wrapper_patch = mock.patch.object(
+            BaseDatabaseWrapper,
+            "ensure_connection",
+            new=cls.ensure_connection_patch_method(),
+        )
+        cls.addClassCleanup(cls._remove_databases_failures)
+        cls.connection_wrapper_patch.start()
 
     @classmethod
     def _remove_databases_failures(cls):
+        cls.connection_wrapper_patch.stop()
         for alias in connections:
             if alias in cls.databases:
                 continue
@@ -246,6 +255,26 @@ class SimpleTestCase(unittest.TestCase):
             for name, _ in cls._disallowed_connection_methods:
                 method = getattr(connection, name)
                 setattr(connection, name, method.wrapped)
+
+    @classmethod
+    def ensure_connection_patch_method(cls):
+        def patched_ensure_connection(self):
+            if self.connection is None and self.alias not in cls.databases:
+                # Connection has not yet been established, but the alias is not allowed.
+                message = cls._disallowed_database_msg % {
+                    "test": "%s.%s" % (cls.__module__, cls.__qualname__),
+                    "alias": self.alias,
+                    "operation": "threaded connections",
+                }
+                return _DatabaseFailure(self.ensure_connection, message)()
+
+            # Copied from BaseDatabaseWrapper.ensure_connection as the original as
+            # been patched at the base class level.
+            if self.connection is None:
+                with self.wrap_database_errors:
+                    self.connect()
+
+        return patched_ensure_connection
 
     def __call__(self, result=None):
         """

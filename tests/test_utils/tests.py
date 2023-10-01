@@ -1,4 +1,5 @@
 import os
+import threading
 import unittest
 import warnings
 from io import StringIO
@@ -2019,6 +2020,29 @@ class DisallowedDatabaseQueriesTests(SimpleTestCase):
         with self.assertRaisesMessage(DatabaseOperationForbidden, expected_message):
             next(Car.objects.iterator())
 
+    def test_disallowed_thread_database_connection(self):
+        expected_message = (
+            "Database threaded connections to 'default' are not allowed in "
+            "SimpleTestCase subclasses. Either subclass TestCase or TransactionTestCase"
+            " to ensure proper test isolation or add 'default' to "
+            "test_utils.tests.DisallowedDatabaseQueriesTests.databases to "
+            "silence this failure."
+        )
+
+        exceptions = []
+
+        def thread_func():
+            try:
+                Car.objects.first()
+            except DatabaseOperationForbidden as e:
+                exceptions.append(e)
+
+        t = threading.Thread(target=thread_func)
+        t.start()
+        t.join()
+        self.assertEqual(len(exceptions), 1)
+        self.assertEqual(exceptions[0].args[0], expected_message)
+
 
 class AllowedDatabaseQueriesTests(SimpleTestCase):
     databases = {"default"}
@@ -2028,6 +2052,19 @@ class AllowedDatabaseQueriesTests(SimpleTestCase):
 
     def test_allowed_database_chunked_cursor_queries(self):
         next(Car.objects.iterator(), None)
+
+    def test_allowed_threaded_database_queries(self):
+        car = Car.objects.create()
+
+        result = []
+
+        def thread_func():
+            result.append(Car.objects.first())
+
+        t = threading.Thread(target=thread_func)
+        t.start()
+        t.join()
+        self.assertEqual(result[0], car)
 
 
 class DatabaseAliasTests(SimpleTestCase):

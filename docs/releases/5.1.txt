@@ -252,6 +252,9 @@ Miscellaneous
 * In order to improve accessibility, the admin's changelist filter is now
   rendered in a ``<nav>`` tag instead of a ``<div>``.
 
+* The :class:`~django.test.SimpleTestCase` class now block database connections
+  inside of threads.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1
