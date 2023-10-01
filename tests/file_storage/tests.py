@@ -23,6 +23,7 @@ from django.core.files.uploadedfile import (
     SimpleUploadedFile,
     TemporaryUploadedFile,
 )
+from django.contrib.staticfiles.storage import CheckFilesModification
 from django.db.models import FileField
 from django.db.models.fields.files import FileDescriptor
 from django.test import LiveServerTestCase, SimpleTestCase, TestCase, override_settings
@@ -30,8 +31,6 @@ from django.test.utils import requires_tz_support
 from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
-
-from django.contrib.staticfiles.storage import CheckFilesModification
 
 from .models import (
     Storage,
