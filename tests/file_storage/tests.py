@@ -31,6 +31,8 @@ from django.urls import NoReverseMatch, reverse_lazy
 from django.utils import timezone
 from django.utils._os import symlinks_supported
 
+from django.contrib.staticfiles.storage import CheckFilesModification
+
 from .models import (
     Storage,
     callable_default_storage,
@@ -1186,3 +1188,74 @@ class StorageHandlerTests(SimpleTestCase):
         )
         with self.assertRaisesMessage(InvalidStorageError, msg):
             test_storages["invalid_backend"]
+
+
+class CheckFilesModificationTestCase(unittest.TestCase):
+
+    def setUp(self):
+        # Create a temporary directory for testing
+        self.temp_dir = tempfile.mkdtemp()
+        self.static_root = os.path.join(self.temp_dir, 'static')
+        os.makedirs(self.static_root)
+
+        # Create a test file in the temporary directory
+        self.test_file_path = os.path.join(self.static_root, 'test.txt')
+        with open(self.test_file_path, 'w') as f:
+            f.write('This is a test file.')
+
+        # Create a storage instance
+        self.storage = FileSystemStorage(location=self.static_root)
+
+    def tearDown(self):
+        # Remove the temporary directory
+        shutil.rmtree(self.temp_dir)
+
+    def test_check_original(self):
+        # Create an instance of CheckFilesModification
+        checker = CheckFilesModification()
+
+        # Get the file path within the storage
+        name = self.storage.get_valid_name('test.txt')
+        file_path = self.storage.path(name)
+
+        # Check if the file is considered the original
+        checker.check({name: (self.storage, file_path)})
+
+        # Assert that no exceptions were raised
+
+    def test_check_modified(self):
+        # Create an instance of CheckFilesModification
+        checker = CheckFilesModification()
+
+        # Get the file path within the storage
+        name = self.storage.get_valid_name('test.txt')
+        file_path = self.storage.path(name)
+
+        # Modify the file
+        with open(file_path, 'a') as f:
+            f.write('\nModification.')
+
+        # Check if the file is considered modified
+        with self.assertRaises(ValueError):
+            checker.check({name: (self.storage, file_path)})
+
+    def test_delete_original(self):
+        # Create an instance of CheckFilesModification
+        checker = CheckFilesModification()
+
+        # Get the file path within the storage
+        name = self.storage.get_valid_name('test.txt')
+        file_path = self.storage.path(name)
+
+        # Delete the original file
+        os.remove(file_path)
+
+        # Attempt to delete the original file
+        checker.delete_original({name: (self.storage, file_path)})
+
+        # Assert that the file has been deleted from storage
+        self.assertFalse(self.storage.exists(name))
+
+
+if __name__ == '__main__':
+    unittest.main()
