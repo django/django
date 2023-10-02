@@ -72,7 +72,8 @@ class Tests(TestCase):
                 "NAME": "file:memorydb_test?mode=memory&cache=shared",
             }
         }
-        creation = DatabaseWrapper(settings_dict).creation
+        db = DatabaseWrapper(settings_dict)
+        creation = db.creation
         self.assertEqual(
             creation._get_test_db_name(),
             creation.connection.settings_dict["TEST"]["NAME"],

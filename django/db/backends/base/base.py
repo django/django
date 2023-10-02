@@ -5,6 +5,7 @@ import logging
 import threading
 import time
 import warnings
+import weakref
 import zoneinfo
 from collections import deque
 from contextlib import contextmanager
@@ -111,12 +112,13 @@ class BaseDatabaseWrapper:
         # call execute(sql, params, many, context).
         self.execute_wrappers = []
 
-        self.client = self.client_class(self)
-        self.creation = self.creation_class(self)
-        self.features = self.features_class(self)
-        self.introspection = self.introspection_class(self)
-        self.ops = self.ops_class(self)
-        self.validation = self.validation_class(self)
+        weak_self = weakref.proxy(self)
+        self.client = self.client_class(weak_self)
+        self.creation = self.creation_class(weak_self)
+        self.features = self.features_class(weak_self)
+        self.introspection = self.introspection_class(weak_self)
+        self.ops = self.ops_class(weak_self)
+        self.validation = self.validation_class(weak_self)
 
     def __repr__(self):
         return (
@@ -660,7 +662,8 @@ class BaseDatabaseWrapper:
         Context manager and decorator that re-throws backend-specific database
         exceptions using Django's common wrappers.
         """
-        return DatabaseErrorWrapper(self)
+        return DatabaseErrorWrapper(weakref.proxy(self))
+        # return DatabaseErrorWrapper(self)
 
     def chunked_cursor(self):
         """
