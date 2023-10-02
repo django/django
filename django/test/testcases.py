@@ -495,6 +495,7 @@ class SimpleTestCase(unittest.TestCase):
             content = b"".join(response.streaming_content)
         else:
             content = response.content
+        content_repr = safe_repr(content)
         if not isinstance(text, bytes) or html:
             text = str(text)
             content = content.decode(response.charset)
@@ -509,7 +510,7 @@ class SimpleTestCase(unittest.TestCase):
                 self, text, None, "Second argument is not valid HTML:"
             )
         real_count = content.count(text)
-        return (text_repr, real_count, msg_prefix)
+        return text_repr, real_count, msg_prefix, content_repr
 
     def assertContains(
         self, response, text, count=None, status_code=200, msg_prefix="", html=False
@@ -521,7 +522,7 @@ class SimpleTestCase(unittest.TestCase):
         If ``count`` is None, the count doesn't matter - the assertion is true
         if the text occurs at least once in the response.
         """
-        text_repr, real_count, msg_prefix = self._assert_contains(
+        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
@@ -529,13 +530,18 @@ class SimpleTestCase(unittest.TestCase):
             self.assertEqual(
                 real_count,
                 count,
-                msg_prefix
-                + "Found %d instances of %s in response (expected %d)"
-                % (real_count, text_repr, count),
+                (
+                    f"{msg_prefix}Found {real_count} instances of {text_repr} "
+                    f"(expected {count}) in the following response\n{content_repr}"
+                ),
             )
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "Couldn't find %s in response" % text_repr
+                real_count != 0,
+                (
+                    f"{msg_prefix}Couldn't find {text_repr} in the following response\n"
+                    f"{content_repr}"
+                ),
             )
 
     def assertNotContains(
@@ -546,12 +552,17 @@ class SimpleTestCase(unittest.TestCase):
         successfully, (i.e., the HTTP status code was as expected) and that
         ``text`` doesn't occur in the content of the response.
         """
-        text_repr, real_count, msg_prefix = self._assert_contains(
+        text_repr, real_count, msg_prefix, content_repr = self._assert_contains(
             response, text, status_code, msg_prefix, html
         )
 
         self.assertEqual(
-            real_count, 0, msg_prefix + "Response should not contain %s" % text_repr
+            real_count,
+            0,
+            (
+                f"{msg_prefix}{text_repr} unexpectedly found in the following response"
+                f"\n{content_repr}"
+            ),
         )
 
     def _check_test_client_response(self, response, attribute, method_name):
@@ -884,17 +895,23 @@ class SimpleTestCase(unittest.TestCase):
         real_count = parsed_haystack.count(parsed_needle)
         if msg_prefix:
             msg_prefix += ": "
+        haystack_repr = safe_repr(haystack)
         if count is not None:
             self.assertEqual(
                 real_count,
                 count,
-                msg_prefix
-                + "Found %d instances of '%s' in response (expected %d)"
-                % (real_count, needle, count),
+                (
+                    f"{msg_prefix}Found {real_count} instances of {needle!r} (expected "
+                    f"{count}) in the following response\n{haystack_repr}"
+                ),
             )
         else:
             self.assertTrue(
-                real_count != 0, msg_prefix + "Couldn't find '%s' in response" % needle
+                real_count != 0,
+                (
+                    f"{msg_prefix}Couldn't find {needle!r} in the following response\n"
+                    f"{haystack_repr}"
+                ),
             )
 
     def assertJSONEqual(self, raw, expected_data, msg=None):

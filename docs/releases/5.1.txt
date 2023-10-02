@@ -201,7 +201,10 @@ Templates
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains`,
+  :meth:`~django.test.SimpleTestCase.assertNotContains`, and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
+  to assertion error messages.
 
 URLs
 ~~~~

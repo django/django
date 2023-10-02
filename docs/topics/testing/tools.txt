@@ -1700,6 +1700,10 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the response content.
+
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the
@@ -1711,6 +1715,10 @@ your test suite.
     character-by-character equality. Whitespace is ignored in most cases,
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the response content.
 
 .. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
@@ -1847,6 +1855,10 @@ your test suite.
 
     Whitespace in most cases is ignored, and attribute ordering is not
     significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the ``haystack``.
 
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
 

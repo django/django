@@ -985,12 +985,18 @@ class HTMLEqualTests(SimpleTestCase):
 
 class InHTMLTests(SimpleTestCase):
     def test_needle_msg(self):
-        msg = "False is not true : Couldn't find '<b>Hello</b>' in response"
+        msg = (
+            "False is not true : Couldn't find '<b>Hello</b>' in the following "
+            "response\n'<p>Test</p>'"
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
 
     def test_msg_prefix(self):
-        msg = "False is not true : Prefix: Couldn't find '<b>Hello</b>' in response"
+        msg = (
+            "False is not true : Prefix: Couldn't find '<b>Hello</b>' in the following "
+            'response\n\'<input type="text" name="Hello" />\''
+        )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertInHTML(
                 "<b>Hello</b>",
@@ -1000,8 +1006,9 @@ class InHTMLTests(SimpleTestCase):
 
     def test_count_msg_prefix(self):
         msg = (
-            "2 != 1 : Prefix: Found 2 instances of '<b>Hello</b>' in response "
-            "(expected 1)"
+            "2 != 1 : Prefix: Found 2 instances of '<b>Hello</b>' (expected 1) in the "
+            "following response\n'<b>Hello</b><b>Hello</b>'"
+            ""
         )
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertInHTML(
@@ -1010,6 +1017,38 @@ class InHTMLTests(SimpleTestCase):
                 count=1,
                 msg_prefix="Prefix",
             )
+
+    def test_base(self):
+        haystack = "<p><b>Hello</b> <span>there</span>! Hi <span>there</span>!</p>"
+
+        self.assertInHTML("<b>Hello</b>", haystack=haystack)
+        msg = f"Couldn't find '<p>Howdy</p>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<p>Howdy</p>", haystack)
+
+        self.assertInHTML("<span>there</span>", haystack=haystack, count=2)
+        msg = (
+            "Found 1 instances of '<b>Hello</b>' (expected 2) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack=haystack, count=2)
+
+    def test_long_haystack(self):
+        haystack = (
+            "<p>This is a very very very very very very very very long message which "
+            "exceedes the max limit of truncation.</p>"
+        )
+        msg = f"Couldn't find '<b>Hello</b>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack)
+
+        msg = (
+            "Found 0 instances of '<b>This</b>' (expected 3) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>This</b>", haystack, 3)
 
 
 class JSONEqualTests(SimpleTestCase):
