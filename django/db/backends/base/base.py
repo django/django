@@ -663,7 +663,6 @@ class BaseDatabaseWrapper:
         exceptions using Django's common wrappers.
         """
         return DatabaseErrorWrapper(weakref.proxy(self))
-        # return DatabaseErrorWrapper(self)
 
     def chunked_cursor(self):
         """
