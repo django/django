@@ -254,6 +254,10 @@ Miscellaneous
 * In order to improve accessibility, the admin's changelist filter is now
   rendered in a ``<nav>`` tag instead of a ``<div>``.
 
+* :meth:`.SimpleTestCase.assertURLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
+  ``msg_prefix``. This is consistent with the behavior of other assertions.
+
 .. _deprecated-features-5.1:
 
 Features deprecated in 5.1

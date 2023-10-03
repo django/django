@@ -989,6 +989,28 @@ class InHTMLTests(SimpleTestCase):
         with self.assertRaisesMessage(AssertionError, msg):
             self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
 
+    def test_msg_prefix(self):
+        msg = "False is not true : Prefix: Couldn't find '<b>Hello</b>' in response"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                '<input type="text" name="Hello" />',
+                msg_prefix="Prefix",
+            )
+
+    def test_count_msg_prefix(self):
+        msg = (
+            "2 != 1 : Prefix: Found 2 instances of '<b>Hello</b>' in response "
+            "(expected 1)"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                "<b>Hello</b><b>Hello</b>",
+                count=1,
+                msg_prefix="Prefix",
+            )
+
 
 class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
@@ -1268,7 +1290,7 @@ class AssertURLEqualTests(SimpleTestCase):
             self.assertURLEqual(
                 "http://example.com/?x=1&x=2",
                 "https://example.com/?x=2&x=1",
-                msg_prefix="Prefix: ",
+                msg_prefix="Prefix",
             )
 
 
