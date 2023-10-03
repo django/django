@@ -463,6 +463,8 @@ class SimpleTestCase(unittest.TestCase):
                 (scheme, netloc, path, params, urlencode(query_parts), fragment)
             )
 
+        if msg_prefix:
+            msg_prefix += ": "
         self.assertEqual(
             normalize(url1),
             normalize(url2),
@@ -880,6 +882,8 @@ class SimpleTestCase(unittest.TestCase):
             self, haystack, None, "Second argument is not valid HTML:"
         )
         real_count = parsed_haystack.count(parsed_needle)
+        if msg_prefix:
+            msg_prefix += ": "
         if count is not None:
             self.assertEqual(
                 real_count,
