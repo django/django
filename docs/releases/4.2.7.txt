@@ -1,0 +1,12 @@
+==========================
+Django 4.2.7 release notes
+==========================
+
+*Expected November 1, 2023*
+
+Django 4.2.7 fixes several bugs in 4.2.6.
+
+Bugfixes
+========
+
+...
