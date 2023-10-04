@@ -50,6 +50,12 @@ Database.register_adapter(datetime.date, adapt_date)
 Database.register_adapter(datetime.datetime, adapt_datetime)
 
 
+def _get_varchar_column(data):
+    if data["max_length"] is None:
+        return "varchar"
+    return "varchar(%(max_length)s)" % data
+
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = "sqlite"
     display_name = "SQLite"
@@ -61,7 +67,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         "BigAutoField": "integer",
         "BinaryField": "BLOB",
         "BooleanField": "bool",
-        "CharField": "varchar(%(max_length)s)",
+        "CharField": _get_varchar_column,
         "DateField": "date",
         "DateTimeField": "datetime",
         "DecimalField": "decimal",
