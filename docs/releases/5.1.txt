@@ -193,12 +193,17 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* Custom tags may now set extra data on the ``Parser`` object that will later
+  be made available on the ``Template`` instance. Such data may be used, for
+  example, by the template loader, or other template clients.
 
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains`,
+  :meth:`~django.test.SimpleTestCase.assertNotContains`, and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
+  to assertion error messages.
 
 URLs
 ~~~~
@@ -249,6 +254,10 @@ Miscellaneous
 -------------
 
 * ...
+
+* :meth:`.SimpleTestCase.assertURLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
+  ``msg_prefix``. This is consistent with the behavior of other assertions.
 
 .. _deprecated-features-5.1:
 

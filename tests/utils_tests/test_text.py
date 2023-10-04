@@ -1,5 +1,6 @@
 import json
 import sys
+from unittest.mock import patch
 
 from django.core.exceptions import SuspiciousFileOperation
 from django.test import SimpleTestCase
@@ -94,11 +95,17 @@ class TestUtilsText(SimpleTestCase):
             text.Truncator(lazystr("The quick brown fox")).chars(10), "The quick…"
         )
 
-    def test_truncate_chars_html(self):
+    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
+    def test_truncate_chars_html_size_limit(self):
+        max_len = text.Truncator.MAX_LENGTH_HTML
+        bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
+        valid_html = "<p>Joel is a slug</p>"  # 14 chars
         perf_test_values = [
-            (("</a" + "\t" * 50000) + "//>", None),
-            ("&" * 50000, "&" * 9 + "…"),
+            ("</a" + "\t" * (max_len - 6) + "//>", None),
+            ("</p" + "\t" * bigger_len + "//>", "</p" + "\t" * 6 + "…"),
+            ("&" * bigger_len, "&" * 9 + "…"),
             ("_X<<<<<<<<<<<>", None),
+            (valid_html * bigger_len, "<p>Joel is a…</p>"),  # 10 chars
         ]
         for value, expected in perf_test_values:
             with self.subTest(value=value):
@@ -176,15 +183,25 @@ class TestUtilsText(SimpleTestCase):
         truncator = text.Truncator("<p>I &lt;3 python, what about you?</p>")
         self.assertEqual("<p>I &lt;3 python,…</p>", truncator.words(3, html=True))
 
+    @patch("django.utils.text.Truncator.MAX_LENGTH_HTML", 10_000)
+    def test_truncate_words_html_size_limit(self):
+        max_len = text.Truncator.MAX_LENGTH_HTML
+        bigger_len = text.Truncator.MAX_LENGTH_HTML + 1
+        valid_html = "<p>Joel is a slug</p>"  # 4 words
         perf_test_values = [
-            ("</a" + "\t" * 50000) + "//>",
-            "&" * 50000,
-            "_X<<<<<<<<<<<>",
+            ("</a" + "\t" * (max_len - 6) + "//>", None),
+            ("</p" + "\t" * bigger_len + "//>", "</p" + "\t" * (max_len - 3) + "…"),
+            ("&" * max_len, None),  # no change
+            ("&" * bigger_len, "&" * max_len + "…"),
+            ("_X<<<<<<<<<<<>", None),
+            (valid_html * bigger_len, valid_html * 12 + "<p>Joel is…</p>"),  # 50 words
         ]
-        for value in perf_test_values:
+        for value, expected in perf_test_values:
             with self.subTest(value=value):
                 truncator = text.Truncator(value)
-                self.assertEqual(value, truncator.words(50, html=True))
+                self.assertEqual(
+                    expected if expected else value, truncator.words(50, html=True)
+                )
 
     def test_wrap(self):
         digits = "1234 67 9"

@@ -141,7 +141,7 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
             )
         else:
             gml_regex = re.compile(
-                r'^<gml:Point srsName="EPSG:4326"><gml:coordinates>'
+                r'^<gml:Point srsName="(urn:ogc:def:crs:)?EPSG:4326"><gml:coordinates>'
                 r"-104\.60925\d+,38\.255001</gml:coordinates></gml:Point>"
             )
         self.assertTrue(gml_regex.match(ptown.gml))

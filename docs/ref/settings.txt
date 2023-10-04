@@ -1511,8 +1511,8 @@ SSL connection.
 Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
 doesn't result in any certificate checking. They're passed to the underlying SSL
 connection. Please refer to the documentation of Python's
-:func:`python:ssl.wrap_socket` function for details on how the certificate chain
-file and private key file are handled.
+:meth:`python:ssl.SSLContext.wrap_socket` function for details on how the
+certificate chain file and private key file are handled.
 
 .. setting:: EMAIL_TIMEOUT
 

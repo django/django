@@ -1,4 +1,5 @@
 from django import template
+from django.template.base import TextNode
 from django.template.defaultfilters import stringfilter
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
@@ -216,3 +217,9 @@ class CounterNode(template.Node):
         count = self.count
         self.count = count + 1
         return str(count)
+
+
+@register.tag("extra_data")
+def do_extra_data(parser, token):
+    parser.extra_data["extra_data"] = "CUSTOM_DATA"
+    return TextNode("")
