@@ -1,4 +1,12 @@
+import enum
+
 from django.db import router
+
+
+class SeverityType(enum.Enum):
+    SAFE = "SAFE"
+    POSSIBLY_DESTRUCTIVE = "POSSIBLY_DESTRUCTIVE"
+    DESTRUCTIVE = "DESTRUCTIVE"
 
 
 class Operation:
@@ -32,6 +40,8 @@ class Operation:
     elidable = False
 
     serialization_expand_args = []
+
+    severity = SeverityType.SAFE
 
     def __new__(cls, *args, **kwargs):
         # We capture the arguments to make returning them trivial
@@ -84,6 +94,17 @@ class Operation:
         Output a brief summary of what the action does.
         """
         return "%s: %s" % (self.__class__.__name__, self._constructor_args)
+
+    def formatted_description(self, style):
+        """
+        Output the describe output in a more informative way.
+        """
+        description = self.describe()
+        if self.severity == SeverityType.SAFE:
+            return style.SUCCESS("+ {}".format(description))
+        elif self.severity == SeverityType.DESTRUCTIVE:
+            return style.ERROR("- {}".format(description))
+        return style.WARNING("~ {}".format(description))
 
     @property
     def migration_name_fragment(self):

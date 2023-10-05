@@ -1,6 +1,6 @@
 from django.db import router
 
-from .base import Operation
+from .base import Operation, SeverityType
 
 
 class SeparateDatabaseAndState(Operation):
@@ -10,6 +10,8 @@ class SeparateDatabaseAndState(Operation):
     that don't support state change to have it applied, or have operations
     that affect the state or not the database, or so on.
     """
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     serialization_expand_args = ["database_operations", "state_operations"]
 
@@ -69,6 +71,7 @@ class RunSQL(Operation):
     """
 
     noop = ""
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(
         self, sql, reverse_sql=None, state_operations=None, hints=None, elidable=False
@@ -139,6 +142,7 @@ class RunPython(Operation):
     """
 
     reduces_to_sql = False
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(
         self, code, reverse_code=None, atomic=None, hints=None, elidable=False

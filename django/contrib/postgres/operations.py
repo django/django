@@ -5,12 +5,14 @@ from django.contrib.postgres.signals import (
 )
 from django.db import NotSupportedError, router
 from django.db.migrations import AddConstraint, AddIndex, RemoveIndex
-from django.db.migrations.operations.base import Operation
+from django.db.migrations.operations.base import Operation, SeverityType
 from django.db.models.constraints import CheckConstraint
 
 
 class CreateExtension(Operation):
     reversible = True
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, name):
         self.name = name
@@ -119,6 +121,8 @@ class NotInTransactionMixin:
 class AddIndexConcurrently(NotInTransactionMixin, AddIndex):
     """Create an index using PostgreSQL's CREATE INDEX CONCURRENTLY syntax."""
 
+    severity = SeverityType.SAFE
+
     atomic = False
 
     def describe(self):
@@ -145,6 +149,8 @@ class RemoveIndexConcurrently(NotInTransactionMixin, RemoveIndex):
     """Remove an index using PostgreSQL's DROP INDEX CONCURRENTLY syntax."""
 
     atomic = False
+
+    severity = SeverityType.SAFE
 
     def describe(self):
         return "Concurrently remove index %s from %s" % (self.name, self.model_name)
@@ -213,6 +219,8 @@ class CollationOperation(Operation):
 class CreateCollation(CollationOperation):
     """Create a collation."""
 
+    severity = SeverityType.SAFE
+
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
             schema_editor.connection.alias, app_label
@@ -235,6 +243,8 @@ class CreateCollation(CollationOperation):
 
 class RemoveCollation(CollationOperation):
     """Remove a collation."""
+
+    severity = SeverityType.SAFE
 
     def database_forwards(self, app_label, schema_editor, from_state, to_state):
         if schema_editor.connection.vendor != "postgresql" or not router.allow_migrate(
@@ -261,6 +271,8 @@ class AddConstraintNotValid(AddConstraint):
     Add a table constraint without enforcing validation, using PostgreSQL's
     NOT VALID syntax.
     """
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, model_name, constraint):
         if not isinstance(constraint, CheckConstraint):
@@ -292,6 +304,8 @@ class AddConstraintNotValid(AddConstraint):
 
 class ValidateConstraint(Operation):
     """Validate a table NOT VALID constraint."""
+
+    severity = SeverityType.POSSIBLY_DESTRUCTIVE
 
     def __init__(self, model_name, name):
         self.model_name = model_name
