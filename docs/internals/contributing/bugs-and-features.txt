@@ -82,6 +82,9 @@ guidelines to follow:
 * Make sure to set the UI/UX flag on the ticket so interested parties can
   find your ticket.
 
+* If the issue relates to accessibility, please link to the relevant
+  :ref:`accessibility standard <accessibility-standards>` if applicable.
+
 .. _requesting-features:
 
 Requesting features

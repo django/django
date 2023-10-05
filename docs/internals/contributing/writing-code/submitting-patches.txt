@@ -408,6 +408,8 @@ All code changes
 * If the change is backwards incompatible in any way, is there a note
   in the release notes (``docs/releases/A.B.txt``)?
 * Is Django's test suite passing?
+* If the change affects the Django admin or rendered HTML output, has
+  :ref:`accessibility testing <accessibility-testing-baseline>` been done?
 
 All tickets
 -----------
