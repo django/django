@@ -11,7 +11,7 @@ from django.db.models import IntegerField, Sum, Value
 from django.test import TestCase, skipUnlessDBFeature
 
 from ..utils import FuncTestMixin
-from .models import City, Country, CountryWebMercator, State, Track
+from .models import City, Country, CountryWebMercator, ManyPointModel, State, Track
 
 
 class GISFunctionsTests(FuncTestMixin, TestCase):
@@ -118,6 +118,25 @@ class GISFunctionsTests(FuncTestMixin, TestCase):
                 .geojson,
                 chicago_json,
             )
+
+    @skipUnlessDBFeature("has_AsGeoJSON_function")
+    def test_asgeojson_option_0(self):
+        p1 = Point(1, 1, srid=4326)
+        p2 = Point(2, 2, srid=4326)
+        obj = ManyPointModel.objects.create(
+            point1=p1,
+            point2=p2,
+            point3=p2.transform(3857, clone=True),
+        )
+        self.assertJSONEqual(
+            ManyPointModel.objects.annotate(geojson=functions.AsGeoJSON("point3"))
+            .get(pk=obj.pk)
+            .geojson,
+            # GeoJSON without CRS.
+            json.loads(
+                '{"type":"Point","coordinates":[222638.98158655,222684.20850554]}'
+            ),
+        )
 
     @skipUnlessDBFeature("has_AsGML_function")
     def test_asgml(self):
