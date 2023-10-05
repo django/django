@@ -271,6 +271,11 @@ faster and more stable. Add the ``--headless`` option to enable this mode.
 
 .. _selenium.webdriver: https://github.com/SeleniumHQ/selenium/tree/trunk/py/selenium/webdriver
 
+.. _screenshot-tests:
+
+Screenshot tests
+~~~~~~~~~~~~~~~~
+
 For testing changes to the admin UI, the selenium tests can be run with the
 ``--screenshots`` option enabled. Screenshots will be saved to the
 ``tests/screenshots/`` directory.
