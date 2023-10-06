@@ -2550,6 +2550,9 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             RemovedInDjango60Warning,
             stacklevel=2,
         )
+        queryset = None
+        if querysets := lookup.get_current_querysets(level):
+            queryset = querysets[0]
         (
             rel_qs,
             rel_obj_attr,
@@ -2557,9 +2560,7 @@ def prefetch_one_level(instances, prefetcher, lookup, level):
             single,
             cache_name,
             is_descriptor,
-        ) = prefetcher.get_prefetch_queryset(
-            instances, lookup.get_current_querysets(level)
-        )
+        ) = prefetcher.get_prefetch_queryset(instances, queryset)
     # We have to handle the possibility that the QuerySet we just got back
     # contains some prefetch_related lookups. We don't want to trigger the
     # prefetch_related functionality by evaluating the query. Rather, we need

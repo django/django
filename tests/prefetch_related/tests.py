@@ -4,10 +4,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import NotSupportedError, connection
 from django.db.models import Prefetch, QuerySet, prefetch_related_objects
-from django.db.models.query import get_prefetcher
+from django.db.models.fields.related import ForwardManyToOneDescriptor
+from django.db.models.query import get_prefetcher, prefetch_one_level
 from django.db.models.sql import Query
 from django.test import (
     TestCase,
+    ignore_warnings,
     override_settings,
     skipIfDBFeature,
     skipUnlessDBFeature,
@@ -1997,7 +1999,7 @@ class PrefetchLimitTests(TestDataMixin, TestCase):
             list(Book.objects.prefetch_related(Prefetch("authors", authors[1:])))
 
 
-class GetCurrentQuerySetDeprecation(TestCase):
+class DeprecationTests(TestCase):
     def test_get_current_queryset_warning(self):
         msg = (
             "Prefetch.get_current_queryset() is deprecated. Use "
@@ -2011,3 +2013,41 @@ class GetCurrentQuerySetDeprecation(TestCase):
             )
         with self.assertWarnsMessage(RemovedInDjango60Warning, msg):
             self.assertIsNone(Prefetch("authors").get_current_queryset(1))
+
+    @ignore_warnings(category=RemovedInDjango60Warning)
+    def test_prefetch_one_level_fallback(self):
+        class NoGetPrefetchQuerySetsDescriptor(ForwardManyToOneDescriptor):
+            def get_prefetch_queryset(self, instances, queryset=None):
+                if queryset is None:
+                    return super().get_prefetch_querysets(instances)
+                return super().get_prefetch_querysets(instances, [queryset])
+
+            def __getattribute__(self, name):
+                if name == "get_prefetch_querysets":
+                    raise AttributeError
+                return super().__getattribute__(name)
+
+        house = House.objects.create()
+        room = Room.objects.create(house=house)
+        house.main_room = room
+        house.save()
+
+        # prefetch_one_level() fallbacks to get_prefetch_queryset().
+        prefetcher = NoGetPrefetchQuerySetsDescriptor(Room._meta.get_field("house"))
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house", House.objects.all()),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])
+
+        obj_list, additional_lookups = prefetch_one_level(
+            [room],
+            prefetcher,
+            Prefetch("house"),
+            0,
+        )
+        self.assertEqual(obj_list, [house])
+        self.assertEqual(additional_lookups, [])
