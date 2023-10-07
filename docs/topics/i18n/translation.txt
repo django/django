@@ -512,17 +512,12 @@ Other uses of lazy in delayed translations
 
 For any other case where you would like to delay the translation, but have to
 pass the translatable string as argument to another function, you can wrap
-this function inside a lazy call yourself. For example::
+this function inside a mark_safe call yourself. For example::
 
-    from django.utils.functional import lazy
     from django.utils.safestring import mark_safe
     from django.utils.translation import gettext_lazy as _
 
-    mark_safe_lazy = lazy(mark_safe, str)
-
-And then later::
-
-    lazy_string = mark_safe_lazy(_("<p>My <strong>string!</strong></p>"))
+    lazy_string = mark_safe(_("<p>My <strong>string!</strong></p>"))
 
 Localized names of languages
 ----------------------------
