@@ -607,6 +607,7 @@ with non-homogeneous set of results.
 
 .. code-block:: pycon
 
+    >>> from django.contrib.contenttypes.prefetch import GenericPrefetch
     >>> bookmark = Bookmark.objects.create(url="https://www.djangoproject.com/")
     >>> animal = Animal.objects.create(name="lion", weight=100)
     >>> TaggedItem.objects.create(tag="great", content_object=bookmark)
