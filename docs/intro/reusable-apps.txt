@@ -240,10 +240,10 @@ this. For a small app like polls, this process isn't too difficult.
 
 #. Only Python modules and packages are included in the package by default. To
    include additional files, we'll need to create a ``MANIFEST.in`` file. The
-   setuptools docs referred to in the previous step discuss this file in more
-   detail. To include the templates, the ``README.rst`` and our ``LICENSE``
-   file, create a file ``django-polls/MANIFEST.in`` with the following
-   contents:
+   ``setuptools`` docs referred to in the previous step discuss this file in
+   more detail. To include the templates, the ``README.rst`` and our
+   ``LICENSE`` file, create a file ``django-polls/MANIFEST.in`` with the
+   following contents:
 
    .. code-block:: text
        :caption: ``django-polls/MANIFEST.in``
