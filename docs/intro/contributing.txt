@@ -43,7 +43,6 @@ so that it can be of use to the widest audience.
     `#django-dev on irc.libera.chat`__ to chat with other Django users who
     might be able to help.
 
-__ https://diveinto.org/python3/table-of-contents.html
 __ https://web.libera.chat/#django-dev
 .. _Django Forum: https://forum.djangoproject.com/
 
