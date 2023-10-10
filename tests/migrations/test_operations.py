@@ -330,7 +330,7 @@ class OperationTests(OperationTestBase):
             pony.delete()
 
         rider.refresh_from_db()
-        self.assertEqual(getattr(rider, fk_fieldname), None)
+        self.assertIsNone(getattr(rider, fk_fieldname))
 
         Rider.objects.all().delete()
         Pony.objects.all().delete()
@@ -465,7 +465,7 @@ class OperationTests(OperationTestBase):
             pony.delete()
 
         rider.refresh_from_db()
-        self.assertEqual(getattr(rider, fk_fieldname), None)
+        self.assertIsNone(getattr(rider, fk_fieldname))
 
         Rider.objects.all().delete()
         Pony.objects.all().delete()
