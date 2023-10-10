@@ -22,10 +22,6 @@ platform-specific instructions if you are on :ref:`macos` or :ref:`windows`.
 .. _PostGIS requirements: https://postgis.net/docs/postgis_installation.html#install_requirements
 .. _build from source: https://postgis.net/docs/postgis_installation.html#install_short_version
 
-.. versionchanged:: 4.2
-
-    Support for ``psycopg`` 3.1.8+ was added.
-
 Post-installation
 =================
 
@@ -34,7 +30,7 @@ Post-installation
 Creating a spatial database
 ---------------------------
 
-PostGIS 2 includes an extension for PostgreSQL that's used to enable spatial
+PostGIS includes an extension for PostgreSQL that's used to enable spatial
 functionality:
 
 .. code-block:: shell
@@ -54,9 +50,9 @@ process. An alternative is to use a migration operation in your project::
     class Migration(migrations.Migration):
         operations = [CreateExtension("postgis"), ...]
 
-If you plan to use PostGIS raster functionality on PostGIS 3+, you should also
-activate the ``postgis_raster`` extension. You can install the extension using
-the :class:`~django.contrib.postgres.operations.CreateExtension` migration
+If you plan to use PostGIS raster functionality, you should also activate the
+``postgis_raster`` extension. You can install the extension using the
+:class:`~django.contrib.postgres.operations.CreateExtension` migration
 operation, or directly by running ``CREATE EXTENSION postgis_raster;``.
 
 GeoDjango does not currently leverage any `PostGIS topology functionality`__.

@@ -4,7 +4,7 @@ import warnings
 from asgiref.sync import iscoroutinefunction, markcoroutinefunction, sync_to_async
 
 
-class RemovedInDjango51Warning(DeprecationWarning):
+class RemovedInNextVersionWarning(DeprecationWarning):
     pass
 
 
@@ -12,7 +12,6 @@ class RemovedInDjango60Warning(PendingDeprecationWarning):
     pass
 
 
-RemovedInNextVersionWarning = RemovedInDjango51Warning
 RemovedAfterNextVersionWarning = RemovedInDjango60Warning
 
 

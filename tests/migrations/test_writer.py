@@ -31,6 +31,10 @@ from django.utils.translation import gettext_lazy as _
 from .models import FoodManager, FoodQuerySet
 
 
+def get_choices():
+    return [(i, str(i)) for i in range(3)]
+
+
 class DeconstructibleInstances:
     def deconstruct(self):
         return ("DeconstructibleInstances", [], {})
@@ -75,6 +79,29 @@ class IntEnum(enum.IntEnum):
 class IntFlagEnum(enum.IntFlag):
     A = 1
     B = 2
+
+
+def decorator(f):
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        return f(*args, **kwargs)
+
+    return wrapper
+
+
+@decorator
+def function_with_decorator():
+    pass
+
+
+@functools.cache
+def function_with_cache():
+    pass
+
+
+@functools.lru_cache(maxsize=10)
+def function_with_lru_cache():
+    pass
 
 
 class OperationWriterTests(SimpleTestCase):
@@ -470,6 +497,14 @@ class WriterTests(SimpleTestCase):
                     "models.IntegerField(choices=[('Group', [(2, '2'), (1, '1')])])",
                 )
 
+    def test_serialize_callable_choices(self):
+        field = models.IntegerField(choices=get_choices)
+        string = MigrationWriter.serialize(field)[0]
+        self.assertEqual(
+            string,
+            "models.IntegerField(choices=migrations.test_writer.get_choices)",
+        )
+
     def test_serialize_nested_class(self):
         for nested_cls in [self.NestedEnum, self.NestedChoices]:
             cls_name = nested_cls.__name__
@@ -565,6 +600,11 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(models.SET(42))
         self.assertEqual(string, "models.SET(42)")
         self.serialize_round_trip(models.SET(42))
+
+    def test_serialize_decorated_functions(self):
+        self.assertSerializedEqual(function_with_decorator)
+        self.assertSerializedEqual(function_with_cache)
+        self.assertSerializedEqual(function_with_lru_cache)
 
     def test_serialize_datetime(self):
         self.assertSerializedEqual(datetime.datetime.now())

@@ -332,10 +332,6 @@ are caught and logged to the ``django.db.backends.base`` logger.
 You can use :meth:`.TestCase.captureOnCommitCallbacks` to test callbacks
 registered with :func:`on_commit`.
 
-.. versionchanged:: 4.2
-
-    The ``robust`` argument was added.
-
 Savepoints
 ----------
 
@@ -381,10 +377,6 @@ If one on-commit function registered with ``robust=False`` within a given
 transaction raises an uncaught exception, no later registered functions in that
 same transaction will run. This is the same behavior as if you'd executed the
 functions sequentially yourself without :func:`on_commit`.
-
-.. versionchanged:: 4.2
-
-    The ``robust`` argument was added.
 
 Timing of execution
 -------------------

@@ -368,13 +368,20 @@ class Tests(TestCase):
         for lookup in lookups:
             with self.subTest(lookup=lookup):
                 self.assertIn("::text", do.lookup_cast(lookup))
-        # RemovedInDjango51Warning.
-        for lookup in lookups:
-            for field_type in ("CICharField", "CIEmailField", "CITextField"):
-                with self.subTest(lookup=lookup, field_type=field_type):
-                    self.assertIn(
-                        "::citext", do.lookup_cast(lookup, internal_type=field_type)
-                    )
+
+    def test_lookup_cast_isnull_noop(self):
+        from django.db.backends.postgresql.operations import DatabaseOperations
+
+        do = DatabaseOperations(connection=None)
+        # Using __isnull lookup doesn't require casting.
+        tests = [
+            "CharField",
+            "EmailField",
+            "TextField",
+        ]
+        for field_type in tests:
+            with self.subTest(field_type=field_type):
+                self.assertEqual(do.lookup_cast("isnull", field_type), "%s")
 
     def test_correct_extraction_psycopg_version(self):
         from django.db.backends.postgresql.base import Database, psycopg_version
@@ -411,12 +418,12 @@ class Tests(TestCase):
 
     def test_get_database_version(self):
         new_connection = connection.copy()
-        new_connection.pg_version = 110009
-        self.assertEqual(new_connection.get_database_version(), (11, 9))
+        new_connection.pg_version = 130009
+        self.assertEqual(new_connection.get_database_version(), (13, 9))
 
-    @mock.patch.object(connection, "get_database_version", return_value=(11,))
+    @mock.patch.object(connection, "get_database_version", return_value=(12,))
     def test_check_database_version_supported(self, mocked_get_database_version):
-        msg = "PostgreSQL 12 or later is required (found 11)."
+        msg = "PostgreSQL 13 or later is required (found 12)."
         with self.assertRaisesMessage(NotSupportedError, msg):
             connection.check_database_version_supported()
         self.assertTrue(mocked_get_database_version.called)

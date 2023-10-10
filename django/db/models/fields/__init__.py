@@ -314,9 +314,7 @@ class Field(RegisterLookupMixin):
         if not self.choices:
             return []
 
-        if not is_iterable(self.choices) or isinstance(
-            self.choices, (str, CallableChoiceIterator)
-        ):
+        if not is_iterable(self.choices) or isinstance(self.choices, str):
             return [
                 checks.Error(
                     "'choices' must be a mapping (e.g. a dictionary) or an iterable "

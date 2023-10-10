@@ -41,9 +41,10 @@ transaction to provide isolation::
             self.assertEqual(cat.speak(), 'The cat says "meow"')
 
 When you :ref:`run your tests <running-tests>`, the default behavior of the
-test utility is to find all the test cases (that is, subclasses of
+test utility is to find all the test case classes (that is, subclasses of
 :class:`unittest.TestCase`) in any file whose name begins with ``test``,
-automatically build a test suite out of those test cases, and run that suite.
+automatically build a test suite out of those test case classes, and run that
+suite.
 
 For more details about :mod:`unittest`, see the Python documentation.
 
@@ -98,7 +99,7 @@ path to a package, module, ``TestCase`` subclass, or test method. For instance:
     # Run all the tests found within the 'animals' package
     $ ./manage.py test animals
 
-    # Run just one test case
+    # Run just one test case class
     $ ./manage.py test animals.tests.AnimalTestCase
 
     # Run just one test method
@@ -223,7 +224,7 @@ the Django test runner reorders tests in the following way:
 
 * All :class:`~django.test.TestCase` subclasses are run first.
 
-* Then, all other Django-based tests (test cases based on
+* Then, all other Django-based tests (test case classes based on
   :class:`~django.test.SimpleTestCase`, including
   :class:`~django.test.TransactionTestCase`) are run with no particular
   ordering guaranteed nor enforced among them.
@@ -380,8 +381,6 @@ time to run tests.
 
 Avoiding disk access for media files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. versionadded:: 4.2
 
 The :class:`~django.core.files.storage.InMemoryStorage` is a convenient way to
 prevent disk access for media files. All data is kept in memory, then it gets

@@ -119,6 +119,7 @@ from .models import (
     Simple,
     Sketch,
     Song,
+    Square,
     State,
     Story,
     StumpJoke,
@@ -215,6 +216,7 @@ class ArticleAdmin(ArticleAdminWithExtraUrl):
         "model_month",
         "order_by_f_expression",
         "order_by_orderby_expression",
+        "model_property_is_from_past",
     )
     list_editable = ("section",)
     list_filter = ("date", "section")
@@ -1175,6 +1177,10 @@ class TravelerAdmin(admin.ModelAdmin):
     autocomplete_fields = ["living_country"]
 
 
+class SquareAdmin(admin.ModelAdmin):
+    readonly_fields = ("area",)
+
+
 site = admin.AdminSite(name="admin")
 site.site_url = "/my-site-url/"
 site.register(Article, ArticleAdmin)
@@ -1298,6 +1304,7 @@ site.register(UserProxy)
 site.register(Box)
 site.register(Country, CountryAdmin)
 site.register(Traveler, TravelerAdmin)
+site.register(Square, SquareAdmin)
 
 # Register core models we need in our tests
 site.register(User, UserAdmin)

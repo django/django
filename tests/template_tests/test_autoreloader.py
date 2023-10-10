@@ -68,6 +68,15 @@ class TemplateReloadTests(SimpleTestCase):
         self.assertIs(autoreload.template_changed(None, template_path), True)
         mock_loader_reset.assert_called_once()
 
+    @override_settings(FORM_RENDERER="django.forms.renderers.TemplatesSetting")
+    @mock.patch("django.template.loaders.cached.Loader.reset")
+    def test_form_template_reset_template_change_no_djangotemplates(
+        self, mock_loader_reset
+    ):
+        template_path = Path(__file__).parent / "templates" / "index.html"
+        self.assertIs(autoreload.template_changed(None, template_path), True)
+        mock_loader_reset.assert_not_called()
+
     @mock.patch("django.forms.renderers.get_default_renderer")
     def test_form_template_reset_non_template_change(self, mock_renderer):
         self.assertIsNone(autoreload.template_changed(None, Path(__file__)))

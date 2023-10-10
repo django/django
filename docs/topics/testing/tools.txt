@@ -158,10 +158,6 @@ Use the ``django.test.Client`` class to make requests.
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. versionchanged:: 4.2
-
-        The ``headers`` parameter was added.
-
     .. method:: Client.get(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
@@ -233,10 +229,6 @@ Use the ``django.test.Client`` class to make requests.
 
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, **extra)
 
@@ -351,20 +343,12 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
         including the ``follow``, ``secure``, ``headers``, and ``extra``
         parameters, except it does not return a message body.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -377,10 +361,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
@@ -392,10 +372,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
@@ -403,10 +379,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
 
@@ -419,10 +391,6 @@ Use the ``django.test.Client`` class to make requests.
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
 
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
-
     .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
@@ -434,10 +402,6 @@ Use the ``django.test.Client`` class to make requests.
 
         The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
         the same as for :meth:`Client.get`.
-
-        .. versionchanged:: 4.2
-
-            The ``headers`` parameter was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -1231,8 +1195,8 @@ Fixture loading
 
 .. attribute:: TransactionTestCase.fixtures
 
-A test case for a database-backed website isn't much use if there isn't any
-data in the database. Tests are more readable and it's more maintainable to
+A test case class for a database-backed website isn't much use if there isn't
+any data in the database. Tests are more readable and it's more maintainable to
 create objects using the ORM, for example in :meth:`TestCase.setUpTestData`,
 however, you can also use :ref:`fixtures <fixtures-explanation>`.
 
@@ -1327,9 +1291,9 @@ For example::
         def test_index_page_view(self):
             call_some_test_code()
 
-This test case will flush the ``default`` and ``other`` test databases before
-running ``test_index_page_view``. You can also use ``'__all__'`` to specify
-that all of the test databases must be flushed.
+This test case class will flush the ``default`` and ``other`` test databases
+before running ``test_index_page_view``. You can also use ``'__all__'`` to
+specify that all of the test databases must be flushed.
 
 The ``databases`` flag also controls which databases the
 :attr:`TransactionTestCase.fixtures` are loaded into. By default, fixtures are
@@ -1533,15 +1497,21 @@ when settings are changed.
 
 Django itself uses this signal to reset various data:
 
-============================================================================ ========================
-Overridden settings                                                          Data reset
-============================================================================ ========================
-USE_TZ, TIME_ZONE                                                            Databases timezone
-TEMPLATES                                                                    Template engines
-SERIALIZATION_MODULES                                                        Serializers cache
-LOCALE_PATHS, LANGUAGE_CODE                                                  Default translation and loaded translations
-DEFAULT_FILE_STORAGE, STATICFILES_STORAGE, STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
-============================================================================ ========================
+================================= ========================
+Overridden settings               Data reset
+================================= ========================
+USE_TZ, TIME_ZONE                 Databases timezone
+TEMPLATES                         Template engines
+FORM_RENDERER                     Default renderer
+SERIALIZATION_MODULES             Serializers cache
+LOCALE_PATHS, LANGUAGE_CODE       Default translation and loaded translations
+STATIC_ROOT, STATIC_URL, STORAGES Storages configuration
+================================= ========================
+
+.. versionchanged:: 5.1
+
+    Resetting the default renderer when the ``FORM_RENDERER`` setting is
+    changed was added.
 
 Isolating apps
 --------------
@@ -1717,11 +1687,6 @@ your test suite.
     ``field`` and ``errors`` have the same meaning as the parameters to
     ``assertFormError()``.
 
-    .. deprecated:: 4.2
-
-        The ``assertFormsetError()`` assertion method is deprecated. Use
-        ``assertFormSetError()`` instead.
-
 .. method:: SimpleTestCase.assertContains(response, text, count=None, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the
@@ -1735,6 +1700,10 @@ your test suite.
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the response content.
+
 .. method:: SimpleTestCase.assertNotContains(response, text, status_code=200, msg_prefix='', html=False)
 
     Asserts that a :class:`response <django.http.HttpResponse>` produced the
@@ -1746,6 +1715,10 @@ your test suite.
     character-by-character equality. Whitespace is ignored in most cases,
     attribute ordering is not significant. See
     :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
+
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the response content.
 
 .. method:: SimpleTestCase.assertTemplateUsed(response, template_name, msg_prefix='', count=None)
 
@@ -1883,6 +1856,10 @@ your test suite.
     Whitespace in most cases is ignored, and attribute ordering is not
     significant. See :meth:`~SimpleTestCase.assertHTMLEqual` for more details.
 
+    .. versionchanged:: 5.1
+
+        In older versions, error messages didn't contain the ``haystack``.
+
 .. method:: SimpleTestCase.assertJSONEqual(raw, expected_data, msg=None)
 
     Asserts that the JSON fragments ``raw`` and ``expected_data`` are equal.
@@ -1914,11 +1891,6 @@ your test suite.
     raised.
 
     Output in case of error can be customized with the ``msg`` argument.
-
-    .. deprecated:: 4.2
-
-        The ``assertQuerysetEqual()`` assertion method is deprecated. Use
-        ``assertQuerySetEqual()`` instead.
 
 .. method:: TransactionTestCase.assertNumQueries(num, func, *args, **kwargs)
 
@@ -1965,7 +1937,7 @@ you might label fast or slow tests::
         def test_slow_but_core(self):
             ...
 
-You can also tag a test case::
+You can also tag a test case class::
 
     @tag("slow", "core")
     class SampleTestCase(TestCase):
@@ -2040,10 +2012,6 @@ test client, with the following exceptions:
 
     >>> c = AsyncClient()
     >>> c.get("/customers/details/", {"name": "fred", "age": 7}, ACCEPT="application/json")
-
-.. versionchanged:: 4.2
-
-    The ``headers`` parameter was added.
 
 .. versionchanged:: 5.0
 

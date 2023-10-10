@@ -85,9 +85,14 @@ view functions:
 * :func:`~django.views.decorators.cache.never_cache`
 * :func:`~django.views.decorators.common.no_append_slash`
 * :func:`~django.views.decorators.csrf.csrf_exempt`
+* :func:`~django.views.decorators.csrf.csrf_protect`
+* :func:`~django.views.decorators.csrf.ensure_csrf_cookie`
+* :func:`~django.views.decorators.csrf.requires_csrf_token`
 * :func:`~django.views.decorators.debug.sensitive_variables`
 * :func:`~django.views.decorators.debug.sensitive_post_parameters`
+* :func:`~django.views.decorators.gzip.gzip_page`
 * :func:`~django.views.decorators.http.condition`
+* ``conditional_page()``
 * :func:`~django.views.decorators.http.etag`
 * :func:`~django.views.decorators.http.last_modified`
 * :func:`~django.views.decorators.http.require_http_methods`
@@ -145,10 +150,6 @@ Transactions do not yet work in async mode. If you have a piece of code that
 needs transactions behavior, we recommend you write that piece as a single
 synchronous function and call it using :func:`sync_to_async`.
 
-.. versionchanged:: 4.2
-
-    Asynchronous model and related manager interfaces were added.
-
 .. _async_performance:
 
 Performance
@@ -196,6 +197,9 @@ cleanup::
         except asyncio.CancelledError:
             # Handle disconnect
             raise
+
+You can also :ref:`handle client disconnects in streaming responses
+<request-response-streaming-disconnect>`.
 
 .. _async-safety:
 

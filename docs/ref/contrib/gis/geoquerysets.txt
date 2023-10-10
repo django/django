@@ -351,8 +351,6 @@ SpatiaLite  ``Intersects(poly, geom)``
 ``isempty``
 -----------
 
-.. versionadded:: 4.2
-
 *Availability*: `PostGIS <https://postgis.net/docs/ST_IsEmpty.html>`__
 
 Tests if the geometry is empty.

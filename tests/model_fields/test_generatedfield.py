@@ -1,8 +1,8 @@
-from django.core.exceptions import FieldError
 from django.db import IntegrityError, connection
-from django.db.models import F, GeneratedField, IntegerField
+from django.db.models import F, FloatField, GeneratedField, IntegerField, Model
 from django.db.models.functions import Lower
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test.utils import isolate_apps
 
 from .models import (
     GeneratedModel,
@@ -49,6 +49,42 @@ class BaseGeneratedFieldTests(SimpleTestCase):
         self.assertEqual(args, [])
         self.assertEqual(kwargs, {"db_persist": True, "expression": F("a") + F("b")})
 
+    @isolate_apps("model_fields")
+    def test_get_col(self):
+        class Square(Model):
+            side = IntegerField()
+            area = GeneratedField(expression=F("side") * F("side"), db_persist=True)
+
+        col = Square._meta.get_field("area").get_col("alias")
+        self.assertIsInstance(col.output_field, IntegerField)
+
+        class FloatSquare(Model):
+            side = IntegerField()
+            area = GeneratedField(
+                expression=F("side") * F("side"),
+                db_persist=True,
+                output_field=FloatField(),
+            )
+
+        col = FloatSquare._meta.get_field("area").get_col("alias")
+        self.assertIsInstance(col.output_field, FloatField)
+
+    @isolate_apps("model_fields")
+    def test_cached_col(self):
+        class Sum(Model):
+            a = IntegerField()
+            b = IntegerField()
+            total = GeneratedField(expression=F("a") + F("b"), db_persist=True)
+
+        field = Sum._meta.get_field("total")
+        cached_col = field.cached_col
+        self.assertIs(field.get_col(Sum._meta.db_table), cached_col)
+        self.assertIs(field.get_col(Sum._meta.db_table, field), cached_col)
+        self.assertIsNot(field.get_col("alias"), cached_col)
+        self.assertIsNot(field.get_col(Sum._meta.db_table, IntegerField()), cached_col)
+        self.assertIs(cached_col.target, field)
+        self.assertIsInstance(cached_col.output_field, IntegerField)
+
 
 class GeneratedFieldTestMixin:
     def _refresh_if_needed(self, m):
@@ -59,7 +95,7 @@ class GeneratedFieldTestMixin:
     def test_unsaved_error(self):
         m = self.base_model(a=1, b=2)
         msg = "Cannot read a generated field from an unsaved model."
-        with self.assertRaisesMessage(FieldError, msg):
+        with self.assertRaisesMessage(AttributeError, msg):
             m.field
 
     def test_create(self):
@@ -144,6 +180,13 @@ class GeneratedFieldTestMixin:
             db_parameters["type"],
             field._resolved_expression.output_field.db_type(connection),
         )
+
+    @skipUnlessDBFeature("supports_collation_on_charfield")
+    def test_db_type_parameters(self):
+        db_type_parameters = self.output_field_model._meta.get_field(
+            "lower_name"
+        ).db_type_parameters(connection)
+        self.assertEqual(db_type_parameters["max_length"], 11)
 
     def test_model_with_params(self):
         m = self.params_model.objects.create()

@@ -26,6 +26,7 @@ only officially support the latest release of each series.
 What's new in Django 5.1
 ========================
 
+
 Database-level values for ``ForeignKey.on_delete``
 --------------------------------------------------
 
@@ -37,6 +38,7 @@ supports four extra values to specify database-level actions:
 * ``DB_SET_NULL`` - sets the referring foreign key to SQL ``NULL``.
 * ``DB_SET_DEFAULT`` - the value of the foreign key column in the referencing
   table will be set to its ``db_default`` value.
+
 
 Minor features
 --------------

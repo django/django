@@ -354,8 +354,6 @@ are returned unchanged.
 ``FromWKB``
 ===========
 
-.. versionadded:: 4.2
-
 .. class:: FromWKB(expression, **extra)
 
 *Availability*: MariaDB, `MySQL
@@ -366,8 +364,6 @@ Creates geometry from `Well-known binary (WKB)`_ representation.
 
 ``FromWKT``
 ===========
-
-.. versionadded:: 4.2
 
 .. class:: FromWKT(expression, **extra)
 
@@ -420,8 +416,6 @@ intersection between them.
 
 ``IsEmpty``
 ===========
-
-.. versionadded:: 4.2
 
 .. class:: IsEmpty(expr)
 

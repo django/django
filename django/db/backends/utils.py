@@ -61,7 +61,9 @@ class CursorWrapper:
                 "Keyword parameters for callproc are not supported on this "
                 "database backend."
             )
-        if not apps.ready:
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
             warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
@@ -90,7 +92,9 @@ class CursorWrapper:
         return executor(sql, params, many, context)
 
     def _execute(self, sql, params, *ignored_wrapper_args):
-        if not apps.ready:
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
             warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:
@@ -101,7 +105,9 @@ class CursorWrapper:
                 return self.cursor.execute(sql, params)
 
     def _executemany(self, sql, param_list, *ignored_wrapper_args):
-        if not apps.ready:
+        # Raise a warning during app initialization (stored_app_configs is only
+        # ever set during testing).
+        if not apps.ready and not apps.stored_app_configs:
             warnings.warn(self.APPS_NOT_READY_WARNING_MSG, category=RuntimeWarning)
         self.db.validate_no_broken_transaction()
         with self.db.wrap_database_errors:

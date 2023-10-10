@@ -5,7 +5,6 @@ from django.contrib.gis.forms import BaseGeometryWidget, OpenLayersWidget
 from django.contrib.gis.geos import GEOSGeometry
 from django.core.exceptions import ValidationError
 from django.test import SimpleTestCase, override_settings
-from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.html import escape
 
 
@@ -445,9 +444,7 @@ class GeometryWidgetTests(SimpleTestCase):
                     "is_hidden": False,
                     "attrs": {
                         "map_srid": 4326,
-                        "map_width": 600,
                         "geom_type": "GEOMETRY",
-                        "map_height": 400,
                         "display_raw": False,
                     },
                     "name": "name",
@@ -486,19 +483,3 @@ class GeometryWidgetTests(SimpleTestCase):
         form = PointForm(data={"p": point.json})
         self.assertTrue(form.is_valid())
         self.assertEqual(form.cleaned_data["p"].srid, 4326)
-
-    def test_deprecated_width_and_height(self):
-        class CustomGeometryWidget(forms.BaseGeometryWidget):
-            map_height = 300
-            map_width = 550
-
-        msg = (
-            "The map_height and map_width widget attributes are deprecated. Please use "
-            "CSS to size map widgets."
-        )
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            CustomGeometryWidget()
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            forms.BaseGeometryWidget({"map_width": 400})
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            forms.BaseGeometryWidget({"map_height": 600})

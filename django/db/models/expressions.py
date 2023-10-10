@@ -512,6 +512,25 @@ class Expression(BaseExpression, Combinable):
 
 _connector_combinations = [
     # Numeric operations - operands of same type.
+    # PositiveIntegerField should take precedence over IntegerField (except
+    # subtraction).
+    {
+        connector: [
+            (
+                fields.PositiveIntegerField,
+                fields.PositiveIntegerField,
+                fields.PositiveIntegerField,
+            ),
+        ]
+        for connector in (
+            Combinable.ADD,
+            Combinable.MUL,
+            Combinable.DIV,
+            Combinable.MOD,
+            Combinable.POW,
+        )
+    },
+    # Other numeric operands.
     {
         connector: [
             (fields.IntegerField, fields.IntegerField, fields.IntegerField),
@@ -1604,6 +1623,15 @@ class Exists(Subquery):
         if not compiler.connection.features.supports_boolean_expr_in_select_clause:
             sql = "CASE WHEN {} THEN 1 ELSE 0 END".format(sql)
         return sql, params
+
+    def as_sql(self, compiler, *args, **kwargs):
+        try:
+            return super().as_sql(compiler, *args, **kwargs)
+        except EmptyResultSet:
+            features = compiler.connection.features
+            if not features.supports_boolean_expr_in_select_clause:
+                return "1=0", ()
+            return compiler.compile(Value(False))
 
 
 @deconstructible(path="django.db.models.OrderBy")

@@ -23,10 +23,6 @@ __ https://dev.maxmind.com/geoip/geolite2-free-geolocation-data
 __ https://db-ip.com/db/lite.php
 __ https://github.com/maxmind/libmaxminddb/
 
-.. versionchanged:: 4.2
-
-    Support for ``.mmdb`` files downloaded from DB-IP was added.
-
 Example
 =======
 

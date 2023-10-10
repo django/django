@@ -137,11 +137,6 @@ class FindersCheckTests(CollectionTestCase):
 class StoragesCheckTests(SimpleTestCase):
     @override_settings(STORAGES={})
     def test_error_empty_storages(self):
-        # DEFAULT_STORAGE_ALIAS and STATICFILES_STORAGE_ALIAS need to be
-        # popped from STORAGES since UserSettingsHolder has code to maintain
-        # backward compatibility until 5.1 is out.
-        settings.STORAGES.clear()  # RemovedInDjango51Warning
-        assert settings.STORAGES == {}  # RemovedInDjango51Warning
         errors = check_storages(None)
         self.assertEqual(errors, [E005])
 
@@ -156,11 +151,6 @@ class StoragesCheckTests(SimpleTestCase):
         }
     )
     def test_error_missing_staticfiles(self):
-        # Check out the previous comment about UserSettingsHolder compat code.
-        settings.STORAGES.pop(STATICFILES_STORAGE_ALIAS)  # RemovedInDjango51Warning
-        assert (
-            STATICFILES_STORAGE_ALIAS not in settings.STORAGES
-        )  # RemovedInDjango51Warning
         errors = check_storages(None)
         self.assertEqual(errors, [E005])
 
@@ -172,10 +162,5 @@ class StoragesCheckTests(SimpleTestCase):
         }
     )
     def test_staticfiles_no_errors(self):
-        # Check out the previous comment about UserSettingsHolder compat code.
-        settings.STORAGES.pop(DEFAULT_STORAGE_ALIAS)  # RemovedInDjango51Warning
-        assert (
-            DEFAULT_STORAGE_ALIAS not in settings.STORAGES
-        )  # RemovedInDjango51Warning
         errors = check_storages(None)
         self.assertEqual(errors, [])

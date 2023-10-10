@@ -378,8 +378,6 @@ Usage example:
 
 .. class:: TrigramStrictWordSimilarity(string, expression, **extra)
 
-.. versionadded:: 4.2
-
 Accepts a string or expression, and a field name or expression. Returns the
 trigram strict word similarity between the two arguments. Similar to
 :class:`TrigramWordSimilarity() <TrigramWordSimilarity>`, except that it forces
@@ -435,8 +433,6 @@ Usage example:
 -----------------------------
 
 .. class:: TrigramStrictWordDistance(string, expression, **extra)
-
-.. versionadded:: 4.2
 
 Accepts a string or expression, and a field name or expression. Returns the
 trigram strict word distance between the two arguments.

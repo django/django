@@ -1,7 +1,7 @@
 [run]
 branch = True
 concurrency = multiprocessing,thread
-data_file = .coverages/.coverage
+data_file = ${RUNTESTS_DIR-.}/.coverages/.coverage
 omit =
     */django/utils/autoreload.py
 source = django

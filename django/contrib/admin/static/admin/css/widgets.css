@@ -533,17 +533,17 @@ span.clearable-file-input label {
     margin: 0;
     padding: 4px 0;
     font-size: 0.75rem;
-    background: #eee;
+    background: var(--close-button-bg);
     border-top: 1px solid var(--border-color);
-    color: var(--body-fg);
+    color: var(--button-fg);
 }
 
 .calendar-cancel:focus, .calendar-cancel:hover {
-    background: #ddd;
+    background: var(--close-button-hover-bg);
 }
 
 .calendar-cancel a {
-    color: black;
+    color: var(--button-fg);
     display: block;
 }
 

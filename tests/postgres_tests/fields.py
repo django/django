@@ -7,9 +7,6 @@ import enum
 from django.db import models
 
 try:
-    from django.contrib.postgres.fields import CICharField  # RemovedInDjango51Warning.
-    from django.contrib.postgres.fields import CIEmailField  # RemovedInDjango51Warning.
-    from django.contrib.postgres.fields import CITextField  # RemovedInDjango51Warning.
     from django.contrib.postgres.fields import (
         ArrayField,
         BigIntegerRangeField,
@@ -47,9 +44,6 @@ except ImportError:
 
     ArrayField = DummyArrayField
     BigIntegerRangeField = models.Field
-    CICharField = models.Field  # RemovedInDjango51Warning.
-    CIEmailField = models.Field  # RemovedInDjango51Warning.
-    CITextField = models.Field  # RemovedInDjango51Warning.
     DateRangeField = models.Field
     DateTimeRangeField = DummyContinuousRangeField
     DecimalRangeField = DummyContinuousRangeField

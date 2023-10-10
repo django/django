@@ -1,6 +1,7 @@
 from django.core import checks
 from django.db import connections, router
 from django.db.models.sql import Query
+from django.utils.functional import cached_property
 
 from . import NOT_PROVIDED, Field
 
@@ -32,6 +33,17 @@ class GeneratedField(Field):
         self.db_persist = db_persist
         super().__init__(**kwargs)
 
+    @cached_property
+    def cached_col(self):
+        from django.db.models.expressions import Col
+
+        return Col(self.model._meta.db_table, self, self.output_field)
+
+    def get_col(self, alias, output_field=None):
+        if alias != self.model._meta.db_table and output_field is None:
+            output_field = self.output_field
+        return super().get_col(alias, output_field)
+
     def contribute_to_class(self, *args, **kwargs):
         super().contribute_to_class(*args, **kwargs)
 
@@ -49,12 +61,10 @@ class GeneratedField(Field):
             self.register_lookup(lookup, lookup_name=lookup_name)
 
     def generated_sql(self, connection):
-        return self._resolved_expression.as_sql(
-            compiler=connection.ops.compiler("SQLCompiler")(
-                self._query, connection=connection, using=None
-            ),
-            connection=connection,
+        compiler = connection.ops.compiler("SQLCompiler")(
+            self._query, connection=connection, using=None
         )
+        return compiler.compile(self._resolved_expression)
 
     def check(self, **kwargs):
         databases = kwargs.get("databases") or []
@@ -149,3 +159,6 @@ class GeneratedField(Field):
 
     def db_parameters(self, connection):
         return self.output_field.db_parameters(connection)
+
+    def db_type_parameters(self, connection):
+        return self.output_field.db_type_parameters(connection)

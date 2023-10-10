@@ -1067,8 +1067,6 @@ perform a similar check at that level.
 ``DATA_UPLOAD_MAX_NUMBER_FILES``
 --------------------------------
 
-.. versionadded:: 3.2.18
-
 Default: ``100``
 
 The maximum number of files that may be received via POST in a
@@ -1331,22 +1329,6 @@ Default exception reporter filter class to be used if none has been assigned to
 the :class:`~django.http.HttpRequest` instance yet.
 See :ref:`Filtering error reports<filtering-error-reports>`.
 
-.. setting:: DEFAULT_FILE_STORAGE
-
-``DEFAULT_FILE_STORAGE``
-------------------------
-
-Default: ``'``:class:`django.core.files.storage.FileSystemStorage`\ ``'``
-
-Default file storage class to be used for any file-related operations that don't
-specify a particular storage system. See :doc:`/topics/files`.
-
-.. deprecated:: 4.2
-
-    This setting is deprecated. Starting with Django 4.2, default file storage
-    engine can be configured with the :setting:`STORAGES` setting under the
-    ``default`` key.
-
 .. setting:: DEFAULT_FROM_EMAIL
 
 ``DEFAULT_FROM_EMAIL``
@@ -1529,8 +1511,8 @@ SSL connection.
 Note that setting :setting:`EMAIL_SSL_CERTFILE` and :setting:`EMAIL_SSL_KEYFILE`
 doesn't result in any certificate checking. They're passed to the underlying SSL
 connection. Please refer to the documentation of Python's
-:func:`python:ssl.wrap_socket` function for details on how the certificate chain
-file and private key file are handled.
+:meth:`python:ssl.SSLContext.wrap_socket` function for details on how the
+certificate chain file and private key file are handled.
 
 .. setting:: EMAIL_TIMEOUT
 
@@ -2597,8 +2579,6 @@ See also the :doc:`/ref/checks` documentation.
 ``STORAGES``
 ------------
 
-.. versionadded:: 4.2
-
 Default::
 
     {
@@ -3103,6 +3083,7 @@ Default::
         "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
         "django.contrib.auth.hashers.Argon2PasswordHasher",
         "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+        "django.contrib.auth.hashers.ScryptPasswordHasher",
     ]
 
 .. setting:: AUTH_PASSWORD_VALIDATORS
@@ -3552,27 +3533,6 @@ This would allow you to refer to the local file
 
     <a href="{% static 'downloads/polls_20101022.tar.gz' %}">
 
-.. setting:: STATICFILES_STORAGE
-
-``STATICFILES_STORAGE``
------------------------
-
-Default: ``'django.contrib.staticfiles.storage.StaticFilesStorage'``
-
-The file storage engine to use when collecting static files with the
-:djadmin:`collectstatic` management command.
-
-A ready-to-use instance of the storage backend defined in this setting
-can be found under ``staticfiles`` key in ``django.core.files.storage.storages``.
-
-For an example, see :ref:`staticfiles-from-cdn`.
-
-.. deprecated:: 4.2
-
-    This setting is deprecated. Starting with Django 4.2, static files storage
-    engine can be configured with the :setting:`STORAGES` setting under the
-    ``staticfiles`` key.
-
 .. setting:: STATICFILES_FINDERS
 
 ``STATICFILES_FINDERS``
@@ -3664,7 +3624,6 @@ Error reporting
 
 File uploads
 ------------
-* :setting:`DEFAULT_FILE_STORAGE`
 * :setting:`FILE_UPLOAD_HANDLERS`
 * :setting:`FILE_UPLOAD_MAX_MEMORY_SIZE`
 * :setting:`FILE_UPLOAD_PERMISSIONS`

@@ -196,11 +196,6 @@ the SQL operator ``&&``. For example:
     >>> Post.objects.filter(tags__overlap=Post.objects.values_list("tags"))
     <QuerySet [<Post: First post>, <Post: Second post>, <Post: Third post>]>
 
-.. versionchanged:: 4.2
-
-    Support for ``QuerySet.values()`` and ``values_list()`` as a right-hand
-    side was added.
-
 .. fieldlookup:: arrayfield.len
 
 ``len``
@@ -281,71 +276,6 @@ transform do not change. For example:
     down to the final underlying data, but most other slices behave strangely
     at the database level and cannot be supported in a logical, consistent
     fashion by Django.
-
-``CIText`` fields
-=================
-
-.. class:: CIText(**options)
-
-    .. deprecated:: 4.2
-
-    A mixin to create case-insensitive text fields backed by the citext_ type.
-    Read about `the performance considerations`_ prior to using it.
-
-    To use ``citext``, use the :class:`.CITextExtension` operation to
-    :ref:`set up the citext extension <create-postgresql-extensions>` in
-    PostgreSQL before the first ``CreateModel`` migration operation.
-
-    If you're using an :class:`~django.contrib.postgres.fields.ArrayField`
-    of ``CIText`` fields, you must add ``'django.contrib.postgres'`` in your
-    :setting:`INSTALLED_APPS`, otherwise field values will appear as strings
-    like ``'{thoughts,django}'``.
-
-    Several fields that use the mixin are provided:
-
-.. class:: CICharField(**options)
-
-    .. deprecated:: 4.2
-
-        ``CICharField`` is deprecated in favor of
-        ``CharField(db_collation="…")`` with a case-insensitive
-        non-deterministic collation.
-
-.. class:: CIEmailField(**options)
-
-    .. deprecated:: 4.2
-
-        ``CIEmailField`` is deprecated in favor of
-        ``EmailField(db_collation="…")`` with a case-insensitive
-        non-deterministic collation.
-
-.. class:: CITextField(**options)
-
-    .. deprecated:: 4.2
-
-        ``CITextField`` is deprecated in favor of
-        ``TextField(db_collation="…")`` with a case-insensitive
-        non-deterministic collation.
-
-    These fields subclass :class:`~django.db.models.CharField`,
-    :class:`~django.db.models.EmailField`, and
-    :class:`~django.db.models.TextField`, respectively.
-
-    ``max_length`` won't be enforced in the database since ``citext`` behaves
-    similar to PostgreSQL's ``text`` type.
-
-    .. _citext: https://www.postgresql.org/docs/current/citext.html
-    .. _the performance considerations: https://www.postgresql.org/docs/current/citext.html#id-1.11.7.19.9
-
-.. admonition:: Case-insensitive collations
-
-    It's preferable to use non-deterministic collations instead of the
-    ``citext`` extension. You can create them using the
-    :class:`~django.contrib.postgres.operations.CreateCollation` migration
-    operation. For more details, see :ref:`manage-postgresql-collations` and
-    the PostgreSQL documentation about `non-deterministic collations`_.
-
-    .. _non-deterministic collations: https://www.postgresql.org/docs/current/collation.html#COLLATION-NONDETERMINISTIC
 
 ``HStoreField``
 ===============

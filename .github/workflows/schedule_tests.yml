@@ -45,7 +45,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: '**/package.json'
       - run: npm install
@@ -76,7 +76,7 @@ jobs:
     name: Selenium tests, PostgreSQL
     services:
       postgres:
-        image: postgres:12-alpine
+        image: postgres:13-alpine
         env:
           POSTGRES_DB: django
           POSTGRES_USER: user

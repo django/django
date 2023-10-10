@@ -31,6 +31,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             "ANALYZE",
             "BUFFERS",
             "COSTS",
+            "GENERIC_PLAN",
             "SETTINGS",
             "SUMMARY",
             "TIMING",
@@ -154,17 +155,6 @@ class DatabaseOperations(BaseDatabaseOperations):
 
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = "%s"
-
-        if lookup_type == "isnull" and internal_type in (
-            "CharField",
-            "EmailField",
-            "TextField",
-            "CICharField",
-            "CIEmailField",
-            "CITextField",
-        ):
-            return "%s::text"
-
         # Cast text lookups to text to allow things like filter(x__contains=4)
         if lookup_type in (
             "iexact",
@@ -179,9 +169,6 @@ class DatabaseOperations(BaseDatabaseOperations):
         ):
             if internal_type in ("IPAddressField", "GenericIPAddressField"):
                 lookup = "HOST(%s)"
-            # RemovedInDjango51Warning.
-            elif internal_type in ("CICharField", "CIEmailField", "CITextField"):
-                lookup = "%s::citext"
             else:
                 lookup = "%s::text"
 

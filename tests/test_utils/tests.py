@@ -26,6 +26,7 @@ from django.forms import (
     formset_factory,
 )
 from django.http import HttpResponse
+from django.template import Context, Template
 from django.template.loader import render_to_string
 from django.test import (
     SimpleTestCase,
@@ -39,13 +40,11 @@ from django.test.testcases import DatabaseOperationForbidden
 from django.test.utils import (
     CaptureQueriesContext,
     TestContextDecorator,
-    ignore_warnings,
     isolate_apps,
     override_settings,
     setup_test_environment,
 )
 from django.urls import NoReverseMatch, path, reverse, reverse_lazy
-from django.utils.deprecation import RemovedInDjango51Warning
 from django.utils.html import VOID_ELEMENTS
 from django.utils.version import PY311
 
@@ -265,15 +264,6 @@ class AssertQuerySetEqualTests(TestCase):
     def setUpTestData(cls):
         cls.p1 = Person.objects.create(name="p1")
         cls.p2 = Person.objects.create(name="p2")
-
-    def test_rename_assertquerysetequal_deprecation_warning(self):
-        msg = "assertQuerysetEqual() is deprecated in favor of assertQuerySetEqual()."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            self.assertQuerysetEqual()
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_deprecated_assertquerysetequal(self):
-        self.assertQuerysetEqual(Person.objects.filter(name="p3"), [])
 
     def test_empty(self):
         self.assertQuerySetEqual(Person.objects.filter(name="p3"), [])
@@ -541,11 +531,19 @@ class AssertTemplateUsedContextManagerTests(SimpleTestCase):
             with self.assertTemplateUsed("template_used/base.html"):
                 render_to_string("template_used/alternative.html")
 
-        with self.assertRaisesMessage(
-            AssertionError, "No templates used to render the response"
-        ):
+        msg = "No templates used to render the response"
+        with self.assertRaisesMessage(AssertionError, msg):
             response = self.client.get("/test_utils/no_template_used/")
             self.assertTemplateUsed(response, "template_used/base.html")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                self.client.get("/test_utils/no_template_used/")
+
+        with self.assertRaisesMessage(AssertionError, msg):
+            with self.assertTemplateUsed("template_used/base.html"):
+                template = Template("template_used/alternative.html", name=None)
+                template.render(Context())
 
     def test_msg_prefix(self):
         msg_prefix = "Prefix"
@@ -985,6 +983,74 @@ class HTMLEqualTests(SimpleTestCase):
         )
 
 
+class InHTMLTests(SimpleTestCase):
+    def test_needle_msg(self):
+        msg = (
+            "False is not true : Couldn't find '<b>Hello</b>' in the following "
+            "response\n'<p>Test</p>'"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", "<p>Test</p>")
+
+    def test_msg_prefix(self):
+        msg = (
+            "False is not true : Prefix: Couldn't find '<b>Hello</b>' in the following "
+            'response\n\'<input type="text" name="Hello" />\''
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                '<input type="text" name="Hello" />',
+                msg_prefix="Prefix",
+            )
+
+    def test_count_msg_prefix(self):
+        msg = (
+            "2 != 1 : Prefix: Found 2 instances of '<b>Hello</b>' (expected 1) in the "
+            "following response\n'<b>Hello</b><b>Hello</b>'"
+            ""
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML(
+                "<b>Hello</b>",
+                "<b>Hello</b><b>Hello</b>",
+                count=1,
+                msg_prefix="Prefix",
+            )
+
+    def test_base(self):
+        haystack = "<p><b>Hello</b> <span>there</span>! Hi <span>there</span>!</p>"
+
+        self.assertInHTML("<b>Hello</b>", haystack=haystack)
+        msg = f"Couldn't find '<p>Howdy</p>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<p>Howdy</p>", haystack)
+
+        self.assertInHTML("<span>there</span>", haystack=haystack, count=2)
+        msg = (
+            "Found 1 instances of '<b>Hello</b>' (expected 2) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack=haystack, count=2)
+
+    def test_long_haystack(self):
+        haystack = (
+            "<p>This is a very very very very very very very very long message which "
+            "exceedes the max limit of truncation.</p>"
+        )
+        msg = f"Couldn't find '<b>Hello</b>' in the following response\n{haystack!r}"
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>Hello</b>", haystack)
+
+        msg = (
+            "Found 0 instances of '<b>This</b>' (expected 3) in the following response"
+            f"\n{haystack!r}"
+        )
+        with self.assertRaisesMessage(AssertionError, msg):
+            self.assertInHTML("<b>This</b>", haystack, 3)
+
+
 class JSONEqualTests(SimpleTestCase):
     def test_simple_equal(self):
         json1 = '{"attr1": "foo", "attr2":"baz"}'
@@ -1263,7 +1329,7 @@ class AssertURLEqualTests(SimpleTestCase):
             self.assertURLEqual(
                 "http://example.com/?x=1&x=2",
                 "https://example.com/?x=2&x=1",
-                msg_prefix="Prefix: ",
+                msg_prefix="Prefix",
             )
 
 
@@ -1425,15 +1491,6 @@ class AssertFormErrorTests(SimpleTestCase):
 
 
 class AssertFormSetErrorTests(SimpleTestCase):
-    def test_rename_assertformseterror_deprecation_warning(self):
-        msg = "assertFormsetError() is deprecated in favor of assertFormSetError()."
-        with self.assertRaisesMessage(RemovedInDjango51Warning, msg):
-            self.assertFormsetError()
-
-    @ignore_warnings(category=RemovedInDjango51Warning)
-    def test_deprecated_assertformseterror(self):
-        self.assertFormsetError(TestFormset.invalid(), 0, "field", "invalid value")
-
     def test_single_error(self):
         self.assertFormSetError(TestFormset.invalid(), 0, "field", "invalid value")
 

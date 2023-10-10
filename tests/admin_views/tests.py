@@ -486,6 +486,14 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "Results of sorting on callable are out of order.",
         )
 
+    def test_change_list_boolean_display_property(self):
+        response = self.client.get(reverse("admin:admin_views_article_changelist"))
+        self.assertContains(
+            response,
+            '<td class="field-model_property_is_from_past">'
+            '<img src="/static/admin/img/icon-yes.svg" alt="True"></td>',
+        )
+
     def test_change_list_sorting_property(self):
         """
         Sort on a list_display field that is a property (column 10 is
@@ -804,7 +812,7 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:admin_views_thing_changelist"))
         self.assertContains(
             response,
-            '<div id="changelist-filter">',
+            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
             msg_prefix="Expected filter not found in changelist view",
         )
         self.assertNotContains(
@@ -857,7 +865,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
     def test_relation_spanning_filters(self):
         changelist_url = reverse("admin:admin_views_chapterxtra1_changelist")
         response = self.client.get(changelist_url)
-        self.assertContains(response, '<div id="changelist-filter">')
+        self.assertContains(
+            response,
+            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+        )
         filters = {
             "chap__id__exact": {
                 "values": [c.id for c in Chapter.objects.all()],
@@ -994,7 +1005,10 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             "Changelist filter isn't showing options contained inside a model "
             "field 'choices' option named group."
         )
-        self.assertContains(response, '<div id="changelist-filter">')
+        self.assertContains(
+            response,
+            '<nav id="changelist-filter" aria-labelledby="changelist-filter-header">',
+        )
         self.assertContains(
             response,
             '<a href="?surface__exact=x">Horizontal</a>',
@@ -1515,6 +1529,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
             response,
             '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
         )
+
+    def test_header(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(response, '<header id="header">')
+        self.client.logout()
+        response = self.client.get(reverse("admin:login"))
+        self.assertContains(response, '<header id="header">')
 
 
 @override_settings(
@@ -6853,6 +6874,11 @@ class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
         )
         field = self.get_admin_readonly_field(response, "plotdetails")
         self.assertEqual(field.contents(), "-")  # default empty value
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_readonly_unsaved_generated_field(self):
+        response = self.client.get(reverse("admin:admin_views_square_add"))
+        self.assertContains(response, '<div class="readonly">-</div>')
 
     @ignore_warnings(category=RemovedInDjango60Warning)
     def test_readonly_field_overrides(self):

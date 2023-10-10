@@ -30,7 +30,9 @@ need to :meth:`~Model.save()`.
     You may be tempted to customize the model by overriding the ``__init__``
     method. If you do so, however, take care not to change the calling
     signature as any change may prevent the model instance from being saved.
-    Rather than overriding ``__init__``, try using one of these approaches:
+    Additionally, referring to model fields within ``__init__`` may potentially
+    result in infinite recursion errors in some circumstances.  Rather than
+    overriding ``__init__``, try using one of these approaches:
 
     #. Add a classmethod on the model class::
 
@@ -199,10 +201,6 @@ all of the instance's fields when a deferred field is reloaded::
 
 A helper method that returns a set containing the attribute names of all those
 fields that are currently deferred for this model.
-
-.. versionchanged:: 4.2
-
-    ``arefresh_from_db()`` method was added.
 
 .. _validating-objects:
 
@@ -425,10 +423,6 @@ If you want customized saving behavior, you can override this ``save()``
 method. See :ref:`overriding-model-methods` for more details.
 
 The model save process also has some subtleties; see the sections below.
-
-.. versionchanged:: 4.2
-
-    ``asave()`` method was added.
 
 Auto-incrementing primary keys
 ------------------------------
@@ -708,10 +702,6 @@ method. See :ref:`overriding-model-methods` for more details.
 Sometimes with :ref:`multi-table inheritance <multi-table-inheritance>` you may
 want to delete only a child model's data. Specifying ``keep_parents=True`` will
 keep the parent model's data.
-
-.. versionchanged:: 4.2
-
-    ``adelete()`` method was added.
 
 Pickling objects
 ================
