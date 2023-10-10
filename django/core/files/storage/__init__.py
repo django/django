@@ -29,7 +29,11 @@ GET_STORAGE_CLASS_DEPRECATED_MSG = (
 
 
 def get_storage_class(import_path=None):
-    warnings.warn(GET_STORAGE_CLASS_DEPRECATED_MSG, RemovedInDjango51Warning)
+    warnings.warn(
+        GET_STORAGE_CLASS_DEPRECATED_MSG,
+        RemovedInDjango51Warning,
+        stacklevel=2,
+    )
     return import_string(import_path or settings.DEFAULT_FILE_STORAGE)
 
 
