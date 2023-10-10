@@ -37,5 +37,5 @@ place: read this material to quickly get up and running.
 
     .. _python: https://www.python.org/
     .. _list of Python resources for non-programmers: https://wiki.python.org/moin/BeginnersGuide/NonProgrammers
-    .. _Python documentation: https://docs.python.org/3/
+    .. _Python documentation: https://docs.python.org/
     .. _books about Python: https://wiki.python.org/moin/PythonBooks
