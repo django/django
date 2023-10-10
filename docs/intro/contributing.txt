@@ -26,9 +26,7 @@ Who's this tutorial for?
 For this tutorial, we expect that you have at least a basic understanding of
 how Django works. This means you should be comfortable going through the
 existing tutorials on :doc:`writing your first Django app</intro/tutorial01>`.
-In addition, you should have a good understanding of Python itself. But if you
-don't, `Dive Into Python`__ is a fantastic (and free) online book for
-beginning Python programmers.
+In addition, you should have a good understanding of Python itself.
 
 Those of you who are unfamiliar with version control systems and Trac will find
 that this tutorial and its links include just enough information to get started.
