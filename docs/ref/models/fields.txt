@@ -1720,11 +1720,11 @@ relation works.
 
 .. attribute:: ForeignKey.on_delete
 
-    When an object referenced by a :class:`ForeignKey` is deleted, Django will
-    emulate the behavior of the SQL constraint specified by the
-    :attr:`on_delete` argument. For example, if you have a nullable
-    :class:`ForeignKey` and you want it to be set null when the referenced
-    object is deleted::
+    When an object referenced by a :class:`ForeignKey` is deleted, the
+    referring objects need updating. The :attr:`on_delete` argument specifies
+    how this is done, and whether Django or your database makes the updates. For
+    example, if you have a nullable :class:`ForeignKey` and you want Django to set
+    it to ``None`` when the referenced object is deleted::
 
         user = models.ForeignKey(
             User,
@@ -1733,11 +1733,16 @@ relation works.
             null=True,
         )
 
-    ``on_delete`` doesn't create an SQL constraint in the database. Support for
-    database-level cascade options :ticket:`may be implemented later <21961>`.
+The possible values for :attr:`~ForeignKey.on_delete` are listed below. Import
+them from :mod:`django.db.models`. The ``DB_*`` variants use the database to
+prevent deletions or update referring objects, whilst the other values make
+Django perform the relevant actions. The database variants are normally more
+efficient because they require less data to be fetched, but they don’t call
+any custom methods or send any signals.
 
-The possible values for :attr:`~ForeignKey.on_delete` are found in
-:mod:`django.db.models`:
+.. versionchanged:: 5.1
+
+    Support for ``DB_*`` variants of on_delete attribute is added
 
 * .. attribute:: CASCADE
 
@@ -1835,6 +1840,68 @@ The possible values for :attr:`~ForeignKey.on_delete` are found in
     Take no action. If your database backend enforces referential
     integrity, this will cause an :exc:`~django.db.IntegrityError` unless
     you manually add an SQL ``ON DELETE`` constraint to the database field.
+
+* .. attribute:: DB_CASCADE
+
+    .. versionadded:: 5.1
+
+    ``DB_CASCADE`` is a custom option introduced in Django that allows the
+    database to handle cascading deletes. This action triggers the SQL
+    constraint ``ON DELETE RESTRICT`` at the database level during the creation
+    or modification of the ``ForeignKey``. With ``DB_CASCADE``, the database
+    itself takes care of deleting related objects when a referenced object 
+    is deleted.
+
+    :meth:`.Model.delete` isn't called on related models, and the
+    :data:`~django.db.models.signals.pre_delete` and
+    :data:`~django.db.models.signals.post_delete` signals are also not sent for
+    any deleted objects.
+
+* .. attribute:: DB_RESTRICT
+
+    .. versionadded:: 5.1
+
+    It prevents the deletion of the referenced object by raising the
+    :class:`~django.db.IntegrityError` exception. This action triggers the SQL
+    constraint ``ON DELETE RESTRICT`` at the database level during the creation
+    or modification of the ``ForeignKey``. It enforces restrictions on deleting
+    objects that have referenced relationships.
+
+* .. attribute:: DB_SET_NULL
+
+    .. versionadded:: 5.1
+
+    Set the :class:`ForeignKey` value to ``null``; this is only possible if
+    :attr:`~Field.null` is ``True``. This works on a database level instead of
+    using in-django options. This triggers SQL constraint 
+    ``ON DELETE SET NULL`` on a database level while creating or altering the
+    ``ForeignKey``.
+
+* .. attribute:: DB_SET_DEFAULT
+
+    .. versionadded:: 5.1
+
+    Set the :class:`ForeignKey` value to its :attr:`Field.db_default` value.
+    the respective field must have a :attr:`Field.db_default` value present.
+    This triggers SQL constraint ``ON DELETE SET DEFAULT`` on a database level
+    while creating or altering the ``ForeignKey``.if a row in the referenced
+    table is deleted, the foreign key values in the referencing table will be 
+    updated to their :attr:`Field.db_default` values.
+
+.. admonition:: Support for DB_SET_DEFAULT in MySQL
+
+    The ``on_delete=DB_SET_DEFAULT`` attribute is not supported in mysql
+    database because Both ``InnoDB`` and ``NDB`` mysql engines reject
+    table definitions containing ``ON DELETE SET DEFAULT`` clauses and for
+    storage engines that support foreign keys, MySQL rejects any ``INSERT``
+    or ``UPDATE`` operation that attempts to create a foreign key value in
+    a child table if there is no matching candidate key value in the 
+    parent table.
+
+    For more details, visit `MySQL foreignkey documentation`_.
+
+.. _MySQL foreignkey documentation: https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html
+
 
 .. attribute:: ForeignKey.limit_choices_to
 

@@ -1,6 +1,6 @@
 from math import ceil
 
-from django.db import connection, models
+from django.db import IntegrityError, connection, models, transaction
 from django.db.models import ProtectedError, Q, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
@@ -12,12 +12,20 @@ from .models import (
     B3,
     MR,
     A,
+    AnotherSetNullBaz,
     Avatar,
     B,
+    Bar,
     Base,
+    Baz,
     Child,
+    DBDefaultsFK,
+    DBLevelChild,
     DeleteBottom,
     DeleteTop,
+    DiamondChild,
+    DiamondParent,
+    Foo,
     GenericB1,
     GenericB2,
     GenericDeleteBottom,
@@ -27,6 +35,7 @@ from .models import (
     M2MFrom,
     M2MTo,
     MRNull,
+    NormalParent,
     Origin,
     P,
     Parent,
@@ -34,7 +43,11 @@ from .models import (
     RChild,
     RChildChild,
     Referrer,
+    RestrictBar,
+    RestrictBaz,
     S,
+    SetNullBar,
+    SetNullBaz,
     T,
     User,
     create_a,
@@ -800,3 +813,156 @@ class FastDeleteTests(TestCase):
         with self.assertNumQueries(1):
             User.objects.filter(~Q(pk__in=[]) | Q(avatar__desc="foo")).delete()
         self.assertFalse(User.objects.exists())
+
+
+class DatabaseLevelOnDeleteTests(TestCase):
+    def test_deletion_on_nested_cascades(self):
+        foo = Foo.objects.create()
+        bar = Bar.objects.create(foo=foo)
+        baz = Baz.objects.create(bar=bar)
+
+        foo.delete()
+
+        with self.assertRaises(Bar.DoesNotExist):
+            bar.refresh_from_db()
+
+        with self.assertRaises(Baz.DoesNotExist):
+            baz.refresh_from_db()
+
+    def test_restricted_deletion(self):
+        foo = Foo.objects.create()
+        RestrictBar.objects.create(foo=foo)
+
+        with self.assertRaises(IntegrityError):
+            foo.delete()
+
+    def test_restricted_deletion_by_cascade(self):
+        foo = Foo.objects.create()
+        bar = Bar.objects.create(foo=foo)
+        RestrictBaz.objects.create(bar=bar)
+        with self.assertRaises(IntegrityError):
+            foo.delete()
+
+    def test_deletion_on_set_null(self):
+        foo = Foo.objects.create()
+        bar = SetNullBar.objects.create(foo=foo, another_field="Some Value")
+        foo.delete()
+        orphan_bar = SetNullBar.objects.get(pk=bar.pk)
+        self.assertEqual(bar.pk, orphan_bar.pk)
+        self.assertEqual(bar.another_field, orphan_bar.another_field)
+        self.assertNotEqual(bar.foo, orphan_bar.foo)
+        self.assertIsNone(orphan_bar.foo)
+
+    def test_set_null_on_cascade_deletion(self):
+        foo = Foo.objects.create()
+        bar = Bar.objects.create(foo=foo)
+        baz = SetNullBaz.objects.create(bar=bar, another_field="Some Value")
+        foo.delete()
+        orphan_baz = SetNullBaz.objects.get(pk=baz.pk)
+        self.assertEqual(baz.pk, orphan_baz.pk)
+        self.assertEqual(baz.another_field, orphan_baz.another_field)
+        self.assertNotEqual(baz.bar, orphan_baz.bar)
+        self.assertIsNone(orphan_baz.bar)
+
+    def test_nested_set_null_on_deletion(self):
+        foo = Foo.objects.create()
+        bar = SetNullBar.objects.create(foo=foo)
+        baz = AnotherSetNullBaz.objects.create(setnullbar=bar)
+        foo.delete()
+
+        orphan_bar = SetNullBar.objects.get(pk=bar.pk)
+        self.assertEqual(bar.pk, orphan_bar.pk)
+        self.assertEqual(bar.another_field, orphan_bar.another_field)
+        self.assertNotEqual(bar.foo, orphan_bar.foo)
+        self.assertIsNone(orphan_bar.foo)
+
+        orphan_baz = AnotherSetNullBaz.objects.get(pk=baz.pk)
+        self.assertEqual(baz.pk, orphan_baz.pk)
+        self.assertEqual(baz.another_field, orphan_baz.another_field)
+        self.assertEqual(baz.setnullbar, orphan_baz.setnullbar)
+        self.assertIsNotNone(orphan_baz.setnullbar)
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_db_default(self):
+        default_parent = Foo.objects.create(pk=1)
+        parent = Foo.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        with self.assertNumQueries(1):
+            parent.delete()
+        child1.refresh_from_db()
+        self.assertEqual(child1.language_code, default_parent)
+
+
+class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
+    def test_queries_on_nested_cascade(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            Bar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                Baz.objects.create(bar=bar)
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            foo.delete()
+
+    def test_queries_on_nested_set_null(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            SetNullBar.objects.create(foo=foo)
+
+        for setnullbar in SetNullBar.objects.all():
+            for i in range(3):
+                AnotherSetNullBaz.objects.create(setnullbar=setnullbar)
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            foo.delete()
+
+    def test_queries_on_nested_set_null_cascade(self):
+        foo = Foo.objects.create()
+
+        for i in range(3):
+            Bar.objects.create(foo=foo)
+
+        for bar in Bar.objects.all():
+            for i in range(3):
+                SetNullBaz.objects.create(bar=bar)
+
+        # one is the deletion
+        with self.assertNumQueries(1):
+            foo.delete()
+
+    def test_queries_on_inherited_model(self):
+        gp = Foo.objects.create()
+        parent = NormalParent.objects.create(grandparent_ptr=gp)
+        diamond_parent = DiamondParent.objects.create(gp_ptr=gp)
+
+        dc = DiamondChild.objects.create(
+            parent_ptr=parent, diamondparent_ptr=diamond_parent
+        )
+
+        with self.assertNumQueries(1):
+            gp.delete()
+
+        with self.assertRaises(NormalParent.DoesNotExist):
+            parent.refresh_from_db()
+
+        with self.assertRaises(DiamondParent.DoesNotExist):
+            diamond_parent.refresh_from_db()
+
+        with self.assertRaises(DiamondChild.DoesNotExist):
+            dc.refresh_from_db()
+
+    def test_restrict_on_inherited_model(self):
+        gp = Foo.objects.create()
+        child = DBLevelChild.objects.create(grandparent_ptr=gp)
+
+        with transaction.atomic():
+            with self.assertRaises(IntegrityError):
+                gp.delete()
+
+        child.refresh_from_db()
