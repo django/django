@@ -147,7 +147,10 @@ class TemplateCommand(BaseCommand):
         camel_case_name = "camel_case_%s_name" % app_or_project
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
-        additional_context = {key: value for key, value in [var.split('=') for var in options['additional_context']]}
+        additional_context = {}
+        for context_option in options['additional_context']:
+            key, value = context_option.split('=')
+            additional_context[key] = value
 
         context = Context(
             {
