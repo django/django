@@ -62,6 +62,16 @@ class TemplateCommand(BaseCommand):
             "-e multiple times.",
         )
         parser.add_argument(
+            "--context",
+            "-c",
+            dest="additional_context",
+            action="append",
+            default=[],
+            help='Additional context for templates'
+            "Use -c multiple times. Specify key and value "
+            "using '='. Example: '-c key=value'",
+        )
+        parser.add_argument(
             "--name",
             "-n",
             dest="files",
@@ -137,9 +147,12 @@ class TemplateCommand(BaseCommand):
         camel_case_name = "camel_case_%s_name" % app_or_project
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
+        additional_context = {key: value for key, value in [var.split('=') for var in options['additional_context']]}
+        
         context = Context(
             {
                 **options,
+                **additional_context,
                 base_name: name,
                 base_directory: top_dir,
                 camel_case_name: camel_case_value,
