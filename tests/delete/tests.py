@@ -4,7 +4,12 @@ from django.db import IntegrityError, connection, models, transaction
 from django.db.models import ProtectedError, Q, RestrictedError
 from django.db.models.deletion import Collector
 from django.db.models.sql.constants import GET_ITERATOR_CHUNK_SIZE
-from django.test import TestCase, skipIfDBFeature, skipUnlessDBFeature
+from django.test import (
+    TestCase,
+    TransactionTestCase,
+    skipIfDBFeature,
+    skipUnlessDBFeature,
+)
 
 from .models import (
     B1,
@@ -883,7 +888,8 @@ class DatabaseLevelOnDeleteTests(TestCase):
         self.assertIsNotNone(orphan_baz.setnullbar)
 
     @skipUnlessDBFeature("has_on_delete_db_default")
-    def test_foreign_key_db_default(self):
+    def test_foreign_key_db_default_exists(self):
+        # Default parent exists
         default_parent = Foo.objects.create(pk=1)
         parent = Foo.objects.create(pk=2)
         child1 = DBDefaultsFK.objects.create(language_code=parent)
@@ -891,6 +897,36 @@ class DatabaseLevelOnDeleteTests(TestCase):
             parent.delete()
         child1.refresh_from_db()
         self.assertEqual(child1.language_code, default_parent)
+        child1.delete()
+        default_parent.delete()
+
+
+class DatabaseLevelOnDeleteTransactionTests(TransactionTestCase):
+    available_apps = ["delete"]
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_default_parent_deleted_before_parent(self):
+        # Default parent does not exists
+        # Default parent deleted before parent
+        default_parent = Foo.objects.create(pk=1)
+        parent = Foo.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        default_parent.delete()
+        with self.assertRaises(IntegrityError):
+            parent.delete()
+            child1.refresh_from_db()
+
+    @skipUnlessDBFeature("has_on_delete_db_default")
+    def test_foreign_key_default_parent_deleted_after_parent(self):
+        # Default parent does not exists
+        # Default parent deleted after parent
+        default_parent = Foo.objects.create(pk=1)
+        parent = Foo.objects.create(pk=2)
+        child1 = DBDefaultsFK.objects.create(language_code=parent)
+        parent.delete()
+        with self.assertRaises(IntegrityError):
+            default_parent.delete()
+            child1.refresh_from_db()
 
 
 class DatabaseLevelOnDeleteQueryAssertionTests(TestCase):
