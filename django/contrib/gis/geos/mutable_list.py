@@ -272,7 +272,7 @@ class ListMixin:
 
         # we're not changing the length of the sequence
         newLen = len(self)
-        newVals = dict(zip(indexList, valueList, strict=True))
+        newVals = dict(zip(indexList, valueList))
 
         def newItems():
             for i in range(newLen):
@@ -293,7 +293,7 @@ class ListMixin:
                 "to extended slice of size %d" % (len(valueList), len(indexList))
             )
 
-        for i, val in zip(indexList, valueList, strict=True):
+        for i, val in zip(indexList, valueList):
             self._set_single(i, val)
 
     def _assign_simple_slice(self, start, stop, valueList):
