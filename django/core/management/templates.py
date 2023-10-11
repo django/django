@@ -58,8 +58,8 @@ class TemplateCommand(BaseCommand):
             action="append",
             default=["py"],
             help='The file extension(s) to render (default: "py"). '
-            "Separate multiple extensions with commas, or use "
-            "-e multiple times.",
+                 "Separate multiple extensions with commas, or use "
+                 "-e multiple times.",
         )
         parser.add_argument(
             "--context",
@@ -68,8 +68,8 @@ class TemplateCommand(BaseCommand):
             action="append",
             default=[],
             help='Additional context for templates'
-            "Use -c multiple times. Specify key and value "
-            "using '='. Example: '-c key=value'",
+                 "Use -c multiple times. Specify key and value "
+                 "using '='. Example: '-c key=value'",
         )
         parser.add_argument(
             "--name",
@@ -78,7 +78,7 @@ class TemplateCommand(BaseCommand):
             action="append",
             default=[],
             help="The file name(s) to render. Separate multiple file names "
-            "with commas, or use -n multiple times.",
+                 "with commas, or use -n multiple times.",
         )
         parser.add_argument(
             "--exclude",
@@ -148,7 +148,7 @@ class TemplateCommand(BaseCommand):
         camel_case_value = "".join(x for x in name.title() if x != "_")
 
         additional_context = {key: value for key, value in [var.split('=') for var in options['additional_context']]}
-        
+
         context = Context(
             {
                 **options,
