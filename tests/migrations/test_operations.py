@@ -239,6 +239,137 @@ class OperationTests(OperationTestBase):
         if connection.features.has_on_delete_db_default:
             self.assertColumnExists(f"{app_label}_rider", "pony_default_id")
 
+    def cascade_assertion(
+        self, fk_parent_model, fk_child_model, fk_fieldname, num_of_queries
+    ):
+        fk_parent = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent}
+        fk_child1 = fk_child_model.objects.create(**kwargs)
+        fk_child2 = fk_child_model.objects.create(**kwargs)
+
+        # 4 for non db, 1 for db
+        with self.assertNumQueries(num_of_queries):
+            fk_parent.delete()
+
+        with self.assertRaises(fk_child1.DoesNotExist):
+            fk_child1.refresh_from_db()
+
+        with self.assertRaises(fk_child2.DoesNotExist):
+            fk_child2.refresh_from_db()
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+    def restrict_assertion(self, fk_parent_model, fk_child_model, fk_fieldname):
+        fk_parent = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent}
+        fk_child = fk_child_model.objects.create(**kwargs)
+
+        with self.assertRaises(IntegrityError):
+            fk_parent.delete()
+
+        fk_child.delete()
+        fk_parent.refresh_from_db()
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+    def set_null_assertion(
+        self, fk_parent_model, fk_child_model, fk_fieldname, num_of_queries
+    ):
+        fk_parent = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent}
+        fk_child1 = fk_child_model.objects.create(**kwargs)
+
+        # 4 for non db, 1 for db
+        with self.assertNumQueries(num_of_queries):
+            fk_parent.delete()
+
+        fk_child1.refresh_from_db()
+        self.assertIsNone(getattr(fk_child1, fk_fieldname))
+
+        fk_parent_model.objects.all().delete()
+        fk_child_model.objects.all().delete()
+
+    def set_default_assertion(
+        self, fk_parent_model, fk_child_model, fk_fieldname, num_of_queries
+    ):
+        fk_parent_default = fk_parent_model.objects.create(id=1)
+        fk_parent = fk_parent_model.objects.create()
+        kwargs = {fk_fieldname: fk_parent}
+        fk_child = fk_child_model.objects.create(**kwargs)
+
+        # Extra begin and commit queries
+        # 4 for non db, 3 for db
+        with self.assertNumQueries(num_of_queries):
+            fk_parent.delete()
+
+        fk_child.refresh_from_db()
+        fk_parent_default.refresh_from_db()
+        self.assertEqual(getattr(fk_child, fk_fieldname), fk_parent_default)
+
+        fk_child_model.objects.all().delete()
+        fk_parent_model.objects.all().delete()
+
+    def database_backward_assertion(
+        self,
+        app_label,
+        project_state,
+        on_delete_type,
+        fk_parent_model,
+        fk_child_model,
+        fk_fieldname,
+    ):
+        Rider = project_state.apps.get_model(app_label, fk_child_model)
+        Pony = project_state.apps.get_model(app_label, fk_parent_model)
+
+        if on_delete_type == "cascade":
+            self.cascade_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=4,
+            )
+        if on_delete_type == "db_cascade":
+            self.cascade_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=1,
+            )
+        if on_delete_type == "set_null":
+            self.set_null_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=4,
+            )
+        if on_delete_type == "db_set_null":
+            self.set_null_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=1,
+            )
+        if on_delete_type in ["restrict", "db_restrict"]:
+            self.restrict_assertion(
+                fk_parent_model=Pony, fk_child_model=Rider, fk_fieldname=fk_fieldname
+            )
+        if on_delete_type == "set_default":
+            self.set_default_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=4,
+            )
+        if on_delete_type == "db_set_default":
+            self.set_default_assertion(
+                fk_parent_model=Pony,
+                fk_child_model=Rider,
+                fk_fieldname=fk_fieldname,
+                num_of_queries=3,
+            )
+
     def change_to_db_cascade_test(
         self, app_label, fk_parent_model, fk_child_model, fk_fieldname, project_state
     ):
@@ -258,15 +389,13 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        Rider.objects.create(**kwargs)
+        self.cascade_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=1,
+        )
 
-        with self.assertNumQueries(1):
-            pony.delete()
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -289,15 +418,10 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        Rider.objects.create(**kwargs)
+        self.restrict_assertion(
+            fk_parent_model=Pony, fk_child_model=Rider, fk_fieldname=fk_fieldname
+        )
 
-        with self.assertRaises(IntegrityError):
-            pony.delete()
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -322,18 +446,13 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        rider = Rider.objects.create(**kwargs)
+        self.set_null_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=1,
+        )
 
-        with self.assertNumQueries(1):
-            pony.delete()
-
-        rider.refresh_from_db()
-        self.assertIsNone(getattr(rider, fk_fieldname))
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -358,21 +477,13 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony1 = Pony.objects.create(id=1)
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        rider = Rider.objects.create(**kwargs)
+        self.set_default_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=3,
+        )
 
-        # Extra begin and commit queries
-        with self.assertNumQueries(3):
-            pony.delete()
-
-        rider.refresh_from_db()
-        pony1.refresh_from_db()
-        self.assertEqual(getattr(rider, fk_fieldname), pony1)
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -395,15 +506,12 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        Rider.objects.create(**kwargs)
-
-        with self.assertNumQueries(4):
-            pony.delete()
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
+        self.cascade_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=4,
+        )
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -425,16 +533,10 @@ class OperationTests(OperationTestBase):
 
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
-
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        Rider.objects.create(**kwargs)
-
-        with self.assertRaises(IntegrityError):
-            pony.delete()
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
+        # Assertion part is same in both db and non db restrict
+        self.restrict_assertion(
+            fk_parent_model=Pony, fk_child_model=Rider, fk_fieldname=fk_fieldname
+        )
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -457,18 +559,13 @@ class OperationTests(OperationTestBase):
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
 
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        rider = Rider.objects.create(**kwargs)
+        self.set_null_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=4,
+        )
 
-        with self.assertNumQueries(4):
-            pony.delete()
-
-        rider.refresh_from_db()
-        self.assertIsNone(getattr(rider, fk_fieldname))
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -492,18 +589,12 @@ class OperationTests(OperationTestBase):
 
         Rider = new_state.apps.get_model(app_label, fk_child_model)
         Pony = new_state.apps.get_model(app_label, fk_parent_model)
-
-        pony1 = Pony.objects.create(id=1)
-        pony = Pony.objects.create()
-        kwargs = {fk_fieldname: pony}
-        rider = Rider.objects.create(**kwargs)
-        pony.delete()
-        rider.refresh_from_db()
-        pony1.refresh_from_db()
-        self.assertEqual(getattr(rider, fk_fieldname), pony1)
-
-        Rider.objects.all().delete()
-        Pony.objects.all().delete()
+        self.set_default_assertion(
+            fk_parent_model=Pony,
+            fk_child_model=Rider,
+            fk_fieldname=fk_fieldname,
+            num_of_queries=4,
+        )
         with connection.schema_editor() as editor:
             operation.database_backwards(app_label, editor, new_state, project_state)
 
@@ -579,6 +670,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with db restrict
                 self.change_to_db_restrict_test(
                     app_label,
@@ -587,6 +686,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with db cascade
                 self.change_to_db_cascade_test(
                     app_label,
@@ -594,6 +701,14 @@ class OperationTests(OperationTestBase):
                     fk_child_model,
                     fk_fieldname,
                     project_state,
+                )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
                 )
                 # Test with db_set default
                 if connection.features.has_on_delete_db_default:
@@ -604,63 +719,65 @@ class OperationTests(OperationTestBase):
                         fk_fieldname,
                         project_state,
                     )
+                    self.database_backward_assertion(
+                        app_label,
+                        project_state,
+                        on_delete_type,
+                        fk_parent_model,
+                        fk_child_model,
+                        fk_fieldname,
+                    )
 
     def test_alter_field_among_db_level_fk(self):
         app_label = "test_alterfadblfk"
         db_cascade_options_primary = {
-            "cascade": [
+            "db_cascade": [
                 models.DB_CASCADE,
                 models.ForeignKey(
-                    f"{app_label}.Pony_cascade", on_delete=models.DB_CASCADE
+                    f"{app_label}.Pony_db_cascade", on_delete=models.DB_CASCADE
                 ),
             ],
-            "set_null": [
+            "db_set_null": [
                 models.DB_SET_NULL,
                 models.ForeignKey(
-                    f"{app_label}.Pony_set_null",
+                    f"{app_label}.Pony_db_set_null",
                     null=True,
                     on_delete=models.DB_SET_NULL,
                 ),
             ],
-            "restrict": [
+            "db_restrict": [
                 models.DB_RESTRICT,
                 models.ForeignKey(
-                    f"{app_label}.Pony_restrict", on_delete=models.DB_RESTRICT
+                    f"{app_label}.Pony_db_restrict", on_delete=models.DB_RESTRICT
                 ),
             ],
         }
         if connection.features.has_on_delete_db_default:
-            db_cascade_options_primary["set_default"] = [
+            db_cascade_options_primary["db_set_default"] = [
                 models.DB_SET_DEFAULT,
                 models.ForeignKey(
-                    f"{app_label}.Pony_set_default",
-                    default="bn",
+                    f"{app_label}.Pony_db_set_default",
+                    db_default=1,
                     on_delete=models.DB_SET_DEFAULT,
                 ),
             ]
-        for primary_on_delete_type in db_cascade_options_primary.keys():
-            with self.subTest(primary_db_cascade_option=primary_on_delete_type):
+        for on_delete_type in db_cascade_options_primary.keys():
+            with self.subTest(primary_db_cascade_option=on_delete_type):
                 operations = [
                     migrations.CreateModel(
-                        f"Pony_{primary_on_delete_type}",
+                        f"Pony_{on_delete_type}",
                         [
-                            (
-                                "id",
-                                models.CharField(
-                                    primary_key=True,
-                                    max_length=10,
-                                ),
-                            ),
+                            ("id", models.AutoField(primary_key=True)),
                         ],
                     ),
                     migrations.CreateModel(
-                        f"Rider_{primary_on_delete_type}",
+                        f"Rider_{on_delete_type}",
                         [
                             ("id", models.AutoField(primary_key=True)),
                             ("number", models.IntegerField(default=1)),
                             (
-                                f"pony_{primary_on_delete_type}",
-                                db_cascade_options_primary[primary_on_delete_type][1],
+                                f"pony_{on_delete_type}",
+                                db_cascade_options_primary[on_delete_type][1],
                             ),
                         ],
                     ),
@@ -668,13 +785,13 @@ class OperationTests(OperationTestBase):
                 project_state = self.apply_operations(
                     app_label, ProjectState(), operations
                 )
-                fk_fieldname = f"pony_{primary_on_delete_type}"
-                fk_parent_model = f"Pony_{primary_on_delete_type}"
-                fk_child_model = f"Rider_{primary_on_delete_type}"
+                fk_fieldname = f"pony_{on_delete_type}"
+                fk_parent_model = f"Pony_{on_delete_type}"
+                fk_child_model = f"Rider_{on_delete_type}"
                 Rider = project_state.apps.get_model(app_label, fk_child_model)
                 self.assertEqual(
                     Rider._meta.get_field(fk_fieldname).remote_field.on_delete,
-                    db_cascade_options_primary[primary_on_delete_type][0],
+                    db_cascade_options_primary[on_delete_type][0],
                 )
 
                 # Test Migrations for non db to non db changes
@@ -686,6 +803,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with db restrict
                 self.change_to_db_restrict_test(
                     app_label,
@@ -693,6 +818,14 @@ class OperationTests(OperationTestBase):
                     fk_child_model,
                     fk_fieldname,
                     project_state,
+                )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
                 )
                 # Test with db cascade
                 self.change_to_db_cascade_test(
@@ -702,6 +835,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with db_set default
                 if connection.features.has_on_delete_db_default:
                     self.change_to_db_set_default_test(
@@ -710,6 +851,14 @@ class OperationTests(OperationTestBase):
                         fk_child_model,
                         fk_fieldname,
                         project_state,
+                    )
+                    self.database_backward_assertion(
+                        app_label,
+                        project_state,
+                        on_delete_type,
+                        fk_parent_model,
+                        fk_child_model,
+                        fk_fieldname,
                     )
 
                 # Test Migrations for db to non db changes
@@ -721,6 +870,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with non db restrict
                 self.change_to_non_db_restrict_test(
                     app_label,
@@ -728,6 +885,14 @@ class OperationTests(OperationTestBase):
                     fk_child_model,
                     fk_fieldname,
                     project_state,
+                )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
                 )
                 # Test with non db cascade
                 self.change_to_non_db_cascade_test(
@@ -737,6 +902,14 @@ class OperationTests(OperationTestBase):
                     fk_fieldname,
                     project_state,
                 )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
+                )
                 # Test with non db_set default
                 self.change_to_non_db_set_default_test(
                     app_label,
@@ -744,6 +917,14 @@ class OperationTests(OperationTestBase):
                     fk_child_model,
                     fk_fieldname,
                     project_state,
+                )
+                self.database_backward_assertion(
+                    app_label,
+                    project_state,
+                    on_delete_type,
+                    fk_parent_model,
+                    fk_child_model,
+                    fk_fieldname,
                 )
 
     def test_add_field_db_level_fk(self):
