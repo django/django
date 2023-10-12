@@ -1810,7 +1810,7 @@ Example usage:
 
     django-admin migrate --pythonpath='/home/djangoprojects/myproject'
 
-.. _import search path: https://diveinto.org/python3/your-first-python-program.html#importsearchpath
+.. _import search path: https://docs.python.org/3/library/sys_path_init.html#sys-path-init
 
 .. django-admin-option:: --settings SETTINGS
 

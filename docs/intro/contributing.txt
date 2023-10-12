@@ -347,7 +347,7 @@ This test checks that the ``make_toast()`` returns ``'toast'``.
     * After reading those, if you want something a little meatier to sink
       your teeth into, there's always the Python :mod:`unittest` documentation.
 
-__ https://diveinto.org/python3/unit-testing.html
+__ https://diveintopython3.net/unit-testing.html
 
 Running your new test
 ---------------------
