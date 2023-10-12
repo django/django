@@ -995,6 +995,7 @@ class UniqueConstraintTests(TestCase):
             exclude={"name"},
         )
 
+    @skipUnlessDBFeature("supports_table_check_constraints")
     def test_validate_nullable_textfield_with_isnull_true(self):
         is_null_constraint = models.UniqueConstraint(
             "price",
