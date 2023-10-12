@@ -35,9 +35,16 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused unnecessary casting of string
   based fields (``CharField``, ``EmailField``, ``TextField``, ``CICharField``,
   ``CIEmailField``, and ``CITextField``) used with the ``__isnull`` lookup on
-  PostgreSQL. As a consequence, the pre-Django 4.2 indexes didn't match and
-  were not used by the query planner (:ticket:`34840`).
+  PostgreSQL. As a consequence, indexes using an ``__isnull`` expression or
+  condition created before Django 4.2 wouldn't be used by the query planner,
+  leading to a performance regression (:ticket:`34840`).
 
-  You may need to recreate indexes propagated to the database with Django
-  4.2 - 4.2.5 as they contain unnecessary ``::text`` casting that is avoided as
-  of this release.
+  You may need to recreate such indexes created in your database with Django
+  4.2 to 4.2.5, as they contain unnecessary ``::text`` casting. Find candidate
+  indexes with this query:
+
+  .. code-block:: sql
+
+        SELECT indexname, indexdef
+        FROM pg_indexes
+        WHERE indexdef LIKE '%::text IS %NULL';
