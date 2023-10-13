@@ -191,7 +191,7 @@ class AuthenticationForm(forms.Form):
         password = self.cleaned_data.get('password')
 
         if username is not None and password:
-            self.user_cache = authenticate(self.request, username=username, password=password)
+            self.user_cache = authenticate(self.request, **{UserModel.USERNAME_FIELD: username}, password=password)
             if self.user_cache is None:
                 raise self.get_invalid_login_error()
             else:
