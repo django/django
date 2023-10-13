@@ -6489,14 +6489,10 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         self.selenium.get(self.live_server_url + reverse("admin:admin_views_story_add"))
         field_title = self.selenium.find_element(By.CLASS_NAME, "field-title")
-        current_size = self.selenium.get_window_size()
-        try:
-            self.selenium.set_window_size(1024, 768)
+        with self.small_screen_size():
             self.assertIs(field_title.is_displayed(), False)
-            self.selenium.set_window_size(767, 575)
+        with self.mobile_size():
             self.assertIs(field_title.is_displayed(), False)
-        finally:
-            self.selenium.set_window_size(current_size["width"], current_size["height"])
 
     def test_updating_related_objects_updates_fk_selects_except_autocompletes(self):
         from selenium.webdriver.common.by import By

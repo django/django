@@ -98,6 +98,20 @@ class SeleniumTestCaseBase(type(LiveServerTestCase)):
         return self.import_webdriver(self.browser)(options=options)
 
 
+class ChangeWindowSize:
+    def __init__(self, width, height, selenium):
+        self.selenium = selenium
+        self.new_size = (width, height)
+
+    def __enter__(self):
+        self.old_size = self.selenium.get_window_size()
+        self.selenium.set_window_size(*self.new_size)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.selenium.set_window_size(self.old_size["width"], self.old_size["height"])
+
+
 @tag("selenium")
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
@@ -117,6 +131,21 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         cls.selenium.implicitly_wait(cls.implicit_wait)
         super().setUpClass()
         cls.addClassCleanup(cls._quit_selenium)
+
+    @contextmanager
+    def desktop_size(self):
+        with ChangeWindowSize(1280, 720, self.selenium):
+            yield
+
+    @contextmanager
+    def small_screen_size(self):
+        with ChangeWindowSize(1024, 768, self.selenium):
+            yield
+
+    @contextmanager
+    def mobile_size(self):
+        with ChangeWindowSize(360, 800, self.selenium):
+            yield
 
     @classmethod
     def _quit_selenium(cls):
