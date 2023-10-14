@@ -3,7 +3,7 @@ import datetime
 from django.core.exceptions import FieldDoesNotExist
 from django.db.models import F
 from django.db.models.functions import Lower
-from django.db.utils import IntegrityError
+from django.db.utils import DataError, IntegrityError
 from django.test import TestCase, override_settings, skipUnlessDBFeature
 
 from .models import (
@@ -260,6 +260,18 @@ class BulkUpdateTests(TestCase):
                 self.assertCountEqual(
                     CustomDbColumn.objects.filter(ip_address=ip), models
                 )
+
+    def test_charfield_constraint(self):
+        article1 = Article.objects.create(
+            name="a" * 20, created=datetime.datetime.today()
+        )
+        article2 = Article.objects.create(
+            name="a" * 20, created=datetime.datetime.today()
+        )
+        article1.name = "b" * 50
+        article2.name = "b" * 50
+        with self.assertRaises(DataError):
+            Article.objects.bulk_update([article1, article2], ["name"])
 
     def test_datetime_field(self):
         articles = [

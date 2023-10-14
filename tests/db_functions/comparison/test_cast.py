@@ -34,6 +34,7 @@ class CastTests(TestCase):
     # Silence "Truncated incorrect CHAR(1) value: 'Bob'".
     @ignore_warnings(module="django.db.backends.mysql.base")
     @skipUnlessDBFeature("supports_cast_with_precision")
+    @skipUnlessDBFeature("supports_cast_char_field_with_precision")
     def test_cast_to_char_field_with_max_length(self):
         names = Author.objects.annotate(
             cast_string=Cast("name", models.CharField(max_length=1))

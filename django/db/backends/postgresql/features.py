@@ -72,6 +72,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_covering_indexes = True
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = False
+    supports_cast_char_field_with_precision = False
     can_rename_index = True
     test_collations = {
         "non_default": "sv-x-icu",

@@ -43,6 +43,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         "AutoField": "integer",
         "BigAutoField": "bigint",
         "SmallAutoField": "smallint",
+        "CharField": cast_char_field_without_max_length,
     }
 
     if is_psycopg3:

@@ -267,6 +267,7 @@ class BaseDatabaseFeatures:
 
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True
+    supports_cast_char_field_with_precision = True
 
     # How many second decimals does the database return when casting a value to
     # a type with time?
