@@ -261,6 +261,7 @@ class BulkUpdateTests(TestCase):
                     CustomDbColumn.objects.filter(ip_address=ip), models
                 )
 
+    @skipUnlessDBFeature("supports_cast_with_precision")
     def test_charfield_constraint(self):
         article1 = Article.objects.create(
             name="a" * 20, created=datetime.datetime.today()
