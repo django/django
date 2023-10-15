@@ -953,6 +953,78 @@ output (as a string) inside a variable. This is useful if you want to use
     {% now "Y" as current_year %}
     {% blocktranslate %}Copyright {{ current_year }}{% endblocktranslate %}
 
+.. templatetag:: query_string
+
+``query_string``
+----------------
+
+.. versionadded:: 5.1
+
+Outputs the query string from a given :class:`~django.http.QueryDict` instance,
+if provided, or ``request.GET`` if not and the
+``django.template.context_processors.request`` context processor is enabled.
+If the ``QueryDict`` is empty, then the output will be an empty string.
+Otherwise, the query string will be returned with a leading ``"?"``.
+
+If not using the ``django.template.context_processors.request`` context
+processor, you must pass either the ``request`` into the template context or a
+``QueryDict`` instance into this tag.
+
+The following example outputs the current query string verbatim. So if the
+query string is ``?color=green&size=M``, the output would be
+``?color=green&size=M``:
+
+.. code-block:: html+django
+
+    {% query_string %}
+
+You can also pass in a custom ``QueryDict`` that will be used instead of
+``request.GET``:
+
+.. code-block:: html+django
+
+    {% query_string my_query_dict %}
+
+Each keyword argument will be added to the query string, replacing any existing
+value for that key. With the query string ``?color=blue``, the following would
+result in ``?color=red&size=S``:
+
+.. code-block:: html+django
+
+    {% query_string color="red" size="S" %}
+
+It is possible to remove parameters by passing ``None`` as a value. With the
+query string ``?color=blue&size=M``, the following would result in ``?size=M``:
+
+.. code-block:: html+django
+
+    {% query_string color=None %}
+
+If the given parameter is a list, the value will remain as a list. For example,
+if ``my_list`` is set to ``["red", "blue"]``, the following would result in
+``?color=red&color=blue``:
+
+.. code-block:: html+django
+
+    {% query_string color=my_list %}
+
+A common example of using this tag is to preserve the current query string when
+displaying a page of results, while adding a link to the next and previous
+pages of results. For example, if the paginator is currently on page 3, and
+the current query string is ``?color=blue&size=M&page=3``, the following code
+would output ``?color=blue&size=M&page=4``:
+
+.. code-block:: html+django
+
+    {% query_string page=page.next_page_number %}
+
+You can also store the value in a variable, for example, if you need multiple
+links to the same page with syntax such as:
+
+.. code-block:: html+django
+
+    {% query_string page=page.next_page_number as next_page %}
+
 .. templatetag:: regroup
 
 ``regroup``

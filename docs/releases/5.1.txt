@@ -198,6 +198,11 @@ Templates
   be made available on the ``Template`` instance. Such data may be used, for
   example, by the template loader, or other template clients.
 
+* The new :ttag:`{% query_string %} <query_string>` template tag allows
+  changing a :class:`~django.http.QueryDict` instance for use in links, for
+  example, to generate a link to the next page while keeping any filtering
+  options in place.
+
 Tests
 ~~~~~
 
