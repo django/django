@@ -12,11 +12,17 @@ class Cast(Func):
     function = "CAST"
     template = "%(function)s(%(expressions)s AS %(db_type)s)"
 
-    def __init__(self, expression, output_field):
+    def __init__(self, expression, output_field, charfield_without_max_length=False):
+        self.charfield_without_max_length = charfield_without_max_length
         super().__init__(expression, output_field=output_field)
 
     def as_sql(self, compiler, connection, **extra_context):
         extra_context["db_type"] = self.output_field.cast_db_type(connection)
+        if (
+            self.charfield_without_max_length
+            and self.output_field.get_internal_type() == "CharField"
+        ):
+            extra_context["db_type"] = connection.ops.cast_char_field_without_max_length
         return super().as_sql(compiler, connection, **extra_context)
 
     def as_sqlite(self, compiler, connection, **extra_context):
