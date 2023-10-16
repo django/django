@@ -16,6 +16,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
 from django.utils.choices import (
+    BlankChoiceIterator,
     CallableChoiceIterator,
     flatten_choices,
     normalize_choices,
@@ -1055,14 +1056,9 @@ class Field(RegisterLookupMixin):
         as <select> choices for this field.
         """
         if self.choices is not None:
-            choices = list(self.choices)
             if include_blank:
-                blank_defined = any(
-                    choice in ("", None) for choice, _ in self.flatchoices
-                )
-                if not blank_defined:
-                    choices = blank_choice + choices
-            return choices
+                return BlankChoiceIterator(self.choices, blank_choice)
+            return self.choices
         rel_model = self.remote_field.model
         limit_choices_to = limit_choices_to or self.get_limit_choices_to()
         choice_func = operator.attrgetter(
