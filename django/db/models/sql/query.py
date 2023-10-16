@@ -404,7 +404,7 @@ class Query(BaseExpression):
             # members of `aggregates` to resolve against each others.
             self.append_annotation_mask([alias])
             refs_subquery |= any(
-                getattr(self.annotations[ref], "subquery", False)
+                getattr(self.annotations[ref], "contains_subquery", False)
                 for ref in aggregate.get_refs()
             )
             refs_window |= any(
