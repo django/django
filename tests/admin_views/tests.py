@@ -35,6 +35,7 @@ from django.test import (
     override_settings,
     skipUnlessDBFeature,
 )
+from django.test.selenium import screenshot_cases
 from django.test.utils import override_script_prefix
 from django.urls import NoReverseMatch, resolve, reverse
 from django.utils import formats, translation
@@ -5732,6 +5733,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             title="A Long Title", published=True, slug="a-long-title"
         )
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
     def test_login_button_centered(self):
         from selenium.webdriver.common.by import By
 
@@ -5743,6 +5745,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         ) - (offset_left + button.get_property("offsetWidth"))
         # Use assertAlmostEqual to avoid pixel rounding errors.
         self.assertAlmostEqual(offset_left, offset_right, delta=3)
+        self.take_screenshot("login")
 
     def test_prepopulated_fields(self):
         """
@@ -6017,6 +6020,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.assertEqual(slug1, "this-is-the-main-name-the-best-2012-02-18")
         self.assertEqual(slug2, "option-two-this-is-the-main-name-the-best")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "dark"])
     def test_collapsible_fieldset(self):
         """
         The 'collapse' class in fieldsets definition allows to
@@ -6031,12 +6035,15 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.live_server_url + reverse("admin:admin_views_article_add")
         )
         self.assertFalse(self.selenium.find_element(By.ID, "id_title").is_displayed())
+        self.take_screenshot("collapsed")
         self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
         self.assertTrue(self.selenium.find_element(By.ID, "id_title").is_displayed())
         self.assertEqual(
             self.selenium.find_element(By.ID, "fieldsetcollapser0").text, "Hide"
         )
+        self.take_screenshot("expanded")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
     def test_selectbox_height_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6047,7 +6054,7 @@ class SeleniumTests(AdminSeleniumTestCase):
         )
         url = self.live_server_url + reverse("admin7:admin_views_pizza_add")
         self.selenium.get(url)
-        self.selenium.find_elements(By.LINK_TEXT, "Show")[0].click()
+        self.selenium.find_elements(By.ID, "fieldsetcollapser0")[0].click()
         from_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter")
         from_box = self.selenium.find_element(By.ID, "id_toppings_from")
         to_filter_box = self.selenium.find_element(By.ID, "id_toppings_filter_selected")
@@ -6062,7 +6069,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 + from_box.get_property("offsetHeight")
             ),
         )
+        self.take_screenshot("selectbox-collapsible")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
     def test_selectbox_height_not_collapsible_fieldset(self):
         from selenium.webdriver.common.by import By
 
@@ -6091,7 +6100,9 @@ class SeleniumTests(AdminSeleniumTestCase):
                 + from_box.get_property("offsetHeight")
             ),
         )
+        self.take_screenshot("selectbox-non-collapsible")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
     def test_first_field_focus(self):
         """JavaScript-assisted auto-focus on first usable form field."""
         from selenium.webdriver.common.by import By
@@ -6108,6 +6119,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.switch_to.active_element,
             self.selenium.find_element(By.ID, "id_name"),
         )
+        self.take_screenshot("focus-single-widget")
 
         # First form field has a MultiWidget
         with self.wait_page_loaded():
@@ -6118,6 +6130,7 @@ class SeleniumTests(AdminSeleniumTestCase):
             self.selenium.switch_to.active_element,
             self.selenium.find_element(By.ID, "id_start_date_0"),
         )
+        self.take_screenshot("focus-multi-widget")
 
     def test_cancel_delete_confirmation(self):
         "Cancelling the deletion of an object takes the user back one page."

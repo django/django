@@ -1,8 +1,11 @@
 import sys
 import unittest
 from contextlib import contextmanager
+from functools import wraps
+from pathlib import Path
 
-from django.test import LiveServerTestCase, tag
+from django.conf import settings
+from django.test import LiveServerTestCase, override_settings, tag
 from django.utils.functional import classproperty
 from django.utils.module_loading import import_string
 from django.utils.text import capfirst
@@ -116,6 +119,30 @@ class ChangeWindowSize:
 class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
     implicit_wait = 10
     external_host = None
+    screenshots = False
+
+    @classmethod
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if not cls.screenshots:
+            return
+
+        for name, func in list(cls.__dict__.items()):
+            if not hasattr(func, "_screenshot_cases"):
+                continue
+            # Remove the main test.
+            delattr(cls, name)
+            # Add separate tests for each screenshot type.
+            for screenshot_case in getattr(func, "_screenshot_cases"):
+
+                @wraps(func)
+                def test(self, *args, _func=func, _case=screenshot_case, **kwargs):
+                    with getattr(self, _case)():
+                        return _func(self, *args, **kwargs)
+
+                test.__name__ = f"{name}_{screenshot_case}"
+                test.__qualname__ = f"{test.__qualname__}_{screenshot_case}"
+                setattr(cls, test.__name__, test)
 
     @classproperty
     def live_server_url(cls):
@@ -147,6 +174,30 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
         with ChangeWindowSize(360, 800, self.selenium):
             yield
 
+    @contextmanager
+    def rtl(self):
+        with self.desktop_size():
+            with override_settings(LANGUAGE_CODE=settings.LANGUAGES_BIDI[-1]):
+                yield
+
+    @contextmanager
+    def dark(self):
+        # Navigate to a page before executing a script.
+        self.selenium.get(self.live_server_url)
+        self.selenium.execute_script("localStorage.setItem('theme', 'dark');")
+        with self.desktop_size():
+            try:
+                yield
+            finally:
+                self.selenium.execute_script("localStorage.removeItem('theme');")
+
+    def take_screenshot(self, name):
+        if not self.screenshots:
+            return
+        path = Path.cwd() / "screenshots" / f"{self._testMethodName}-{name}.png"
+        path.parent.mkdir(exist_ok=True, parents=True)
+        self.selenium.save_screenshot(path)
+
     @classmethod
     def _quit_selenium(cls):
         # quit() the WebDriver before attempting to terminate and join the
@@ -163,3 +214,15 @@ class SeleniumTestCase(LiveServerTestCase, metaclass=SeleniumTestCaseBase):
             yield
         finally:
             self.selenium.implicitly_wait(self.implicit_wait)
+
+
+def screenshot_cases(method_names):
+    if isinstance(method_names, str):
+        method_names = method_names.split(",")
+
+    def wrapper(func):
+        func._screenshot_cases = method_names
+        setattr(func, "tags", {"screenshot"}.union(getattr(func, "tags", set())))
+        return func
+
+    return wrapper
