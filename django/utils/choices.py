@@ -6,6 +6,7 @@ from django.utils.functional import Promise
 __all__ = [
     "BaseChoiceIterator",
     "CallableChoiceIterator",
+    "flatten_choices",
     "normalize_choices",
 ]
 
@@ -41,6 +42,15 @@ class CallableChoiceIterator(BaseChoiceIterator):
 
     def __iter__(self):
         yield from normalize_choices(self.func())
+
+
+def flatten_choices(choices):
+    """Flatten choices by removing nested values."""
+    for value_or_group, label_or_nested in choices or ():
+        if isinstance(label_or_nested, (list, tuple)):
+            yield from label_or_nested
+        else:
+            yield value_or_group, label_or_nested
 
 
 def normalize_choices(value, *, depth=0):

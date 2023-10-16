@@ -1,3 +1,4 @@
+import collections.abc
 from unittest import mock
 
 from django.db.models import TextChoices
@@ -5,6 +6,7 @@ from django.test import SimpleTestCase
 from django.utils.choices import (
     BaseChoiceIterator,
     CallableChoiceIterator,
+    flatten_choices,
     normalize_choices,
 )
 from django.utils.translation import gettext_lazy as _
@@ -54,6 +56,46 @@ class ChoiceIteratorTests(SimpleTestCase):
                 with self.assertRaises(IndexError) as ctx:
                     choices[i]
                 self.assertTrue(str(ctx.exception).endswith("index out of range"))
+
+
+class FlattenChoicesTests(SimpleTestCase):
+    def test_empty(self):
+        def generator():
+            yield from ()
+
+        for choices in ({}, [], (), set(), frozenset(), generator(), None, ""):
+            with self.subTest(choices=choices):
+                result = flatten_choices(choices)
+                self.assertIsInstance(result, collections.abc.Generator)
+                self.assertEqual(list(result), [])
+
+    def test_non_empty(self):
+        choices = [
+            ("C", _("Club")),
+            ("D", _("Diamond")),
+            ("H", _("Heart")),
+            ("S", _("Spade")),
+        ]
+        result = flatten_choices(choices)
+        self.assertIsInstance(result, collections.abc.Generator)
+        self.assertEqual(list(result), choices)
+
+    def test_nested_choices(self):
+        choices = [
+            ("Audio", [("vinyl", _("Vinyl")), ("cd", _("CD"))]),
+            ("Video", [("vhs", _("VHS Tape")), ("dvd", _("DVD"))]),
+            ("unknown", _("Unknown")),
+        ]
+        expected = [
+            ("vinyl", _("Vinyl")),
+            ("cd", _("CD")),
+            ("vhs", _("VHS Tape")),
+            ("dvd", _("DVD")),
+            ("unknown", _("Unknown")),
+        ]
+        result = flatten_choices(choices)
+        self.assertIsInstance(result, collections.abc.Generator)
+        self.assertEqual(list(result), expected)
 
 
 class NormalizeFieldChoicesTests(SimpleTestCase):

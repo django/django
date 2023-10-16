@@ -15,7 +15,11 @@ from django.db import connection, connections, router
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query_utils import DeferredAttribute, RegisterLookupMixin
 from django.utils import timezone
-from django.utils.choices import CallableChoiceIterator, normalize_choices
+from django.utils.choices import (
+    CallableChoiceIterator,
+    flatten_choices,
+    normalize_choices,
+)
 from django.utils.datastructures import DictWrapper
 from django.utils.dateparse import (
     parse_date,
@@ -1080,19 +1084,10 @@ class Field(RegisterLookupMixin):
         """
         return str(self.value_from_object(obj))
 
-    def _get_flatchoices(self):
+    @property
+    def flatchoices(self):
         """Flattened version of choices tuple."""
-        if self.choices is None:
-            return []
-        flat = []
-        for choice, value in self.choices:
-            if isinstance(value, (list, tuple)):
-                flat.extend(value)
-            else:
-                flat.append((choice, value))
-        return flat
-
-    flatchoices = property(_get_flatchoices)
+        return list(flatten_choices(self.choices))
 
     def save_form_data(self, instance, data):
         setattr(instance, self.name, data)
