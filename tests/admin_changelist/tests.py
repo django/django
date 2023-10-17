@@ -1686,6 +1686,7 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         self.admin_login(username="super", password="secret")
         self.selenium.get(self.live_server_url + reverse("admin:auth_user_changelist"))
+        self.is_page_accessible()
 
         form_id = "#changelist-form"
 
@@ -1712,12 +1713,14 @@ class SeleniumTests(AdminSeleniumTestCase):
 
         # Select a row and check again
         row_selector.click()
+        self.is_page_accessible()
         self.assertEqual(selection_indicator.text, "1 of 1 selected")
         self.assertIs(all_selector.get_property("checked"), True)
         self.assertEqual(row.get_attribute("class"), "selected")
 
         # Deselect a row and check again
         row_selector.click()
+        self.is_page_accessible()
         self.assertEqual(selection_indicator.text, "0 of 1 selected")
         self.assertIs(all_selector.get_property("checked"), False)
         self.assertEqual(row.get_attribute("class"), "")
@@ -1853,7 +1856,6 @@ class SeleniumTests(AdminSeleniumTestCase):
         self.selenium.get(
             self.live_server_url + reverse("admin:admin_changelist_parent_changelist")
         )
-
         name_input = self.selenium.find_element(By.ID, "id_form-0-name")
         name_input.clear()
         name_input.send_keys("bar")

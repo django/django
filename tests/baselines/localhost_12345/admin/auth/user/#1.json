@@ -1,0 +1,367 @@
+{
+    "results": [
+        {
+            "ruleId": "html_skipnav_exists",
+            "value": [
+                "VIOLATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Potential_1",
+            "message": "Verify there is a way to bypass blocks of content that are repeated on multiple Web pages",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 0,
+                "height": 600,
+                "width": 800
+            },
+            "snippet": "<html data-theme=\"auto\" dir=\"ltr\" lang=\"en\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialviolation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/html_skipnav_exists.html#%7B%22message%22%3A%22Verify%20there%20is%20a%20way%20to%20bypass%20blocks%20of%20content%20that%20are%20repeated%20on%20multiple%20Web%20pages%22%2C%22snippet%22%3A%22%3Chtml%20data-theme%3D%5C%22auto%5C%22%20dir%3D%5C%22ltr%5C%22%20lang%3D%5C%22en%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22html_skipnav_exists%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "style_before_after_review",
+            "value": [
+                "VIOLATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]/head[1]/link[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Potential_1",
+            "message": "Verify the '::before' and '::after' pseudo-elements do not insert non-decorative content",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 0,
+                "height": 0,
+                "width": 0
+            },
+            "snippet": "<link href=\"/static/admin/css/base.css\" rel=\"stylesheet\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialviolation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/style_before_after_review.html#%7B%22message%22%3A%22Verify%20the%20'%3A%3Abefore'%20and%20'%3A%3Aafter'%20pseudo-elements%20do%20not%20insert%20non-decorative%20content%22%2C%22snippet%22%3A%22%3Clink%20href%3D%5C%22%2Fstatic%2Fadmin%2Fcss%2Fbase.css%5C%22%20rel%3D%5C%22stylesheet%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22style_before_after_review%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "style_color_misuse",
+            "value": [
+                "VIOLATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]/head[1]/link[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 2,
+            "reasonId": "Potential_1",
+            "message": "Verify color is not used as the only visual means of conveying information",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 0,
+                "height": 0,
+                "width": 0
+            },
+            "snippet": "<link href=\"/static/admin/css/base.css\" rel=\"stylesheet\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialviolation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/style_color_misuse.html#%7B%22message%22%3A%22Verify%20color%20is%20not%20used%20as%20the%20only%20visual%20means%20of%20conveying%20information%22%2C%22snippet%22%3A%22%3Clink%20href%3D%5C%22%2Fstatic%2Fadmin%2Fcss%2Fbase.css%5C%22%20rel%3D%5C%22stylesheet%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22style_color_misuse%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "style_highcontrast_visible",
+            "value": [
+                "VIOLATION",
+                "MANUAL"
+            ],
+            "path": {
+                "dom": "/html[1]/head[1]/link[1]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Manual_1",
+            "message": "Confirm Windows high contrast mode is supported when using CSS to include, position or alter non-decorative content",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 0,
+                "height": 0,
+                "width": 0
+            },
+            "snippet": "<link href=\"/static/admin/css/base.css\" rel=\"stylesheet\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "manual",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/style_highcontrast_visible.html#%7B%22message%22%3A%22Confirm%20Windows%20high%20contrast%20mode%20is%20supported%20when%20using%20CSS%20to%20include%2C%20position%20or%20alter%20non-decorative%20content%22%2C%22snippet%22%3A%22%3Clink%20href%3D%5C%22%2Fstatic%2Fadmin%2Fcss%2Fbase.css%5C%22%20rel%3D%5C%22stylesheet%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22MANUAL%22%5D%2C%22reasonId%22%3A%22Manual_1%22%2C%22ruleId%22%3A%22style_highcontrast_visible%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "style_before_after_review",
+            "value": [
+                "VIOLATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]/head[1]/link[3]",
+                "aria": "/document[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Potential_1",
+            "message": "Verify the '::before' and '::after' pseudo-elements do not insert non-decorative content",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 0,
+                "top": 0,
+                "height": 0,
+                "width": 0
+            },
+            "snippet": "<link href=\"/static/admin/css/nav_sidebar.css\" rel=\"stylesheet\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialviolation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/style_before_after_review.html#%7B%22message%22%3A%22Verify%20the%20'%3A%3Abefore'%20and%20'%3A%3Aafter'%20pseudo-elements%20do%20not%20insert%20non-decorative%20content%22%2C%22snippet%22%3A%22%3Clink%20href%3D%5C%22%2Fstatic%2Fadmin%2Fcss%2Fnav_sidebar.css%5C%22%20rel%3D%5C%22stylesheet%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22style_before_after_review%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "aria_content_in_landmark",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/a[1]",
+                "aria": "/document[1]/link[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 5,
+                "top": -994,
+                "height": 27,
+                "width": 143
+            },
+            "snippet": "<a class=\"skip-to-content-link\" href=\"#content-start\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/aria_content_in_landmark.html#%7B%22message%22%3A%22Content%20is%20not%20within%20a%20landmark%20element%22%2C%22snippet%22%3A%22%3Ca%20class%3D%5C%22skip-to-content-link%5C%22%20href%3D%5C%22%23content-start%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22FAIL%22%5D%2C%22reasonId%22%3A%22Fail_1%22%2C%22ruleId%22%3A%22aria_content_in_landmark%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "aria_content_in_landmark",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[1]/div[1]/div[1]/div[1]/a[1]",
+                "aria": "/document[1]/link[2]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 280,
+                "top": 116,
+                "height": 28,
+                "width": 221
+            },
+            "snippet": "<a href=\"/admin/\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/aria_content_in_landmark.html#%7B%22message%22%3A%22Content%20is%20not%20within%20a%20landmark%20element%22%2C%22snippet%22%3A%22%3Ca%20href%3D%5C%22%2Fadmin%2F%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22FAIL%22%5D%2C%22reasonId%22%3A%22Fail_1%22%2C%22ruleId%22%3A%22aria_content_in_landmark%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "aria_content_in_landmark",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[1]/div[1]/div[1]/button[1]",
+                "aria": "/document[1]/button[1]"
+            },
+            "ruleTime": 1,
+            "reasonId": "Fail_1",
+            "message": "Content is not within a landmark element",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 505,
+                "top": 115,
+                "height": 30,
+                "width": 16
+            },
+            "snippet": "<button class=\"theme-toggle\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/aria_content_in_landmark.html#%7B%22message%22%3A%22Content%20is%20not%20within%20a%20landmark%20element%22%2C%22snippet%22%3A%22%3Cbutton%20class%3D%5C%22theme-toggle%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22FAIL%22%5D%2C%22reasonId%22%3A%22Fail_1%22%2C%22ruleId%22%3A%22aria_content_in_landmark%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "aria_accessiblename_exists",
+            "value": [
+                "VIOLATION",
+                "FAIL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[1]/div[2]/div[1]/div[1]/div[1]/form[1]",
+                "aria": "/document[1]/form[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "fail_no_accessible_name",
+            "message": "Element <form> with \"form\" role has no accessible name",
+            "messageArgs": [
+                "form",
+                "form"
+            ],
+            "apiArgs": [],
+            "bounds": {
+                "left": 224,
+                "top": 180,
+                "height": 191,
+                "width": 352
+            },
+            "snippet": "<form id=\"login-form\" method=\"post\" action=\"/admin/login/?next=/admin/auth/user/\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "violation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/aria_accessiblename_exists.html#%7B%22message%22%3A%22Element%20%3Cform%3E%20with%20%5C%22form%5C%22%20role%20has%20no%20accessible%20name%22%2C%22snippet%22%3A%22%3Cform%20id%3D%5C%22login-form%5C%22%20method%3D%5C%22post%5C%22%20action%3D%5C%22%2Fadmin%2Flogin%2F%3Fnext%3D%2Fadmin%2Fauth%2Fuser%2F%5C%22%3E%22%2C%22value%22%3A%5B%22VIOLATION%22%2C%22FAIL%22%5D%2C%22reasonId%22%3A%22fail_no_accessible_name%22%2C%22ruleId%22%3A%22aria_accessiblename_exists%22%2C%22msgArgs%22%3A%5B%22form%22%2C%22form%22%5D%7D"
+        },
+        {
+            "ruleId": "input_fields_grouped",
+            "value": [
+                "RECOMMENDATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[1]/div[2]/div[1]/div[1]/div[1]/form[1]/div[1]/input[1]",
+                "aria": "/document[1]/form[1]/textbox[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Potential_1",
+            "message": "Use the <fieldset> element to group logically related input elements",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 224,
+                "top": 212,
+                "height": 36,
+                "width": 352
+            },
+            "snippet": "<input id=\"id_username\" required=\"\" maxlength=\"150\" autocomplete=\"username\" autocapitalize=\"none\" autofocus=\"\" name=\"username\" type=\"text\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialrecommendation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/input_fields_grouped.html#%7B%22message%22%3A%22Use%20the%20%3Cfieldset%3E%20element%20to%20group%20logically%20related%20input%20elements%22%2C%22snippet%22%3A%22%3Cinput%20id%3D%5C%22id_username%5C%22%20required%3D%5C%22%5C%22%20maxlength%3D%5C%22150%5C%22%20autocomplete%3D%5C%22username%5C%22%20autocapitalize%3D%5C%22none%5C%22%20autofocus%3D%5C%22%5C%22%20name%3D%5C%22username%5C%22%20type%3D%5C%22text%5C%22%3E%22%2C%22value%22%3A%5B%22RECOMMENDATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22input_fields_grouped%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        },
+        {
+            "ruleId": "input_fields_grouped",
+            "value": [
+                "RECOMMENDATION",
+                "POTENTIAL"
+            ],
+            "path": {
+                "dom": "/html[1]/body[1]/div[1]/div[2]/div[1]/div[1]/div[1]/form[1]/div[2]/input[1]",
+                "aria": "/document[1]/form[1]"
+            },
+            "ruleTime": 0,
+            "reasonId": "Potential_1",
+            "message": "Use the <fieldset> element to group logically related input elements",
+            "messageArgs": [],
+            "apiArgs": [],
+            "bounds": {
+                "left": 224,
+                "top": 284,
+                "height": 36,
+                "width": 352
+            },
+            "snippet": "<input id=\"id_password\" required=\"\" autocomplete=\"current-password\" name=\"password\" type=\"password\">",
+            "category": "Accessibility",
+            "ignored": false,
+            "level": "potentialrecommendation",
+            "help": "https://able.ibm.com/rules/archives/2023.07.26/doc/en-US/input_fields_grouped.html#%7B%22message%22%3A%22Use%20the%20%3Cfieldset%3E%20element%20to%20group%20logically%20related%20input%20elements%22%2C%22snippet%22%3A%22%3Cinput%20id%3D%5C%22id_password%5C%22%20required%3D%5C%22%5C%22%20autocomplete%3D%5C%22current-password%5C%22%20name%3D%5C%22password%5C%22%20type%3D%5C%22password%5C%22%3E%22%2C%22value%22%3A%5B%22RECOMMENDATION%22%2C%22POTENTIAL%22%5D%2C%22reasonId%22%3A%22Potential_1%22%2C%22ruleId%22%3A%22input_fields_grouped%22%2C%22msgArgs%22%3A%5B%5D%7D"
+        }
+    ],
+    "numExecuted": 326,
+    "ruleTime": 50,
+    "nls": {
+        "html_skipnav_exists": {
+            "0": "Provide a way to bypass blocks of content that are repeated on multiple Web pages",
+            "Potential_1": "Verify there is a way to bypass blocks of content that are repeated on multiple Web pages"
+        },
+        "aria_content_in_landmark": {
+            "0": "All content must reside within an element with a landmark role",
+            "Fail_1": "Content is not within a landmark element"
+        },
+        "style_before_after_review": {
+            "0": "Do not use CSS '::before' and '::after' pseudo-elements to insert non-decorative content",
+            "Potential_1": "Verify the '::before' and '::after' pseudo-elements do not insert non-decorative content"
+        },
+        "style_color_misuse": {
+            "0": "Combine color and descriptive markup to convey information",
+            "Potential_1": "Verify color is not used as the only visual means of conveying information"
+        },
+        "style_highcontrast_visible": {
+            "0": "Windows high contrast mode must be supported when using CSS to include, position or alter non-decorative content",
+            "Manual_1": "Confirm Windows high contrast mode is supported when using CSS to include, position or alter non-decorative content"
+        },
+        "aria_accessiblename_exists": {
+            "0": "Elements with cerain roles must have accessible names per ARIA specification",
+            "fail_no_accessible_name": "Element <{0}> with \"{1}\" role has no accessible name"
+        },
+        "input_fields_grouped": {
+            "0": "Groups of logically related input elements should be contained within a <fieldset> element",
+            "Potential_1": "Use the <fieldset> element to group logically related input elements"
+        }
+    },
+    "summary": {
+        "counts": {
+            "violation": 4,
+            "potentialviolation": 4,
+            "recommendation": 0,
+            "potentialrecommendation": 2,
+            "manual": 1,
+            "pass": 315,
+            "ignored": 0,
+            "elements": 38,
+            "elementsViolation": 4,
+            "elementsViolationReview": 7
+        },
+        "scanTime": 205,
+        "ruleArchive": "Latest Deployment (latest)",
+        "policies": [
+            "IBM_Accessibility"
+        ],
+        "reportLevels": [
+            "violation",
+            "potentialviolation",
+            "recommendation",
+            "potentialrecommendation",
+            "manual"
+        ],
+        "startScan": 1691247715943,
+        "URL": "http://localhost:12345/admin/login/?next=/admin/auth/user/#1"
+    },
+    "scanID": "61cdf4cc-23b3-497f-9f97-e252cf687cd9",
+    "toolID": "accessibility-checker-v3.1.58",
+    "label": "localhost_12345/admin/auth/user/#1"
+}
