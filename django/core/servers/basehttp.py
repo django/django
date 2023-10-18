@@ -185,12 +185,19 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
     def log_request(self, code="-", size="-"):
         if isinstance(code, HTTPStatus):
             code = code.value
+        response_time = (time.time() - self.request_start_time) * 1e3
+        response_time = (
+            f"{int(response_time)}ms"
+            if response_time < 1000
+            else f"{response_time / 1e3:.2f}s"
+        )
+
         self.log_message(
-            '"%s" %s %s %dms',
+            '"%s" %s %s %s',
             self.requestline,
             str(code),
             str(size),
-            int((time.time() - self.request_start_time) * 1e3),
+            response_time,
         )
 
     def log_message(self, format, *args):
