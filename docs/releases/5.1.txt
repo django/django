@@ -206,8 +206,8 @@ Tests
   :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
   to assertion error messages.
 
-* Django test runner now supports ``--screenshots`` option to save screenshots
-  for Selenium tests.
+* The Django test runner now supports a ``--screenshots`` option to save
+  screenshots for Selenium tests.
 
 URLs
 ~~~~
