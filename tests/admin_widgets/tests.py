@@ -1083,7 +1083,6 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         """
         from selenium.webdriver.common.by import By
 
-        self.selenium.set_window_size(1024, 768)
         self.admin_login(username="super", password="secret", login_url="/")
 
         # Enter test data
@@ -1096,29 +1095,30 @@ class DateTimePickerSeleniumTests(AdminWidgetSeleniumTestCase):
         path = os.path.join(
             os.path.dirname(import_module("django.contrib.admin").__file__), "locale"
         )
-        for language_code, language_name in settings.LANGUAGES:
-            try:
-                catalog = gettext.translation("djangojs", path, [language_code])
-            except OSError:
-                continue
-            if month_string in catalog._catalog:
-                month_name = catalog._catalog[month_string]
-            else:
-                month_name = month_string
+        url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
+        with self.small_screen_size():
+            for language_code, language_name in settings.LANGUAGES:
+                try:
+                    catalog = gettext.translation("djangojs", path, [language_code])
+                except OSError:
+                    continue
+                if month_string in catalog._catalog:
+                    month_name = catalog._catalog[month_string]
+                else:
+                    month_name = month_string
 
-            # Get the expected caption
-            may_translation = month_name
-            expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
+                # Get the expected caption.
+                may_translation = month_name
+                expected_caption = "{:s} {:d}".format(may_translation.upper(), 1984)
 
-            # Test with every locale
-            with override_settings(LANGUAGE_CODE=language_code):
-                # Open a page that has a date picker widget
-                url = reverse("admin:admin_widgets_member_change", args=(member.pk,))
-                self.selenium.get(self.live_server_url + url)
-                # Click on the calendar icon
-                self.selenium.find_element(By.ID, "calendarlink0").click()
-                # Make sure that the right month and year are displayed
-                self.wait_for_text("#calendarin0 caption", expected_caption)
+                # Every locale.
+                with override_settings(LANGUAGE_CODE=language_code):
+                    # Open a page that has a date picker widget.
+                    self.selenium.get(self.live_server_url + url)
+                    # Click on the calendar icon.
+                    self.selenium.find_element(By.ID, "calendarlink0").click()
+                    # The right month and year are displayed.
+                    self.wait_for_text("#calendarin0 caption", expected_caption)
 
 
 @requires_tz_support
@@ -1416,23 +1416,24 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
     def test_basic(self):
         from selenium.webdriver.common.by import By
 
-        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
-        self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url
-            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
-        )
+        with self.small_screen_size():
+            self.admin_login(username="super", password="secret", login_url="/")
+            self.selenium.get(
+                self.live_server_url
+                + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
+            )
 
-        self.wait_page_ready()
-        self.execute_basic_operations("vertical", "students")
-        self.execute_basic_operations("horizontal", "alumni")
+            self.wait_page_ready()
+            self.execute_basic_operations("vertical", "students")
+            self.execute_basic_operations("horizontal", "alumni")
 
-        # Save and check that everything is properly stored in the database ---
-        self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
-        self.wait_page_ready()
+            # Save, everything should be stored properly stored in the
+            # database.
+            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+            self.wait_page_ready()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(
             list(self.school.students.all()),
@@ -1451,113 +1452,116 @@ class HorizontalVerticalFilterSeleniumTests(AdminWidgetSeleniumTestCase):
         from selenium.webdriver.common.by import By
         from selenium.webdriver.common.keys import Keys
 
-        self.selenium.set_window_size(1024, 768)
         self.school.students.set([self.lisa, self.peter])
         self.school.alumni.set([self.lisa, self.peter])
 
-        self.admin_login(username="super", password="secret", login_url="/")
-        self.selenium.get(
-            self.live_server_url
-            + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
-        )
-
-        for field_name in ["students", "alumni"]:
-            from_box = "#id_%s_from" % field_name
-            to_box = "#id_%s_to" % field_name
-            choose_link = "id_%s_add_link" % field_name
-            remove_link = "id_%s_remove_link" % field_name
-            input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
-
-            # Initial values
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jason.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                ],
+        with self.small_screen_size():
+            self.admin_login(username="super", password="secret", login_url="/")
+            self.selenium.get(
+                self.live_server_url
+                + reverse("admin:admin_widgets_school_change", args=(self.school.id,))
             )
 
-            # Typing in some characters filters out non-matching options
-            input.send_keys("a")
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            input.send_keys("R")
-            self.assertSelectOptions(from_box, [str(self.arthur.id)])
+            for field_name in ["students", "alumni"]:
+                from_box = "#id_%s_from" % field_name
+                to_box = "#id_%s_to" % field_name
+                choose_link = "id_%s_add_link" % field_name
+                remove_link = "id_%s_remove_link" % field_name
+                input = self.selenium.find_element(By.ID, "id_%s_input" % field_name)
+                # Initial values.
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jason.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                    ],
+                )
+                # Typing in some characters filters out non-matching options.
+                input.send_keys("a")
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                input.send_keys("R")
+                self.assertSelectOptions(from_box, [str(self.arthur.id)])
+                # Clearing the text box makes the other options reappear.
+                input.send_keys([Keys.BACK_SPACE])
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                input.send_keys([Keys.BACK_SPACE])
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jason.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                    ],
+                )
 
-            # Clearing the text box makes the other options reappear
-            input.send_keys([Keys.BACK_SPACE])
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            input.send_keys([Keys.BACK_SPACE])
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jason.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                ],
-            )
+                # Choosing a filtered option sends it properly to the 'to' box.
+                input.send_keys("a")
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.jason.id)]
+                )
+                self.select_option(from_box, str(self.jason.id))
+                self.selenium.find_element(By.ID, choose_link).click()
+                self.assertSelectOptions(from_box, [str(self.arthur.id)])
+                self.assertSelectOptions(
+                    to_box,
+                    [
+                        str(self.lisa.id),
+                        str(self.peter.id),
+                        str(self.jason.id),
+                    ],
+                )
 
-            # -----------------------------------------------------------------
-            # Choosing a filtered option sends it properly to the 'to' box.
-            input.send_keys("a")
-            self.assertSelectOptions(
-                from_box, [str(self.arthur.id), str(self.jason.id)]
-            )
-            self.select_option(from_box, str(self.jason.id))
-            self.selenium.find_element(By.ID, choose_link).click()
-            self.assertSelectOptions(from_box, [str(self.arthur.id)])
-            self.assertSelectOptions(
-                to_box,
-                [
-                    str(self.lisa.id),
-                    str(self.peter.id),
-                    str(self.jason.id),
-                ],
-            )
+                self.select_option(to_box, str(self.lisa.id))
+                self.selenium.find_element(By.ID, remove_link).click()
+                self.assertSelectOptions(
+                    from_box, [str(self.arthur.id), str(self.lisa.id)]
+                )
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
 
-            self.select_option(to_box, str(self.lisa.id))
-            self.selenium.find_element(By.ID, remove_link).click()
-            self.assertSelectOptions(from_box, [str(self.arthur.id), str(self.lisa.id)])
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+                input.send_keys([Keys.BACK_SPACE])  # Clear text box
+                self.assertSelectOptions(
+                    from_box,
+                    [
+                        str(self.arthur.id),
+                        str(self.bob.id),
+                        str(self.cliff.id),
+                        str(self.jenny.id),
+                        str(self.john.id),
+                        str(self.lisa.id),
+                    ],
+                )
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
 
-            input.send_keys([Keys.BACK_SPACE])  # Clear text box
-            self.assertSelectOptions(
-                from_box,
-                [
-                    str(self.arthur.id),
-                    str(self.bob.id),
-                    str(self.cliff.id),
-                    str(self.jenny.id),
-                    str(self.john.id),
-                    str(self.lisa.id),
-                ],
-            )
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
+                # Pressing enter on a filtered option sends it properly to
+                # the 'to' box.
+                self.select_option(to_box, str(self.jason.id))
+                self.selenium.find_element(By.ID, remove_link).click()
+                input.send_keys("ja")
+                self.assertSelectOptions(from_box, [str(self.jason.id)])
+                input.send_keys([Keys.ENTER])
+                self.assertSelectOptions(
+                    to_box, [str(self.peter.id), str(self.jason.id)]
+                )
+                input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
 
-            # -----------------------------------------------------------------
-            # Pressing enter on a filtered option sends it properly to
-            # the 'to' box.
-            self.select_option(to_box, str(self.jason.id))
-            self.selenium.find_element(By.ID, remove_link).click()
-            input.send_keys("ja")
-            self.assertSelectOptions(from_box, [str(self.jason.id)])
-            input.send_keys([Keys.ENTER])
-            self.assertSelectOptions(to_box, [str(self.peter.id), str(self.jason.id)])
-            input.send_keys([Keys.BACK_SPACE, Keys.BACK_SPACE])
-
-        # Save and check that everything is properly stored in the database ---
-        with self.wait_page_loaded():
-            self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
+            # Save, everything should be stored properly in the database.
+            with self.wait_page_loaded():
+                self.selenium.find_element(By.XPATH, '//input[@value="Save"]').click()
         self.school = School.objects.get(id=self.school.id)  # Reload from database
         self.assertEqual(list(self.school.students.all()), [self.jason, self.peter])
         self.assertEqual(list(self.school.alumni.all()), [self.jason, self.peter])
