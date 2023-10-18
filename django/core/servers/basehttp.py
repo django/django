@@ -186,7 +186,7 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
         if isinstance(code, HTTPStatus):
             code = code.value
         self.log_message(
-            '"%s" %s %s %sms',
+            '"%s" %s %s %dms',
             self.requestline,
             str(code),
             str(size),

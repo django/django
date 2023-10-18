@@ -39,13 +39,15 @@ class WSGIRequestHandlerTestCase(SimpleTestCase):
             for status_code in status_codes:
                 # The correct level gets the message.
                 with self.assertLogs("django.server", level.upper()) as cm:
-                    handler.log_message("GET %s %s", "A", str(status_code))
-                self.assertIn("GET A %d" % status_code, cm.output[0])
+                    handler.log_message("GET %s %s %dms", "A", str(status_code), 200)
+                self.assertIn("GET A %d %dms" % (status_code, 200), cm.output[0])
                 # Incorrect levels don't have any messages.
                 for wrong_level in level_status_codes:
                     if wrong_level != level:
                         with self.assertLogs("django.server", "INFO") as cm:
-                            handler.log_message("GET %s %s", "A", str(status_code))
+                            handler.log_message(
+                                "GET %s %s %dms", "A", str(status_code), 200
+                            )
                         self.assertNotEqual(
                             cm.records[0].levelname, wrong_level.upper()
                         )
