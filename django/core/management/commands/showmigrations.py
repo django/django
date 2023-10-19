@@ -24,6 +24,13 @@ class Command(BaseCommand):
                 '"default" database.'
             ),
         )
+        parser.add_argument(
+            "--new",
+            action="store_true",
+            help=(
+                "Like `--list`, but only shows unapplied migrations"
+            ),
+        )
 
         formats = parser.add_mutually_exclusive_group()
         formats.add_argument(
@@ -55,7 +62,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.verbosity = options["verbosity"]
-
+        self.show_new = options["new"]
         # Get the database we're operating from
         db = options["database"]
         connection = connections[db]
@@ -63,7 +70,10 @@ class Command(BaseCommand):
         if options["format"] == "plan":
             return self.show_plan(connection, options["app_label"])
         else:
-            return self.show_list(connection, options["app_label"])
+            return self.show_list(connection,
+                                  options["app_label"],
+                                  show_new=self.show_new,
+                                  )
 
     def _validate_app_names(self, loader, app_names):
         has_bad_names = False
@@ -76,7 +86,7 @@ class Command(BaseCommand):
         if has_bad_names:
             sys.exit(2)
 
-    def show_list(self, connection, app_names=None):
+    def show_list(self, connection, app_names=None, show_new=False):
         """
         Show a list of all migrations on the system, or only those of
         some named apps.
@@ -108,7 +118,7 @@ class Command(BaseCommand):
                             )
                         applied_migration = loader.applied_migrations.get(plan_node)
                         # Mark it as applied/unapplied
-                        if applied_migration:
+                        if applied_migration and not show_new:
                             if plan_node in recorded_migrations:
                                 output = " [X] %s" % title
                             else:
@@ -124,7 +134,7 @@ class Command(BaseCommand):
                                     )
                                 )
                             self.stdout.write(output)
-                        else:
+                        elif not applied_migration and show_new:
                             self.stdout.write(" [ ] %s" % title)
                         shown.add(plan_node)
             # If we didn't print anything, then a small message
