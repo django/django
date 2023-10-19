@@ -456,6 +456,29 @@ class MigrateTests(MigrationTestBase):
         # Cleanup by unmigrating everything
         call_command("migrate", "migrations", "zero", verbosity=0)
 
+    @override_settings(MIGRATION_MODULES={"migrations": "migrations.test_migrations"})
+    def test_showmigrations_show_unapplied_only(self):
+        """
+        showmigrations --unapplied only displays unapplied migrations
+        """
+        out = io.StringIO()
+
+        call_command("migrate", "migrations", "0001", verbosity=0)
+
+        # Giving the explicit app_label tests for selective `show_list` in the command
+        call_command(
+            "showmigrations",
+            "migrations",
+            unapplied=True,
+            format="list",
+            stdout=out,
+            verbosity=0,
+            no_color=True,
+        )
+        self.assertEqual("migrations\n [ ] 0002_second\n", out.getvalue().lower())
+        # Cleanup by unmigrating everything
+        call_command("migrate", "migrations", "zero", verbosity=0)
+
     @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
     )
