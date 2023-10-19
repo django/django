@@ -42,7 +42,9 @@ class AdminSidebarTests(TestCase):
 
     def test_sidebar_not_on_index(self):
         response = self.client.get(reverse("test_with_sidebar:index"))
-        self.assertContains(response, '<main id="content-start" class="content" tabindex="-1">')
+        self.assertContains(
+            response, '<main id="content-start" class="content" tabindex="-1">'
+        )
         self.assertNotContains(
             response, '<nav class="sticky" id="nav-sidebar" aria-label="Sidebar">'
         )
