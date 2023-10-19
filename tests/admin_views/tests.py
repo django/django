@@ -1598,6 +1598,13 @@ class AdminViewBasicTest(AdminViewBasicTestCase):
         response = self.client.get(reverse("admin:login"))
         self.assertContains(response, '<header id="header">')
 
+    def test_main_content(self):
+        response = self.client.get(reverse("admin:index"))
+        self.assertContains(
+            response,
+            '<main id="content-start" class="content" tabindex="-1">',
+        )
+
 
 @override_settings(
     AUTH_PASSWORD_VALIDATORS=[

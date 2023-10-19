@@ -81,13 +81,13 @@
     {% endblock %}
     {% endif %}
 
-    <main class="main" id="main">
+    <div class="main" id="main">
       {% if not is_popup and is_nav_sidebar_enabled %}
         {% block nav-sidebar %}
           {% include "admin/nav_sidebar.html" %}
         {% endblock %}
       {% endif %}
-      <div id="content-start" class="content" tabindex="-1">
+      <main id="content-start" class="content" tabindex="-1">
         {% block messages %}
           {% if messages %}
             <ul class="messagelist">{% for message in messages %}
@@ -109,8 +109,8 @@
         </div>
         <!-- END Content -->
         {% block footer %}<div id="footer"></div>{% endblock %}
-      </div>
-    </main>
+      </main>
+    </div>
 </div>
 <!-- END Container -->
 
