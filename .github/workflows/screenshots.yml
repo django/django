@@ -1,7 +1,7 @@
 name: Visual Regression Tests
 
 on:
-  pull_request:
+  pull_request_target:
     types: [labeled, synchronize, opened, reopened]
     paths-ignore:
       - 'docs/**'
@@ -58,6 +58,7 @@ jobs:
         if: steps.find-comment.outputs.comment-id == ''
         uses: peter-evans/create-or-update-comment@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             🖼️ **Screenshots created**
@@ -72,6 +73,7 @@ jobs:
         if: steps.find-comment.outputs.comment-id != ''
         uses: peter-evans/create-or-update-comment@v3
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           comment-id: ${{ steps.find-comment.outputs.comment-id }}
           body: |
             - Generated screenshots for ${{ github.event.pull_request.head.sha }} at ${{ steps.generate-screenshots.outputs.date }} ([download](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
