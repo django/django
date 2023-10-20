@@ -10,7 +10,7 @@
         {% for model in app.models %}
           {% with model_name=model.object_name|lower %}
             <tr class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
-              <th scope="row">
+              <th scope="row" id="{{ app.app_label }}-{{ model_name }}">
                 {% if model.admin_url %}
                   <a href="{{ model.admin_url }}"{% if model.admin_url in request.path|urlencode %} aria-current="page"{% endif %}>{{ model.name }}</a>
                 {% else %}
@@ -19,16 +19,16 @@
               </th>
 
               {% if model.add_url %}
-                <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+                <td><a href="{{ model.add_url }}" class="addlink" aria-describedby="{{ app.app_label }}-{{ model_name }}">{% translate 'Add' %}</a></td>
               {% else %}
                 <td></td>
               {% endif %}
 
               {% if model.admin_url and show_changelinks %}
                 {% if model.view_only %}
-                  <td><a href="{{ model.admin_url }}" class="viewlink">{% translate 'View' %}</a></td>
+                  <td><a href="{{ model.admin_url }}" class="viewlink" aria-describedby="{{ app.app_label }}-{{ model_name }}">{% translate 'View' %}</a></td>
                 {% else %}
-                  <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
+                  <td><a href="{{ model.admin_url }}" class="changelink" aria-describedby="{{ app.app_label }}-{{ model_name }}">{% translate 'Change' %}</a></td>
                 {% endif %}
               {% elif show_changelinks %}
                 <td></td>
