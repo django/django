@@ -106,8 +106,8 @@ class Command(BaseCommand):
         # For each app, print its migrations in order from oldest (roots) to
         # newest (leaves).
         for app_name in app_names:
-            self.stdout.write(app_name, self.style.MIGRATE_LABEL)
             shown = set()
+            outputs = []
             for node in graph.leaf_nodes(app_name):
                 for plan_node in graph.forwards_plan(node):
                     if plan_node not in shown and plan_node[0] == app_name:
@@ -135,12 +135,19 @@ class Command(BaseCommand):
                                     )
                                 )
                             if not show_unapplied_only:
-                                self.stdout.write(output)
+                                outputs.append(output)
                         else:
-                            self.stdout.write(" [ ] %s" % title)
+                            output = " [ ] %s" % title
+                            outputs.append(output)
                         shown.add(plan_node)
+            if outputs:
+                self.stdout.write(app_name, self.style.MIGRATE_LABEL)
+                for output in outputs:
+                    self.stdout.write(output)
+
             # If we didn't print anything, then a small message
             if not shown:
+                self.stdout.write(app_name, self.style.MIGRATE_LABEL)
                 self.stdout.write(" (no migrations)", self.style.ERROR)
 
     def show_plan(self, connection, app_names=None):

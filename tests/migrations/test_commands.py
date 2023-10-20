@@ -480,6 +480,28 @@ class MigrateTests(MigrationTestBase):
         call_command("migrate", "migrations", "zero", verbosity=0)
 
     @override_settings(
+        INSTALLED_APPS=[
+            "migrations.migrations_test_apps.mutate_state_b",
+            "migrations.migrations_test_apps.alter_fk.author_app",
+            "migrations.migrations_test_apps.alter_fk.book_app",
+        ]
+    )
+    def test_showmigrations_unapplied_multiple_app_labels(self):
+        """
+        `showmigrations --plan app_label` output with multiple app_labels.
+        """
+        # Multiple apps: author_app depends on book_app; mutate_state_b doesn't
+        # depend on other apps.
+        out = io.StringIO()
+
+        # run all migrations for author app
+        call_command("migrate", "author_app", verbosity=0)
+        call_command(
+            "showmigrations", unapplied=True, format="list", stdout=out
+        )
+        self.assertNotIn('author_app', out.getvalue())
+
+    @override_settings(
         MIGRATION_MODULES={"migrations": "migrations.test_migrations_squashed"}
     )
     def test_showmigrations_list_squashed(self):
@@ -489,7 +511,7 @@ class MigrateTests(MigrationTestBase):
         )
         self.assertEqual(
             "migrations\n [ ] 0001_squashed_0002 (2 squashed migrations)\n",
-            out.getvalue().lower(),
+            out.getvalue().lower()
         )
         out = io.StringIO()
         call_command(
@@ -843,6 +865,7 @@ class MigrateTests(MigrationTestBase):
         call_command(
             "showmigrations", "author_app", "mutate_state_b", format="plan", stdout=out
         )
+
         self.assertEqual(
             "[ ]  author_app.0001_initial\n"
             "[ ]  book_app.0001_initial\n"
