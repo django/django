@@ -101,7 +101,7 @@ class URLValidator(RegexValidator):
         r"\Z",
         re.IGNORECASE,
     )
-    message = _("Enter a valid URL.")
+    message = _("Enter a valid URL. cause: %(cause)")
     schemes = ["http", "https", "ftp", "ftps"]
     unsafe_chars = frozenset("\t\r\n")
     max_length = 2048
@@ -113,19 +113,19 @@ class URLValidator(RegexValidator):
 
     def __call__(self, value):
         if not isinstance(value, str) or len(value) > self.max_length:
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+            raise ValidationError(self.message, code=self.code, params={"value": value, cause: "exceeds max length", max_length: self.max_length})
         if self.unsafe_chars.intersection(value):
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+            raise ValidationError(self.message, code=self.code, params={"value": value, cause: "unsafe chars"})
         # Check if the scheme is valid.
         scheme = value.split("://")[0].lower()
         if scheme not in self.schemes:
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+            raise ValidationError(self.message, code=self.code, params={"value": value, cause: "scheme not allowed"})
 
         # Then check full URL
         try:
             splitted_url = urlsplit(value)
-        except ValueError:
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+        except ValueError as e:
+            raise ValidationError(self.message, code=self.code, params={"value": value, "cause": 'urlsplit ValueError', error: e})
         try:
             super().__call__(value)
         except ValidationError as e:
@@ -149,7 +149,7 @@ class URLValidator(RegexValidator):
                     validate_ipv6_address(potential_ip)
                 except ValidationError:
                     raise ValidationError(
-                        self.message, code=self.code, params={"value": value}
+                        self.message, code=self.code, params={"value": value, cause: 'invalid ipv6 address'}
                     )
 
         # The maximum length of a full host name is 253 characters per RFC 1034
@@ -157,7 +157,7 @@ class URLValidator(RegexValidator):
         # one byte for the length of the name and one byte for the trailing dot
         # that's used to indicate absolute names in DNS.
         if splitted_url.hostname is None or len(splitted_url.hostname) > 253:
-            raise ValidationError(self.message, code=self.code, params={"value": value})
+            raise ValidationError(self.message, code=self.code, params={"value": value, 'cause': 'hostname exceeds 253 characters'})
 
 
 integer_validator = RegexValidator(
