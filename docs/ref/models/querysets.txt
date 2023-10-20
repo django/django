@@ -1211,6 +1211,19 @@ results; these ``QuerySets`` are then used in the ``self.toppings.all()`` calls.
 The additional queries in ``prefetch_related()`` are executed after the
 ``QuerySet`` has begun to be evaluated and the primary query has been executed.
 
+Note that there is no mechanism to prevent another database query from altering
+the items in between the execution of the primary query and the additional
+queries, which could produce an inconsistent result. For example, if a
+``Pizza`` is deleted after the primary query has executed, its toppings will
+not be returned in the additional query, and it will seem like the pizza has no
+toppings:
+
+.. code-block:: pycon
+
+    >>> Pizza.objects.prefetch_related("toppings")
+    #  "Hawaiian" Pizza was deleted in another shell.
+    <QuerySet [<Pizza: Hawaiian ()>, <Pizza: Seafood (prawns, smoked salmon)>]>
+
 If you have an iterable of model instances, you can prefetch related attributes
 on those instances using the :func:`~django.db.models.prefetch_related_objects`
 function.
