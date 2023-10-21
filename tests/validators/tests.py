@@ -805,6 +805,10 @@ class TestValidatorEquality(TestCase):
             FileExtensionValidator(["txt", "png"]),
         )
         self.assertEqual(
+            FileExtensionValidator(["jpg", "png", "txt"]),
+            FileExtensionValidator(["txt", "jpg", "png"]),
+        )
+        self.assertEqual(
             FileExtensionValidator(["txt"]),
             FileExtensionValidator(["txt"], code="invalid_extension"),
         )
