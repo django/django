@@ -29,7 +29,7 @@ Serving the site and your static files from the same server
 -----------------------------------------------------------
 
 If you want to serve your static files from the same server that's already
-serving your site, the process may look something like:
+serving your site, the process may look something like :
 
 * Push your code up to the deployment server.
 * On the server, run :djadmin:`collectstatic` to copy all the static files
