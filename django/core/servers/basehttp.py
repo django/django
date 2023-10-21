@@ -191,7 +191,6 @@ class WSGIRequestHandler(simple_server.WSGIRequestHandler):
             response_time = f"{response_time}ms"
         else:
             response_time = f"{response_time:.2f}s"
-        )
 
         self.log_message(
             '"%s" %s %s %s',
