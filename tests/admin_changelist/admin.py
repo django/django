@@ -127,6 +127,20 @@ class DynamicListDisplayChildAdmin(admin.ModelAdmin):
         return my_list_display
 
 
+class ListDisplayClassesChildAdmin(admin.ModelAdmin):
+    def get_html_classes(self, obj):
+        return ["shaded", "green", obj.name] if obj is not None else []
+
+    def get_html_class(self, obj):
+        return f'age_{obj.age}' if obj is not None else None
+
+    def get_empty(self, obj):
+        return ''
+
+    def get_none(self, obj):
+        return None
+
+
 class DynamicListDisplayLinksChildAdmin(admin.ModelAdmin):
     list_display = ("parent", "name", "age")
     list_display_links = ["parent", "name"]

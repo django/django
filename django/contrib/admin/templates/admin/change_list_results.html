@@ -28,7 +28,7 @@
 {% if result.form and result.form.non_field_errors %}
     <tr><td colspan="{{ result|length }}">{{ result.form.non_field_errors }}</td></tr>
 {% endif %}
-<tr>{% for item in result %}{{ item }}{% endfor %}</tr>
+<tr{{ result.row_classes }}>{% for item in result %}{{ item }}{% endfor %}</tr>
 {% endfor %}
 </tbody>
 </table>

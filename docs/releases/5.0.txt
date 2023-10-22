@@ -222,6 +222,10 @@ Minor features
 * Properties in :attr:`.ModelAdmin.list_display` now support ``boolean``
   attribute.
 
+* The new :attr:`.ModelAdmin.list_display_classes` and  
+  :meth:`.ModelAdmin.get_list_display_classes` method allows CSS classes to
+  be added to changelist table rows.
+
 * jQuery is upgraded from version 3.6.4 to 3.7.1.
 
 

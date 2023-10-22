@@ -45,6 +45,7 @@ from .admin import (
     FilteredChildAdmin,
     GroupAdmin,
     InvitationAdmin,
+    ListDisplayClassesChildAdmin,
     NoListDisplayLinksParentAdmin,
     ParentAdmin,
     ParentAdminTwoSearchFields,
@@ -1612,6 +1613,50 @@ class ChangeListTests(TestCase):
                 self.assertContains(
                     response, f'0 results (<a href="{href}">1 total</a>)'
                 )
+
+    def test_list_display_classes(self):
+        parent = Parent.objects.create(name="parent")
+        for i in range(1, 10):
+            Child.objects.create(id=i, name="child %s" % i, parent=parent, age=i)
+
+        superuser = self._create_superuser("superuser")
+        request = self._mocked_authenticated_request("/child/", superuser)
+
+        m = ListDisplayClassesChildAdmin(Child, custom_site)
+        list_display_classes = m.get_list_display_classes(request)
+        self.assertEqual(list_display_classes, ())
+
+        m.list_display_classes = ("get_html_class",)
+        list_display_classes = m.get_list_display_classes(request)
+        self.assertEqual(list_display_classes, ("get_html_class",))
+
+        response = m.changelist_view(request)
+        for i in range(1, 10):
+            self.assertContains(response, '<tr class="age_%s">' % (i,))
+
+        m.list_display_classes = ("get_html_classes",)
+        list_display_classes = m.get_list_display_classes(request)
+        self.assertEqual(list_display_classes, ("get_html_classes",))
+
+        response = m.changelist_view(request)
+        for i in range(1, 10):
+            self.assertContains(response, '<tr class="shaded green child_%s">' % (i,))
+
+        m.list_display_classes = ("get_html_classes", "get_html_class")
+        list_display_classes = m.get_list_display_classes(request)
+        self.assertEqual(list_display_classes, ("get_html_classes", "get_html_class"))
+
+        response = m.changelist_view(request)
+        for i in range(1, 10):
+            self.assertContains(response, '<tr class="shaded green child_%s age_%s">' % (i, i))
+
+        m.list_display_classes = ("get_html_classes", "get_empty", "get_none", "get_html_class")
+        list_display_classes = m.get_list_display_classes(request)
+        self.assertEqual(list_display_classes, ("get_html_classes", "get_empty", "get_none", "get_html_class"))
+
+        response = m.changelist_view(request)
+        for i in range(1, 10):
+            self.assertContains(response, '<tr class="shaded green child_%s age_%s">' % (i, i))
 
 
 class GetAdminLogTests(TestCase):

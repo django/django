@@ -640,6 +640,7 @@ class ModelAdmin(BaseModelAdmin):
     """Encapsulate all admin options and functionality for a given model."""
 
     list_display = ("__str__",)
+    list_display_classes = ()
     list_display_links = ()
     list_filter = ()
     list_select_related = False
@@ -874,6 +875,7 @@ class ModelAdmin(BaseModelAdmin):
             self,
             sortable_by,
             self.search_help_text,
+            list_display_classes=self.get_list_display_classes(request),
         )
 
     def get_object(self, request, object_id, from_field=None):
@@ -1093,6 +1095,13 @@ class ModelAdmin(BaseModelAdmin):
         changelist.
         """
         return self.list_display
+
+    def get_list_display_classes(self, request):
+        """
+        Return a sequence containing the fields to be added as CSS classes
+        on each row of the changelist.
+        """
+        return self.list_display_classes
 
     def get_list_display_links(self, request, list_display):
         """

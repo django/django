@@ -841,6 +841,147 @@ subclass::
       as a ``ModelAdmin`` attribute, the model field will be used.
 
 
+.. attribute:: ModelAdmin.list_display_classes
+
+    .. versionadded:: 5.0
+
+    Set ``list_display_classes`` to control which fields are used to add
+    CSS classes to the table row for an object.
+
+    Example::
+
+        list_display_classes = ["first_name", "last_name"]
+
+    If you don't set ``list_display_classes``, no CSS class attribute will be  
+    set for the table row element. 
+
+    There are four types of values that can be used in ``list_display_classes``.
+
+    * The name of a model field. For example::
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display_classes = ["first_name", "last_name"]
+
+    * A callable that accepts one argument, the model instance. For example::
+
+          def upper_case_names(obj):
+              return [obj.first_name.upper(), obj.last_name.upper()]
+
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display_classes = [upper_case_name]
+
+    * A string representing a ``ModelAdmin`` method that accepts one argument,
+      the model instance. For example::
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display = ["upper_case_name"]
+
+              def upper_case_names(self, obj):
+                  return [obj.first_name.upper(), obj.last_name.upper()]
+
+    * A string representing a model attribute or method (without any required
+      arguments). For example::
+
+          from django.contrib import admin
+          from django.db import models
+
+
+          class Person(models.Model):
+              name = models.CharField(max_length=50)
+              birthday = models.DateField()
+
+              def decade_born_in(self):
+                  decade = self.birthday.year // 10 * 10
+                  return f"{decade}"
+
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display_classes = ["decade_born_in"]
+
+    A few special cases to note about ``list_display_classes``:
+
+    * If the field is a ``ForeignKey``, Django will display the
+      ``__str__()`` of the related object.
+
+    * ``ManyToManyField`` fields aren't supported, because that would
+      entail executing a separate SQL statement for each row in the table.
+      If you want to do this nonetheless, give your model a custom method,
+      and add that method's name to ``list_display``. (See below for more
+      on custom methods in ``list_display``.)
+
+    * If the field is a ``BooleanField``, Django will display a pretty "yes",
+      "no", or "unknown" icon instead of ``True``, ``False``, or ``None``.
+
+    * If the string given is a method of the model, ``ModelAdmin`` or a
+      callable, Django will HTML-escape the output by default. To escape
+      user input and allow your own unescaped tags, use
+      :func:`~django.utils.html.format_html`.
+
+    * If the string given contains the space character, Django will replace it 
+      with an underscore, since the space character is reserved as the CSS
+      class name separator. To add multiple CSS classes with a single 
+      function, return a list containing the desired CSS class strings.
+
+    Here's a full example model::
+
+          from django.contrib import admin
+          from django.db import models
+          from django.utils.html import format_html
+
+
+          class Person(models.Model):
+              first_name = models.CharField(max_length=50)
+              last_name = models.CharField(max_length=50)
+              color_name = models.CharField(max_length=50)
+              shaded = models.BooleanField()
+
+              @property
+              def color_and_name(self):
+                  if self.shaded:
+                      return [self.color_name, 'shaded_text']
+                  return [self.color_name]
+
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display_classes = ["color_and_name"]
+
+    * If the value of a field is ``None``, an empty string, or an iterable
+      without elements, Django will not add any CSS classes from the field.
+
+    * The ``__str__()`` method is just as valid in ``list_display_classes`` as 
+      any other model method, so it's perfectly OK to do this::
+
+          list_display_classes = ["__str__", "some_other_field"]
+
+    * Elements of ``list_display_classes`` can also be properties
+      ::
+
+          class Person(models.Model):
+              name = models.CharField(max_length=50)
+              birthday = models.DateField()
+
+              @property
+              def decade_born_in(self):
+                  decade = self.birthday.year // 10 * 10
+                  return f"{decade}"
+
+
+          class PersonAdmin(admin.ModelAdmin):
+              list_display_classes = ["decade_born_in"]
+
+    * Django will try to interpret every element of ``list_display_classes`` 
+      in this order:
+
+      * A field of the model.
+      * A callable.
+      * A string representing a ``ModelAdmin`` attribute.
+      * A string representing a model attribute.
+
+      For example if you have ``first_name`` as a model field and
+      as a ``ModelAdmin`` attribute, the model field will be used.
+
+
 .. attribute:: ModelAdmin.list_display_links
 
     Use ``list_display_links`` to control if and which fields in
@@ -1537,6 +1678,15 @@ templates used by the :class:`ModelAdmin` views:
     expected to return a ``list`` or ``tuple`` of field names that will be
     displayed on the changelist view as described above in the
     :attr:`ModelAdmin.list_display` section.
+
+.. method:: ModelAdmin.get_list_display_classes(request)
+
+    .. versionadded:: 5.0
+
+    The ``get_list_display_classes`` method is given the ``HttpRequest`` and 
+    is expected to return a ``list`` or ``tuple`` of field names that will be
+    added as CSS classes on the table rows of the changelist view as described 
+    above in the :attr:`ModelAdmin.list_display_classes` section.
 
 .. method:: ModelAdmin.get_list_display_links(request, list_display)
 

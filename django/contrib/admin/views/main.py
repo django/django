@@ -83,12 +83,14 @@ class ChangeList:
         model_admin,
         sortable_by,
         search_help_text,
+        list_display_classes=(),
     ):
         self.model = model
         self.opts = model._meta
         self.lookup_opts = self.opts
         self.root_queryset = model_admin.get_queryset(request)
         self.list_display = list_display
+        self.list_display_classes = list_display_classes
         self.list_display_links = list_display_links
         self.list_filter = list_filter
         self.has_filters = None
