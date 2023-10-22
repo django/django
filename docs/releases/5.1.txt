@@ -171,6 +171,9 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``generic_plan`` option on
   PostgreSQL 16+.
 
+* :class:`~django.db.models.expressions.RowRange` now accepts positive integers
+  for the ``start`` argument and negative integers for the ``end`` argument.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
