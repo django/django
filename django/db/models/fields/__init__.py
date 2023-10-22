@@ -1595,10 +1595,13 @@ class DateTimeField(DateField):
                 # local time. This won't work during DST change, but we can't
                 # do much about it, so we let the exceptions percolate up the
                 # call stack.
+                try:
+                    name = f"{self.model.__name__}.{self.name}"
+                except AttributeError:
+                    name = "(unbound)"
                 warnings.warn(
-                    "DateTimeField %s.%s received a naive datetime "
-                    "(%s) while time zone support is active."
-                    % (self.model.__name__, self.name, value),
+                    f"DateTimeField {name} received a naive datetime ({value}) while "
+                    "time zone support is active.",
                     RuntimeWarning,
                 )
                 default_timezone = timezone.get_default_timezone()
