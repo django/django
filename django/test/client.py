@@ -518,7 +518,7 @@ class RequestFactory:
     def options(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         secure=False,
         *,
@@ -565,7 +565,7 @@ class RequestFactory:
     def delete(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         secure=False,
         *,
@@ -582,7 +582,7 @@ class RequestFactory:
         self,
         method,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         secure=False,
         *,
@@ -591,14 +591,14 @@ class RequestFactory:
     ):
         """Construct an arbitrary HTTP request."""
         parsed = urlparse(str(path))  # path can be lazy
-        data = force_bytes(data, settings.DEFAULT_CHARSET)
         r = {
             "PATH_INFO": self._get_path(parsed),
             "REQUEST_METHOD": method,
             "SERVER_PORT": "443" if secure else "80",
             "wsgi.url_scheme": "https" if secure else "http",
         }
-        if data:
+        if data is not None:
+            data = force_bytes(data, settings.DEFAULT_CHARSET)
             r.update(
                 {
                     "CONTENT_LENGTH": str(len(data)),
@@ -680,7 +680,7 @@ class AsyncRequestFactory(RequestFactory):
         self,
         method,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         secure=False,
         *,
@@ -689,7 +689,6 @@ class AsyncRequestFactory(RequestFactory):
     ):
         """Construct an arbitrary HTTP request."""
         parsed = urlparse(str(path))  # path can be lazy.
-        data = force_bytes(data, settings.DEFAULT_CHARSET)
         s = {
             "method": method,
             "path": self._get_path(parsed),
@@ -697,7 +696,8 @@ class AsyncRequestFactory(RequestFactory):
             "scheme": "https" if secure else "http",
             "headers": [(b"host", b"testserver")],
         }
-        if data:
+        if data is not None:
+            data = force_bytes(data, settings.DEFAULT_CHARSET)
             s["headers"].extend(
                 [
                     (b"content-length", str(len(data)).encode("ascii")),
@@ -889,7 +889,7 @@ class ClientMixin:
         return response._json
 
     def _follow_redirect(
-        self, response, *, data="", content_type="", headers=None, **extra
+        self, response, *, data=None, content_type="", headers=None, **extra
     ):
         """Follow a single redirect contained in response using GET."""
         response_url = response.url
@@ -1106,7 +1106,7 @@ class Client(ClientMixin, RequestFactory):
     def options(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         follow=False,
         secure=False,
@@ -1190,7 +1190,7 @@ class Client(ClientMixin, RequestFactory):
     def delete(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         follow=False,
         secure=False,
@@ -1218,7 +1218,7 @@ class Client(ClientMixin, RequestFactory):
     def trace(
         self,
         path,
-        data="",
+        data=None,
         follow=False,
         secure=False,
         *,
@@ -1240,7 +1240,7 @@ class Client(ClientMixin, RequestFactory):
     def _handle_redirects(
         self,
         response,
-        data="",
+        data=None,
         content_type="",
         headers=None,
         **extra,
@@ -1407,7 +1407,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
     async def options(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         follow=False,
         secure=False,
@@ -1491,7 +1491,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
     async def delete(
         self,
         path,
-        data="",
+        data=None,
         content_type="application/octet-stream",
         follow=False,
         secure=False,
@@ -1519,7 +1519,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
     async def trace(
         self,
         path,
-        data="",
+        data=None,
         follow=False,
         secure=False,
         *,
@@ -1541,7 +1541,7 @@ class AsyncClient(ClientMixin, AsyncRequestFactory):
     async def _ahandle_redirects(
         self,
         response,
-        data="",
+        data=None,
         content_type="",
         headers=None,
         **extra,
