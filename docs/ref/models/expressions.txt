@@ -889,7 +889,7 @@ Frames
 For a window frame, you can choose either a range-based sequence of rows or an
 ordinary sequence of rows.
 
-.. class:: ValueRange(start=None, end=None)
+.. class:: ValueRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
@@ -899,7 +899,7 @@ ordinary sequence of rows.
     the standard start and end points, such as ``CURRENT ROW`` and ``UNBOUNDED
     FOLLOWING``.
 
-.. class:: RowRange(start=None, end=None)
+.. class:: RowRange(start=None, end=None, exclusion=None)
 
     .. attribute:: frame_type
 
@@ -910,6 +910,27 @@ Both classes return SQL with the template:
 .. code-block:: sql
 
     %(frame_type)s BETWEEN %(start)s AND %(end)s
+
+
+.. class:: Exclusion
+
+    .. versionadded:: 5.1
+
+    .. attribute:: CURRENT_ROW
+
+    .. attribute:: GROUP
+
+    .. attribute:: TIES
+
+    .. attribute:: NO_OTHERS
+
+If ``exclusion`` is an attribute of
+:class:`~django.db.models.expressions.Exclusion`, this returns for supported
+databases:
+
+.. code-block:: sql
+
+    %(frame_type)s BETWEEN %(start)s AND %(end)s EXCLUDE (exclusion)s
 
 Frames narrow the rows that are used for computing the result. They shift from
 some start point to some specified end point. Frames can be used with and
@@ -976,7 +997,8 @@ released between twelve months before and twelve months after the each movie:
 .. versionchanged:: 5.1
 
     Support for positive integer ``start`` and negative integer ``end`` was
-    added for ``RowRange``.
+    added for ``RowRange``. ``exclusion`` was added to ``RowRange`` and
+    ``ValueRange``.
 
 .. currentmodule:: django.db.models
 

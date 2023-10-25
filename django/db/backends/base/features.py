@@ -264,6 +264,7 @@ class BaseDatabaseFeatures:
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
     only_supports_unbounded_with_preceding_and_following = False
+    supports_frame_exclusion = False
 
     # Does the backend support CAST with precision?
     supports_cast_with_precision = True

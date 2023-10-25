@@ -4,6 +4,7 @@ import functools
 import inspect
 from collections import defaultdict
 from decimal import Decimal
+from enum import Enum
 from types import NoneType
 from uuid import UUID
 
@@ -1848,6 +1849,13 @@ class Window(SQLiteNumericMixin, Expression):
         return group_by_cols
 
 
+class Exclusion(Enum):
+    CURRENT_ROW = "CURRENT ROW"
+    GROUP = "GROUP"
+    TIES = "TIES"
+    NO_OTHERS = "NO OTHERS"
+
+
 class WindowFrame(Expression):
     """
     Model the frame clause in window expressions. There are two types of frame
@@ -1859,9 +1867,10 @@ class WindowFrame(Expression):
 
     template = "%(frame_type)s BETWEEN %(start)s AND %(end)s"
 
-    def __init__(self, start=None, end=None):
+    def __init__(self, start=None, end=None, exclusion=None):
         self.start = Value(start)
         self.end = Value(end)
+        self.exclusion = exclusion
 
     def set_source_expressions(self, exprs):
         self.start, self.end = exprs
@@ -1869,13 +1878,26 @@ class WindowFrame(Expression):
     def get_source_expressions(self):
         return [self.start, self.end]
 
+    def get_exclusion(self):
+        if not connection.features.supports_frame_exclusion:
+            raise NotSupportedError(
+                "This backend does not support window frame exclusions."
+            )
+        if self.exclusion in Exclusion.__members__.values():
+            return f"EXCLUDE {self.exclusion.value}"
+        raise ValueError("exclusion must be a valid Exclusion value.")
+
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         start, end = self.window_frame_start_end(
             connection, self.start.value, self.end.value
         )
+        window_frame_template_parts = [self.template]
+        if self.exclusion is not None:
+            exclusion_as_sql = self.get_exclusion()
+            window_frame_template_parts.append(exclusion_as_sql)
         return (
-            self.template
+            " ".join(window_frame_template_parts)
             % {
                 "frame_type": self.frame_type,
                 "start": start,
@@ -1908,7 +1930,11 @@ class WindowFrame(Expression):
             end = "%d %s" % (abs(self.end.value), connection.ops.PRECEDING)
         else:
             end = connection.ops.UNBOUNDED_FOLLOWING
-        return self.template % {
+
+        window_frame_template_parts = [self.template]
+        if self.exclusion in Exclusion.__members__.values():
+            window_frame_template_parts.append(f"EXCLUDE {self.exclusion.value}")
+        return " ".join(window_frame_template_parts) % {
             "frame_type": self.frame_type,
             "start": start,
             "end": end,

@@ -162,3 +162,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     @cached_property
     def supports_primitives_in_json_field(self):
         return self.connection.oracle_version >= (21,)
+
+    @cached_property
+    def supports_frame_exclusion(self):
+        return self.connection.oracle_version >= (21,)
