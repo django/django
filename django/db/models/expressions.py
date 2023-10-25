@@ -4,6 +4,7 @@ import functools
 import inspect
 from collections import defaultdict
 from decimal import Decimal
+from enum import Enum
 from types import NoneType
 from uuid import UUID
 
@@ -1848,6 +1849,16 @@ class Window(SQLiteNumericMixin, Expression):
         return group_by_cols
 
 
+class WindowFrameExclusion(Enum):
+    CURRENT_ROW = "CURRENT ROW"
+    GROUP = "GROUP"
+    TIES = "TIES"
+    NO_OTHERS = "NO OTHERS"
+
+    def __repr__(self):
+        return f"{self.__class__.__qualname__}.{self._name_}"
+
+
 class WindowFrame(Expression):
     """
     Model the frame clause in window expressions. There are two types of frame
@@ -1857,11 +1868,17 @@ class WindowFrame(Expression):
     row in the frame).
     """
 
-    template = "%(frame_type)s BETWEEN %(start)s AND %(end)s"
+    template = "%(frame_type)s BETWEEN %(start)s AND %(end)s%(exclude)s"
 
-    def __init__(self, start=None, end=None):
+    def __init__(self, start=None, end=None, exclusion=None):
         self.start = Value(start)
         self.end = Value(end)
+        if not isinstance(exclusion, (NoneType, WindowFrameExclusion)):
+            raise TypeError(
+                f"{self.__class__.__qualname__}.exclusion must be a "
+                "WindowFrameExclusion instance."
+            )
+        self.exclusion = exclusion
 
     def set_source_expressions(self, exprs):
         self.start, self.end = exprs
@@ -1869,17 +1886,27 @@ class WindowFrame(Expression):
     def get_source_expressions(self):
         return [self.start, self.end]
 
+    def get_exclusion(self):
+        if self.exclusion is None:
+            return ""
+        return f" EXCLUDE {self.exclusion.value}"
+
     def as_sql(self, compiler, connection):
         connection.ops.check_expression_support(self)
         start, end = self.window_frame_start_end(
             connection, self.start.value, self.end.value
         )
+        if self.exclusion and not connection.features.supports_frame_exclusion:
+            raise NotSupportedError(
+                "This backend does not support window frame exclusions."
+            )
         return (
             self.template
             % {
                 "frame_type": self.frame_type,
                 "start": start,
                 "end": end,
+                "exclude": self.get_exclusion(),
             },
             [],
         )
@@ -1912,6 +1939,7 @@ class WindowFrame(Expression):
             "frame_type": self.frame_type,
             "start": start,
             "end": end,
+            "exclude": self.get_exclusion(),
         }
 
     def window_frame_start_end(self, connection, start, end):

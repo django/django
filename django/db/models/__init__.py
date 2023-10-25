@@ -34,6 +34,7 @@ from django.db.models.expressions import (
     When,
     Window,
     WindowFrame,
+    WindowFrameExclusion,
 )
 from django.db.models.fields import *  # NOQA
 from django.db.models.fields import __all__ as fields_all
@@ -91,6 +92,7 @@ __all__ += [
     "When",
     "Window",
     "WindowFrame",
+    "WindowFrameExclusion",
     "FileField",
     "ImageField",
     "GeneratedField",

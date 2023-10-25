@@ -22,6 +22,7 @@ from django.db.models import (
     When,
     Window,
     WindowFrame,
+    WindowFrameExclusion,
 )
 from django.db.models.fields.json import KeyTextTransform, KeyTransform
 from django.db.models.functions import (
@@ -41,7 +42,7 @@ from django.db.models.functions import (
     Upper,
 )
 from django.db.models.lookups import Exact
-from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
+from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import CaptureQueriesContext
 
 from .models import Classification, Detail, Employee, PastEmployeeDepartment
@@ -1211,6 +1212,47 @@ class WindowFunctionTests(TestCase):
             ordered=False,
         )
 
+    @skipUnlessDBFeature(
+        "supports_frame_exclusion", "supports_frame_range_fixed_distance"
+    )
+    def test_range_exclude_current(self):
+        qs = Employee.objects.annotate(
+            sum=Window(
+                expression=Sum("salary"),
+                order_by=F("salary").asc(),
+                partition_by="department",
+                frame=ValueRange(end=2, exclusion=WindowFrameExclusion.CURRENT_ROW),
+            )
+        ).order_by("department", "salary")
+        self.assertIn(
+            "RANGE BETWEEN UNBOUNDED PRECEDING AND 2 FOLLOWING EXCLUDE CURRENT ROW",
+            str(qs.query),
+        )
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), None),
+                ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 82000),
+                ("Jenson", 45000, "Accounting", datetime.date(2008, 4, 1), 82000),
+                ("Adams", 50000, "Accounting", datetime.date(2013, 7, 1), 127000),
+                ("Moore", 34000, "IT", datetime.date(2013, 8, 1), None),
+                ("Wilkinson", 60000, "IT", datetime.date(2011, 3, 1), 34000),
+                ("Johnson", 80000, "Management", datetime.date(2005, 7, 1), None),
+                ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 80000),
+                ("Smith", 38000, "Marketing", datetime.date(2009, 10, 1), None),
+                ("Johnson", 40000, "Marketing", datetime.date(2012, 3, 1), 38000),
+                ("Brown", 53000, "Sales", datetime.date(2009, 9, 1), None),
+                ("Smith", 55000, "Sales", datetime.date(2007, 6, 1), 53000),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.salary,
+                row.department,
+                row.hire_date,
+                row.sum,
+            ),
+        )
+
     def test_range_unbound(self):
         """A query with RANGE BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING."""
         qs = Employee.objects.annotate(
@@ -1288,6 +1330,190 @@ class WindowFunctionTests(TestCase):
                 row.highest_avg_salary_date,
             ),
         )
+
+    @skipUnlessDBFeature("supports_frame_exclusion")
+    def test_row_range_rank_exclude_current_row(self):
+        qs = Employee.objects.annotate(
+            avg_salary_cohort=Window(
+                expression=Avg("salary"),
+                order_by=[F("hire_date").asc(), F("name").desc()],
+                frame=RowRange(
+                    start=-1, end=1, exclusion=WindowFrameExclusion.CURRENT_ROW
+                ),
+            )
+        ).order_by("hire_date")
+        self.assertIn(
+            "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING EXCLUDE CURRENT ROW",
+            str(qs.query),
+        )
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 80000),
+                ("Johnson", 80000, "Management", datetime.date(2005, 7, 1), 72500),
+                ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 67500),
+                ("Smith", 55000, "Sales", datetime.date(2007, 6, 1), 45000),
+                ("Jenson", 45000, "Accounting", datetime.date(2008, 4, 1), 46000),
+                ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), 49000),
+                ("Brown", 53000, "Sales", datetime.date(2009, 9, 1), 37500),
+                ("Smith", 38000, "Marketing", datetime.date(2009, 10, 1), 56500),
+                ("Wilkinson", 60000, "IT", datetime.date(2011, 3, 1), 39000),
+                ("Johnson", 40000, "Marketing", datetime.date(2012, 3, 1), 55000),
+                ("Adams", 50000, "Accounting", datetime.date(2013, 7, 1), 37000),
+                ("Moore", 34000, "IT", datetime.date(2013, 8, 1), 50000),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.salary,
+                row.department,
+                row.hire_date,
+                row.avg_salary_cohort,
+            ),
+        )
+
+    @skipUnlessDBFeature("supports_frame_exclusion")
+    def test_row_range_rank_exclude_group(self):
+        qs = Employee.objects.annotate(
+            avg_salary_cohort=Window(
+                expression=Avg("salary"),
+                order_by=[F("hire_date").asc(), F("name").desc()],
+                frame=RowRange(start=-1, end=1, exclusion=WindowFrameExclusion.GROUP),
+            )
+        ).order_by("hire_date")
+        self.assertIn(
+            "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING EXCLUDE GROUP",
+            str(qs.query),
+        )
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 80000),
+                ("Johnson", 80000, "Management", datetime.date(2005, 7, 1), 72500),
+                ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 67500),
+                ("Smith", 55000, "Sales", datetime.date(2007, 6, 1), 45000),
+                ("Jenson", 45000, "Accounting", datetime.date(2008, 4, 1), 46000),
+                ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), 49000),
+                ("Brown", 53000, "Sales", datetime.date(2009, 9, 1), 37500),
+                ("Smith", 38000, "Marketing", datetime.date(2009, 10, 1), 56500),
+                ("Wilkinson", 60000, "IT", datetime.date(2011, 3, 1), 39000),
+                ("Johnson", 40000, "Marketing", datetime.date(2012, 3, 1), 55000),
+                ("Adams", 50000, "Accounting", datetime.date(2013, 7, 1), 37000),
+                ("Moore", 34000, "IT", datetime.date(2013, 8, 1), 50000),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.salary,
+                row.department,
+                row.hire_date,
+                row.avg_salary_cohort,
+            ),
+        )
+
+    @skipUnlessDBFeature("supports_frame_exclusion")
+    def test_row_range_rank_exclude_ties(self):
+        qs = Employee.objects.annotate(
+            sum_salary_cohort=Window(
+                expression=Sum("salary"),
+                order_by=[F("hire_date").asc(), F("name").desc()],
+                frame=RowRange(start=-1, end=1, exclusion=WindowFrameExclusion.TIES),
+            )
+        ).order_by("hire_date")
+        self.assertIn(
+            "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING EXCLUDE TIES",
+            str(qs.query),
+        )
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 180000),
+                ("Johnson", 80000, "Management", datetime.date(2005, 7, 1), 225000),
+                ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 180000),
+                ("Smith", 55000, "Sales", datetime.date(2007, 6, 1), 145000),
+                ("Jenson", 45000, "Accounting", datetime.date(2008, 4, 1), 137000),
+                ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), 135000),
+                ("Brown", 53000, "Sales", datetime.date(2009, 9, 1), 128000),
+                ("Smith", 38000, "Marketing", datetime.date(2009, 10, 1), 151000),
+                ("Wilkinson", 60000, "IT", datetime.date(2011, 3, 1), 138000),
+                ("Johnson", 40000, "Marketing", datetime.date(2012, 3, 1), 150000),
+                ("Adams", 50000, "Accounting", datetime.date(2013, 7, 1), 124000),
+                ("Moore", 34000, "IT", datetime.date(2013, 8, 1), 84000),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.salary,
+                row.department,
+                row.hire_date,
+                row.sum_salary_cohort,
+            ),
+        )
+
+    @skipUnlessDBFeature("supports_frame_exclusion")
+    def test_row_range_rank_exclude_no_others(self):
+        qs = Employee.objects.annotate(
+            sum_salary_cohort=Window(
+                expression=Sum("salary"),
+                order_by=[F("hire_date").asc(), F("name").desc()],
+                frame=RowRange(
+                    start=-1, end=1, exclusion=WindowFrameExclusion.NO_OTHERS
+                ),
+            )
+        ).order_by("hire_date")
+        self.assertIn(
+            "ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING EXCLUDE NO OTHERS",
+            str(qs.query),
+        )
+        self.assertQuerySetEqual(
+            qs,
+            [
+                ("Miller", 100000, "Management", datetime.date(2005, 6, 1), 180000),
+                ("Johnson", 80000, "Management", datetime.date(2005, 7, 1), 225000),
+                ("Jones", 45000, "Accounting", datetime.date(2005, 11, 1), 180000),
+                ("Smith", 55000, "Sales", datetime.date(2007, 6, 1), 145000),
+                ("Jenson", 45000, "Accounting", datetime.date(2008, 4, 1), 137000),
+                ("Williams", 37000, "Accounting", datetime.date(2009, 6, 1), 135000),
+                ("Brown", 53000, "Sales", datetime.date(2009, 9, 1), 128000),
+                ("Smith", 38000, "Marketing", datetime.date(2009, 10, 1), 151000),
+                ("Wilkinson", 60000, "IT", datetime.date(2011, 3, 1), 138000),
+                ("Johnson", 40000, "Marketing", datetime.date(2012, 3, 1), 150000),
+                ("Adams", 50000, "Accounting", datetime.date(2013, 7, 1), 124000),
+                ("Moore", 34000, "IT", datetime.date(2013, 8, 1), 84000),
+            ],
+            transform=lambda row: (
+                row.name,
+                row.salary,
+                row.department,
+                row.hire_date,
+                row.sum_salary_cohort,
+            ),
+        )
+
+    @skipIfDBFeature("supports_frame_exclusion")
+    def test_unsupported_frame_exclusion_raises_error(self):
+        msg = "This backend does not support window frame exclusions."
+        with self.assertRaisesMessage(NotSupportedError, msg):
+            list(
+                Employee.objects.annotate(
+                    avg_salary_cohort=Window(
+                        expression=Avg("salary"),
+                        order_by=[F("hire_date").asc(), F("name").desc()],
+                        frame=RowRange(
+                            start=-1, end=1, exclusion=WindowFrameExclusion.CURRENT_ROW
+                        ),
+                    )
+                )
+            )
+
+    @skipUnlessDBFeature("supports_frame_exclusion")
+    def test_invalid_frame_exclusion_value_raises_error(self):
+        msg = "RowRange.exclusion must be a WindowFrameExclusion instance."
+        with self.assertRaisesMessage(TypeError, msg):
+            Employee.objects.annotate(
+                avg_salary_cohort=Window(
+                    expression=Avg("salary"),
+                    order_by=[F("hire_date").asc(), F("name").desc()],
+                    frame=RowRange(start=-1, end=1, exclusion="RUBBISH"),
+                )
+            )
 
     def test_row_range_rank(self):
         """
@@ -1735,6 +1961,13 @@ class NonQueryWindowTests(SimpleTestCase):
             repr(RowRange(start=1, end=2)),
             "<RowRange: ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING>",
         )
+        self.assertEqual(
+            repr(RowRange(start=1, end=2, exclusion=WindowFrameExclusion.CURRENT_ROW)),
+            "<RowRange: ROWS BETWEEN 1 FOLLOWING AND 2 FOLLOWING EXCLUDE CURRENT ROW>",
+        )
+
+    def test_window_frame_exclusion_repr(self):
+        self.assertEqual(repr(WindowFrameExclusion.TIES), "WindowFrameExclusion.TIES")
 
     def test_empty_group_by_cols(self):
         window = Window(expression=Sum("pk"))
