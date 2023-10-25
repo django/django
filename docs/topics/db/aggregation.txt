@@ -222,12 +222,14 @@ Combining multiple aggregations
 Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
 wrong results <10060>` because joins are used instead of subqueries:
 
+.. code-block:: pycon
+
     >>> book = Book.objects.first()
     >>> book.authors.count()
     2
     >>> book.store_set.count()
     3
-    >>> q = Book.objects.annotate(Count('authors'), Count('store'))
+    >>> q = Book.objects.annotate(Count("authors"), Count("store"))
     >>> q[0].authors__count
     6
     >>> q[0].store__count
@@ -237,7 +239,11 @@ For most aggregates, there is no way to avoid this problem, however, the
 :class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
-    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
+.. code-block:: pycon
+
+    >>> q = Book.objects.annotate(
+    ...     Count("authors", distinct=True), Count("store", distinct=True)
+    ... )
     >>> q[0].authors__count
     2
     >>> q[0].store__count
@@ -514,7 +520,9 @@ the annotation is computed over all members of the group.
 For example, consider an author query that attempts to find out the average
 rating of books written by each author:
 
-    >>> Author.objects.annotate(average_rating=Avg('book__rating'))
+.. code-block:: pycon
+
+    >>> Author.objects.annotate(average_rating=Avg("book__rating"))
 
 This will return one result for each author in the database, annotated with
 their average book rating.

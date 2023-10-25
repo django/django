@@ -997,6 +997,8 @@ databases don't allow ``LIMIT`` or ``OFFSET`` in the combined queries.
 Uses SQL's ``INTERSECT`` operator to return the shared elements of two or more
 ``QuerySet``\s. For example:
 
+.. code-block:: pycon
+
     >>> qs1.intersection(qs2, qs3)
 
 See :meth:`union` for some restrictions.
@@ -1197,7 +1199,9 @@ item in the Pizza ``QuerySet``.
 
 We can reduce to just two queries using ``prefetch_related``:
 
-    >>> Pizza.objects.prefetch_related('toppings')
+.. code-block:: pycon
+
+    >>> Pizza.objects.prefetch_related("toppings")
 
 This implies a ``self.toppings.all()`` for each ``Pizza``; now each time
 ``self.toppings.all()`` is called, instead of having to go to the database for
@@ -1241,7 +1245,9 @@ database.
     results, and retrieve data using a fresh database query. So, if you write
     the following:
 
-        >>> pizzas = Pizza.objects.prefetch_related('toppings')
+    .. code-block:: pycon
+
+        >>> pizzas = Pizza.objects.prefetch_related("toppings")
         >>> [list(pizza.toppings.filter(spicy=True)) for pizza in pizzas]
 
     ...then the fact that ``pizza.toppings.all()`` has been prefetched will not
@@ -1301,7 +1307,9 @@ Chaining ``prefetch_related`` calls will accumulate the lookups that are
 prefetched. To clear any ``prefetch_related`` behavior, pass ``None`` as a
 parameter:
 
-   >>> non_prefetched = qs.prefetch_related(None)
+.. code-block:: pycon
+
+    >>> non_prefetched = qs.prefetch_related(None)
 
 One difference to note when using ``prefetch_related`` is that objects created
 by a query can be shared between the different objects that they are related to
@@ -1332,20 +1340,28 @@ the prefetch operation.
 In its simplest form ``Prefetch`` is equivalent to the traditional string based
 lookups:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Restaurant.objects.prefetch_related(Prefetch('pizzas__toppings'))
+    >>> Restaurant.objects.prefetch_related(Prefetch("pizzas__toppings"))
 
 You can provide a custom queryset with the optional ``queryset`` argument.
 This can be used to change the default ordering of the queryset:
 
+.. code-block:: pycon
+
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas__toppings', queryset=Toppings.objects.order_by('name')))
+    ...     Prefetch("pizzas__toppings", queryset=Toppings.objects.order_by("name"))
+    ... )
 
 Or to call :meth:`~django.db.models.query.QuerySet.select_related()` when
 applicable to reduce the number of queries even further:
 
+.. code-block:: pycon
+
     >>> Pizza.objects.prefetch_related(
-    ...     Prefetch('restaurants', queryset=Restaurant.objects.select_related('best_pizza')))
+    ...     Prefetch("restaurants", queryset=Restaurant.objects.select_related("best_pizza"))
+    ... )
 
 You can also assign the prefetched result to a custom attribute with the optional
 ``to_attr`` argument. The result will be stored directly in a list.
@@ -1353,32 +1369,42 @@ You can also assign the prefetched result to a custom attribute with the optiona
 This allows prefetching the same relation multiple times with a different
 ``QuerySet``; for instance:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', to_attr='menu'),
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'))
+    ...     Prefetch("pizzas", to_attr="menu"),
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ... )
 
 Lookups created with custom ``to_attr`` can still be traversed as usual by other
 lookups:
 
+.. code-block:: pycon
+
     >>> vegetarian_pizzas = Pizza.objects.filter(vegetarian=True)
     >>> Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=vegetarian_pizzas, to_attr='vegetarian_menu'),
-    ...     'vegetarian_menu__toppings')
+    ...     Prefetch("pizzas", queryset=vegetarian_pizzas, to_attr="vegetarian_menu"),
+    ...     "vegetarian_menu__toppings",
+    ... )
 
 Using ``to_attr`` is recommended when filtering down the prefetch result as it is
 less ambiguous than storing a filtered result in the related manager's cache:
+
+.. code-block:: pycon
 
     >>> queryset = Pizza.objects.filter(vegetarian=True)
     >>>
     >>> # Recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset, to_attr='vegetarian_pizzas'))
+    ...     Prefetch("pizzas", queryset=queryset, to_attr="vegetarian_pizzas")
+    ... )
     >>> vegetarian_pizzas = restaurants[0].vegetarian_pizzas
     >>>
     >>> # Not recommended:
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('pizzas', queryset=queryset))
+    ...     Prefetch("pizzas", queryset=queryset),
+    ... )
     >>> vegetarian_pizzas = restaurants[0].pizzas.all()
 
 Custom prefetching also works with single related relations like
@@ -1394,10 +1420,13 @@ where prefetching with a custom ``QuerySet`` is useful:
 * You want to use performance optimization techniques like
   :meth:`deferred fields <defer()>`:
 
-    >>> queryset = Pizza.objects.only('name')
+  .. code-block:: pycon
+
+    >>> queryset = Pizza.objects.only("name")
     >>>
     >>> restaurants = Restaurant.objects.prefetch_related(
-    ...     Prefetch('best_pizza', queryset=queryset))
+    ...     Prefetch("best_pizza", queryset=queryset)
+    ... )
 
 When using multiple databases, ``Prefetch`` will respect your choice of
 database. If the inner query does not specify a database, it will use the
@@ -1427,20 +1456,26 @@ database selected by the outer query. All of the following are valid:
 
     Take the following examples:
 
-       >>> prefetch_related('pizzas__toppings', 'pizzas')
+    .. code-block:: pycon
+
+       >>> prefetch_related("pizzas__toppings", "pizzas")
 
     This works even though it's unordered because ``'pizzas__toppings'``
     already contains all the needed information, therefore the second argument
     ``'pizzas'`` is actually redundant.
 
-        >>> prefetch_related('pizzas__toppings', Prefetch('pizzas', queryset=Pizza.objects.all()))
+    .. code-block:: pycon
+
+        >>> prefetch_related("pizzas__toppings", Prefetch("pizzas", queryset=Pizza.objects.all()))
 
     This will raise a ``ValueError`` because of the attempt to redefine the
     queryset of a previously seen lookup. Note that an implicit queryset was
     created to traverse ``'pizzas'`` as part of the ``'pizzas__toppings'``
     lookup.
 
-        >>> prefetch_related('pizza_list__toppings', Prefetch('pizzas', to_attr='pizza_list'))
+    .. code-block:: pycon
+
+        >>> prefetch_related("pizza_list__toppings", Prefetch("pizzas", to_attr="pizza_list"))
 
     This will trigger an ``AttributeError`` because ``'pizza_list'`` doesn't exist yet
     when ``'pizza_list__toppings'`` is being processed.
@@ -4058,12 +4093,14 @@ The ``lookup`` argument describes the relations to follow and works the same
 as the string based lookups passed to
 :meth:`~django.db.models.query.QuerySet.prefetch_related()`. For example:
 
+.. code-block:: pycon
+
     >>> from django.db.models import Prefetch
-    >>> Question.objects.prefetch_related(Prefetch('choice_set')).get().choice_set.all()
+    >>> Question.objects.prefetch_related(Prefetch("choice_set")).get().choice_set.all()
     <QuerySet [<Choice: Not much>, <Choice: The sky>, <Choice: Just hacking again>]>
     # This will only execute two queries regardless of the number of Question
     # and Choice objects.
-    >>> Question.objects.prefetch_related(Prefetch('choice_set'))
+    >>> Question.objects.prefetch_related(Prefetch("choice_set"))
     <QuerySet [<Question: What's up?>]>
 
 The ``queryset`` argument supplies a base ``QuerySet`` for the given lookup.
@@ -4071,17 +4108,21 @@ This is useful to further filter down the prefetch operation, or to call
 :meth:`~django.db.models.query.QuerySet.select_related()` from the prefetched
 relation, hence reducing the number of queries even further:
 
+.. code-block:: pycon
+
     >>> voted_choices = Choice.objects.filter(votes__gt=0)
     >>> voted_choices
     <QuerySet [<Choice: The sky>]>
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices)
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices)
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
     <QuerySet [<Choice: The sky>]>
 
 The ``to_attr`` argument sets the result of the prefetch operation to a custom
 attribute:
 
-    >>> prefetch = Prefetch('choice_set', queryset=voted_choices, to_attr='voted_choices')
+.. code-block:: pycon
+
+    >>> prefetch = Prefetch("choice_set", queryset=voted_choices, to_attr="voted_choices")
     >>> Question.objects.prefetch_related(prefetch).get().voted_choices
     [<Choice: The sky>]
     >>> Question.objects.prefetch_related(prefetch).get().choice_set.all()
