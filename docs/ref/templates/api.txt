@@ -498,24 +498,30 @@ If you ``pop()`` too much, it'll raise
 You can also use ``push()`` as a context manager to ensure a matching ``pop()``
 is called.
 
+.. code-block:: pycon
+
     >>> c = Context()
-    >>> c['foo'] = 'first level'
+    >>> c["foo"] = "first level"
     >>> with c.push():
-    ...     c['foo'] = 'second level'
-    ...     c['foo']
+    ...     c["foo"] = "second level"
+    ...     c["foo"]
+    ...
     'second level'
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
 
 All arguments passed to ``push()`` will be passed to the ``dict`` constructor
 used to build the new context level.
 
+.. code-block:: pycon
+
     >>> c = Context()
-    >>> c['foo'] = 'first level'
-    >>> with c.push(foo='second level'):
-    ...     c['foo']
+    >>> c["foo"] = "first level"
+    >>> with c.push(foo="second level"):
+    ...     c["foo"]
+    ...
     'second level'
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
 
 .. method:: Context.update(other_dict)
@@ -525,26 +531,31 @@ object also defines an ``update()`` method. This works like ``push()``
 but takes a dictionary as an argument and pushes that dictionary onto
 the stack instead of an empty one.
 
+.. code-block:: pycon
+
     >>> c = Context()
-    >>> c['foo'] = 'first level'
-    >>> c.update({'foo': 'updated'})
+    >>> c["foo"] = "first level"
+    >>> c.update({"foo": "updated"})
     {'foo': 'updated'}
-    >>> c['foo']
+    >>> c["foo"]
     'updated'
     >>> c.pop()
     {'foo': 'updated'}
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
 
 Like ``push()``, you can use ``update()`` as a context manager to ensure a
 matching ``pop()`` is called.
 
+.. code-block:: pycon
+
     >>> c = Context()
-    >>> c['foo'] = 'first level'
-    >>> with c.update({'foo': 'second level'}):
-    ...     c['foo']
+    >>> c["foo"] = "first level"
+    >>> with c.update({"foo": "second level"}):
+    ...     c["foo"]
+    ...
     'second level'
-    >>> c['foo']
+    >>> c["foo"]
     'first level'
 
 Using a ``Context`` as a stack comes in handy in :ref:`some custom template
@@ -555,20 +566,24 @@ tags <howto-writing-custom-template-tags>`.
 Using ``flatten()`` method you can get whole ``Context`` stack as one dictionary
 including builtin variables.
 
+.. code-block:: pycon
+
     >>> c = Context()
-    >>> c['foo'] = 'first level'
-    >>> c.update({'bar': 'second level'})
+    >>> c["foo"] = "first level"
+    >>> c.update({"bar": "second level"})
     {'bar': 'second level'}
     >>> c.flatten()
     {'True': True, 'None': None, 'foo': 'first level', 'False': False, 'bar': 'second level'}
 
 A ``flatten()`` method is also internally used to make ``Context`` objects comparable.
 
+.. code-block:: pycon
+
     >>> c1 = Context()
-    >>> c1['foo'] = 'first level'
-    >>> c1['bar'] = 'second level'
+    >>> c1["foo"] = "first level"
+    >>> c1["bar"] = "second level"
     >>> c2 = Context()
-    >>> c2.update({'bar': 'second level', 'foo': 'first level'})
+    >>> c2.update({"bar": "second level", "foo": "first level"})
     {'foo': 'first level', 'bar': 'second level'}
     >>> c1 == c2
     True
