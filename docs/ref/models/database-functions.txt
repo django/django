@@ -89,11 +89,13 @@ Usage examples:
     A Python value passed to ``Coalesce`` on MySQL may be converted to an
     incorrect type unless explicitly cast to the correct database type:
 
-    >>> from django.db.models import DateTimeField
-    >>> from django.db.models.functions import Cast, Coalesce
-    >>> from django.utils import timezone
-    >>> now = timezone.now()
-    >>> Coalesce('updated', Cast(now, DateTimeField()))
+    .. code-block:: pycon
+
+        >>> from django.db.models import DateTimeField
+        >>> from django.db.models.functions import Cast, Coalesce
+        >>> from django.utils import timezone
+        >>> now = timezone.now()
+        >>> Coalesce("updated", Cast(now, DateTimeField()))
 
 ``Collate``
 -----------

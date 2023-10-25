@@ -371,12 +371,14 @@ Methods
     Otherwise the absolute URI is built using the server variables available in
     this request. For example:
 
-    >>> request.build_absolute_uri()
-    'https://example.com/music/bands/the_beatles/?print=true'
-    >>> request.build_absolute_uri('/bands/')
-    'https://example.com/bands/'
-    >>> request.build_absolute_uri('https://example2.com/bands/')
-    'https://example2.com/bands/'
+    .. code-block:: pycon
+
+        >>> request.build_absolute_uri()
+        'https://example.com/music/bands/the_beatles/?print=true'
+        >>> request.build_absolute_uri("/bands/")
+        'https://example.com/bands/'
+        >>> request.build_absolute_uri("https://example2.com/bands/")
+        'https://example2.com/bands/'
 
     .. note::
 
@@ -494,8 +496,10 @@ a subclass of dictionary. Exceptions are outlined here:
 
     Instantiates a ``QueryDict`` object based on ``query_string``.
 
-    >>> QueryDict('a=1&a=2&c=3')
-    <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
+    .. code-block:: pycon
+
+        >>> QueryDict("a=1&a=2&c=3")
+        <QueryDict: {'a': ['1', '2'], 'c': ['3']}>
 
     If ``query_string`` is not passed in, the resulting ``QueryDict`` will be
     empty (it will have no keys or values).
