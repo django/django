@@ -166,6 +166,12 @@ Messages to this logger have the following extra context:
 
 * ``request``: The request object (a :py:class:`socket.socket`) that generated the logging message.
 
+* ``response_time``: The time taken for the server to process the request and send a response back to the client, typically measured in milliseconds or seconds.
+
+    .. versionchanged:: 5.1
+
+    Response time was added in message.
+
 .. _django-template-logger:
 
 ``django.template``
