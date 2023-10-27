@@ -151,10 +151,10 @@ Forms
       import datetime, pathlib
       from django import forms
 
+
       class NewForm(forms.Form):
           file_path_field = forms.FilePathField(
-              path=pathlib.Path('/to/some/directory'),
-              cache=datetime.timedelta(minutes=5)
+              path=pathlib.Path("/to/some/directory"), cache=datetime.timedelta(minutes=5)
           )
 
 Generic Views
