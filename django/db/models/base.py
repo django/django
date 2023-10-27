@@ -691,7 +691,7 @@ class Model(AltersData, metaclass=ModelBase):
             self._prefetched_objects_cache = {}
         else:
             prefetched_objects_cache = getattr(self, "_prefetched_objects_cache", ())
-            for field in fields:
+            for field in list(fields):
                 if field in prefetched_objects_cache:
                     del prefetched_objects_cache[field]
                     fields.remove(field)
