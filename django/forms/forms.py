@@ -166,7 +166,7 @@ class BaseForm(RenderableFormMixin):
 
     def _refresh_cached_fields(self):
         """Call refresh_cache() method on Fields with caches."""
-        for field in self.fields:
+        for field in self.fields.values():
             if hasattr(field, "refresh_cache"):
                 field.refresh_cache()
 
