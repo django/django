@@ -734,10 +734,10 @@ For each field, we describe the default widget used if you don't specify
         Default is ``False``. Specifies how long the contents of ``path`` will be 
         cached before being read again from the filesystem. If ``False``, the contents
         of ``path`` are read every time the form is instantiated. If ``True``, the 
-        contents of ``path`` are cached the first time the form is instantiated and 
-        never reloaded. If set to a ``datetime.timedelta`` object, the contents of 
-        ``path`` are cached and are read from the filesystem again after the duration
-        specified in the ``datetime.timedelta``.
+        contents of ``path`` are cached when the form is imported and never reloaded. 
+        If set to a :class:`python:datetime.timedelta` object, the contents of 
+        ``path`` are cached and are read from the filesystem again after the duration 
+        specified in the :class:`python:datetime.timedelta`.
 
 ``FloatField``
 --------------

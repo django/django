@@ -138,11 +138,11 @@ File Uploads
 Forms
 ~~~~~
 
-* The new :attr:`~.django.forms.FilePathField.cache` attribute of
+* The new :attr:`~django.forms.FilePathField.cache` attribute of
   :class:`django.forms.FilePathField` and :class:`django.db.models.FilePathField` 
   offers configurable caching of the contents of the source path. The default is 
-  `False`, which will read the source path each time the form is loaded. If set to 
-  `True`, the contents of the source path are cached when the form is first imported. 
+  ``False``, which will read the source path each time the form is loaded. If set to 
+  ``True``, the contents of the source path are cached when the form is first imported.
   If set to a Python :class:`python:datetime.timedelta` object, the cache will be 
   refreshed after the specified duration.
 
