@@ -1199,6 +1199,8 @@ directory on the filesystem. Has some special arguments, of which the first is
 
 .. attribute:: FilePathField.cache
 
+    .. versionadded:: 5.1
+
     Optional. Either ``True``, ``False``, or a ``datetime.timedelta`` object. 
     Default is ``False``. Specifies how long the contents of ``path`` will be 
     cached before being read again from the filesystem. If ``False``, the contents
