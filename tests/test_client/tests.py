@@ -856,6 +856,13 @@ class ClientTest(TestCase):
             response, "https://www.djangoproject.com/", fetch_redirect_response=False
         )
 
+    @override_settings(ALLOWED_HOSTS=["hostname1", "hostname2"])
+    def test_redirect_with_http_host(self):
+        response = self.client.get(
+            "/redirect_to_different_hostname/", follow=True, HTTP_HOST="hostname1"
+        )
+        self.assertEqual(response.content, b"hostname2")
+
     def test_external_redirect_without_trailing_slash(self):
         """
         Client._handle_redirects() with an empty path.
