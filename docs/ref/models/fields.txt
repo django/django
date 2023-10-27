@@ -1147,7 +1147,7 @@ periodically via e.g. cron).
 ``FilePathField``
 -----------------
 
-.. class:: FilePathField(path='', match=None, recursive=False, allow_files=True, allow_folders=False, max_length=100, **options)
+.. class:: FilePathField(path='', match=None, recursive=False, allow_files=True, allow_folders=False, cache=False, max_length=100, **options)
 
 A :class:`CharField` whose choices are limited to the filenames in a certain
 directory on the filesystem. Has some special arguments, of which the first is
@@ -1196,6 +1196,17 @@ directory on the filesystem. Has some special arguments, of which the first is
     Optional.  Either ``True`` or ``False``.  Default is ``False``.  Specifies
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
+
+.. attribute:: FilePathField.cache
+
+    Optional. Either ``True``, ``False``, or a ``datetime.timedelta`` object. 
+    Default is ``False``. Specifies how long the contents of ``path`` will be 
+    cached before being read again from the filesystem. If ``False``, the contents
+    of ``path`` are read every time the form is instantiated. If ``True``, the 
+    contents of ``path`` are cached the first time the form is instantiated and 
+    never reloaded. If set to a ``datetime.timedelta`` object, the contents of 
+    ``path`` are cached and are read from the filesystem again after the duration
+    specified in the ``datetime.timedelta``.
 
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::
