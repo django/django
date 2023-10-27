@@ -103,6 +103,7 @@ class BaseForm(RenderableFormMixin):
         self.fields = copy.deepcopy(self.base_fields)
         self._bound_fields_cache = {}
         self.order_fields(self.field_order if field_order is None else field_order)
+        self._refresh_cached_fields()
 
         if use_required_attribute is not None:
             self.use_required_attribute = use_required_attribute
@@ -162,6 +163,12 @@ class BaseForm(RenderableFormMixin):
         """Yield (name, bf) pairs, where bf is a BoundField object."""
         for name in self.fields:
             yield name, self[name]
+
+    def _refresh_cached_fields(self):
+        """Call refresh_cache() method on Fields with caches."""
+        for field in self.fields:
+            if hasattr(field, "refresh_cache"):
+                field.refresh_cache()
 
     def __iter__(self):
         """Yield the form's fields as BoundField objects."""
