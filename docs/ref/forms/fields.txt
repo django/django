@@ -695,7 +695,7 @@ For each field, we describe the default widget used if you don't specify
     * Validates that the selected choice exists in the list of choices.
     * Error message keys: ``required``, ``invalid_choice``
 
-    The field allows choosing from files inside a certain directory. It takes five
+    The field allows choosing from files inside a certain directory. It takes six
     extra arguments; only ``path`` is required:
 
     .. attribute:: path
@@ -726,6 +726,16 @@ For each field, we describe the default widget used if you don't specify
         whether folders in the specified location should be included.  Either this or
         :attr:`allow_files` must be ``True``.
 
+    .. attribute:: cache
+
+        Optional. Either ``True``, ``False``, or a ``datetime.timedelta`` object. 
+        Default is ``False``. Specifies how long the contents of ``path`` will be 
+        cached before being read again from the filesystem. If ``False``, the contents
+        of ``path`` are read every time the form is instantiated. If ``True``, the 
+        contents of ``path`` are cached the first time the form is instantiated and 
+        never reloaded. If set to a ``datetime.timedelta`` object, the contents of 
+        ``path`` are cached and are read from the filesystem again after the duration
+        specified in the ``datetime.timedelta``.
 
 ``FloatField``
 --------------
