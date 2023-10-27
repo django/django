@@ -1,3 +1,5 @@
+import datetime
+
 from django.apps import apps
 from django.db import models
 from django.test import SimpleTestCase, override_settings
@@ -207,13 +209,24 @@ class FieldDeconstructionTests(SimpleTestCase):
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"match": r".*\.txt$"})
-        field = models.FilePathField(recursive=True, allow_folders=True, max_length=123)
+        self.assertEqual(kwargs, {"cache": False, "match": r".*\.txt$"})
+        field = models.FilePathField(
+            recursive=True,
+            allow_folders=True,
+            max_length=123,
+            cache=datetime.timedelta(seconds=5),
+        )
         name, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.FilePathField")
         self.assertEqual(args, [])
         self.assertEqual(
-            kwargs, {"recursive": True, "allow_folders": True, "max_length": 123}
+            kwargs,
+            {
+                "recursive": True,
+                "allow_folders": True,
+                "max_length": 123,
+                "cache": datetime.timedelta(seconds=5),
+            },
         )
 
     def test_float_field(self):
