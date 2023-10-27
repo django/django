@@ -1247,7 +1247,7 @@ class FilePathField(ChoiceField):
     def refresh_cache(self):
         """Calls _set_choices() if cache is disabled or stale."""
         if isinstance(self.cache, datetime.timedelta):
-            now = datetime.now()
+            now = datetime.datetime.now()
             if now - self._cache_timestamp > self.cache:
                 self._set_choices()
         elif not self.cache:
