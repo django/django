@@ -1,4 +1,7 @@
+import datetime
 import os.path
+import time
+from pathlib import Path
 
 from django.core.exceptions import ValidationError
 from django.forms import FilePathField
@@ -111,3 +114,84 @@ class FilePathFieldTest(SimpleTestCase):
                 ("/filepathfield_test_dir/c/f", "c/f"),
             ],
         )
+
+    def test_cache_true(self):
+        insulated_path = Path(self.path).parent / "filepathfield_test_cache_true_dir"
+        f = FilePathField(path=insulated_path, cache=True)
+        # Then add a new file
+        new_file = insulated_path / "z.py"
+        new_file.touch()
+        # Check that z.py is not a choice before calling refresh_cache()
+        expected = [
+            ("/filepathfield_test_cache_true_dir/README", "README"),
+            ("/filepathfield_test_cache_true_dir/__init__.py", "__init__.py"),
+            ("/filepathfield_test_cache_true_dir/a.py", "a.py"),
+            ("/filepathfield_test_cache_true_dir/ab.py", "ab.py"),
+            ("/filepathfield_test_cache_true_dir/b.py", "b.py"),
+        ]
+        try:
+            self.assertChoices(f, expected)
+            # Check that z.py is a not choice after calling refresh_cache()
+            # (which should do nothing since the cache is not invalidated
+            # when set to True)
+            f.refresh_cache()
+            self.assertChoices(f, expected)
+        finally:
+            # Check that z.py is not a choice before calling refresh_cache()
+            new_file.unlink()
+
+    def test_cache_false(self):
+        insulated_path = Path(self.path).parent / "filepathfield_test_cache_false_dir"
+        f = FilePathField(path=insulated_path, cache=False)
+        # Then add a new file
+        new_file = insulated_path / "z.py"
+        new_file.touch()
+        # Check that z.py is not a choice before calling refresh_cache()
+        expected = [
+            ("/filepathfield_test_cache_false_dir/README", "README"),
+            ("/filepathfield_test_cache_false_dir/__init__.py", "__init__.py"),
+            ("/filepathfield_test_cache_false_dir/a.py", "a.py"),
+            ("/filepathfield_test_cache_false_dir/ab.py", "ab.py"),
+            ("/filepathfield_test_cache_false_dir/b.py", "b.py"),
+        ]
+        try:
+            self.assertChoices(f, expected)
+            # Check that z.py is a choice after calling refresh_cache()
+            f.refresh_cache()
+            expected.append(("/filepathfield_test_cache_false_dir/z.py", "z.py"))
+            self.assertChoices(f, expected)
+        finally:
+            # delete z.py even if test fails
+            new_file.unlink()
+
+    def test_cache_timedelta(self):
+        insulated_path = (
+            Path(self.path).parent / "filepathfield_test_cache_timedelta_dir"
+        )
+        f = FilePathField(path=insulated_path, cache=datetime.timedelta(seconds=5))
+        # Then add a new file
+        new_file = insulated_path / "z.py"
+        new_file.touch()
+        # Check that z.py is not a choice before calling refresh_cache()
+        expected = [
+            ("/filepathfield_test_cache_timedelta_dir/README", "README"),
+            ("/filepathfield_test_cache_timedelta_dir/__init__.py", "__init__.py"),
+            ("/filepathfield_test_cache_timedelta_dir/a.py", "a.py"),
+            ("/filepathfield_test_cache_timedelta_dir/ab.py", "ab.py"),
+            ("/filepathfield_test_cache_timedelta_dir/b.py", "b.py"),
+        ]
+        try:
+            self.assertChoices(f, expected)
+            # Check that z.py is a not choice after calling refresh_cache()
+            # within the timedelta
+            f.refresh_cache()
+            self.assertChoices(f, expected)
+            # Check that z.py is a choice after calling refresh_cache()
+            # after the timedelta
+            time.sleep(5)
+            f.refresh_cache()
+            expected.append(("/filepathfield_test_cache_timedelta_dir/z.py", "z.py"))
+            self.assertChoices(f, expected)
+        finally:
+            # delete z.py even if test fails
+            new_file.unlink()

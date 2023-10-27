@@ -1,6 +1,7 @@
 import copy
 import datetime
 import json
+import unittest
 import uuid
 
 from django.core.exceptions import NON_FIELD_ERRORS
@@ -5226,3 +5227,13 @@ class OverrideTests(SimpleTestCase):
             '<label for="id_name" class="required">Name:</label>'
             '<legend class="required">Language:</legend>',
         )
+
+    def test_refresh_cached_fields(self):
+        class CacheField(BooleanField):
+            refresh_cache = unittest.mock.MagicMock()
+
+        class CacheForm(Form):
+            field = CacheField()
+
+        form = CacheForm()
+        self.assertTrue(form.fields["field"].refresh_cache.called)
