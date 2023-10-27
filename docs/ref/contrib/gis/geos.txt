@@ -325,8 +325,7 @@ Properties
     is simple if and only if it does not intersect itself (except at boundary
     points).  For example, a :class:`LineString` object is not simple if it
     intersects itself. Thus, :class:`LinearRing` and :class:`Polygon` objects
-    are always simple because they do cannot intersect themselves, by
-    definition.
+    are always simple because they cannot intersect themselves, by definition.
 
 .. attribute:: GEOSGeometry.valid
 
