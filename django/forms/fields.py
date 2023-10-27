@@ -1194,12 +1194,18 @@ class FilePathField(ChoiceField):
         recursive=False,
         allow_files=True,
         allow_folders=False,
+        cache=False,
         **kwargs,
     ):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
+        self.recursive, self.cache = recursive, cache
+        if isinstance(self.cache, datetime.timedelta):
+            self._cache_timestamp = datetime.datetime.now()
         super().__init__(choices=(), **kwargs)
+        self._set_choices()
 
+    def _set_choices(self):
         if self.required:
             self.choices = []
         else:
@@ -1208,20 +1214,20 @@ class FilePathField(ChoiceField):
         if self.match is not None:
             self.match_re = re.compile(self.match)
 
-        if recursive:
+        if self.recursive:
             for root, dirs, files in sorted(os.walk(self.path)):
                 if self.allow_files:
                     for f in sorted(files):
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
                 if self.allow_folders:
                     for f in sorted(dirs):
                         if f == "__pycache__":
                             continue
                         if self.match is None or self.match_re.search(f):
                             f = os.path.join(root, f)
-                            self.choices.append((f, f.replace(path, "", 1)))
+                            self.choices.append((f, f.replace(self.path, "", 1)))
         else:
             choices = []
             with os.scandir(self.path) as entries:
@@ -1237,6 +1243,15 @@ class FilePathField(ChoiceField):
             self.choices.extend(choices)
 
         self.widget.choices = self.choices
+
+    def refresh_cache(self):
+        """Calls _set_choices() if cache is disabled or stale."""
+        if isinstance(self.cache, datetime.timedelta):
+            now = datetime.now()
+            if now - self._cache_timestamp > self.cache:
+                self._set_choices()
+        elif not self.cache:
+            self._set_choices()
 
 
 class SplitDateTimeField(MultiValueField):
