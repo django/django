@@ -179,6 +179,14 @@ def method_saving_308_redirect_view(request):
     return _post_view_redirect(request, 308)
 
 
+def redirect_to_different_hostname(request):
+    return HttpResponseRedirect("https://hostname2/get_host_view/")
+
+
+def get_host_view(request):
+    return HttpResponse(request.get_host())
+
+
 def view_with_secure(request):
     "A view that indicates if the request was secure"
     response = HttpResponse()
