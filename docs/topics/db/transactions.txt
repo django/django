@@ -187,7 +187,7 @@ Django provides a single API to control database transactions.
         If you catch exceptions raised by raw SQL queries, Django's behavior
         is unspecified and database-dependent.
 
-    .. admonition:: You may need to manually revert model state when rolling back a transaction.
+    .. admonition:: You may need to manually revert app state when rolling back a transaction.
 
         The values of a model's fields won't be reverted when a transaction
         rollback happens. This could lead to an inconsistent model state unless
@@ -209,6 +209,14 @@ Django provides a single API to control database transactions.
 
             if obj.active:
                 ...
+
+        This also applies to any other mechanism that may hold app state, such
+        as caching or global variables. For example, if the code proactively
+        updates data in the cache after saving an object, it's recommended to
+        use :ref:`transcation.on_commit <performing-actions-after-commit>`
+        instead, to defer cache alterations until the transaction is actually
+        committed.
+
 
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
     to commit, roll back, or change the autocommit state of the database
@@ -284,6 +292,8 @@ This requires you to commit explicitly every transaction, even those started
 by Django or by third-party libraries. Thus, this is best used in situations
 where you want to run your own transaction-controlling middleware or do
 something really strange.
+
+.. _performing-actions-after-commit:
 
 Performing actions after commit
 ===============================
