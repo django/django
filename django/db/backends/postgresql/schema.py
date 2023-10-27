@@ -100,7 +100,8 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
                 return None
             # Non-deterministic collations on Postgresql don't support indexes
             # for operator classes varchar_pattern_ops/text_pattern_ops.
-            if getattr(field, "db_collation", None):
+            collation_name = getattr(field, "db_collation", None)
+            if collation_name and not self._is_collation_deterministic(collation_name):
                 return None
             if db_type.startswith("varchar"):
                 return self._create_index_sql(
@@ -372,3 +373,16 @@ class DatabaseSchemaEditor(BaseDatabaseSchemaEditor):
             include=include,
             expressions=expressions,
         )
+
+    def _is_collation_deterministic(self, collation_name):
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT collisdeterministic
+                FROM pg_collation
+                WHERE collname = %s
+                """,
+                [collation_name],
+            )
+            row = cursor.fetchone()
+            return row[0] if row else None

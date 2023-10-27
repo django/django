@@ -13,3 +13,7 @@ Bugfixes
 * Fixed a regression in Django 4.2 that caused a crash of
   ``QuerySet.aggregate()`` with aggregates referencing expressions containing
   subqueries (:ticket:`34798`).
+
+* Restored, following a regression in Django 4.2, creating
+  ``varchar/text_pattern_ops`` indexes on ``CharField`` and ``TextField`` with
+  deterministic collations on PostgreSQL (:ticket:`34932`).

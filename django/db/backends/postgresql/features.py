@@ -72,6 +72,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_covering_indexes = True
     can_rename_index = True
     test_collations = {
+        "deterministic": "C",
         "non_default": "sv-x-icu",
         "swedish_ci": "sv-x-icu",
     }
