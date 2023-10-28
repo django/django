@@ -6717,6 +6717,18 @@ class SeleniumTests(AdminSeleniumTestCase):
         name_input_value = name_input.get_attribute("value")
         self.assertEqual(name_input_value, "Test section 1")
 
+    @screenshot_cases(["desktop_size", "mobile_size", "rtl", "dark"])
+    def test_user_change_password(self):
+        self.admin_login(
+            username="super", password="secret", login_url=reverse("admin:index")
+        )
+
+        change_url = reverse("admin:auth_user_change", args=(self.superuser.pk,))
+        with self.wait_page_loaded():
+            self.selenium.get(self.live_server_url + change_url)
+
+        self.take_screenshot("user_change")
+
 
 @override_settings(ROOT_URLCONF="admin_views.urls")
 class ReadonlyTest(AdminFieldExtractionMixin, TestCase):
