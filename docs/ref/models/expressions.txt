@@ -781,7 +781,7 @@ instead they are part of the selected columns.
 
     .. attribute:: template
 
-        Defaults to ``%(expression)s OVER (%(window)s)'``. If only the
+        Defaults to ``%(expression)s OVER (%(window)s)``. If only the
         ``expression`` argument is provided, the window clause will be blank.
 
 The ``Window`` class is the main expression for an ``OVER`` clause.
@@ -954,9 +954,9 @@ with the average rating of a movie's two prior and two following peers:
 
 If the database supports it, you can specify the start and end points based on
 values of an expression in the partition. If the ``released`` field of the
-``Movie`` model stores the release month of each movies, this ``ValueRange``
+``Movie`` model stores the release month of each movie, this ``ValueRange``
 example annotates each movie with the average rating of a movie's peers
-released between twelve months before and twelve months after the each movie:
+released between twelve months before and twelve months after each movie:
 
 .. code-block:: pycon
 
