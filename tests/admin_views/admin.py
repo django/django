@@ -8,6 +8,10 @@ from django.contrib.admin import BooleanFieldListFilter
 from django.contrib.admin.views.main import ChangeList
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
+from django.contrib.redirects.admin import RedirectAdmin
+from django.contrib.redirects.models import Redirect
+from django.contrib.sites.admin import SiteAdmin
+from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.core.mail import EmailMessage
 from django.db import models
@@ -1299,9 +1303,11 @@ site.register(Box)
 site.register(Country, CountryAdmin)
 site.register(Traveler, TravelerAdmin)
 
-# Register core models we need in our tests
+# Register core and contrib models we need in our tests
 site.register(User, UserAdmin)
 site.register(Group, GroupAdmin)
+site.register(Redirect, RedirectAdmin)
+site.register(Site, SiteAdmin)
 
 # Used to test URL namespaces
 site2 = admin.AdminSite(name="namespaced_admin")
