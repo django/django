@@ -24,7 +24,7 @@ html[data-theme="light"],
     --breadcrumbs-link-fg: var(--body-bg);
     --breadcrumbs-bg: #264b5d;
 
-    --link-fg: #417893;
+    --link-fg: #1c7dad;
     --link-hover-color: #036;
     --link-selected-fg: var(--secondary);
 
@@ -102,8 +102,8 @@ body {
 /* LINKS */
 
 a:link, a:visited {
-    color: var(--body-fg);
-    text-decoration: none;
+    color: var(--link-fg);
+    text-decoration: underline;
     transition: color 0.15s, background 0.15s;
 }
 
