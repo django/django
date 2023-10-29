@@ -2397,15 +2397,27 @@ class MakeMigrationsTests(MigrationTestBase):
         makemigrations --check should exit with a non-zero status when
         there are changes to an app requiring migrations.
         """
-        with self.temporary_migration_module() as tmpdir:
-            with self.assertRaises(SystemExit):
-                call_command("makemigrations", "--check", "migrations", verbosity=0)
-            self.assertFalse(os.path.exists(tmpdir))
+        out = io.StringIO()
+        with (
+            self.temporary_migration_module() as tmpdir,
+            self.assertRaises(SystemExit) as cm,
+        ):
+            call_command(
+                "makemigrations",
+                "--check",
+                "migrations",
+                stdout=out,
+            )
+        self.assertEqual(cm.exception.code, 1)
+        self.assertIn("Migrations for 'migrations':", out.getvalue())
+        self.assertFalse(os.path.exists(tmpdir))
 
+        out = io.StringIO()
         with self.temporary_migration_module(
             module="migrations.test_migrations_no_changes"
         ):
-            call_command("makemigrations", "--check", "migrations", verbosity=0)
+            call_command("makemigrations", "--check", "migrations", stdout=out)
+        self.assertEqual(out.getvalue(), "No changes detected in app 'migrations'\n")
 
     def test_makemigrations_migration_path_output(self):
         """
