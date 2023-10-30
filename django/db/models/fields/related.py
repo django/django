@@ -9,7 +9,7 @@ from django.conf import SettingsReference, settings
 from django.core import checks, exceptions
 from django.db import connection, router
 from django.db.backends import utils
-from django.db.models import Q
+from django.db.models import NOT_PROVIDED, Q
 from django.db.models.constants import LOOKUP_SEP
 from django.db.models.deletion import (
     CASCADE,
@@ -1036,7 +1036,7 @@ class ForeignKey(ForeignObject):
                     id="fields.E321",
                 )
             ]
-        elif on_delete == DB_SET_DEFAULT and not self.has_db_default():
+        elif on_delete == DB_SET_DEFAULT and self.db_default is NOT_PROVIDED:
             return [
                 checks.Error(
                     "Field specifies on_delete=DB_SET_DEFAULT, but has "
@@ -1077,7 +1077,7 @@ class ForeignKey(ForeignObject):
                     "Using python based on_delete with database "
                     "level on_delete referenced model is prohibited "
                     f"Related field is {related_model_field}.",
-                    hint="Use database level cascading for foreignkeys",
+                    hint="Use database-level cascading for foreign keys",
                     obj=self,
                     id="fields.E323",
                 )

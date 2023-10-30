@@ -1876,9 +1876,10 @@ any custom methods or send any signals.
 .. admonition:: ``DB_SET_DEFAULT`` on MySQL and MariaDB
 
     ``DB_SET_DEFAULT`` is not supported on MySQL and MariaDB, due to lack of
-    support in InnoDB (and NDB). See the foreing key documentation for
+    support in InnoDB (and NDB). See the foreign key documentation for
     `MySQL <https://dev.mysql.com/doc/refman/8.0/en/create-table-foreign-keys.html>`__
     and `MariaDB <https://mariadb.com/kb/en/foreign-keys/>`__.
+
 .. attribute:: ForeignKey.limit_choices_to
 
     Sets a limit to the available choices for this field when this field is

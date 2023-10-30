@@ -2075,7 +2075,7 @@ class DatabaseLevelCascadeCheckTests(SimpleTestCase):
                     "Using python based on_delete with database "
                     "level on_delete referenced model is prohibited "
                     f"Related field is {related_model_status.get('field')}.",
-                    hint="Use database level cascading for foreignkeys",
+                    hint="Use database-level cascading for foreign keys",
                     obj=baz_field,
                     id="fields.E323",
                 ),
@@ -2147,7 +2147,7 @@ class DatabaseLevelCascadeCheckTests(SimpleTestCase):
                     "Using python based on_delete with database "
                     "level on_delete referenced model is prohibited "
                     f"Related field is {rel_field}.",
-                    hint="Use database level cascading for foreignkeys",
+                    hint="Use database-level cascading for foreign keys",
                     obj=field,
                     id="fields.E323",
                 )
