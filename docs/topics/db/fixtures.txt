@@ -40,7 +40,6 @@ or to provide some :ref:`initial data <initial-data-via-fixtures>` using the
 
     django-admin loaddata <fixture label>
 
-
 Where Django looks for fixtures?
 ================================
 
@@ -91,7 +90,7 @@ Multiple fixtures can be specified in the same invocation. For example:
 
 .. code-block:: shell
 
-    manage.py loaddata mammals birds insects
+    django-admin loaddata mammals birds insects
 
 or in a test case class:
 
