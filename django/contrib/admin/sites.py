@@ -61,6 +61,8 @@ class AdminSite:
 
     final_catch_all_view = True
 
+    sort_names = True
+
     def __init__(self, name="admin"):
         self._registry = {}  # model_class class -> admin_class instance
         self.name = name
@@ -535,7 +537,12 @@ class AdminSite:
         registered in this site.
         """
         app_dict = self._build_app_dict(request, app_label)
-
+        
+        # Return unsorted apps and models
+        if not self.sort_names:
+            app_list = app_dict.values()
+            return app_list
+        
         # Sort the apps alphabetically.
         app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
 
