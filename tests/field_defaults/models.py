@@ -10,6 +10,7 @@ field.
 """
 
 from datetime import datetime
+from decimal import Decimal
 
 from django.db import models
 from django.db.models.functions import Coalesce, ExtractYear, Now, Pi
@@ -33,6 +34,9 @@ class DBArticle(models.Model):
 
     headline = models.CharField(max_length=100, db_default="Default headline")
     pub_date = models.DateTimeField(db_default=Now())
+    cost = models.DecimalField(
+        max_digits=3, decimal_places=2, db_default=Decimal("3.33")
+    )
 
     class Meta:
         required_db_features = {"supports_expression_defaults"}

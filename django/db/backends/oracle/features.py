@@ -119,6 +119,10 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "Oracle doesn't support comparing NCLOB to NUMBER.": {
             "generic_relations_regress.tests.GenericRelationTests.test_textlink_filter",
         },
+        "DecimalField.db_default doesn't return decimal.Decimal instances on Oracle "
+        "(#34941).": {
+            "field_defaults.tests.DefaultTests.test_field_db_defaults_returning",
+        },
     }
     django_test_expected_failures = {
         # A bug in Django/oracledb with respect to string handling (#23843).
