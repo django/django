@@ -424,3 +424,11 @@ def two_arg_exception(request):
 
 class CBView(TemplateView):
     template_name = "base.html"
+
+
+def source(request):
+    return HttpResponseRedirect("https://hostname2/target/")
+
+
+def target(request):
+    return HttpResponse(request.get_host())

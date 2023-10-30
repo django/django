@@ -76,4 +76,6 @@ urlpatterns = [
     path("accounts/logout/", auth_views.LogoutView.as_view()),
     # Async views.
     path("async_get_view/", views.async_get_view, name="async_get_view"),
+    path("source/", views.source, name="source"),
+    path("target/", views.target, name="target"),
 ]
