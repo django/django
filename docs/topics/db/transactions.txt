@@ -213,10 +213,9 @@ Django provides a single API to control database transactions.
         This also applies to any other mechanism that may hold app state, such
         as caching or global variables. For example, if the code proactively
         updates data in the cache after saving an object, it's recommended to
-        use :ref:`transcation.on_commit <performing-actions-after-commit>`
+        use :ref:`transaction.on_commit() <performing-actions-after-commit>`
         instead, to defer cache alterations until the transaction is actually
         committed.
-
 
     In order to guarantee atomicity, ``atomic`` disables some APIs. Attempting
     to commit, roll back, or change the autocommit state of the database
