@@ -820,7 +820,6 @@ class ModelAdminTests(TestCase):
         tests = (
             (ma.log_addition, ADDITION, {"added": {}}),
             (ma.log_change, CHANGE, {"changed": {"fields": ["name", "bio"]}}),
-            (ma.log_deletion, DELETION, str(self.band)),
         )
         for method, flag, message in tests:
             with self.subTest(name=method.__name__):
@@ -831,12 +830,23 @@ class ModelAdminTests(TestCase):
                 self.assertEqual(fetched.content_type, content_type)
                 self.assertEqual(fetched.object_id, str(self.band.pk))
                 self.assertEqual(fetched.user, mock_request.user)
-                if flag == DELETION:
-                    self.assertEqual(fetched.change_message, "")
-                    self.assertEqual(fetched.object_repr, message)
-                else:
-                    self.assertEqual(fetched.change_message, str(message))
-                    self.assertEqual(fetched.object_repr, str(self.band))
+                self.assertEqual(fetched.change_message, str(message))
+                self.assertEqual(fetched.object_repr, str(self.band))
+
+    def test_log_deletion(self):
+        ma = ModelAdmin(Band, self.site)
+        mock_request = MockRequest()
+        mock_request.user = User.objects.create(username="bill")
+        content_type = get_content_type_for_model(self.band)
+        created = ma.log_deletion(mock_request, self.band, str(self.band))
+        fetched = LogEntry.objects.filter(action_flag=DELETION).latest("id")
+        self.assertEqual(created, fetched)
+        self.assertEqual(fetched.action_flag, DELETION)
+        self.assertEqual(fetched.content_type, content_type)
+        self.assertEqual(fetched.object_id, str(self.band.pk))
+        self.assertEqual(fetched.user, mock_request.user)
+        self.assertEqual(fetched.change_message, "")
+        self.assertEqual(fetched.object_repr, str(self.band))
 
     def test_get_autocomplete_fields(self):
         class NameAdmin(ModelAdmin):
