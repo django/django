@@ -1554,6 +1554,19 @@ class LocmemBackendTests(BaseEmailBackendTests, SimpleTestCase):
                 "Subject\nMultiline", "Content", "from@example.com", ["to@example.com"]
             )
 
+    def test_outbox_not_mutated_after_send(self):
+        email = EmailMessage(
+            subject="correct subject",
+            body="test body",
+            from_email="from@example.com",
+            to=["to@example.com"],
+        )
+        email.send()
+        email.subject = "other subject"
+        email.to.append("other@example.com")
+        self.assertEqual(mail.outbox[0].subject, "correct subject")
+        self.assertEqual(mail.outbox[0].to, ["to@example.com"])
+
 
 class FileBackendTests(BaseEmailBackendTests, SimpleTestCase):
     email_backend = "django.core.mail.backends.filebased.EmailBackend"

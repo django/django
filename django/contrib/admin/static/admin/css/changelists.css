@@ -139,6 +139,12 @@
     margin: 0 0 0 30px;
 }
 
+@media (forced-colors: active) {
+  #changelist-filter {
+      border: 1px solid;
+  }
+}
+
 #changelist-filter h2 {
     font-size: 0.875rem;
     text-transform: uppercase;

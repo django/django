@@ -244,7 +244,7 @@ class EmailValidator:
     def __eq__(self, other):
         return (
             isinstance(other, EmailValidator)
-            and (self.domain_allowlist == other.domain_allowlist)
+            and (set(self.domain_allowlist) == set(other.domain_allowlist))
             and (self.message == other.message)
             and (self.code == other.code)
         )
@@ -595,7 +595,8 @@ class FileExtensionValidator:
     def __eq__(self, other):
         return (
             isinstance(other, self.__class__)
-            and self.allowed_extensions == other.allowed_extensions
+            and set(self.allowed_extensions or [])
+            == set(other.allowed_extensions or [])
             and self.message == other.message
             and self.code == other.code
         )

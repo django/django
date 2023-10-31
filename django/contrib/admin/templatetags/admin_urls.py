@@ -22,10 +22,14 @@ def admin_urlquote(value):
 def add_preserved_filters(context, url, popup=False, to_field=None):
     opts = context.get("opts")
     preserved_filters = context.get("preserved_filters")
+    preserved_qsl = context.get("preserved_qsl")
 
     parsed_url = list(urlparse(url))
     parsed_qs = dict(parse_qsl(parsed_url[4]))
     merged_qs = {}
+
+    if preserved_qsl:
+        merged_qs.update(preserved_qsl)
 
     if opts and preserved_filters:
         preserved_filters = dict(parse_qsl(preserved_filters))

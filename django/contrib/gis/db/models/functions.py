@@ -195,8 +195,7 @@ class AsGeoJSON(GeoFunc):
             options = 1
         elif crs:
             options = 2
-        if options:
-            expressions.append(options)
+        expressions.append(options)
         super().__init__(*expressions, **extra)
 
     def as_oracle(self, compiler, connection, **extra_context):

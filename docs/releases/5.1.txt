@@ -171,6 +171,14 @@ Models
 * :meth:`.QuerySet.explain` now supports the ``generic_plan`` option on
   PostgreSQL 16+.
 
+* :class:`~django.db.models.expressions.RowRange` now accepts positive integers
+  for the ``start`` argument and negative integers for the ``end`` argument.
+
+* The new ``exclusion`` argument of
+  :class:`~django.db.models.expressions.RowRange` and
+  :class:`~django.db.models.expressions.ValueRange` allows excluding rows,
+  groups, and ties from the window frames.
+
 Requests and Responses
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -194,12 +202,25 @@ Signals
 Templates
 ~~~~~~~~~
 
-* ...
+* Custom tags may now set extra data on the ``Parser`` object that will later
+  be made available on the ``Template`` instance. Such data may be used, for
+  example, by the template loader, or other template clients.
+
+* The new :ttag:`{% query_string %} <query_string>` template tag allows
+  changing a :class:`~django.http.QueryDict` instance for use in links, for
+  example, to generate a link to the next page while keeping any filtering
+  options in place.
 
 Tests
 ~~~~~
 
-* ...
+* :meth:`~django.test.SimpleTestCase.assertContains`,
+  :meth:`~django.test.SimpleTestCase.assertNotContains`, and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` assertions now add haystacks
+  to assertion error messages.
+
+* The Django test runner now supports a ``--screenshots`` option to save
+  screenshots for Selenium tests.
 
 URLs
 ~~~~
@@ -251,6 +272,10 @@ Miscellaneous
 
 * In order to improve accessibility, the admin's changelist filter is now
   rendered in a ``<nav>`` tag instead of a ``<div>``.
+
+* :meth:`.SimpleTestCase.assertURLEqual` and
+  :meth:`~django.test.SimpleTestCase.assertInHTML` now add ``": "`` to the
+  ``msg_prefix``. This is consistent with the behavior of other assertions.
 
 .. _deprecated-features-5.1:
 

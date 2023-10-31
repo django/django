@@ -1,0 +1,79 @@
+name: Visual Regression Tests
+
+on:
+  pull_request_target:
+    types: [labeled, synchronize, opened, reopened]
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  selenium-screenshots:
+    if: contains(join(github.event.pull_request.labels.*.name, '|'), 'screenshots')
+    runs-on: ubuntu-latest
+    name: Screenshots
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'tests/requirements/py3.txt'
+      - name: Install and upgrade packaging tools
+        run: python -m pip install --upgrade pip setuptools wheel
+      - run: python -m pip install -r tests/requirements/py3.txt -e .
+      - name: Run Selenium tests with screenshots
+        id: generate-screenshots
+        working-directory: ./tests/
+        run: |
+          python -Wall runtests.py --verbosity 2 --noinput --selenium=chrome --headless --screenshots --settings=test_sqlite --parallel 2
+          echo "date=$(date)" >> $GITHUB_OUTPUT
+          echo "🖼️ **Screenshots created**" >> $GITHUB_STEP_SUMMARY
+          echo "Generated screenshots for ${{ github.event.pull_request.head.sha }} at $(date)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots-${{ github.event.pull_request.head.sha }}
+          path: tests/screenshots/
+
+      - name: Find comment to update
+        uses: peter-evans/find-comment@v2
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: You can download the generated screenshots from the workflow artifacts.
+
+      - name: Create comment
+        if: steps.find-comment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            🖼️ **Screenshots created**
+
+            You can download the generated screenshots from the workflow artifacts.
+
+            _Please note that artifacts are only available for download for ${{ github.retention_days }} days._
+
+            - Generated screenshots for ${{ github.event.pull_request.head.sha }} at ${{ steps.generate-screenshots.outputs.date }} ([download](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).
+
+      - name: Update comment
+        if: steps.find-comment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          body: |
+            - Generated screenshots for ${{ github.event.pull_request.head.sha }} at ${{ steps.generate-screenshots.outputs.date }} ([download](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})).

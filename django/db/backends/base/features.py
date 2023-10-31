@@ -263,6 +263,7 @@ class BaseDatabaseFeatures:
     # Does the backend support window expressions (expression OVER (...))?
     supports_over_clause = False
     supports_frame_range_fixed_distance = False
+    supports_frame_exclusion = False
     only_supports_unbounded_with_preceding_and_following = False
 
     # Does the backend support CAST with precision?

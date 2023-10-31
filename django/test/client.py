@@ -901,6 +901,7 @@ class ClientMixin:
             extra["wsgi.url_scheme"] = url.scheme
         if url.hostname:
             extra["SERVER_NAME"] = url.hostname
+            extra["HTTP_HOST"] = url.hostname
         if url.port:
             extra["SERVER_PORT"] = str(url.port)
 

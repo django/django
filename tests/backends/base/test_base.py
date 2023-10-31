@@ -62,7 +62,7 @@ class DatabaseWrapperTests(SimpleTestCase):
 
 
 class DatabaseWrapperLoggingTests(TransactionTestCase):
-    available_apps = []
+    available_apps = ["backends"]
 
     @override_settings(DEBUG=True)
     def test_commit_debug_log(self):

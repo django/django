@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.db import connection
 from django.db.models import F, Max, Min
+from django.db.models.functions import Now
 from django.http import HttpRequest
 from django.template import (
     Context,
@@ -326,6 +327,13 @@ class NewDatabaseTests(TestCase):
             Event.objects.create(dt=dt)
         event = Event.objects.get()
         self.assertEqual(event.dt, datetime.datetime(2011, 9, 1, tzinfo=EAT))
+
+    @requires_tz_support
+    def test_filter_unbound_datetime_with_naive_date(self):
+        dt = datetime.date(2011, 9, 1)
+        msg = "DateTimeField (unbound) received a naive datetime"
+        with self.assertWarnsMessage(RuntimeWarning, msg):
+            Event.objects.annotate(unbound_datetime=Now()).filter(unbound_datetime=dt)
 
     @requires_tz_support
     def test_naive_datetime_with_microsecond(self):

@@ -215,8 +215,12 @@ the database according to a parameter passed in the URL, loading a template and
 returning the rendered template. Because this is so common, Django provides a
 shortcut, called the "generic views" system.
 
-Generic views abstract common patterns to the point where you don't even need
-to write Python code to write an app.
+Generic views abstract common patterns to the point where you don't even need to
+write Python code to write an app. For example, the
+:class:`~django.views.generic.list.ListView` and
+:class:`~django.views.generic.detail.DetailView` generic views
+abstract the concepts of "display a list of objects" and
+"display a detail page for a particular type of object" respectively.
 
 Let's convert our poll app to use the generic views system, so we can delete a
 bunch of our own code. We'll have to take a few steps to make the conversion.
@@ -261,7 +265,11 @@ First, open the ``polls/urls.py`` URLconf and change it like so:
     ]
 
 Note that the name of the matched pattern in the path strings of the second and
-third patterns has changed from ``<question_id>`` to ``<pk>``.
+third patterns has changed from ``<question_id>`` to ``<pk>``. This is
+necessary because we'll use the
+:class:`~django.views.generic.detail.DetailView` generic view to replace our
+``detail()`` and ``results()`` views, and it expects the primary key value
+captured from the URL to be called ``"pk"``.
 
 Amend views
 -----------
@@ -303,19 +311,11 @@ views and use Django's generic views instead. To do so, open the
     def vote(request, question_id):
         ...  # same as above, no changes needed.
 
-We're using two generic views here:
-:class:`~django.views.generic.list.ListView` and
-:class:`~django.views.generic.detail.DetailView`. Respectively, those
-two views abstract the concepts of "display a list of objects" and
-"display a detail page for a particular type of object."
-
-* Each generic view needs to know what model it will be acting
-  upon. This is provided using the ``model`` attribute.
-
-* The :class:`~django.views.generic.detail.DetailView` generic view
-  expects the primary key value captured from the URL to be called
-  ``"pk"``, so we've changed ``question_id`` to ``pk`` for the generic
-  views.
+Each generic view needs to know what model it will be acting upon. This is
+provided using either the ``model`` attribute (in this example, ``model =
+Question`` for  ``DetailView`` and ``ResultsView``) or by defining the
+:meth:`~django.views.generic.list.MultipleObjectMixin.get_queryset` method (as
+shown in ``IndexView``).
 
 By default, the :class:`~django.views.generic.detail.DetailView` generic
 view uses a template called ``<app name>/<model name>_detail.html``.

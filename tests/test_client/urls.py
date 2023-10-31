@@ -25,6 +25,12 @@ urlpatterns = [
         "redirect_view_308_query_string/",
         views.method_saving_308_redirect_query_string_view,
     ),
+    path(
+        "redirect_to_different_hostname/",
+        views.redirect_to_different_hostname,
+        name="redirect_to_different_hostname",
+    ),
+    path("get_host_view/", views.get_host_view, name="get_host_view"),
     path("secure_view/", views.view_with_secure),
     path(
         "permanent_redirect_view/",

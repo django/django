@@ -522,7 +522,7 @@ During the deprecation period string literals will be attempted to be JSON
 decoded and a warning will be emitted on success that points at passing
 non-encoded forms instead.
 
-Code that use to pass JSON encoded string literals::
+Code that used to pass JSON encoded string literals::
 
     Document.objects.bulk_create(
         Document(data=Value("null")),

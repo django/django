@@ -741,9 +741,9 @@ lists and tuples. All settings that were formerly tuples are now lists.
 Django template loaders previously required an ``is_usable`` attribute to be
 defined. If a loader was configured in the template settings and this attribute
 was ``False``, the loader would be silently ignored. In practice, this was only
-used by the egg loader to detect if setuptools was installed. The ``is_usable``
-attribute is now removed and the egg loader instead fails at runtime if
-setuptools is not installed.
+used by the egg loader to detect if ``setuptools`` was installed. The
+``is_usable`` attribute is now removed and the egg loader instead fails at
+runtime if ``setuptools`` is not installed.
 
 Related set direct assignment
 -----------------------------
@@ -1028,10 +1028,10 @@ a Django application with this structure:
 
 .. _syntax-error-old-setuptools-django-19:
 
-``SyntaxError`` when installing Django setuptools 5.5.x
--------------------------------------------------------
+``SyntaxError`` when installing Django ``setuptools`` 5.5.x
+-----------------------------------------------------------
 
-When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see:
+When installing Django 1.9 or 1.9.1 with ``setuptools`` 5.5.x, you'll see:
 
 .. code-block:: shell
 
@@ -1048,10 +1048,10 @@ When installing Django 1.9 or 1.9.1 with setuptools 5.5.x, you'll see:
     SyntaxError: invalid syntax
 
 It's safe to ignore these errors (Django will still install just fine), but you
-can avoid them by upgrading setuptools to a more recent version. If you're
+can avoid them by upgrading ``setuptools`` to a more recent version. If you're
 using pip, you can upgrade pip using ``python -m pip install -U pip`` which
-will also upgrade setuptools. This is resolved in later versions of Django as
-described in the :doc:`/releases/1.9.2`.
+will also upgrade ``setuptools``. This is resolved in later versions of Django
+as described in the :doc:`/releases/1.9.2`.
 
 Miscellaneous
 -------------

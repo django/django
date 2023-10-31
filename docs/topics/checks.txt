@@ -214,3 +214,67 @@ Messages are comparable. That allows you to easily write tests::
         )
     ]
     self.assertEqual(errors, expected_errors)
+
+Writing integration tests
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Given the need to register certain checks when the application loads, it can be
+useful to test their integration within the system checks framework. This can
+be accomplished by using the :func:`~django.core.management.call_command`
+function.
+
+For example, this test demonstrates that the :setting:`SITE_ID` setting must be
+an integer, a built-in :ref:`check from the sites framework
+<sites-system-checks>`::
+
+    from django.core.management import call_command
+    from django.core.management.base import SystemCheckError
+    from django.test import SimpleTestCase, modify_settings, override_settings
+
+
+    class SystemCheckIntegrationTest(SimpleTestCase):
+        @override_settings(SITE_ID="non_integer")
+        @modify_settings(INSTALLED_APPS={"prepend": "django.contrib.sites"})
+        def test_non_integer_site_id(self):
+            message = "(sites.E101) The SITE_ID setting must be an integer."
+            with self.assertRaisesMessage(SystemCheckError, message):
+                call_command("check")
+
+Consider the following check which issues a warning on deployment if a custom
+setting named ``ENABLE_ANALYTICS`` is not set to ``True``::
+
+    from django.conf import settings
+    from django.core.checks import Warning, register
+
+
+    @register("myapp", deploy=True)
+    def check_enable_analytics_is_true_on_deploy(app_configs, **kwargs):
+        errors = []
+        if getattr(settings, "ENABLE_ANALYTICS", None) is not True:
+            errors.append(
+                Warning(
+                    "The ENABLE_ANALYTICS setting should be set to True in deployment.",
+                    id="myapp.W001",
+                )
+            )
+        return errors
+
+Given that this check will not raise a ``SystemCheckError``, the presence of
+the warning message in the ``stderr`` output can be asserted like so::
+
+    from io import StringIO
+
+    from django.core.management import call_command
+    from django.test import SimpleTestCase, override_settings
+
+
+    class EnableAnalyticsDeploymentCheckTest(SimpleTestCase):
+        @override_settings(ENABLE_ANALYTICS=None)
+        def test_when_set_to_none(self):
+            stderr = StringIO()
+            call_command("check", "-t", "myapp", "--deploy", stderr=stderr)
+            message = (
+                "(myapp.W001) The ENABLE_ANALYTICS setting should be set "
+                "to True in deployment."
+            )
+            self.assertIn(message, stderr.getvalue())

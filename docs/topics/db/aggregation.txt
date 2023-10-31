@@ -60,14 +60,16 @@ above:
     >>> Book.objects.filter(publisher__name="BaloneyPress").count()
     73
 
-    # Average price across all books.
+    # Average price across all books, provide default to be returned instead
+    # of None if no books exist.
     >>> from django.db.models import Avg
-    >>> Book.objects.aggregate(Avg("price"))
+    >>> Book.objects.aggregate(Avg("price", default=0))
     {'price__avg': 34.35}
 
-    # Max price across all books.
+    # Max price across all books, provide default to be returned instead of
+    # None if no books exist.
     >>> from django.db.models import Max
-    >>> Book.objects.aggregate(Max("price"))
+    >>> Book.objects.aggregate(Max("price", default=0))
     {'price__max': Decimal('81.20')}
 
     # Difference between the highest priced book and the average price of all books.
@@ -220,12 +222,14 @@ Combining multiple aggregations
 Combining multiple aggregations with ``annotate()`` will :ticket:`yield the
 wrong results <10060>` because joins are used instead of subqueries:
 
+.. code-block:: pycon
+
     >>> book = Book.objects.first()
     >>> book.authors.count()
     2
     >>> book.store_set.count()
     3
-    >>> q = Book.objects.annotate(Count('authors'), Count('store'))
+    >>> q = Book.objects.annotate(Count("authors"), Count("store"))
     >>> q[0].authors__count
     6
     >>> q[0].store__count
@@ -235,7 +239,11 @@ For most aggregates, there is no way to avoid this problem, however, the
 :class:`~django.db.models.Count` aggregate has a ``distinct`` parameter that
 may help:
 
-    >>> q = Book.objects.annotate(Count('authors', distinct=True), Count('store', distinct=True))
+.. code-block:: pycon
+
+    >>> q = Book.objects.annotate(
+    ...     Count("authors", distinct=True), Count("store", distinct=True)
+    ... )
     >>> q[0].authors__count
     2
     >>> q[0].store__count
@@ -512,7 +520,9 @@ the annotation is computed over all members of the group.
 For example, consider an author query that attempts to find out the average
 rating of books written by each author:
 
-    >>> Author.objects.annotate(average_rating=Avg('book__rating'))
+.. code-block:: pycon
+
+    >>> Author.objects.annotate(average_rating=Avg("book__rating"))
 
 This will return one result for each author in the database, annotated with
 their average book rating.
@@ -632,3 +642,40 @@ aggregate that author count, referencing the annotation field:
     >>> from django.db.models import Avg, Count
     >>> Book.objects.annotate(num_authors=Count("authors")).aggregate(Avg("num_authors"))
     {'num_authors__avg': 1.66}
+
+Aggregating on empty querysets or groups
+----------------------------------------
+
+When an aggregation is applied to an empty queryset or grouping, the result
+defaults to its :ref:`default <aggregate-default>` parameter, typically
+``None``. This behavior occurs because aggregate functions return ``NULL`` when
+the executed query returns no rows.
+
+You can specify a return value by providing the :ref:`default
+<aggregate-default>` argument for most aggregations. However, since
+:class:`~django.db.models.Count` does not support the :ref:`default
+<aggregate-default>` argument, it will always return ``0`` for empty querysets
+or groups.
+
+For example, assuming that no book contains *web* in its name, calculating the
+total price for this book set would return ``None`` since there are no matching
+rows to compute the :class:`~django.db.models.Sum` aggregation on:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Sum
+    >>> Book.objects.filter(name__contains="web").aggregate(Sum("price"))
+    {"price__sum": None}
+
+However, the :ref:`default <aggregate-default>` argument can be set when
+calling :class:`~django.db.models.Sum` to return a different default value if
+no books can be found:
+
+.. code-block:: pycon
+
+    >>> Book.objects.filter(name__contains="web").aggregate(Sum("price", default=0))
+    {"price__sum": Decimal("0")}
+
+Under the hood, the :ref:`default <aggregate-default>` argument is implemented
+by wrapping the aggregate function with
+:class:`~django.db.models.functions.Coalesce`.

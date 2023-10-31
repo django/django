@@ -878,6 +878,12 @@ a.deletelink:focus, a.deletelink:hover {
     margin-right: -300px;
 }
 
+@media (forced-colors: active) {
+  #content-related {
+      border: 1px solid;
+  }
+}
+
 #footer {
     clear: both;
     padding: 10px;
@@ -926,6 +932,12 @@ a.deletelink:focus, a.deletelink:hover {
 
 #header a:focus , #header a:hover {
     text-decoration: underline;
+}
+
+@media (forced-colors: active) {
+  #header {
+      border-bottom: 1px solid;
+  }
 }
 
 #branding {

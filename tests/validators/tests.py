@@ -750,6 +750,10 @@ class TestValidatorEquality(TestCase):
             EmailValidator(message="BAD EMAIL", code="bad"),
             EmailValidator(message="BAD EMAIL", code="bad"),
         )
+        self.assertEqual(
+            EmailValidator(allowlist=["127.0.0.1", "localhost"]),
+            EmailValidator(allowlist=["localhost", "127.0.0.1"]),
+        )
 
     def test_basic_equality(self):
         self.assertEqual(
@@ -803,6 +807,10 @@ class TestValidatorEquality(TestCase):
         self.assertEqual(
             FileExtensionValidator(["TXT", "png"]),
             FileExtensionValidator(["txt", "png"]),
+        )
+        self.assertEqual(
+            FileExtensionValidator(["jpg", "png", "txt"]),
+            FileExtensionValidator(["txt", "jpg", "png"]),
         )
         self.assertEqual(
             FileExtensionValidator(["txt"]),
