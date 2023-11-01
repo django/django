@@ -45,9 +45,7 @@ def delete_selected(modeladmin, request, queryset):
             raise PermissionDenied
         n = len(queryset)
         if n:
-            for obj in queryset:
-                obj_display = str(obj)
-                modeladmin.log_deletion(request, obj, obj_display)
+            modeladmin.log_deletions(request, queryset)
             modeladmin.delete_queryset(request, queryset)
             modeladmin.message_user(
                 request,

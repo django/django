@@ -3808,33 +3808,27 @@ class AdminViewStringPrimaryKeyTest(TestCase):
             r"""-_.!~*'() ;/?:@&=+$, <>#%" {}|\^[]`"""
         )
         cls.m1 = ModelWithStringPrimaryKey.objects.create(string_pk=cls.pk)
-        content_type_pk = ContentType.objects.get_for_model(
-            ModelWithStringPrimaryKey
-        ).pk
         user_pk = cls.superuser.pk
-        LogEntry.objects.log_action(
+        LogEntry.objects.log_actions(
             user_pk,
-            content_type_pk,
-            cls.pk,
-            cls.pk,
+            [cls.m1],
             2,
             change_message="Changed something",
+            single_object=True,
         )
-        LogEntry.objects.log_action(
+        LogEntry.objects.log_actions(
             user_pk,
-            content_type_pk,
-            cls.pk,
-            cls.pk,
+            [cls.m1],
             1,
             change_message="Added something",
+            single_object=True,
         )
-        LogEntry.objects.log_action(
+        LogEntry.objects.log_actions(
             user_pk,
-            content_type_pk,
-            cls.pk,
-            cls.pk,
+            [cls.m1],
             3,
             change_message="Deleted something",
+            single_object=True,
         )
 
     def setUp(self):
