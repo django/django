@@ -1295,6 +1295,26 @@ class FkNameCheckTests(CheckTestCase):
 
         self.assertIsValid(ProxyProxyChildAdminFkName, ProxyProxyChild)
 
+    def test_proxy_model_child_fk_on_parent(self):
+        class Reporter(Model):
+            pass
+
+        class Journalist(Reporter):
+            class Meta:
+                proxy = True
+
+        class Article(Model):
+            reporter = ForeignKey(Journalist, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = Article
+            fk_name = "reporter"
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, Reporter)
+
 
 class ExtraCheckTests(CheckTestCase):
     def test_not_integer(self):
