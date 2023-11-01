@@ -36,8 +36,19 @@ Issues under Django's security process
 All security issues have been handled under versions of Django's security
 process. These are listed below.
 
+November 1, 2023 - :cve:`2023-46695`
+------------------------------------
+
+Potential denial of service vulnerability in ``UsernameField`` on Windows.
+`Full description
+<https://www.djangoproject.com/weblog/2023/nov/01/security-releases/>`__
+
+* Django 4.2 :commit:`(patch) <048a9ebb6ea468426cb4e57c71572cbbd975517f>`
+* Django 4.1 :commit:`(patch) <4965bfdde2e5a5c883685019e57d123a3368a75e>`
+* Django 3.2 :commit:`(patch) <f9a7fb8466a7ba4857eaf930099b5258f3eafb2b>`
+
 October 4, 2023 - :cve:`2023-43665`
--------------------------------------
+-----------------------------------
 
 Denial-of-service possibility in ``django.utils.text.Truncator``.
 `Full description
