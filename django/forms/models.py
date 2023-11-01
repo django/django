@@ -1211,6 +1211,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
         if len(fks_to_parent) == 1:
             fk = fks_to_parent[0]
             parent_list = parent_model._meta.get_parent_list()
+            parent_list.append(parent_model)
             if (
                 not isinstance(fk, ForeignKey)
                 or (
@@ -1236,6 +1237,7 @@ def _get_foreign_key(parent_model, model, fk_name=None, can_fail=False):
     else:
         # Try to discover what the ForeignKey from model to parent_model is
         parent_list = parent_model._meta.get_parent_list()
+        parent_list.append(parent_model)
         fks_to_parent = [
             f
             for f in opts.fields

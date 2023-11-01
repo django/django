@@ -1268,6 +1268,45 @@ class FkNameCheckTests(CheckTestCase):
 
         self.assertIsValid(TestModelAdmin, ValidationTestModel)
 
+    def test_proxy_model(self):
+        class Reporter(Model):
+            pass
+
+        class ProxyJournalist(Reporter):
+            class Meta:
+                proxy = True
+
+        class Article(Model):
+            reporter = ForeignKey(ProxyJournalist, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = Article
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, Reporter)
+
+    def test_proxy_model_fk_name(self):
+        class ReporterFkName(Model):
+            pass
+
+        class ProxyJournalistFkName(ReporterFkName):
+            class Meta:
+                proxy = True
+
+        class ArticleFkName(Model):
+            reporter = ForeignKey(ProxyJournalistFkName, on_delete=CASCADE)
+
+        class ArticleInline(admin.TabularInline):
+            model = ArticleFkName
+            fk_name = "reporter"
+
+        class ReporterAdmin(admin.ModelAdmin):
+            inlines = [ArticleInline]
+
+        self.assertIsValid(ReporterAdmin, ReporterFkName)
+
     def test_proxy_model_parent(self):
         class Parent(Model):
             pass
