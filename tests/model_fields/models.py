@@ -20,7 +20,7 @@ except ImportError:
 
 
 test_collation = SimpleLazyObject(
-    lambda: connection.features.test_collations.get("non_default")
+    lambda: connection.features.test_collations["virtual"]
 )
 
 
@@ -529,10 +529,7 @@ class GeneratedModelOutputField(models.Model):
     )
 
     class Meta:
-        required_db_features = {
-            "supports_stored_generated_columns",
-            "supports_collation_on_charfield",
-        }
+        required_db_features = {"supports_stored_generated_columns"}
 
 
 class GeneratedModelOutputFieldVirtual(models.Model):
@@ -544,10 +541,7 @@ class GeneratedModelOutputFieldVirtual(models.Model):
     )
 
     class Meta:
-        required_db_features = {
-            "supports_virtual_generated_columns",
-            "supports_collation_on_charfield",
-        }
+        required_db_features = {"supports_virtual_generated_columns"}
 
 
 class GeneratedModelNull(models.Model):
