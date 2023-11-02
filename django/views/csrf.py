@@ -64,6 +64,7 @@ def csrf_failure(request, reason="", template_name=CSRF_FAILURE_TEMPLATE_NAME):
         "DEBUG": settings.DEBUG,
         "docs_version": get_docs_version(),
         "more": _("More information is available with DEBUG=True."),
+        "request": request,
     }
     try:
         t = loader.get_template(template_name)
