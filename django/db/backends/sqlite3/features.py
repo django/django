@@ -47,6 +47,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "ci": "nocase",
         "cs": "binary",
         "non_default": "nocase",
+        "virtual": "nocase",
     }
     django_test_expected_failures = {
         # The django_format_dtdelta() function doesn't properly handle mixed

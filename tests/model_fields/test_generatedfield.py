@@ -165,12 +165,8 @@ class GeneratedFieldTestMixin:
         with self.assertNumQueries(0), self.assertRaises(does_not_exist):
             self.base_model.objects.get(field__gte=overflow_value)
 
-    @skipUnlessDBFeature("supports_collation_on_charfield")
     def test_output_field(self):
-        collation = connection.features.test_collations.get("non_default")
-        if not collation:
-            self.skipTest("Language collations are not supported.")
-
+        collation = connection.features.test_collations["virtual"]
         m = self.output_field_model.objects.create(name="NAME")
         field = m._meta.get_field("lower_name")
         db_parameters = field.db_parameters(connection)
@@ -181,7 +177,6 @@ class GeneratedFieldTestMixin:
             field._resolved_expression.output_field.db_type(connection),
         )
 
-    @skipUnlessDBFeature("supports_collation_on_charfield")
     def test_db_type_parameters(self):
         db_type_parameters = self.output_field_model._meta.get_field(
             "lower_name"

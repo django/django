@@ -78,6 +78,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "deterministic": "C",
         "non_default": "sv-x-icu",
         "swedish_ci": "sv-x-icu",
+        "virtual": "sv-x-icu",
     }
     test_now_utc_template = "STATEMENT_TIMESTAMP() AT TIME ZONE 'UTC'"
     insert_test_table_with_defaults = "INSERT INTO {} DEFAULT VALUES"

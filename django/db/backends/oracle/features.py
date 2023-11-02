@@ -80,12 +80,6 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_comparing_boolean_expr = False
     supports_json_field_contains = False
     supports_collation_on_textfield = False
-    test_collations = {
-        "ci": "BINARY_CI",
-        "cs": "BINARY",
-        "non_default": "SWEDISH_CI",
-        "swedish_ci": "SWEDISH_CI",
-    }
     test_now_utc_template = "CURRENT_TIMESTAMP AT TIME ZONE 'UTC'"
 
     django_test_skips = {
@@ -146,6 +140,16 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "PositiveSmallIntegerField": "IntegerField",
             "SmallIntegerField": "IntegerField",
             "TimeField": "DateTimeField",
+        }
+
+    @cached_property
+    def test_collations(self):
+        return {
+            "ci": "BINARY_CI",
+            "cs": "BINARY",
+            "non_default": "SWEDISH_CI",
+            "swedish_ci": "SWEDISH_CI",
+            "virtual": "SWEDISH_CI" if self.supports_collation_on_charfield else None,
         }
 
     @cached_property

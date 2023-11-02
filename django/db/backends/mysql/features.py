@@ -86,6 +86,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
             "ci": f"{charset}_general_ci",
             "non_default": f"{charset}_esperanto_ci",
             "swedish_ci": f"{charset}_swedish_ci",
+            "virtual": f"{charset}_esperanto_ci",
         }
 
     test_now_utc_template = "UTC_TIMESTAMP(6)"

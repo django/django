@@ -374,6 +374,7 @@ class BaseDatabaseFeatures:
         "cs": None,  # Case-sensitive.
         "non_default": None,  # Non-default.
         "swedish_ci": None,  # Swedish case-insensitive.
+        "virtual": None,  # A collation that can be used for virtual columns.
     }
     # SQL template override for tests.aggregation.tests.NowUTC
     test_now_utc_template = None
