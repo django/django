@@ -1,4 +1,5 @@
 import datetime
+import decimal
 
 from .base import Database
 
@@ -23,7 +24,7 @@ class InsertVar:
         "FloatField": Database.NATIVE_FLOAT,
         "DateTimeField": Database.TIMESTAMP,
         "DateField": Database.Date,
-        "DecimalField": Database.NUMBER,
+        "DecimalField": decimal.Decimal,
     }
 
     def __init__(self, field):
