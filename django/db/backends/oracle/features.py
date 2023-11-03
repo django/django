@@ -122,6 +122,8 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         "DecimalField.db_default doesn't return decimal.Decimal instances on Oracle "
         "(#34941).": {
             "field_defaults.tests.DefaultTests.test_field_db_defaults_returning",
+            "migrations.test_operations.OperationTests."
+            "test_alter_field_change_nullable_to_decimal_database_default_not_null",
         },
     }
     django_test_expected_failures = {
