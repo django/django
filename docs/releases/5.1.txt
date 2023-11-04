@@ -332,3 +332,8 @@ to remove usage of these features.
 * The ``DEFAULT_FILE_STORAGE`` and ``STATICFILES_STORAGE`` settings is removed.
 
 * The ``django.core.files.storage.get_storage_class()`` function is removed.
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
