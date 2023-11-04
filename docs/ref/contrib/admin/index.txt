@@ -2936,6 +2936,11 @@ Templates can override or extend base admin templates as described in
     Path to a custom template that will be used by the admin site password
     change done view.
 
+.. attribute:: AdminSite.sort_names
+
+    A boolean value that determines whether sort or not apps and models 
+    in admin panel. By default, it is set to ``True``.
+
 ``AdminSite`` methods
 ---------------------
 
