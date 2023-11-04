@@ -1194,14 +1194,16 @@ class FilePathField(ChoiceField):
         recursive=False,
         allow_files=True,
         allow_folders=False,
-        cache=False,
+        refresh_seconds=None,
         **kwargs,
     ):
         self.path, self.match, self.recursive = path, match, recursive
         self.allow_files, self.allow_folders = allow_files, allow_folders
-        self.recursive, self.cache = recursive, cache
-        if isinstance(self.cache, datetime.timedelta):
-            self._cache_timestamp = datetime.datetime.now()
+        if refresh_seconds is not None and refresh_seconds >= 0:
+            self.refresh_interval = datetime.timedelta(seconds=refresh_seconds)
+            self.refresh_at = datetime.datetime.now() + self.refresh_interval
+        else:
+            self.refresh_at = None
         super().__init__(choices=(), **kwargs)
         self._set_choices()
 
@@ -1245,12 +1247,9 @@ class FilePathField(ChoiceField):
         self.widget.choices = self.choices
 
     def refresh_cache(self):
-        """Calls _set_choices() if cache is disabled or stale."""
-        if isinstance(self.cache, datetime.timedelta):
-            now = datetime.datetime.now()
-            if now - self._cache_timestamp > self.cache:
-                self._set_choices()
-        elif not self.cache:
+        """Calls _set_choices() if refreshing is enabled and the cache is stale."""
+        if self.refresh_at is not None and self.refresh_at <= datetime.datetime.now():
+            self.refresh_at = datetime.datetime.now() + self.refresh_interval
             self._set_choices()
 
 

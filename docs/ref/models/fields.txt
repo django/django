@@ -1197,18 +1197,17 @@ directory on the filesystem. Has some special arguments, of which the first is
     whether folders in the specified location should be included.  Either this
     or :attr:`~FilePathField.allow_files` must be ``True``.
 
-.. attribute:: FilePathField.cache
+.. attribute:: FilePathField.refresh_seconds
 
     .. versionadded:: 5.1
 
-    Optional. Either ``True``, ``False``, or a ``datetime.timedelta`` object. 
-    Default is ``False``. Specifies how long the contents of ``path`` will be 
-    cached before being read again from the filesystem. If ``False``, the contents
-    of ``path`` are read every time the form is instantiated. If ``True``, the 
-    contents of ``path`` are cached when the form is imported and never reloaded. If 
-    set to a :class:`python:datetime.timedelta` object, the contents of ``path`` 
-    are cached and are read from the filesystem again after the duration specified in 
-    the :class:`python:datetime.timedelta`.
+    Optional. Either a positive integer or ``None``. Default is ``None``. 
+    Specifies how long the contents of ``path`` will be cached before being read 
+    again from the filesystem. If ``None``, the contents of ``path`` are cached
+    when the form is imported and never reloaded. If set to an integer, the 
+    contents of ``path`` are cached and are read from the filesystem again after 
+    the number of seconds specified. If ``0``, the contents of ``path`` are read 
+    every time the form is instantiated. 
 
 The one potential gotcha is that :attr:`~FilePathField.match` applies to the
 base filename, not the full path. So, this example::

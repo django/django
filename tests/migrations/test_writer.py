@@ -579,8 +579,7 @@ class WriterTests(SimpleTestCase):
         string, imports = MigrationWriter.serialize(field)
         self.assertEqual(
             string,
-            "models.FilePathField(cache=False, "
-            + "path=pathlib.PurePosixPath('/home/user'))",
+            "models.FilePathField(path=pathlib.PurePosixPath('/home/user'))",
         )
         self.assertIn("import pathlib", imports)
 
@@ -592,9 +591,7 @@ class WriterTests(SimpleTestCase):
 
         field = models.FilePathField(path=path_like)
         string = MigrationWriter.serialize(field)[0]
-        self.assertEqual(
-            string, "models.FilePathField(cache=False, path=%r)" % path_like.path
-        )
+        self.assertEqual(string, "models.FilePathField(path=%r)" % path_like.path)
 
     def test_serialize_functions(self):
         with self.assertRaisesMessage(ValueError, "Cannot serialize function: lambda"):

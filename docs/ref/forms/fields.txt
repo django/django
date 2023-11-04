@@ -726,18 +726,17 @@ For each field, we describe the default widget used if you don't specify
         whether folders in the specified location should be included.  Either this or
         :attr:`allow_files` must be ``True``.
 
-    .. attribute:: cache
+    .. attribute:: refresh_seconds
 
         .. versionadded:: 5.1
 
-        Optional. Either ``True``, ``False``, or a ``datetime.timedelta`` object. 
-        Default is ``False``. Specifies how long the contents of ``path`` will be 
-        cached before being read again from the filesystem. If ``False``, the contents
-        of ``path`` are read every time the form is instantiated. If ``True``, the 
-        contents of ``path`` are cached when the form is imported and never reloaded. 
-        If set to a :class:`python:datetime.timedelta` object, the contents of 
-        ``path`` are cached and are read from the filesystem again after the duration 
-        specified in the :class:`python:datetime.timedelta`.
+        Optional. Either a positive integer or ``None``. Default is ``None``. 
+        Specifies how long the contents of ``path`` will be cached before being read 
+        again from the filesystem. If ``None``, the contents of ``path`` are cached
+        when the form is imported and never reloaded. If set to an integer, the 
+        contents of ``path`` are cached and are read from the filesystem again after 
+        the number of seconds specified. If ``0``, the contents of ``path`` are read 
+        every time the form is instantiated. 
 
 ``FloatField``
 --------------
