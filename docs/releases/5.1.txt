@@ -142,10 +142,10 @@ Forms
   :class:`django.forms.FilePathField` and :class:`django.db.models.FilePathField` 
   offers configurable caching of the contents of the source path. The default value is
   ``None``, in which case the contents of the source path are cached when the form is 
-  first imported and never refreshed. If set to an integer, the contents of ``path`` 
-  are cached and are read from the filesystem again after the number of seconds 
-  specified. If set to ``0``, the field will read the source path each time the form 
-  is loaded. 
+  first imported and never refreshed (this is how FilePathField has always worked). 
+  If set to an integer, the contents of ``path`` are cached and are read from the 
+  filesystem again after the number of seconds specified. If set to ``0``, the field 
+  will read the source path each time the form is loaded. 
 
   For example::
 
