@@ -156,7 +156,8 @@ Forms
       class NewForm(forms.Form):
           file_path_field = forms.FilePathField(
               # refresh the contents of the path every 5 minutes
-              path=pathlib.Path("/to/some/directory"), refresh_seconds=300
+              path=pathlib.Path("/to/some/directory"),
+              refresh_seconds=300,
           )
 
 Generic Views
