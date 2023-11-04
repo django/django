@@ -537,12 +537,12 @@ class AdminSite:
         registered in this site.
         """
         app_dict = self._build_app_dict(request, app_label)
-        
+
         # Return unsorted apps and models
         if not self.sort_names:
             app_list = app_dict.values()
             return app_list
-        
+
         # Sort the apps alphabetically.
         app_list = sorted(app_dict.values(), key=lambda x: x["name"].lower())
 
