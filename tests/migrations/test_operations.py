@@ -1692,15 +1692,22 @@ class OperationTests(OperationTestBase):
         field = new_state.models[app_label, "pony"].fields["height"]
         self.assertEqual(field.default, 3)
         self.assertEqual(field.db_default, Value(4))
-        project_state.apps.get_model(app_label, "pony").objects.create(weight=4)
+        pre_pony_pk = (
+            project_state.apps.get_model(app_label, "pony").objects.create(weight=4).pk
+        )
         self.assertColumnNotExists(table_name, "height")
         # Add field.
         with connection.schema_editor() as editor:
             operation.database_forwards(app_label, editor, project_state, new_state)
         self.assertColumnExists(table_name, "height")
+        post_pony_pk = (
+            project_state.apps.get_model(app_label, "pony").objects.create(weight=10).pk
+        )
         new_model = new_state.apps.get_model(app_label, "pony")
-        old_pony = new_model.objects.get()
-        self.assertEqual(old_pony.height, 4)
+        pre_pony = new_model.objects.get(pk=pre_pony_pk)
+        self.assertEqual(pre_pony.height, 4)
+        post_pony = new_model.objects.get(pk=post_pony_pk)
+        self.assertEqual(post_pony.height, 4)
         new_pony = new_model.objects.create(weight=5)
         if not connection.features.can_return_columns_from_insert:
             new_pony.refresh_from_db()
