@@ -120,7 +120,7 @@ Making requests
 
 Use the ``django.test.Client`` class to make requests.
 
-.. class:: Client(enforce_csrf_checks=False, raise_request_exception=True, json_encoder=DjangoJSONEncoder, *, headers=None, **defaults)
+.. class:: Client(enforce_csrf_checks=False, raise_request_exception=True, json_encoder=DjangoJSONEncoder, *, headers=None, query_params=None, **defaults)
 
     A testing HTTP client. Takes several arguments that can customize behavior.
 
@@ -128,6 +128,9 @@ Use the ``django.test.Client`` class to make requests.
     every request. For example, to set a ``User-Agent`` header::
 
         client = Client(headers={"user-agent": "curl/7.79.1"})
+
+    ``query_params`` allows you to specify the default query string that will
+    be set on every request.
 
     Arbitrary keyword arguments in ``**defaults`` set WSGI
     :pep:`environ variables <3333#environ-variables>`. For example, to set the
@@ -140,8 +143,8 @@ Use the ``django.test.Client`` class to make requests.
         Keyword arguments starting with a ``HTTP_`` prefix are set as headers,
         but the ``headers`` parameter should be preferred for readability.
 
-    The values from the ``headers`` and ``extra`` keyword arguments passed to
-    :meth:`~django.test.Client.get()`,
+    The values from the ``headers``, ``query_params``, and ``extra`` keyword
+    arguments passed to :meth:`~django.test.Client.get()`,
     :meth:`~django.test.Client.post()`, etc. have precedence over
     the defaults passed to the class constructor.
 
@@ -155,27 +158,35 @@ Use the ``django.test.Client`` class to make requests.
     The ``json_encoder`` argument allows setting a custom JSON encoder for
     the JSON serialization that's described in :meth:`post`.
 
+    .. versionchanged:: 5.1
+
+        The ``query_params`` argument was added.
+
     Once you have a ``Client`` instance, you can call any of the following
     methods:
 
-    .. method:: Client.get(path, data=None, follow=False, secure=False, *, headers=None, **extra)
+    .. method:: Client.get(path, data=None, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a GET request on the provided ``path`` and returns a ``Response``
         object, which is documented below.
 
-        The key-value pairs in the ``data`` dictionary are used to create a GET
-        data payload. For example:
+        The key-value pairs in the ``query_params`` dictionary are used to set
+        query strings. For example:
 
         .. code-block:: pycon
 
             >>> c = Client()
-            >>> c.get("/customers/details/", {"name": "fred", "age": 7})
+            >>> c.get("/customers/details/", query_params={"name": "fred", "age": 7})
 
         ...will result in the evaluation of a GET request equivalent to:
 
         .. code-block:: text
 
             /customers/details/?name=fred&age=7
+
+        It is also possible to pass these parameters into the ``data``
+        parameter. However, ``query_params`` is preferred as it works for any
+        HTTP method.
 
         The ``headers`` parameter can be used to specify headers to be sent in
         the request. For example:
@@ -185,7 +196,7 @@ Use the ``django.test.Client`` class to make requests.
             >>> c = Client()
             >>> c.get(
             ...     "/customers/details/",
-            ...     {"name": "fred", "age": 7},
+            ...     query_params={"name": "fred", "age": 7},
             ...     headers={"accept": "application/json"},
             ... )
 
@@ -211,8 +222,8 @@ Use the ``django.test.Client`` class to make requests.
             >>> c = Client()
             >>> c.get("/customers/details/?name=fred&age=7")
 
-        If you provide a URL with both an encoded GET data and a data argument,
-        the data argument will take precedence.
+        If you provide a URL with both an encoded GET data and either a
+        query_params or data argument these arguments will take precedence.
 
         If you set ``follow`` to ``True`` the client will follow any redirects
         and a ``redirect_chain`` attribute will be set in the response object
@@ -230,7 +241,11 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.post(path, data=None, content_type=MULTIPART_CONTENT, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a POST request on the provided ``path`` and returns a
         ``Response`` object, which is documented below.
@@ -321,8 +336,8 @@ Use the ``django.test.Client`` class to make requests.
         such as an image, this means you will need to open the file in
         ``rb`` (read binary) mode.
 
-        The ``headers`` and ``extra`` parameters acts the same as for
-        :meth:`Client.get`.
+        The ``headers``, ``query_params``, and ``extra`` parameters acts the
+        same as for :meth:`Client.get`.
 
         If the URL you request with a POST contains encoded parameters, these
         parameters will be made available in the request.GET data. For example,
@@ -330,7 +345,9 @@ Use the ``django.test.Client`` class to make requests.
 
         .. code-block:: pycon
 
-            >>> c.post("/login/?visitor=true", {"name": "fred", "passwd": "secret"})
+            >>> c.post(
+            ...     "/login/", {"name": "fred", "passwd": "secret"}, query_params={"visitor": "true"}
+            ... )
 
         ... the view handling this request could interrogate request.POST
         to retrieve the username and password, and could interrogate request.GET
@@ -343,14 +360,22 @@ Use the ``django.test.Client`` class to make requests.
         If you set ``secure`` to ``True`` the client will emulate an HTTPS
         request.
 
-    .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.head(path, data=None, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a HEAD request on the provided ``path`` and returns a
         ``Response`` object. This method works just like :meth:`Client.get`,
-        including the ``follow``, ``secure``, ``headers``, and ``extra``
-        parameters, except it does not return a message body.
+        including the ``follow``, ``secure``, ``headers``, ``query_params``,
+        and ``extra`` parameters, except it does not return a message body.
 
-    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.options(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes an OPTIONS request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -358,10 +383,14 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
-        the same as for :meth:`Client.get`.
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
 
-    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.put(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PUT request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -369,18 +398,26 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
-        the same as for :meth:`Client.get`.
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
 
-    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.patch(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a PATCH request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
 
-        The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
-        the same as for :meth:`Client.get`.
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
 
-    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.delete(path, data='', content_type='application/octet-stream', follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a DELETE request on the provided ``path`` and returns a
         ``Response`` object. Useful for testing RESTful interfaces.
@@ -388,10 +425,14 @@ Use the ``django.test.Client`` class to make requests.
         When ``data`` is provided, it is used as the request body, and
         a ``Content-Type`` header is set to ``content_type``.
 
-        The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
-        the same as for :meth:`Client.get`.
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
 
-    .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, **extra)
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
+
+    .. method:: Client.trace(path, follow=False, secure=False, *, headers=None, query_params=None, **extra)
 
         Makes a TRACE request on the provided ``path`` and returns a
         ``Response`` object. Useful for simulating diagnostic probes.
@@ -400,8 +441,12 @@ Use the ``django.test.Client`` class to make requests.
         parameter in order to comply with :rfc:`9110#section-9.3.8`, which
         mandates that TRACE requests must not have a body.
 
-        The ``follow``, ``secure``, ``headers``, and ``extra`` parameters act
-        the same as for :meth:`Client.get`.
+        The ``follow``, ``secure``, ``headers``, ``query_params``, and
+        ``extra`` parameters act the same as for :meth:`Client.get`.
+
+        .. versionchanged:: 5.1
+
+            The ``query_params`` argument was added.
 
     .. method:: Client.login(**credentials)
     .. method:: Client.alogin(**credentials)
@@ -1997,7 +2042,7 @@ If you are testing from an asynchronous function, you must also use the
 asynchronous test client. This is available as ``django.test.AsyncClient``,
 or as ``self.async_client`` on any test.
 
-.. class:: AsyncClient(enforce_csrf_checks=False, raise_request_exception=True, *, headers=None, **defaults)
+.. class:: AsyncClient(enforce_csrf_checks=False, raise_request_exception=True, *, headers=None, query_params=None, **defaults)
 
 ``AsyncClient`` has the same methods and signatures as the synchronous (normal)
 test client, with the following exceptions:
@@ -2016,6 +2061,10 @@ test client, with the following exceptions:
 .. versionchanged:: 5.0
 
     Support for the ``follow`` parameter was added to the ``AsyncClient``.
+
+.. versionchanged:: 5.1
+
+    The ``query_params`` argument was added.
 
 Using ``AsyncClient`` any method that makes a request must be awaited::
 

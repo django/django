@@ -224,6 +224,17 @@ Tests
 * The Django test runner now supports a ``--screenshots`` option to save
   screenshots for Selenium tests.
 
+* The :class:`~django.test.RequestFactory`,
+  :class:`~django.test.AsyncRequestFactory`, :class:`~django.test.Client`, and
+  :class:`~django.test.AsyncClient` classes now support the ``query_params``
+  parameter, which accepts a dictionary of query string keys and values. This
+  allows setting query strings on any HTTP methods more easily.
+
+  .. code-block:: python
+
+     self.client.post("/items/1", query_params={"action": "delete"})
+     await self.async_client.post("/items/1", query_params={"action": "delete"})
+
 URLs
 ~~~~
 

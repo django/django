@@ -1197,6 +1197,10 @@ class QueryStringTests(SimpleTestCase):
         self.assertEqual(response.context["get-foo"], "whiz")
         self.assertIsNone(response.context["post-foo"])
 
+        response = self.client.post("/request_data/", query_params={"foo": "whiz"})
+        self.assertEqual(response.context["get-foo"], "whiz")
+        self.assertIsNone(response.context["post-foo"])
+
         # POST data provided in the URL augments actual form data
         response = self.client.post("/request_data/?foo=whiz", data={"foo": "bang"})
         self.assertEqual(response.context["get-foo"], "whiz")
