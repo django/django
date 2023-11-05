@@ -309,6 +309,11 @@ table p.datetime {
     padding-left: 0;
 }
 
+.datetimeshortcuts a:link, .datetimeshortcuts a:visited {
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .datetimeshortcuts .clock-icon, .datetimeshortcuts .date-icon {
     position: relative;
     display: inline-block;
@@ -499,6 +504,11 @@ span.clearable-file-input label {
     padding: 8px 0;
 }
 
+.calendar-shortcuts a:link, .calendar-shortcuts a:visited {
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .calendarbox .calendarnav-previous, .calendarbox .calendarnav-next {
     display: block;
     position: absolute;
@@ -545,6 +555,7 @@ span.clearable-file-input label {
 .calendar-cancel a {
     color: var(--button-fg);
     display: block;
+    text-decoration: none;
 }
 
 ul.timelist, .timelist li {
