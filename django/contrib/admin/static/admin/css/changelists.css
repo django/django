@@ -139,6 +139,10 @@
     margin: 0 0 0 30px;
 }
 
+#changelist-filter a {
+    text-decoration: none;
+}
+
 @media (forced-colors: active) {
   #changelist-filter {
       border: 1px solid;

@@ -363,6 +363,7 @@ thead th {
 
 thead th a:link, thead th a:visited {
     color: var(--body-quiet-color);
+    text-decoration: none;
 }
 
 thead th.sorted {
@@ -707,6 +708,7 @@ div.breadcrumbs {
 
 div.breadcrumbs a {
     color: var(--breadcrumbs-link-fg);
+    text-decoration: none;
 }
 
 div.breadcrumbs a:focus, div.breadcrumbs a:hover {
@@ -720,9 +722,19 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     background: url(../img/icon-viewlink.svg) 0 1px no-repeat;
 }
 
+.viewlink:link, .viewlink:visited, .inlineviewlink:link, .inlineviewlink:visited {
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .hidelink {
     padding-left: 16px;
     background: url(../img/icon-hidelink.svg) 0 1px no-repeat;
+}
+
+.hidelink:link, .hidelink:visited{
+    color: var(--body-fg);
+    text-decoration: none;
 }
 
 .addlink {
@@ -730,14 +742,29 @@ div.breadcrumbs a:focus, div.breadcrumbs a:hover {
     background: url(../img/icon-addlink.svg) 0 1px no-repeat;
 }
 
+.addlink:link, .addlink:visited{
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .changelink, .inlinechangelink {
     padding-left: 16px;
     background: url(../img/icon-changelink.svg) 0 1px no-repeat;
 }
 
+.changelink:link, .changelink:visited, .inlinechangelink:link, .inlinechangelink:visited {
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .deletelink {
     padding-left: 16px;
     background: url(../img/icon-deletelink.svg) 0 1px no-repeat;
+}
+
+.deletelink:link, .deletelink:visited {
+    color: var(--body-fg);
+    text-decoration: none;
 }
 
 a.deletelink:link, a.deletelink:visited {
@@ -746,6 +773,16 @@ a.deletelink:link, a.deletelink:visited {
 
 a.deletelink:focus, a.deletelink:hover {
     color: #993333; /* XXX Probably unused? */
+    text-decoration: none;
+}
+
+.historylink:link, .historylink:visited{
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
+.closelink:link, .closelink:visited{
+    color: var(--body-fg);
     text-decoration: none;
 }
 
@@ -928,6 +965,7 @@ a.deletelink:focus, a.deletelink:hover {
 
 #header a:link, #header a:visited, #logout-form button {
     color: var(--header-link-color);
+    text-decoration: none;
 }
 
 #header a:focus , #header a:hover {
@@ -1112,7 +1150,6 @@ a.deletelink:focus, a.deletelink:hover {
 .paginator a:link, .paginator a:visited {
     padding: 2px 6px;
     background: var(--button-bg);
-    text-decoration: none;
     color: var(--button-fg);
 }
 
