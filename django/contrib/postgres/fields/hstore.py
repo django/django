@@ -10,6 +10,26 @@ from django.utils.translation import gettext_lazy as _
 __all__ = ["HStoreField"]
 
 
+class KeyTransform(Transform):
+    output_field = TextField()
+
+    def __init__(self, key_name, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.key_name = key_name
+
+    def as_sql(self, compiler, connection):
+        lhs, params = compiler.compile(self.lhs)
+        return "(%s -> %%s)" % lhs, tuple(params) + (self.key_name,)
+
+
+class KeyTransformFactory:
+    def __init__(self, key_name):
+        self.key_name = key_name
+
+    def __call__(self, *args, **kwargs):
+        return KeyTransform(self.key_name, *args, **kwargs)
+
+
 class HStoreField(CheckFieldDefaultMixin, Field):
     empty_strings_allowed = False
     description = _("Map of strings to strings/nulls")
@@ -76,26 +96,6 @@ HStoreField.register_lookup(lookups.ContainedBy)
 HStoreField.register_lookup(lookups.HasKey)
 HStoreField.register_lookup(lookups.HasKeys)
 HStoreField.register_lookup(lookups.HasAnyKeys)
-
-
-class KeyTransform(Transform):
-    output_field = TextField()
-
-    def __init__(self, key_name, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.key_name = key_name
-
-    def as_sql(self, compiler, connection):
-        lhs, params = compiler.compile(self.lhs)
-        return "(%s -> %%s)" % lhs, tuple(params) + (self.key_name,)
-
-
-class KeyTransformFactory:
-    def __init__(self, key_name):
-        self.key_name = key_name
-
-    def __call__(self, *args, **kwargs):
-        return KeyTransform(self.key_name, *args, **kwargs)
 
 
 @HStoreField.register_lookup
