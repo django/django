@@ -1148,6 +1148,7 @@ a.deletelink:focus, a.deletelink:hover {
 }
 
 .paginator a:link, .paginator a:visited {
+    text-decoration: none;
     padding: 2px 6px;
     background: var(--button-bg);
     color: var(--button-fg);
@@ -1157,6 +1158,10 @@ a.deletelink:focus, a.deletelink:hover {
     border: none;
     background: none;
     color: var(--link-fg);
+}
+
+.paginator a.showall:link, .paginator a.showall:visited{
+    text-decoration: underline;
 }
 
 .paginator a.showall:focus, .paginator a.showall:hover {
