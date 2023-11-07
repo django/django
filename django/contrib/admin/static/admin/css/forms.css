@@ -499,6 +499,13 @@ body.popup .submit-row {
     font-size: 0.75rem;
 }
 
+.inline-group ul.tools a.add:link, .inline-group ul.tools a.add:visited,
+.inline-group div.add-row a:link, .inline-group div.add-row a:visited,
+.inline-group .tabular tr.add-row td a:link, .inline-group .tabular tr.add-row td a:visited {
+    color: var(--body-fg);
+    text-decoration: none;
+}
+
 .empty-form {
     display: none;
 }
