@@ -9,4 +9,5 @@ Django 4.2.8 fixes several bugs in 4.2.7.
 Bugfixes
 ========
 
-* ...
+* Fixed a regression in Django 4.2 that caused :option:`makemigrations --check`
+  to stop displaying pending migrations (:ticket:`34457`).
