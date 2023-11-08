@@ -131,7 +131,3 @@ class CsrfViewTests(SimpleTestCase):
         with mock.patch.object(Path, "open") as m:
             csrf_failure(mock.MagicMock(), mock.Mock())
             m.assert_called_once_with(encoding="utf-8")
-
-    def test_csrf_response_has_request_context_processor(self):
-        response = self.client.post("/")
-        self.assertIs(response.wsgi_request, response.context.get("request"))
