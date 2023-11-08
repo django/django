@@ -240,6 +240,20 @@ class TestModelDetailView(TestDataMixin, AdminDocsTestCase):
                 reverse("django-admindocs-models-detail", args=["admin_docs", "Person"])
             )
 
+    def test_table_headers(self):
+        tests = [
+            ("Method", 1),
+            ("Arguments", 1),
+            ("Description", 2),
+            ("Field", 1),
+            ("Type", 1),
+            ("Method", 1),
+        ]
+        for table_header, count in tests:
+            self.assertContains(
+                self.response, f'<th scope="col">{table_header}</th>', count=count
+            )
+
     def test_method_excludes(self):
         """
         Methods that begin with strings defined in
