@@ -1082,7 +1082,7 @@ class Value(SQLiteNumericMixin, Expression):
 
     def _resolve_output_field(self):
         if isinstance(self.value, str):
-            return fields.CharField()
+            return fields.CharField(max_length=len(self.value))
         if isinstance(self.value, bool):
             return fields.BooleanField()
         if isinstance(self.value, int):
