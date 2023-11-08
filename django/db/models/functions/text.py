@@ -73,6 +73,23 @@ class ConcatPair(Func):
 
     function = "CONCAT"
 
+    def _resolve_output_field(self):
+        text_field = None
+        max_length = 0
+        for field in self.get_source_fields():
+            if isinstance(field, TextField):
+                text_field = field
+            elif (
+                isinstance(field, CharField)
+                and (field_max_length := field.max_length) is not None
+            ):
+                max_length += field_max_length
+            else:
+                return super()._resolve_output_field()
+        if text_field is not None:
+            return text_field
+        return CharField(max_length=max_length)
+
     def as_sqlite(self, compiler, connection, **extra_context):
         coalesced = self.coalesce()
         return super(ConcatPair, coalesced).as_sql(

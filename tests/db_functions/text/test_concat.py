@@ -1,5 +1,6 @@
 from unittest import skipUnless
 
+from django.core.exceptions import FieldError
 from django.db import connection
 from django.db.models import CharField, TextField
 from django.db.models import Value as V
@@ -62,18 +63,29 @@ class ConcatTests(TestCase):
             title="The Title", text=lorem_ipsum, written=timezone.now()
         )
         article = Article.objects.annotate(
-            title_text=Concat("title", V(" - "), "text", output_field=TextField()),
+            title_text=Concat("title", V(" - "), "text"),
         ).get(title="The Title")
         self.assertEqual(article.title + " - " + article.text, article.title_text)
         # Wrap the concat in something else to ensure that text is returned
         # rather than bytes.
         article = Article.objects.annotate(
-            title_text=Upper(
-                Concat("title", V(" - "), "text", output_field=TextField())
-            ),
+            title_text=Upper(Concat("title", V(" - "), "text")),
         ).get(title="The Title")
         expected = article.title + " - " + article.text
         self.assertEqual(expected.upper(), article.title_text)
+
+    def test_resolved_output_field(self):
+        qs = Article.objects.annotate(
+            title_summary=Concat("title", V(" - "), "summary"),
+            title_text=Concat("title", V(" - "), "text"),
+        )
+        title_summary = qs.query.annotations["title_summary"]
+        self.assertIsInstance(title_summary.output_field, CharField)
+        self.assertEqual(title_summary.output_field.max_length, 253)
+        title_text = qs.query.annotations["title_text"]
+        self.assertIsInstance(title_text.output_field, TextField)
+        with self.assertRaises(FieldError):
+            Article.objects.annotate(concat_mixed=Concat("title", "views")).get()
 
     @skipUnless(connection.vendor == "sqlite", "sqlite specific implementation detail.")
     def test_coalesce_idempotent(self):
