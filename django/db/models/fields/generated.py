@@ -1,5 +1,7 @@
 from django.core import checks
+from django.core.exceptions import FieldError
 from django.db import connections, router
+from django.db.models import CharField
 from django.db.models.sql import Query
 from django.utils.functional import cached_property
 
@@ -17,6 +19,8 @@ class GeneratedField(Field):
     output_field = None
 
     def __init__(self, *, expression, db_persist=None, output_field=None, **kwargs):
+        if output_field is None:
+            raise FieldError("Expression doesn't contain an explicit type. You must set output_field.")
         if kwargs.setdefault("editable", False):
             raise ValueError("GeneratedField cannot be editable.")
         if not kwargs.setdefault("blank", True):
@@ -32,6 +36,11 @@ class GeneratedField(Field):
         self._output_field = output_field
         self.db_persist = db_persist
         super().__init__(**kwargs)
+
+    def _check_output_field(self, **kwargs):
+        if isinstance(self.output_field, CharField):
+            return self.output_field.check(**kwargs)
+        return []
 
     @cached_property
     def cached_col(self):
