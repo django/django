@@ -72,7 +72,7 @@ class Command(BaseCommand):
             dest="check_changes",
             help=(
                 "Exit with a non-zero status if model changes are missing migrations "
-                "and don't actually write them."
+                "and don't actually write them. Implies --dry-run."
             ),
         )
         parser.add_argument(
@@ -114,6 +114,8 @@ class Command(BaseCommand):
             raise CommandError("The migration name must be a valid Python identifier.")
         self.include_header = options["include_header"]
         check_changes = options["check_changes"]
+        if check_changes:
+            self.dry_run = True
         self.scriptable = options["scriptable"]
         self.update = options["update"]
         # If logs and prompts are diverted to stderr, remove the ERROR style.
@@ -251,12 +253,12 @@ class Command(BaseCommand):
                 else:
                     self.log("No changes detected")
         else:
-            if check_changes:
-                sys.exit(1)
             if self.update:
                 self.write_to_last_migration_files(changes)
             else:
                 self.write_migration_files(changes)
+            if check_changes:
+                sys.exit(1)
 
     def write_to_last_migration_files(self, changes):
         loader = MigrationLoader(connections[DEFAULT_DB_ALIAS])
