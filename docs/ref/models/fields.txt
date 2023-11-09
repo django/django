@@ -1284,8 +1284,8 @@ materialized view.
 
     There are many database-specific restrictions on generated fields that
     Django doesn't validate and the database may raise an error e.g. PostgreSQL
-    requires functions and operators referenced in a generated columns to be
-    marked as ``IMMUTABLE`` .
+    requires functions and operators referenced in a generated column to be
+    marked as ``IMMUTABLE``.
 
     You should always check that ``expression`` is supported on your database.
     Check out `MariaDB`_, `MySQL`_, `Oracle`_, `PostgreSQL`_, or `SQLite`_
