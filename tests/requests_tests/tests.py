@@ -11,7 +11,7 @@ from django.http import (
     RawPostDataException,
     UnreadablePostError,
 )
-from django.http.multipartparser import MultiPartParserError
+from django.http.multipartparser import MAX_TOTAL_HEADER_SIZE, MultiPartParserError
 from django.http.request import split_domain_port
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.test.client import BOUNDARY, MULTIPART_CONTENT, FakePayload
@@ -688,6 +688,31 @@ class RequestsTests(SimpleTestCase):
             "Invalid non-ASCII Content-Type in multipart: multipart/form-data; "
             "boundary = à"
         )
+        with self.assertRaisesMessage(MultiPartParserError, msg):
+            request.POST
+
+    def test_multipart_with_header_fields_too_large(self):
+        payload = FakePayload(
+            "\r\n".join(
+                [
+                    "--boundary",
+                    'Content-Disposition: form-data; name="name"',
+                    "X-Long-Header: %s" % ("-" * (MAX_TOTAL_HEADER_SIZE + 1)),
+                    "",
+                    "value",
+                    "--boundary--",
+                ]
+            )
+        )
+        request = WSGIRequest(
+            {
+                "REQUEST_METHOD": "POST",
+                "CONTENT_TYPE": "multipart/form-data; boundary=boundary",
+                "CONTENT_LENGTH": len(payload),
+                "wsgi.input": payload,
+            }
+        )
+        msg = "Request max total header size exceeded."
         with self.assertRaisesMessage(MultiPartParserError, msg):
             request.POST
 

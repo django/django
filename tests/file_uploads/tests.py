@@ -16,6 +16,7 @@ from django.core.files.storage import default_storage
 from django.core.files.uploadedfile import SimpleUploadedFile, UploadedFile
 from django.http.multipartparser import (
     FILE,
+    MAX_TOTAL_HEADER_SIZE,
     MultiPartParser,
     MultiPartParserError,
     Parser,
@@ -602,6 +603,57 @@ class FileUploadTests(TestCase):
                 )
             temp_path = response.json()["temp_path"]
             self.assertIs(os.path.exists(temp_path), False)
+
+    def test_upload_large_header_fields(self):
+        payload = client.FakePayload(
+            "\r\n".join(
+                [
+                    "--" + client.BOUNDARY,
+                    'Content-Disposition: form-data; name="my_file"; '
+                    'filename="test.txt"',
+                    "Content-Type: text/plain",
+                    "X-Long-Header: %s" % ("-" * 500),
+                    "",
+                    "file contents",
+                    "--" + client.BOUNDARY + "--\r\n",
+                ]
+            ),
+        )
+        r = {
+            "CONTENT_LENGTH": len(payload),
+            "CONTENT_TYPE": client.MULTIPART_CONTENT,
+            "PATH_INFO": "/echo_content/",
+            "REQUEST_METHOD": "POST",
+            "wsgi.input": payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"my_file": "file contents"})
+
+    def test_upload_header_fields_too_large(self):
+        payload = client.FakePayload(
+            "\r\n".join(
+                [
+                    "--" + client.BOUNDARY,
+                    'Content-Disposition: form-data; name="my_file"; '
+                    'filename="test.txt"',
+                    "Content-Type: text/plain",
+                    "X-Long-Header: %s" % ("-" * (MAX_TOTAL_HEADER_SIZE + 1)),
+                    "",
+                    "file contents",
+                    "--" + client.BOUNDARY + "--\r\n",
+                ]
+            ),
+        )
+        r = {
+            "CONTENT_LENGTH": len(payload),
+            "CONTENT_TYPE": client.MULTIPART_CONTENT,
+            "PATH_INFO": "/echo_content/",
+            "REQUEST_METHOD": "POST",
+            "wsgi.input": payload,
+        }
+        response = self.client.request(**r)
+        self.assertEqual(response.status_code, 400)
 
     def test_fileupload_getlist(self):
         file = tempfile.NamedTemporaryFile
