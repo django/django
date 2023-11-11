@@ -2861,6 +2861,92 @@ class AutodetectorTests(BaseAutodetectorTests):
         changes = self.get_changes([book_with_type], [book_with_resolved_type])
         self.assertEqual(len(changes), 0)
 
+    def test_add_constraints_with_reversed_order(self):
+        author_names_check_constraint = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(name__contains="Bob")
+                        | models.Q(name__contains="Barbara"),
+                        name="name_contains_bob_or_barbara",
+                    )
+                ]
+            },
+        )
+        author_names_check_constraint_reversed = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(name__contains="Barbara")
+                        | models.Q(name__contains="Bob"),
+                        name="name_contains_bob_or_barbara",
+                    )
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [author_names_check_constraint], [author_names_check_constraint_reversed]
+        )
+        self.assertEqual(len(changes), 0)
+
+    def test_add_constraints_with_reversed_order_in_combined_q(self):
+        author_names_check_constraint = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(id__gt=1000)
+                        & (
+                            models.Q(name__contains="Bob")
+                            | models.Q(name__contains="Barbara")
+                        ),
+                        name="name_contains_bob_or_barbara",
+                    )
+                ]
+            },
+        )
+        author_names_check_constraint_reversed = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(id__gt=1000)
+                        & (
+                            models.Q(name__contains="Barbara")
+                            | models.Q(name__contains="Bob")
+                        ),
+                        name="name_contains_bob_or_barbara",
+                    )
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [author_names_check_constraint], [author_names_check_constraint_reversed]
+        )
+        self.assertEqual(len(changes), 0)
+
     def test_add_index_with_new_model(self):
         book_with_index_title_and_pony = ModelState(
             "otherapp",

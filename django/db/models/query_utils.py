@@ -157,7 +157,7 @@ class Q(tree.Node):
     def identity(self):
         path, args, kwargs = self.deconstruct()
         identity = [path, *kwargs.items()]
-        for child in args:
+        for child in sorted(args, key=str):
             if isinstance(child, tuple):
                 arg, value = child
                 value = make_hashable(value)
