@@ -157,7 +157,7 @@ class Q(tree.Node):
     def identity(self):
         path, args, kwargs = self.deconstruct()
         identity = [path, *kwargs.items()]
-        for child in sorted(args, key=str):
+        for child in args:
             if isinstance(child, tuple):
                 arg, value = child
                 value = make_hashable(value)
@@ -173,6 +173,25 @@ class Q(tree.Node):
 
     def __hash__(self):
         return hash(self.identity)
+
+    def sort(self):
+        _, args, _ = self.deconstruct()
+        unsorted_hashable_args = []
+        for child in args:
+            if isinstance(child, tuple):
+                arg, value = child
+                value = make_hashable(value)
+                unsorted_hashable_args.append((arg, value))
+            elif isinstance(child, Q):
+                unsorted_hashable_args.append(child.sort())
+            else:
+                unsorted_hashable_args.append(child)
+        sorted_args = sorted(unsorted_hashable_args, key=hash)
+        if tuple(sorted_args) != args:
+            obj = self.copy()
+            obj.children = sorted_args
+            return obj
+        return self
 
 
 class DeferredAttribute:

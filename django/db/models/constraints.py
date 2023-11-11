@@ -94,7 +94,7 @@ class CheckConstraint(BaseConstraint):
     def __init__(
         self, *, check, name, violation_error_code=None, violation_error_message=None
     ):
-        self.check = check
+        self.check = check.sort() if isinstance(check, Q) else check
         if not getattr(check, "conditional", False):
             raise TypeError(
                 "CheckConstraint.check must be a Q instance or boolean expression."
