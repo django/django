@@ -303,6 +303,10 @@ class BaseDatabaseFeatures:
     # in UPDATE statements to ensure the expression has the correct type?
     requires_casted_case_in_updates = False
 
+    # Does this backend require casting non-text members to text with using
+    # the || concat operation?
+    requires_casted_text_in_pipes_concat = False
+
     # Does the backend support partial indexes (CREATE INDEX ... WHERE ...)?
     supports_partial_indexes = True
     supports_functions_in_partial_indexes = True

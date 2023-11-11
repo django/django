@@ -1,9 +1,7 @@
-from unittest import skipUnless
-
 from django.db import connection
 from django.db.models import CharField, TextField
 from django.db.models import Value as V
-from django.db.models.functions import Concat, ConcatPair, Upper
+from django.db.models.functions import Concat, Upper
 from django.test import TestCase
 from django.utils import timezone
 
@@ -74,19 +72,6 @@ class ConcatTests(TestCase):
         ).get(title="The Title")
         expected = article.title + " - " + article.text
         self.assertEqual(expected.upper(), article.title_text)
-
-    @skipUnless(
-        connection.vendor in ("sqlite", "postgresql"),
-        "SQLite and PostgreSQL specific implementation detail.",
-    )
-    def test_coalesce_idempotent(self):
-        pair = ConcatPair(V("a"), V("b"))
-        # Check nodes counts
-        self.assertEqual(len(list(pair.flatten())), 3)
-        self.assertEqual(
-            len(list(pair.coalesce().flatten())), 7
-        )  # + 2 Coalesce + 2 Value()
-        self.assertEqual(len(list(pair.flatten())), 3)
 
     def test_sql_generation_idempotency(self):
         qs = Article.objects.annotate(description=Concat("title", V(": "), "summary"))

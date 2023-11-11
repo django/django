@@ -65,87 +65,50 @@ class Chr(Transform):
         return super().as_sql(compiler, connection, function="CHAR", **extra_context)
 
 
-class ConcatPair(Func):
-    """
-    Concatenate two arguments together. This is used by `Concat` because not
-    all backend databases support more than two arguments.
-    """
-
-    function = "CONCAT"
-
-    def pipes_concat_sql(self, compiler, connection, **extra_context):
-        coalesced = self.coalesce()
-        return super(ConcatPair, coalesced).as_sql(
-            compiler,
-            connection,
-            template="%(expressions)s",
-            arg_joiner=" || ",
-            **extra_context,
-        )
-
-    as_sqlite = pipes_concat_sql
-
-    def as_postgresql(self, compiler, connection, **extra_context):
-        c = self.copy()
-        c.set_source_expressions(
-            [
-                expression
-                if isinstance(expression.output_field, (CharField, TextField))
-                else Cast(expression, TextField())
-                for expression in c.get_source_expressions()
-            ]
-        )
-        return c.pipes_concat_sql(compiler, connection, **extra_context)
-
-    def as_mysql(self, compiler, connection, **extra_context):
-        # Use CONCAT_WS with an empty separator so that NULLs are ignored.
-        return super().as_sql(
-            compiler,
-            connection,
-            function="CONCAT_WS",
-            template="%(function)s('', %(expressions)s)",
-            **extra_context,
-        )
-
-    def coalesce(self):
-        # null on either side results in null for expression, wrap with coalesce
-        c = self.copy()
-        c.set_source_expressions(
-            [
-                Coalesce(expression, Value(""))
-                for expression in c.get_source_expressions()
-            ]
-        )
-        return c
-
-
 class Concat(Func):
     """
-    Concatenate text fields together. Backends that result in an entire
-    null expression when any arguments are null will wrap each argument in
-    coalesce functions to ensure a non-null result.
+    Concatenate expressions together into a string.
+
+    Handle nulls and non-textual expressions gracefully.
     """
 
     function = None
     template = "%(expressions)s"
+    arg_joiner = " || "
 
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError("Concat must take at least two expressions")
-        paired = self._paired(expressions, output_field=extra.get("output_field"))
-        super().__init__(paired, **extra)
+        super().__init__(*expressions, **extra)
 
-    def _paired(self, expressions, output_field):
-        # wrap pairs of expressions in successive concat functions
-        # exp = [a, b, c, d]
-        # -> ConcatPair(a, ConcatPair(b, ConcatPair(c, d))))
-        if len(expressions) == 2:
-            return ConcatPair(*expressions, output_field=output_field)
-        return ConcatPair(
-            expressions[0],
-            self._paired(expressions[1:], output_field=output_field),
-            output_field=output_field,
+    def as_mysql(self, compiler, connection):
+        # MySQL || operator is an alias for OR unless PIPES_AS_CONCAT is enabled.
+        return Func(Value(""), *self.source_expressions, function="CONCAT_WS").as_sql(
+            compiler, connection
         )
+
+    def as_sql(self, compiler, connection, **extra_context):
+        copy = self.copy()
+        source_expressions = copy.get_source_expressions()
+        if connection.features.requires_casted_text_in_pipes_concat:
+            source_expressions = [
+                expr
+                if isinstance(expr.output_field, (CharField, TextField))
+                else Cast(expr, TextField())
+                for expr in source_expressions
+            ]
+        # Systematically coalesce source expression to empty strings because
+        # their nullability cannot be accurately inferred.
+        if not connection.features.interprets_empty_strings_as_nulls:
+            source_expressions = [
+                Coalesce(expr, Value("")) for expr in source_expressions
+            ]
+        copy.set_source_expressions(source_expressions)
+        return super(Concat, copy).as_sql(compiler, connection, **extra_context)
+
+
+class ConcatPair(Concat):
+    pass
 
 
 class Left(Func):

@@ -60,6 +60,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
         )
     """
     requires_casted_case_in_updates = True
+    requires_casted_text_in_pipes_concat = True
     supports_over_clause = True
     supports_frame_exclusion = True
     only_supports_unbounded_with_preceding_and_following = True
