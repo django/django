@@ -283,9 +283,10 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
     <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
-When a field has help text and the widget is not rendered in a ``<fieldset>``,
-``aria-describedby`` is added to the ``<input>`` to associate it to the
-help text:
+When a field has help text it is associated with its input using the
+``aria-describedby`` HTML attribute. If the widget is rendered in a
+``<fieldset>`` then ``aria-describedby`` is added to this element, otherwise it
+is added to the widget's ``<input>``:
 
 .. code-block:: pycon
 
@@ -324,6 +325,10 @@ inside ``aria-describedby``:
 .. versionchanged:: 5.0
 
     ``aria-describedby`` was added to associate ``help_text`` with its input.
+
+.. versionchanged:: 5.1
+
+    ``aria-describedby`` support was added for ``<fieldset>``.
 
 ``error_messages``
 ------------------

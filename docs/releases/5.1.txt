@@ -138,7 +138,9 @@ File Uploads
 Forms
 ~~~~~
 
-* ...
+* In order to improve accessibility and enable screen readers to associate
+  fieldsets with their help text, the form fieldset now includes the
+  ``aria-describedby`` HTML attribute.
 
 Generic Views
 ~~~~~~~~~~~~~
