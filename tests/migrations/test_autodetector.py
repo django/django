@@ -2947,6 +2947,45 @@ class AutodetectorTests(BaseAutodetectorTests):
         )
         self.assertEqual(len(changes), 0)
 
+    def test_consolidate_constraint_to_one_q_object(self):
+        author_name_and_id_check_constraint = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(name__contains="Bob") & models.Q(id__gt=1000),
+                        name="name_contains_bob_and_id_over_1000",
+                    )
+                ]
+            },
+        )
+        author_name_and_id_check_constraint_consolidated = ModelState(
+            "testapp",
+            "Author",
+            [
+                ("id", models.AutoField(primary_key=True)),
+                ("name", models.CharField(max_length=200)),
+            ],
+            {
+                "constraints": [
+                    models.CheckConstraint(
+                        check=models.Q(name__contains="Bob", id__gt=1000),
+                        name="name_contains_bob_and_id_over_1000",
+                    )
+                ]
+            },
+        )
+        changes = self.get_changes(
+            [author_name_and_id_check_constraint],
+            [author_name_and_id_check_constraint_consolidated],
+        )
+        self.assertEqual(len(changes), 0)
+
     def test_add_index_with_new_model(self):
         book_with_index_title_and_pony = ModelState(
             "otherapp",
