@@ -877,6 +877,8 @@ class SQLCompiler:
                     if self._meta_ordering:
                         order_by = None
                 if having:
+                    if not grouping:
+                        result.extend(self.connection.ops.force_group_by())
                     result.append("HAVING %s" % having)
                     params.extend(h_params)
 

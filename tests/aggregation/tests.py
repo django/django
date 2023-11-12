@@ -2126,6 +2126,15 @@ class AggregateTestCase(TestCase):
         qs = Publisher.objects.filter(pk__in=author_qs)
         self.assertCountEqual(qs, [self.p1, self.p2, self.p3, self.p4])
 
+    def test_having_with_no_group_by(self):
+        author_qs = (
+            Author.objects.values(static_value=Value("static-value"))
+            .annotate(sum=Sum("age"))
+            .filter(sum__gte=0)
+            .values_list("sum", flat=True)
+        )
+        self.assertEqual(list(author_qs), [337])
+
 
 class AggregateAnnotationPruningTests(TestCase):
     @classmethod
