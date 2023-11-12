@@ -286,6 +286,8 @@ class Field(RegisterLookupMixin):
         Check if field name is valid, i.e. 1) does not end with an
         underscore, 2) does not contain "__" and 3) is not "pk".
         """
+        if self.name is None:
+            return []
         if self.name.endswith("_"):
             return [
                 checks.Error(

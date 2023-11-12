@@ -4,7 +4,7 @@ import uuid
 from django.core.checks import Error
 from django.core.checks import Warning as DjangoWarning
 from django.db import connection, models
-from django.db.models.functions import Coalesce, Pi
+from django.db.models.functions import Coalesce, LPad, Pi
 from django.test import SimpleTestCase, TestCase, skipIfDBFeature, skipUnlessDBFeature
 from django.test.utils import isolate_apps, override_settings
 from django.utils.functional import lazy
@@ -1335,4 +1335,80 @@ class GeneratedFieldTests(TestCase):
         self.assertEqual(
             Model._meta.get_field("field").check(databases={"default"}),
             expected_errors,
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_output_field_check_error(self):
+        class Model(models.Model):
+            value = models.DecimalField(max_digits=5, decimal_places=2)
+            field = models.GeneratedField(
+                expression=models.F("value") * 2,
+                output_field=models.DecimalField(max_digits=-1, decimal_places=-1),
+                db_persist=True,
+            )
+
+        expected_errors = [
+            Error(
+                "GeneratedField.output_field has errors:"
+                "\n    'decimal_places' must be a non-negative integer. (fields.E131)"
+                "\n    'max_digits' must be a positive integer. (fields.E133)",
+                obj=Model._meta.get_field("field"),
+                id="fields.E223",
+            ),
+        ]
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_errors,
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_output_field_charfield_unlimited_error(self):
+        class Model(models.Model):
+            name = models.CharField(max_length=255)
+            field = models.GeneratedField(
+                expression=LPad("name", 7, models.Value("xy")),
+                output_field=models.CharField(),
+                db_persist=True,
+            )
+
+        expected_errors = (
+            []
+            if connection.features.supports_unlimited_charfield
+            else [
+                Error(
+                    "GeneratedField.output_field has errors:"
+                    "\n    CharFields must define a 'max_length' attribute. "
+                    "(fields.E120)",
+                    obj=Model._meta.get_field("field"),
+                    id="fields.E223",
+                ),
+            ]
+        )
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_errors,
+        )
+
+    @skipUnlessDBFeature("supports_stored_generated_columns")
+    def test_output_field_check_warning(self):
+        class Model(models.Model):
+            value = models.IntegerField()
+            field = models.GeneratedField(
+                expression=models.F("value") * 2,
+                output_field=models.IntegerField(max_length=40),
+                db_persist=True,
+            )
+
+        expected_warnings = [
+            DjangoWarning(
+                "GeneratedField.output_field has warnings:"
+                "\n    'max_length' is ignored when used with IntegerField. "
+                "(fields.W122)",
+                obj=Model._meta.get_field("field"),
+                id="fields.W224",
+            ),
+        ]
+        self.assertEqual(
+            Model._meta.get_field("field").check(databases={"default"}),
+            expected_warnings,
         )
