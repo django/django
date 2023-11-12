@@ -1,9 +1,9 @@
 from django.db import connection
 from django.db.models import CharField, TextField
 from django.db.models import Value as V
-from django.db.models.functions import Concat, Upper
+from django.db.models.functions import Concat, ConcatPair, Upper
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import deprecation, timezone
 
 from ..models import Article, Author
 
@@ -92,3 +92,10 @@ class ConcatTests(TestCase):
             ctx.captured_queries[0]["sql"].count("::text"),
             1 if connection.vendor == "postgresql" else 0,
         )
+
+    def test_concat_pair_deprecation(self):
+        with self.assertWarnsMessage(
+            deprecation.RemovedInDjango60Warning,
+            "ConcatPair is deprecated, use Concat instead.",
+        ):
+            ConcatPair("foo", "bar")

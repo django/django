@@ -1,8 +1,11 @@
+import warnings
+
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
 from django.db.models.fields import CharField, IntegerField, TextField
 from django.db.models.functions import Cast, Coalesce
 from django.db.models.lookups import Transform
+from django.utils.deprecation import RemovedInDjango60Warning
 
 
 class MySQLSHA2Mixin:
@@ -108,7 +111,14 @@ class Concat(Func):
 
 
 class ConcatPair(Concat):
-    pass
+    def __init__(self, *expressions, **extra):
+        # RemovedInDjango60Warning.
+        warnings.warn(
+            "ConcatPair is deprecated, use Concat instead.",
+            category=RemovedInDjango60Warning,
+            stacklevel=2,
+        )
+        super().__init__(*expressions, **extra)
 
 
 class Left(Func):

@@ -290,6 +290,11 @@ Miscellaneous
   ``ModelAdmin.log_deletions()`` and  ``LogEntryManager.log_actions()``
   instead.
 
+* The undocumented ``django.db.models.functions.ConcatPair`` function
+  expression has been deprecated and aliased to
+  :class:`~django.db.models.functions.Concat` which should be used
+  instead.
+
 Features removed in 5.1
 =======================
 
