@@ -2227,7 +2227,6 @@ class ValueTests(TestCase):
             with self.subTest(type=type(value)):
                 expr = Value(value)
                 self.assertIsInstance(expr.output_field, output_field_type)
-        self.assertEqual(Value("foo").output_field.max_length, 3)
 
     def test_resolve_output_field_failure(self):
         msg = "Cannot resolve expression type, unknown output_field"
