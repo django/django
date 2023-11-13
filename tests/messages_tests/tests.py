@@ -1,3 +1,5 @@
+import importlib
+import sys
 from unittest import mock
 
 from django.conf import settings
@@ -65,8 +67,13 @@ class TestLevelTags(SimpleTestCase):
         self.assertEqual(base.LEVEL_TAGS, self.message_tags)
 
     def test_lazy(self):
+        storage_base_import_path = "django.contrib.messages.storage.base"
+        in_use_base = sys.modules.pop(storage_base_import_path)
+        self.addCleanup(sys.modules.__setitem__, storage_base_import_path, in_use_base)
         # Don't use @override_settings to avoid calling the setting_changed
-        # signal.
+        # signal, but ensure that base.LEVEL_TAGS hasn't been read yet (this
+        # means that we need to ensure the `base` module is freshly imported).
+        base = importlib.import_module(storage_base_import_path)
         old_message_tags = getattr(settings, "MESSAGE_TAGS", None)
         settings.MESSAGE_TAGS = {constants.ERROR: "bad"}
         try:
