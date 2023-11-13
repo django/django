@@ -16,7 +16,7 @@ class GeneratedField(Field):
     _resolved_expression = None
     output_field = None
 
-    def __init__(self, *, expression, db_persist=None, output_field=None, **kwargs):
+    def __init__(self, *, expression, output_field, db_persist=None, **kwargs):
         if kwargs.setdefault("editable", False):
             raise ValueError("GeneratedField cannot be editable.")
         if not kwargs.setdefault("blank", True):
@@ -29,7 +29,7 @@ class GeneratedField(Field):
             raise ValueError("GeneratedField.db_persist must be True or False.")
 
         self.expression = expression
-        self._output_field = output_field
+        self.output_field = output_field
         self.db_persist = db_persist
         super().__init__(**kwargs)
 
@@ -50,11 +50,6 @@ class GeneratedField(Field):
         self._query = Query(model=self.model, alias_cols=False)
         self._resolved_expression = self.expression.resolve_expression(
             self._query, allow_joins=False
-        )
-        self.output_field = (
-            self._output_field
-            if self._output_field is not None
-            else self._resolved_expression.output_field
         )
         # Register lookups from the output_field class.
         for lookup_name, lookup in self.output_field.get_class_lookups().items():
@@ -150,8 +145,7 @@ class GeneratedField(Field):
         del kwargs["editable"]
         kwargs["db_persist"] = self.db_persist
         kwargs["expression"] = self.expression
-        if self._output_field is not None:
-            kwargs["output_field"] = self._output_field
+        kwargs["output_field"] = self.output_field
         return name, path, args, kwargs
 
     def get_internal_type(self):

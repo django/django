@@ -1,5 +1,12 @@
 from django.db import IntegrityError, connection
-from django.db.models import F, FloatField, GeneratedField, IntegerField, Model
+from django.db.models import (
+    CharField,
+    F,
+    FloatField,
+    GeneratedField,
+    IntegerField,
+    Model,
+)
 from django.db.models.functions import Lower
 from django.test import SimpleTestCase, TestCase, skipUnlessDBFeature
 from django.test.utils import isolate_apps
@@ -8,8 +15,8 @@ from .models import (
     GeneratedModel,
     GeneratedModelNull,
     GeneratedModelNullVirtual,
-    GeneratedModelOutputField,
-    GeneratedModelOutputFieldVirtual,
+    GeneratedModelOutputFieldDbCollation,
+    GeneratedModelOutputFieldDbCollationVirtual,
     GeneratedModelParams,
     GeneratedModelParamsVirtual,
     GeneratedModelVirtual,
@@ -19,41 +26,77 @@ from .models import (
 class BaseGeneratedFieldTests(SimpleTestCase):
     def test_editable_unsupported(self):
         with self.assertRaisesMessage(ValueError, "GeneratedField cannot be editable."):
-            GeneratedField(expression=Lower("name"), editable=True, db_persist=False)
+            GeneratedField(
+                expression=Lower("name"),
+                output_field=CharField(max_length=255),
+                editable=True,
+                db_persist=False,
+            )
 
     def test_blank_unsupported(self):
         with self.assertRaisesMessage(ValueError, "GeneratedField must be blank."):
-            GeneratedField(expression=Lower("name"), blank=False, db_persist=False)
+            GeneratedField(
+                expression=Lower("name"),
+                output_field=CharField(max_length=255),
+                blank=False,
+                db_persist=False,
+            )
 
     def test_default_unsupported(self):
         msg = "GeneratedField cannot have a default."
         with self.assertRaisesMessage(ValueError, msg):
-            GeneratedField(expression=Lower("name"), default="", db_persist=False)
+            GeneratedField(
+                expression=Lower("name"),
+                output_field=CharField(max_length=255),
+                default="",
+                db_persist=False,
+            )
 
     def test_database_default_unsupported(self):
         msg = "GeneratedField cannot have a database default."
         with self.assertRaisesMessage(ValueError, msg):
-            GeneratedField(expression=Lower("name"), db_default="", db_persist=False)
+            GeneratedField(
+                expression=Lower("name"),
+                output_field=CharField(max_length=255),
+                db_default="",
+                db_persist=False,
+            )
 
     def test_db_persist_required(self):
         msg = "GeneratedField.db_persist must be True or False."
         with self.assertRaisesMessage(ValueError, msg):
-            GeneratedField(expression=Lower("name"))
+            GeneratedField(
+                expression=Lower("name"), output_field=CharField(max_length=255)
+            )
         with self.assertRaisesMessage(ValueError, msg):
-            GeneratedField(expression=Lower("name"), db_persist=None)
+            GeneratedField(
+                expression=Lower("name"),
+                output_field=CharField(max_length=255),
+                db_persist=None,
+            )
 
     def test_deconstruct(self):
-        field = GeneratedField(expression=F("a") + F("b"), db_persist=True)
+        field = GeneratedField(
+            expression=F("a") + F("b"), output_field=IntegerField(), db_persist=True
+        )
         _, path, args, kwargs = field.deconstruct()
         self.assertEqual(path, "django.db.models.GeneratedField")
         self.assertEqual(args, [])
-        self.assertEqual(kwargs, {"db_persist": True, "expression": F("a") + F("b")})
+        self.assertEqual(kwargs["db_persist"], True)
+        self.assertEqual(kwargs["expression"], F("a") + F("b"))
+        self.assertEqual(
+            kwargs["output_field"].deconstruct(), IntegerField().deconstruct()
+        )
 
     @isolate_apps("model_fields")
     def test_get_col(self):
         class Square(Model):
             side = IntegerField()
-            area = GeneratedField(expression=F("side") * F("side"), db_persist=True)
+            area = GeneratedField(
+                expression=F("side") * F("side"),
+                output_field=IntegerField(),
+                db_persist=True,
+            )
 
         col = Square._meta.get_field("area").get_col("alias")
         self.assertIsInstance(col.output_field, IntegerField)
@@ -74,7 +117,9 @@ class BaseGeneratedFieldTests(SimpleTestCase):
         class Sum(Model):
             a = IntegerField()
             b = IntegerField()
-            total = GeneratedField(expression=F("a") + F("b"), db_persist=True)
+            total = GeneratedField(
+                expression=F("a") + F("b"), output_field=IntegerField(), db_persist=True
+            )
 
         field = Sum._meta.get_field("total")
         cached_col = field.cached_col
@@ -165,9 +210,9 @@ class GeneratedFieldTestMixin:
         with self.assertNumQueries(0), self.assertRaises(does_not_exist):
             self.base_model.objects.get(field__gte=overflow_value)
 
-    def test_output_field(self):
+    def test_output_field_db_collation(self):
         collation = connection.features.test_collations["virtual"]
-        m = self.output_field_model.objects.create(name="NAME")
+        m = self.output_field_db_collation_model.objects.create(name="NAME")
         field = m._meta.get_field("lower_name")
         db_parameters = field.db_parameters(connection)
         self.assertEqual(db_parameters["collation"], collation)
@@ -178,7 +223,7 @@ class GeneratedFieldTestMixin:
         )
 
     def test_db_type_parameters(self):
-        db_type_parameters = self.output_field_model._meta.get_field(
+        db_type_parameters = self.output_field_db_collation_model._meta.get_field(
             "lower_name"
         ).db_type_parameters(connection)
         self.assertEqual(db_type_parameters["max_length"], 11)
@@ -202,7 +247,7 @@ class GeneratedFieldTestMixin:
 class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModel
     nullable_model = GeneratedModelNull
-    output_field_model = GeneratedModelOutputField
+    output_field_db_collation_model = GeneratedModelOutputFieldDbCollation
     params_model = GeneratedModelParams
 
 
@@ -210,5 +255,5 @@ class StoredGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
 class VirtualGeneratedFieldTests(GeneratedFieldTestMixin, TestCase):
     base_model = GeneratedModelVirtual
     nullable_model = GeneratedModelNullVirtual
-    output_field_model = GeneratedModelOutputFieldVirtual
+    output_field_db_collation_model = GeneratedModelOutputFieldDbCollationVirtual
     params_model = GeneratedModelParamsVirtual

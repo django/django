@@ -1237,7 +1237,7 @@ when :attr:`~django.forms.Field.localize` is ``False`` or
 
 .. versionadded:: 5.0
 
-.. class:: GeneratedField(expression, db_persist=None, output_field=None, **kwargs)
+.. class:: GeneratedField(expression, output_field, db_persist=None, **kwargs)
 
 A field that is always computed based on other fields in the model. This field
 is managed and updated by the database itself. Uses the ``GENERATED ALWAYS``
@@ -1259,6 +1259,10 @@ materialized view.
     the model (in the same database table). Generated fields cannot reference
     other generated fields. Database backends can impose further restrictions.
 
+.. attribute:: GeneratedField.output_field
+
+    A model field instance to define the field's data type.
+
 .. attribute:: GeneratedField.db_persist
 
     Determines if the database column should occupy storage as if it were a
@@ -1267,12 +1271,6 @@ materialized view.
 
     PostgreSQL only supports persisted columns. Oracle only supports virtual
     columns.
-
-.. attribute:: GeneratedField.output_field
-
-    An optional model field instance to define the field's data type. This can
-    be used to customize attributes like the field's collation. By default, the
-    output field is derived from ``expression``.
 
 .. admonition:: Refresh the data
 
