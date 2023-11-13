@@ -142,7 +142,11 @@ to create a field that is always computed from other fields. For example::
 
     class Square(models.Model):
         side = models.IntegerField()
-        area = models.GeneratedField(expression=F("side") * F("side"), db_persist=True)
+        area = models.GeneratedField(
+            expression=F("side") * F("side"),
+            output_field=models.BigIntegerField(),
+            db_persist=True,
+        )
 
 More options for declaring field choices
 ----------------------------------------

@@ -485,7 +485,11 @@ class UUIDGrandchild(UUIDChild):
 class GeneratedModel(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
-    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=True)
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=True,
+    )
 
     class Meta:
         required_db_features = {"supports_stored_generated_columns"}
@@ -494,7 +498,11 @@ class GeneratedModel(models.Model):
 class GeneratedModelVirtual(models.Model):
     a = models.IntegerField()
     b = models.IntegerField()
-    field = models.GeneratedField(expression=F("a") + F("b"), db_persist=False)
+    field = models.GeneratedField(
+        expression=F("a") + F("b"),
+        output_field=models.IntegerField(),
+        db_persist=False,
+    )
 
     class Meta:
         required_db_features = {"supports_virtual_generated_columns"}
@@ -503,6 +511,7 @@ class GeneratedModelVirtual(models.Model):
 class GeneratedModelParams(models.Model):
     field = models.GeneratedField(
         expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
         db_persist=True,
     )
 
@@ -513,6 +522,7 @@ class GeneratedModelParams(models.Model):
 class GeneratedModelParamsVirtual(models.Model):
     field = models.GeneratedField(
         expression=Value("Constant", output_field=models.CharField(max_length=10)),
+        output_field=models.CharField(max_length=10),
         db_persist=False,
     )
 
@@ -520,7 +530,7 @@ class GeneratedModelParamsVirtual(models.Model):
         required_db_features = {"supports_virtual_generated_columns"}
 
 
-class GeneratedModelOutputField(models.Model):
+class GeneratedModelOutputFieldDbCollation(models.Model):
     name = models.CharField(max_length=10)
     lower_name = models.GeneratedField(
         expression=Lower("name"),
@@ -532,7 +542,7 @@ class GeneratedModelOutputField(models.Model):
         required_db_features = {"supports_stored_generated_columns"}
 
 
-class GeneratedModelOutputFieldVirtual(models.Model):
+class GeneratedModelOutputFieldDbCollationVirtual(models.Model):
     name = models.CharField(max_length=10)
     lower_name = models.GeneratedField(
         expression=Lower("name"),
@@ -547,7 +557,10 @@ class GeneratedModelOutputFieldVirtual(models.Model):
 class GeneratedModelNull(models.Model):
     name = models.CharField(max_length=10, null=True)
     lower_name = models.GeneratedField(
-        expression=Lower("name"), db_persist=True, null=True
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=True,
+        null=True,
     )
 
     class Meta:
@@ -557,7 +570,10 @@ class GeneratedModelNull(models.Model):
 class GeneratedModelNullVirtual(models.Model):
     name = models.CharField(max_length=10, null=True)
     lower_name = models.GeneratedField(
-        expression=Lower("name"), db_persist=False, null=True
+        expression=Lower("name"),
+        output_field=models.CharField(max_length=10),
+        db_persist=False,
+        null=True,
     )
 
     class Meta:

@@ -5798,10 +5798,14 @@ class OperationTests(OperationTestBase):
     def _test_invalid_generated_field_changes(self, db_persist):
         regular = models.IntegerField(default=1)
         generated_1 = models.GeneratedField(
-            expression=F("pink") + F("pink"), db_persist=db_persist
+            expression=F("pink") + F("pink"),
+            output_field=models.IntegerField(),
+            db_persist=db_persist,
         )
         generated_2 = models.GeneratedField(
-            expression=F("pink") + F("pink") + F("pink"), db_persist=db_persist
+            expression=F("pink") + F("pink") + F("pink"),
+            output_field=models.IntegerField(),
+            db_persist=db_persist,
         )
         tests = [
             ("test_igfc_1", regular, generated_1),
@@ -5841,12 +5845,20 @@ class OperationTests(OperationTestBase):
             migrations.AddField(
                 "Pony",
                 "modified_pink",
-                models.GeneratedField(expression=F("pink"), db_persist=True),
+                models.GeneratedField(
+                    expression=F("pink"),
+                    output_field=models.IntegerField(),
+                    db_persist=True,
+                ),
             ),
             migrations.AlterField(
                 "Pony",
                 "modified_pink",
-                models.GeneratedField(expression=F("pink"), db_persist=False),
+                models.GeneratedField(
+                    expression=F("pink"),
+                    output_field=models.IntegerField(),
+                    db_persist=False,
+                ),
             ),
         ]
         msg = (
@@ -5863,7 +5875,9 @@ class OperationTests(OperationTestBase):
             "Pony",
             "modified_pink",
             models.GeneratedField(
-                expression=F("pink") + F("pink"), db_persist=db_persist
+                expression=F("pink") + F("pink"),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
             ),
         )
         project_state, new_state = self.make_test_state(app_label, operation)
@@ -5894,7 +5908,9 @@ class OperationTests(OperationTestBase):
             "Pony",
             "modified_pink",
             models.GeneratedField(
-                expression=F("pink") + F("pink"), db_persist=db_persist
+                expression=F("pink") + F("pink"),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
             ),
         )
         project_state, new_state = self.make_test_state(app_label, operation)

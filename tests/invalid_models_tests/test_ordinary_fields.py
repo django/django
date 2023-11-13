@@ -1216,7 +1216,9 @@ class GeneratedFieldTests(TestCase):
         class Model(models.Model):
             name = models.IntegerField()
             field = models.GeneratedField(
-                expression=models.F("name"), db_persist=db_persist
+                expression=models.F("name"),
+                output_field=models.IntegerField(),
+                db_persist=db_persist,
             )
 
         expected_errors = []
@@ -1252,7 +1254,11 @@ class GeneratedFieldTests(TestCase):
     def test_not_supported_stored_required_db_features(self):
         class Model(models.Model):
             name = models.IntegerField()
-            field = models.GeneratedField(expression=models.F("name"), db_persist=True)
+            field = models.GeneratedField(
+                expression=models.F("name"),
+                output_field=models.IntegerField(),
+                db_persist=True,
+            )
 
             class Meta:
                 required_db_features = {"supports_stored_generated_columns"}
@@ -1262,7 +1268,11 @@ class GeneratedFieldTests(TestCase):
     def test_not_supported_virtual_required_db_features(self):
         class Model(models.Model):
             name = models.IntegerField()
-            field = models.GeneratedField(expression=models.F("name"), db_persist=False)
+            field = models.GeneratedField(
+                expression=models.F("name"),
+                output_field=models.IntegerField(),
+                db_persist=False,
+            )
 
             class Meta:
                 required_db_features = {"supports_virtual_generated_columns"}
@@ -1273,7 +1283,11 @@ class GeneratedFieldTests(TestCase):
     def test_not_supported_virtual(self):
         class Model(models.Model):
             name = models.IntegerField()
-            field = models.GeneratedField(expression=models.F("name"), db_persist=False)
+            field = models.GeneratedField(
+                expression=models.F("name"),
+                output_field=models.IntegerField(),
+                db_persist=False,
+            )
             a = models.TextField()
 
         excepted_errors = (
@@ -1298,7 +1312,11 @@ class GeneratedFieldTests(TestCase):
     def test_not_supported_stored(self):
         class Model(models.Model):
             name = models.IntegerField()
-            field = models.GeneratedField(expression=models.F("name"), db_persist=True)
+            field = models.GeneratedField(
+                expression=models.F("name"),
+                output_field=models.IntegerField(),
+                db_persist=True,
+            )
             a = models.TextField()
 
         expected_errors = (
