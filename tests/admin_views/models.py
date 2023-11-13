@@ -1147,6 +1147,7 @@ class Square(models.Model):
     area = models.GeneratedField(
         db_persist=True,
         expression=models.F("side") * models.F("side"),
+        output_field=models.BigIntegerField(),
     )
 
     class Meta:
