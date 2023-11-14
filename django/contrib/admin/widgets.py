@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.db.models import CASCADE, UUIDField
+from django.db.models.fields.reverse_related import ForeignObjectRel
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import smart_urlquote
@@ -546,6 +547,8 @@ class AutocompleteMixin:
             self.field.remote_field, "field_name", remote_model_opts.pk.attname
         )
         to_field_name = remote_model_opts.get_field(to_field_name).attname
+        if isinstance(self.field, ForeignObjectRel):
+            to_field_name = "%s__%s" % (self.field.name, to_field_name)
         choices = (
             (getattr(obj, to_field_name), self.choices.field.label_from_instance(obj))
             for obj in self.choices.queryset.using(self.db).filter(
