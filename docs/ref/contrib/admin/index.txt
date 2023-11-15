@@ -2803,7 +2803,7 @@ template override to your project:
 
     {% block extrastyle %}{{ block.super }}
     <style>
-    :root {
+    html[data-theme="light"], :root {
       --primary: #9774d5;
       --secondary: #785cab;
       --link-fg: #7c449b;
