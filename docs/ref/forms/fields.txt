@@ -283,9 +283,9 @@ fields. We've specified ``auto_id=False`` to simplify the output:
     <div>Sender:<div class="helptext">A valid email address, please.</div><input type="email" name="sender" required></div>
     <div>Cc myself:<input type="checkbox" name="cc_myself"></div>
 
-When a field has help text and :attr:`~django.forms.BoundField.id_for_label`
-returns a value, we associate ``help_text`` with the input using the
-``aria-describedby`` HTML attribute:
+When a field has help text and the widget is not rendered in a ``<fieldset>``,
+``aria-describedby`` is added to the ``<input>`` to associate it to the
+help text:
 
 .. code-block:: pycon
 
