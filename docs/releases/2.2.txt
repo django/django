@@ -531,3 +531,8 @@ Miscellaneous
   prevent unexpected queries against non-default databases to leak state
   between tests. The previous behavior of ``allow_database_queries=True`` and
   ``multi_db=True`` can be achieved by setting ``databases='__all__'``.
+
+:mod:`django.shortcuts`
+~~~~~~~~~~~~~~~~~~~~~~~
+
+* The new :func:`django.shortcuts.make_toast` function returns ``'toast'``.
