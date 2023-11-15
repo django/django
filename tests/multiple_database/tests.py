@@ -1302,18 +1302,18 @@ class QueryTestCase(TestCase):
             title="Dive into Water", published=datetime.date(2009, 5, 4), extra_arg=True
         )
 
-    @override_settings(
-        DATABASE_ROUTERS=[
-            "multiple_database.tests.TestRouter"
-        ]
-    )
+    @override_settings(DATABASE_ROUTERS=["multiple_database.tests.TestRouter"])
     def test_contenttype_in_separate_db(self):
         ContentType.objects.using("other").all().delete()
         book_title = "Test Content Type in Separate DB"
         book_published_date = datetime.date(2009, 5, 4)
-        Book.objects.using("other").create(title=book_title, published=book_published_date)
+        Book.objects.using("other").create(
+            title=book_title, published=book_published_date
+        )
 
-        book_type = ContentType.objects.using("default").get(app_label="multiple_database", model='book')
+        book_type = ContentType.objects.using("default").get(
+            app_label="multiple_database", model="book"
+        )
 
         book = book_type.get_object_for_this_type(title=book_title)
         self.assertEqual(book.published, book_published_date)
