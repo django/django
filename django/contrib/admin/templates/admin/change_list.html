@@ -21,7 +21,9 @@
 {% block extrahead %}
 {{ block.super }}
 {{ media.js }}
-<script src="{% static 'admin/js/filters.js' %}" defer></script>
+{% if cl.has_filters %}
+  <script src="{% static 'admin/js/filters.js' %}" defer></script>
+{% endif %}
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
@@ -71,23 +73,25 @@
         {% block pagination %}{% pagination cl %}{% endblock %}
         </form>
       </div>
-      {% block filters %}
-        {% if cl.has_filters %}
-          <nav id="changelist-filter" aria-labelledby="changelist-filter-header">
-            <h2 id="changelist-filter-header">{% translate 'Filter' %}</h2>
-            {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
-              {% if cl.is_facets_optional %}<h3>
-                {% if cl.add_facets %}<a href="{{ cl.remove_facet_link }}" class="hidelink">{% translate "Hide counts" %}</a>
-                {% else %}<a href="{{ cl.add_facet_link }}" class="viewlink">{% translate "Show counts" %}</a>{% endif %}
-              </h3>{% endif %}
-              {% if cl.has_active_filters %}<h3>
-                <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
-              </h3>{% endif %}
-            </div>{% endif %}
-            {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
-          </nav>
-        {% endif %}
-      {% endblock %}
     </div>
   </div>
+{% endblock %}
+
+{% block filters %}
+  {% if cl.has_filters %}
+    <nav id="changelist-filter" class="module" aria-labelledby="changelist-filter-header">
+      <h2 id="changelist-filter-header">{% translate 'Filter' %}</h2>
+      {% if cl.is_facets_optional or cl.has_active_filters %}<div id="changelist-filter-extra-actions">
+        {% if cl.is_facets_optional %}<h3>
+          {% if cl.add_facets %}<a href="{{ cl.remove_facet_link }}" class="hidelink">{% translate "Hide counts" %}</a>
+          {% else %}<a href="{{ cl.add_facet_link }}" class="viewlink">{% translate "Show counts" %}</a>{% endif %}
+        </h3>{% endif %}
+        {% if cl.has_active_filters %}<h3>
+          <a href="{{ cl.clear_all_filters_qs }}">&#10006; {% translate "Clear all filters" %}</a>
+        </h3>{% endif %}
+      </div>{% endif %}
+      {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+    </nav>
+    <button class="sticky toggle-sidebar sidebar-filter" id="toggle-filter-sidebar" aria-label="{% translate 'Toggle filters' %}"></button>
+  {% endif %}
 {% endblock %}

@@ -133,10 +133,9 @@
 
 #changelist-filter {
     flex: 0 0 240px;
-    order: 1;
     background: var(--darkened-bg);
     border-left: none;
-    margin: 0 0 0 30px;
+    margin: 0;
 }
 
 @media (forced-colors: active) {
