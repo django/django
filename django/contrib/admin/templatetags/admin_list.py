@@ -18,6 +18,7 @@ from django.contrib.admin.views.main import (
 )
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models.constants import LOOKUP_SEP
 from django.template import Library
 from django.template.loader import get_template
 from django.templatetags.static import static
@@ -112,7 +113,7 @@ def result_headers(cl):
             # Set ordering for attr that is a property, if defined.
             if isinstance(attr, property) and hasattr(attr, "fget"):
                 admin_order_field = getattr(attr.fget, "admin_order_field", None)
-            if not admin_order_field:
+            if not admin_order_field and LOOKUP_SEP not in field_name:
                 is_field_sortable = False
 
         if not is_field_sortable:

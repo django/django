@@ -3,7 +3,7 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 
-from .models import Band, Child, Event, Parent, ProxyUser, Swallow
+from .models import Band, Child, Event, GrandChild, Parent, ProxyUser, Swallow
 
 site = admin.AdminSite(name="admin")
 
@@ -55,6 +55,9 @@ class ChildAdmin(admin.ModelAdmin):
 
 class GrandChildAdmin(admin.ModelAdmin):
     list_display = ["name", "parent__name", "parent__parent__name"]
+
+
+site.register(GrandChild, GrandChildAdmin)
 
 
 class CustomPaginationAdmin(ChildAdmin):
