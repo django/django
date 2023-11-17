@@ -136,6 +136,7 @@
     background: var(--darkened-bg);
     border-left: none;
     margin: 0;
+    overflow: auto;
 }
 
 @media (forced-colors: active) {

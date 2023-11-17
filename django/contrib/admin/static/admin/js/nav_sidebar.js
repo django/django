@@ -77,14 +77,14 @@
     window.initSidebarQuickFilter = initSidebarQuickFilter;
     initSidebarQuickFilter();
 
-    // right sidebar (filter)
+    // secondary sidebar (filter)
     handleSidebarToggle(
         'toggle-filter-sidebar',
         'changelist-filter',
         'django.admin.filterSidebarIsOpen',
     );
 
-    // left sidebar (nav)
+    // leading sidebar (nav)
     handleSidebarToggle(
         'toggle-nav-sidebar',
         'nav-sidebar',
