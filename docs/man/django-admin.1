@@ -27,7 +27,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.TH "DJANGO-ADMIN" "1" "September 18, 2023" "5.0" "Django"
+.TH "DJANGO-ADMIN" "1" "November 17, 2023" "5.0" "Django"
 .SH NAME
 django-admin \- Utility script for the Django web framework
 .sp
@@ -999,7 +999,7 @@ Generate migration files without Django version and timestamp header.
 .UNINDENT
 .sp
 Makes \fBmakemigrations\fP exit with a non\-zero status when model changes without
-migrations are detected.
+migrations are detected. Implies \fB\-\-dry\-run\fP\&.
 .sp
 In older versions, the missing migrations were also created when using the
 \fB\-\-check\fP option.
@@ -1965,12 +1965,12 @@ override this by passing the desired number of processes, e.g.
 variable.
 .sp
 Django distributes test cases — \fI\%unittest.TestCase\fP subclasses — to
-subprocesses. If there are fewer test cases than configured processes, Django
-will reduce the number of processes accordingly.
+subprocesses. If there are fewer test case classes than configured processes,
+Django will reduce the number of processes accordingly.
 .sp
-Each process gets its own database. You must ensure that different test cases
-don\(aqt access the same resources. For instance, test cases that touch the
-filesystem should create a temporary directory for their own use.
+Each process gets its own database. You must ensure that different test case
+classes don\(aqt access the same resources. For instance, test case classes that
+touch the filesystem should create a temporary directory for their own use.
 .sp
 \fBNOTE:\fP
 .INDENT 0.0
