@@ -1199,12 +1199,13 @@ class Query(BaseExpression):
             sql = "(%s)" % sql
         return sql, params
 
-    def resolve_lookup_value(self, value, can_reuse, allow_joins):
+    def resolve_lookup_value(self, value, can_reuse, allow_joins, summarize=False):
         if hasattr(value, "resolve_expression"):
             value = value.resolve_expression(
                 self,
                 reuse=can_reuse,
                 allow_joins=allow_joins,
+                summarize=summarize,
             )
         elif isinstance(value, (list, tuple)):
             # The items of the iterable may be expressions and therefore need
@@ -1432,7 +1433,7 @@ class Query(BaseExpression):
             raise FieldError("Joined field references are not permitted in this query")
 
         pre_joins = self.alias_refcount.copy()
-        value = self.resolve_lookup_value(value, can_reuse, allow_joins)
+        value = self.resolve_lookup_value(value, can_reuse, allow_joins, summarize)
         used_joins = {
             k for k, v in self.alias_refcount.items() if v > pre_joins.get(k, 0)
         }
