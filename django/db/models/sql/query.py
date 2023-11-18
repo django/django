@@ -451,13 +451,14 @@ class Query(BaseExpression):
             # Temporarily add aggregate to annotations to allow remaining
             # members of `aggregates` to resolve against each others.
             self.append_annotation_mask([alias])
+            aggregate_refs = aggregate.get_refs()
             refs_subquery |= any(
                 getattr(self.annotations[ref], "contains_subquery", False)
-                for ref in aggregate.get_refs()
+                for ref in aggregate_refs
             )
             refs_window |= any(
                 getattr(self.annotations[ref], "contains_over_clause", True)
-                for ref in aggregate.get_refs()
+                for ref in aggregate_refs
             )
             aggregate = aggregate.replace_expressions(replacements)
             self.annotations[alias] = aggregate
