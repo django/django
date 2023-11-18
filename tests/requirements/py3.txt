@@ -4,10 +4,10 @@ argon2-cffi >= 19.2.0
 bcrypt
 black
 docutils >= 0.19
-geoip2; python_version < '3.12'
+geoip2
 jinja2 >= 2.11.0
-numpy; python_version < '3.12'
-Pillow >= 6.2.1; sys.platform != 'win32' or python_version < '3.12'
+numpy
+Pillow >= 6.2.1
 # pylibmc/libmemcached can't be built on Windows.
 pylibmc; sys.platform != 'win32'
 pymemcache >= 3.4.0
