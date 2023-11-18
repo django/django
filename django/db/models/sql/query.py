@@ -1268,7 +1268,7 @@ class Query(BaseExpression):
             # The items of the iterable may be expressions and therefore need
             # to be resolved independently.
             values = (
-                self.resolve_lookup_value(sub_value, can_reuse, allow_joins)
+                self.resolve_lookup_value(sub_value, can_reuse, allow_joins, summarize)
                 for sub_value in value
             )
             type_ = type(value)

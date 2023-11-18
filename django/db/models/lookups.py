@@ -471,6 +471,14 @@ class IntegerLessThanOrEqual(IntegerFieldOverflow, LessThanOrEqual):
 class In(FieldGetDbPrepValueIterableMixin, BuiltinLookup):
     lookup_name = "in"
 
+    def get_refs(self):
+        refs = super().get_refs()
+        if self.rhs_is_direct_value():
+            for rhs in self.rhs:
+                if get_rhs_refs := getattr(rhs, "get_refs", None):
+                    refs |= get_rhs_refs()
+        return refs
+
     def get_prep_lookup(self):
         from django.db.models.sql.query import Query  # avoid circular import
 
