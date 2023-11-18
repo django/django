@@ -3207,11 +3207,13 @@ class ModelFormCustomErrorTests(SimpleTestCase):
         errors = CustomErrorMessageForm(data).errors
         self.assertHTMLEqual(
             str(errors["name1"]),
-            '<ul class="errorlist"><li>Form custom error message.</li></ul>',
+            '<ul class="errorlist" id="id_name1_error">'
+            "<li>Form custom error message.</li></ul>",
         )
         self.assertHTMLEqual(
             str(errors["name2"]),
-            '<ul class="errorlist"><li>Model custom error message.</li></ul>',
+            '<ul class="errorlist" id="id_name2_error">'
+            "<li>Model custom error message.</li></ul>",
         )
 
     def test_model_clean_error_messages(self):
@@ -3220,14 +3222,15 @@ class ModelFormCustomErrorTests(SimpleTestCase):
         self.assertFalse(form.is_valid())
         self.assertHTMLEqual(
             str(form.errors["name1"]),
-            '<ul class="errorlist"><li>Model.clean() error messages.</li></ul>',
+            '<ul class="errorlist" id="id_name1_error">'
+            "<li>Model.clean() error messages.</li></ul>",
         )
         data = {"name1": "FORBIDDEN_VALUE2", "name2": "ABC"}
         form = CustomErrorMessageForm(data)
         self.assertFalse(form.is_valid())
         self.assertHTMLEqual(
             str(form.errors["name1"]),
-            '<ul class="errorlist">'
+            '<ul class="errorlist" id="id_name1_error">'
             "<li>Model.clean() error messages (simpler syntax).</li></ul>",
         )
         data = {"name1": "GLOBAL_ERROR", "name2": "ABC"}
