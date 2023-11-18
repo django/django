@@ -306,6 +306,10 @@ class DatabaseOperations(BaseDatabaseOperations):
         elif connector == ">>":
             lhs, rhs = sub_expressions
             return "FLOOR(%(lhs)s / POW(2, %(rhs)s))" % {"lhs": lhs, "rhs": rhs}
+        elif connector == "||":
+            # MySQL || operator is an alias for OR unless PIPES_AS_CONCAT mode
+            # is enabled.
+            return "CONCAT_WS('', %s)" % ", ".join(sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def get_db_converters(self, expression):

@@ -153,6 +153,13 @@ class DatabaseOperations(BaseDatabaseOperations):
         """
         return cursor.fetchall()
 
+    def combine_expression(self, connector, sub_expressions):
+        if connector == "||":
+            return " || ".join(
+                "COALESCE((%s)::text, '')" % sql for sql in sub_expressions
+            )
+        return super().combine_expression(connector, sub_expressions)
+
     def lookup_cast(self, lookup_type, internal_type=None):
         lookup = "%s"
         # Cast text lookups to text to allow things like filter(x__contains=4)

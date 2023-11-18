@@ -2,8 +2,7 @@ import warnings
 
 from django.db import NotSupportedError
 from django.db.models.expressions import Func, Value
-from django.db.models.fields import CharField, IntegerField, TextField
-from django.db.models.functions import Cast, Coalesce
+from django.db.models.fields import CharField, IntegerField
 from django.db.models.lookups import Transform
 from django.utils.deprecation import RemovedInDjango60Warning
 
@@ -75,39 +74,20 @@ class Concat(Func):
     Handle nulls and non-textual expressions gracefully.
     """
 
-    function = None
-    template = "%(expressions)s"
-    arg_joiner = " || "
-
     def __init__(self, *expressions, **extra):
         if len(expressions) < 2:
             raise ValueError("Concat must take at least two expressions")
         super().__init__(*expressions, **extra)
 
-    def as_mysql(self, compiler, connection):
-        # MySQL || operator is an alias for OR unless PIPES_AS_CONCAT is enabled.
-        return Func(Value(""), *self.source_expressions, function="CONCAT_WS").as_sql(
-            compiler, connection
-        )
-
     def as_sql(self, compiler, connection, **extra_context):
-        copy = self.copy()
-        source_expressions = copy.get_source_expressions()
-        if connection.features.requires_casted_text_in_pipes_concat:
-            source_expressions = [
-                expr
-                if isinstance(expr.output_field, (CharField, TextField))
-                else Cast(expr, TextField())
-                for expr in source_expressions
-            ]
-        # Systematically coalesce source expression to empty strings because
-        # their nullability cannot be accurately inferred.
-        if not connection.features.interprets_empty_strings_as_nulls:
-            source_expressions = [
-                Coalesce(expr, Value("")) for expr in source_expressions
-            ]
-        copy.set_source_expressions(source_expressions)
-        return super(Concat, copy).as_sql(compiler, connection, **extra_context)
+        connection.ops.check_expression_support(self)
+        sql_parts = []
+        params = []
+        for expr in self.source_expressions:
+            arg_sql, arg_params = compiler.compile(expr)
+            sql_parts.append(arg_sql)
+            params.extend(arg_params)
+        return connection.ops.combine_expression("||", sql_parts), params
 
 
 class ConcatPair(Concat):

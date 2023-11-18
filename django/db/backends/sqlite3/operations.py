@@ -373,6 +373,8 @@ class DatabaseOperations(BaseDatabaseOperations):
             return "POWER(%s)" % ",".join(sub_expressions)
         elif connector == "#":
             return "BITXOR(%s)" % ",".join(sub_expressions)
+        elif connector == "||":
+            return " || ".join("COALESCE(%s, '')" % sql for sql in sub_expressions)
         return super().combine_expression(connector, sub_expressions)
 
     def combine_duration_expression(self, connector, sub_expressions):

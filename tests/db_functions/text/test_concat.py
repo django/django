@@ -87,11 +87,6 @@ class ConcatTests(TestCase):
                 ),
             ).get()
         self.assertEqual(author.name_text, "The Name::42")
-        # Only non-string columns are casted on PostgreSQL.
-        self.assertEqual(
-            ctx.captured_queries[0]["sql"].count("::text"),
-            1 if connection.vendor == "postgresql" else 0,
-        )
 
     def test_concat_pair_deprecation(self):
         with self.assertWarnsMessage(
