@@ -1025,7 +1025,7 @@ method you're using:
 Customizing the error list format
 ---------------------------------
 
-.. class:: ErrorList(initlist=None, error_class=None, renderer=None)
+.. class:: ErrorList(initlist=None, error_class=None, renderer=None, field_id=None)
 
     By default, forms use ``django.forms.utils.ErrorList`` to format validation
     errors. ``ErrorList`` is a list like object where ``initlist`` is the
@@ -1042,6 +1042,13 @@ Customizing the error list format
         Specifies the :doc:`renderer <renderers>` to use for ``ErrorList``.
         Defaults to ``None`` which means to use the default renderer
         specified by the :setting:`FORM_RENDERER` setting.
+
+    .. attribute:: field_id
+
+        An ``id`` for the field for which the errors relate. This allows an
+        HTML ``id`` attribute to be added in the error template and is useful
+        to associate the errors with the field. The default template uses the
+        format ``id="{{ field_id }}_error"``.
 
     .. attribute:: template_name
 
@@ -1097,6 +1104,10 @@ Customizing the error list format
     overriding the :attr:`.template_name` attribute or more generally by
     overriding the default template, see also
     :ref:`overriding-built-in-form-templates`.
+
+    .. versionadded:: 5.1
+
+        The ``field_id`` attributed was added.
 
 More granular output
 ====================
@@ -1428,7 +1439,7 @@ Methods of ``BoundField``
 
     .. versionadded:: 5.0
 
-    The render method is called by ``as_field_group``. All arguments are 
+    The render method is called by ``as_field_group``. All arguments are
     optional and default to:
 
     * ``template_name``: :attr:`.BoundField.template_name`
