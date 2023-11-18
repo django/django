@@ -11,3 +11,7 @@ Bugfixes
 
 * Fixed a regression in Django 4.2 that caused :option:`makemigrations --check`
   to stop displaying pending migrations (:ticket:`34457`).
+
+* Fixed a regression in Django 4.2 that caused a crash of
+  ``QuerySet.aggregate()`` with aggregates referencing other aggregates or
+  window functions through conditional expressions (:ticket:`34975`).
