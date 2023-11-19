@@ -986,14 +986,16 @@ the ``Form``, then the latter ``field_order`` will have precedence.
 You may rearrange the fields any time using ``order_fields()`` with a list of
 field names as in :attr:`~django.forms.Form.field_order`.
 
+.. _form-error-display:
+
 How errors are displayed
 ------------------------
 
 If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
-will include the validation errors as a ``<ul class="errorlist">`` near the
-field. The particular positioning of the error messages depends on the output
-method you're using:
+will include the validation errors as a ``<ul class="errorlist">``.
+
+The following:
 
 .. code-block:: pycon
 
@@ -1003,22 +1005,44 @@ method you're using:
     ...     "sender": "invalid email address",
     ...     "cc_myself": True,
     ... }
-    >>> f = ContactForm(data, auto_id=False)
-    >>> print(f)
-    <div>Subject:
-      <ul class="errorlist"><li>This field is required.</li></ul>
-      <input type="text" name="subject" maxlength="100" required aria-invalid="true">
+    >>> ContactForm(data).as_div()
+
+… gives HTML like:
+
+.. code-block:: html
+
+    <div>
+      <label for="id_subject">Subject:</label>
+      <ul class="errorlist" id="id_subject_error"><li>This field is required.</li></ul>
+      <input type="text" name="subject" maxlength="100" required aria-invalid="true" aria-describedby="id_subject_error" id="id_subject">
     </div>
-    <div>Message:
-      <textarea name="message" cols="40" rows="10" required>Hi there</textarea>
+    <div>
+      <label for="id_message">Message:</label>
+      <textarea name="message" cols="40" rows="10" required id="id_message">Hi there</textarea>
     </div>
-    <div>Sender:
-      <ul class="errorlist"><li>Enter a valid email address.</li></ul>
-      <input type="email" name="sender" value="invalid email address" required aria-invalid="true">
+    <div>
+      <label for="id_sender">Sender:</label>
+      <ul class="errorlist" id="id_sender_error"><li>Enter a valid email address.</li></ul>
+      <input type="email" name="sender" value="invalid email address" maxlength="320" required aria-invalid="true" aria-describedby="id_sender_error" id="id_sender">
     </div>
-    <div>Cc myself:
-      <input type="checkbox" name="cc_myself" checked>
+    <div>
+        <label for="id_cc_myself">Cc myself:</label>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself" checked>
     </div>
+
+Django's default form templates will associate validation errors with their
+input by using the ``aria-describedby`` HTML attribute when the field has an
+``auto_id`` and a custom ``aria-describedby`` is not provided. If a custom
+``aria-describedby`` is set when defining the widget this will override the
+default value.
+
+If the widget is rendered in a ``<fieldset>`` then ``aria-describedby`` is
+added to this element, otherwise it is added to the widget's HTML element (e.g.
+``<input>``).
+
+.. versionchanged:: 5.2
+
+    ``aria-describedby`` was added to associate errors with its input.
 
 .. _ref-forms-error-list-format:
 
@@ -1166,7 +1190,7 @@ Attributes of ``BoundField``
     .. versionadded:: 5.2
 
     Returns an ``aria-describedby`` reference to associate a field with its
-    help text. Returns ``None`` if ``aria-describedby`` is set in
+    help text and errors. Returns ``None`` if ``aria-describedby`` is set in
     :attr:`Widget.attrs` to preserve the user defined attribute when rendering
     the form.
 
