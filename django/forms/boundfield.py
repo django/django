@@ -295,11 +295,17 @@ class BoundField(RenderableFieldMixin):
         if (
             not attrs.get("aria-describedby")
             and not widget.attrs.get("aria-describedby")
-            and self.field.help_text
             and not self.use_fieldset
             and self.auto_id
+            and not self.is_hidden  # Thoughts?
         ):
-            attrs["aria-describedby"] = f"{self.auto_id}_helptext"
+            aria_describedby = []
+            if self.help_text:
+                aria_describedby.append(f"{self.auto_id}_helptext")
+            if self.errors:
+                aria_describedby.append(f"{self.auto_id}_error")
+            if aria_describedby:
+                attrs["aria-describedby"] = " ".join(aria_describedby)
         return attrs
 
     @property

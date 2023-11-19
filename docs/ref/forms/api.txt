@@ -991,9 +991,13 @@ How errors are displayed
 
 If you render a bound ``Form`` object, the act of rendering will automatically
 run the form's validation if it hasn't already happened, and the HTML output
-will include the validation errors as a ``<ul class="errorlist">`` near the
-field. The particular positioning of the error messages depends on the output
-method you're using:
+will include the validation errors as a ``<ul class="errorlist">``.
+
+Validation errors are associated with their input using the
+``aria-describedby`` HTML attribute where a field has an ``auto_id`` and a
+custom ``aria-describedby`` is not provided. If the widget is rendered in a
+``<fieldset>`` then ``aria-describedby`` is added to this element, otherwise it
+is added to the widget's ``<input>``:
 
 .. code-block:: pycon
 
@@ -1003,22 +1007,35 @@ method you're using:
     ...     "sender": "invalid email address",
     ...     "cc_myself": True,
     ... }
-    >>> f = ContactForm(data, auto_id=False)
+    >>> f = ContactForm(data)
     >>> print(f)
-    <div>Subject:
-      <ul class="errorlist"><li>This field is required.</li></ul>
-      <input type="text" name="subject" maxlength="100" required aria-invalid="true">
+    <div>
+      <label for="id_subject">Subject:</label>
+      <ul class="errorlist" id="id_subject_error"><li>This field is required.</li></ul>
+      <input type="text" name="subject" maxlength="100" required aria-invalid="true" aria-describedby="id_subject_error" id="id_subject">
     </div>
-    <div>Message:
+    <div>
+      <label for="id_message">Message:</label>
       <textarea name="message" cols="40" rows="10" required>Hi there</textarea>
     </div>
-    <div>Sender:
-      <ul class="errorlist"><li>Enter a valid email address.</li></ul>
-      <input type="email" name="sender" value="invalid email address" required aria-invalid="true">
+    <div>
+      <label for="id_sender">Sender:</label>
+      <ul class="errorlist" id="id_sender_error"><li>Enter a valid email address.</li></ul>
+      <input type="email" name="sender" value="invalid email address" maxlength="320" required aria-invalid="true" aria-describedby="id_sender_error" id="id_sender">
     </div>
-    <div>Cc myself:
-      <input type="checkbox" name="cc_myself" checked>
+    <div>
+        <label for="id_cc_myself">Cc myself:</label>
+        <input type="checkbox" name="cc_myself" id="id_cc_myself" checked>
     </div>
+
+If a custom ``aria-describedby`` is provided when defining the widget this will
+be used in place of the default value. Consideration will need to be given how
+to associate errors with their inputs to allow these descriptions to be read to
+screen reader users.
+
+.. versionadded:: 5.1
+
+    ``aria-describedby`` was added to associate errors with its input.
 
 .. _ref-forms-error-list-format:
 
