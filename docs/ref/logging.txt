@@ -199,6 +199,28 @@ This logging does not include framework-level initialization (e.g.
 ``SET TIMEZONE``). Turn on query logging in your database if you wish to view
 all database queries.
 
+.. _django-utils-autoreloader-logger:
+
+``django.utils.autoreload``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Log messages related to the autoreload development feature of Django. 
+This is the logger used to signify a source code file modification.
+
+.. _django-contrib-gis-logger:
+
+``django.contrib.gis``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Logging related to GeoDjango internals, including external GeoSpatial libraries (Geos, GDAL...).
+
+.. _django-dispatch-logger:
+
+``django.dispatch``
+~~~~~~~~~~~~~~~~~~~
+
+Logger used in Django Signal.
+
 .. _django-security-logger:
 
 ``django.security.*``
