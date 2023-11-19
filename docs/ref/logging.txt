@@ -199,6 +199,39 @@ This logging does not include framework-level initialization (e.g.
 ``SET TIMEZONE``). Turn on query logging in your database if you wish to view
 all database queries.
 
+.. _django-utils-autoreloader-logger:
+
+``django.utils.autoreload``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Log messages related to automatic code reloading during the execution of the
+Django development server. This logger generates an ``INFO`` message upon
+detecting a modification in a source code file and may produce ``WARNING``
+messages during filesystem inspection and event subscription processes.
+
+.. _django-contrib-gis-logger:
+
+``django.contrib.gis``
+~~~~~~~~~~~~~~~~~~~~~~
+
+Log messages related to :doc:`contrib/gis/index` at various points: during the
+loading of external GeoSpatial libraries (GEOS, GDAL, etc.) and when reporting
+errors. Each ``ERROR`` log record includes the caught exception and relevant
+contextual data.
+
+.. _django-dispatch-logger:
+
+``django.dispatch``
+~~~~~~~~~~~~~~~~~~~
+
+This logger is used in :doc:`signals`, specifically within the
+:mod:`~django.dispatch.Signal` class, to report issues when dispatching a
+signal to a connected receiver. The ``ERROR`` log record includes the caught
+exception as ``exc_info`` and adds the following extra context:
+
+* ``receiver``: The name of the receiver.
+* ``err``: The exception that occurred when calling the receiver.
+
 .. _django-security-logger:
 
 ``django.security.*``
