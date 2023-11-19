@@ -2399,8 +2399,8 @@ exists in the database, an :exc:`~django.db.IntegrityError` is raised.
 ``bulk_create()``
 ~~~~~~~~~~~~~~~~~
 
-.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
-.. method:: abulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None)
+.. method:: bulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None, condition=None)
+.. method:: abulk_create(objs, batch_size=None, ignore_conflicts=False, update_conflicts=False, update_fields=None, unique_fields=None, condition=None)
 
 *Asynchronous version*: ``abulk_create()``
 
@@ -2460,6 +2460,15 @@ be in conflict must be provided.
 
 Enabling the ``ignore_conflicts`` parameter disables setting the primary key on
 each model instance (if the database normally supports it).
+
+.. versionchanged:: 6.0
+
+   Added the ``condition`` parameter to support conditional updates during
+   ``bulk_create(..., update_conflicts=True)``. ``condition`` accepts Django
+   conditional expressions ( :class:`~django.db.models.Q`, :class:`~django.db.models.F`,
+   and :class:`~django.db.models.Excluded`; see :ref:`excluded-expressions`)
+   and is supported on PostgreSQL and SQLite.
+
 
 .. warning::
 

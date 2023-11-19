@@ -305,6 +305,65 @@ companies::
 
     Company.objects.update(is_active=~F("is_active"))
 
+.. _excluded-expressions:
+
+``Excluded()`` expressions
+-------------------------
+
+.. class:: Excluded(name)
+
+.. versionadded:: 6.0
+
+An :class:`~django.db.models.Excluded` expression refers to the values **proposed for
+insertion** during an ``INSERT ... ON CONFLICT DO UPDATE`` (i.e., the row
+that caused the conflict). On PostgreSQL and SQLite this maps to the SQL
+pseudo-table ``EXCLUDED``.
+
+``Excluded`` is a subclass of :class:`F`, so it supports arithmetic and can
+be combined with :class:`Q` and other expressions:
+
+.. code-block:: pycon
+
+    >>> from django.db.models import Excluded, F, Q
+    >>> # Update if the new "rank" is greater than the old one + 1
+    >>> condition = Q(rank__gt=F("rank") + 1)
+    >>> # Or if the current DB value is less than the proposed value minus 1
+    >>> condition |= Q(rank__lt=Excluded("rank") - 1)
+
+``Excluded`` is primarily intended for use with
+:meth:`~django.db.models.query.QuerySet.bulk_create` when
+``update_conflicts=True`` and a conditional ``WHERE`` clause is supplied via
+``condition=``:
+
+.. code-block:: pycon
+
+    >>> from myapp.models import Item
+    >>> items = [Item(id=1, rank=4), Item(id=2, rank=3)]
+    >>> Item.objects.bulk_create(
+    ...     items,
+    ...     update_conflicts=True,
+    ...     update_fields=["rank"],
+    ...     unique_fields=["id"],
+    ...     condition=Q(rank__lt=Excluded("rank") - 1),
+    ... )
+
+Availability and backend support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Conditional updates on conflict and ``Excluded`` are supported on
+PostgreSQL and SQLite. On other backends, using :class:`Excluded` raises
+:class:`~django.db.NotSupportedError`.
+
+The corresponding backend feature flags are:
+
+* :attr:`~django.db.backends.base.features.BaseDatabaseFeatures.supports_update_conflicts_with_condition`
+* :attr:`~django.db.backends.base.features.BaseDatabaseFeatures.supports_excluded_expression`
+
+See also
+~~~~~~~~
+
+* :meth:`~django.db.models.query.QuerySet.bulk_create` (``condition=`` parameter)
+
 .. _func-expressions:
 
 ``Func()`` expressions

@@ -1789,6 +1789,21 @@ class SQLInsertCompiler(SQLCompiler):
 
         return placeholder_rows, param_rows
 
+    def compile_bulk_operation_condition_to_sql(self):
+        if self.query.condition is None:
+            return None, []
+        if not getattr(self.query.condition, "conditional", False):
+            raise ValueError(
+                "The 'condition' parameter of bulk_create must be a conditional "
+                "expression, an instance of Q, F, or Excluded."
+            )
+        query = Query(self.query.model)
+        query.add_q(self.query.condition)
+        compiler = query.get_compiler(connection=self.connection)
+        node = query.where
+        sql, params = compiler.compile(node)
+        return sql, params
+
     def as_sql(self):
         # We don't need quote_name_unless_alias() here, since these are all
         # going to be column names (so we can avoid the extra overhead).
@@ -1874,6 +1889,14 @@ class SQLInsertCompiler(SQLCompiler):
             (f.column for f in self.query.update_fields),
             (f.column for f in self.query.unique_fields),
         )
+        if on_conflict_suffix_sql:
+            (
+                condition_sql,
+                condition_params,
+            ) = self.compile_bulk_operation_condition_to_sql()
+            if condition_sql:
+                on_conflict_suffix_sql += f" WHERE {condition_sql}"
+                param_rows += [condition_params]
         if (
             self.returning_fields
             and self.connection.features.can_return_columns_from_insert
@@ -1886,8 +1909,7 @@ class SQLInsertCompiler(SQLCompiler):
             else:
                 result.append("VALUES (%s)" % ", ".join(placeholder_rows[0]))
                 params = [param_rows[0]]
-            if on_conflict_suffix_sql:
-                result.append(on_conflict_suffix_sql)
+            result.append(on_conflict_suffix_sql)
             # Skip empty r_sql to allow subclasses to customize behavior for
             # 3rd party backends. Refs #19096.
             r_sql, self.returning_params = self.connection.ops.returning_columns(

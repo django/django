@@ -43,6 +43,11 @@ class DatabaseFeatures(BaseDatabaseFeatures):
     supports_update_conflicts_with_target = True
     supports_stored_generated_columns = True
     supports_virtual_generated_columns = True
+    supports_update_conflicts_with_condition = True
+    supports_excluded_expression = True
+    supports_stored_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
+    supports_virtual_generated_columns = Database.sqlite_version_info >= (3, 31, 0)
+
     test_collations = {
         "ci": "nocase",
         "cs": "binary",
