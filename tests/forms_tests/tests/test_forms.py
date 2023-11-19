@@ -183,27 +183,30 @@ class FormsTestCase(SimpleTestCase):
             '<div><label for="id_first_name">First name:</label>'
             '<ul class="errorlist" id="id_first_name_error"><li>This field is required.'
             '</li></ul><input type="text" name="first_name" aria-invalid="true" '
-            'required id="id_first_name"></div>'
+            'required id="id_first_name" aria-describedby="id_first_name_error"></div>'
             '<div><label for="id_last_name">Last name:</label>'
             '<ul class="errorlist" id="id_last_name_error"><li>This field is required.'
             '</li></ul><input type="text" name="last_name" aria-invalid="true" '
-            'required id="id_last_name"></div><div>'
-            '<label for="id_birthday">Birthday:</label>'
+            'required id="id_last_name" aria-describedby="id_last_name_error"></div>'
+            '<div><label for="id_birthday">Birthday:</label>'
             '<ul class="errorlist" id="id_birthday_error"><li>This field is required.'
             '</li></ul><input type="text" name="birthday" aria-invalid="true" required '
-            'id="id_birthday"></div>',
+            'id="id_birthday" aria-describedby="id_birthday_error"></div>',
         )
         self.assertHTMLEqual(
             p.as_table(),
             """<tr><th><label for="id_first_name">First name:</label></th><td>
 <ul class="errorlist" id="id_first_name_error"><li>This field is required.</li></ul>
-<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required
+aria-describedby="id_first_name_error">
 </td></tr><tr><th><label for="id_last_name">Last name:</label></th>
 <td><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li></ul>
-<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required
+aria-describedby="id_last_name_error">
 </td></tr><tr><th><label for="id_birthday">Birthday:</label></th>
 <td><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li></ul>
-<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required
+aria-describedby="id_birthday_error">
 </td></tr>""",
         )
         self.assertHTMLEqual(
@@ -211,13 +214,16 @@ class FormsTestCase(SimpleTestCase):
             """<li><ul class="errorlist" id="id_first_name_error">
 <li>This field is required.</li></ul>
 <label for="id_first_name">First name:</label>
-<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required
+aria-describedby="id_first_name_error">
 </li><li><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li>
 </ul><label for="id_last_name">Last name:</label>
-<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required
+aria-describedby="id_last_name_error">
 </li><li><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li>
 </ul><label for="id_birthday">Birthday:</label>
-<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required
+aria-describedby="id_birthday_error">
 </li>""",
         )
         self.assertHTMLEqual(
@@ -225,13 +231,16 @@ class FormsTestCase(SimpleTestCase):
             """<ul class="errorlist" id="id_first_name_error"><li>
 This field is required.</li></ul>
 <p><label for="id_first_name">First name:</label>
-<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required>
+<input type="text" name="first_name" id="id_first_name" aria-invalid="true" required
+aria-describedby="id_first_name_error">
 </p><ul class="errorlist" id="id_last_name_error"><li>This field is required.</li></ul>
 <p><label for="id_last_name">Last name:</label>
-<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required>
+<input type="text" name="last_name" id="id_last_name" aria-invalid="true" required
+aria-describedby="id_last_name_error">
 </p><ul class="errorlist" id="id_birthday_error"><li>This field is required.</li></ul>
 <p><label for="id_birthday">Birthday:</label>
-<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required>
+<input type="text" name="birthday" id="id_birthday" aria-invalid="true" required
+aria-describedby="id_birthday_error">
 </p>""",
         )
         self.assertHTMLEqual(
@@ -239,15 +248,15 @@ This field is required.</li></ul>
             '<div><label for="id_first_name">First name:</label>'
             '<ul class="errorlist" id="id_first_name_error"><li>This field is required.'
             '</li></ul><input type="text" name="first_name" aria-invalid="true" '
-            'required id="id_first_name"></div>'
+            'required id="id_first_name" aria-describedby="id_first_name_error"></div>'
             '<div><label for="id_last_name">Last name:</label>'
             '<ul class="errorlist" id="id_last_name_error"><li>This field is required.'
             '</li></ul><input type="text" name="last_name" aria-invalid="true" '
-            'required id="id_last_name"></div><div>'
-            '<label for="id_birthday">Birthday:</label>'
+            'required id="id_last_name" aria-describedby="id_last_name_error"></div>'
+            '<div><label for="id_birthday">Birthday:</label>'
             '<ul class="errorlist" id="id_birthday_error"><li>This field is required.'
             '</li></ul><input type="text" name="birthday" aria-invalid="true" required '
-            'id="id_birthday"></div>',
+            'id="id_birthday" aria-describedby="id_birthday_error"></div>',
         )
 
     def test_empty_querydict_args(self):
@@ -3126,6 +3135,52 @@ Options: <select multiple name="options" aria-invalid="true" required>
             'required aria-describedby="id_username_helptext"></div>',
         )
 
+    def test_select_aria_describedby(self):
+        class TestForm(Form):
+            color = MultipleChoiceField(
+                choices=[("red", "Red"), ("green", "Green")],
+                help_text="Select Color",
+            )
+
+        f = TestForm({"color": "Blue"})
+        self.assertHTMLEqual(
+            str(f),
+            '<div><label for="id_color">Color:</label><div class="helptext" '
+            'id="id_color_helptext">Select Color</div>'
+            '<ul class="errorlist" id="id_color_error"><li>Enter a list of values.'
+            '</li></ul><select name="color" required aria-invalid="true" '
+            'aria-describedby="id_color_helptext id_color_error" id="id_color" '
+            'multiple><option value="red">Red</option>'
+            '<option value="green">Green</option></select></div>',
+        )
+
+    def test_textarea_aria_describedby(self):
+        class TestForm(Form):
+            color = CharField(widget=Textarea, max_length=5, help_text="Enter Color")
+
+        f = TestForm({"color": "Purple"})
+        self.assertHTMLEqual(
+            str(f),
+            '<div><label for="id_color">Color:</label>'
+            '<div class="helptext" id="id_color_helptext">Enter Color</div>'
+            '<ul class="errorlist" id="id_color_error">'
+            "<li>Ensure this value has at most 5 characters (it has 6).</li></ul>"
+            '<textarea name="color" cols="40" rows="10" maxlength="5" required '
+            'aria-invalid="true" aria-describedby="id_color_helptext id_color_error" '
+            'id="id_color">Purple</textarea></div>',
+        )
+
+    def test_aria_describedby_called_multiple_times(self):
+        class TestForm(Form):
+            color = CharField(widget=Textarea, help_text="Enter Color")
+
+        f = TestForm({"color": "Purple"})
+        self.assertEqual(f["color"].aria_describedby, "id_color_helptext")
+        f.add_error("color", "An error about Purple.")
+        self.assertEqual(
+            f["color"].aria_describedby, "id_color_helptext id_color_error"
+        )
+
     def test_fieldset_aria_describedby(self):
         class FieldsetForm(Form):
             checkbox = MultipleChoiceField(
@@ -3169,6 +3224,34 @@ Options: <select multiple name="options" aria-invalid="true" required>
             '<input type="text" name="datetime_0" required id="id_datetime_0" />'
             '<input type="text" name="datetime_1" required id="id_datetime_1" />'
             "</fieldset></div>",
+        )
+        f = FieldsetForm({})
+        self.assertHTMLEqual(
+            '<div><fieldset aria-describedby="id_checkbox_helptext '
+            'id_checkbox_error"> <legend>Checkbox:</legend> <div class="helptext" '
+            'id="id_checkbox_helptext">Checkbox help text</div> <ul class="errorlist" '
+            'id="id_checkbox_error"> <li>This field is required.</li> </ul> '
+            '<div id="id_checkbox"> <div> <label for="id_checkbox_0"><input '
+            'type="checkbox" name="checkbox" value="a" aria-invalid="true" '
+            'id="id_checkbox_0" /> A</label> </div> <div> <label for="id_checkbox_1">'
+            '<input type="checkbox" name="checkbox" value="b" aria-invalid="true" '
+            'id="id_checkbox_1" /> B</label> </div> </div> </fieldset> </div> <div> '
+            '<fieldset aria-describedby="id_radio_helptext id_radio_error"> '
+            '<legend>Radio:</legend> <div class="helptext" id="id_radio_helptext">'
+            'Radio help text</div> <ul class="errorlist" id="id_radio_error"><li>'
+            'This field is required.</li> </ul> <div id="id_radio"><div><label '
+            'for="id_radio_0"><input type="radio" name="radio" value="a" required '
+            'aria-invalid="true" id="id_radio_0" />A</label></div><div><label '
+            'for="id_radio_1"><input type="radio" name="radio" value="b" required '
+            'aria-invalid="true" id="id_radio_1" />B</label></div></div></fieldset>'
+            '</div><div><fieldset aria-describedby="id_datetime_helptext '
+            'id_datetime_error"><legend>Datetime:</legend><div class="helptext" '
+            'id="id_datetime_helptext">Enter Date and Time</div><ul class="errorlist" '
+            'id="id_datetime_error"><li>This field is required.</li></ul><input '
+            'type="text" name="datetime_0" required aria-invalid="true" '
+            'id="id_datetime_0" /><input type="text" name="datetime_1" required '
+            'aria-invalid="true" id="id_datetime_1" /></fieldset></div>',
+            str(f),
         )
         f = FieldsetForm(auto_id=False)
         # aria-describedby is not included.
@@ -3712,7 +3795,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <li class="required error"><ul class="errorlist" id="id_name_error">
             <li>This field is required.</li></ul>
             <label class="required" for="id_name">Name:</label>
-            <input type="text" name="name" id="id_name" aria-invalid="true" required>
+            <input type="text" name="name" id="id_name" aria-invalid="true" required
+             aria-describedby="id_name_error">
             </li><li class="required">
             <label class="required" for="id_is_cool">Is cool:</label>
             <select name="is_cool" id="id_is_cool">
@@ -3725,7 +3809,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <li class="required error"><ul class="errorlist" id="id_age_error">
             <li>This field is required.</li></ul>
             <label class="required" for="id_age">Age:</label>
-            <input type="number" name="age" id="id_age" aria-invalid="true" required>
+            <input type="number" name="age" id="id_age" aria-invalid="true" required
+            aria-describedby="id_age_error">
             </li>""",
         )
 
@@ -3735,7 +3820,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <ul class="errorlist" id="id_name_error"><li>This field is required.</li>
             </ul><p class="required error">
             <label class="required" for="id_name">Name:</label>
-            <input type="text" name="name" id="id_name" aria-invalid="true" required>
+            <input type="text" name="name" id="id_name" aria-invalid="true" required
+            aria-describedby="id_name_error">
             </p><p class="required">
             <label class="required" for="id_is_cool">Is cool:</label>
             <select name="is_cool" id="id_is_cool">
@@ -3748,7 +3834,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             <ul class="errorlist" id="id_age_error"><li>This field is required.</li>
             </ul><p class="required error"><label class="required" for="id_age">
             Age:</label><input type="number" name="age" id="id_age" aria-invalid="true"
-            required></p>""",
+            required aria-describedby="id_age_error"></p>""",
         )
 
         self.assertHTMLEqual(
@@ -3756,7 +3842,8 @@ Options: <select multiple name="options" aria-invalid="true" required>
             """<tr class="required error">
 <th><label class="required" for="id_name">Name:</label></th>
 <td><ul class="errorlist" id="id_name_error"><li>This field is required.</li></ul>
-<input type="text" name="name" id="id_name" aria-invalid="true" required></td></tr>
+<input type="text" name="name" id="id_name" aria-invalid="true" required
+aria-describedby="id_name_error"></td></tr>
 <tr class="required"><th><label class="required" for="id_is_cool">Is cool:</label></th>
 <td><select name="is_cool" id="id_is_cool">
 <option value="unknown" selected>Unknown</option>
@@ -3767,14 +3854,15 @@ Options: <select multiple name="options" aria-invalid="true" required>
 <input type="email" name="email" id="id_email" maxlength="320"></td></tr>
 <tr class="required error"><th><label class="required" for="id_age">Age:</label></th>
 <td><ul class="errorlist" id="id_age_error"><li>This field is required.</li></ul>
-<input type="number" name="age" id="id_age" aria-invalid="true" required></td></tr>""",
+<input type="number" name="age" id="id_age" aria-invalid="true" required
+aria-describedby="id_age_error"></td></tr>""",
         )
         self.assertHTMLEqual(
             p.as_div(),
             '<div class="required error"><label for="id_name" class="required">Name:'
             '</label><ul class="errorlist" id="id_name_error"><li>This field is '
             'required.</li></ul><input type="text" name="name" required id="id_name" '
-            'aria-invalid="true" /></div>'
+            'aria-invalid="true" aria-describedby="id_name_error" /></div>'
             '<div class="required"><label for="id_is_cool" class="required">Is cool:'
             '</label><select name="is_cool" id="id_is_cool">'
             '<option value="unknown" selected>Unknown</option>'
@@ -3784,7 +3872,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             '<div class="required error"><label for="id_age" class="required">Age:'
             '</label><ul class="errorlist" id="id_age_error"><li>This field is '
             'required.</li></ul><input type="number" name="age" required id="id_age" '
-            'aria-invalid="true" /></div>',
+            'aria-invalid="true" aria-describedby="id_age_error" /></div>',
         )
 
     def test_label_has_required_css_class(self):
@@ -4470,7 +4558,7 @@ Options: <select multiple name="options" aria-invalid="true" required>
             "&quot;bar&quot;!</li></ul>"
             '<label for="id_visible">Visible:</label> '
             '<input type="text" name="visible" aria-invalid="true" value="b" '
-            'id="id_visible" required>'
+            'id="id_visible" required aria-describedby="id_visible_error">'
             '<input type="hidden" name="hidden" value="a" id="id_hidden"></li>',
         )
 
