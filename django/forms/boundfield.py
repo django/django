@@ -305,6 +305,8 @@ class BoundField(RenderableFieldMixin):
         if self.auto_id and not self.is_hidden:
             if self.help_text:
                 aria_describedby.append(f"{self.auto_id}_helptext")
+            if self.errors:
+                aria_describedby.append(f"{self.auto_id}_error")
         return " ".join(aria_describedby)
 
     @property
