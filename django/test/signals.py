@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.utils.formats import FORMAT_SETTINGS, reset_format_cache
 from django.utils.functional import empty
 from django.utils.module_loading import import_string
+from django.utils.version import PY312
 
 template_rendered = Signal()
 
@@ -183,7 +184,7 @@ def complex_setting_changed(*, enter, setting, **kwargs):
         # this stacklevel shows the line containing the override_settings call.
         warnings.warn(
             f"Overriding setting {setting} can lead to unexpected behavior.",
-            stacklevel=6,
+            stacklevel=5 if PY312 else 6,
         )
 
 
