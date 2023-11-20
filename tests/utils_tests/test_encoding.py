@@ -43,9 +43,14 @@ class TestEncodingUtils(SimpleTestCase):
         self.assertIs(type(force_str(s)), str)
 
     def test_force_str_DjangoUnicodeDecodeError(self):
+        if hasattr(sys, "pypy_version_info"):
+            error = "unexpected end of data"
+        else:
+            error = "invalid start byte"
+
         msg = (
-            "'utf-8' codec can't decode byte 0xff in position 0: invalid "
-            "start byte. You passed in b'\\xff' (<class 'bytes'>)"
+            f"'utf-8' codec can't decode byte 0xff in position 0: {error}. "
+            "You passed in b'\\xff' (<class 'bytes'>)"
         )
         with self.assertRaisesMessage(DjangoUnicodeDecodeError, msg):
             force_str(b"\xff")
