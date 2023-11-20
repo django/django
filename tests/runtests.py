@@ -52,7 +52,8 @@ warnings.simplefilter("error", RuntimeWarning)
 # references, which are a minority, so the garbage collection threshold can be
 # larger than the default threshold of 700 allocations + deallocations without
 # much increase in memory usage.
-gc.set_threshold(100_000)
+if not hasattr(sys, "pypy_version_info"):
+    gc.set_threshold(100_000)
 
 RUNTESTS_DIR = os.path.abspath(os.path.dirname(__file__))
 
