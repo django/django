@@ -1686,7 +1686,24 @@ class Model(AltersData, metaclass=ModelBase):
                     )
                 )
         return errors
+def handle_model_proxy(new_class, is_proxy, parents):
+    if is_proxy:
+        base = find_base_parent(parents)
+        if base:
+            check_proxy_base(new_class, base)
+            new_class._meta.setup_proxy(base)
+            new_class._meta.concrete_model = base._meta.concrete_model
 
+def find_base_parent(parents):
+    for parent in [kls for kls in parents if hasattr(kls, "_meta")]:
+        if not parent._meta.abstract:
+            return parent
+
+def check_proxy_base(new_class, base):
+    if base._meta.swapped:
+        raise TypeError(
+            f"{new_class.__name__} cannot proxy the swapped model '{base._meta.swapped}'."
+        )
     @classmethod
     def _check_model(cls):
         errors = []
