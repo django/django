@@ -224,18 +224,16 @@ class BaseForm(RenderableFormMixin):
         hidden_fields = []
         top_errors = self.non_field_errors().copy()
         for name, bf in self._bound_items():
-            bf_errors = self.error_class(bf.errors, renderer=self.renderer)
             if bf.is_hidden:
-                if bf_errors:
+                if bf.errors:
                     top_errors += [
                         _("(Hidden field %(name)s) %(error)s")
                         % {"name": name, "error": str(e)}
-                        for e in bf_errors
+                        for e in bf.errors
                     ]
                 hidden_fields.append(bf)
             else:
-                errors_str = str(bf_errors)
-                fields.append((bf, errors_str))
+                fields.append((bf, bf.errors))
         return {
             "form": self,
             "fields": fields,
