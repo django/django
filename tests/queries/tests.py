@@ -3,7 +3,6 @@ import pickle
 import sys
 import unittest
 from operator import attrgetter
-from threading import Lock
 
 from django.core.exceptions import EmptyResultSet, FieldError, FullResultSet
 from django.db import DEFAULT_DB_ALIAS, connection
@@ -111,6 +110,11 @@ from .models import (
     Valid,
     X,
 )
+
+
+class UnpickleableError(Exception):
+    def __reduce__(self):
+        raise type(self)("Cannot pickle.")
 
 
 class Queries1Tests(TestCase):
@@ -2571,8 +2575,8 @@ class CloneTests(TestCase):
         # Evaluate the Note queryset, populating the query cache
         list(n_list)
         # Make one of cached results unpickable.
-        n_list._result_cache[0].lock = Lock()
-        with self.assertRaises(TypeError):
+        n_list._result_cache[0].error = UnpickleableError()
+        with self.assertRaises(UnpickleableError):
             pickle.dumps(n_list)
         # Use the note queryset in a query, and evaluate
         # that query in a way that involves cloning.
