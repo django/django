@@ -3,17 +3,17 @@
 # Translators:
 # Aleksa Cukovic` <aleksacukovic1@gmail.com>, 2020
 # Danijela Popović, 2022
-# Igor Jerosimić, 2019-2021
+# Igor Jerosimić, 2019-2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Janos Guljas <janos@resenje.org>, 2011-2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:23-0500\n"
-"PO-Revision-Date: 2022-06-25 06:49+0000\n"
-"Last-Translator: Danijela Popović\n"
-"Language-Team: Serbian (Latin) (http://www.transifex.com/django/django/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Igor Jerosimić, 2019-2021,2023\n"
+"Language-Team: Serbian (Latin) (http://app.transifex.com/django/django/"
 "language/sr@latin/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -54,6 +54,9 @@ msgstr "bosanski"
 
 msgid "Catalan"
 msgstr "katalonski"
+
+msgid "Central Kurdish (Sorani)"
+msgstr "centralnokurdski (sorani)"
 
 msgid "Czech"
 msgstr "češki"
@@ -295,6 +298,9 @@ msgstr "tatarski"
 msgid "Udmurt"
 msgstr "udmurtski"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "ukrajinski"
 
@@ -391,6 +397,12 @@ msgstr "Ova vrednost mora biti veća od %(limit_value)s ili tačno toliko."
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr "Ova vrednost mora da umnožak veličine koraka %(limit_value)s."
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -473,7 +485,7 @@ msgstr "%(model_name)s sa poljem %(field_labels)s već postoji."
 
 #, python-format
 msgid "Constraint “%(name)s” is violated."
-msgstr ""
+msgstr "Ograničenje „%(name)s“ je prekršeno."
 
 #, python-format
 msgid "Value %(value)r is not a valid choice."
@@ -516,6 +528,9 @@ msgstr "Bulova vrednost (True ili False)"
 #, python-format
 msgid "String (up to %(max_length)s)"
 msgstr "String (najviše %(max_length)s znakova)"
+
+msgid "String (unlimited)"
+msgstr "String (neograničeno)"
 
 msgid "Comma-separated integers"
 msgstr "Celi brojevi razdvojeni zapetama"
@@ -687,11 +702,11 @@ msgstr "Relacija jedan na jedan"
 
 #, python-format
 msgid "%(from)s-%(to)s relationship"
-msgstr ""
+msgstr "Relacija %(from)s-%(to)s"
 
 #, python-format
 msgid "%(from)s-%(to)s relationships"
-msgstr ""
+msgstr "Relacije %(from)s-%(to)s"
 
 msgid "Many-to-many relationship"
 msgstr "Relacija više na više"
@@ -738,8 +753,11 @@ msgid "Ensure this filename has at most %(max)d character (it has %(length)d)."
 msgid_plural ""
 "Ensure this filename has at most %(max)d characters (it has %(length)d)."
 msgstr[0] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 msgstr[1] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 msgstr[2] ""
+"Ime fajla ne može imati više od %(max)d karaktera (trenutno ima %(length)d)."
 
 msgid "Please either submit a file or check the clear checkbox, not both."
 msgstr "Može se samo poslati fajl ili izbrisati, ne oba."
@@ -774,7 +792,7 @@ msgstr ":"
 
 #, python-format
 msgid "(Hidden field %(name)s) %(error)s"
-msgstr ""
+msgstr "(Skriveno polje %(name)s) %(error)s"
 
 #, python-format
 msgid ""
@@ -788,16 +806,16 @@ msgstr ""
 #, python-format
 msgid "Please submit at most %(num)d form."
 msgid_plural "Please submit at most %(num)d forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Molim prosledite najviše %(num)d formular."
+msgstr[1] "Molim prosledite najviše %(num)d formulara."
+msgstr[2] "Molim prosledite najviše %(num)d formulara."
 
 #, python-format
 msgid "Please submit at least %(num)d form."
 msgid_plural "Please submit at least %(num)d forms."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] " Molim prosledite najmanje %(num)d formular."
+msgstr[1] " Molim prosledite najmanje %(num)d formulara."
+msgstr[2] " Molim prosledite najmanje %(num)d formulara."
 
 msgid "Order"
 msgstr "Redosled"
@@ -833,13 +851,15 @@ msgstr "Odabrana vrednost nije među ponuđenima. Odaberite jednu od ponuđenih.
 
 #, python-format
 msgid "“%(pk)s” is not a valid value."
-msgstr ""
+msgstr "\"%(pk)s\" nije ispravna vrednost."
 
 #, python-format
 msgid ""
 "%(datetime)s couldn’t be interpreted in time zone %(current_timezone)s; it "
 "may be ambiguous or it may not exist."
 msgstr ""
+"Vreme %(datetime)s se ne može protumačiti u vremenskoj zoni "
+"%(current_timezone)s; možda je dvosmisleno ili ne postoji."
 
 msgid "Clear"
 msgstr "Očisti"
@@ -1143,37 +1163,37 @@ msgstr[2] "%(num)d godina"
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d mesec"
+msgstr[1] "%(num)d meseca"
+msgstr[2] "%(num)d meseci"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d nedelja"
+msgstr[1] "%(num)d nedelje"
+msgstr[2] "%(num)d nedelja"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d dan"
+msgstr[1] "%(num)d dana"
+msgstr[2] "%(num)d dana"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d sat"
+msgstr[1] "%(num)d sata"
+msgstr[2] "%(num)d sati"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%(num)d minut"
+msgstr[1] "%(num)d minuta"
+msgstr[2] "%(num)d minuta"
 
 msgid "Forbidden"
 msgstr "Zabranjeno"
@@ -1187,6 +1207,10 @@ msgid ""
 "required for security reasons, to ensure that your browser is not being "
 "hijacked by third parties."
 msgstr ""
+"Ova poruka je prikazana jer ovaj HTTPS sajt zahteva da \"Referer header\" "
+"bude poslat od strane vašeg internet pregledača, što trenutno nije slučaj. "
+"Pomenuto zaglavlje je potrebno iz bezbedonosnih razloga, da bi se osiguralo "
+"da vaš pregledač nije pod kontrolom trećih lica."
 
 msgid ""
 "If you have configured your browser to disable “Referer” headers, please re-"
@@ -1201,9 +1225,14 @@ msgid ""
 "If you are using the <meta name=\"referrer\" content=\"no-referrer\"> tag or "
 "including the “Referrer-Policy: no-referrer” header, please remove them. The "
 "CSRF protection requires the “Referer” header to do strict referer checking. "
-"If you’re concerned about privacy, use alternatives like <a rel=\"noreferrer"
-"\" …> for links to third-party sites."
+"If you’re concerned about privacy, use alternatives like <a "
+"rel=\"noreferrer\" …> for links to third-party sites."
 msgstr ""
+"Ako koristite <meta name=\"referrer\" content=\"no-referrer\"> tag ili "
+"\"Referrer-Policy: no-referrer\" zaglavlje, molimo da ih uklonite. CSRF "
+"zaštita zahteva \"Referer\" zaglavlje da bi se obavila striktna \"referrer\" "
+"provera. Ukoliko vas brine privatnost, koristite alternative kao <a "
+"rel=\"noreferrer\" ...> za linkove ka drugim sajtovima."
 
 msgid ""
 "You are seeing this message because this site requires a CSRF cookie when "
@@ -1296,13 +1325,14 @@ msgstr ""
 #, python-format
 msgid ""
 "You are seeing this page because <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> is in your settings file and you have not configured any "
-"URLs."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> is in your settings file and you have not "
+"configured any URLs."
 msgstr ""
 "Ova strana je prikazana jer je <a href=\"https://docs.djangoproject.com/en/"
-"%(version)s/ref/settings/#debug\" target=\"_blank\" rel=\"noopener"
-"\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali nijedan URL."
+"%(version)s/ref/settings/#debug\" target=\"_blank\" "
+"rel=\"noopener\">DEBUG=True</a> u vašim podešavanjima i niste konfigurisali "
+"nijedan URL."
 
 msgid "Django Documentation"
 msgstr "Đango dokumentacija"

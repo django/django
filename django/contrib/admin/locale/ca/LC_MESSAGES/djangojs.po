@@ -3,6 +3,7 @@
 # Translators:
 # Antoni Aloy <aaloy@apsl.net>, 2017,2021
 # Carles Barrobés <carles@barrobes.com>, 2011-2012,2014
+# Carlton Gibson <carlton.gibson@gmail.com>, 2023
 # Emilio Carrion, 2022
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Roger Pons <rogerpons@gmail.com>, 2015
@@ -10,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Emilio Carrion\n"
-"Language-Team: Catalan (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Carlton Gibson <carlton.gibson@gmail.com>, 2023\n"
+"Language-Team: Catalan (http://app.transifex.com/django/django/language/"
 "ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -67,12 +68,22 @@ msgstr ""
 "los a la caixa de sota i fent clic a la fletxa \"Eliminar\" entre les dues "
 "caixes."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Escriviu en aquesta caixa per a filtrar la llista de %s seleccionats."
+
 msgid "Remove all"
 msgstr "Esborrar-los tots"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Feu clic per eliminar tots els %s escollits d'un cop."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s opcion seleccionada no visible"
+msgstr[1] "%s opcions seleccionades no visibles"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -235,6 +246,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Des"
 
+msgid "Sunday"
+msgstr "Diumenge"
+
+msgid "Monday"
+msgstr "Dilluns"
+
+msgid "Tuesday"
+msgstr "Dimarts"
+
+msgid "Wednesday"
+msgstr "Dimecres"
+
+msgid "Thursday"
+msgstr "Dijous"
+
+msgid "Friday"
+msgstr "Divendres"
+
+msgid "Saturday"
+msgstr "Dissabte"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "dg."
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "dl."
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "dt."
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "dc."
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "dj."
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "dv."
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "ds."
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "D"
@@ -262,11 +322,6 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "S"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr "Ja ha enviat aquest formulari. Estàs segur que vols enviar-ho de nou?"
 
 msgid "Show"
 msgstr "Mostrar"

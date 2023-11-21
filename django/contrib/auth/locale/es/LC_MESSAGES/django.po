@@ -11,16 +11,16 @@
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Josue Naaman Nistal Guerra <josuenistal@hotmail.com>, 2014
 # Leonardo J. Caballero G. <leonardocaballero@gmail.com>, 2011
-# Uriel Medina <urimeba511@gmail.com>, 2020-2021
+# Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2022-04-25 08:09+0000\n"
-"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021\n"
-"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2021,2023\n"
+"Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -287,11 +287,12 @@ msgid "Password reset on %(site_name)s"
 msgstr "Contraseña restablecida en %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Introduza un nombre de usuario válido. Este valor puede contener únicamente "
-"letras inglesas, números y los caracteres @/./+/-/_ "
+"Introduzca un nombre de usuario válido. Este valor solo puede contener "
+"letras mayúsculas y minúsculas de la A la Z (excepto las acentuadas), "
+"números y los caracteres @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

@@ -8,10 +8,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
 "Last-Translator: Claude Paroz <claude@2xlibre.net>, 2014-2017,2020-2023\n"
-"Language-Team: French (http://www.transifex.com/django/django/language/fr/)\n"
+"Language-Team: French (http://app.transifex.com/django/django/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -247,6 +247,55 @@ msgstr "nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "déc"
+
+msgid "Sunday"
+msgstr "dimanche"
+
+msgid "Monday"
+msgstr "lundi"
+
+msgid "Tuesday"
+msgstr "mardi"
+
+msgid "Wednesday"
+msgstr "mercredi"
+
+msgid "Thursday"
+msgstr "jeudi"
+
+msgid "Friday"
+msgstr "vendredi"
+
+msgid "Saturday"
+msgstr "samedi"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "dim"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "lun"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "mar"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "mer"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "jeu"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "ven"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "sam"
 
 msgctxt "one letter Sunday"
 msgid "S"

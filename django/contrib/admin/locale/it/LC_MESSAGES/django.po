@@ -6,6 +6,7 @@
 # Davide Targa <davide.targa@gmail.com>, 2021
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Flavio Curella <flavio.curella@gmail.com>, 2013
+# Franky Bonanno, 2023
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Luciano De Falco Alfano, 2016
 # Marco Bonetti, 2014
@@ -19,10 +20,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: Paolo Melchiorre <paolo@melchiorre.org>, 2022-2023\n"
-"Language-Team: Italian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Franky Bonanno, 2023\n"
+"Language-Team: Italian (http://app.transifex.com/django/django/language/"
 "it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -189,6 +190,9 @@ msgstr "Nessuno"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr ""
 "Tieni premuto \"Control\", o \"Command\" su Mac, per selezionarne più di uno."
+
+msgid "Select this object for an action - {}"
+msgstr "Seleziona questo oggetto per intraprendere un'azione - {}"
 
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
@@ -358,6 +362,9 @@ msgstr "Seleziona tutti %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Annulla la selezione"
 
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelli nell'applicazione %(name)s"
@@ -410,9 +417,6 @@ msgstr "Documentazione"
 msgid "Log out"
 msgstr "Annulla l'accesso"
 
-msgid "Breadcrumbs"
-msgstr "Breadcrumbs"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Aggiungi %(name)s"
@@ -425,6 +429,12 @@ msgstr "Vedi sul sito"
 
 msgid "Filter"
 msgstr "Filtra"
+
+msgid "Hide counts"
+msgstr "Nascondi i conteggi "
+
+msgid "Show counts"
+msgstr "Mostra i conteggi "
 
 msgid "Clear all filters"
 msgstr "Cancella tutti i filtri"
@@ -533,6 +543,15 @@ msgstr "Le mie azioni"
 
 msgid "None available"
 msgstr "Nulla disponibile"
+
+msgid "Added:"
+msgstr "Aggiunto"
+
+msgid "Changed:"
+msgstr "Cambiato "
+
+msgid "Deleted:"
+msgstr "Eliminato "
 
 msgid "Unknown content"
 msgstr "Contenuto sconosciuto"
@@ -743,6 +762,10 @@ msgstr "Indirizzo email:"
 
 msgid "Reset my password"
 msgstr "Reimposta la mia password"
+
+msgid "Select all objects on this page for an action"
+msgstr ""
+"Seleziona tutti gli oggetti di questa pagina per intraprendere un'azione "
 
 msgid "All dates"
 msgstr "Tutte le date"

@@ -18,16 +18,17 @@
 # Miguel Angel Tribaldos <mtribaldos@gmail.com>, 2017
 # Miguel Gonzalez <migonzalvar@gmail.com>, 2023
 # Pablo, 2015
+# Salomon Herrera, 2023
 # Uriel Medina <urimeba511@gmail.com>, 2020-2023
 # Veronicabh <vero.blazher@gmail.com>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
-"Last-Translator: Miguel Gonzalez <migonzalvar@gmail.com>, 2023\n"
-"Language-Team: Spanish (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: Uriel Medina <urimeba511@gmail.com>, 2020-2023\n"
+"Language-Team: Spanish (http://app.transifex.com/django/django/language/"
 "es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -196,6 +197,9 @@ msgstr ""
 "Mantenga presionado \"Control\" o \"Comando\" en una Mac, para seleccionar "
 "más de uno."
 
+msgid "Select this object for an action - {}"
+msgstr "Seleccione este objeto para una acción - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "El {name} “{obj}” fue agregado correctamente."
@@ -362,6 +366,9 @@ msgstr "Seleccionar todos los %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Limpiar selección"
 
+msgid "Breadcrumbs"
+msgstr "Migas de pan"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelos en la aplicación %(name)s"
@@ -415,9 +422,6 @@ msgstr "Documentación"
 msgid "Log out"
 msgstr "Cerrar sesión"
 
-msgid "Breadcrumbs"
-msgstr "Migas de pan"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Añadir %(name)s"
@@ -430,6 +434,12 @@ msgstr "Ver en el sitio"
 
 msgid "Filter"
 msgstr "Filtro"
+
+msgid "Hide counts"
+msgstr "Ocultar recuentos"
+
+msgid "Show counts"
+msgstr "Mostrar recuentos"
 
 msgid "Clear all filters"
 msgstr "Borrar todos los filtros"
@@ -538,6 +548,15 @@ msgstr "Mis acciones"
 
 msgid "None available"
 msgstr "Ninguno disponible"
+
+msgid "Added:"
+msgstr "Agregado:"
+
+msgid "Changed:"
+msgstr "Modificado:"
+
+msgid "Deleted:"
+msgstr "Eliminado:"
 
 msgid "Unknown content"
 msgstr "Contenido desconocido"
@@ -752,6 +771,9 @@ msgstr "Correo electrónico:"
 
 msgid "Reset my password"
 msgstr "Restablecer mi contraseña"
+
+msgid "Select all objects on this page for an action"
+msgstr "Seleccione todos los objetos de esta página para una acción"
 
 msgid "All dates"
 msgstr "Todas las fechas"

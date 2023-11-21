@@ -1,9 +1,9 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021
+# Fery Setiawan <gembelweb@gmail.com>, 2015-2016,2018,2020-2021,2023
 # Jannis Leidel <jannis@leidel.info>, 2011
-# oon arfiandwi <oon.arfiandwi@gmail.com>, 2016
+# oon arfiandwi (OonID) <oon.arfiandwi@gmail.com>, 2016
 # rodin <romihardiyanto@gmail.com>, 2011,2013
 # rodin <romihardiyanto@gmail.com>, 2013-2016
 # sag᠎e <laymonage@gmail.com>, 2019
@@ -11,10 +11,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-09-21 10:22+0200\n"
-"PO-Revision-Date: 2021-12-25 08:09+0000\n"
-"Last-Translator: Fery Setiawan <gembelweb@gmail.com>\n"
-"Language-Team: Indonesian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-03-17 03:19-0500\n"
+"PO-Revision-Date: 2023-12-04 08:09+0000\n"
+"Last-Translator: Fery Setiawan <gembelweb@gmail.com>, "
+"2015-2016,2018,2020-2021,2023\n"
+"Language-Team: Indonesian (http://app.transifex.com/django/django/language/"
 "id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -268,11 +269,11 @@ msgid "Password reset on %(site_name)s"
 msgstr "Penyetelan ulang sandi di %(site_name)s"
 
 msgid ""
-"Enter a valid username. This value may contain only English letters, "
-"numbers, and @/./+/-/_ characters."
+"Enter a valid username. This value may contain only unaccented lowercase a-z "
+"and uppercase A-Z letters, numbers, and @/./+/-/_ characters."
 msgstr ""
-"Masukkan nama pengguna valid. Nilai ini mungkin mengandung hanya karakter "
-"dalam bahasa Inggris, angka dan karakter @/./+/-/_."
+"Masukkan nama pengguna sah. Nilai ini mungkin menggandung tanpa tekanan "
+"huruf kecil a-z dan huruf besar A-Z, angka dan karakter @/./+/-/_."
 
 msgid ""
 "Enter a valid username. This value may contain only letters, numbers, and "

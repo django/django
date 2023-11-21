@@ -3,23 +3,27 @@
 # Translators:
 # Christopher Penkin, 2012
 # Christopher Penkin, 2012
-# F Wolff <friedel@translate.org.za>, 2019-2020
+# F Wolff <friedel@translate.org.za>, 2019-2020,2023
 # Pi Delport <pjdelport@gmail.com>, 2012
 # Pi Delport <pjdelport@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-14 19:53+0200\n"
-"PO-Revision-Date: 2020-07-20 17:06+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019-2020,2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: af\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "Delete selected %(verbose_name_plural)s"
+msgstr "Skrap gekose %(verbose_name_plural)s"
 
 #, python-format
 msgid "Successfully deleted %(count)d %(items)s."
@@ -31,10 +35,6 @@ msgstr "Kan %(name)s nie skrap nie"
 
 msgid "Are you sure?"
 msgstr "Is u seker?"
-
-#, python-format
-msgid "Delete selected %(verbose_name_plural)s"
-msgstr "Skrap gekose %(verbose_name_plural)s"
 
 msgid "Administration"
 msgstr "Administrasie"
@@ -180,6 +180,9 @@ msgstr "Geen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hou “Control” in (of “Command” op ’n Mac) om meer as een te kies."
 
+msgid "Select this object for an action - {}"
+msgstr "Kies dié objek vir ’n aksie - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "Die {name} “{obj}” is suksesvol bygevoeg."
@@ -268,8 +271,9 @@ msgstr "0 uit %(cnt)s gekies"
 msgid "Change history: %s"
 msgstr "Verander geskiedenis: %s"
 
-#. Translators: Model verbose name and instance representation,
-#. suitable to be an item in a list.
+#. Translators: Model verbose name and instance
+#. representation, suitable to be an item in a
+#. list.
 #, python-format
 msgid "%(class_name)s %(instance)s"
 msgstr "%(class_name)s %(instance)s"
@@ -339,6 +343,9 @@ msgstr "Kies al %(total_count)s %(module_name)s"
 msgid "Clear selection"
 msgstr "Verwyder keuses"
 
+msgid "Breadcrumbs"
+msgstr "Broodkrummels"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modelle in die %(name)s-toepassing"
@@ -350,7 +357,7 @@ msgid "View"
 msgstr "Bekyk"
 
 msgid "You don’t have permission to view or edit anything."
-msgstr ""
+msgstr "U het nie regte om enigiets te sien of te redigeer nie."
 
 msgid ""
 "First, enter a username and password. Then, you’ll be able to edit more user "
@@ -366,14 +373,16 @@ msgid "Change password"
 msgstr "Verander wagwoord"
 
 msgid "Please correct the error below."
-msgstr "Maak die onderstaande fout asb. reg."
-
-msgid "Please correct the errors below."
-msgstr "Maak die onderstaande foute asb. reg."
+msgid_plural "Please correct the errors below."
+msgstr[0] "Korrigeer asb. die fout hier onder."
+msgstr[1] "Korrigeer asb. die foute hier onder."
 
 #, python-format
 msgid "Enter a new password for the user <strong>%(username)s</strong>."
 msgstr "Vul ’n nuwe wagwoord vir gebruiker <strong>%(username)s</strong> in."
+
+msgid "Skip to main content"
+msgstr "Gaan direk na hoofinhoud"
 
 msgid "Welcome,"
 msgstr "Welkom,"
@@ -400,8 +409,14 @@ msgstr "Bekyk op werf"
 msgid "Filter"
 msgstr "Filtreer"
 
+msgid "Hide counts"
+msgstr "Versteek tellings"
+
+msgid "Show counts"
+msgstr "Wys tellings"
+
 msgid "Clear all filters"
-msgstr ""
+msgstr "Verwyder filters"
 
 msgid "Remove from sorting"
 msgstr "Verwyder uit sortering"
@@ -412,6 +427,15 @@ msgstr "Sorteerprioriteit: %(priority_number)s"
 
 msgid "Toggle sorting"
 msgstr "Wissel sortering"
+
+msgid "Toggle theme (current theme: auto)"
+msgstr "Wissel tema (tans: outomaties)"
+
+msgid "Toggle theme (current theme: light)"
+msgstr "Wissel tema (tans: lig)"
+
+msgid "Toggle theme (current theme: dark)"
+msgstr "Wissel tema (tans: donker)"
 
 msgid "Delete"
 msgstr "Skrap"
@@ -498,6 +522,15 @@ msgstr "My aksies"
 msgid "None available"
 msgstr "Niks beskikbaar nie"
 
+msgid "Added:"
+msgstr "Bygevoeg:"
+
+msgid "Changed:"
+msgstr "Gewysig:"
+
+msgid "Deleted:"
+msgstr "Geskrap:"
+
 msgid "Unknown content"
 msgstr "Onbekende inhoud"
 
@@ -524,6 +557,15 @@ msgstr "Wagwoord of gebruikersnaam vergeet?"
 msgid "Toggle navigation"
 msgstr ""
 
+msgid "Sidebar"
+msgstr "Kantbalk"
+
+msgid "Start typing to filter…"
+msgstr "Tik om te filtreer..."
+
+msgid "Filter navigation items"
+msgstr ""
+
 msgid "Date/time"
 msgstr "Datum/tyd"
 
@@ -532,6 +574,11 @@ msgstr "Gebruiker"
 
 msgid "Action"
 msgstr "Aksie"
+
+msgid "entry"
+msgid_plural "entries"
+msgstr[0] "inskrywing"
+msgstr[1] "inskrywings"
 
 msgid ""
 "This object doesn’t have a change history. It probably wasn’t added via this "
@@ -589,9 +636,12 @@ msgstr "Voeg nog ’n %(model)s by"
 msgid "Delete selected %(model)s"
 msgstr "Skrap gekose %(model)s"
 
-msgid "Thanks for spending some quality time with the Web site today."
+#, python-format
+msgid "View selected %(model)s"
+msgstr "Wys gekose %(model)s"
+
+msgid "Thanks for spending some quality time with the web site today."
 msgstr ""
-"Dankie vir die kwaliteittyd wat u met die webwerf deurgebring het vandag."
 
 msgid "Log in again"
 msgstr "Meld weer aan"
@@ -688,6 +738,9 @@ msgstr "E-posadres:"
 
 msgid "Reset my password"
 msgstr "Herstel my wagwoord"
+
+msgid "Select all objects on this page for an action"
+msgstr "Kies alle objekte op dié bladsy vir ’n aksie"
 
 msgid "All dates"
 msgstr "Alle datums"

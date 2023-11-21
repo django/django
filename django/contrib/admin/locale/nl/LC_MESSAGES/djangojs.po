@@ -9,16 +9,16 @@
 # 6a27f10aef159701c7a5ff07f0fb0a78_05545ed <bc5d401a7ecd9343dd5afac265ed8ab3_4845>, 2011-2012
 # Meteor0id, 2019-2020
 # 8de006b1b0894aab6aef71979dcd8bd6_5c6b207 <ff2658a8d8dbebbd9cc240b8c133a515_234097>, 2015
-# Tonnes <tonnes.mb@gmail.com>, 2019-2020,2022
+# Tonnes <tonnes.mb@gmail.com>, 2019-2020,2022-2023
 # wunki <petar@wunki.org>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-05-17 05:26-0500\n"
-"PO-Revision-Date: 2022-07-25 07:59+0000\n"
-"Last-Translator: Tonnes <tonnes.mb@gmail.com>\n"
-"Language-Team: Dutch (http://www.transifex.com/django/django/language/nl/)\n"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Tonnes <tonnes.mb@gmail.com>, 2019-2020,2022-2023\n"
+"Language-Team: Dutch (http://app.transifex.com/django/django/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -71,12 +71,22 @@ msgstr ""
 "het vak hieronder te selecteren en daarna op de pijl 'Verwijderen' tussen de "
 "twee vakken te klikken."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Typ in dit vak om de lijst met geselecteerde %s te filteren."
+
 msgid "Remove all"
 msgstr "Alle verwijderen"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klik om alle gekozen %s tegelijk te verwijderen."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] "%s geselecteerde optie niet zichtbaar"
+msgstr[1] "%s geselecteerde opties niet zichtbaar"
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -240,6 +250,55 @@ msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "dec"
 
+msgid "Sunday"
+msgstr "zondag"
+
+msgid "Monday"
+msgstr "maandag"
+
+msgid "Tuesday"
+msgstr "dinsdag"
+
+msgid "Wednesday"
+msgstr "woensdag"
+
+msgid "Thursday"
+msgstr "donderdag"
+
+msgid "Friday"
+msgstr "vrijdag"
+
+msgid "Saturday"
+msgstr "zaterdag"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "zo"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "ma"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "di"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "wo"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "do"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "vr"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "za"
+
 msgctxt "one letter Sunday"
 msgid "S"
 msgstr "Z"
@@ -267,13 +326,6 @@ msgstr "V"
 msgctxt "one letter Saturday"
 msgid "S"
 msgstr "Z"
-
-msgid ""
-"You have already submitted this form. Are you sure you want to submit it "
-"again?"
-msgstr ""
-"U hebt dit formulier al verstuurd. Weet u zeker dat u het nogmaals wilt "
-"versturen?"
 
 msgid "Show"
 msgstr "Tonen"

@@ -1,7 +1,7 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# Andrej Marsetič, 2022
+# Andrej Marsetič, 2022-2023
 # iElectric <domen@dev.si>, 2011-2012
 # Jannis Leidel <jannis@leidel.info>, 2011
 # Jure Cuhalev <gandalf@owca.info>, 2012-2013
@@ -13,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 06:49+0000\n"
-"Last-Translator: Andrej Marsetič, 2022\n"
-"Language-Team: Slovenian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 06:49+0000\n"
+"Last-Translator: Andrej Marsetič, 2022-2023\n"
+"Language-Team: Slovenian (http://app.transifex.com/django/django/language/"
 "sl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -301,6 +301,9 @@ msgstr "Tatarščina"
 msgid "Udmurt"
 msgstr "Udmurski jezik"
 
+msgid "Uyghur"
+msgstr ""
+
 msgid "Ukrainian"
 msgstr "Ukrajinščina"
 
@@ -394,6 +397,12 @@ msgstr "Poskrbite, da bo ta vrednost večja ali enaka %(limit_value)s."
 
 #, python-format
 msgid "Ensure this value is a multiple of step size %(limit_value)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"Ensure this value is a multiple of step size %(limit_value)s, starting from "
+"%(offset)s, e.g. %(offset)s, %(valid_value1)s, %(valid_value2)s, and so on."
 msgstr ""
 
 #, python-format
@@ -1151,50 +1160,50 @@ msgstr ", "
 #, python-format
 msgid "%(num)d year"
 msgid_plural "%(num)d years"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d leto"
+msgstr[1] "%(num)d leti"
+msgstr[2] "%(num)d let"
+msgstr[3] "%(num)d let"
 
 #, python-format
 msgid "%(num)d month"
 msgid_plural "%(num)d months"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d mesec"
+msgstr[1] "%(num)d meseca "
+msgstr[2] "%(num)d mesecev"
+msgstr[3] "%(num)d mesecev"
 
 #, python-format
 msgid "%(num)d week"
 msgid_plural "%(num)d weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d teden"
+msgstr[1] "%(num)d tedna"
+msgstr[2] "%(num)d tednov"
+msgstr[3] "%(num)d tednov"
 
 #, python-format
 msgid "%(num)d day"
 msgid_plural "%(num)d days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d dan"
+msgstr[1] "%(num)d dneva"
+msgstr[2] "%(num)d dni"
+msgstr[3] "%(num)d dni"
 
 #, python-format
 msgid "%(num)d hour"
 msgid_plural "%(num)d hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d uro"
+msgstr[1] "%(num)d uri"
+msgstr[2] "%(num)d ure"
+msgstr[3] "%(num)d ur"
 
 #, python-format
 msgid "%(num)d minute"
 msgid_plural "%(num)d minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "%(num)d minuto"
+msgstr[1] "%(num)d minuti"
+msgstr[2] "%(num)d minute"
+msgstr[3] "%(num)d minut"
 
 msgid "Forbidden"
 msgstr "Prepovedano"

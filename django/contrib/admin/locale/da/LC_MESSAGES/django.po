@@ -12,10 +12,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-17 02:13-0600\n"
-"PO-Revision-Date: 2023-04-25 07:05+0000\n"
+"POT-Creation-Date: 2023-09-18 11:41-0300\n"
+"PO-Revision-Date: 2023-12-04 07:05+0000\n"
 "Last-Translator: Erik Ramsgaard Wognsen <r4mses@gmail.com>, 2020-2023\n"
-"Language-Team: Danish (http://www.transifex.com/django/django/language/da/)\n"
+"Language-Team: Danish (http://app.transifex.com/django/django/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -181,6 +181,9 @@ msgstr "Ingen"
 msgid "Hold down “Control”, or “Command” on a Mac, to select more than one."
 msgstr "Hold “Ctrl”, eller “Æbletasten” på Mac, nede for at vælge mere end én."
 
+msgid "Select this object for an action - {}"
+msgstr "Vælg dette objekt for en handling - {}"
+
 #, python-brace-format
 msgid "The {name} “{obj}” was added successfully."
 msgstr "{name} “{obj}” blev tilføjet."
@@ -340,6 +343,9 @@ msgstr "Vælg alle %(total_count)s  %(module_name)s "
 msgid "Clear selection"
 msgstr "Ryd valg"
 
+msgid "Breadcrumbs"
+msgstr "Sti"
+
 #, python-format
 msgid "Models in the %(name)s application"
 msgstr "Modeller i applikationen %(name)s"
@@ -390,9 +396,6 @@ msgstr "Dokumentation"
 msgid "Log out"
 msgstr "Log ud"
 
-msgid "Breadcrumbs"
-msgstr "Sti"
-
 #, python-format
 msgid "Add %(name)s"
 msgstr "Tilføj %(name)s"
@@ -405,6 +408,12 @@ msgstr "Se på website"
 
 msgid "Filter"
 msgstr "Filtrer"
+
+msgid "Hide counts"
+msgstr "Skjul antal"
+
+msgid "Show counts"
+msgstr "Vis antal"
 
 msgid "Clear all filters"
 msgstr "Nulstil alle filtre"
@@ -513,6 +522,15 @@ msgstr "Mine handlinger"
 
 msgid "None available"
 msgstr "Ingen tilgængelige"
+
+msgid "Added:"
+msgstr "Tilføjede:"
+
+msgid "Changed:"
+msgstr "Ændrede:"
+
+msgid "Deleted:"
+msgstr "Slettede:"
 
 msgid "Unknown content"
 msgstr "Ukendt indhold"
@@ -723,6 +741,9 @@ msgstr "E-mail-adresse:"
 
 msgid "Reset my password"
 msgstr "Nulstil min adgangskode"
+
+msgid "Select all objects on this page for an action"
+msgstr "Vælg alle objekter på denne side for en handling"
 
 msgid "All dates"
 msgstr "Alle datoer"

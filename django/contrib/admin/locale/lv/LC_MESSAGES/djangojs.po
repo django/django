@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-03-17 03:19-0500\n"
-"PO-Revision-Date: 2023-04-25 07:59+0000\n"
-"Last-Translator: Pēteris Caune, 2023\n"
-"Language-Team: Latvian (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: Edgars Voroboks <edgars.voroboks@gmail.com>, 2023\n"
+"Language-Team: Latvian (http://app.transifex.com/django/django/language/"
 "lv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -250,6 +250,55 @@ msgstr "Nov"
 msgctxt "abbrev. month December"
 msgid "Dec"
 msgstr "Dec"
+
+msgid "Sunday"
+msgstr "Svētdiena"
+
+msgid "Monday"
+msgstr "Pirmdiena"
+
+msgid "Tuesday"
+msgstr "Otrdiena"
+
+msgid "Wednesday"
+msgstr "Trešdiena"
+
+msgid "Thursday"
+msgstr "Ceturtdiena"
+
+msgid "Friday"
+msgstr "Piektdiena"
+
+msgid "Saturday"
+msgstr "Sestdiena"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Sv"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Pr"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Ot"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Tr"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Ce"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Pi"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Se"
 
 msgctxt "one letter Sunday"
 msgid "S"

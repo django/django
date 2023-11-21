@@ -1,17 +1,17 @@
 # This file is distributed under the same license as the Django package.
 #
 # Translators:
-# F Wolff <friedel@translate.org.za>, 2019
+# F Wolff <friedel@translate.org.za>, 2019,2023
 # Pi Delport <pjdelport@gmail.com>, 2013
 # Pi Delport <pjdelport@gmail.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-17 11:50+0200\n"
-"PO-Revision-Date: 2019-01-04 18:43+0000\n"
-"Last-Translator: F Wolff <friedel@translate.org.za>\n"
-"Language-Team: Afrikaans (http://www.transifex.com/django/django/language/"
+"POT-Creation-Date: 2023-09-18 15:04-0300\n"
+"PO-Revision-Date: 2023-12-04 07:59+0000\n"
+"Last-Translator: F Wolff <friedel@translate.org.za>, 2019,2023\n"
+"Language-Team: Afrikaans (http://app.transifex.com/django/django/language/"
 "af/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -63,12 +63,22 @@ msgstr ""
 "Hierdie is die lys gekose %s. Verwyder gerus deur hulle in die boksie "
 "hieronder te merk en dan die “Verwyder”-knoppie tussen die boksies te klik."
 
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr "Tik in hierdie blokkie om die lys gekose %s te filtreer."
+
 msgid "Remove all"
 msgstr "Verwyder almal"
 
 #, javascript-format
 msgid "Click to remove all chosen %s at once."
 msgstr "Klik om al die %s gelyktydig te verwyder."
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+msgstr[1] ""
 
 msgid "%(sel)s of %(cnt)s selected"
 msgid_plural "%(sel)s of %(cnt)s selected"
@@ -83,22 +93,20 @@ msgstr ""
 "’n aksie uit te voer, sal ongestoorde veranderinge verlore gaan."
 
 msgid ""
-"You have selected an action, but you haven't saved your changes to "
-"individual fields yet. Please click OK to save. You'll need to re-run the "
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
-"U het ’n aksie gekies, maar nog nie die veranderinge aan individuele velde "
-"gestoor nie. Klik asb. OK om te stoor. Dit sal nodig wees om weer die aksie "
-"uit te voer."
+"’n Aksie is gekies, maar die veranderinge aan individuele velde is nog nie "
+"gestoor nie. Klik OK om te stoor. Die aksie sal weer uitgevoer moet word."
 
 msgid ""
-"You have selected an action, and you haven't made any changes on individual "
-"fields. You're probably looking for the Go button rather than the Save "
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
-"U het ’n aksie gekies en het nie enige veranderinge aan individuele velde "
-"aangebring nie. U soek waarskynlik na die Gaan-knoppie eerder as die Stoor-"
-"knoppie."
+"’n Aksie is gekies en geen veranderinge aan individuele velde is gemaak nie. "
+"Dalk op soek na die Gaan-knoppie in plaas van die Stoor-knoppie?"
 
 msgid "Now"
 msgstr "Nou"
@@ -183,6 +191,103 @@ msgstr "November"
 
 msgid "December"
 msgstr "Desember"
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr "Jan"
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr "Feb"
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr "Mrt"
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr "Apr"
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr "Mei"
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr "Jun"
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr "Jul"
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr "Aug"
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr "Sep"
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr "Okt"
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr "Nov"
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr "Des"
+
+msgid "Sunday"
+msgstr "Sondag"
+
+msgid "Monday"
+msgstr "Maandag"
+
+msgid "Tuesday"
+msgstr "Dinsdag"
+
+msgid "Wednesday"
+msgstr "Woensdag"
+
+msgid "Thursday"
+msgstr "Donderdag"
+
+msgid "Friday"
+msgstr "Vrydag"
+
+msgid "Saturday"
+msgstr "Saterdag"
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr "Son"
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr "Ma"
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr "Di"
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr "Wo"
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr "Do"
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr "Vr"
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr "Sa"
 
 msgctxt "one letter Sunday"
 msgid "S"
